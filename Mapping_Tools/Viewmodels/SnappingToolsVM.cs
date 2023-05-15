@@ -48,44 +48,44 @@ namespace Mapping_Tools.Viewmodels {
         public CommandImplementation LockedToggleCommand { get; set; }
         public CommandImplementation InheritableToggleCommand { get; set; }
 
-        private IRelevantObject _lastSnappedRelevantObject;
-        private HitObject _heldHitObject;
-        private HitObject[] _heldHitObjects;
-        private Vector2 _heldHitObjectMouseOffset;
-        private readonly List<IRelevantDrawable> _lastSelectedRelevantDrawables;
-        private readonly List<IRelevantDrawable> _lastLockedRelevantDrawables;
-        private readonly List<IRelevantDrawable> _lastInheritRelevantDrawables;
-        private bool _selectedToggle;
-        private bool _lockedToggle;
-        private bool _inheritableToggle;
-        private bool _unlockedSomething;
+        private IRelevantObject lastSnappedRelevantObject;
+        private HitObject heldHitObject;
+        private HitObject[] heldHitObjects;
+        private Vector2 heldHitObjectMouseOffset;
+        private readonly List<IRelevantDrawable> lastSelectedRelevantDrawables;
+        private readonly List<IRelevantDrawable> lastLockedRelevantDrawables;
+        private readonly List<IRelevantDrawable> lastInheritRelevantDrawables;
+        private bool selectedToggle;
+        private bool lockedToggle;
+        private bool inheritableToggle;
+        private bool unlockedSomething;
 
-        private int _editorTime;
-        private bool _osuActivated;
-        private int _fetchEditorFails;
+        private int editorTime;
+        private bool osuActivated;
+        private int fetchEditorFails;
 
-        private string _filter = "";
-        public string Filter { get => _filter; set => SetFilter(value); }
+        private string filter = "";
+        public string Filter { get => filter; set => SetFilter(value); }
 
-        private readonly DispatcherTimer _updateTimer;
-        private readonly DispatcherTimer _autoSnapTimer;
-        private readonly DispatcherTimer _selectTimer;
-        private readonly DispatcherTimer _lockTimer;
-        private readonly DispatcherTimer _inheritTimer;
+        private readonly DispatcherTimer updateTimer;
+        private readonly DispatcherTimer autoSnapTimer;
+        private readonly DispatcherTimer selectTimer;
+        private readonly DispatcherTimer lockTimer;
+        private readonly DispatcherTimer inheritTimer;
 
         private const double RelevancyBias = 4;
         private const double PointsBias = 3;
         private const double SpecialBias = 2;
         private const double SelectionRange = 80;
 
-        private readonly CoordinateConverter _coordinateConverter;
-        private readonly FileSystemWatcher _configWatcher;
+        private readonly CoordinateConverter coordinateConverter;
+        private readonly FileSystemWatcher configWatcher;
 
-        private SnappingToolsOverlay _overlay;
-        private ProcessSharp _processSharp;
-        private IWindow _osuWindow;
+        private SnappingToolsOverlay overlay;
+        private ProcessSharp processSharp;
+        private IWindow osuWindow;
 
-        private State _state;
+        private State state;
 
         private enum State {
             Disabled,
@@ -106,7 +106,7 @@ namespace Mapping_Tools.Viewmodels {
         #region default constructor
         public SnappingToolsVm() {
             // Set up a coordinate converter for converting coordinates between screen and osu!
-            _coordinateConverter = new CoordinateConverter();
+            coordinateConverter = new CoordinateConverter();
             
             // Initialize project and preferences
             Project = new SnappingToolsProject();
@@ -139,46 +139,46 @@ namespace Mapping_Tools.Viewmodels {
             LayerCollection.SetInceptionLevel(4);
             
             // Set up timers for responding to hotkey presses and beatmap changes
-            _updateTimer = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromMilliseconds(100) };
-            _updateTimer.Tick += UpdateTimerTick;
-            _autoSnapTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
-            _autoSnapTimer.Tick += AutoSnapTimerTick;
-            _selectTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
-            _selectTimer.Tick += SelectTimerTick;
-            _lockTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
-            _lockTimer.Tick += LockTimerTick;
-            _inheritTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
-            _inheritTimer.Tick += InheritTimerTick;
+            updateTimer = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromMilliseconds(100) };
+            updateTimer.Tick += UpdateTimerTick;
+            autoSnapTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
+            autoSnapTimer.Tick += AutoSnapTimerTick;
+            selectTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
+            selectTimer.Tick += SelectTimerTick;
+            lockTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
+            lockTimer.Tick += LockTimerTick;
+            inheritTimer = new DispatcherTimer(DispatcherPriority.Send) { Interval = TimeSpan.FromMilliseconds(16) };
+            inheritTimer.Tick += InheritTimerTick;
 
             // Setup some lists for the hotkey controls
-            _lastSelectedRelevantDrawables = new List<IRelevantDrawable>();
-            _lastLockedRelevantDrawables = new List<IRelevantDrawable>();
-            _lastInheritRelevantDrawables = new List<IRelevantDrawable>();
+            lastSelectedRelevantDrawables = new List<IRelevantDrawable>();
+            lastLockedRelevantDrawables = new List<IRelevantDrawable>();
+            lastInheritRelevantDrawables = new List<IRelevantDrawable>();
 
             // Setup commands
             InitializeCommands();
 
             // Listen for changes in the osu! user config
-            _configWatcher = new FileSystemWatcher();
+            configWatcher = new FileSystemWatcher();
             SetConfigWatcherPath(SettingsManager.Settings.OsuConfigPath);
-            _configWatcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.Attributes | NotifyFilters.CreationTime;
-            _configWatcher.Changed += OnChangedConfigWatcher;
+            configWatcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.Attributes | NotifyFilters.CreationTime;
+            configWatcher.Changed += OnChangedConfigWatcher;
 
             // Listen for changes in osu! user config path in the settings
             SettingsManager.Settings.PropertyChanged += OnSettingsChanged;
 
-            _state = State.LookingForProcess;
+            state = State.LookingForProcess;
         }
         #endregion
         
         #region main loop
         private void UpdateTimerTick(object sender, EventArgs e) {
             var reader = EditorReaderStuff.GetEditorReader();
-            switch (_state) {
+            switch (state) {
                 case State.Disabled:
                     break;
                 case State.LookingForProcess:
-                    _updateTimer.Interval = TimeSpan.FromSeconds(5);
+                    updateTimer.Interval = TimeSpan.FromSeconds(5);
 
                     // Set up objects/overlay
                     var process = EditorReaderStuff.GetOsuProcess();
@@ -193,28 +193,28 @@ namespace Mapping_Tools.Viewmodels {
                         return;
                     }
 
-                    _processSharp = new ProcessSharp(process, MemoryType.Remote);
-                    _osuWindow = _processSharp.WindowFactory.MainWindow;
+                    processSharp = new ProcessSharp(process, MemoryType.Remote);
+                    osuWindow = processSharp.WindowFactory.MainWindow;
 
-                    _updateTimer.Interval = TimeSpan.FromSeconds(1);
-                    _state = State.LookingForEditor;
+                    updateTimer.Interval = TimeSpan.FromSeconds(1);
+                    state = State.LookingForEditor;
                     break;
                 case State.LookingForEditor:
-                    _updateTimer.Interval = TimeSpan.FromSeconds(1);
+                    updateTimer.Interval = TimeSpan.FromSeconds(1);
                     if (reader.ProcessNeedsReload()) {
-                        _state = State.LookingForProcess;
-                        _overlay?.Dispose();
+                        state = State.LookingForProcess;
+                        overlay?.Dispose();
                         return;
                     }
 
                     try {
-                        if (!_osuWindow.Title.EndsWith(@".osu")) {
+                        if (!osuWindow.Title.EndsWith(@".osu")) {
                             return;
                         }
                     }
                     catch (ArgumentException) {
-                        _state = State.LookingForProcess;
-                        _overlay?.Dispose();
+                        state = State.LookingForProcess;
+                        overlay?.Dispose();
                         return;
                     }
 
@@ -222,46 +222,46 @@ namespace Mapping_Tools.Viewmodels {
                         reader.FetchEditor();
                     }
                     catch (Exception ex) {
-                        _fetchEditorFails++;
-                        if (_fetchEditorFails <= 3) return;
+                        fetchEditorFails++;
+                        if (fetchEditorFails <= 3) return;
 
                         MessageBox.Show("Editor Reader seems to be failing a lot. Try restarting osu! and opening Geometry Dashboard again or refer to the FAQ.");
                         ex.Show();
 
-                        _updateTimer.IsEnabled = false;
+                        updateTimer.IsEnabled = false;
                         return;
                     }
 
-                    _overlay = new SnappingToolsOverlay { Converter = _coordinateConverter };
-                    _overlay.Initialize(_osuWindow);
-                    _overlay.Enable();
+                    overlay = new SnappingToolsOverlay { Converter = coordinateConverter };
+                    overlay.Initialize(osuWindow);
+                    overlay.Enable();
 
-                    _overlay.SetBorder(Preferences.DebugEnabled);
+                    overlay.SetBorder(Preferences.DebugEnabled);
 
-                    _overlay.OverlayWindow.Draw += OnDraw;
+                    overlay.OverlayWindow.Draw += OnDraw;
 
-                    _updateTimer.Interval = TimeSpan.FromMilliseconds(100);
-                    _state = State.Active;
+                    updateTimer.Interval = TimeSpan.FromMilliseconds(100);
+                    state = State.Active;
                     break;
                 case State.Active:
-                    _updateTimer.Interval = TimeSpan.FromMilliseconds(100);
+                    updateTimer.Interval = TimeSpan.FromMilliseconds(100);
 
                     // It successfully fetched editor so editor reader is probably working
-                    _fetchEditorFails = 0;
+                    fetchEditorFails = 0;
 
                     if (reader.ProcessNeedsReload()) {
-                        _state = State.LookingForProcess;
-                        _overlay.Dispose();
+                        state = State.LookingForProcess;
+                        overlay.Dispose();
                         return;
                     }
                     if (reader.EditorNeedsReload()) {
-                        _state = State.LookingForEditor;
-                        _overlay.Dispose();
+                        state = State.LookingForEditor;
+                        overlay.Dispose();
                         return;
                     }
 
                     // Get osu! state
-                    var osuActivated = _osuWindow.IsActivated;
+                    var osuActivated = osuWindow.IsActivated;
 
                     // Get editor time
                     var editorTime = reader.EditorTime();
@@ -272,14 +272,14 @@ namespace Mapping_Tools.Viewmodels {
                             UpdateRelevantObjects();
                             break;
                         case UpdateMode.TimeChange:
-                            if (_editorTime != editorTime) {
+                            if (this.editorTime != editorTime) {
                                 UpdateRelevantObjects();
                             }
 
                             break;
                         case UpdateMode.OsuActivated:
                             // Before not activated and after activated
-                            if (!_osuActivated && osuActivated) {
+                            if (!this.osuActivated && osuActivated) {
                                 UpdateRelevantObjects();
                             }
 
@@ -294,46 +294,46 @@ namespace Mapping_Tools.Viewmodels {
                     }
 
                     // Update old editor time variable
-                    _editorTime = editorTime;
+                    this.editorTime = editorTime;
                     // Update old osu activated variable
-                    _osuActivated = osuActivated;
+                    this.osuActivated = osuActivated;
 
                     // Try to get the current osu window position, this can throw an exception
                     try {
-                        _coordinateConverter.OsuWindowPosition = new Vector2(_osuWindow.X, _osuWindow.Y);
+                        coordinateConverter.OsuWindowPosition = new Vector2(osuWindow.X, osuWindow.Y);
                     } catch (Exception ex) {
                         Debug.WriteLine(ex);
                     }
                     
-                    _overlay.Update();
+                    overlay.Update();
 
                     // Don't do hotkeys if osu is deactivated
                     if (!osuActivated)
                         break;
 
-                    if (!_autoSnapTimer.IsEnabled && IsHotkeyDown(Preferences.SnapHotkey)) {
+                    if (!autoSnapTimer.IsEnabled && IsHotkeyDown(Preferences.SnapHotkey)) {
                         // Update overlay but not on parents only view mode, because that one updates on his own terms
                         if (HotkeyDownRedrawsOverlay)
-                            _overlay.OverlayWindow.InvalidateVisual();
+                            overlay.OverlayWindow.InvalidateVisual();
 
                         // Reset last snapped relevant object to trigger an overlay update in the snap timer tick
-                        _lastSnappedRelevantObject = null;
+                        lastSnappedRelevantObject = null;
 
                         // Find any possible held hit object
                         FetchHeldHitObject();
                         var cursorPos = GetCursorPosition();
-                        _heldHitObjectMouseOffset = _heldHitObject != null ? _heldHitObject.Pos - cursorPos : Vector2.Zero;
+                        heldHitObjectMouseOffset = heldHitObject != null ? heldHitObject.Pos - cursorPos : Vector2.Zero;
                         
-                        _autoSnapTimer.Start();
+                        autoSnapTimer.Start();
                     }
-                    if (!_selectTimer.IsEnabled && IsHotkeyDown(Preferences.SelectHotkey)) {
-                        _selectTimer.Start();
+                    if (!selectTimer.IsEnabled && IsHotkeyDown(Preferences.SelectHotkey)) {
+                        selectTimer.Start();
                     }
-                    if (!_lockTimer.IsEnabled && IsHotkeyDown(Preferences.LockHotkey)) {
-                        _lockTimer.Start();
+                    if (!lockTimer.IsEnabled && IsHotkeyDown(Preferences.LockHotkey)) {
+                        lockTimer.Start();
                     }
-                    if (!_inheritTimer.IsEnabled && IsHotkeyDown(Preferences.InheritHotkey)) {
-                        _inheritTimer.Start();
+                    if (!inheritTimer.IsEnabled && IsHotkeyDown(Preferences.InheritHotkey)) {
+                        inheritTimer.Start();
                     }
                     break;
                 default:
@@ -345,7 +345,7 @@ namespace Mapping_Tools.Viewmodels {
         #region geometry dashboard helpers
 
         private Point GetRelativeDpiPoint(Vector2 pos, Vector2 offset) {
-            var dpi = _coordinateConverter.ToDpi(_coordinateConverter.EditorToRelativeCoordinate(pos));
+            var dpi = coordinateConverter.ToDpi(coordinateConverter.EditorToRelativeCoordinate(pos));
             return new Point(dpi.X + offset.X, dpi.Y + offset.Y);
         }
         
@@ -362,7 +362,7 @@ namespace Mapping_Tools.Viewmodels {
                 // Handle key down rendering
                 if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Everything)) {
                     foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
-                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                        relevantDrawable.DrawYourself(context, coordinateConverter, Preferences);
                     }
                     // It has already drawn everything so return
                     return;
@@ -370,30 +370,30 @@ namespace Mapping_Tools.Viewmodels {
 
                 var objectsToRender = new HashSet<IRelevantObject>();
 
-                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Parents) && _lastSnappedRelevantObject != null) {
+                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Parents) && lastSnappedRelevantObject != null) {
                     // Get the parents of the relevant object which is being snapped to
-                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetParentage(int.MaxValue));
-                } else if (Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectParents) && _lastSnappedRelevantObject != null) {
-                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetParentage(1));
+                    objectsToRender.UnionWith(lastSnappedRelevantObject.GetParentage(int.MaxValue));
+                } else if (Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectParents) && lastSnappedRelevantObject != null) {
+                    objectsToRender.UnionWith(lastSnappedRelevantObject.GetParentage(1));
                 }
 
-                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Children) && _lastSnappedRelevantObject != null) {
+                if (Preferences.KeyDownViewMode.HasFlag(ViewMode.Children) && lastSnappedRelevantObject != null) {
                     // Get the parents of the relevant object which is being snapped to
-                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetDescendants(int.MaxValue));
-                } else if (Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectChildren) && _lastSnappedRelevantObject != null) {
-                    objectsToRender.UnionWith(_lastSnappedRelevantObject.GetDescendants(1));
+                    objectsToRender.UnionWith(lastSnappedRelevantObject.GetDescendants(int.MaxValue));
+                } else if (Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectChildren) && lastSnappedRelevantObject != null) {
+                    objectsToRender.UnionWith(lastSnappedRelevantObject.GetDescendants(1));
                 }
 
                 foreach (var relevantObject in objectsToRender) {
                     if (relevantObject is IRelevantDrawable relevantDrawable) {
-                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                        relevantDrawable.DrawYourself(context, coordinateConverter, Preferences);
                     }
                 }
             } else {
                 // Handle key up rendering
                 if (Preferences.KeyUpViewMode.HasFlag(ViewMode.Everything)) {
                     foreach (var relevantDrawable in LayerCollection.GetAllRelevantDrawables()) {
-                        relevantDrawable.DrawYourself(context, _coordinateConverter, Preferences);
+                        relevantDrawable.DrawYourself(context, coordinateConverter, Preferences);
                     }
                 }
             }
@@ -413,10 +413,10 @@ namespace Mapping_Tools.Viewmodels {
 
             switch (selectionMode) {
                 case SelectedHitObjectMode.AllwaysAllVisible:
-                    return hitObjects.Where(o => _editorTime > o.Time - approachTime && _editorTime < o.EndTime + approachTime).ToList();
+                    return hitObjects.Where(o => editorTime > o.Time - approachTime && editorTime < o.EndTime + approachTime).ToList();
                 case SelectedHitObjectMode.VisibleOrSelected:
                     var thereAreSelected = hitObjects.Any(o => o.IsSelected);
-                    return hitObjects.Where(o => thereAreSelected ? o.IsSelected : _editorTime > o.Time - approachTime && _editorTime < o.EndTime + approachTime).ToList();
+                    return hitObjects.Where(o => thereAreSelected ? o.IsSelected : editorTime > o.Time - approachTime && editorTime < o.EndTime + approachTime).ToList();
                 case SelectedHitObjectMode.OnlySelected:
                     return hitObjects.Where(o => o.IsSelected).ToList();
                 default:
@@ -426,24 +426,24 @@ namespace Mapping_Tools.Viewmodels {
 
         private void FetchHeldHitObject() {
             if (Mouse.LeftButton != MouseButtonState.Pressed && !Control.MouseButtons.HasFlag(MouseButtons.Left)) {
-                _heldHitObject = null;
-                _heldHitObjects = new HitObject[0];
+                heldHitObject = null;
+                heldHitObjects = new HitObject[0];
                 return;
             }
 
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot();
 
             if (reader == null) {
-                _heldHitObject = null;
-                _heldHitObjects = new HitObject[0];
+                heldHitObject = null;
+                heldHitObjects = new HitObject[0];
                 return;
             }
 
             var selectedHitObjects = EditorReaderStuff.GetHitObjects(reader).Where(o => o.IsSelected).ToArray();
 
             if (selectedHitObjects.Length == 0) {
-                _heldHitObject = null;
-                _heldHitObjects = new HitObject[0];
+                heldHitObject = null;
+                heldHitObjects = new HitObject[0];
                 return;
             }
 
@@ -461,11 +461,11 @@ namespace Mapping_Tools.Viewmodels {
             }
 
             if (closest != null && bestDist <= circleRadius) {
-                _heldHitObject = closest;
-                _heldHitObjects = selectedHitObjects;
+                heldHitObject = closest;
+                heldHitObjects = selectedHitObjects;
             } else {
-                _heldHitObject = null;
-                _heldHitObjects = new HitObject[0];
+                heldHitObject = null;
+                heldHitObjects = new HitObject[0];
             }
         }
       
@@ -492,7 +492,7 @@ namespace Mapping_Tools.Viewmodels {
                 return;
             }
 
-            _overlay.OverlayWindow.InvalidateVisual();
+            overlay.OverlayWindow.InvalidateVisual();
         }
 
 
@@ -555,7 +555,7 @@ namespace Mapping_Tools.Viewmodels {
             // System.Windows.Forms.Cursor.Position = new Point();
             var cursorPoint = System.Windows.Forms.Cursor.Position;
             // CONVERT THIS CURSOR POSITION TO EDITOR POSITION
-            var cursorPos = _coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
+            var cursorPos = coordinateConverter.ScreenToEditorCoordinate(new Vector2(cursorPoint.X, cursorPoint.Y));
 
             return cursorPos;
         }
@@ -580,37 +580,37 @@ namespace Mapping_Tools.Viewmodels {
             // Check timer stop
             if (!IsHotkeyDown(Preferences.SnapHotkey)) {
                 if (HotkeyUpRedrawsOverlay)
-                    _overlay?.OverlayWindow.InvalidateVisual();
-                _autoSnapTimer.Stop();
+                    overlay?.OverlayWindow.InvalidateVisual();
+                autoSnapTimer.Stop();
                 return;
             }
             
             // Get nearest drawable
             var cursorPos = GetCursorPosition();
             // Get the offset if a hit object is being held so the center of that object gets snapped
-            var nearest = GetNearestDrawable(cursorPos + _heldHitObjectMouseOffset, heldHitObjects:_heldHitObjects);
+            var nearest = GetNearestDrawable(cursorPos + heldHitObjectMouseOffset, heldHitObjects:heldHitObjects);
 
             // Update overlay if the last snapped changed and parentview is on
-            if (nearest != _lastSnappedRelevantObject && SnapChangeRedrawsOverlay) {
+            if (nearest != lastSnappedRelevantObject && SnapChangeRedrawsOverlay) {
                 // Set the last snapped relevant object
-                _lastSnappedRelevantObject = nearest;
+                lastSnappedRelevantObject = nearest;
                 // Update overlay
-                _overlay.OverlayWindow.InvalidateVisual();
+                overlay.OverlayWindow.InvalidateVisual();
             }
 
             // CONVERT THIS TO CURSOR POSITION
             if (nearest == null) return;
 
-            var nearestPoint = _coordinateConverter.EditorToScreenCoordinate(
-                nearest.NearestPoint(cursorPos + _heldHitObjectMouseOffset) - _heldHitObjectMouseOffset);
+            var nearestPoint = coordinateConverter.EditorToScreenCoordinate(
+                nearest.NearestPoint(cursorPos + heldHitObjectMouseOffset) - heldHitObjectMouseOffset);
             System.Windows.Forms.Cursor.Position = new System.Drawing.Point((int) Math.Round(nearestPoint.X), (int) Math.Round(nearestPoint.Y));
         }
 
         private void SelectTimerTick(object sender, EventArgs e) {
             // Check timer stop
             if (!IsHotkeyDown(Preferences.SelectHotkey)) {
-                _selectTimer.Stop();
-                _lastSelectedRelevantDrawables.Clear();
+                selectTimer.Stop();
+                lastSelectedRelevantDrawables.Clear();
                 return;
             }
 
@@ -621,29 +621,29 @@ namespace Mapping_Tools.Viewmodels {
             if (nearest == null) return;
 
             // Check if this drawable was already handled with this keypress
-            if (_lastSelectedRelevantDrawables.Contains(nearest)) return;
+            if (lastSelectedRelevantDrawables.Contains(nearest)) return;
 
             // Get the selecting mode
-            if (_lastSelectedRelevantDrawables.Count == 0) {
-                _selectedToggle = !nearest.IsSelected;
+            if (lastSelectedRelevantDrawables.Count == 0) {
+                selectedToggle = !nearest.IsSelected;
             }
 
             // Set the selected variable of the nearest drawable
-            nearest.IsSelected = _selectedToggle;
+            nearest.IsSelected = selectedToggle;
 
             // Add nearest drawable to the list so it doesnt get toggled later
-            _lastSelectedRelevantDrawables.Add(nearest);
+            lastSelectedRelevantDrawables.Add(nearest);
 
             // Redraw overlay
-            _overlay.OverlayWindow.InvalidateVisual();
+            overlay.OverlayWindow.InvalidateVisual();
         }
 
         private void LockTimerTick(object sender, EventArgs e) {
             // Check timer stop
             if (!IsHotkeyDown(Preferences.LockHotkey)) {
-                _lockTimer.Stop();
-                _lastLockedRelevantDrawables.Clear();
-                _unlockedSomething = false;
+                lockTimer.Stop();
+                lastLockedRelevantDrawables.Clear();
+                unlockedSomething = false;
                 return;
             }
 
@@ -654,37 +654,37 @@ namespace Mapping_Tools.Viewmodels {
             if (nearest == null) return;
 
             // Check if this drawable was already handled with this keypress
-            if (_lastLockedRelevantDrawables.Contains(nearest)) return;
+            if (lastLockedRelevantDrawables.Contains(nearest)) return;
 
             // Get the locking mode
-            if (_lastLockedRelevantDrawables.Count == 0) {
-                _lockedToggle = !nearest.IsLocked;
+            if (lastLockedRelevantDrawables.Count == 0) {
+                lockedToggle = !nearest.IsLocked;
             }
 
             // Set the locked variable of the nearest drawable
-            if (_lockedToggle) {
+            if (lockedToggle) {
                 if (!nearest.IsLocked) {
                     LayerCollection.GetRootLayer().Add(nearest.GetLockedRelevantObject());
                 }
             } else {
-                if (nearest.IsLocked && !_unlockedSomething) {
+                if (nearest.IsLocked && !unlockedSomething) {
                     nearest.Dispose();
-                    _unlockedSomething = true;
+                    unlockedSomething = true;
                 }
             }
 
             // Add nearest drawable to the list so it doesnt get toggled later
-            _lastLockedRelevantDrawables.Add(nearest);
+            lastLockedRelevantDrawables.Add(nearest);
 
             // Redraw overlay
-            _overlay.OverlayWindow.InvalidateVisual();
+            overlay.OverlayWindow.InvalidateVisual();
         }
 
         private void InheritTimerTick(object sender, EventArgs e) {
             // Check timer stop
             if (!IsHotkeyDown(Preferences.InheritHotkey)) {
-                _inheritTimer.Stop();
-                _lastInheritRelevantDrawables.Clear();
+                inheritTimer.Stop();
+                lastInheritRelevantDrawables.Clear();
                 return;
             }
 
@@ -695,21 +695,21 @@ namespace Mapping_Tools.Viewmodels {
             if (nearest == null) return;
 
             // Check if this drawable was already handled with this keypress
-            if (_lastInheritRelevantDrawables.Contains(nearest)) return;
+            if (lastInheritRelevantDrawables.Contains(nearest)) return;
 
             // Get the inherit mode
-            if (_lastInheritRelevantDrawables.Count == 0) {
-                _inheritableToggle = !nearest.IsInheritable;
+            if (lastInheritRelevantDrawables.Count == 0) {
+                inheritableToggle = !nearest.IsInheritable;
             }
 
             // Set the inheritable variable of the nearest drawable
-            nearest.IsInheritable = _inheritableToggle;
+            nearest.IsInheritable = inheritableToggle;
 
             // Add nearest drawable to the list so it doesnt get toggled later
-            _lastInheritRelevantDrawables.Add(nearest);
+            lastInheritRelevantDrawables.Add(nearest);
 
             // Redraw overlay
-            _overlay.OverlayWindow.InvalidateVisual();
+            overlay.OverlayWindow.InvalidateVisual();
         }
         
         #endregion
@@ -725,29 +725,29 @@ namespace Mapping_Tools.Viewmodels {
         private void PreferencesOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             switch (e.PropertyName) {
                 case "OffsetLeft":
-                    _coordinateConverter.EditorBoxOffset.Left = Preferences.OffsetLeft;
+                    coordinateConverter.EditorBoxOffset.Left = Preferences.OffsetLeft;
                     break;
                 case "OffsetTop":
-                    _coordinateConverter.EditorBoxOffset.Top = Preferences.OffsetTop;
+                    coordinateConverter.EditorBoxOffset.Top = Preferences.OffsetTop;
                     break;
                 case "OffsetRight":
-                    _coordinateConverter.EditorBoxOffset.Right = Preferences.OffsetRight;
+                    coordinateConverter.EditorBoxOffset.Right = Preferences.OffsetRight;
                     break;
                 case "OffsetBottom":
-                    _coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
+                    coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
                     break;
                 case "AcceptableDifference":
                     LayerCollection.AcceptableDifference = Preferences.AcceptableDifference;
                     break;
                 case "DebugEnabled":
-                    _overlay?.SetBorder(Preferences.DebugEnabled);
+                    overlay?.SetBorder(Preferences.DebugEnabled);
                     break;
                 case "VisiblePlayfieldBoundary":
-                    _overlay?.OverlayWindow.InvalidateVisual();
+                    overlay?.OverlayWindow.InvalidateVisual();
                     break;
                 case "InceptionLevel":
                     LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
-                    _overlay?.OverlayWindow.InvalidateVisual();
+                    overlay?.OverlayWindow.InvalidateVisual();
                     break;
             }
         }
@@ -755,7 +755,7 @@ namespace Mapping_Tools.Viewmodels {
         private void OnSettingsChanged(object sender, PropertyChangedEventArgs e) {
             if (e.PropertyName != "OsuConfigPath") return;
             SetConfigWatcherPath(SettingsManager.Settings.OsuConfigPath);
-            _coordinateConverter.ReadConfig();
+            coordinateConverter.ReadConfig();
         }
 
         private void OnGeneratorSettingsPropertyChanged(object sender, PropertyChangedEventArgs e) {
@@ -764,7 +764,7 @@ namespace Mapping_Tools.Viewmodels {
 
             switch (e.PropertyName) {
                 case "IsActive":
-                    if (_state == State.Active) {
+                    if (state == State.Active) {
                         // Reload relevant objects when a generator gets enabled/disabled
                         if (settings.IsActive) {
                             // Generate new objects for all layers
@@ -781,12 +781,12 @@ namespace Mapping_Tools.Viewmodels {
                         }
 
                         // Redraw the overlay
-                        _overlay.OverlayWindow.InvalidateVisual();
+                        overlay.OverlayWindow.InvalidateVisual();
                     }
 
                     break;
                 default:
-                    if (_state == State.Active) {
+                    if (state == State.Active) {
                         // Delete all relevant objects generated by this generator
                         foreach (var objectLayerObject in LayerCollection.ObjectLayers.SelectMany(objectLayer => objectLayer.Objects.Values)) {
                             for (var i = 0; i < objectLayerObject.Count; i++) {
@@ -800,7 +800,7 @@ namespace Mapping_Tools.Viewmodels {
                         LayerCollection.GetRootLayer().GenerateNewObjects(true);
 
                         // Redraw the overlay
-                        _overlay.OverlayWindow.InvalidateVisual();
+                        overlay.OverlayWindow.InvalidateVisual();
                     }
 
                     break;
@@ -814,14 +814,14 @@ namespace Mapping_Tools.Viewmodels {
 
         private void SetConfigWatcherPath(string path) {
             try {
-                _configWatcher.Path = Path.GetDirectoryName(path);
-                _configWatcher.Filter = Path.GetFileName(path);
+                configWatcher.Path = Path.GetDirectoryName(path);
+                configWatcher.Filter = Path.GetFileName(path);
             }
             catch (Exception ex) { Console.WriteLine(@"Can't set ConfigWatcher Path/Filter: " + ex.Message); }
         }
 
         private void OnChangedConfigWatcher(object sender, FileSystemEventArgs e) {
-            _coordinateConverter.ReadConfig();
+            coordinateConverter.ReadConfig();
         }
 
         #endregion
@@ -835,7 +835,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void SetFilter(string value) {
-            _filter = value;
+            filter = value;
             CollectionViewSource.GetDefaultView(Generators).Refresh();
         }
         
@@ -867,7 +867,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
                 }
                 LayerCollection.GetRootLayer().GenerateNewObjects(true);
-                _overlay.OverlayWindow.InvalidateVisual();
+                overlay.OverlayWindow.InvalidateVisual();
             });
             LockedToggleCommand = new CommandImplementation(_ => {
                 var virtualObjects = LayerCollection.GetAllRelevantDrawables();
@@ -892,7 +892,7 @@ namespace Mapping_Tools.Viewmodels {
                     relevantObject.Dispose();
                 }
                 LayerCollection.GetRootLayer().GenerateNewObjects(true);
-                _overlay.OverlayWindow.InvalidateVisual();
+                overlay.OverlayWindow.InvalidateVisual();
             });
             InheritableToggleCommand = new CommandImplementation(_ => {
                 var virtualObjects = LayerCollection.GetAllRelevantDrawables();
@@ -916,7 +916,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
                 }
                 LayerCollection.GetRootLayer().GenerateNewObjects(true);
-                _overlay.OverlayWindow.InvalidateVisual();
+                overlay.OverlayWindow.InvalidateVisual();
             });
         }
 
@@ -925,15 +925,15 @@ namespace Mapping_Tools.Viewmodels {
         #region serialization stuff
 
         public void UpdateEverything() {
-            _coordinateConverter.EditorBoxOffset.Left = Preferences.OffsetLeft;
-            _coordinateConverter.EditorBoxOffset.Top = Preferences.OffsetTop;
-            _coordinateConverter.EditorBoxOffset.Right = Preferences.OffsetRight;
-            _coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
+            coordinateConverter.EditorBoxOffset.Left = Preferences.OffsetLeft;
+            coordinateConverter.EditorBoxOffset.Top = Preferences.OffsetTop;
+            coordinateConverter.EditorBoxOffset.Right = Preferences.OffsetRight;
+            coordinateConverter.EditorBoxOffset.Bottom = Preferences.OffsetBottom;
             LayerCollection.AcceptableDifference = Preferences.AcceptableDifference;
             LayerCollection.SetInceptionLevel(Preferences.InceptionLevel);
-            if (_overlay != null) {
-                _overlay.SetBorder(Preferences.DebugEnabled);
-                _overlay.OverlayWindow.InvalidateVisual();
+            if (overlay != null) {
+                overlay.SetBorder(Preferences.DebugEnabled);
+                overlay.OverlayWindow.InvalidateVisual();
             }
         }
 
@@ -964,7 +964,7 @@ namespace Mapping_Tools.Viewmodels {
         public void SetLockedObjects(RelevantObjectCollection objects) {
             LayerCollection.GetRootLayer().Objects.MergeWith(objects);
 
-            _overlay.OverlayWindow.InvalidateVisual();
+            overlay.OverlayWindow.InvalidateVisual();
         }
 
         #endregion
@@ -972,24 +972,24 @@ namespace Mapping_Tools.Viewmodels {
         #region tool management helpers
 
         public void Dispose() {
-            _updateTimer.Stop();
-            _overlay?.Dispose();
-            _configWatcher?.Dispose();
-            _processSharp?.Dispose();
-            _osuWindow?.Dispose();
+            updateTimer.Stop();
+            overlay?.Dispose();
+            configWatcher?.Dispose();
+            processSharp?.Dispose();
+            osuWindow?.Dispose();
         }
 
         public void Activate() {
-            _updateTimer.IsEnabled = true;
+            updateTimer.IsEnabled = true;
 
             try {
-                _configWatcher.EnableRaisingEvents = true;
+                configWatcher.EnableRaisingEvents = true;
             } catch (Exception ex) {
                 MessageBox.Show("Can not enable filesystem watcher. osu! config path is probably incorrect. Please set the correct path in the Preferences or your overlay might have the wrong position.", "Warning");
                 ex.Show();
             }
 
-            _state = State.LookingForProcess;
+            state = State.LookingForProcess;
 
             Project?.Activate();
         }
@@ -997,17 +997,17 @@ namespace Mapping_Tools.Viewmodels {
         public void Deactivate() {
             if (Preferences.KeepRunning) return;
 
-            _updateTimer.IsEnabled = false;
+            updateTimer.IsEnabled = false;
 
             try {
-                _configWatcher.EnableRaisingEvents = false;
+                configWatcher.EnableRaisingEvents = false;
             } catch (Exception ex) {
                 MessageBox.Show("Can not enable filesystem watcher. osu! config path is probably incorrect. Please set the correct path in the Preferences or your overlay might have the wrong position.", "Warning");
                 ex.Show();
             }
 
-            _state = State.Disabled;
-            _overlay?.Dispose();
+            state = State.Disabled;
+            overlay?.Dispose();
 
             Project?.Deactivate();
         }

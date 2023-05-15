@@ -15,11 +15,11 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public bool Quick { get; set; }
 
-        private ImportMode _importModeSetting;
+        private ImportMode importModeSetting;
         public ImportMode ImportModeSetting {
-            get => _importModeSetting;
+            get => importModeSetting;
             set {
-                if (Set(ref _importModeSetting, value)) {
+                if (Set(ref importModeSetting, value)) {
                     RaisePropertyChanged(nameof(TimeCodeBoxVisibility));
                 }
             }
@@ -31,11 +31,11 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public Visibility TimeCodeBoxVisibility => ImportModeSetting == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
 
-        private FreeVariable _freeVariableSetting;
+        private FreeVariable freeVariableSetting;
         public FreeVariable FreeVariableSetting {
-            get => _freeVariableSetting;
+            get => freeVariableSetting;
             set {
-                if (Set(ref _freeVariableSetting, value)) {
+                if (Set(ref freeVariableSetting, value)) {
                     RaisePropertyChanged(nameof(DurationBoxVisibility));
                     RaisePropertyChanged(nameof(EndTimeBoxVisibility));
                     RaisePropertyChanged(nameof(LengthBoxVisibility));
@@ -59,63 +59,63 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public Visibility VelocityBoxVisibility => FreeVariableSetting != FreeVariable.Velocity ? Visibility.Visible : Visibility.Collapsed;
 
-        private string _timeCode;
+        private string timeCode;
         public string TimeCode {
-            get => _timeCode;
-            set => Set(ref _timeCode, value);
+            get => timeCode;
+            set => Set(ref timeCode, value);
         }
 
-        private double _duration;
+        private double duration;
         public double Duration {
-            get => _duration;
-            set => Set(ref _duration, value);
+            get => duration;
+            set => Set(ref duration, value);
         }
 
-        private double _endTime;
+        private double endTime;
         public double EndTime {
-            get => _endTime;
-            set => Set(ref _endTime, value);
+            get => endTime;
+            set => Set(ref endTime, value);
         }
 
-        private double _length;
+        private double length;
         public double Length {
-            get => _length;
-            set => Set(ref _length, value);
+            get => length;
+            set => Set(ref length, value);
         }
 
-        private double _sliderVelocity;
+        private double sliderVelocity;
         public double SliderVelocity {
-            get => _sliderVelocity;
-            set => Set(ref _sliderVelocity, value);
+            get => sliderVelocity;
+            set => Set(ref sliderVelocity, value);
         }
 
-        private bool _moveAnchors;
+        private bool moveAnchors;
         public bool MoveAnchors {
-            get => _moveAnchors;
-            set => Set(ref _moveAnchors, value);
+            get => moveAnchors;
+            set => Set(ref moveAnchors, value);
         }
 
-        private bool _useEndTime;
+        private bool useEndTime;
         public bool UseEndTime {
-            get => _useEndTime;
+            get => useEndTime;
             set {
-                if (Set(ref _useEndTime, value)) {
+                if (Set(ref useEndTime, value)) {
                     RaisePropertyChanged(nameof(DurationBoxVisibility));
                     RaisePropertyChanged(nameof(EndTimeBoxVisibility));
                 }
             }
         }
 
-        private bool _delegateSvToBpm;
+        private bool delegateSvToBpm;
         public bool DelegateToBpm {
-            get => _delegateSvToBpm;
-            set => Set(ref _delegateSvToBpm, value);
+            get => delegateSvToBpm;
+            set => Set(ref delegateSvToBpm, value);
         }
 
-        private bool _removeSliderTicks;
+        private bool removeSliderTicks;
         public bool RemoveSliderTicks {
-            get => _removeSliderTicks;
-            set => Set(ref _removeSliderTicks, value);
+            get => removeSliderTicks;
+            set => Set(ref removeSliderTicks, value);
         }
 
         #endregion

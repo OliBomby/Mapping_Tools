@@ -8,11 +8,11 @@ namespace Mapping_Tools.Components.TimeLine {
     public partial class TimeLineMark :UserControl {
         public double Time { get; set; }
 
-        public TimeLineMark(double m_seconds) {
+        public TimeLineMark(double mSeconds) {
             InitializeComponent();
-            Time = m_seconds;
+            Time = mSeconds;
 
-            TimeSpan ts = TimeSpan.FromMilliseconds(m_seconds);
+            TimeSpan ts = TimeSpan.FromMilliseconds(mSeconds);
             string m = ts.Minutes.ToString();
             if( m.Length < 2 )
                 m = "0" + m;

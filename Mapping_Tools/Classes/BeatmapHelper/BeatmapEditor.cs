@@ -33,21 +33,21 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public override void SaveFile() {
-            GenerateBetterSaveMD5(TextFile.GetLines());
+            GenerateBetterSaveMd5(TextFile.GetLines());
             base.SaveFile();
         }
 
         public override void SaveFile(string path) {
-            GenerateBetterSaveMD5(TextFile.GetLines());
+            GenerateBetterSaveMd5(TextFile.GetLines());
             base.SaveFile(path);
         }
 
         public override void SaveFile(List<string> lines) {
-            GenerateBetterSaveMD5(lines);
+            GenerateBetterSaveMd5(lines);
             base.SaveFile(lines);
         }
 
-        private static void GenerateBetterSaveMD5(List<string> lines) {
+        private static void GenerateBetterSaveMd5(List<string> lines) {
             var tempPath = System.IO.Path.Combine(MainWindow.AppDataPath, "temp.osu");
 
             if (!File.Exists(tempPath))
@@ -56,7 +56,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
             File.WriteAllLines(tempPath, lines);
 
-            EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString = EditorReaderStuff.GetMD5FromPath(tempPath);
+            EditorReaderStuff.DontCoolSaveWhenMd5EqualsThisString = EditorReaderStuff.GetMd5FromPath(tempPath);
         }
     }
 }

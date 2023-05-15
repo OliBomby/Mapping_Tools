@@ -11,79 +11,79 @@ using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
     public class HitsoundStudioVm : BindableBase {
-        private string _baseBeatmap;
+        private string baseBeatmap;
         public string BaseBeatmap {
-            get => _baseBeatmap;
-            set => Set(ref _baseBeatmap, value);
+            get => baseBeatmap;
+            set => Set(ref baseBeatmap, value);
         }
 
-        private Sample _defaultSample;
+        private Sample defaultSample;
         public Sample DefaultSample {
-            get => _defaultSample;
-            set => Set(ref _defaultSample, value);
+            get => defaultSample;
+            set => Set(ref defaultSample, value);
         }
 
-        private string _exportFolder;
+        private string exportFolder;
         public string ExportFolder {
-            get => _exportFolder;
-            set => Set(ref _exportFolder, value);
+            get => exportFolder;
+            set => Set(ref exportFolder, value);
         }
 
-        private string _hitsoundDiffName;
+        private string hitsoundDiffName;
         public string HitsoundDiffName {
-            get => _hitsoundDiffName;
-            set => Set(ref _hitsoundDiffName, value);
+            get => hitsoundDiffName;
+            set => Set(ref hitsoundDiffName, value);
         }
 
-        private bool _showResults;
+        private bool showResults;
         public bool ShowResults {
-            get => _showResults;
-            set => Set(ref _showResults, value);
+            get => showResults;
+            set => Set(ref showResults, value);
         }
 
-        private bool _exportMap;
+        private bool exportMap;
         public bool ExportMap {
-            get => _exportMap;
-            set => Set(ref _exportMap, value);
+            get => exportMap;
+            set => Set(ref exportMap, value);
         }
 
-        private bool _exportSamples;
+        private bool exportSamples;
         public bool ExportSamples {
-            get => _exportSamples;
-            set => Set(ref _exportSamples, value);
+            get => exportSamples;
+            set => Set(ref exportSamples, value);
         }
 
-        private bool _deleteAllInExportFirst;
+        private bool deleteAllInExportFirst;
         public bool DeleteAllInExportFirst {
-            get => _deleteAllInExportFirst;
-            set => Set(ref _deleteAllInExportFirst, value);
+            get => deleteAllInExportFirst;
+            set => Set(ref deleteAllInExportFirst, value);
         }
 
-        private bool _usePreviousSampleSchema;
+        private bool usePreviousSampleSchema;
         public bool UsePreviousSampleSchema {
-            get => _usePreviousSampleSchema;
-            set => Set(ref _usePreviousSampleSchema, value);
+            get => usePreviousSampleSchema;
+            set => Set(ref usePreviousSampleSchema, value);
         }
 
-        private bool _allowGrowthPreviousSampleSchema;
+        private bool allowGrowthPreviousSampleSchema;
         public bool AllowGrowthPreviousSampleSchema {
-            get => _allowGrowthPreviousSampleSchema;
-            set => Set(ref _allowGrowthPreviousSampleSchema, value);
+            get => allowGrowthPreviousSampleSchema;
+            set => Set(ref allowGrowthPreviousSampleSchema, value);
         }
 
-        private bool _addCoincidingRegularHitsounds;
+        private bool addCoincidingRegularHitsounds;
         public bool AddCoincidingRegularHitsounds {
-            get => _addCoincidingRegularHitsounds;
-            set => Set(ref _addCoincidingRegularHitsounds, value);
+            get => addCoincidingRegularHitsounds;
+            set => Set(ref addCoincidingRegularHitsounds, value);
         }
 
         public SampleSchema PreviousSampleSchema { get; set; }
 
-        private HitsoundExportMode _hitsoundExportModeSetting;
+        private HitsoundExportMode hitsoundExportModeSetting;
         public HitsoundExportMode HitsoundExportModeSetting {
-            get => _hitsoundExportModeSetting;
+            get => hitsoundExportModeSetting;
             set {
-                if (Set(ref _hitsoundExportModeSetting, value)) {
+                if (Set(ref hitsoundExportModeSetting, value)) {
                     RaisePropertyChanged(nameof(StandardExtraSettingsVisibility));
                     RaisePropertyChanged(nameof(CoincidingExtraSettingsVisibility));
                     RaisePropertyChanged(nameof(StoryboardExtraSettingsVisibility));
@@ -105,32 +105,32 @@ namespace Mapping_Tools.Viewmodels {
         
         public IEnumerable<HitsoundExportMode> HitsoundExportModes => Enum.GetValues(typeof(HitsoundExportMode)).Cast<HitsoundExportMode>();
 
-        private GameMode _hitsoundExportGameMode;
+        private GameMode hitsoundExportGameMode;
         public GameMode HitsoundExportGameMode {
-            get => _hitsoundExportGameMode;
-            set => Set(ref _hitsoundExportGameMode, value);
+            get => hitsoundExportGameMode;
+            set => Set(ref hitsoundExportGameMode, value);
         }
 
         [JsonIgnore]
         public IEnumerable<GameMode> HitsoundExportGameModes => Enum.GetValues(typeof(GameMode)).Cast<GameMode>();
 
-        private double _zipLayersLeniency;
+        private double zipLayersLeniency;
         public double ZipLayersLeniency {
-            get => _zipLayersLeniency;
-            set => Set(ref _zipLayersLeniency, value);
+            get => zipLayersLeniency;
+            set => Set(ref zipLayersLeniency, value);
         }
 
-        private int _firstCustomIndex;
+        private int firstCustomIndex;
         public int FirstCustomIndex {
-            get => _firstCustomIndex;
-            set => Set(ref _firstCustomIndex, value);
+            get => firstCustomIndex;
+            set => Set(ref firstCustomIndex, value);
         }
 
-        private HitsoundExporter.SampleExportFormat _singleSampleExportFormat;
+        private HitsoundExporter.SampleExportFormat singleSampleExportFormat;
         public HitsoundExporter.SampleExportFormat SingleSampleExportFormat {
-            get => _singleSampleExportFormat;
+            get => singleSampleExportFormat;
             set {
-                if (Set(ref _singleSampleExportFormat, value)) {
+                if (Set(ref singleSampleExportFormat, value)) {
                     RaisePropertyChanged(nameof(SingleSampleExportFormatDisplay));
                     if (value == HitsoundExporter.SampleExportFormat.MidiChords) {
                         MixedSampleExportFormat = value;
@@ -141,11 +141,11 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
-        private HitsoundExporter.SampleExportFormat _mixedSampleExportFormat;
+        private HitsoundExporter.SampleExportFormat mixedSampleExportFormat;
         public HitsoundExporter.SampleExportFormat MixedSampleExportFormat {
-            get => _mixedSampleExportFormat;
+            get => mixedSampleExportFormat;
             set {
-                if (Set(ref _mixedSampleExportFormat, value)) {
+                if (Set(ref mixedSampleExportFormat, value)) {
                     RaisePropertyChanged(nameof(MixedSampleExportFormatDisplay));
                     if (value == HitsoundExporter.SampleExportFormat.MidiChords) {
                         SingleSampleExportFormat = value;

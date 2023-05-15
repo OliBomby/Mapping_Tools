@@ -7,14 +7,14 @@ namespace Mapping_Tools.Viewmodels {
     public class TimingHelperVm : BindableBase {
         #region Properties
 
-        private bool _objects;
-        private bool _bookmarks;
-        private bool _greenlines;
-        private bool _redlines;
-        private bool _omitBarline;
-        private double _leniency;
-        private double _beatsBetween;
-        private IBeatDivisor[] _beatDivisors;
+        private bool objects;
+        private bool bookmarks;
+        private bool greenlines;
+        private bool redlines;
+        private bool omitBarline;
+        private double leniency;
+        private double beatsBetween;
+        private IBeatDivisor[] beatDivisors;
 
         [JsonIgnore]
         public string[] Paths;
@@ -23,43 +23,43 @@ namespace Mapping_Tools.Viewmodels {
         public bool Quick;
 
         public bool Objects {
-            get => _objects;
-            set => Set(ref _objects, value);
+            get => objects;
+            set => Set(ref objects, value);
         }
 
         public bool Bookmarks {
-            get => _bookmarks;
-            set => Set(ref _bookmarks, value);
+            get => bookmarks;
+            set => Set(ref bookmarks, value);
         }
 
         public bool Greenlines {
-            get => _greenlines;
-            set => Set(ref _greenlines, value);
+            get => greenlines;
+            set => Set(ref greenlines, value);
         }
 
         public bool Redlines {
-            get => _redlines;
-            set => Set(ref _redlines, value);
+            get => redlines;
+            set => Set(ref redlines, value);
         }
 
         public bool OmitBarline {
-            get => _omitBarline;
-            set => Set(ref _omitBarline, value);
+            get => omitBarline;
+            set => Set(ref omitBarline, value);
         }
 
         public double Leniency {
-            get => _leniency;
-            set => Set(ref _leniency, value);
+            get => leniency;
+            set => Set(ref leniency, value);
         }
 
         public double BeatsBetween {
-            get => _beatsBetween;
-            set => Set(ref _beatsBetween, value);
+            get => beatsBetween;
+            set => Set(ref beatsBetween, value);
         }
 
         public IBeatDivisor[] BeatDivisors {
-            get => _beatDivisors;
-            set => Set(ref _beatDivisors, value);
+            get => beatDivisors;
+            set => Set(ref beatDivisors, value);
         }
 
         #endregion

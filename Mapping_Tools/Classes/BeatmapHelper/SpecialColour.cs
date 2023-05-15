@@ -5,11 +5,11 @@ using Mapping_Tools.Annotations;
 namespace Mapping_Tools.Classes.BeatmapHelper {
 
     public class SpecialColour :ComboColour, IEquatable<SpecialColour>, ICloneable {
-        private string _name;
+        private string name;
 
         public string Name {
-            get => _name;
-            set => Set(ref _name, value);
+            get => name;
+            set => Set(ref name, value);
         }
 
         [UsedImplicitly]
@@ -31,7 +31,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 return false;
             if( ReferenceEquals(this, other) )
                 return true;
-            return _name == other._name && Color == other.Color;
+            return name == other.name && Color == other.Color;
         }
 
         public override bool Equals(object obj) {
@@ -43,7 +43,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public override int GetHashCode() {
-            return ( _name != null ? _name.GetHashCode() : 0 );
+            return ( name != null ? name.GetHashCode() : 0 );
         }
     }
 }

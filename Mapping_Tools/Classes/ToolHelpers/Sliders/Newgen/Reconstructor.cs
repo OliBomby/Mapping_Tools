@@ -86,12 +86,12 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             var segmentDir = end - start;
             Matrix2 transform;
 
-            if (hintDir.LengthSquared < Precision.DOUBLE_EPSILON &&
-                segmentDir.LengthSquared < Precision.DOUBLE_EPSILON) {
+            if (hintDir.LengthSquared < Precision.DoubleEpsilon &&
+                segmentDir.LengthSquared < Precision.DoubleEpsilon) {
                 transform = Matrix2.CreateRotation(-theta);
-            } else if (hintDir.LengthSquared < Precision.DOUBLE_EPSILON) {
+            } else if (hintDir.LengthSquared < Precision.DoubleEpsilon) {
                 transform = Matrix2.CreateRotation(segmentDir.Theta);
-            } else if (segmentDir.LengthSquared < Precision.DOUBLE_EPSILON) {
+            } else if (segmentDir.LengthSquared < Precision.DoubleEpsilon) {
                 transform = Matrix2.CreateRotation(hintDir.Theta - theta);
             } else {
                 // Scale along the axis of hintDir

@@ -50,8 +50,8 @@ namespace Mapping_Tools.Views.Sliderator {
                                                         Environment.NewLine + Environment.NewLine +
                                                         "Check out all the options. The tooltips should help you further.";
 
-        private bool _ignoreAnchorsChange;
-        private bool _initialized;
+        private bool ignoreAnchorsChange;
+        private bool initialized;
 
         public SlideratorView() {
             InitializeComponent();
@@ -82,22 +82,22 @@ namespace Mapping_Tools.Views.Sliderator {
         }
 
         private void SlideratorView_OnLoaded(object sender, RoutedEventArgs e) {
-            if (_initialized) return;
+            if (initialized) return;
 
             ProjectManager.LoadProject(this, message: false);
-            _initialized = true;
+            initialized = true;
         }
 
         private SlideratorVm ViewModel => (SlideratorVm) DataContext;
 
         private void AnchorsOnAnchorsChanged(object sender, DependencyPropertyChangedEventArgs e) {
-            if (_ignoreAnchorsChange) return;
+            if (ignoreAnchorsChange) return;
 
             var anchor = (Anchor) sender;
 
             // Correct the anchor change if it resulted in a speed limit violation
             if (ViewModel.ExportAsNormal && (PrevOverSpeedLimit(anchor) || NextOverSpeedLimit(anchor))) {
-                _ignoreAnchorsChange = true;
+                ignoreAnchorsChange = true;
                 Graph.IgnoreAnchorUpdates = true;
 
                 // Use binary search to find the closest value to the limit
@@ -130,11 +130,11 @@ namespace Mapping_Tools.Views.Sliderator {
                             if (anchor.PreviousAnchor != null) {
                                 var maxSpeed = InterpolatorHelper.GetBiggestDerivative(anchor.Interpolator);
 
-                                if (Math.Abs(newVector2.X - anchor.PreviousAnchor.Pos.X) < Precision.DOUBLE_EPSILON)
+                                if (Math.Abs(newVector2.X - anchor.PreviousAnchor.Pos.X) < Precision.DoubleEpsilon)
                                     bounds.Add(new Vector2(anchor.PreviousAnchor.Pos.Y));
                                 else
                                     bounds.Add(new Vector2(anchor.PreviousAnchor.Pos.Y) +
-                                               new Vector2(Precision.DOUBLE_EPSILON).PerpendicularRight +
+                                               new Vector2(Precision.DoubleEpsilon).PerpendicularRight +
                                                new Vector2(ViewModel.VelocityLimit * ViewModel.SvGraphMultiplier *
                                                            (newVector2.X - anchor.PreviousAnchor.Pos.X) / maxSpeed)
                                                    .PerpendicularLeft);
@@ -143,11 +143,11 @@ namespace Mapping_Tools.Views.Sliderator {
                             if (anchor.NextAnchor != null) {
                                 var maxSpeed = InterpolatorHelper.GetBiggestDerivative(anchor.NextAnchor.Interpolator);
 
-                                if (Math.Abs(newVector2.X - anchor.NextAnchor.Pos.X) < Precision.DOUBLE_EPSILON)
+                                if (Math.Abs(newVector2.X - anchor.NextAnchor.Pos.X) < Precision.DoubleEpsilon)
                                     bounds.Add(new Vector2(anchor.NextAnchor.Pos.Y));
                                 else
                                     bounds.Add(new Vector2(anchor.NextAnchor.Pos.Y) +
-                                               new Vector2(Precision.DOUBLE_EPSILON).PerpendicularRight +
+                                               new Vector2(Precision.DoubleEpsilon).PerpendicularRight +
                                                new Vector2(ViewModel.VelocityLimit * ViewModel.SvGraphMultiplier *
                                                            (newVector2.X - anchor.NextAnchor.Pos.X) / maxSpeed)
                                                    .PerpendicularRight);
@@ -166,7 +166,7 @@ namespace Mapping_Tools.Views.Sliderator {
                         break;
                 }
 
-                _ignoreAnchorsChange = false;
+                ignoreAnchorsChange = false;
                 Graph.IgnoreAnchorUpdates = false;
             }
 
@@ -427,7 +427,7 @@ namespace Mapping_Tools.Views.Sliderator {
             if (!TypeConverters.TryParseDouble(dialog.ValueBox.Text, out var value)) return;
 
             var maxValue = GetMaxCompletion();
-            if (Math.Abs(maxValue) < Precision.DOUBLE_EPSILON) return;
+            if (Math.Abs(maxValue) < Precision.DoubleEpsilon) return;
             Graph.ScaleAnchors(new Size(1, value / maxValue));
         }
 
@@ -493,25 +493,25 @@ namespace Mapping_Tools.Views.Sliderator {
                 return false;
             }
 
-            if (ViewModel.ExportAsNormal && maxVelocity > ViewModel.VelocityLimit + Precision.DOUBLE_EPSILON) {
+            if (ViewModel.ExportAsNormal && maxVelocity > ViewModel.VelocityLimit + Precision.DoubleEpsilon) {
                 message = "A velocity faster than the SV limit is illegal. Please check your graph or increase the SV limit.";
                 return false;
             }
 
             if (double.IsInfinity(ViewModel.BeatsPerMinute) || double.IsNaN(ViewModel.BeatsPerMinute) ||
-                Math.Abs(ViewModel.BeatsPerMinute) < Precision.DOUBLE_EPSILON) {
+                Math.Abs(ViewModel.BeatsPerMinute) < Precision.DoubleEpsilon) {
                 message = "The beats per minute field has an illegal value";
                 return false;
             }
 
             if (double.IsInfinity(ViewModel.GraphBeats) || double.IsNaN(ViewModel.GraphBeats) ||
-                Math.Abs(ViewModel.GraphBeats) < Precision.DOUBLE_EPSILON) {
+                Math.Abs(ViewModel.GraphBeats) < Precision.DoubleEpsilon) {
                 message = "The beat length field has an illegal value";
                 return false;
             }
 
             if (double.IsInfinity(ViewModel.GlobalSv) || double.IsNaN(ViewModel.GlobalSv) ||
-                Math.Abs(ViewModel.GlobalSv) < Precision.DOUBLE_EPSILON) {
+                Math.Abs(ViewModel.GlobalSv) < Precision.DoubleEpsilon) {
                 message = "The global SV field has an illegal value";
                 return false;
             }
@@ -743,8 +743,8 @@ namespace Mapping_Tools.Views.Sliderator {
                     clone.SliderVelocity = removeSliderTicks ? double.NaN : -100;
                     
                     // Add redlines
-                    timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
-                    timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
+                    timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon));
+                    timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon));
 
                     clone.Time -= 1;
                 }
@@ -755,7 +755,7 @@ namespace Mapping_Tools.Views.Sliderator {
                         var tp = timing.GetTimingPointAtTime(ho.Time).Copy();
                         tp.MpB = sv;
                         tp.Offset = ho.Time;
-                        return new TimingPointsChange(tp, mpb: true, fuzzyness: Precision.DOUBLE_EPSILON);
+                        return new TimingPointsChange(tp, mpb: true, fuzzyness: Precision.DoubleEpsilon);
                     }));
 
                 TimingPointsChange.ApplyChanges(timing, timingPointsChanges);

@@ -5,13 +5,13 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
 {
     public class SinglePointCircleGeneratorSettings : GeneratorSettings
     {
-        private double _radius;
+        private double radius;
         [DisplayName("Radius")]
         [Description("The radius of the circle in osu! pixels.")]
         public double Radius
         {
-            get => _radius;
-            set => Set(ref _radius, value);
+            get => radius;
+            set => Set(ref radius, value);
         }
 
         public SinglePointCircleGeneratorSettings()

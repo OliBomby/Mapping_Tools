@@ -75,7 +75,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 Editor.SaveFile(tempPath, editor.Beatmap.GetLines());
 
                 // Get MD5 from temp file
-                var currentMapHash = EditorReaderStuff.GetMD5FromPath(tempPath);
+                var currentMapHash = EditorReaderStuff.GetMd5FromPath(tempPath);
 
                 // Comparing with previously made periodic backup
                 if (currentMapHash == previousPeriodicBackupHash) {
@@ -360,14 +360,14 @@ namespace Mapping_Tools.Classes.SystemTools {
                 string hashString = "";
                 try {
                     if (File.Exists(currentPath)) {
-                        hashString = EditorReaderStuff.GetMD5FromPath(currentPath);
+                        hashString = EditorReaderStuff.GetMd5FromPath(currentPath);
                     }
                 }
                 catch {
                     return;
                 }
 
-                if (EditorReaderStuff.DontCoolSaveWhenMD5EqualsThisString == hashString) {
+                if (EditorReaderStuff.DontCoolSaveWhenMd5EqualsThisString == hashString) {
                     return;
                 }
 

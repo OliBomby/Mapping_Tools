@@ -110,7 +110,7 @@ namespace Mapping_Tools.Views.TimingHelper {
 
                 // Remove multiple markers on the same tick
                 var newMarkers = new List<Marker>(markers.Count);
-                newMarkers.AddRange(markers.Where((t, i) => i == 0 || Math.Abs(t.Time - markers[i - 1].Time) >= arg.Leniency + Precision.DOUBLE_EPSILON));
+                newMarkers.AddRange(markers.Where((t, i) => i == 0 || Math.Abs(t.Time - markers[i - 1].Time) >= arg.Leniency + Precision.DoubleEpsilon));
                 markers = newMarkers;
 
                 // Calculate the beats between time and the last time or redline for each time

@@ -155,8 +155,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public int Repeat {
-            get => IsSlider ? _repeat : IsCircle ? 0 : 1;
-            set => _repeat = value;
+            get => IsSlider ? repeat : IsCircle ? 0 : 1;
+            set => repeat = value;
         }
 
         public double PixelLength { get; set; }
@@ -186,7 +186,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public double GetEndTime(bool floor = true) {
             var endTime = Time + TemporalLength * Repeat;
-            return floor ? Math.Floor(endTime + Precision.DOUBLE_EPSILON) : endTime;
+            return floor ? Math.Floor(endTime + Precision.DoubleEpsilon) : endTime;
         }
 
         private void SetEndTime(double value) {
@@ -213,7 +213,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public bool IsSelected { get; set; }
 
         public List<TimingPoint> BodyHitsounds = new List<TimingPoint>();
-        private int _repeat;
+        private int repeat;
 
         // Special combined with timeline
         public List<TimelineObject> TimelineObjects = new List<TimelineObject>();
@@ -645,7 +645,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             var newTime = GetResnappedTime(timing, beatDivisors, floor, tp, firstTp);
             var deltaTime = newTime - Time;
             MoveTime(deltaTime);
-            return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
+            return Math.Abs(deltaTime) > Precision.DoubleEpsilon;
         }
 
         public bool ResnapEnd(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
@@ -664,7 +664,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             var deltaTime = newTime - EndTime;
             MoveEndTime(timing, deltaTime);
 
-            return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
+            return Math.Abs(deltaTime) > Precision.DoubleEpsilon;
         }
 
         public bool ResnapEndClassic(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, TimingPoint firstTp = null) {
@@ -673,7 +673,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             var deltaTime = newTemporalLength - TemporalLength;
             ChangeTemporalTime(timing, deltaTime);
 
-            return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
+            return Math.Abs(deltaTime) > Precision.DoubleEpsilon;
         }
 
         public bool ResnapPosition(GameMode mode, double circleSize) {
@@ -686,7 +686,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             var dY = 192 - Pos.Y;
             Move(new Vector2(dX, dY));
 
-            return Math.Abs(dX) > Precision.DOUBLE_EPSILON || Math.Abs(dY) > Precision.DOUBLE_EPSILON;
+            return Math.Abs(dX) > Precision.DoubleEpsilon || Math.Abs(dY) > Precision.DoubleEpsilon;
         }
 
         public double GetResnappedTime(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
@@ -700,7 +700,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                    (EdgeSampleSets != null && EdgeSampleSets.Any(o => o != SampleSet.None)) ||
                    (EdgeAdditionSets != null && EdgeAdditionSets.Any(o => o != SampleSet.None)) ||
                    SampleSet != SampleSet.None || AdditionSet != SampleSet.None || CustomIndex != 0 || 
-                   Math.Abs(SampleVolume) > Precision.DOUBLE_EPSILON || !string.IsNullOrEmpty(Filename);
+                   Math.Abs(SampleVolume) > Precision.DoubleEpsilon || !string.IsNullOrEmpty(Filename);
         }
 
         public override string ToString() {

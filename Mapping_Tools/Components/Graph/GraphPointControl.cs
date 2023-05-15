@@ -18,12 +18,12 @@ namespace Mapping_Tools.Components.Graph {
 
         protected double Size => DefaultSize * SizeMultiplier;
 
-        private double _sizeMultiplier;
+        private double sizeMultiplier;
         protected double SizeMultiplier {
-            get => _sizeMultiplier;
+            get => sizeMultiplier;
             set {
-                if (Math.Abs(_sizeMultiplier - value) < Precision.DOUBLE_EPSILON) return;
-                _sizeMultiplier = value;
+                if (Math.Abs(sizeMultiplier - value) < Precision.DoubleEpsilon) return;
+                sizeMultiplier = value;
                 SetSize(Size);
             }
         }

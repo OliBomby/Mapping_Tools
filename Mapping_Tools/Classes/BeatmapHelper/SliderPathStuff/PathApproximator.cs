@@ -10,14 +10,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
     /// Helper methods to approximate a path by interpolating a sequence of control points.
     /// </summary>
     public static class PathApproximator {
-        private const double bezier_tolerance = 0.25f;
+        private const double BezierTolerance = 0.25f;
 
         /// <summary>
         /// The amount of pieces to calculate for each control point quadruplet.
         /// </summary>
-        private const int catmull_detail = 50;
+        private const int CatmullDetail = 50;
 
-        private const double circular_arc_tolerance = 0.1f;
+        private const double CircularArcTolerance = 0.1f;
 
         /// <summary>
         /// Creates a piecewise-linear approximation of a bezier curve, by adaptively repeatedly subdividing
@@ -81,7 +81,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
         /// </summary>
         /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
         public static List<Vector2> ApproximateCatmull(List<Vector2> controlPoints) {
-            var result = new List<Vector2>(( controlPoints.Length() - 1 ) * catmull_detail * 2);
+            var result = new List<Vector2>(( controlPoints.Length() - 1 ) * CatmullDetail * 2);
 
             for( int i = 0; i < controlPoints.Length() - 1; i++ ) {
                 var v1 = i > 0 ? controlPoints[i - 1] : controlPoints[i];
@@ -89,9 +89,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
                 var v3 = i < controlPoints.Length() - 1 ? controlPoints[i + 1] : v2 + v2 - v1;
                 var v4 = i < controlPoints.Length() - 2 ? controlPoints[i + 2] : v3 + v3 - v2;
 
-                for( int c = 0; c < catmull_detail; c++ ) {
-                    result.Add(CatmullFindPoint(ref v1, ref v2, ref v3, ref v4, (double) c / catmull_detail));
-                    result.Add(CatmullFindPoint(ref v1, ref v2, ref v3, ref v4, (double) ( c + 1 ) / catmull_detail));
+                for( int c = 0; c < CatmullDetail; c++ ) {
+                    result.Add(CatmullFindPoint(ref v1, ref v2, ref v3, ref v4, (double) c / CatmullDetail));
+                    result.Add(CatmullFindPoint(ref v1, ref v2, ref v3, ref v4, (double) ( c + 1 ) / CatmullDetail));
                 }
             }
 
@@ -156,7 +156,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
             // is: 2 * Math.Acos(1 - TOLERANCE / r)
             // The special case is required for extremely short sliders where the radius is smaller than
             // the tolerance. This is a pathological rather than a realistic case.
-            int amountPoints = 2 * r <= circular_arc_tolerance ? 2 : Math.Max(2, (int) Math.Ceiling(thetaRange / ( 2 * Math.Acos(1 - circular_arc_tolerance / r) )));
+            int amountPoints = 2 * r <= CircularArcTolerance ? 2 : Math.Max(2, (int) Math.Ceiling(thetaRange / ( 2 * Math.Acos(1 - CircularArcTolerance / r) )));
 
             List<Vector2> output = new List<Vector2>(amountPoints);
 
@@ -194,7 +194,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
         /// <returns>Whether the control points are flat enough.</returns>
         private static bool BezierIsFlatEnough(Vector2[] controlPoints) {
             for( int i = 1; i < controlPoints.Length - 1; i++ )
-                if( ( controlPoints[i - 1] - 2 * controlPoints[i] + controlPoints[i + 1] ).LengthSquared > bezier_tolerance * bezier_tolerance * 4 )
+                if( ( controlPoints[i - 1] - 2 * controlPoints[i] + controlPoints[i + 1] ).LengthSquared > BezierTolerance * BezierTolerance * 4 )
                     return false;
 
             return true;

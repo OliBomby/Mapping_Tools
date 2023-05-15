@@ -15,42 +15,42 @@ namespace Mapping_Tools.Viewmodels {
     public class HitsoundCopierVm : BindableBase {
         #region Properties
 
-        private string _pathTo;
-        private string _pathFrom;
-        private int _copyMode;
-        private double _temporalLeniency;
-        private bool _copyHitsounds;
-        private bool _copyBodyHitsounds;
-        private bool _copySampleSets;
-        private bool _copyVolumes;
-        private bool _alwaysPreserve5Volume;
-        private bool _copyStoryboardedSamples;
-        private bool _ignoreHitsoundSatisfiedSamples;
-        private bool _ignoreWheneverHitsound;
-        private bool _copyToSliderTicks;
-        private bool _copyToSliderSlides;
-        public int _startIndex;
-        private bool _muteSliderends;
-        private IBeatDivisor[] _beatDivisors;
-        private IBeatDivisor[] _mutedDivisors;
-        private double _minLength;
-        private int _mutedIndex;
-        private SampleSet _mutedSampleSet;
+        private string pathTo;
+        private string pathFrom;
+        private int copyMode;
+        private double temporalLeniency;
+        private bool copyHitsounds;
+        private bool copyBodyHitsounds;
+        private bool copySampleSets;
+        private bool copyVolumes;
+        private bool alwaysPreserve5Volume;
+        private bool copyStoryboardedSamples;
+        private bool ignoreHitsoundSatisfiedSamples;
+        private bool ignoreWheneverHitsound;
+        private bool copyToSliderTicks;
+        private bool copyToSliderSlides;
+        private int startIndex;
+        private bool muteSliderends;
+        private IBeatDivisor[] beatDivisors;
+        private IBeatDivisor[] mutedDivisors;
+        private double minLength;
+        private int mutedIndex;
+        private SampleSet mutedSampleSet;
 
         public string PathTo {
-            get => _pathTo;
-            set => Set(ref _pathTo, value);
+            get => pathTo;
+            set => Set(ref pathTo, value);
         }
 
         public string PathFrom {
-            get => _pathFrom;
-            set => Set(ref _pathFrom, value);
+            get => pathFrom;
+            set => Set(ref pathFrom, value);
         }
 
         public int CopyMode {
-            get => _copyMode;
+            get => copyMode;
             set {
-                if (Set(ref _copyMode, value)) {
+                if (Set(ref copyMode, value)) {
                     RaisePropertyChanged(nameof(SmartCopyModeSelected));
                 }
             }
@@ -60,63 +60,63 @@ namespace Mapping_Tools.Viewmodels {
         public bool SmartCopyModeSelected => CopyMode == 1;
 
         public double TemporalLeniency {
-            get => _temporalLeniency;
-            set => Set(ref _temporalLeniency, value);
+            get => temporalLeniency;
+            set => Set(ref temporalLeniency, value);
         }
 
         public bool CopyHitsounds {
-            get => _copyHitsounds;
-            set => Set(ref _copyHitsounds, value);
+            get => copyHitsounds;
+            set => Set(ref copyHitsounds, value);
         }
 
         public bool CopyBodyHitsounds {
-            get => _copyBodyHitsounds;
-            set => Set(ref _copyBodyHitsounds, value);
+            get => copyBodyHitsounds;
+            set => Set(ref copyBodyHitsounds, value);
         }
 
         public bool CopySampleSets {
-            get => _copySampleSets;
-            set => Set(ref _copySampleSets, value);
+            get => copySampleSets;
+            set => Set(ref copySampleSets, value);
         }
 
         public bool CopyVolumes {
-            get => _copyVolumes;
-            set => Set(ref _copyVolumes, value);
+            get => copyVolumes;
+            set => Set(ref copyVolumes, value);
         }
 
         public bool AlwaysPreserve5Volume {
-            get => _alwaysPreserve5Volume;
-            set => Set(ref _alwaysPreserve5Volume, value);
+            get => alwaysPreserve5Volume;
+            set => Set(ref alwaysPreserve5Volume, value);
         }
 
         public bool CopyStoryboardedSamples {
-            get => _copyStoryboardedSamples;
-            set => Set(ref _copyStoryboardedSamples, value);
+            get => copyStoryboardedSamples;
+            set => Set(ref copyStoryboardedSamples, value);
         }
 
         public bool IgnoreHitsoundSatisfiedSamples {
-            get => _ignoreHitsoundSatisfiedSamples;
-            set => Set(ref _ignoreHitsoundSatisfiedSamples, value);
+            get => ignoreHitsoundSatisfiedSamples;
+            set => Set(ref ignoreHitsoundSatisfiedSamples, value);
         }
 
         public bool IgnoreWheneverHitsound {
-            get => _ignoreWheneverHitsound;
-            set => Set(ref _ignoreWheneverHitsound, value);
+            get => ignoreWheneverHitsound;
+            set => Set(ref ignoreWheneverHitsound, value);
         }
 
         public bool CopyToSliderTicks {
-            get => _copyToSliderTicks;
+            get => copyToSliderTicks;
             set { 
-                if (Set(ref _copyToSliderTicks, value)) {
+                if (Set(ref copyToSliderTicks, value)) {
                     RaisePropertyChanged(nameof(StartIndexBoxVisible));
                 } 
             }
         }
 
         public bool CopyToSliderSlides {
-            get => _copyToSliderSlides;
+            get => copyToSliderSlides;
             set {
-                if (Set(ref _copyToSliderSlides, value)) {
+                if (Set(ref copyToSliderSlides, value)) {
                     RaisePropertyChanged(nameof(StartIndexBoxVisible));
                 }
             }
@@ -126,38 +126,38 @@ namespace Mapping_Tools.Viewmodels {
         public bool StartIndexBoxVisible => CopyToSliderSlides || CopyToSliderTicks;
 
         public int StartIndex {
-            get => _startIndex;
-            set => Set(ref _startIndex, value);
+            get => startIndex;
+            set => Set(ref startIndex, value);
         }
 
         public bool MuteSliderends {
-            get => _muteSliderends;
-            set => Set(ref _muteSliderends, value);
+            get => muteSliderends;
+            set => Set(ref muteSliderends, value);
         }
 
         public IBeatDivisor[] BeatDivisors {
-            get => _beatDivisors;
-            set => Set(ref _beatDivisors, value);
+            get => beatDivisors;
+            set => Set(ref beatDivisors, value);
         }
 
         public IBeatDivisor[] MutedDivisors {
-            get => _mutedDivisors;
-            set => Set(ref _mutedDivisors, value);
+            get => mutedDivisors;
+            set => Set(ref mutedDivisors, value);
         }
 
         public double MinLength {
-            get => _minLength;
-            set => Set(ref _minLength, value);
+            get => minLength;
+            set => Set(ref minLength, value);
         }
 
         public int MutedIndex {
-            get => _mutedIndex;
-            set => Set(ref _mutedIndex, value);
+            get => mutedIndex;
+            set => Set(ref mutedIndex, value);
         }
 
         public SampleSet MutedSampleSet {
-            get => _mutedSampleSet;
-            set => Set(ref _mutedSampleSet, value);
+            get => mutedSampleSet;
+            set => Set(ref mutedSampleSet, value);
         }
 
         [JsonIgnore]

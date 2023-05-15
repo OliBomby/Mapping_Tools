@@ -7,9 +7,9 @@ using System.Collections.Generic;
 namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
     public static class SliderInvisiblator
     {
-        public static int SNAPTOL => (int)Math.Pow(2, 5) * 3;
+        public static int Snaptol => (int)Math.Pow(2, 5) * 3;
 
-        public static (Vector2[], double) Invisiblate(int duration, Vector2[] sbPositions, double globalSV = 1.4)
+        public static (Vector2[], double) Invisiblate(int duration, Vector2[] sbPositions, double globalSv = 1.4)
         {
             // Before rounding sbPositions, calculate starting coordinate for each ms' final segment to make the sliderball rotate appropriately
             Vector2[] msLastSegStart = new Vector2[duration + 1];
@@ -30,7 +30,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
                     ang = Math.Atan2(sbPositions[i - 1].Y - sbPositions[i].Y, sbPositions[i - 1].X - sbPositions[i].X);
                     savedAng = ang;
                 }
-                msLastSegStart[i] = new Vector2((float)(SNAPTOL * Math.Cos(ang) + (float)sbPositions[i].Rounded().X), (float)(SNAPTOL * Math.Sin(ang) + (float)sbPositions[i].Rounded().Y));
+                msLastSegStart[i] = new Vector2((float)(Snaptol * Math.Cos(ang) + (float)sbPositions[i].Rounded().X), (float)(Snaptol * Math.Sin(ang) + (float)sbPositions[i].Rounded().Y));
             }
 
             // Round all positions to float precision values
@@ -46,7 +46,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
             // First ms travel adds SNAPTOL
             curMsPath.Add(sbPositions[0]);
             curMsPath.Add(new Vector2((float)(67141632 + maxXY.X), (float)sbPositions[0].Y));
-            curMsPath.Add(new Vector2((float)(67141632 + maxXY.X), (float)(33587200 - (SNAPTOL / 6) + maxXY.Y)));
+            curMsPath.Add(new Vector2((float)(67141632 + maxXY.X), (float)(33587200 - (Snaptol / 6) + maxXY.Y)));
             curMsPath.Add(new Vector2((float)(67141632 + maxXY.X), (float)msLastSegStart[1].Y));
             curMsPath.Add(msLastSegStart[1]);
             curMsPath.Add(sbPositions[1]);
@@ -54,12 +54,12 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
             // The precision of bpm calculation might be important when trying to be this precise with virtual sliderball position. Although the bpm is stored as a G17, it's written to the .osu as a G15 because that's the default for ToString().
             // So we will be using G15 to not fuck people over in the editor as they use this tool and continue mapping.
 
-            double frameDist = OsuStableDistance(curMsPath) - 2 * SNAPTOL / 3;
+            double frameDist = OsuStableDistance(curMsPath) - 2 * Snaptol / 3;
 
-            double MpB = 100 * globalSV / frameDist;
+            double MpB = 100 * globalSv / frameDist;
             MpB = double.Parse(MpB.ToString());
 
-            frameDist = 100 * globalSV / MpB;
+            frameDist = 100 * globalSv / MpB;
 
 
             curMsPath.ToArray().CopyTo(controlPoints, 0);
@@ -73,7 +73,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
                 curMsPath.Add(sbPositions[i - 1]);
 
                 // verticalTravel tells us how far down we need to go before going over and back up
-                double verticalTravel = correction + frameDist - (Math.Abs(sbPositions[i - 1].X - msLastSegStart[i].X) + (sbPositions[i - 1].Y - msLastSegStart[i].Y) + SNAPTOL);
+                double verticalTravel = correction + frameDist - (Math.Abs(sbPositions[i - 1].X - msLastSegStart[i].X) + (sbPositions[i - 1].Y - msLastSegStart[i].Y) + Snaptol);
 
                 curMsPath.Add(new Vector2((float)sbPositions[i - 1].X, (float)(sbPositions[i - 1].Y + verticalTravel / 2)));
                 if (sbPositions[i - 1].X != msLastSegStart[i].X) {

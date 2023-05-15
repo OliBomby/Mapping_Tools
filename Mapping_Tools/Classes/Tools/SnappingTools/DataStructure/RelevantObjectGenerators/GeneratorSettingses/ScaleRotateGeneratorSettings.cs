@@ -3,36 +3,36 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGene
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses {
     public class ScaleRotateGeneratorSettings : GeneratorSettings {
-        private double _angle;
+        private double angle;
         [DisplayName("Angle")]
         [Description("The angle in degrees to rotate by. Rotation by a positive angle rotates the object counterclockwise, whereas rotation by a negative angle rotates the object clockwise.")]
         public double Angle {
-            get => _angle;
-            set => Set(ref _angle, value);
+            get => angle;
+            set => Set(ref angle, value);
         }
 
-        private double _scalar;
+        private double scalar;
         [DisplayName("Scalar")]
         [Description("The scalar for the uniform scaling.")]
         public double Scalar {
-            get => _scalar;
-            set => Set(ref _scalar, value);
+            get => scalar;
+            set => Set(ref scalar, value);
         }
 
-        private SelectionPredicateCollection _originInputPredicate;
+        private SelectionPredicateCollection originInputPredicate;
         [DisplayName("Origin Input Selection")]
         [Description("Specifies extra rules that virtual lines need to obey to be used as the axis by this generator.")]
         public SelectionPredicateCollection OriginInputPredicate {
-            get => _originInputPredicate;
-            set => Set(ref _originInputPredicate, value);
+            get => originInputPredicate;
+            set => Set(ref originInputPredicate, value);
         }
         
-        private SelectionPredicateCollection _otherInputPredicate;
+        private SelectionPredicateCollection otherInputPredicate;
         [DisplayName("Other Input Selection")]
         [Description("Specifies extra rules that virtual objects need to obey to get mirrored by this generator.")]
         public SelectionPredicateCollection OtherInputPredicate {
-            get => _otherInputPredicate;
-            set => Set(ref _otherInputPredicate, value);
+            get => otherInputPredicate;
+            set => Set(ref otherInputPredicate, value);
         }
 
         public ScaleRotateGeneratorSettings() {

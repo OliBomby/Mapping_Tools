@@ -94,7 +94,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             var a1 = start.Value.PostAngle;
             var a2 = end.Value.PreAngle;
 
-            if (Math.Abs(MathHelper.AngleDifference(a1, a2)) < Precision.DOUBLE_EPSILON) {
+            if (Math.Abs(MathHelper.AngleDifference(a1, a2)) < Precision.DoubleEpsilon) {
                 return null;
             }
 
@@ -205,7 +205,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
                     segmentAngleChange += Math.Abs(angleChange);
 
-                    if (segmentAngleChange > maxSegmentAngle + Precision.DOUBLE_EPSILON) {
+                    if (segmentAngleChange > maxSegmentAngle + Precision.DoubleEpsilon) {
                         segments.Add((startSegment, currentSegment));
 
                         startSegment = currentSegment;

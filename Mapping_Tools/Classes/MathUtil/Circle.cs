@@ -68,12 +68,12 @@ namespace Mapping_Tools.Classes.MathUtil {
             double c = d2 * p1 - d1 * p2 - d2 * c1 + d1 * c2;
             double disc = r * r * ds - c * c;
 
-            if (disc <= -Precision.DOUBLE_EPSILON * 10) {
+            if (disc <= -Precision.DoubleEpsilon * 10) {
                 intersections = new Vector2[0];
                 return false;
             }
 
-            if (Math.Abs(disc) < Precision.DOUBLE_EPSILON * 10) {
+            if (Math.Abs(disc) < Precision.DoubleEpsilon * 10) {
                 intersections = new Vector2[1] { new Vector2(c * d2 / ds + c1, -c * d1 / ds + c2) };
                 return true;
             }
@@ -105,7 +105,7 @@ namespace Mapping_Tools.Classes.MathUtil {
             var p2 = left.Centre + a * (right.Centre - left.Centre) / d;
             var h = Math.Sqrt(left.Radius * left.Radius - a * a);
 
-            if (Math.Abs(d - (left.Radius + right.Radius)) < Precision.DOUBLE_EPSILON) {
+            if (Math.Abs(d - (left.Radius + right.Radius)) < Precision.DoubleEpsilon) {
                 // One solution
                 intersections = new[] {
                     p2
@@ -157,13 +157,13 @@ namespace Mapping_Tools.Classes.MathUtil {
             return !left.Equals(right);
         }
 
-        private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+        private static readonly string ListSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
         /// Returns a System.string that represents the current Circle.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return string.Format("({1}{0} {2})", listSeparator, Centre, Radius);
+            return string.Format("({1}{0} {2})", ListSeparator, Centre, Radius);
         }
 
 

@@ -8,50 +8,50 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
     /// This class can generate bezier anchors which approximate arbitrary paths
     /// </summary>
     public class PathGenerator {
-        private List<Vector2> _path; // input path
-        private List<Vector2> _diff; // path segments
-        private List<double> _angle; // path segment angles
-        private List<double> _diffL; // length of segments
-        private List<double> _pathL; // cumulative length
+        private List<Vector2> path; // input path
+        private List<Vector2> diff; // path segments
+        private List<double> angle; // path segment angles
+        private List<double> diffL; // length of segments
+        private List<double> pathL; // cumulative length
 
         public PathGenerator(List<Vector2> path) {
             SetPath(path);
         }
 
         public PathGenerator(List<Vector2> path, List<Vector2> diff, List<double> angle, List<double> diffL, List<double> pathL) {
-            _path = path;
-            _diff = diff;
-            _angle = angle;
-            _diffL = diffL;
-            _pathL = pathL;
+            this.path = path;
+            this.diff = diff;
+            this.angle = angle;
+            this.diffL = diffL;
+            this.pathL = pathL;
         }
 
         public void SetPath(List<Vector2> pathPoints) {
-            _path = new List<Vector2> { pathPoints.First() };
-            _diff = new List<Vector2>();
-            _angle = new List<double>();
-            _diffL = new List<double>();
+            path = new List<Vector2> { pathPoints.First() };
+            diff = new List<Vector2>();
+            angle = new List<double>();
+            diffL = new List<double>();
             double sum = 0;
-            _pathL = new List<double> { sum };
+            pathL = new List<double> { sum };
 
             foreach (var point in pathPoints.Skip(1)) {
-                var diff = point - _path.Last();
+                var diff = point - path.Last();
                 var dist = diff.Length;
 
-                if (dist < Precision.DOUBLE_EPSILON) continue;
+                if (dist < Precision.DoubleEpsilon) continue;
 
-                _path.Add(point);
-                _diff.Add(diff);
-                _angle.Add(diff.Theta);
-                _diffL.Add(dist);
+                path.Add(point);
+                this.diff.Add(diff);
+                angle.Add(diff.Theta);
+                diffL.Add(dist);
                 sum += dist;
-                _pathL.Add(sum);
+                pathL.Add(sum);
             }
 
             // Add last member again so these lists have the same number of elements as path
-            _diff.Add(_diff.Last());
-            _angle.Add(_angle.Last());
-            _diffL.Add(_diffL.Last());
+            diff.Add(diff.Last());
+            angle.Add(angle.Last());
+            diffL.Add(diffL.Last());
         }
         /// <summary>
         /// Generates anchors which approximate the entire path
@@ -59,7 +59,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         /// <param name="maxAngle"></param>
         /// <returns></returns>
         public IEnumerable<Vector2> GeneratePath(double maxAngle = Math.PI * 1 / 4) {
-            return GeneratePath(0, _path.Count - 1, maxAngle);
+            return GeneratePath(0, path.Count - 1, maxAngle);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
             var p2 = GetContinuousPosition(endIndex);
 
             const int numTestPoints = 100;
-            var labels = _path.GetRange((int) startIndex, (int) Math.Ceiling(endIndex) - (int) startIndex + 1);
+            var labels = path.GetRange((int) startIndex, (int) Math.Ceiling(endIndex) - (int) startIndex + 1);
 
             Vector2?[] middles = {
                 TangentIntersectionApproximation(startIndex, endIndex), 
@@ -152,7 +152,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
             var p2 = GetContinuousPosition(endIndex);
 
             var a1 = GetContinuousAngle(startIndex);
-            var a2 = GetContinuousAngle(endIndex - 2 * Precision.DOUBLE_EPSILON);
+            var a2 = GetContinuousAngle(endIndex - 2 * Precision.DoubleEpsilon);
 
             if (Math.Abs(GetSmallestAngle(a1, a2)) > 0.1) {
                 var t1 = new Line2(p1, a1);
@@ -210,7 +210,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
                 startIndex = temp;
             }
 
-            endIndex = MathHelper.Clamp(endIndex, 0, _angle.Count - 1);
+            endIndex = MathHelper.Clamp(endIndex, 0, angle.Count - 1);
 
             int startIndexInt = (int) Math.Ceiling(startIndex);
             int endIndexInt = (int) Math.Floor(endIndex);
@@ -224,14 +224,14 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
             // Loop through the whole path and divide it into sub-ranges at every inflection point
             //Console.WriteLine($"Iterating from {startIndexInt} to {endIndexInt}");
             for (int i = startIndexInt; i <= endIndexInt; i++) {
-                var pos = _path[i];
-                var angle = _angle[i];
+                var pos = path[i];
+                var angle = this.angle[i];
                 var angleChange = GetSmallestAngle(angle, lastAngle);
                 //Console.WriteLine("Angle change: " + angleChange);
 
                 // Check for inflection point or red anchors
-                if ((angleChange * lastAngleChange < -Precision.DOUBLE_EPSILON && Math.Abs(startSubRange - i) > 1) ||
-                    ((pos - pos.Rounded()).LengthSquared < Precision.DOUBLE_EPSILON && Math.Abs(angleChange) > Precision.DOUBLE_EPSILON)) {
+                if ((angleChange * lastAngleChange < -Precision.DoubleEpsilon && Math.Abs(startSubRange - i) > 1) ||
+                    ((pos - pos.Rounded()).LengthSquared < Precision.DoubleEpsilon && Math.Abs(angleChange) > Precision.DoubleEpsilon)) {
                     subRanges.Add(new Tuple<double, double, double>(startSubRange, i, subRangeAngleChange));
 
                     //Console.WriteLine($"Adding segment for inflection point or red: {startSubRange} to {i}");
@@ -264,7 +264,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
                 lastAngleChange = angleChange;
             }
 
-            if (Math.Abs(startSubRange - endIndex) > Precision.DOUBLE_EPSILON) {
+            if (Math.Abs(startSubRange - endIndex) > Precision.DoubleEpsilon) {
                 subRanges.Add(new Tuple<double, double, double>(startSubRange, endIndex, subRangeAngleChange));
             }
 
@@ -289,12 +289,12 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
                 // Loop through the sub-range and count the angle change to make even divisions of the angle
                 //Console.WriteLine($"Iterating subrange from {segmentStartIndexInt} to {segmentEndIndexInt}");
                 for (int i = segmentStartIndexInt; i <= segmentEndIndexInt; i++) {
-                    var angle = _angle[i];
+                    var angle = this.angle[i];
                     var angleChange = GetSmallestAngle(angle, lastAngle);
 
                     segmentAngleChange += Math.Abs(angleChange);
 
-                    if (segmentAngleChange > maxSegmentAngle + Precision.DOUBLE_EPSILON) {
+                    if (segmentAngleChange > maxSegmentAngle + Precision.DoubleEpsilon) {
                         segments.Add(new Tuple<double, double>(startSegment, i));
                         //Console.WriteLine($"Adding segment for angle: {startSegment} to {i}");
 
@@ -305,7 +305,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
                     lastAngle = angle;
                 }
 
-                if (Math.Abs(startSegment - subRange.Item2) > Precision.DOUBLE_EPSILON) {
+                if (Math.Abs(startSegment - subRange.Item2) > Precision.DoubleEpsilon) {
                     segments.Add(new Tuple<double, double>(startSegment, subRange.Item2));
                     //Console.WriteLine($"Adding segment at the end: {startSegment}, {subRange.Item2}");
                 }
@@ -330,40 +330,40 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
             int segmentIndex = (int) Math.Floor(index);
             double segmentProgression = index - segmentIndex;
 
-            return Math.Abs(segmentProgression) < Precision.DOUBLE_EPSILON ? 
-                _path[segmentIndex] : 
-                Math.Abs(segmentProgression - 1) < Precision.DOUBLE_EPSILON ?
-                    _path[segmentIndex + 1] :
-                Vector2.Lerp(_path[segmentIndex], _path[segmentIndex + 1], segmentProgression);
+            return Math.Abs(segmentProgression) < Precision.DoubleEpsilon ? 
+                path[segmentIndex] : 
+                Math.Abs(segmentProgression - 1) < Precision.DoubleEpsilon ?
+                    path[segmentIndex + 1] :
+                Vector2.Lerp(path[segmentIndex], path[segmentIndex + 1], segmentProgression);
         }
 
         public double GetContinuousAngle(double index) {
-            int segmentIndex = MathHelper.Clamp((int)Math.Floor(index + Precision.DOUBLE_EPSILON), 0, _angle.Count - 1);
+            int segmentIndex = MathHelper.Clamp((int)Math.Floor(index + Precision.DoubleEpsilon), 0, angle.Count - 1);
 
-            return _angle[segmentIndex];
+            return angle[segmentIndex];
         }
 
         public double GetContinuousDistance(double index) {
             int segmentIndex = (int)Math.Floor(index);
             double segmentProgression = index - segmentIndex;
 
-            return Math.Abs(segmentProgression) < Precision.DOUBLE_EPSILON ?
-                _pathL[segmentIndex] :
-                Math.Abs(segmentProgression - 1) < Precision.DOUBLE_EPSILON ?
-                    _pathL[segmentIndex + 1] :
-                    (1 - segmentProgression) * _pathL[segmentIndex] + segmentProgression * _pathL[segmentIndex + 1];
+            return Math.Abs(segmentProgression) < Precision.DoubleEpsilon ?
+                pathL[segmentIndex] :
+                Math.Abs(segmentProgression - 1) < Precision.DoubleEpsilon ?
+                    pathL[segmentIndex + 1] :
+                    (1 - segmentProgression) * pathL[segmentIndex] + segmentProgression * pathL[segmentIndex + 1];
         }
 
         public double GetIndexAtDistance(double distance) {
-            var index = _pathL.BinarySearch(distance);
+            var index = pathL.BinarySearch(distance);
             if (index >= 0) {
                 return index;
             }
 
             var i2 = ~index;
             var i1 = i2 - 1;
-            var d1 = _pathL[i1];
-            var d2 = _pathL[i2];
+            var d1 = pathL[i1];
+            var d2 = pathL[i2];
 
             return (distance - d1) / (d2 - d1) + i1;
         }

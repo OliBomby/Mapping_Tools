@@ -12,12 +12,12 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {
     public class SnappingToolsProject : BindableBase, IDisposable {
         [CanBeNull]
         [JsonIgnore]
-        private IEnumerable<RelevantObjectsGenerator> _generators;
+        private IEnumerable<RelevantObjectsGenerator> generators;
 
-        private SnappingToolsPreferences _currentPreferences;
+        private SnappingToolsPreferences currentPreferences;
         public SnappingToolsPreferences CurrentPreferences {
-            get => _currentPreferences;
-            set => Set(ref _currentPreferences, value);
+            get => currentPreferences;
+            set => Set(ref currentPreferences, value);
         }
 
         public ObservableCollection<SnappingToolsSaveSlot> SaveSlots { get; }
@@ -48,22 +48,22 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {
         /// </summary>
         /// <param name="generators"></param>
         public void SetGenerators(IEnumerable<RelevantObjectsGenerator> generators) {
-            _generators = generators;
-            if (_generators != null) {
-                CurrentPreferences.ApplyGeneratorSettings(_generators);
+            this.generators = generators;
+            if (this.generators != null) {
+                CurrentPreferences.ApplyGeneratorSettings(this.generators);
             }
         }
 
         public void SetCurrentPreferences(SnappingToolsPreferences preferences) {
             CurrentPreferences = (SnappingToolsPreferences)preferences.Clone();
-            if (_generators != null) {
-                CurrentPreferences.ApplyGeneratorSettings(_generators);
+            if (generators != null) {
+                CurrentPreferences.ApplyGeneratorSettings(generators);
             }
         }
 
         public SnappingToolsPreferences GetCurrentPreferences() {
-            if (_generators != null) {
-                CurrentPreferences.SaveGeneratorSettings(_generators);
+            if (generators != null) {
+                CurrentPreferences.SaveGeneratorSettings(generators);
             }
             return CurrentPreferences;
         }
@@ -73,8 +73,8 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {
         /// </summary>
         /// <returns></returns>
         public SnappingToolsProject GetThis() {
-            if (_generators != null) {
-                CurrentPreferences.SaveGeneratorSettings(_generators);
+            if (generators != null) {
+                CurrentPreferences.SaveGeneratorSettings(generators);
             }
 
             return this;

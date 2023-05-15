@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper {
     public class ReaperEditor : Editor
     {
-        public ReaperProject project => (ReaperProject)TextFile;
+        public ReaperProject Project => (ReaperProject)TextFile;
 
         public ReaperEditor(List<string> lines) 
             => TextFile = new ReaperProject(lines);

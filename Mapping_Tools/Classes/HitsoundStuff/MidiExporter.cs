@@ -16,17 +16,17 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
 		public static void SaveToFile(string fileName, int[] bankNumbers, int[] patchNumbers, int[] noteNumbers, double[] durations, int[] velocities) {
-            const int MidiFileType = 0;
-            const int MicrosecondsPerQuaterNote = 1000000;
-            const int TicksPerQuarterNote = 120;
+            const int midiFileType = 0;
+            const int microsecondsPerQuaterNote = 1000000;
+            const int ticksPerQuarterNote = 120;
 
-            const int TrackNumber = 0;
-            const long Time = 0;
+            const int trackNumber = 0;
+            const long time = 0;
 
-            var collection = new MidiEventCollection(MidiFileType, TicksPerQuarterNote);
+            var collection = new MidiEventCollection(midiFileType, ticksPerQuarterNote);
 
-            collection.AddEvent(new TextEvent("Note Stream", MetaEventType.TextEvent, Time), TrackNumber);
-            collection.AddEvent(new TempoEvent(MicrosecondsPerQuaterNote, Time), TrackNumber);
+            collection.AddEvent(new TextEvent("Note Stream", MetaEventType.TextEvent, time), trackNumber);
+            collection.AddEvent(new TempoEvent(microsecondsPerQuaterNote, time), trackNumber);
 
             var channels = new List<Tuple<int, int>>();
 
@@ -38,14 +38,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     channels.Add(new Tuple<int, int>(bankNumbers[i], patchNumbers[i]));
 
                     channelIndex = channels.Count;
-                    collection.AddEvent(new ControlChangeEvent(Time, channelIndex, MidiController.BankSelect, bankNumbers[i] >> 7), TrackNumber);
-                    collection.AddEvent(new ControlChangeEvent(Time, channelIndex, MidiController.BankSelectLsb, (byte)bankNumbers[i] & 0x01111111), TrackNumber);
-                    collection.AddEvent(new PatchChangeEvent(Time, channelIndex, patchNumbers[i]), TrackNumber);
+                    collection.AddEvent(new ControlChangeEvent(time, channelIndex, MidiController.BankSelect, bankNumbers[i] >> 7), trackNumber);
+                    collection.AddEvent(new ControlChangeEvent(time, channelIndex, MidiController.BankSelectLsb, (byte)bankNumbers[i] & 0x01111111), trackNumber);
+                    collection.AddEvent(new PatchChangeEvent(time, channelIndex, patchNumbers[i]), trackNumber);
                 }
 
-                var tickDuration = (int) (durations[i] * 1000 / MicrosecondsPerQuaterNote * TicksPerQuarterNote);
-                collection.AddEvent(new NoteOnEvent(Time, channelIndex, noteNumbers[i], velocities[i], tickDuration), TrackNumber);
-                collection.AddEvent(new NoteEvent(Time + tickDuration, channelIndex, MidiCommandCode.NoteOff, noteNumbers[i], 0), TrackNumber);
+                var tickDuration = (int) (durations[i] * 1000 / microsecondsPerQuaterNote * ticksPerQuarterNote);
+                collection.AddEvent(new NoteOnEvent(time, channelIndex, noteNumbers[i], velocities[i], tickDuration), trackNumber);
+                collection.AddEvent(new NoteEvent(time + tickDuration, channelIndex, MidiCommandCode.NoteOff, noteNumbers[i], 0), trackNumber);
 
                 notesAdded++;
             }

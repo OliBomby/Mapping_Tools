@@ -53,12 +53,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
 
                 double maxVolume = package.Samples.Max(o => o.SampleArgs.Volume);
-                if (Math.Abs(maxVolume - -0.01) < Precision.DOUBLE_EPSILON) {
+                if (Math.Abs(maxVolume - -0.01) < Precision.DoubleEpsilon) {
                     maxVolume = 1;
                 }
 
                 foreach (Sample sample in package.Samples) {
-                    if (Math.Abs(sample.SampleArgs.Volume - -0.01) < Precision.DOUBLE_EPSILON) {
+                    if (Math.Abs(sample.SampleArgs.Volume - -0.01) < Precision.DoubleEpsilon) {
                         sample.SampleArgs.Volume = 1;
                     }
 
@@ -72,7 +72,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                     if (Math.Abs(newVolume - 1) > roughness && !alwaysFullVolume) {
                         // If roughness is not 0 it will quantize the new volume in order to reduce the number of different volumes
-                        sample.SampleArgs.Volume = Math.Abs(roughness) > Precision.DOUBLE_EPSILON ? 
+                        sample.SampleArgs.Volume = Math.Abs(roughness) > Precision.DoubleEpsilon ?
                             roughness * Math.Round(newVolume / roughness) : 
                             newVolume;
                     } else {

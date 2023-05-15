@@ -345,7 +345,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 stackOffset = Math.Round(stackOffset);
             }
 
-            const int STACK_LENIENCE = 3;
+            const int stackLenience = 3;
 
             Vector2 stackVector = new Vector2(stackOffset, stackOffset);
             float stackThresold = (float) (preEmpt * stackLeniency);
@@ -369,8 +369,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                         //We are no longer within stacking range of the next object.
                         break;
 
-                    if (Vector2.Distance(stackBaseObject.Pos, objectN.Pos) < STACK_LENIENCE ||
-                        (stackBaseObject.IsSlider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < STACK_LENIENCE)) {
+                    if (Vector2.Distance(stackBaseObject.Pos, objectN.Pos) < stackLenience ||
+                        (stackBaseObject.IsSlider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < stackLenience)) {
                         stackBaseIndex = n;
 
                         // HitObjects after the specified update range haven't been reset yet
@@ -429,11 +429,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                             *        o <- hitCircle has stack of -1
                             *         o <- hitCircle has stack of -2
                             */
-                        if (objectN.IsSlider && Vector2.Distance(objectN.EndPos, objectI.Pos) < STACK_LENIENCE) {
+                        if (objectN.IsSlider && Vector2.Distance(objectN.EndPos, objectI.Pos) < stackLenience) {
                             int offset = objectI.StackCount - objectN.StackCount + 1;
                             for (int j = n + 1; j <= i; j++) {
                                 //For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
-                                if (Vector2.Distance(objectN.EndPos, HitObjects[j].Pos) < STACK_LENIENCE)
+                                if (Vector2.Distance(objectN.EndPos, HitObjects[j].Pos) < stackLenience)
                                     HitObjects[j].StackCount -= offset;
                             }
 
@@ -442,7 +442,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                             break;
                         }
 
-                        if (Vector2.Distance(objectN.Pos, objectI.Pos) < STACK_LENIENCE) {
+                        if (Vector2.Distance(objectN.Pos, objectI.Pos) < stackLenience) {
                             //Keep processing as if there are no sliders.  If we come across a slider, this gets cancelled out.
                             //NOTE: Sliders with start positions stacking are a special case that is also handled here.
 
@@ -463,7 +463,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                             //We are no longer within stacking range of the previous object.
                             break;
 
-                        if (Vector2.Distance(objectN.EndPos, objectI.Pos) < STACK_LENIENCE) {
+                        if (Vector2.Distance(objectN.EndPos, objectI.Pos) < stackLenience) {
                             objectN.StackCount = objectI.StackCount + 1;
                             objectI = objectN;
                         }

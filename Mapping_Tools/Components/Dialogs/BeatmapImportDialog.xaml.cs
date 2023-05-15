@@ -12,13 +12,13 @@ namespace Mapping_Tools.Components.Dialogs {
     /// Interaction logic for BeatmapImportDialog.xaml
     /// </summary>
     public partial class BeatmapImportDialog : INotifyPropertyChanged {
-        private string _path;
+        private string path;
 
         public string Path {
-            get => _path;
+            get => path;
             set {
-                if (_path == value) return;
-                _path = value;
+                if (path == value) return;
+                path = value;
                 OnPropertyChanged();
             }
         }

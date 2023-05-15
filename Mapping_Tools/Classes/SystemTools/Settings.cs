@@ -10,125 +10,125 @@ namespace Mapping_Tools.Classes.SystemTools {
         public Rect? MainWindowRestoreBounds { get; set; }
         public bool MainWindowMaximized { get; set; }
 
-        private string _osuPath;
+        private string osuPath;
         public string OsuPath {
-            get => _osuPath;
-            set => Set(ref _osuPath, value);
+            get => osuPath;
+            set => Set(ref osuPath, value);
         }
 
-        private string _songsPath;
+        private string songsPath;
         public string SongsPath {
-            get => _songsPath;
-            set => Set(ref _songsPath, value);
+            get => songsPath;
+            set => Set(ref songsPath, value);
         }
 
-        private string _backupsPath;
+        private string backupsPath;
         public string BackupsPath {
-            get => _backupsPath;
-            set => Set(ref _backupsPath, value);
+            get => backupsPath;
+            set => Set(ref backupsPath, value);
         }
 
-        private string _osuConfigPath;
+        private string osuConfigPath;
         public string OsuConfigPath {
-            get => _osuConfigPath;
-            set => Set(ref _osuConfigPath, value);
+            get => osuConfigPath;
+            set => Set(ref osuConfigPath, value);
         }
 
-        private bool _makeBackups;
+        private bool makeBackups;
         public bool MakeBackups {
-            get => _makeBackups;
-            set => Set(ref _makeBackups, value);
+            get => makeBackups;
+            set => Set(ref makeBackups, value);
         }
 
-        private bool _useEditorReader;
+        private bool useEditorReader;
         public bool UseEditorReader {
-            get => _useEditorReader;
-            set => Set(ref _useEditorReader, value);
+            get => useEditorReader;
+            set => Set(ref useEditorReader, value);
         }
 
-        private bool _overrideOsuSave;
+        private bool overrideOsuSave;
         public bool OverrideOsuSave {
-            get => _overrideOsuSave;
-            set => Set(ref _overrideOsuSave, value);
+            get => overrideOsuSave;
+            set => Set(ref overrideOsuSave, value);
         }
 
-        private bool _autoReload;
+        private bool autoReload;
         public bool AutoReload {
-            get => _autoReload;
-            set => Set(ref _autoReload, value);
+            get => autoReload;
+            set => Set(ref autoReload, value);
         }
 
-        private Hotkey _quickRunHotkey;
+        private Hotkey quickRunHotkey;
         public Hotkey QuickRunHotkey {
-            get => _quickRunHotkey;
-            set => Set(ref _quickRunHotkey, value);
+            get => quickRunHotkey;
+            set => Set(ref quickRunHotkey, value);
         }
 
-        private bool _smartQuickRunEnabled;
+        private bool smartQuickRunEnabled;
         public bool SmartQuickRunEnabled {
-            get => _smartQuickRunEnabled;
-            set => Set(ref _smartQuickRunEnabled, value);
+            get => smartQuickRunEnabled;
+            set => Set(ref smartQuickRunEnabled, value);
         }
 
-        private string _noneQuickRunTool;
+        private string noneQuickRunTool;
         public string NoneQuickRunTool {
-            get => _noneQuickRunTool;
-            set => Set(ref _noneQuickRunTool, value);
+            get => noneQuickRunTool;
+            set => Set(ref noneQuickRunTool, value);
         }
 
-        private string _singleQuickRunTool;
+        private string singleQuickRunTool;
         public string SingleQuickRunTool {
-            get => _singleQuickRunTool;
-            set => Set(ref _singleQuickRunTool, value);
+            get => singleQuickRunTool;
+            set => Set(ref singleQuickRunTool, value);
         }
 
-        private string _multipleQuickRunTool;
+        private string multipleQuickRunTool;
         public string MultipleQuickRunTool {
-            get => _multipleQuickRunTool;
-            set => Set(ref _multipleQuickRunTool, value);
+            get => multipleQuickRunTool;
+            set => Set(ref multipleQuickRunTool, value);
         }
 
-        private Hotkey _betterSaveHotkey;
+        private Hotkey betterSaveHotkey;
         public Hotkey BetterSaveHotkey {
-            get => _betterSaveHotkey;
-            set => Set(ref _betterSaveHotkey, value);
+            get => betterSaveHotkey;
+            set => Set(ref betterSaveHotkey, value);
         }
 
-        private int _maxBackupFiles;
+        private int maxBackupFiles;
         public int MaxBackupFiles {
-            get => _maxBackupFiles;
-            set => Set(ref _maxBackupFiles, value);
+            get => maxBackupFiles;
+            set => Set(ref maxBackupFiles, value);
         }
 
-        private bool _makePeriodicBackups;
+        private bool makePeriodicBackups;
         public bool MakePeriodicBackups {
-            get => _makePeriodicBackups;
-            set => Set(ref _makePeriodicBackups, value);
+            get => makePeriodicBackups;
+            set => Set(ref makePeriodicBackups, value);
         }
 
-        private TimeSpan _periodicBackupInterval;
+        private TimeSpan periodicBackupInterval;
         public TimeSpan PeriodicBackupInterval {
-            get => _periodicBackupInterval;
-            set => Set(ref _periodicBackupInterval, value);
+            get => periodicBackupInterval;
+            set => Set(ref periodicBackupInterval, value);
         }
 
-        private bool _currentBeatmapDefaultFolder;
+        private bool currentBeatmapDefaultFolder;
         public bool CurrentBeatmapDefaultFolder {
-            get => _currentBeatmapDefaultFolder;
-            set => Set(ref _currentBeatmapDefaultFolder, value);
+            get => currentBeatmapDefaultFolder;
+            set => Set(ref currentBeatmapDefaultFolder, value);
         }
 
-        private Hotkey _quickUndoHotkey;
+        private Hotkey quickUndoHotkey;
         public Hotkey QuickUndoHotkey {
-            get => _quickUndoHotkey;
-            set => Set(ref _quickUndoHotkey, value);
+            get => quickUndoHotkey;
+            set => Set(ref quickUndoHotkey, value);
         }
 
-        [CanBeNull] private Version _skipVersion;
+        [CanBeNull] private Version skipVersion;
         [CanBeNull]
         public Version SkipVersion {
-            get => _skipVersion;
-            set => Set(ref _skipVersion, value);
+            get => skipVersion;
+            set => Set(ref skipVersion, value);
         }
 
         /// <summary>

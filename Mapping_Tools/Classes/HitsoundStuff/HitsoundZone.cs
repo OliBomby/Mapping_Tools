@@ -11,38 +11,38 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
     /// </summary>
     public class HitsoundZone : INotifyPropertyChanged
     {
-        private bool _isSelected;
-        private string _name;
-        private string _filename;
-        private double _xPos;
-        private double _yPos;
-        private Hitsound _hitsound;
-        private SampleSet _sampleSet;
-        private SampleSet _additionsSet;
-        private int _customIndex;
+        private bool isSelected;
+        private string name;
+        private string filename;
+        private double xPos;
+        private double yPos;
+        private Hitsound hitsound;
+        private SampleSet sampleSet;
+        private SampleSet additionsSet;
+        private int customIndex;
 
         public HitsoundZone() {
-            _isSelected = false;
-            _name = "";
-            _filename = "";
-            _xPos = -1;
-            _yPos = -1;
-            _hitsound = Hitsound.Normal;
-            _sampleSet = SampleSet.None;
-            _additionsSet = SampleSet.None;
-            _customIndex = 0;
+            isSelected = false;
+            name = "";
+            filename = "";
+            xPos = -1;
+            yPos = -1;
+            hitsound = Hitsound.Normal;
+            sampleSet = SampleSet.None;
+            additionsSet = SampleSet.None;
+            customIndex = 0;
         }
 
         public HitsoundZone(bool isSelected, string name, string filename, double xPos, double yPos, Hitsound hitsound, SampleSet sampleSet, SampleSet additionsSet, int customIndex) {
-            _isSelected = isSelected;
-            _name = name;
-            _filename = filename;
-            _xPos = xPos;
-            _yPos = yPos;
-            _hitsound = hitsound;
-            _sampleSet = sampleSet;
-            _additionsSet = additionsSet;
-            _customIndex = customIndex;
+            this.isSelected = isSelected;
+            this.name = name;
+            this.filename = filename;
+            this.xPos = xPos;
+            this.yPos = yPos;
+            this.hitsound = hitsound;
+            this.sampleSet = sampleSet;
+            this.additionsSet = additionsSet;
+            this.customIndex = customIndex;
         }
 
         /// <summary>
@@ -66,82 +66,82 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         [JsonIgnore]
         public bool IsSelected {
-            get => _isSelected;
+            get => isSelected;
             set {
-                if (_isSelected == value) return;
-                _isSelected = value;
+                if (isSelected == value) return;
+                isSelected = value;
                 OnPropertyChanged();
             }
         }
 
         public string Filename {
-            get => _filename;
+            get => filename;
             set {
-                if (_filename == value) return;
-                _filename = value;
+                if (filename == value) return;
+                filename = value;
                 OnPropertyChanged();
             }
         }
 
         public string Name {
-            get => _name;
+            get => name;
             set {
-                if (_name == value) return;
-                _name = value;
+                if (name == value) return;
+                name = value;
                 OnPropertyChanged();
             }
         }
 
         public double XPos {
-            get => _xPos;
+            get => xPos;
             set {
-                if (_xPos == value) return;
-                _xPos = value;
+                if (xPos == value) return;
+                xPos = value;
                 OnPropertyChanged();
             }
         }
 
         public double YPos {
-            get => _yPos;
+            get => yPos;
             set {
-                if (_yPos == value) return;
-                _yPos = value;
+                if (yPos == value) return;
+                yPos = value;
                 OnPropertyChanged();
             }
         }
 
         public Hitsound Hitsound {
-            get => _hitsound;
+            get => hitsound;
             set {
-                if (_hitsound == value) return;
-                _hitsound = value;
+                if (hitsound == value) return;
+                hitsound = value;
                 OnPropertyChanged();
             }
         }
 
         public SampleSet SampleSet {
-            get => _sampleSet;
+            get => sampleSet;
             set {
-                if (_sampleSet == value) return;
-                _sampleSet = value;
+                if (sampleSet == value) return;
+                sampleSet = value;
                 OnPropertyChanged();
             }
         }
 
         public SampleSet AdditionsSet {
-            get => _additionsSet;
+            get => additionsSet;
             set {
-                if (_additionsSet == value) return;
-                _additionsSet = value;
+                if (additionsSet == value) return;
+                additionsSet = value;
                 OnPropertyChanged();
             }
         }
 
         public int CustomIndex {
-            get => _customIndex;
+            get => customIndex;
             set {
-                if (_customIndex == value) return;
-                _customIndex = value;
+                if (customIndex == value) return;
+                customIndex = value;
                 OnPropertyChanged();
             }
         }

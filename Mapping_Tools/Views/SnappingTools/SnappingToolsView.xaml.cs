@@ -19,8 +19,8 @@ namespace Mapping_Tools.Views.SnappingTools {
 
         public static readonly string ToolDescription = $@"Generates and keeps track of a list virtual objects that are geometrically relevant to the objects visible on your screen. Press and hold the Activation Key to let your cursor snap to the closest virtual object.{Environment.NewLine}⚠ You must specify your user config file in the Preferences for this tool to function.";
 
-        private double _scrollOffset;
-        private bool _resetScroll = true;
+        private double scrollOffset;
+        private bool resetScroll = true;
 
         public SnappingToolsVm ViewModel
         {
@@ -80,7 +80,7 @@ namespace Mapping_Tools.Views.SnappingTools {
         private void UIElement_OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             var scv = (ScrollViewer)sender;
-            _scrollOffset = scv.VerticalOffset - e.Delta;
+            scrollOffset = scv.VerticalOffset - e.Delta;
             scv.ScrollToVerticalOffset(scv.VerticalOffset - e.Delta);
             e.Handled = true;
         }
@@ -106,15 +106,15 @@ namespace Mapping_Tools.Views.SnappingTools {
         private void ScrollViewer_OnScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             var scv = (ScrollViewer)sender;
-            if (_resetScroll && Math.Abs(_scrollOffset - scv.VerticalOffset) > Precision.DOUBLE_EPSILON)
+            if (resetScroll && Math.Abs(scrollOffset - scv.VerticalOffset) > Precision.DoubleEpsilon)
             {
-                scv.ScrollToVerticalOffset(_scrollOffset);
+                scv.ScrollToVerticalOffset(scrollOffset);
             }
         }
 
         private void UIElement_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            _resetScroll = !Equals(e.Source, GeneratorsScrollViewer);
+            resetScroll = !Equals(e.Source, GeneratorsScrollViewer);
         }
 
         #region IHaveExtraMenuItems members

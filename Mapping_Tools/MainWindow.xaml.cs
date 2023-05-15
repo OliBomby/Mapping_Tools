@@ -23,7 +23,7 @@ namespace Mapping_Tools {
 
     public partial class MainWindow {
         private bool autoSave = true;
-        private UpdaterWindow _updaterWindow;
+        private UpdaterWindow updaterWindow;
         private bool updateAfterClose;
         private Task downloadUpdateTask;
         private UpdateManager updateManager;
@@ -122,13 +122,13 @@ namespace Mapping_Tools {
                 }
 
                 Dispatcher.Invoke(() => {
-                    _updaterWindow = new UpdaterWindow(updateManager.Progress) {
+                    updaterWindow = new UpdaterWindow(updateManager.Progress) {
                         ShowActivated = true
                     };
 
-                    _updaterWindow.Closed += DisposeUpdateManager;
+                    updaterWindow.Closed += DisposeUpdateManager;
 
-                    _updaterWindow.ActionSelected += async (_, action) => {
+                    updaterWindow.ActionSelected += async (_, action) => {
                         switch (action) {
                             case UpdateAction.Restart:
                                 updateAfterClose = false;
@@ -136,7 +136,7 @@ namespace Mapping_Tools {
                                 updateManager.RestartAfterUpdate = true;
                                 updateManager.StartUpdateProcess();
 
-                                _updaterWindow.Close();
+                                updaterWindow.Close();
                                 Close();
                                 break;
 
@@ -146,20 +146,20 @@ namespace Mapping_Tools {
                                 downloadUpdateTask = updateManager.DownloadUpdateAsync();
 
                                 // Preserve the update manager so it can be used later to download the update
-                                _updaterWindow.Closed -= DisposeUpdateManager;
+                                updaterWindow.Closed -= DisposeUpdateManager;
 
-                                _updaterWindow.Close();
+                                updaterWindow.Close();
                                 break;
 
                             case UpdateAction.Skip:
                                 updateAfterClose = false;
                                 // Update the skip version so we skip this version in the future
                                 SettingsManager.Settings.SkipVersion = updateManager.UpdatesResult.LastVersion;
-                                _updaterWindow.Close();
+                                updaterWindow.Close();
                                 break;
 
                             default:
-                                _updaterWindow.Close();
+                                updaterWindow.Close();
                                 break;
                         }
                     };
@@ -169,7 +169,7 @@ namespace Mapping_Tools {
                         updateManager = null;
                     }
 
-                    _updaterWindow.Show();
+                    updaterWindow.Show();
                 });
             } catch (Exception e) {
                 MessageBox.Show("UPDATER_EXCEPTION: " + e.Message);
@@ -193,17 +193,17 @@ namespace Mapping_Tools {
                 downloadUpdateTask = updateManager.DownloadUpdateAsync();
             }
 
-            _updaterWindow = new UpdaterWindow(updateManager.Progress, true) {
+            updaterWindow = new UpdaterWindow(updateManager.Progress, true) {
                 ShowActivated = true
             };
 
             _ = Dispatcher.Invoke(async () => {
                 await downloadUpdateTask;
                 updateManager.StartUpdateProcess();
-                _updaterWindow.Close();
+                updaterWindow.Close();
             });
 
-            _updaterWindow.ShowDialog();
+            updaterWindow.ShowDialog();
         }
 
         private void Window_Closing(object sender, EventArgs e) {

@@ -27,12 +27,12 @@ namespace Mapping_Tools.Viewmodels
         private CancellationTokenSource previewTokenSource;
         private readonly object previewTokenLock = new();
 
-        private bool _isProcessingPreview;
+        private bool isProcessingPreview;
         [JsonIgnore]
         public bool IsProcessingPreview
         {
-            get => _isProcessingPreview;
-            set => Set(ref _isProcessingPreview, value);
+            get => isProcessingPreview;
+            set => Set(ref isProcessingPreview, value);
         }
 
         [JsonIgnore]
@@ -41,68 +41,68 @@ namespace Mapping_Tools.Viewmodels
         [JsonIgnore]
         public bool Quick { get; set; }
 
-        private long _viewportSize;
+        private long viewportSize;
         public long ViewportSize
         {
-            get => _viewportSize;
-            set => Set(ref _viewportSize, value);
+            get => viewportSize;
+            set => Set(ref viewportSize, value);
         }
 
-        private int _quality;
+        private int quality;
         public int Quality
         {
-            get => _quality;
+            get => quality;
             set
             {
-                if (Set(ref _quality, value)) {
+                if (Set(ref quality, value)) {
                     RegeneratePreview();
                 }
             }
         }
 
-        private long _segmentCount;
+        private long segmentCount;
         public long SegmentCount
         {
-            get => _segmentCount;
-            set => Set(ref _segmentCount, value);
+            get => segmentCount;
+            set => Set(ref segmentCount, value);
         }
 
         [JsonIgnore]
         public IEnumerable<long> ViewportSizes => new List<long> { 16384, 32768 };
 
-        private double _yResolution;
+        private double yResolution;
         public double YResolution
         {
-            get => _yResolution;
-            set => Set(ref _yResolution, value);
+            get => yResolution;
+            set => Set(ref yResolution, value);
         }
 
-        private double _sliderStartX;
+        private double sliderStartX;
         public double SliderStartX
         {
-            get => _sliderStartX;
-            set => Set(ref _sliderStartX, value);
+            get => sliderStartX;
+            set => Set(ref sliderStartX, value);
         }
 
-        private double _sliderStartY;
+        private double sliderStartY;
         public double SliderStartY
         {
-            get => _sliderStartY;
-            set => Set(ref _sliderStartY, value);
+            get => sliderStartY;
+            set => Set(ref sliderStartY, value);
         }
 
-        private double _imageStartX;
+        private double imageStartX;
         public double ImageStartX
         {
-            get => _imageStartX;
-            set => Set(ref _imageStartX, value);
+            get => imageStartX;
+            set => Set(ref imageStartX, value);
         }
 
-        private double _imageStartY;
+        private double imageStartY;
         public double ImageStartY
         {
-            get => _imageStartY;
-            set => Set(ref _imageStartY, value);
+            get => imageStartY;
+            set => Set(ref imageStartY, value);
         }
 
         [JsonIgnore]
@@ -134,40 +134,40 @@ namespace Mapping_Tools.Viewmodels
         }
 
 
-        private bool _useMapComboColors;
+        private bool useMapComboColors;
 
         public bool UseMapComboColors
         {
-            get => _useMapComboColors;
+            get => useMapComboColors;
             set
             {
-                if (Set(ref _useMapComboColors, value)) {
+                if (Set(ref useMapComboColors, value)) {
                     CurrentTrackColor = value ? ComboColor : Color.FromArgb(TrackColorPickerColor.R, TrackColorPickerColor.G, TrackColorPickerColor.B);
-                    RaisePropertyChanged(nameof(ShouldShowCCPicker));
+                    RaisePropertyChanged(nameof(ShouldShowCcPicker));
                     RaisePropertyChanged(nameof(ShouldShowPalette));
                 }
             }
         }
 
-        private Color _currentTrackColor;
+        private Color currentTrackColor;
         public Color CurrentTrackColor
         {
-            get => _currentTrackColor;
+            get => currentTrackColor;
             set
             {
-                if (Set(ref _currentTrackColor, value)) {
+                if (Set(ref currentTrackColor, value)) {
                     RegeneratePreview();
                 }
             }
         }
 
-        private Color _comboColor;
+        private Color comboColor;
         public Color ComboColor
         {
-            get => _comboColor;
+            get => comboColor;
             set
             {
-                if (Set(ref _comboColor, value) && UseMapComboColors) {
+                if (Set(ref comboColor, value) && UseMapComboColors) {
                     CurrentTrackColor = value;
                     RaisePropertyChanged(nameof(PickedComboColor));
                 }
@@ -177,50 +177,50 @@ namespace Mapping_Tools.Viewmodels
         [JsonIgnore]
         public string PickedComboColor => ColorTranslator.ToHtml(ComboColor);
 
-        private System.Windows.Media.Color _trackColorPickerColor;
+        private System.Windows.Media.Color trackColorPickerColor;
 
         public System.Windows.Media.Color TrackColorPickerColor
         {
-            get => _trackColorPickerColor;
+            get => trackColorPickerColor;
             set {
-                if(Set(ref _trackColorPickerColor, value) && !UseMapComboColors) {
+                if(Set(ref trackColorPickerColor, value) && !UseMapComboColors) {
                     CurrentTrackColor = Color.FromArgb(value.R, value.G, value.B);
                     RegeneratePreview();
                 }
             }
         }
 
-        private System.Windows.Media.Color _borderColor;
+        private System.Windows.Media.Color borderColor;
 
         public System.Windows.Media.Color BorderColor
         {
-            get => _borderColor;
+            get => borderColor;
             set
             {
-                if (Set(ref _borderColor, value)) {
+                if (Set(ref borderColor, value)) {
                     RegeneratePreview();
                 }
             }
         }
 
         [JsonIgnore]
-        public Visibility ShouldShowCCPicker => UseMapComboColors ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility ShouldShowCcPicker => UseMapComboColors ? Visibility.Visible : Visibility.Collapsed;
 
         [JsonIgnore]
         public Visibility ShouldShowPalette => UseMapComboColors ? Visibility.Collapsed : Visibility.Visible;
 
-        private double _timeCode;
+        private double timeCode;
         public double TimeCode
         {
-            get => _timeCode;
-            set => Set(ref _timeCode, value);
+            get => timeCode;
+            set => Set(ref timeCode, value);
         }
 
-        private double _duration;
+        private double duration;
         public double Duration
         {
-            get => _duration;
-            set => Set(ref _duration, value);
+            get => duration;
+            set => Set(ref duration, value);
         }
 
         [JsonIgnore]
@@ -229,113 +229,113 @@ namespace Mapping_Tools.Viewmodels
         [System.Runtime.InteropServices.DllImport("gdi32.dll")]
         public static extern bool DeleteObject(IntPtr hObject);
 
-        private Bitmap _bm;
+        private Bitmap bm;
         [JsonIgnore]
-        public Bitmap BM
+        public Bitmap Bm
         {
-            get => _bm;
-            set => Set(ref _bm, value);
+            get => bm;
+            set => Set(ref bm, value);
         }
 
-        private InteropBitmap _bmImage;
+        private InteropBitmap bmImage;
         [JsonIgnore]
-        public InteropBitmap BMImage
+        public InteropBitmap BmImage
         {
-            get => _bmImage;
-            set => Set(ref _bmImage, value);
+            get => bmImage;
+            set => Set(ref bmImage, value);
         }
 
-        private string _pictureFile;
+        private string pictureFile;
         public string PictureFile
         {
-            get => _pictureFile;
+            get => pictureFile;
             set {
-                Set(ref _pictureFile, value);
-                BM = new Bitmap(value);
-                RaisePropertyChanged(nameof(BM));
+                Set(ref pictureFile, value);
+                Bm = new Bitmap(value);
+                RaisePropertyChanged(nameof(Bm));
                 RegeneratePreview();
             }
         }
 
-        private bool _blackOn;
+        private bool blackOn;
         public bool BlackOn
         {
-            get => _blackOn;
+            get => blackOn;
             set {
-                if (Set(ref _blackOn, value)) {
+                if (Set(ref blackOn, value)) {
                     RegeneratePreview();
                 }
             }
         }
 
-        private bool _borderOn;
+        private bool borderOn;
         public bool BorderOn
         {
-            get => _borderOn;
+            get => borderOn;
             set {
-                if (Set(ref _borderOn, value)) {
+                if (Set(ref borderOn, value)) {
                     RegeneratePreview();
                 }
             }
         }
 
-        private bool _redOn;
+        private bool redOn;
         public bool RedOn
         {
-            get => _redOn;
+            get => redOn;
             set {
-                if (Set(ref _redOn, value)) {
+                if (Set(ref redOn, value)) {
                     RegeneratePreview();
                 }
             }
         }
 
-        private bool _greenOn;
+        private bool greenOn;
         public bool GreenOn
         {
-            get => _greenOn;
+            get => greenOn;
             set {
-                if (Set(ref _greenOn, value)) {
+                if (Set(ref greenOn, value)) {
                     RegeneratePreview();
                 }
             }
         }
 
-        private bool _blueOn;
+        private bool blueOn;
         public bool BlueOn
         {
-            get => _blueOn;
+            get => blueOn;
             set {
-                if (Set(ref _blueOn, value)) {
+                if (Set(ref blueOn, value)) {
                     RegeneratePreview();
                 }
             }
         }
 
-        private bool _alphaOn;
+        private bool alphaOn;
         public bool AlphaOn
         {
-            get => _alphaOn;
+            get => alphaOn;
             set {
-                if (Set(ref _alphaOn, value)) {
+                if (Set(ref alphaOn, value)) {
                     RegeneratePreview();
                 }
             }
         }
 
-        private bool _setBeatmapColors;
+        private bool setBeatmapColors;
         public bool SetBeatmapColors
         {
-            get => _setBeatmapColors;
-            set => Set(ref _setBeatmapColors, value);
+            get => setBeatmapColors;
+            set => Set(ref setBeatmapColors, value);
         }
 
-        private HitObject _selectedSlider;
+        private HitObject selectedSlider;
         public HitObject SelectedSlider
         {
-            get => _selectedSlider;
+            get => selectedSlider;
             set {
-                if (Set(ref _selectedSlider, value)) {
+                if (Set(ref selectedSlider, value)) {
                     RegeneratePreview();
                 }
             }
@@ -356,7 +356,7 @@ namespace Mapping_Tools.Viewmodels
         #endregion
 
         public void RegeneratePreview() {
-            if (BM == null) {
+            if (Bm == null) {
                 return;
             }
             CancellationToken ct;
@@ -371,7 +371,7 @@ namespace Mapping_Tools.Viewmodels
 
             // Raise property changed for the load indicator in the preview
             IsProcessingPreview = true;
-            Bitmap bm = (Bitmap)BM.Clone();
+            Bitmap bm = (Bitmap)Bm.Clone();
             Color ctc = Color.FromArgb(CurrentTrackColor.ToArgb());
             Color bc = Color.FromArgb(BorderColor.R, BorderColor.G, BorderColor.B);
             HitObject ss = null;
@@ -395,9 +395,9 @@ namespace Mapping_Tools.Viewmodels
                     finally {
                         DeleteObject(hBitmap);
                     }
-                    BMImage = retval;
+                    BmImage = retval;
                     SegmentCount = segmentCount;
-                    RaisePropertyChanged(nameof(BMImage));
+                    RaisePropertyChanged(nameof(BmImage));
                 });
 
             }, ct).ContinueWith(task => {
@@ -441,8 +441,8 @@ namespace Mapping_Tools.Viewmodels
             Quality = 1;
             TrackColorPickerColor = System.Windows.Media.Color.FromArgb(255, 255, 255, 255);
             BorderColor = System.Windows.Media.Color.FromArgb(255, 255, 255, 255);
-            BMImage = null;
-            BM = null;
+            BmImage = null;
+            Bm = null;
             SelectedSlider = null;
 
             UploadFileCommand = new CommandImplementation(_ => SetFile());

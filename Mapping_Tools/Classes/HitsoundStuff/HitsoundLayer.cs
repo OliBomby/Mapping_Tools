@@ -12,78 +12,78 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
     /// It is also directly connected to the source of the data.
     /// </summary>
     public class HitsoundLayer : BindableBase {
-        private string _name;
+        private string name;
         /// <summary>
         /// The name of this hitsound layer. This is only for the convenience of the user and not an unique identifier.
         /// </summary>
         public string Name {
-            get => _name;
-            set => Set(ref _name, value);
+            get => name;
+            set => Set(ref name, value);
         }
 
-        private SampleSet _sampleSet;
+        private SampleSet sampleSet;
         /// <summary>
         /// The sample set that this sample should play on.
         /// </summary>
         public SampleSet SampleSet {
-            get => _sampleSet;
+            get => sampleSet;
             set {
-                if (Set(ref _sampleSet, value)) {
+                if (Set(ref sampleSet, value)) {
                     RaisePropertyChanged(nameof(SampleSetString));
                 }
             }
         }
 
-        private Hitsound _hitsound;
+        private Hitsound hitsound;
         /// <summary>
         /// The hitsound that this sample should play on.
         /// </summary>
         public Hitsound Hitsound {
-            get => _hitsound;
+            get => hitsound;
             set {
-                if (Set(ref _hitsound, value)) {
+                if (Set(ref hitsound, value)) {
                     RaisePropertyChanged(nameof(HitsoundString));
                 }
             }
         }
 
-        private int _priority;
+        private int priority;
         /// <summary>
         /// The priority of this hitsound layer. When mixing multiple <see cref="Sample"/>,
         /// the sampleset of the one with the lowest priority will be taken.
         /// This priority value is equal to the index in the hitsound layers list.
         /// </summary>
         public int Priority {
-            get => _priority;
-            set => Set(ref _priority, value);
+            get => priority;
+            set => Set(ref priority, value);
         }
 
-        private LayerImportArgs _importArgs;
+        private LayerImportArgs importArgs;
         /// <summary>
         /// Contains all the information about how this hitsound layer was generated, so it can be reloaded.
         /// </summary>
         public LayerImportArgs ImportArgs {
-            get => _importArgs;
-            set => Set(ref _importArgs, value);
+            get => importArgs;
+            set => Set(ref importArgs, value);
         }
 
-        private SampleGeneratingArgs _sampleArgs;
+        private SampleGeneratingArgs sampleArgs;
         /// <summary>
         /// Contains all the information about how the sound of this hitsound should be generated.
         /// </summary>
         public SampleGeneratingArgs SampleArgs {
-            get => _sampleArgs;
-            set => Set(ref _sampleArgs, value);
+            get => sampleArgs;
+            set => Set(ref sampleArgs, value);
         }
 
-        private List<double> _times;
+        private List<double> times;
         /// <summary>
         /// Contains all the times that this hitsound should play.
         /// This list is usually sorted.
         /// </summary>
         public List<double> Times {
-            get => _times;
-            set => Set(ref _times, value);
+            get => times;
+            set => Set(ref times, value);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             if (Times.Count < 2) return;
 
             for (int i = 1; i < Times.Count; i++) {
-                if (Math.Abs(Times[i] - Times[i - 1]) < Precision.DOUBLE_EPSILON) {
+                if (Math.Abs(Times[i] - Times[i - 1]) < Precision.DoubleEpsilon) {
                     Times.RemoveAt(i);
                     i--;
                 }    

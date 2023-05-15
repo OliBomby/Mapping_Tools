@@ -19,11 +19,11 @@ namespace Mapping_Tools.Components.Graph {
     /// Interaction logic for Graph.xaml
     /// </summary>
     public partial class Graph {
-        private bool _initialized;
-        private bool _drawAnchors;
-        private bool _isDragging;
-        private Point _lastMousePoint;
-        private readonly List<GraphMarker> _markers;
+        private bool initialized;
+        private bool drawAnchors;
+        private bool isDragging;
+        private Point lastMousePoint;
+        private readonly List<GraphMarker> markers;
 
         public bool IgnoreAnchorUpdates { get; set; }
 
@@ -460,7 +460,7 @@ namespace Mapping_Tools.Components.Graph {
         public Graph() {
             InitializeComponent();
             
-            _markers = new List<GraphMarker>();
+            markers = new List<GraphMarker>();
             Anchors = new AnchorCollection();
             ExtraMarkers = new ObservableCollection<GraphMarker>();
             LastInterpolationSet = typeof(SingleCurveInterpolator);
@@ -476,7 +476,7 @@ namespace Mapping_Tools.Components.Graph {
             Anchors.AnchorsChanged += AnchorsOnAnchorsChanged;
             ExtraMarkers.CollectionChanged += ExtraMarkersOnCollectionChanged;
 
-            _initialized = true;
+            initialized = true;
             UpdateVisual();
         }
 
@@ -766,7 +766,7 @@ namespace Mapping_Tools.Components.Graph {
 
         private static void OnEdgesBrushChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var g = (Graph) d;
-            g._markers.ForEach(o => o.Stroke = g.EdgesBrush);
+            g.markers.ForEach(o => o.Stroke = g.EdgesBrush);
             g.UpdateVisual();
         }
 
@@ -821,12 +821,12 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         public void RegenerateMarkers() {
-            _markers.Clear();
+            markers.Clear();
             if (HorizontalMarkerGenerator != null)
-                _markers.AddRange(HorizontalMarkerGenerator.GenerateMarkers(ViewMinX, ViewMaxX, Orientation.Vertical,
+                markers.AddRange(HorizontalMarkerGenerator.GenerateMarkers(ViewMinX, ViewMaxX, Orientation.Vertical,
                     (int)(ActualWidth / MinMarkerSpacing)));
             if (VerticalMarkerGenerator != null)
-                _markers.AddRange(VerticalMarkerGenerator.GenerateMarkers(ViewMinY, ViewMaxY, Orientation.Horizontal,
+                markers.AddRange(VerticalMarkerGenerator.GenerateMarkers(ViewMinY, ViewMaxY, Orientation.Horizontal,
                     (int)(ActualHeight / MinMarkerSpacing)));
 
             UpdateMarkers();
@@ -839,16 +839,16 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         public void UpdateVisual() {
-            if (!_initialized) return;
+            if (!initialized) return;
 
             // Clear canvas
             MainCanvas.Children.Clear();
 
             // Add markers
-            foreach (var marker in _markers.Concat(ExtraMarkers).Where(marker => marker.X > -Precision.DOUBLE_EPSILON && 
-                                                            marker.X < ActualWidth + Precision.DOUBLE_EPSILON && 
-                                                            marker.Y > -Precision.DOUBLE_EPSILON && 
-                                                            marker.Y < ActualHeight + Precision.DOUBLE_EPSILON)) {
+            foreach (var marker in markers.Concat(ExtraMarkers).Where(marker => marker.X > -Precision.DoubleEpsilon && 
+                                                            marker.X < ActualWidth + Precision.DoubleEpsilon && 
+                                                            marker.Y > -Precision.DoubleEpsilon && 
+                                                            marker.Y < ActualHeight + Precision.DoubleEpsilon)) {
                 MainCanvas.Children.Add(marker);
             }
 
@@ -941,7 +941,7 @@ namespace Mapping_Tools.Components.Graph {
             MainCanvas.Children.Add(polygon);
 
             // Return if we dont draw Anchors or if the graph is not user editable. Having invisible anchors makes it impossible to edit
-            if (!_drawAnchors || !UserEditable) return;
+            if (!drawAnchors || !UserEditable) return;
             
             // Add tension Anchors
             foreach (var anchor in Anchors) {
@@ -949,7 +949,7 @@ namespace Mapping_Tools.Components.Graph {
                 var next = anchor;
                 var previous = anchor.PreviousAnchor;
 
-                if (previous == null || Math.Abs(next.Pos.X - previous.Pos.X) < Precision.DOUBLE_EPSILON) {
+                if (previous == null || Math.Abs(next.Pos.X - previous.Pos.X) < Precision.DoubleEpsilon) {
                     continue;
                 }
                 var x = (next.Pos.X + previous.Pos.X) / 2;
@@ -990,7 +990,7 @@ namespace Mapping_Tools.Components.Graph {
                     // Find the nearest marker
                     GraphMarker nearestMarkerHorizontal = null;
                     double nearestDistance = double.PositiveInfinity;
-                    foreach (var marker in _markers.Concat(ExtraMarkers).Where(o => o.Orientation == Orientation.Vertical && o.Snappable)) {
+                    foreach (var marker in markers.Concat(ExtraMarkers).Where(o => o.Orientation == Orientation.Vertical && o.Snappable)) {
                         var markerPos = GetValue(marker);
                         var dist = Math.Abs(pos.X - markerPos.X);
                         if (!(dist < nearestDistance)) continue;
@@ -1005,7 +1005,7 @@ namespace Mapping_Tools.Components.Graph {
                     // Find the nearest marker
                     GraphMarker nearestMarkerVertical = null;
                     double nearestDistance = double.PositiveInfinity;
-                    foreach (var marker in _markers.Concat(ExtraMarkers).Where(o => o.Orientation == Orientation.Horizontal && o.Snappable)) {
+                    foreach (var marker in markers.Concat(ExtraMarkers).Where(o => o.Orientation == Orientation.Horizontal && o.Snappable)) {
                         var markerPos = GetValue(marker);
                         var dist = Math.Abs(pos.Y - markerPos.Y);
                         if (!(dist < nearestDistance)) continue;
@@ -1056,14 +1056,14 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void Graph_OnMouseEnter(object sender, MouseEventArgs e) {
-            if (_drawAnchors) return;
-            _drawAnchors = true;
+            if (drawAnchors) return;
+            drawAnchors = true;
             UpdateVisual();
         }
 
         private void Graph_OnMouseLeave(object sender, MouseEventArgs e) {
-            if (!_drawAnchors) return;
-            _drawAnchors = false;
+            if (!drawAnchors) return;
+            drawAnchors = false;
             UpdateVisual();
         }
 
@@ -1101,7 +1101,7 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void UpdateMarkers() {
-            foreach (var graphMarker in _markers.Concat(ExtraMarkers)) {
+            foreach (var graphMarker in markers.Concat(ExtraMarkers)) {
                 graphMarker.Stroke = EdgesBrush;
                 graphMarker.Width = ActualWidth;
                 graphMarker.Height = ActualHeight;
@@ -1121,32 +1121,32 @@ namespace Mapping_Tools.Components.Graph {
         }
 
         private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
-            _lastMousePoint = e.GetPosition(this);
+            lastMousePoint = e.GetPosition(this);
 
             CaptureMouse();
-            _isDragging = true;
+            isDragging = true;
             e.Handled = true;
         }
 
         private void UserControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
             ReleaseMouseCapture();
-            _isDragging = false;
+            isDragging = false;
             e.Handled = true;
         }
 
         private void UserControl_MouseMove(object sender, MouseEventArgs e) {
-            if (!_isDragging) return;
+            if (!isDragging) return;
 
             if (e.RightButton != MouseButtonState.Pressed && e.LeftButton != MouseButtonState.Pressed) {
                 ReleaseMouseCapture();
-                _isDragging = false;
+                isDragging = false;
                 return;
             }
 
             // Get the position of the mouse relative to the Canvas
             var newMousePoint = e.GetPosition(this);
-            var diff = _lastMousePoint - newMousePoint;
-            _lastMousePoint = newMousePoint;
+            var diff = lastMousePoint - newMousePoint;
+            lastMousePoint = newMousePoint;
 
             // Move the view box by diff
             var valueDiff = GetValueVector(new Point(diff.X, diff.Y));

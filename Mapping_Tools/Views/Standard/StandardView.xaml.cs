@@ -20,7 +20,7 @@ namespace Mapping_Tools.Views.Standard {
 
         public class ChangelogItem
         {
-            public string ID { get; set; }
+            public string Id { get; set; }
             public string Title { get; set; }
             public string Text { get; set; }
             public string Date { get; set; }
@@ -40,7 +40,7 @@ namespace Mapping_Tools.Views.Standard {
 
                 foreach (dynamic dict in json) {
                     ChangelogList.Items.Add(new ChangelogItem {
-                        ID = dict["id"],
+                        Id = dict["id"],
                         Title = dict["name"],
                         Text = dict["body"],
                         Date = dict["published_at"],

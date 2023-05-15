@@ -421,7 +421,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                     // Construct hitsound layer properties
                     var sampleArgs = new SampleGeneratingArgs(string.Empty, bank, patch, instrument, key, length, velocity);
-                    var importArgs = new LayerImportArgs(ImportType.MIDI) {
+                    var importArgs = new LayerImportArgs(ImportType.Midi) {
                         Path = path,
                         Bank = bank,
                         Patch = patch,
@@ -472,7 +472,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     return ImportHitsounds(reloadingArgs.Path, reloadingArgs.DiscriminateVolumes, reloadingArgs.DetectDuplicateSamples, reloadingArgs.RemoveDuplicates, false);
                 case ImportType.Storyboard:
                     return ImportStoryboard(reloadingArgs.Path, reloadingArgs.DiscriminateVolumes, reloadingArgs.RemoveDuplicates);
-                case ImportType.MIDI:
+                case ImportType.Midi:
                     return ImportMidi(reloadingArgs.Path,
                         lengthRoughness: reloadingArgs.LengthRoughness,
                         velocityRoughness: reloadingArgs.VelocityRoughness);

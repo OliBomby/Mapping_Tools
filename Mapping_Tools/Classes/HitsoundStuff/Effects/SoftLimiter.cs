@@ -27,23 +27,23 @@ namespace Mapping_Tools.Classes.HitsoundStuff.Effects {
         }
 
         protected override void Sample(ref float spl0, ref float spl1) {
-            var dB0 = amp_dB * log(abs(spl0)) + boost_dB;
-            var dB1 = amp_dB * log(abs(spl1)) + boost_dB;
+            var dB0 = amp_dB * Log(Abs(spl0)) + boost_dB;
+            var dB1 = amp_dB * Log(Abs(spl1)) + boost_dB;
 
             if (dB0 > threshold_dB) {
                 var over_dB = dB0 - threshold_dB;
                 over_dB = a * over_dB + b * over_dB * over_dB;
-                dB0 = min(threshold_dB + over_dB, limit_dB);
+                dB0 = Min(threshold_dB + over_dB, limit_dB);
             }
 
             if (dB1 > threshold_dB) {
                 var over_dB = dB1 - threshold_dB;
                 over_dB = a * over_dB + b * over_dB * over_dB;
-                dB1 = min(threshold_dB + over_dB, limit_dB);
+                dB1 = Min(threshold_dB + over_dB, limit_dB);
             }
 
-            spl0 = exp(dB0 / amp_dB) * sign(spl0);
-            spl1 = exp(dB1 / amp_dB) * sign(spl1);
+            spl0 = Exp(dB0 / amp_dB) * Sign(spl0);
+            spl1 = Exp(dB1 / amp_dB) * Sign(spl1);
         }
     }
 }

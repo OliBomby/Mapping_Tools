@@ -232,10 +232,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="snap2"></param>
         /// <param name="floor"></param>
         /// <param name="tp"></param>
-        /// <param name="firstTP"></param>
+        /// <param name="firstTp"></param>
         /// <returns></returns>
-        public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor=true, TimingPoint tp=null, TimingPoint firstTP = null) {
-            double newTime = timing.Resnap(Offset, beatDivisors, floor, tp: tp, firstTp: firstTP);
+        public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor=true, TimingPoint tp=null, TimingPoint firstTp = null) {
+            double newTime = timing.Resnap(Offset, beatDivisors, floor, tp: tp, firstTp: firstTp);
             double deltaTime = newTime - Offset;
             Offset += deltaTime;
             return deltaTime != 0;

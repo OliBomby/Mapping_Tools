@@ -9,22 +9,22 @@ namespace Mapping_Tools.Views {
     public class SingleRunMappingTool : MappingTool {
         protected readonly BackgroundWorker BackgroundWorker;
 
-        private bool _canRun = true;
+        private bool canRun = true;
         public bool CanRun {
-            get => _canRun;
-            set => Set(ref _canRun, value);
+            get => canRun;
+            set => Set(ref canRun, value);
         }
 
-        private int _progress;
+        private int progress;
         public int Progress {
-            get => _progress;
-            set => Set(ref _progress, value);
+            get => progress;
+            set => Set(ref progress, value);
         }
 
-        private bool _verbose;
+        private bool verbose;
         public bool Verbose {
-            get => _verbose;
-            set => Set(ref _verbose, value);
+            get => verbose;
+            set => Set(ref verbose, value);
         }
 
         public SingleRunMappingTool() {

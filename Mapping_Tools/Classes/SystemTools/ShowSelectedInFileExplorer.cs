@@ -13,18 +13,18 @@
         [Flags]
         enum SHCONT : ushort
         {
-            SHCONTF_CHECKING_FOR_CHILDREN = 0x0010,
-            SHCONTF_FOLDERS = 0x0020,
-            SHCONTF_NONFOLDERS = 0x0040,
-            SHCONTF_INCLUDEHIDDEN = 0x0080,
-            SHCONTF_INIT_ON_FIRST_NEXT = 0x0100,
-            SHCONTF_NETPRINTERSRCH = 0x0200,
-            SHCONTF_SHAREABLE = 0x0400,
-            SHCONTF_STORAGE = 0x0800,
-            SHCONTF_NAVIGATION_ENUM = 0x1000,
-            SHCONTF_FASTITEMS = 0x2000,
-            SHCONTF_FLATLIST = 0x4000,
-            SHCONTF_ENABLE_ASYNC = 0x8000
+            ShcontfCheckingForChildren = 0x0010,
+            ShcontfFolders = 0x0020,
+            ShcontfNonfolders = 0x0040,
+            ShcontfIncludehidden = 0x0080,
+            ShcontfInitOnFirstNext = 0x0100,
+            ShcontfNetprintersrch = 0x0200,
+            ShcontfShareable = 0x0400,
+            ShcontfStorage = 0x0800,
+            ShcontfNavigationEnum = 0x1000,
+            ShcontfFastitems = 0x2000,
+            ShcontfFlatlist = 0x4000,
+            ShcontfEnableAsync = 0x8000
         }
 
         [ComImport,
@@ -37,7 +37,7 @@
             void ParseDisplayName(IntPtr hwnd, [In, MarshalAs(UnmanagedType.Interface)] IBindCtx pbc, [In, MarshalAs(UnmanagedType.LPWStr)] string pszDisplayName, [Out] out uint pchEaten, [Out] out IntPtr ppidl, [In, Out] ref uint pdwAttributes);
             [PreserveSig]
             [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-            int EnumObjects([In] IntPtr hwnd, [In] SHCONT grfFlags, [MarshalAs(UnmanagedType.Interface)] out IEnumIDList ppenumIDList);
+            int EnumObjects([In] IntPtr hwnd, [In] SHCONT grfFlags, [MarshalAs(UnmanagedType.Interface)] out IEnumIDList ppenumIdList);
 
             [PreserveSig]
             [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
@@ -94,7 +94,7 @@
                 SetLastError = true)]
             static extern int SHGetDesktopFolder_([MarshalAs(UnmanagedType.Interface)] out IShellFolder ppshf);
 
-            public static IShellFolder SHGetDesktopFolder()
+            public static IShellFolder ShGetDesktopFolder()
             {
                 IShellFolder result;
                 Marshal.ThrowExceptionForHR(SHGetDesktopFolder_(out result));
@@ -106,7 +106,7 @@
                 [In] IntPtr pidlFolder, uint cidl, [In, Optional, MarshalAs(UnmanagedType.LPArray)] IntPtr[] apidl,
                 int dwFlags);
 
-            public static void SHOpenFolderAndSelectItems(IntPtr pidlFolder, IntPtr[] apidl, int dwFlags)
+            public static void ShOpenFolderAndSelectItems(IntPtr pidlFolder, IntPtr[] apidl, int dwFlags)
             {
                 var cidl = (apidl != null) ? (uint)apidl.Length : 0U;
                 var result = SHOpenFolderAndSelectItems_(pidlFolder, cidl, apidl, dwFlags);
@@ -117,7 +117,7 @@
             public static extern void ILFree([In] IntPtr pidl);
         }
 
-        static IntPtr GetShellFolderChildrenRelativePIDL(IShellFolder parentFolder, string displayName)
+        static IntPtr GetShellFolderChildrenRelativePidl(IShellFolder parentFolder, string displayName)
         {
             uint pchEaten;
             uint pdwAttributes = 0;
@@ -127,40 +127,40 @@
             return ppidl;
         }
 
-        static IntPtr PathToAbsolutePIDL(string path)
+        static IntPtr PathToAbsolutePidl(string path)
         {
-            var desktopFolder = NativeMethods.SHGetDesktopFolder();
-            return GetShellFolderChildrenRelativePIDL(desktopFolder, path);
+            var desktopFolder = NativeMethods.ShGetDesktopFolder();
+            return GetShellFolderChildrenRelativePidl(desktopFolder, path);
         }
 
-        static Guid IID_IShellFolder = typeof(IShellFolder).GUID;
+        static Guid iid_iShellFolder = typeof(IShellFolder).GUID;
 
-        static IShellFolder PIDLToShellFolder(IShellFolder parent, IntPtr pidl)
+        static IShellFolder PidlToShellFolder(IShellFolder parent, IntPtr pidl)
         {
             IShellFolder folder;
-            var result = parent.BindToObject(pidl, null, ref IID_IShellFolder, out folder);
+            var result = parent.BindToObject(pidl, null, ref iid_iShellFolder, out folder);
             Marshal.ThrowExceptionForHR((int)result);
             return folder;
         }
 
-        static IShellFolder PIDLToShellFolder(IntPtr pidl)
+        static IShellFolder PidlToShellFolder(IntPtr pidl)
         {
-            return PIDLToShellFolder(NativeMethods.SHGetDesktopFolder(), pidl);
+            return PidlToShellFolder(NativeMethods.ShGetDesktopFolder(), pidl);
         }
 
-        static void SHOpenFolderAndSelectItems(IntPtr pidlFolder, IntPtr[] apidl, bool edit)
+        static void ShOpenFolderAndSelectItems(IntPtr pidlFolder, IntPtr[] apidl, bool edit)
         {
-            NativeMethods.SHOpenFolderAndSelectItems(pidlFolder, apidl, edit ? 1 : 0);
+            NativeMethods.ShOpenFolderAndSelectItems(pidlFolder, apidl, edit ? 1 : 0);
         }
 
         public static void FileOrFolder(string path, bool edit = false)
         {
             if (path == null) throw new ArgumentNullException("path");
 
-            var pidl = PathToAbsolutePIDL(path);
+            var pidl = PathToAbsolutePidl(path);
             try
             {
-                SHOpenFolderAndSelectItems(pidl, null, edit);
+                ShOpenFolderAndSelectItems(pidl, null, edit);
             }
             finally
             {
@@ -201,17 +201,17 @@
             if (filenames == null) throw new ArgumentNullException("filenames");
             if (filenames.Count == 0) return;
 
-            var parentPidl = PathToAbsolutePIDL(parentDirectory);
+            var parentPidl = PathToAbsolutePidl(parentDirectory);
             try
             {
-                var parent = PIDLToShellFolder(parentPidl);
+                var parent = PidlToShellFolder(parentPidl);
                 var filesPidl = filenames
-                    .Select(filename => GetShellFolderChildrenRelativePIDL(parent, filename))
+                    .Select(filename => GetShellFolderChildrenRelativePidl(parent, filename))
                     .ToArray();
 
                 try
                 {
-                    SHOpenFolderAndSelectItems(parentPidl, filesPidl, false);
+                    ShOpenFolderAndSelectItems(parentPidl, filesPidl, false);
                 }
                 finally
                 {

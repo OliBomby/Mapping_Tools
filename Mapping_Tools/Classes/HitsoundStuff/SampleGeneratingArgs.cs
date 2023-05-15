@@ -68,9 +68,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         public bool CanCopyPaste => !string.IsNullOrEmpty(GetExtension()) &&
                                     !UsesSoundFont &&
-                                    Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON &&
-                                    Math.Abs(Panning) < Precision.DOUBLE_EPSILON &&
-                                    Math.Abs(PitchShift) < Precision.DOUBLE_EPSILON;
+                                    Math.Abs(Volume - 1) < Precision.DoubleEpsilon &&
+                                    Math.Abs(Panning) < Precision.DoubleEpsilon &&
+                                    Math.Abs(PitchShift) < Precision.DoubleEpsilon;
 
         private string path;
         public string Path {
@@ -140,13 +140,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public string GetFilename() {
             var filename = System.IO.Path.GetFileNameWithoutExtension(Path);
             return GetExtension().ToLower() == ".sf2" ?
-                Math.Abs(Panning) < Precision.DOUBLE_EPSILON &&
-                Math.Abs(PitchShift) < Precision.DOUBLE_EPSILON ?
+                Math.Abs(Panning) < Precision.DoubleEpsilon &&
+                Math.Abs(PitchShift) < Precision.DoubleEpsilon ?
                     $"{filename}-{Bank}-{Patch}-{Instrument}-{Key}-{(int)Length}-{Velocity}" :
                 $"{filename}-{(int)(Panning * 100)}-{(int)(PitchShift * 100)}-{Bank}-{Patch}-{Instrument}-{Key}-{(int)Length}-{Velocity}" :
-                Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON &&
-                Math.Abs(Panning) < Precision.DOUBLE_EPSILON &&
-                Math.Abs(PitchShift) < Precision.DOUBLE_EPSILON ?
+                Math.Abs(Volume - 1) < Precision.DoubleEpsilon &&
+                Math.Abs(Panning) < Precision.DoubleEpsilon &&
+                Math.Abs(PitchShift) < Precision.DoubleEpsilon ?
                    filename :
                 $"{filename}-{(int)(Volume * 100)}-{(int)(Panning * 100)}-{(int)(PitchShift * 100)}";
         }
@@ -175,14 +175,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             if (other is null) return false;
 
             return Path == other.Path &&
-                   Math.Abs(Volume - other.Volume) < Precision.DOUBLE_EPSILON &&
-                   Math.Abs(Panning - other.Panning) < Precision.DOUBLE_EPSILON &&
-                   Math.Abs(PitchShift - other.PitchShift) < Precision.DOUBLE_EPSILON &&
+                   Math.Abs(Volume - other.Volume) < Precision.DoubleEpsilon &&
+                   Math.Abs(Panning - other.Panning) < Precision.DoubleEpsilon &&
+                   Math.Abs(PitchShift - other.PitchShift) < Precision.DoubleEpsilon &&
                    Bank == other.Bank &&
                    Patch == other.Patch &&
                    Instrument == other.Instrument &&
                    Key == other.Key &&
-                   Math.Abs(Length - other.Length) < Precision.DOUBLE_EPSILON;
+                   Math.Abs(Length - other.Length) < Precision.DoubleEpsilon;
         }
 
         public override bool Equals(object obj) {

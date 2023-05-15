@@ -11,126 +11,126 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGene
 namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {
     public class SnappingToolsPreferences : BindableBase, ICloneable {
         #region private storage
-        private Dictionary<string, RelevantObjectPreferences> _relevantObjectPreferences;
-        private Dictionary<Type, GeneratorSettings> _generatorSettings;
+        private Dictionary<string, RelevantObjectPreferences> relevantObjectPreferences;
+        private Dictionary<Type, GeneratorSettings> generatorSettings;
 
-        private Hotkey _snapHotkey;
-        private Hotkey _selectHotkey;
-        private Hotkey _lockHotkey;
-        private Hotkey _inheritHotkey;
-        private Hotkey _refreshHotkey;
-        private double _offsetLeft;
-        private double _offsetTop;
-        private double _offsetRight;
-        private double _offsetBottom;
-        private double _acceptableDifference;
-        private bool _keepRunning;
-        private bool _visiblePlayfieldBoundary;
-        private bool _debugEnabled;
-        private ViewMode _keyDownViewMode;
-        private ViewMode _keyUpViewMode;
-        private SelectedHitObjectMode _selectedHitObjectMode;
-        private UpdateMode _updateMode;
-        private int _inceptionLevel;
+        private Hotkey snapHotkey;
+        private Hotkey selectHotkey;
+        private Hotkey lockHotkey;
+        private Hotkey inheritHotkey;
+        private Hotkey refreshHotkey;
+        private double offsetLeft;
+        private double offsetTop;
+        private double offsetRight;
+        private double offsetBottom;
+        private double acceptableDifference;
+        private bool keepRunning;
+        private bool visiblePlayfieldBoundary;
+        private bool debugEnabled;
+        private ViewMode keyDownViewMode;
+        private ViewMode keyUpViewMode;
+        private SelectedHitObjectMode selectedHitObjectMode;
+        private UpdateMode updateMode;
+        private int inceptionLevel;
         #endregion
 
         public Dictionary<string, RelevantObjectPreferences> RelevantObjectPreferences {
-            get => _relevantObjectPreferences;
-            set => Set(ref _relevantObjectPreferences, value);
+            get => relevantObjectPreferences;
+            set => Set(ref relevantObjectPreferences, value);
         }
 
         public Dictionary<Type, GeneratorSettings> GeneratorSettings {
-            get => _generatorSettings;
-            set => Set(ref _generatorSettings, value);
+            get => generatorSettings;
+            set => Set(ref generatorSettings, value);
         }
 
         #region global settings
         public Hotkey SnapHotkey {
-            get => _snapHotkey;
-            set => Set(ref _snapHotkey, value);
+            get => snapHotkey;
+            set => Set(ref snapHotkey, value);
         }
         public Hotkey SelectHotkey {
-            get => _selectHotkey;
-            set => Set(ref _selectHotkey, value);
+            get => selectHotkey;
+            set => Set(ref selectHotkey, value);
         }
         public Hotkey LockHotkey {
-            get => _lockHotkey;
-            set => Set(ref _lockHotkey, value);
+            get => lockHotkey;
+            set => Set(ref lockHotkey, value);
         }
         public Hotkey InheritHotkey {
-            get => _inheritHotkey;
-            set => Set(ref _inheritHotkey, value);
+            get => inheritHotkey;
+            set => Set(ref inheritHotkey, value);
         }
         public Hotkey RefreshHotkey {
-            get => _refreshHotkey;
-            set => Set(ref _refreshHotkey, value);
+            get => refreshHotkey;
+            set => Set(ref refreshHotkey, value);
         }
 
         public double OffsetLeft {
-            get => _offsetLeft;
-            set => Set(ref _offsetLeft, value);
+            get => offsetLeft;
+            set => Set(ref offsetLeft, value);
         }
 
         public double OffsetTop {
-            get => _offsetTop;
-            set => Set(ref _offsetTop, value);
+            get => offsetTop;
+            set => Set(ref offsetTop, value);
         }
 
         public double OffsetRight {
-            get => _offsetRight;
-            set => Set(ref _offsetRight, value);
+            get => offsetRight;
+            set => Set(ref offsetRight, value);
         }
 
         public double OffsetBottom {
-            get => _offsetBottom;
-            set => Set(ref _offsetBottom, value);
+            get => offsetBottom;
+            set => Set(ref offsetBottom, value);
         }
 
         public Box2 OverlayOffset => new Box2(OffsetLeft, OffsetTop, OffsetRight, OffsetBottom);
 
         public double AcceptableDifference {
-            get => _acceptableDifference;
-            set => Set(ref _acceptableDifference, value);
+            get => acceptableDifference;
+            set => Set(ref acceptableDifference, value);
         }
 
         public bool KeepRunning {
-            get => _keepRunning;
-            set => Set(ref _keepRunning, value);
+            get => keepRunning;
+            set => Set(ref keepRunning, value);
         }
 
         public bool VisiblePlayfieldBoundary {
-            get => _visiblePlayfieldBoundary;
-            set => Set(ref _visiblePlayfieldBoundary, value);
+            get => visiblePlayfieldBoundary;
+            set => Set(ref visiblePlayfieldBoundary, value);
         }
 
         public bool DebugEnabled {
-            get => _debugEnabled;
-            set => Set(ref _debugEnabled, value);
+            get => debugEnabled;
+            set => Set(ref debugEnabled, value);
         }
 
         public ViewMode KeyDownViewMode {
-            get => _keyDownViewMode;
-            set => Set(ref _keyDownViewMode, value);
+            get => keyDownViewMode;
+            set => Set(ref keyDownViewMode, value);
         }
 
         public ViewMode KeyUpViewMode {
-            get => _keyUpViewMode;
-            set => Set(ref _keyUpViewMode, value);
+            get => keyUpViewMode;
+            set => Set(ref keyUpViewMode, value);
         }
 
         public SelectedHitObjectMode SelectedHitObjectMode {
-            get => _selectedHitObjectMode;
-            set => Set(ref _selectedHitObjectMode, value);
+            get => selectedHitObjectMode;
+            set => Set(ref selectedHitObjectMode, value);
         }
 
         public UpdateMode UpdateMode {
-            get => _updateMode;
-            set => Set(ref _updateMode, value);
+            get => updateMode;
+            set => Set(ref updateMode, value);
         }
 
         public int InceptionLevel {
-            get => _inceptionLevel;
-            set => Set(ref _inceptionLevel, value);
+            get => inceptionLevel;
+            set => Set(ref inceptionLevel, value);
         }
         #endregion
 
@@ -186,7 +186,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {
 
         #region default constructor
         public SnappingToolsPreferences() {
-            _relevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences> {
+            relevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences> {
                 {
                     RelevantPoint.PreferencesNameStatic, new RelevantObjectPreferences {
                         Name = RelevantPoint.PreferencesNameStatic,
@@ -218,25 +218,25 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {
                 }
             };
 
-            _generatorSettings = new Dictionary<Type, GeneratorSettings>();
+            generatorSettings = new Dictionary<Type, GeneratorSettings>();
 
-            _snapHotkey = new Hotkey(Key.M, ModifierKeys.None);
-            _selectHotkey = new Hotkey(Key.N, ModifierKeys.None);
-            _lockHotkey = new Hotkey(Key.N, ModifierKeys.Shift);
-            _inheritHotkey = new Hotkey(Key.N, ModifierKeys.Alt);
-            _refreshHotkey = new Hotkey(Key.B, ModifierKeys.None);
-            _offsetLeft = 0;
-            _offsetTop = 1;
-            _offsetRight = 0;
-            _offsetBottom = 1;
-            _acceptableDifference = 2;
-            _keepRunning = false;
-            _debugEnabled = false;
-            _keyDownViewMode = ViewMode.Parents;
-            _keyUpViewMode = ViewMode.Everything;
-            _selectedHitObjectMode = SelectedHitObjectMode.AllwaysAllVisible;
-            _updateMode = UpdateMode.TimeChange;
-            _inceptionLevel = 5;
+            snapHotkey = new Hotkey(Key.M, ModifierKeys.None);
+            selectHotkey = new Hotkey(Key.N, ModifierKeys.None);
+            lockHotkey = new Hotkey(Key.N, ModifierKeys.Shift);
+            inheritHotkey = new Hotkey(Key.N, ModifierKeys.Alt);
+            refreshHotkey = new Hotkey(Key.B, ModifierKeys.None);
+            offsetLeft = 0;
+            offsetTop = 1;
+            offsetRight = 0;
+            offsetBottom = 1;
+            acceptableDifference = 2;
+            keepRunning = false;
+            debugEnabled = false;
+            keyDownViewMode = ViewMode.Parents;
+            keyUpViewMode = ViewMode.Everything;
+            selectedHitObjectMode = SelectedHitObjectMode.AllwaysAllVisible;
+            updateMode = UpdateMode.TimeChange;
+            inceptionLevel = 5;
         }
         #endregion
     }

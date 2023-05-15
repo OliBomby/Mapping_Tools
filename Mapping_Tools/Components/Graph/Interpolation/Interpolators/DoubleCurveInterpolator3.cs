@@ -7,16 +7,16 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [VerticalMirrorInterpolator]
     [CustomDerivativeExtrema(new []{0, 0.5, 1})]
     public class DoubleCurveInterpolator3 : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator {
-        private readonly LinearInterpolator _linearDegenerate;
+        private readonly LinearInterpolator linearDegenerate;
 
         public DoubleCurveInterpolator3() {
-            _linearDegenerate = new LinearInterpolator();
+            linearDegenerate = new LinearInterpolator();
             InterpolationFunction = Function;
         }
 
         public double Function(double t) {
-            if (Math.Abs(P) < Precision.DOUBLE_EPSILON) {
-                return _linearDegenerate.GetInterpolation(t);
+            if (Math.Abs(P) < Precision.DoubleEpsilon) {
+                return linearDegenerate.GetInterpolation(t);
             }
 
             var p = MathHelper.Clamp(P, -1, 1) * 7;
@@ -42,8 +42,8 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         public double GetDerivative(double t) {
-            if (Math.Abs(P) < Precision.DOUBLE_EPSILON) {
-                return _linearDegenerate.GetDerivative(t);
+            if (Math.Abs(P) < Precision.DoubleEpsilon) {
+                return linearDegenerate.GetDerivative(t);
             }
 
             var p = MathHelper.Clamp(P, -1, 1) * 7;
@@ -51,8 +51,8 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         public double GetIntegral(double t1, double t2) {
-            if (Math.Abs(P) < Precision.DOUBLE_EPSILON) {
-                return _linearDegenerate.GetIntegral(t1, t2);
+            if (Math.Abs(P) < Precision.DoubleEpsilon) {
+                return linearDegenerate.GetIntegral(t1, t2);
             }
 
             var p = MathHelper.Clamp(P, -1, 1) * 7;

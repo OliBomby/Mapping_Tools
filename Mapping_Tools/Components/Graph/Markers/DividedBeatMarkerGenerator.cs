@@ -29,26 +29,26 @@ namespace Mapping_Tools.Components.Graph.Markers {
             var vStart = Math.Ceiling(start / step) * step;
             var v = vStart;
             int i = 0;
-            while (v <= end + Precision.DOUBLE_EPSILON) {
+            while (v <= end + Precision.DoubleEpsilon) {
                 Color markerColor;
                 double markerLength;
 
-                if (Math.Abs(v % 4) < Precision.DOUBLE_EPSILON) {
+                if (Math.Abs(v % 4) < Precision.DoubleEpsilon) {
                     markerColor = Colors.White;
                     markerLength = 20;
-                } else if (Math.Abs(v % 1) < Precision.DOUBLE_EPSILON) {
+                } else if (Math.Abs(v % 1) < Precision.DoubleEpsilon) {
                     markerColor = Colors.White;
                     markerLength = 12;
-                } else if (Math.Abs(v % (1d / 2)) < Precision.DOUBLE_EPSILON) {
+                } else if (Math.Abs(v % (1d / 2)) < Precision.DoubleEpsilon) {
                     markerColor = Colors.Red;
                     markerLength = 7;
-                } else if (Math.Abs(v % (1d / 4)) < Precision.DOUBLE_EPSILON) {
+                } else if (Math.Abs(v % (1d / 4)) < Precision.DoubleEpsilon) {
                     markerColor = Colors.DodgerBlue;
                     markerLength = 7;
-                } else if (Math.Abs(v % (1d / 8)) < Precision.DOUBLE_EPSILON) {
+                } else if (Math.Abs(v % (1d / 8)) < Precision.DoubleEpsilon) {
                     markerColor = Colors.Yellow;
                     markerLength = 7;
-                } else if (Math.Abs(v % (1d / 6)) < Precision.DOUBLE_EPSILON) {
+                } else if (Math.Abs(v % (1d / 6)) < Precision.DoubleEpsilon) {
                     markerColor = Colors.Purple;
                     markerLength = 7;
                 } else {

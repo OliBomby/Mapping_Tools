@@ -6,7 +6,7 @@
         None = 0,
         Stack = 1,
         Hitsounds = 2,
-        MIDI = 3,
+        Midi = 3,
         Storyboard = 4,
     }
 }

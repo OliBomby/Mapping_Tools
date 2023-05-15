@@ -13,11 +13,11 @@ using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.Tools.ComboColourStudio {
     public class ColourPoint : BindableBase, ICloneable {
-        private double _time;
-        private ObservableCollection<SpecialColour> _colourSequence; 
-        private ColourPointMode _mode;
-        private bool _isSelected;
-        private ComboColourProject _parentProject;
+        private double time;
+        private ObservableCollection<SpecialColour> colourSequence;
+        private ColourPointMode mode;
+        private bool isSelected;
+        private ComboColourProject parentProject;
 
         public ColourPoint() : this(0, new ObservableCollection<SpecialColour>(), ColourPointMode.Normal, null) {}
 
@@ -68,31 +68,31 @@ namespace Mapping_Tools.Classes.Tools.ComboColourStudio {
         }
 
         public double Time {
-            get => _time;
-            set => Set(ref _time, value);
+            get => time;
+            set => Set(ref time, value);
         }
 
         public ObservableCollection<SpecialColour> ColourSequence {
-            get => _colourSequence;
-            set => Set(ref _colourSequence, value);
+            get => colourSequence;
+            set => Set(ref colourSequence, value);
         }
 
         public ColourPointMode Mode {
-            get => _mode;
-            set => Set(ref _mode, value);
+            get => mode;
+            set => Set(ref mode, value);
         }
 
         [JsonIgnore]
         public bool IsSelected {
-            get => _isSelected;
-            set => Set(ref _isSelected, value);
+            get => isSelected;
+            set => Set(ref isSelected, value);
         }
 
         [CanBeNull]
         [JsonIgnore]
         public ComboColourProject ParentProject {
-            get => _parentProject;
-            set => Set(ref _parentProject, value);
+            get => parentProject;
+            set => Set(ref parentProject, value);
         }
 
         [JsonIgnore]

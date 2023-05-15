@@ -19,8 +19,8 @@ namespace Mapping_Tools.Classes.ToolHelpers {
 
     public static class EditorReaderStuff
     {
-        private static readonly EditorReader editorReader = new();
-        public static string DontCoolSaveWhenMD5EqualsThisString = "";
+        private static readonly EditorReader EditorReader = new();
+        public static string DontCoolSaveWhenMd5EqualsThisString = "";
 
         /// <summary>
         /// Don't use this unless you know what you're doing
@@ -28,7 +28,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         /// <returns></returns>
         public static EditorReader GetEditorReader()
         {
-            return editorReader;
+            return EditorReader;
         }
 
         /// <summary>
@@ -222,7 +222,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static string GetMD5FromPath(string path)
+        public static string GetMd5FromPath(string path)
         {
             using (var md5 = MD5.Create())
             {
@@ -364,7 +364,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         }
 
         /// <summary>
-        /// Gets the path to the beatmap currently open in the <see cref="EditorReader"/> instance.
+        /// Gets the path to the beatmap currently open in the <see cref="Editor_Reader.EditorReader"/> instance.
         /// </summary>
         /// <param name="fullReader">Reader object that has already fetched all</param>
         /// <returns></returns>

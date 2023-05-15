@@ -15,7 +15,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         public int Index;
 
-        private SampleGeneratingArgsComparer Comparer;
+        private SampleGeneratingArgsComparer comparer;
 
         /// <summary>
         /// 
@@ -35,10 +35,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <param name="index"></param>
         public CustomIndex(int index, SampleGeneratingArgsComparer comparer = null) {
             Index = index;
-            Comparer = comparer ?? new SampleGeneratingArgsComparer();
+            this.comparer = comparer ?? new SampleGeneratingArgsComparer();
             Samples = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
             foreach (string key in AllKeys) {
-                Samples[key] = new HashSet<SampleGeneratingArgs>(Comparer);
+                Samples[key] = new HashSet<SampleGeneratingArgs>(this.comparer);
             }
         }
 
@@ -47,10 +47,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         public CustomIndex(SampleGeneratingArgsComparer comparer = null) {
             Index = -1;
-            Comparer = comparer ?? new SampleGeneratingArgsComparer();
+            this.comparer = comparer ?? new SampleGeneratingArgsComparer();
             Samples = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
             foreach (string key in AllKeys) {
-                Samples[key] = new HashSet<SampleGeneratingArgs>(Comparer);
+                Samples[key] = new HashSet<SampleGeneratingArgs>(this.comparer);
             }
         }
 
@@ -139,7 +139,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         /// <returns></returns>
         public CustomIndex Copy() {
-            CustomIndex ci = new CustomIndex(Index, Comparer);
+            CustomIndex ci = new CustomIndex(Index, comparer);
             ci.MergeWith(this);
             return ci;
         }

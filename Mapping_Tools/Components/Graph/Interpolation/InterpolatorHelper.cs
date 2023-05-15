@@ -8,10 +8,10 @@ namespace Mapping_Tools.Components.Graph.Interpolation {
     public class InterpolatorHelper {
         private static readonly Type InterfaceType = typeof(IGraphInterpolator);
 
-        private static Type[] _interpolators;
+        private static Type[] interpolators;
         public static Type[] GetInterpolators() {
             try {
-                return _interpolators ?? (_interpolators = AppDomain.CurrentDomain.GetAssemblies()
+                return interpolators ?? (interpolators = AppDomain.CurrentDomain.GetAssemblies()
                            .SelectMany(x => x.GetTypes())
                            .Where(x => InterfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract &&
                                        x.GetCustomAttribute<IgnoreInterpolatorAttribute>() == null).OrderBy(GetName, new InterpolatorComparer()).ToArray());

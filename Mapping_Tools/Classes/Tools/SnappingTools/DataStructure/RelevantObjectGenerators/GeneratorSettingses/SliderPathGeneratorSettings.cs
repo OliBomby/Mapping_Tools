@@ -3,12 +3,12 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGene
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses {
     public class SliderPathGeneratorSettings : GeneratorSettings {
-        private double _pointDensity;
+        private double pointDensity;
         [DisplayName("Point Density")]
         [Description("Specifies how many points will be generated per osu! pixel of sliderpath.")]
         public double PointDensity {
-            get => _pointDensity;
-            set => Set(ref _pointDensity, value);
+            get => pointDensity;
+            set => Set(ref pointDensity, value);
         }
 
         public override object Clone() {

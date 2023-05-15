@@ -34,7 +34,7 @@ namespace Mapping_Tools.Components.Graph.Markers {
             var vStart = Math.Ceiling((start - Offset) / step) * step + Offset;
             var v = vStart;
             int i = 0;
-            while (v <= end + Precision.DOUBLE_EPSILON) {
+            while (v <= end + Precision.DoubleEpsilon) {
                 markers.Add(new GraphMarker {Orientation = orientation, Text = $"{v:g2}{Unit}", Value = v, Snappable = Snappable});
                 v = vStart + step * ++i;
             }

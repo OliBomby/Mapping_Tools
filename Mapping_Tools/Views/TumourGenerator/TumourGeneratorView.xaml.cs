@@ -29,7 +29,7 @@ You can also generate multiple layers of tumours. A layer will either merge the 
 Enable the Advanced toggle and click the ... button to edit how a parameter changes over time. Use the arrow keys on the sliders to do fine adjustments.
 To get started, select a slider in your beatmap and click 'Preview slider' to preview changes or click the run button to instantly generate tumours on the selected sliders.";
 
-        private bool _initialized;
+        private bool initialized;
 
         private TumourGeneratorVm ViewModel => (TumourGeneratorVm)DataContext;
 
@@ -41,10 +41,10 @@ To get started, select a slider in your beatmap and click 'Preview slider' to pr
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e) {
-            if (_initialized) return;
+            if (initialized) return;
 
             ProjectManager.LoadProject(this, message: false);
-            _initialized = true;
+            initialized = true;
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -164,9 +164,9 @@ To get started, select a slider in your beatmap and click 'Preview slider' to pr
 
                                 // Add redlines
                                 timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb: true, unInherited: true,
-                                    omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
+                                    omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon));
                                 timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb: true, unInherited: true,
-                                    omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
+                                    omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon));
 
                                 ho.Time -= 1;
                             }
@@ -175,7 +175,7 @@ To get started, select a slider in your beatmap and click 'Preview slider' to pr
                             tp.Offset = ho.Time;
                             tp.MpB = ho.SliderVelocity;
                             timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true,
-                                fuzzyness: Precision.DOUBLE_EPSILON));
+                                fuzzyness: Precision.DoubleEpsilon));
                         }
                     }
 

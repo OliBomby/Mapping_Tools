@@ -19,9 +19,9 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
     /// Interaction logic for OsuPatternImportDialog.xaml
     /// </summary>
     public partial class CustomDialog {
-        private readonly int _autoSelectIndex;
-        private int _populationIndex;
-        private UIElement _autoSelectElement;
+        private readonly int autoSelectIndex;
+        private int populationIndex;
+        private UIElement autoSelectElement;
 
         public CustomDialog(object viewModel, int autoSelectIndex = -1) {
             if (viewModel == null) return;
@@ -29,7 +29,7 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
             InitializeComponent();
 
             DataContext = viewModel;
-            _autoSelectIndex = autoSelectIndex;
+            this.autoSelectIndex = autoSelectIndex;
             PopulateSettings(DataContext);
 
             AcceptButton.Command = new CommandImplementation(AcceptButtonCommand);
@@ -43,7 +43,7 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
         }
 
         private void PopulateSettings(object settings) {
-            _populationIndex = 0;
+            populationIndex = 0;
 
             var type = settings.GetType();
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -97,10 +97,10 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                 ? CreateEditableElement(prop, settings, name, description)
                 : CreateReadOnlyElement(prop, settings, name, description);
 
-            if (content != null && _autoSelectIndex == _populationIndex) {
-                _autoSelectElement = content;
+            if (content != null && autoSelectIndex == populationIndex) {
+                autoSelectElement = content;
             }
-            _populationIndex++;
+            populationIndex++;
 
             return content;
         }
@@ -209,9 +209,9 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
         }
 
         private void CustomDialog_OnLoaded(object sender, RoutedEventArgs e) {
-            if (_autoSelectElement != null) {
-                _autoSelectElement.Focus();
-                if (_autoSelectElement is TextBox textBox) {
+            if (autoSelectElement != null) {
+                autoSelectElement.Focus();
+                if (autoSelectElement is TextBox textBox) {
                     textBox.SelectAll();
                 }
             }

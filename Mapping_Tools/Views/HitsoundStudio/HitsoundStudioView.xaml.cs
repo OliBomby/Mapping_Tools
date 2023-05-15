@@ -26,7 +26,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
     /// </summary>
     public partial class HitsoundStudioView : ISavable<HitsoundStudioVm>, IHaveExtraProjectMenuItems
     {
-        private HitsoundStudioVm Settings;
+        private HitsoundStudioVm settings;
 
         private bool suppressEvents;
 
@@ -48,8 +48,8 @@ namespace Mapping_Tools.Views.HitsoundStudio
             InitializeComponent();
             Width = MainWindow.AppWindow.content_views.Width;
             Height = MainWindow.AppWindow.content_views.Height;
-            Settings = new HitsoundStudioVm();
-            DataContext = Settings;
+            settings = new HitsoundStudioVm();
+            DataContext = settings;
             LayersList.SelectedIndex = 0;
             Num_Layers_Changed();
             GetSelectedLayers();
@@ -256,12 +256,12 @@ namespace Mapping_Tools.Views.HitsoundStudio
         }
 
         private async void Start_Click(object sender, RoutedEventArgs e) {
-            var dialog = new HitsoundStudioExportDialog(Settings);
+            var dialog = new HitsoundStudioExportDialog(settings);
             var result = await DialogHost.Show(dialog, "RootDialog");
 
             if (!(bool) result) return;
 
-            if (Settings.BaseBeatmap == null || Settings.DefaultSample == null)
+            if (settings.BaseBeatmap == null || settings.DefaultSample == null)
             {
                 MessageBox.Show("Please select a base beatmap and default hitsound first.");
                 return;
@@ -270,7 +270,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
             // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
 
-            BackgroundWorker.RunWorkerAsync(Settings);
+            BackgroundWorker.RunWorkerAsync(settings);
             CanRun = false;
         }
 
@@ -349,7 +349,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 string path = IOHelper.SampleFileDialog();
                 if (path != "")
                 {
-                    Settings.DefaultSample.SampleArgs.Path = path;
+                    settings.DefaultSample.SampleArgs.Path = path;
                     DefaultSamplePathBox.Text = path;
                 }
             } catch (Exception ex) { ex.Show(); }
@@ -362,7 +362,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 string[] paths = IOHelper.BeatmapFileDialog(restore: !SettingsManager.Settings.CurrentBeatmapDefaultFolder);
                 if (paths.Length != 0)
                 {
-                    Settings.BaseBeatmap = paths[0];
+                    settings.BaseBeatmap = paths[0];
                 }
             } catch (Exception ex) { ex.Show(); }
         }
@@ -374,7 +374,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 string path = IOHelper.GetCurrentBeatmap();
                 if (path != "")
                 {
-                    Settings.BaseBeatmap = path;
+                    settings.BaseBeatmap = path;
                 }
             } catch (Exception ex) { ex.Show(); }
         }
@@ -466,7 +466,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
             SelectedStackPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Stack) ? Visibility.Visible : Visibility.Collapsed;
             SelectedHitsoundsPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Hitsounds) ? Visibility.Visible : Visibility.Collapsed;
             SelectedStoryboardPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Storyboard) ? Visibility.Visible : Visibility.Collapsed;
-            SelectedMIDIPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.MIDI) ? Visibility.Visible : Visibility.Collapsed;
+            SelectedMIDIPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Midi) ? Visibility.Visible : Visibility.Collapsed;
             ImportArgsPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.CanImport) ? Visibility.Visible : Visibility.Collapsed;
 
             suppressEvents = false;
@@ -504,7 +504,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
         private void Num_Layers_Changed()
         {
-            if (Settings.HitsoundLayers.Count == 0)
+            if (settings.HitsoundLayers.Count == 0)
             {
                 FirstGrid.ColumnDefinitions[0].Width = new GridLength(0);
                 EditPanel.IsEnabled = false;
@@ -521,7 +521,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
         {
             try
             {
-                HitsoundLayerImportWindow importWindow = new HitsoundLayerImportWindow(Settings.HitsoundLayers.Count);
+                HitsoundLayerImportWindow importWindow = new HitsoundLayerImportWindow(settings.HitsoundLayers.Count);
                 importWindow.ShowDialog();
 
                 LayersList.SelectedItems.Clear();
@@ -529,7 +529,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 {
                     if (layer != null)
                     {
-                        Settings.HitsoundLayers.Add(layer);
+                        settings.HitsoundLayers.Add(layer);
                         LayersList.SelectedItems.Add(layer);
                     }
                 }
@@ -556,15 +556,15 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
                 suppressEvents = true;
 
-                int index = Settings.HitsoundLayers.IndexOf(selectedLayer);
+                int index = settings.HitsoundLayers.IndexOf(selectedLayer);
 
                 foreach (HitsoundLayer hsl in selectedLayers)
                 {
-                    Settings.HitsoundLayers.Remove(hsl);
+                    settings.HitsoundLayers.Remove(hsl);
                 }
                 suppressEvents = false;
 
-                LayersList.SelectedIndex = Math.Max(Math.Min(index - 1, Settings.HitsoundLayers.Count - 1), 0);
+                LayersList.SelectedIndex = Math.Max(Math.Min(index - 1, settings.HitsoundLayers.Count - 1), 0);
 
                 RecalculatePriorities();
                 Num_Layers_Changed();
@@ -581,14 +581,14 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 {
                     suppressEvents = true;
 
-                    int selectedIndex = Settings.HitsoundLayers.IndexOf(selectedLayer);
+                    int selectedIndex = settings.HitsoundLayers.IndexOf(selectedLayer);
                     List<HitsoundLayer> moveList = new List<HitsoundLayer>();
                     foreach (HitsoundLayer hsl in selectedLayers)
                     {
                         moveList.Add(hsl);
                     }
 
-                    foreach (HitsoundLayer hsl in Settings.HitsoundLayers)
+                    foreach (HitsoundLayer hsl in settings.HitsoundLayers)
                     {
                         if (moveList.Contains(hsl))
                         {
@@ -600,15 +600,15 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
                     foreach (HitsoundLayer hsl in moveList)
                     {
-                        int index = Settings.HitsoundLayers.IndexOf(hsl);
+                        int index = settings.HitsoundLayers.IndexOf(hsl);
 
                         //Dont move left if it is the first item in the list or it is not in the list
                         if (index <= 0)
                             continue;
 
                         //Swap with this item with the one to its left
-                        Settings.HitsoundLayers.Remove(hsl);
-                        Settings.HitsoundLayers.Insert(index - 1, hsl);
+                        settings.HitsoundLayers.Remove(hsl);
+                        settings.HitsoundLayers.Insert(index - 1, hsl);
                     }
 
                     LayersList.SelectedItems.Clear();
@@ -635,16 +635,16 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 {
                     suppressEvents = true;
 
-                    int selectedIndex = Settings.HitsoundLayers.IndexOf(selectedLayer);
+                    int selectedIndex = settings.HitsoundLayers.IndexOf(selectedLayer);
                     List<HitsoundLayer> moveList = new List<HitsoundLayer>();
                     foreach (HitsoundLayer hsl in selectedLayers)
                     {
                         moveList.Add(hsl);
                     }
 
-                    for (int i = Settings.HitsoundLayers.Count - 1; i >= 0; i--)
+                    for (int i = settings.HitsoundLayers.Count - 1; i >= 0; i--)
                     {
-                        HitsoundLayer hsl = Settings.HitsoundLayers[i];
+                        HitsoundLayer hsl = settings.HitsoundLayers[i];
                         if (moveList.Contains(hsl))
                         {
                             moveList.Remove(hsl);
@@ -656,15 +656,15 @@ namespace Mapping_Tools.Views.HitsoundStudio
                     for (int i = moveList.Count - 1; i >= 0; i--)
                     {
                         HitsoundLayer hsl = moveList[i];
-                        int index = Settings.HitsoundLayers.IndexOf(hsl);
+                        int index = settings.HitsoundLayers.IndexOf(hsl);
 
                         //Dont move left if it is the first item in the list or it is not in the list
-                        if (index >= Settings.HitsoundLayers.Count - 1)
+                        if (index >= settings.HitsoundLayers.Count - 1)
                             continue;
 
                         //Swap with this item with the one to its left
-                        Settings.HitsoundLayers.Remove(hsl);
-                        Settings.HitsoundLayers.Insert(index + 1, hsl);
+                        settings.HitsoundLayers.Remove(hsl);
+                        settings.HitsoundLayers.Insert(index + 1, hsl);
                     }
 
                     LayersList.SelectedItems.Clear();
@@ -684,9 +684,9 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
         private void RecalculatePriorities()
         {
-            for (int i = 0; i < Settings.HitsoundLayers.Count; i++)
+            for (int i = 0; i < settings.HitsoundLayers.Count; i++)
             {
-                Settings.HitsoundLayers[i].Priority = i;
+                settings.HitsoundLayers[i].Priority = i;
             }
         }
 
@@ -1043,15 +1043,15 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
         public HitsoundStudioVm GetSaveData()
         {
-            return Settings;
+            return settings;
         }
 
         public void SetSaveData(HitsoundStudioVm saveData)
         {
             suppressEvents = true;
 
-            Settings = saveData;
-            DataContext = Settings;
+            settings = saveData;
+            DataContext = settings;
 
             suppressEvents = false;
 
@@ -1074,7 +1074,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
         private void LoadSampleSchemaFromFile(object sender, RoutedEventArgs e) {
             try {
                 var project = ProjectManager.GetProject(this, true);
-                Settings.PreviousSampleSchema = project.PreviousSampleSchema;
+                settings.PreviousSampleSchema = project.PreviousSampleSchema;
 
                 Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully loaded sample schema!"));
             } catch (ArgumentException) { }

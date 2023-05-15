@@ -12,16 +12,16 @@ using System.Text.Json.Serialization;
 namespace Mapping_Tools.Viewmodels {
 
     public class TimingCopierVm :INotifyPropertyChanged {
-        private string _importPath;
-        private string _exportPath;
-        private string _resnapMode;
-        private IBeatDivisor[] _beatDivisors;
+        private string importPath;
+        private string exportPath;
+        private string resnapMode;
+        private IBeatDivisor[] beatDivisors;
 
         public TimingCopierVm() {
-            _importPath = "";
-            _exportPath = "";
-            _resnapMode = "Number of beats between objects stays the same";
-            _beatDivisors = RationalBeatDivisor.GetDefaultBeatDivisors();
+            importPath = "";
+            exportPath = "";
+            resnapMode = "Number of beats between objects stays the same";
+            beatDivisors = RationalBeatDivisor.GetDefaultBeatDivisors();
 
             ImportLoadCommand = new CommandImplementation(
                 _ => {
@@ -67,41 +67,41 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string ImportPath {
-            get => _importPath;
+            get => importPath;
             set {
-                if( _importPath == value )
+                if( importPath == value )
                     return;
-                _importPath = value;
+                importPath = value;
                 OnPropertyChanged();
             }
         }
 
         public string ExportPath {
-            get => _exportPath;
+            get => exportPath;
             set {
-                if( _exportPath == value )
+                if( exportPath == value )
                     return;
-                _exportPath = value;
+                exportPath = value;
                 OnPropertyChanged();
             }
         }
 
         public string ResnapMode {
-            get => _resnapMode;
+            get => resnapMode;
             set {
-                if( _resnapMode == value )
+                if( resnapMode == value )
                     return;
-                _resnapMode = value;
+                resnapMode = value;
                 OnPropertyChanged();
             }
         }
 
         public IBeatDivisor[] BeatDivisors {
-            get => _beatDivisors;
+            get => beatDivisors;
             set {
-                if( _beatDivisors == value )
+                if( beatDivisors == value )
                     return;
-                _beatDivisors = value;
+                beatDivisors = value;
                 OnPropertyChanged();
             }
         }

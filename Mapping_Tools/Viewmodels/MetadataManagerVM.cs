@@ -17,32 +17,32 @@ using System.Text.Json.Serialization;
 namespace Mapping_Tools.Viewmodels {
 
     public class MetadataManagerVm :INotifyPropertyChanged {
-        private Visibility _beatmapFileNameOverflowErrorVisibility;
+        private Visibility beatmapFileNameOverflowErrorVisibility;
 
-        private string _importPath;
-        private string _exportPath;
+        private string importPath;
+        private string exportPath;
 
-        private string _artist;
-        private string _romanisedArtist;
-        private string _title;
-        private string _romanisedTitle;
-        private string _beatmapCreator;
-        private string _source;
-        private string _tags;
-        private bool _removeDuplicateTags;
-        private bool _resetIds;
+        private string artist;
+        private string romanisedArtist;
+        private string title;
+        private string romanisedTitle;
+        private string beatmapCreator;
+        private string source;
+        private string tags;
+        private bool removeDuplicateTags;
+        private bool resetIds;
 
-        private double _previewTime;
-        private bool _useComboColours;
-        private ObservableCollection<ComboColour> _comboColours;
-        private ObservableCollection<SpecialColour> _specialColours;
+        private double previewTime;
+        private bool useComboColours;
+        private ObservableCollection<ComboColour> comboColours;
+        private ObservableCollection<SpecialColour> specialColours;
 
         public MetadataManagerVm() {
-            _importPath = "";
-            _exportPath = "";
-            _removeDuplicateTags = true;
+            importPath = "";
+            exportPath = "";
+            removeDuplicateTags = true;
 
-            _useComboColours = true;
+            useComboColours = true;
             ComboColours = new ObservableCollection<ComboColour>();
             SpecialColours = new ObservableCollection<SpecialColour>();
 
@@ -161,163 +161,163 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public string ImportPath {
-            get => _importPath;
+            get => importPath;
             set {
-                if( _importPath == value )
+                if( importPath == value )
                     return;
-                _importPath = value;
+                importPath = value;
                 OnPropertyChanged();
             }
         }
 
         public string ExportPath {
-            get => _exportPath;
+            get => exportPath;
             set {
-                if( _exportPath == value )
+                if( exportPath == value )
                     return;
-                _exportPath = value;
+                exportPath = value;
                 OnPropertyChanged();
             }
         }
 
         public string Artist {
-            get => _artist;
+            get => artist;
             set {
-                if( _artist == value )
+                if( artist == value )
                     return;
-                _artist = value;
+                artist = value;
                 OnPropertyChanged();
             }
         }
 
         public string RomanisedArtist {
-            get => _romanisedArtist;
+            get => romanisedArtist;
             set {
-                if( _romanisedArtist == value )
+                if( romanisedArtist == value )
                     return;
-                _romanisedArtist = value;
+                romanisedArtist = value;
                 OnPropertyChanged();
             }
         }
 
         public string Title {
-            get => _title;
+            get => title;
             set {
-                if( _title == value )
+                if( title == value )
                     return;
-                _title = value;
+                title = value;
                 OnPropertyChanged();
             }
         }
 
         public string RomanisedTitle {
-            get => _romanisedTitle;
+            get => romanisedTitle;
             set {
-                if( _romanisedTitle == value )
+                if( romanisedTitle == value )
                     return;
-                _romanisedTitle = value;
+                romanisedTitle = value;
                 OnPropertyChanged();
             }
         }
 
         public string BeatmapCreator {
-            get => _beatmapCreator;
+            get => beatmapCreator;
             set {
-                if( _beatmapCreator == value )
+                if( beatmapCreator == value )
                     return;
-                _beatmapCreator = value;
+                beatmapCreator = value;
                 OnPropertyChanged();
             }
         }
 
         public string Source {
-            get => _source;
+            get => source;
             set {
-                if( _source == value )
+                if( source == value )
                     return;
-                _source = value;
+                source = value;
                 OnPropertyChanged();
             }
         }
 
         public string Tags {
-            get => _tags;
+            get => tags;
             set {
-                if( _tags == value )
+                if( tags == value )
                     return;
-                _tags = value;
-                if (_removeDuplicateTags)
-                    _tags = RemoveDuplicateTags(value);
-                TagsOverflowErrorVisibility = _tags.Length > 1024 || _tags.Split(' ').Length > 100 ? Visibility.Visible : Visibility.Collapsed;
+                tags = value;
+                if (removeDuplicateTags)
+                    tags = RemoveDuplicateTags(value);
+                TagsOverflowErrorVisibility = tags.Length > 1024 || tags.Split(' ').Length > 100 ? Visibility.Visible : Visibility.Collapsed;
                 OnPropertyChanged(nameof(TagsOverflowErrorVisibility));
                 OnPropertyChanged();
             }
         }
 
         public bool DoRemoveDuplicateTags {
-            get => _removeDuplicateTags;
+            get => removeDuplicateTags;
             set {
-                if( _removeDuplicateTags == value )
+                if( removeDuplicateTags == value )
                     return;
-                _removeDuplicateTags = value;
-                if (_removeDuplicateTags)
+                removeDuplicateTags = value;
+                if (removeDuplicateTags)
                     Tags = RemoveDuplicateTags(Tags);
                 OnPropertyChanged();
             }
         }
 
         public bool ResetIds {
-            get => _resetIds;
+            get => resetIds;
             set {
-                if( _resetIds == value ) return;
-                _resetIds = value;
+                if( resetIds == value ) return;
+                resetIds = value;
                 OnPropertyChanged();
             }
         }
 
         public double PreviewTime {
-            get => _previewTime;
+            get => previewTime;
             set {
-                if( Math.Abs(_previewTime - value) < Precision.DOUBLE_EPSILON )
+                if( Math.Abs(previewTime - value) < Precision.DoubleEpsilon )
                     return;
-                _previewTime = value;
+                previewTime = value;
                 OnPropertyChanged();
             }
         }
 
         public bool UseComboColours {
-            get => _useComboColours;
+            get => useComboColours;
             set {
-                if( _useComboColours == value ) return;
-                _useComboColours = value;
+                if( useComboColours == value ) return;
+                useComboColours = value;
                 OnPropertyChanged();
             }
         }
 
         public ObservableCollection<ComboColour> ComboColours {
-            get => _comboColours;
+            get => comboColours;
             set {
-                if (_comboColours == value) return;
-                _comboColours = value;
+                if (comboColours == value) return;
+                comboColours = value;
                 OnPropertyChanged();
             }
         }
 
         public ObservableCollection<SpecialColour> SpecialColours {
-            get => _specialColours;
+            get => specialColours;
             set {
-                if (_specialColours == value) return;
-                _specialColours = value;
+                if (specialColours == value) return;
+                specialColours = value;
                 OnPropertyChanged();
             }
         }
 
         [JsonIgnore]
         public Visibility BeatmapFileNameOverflowErrorVisibility {
-            get => _beatmapFileNameOverflowErrorVisibility;
+            get => beatmapFileNameOverflowErrorVisibility;
             set {
-                if (_beatmapFileNameOverflowErrorVisibility == value) return;
-                _beatmapFileNameOverflowErrorVisibility = value;
+                if (beatmapFileNameOverflowErrorVisibility == value) return;
+                beatmapFileNameOverflowErrorVisibility = value;
                 OnPropertyChanged();
             }
         }

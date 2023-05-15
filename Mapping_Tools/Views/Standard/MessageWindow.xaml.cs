@@ -26,16 +26,16 @@ namespace Mapping_Tools.Views.Standard
             InitializeComponent();
         }
 
-        public MessageWindow(ErrorType errorType, String Message = null, string title = null, RunWorkerCompletedEventArgs eventArg = null)
+        public MessageWindow(ErrorType errorType, String message = null, string title = null, RunWorkerCompletedEventArgs eventArg = null)
         {
             InitializeComponent();
             if(errorType == ErrorType.Success && title != null)
             {
-                LoadSuccessWindow(Message,title);
+                LoadSuccessWindow(message,title);
             }
             else if (errorType == ErrorType.Success && title == null)
             {
-                LoadSuccessWindow(Message);
+                LoadSuccessWindow(message);
             }
             else if (errorType == ErrorType.Error)
             {

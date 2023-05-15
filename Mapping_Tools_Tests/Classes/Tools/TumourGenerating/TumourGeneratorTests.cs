@@ -44,10 +44,10 @@ namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating {
 
                 switch (pos.X) {
                     case >= 100 and <= 105:
-                        Assert.AreEqual(-pos.X + 100, pos.Y, Precision.DOUBLE_EPSILON);
+                        Assert.AreEqual(-pos.X + 100, pos.Y, Precision.DoubleEpsilon);
                         break;
                     case > 105 and <= 110:
-                        Assert.AreEqual(pos.X - 110, pos.Y, Precision.DOUBLE_EPSILON);
+                        Assert.AreEqual(pos.X - 110, pos.Y, Precision.DoubleEpsilon);
                         break;
                 }
 
@@ -55,7 +55,7 @@ namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating {
             }
 
             var mid = PathHelper.FindFirstOccurrence(start, 105);
-            Assert.AreEqual(105, mid.Value.CumulativeLength, Precision.DOUBLE_EPSILON);
+            Assert.AreEqual(105, mid.Value.CumulativeLength, Precision.DoubleEpsilon);
 
             // Check hint
             Assert.AreEqual(4, pathWithHints.ReconstructionHints.Count);
@@ -69,13 +69,13 @@ namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating {
 
                 switch (pos.X) {
                     case >= 100 and <= 105:
-                        Assert.AreEqual(-pos.X + 100, pos.Y, Precision.DOUBLE_EPSILON);
+                        Assert.AreEqual(-pos.X + 100, pos.Y, Precision.DoubleEpsilon);
                         break;
                     case > 105 and <= 110:
-                        Assert.AreEqual(-5, pos.Y, Precision.DOUBLE_EPSILON);
+                        Assert.AreEqual(-5, pos.Y, Precision.DoubleEpsilon);
                         break;
                     case > 110 and <= 115:
-                        Assert.AreEqual(pos.X - 115, pos.Y, Precision.DOUBLE_EPSILON);
+                        Assert.AreEqual(pos.X - 115, pos.Y, Precision.DoubleEpsilon);
                         break;
                 }
 

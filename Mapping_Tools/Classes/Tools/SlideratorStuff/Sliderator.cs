@@ -15,67 +15,67 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
         private double _Pos(double s) => PositionFunction(Math.Min(s * Velocity, MaxT)); // normalized position function, px -> px
         public double MaxS => MaxT * Velocity; // expected pixellength
 
-        private List<Vector2> _path; // input path
-        private List<Vector2> _diff; // path segments
-        private List<double> _angle; // path segment angles
-        private List<double> _diffL; // length of segments
-        private List<double> _pathL; // cumulative length
-        private double _totalPathL => _pathL.Last(); // total length
+        private List<Vector2> path; // input path
+        private List<Vector2> diff; // path segments
+        private List<double> angle; // path segment angles
+        private List<double> diffL; // length of segments
+        private List<double> pathL; // cumulative length
+        private double TotalPathL => pathL.Last(); // total length
 
-        private List<LatticePoint> _lattice; // path lattice points
-        private List<Neuron> _slider; // slider red anchors, tumours and interpolations
+        private List<LatticePoint> lattice; // path lattice points
+        private List<Neuron> slider; // slider red anchors, tumours and interpolations
 
         public void SetPath(List<Vector2> pathPoints) {
-            _path = new List<Vector2> {pathPoints.First()};
-            _diff = new List<Vector2>();
-            _angle = new List<double>();
-            _diffL = new List<double>();
+            path = new List<Vector2> {pathPoints.First()};
+            diff = new List<Vector2>();
+            angle = new List<double>();
+            diffL = new List<double>();
             double sum = 0;
-            _pathL = new List<double> {sum};
+            pathL = new List<double> {sum};
             foreach (var p in pathPoints.Skip(1)) {
-                var d = p - _path.Last();
+                var d = p - path.Last();
                 var dl = d.Length;
-                if (dl < Precision.DOUBLE_EPSILON) continue;
-                _path.Add(p);
-                _diff.Add(d);
-                _angle.Add(d.Theta);
-                _diffL.Add(dl);
+                if (dl < Precision.DoubleEpsilon) continue;
+                path.Add(p);
+                diff.Add(d);
+                angle.Add(d.Theta);
+                diffL.Add(dl);
                 sum += dl;
-                _pathL.Add(sum);
+                pathL.Add(sum);
             }
 
-            if (Math.Abs(sum) < Precision.DOUBLE_EPSILON) throw new InvalidOperationException("Zero length path.");
+            if (Math.Abs(sum) < Precision.DoubleEpsilon) throw new InvalidOperationException("Zero length path.");
 
             // Add last member again so these lists have the same number of elements as path
-            _diff.Add(_diff.Last());
-            _angle.Add(_angle.Last());
-            _diffL.Add(_diffL.Last());
+            diff.Add(diff.Last());
+            angle.Add(angle.Last());
+            diffL.Add(diffL.Last());
         }
 
         private Vector2 PositionAt(double x) {
-            int n = _pathL.BinarySearch(x);
+            int n = pathL.BinarySearch(x);
             if (n < 0) n = ~n - 1;
             if (n == -1) n += 1;
-            if (n == _diff.Count) n -= 1;
-            return _path[n] + _diff[n] / _diffL[n] * (x - _pathL[n]);
+            if (n == diff.Count) n -= 1;
+            return path[n] + diff[n] / diffL[n] * (x - pathL[n]);
         }
 
         private LatticePoint GetNearestLatticePoint(double pathPosition) {
             int l = 0;
-            int r = _lattice.Count - 1;
+            int r = lattice.Count - 1;
 
             while (r - l > 1) {
                 var i = (l + r) / 2;
-                if (_lattice[i].PathPosition > pathPosition) {
+                if (lattice[i].PathPosition > pathPosition) {
                     r = i;
                 } else {
                     l = i;
                 }
             }
 
-            return Math.Abs(pathPosition - _lattice[l].PathPosition) < Math.Abs(pathPosition - _lattice[r].PathPosition)
-                ? _lattice[l]
-                : _lattice[r];
+            return Math.Abs(pathPosition - lattice[l].PathPosition) < Math.Abs(pathPosition - lattice[r].PathPosition)
+                ? lattice[l]
+                : lattice[r];
         }
 
         private double NextCrossing(double start, double low, double high, out int side, double precision = 0.01, double resolution = 0.25) { // where it next crosses below a lower bound or above an upper bound
@@ -114,7 +114,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
 
             for (int n = 0; n < diff.Count - 1; n++) { // iterate through path segments -1 because the last one is repeated
                 var l = diffL[n]; // segment length
-                if (Math.Abs(l) < Precision.DOUBLE_EPSILON) continue; // skip segment if degenerate
+                if (Math.Abs(l) < Precision.DoubleEpsilon) continue; // skip segment if degenerate
                 var a = path[n]; // start point
                 var d = diff[n]; // vector to end point
                 var l2 = d.LengthSquared;
@@ -132,7 +132,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
                     var ep = (j - r) * d[ax] / l * (1 - 2 * ax); // right handed perpendicular error
 
                     if (e > tolerance) continue;
-                    if (Math.Abs(t - 1) < Precision.DOUBLE_EPSILON && n + 1 < diff.Count) continue;
+                    if (Math.Abs(t - 1) < Precision.DoubleEpsilon && n + 1 < diff.Count) continue;
                     if (lattice.Count > 0 && k == lattice.Last().Pos) { // repeated point
                         if (e <= lattice.Last().Error)
                             lattice[lattice.Count - 1] = new LatticePoint(k, p, x, e, ep, n, t);
@@ -146,7 +146,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
         }
 
         private void GetLatticePoints() {
-            _lattice = LatticePoints(_path, _diff, _diffL, _pathL, 0.35);
+            lattice = LatticePoints(path, diff, diffL, pathL, 0.35);
         }
 
         private double GetSpeedAtTime(double time, double epsilon) {
@@ -159,13 +159,13 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
             const double epsilon = 0.01;  // Resolution for for speed differentiation
             const double deltaT = 0.02;  // Size of time step
 
-            _slider = new List<Neuron>();
+            slider = new List<Neuron>();
 
             double actualLength = 0;
             double nucleusTime = 0;
             double nucleusWantedLength = 0;
             int lastDirection = 1;
-            Neuron currentNeuron = new Neuron(_lattice.First(), 0);
+            Neuron currentNeuron = new Neuron(lattice.First(), 0);
             for (double t = 0; t <= MaxT; t += deltaT) {
                 var time = Math.Min(t, MaxT);
                 var wantedLength = PositionFunction(time);  // Input is time in milliseconds and output is position in osu! pixels
@@ -185,7 +185,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
                     currentNeuron.Terminal = newNeuron;
 
                     currentNeuron.WantedLength = actualLength;
-                    _slider.Add(currentNeuron);
+                    slider.Add(currentNeuron);
 
                     currentNeuron = newNeuron;
                     nucleusWantedLength = wantedLength;
@@ -204,7 +204,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
                         currentNeuron.Terminal = newNeuron;
 
                         currentNeuron.WantedLength += actualLength;
-                        _slider.Add(currentNeuron);
+                        slider.Add(currentNeuron);
 
                         currentNeuron = newNeuron;
                         nucleusWantedLength = wantedLength;
@@ -224,15 +224,15 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
             currentNeuron.WantedLength += actualLength;
             var lastNeuron = new Neuron(GetNearestLatticePoint(PositionFunction(MaxT)), MaxT);
             currentNeuron.Terminal = lastNeuron;
-            _slider.Add(currentNeuron);
-            _slider.Add(lastNeuron);
+            slider.Add(currentNeuron);
+            slider.Add(lastNeuron);
 
-            double totalWantedLength = _slider.Sum(n => n.WantedLength);
+            double totalWantedLength = slider.Sum(n => n.WantedLength);
             //Console.WriteLine(@"Total wanted length: " + totalWantedLength);
 
             // Multiply with ratio to exactly match the expected total length
             var ratio = MaxS / totalWantedLength;
-            foreach (var neuron in _slider) {
+            foreach (var neuron in slider) {
                 neuron.WantedLength *= ratio;
             }
 
@@ -248,10 +248,10 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
         }
 
         private void GenerateAxons() {
-            var pathGenerator = new PathGenerator(_path, _diff, _angle, _diffL, _pathL);
+            var pathGenerator = new PathGenerator(path, diff, angle, diffL, pathL);
 
             // Generate bezier points that approximate the paths between neurons
-            foreach (var neuron in _slider.Where(n => n.Terminal != null)) {
+            foreach (var neuron in slider.Where(n => n.Terminal != null)) {
                 var firstPoint = neuron.Nucleus.Pos;
                 var lastPoint = neuron.Terminal.Nucleus.Pos;
 
@@ -276,8 +276,8 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
         private Vector2 NearbyNonZeroDiff(int index) {
             Vector2 diff = Vector2.UnitX;
             for (int i = 0; i < 10; i++) {
-                diff = _diff[MathHelper.Clamp(index + i, 0, _diff.Count - 1)];
-                if (Math.Abs(diff.X) > Precision.DOUBLE_EPSILON || Math.Abs(diff.Y) > Precision.DOUBLE_EPSILON) {
+                diff = this.diff[MathHelper.Clamp(index + i, 0, this.diff.Count - 1)];
+                if (Math.Abs(diff.X) > Precision.DoubleEpsilon || Math.Abs(diff.Y) > Precision.DoubleEpsilon) {
                     return diff;
                 }
             }
@@ -288,7 +288,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
         private void GenerateDendrites() {
             double leftovers = 0;
             //double totalDendriteToAddLength = 0;
-            foreach (var neuron in _slider.Where(n => n.Terminal != null)) {
+            foreach (var neuron in slider.Where(n => n.Terminal != null)) {
                 // Find angles for the neuron and the terminal to point the dendrites towards
                 var dir = Math.Sign(neuron.Terminal.Nucleus.PathPosition - neuron.Nucleus.PathPosition);
                 dir = dir == 0 ? 1 : dir;  // Let dir not be zero
@@ -374,8 +374,8 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
 
         private List<Vector2> AnchorsList() {
             var anchors = new List<Vector2>();
-            for (var index = 0; index < _slider.Count; index++) {
-                var neuron = _slider[index];
+            for (var index = 0; index < slider.Count; index++) {
+                var neuron = slider[index];
 
                 anchors.Add(neuron.Nucleus.Pos);
                 if (index != 0) {
@@ -388,7 +388,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
                     anchors.Add(neuron.Nucleus.Pos);
                 }
 
-                if (index != _slider.Count - 1) {
+                if (index != slider.Count - 1) {
                     anchors.AddRange(neuron.Axon.Points.GetRange(1, neuron.Axon.Points.Count - 2));
                 }
             }
@@ -409,7 +409,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
         public List<Vector2> SliderateStream(double deltaT) {
             var points = new List<Vector2>();
 
-            for (double t = 0; t <= MaxT + Precision.DOUBLE_EPSILON; t += deltaT) {
+            for (double t = 0; t <= MaxT + Precision.DoubleEpsilon; t += deltaT) {
                 points.Add(PositionAt(PositionFunction(t)).Rounded());
             }
 
