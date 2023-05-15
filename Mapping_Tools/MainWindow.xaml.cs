@@ -446,7 +446,7 @@ namespace Mapping_Tools {
                 }
 
                 MasterGrid.Margin = new Thickness(7);
-                window_border.BorderThickness = new Thickness(0);
+                WindowBorder.BorderThickness = new Thickness(0);
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
             } else {
                 if (actuallyChangeFullscreen) {
@@ -454,7 +454,7 @@ namespace Mapping_Tools {
                 }
 
                 MasterGrid.Margin = new Thickness(0);
-                window_border.BorderThickness = new Thickness(1);
+                WindowBorder.BorderThickness = new Thickness(1);
                 bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
             EnsureOnScreen();

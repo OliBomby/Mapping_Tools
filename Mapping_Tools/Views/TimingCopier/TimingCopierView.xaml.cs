@@ -29,8 +29,8 @@ namespace Mapping_Tools.Views.TimingCopier {
         public TimingCopierView() {
             InitializeComponent();
             DataContext = new TimingCopierVm();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             ProjectManager.LoadProject(this, message: false);
         }
 

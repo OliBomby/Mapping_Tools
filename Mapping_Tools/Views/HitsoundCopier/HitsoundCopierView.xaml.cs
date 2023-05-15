@@ -40,8 +40,8 @@ namespace Mapping_Tools.Views.HitsoundCopier {
         /// <inheritdoc />
         public HitsoundCopierView() {
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             DataContext = new HitsoundCopierVm();
             ProjectManager.LoadProject(this, message: false);
         }

@@ -46,8 +46,8 @@ namespace Mapping_Tools.Views.HitsoundStudio
         public HitsoundStudioView()
         {
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             settings = new HitsoundStudioVm();
             DataContext = settings;
             LayersList.SelectedIndex = 0;
@@ -466,7 +466,7 @@ namespace Mapping_Tools.Views.HitsoundStudio
             SelectedStackPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Stack) ? Visibility.Visible : Visibility.Collapsed;
             SelectedHitsoundsPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Hitsounds) ? Visibility.Visible : Visibility.Collapsed;
             SelectedStoryboardPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Storyboard) ? Visibility.Visible : Visibility.Collapsed;
-            SelectedMIDIPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Midi) ? Visibility.Visible : Visibility.Collapsed;
+            SelectedMidiPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Midi) ? Visibility.Visible : Visibility.Collapsed;
             ImportArgsPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.CanImport) ? Visibility.Visible : Visibility.Collapsed;
 
             suppressEvents = false;

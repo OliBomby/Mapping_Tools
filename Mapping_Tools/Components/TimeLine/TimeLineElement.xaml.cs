@@ -21,8 +21,8 @@ namespace Mapping_Tools.Components.TimeLine {
             InitializeComponent();
             this.action = action;
             milliseconds = mSeconds;
-            rectOuter.Height = height;
-            rectInner.Height = height;
+            RectOuter.Height = height;
+            RectInner.Height = height;
 
             SetupColour();
 
@@ -87,8 +87,8 @@ namespace Mapping_Tools.Components.TimeLine {
                     };
                     break;
             }
-            rectInner.Fill = inner;
-            rectOuter.Fill = outer;
+            RectInner.Fill = inner;
+            RectOuter.Fill = outer;
         }
 
         // Creates tooltip from seconds value
@@ -105,7 +105,7 @@ namespace Mapping_Tools.Components.TimeLine {
             if (ms.Length < 2)
                 ms = "0" + ms;
 
-            mainCanvas.ToolTip = string.Format("{0}:{1}:{2}", m, s, ms);
+            MainCanvas.ToolTip = string.Format("{0}:{1}:{2}", m, s, ms);
         }
 
         //Open osu at timestamp

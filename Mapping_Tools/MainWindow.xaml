@@ -133,7 +133,7 @@
                                     Content="{materialDesign:PackIcon WindowMinimize}" 
                                     Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
                                     Click="MinimizeWin" />
-                            <Button x:Name="toggle_button" 
+                            <Button x:Name="ToggleButton" 
                                     Style="{DynamicResource MaterialDesignFlatButton}" 
                                     Content="{materialDesign:PackIcon WindowMaximize}" 
                                     Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
@@ -181,7 +181,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock 
                                     Grid.Column="0"
-                                    Name="currentMaps" 
+                                    Name="CurrentMaps" 
                                     HorizontalAlignment="Center"
                                     TextWrapping="NoWrap" 
                                     TextTrimming="None" 
@@ -255,7 +255,7 @@
                             x:Name="ContentScroller" 
                             VerticalScrollBarVisibility="{Binding VerticalContentScrollBarVisibility}" 
                             HorizontalScrollBarVisibility="{Binding HorizontalContentScrollBarVisibility}">
-                            <ContentControl Margin="20" Name="content_views" Content="{Binding View}"></ContentControl>
+                            <ContentControl Margin="20" Name="ContentViews" Content="{Binding View}"></ContentControl>
                         </ScrollViewer>
 
                         <materialDesign:Snackbar 
@@ -265,6 +265,6 @@
                 </materialDesign:DrawerHost>
             </Grid>
         </materialDesign:DialogHost>
-        <Border Name="window_border" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}" />
+        <Border Name="WindowBorder" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}" />
     </Grid>
 </Window>

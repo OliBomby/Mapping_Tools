@@ -25,8 +25,8 @@ namespace Mapping_Tools.Views.RhythmGuide {
         /// </summary>
         public RhythmGuideView() {
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             DataContext = new RhythmGuideVm();
             ProjectManager.LoadProject(this, message: false);
         }

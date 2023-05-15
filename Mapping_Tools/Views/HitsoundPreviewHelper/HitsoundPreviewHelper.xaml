@@ -11,8 +11,8 @@
     <UserControl.Resources>
         <domain:IntToStringConverter x:Key="I2SConverter"/>
         <domain:DoubleToStringConverter x:Key="D2SConverter"/>
-        <domain:SampleSetToStringConverter x:Key="SS2SConverter"/>
-        <domain:HitsoundToStringConverter x:Key="HS2SConverter"/>
+        <domain:SampleSetToStringConverter x:Key="Ss2SConverter"/>
+        <domain:HitsoundToStringConverter x:Key="Hs2SConverter"/>
     </UserControl.Resources>
     <Grid Name="MasterGrid">
         <Grid.RowDefinitions>
@@ -105,15 +105,15 @@
                         <!-- use custom combo box column to get better combos. Use ItemsSourceBinding as your binding template to be applied to each combo -->
                         <materialDesign:DataGridComboBoxColumn
                             Header="Hitsound"
-                            SelectedValueBinding="{Binding Hitsound, Converter={StaticResource HS2SConverter}, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedValueBinding="{Binding Hitsound, Converter={StaticResource Hs2SConverter}, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Hitsounds}" />
                         <materialDesign:DataGridComboBoxColumn
                             Header="SampleSet"
-                            SelectedValueBinding="{Binding SampleSet, Converter={StaticResource SS2SConverter}, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedValueBinding="{Binding SampleSet, Converter={StaticResource Ss2SConverter}, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.SampleSets}" />
                         <materialDesign:DataGridComboBoxColumn
                             Header="Additions"
-                            SelectedValueBinding="{Binding AdditionsSet, Converter={StaticResource SS2SConverter}, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedValueBinding="{Binding AdditionsSet, Converter={StaticResource Ss2SConverter}, UpdateSourceTrigger=PropertyChanged}"
                             ItemsSourceBinding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.SampleSets}" />
                         <materialDesign:DataGridTextColumn
                             Binding="{Binding CustomIndex, Converter={StaticResource I2SConverter}, ConverterParameter=0, UpdateSourceTrigger=PropertyChanged}"

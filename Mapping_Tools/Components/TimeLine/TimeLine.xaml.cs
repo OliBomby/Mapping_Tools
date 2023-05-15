@@ -40,7 +40,7 @@ namespace Mapping_Tools.Components.TimeLine {
         public void AddElement(double mSeconds, double action) {
             TimeLineElement te = new TimeLineElement(timeLineInnerHeight, mSeconds, action);
             elements.Add(te);
-            mainCanvas.Children.Add(te);
+            MainCanvas.Children.Add(te);
 
             Canvas.SetTop(te, elementTop);
             Canvas.SetLeft(te, ( timeLineWidth * ( mSeconds - startMSeconds ) / ( endMSeconds - startMSeconds ) ) - 1);
@@ -50,7 +50,7 @@ namespace Mapping_Tools.Components.TimeLine {
             foreach( TimeLineMark tMark_s in marks ) {
                 TimeLineElement te = new TimeLineElement(timeLineInnerHeight, tMark_s.Time, 0);
                 elements.Add(te);
-                mainCanvas.Children.Add(te);
+                MainCanvas.Children.Add(te);
                 Canvas.SetTop(te, elementTop);
                 Canvas.SetLeft(te, ( timeLineWidth * ( tMark_s.Time - startMSeconds ) / ( endMSeconds - startMSeconds ) ) - 1);
             }
@@ -60,20 +60,20 @@ namespace Mapping_Tools.Components.TimeLine {
             // Create first mark
             TimeLineMark tmStart = new TimeLineMark(startMSeconds);
             marks.Add(tmStart);
-            mainCanvas.Children.Add(tmStart);
+            MainCanvas.Children.Add(tmStart);
 
             // Create middle marks
             double intervalCount = ( ( endMSeconds - startMSeconds ) / intervalMSeconds ) - 1;
             for( int i = 1; i <= intervalCount; i++ ) {
                 TimeLineMark tm = new TimeLineMark(startMSeconds + ( intervalMSeconds * i ));
                 marks.Add(tm);
-                mainCanvas.Children.Add(tm);
+                MainCanvas.Children.Add(tm);
             }
 
             // Create last mark
             TimeLineMark tmEnd = new TimeLineMark(endMSeconds);
             marks.Add(tmEnd);
-            mainCanvas.Children.Add(tmEnd);
+            MainCanvas.Children.Add(tmEnd);
 
             // Setup spacing
             spacing = timeLineWidth / ( marks.Count - 1 );
@@ -101,7 +101,7 @@ namespace Mapping_Tools.Components.TimeLine {
             // Set Line's width and color  
             line.StrokeThickness = 2;
             line.Stroke = blackBrush;
-            mainCanvas.Children.Add(line);
+            MainCanvas.Children.Add(line);
 
             // Canvas.Top value for TimelineElements
             elementTop = 1 + (int) tmStart.ActualHeight + 1;
@@ -109,8 +109,8 @@ namespace Mapping_Tools.Components.TimeLine {
             timeLineInnerHeight = timeLineHeight - 46 - 2;
             // Set the canvas's width
             //mainCanvas.Width = ( spacing * ( TMarks.Count - 1 ) ) + (int) tmEnd.ActualWidth;
-            mainCanvas.Width = timeLineWidth;
-            mainCanvas.Height = 50;
+            MainCanvas.Width = timeLineWidth;
+            MainCanvas.Height = 50;
             GenerateMarkerElements();
         }
     }

@@ -270,6 +270,6 @@
             </Grid>
         </materialDesign:ColorZone>
 
-        <Border Name="window_border" BorderThickness="1" Grid.RowSpan="3" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
+        <Border Name="WindowBorder" BorderThickness="1" Grid.RowSpan="3" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
     </Grid>
 </Window>

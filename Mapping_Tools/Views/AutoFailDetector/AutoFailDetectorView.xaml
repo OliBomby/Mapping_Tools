@@ -109,7 +109,7 @@
             </Grid>
         </Grid>
         <Grid Name="FourthGrid" Grid.Row="2">
-            <StackPanel x:Name="tl_host"
+            <StackPanel x:Name="TlHost"
                         ToolTip="This timeline shows where the auto-fail occurs. Red lines show the objects which unload and cause auto-fail. Green lines show the objects which could potentially unload with different object counts. Purple lines show objects which make other objects potentially unload. You can double-click the lines to go to that time."/>
         </Grid>
     </Grid>

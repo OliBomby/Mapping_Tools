@@ -46,8 +46,8 @@ namespace Mapping_Tools.Views.MapCleaner {
         /// </summary>
         public CleanerView() {
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             DataContext = new MapCleanerVm();
             ProjectManager.LoadProject(this, message: false);
 
@@ -185,7 +185,7 @@ namespace Mapping_Tools.Views.MapCleaner {
         }
 
         private void FillTimeLine() {
-            tl?.mainCanvas.Children.Clear();
+            tl?.MainCanvas.Children.Clear();
             try {
                 tl = new TimeLine(MainWindow.AppWindow.MainContentGrid.ActualWidth, 100.0, endTimeMonitor);
                 foreach (double timingS in timingpointsAdded) {
@@ -197,8 +197,8 @@ namespace Mapping_Tools.Views.MapCleaner {
                 foreach (double timingS in timingpointsRemoved) {
                     tl.AddElement(timingS, 3);
                 }
-                tl_host.Children.Clear();
-                tl_host.Children.Add(tl);
+                TlHost.Children.Clear();
+                TlHost.Children.Add(tl);
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
             }

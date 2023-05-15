@@ -86,7 +86,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" FontSize="32" Foreground="{DynamicResource PrimaryHueMidBrush}"><Run Text="Recent"/></TextBlock>
-            <ListView Grid.Row="1" x:Name="recentList" MouseDoubleClick="RecentList_MouseDoubleClick"
+            <ListView Grid.Row="1" x:Name="RecentList" MouseDoubleClick="RecentList_MouseDoubleClick"
                       ToolTip="Double-click any selection of items to set them as the current beatmap.">
                 <ListView.View>
                     <GridView>

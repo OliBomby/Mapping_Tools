@@ -36,8 +36,8 @@ To get started, select a slider in your beatmap and click 'Preview slider' to pr
         public TumourGeneratorView() {
             InitializeComponent();
             SetSaveData(new TumourGeneratorVm());
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e) {

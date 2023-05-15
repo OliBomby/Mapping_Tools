@@ -41,8 +41,8 @@ namespace Mapping_Tools.Views.AutoFailDetector {
         /// </summary>
         public AutoFailDetectorView() {
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             DataContext = new AutoFailDetectorVm();
 
             // It's important to see the results
@@ -151,7 +151,7 @@ namespace Mapping_Tools.Views.AutoFailDetector {
 
 
         private void FillTimeLine() {
-            tl?.mainCanvas.Children.Clear();
+            tl?.MainCanvas.Children.Clear();
             try {
                 tl = new TimeLine(MainWindow.AppWindow.MainContentGrid.ActualWidth, 100.0, endTimeMonitor);
                 foreach (double timingS in potentialUnloadingObjects) {
@@ -163,8 +163,8 @@ namespace Mapping_Tools.Views.AutoFailDetector {
                 foreach (double timingS in unloadingObjects) {
                     tl.AddElement(timingS, 3);
                 }
-                tl_host.Children.Clear();
-                tl_host.Children.Add(tl);
+                TlHost.Children.Clear();
+                TlHost.Children.Add(tl);
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
             }

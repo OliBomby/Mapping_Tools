@@ -33,8 +33,8 @@ namespace Mapping_Tools.Views.SnappingTools {
         {
             DataContext = new SnappingToolsVm();
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             ProjectManager.LoadProject(this, message: false);
         }
 

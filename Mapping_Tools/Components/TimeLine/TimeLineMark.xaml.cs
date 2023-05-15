@@ -20,7 +20,7 @@ namespace Mapping_Tools.Components.TimeLine {
             if( s.Length < 2)
                 s = "0" + s;
 
-            text.Text = string.Format("{0}:{1}", m, s);
+            Text.Text = string.Format("{0}:{1}", m, s);
         }
     }
 }

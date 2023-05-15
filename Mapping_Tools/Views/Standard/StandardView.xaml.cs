@@ -56,7 +56,7 @@ namespace Mapping_Tools.Views.Standard {
             if (SettingsManager.GetRecentMaps().Count > 0) {
                 foreach (string[] s in SettingsManager.GetRecentMaps()) {
                     // Populate listview in the component
-                    recentList.Items.Add(new MyItem { Path = s[0], Date = s[1] });
+                    RecentList.Items.Add(new MyItem { Path = s[0], Date = s[1] });
                 }
             }
         }
@@ -68,7 +68,7 @@ namespace Mapping_Tools.Views.Standard {
         }
 
         private void RecentList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
-            var selectedItems = recentList.SelectedItems;
+            var selectedItems = RecentList.SelectedItems;
             List<string> items = new List<string>();
             foreach (var item in selectedItems) {
                 items.Add(((MyItem)item).Path);

@@ -32,8 +32,8 @@ namespace Mapping_Tools.Views.SliderCompletionator {
         /// <inheritdoc />
         public SliderCompletionatorView() {
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             DataContext = new SliderCompletionatorVm();
             ProjectManager.LoadProject(this, message: false);
         }

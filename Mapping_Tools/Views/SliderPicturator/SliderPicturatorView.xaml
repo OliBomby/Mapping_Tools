@@ -201,9 +201,9 @@
                                     </ComboBox>
                                     <Rectangle Width="30" Height="30" Visibility="{Binding ShouldShowCCPicker}" Fill="{Binding PickedComboColor}" />
                                 </StackPanel>
-                                <xctk:ColorPicker Grid.Row="1" Grid.Column="1" Name="ClrPcker_Track" SelectedColor="{Binding TrackColorPickerColor}" Visibility="{Binding ShouldShowPalette}" Margin="10,3,0,3"></xctk:ColorPicker>
+                                <xctk:ColorPicker Grid.Row="1" Grid.Column="1" Name="ClrPckerTrack" SelectedColor="{Binding TrackColorPickerColor}" Visibility="{Binding ShouldShowPalette}" Margin="10,3,0,3"></xctk:ColorPicker>
                                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Border Color:" VerticalAlignment="Center"/>
-                                <xctk:ColorPicker Grid.Row="2" Grid.Column="1" Name="ClrPcker_Border" SelectedColor="{Binding BorderColor}" Margin="10,3,0,3"></xctk:ColorPicker>
+                                <xctk:ColorPicker Grid.Row="2" Grid.Column="1" Name="ClrPckerBorder" SelectedColor="{Binding BorderColor}" Margin="10,3,0,3"></xctk:ColorPicker>
                             </Grid>
                         </StackPanel>
 

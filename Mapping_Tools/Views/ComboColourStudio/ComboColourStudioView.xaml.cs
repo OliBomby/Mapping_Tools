@@ -33,8 +33,8 @@ namespace Mapping_Tools.Views.ComboColourStudio {
         public ComboColourStudioView() {
             InitializeComponent();
             DataContext = new ComboColourStudioVm();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             ProjectManager.LoadProject(this, message: false);
         }
 

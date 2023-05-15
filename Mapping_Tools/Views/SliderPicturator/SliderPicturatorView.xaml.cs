@@ -32,8 +32,8 @@ namespace Mapping_Tools.Views.SliderPicturator {
         public SliderPicturatorView()
         {
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             DataContext = new SliderPicturatorVm();
             ProjectManager.LoadProject(this, message: false);
         }
