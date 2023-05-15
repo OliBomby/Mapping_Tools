@@ -324,7 +324,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
         }
 
         private static void CopyHitsounds(HitsoundCopierVm arg, Timeline tlFrom, Timeline tlTo) {
-            foreach (var tloFrom in tlFrom.TimelineObjects) {
+            foreach (var tloFrom in tlFrom.TimelineObjects.Where(o => o.HasHitsound)) {
                 var tloTo = tlTo.GetNearestTlo(tloFrom.Time, true);
 
                 if (tloTo != null &&
@@ -345,7 +345,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             var CustomSampledTimes = new HashSet<int>();
             var tloToSliderSlide = new List<TimelineObject>();
 
-            foreach (var tloFrom in tlFrom.TimelineObjects) {
+            foreach (var tloFrom in tlFrom.TimelineObjects.Where(o => o.HasHitsound)) {
                 var tloTo = tlTo.GetNearestTlo(tloFrom.Time, true);
 
                 if (tloTo != null &&
