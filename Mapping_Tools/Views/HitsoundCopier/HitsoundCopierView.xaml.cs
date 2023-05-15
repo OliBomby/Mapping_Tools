@@ -40,8 +40,8 @@ namespace Mapping_Tools.Views.HitsoundCopier {
         /// <inheritdoc />
         public HitsoundCopierView() {
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             DataContext = new HitsoundCopierVm();
             ProjectManager.LoadProject(this, message: false);
         }
@@ -114,8 +114,8 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                     // Save tlo times where timingpoint volume is 5%
                     // Timingpointchange all the undefined tlo from copyFrom
                     volumeMuteTimes?.AddRange(from tloTo in tlTo.TimelineObjects
-                        where tloTo.CanCopy && Math.Abs(tloTo.SampleVolume) < Precision.DOUBLE_EPSILON
-                                            && Math.Abs(tloTo.FenoSampleVolume - 5) < Precision.DOUBLE_EPSILON
+                        where tloTo.CanCopy && Math.Abs(tloTo.SampleVolume) < Precision.DoubleEpsilon
+                                            && Math.Abs(tloTo.FenoSampleVolume - 5) < Precision.DoubleEpsilon
                         select tloTo.Time);
 
                     // Volumes and samplesets and customindices greenlines get copied with timingpointchanges and allafter enabled
@@ -140,7 +140,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
                         // Exclude objects which use their own sample volume property instead
                         foreach (var tloTo in processedTimeline.TimelineObjects.Where(o =>
-                                     Math.Abs(o.SampleVolume) < Precision.DOUBLE_EPSILON && Precision.AlmostBigger(o.Time, firstTime))) {
+                                     Math.Abs(o.SampleVolume) < Precision.DoubleEpsilon && Precision.AlmostBigger(o.Time, firstTime))) {
                             if (volumeMuteTimes.Contains(tloTo.Time)) {
                                 // Add timingpointschange to copy timingpoint hitsounds
                                 var tp = tloTo.HitsoundTimingPoint.Copy();
@@ -243,6 +243,12 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                                 continue;
                         }
 
+                        if (arg.IgnoreWheneverHitsound) {
+                            if (processedTimeline.TimelineObjects.Any(o => Math.Abs(o.Time - sampleFrom.StartTime) <= arg.TemporalLeniency)) {
+                                continue;
+                            }
+                        }
+
                         // Add the StoryboardSoundSamples from beatmapFrom to beatmapTo if it doesn't already have the sample
                         if (!samplesTo.Contains(sampleFrom)) {
                             beatmapTo.StoryboardSoundSamples.Add(sampleFrom);
@@ -318,7 +324,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
         }
 
         private static void CopyHitsounds(HitsoundCopierVm arg, Timeline tlFrom, Timeline tlTo) {
-            foreach (var tloFrom in tlFrom.TimelineObjects) {
+            foreach (var tloFrom in tlFrom.TimelineObjects.Where(o => o.HasHitsound)) {
                 var tloTo = tlTo.GetNearestTlo(tloFrom.Time, true);
 
                 if (tloTo != null &&
@@ -339,7 +345,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             var CustomSampledTimes = new HashSet<int>();
             var tloToSliderSlide = new List<TimelineObject>();
 
-            foreach (var tloFrom in tlFrom.TimelineObjects) {
+            foreach (var tloFrom in tlFrom.TimelineObjects.Where(o => o.HasHitsound)) {
                 var tloTo = tlTo.GetNearestTlo(tloFrom.Time, true);
 
                 if (tloTo != null &&
@@ -466,10 +472,10 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                         var newSampleSet = tloTo.FenoSampleSet;
                         var latest = double.NegativeInfinity;
                         foreach (TimingPointsChange tpc in timingPointsChanges) {
-                            if (!tpc.Sampleset || !(tpc.MyTP.Offset <= tloTo.Time) || !(tpc.MyTP.Offset >= latest))
+                            if (!tpc.Sampleset || !(tpc.MyTp.Offset <= tloTo.Time) || !(tpc.MyTp.Offset >= latest))
                                 continue;
-                            newSampleSet = tpc.MyTP.SampleSet;
-                            latest = tpc.MyTP.Offset;
+                            newSampleSet = tpc.MyTp.SampleSet;
+                            latest = tpc.MyTp.Offset;
                         }
 
                         tp.SampleSet = newSampleSet;
@@ -483,10 +489,10 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                         var newIndex = tloTo.FenoCustomIndex;
                         var latest = double.NegativeInfinity;
                         foreach (var tpc in timingPointsChanges) {
-                            if (!tpc.Index || !(tpc.MyTP.Offset <= tloTo.Time) || !(tpc.MyTP.Offset >= latest))
+                            if (!tpc.Index || !(tpc.MyTp.Offset <= tloTo.Time) || !(tpc.MyTp.Offset >= latest))
                                 continue;
-                            newIndex = tpc.MyTP.SampleIndex;
-                            latest = tpc.MyTP.Offset;
+                            newIndex = tpc.MyTp.SampleIndex;
+                            latest = tpc.MyTp.Offset;
                         }
 
                         tp.SampleIndex = newIndex;

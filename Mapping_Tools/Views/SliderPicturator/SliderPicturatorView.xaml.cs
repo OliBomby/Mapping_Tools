@@ -32,8 +32,8 @@ namespace Mapping_Tools.Views.SliderPicturator {
         public SliderPicturatorView()
         {
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             DataContext = new SliderPicturatorVm();
             ProjectManager.LoadProject(this, message: false);
         }
@@ -191,8 +191,8 @@ namespace Mapping_Tools.Views.SliderPicturator {
 
             // Add redlines
             var timingPointsChanges = new List<TimingPointsChange> {
-                new(tpOn, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON),
-                new(tpAfter, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON)
+                new(tpOn, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon),
+                new(tpAfter, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon)
             };
 
             ho.Time -= 1;
@@ -202,7 +202,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
                 var tp = timing.GetTimingPointAtTime(bmho.Time).Copy();
                 tp.MpB = sv;
                 tp.Offset = bmho.Time;
-                return new TimingPointsChange(tp, mpb: true, fuzzyness: Precision.DOUBLE_EPSILON);
+                return new TimingPointsChange(tp, mpb: true, fuzzyness: Precision.DoubleEpsilon);
             }));
 
             TimingPointsChange.ApplyChanges(timing, timingPointsChanges);

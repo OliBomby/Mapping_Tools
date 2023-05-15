@@ -3,13 +3,13 @@ using System.ComponentModel;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class SelectedPatternImportVm : BindableBase {
-        private string _name;
+        private string name;
 
         [DisplayName("Name")]
         [Description("The name for the pattern.")]
         public string Name { 
-            get => _name; 
-            set => Set(ref _name, value);
+            get => name; 
+            set => Set(ref name, value);
         }
     }
 }

@@ -39,7 +39,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools {
         /// <summary>
         /// 
         /// </summary>
-        private string[] _configLines;
+        private string[] configLines;
 
         /// <summary>
         /// The window position of the osu! game using <see cref="Vector2"/>.
@@ -100,7 +100,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools {
         public void ReadConfig() {
             try {
                 // Try reading the user config for drawing data
-                _configLines = File.ReadAllLines(SettingsManager.Settings.OsuConfigPath);
+                configLines = File.ReadAllLines(SettingsManager.Settings.OsuConfigPath);
 
                 Fullscreen = FindConfigValue("Fullscreen") == "1";
                 if (Fullscreen) {
@@ -118,7 +118,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools {
         }
 
         private string FindConfigValue(string key) {
-            foreach (var line in _configLines) {
+            foreach (var line in configLines) {
                 var split = line.Split('=');
                 if (split[0].Trim() == key) {
                     return split[1].Trim();

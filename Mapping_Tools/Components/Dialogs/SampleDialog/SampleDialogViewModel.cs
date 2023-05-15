@@ -3,11 +3,11 @@
 namespace Mapping_Tools.Components.Dialogs.SampleDialog {
     public class SampleDialogViewModel : BindableBase
     {
-        private string _name;
+        private string name;
 
         public string Name {
-            get => _name;
-            set => Set(ref _name, value);
+            get => name;
+            set => Set(ref name, value);
         }
     }
 }

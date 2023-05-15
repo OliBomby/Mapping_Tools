@@ -14,7 +14,7 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper {
         /// <summary>
         /// The beats per minute value of the envelope tempo point with a precision of 10 decimal places.
         /// </summary>
-        public decimal BPM { get; set; }
+        public decimal Bpm { get; set; }
 
         public EnvelopeShape EnvelopeShape { get; set; }
 
@@ -33,7 +33,7 @@ namespace Mapping_Tools.Classes.ExternalFileUtil.Reaper {
         {
             string[] timingInformation = line.Split(char.Parse(""));
             Time = decimal.Parse(timingInformation[1]);
-            BPM = decimal.Parse(timingInformation[2]);
+            Bpm = decimal.Parse(timingInformation[2]);
             EnvelopeShape = (EnvelopeShape)int.Parse(timingInformation[3]);
             TempoSignature = timingInformation[4] != null ? GetTempoSignature(timingInformation[4]) : new TempoSignature(4);
         }

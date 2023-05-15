@@ -6,85 +6,85 @@ using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
     public class MapCleanerArgs : BindableBase {
-        private bool _volumeSliders;
-        private bool _sampleSetSliders;
-        private bool _volumeSpinners;
-        private bool _resnapObjects;
-        private bool _resnapBookmarks;
-        private bool _analyzeSamples;
-        private bool _removeUnusedSamples;
-        private bool _removeHitsounds;
-        private bool _removeMuting;
-        private bool _removeUnclickableHitsounds;
-        private IBeatDivisor[] _beatDivisors;
+        private bool volumeSliders;
+        private bool sampleSetSliders;
+        private bool volumeSpinners;
+        private bool resnapObjects;
+        private bool resnapBookmarks;
+        private bool analyzeSamples;
+        private bool removeUnusedSamples;
+        private bool removeHitsounds;
+        private bool removeMuting;
+        private bool removeUnclickableHitsounds;
+        private IBeatDivisor[] beatDivisors;
 
         public bool VolumeSliders {
-            get => _volumeSliders;
-            set => Set(ref _volumeSliders, value);
+            get => volumeSliders;
+            set => Set(ref volumeSliders, value);
         }
 
         public bool SampleSetSliders {
-            get => _sampleSetSliders;
-            set => Set(ref _sampleSetSliders, value);
+            get => sampleSetSliders;
+            set => Set(ref sampleSetSliders, value);
         }
 
         public bool VolumeSpinners {
-            get => _volumeSpinners;
-            set => Set(ref _volumeSpinners, value);
+            get => volumeSpinners;
+            set => Set(ref volumeSpinners, value);
         }
 
         public bool ResnapObjects {
-            get => _resnapObjects;
-            set => Set(ref _resnapObjects, value);
+            get => resnapObjects;
+            set => Set(ref resnapObjects, value);
         }
 
         public bool ResnapBookmarks {
-            get => _resnapBookmarks;
-            set => Set(ref _resnapBookmarks, value);
+            get => resnapBookmarks;
+            set => Set(ref resnapBookmarks, value);
         }
 
         public bool AnalyzeSamples {
-            get => _analyzeSamples;
-            set => Set(ref _analyzeSamples, value);
+            get => analyzeSamples;
+            set => Set(ref analyzeSamples, value);
         }
 
         public bool RemoveUnusedSamples {
-            get => _removeUnusedSamples;
-            set => Set(ref _removeUnusedSamples, value);
+            get => removeUnusedSamples;
+            set => Set(ref removeUnusedSamples, value);
         }
 
         public bool RemoveHitsounds {
-            get => _removeHitsounds;
-            set => Set(ref _removeHitsounds, value);
+            get => removeHitsounds;
+            set => Set(ref removeHitsounds, value);
         }
 
         public bool RemoveMuting {
-            get => _removeMuting;
-            set => Set(ref _removeMuting, value);
+            get => removeMuting;
+            set => Set(ref removeMuting, value);
         }
 
         public bool RemoveUnclickableHitsounds {
-            get => _removeUnclickableHitsounds;
-            set => Set(ref _removeUnclickableHitsounds, value);
+            get => removeUnclickableHitsounds;
+            set => Set(ref removeUnclickableHitsounds, value);
         }
 
         public IBeatDivisor[] BeatDivisors {
-            get => _beatDivisors;
-            set => Set(ref _beatDivisors, value);
+            get => beatDivisors;
+            set => Set(ref beatDivisors, value);
         }
 
         public MapCleanerArgs(bool volumeSliders, bool sampleSetSliders, bool volumeSpinners, bool resnapObjects, bool resnapBookmarks, bool analyzeSamples, bool removeUnusedSamples, bool removeHitsounds, bool removeMuting, bool removeUnclickableHitsounds, IEnumerable<IBeatDivisor> beatDivisors) {
-            _volumeSliders = volumeSliders;
-            _sampleSetSliders = sampleSetSliders;
-            _volumeSpinners = volumeSpinners;
-            _resnapObjects = resnapObjects;
-            _resnapBookmarks = resnapBookmarks;
-            _analyzeSamples = analyzeSamples;
-            _removeUnusedSamples = removeUnusedSamples;
-            _removeHitsounds = removeHitsounds;
-            _removeMuting = removeMuting;
-            _removeUnclickableHitsounds = removeUnclickableHitsounds;
-            _beatDivisors = beatDivisors.ToArray();
+            this.volumeSliders = volumeSliders;
+            this.sampleSetSliders = sampleSetSliders;
+            this.volumeSpinners = volumeSpinners;
+            this.resnapObjects = resnapObjects;
+            this.resnapBookmarks = resnapBookmarks;
+            this.analyzeSamples = analyzeSamples;
+            this.removeUnusedSamples = removeUnusedSamples;
+            this.removeHitsounds = removeHitsounds;
+            this.removeMuting = removeMuting;
+            this.removeUnclickableHitsounds = removeUnclickableHitsounds;
+            this.beatDivisors = beatDivisors.ToArray();
         }
 
         public static readonly MapCleanerArgs BasicClean = new MapCleanerArgs(true, true, true, false, false, true, false, false, false, false, RationalBeatDivisor.GetDefaultBeatDivisors());

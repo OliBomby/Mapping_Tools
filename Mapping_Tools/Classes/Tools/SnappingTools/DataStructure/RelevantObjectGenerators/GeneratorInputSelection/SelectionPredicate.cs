@@ -4,16 +4,16 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection {
     public class SelectionPredicate : BindableBase, IEquatable<SelectionPredicate>, ICloneable {
-        private bool _needSelected;
-        private bool _needLocked;
-        private bool _needGeneratedByThis;
-        private bool _needGeneratedNotByThis;
-        private double _minRelevancy;
-        public bool NeedSelected { get => _needSelected; set => Set(ref _needSelected, value); }
-        public bool NeedLocked { get => _needLocked; set => Set(ref _needLocked, value); }
-        public bool NeedGeneratedByThis { get => _needGeneratedByThis; set => Set(ref _needGeneratedByThis, value); }
-        public bool NeedGeneratedNotByThis { get => _needGeneratedNotByThis; set => Set(ref _needGeneratedNotByThis, value); }
-        public double MinRelevancy { get => _minRelevancy; set => Set(ref _minRelevancy, value); }
+        private bool needSelected;
+        private bool needLocked;
+        private bool needGeneratedByThis;
+        private bool needGeneratedNotByThis;
+        private double minRelevancy;
+        public bool NeedSelected { get => needSelected; set => Set(ref needSelected, value); }
+        public bool NeedLocked { get => needLocked; set => Set(ref needLocked, value); }
+        public bool NeedGeneratedByThis { get => needGeneratedByThis; set => Set(ref needGeneratedByThis, value); }
+        public bool NeedGeneratedNotByThis { get => needGeneratedNotByThis; set => Set(ref needGeneratedNotByThis, value); }
+        public double MinRelevancy { get => minRelevancy; set => Set(ref minRelevancy, value); }
 
         public bool Check(IRelevantObject relevantObject, RelevantObjectsGenerator generator) {
             if (NeedSelected && !relevantObject.IsSelected) return false;
@@ -34,7 +34,7 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public bool Equals(SelectionPredicate other) {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return _needSelected == other._needSelected && _needLocked == other._needLocked && _needGeneratedByThis == other._needGeneratedByThis && _needGeneratedNotByThis == other._needGeneratedNotByThis && _minRelevancy.Equals(other._minRelevancy);
+            return needSelected == other.needSelected && needLocked == other.needLocked && needGeneratedByThis == other.needGeneratedByThis && needGeneratedNotByThis == other.needGeneratedNotByThis && minRelevancy.Equals(other.minRelevancy);
         }
 
         public override bool Equals(object obj) {
@@ -45,11 +45,11 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
 
         public override int GetHashCode() {
             unchecked {
-                var hashCode = _needSelected.GetHashCode();
-                hashCode = (hashCode * 397) ^ _needLocked.GetHashCode();
-                hashCode = (hashCode * 397) ^ _needGeneratedByThis.GetHashCode();
-                hashCode = (hashCode * 397) ^ _needGeneratedNotByThis.GetHashCode();
-                hashCode = (hashCode * 397) ^ _minRelevancy.GetHashCode();
+                var hashCode = needSelected.GetHashCode();
+                hashCode = (hashCode * 397) ^ needLocked.GetHashCode();
+                hashCode = (hashCode * 397) ^ needGeneratedByThis.GetHashCode();
+                hashCode = (hashCode * 397) ^ needGeneratedNotByThis.GetHashCode();
+                hashCode = (hashCode * 397) ^ minRelevancy.GetHashCode();
                 return hashCode;
             }
         }

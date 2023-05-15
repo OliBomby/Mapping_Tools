@@ -13,10 +13,10 @@ using Mapping_Tools.Components.Domain;
 
 namespace Mapping_Tools.Classes.Tools.ComboColourStudio {
     public class ComboColourProject : BindableBase {
-        private ObservableCollection<ColourPoint> _colourPoints;
-        private ObservableCollection<SpecialColour> _comboColours;
+        private ObservableCollection<ColourPoint> colourPoints;
+        private ObservableCollection<SpecialColour> comboColours;
 
-        private int _maxBurstLength;
+        private int maxBurstLength;
 
         public ComboColourProject() {
             ColourPoints = new ObservableCollection<ColourPoint>();
@@ -241,7 +241,7 @@ namespace Mapping_Tools.Classes.Tools.ComboColourStudio {
                 // Factor the contribution over the cost
                 var score = contribution / cost;
                 
-                if (bestSequence != null && (score < bestScore || Math.Abs(score - bestScore) < Precision.DOUBLE_EPSILON && cost >= bestCost)) continue;
+                if (bestSequence != null && (score < bestScore || Math.Abs(score - bestScore) < Precision.DoubleEpsilon && cost >= bestCost)) continue;
 
                 bestScore = score;
                 bestSequence = sequence;
@@ -323,22 +323,22 @@ namespace Mapping_Tools.Classes.Tools.ComboColourStudio {
 
         
         public ObservableCollection<ColourPoint> ColourPoints {
-            get => _colourPoints;
-            set { Set(ref _colourPoints, value);
+            get => colourPoints;
+            set { Set(ref colourPoints, value);
                 ColourPoints.CollectionChanged += ColourPointsOnCollectionChanged;
             }
         }
 
         public ObservableCollection<SpecialColour> ComboColours {
-            get => _comboColours;
-            set { Set(ref _comboColours, value);
+            get => comboColours;
+            set { Set(ref comboColours, value);
                 ComboColours.CollectionChanged += ComboColoursOnCollectionChanged;
             }
         }
 
         public int MaxBurstLength {
-            get => _maxBurstLength;
-            set => Set(ref _maxBurstLength, value);
+            get => maxBurstLength;
+            set => Set(ref maxBurstLength, value);
         }
 
         public CommandImplementation AddColourPointCommand { get; }

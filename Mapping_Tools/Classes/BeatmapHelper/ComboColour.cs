@@ -8,14 +8,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
     /// Its spelled "Colours" in the game.
     /// </summary>
     public class ComboColour : BindableBase {
-        private Color _color;
+        private Color color;
 
         /// <summary>
         /// The color value of the colour.
         /// </summary>
         public Color Color {
-            get => _color;
-            set => Set(ref _color, value);
+            get => color;
+            set => Set(ref color, value);
         }
         
         /// <inheritdoc />

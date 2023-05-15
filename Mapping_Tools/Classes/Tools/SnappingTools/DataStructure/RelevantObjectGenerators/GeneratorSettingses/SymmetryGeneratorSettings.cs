@@ -3,20 +3,20 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGene
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses {
     public class SymmetryGeneratorSettings : GeneratorSettings {
-        private SelectionPredicateCollection _axisInputPredicate;
+        private SelectionPredicateCollection axisInputPredicate;
         [DisplayName("Axis Input Selection")]
         [Description("Specifies extra rules that virtual lines need to obey to be used as the axis by this generator.")]
         public SelectionPredicateCollection AxisInputPredicate {
-            get => _axisInputPredicate;
-            set => Set(ref _axisInputPredicate, value);
+            get => axisInputPredicate;
+            set => Set(ref axisInputPredicate, value);
         }
         
-        private SelectionPredicateCollection _otherInputPredicate;
+        private SelectionPredicateCollection otherInputPredicate;
         [DisplayName("Other Input Selection")]
         [Description("Specifies extra rules that virtual objects need to obey to get mirrored by this generator.")]
         public SelectionPredicateCollection OtherInputPredicate {
-            get => _otherInputPredicate;
-            set => Set(ref _otherInputPredicate, value);
+            get => otherInputPredicate;
+            set => Set(ref otherInputPredicate, value);
         }
 
         public SymmetryGeneratorSettings() {

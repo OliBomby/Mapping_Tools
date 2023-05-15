@@ -88,7 +88,7 @@ namespace Mapping_Tools.Views.HitsoundStudio {
         }
 
         private void MIDIBrowse3_Click(object sender, RoutedEventArgs e) {
-            string path = IOHelper.MIDIFileDialog();
+            string path = IOHelper.MidiFileDialog();
             if( path != "" ) { BeatmapPathBox3.Text = path; }
         }
 

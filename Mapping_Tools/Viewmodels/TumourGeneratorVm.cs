@@ -25,35 +25,35 @@ namespace Mapping_Tools.Viewmodels {
         private CancellationTokenSource previewTokenSource;
         private readonly object previewTokenLock = new();
 
-        private bool _isProcessingPreview;
+        private bool isProcessingPreview;
         [JsonIgnore]
         public bool IsProcessingPreview {
-            get => _isProcessingPreview;
-            set => Set(ref _isProcessingPreview, value);
+            get => isProcessingPreview;
+            set => Set(ref isProcessingPreview, value);
         }
         
-        private HitObject _previewHitObject;
+        private HitObject previewHitObject;
         public HitObject PreviewHitObject {
-            get => _previewHitObject;
-            set => Set(ref _previewHitObject, value, action: RegeneratePreview);
+            get => previewHitObject;
+            set => Set(ref previewHitObject, value, action: RegeneratePreview);
         }
 
-        private HitObject _tumouredPreviewHitObject;
+        private HitObject tumouredPreviewHitObject;
         [JsonIgnore]
         public HitObject TumouredPreviewHitObject {
-            get => _tumouredPreviewHitObject;
+            get => tumouredPreviewHitObject;
             set {
-                if (Set(ref _tumouredPreviewHitObject, value)) {
+                if (Set(ref tumouredPreviewHitObject, value)) {
                     IsProcessingPreview = false;
                 }
             }
         }
 
-        private ImportMode _importModeSetting;
+        private ImportMode importModeSetting;
         public ImportMode ImportModeSetting {
-            get => _importModeSetting;
+            get => importModeSetting;
             set {
-                if (Set(ref _importModeSetting, value)) {
+                if (Set(ref importModeSetting, value)) {
                     RaisePropertyChanged(nameof(TimeCodeBoxVisibility));
                 }
             }
@@ -62,25 +62,25 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public IEnumerable<ImportMode> ImportModes => Enum.GetValues(typeof(ImportMode)).Cast<ImportMode>();
 
-        private string _timeCode;
+        private string timeCode;
         public string TimeCode {
-            get => _timeCode;
-            set => Set(ref _timeCode, value);
+            get => timeCode;
+            set => Set(ref timeCode, value);
         }
 
         [JsonIgnore]
         public Visibility TimeCodeBoxVisibility => ImportModeSetting == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
 
-        private ObservableCollection<TumourLayer> _tumourLayers;
+        private ObservableCollection<TumourLayer> tumourLayers;
         public ObservableCollection<TumourLayer> TumourLayers {
-            get => _tumourLayers;
+            get => tumourLayers;
             set {
-                if (Set(ref _tumourLayers, value)) {
+                if (Set(ref tumourLayers, value)) {
                     RegeneratePreview();
-                    foreach (TumourLayer layer in _tumourLayers) {
+                    foreach (TumourLayer layer in tumourLayers) {
                         layer.PropertyChanged += TumourLayerOnPropertyChanged;
                     }
-                    _tumourLayers.CollectionChanged += TumourLayersOnCollectionChanged;
+                    tumourLayers.CollectionChanged += TumourLayersOnCollectionChanged;
                 }
             }
         }
@@ -102,81 +102,81 @@ namespace Mapping_Tools.Viewmodels {
             RegeneratePreview();
         }
 
-        private TumourLayer _currentLayer;
+        private TumourLayer currentLayer;
         [JsonIgnore]
         public TumourLayer CurrentLayer {
-            get => _currentLayer;
+            get => currentLayer;
             set {
-                if (Set(ref _currentLayer, value)) {
-                    if (_currentLayer is not null) {
-                        _currentLayer.PropertyChanged += TumourLayerOnPropertyChanged;
+                if (Set(ref currentLayer, value)) {
+                    if (currentLayer is not null) {
+                        currentLayer.PropertyChanged += TumourLayerOnPropertyChanged;
                     }
                     RaisePropertyChanged(nameof(TumourRangeSliderSmallChange));
                 }
             }
         }
 
-        private int _currentLayerIndex;
+        private int currentLayerIndex;
         public int CurrentLayerIndex {
-            get => _currentLayerIndex;
+            get => currentLayerIndex;
             set {
-                if (Set(ref _currentLayerIndex, value)) {
+                if (Set(ref currentLayerIndex, value)) {
                     RaisePropertyChanged(nameof(TumourStartSliderMin));
                     RaisePropertyChanged(nameof(TumourRangeSliderMax));
                 }
             }
         }
 
-        private bool _justMiddleAnchors;
+        private bool justMiddleAnchors;
         public bool JustMiddleAnchors {
-            get => _justMiddleAnchors;
-            set => Set(ref _justMiddleAnchors, value, action: RegeneratePreview);
+            get => justMiddleAnchors;
+            set => Set(ref justMiddleAnchors, value, action: RegeneratePreview);
         }
 
-        private bool _fixSv;
+        private bool fixSv;
         public bool FixSv {
-            get => _fixSv;
-            set => Set(ref _fixSv, value);
+            get => fixSv;
+            set => Set(ref fixSv, value);
         }
 
-        private bool _delegateToBpm;
+        private bool delegateToBpm;
         public bool DelegateToBpm {
-            get => _delegateToBpm;
-            set => Set(ref _delegateToBpm, value);
+            get => delegateToBpm;
+            set => Set(ref delegateToBpm, value);
         }
 
-        private bool _removeSliderTicks;
+        private bool removeSliderTicks;
         public bool RemoveSliderTicks {
-            get => _removeSliderTicks;
-            set => Set(ref _removeSliderTicks, value);
+            get => removeSliderTicks;
+            set => Set(ref removeSliderTicks, value);
         }
 
-        private bool _advancedOptions;
+        private bool advancedOptions;
         public bool AdvancedOptions {
-            get => _advancedOptions;
+            get => advancedOptions;
             set {
-                if (Set(ref _advancedOptions, value)) {
+                if (Set(ref advancedOptions, value)) {
                     RaisePropertyChanged(nameof(TumourStartSliderMin));
                 }
             }
         }
 
-        private bool _debugConstruction;
+        private bool debugConstruction;
         public bool DebugConstruction {
-            get => _debugConstruction;
-            set => Set(ref _debugConstruction, value, action: RegeneratePreview);
+            get => debugConstruction;
+            set => Set(ref debugConstruction, value, action: RegeneratePreview);
         }
 
-        private double _scale;
+        private double scale;
         public double Scale {
-            get => _scale;
-            set => Set(ref _scale, value, action: RegeneratePreview);
+            get => scale;
+            set => Set(ref scale, value, action: RegeneratePreview);
         }
 
-        private double _circleSize;
+        private double circleSize;
         public double CircleSize {
-            get => _circleSize;
-            set => Set(ref _circleSize, value, action: RegeneratePreview);
+            get => circleSize;
+            set => Set(ref circleSize, value, action: RegeneratePreview);
         }
 
         [JsonIgnore]

@@ -312,12 +312,12 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Returns the rotation component of this instance. Quite slow.
         /// </summary>
         /// <param name="row_normalise">Whether the method should row-normalise (i.e. remove scale from) the Matrix. Pass false if you know it's already normalised.</param>
-        public Quaternion ExtractRotation(bool row_normalise = true) {
+        public Quaternion ExtractRotation(bool rowNormalise = true) {
             var row0 = Row0;
             var row1 = Row1;
             var row2 = Row2;
 
-            if( row_normalise ) {
+            if( rowNormalise ) {
                 row0 = row0.Normalized();
                 row1 = row1.Normalized();
                 row2 = row2.Normalized();

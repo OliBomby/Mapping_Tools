@@ -20,7 +20,7 @@ namespace Mapping_Tools.Views.Standard {
 
         public class ChangelogItem
         {
-            public string ID { get; set; }
+            public string Id { get; set; }
             public string Title { get; set; }
             public string Text { get; set; }
             public string Date { get; set; }
@@ -40,7 +40,7 @@ namespace Mapping_Tools.Views.Standard {
 
                 foreach (dynamic dict in json) {
                     ChangelogList.Items.Add(new ChangelogItem {
-                        ID = dict["id"],
+                        Id = dict["id"],
                         Title = dict["name"],
                         Text = dict["body"],
                         Date = dict["published_at"],
@@ -56,7 +56,7 @@ namespace Mapping_Tools.Views.Standard {
             if (SettingsManager.GetRecentMaps().Count > 0) {
                 foreach (string[] s in SettingsManager.GetRecentMaps()) {
                     // Populate listview in the component
-                    recentList.Items.Add(new MyItem { Path = s[0], Date = s[1] });
+                    RecentList.Items.Add(new MyItem { Path = s[0], Date = s[1] });
                 }
             }
         }
@@ -68,7 +68,7 @@ namespace Mapping_Tools.Views.Standard {
         }
 
         private void RecentList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
-            var selectedItems = recentList.SelectedItems;
+            var selectedItems = RecentList.SelectedItems;
             List<string> items = new List<string>();
             foreach (var item in selectedItems) {
                 items.Add(((MyItem)item).Path);

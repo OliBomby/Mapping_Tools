@@ -20,9 +20,9 @@ namespace Mapping_Tools.Viewmodels {
     public class MainWindowVm : BindableBase {
         private ICollectionView navigationItemsView;
 
-        private List<FrameworkElement> DefaultItems;
-        private List<FrameworkElement> ToolItems;
-        private List<FrameworkElement> FavoriteItems;
+        private List<FrameworkElement> defaultItems;
+        private List<FrameworkElement> toolItems;
+        private List<FrameworkElement> favoriteItems;
 
         public ViewCollection Views { get; set; }
 
@@ -159,7 +159,7 @@ namespace Mapping_Tools.Viewmodels {
         public CommandImplementation OpenNavigationDrawer { get; }
 
         private void GenerateDefaultItems() {
-            DefaultItems = new List<FrameworkElement> {
+            defaultItems = new List<FrameworkElement> {
                 CreateNavigationItem(typeof(StandardView)),
                 CreateNavigationItem(typeof(PreferencesView))
             };
@@ -170,7 +170,7 @@ namespace Mapping_Tools.Viewmodels {
                 .Where(o => o.GetCustomAttribute<HiddenToolAttribute>() == null &&
                             !SettingsManager.Settings.FavoriteTools.Contains(ViewCollection.GetName(o)))
                 .OrderBy(ViewCollection.GetName);
-            ToolItems = tools.Select(o => (FrameworkElement)CreateNavigationItem(o, 2)).ToList();
+            toolItems = tools.Select(o => (FrameworkElement)CreateNavigationItem(o, 2)).ToList();
         }
 
         private void GenerateFavoriteToolItems() {
@@ -178,7 +178,7 @@ namespace Mapping_Tools.Viewmodels {
                 .Where(o => o.GetCustomAttribute<HiddenToolAttribute>() == null &&
                             SettingsManager.Settings.FavoriteTools.Contains(ViewCollection.GetName(o)))
                 .OrderBy(ViewCollection.GetName);
-            FavoriteItems = tools.Select(o => (FrameworkElement)CreateNavigationItem(o, 2)).ToList();
+            favoriteItems = tools.Select(o => (FrameworkElement)CreateNavigationItem(o, 2)).ToList();
         }
 
         private void GenerateNavigationItems() {
@@ -188,13 +188,13 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void UpdateNavigationItems() {
-            var items = DefaultItems.Concat(new[] { new Separator() });
+            var items = defaultItems.Concat(new[] { new Separator() });
 
-            if (FavoriteItems.Count > 0) {
-                items = items.Concat(FavoriteItems).Concat(new[] { new Separator() });
+            if (favoriteItems.Count > 0) {
+                items = items.Concat(favoriteItems).Concat(new[] { new Separator() });
             }
 
-            items = items.Concat(ToolItems);
+            items = items.Concat(toolItems);
             
             NavigationItems = new ObservableCollection<FrameworkElement>(items);
             navigationItemsView = CollectionViewSource.GetDefaultView(NavigationItems);

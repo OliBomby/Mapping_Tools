@@ -18,8 +18,8 @@ namespace Mapping_Tools.Components {
                 new UIPropertyMetadata(true));
 
 
-        public static readonly DependencyProperty GIFSourceProperty =
-            DependencyProperty.Register("GIFSource", typeof(string), typeof(GIFImageControl),
+        public static readonly DependencyProperty GifSourceProperty =
+            DependencyProperty.Register("GifSource", typeof(string), typeof(GIFImageControl),
                 new UIPropertyMetadata("", GIFSource_Changed));
 
 
@@ -28,10 +28,10 @@ namespace Mapping_Tools.Components {
                 new UIPropertyMetadata(true, PlayAnimation_Changed));
 
 
-        private Bitmap _Bitmap;
+        private Bitmap bitmap;
 
 
-        private bool _mouseClickStarted;
+        private bool mouseClickStarted;
 
 
         public GIFImageControl() {
@@ -61,10 +61,10 @@ namespace Mapping_Tools.Components {
         }
 
 
-        public string GIFSource {
-            get => (string) GetValue(GIFSourceProperty);
+        public string GifSource {
+            get => (string) GetValue(GifSourceProperty);
 
-            set => SetValue(GIFSourceProperty, value);
+            set => SetValue(GifSourceProperty, value);
         }
 
 
@@ -76,21 +76,21 @@ namespace Mapping_Tools.Components {
 
 
         private void GIFImageControl_MouseLeave(object sender, MouseEventArgs e) {
-            _mouseClickStarted = false;
+            mouseClickStarted = false;
         }
 
 
         private void GIFImageControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
-            if (_mouseClickStarted)
+            if (mouseClickStarted)
 
                 FireClickEvent(sender, e);
 
-            _mouseClickStarted = false;
+            mouseClickStarted = false;
         }
 
 
         private void GIFImageControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
-            _mouseClickStarted = true;
+            mouseClickStarted = true;
         }
 
 
@@ -110,28 +110,28 @@ namespace Mapping_Tools.Components {
             if ((bool) e.NewValue) {
                 //StartAnimation if GIFSource is properly set
 
-                if (null != gic._Bitmap)
+                if (null != gic.bitmap)
 
-                    ImageAnimator.Animate(gic._Bitmap, gic.OnFrameChanged);
+                    ImageAnimator.Animate(gic.bitmap, gic.OnFrameChanged);
             }
             else
 
                 //Pause Animation
 
             {
-                ImageAnimator.StopAnimate(gic._Bitmap, gic.OnFrameChanged);
+                ImageAnimator.StopAnimate(gic.bitmap, gic.OnFrameChanged);
             }
         }
 
 
-        private void SetImageGIFSource() {
-            if (null != _Bitmap) {
-                ImageAnimator.StopAnimate(_Bitmap, OnFrameChanged);
+        private void SetImageGifSource() {
+            if (null != bitmap) {
+                ImageAnimator.StopAnimate(bitmap, OnFrameChanged);
 
-                _Bitmap = null;
+                bitmap = null;
             }
 
-            if (string.IsNullOrEmpty(GIFSource)) {
+            if (string.IsNullOrEmpty(GifSource)) {
                 //Turn off if GIF set to null or empty
 
                 Source = null;
@@ -141,8 +141,8 @@ namespace Mapping_Tools.Components {
                 return;
             }
 
-            if (File.Exists(GIFSource)) {
-                _Bitmap = (Bitmap) System.Drawing.Image.FromFile(GIFSource);
+            if (File.Exists(GifSource)) {
+                bitmap = (Bitmap) System.Drawing.Image.FromFile(GifSource);
             }
 
             else {
@@ -150,27 +150,27 @@ namespace Mapping_Tools.Components {
 
                 var assemblyToSearch = Assembly.GetAssembly(GetType());
 
-                _Bitmap = GetBitmapResourceFromAssembly(assemblyToSearch);
+                bitmap = GetBitmapResourceFromAssembly(assemblyToSearch);
 
-                if (null == _Bitmap) {
+                if (null == bitmap) {
                     assemblyToSearch = Assembly.GetCallingAssembly();
 
-                    _Bitmap = GetBitmapResourceFromAssembly(assemblyToSearch);
+                    bitmap = GetBitmapResourceFromAssembly(assemblyToSearch);
 
-                    if (null == _Bitmap) {
+                    if (null == bitmap) {
                         assemblyToSearch = Assembly.GetEntryAssembly();
 
-                        _Bitmap = GetBitmapResourceFromAssembly(assemblyToSearch);
+                        bitmap = GetBitmapResourceFromAssembly(assemblyToSearch);
 
-                        if (null == _Bitmap)
+                        if (null == bitmap)
 
-                            throw new FileNotFoundException("GIF Source was not found.", GIFSource);
+                            throw new FileNotFoundException("GIF Source was not found.", GifSource);
                     }
                 }
             }
 
             if (PlayAnimation)
-                ImageAnimator.Animate(_Bitmap, OnFrameChanged);
+                ImageAnimator.Animate(bitmap, OnFrameChanged);
         }
 
 
@@ -178,7 +178,7 @@ namespace Mapping_Tools.Components {
             var resourselist = assemblyToSearch.GetManifestResourceNames().ToList();
 
             if (null != assemblyToSearch.FullName) {
-                var searchName = $"Mapping_Tools.{GIFSource}";
+                var searchName = $"Mapping_Tools.{GifSource}";
 
                 if (resourselist.Contains(searchName)) {
                     var bitmapStream = assemblyToSearch.GetManifestResourceStream(searchName);
@@ -194,7 +194,7 @@ namespace Mapping_Tools.Components {
 
 
         private static void GIFSource_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            ((GIFImageControl) d).SetImageGIFSource();
+            ((GIFImageControl) d).SetImageGifSource();
         }
 
 
@@ -206,9 +206,9 @@ namespace Mapping_Tools.Components {
 
         private void OnFrameChangedInMainThread() {
             if (PlayAnimation) {
-                ImageAnimator.UpdateFrames(_Bitmap);
+                ImageAnimator.UpdateFrames(bitmap);
 
-                Source = GetBitmapSource(_Bitmap);
+                Source = GetBitmapSource(bitmap);
 
                 InvalidateVisual();
             }

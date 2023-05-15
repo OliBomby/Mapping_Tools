@@ -5,8 +5,8 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
-    <AssemblyVersion>1.12.3</AssemblyVersion>
-    <FileVersion>1.12.3</FileVersion>
+    <AssemblyVersion>1.12.5</AssemblyVersion>
+    <FileVersion>1.12.5</FileVersion>
     <AssemblyName>Mapping Tools</AssemblyName>
     <ApplicationIcon>Data\mt_icon.ico</ApplicationIcon>
     <Platforms>AnyCPU;x86;x64</Platforms>
@@ -143,12 +143,6 @@
     <Compile Update="Components\TimeLine\TimeLineMark.xaml.cs">
       <DependentUpon>TimeLineMark.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Components\TimingStudio\StudioTimingPointGraphic.xaml.cs">
-      <DependentUpon>StudioTimingPointGraphic.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Components\TimingStudio\TimingStudioTimeline.xaml.cs">
-      <DependentUpon>TimingStudioTimeline.xaml</DependentUpon>
-    </Compile>
     <Compile Update="Components\ViewHeaderComponent.xaml.cs">
       <DependentUpon>ViewHeaderComponent.xaml</DependentUpon>
     </Compile>
@@ -238,9 +232,6 @@
     <Compile Update="Views\TimingHelper\TimingHelperView.xaml.cs">
       <DependentUpon>TimingHelperView.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\TimingStudio\TimingStudioView.xaml.cs">
-      <DependentUpon>TimingStudioView.xaml</DependentUpon>
-    </Compile>
     <Compile Update="Views\MapsetMerger\MapsetMergerView.cs">
       <DependentUpon>MapsetMergerView.xaml</DependentUpon>
     </Compile>
@@ -302,12 +293,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Components\TimeLine\TimeLineMark.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Components\TimingStudio\StudioTimingPointGraphic.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Components\TimingStudio\TimingStudioTimeline.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Components\ViewHeaderComponent.xaml">
@@ -395,9 +380,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\TimingHelper\TimingHelperView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\TimingStudio\TimingStudioView.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

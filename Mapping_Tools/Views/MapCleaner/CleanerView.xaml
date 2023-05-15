@@ -123,7 +123,7 @@
             </Grid>
         </Grid>
         <Grid Name="FourthGrid" Grid.Row="2">
-            <StackPanel x:Name="tl_host"
+            <StackPanel x:Name="TlHost"
                         ToolTip="This timeline shows the changes in the control points of the map. You can double-click the lines to go to that time."/>
         </Grid>
     </Grid>

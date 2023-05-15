@@ -16,34 +16,34 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         private static readonly ITumourTemplate CircleTemplate = new CircleTemplate();
         private static readonly ITumourTemplate ParabolaTemplate = new ParabolaTemplate();
 
-        private TumourTemplate _tumourTemplateEnum;
-        private WrappingMode _wrappingMode;
-        private TumourSidedness _tumourSidedness;
-        private GraphState _tumourLength;
-        private GraphState _tumourScale;
-        private GraphState _tumourRotation;
-        private GraphState _tumourParameter;
-        private GraphState _tumourDistance;
-        private int _tumourCount;
-        private double _tumourStart;
-        private double _tumourEnd;
-        private int _randomSeed;
-        private bool _recalculate;
-        private bool _useAbsoluteRange;
-        private bool _isActive;
-        private string _name;
+        private TumourTemplate tumourTemplateEnum;
+        private WrappingMode wrappingMode;
+        private TumourSidedness tumourSidedness;
+        private GraphState tumourLength;
+        private GraphState tumourScale;
+        private GraphState tumourRotation;
+        private GraphState tumourParameter;
+        private GraphState tumourDistance;
+        private int tumourCount;
+        private double tumourStart;
+        private double tumourEnd;
+        private int randomSeed;
+        private bool recalculate;
+        private bool useAbsoluteRange;
+        private bool isActive;
+        private string name;
 
         public TumourTemplate TumourTemplateEnum {
-            get => _tumourTemplateEnum;
+            get => tumourTemplateEnum;
             set {
-                if (Set(ref _tumourTemplateEnum, value)) {
+                if (Set(ref tumourTemplateEnum, value)) {
                     RaisePropertyChanged(nameof(TumourTemplate));
                 }
             }
         }
 
         [JsonIgnore]
-        public ITumourTemplate TumourTemplate => _tumourTemplateEnum switch {
+        public ITumourTemplate TumourTemplate => tumourTemplateEnum switch {
             Enums.TumourTemplate.Triangle => TriangleTemplate,
             Enums.TumourTemplate.Square => SquareTemplate,
             Enums.TumourTemplate.Circle => CircleTemplate,
@@ -52,78 +52,78 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
         };
 
         public WrappingMode WrappingMode {
-            get => _wrappingMode;
-            set => Set(ref _wrappingMode, value);
+            get => wrappingMode;
+            set => Set(ref wrappingMode, value);
         }
 
         public TumourSidedness TumourSidedness {
-            get => _tumourSidedness;
-            set => Set(ref _tumourSidedness, value);
+            get => tumourSidedness;
+            set => Set(ref tumourSidedness, value);
         }
 
         public GraphState TumourLength {
-            get => _tumourLength;
-            set => Set(ref _tumourLength, value);
+            get => tumourLength;
+            set => Set(ref tumourLength, value);
         }
 
         public GraphState TumourScale {
-            get => _tumourScale;
-            set => Set(ref _tumourScale, value);
+            get => tumourScale;
+            set => Set(ref tumourScale, value);
         }
 
         public GraphState TumourRotation {
-            get => _tumourRotation;
-            set => Set(ref _tumourRotation, value);
+            get => tumourRotation;
+            set => Set(ref tumourRotation, value);
         }
 
         public GraphState TumourParameter {
-            get => _tumourParameter;
-            set => Set(ref _tumourParameter, value);
+            get => tumourParameter;
+            set => Set(ref tumourParameter, value);
         }
 
         public GraphState TumourDistance {
-            get => _tumourDistance;
-            set => Set(ref _tumourDistance, value);
+            get => tumourDistance;
+            set => Set(ref tumourDistance, value);
         }
 
         public int TumourCount {
-            get => _tumourCount;
-            set => Set(ref _tumourCount, value);
+            get => tumourCount;
+            set => Set(ref tumourCount, value);
         }
 
         public double TumourStart {
-            get => _tumourStart;
-            set => Set(ref _tumourStart, value);
+            get => tumourStart;
+            set => Set(ref tumourStart, value);
         }
 
         public double TumourEnd {
-            get => _tumourEnd;
-            set => Set(ref _tumourEnd, value);
+            get => tumourEnd;
+            set => Set(ref tumourEnd, value);
         }
 
         public int RandomSeed {
-            get => _randomSeed;
-            set => Set(ref _randomSeed, value);
+            get => randomSeed;
+            set => Set(ref randomSeed, value);
         }
 
         public bool UseAbsoluteRange {
-            get => _useAbsoluteRange;
-            set => Set(ref _useAbsoluteRange, value);
+            get => useAbsoluteRange;
+            set => Set(ref useAbsoluteRange, value);
         }
 
         public bool Recalculate {
-            get => _recalculate;
-            set => Set(ref _recalculate, value);
+            get => recalculate;
+            set => Set(ref recalculate, value);
         }
 
         public bool IsActive {
-            get => _isActive;
-            set => Set(ref _isActive, value);
+            get => isActive;
+            set => Set(ref isActive, value);
         }
 
         public string Name {
-            get => _name;
-            set => Set(ref _name, value);
+            get => name;
+            set => Set(ref name, value);
         }
 
         [JsonIgnore]

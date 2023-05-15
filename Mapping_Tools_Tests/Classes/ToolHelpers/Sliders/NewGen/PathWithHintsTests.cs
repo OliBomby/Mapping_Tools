@@ -183,7 +183,7 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             Assert.IsNull(path.ReconstructionHints[2].Anchors);
             Assert.AreEqual(points[3], path.ReconstructionHints[3].Start);
             Assert.AreEqual(points[8], path.ReconstructionHints[3].End);
-            Assert.AreEqual(1/6d, path.ReconstructionHints[3].StartP, Precision.DOUBLE_EPSILON);
+            Assert.AreEqual(1/6d, path.ReconstructionHints[3].StartP, Precision.DoubleEpsilon);
             Assert.AreEqual(1, path.ReconstructionHints[3].EndP);
             Assert.IsNotNull(path.ReconstructionHints[3].Anchors);
             Assert.AreEqual(points[8], path.ReconstructionHints[4].Start);
@@ -216,7 +216,7 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             Assert.AreEqual(points[2], path.ReconstructionHints[1].Start);
             Assert.AreEqual(points[7], path.ReconstructionHints[1].End);
             Assert.AreEqual(0, path.ReconstructionHints[1].StartP);
-            Assert.AreEqual(1 - 1/6d, path.ReconstructionHints[1].EndP, Precision.DOUBLE_EPSILON);
+            Assert.AreEqual(1 - 1/6d, path.ReconstructionHints[1].EndP, Precision.DoubleEpsilon);
             Assert.IsNotNull(path.ReconstructionHints[1].Anchors);
             Assert.AreEqual(points[7], path.ReconstructionHints[2].Start);
             Assert.AreEqual(points[8], path.ReconstructionHints[2].End);
@@ -258,7 +258,7 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             Assert.AreEqual(points[2], path.ReconstructionHints[1].Start);
             Assert.AreEqual(points[3], path.ReconstructionHints[1].End);
             Assert.AreEqual(0, path.ReconstructionHints[1].StartP);
-            Assert.AreEqual(1/6d, path.ReconstructionHints[1].EndP, Precision.DOUBLE_EPSILON);
+            Assert.AreEqual(1/6d, path.ReconstructionHints[1].EndP, Precision.DoubleEpsilon);
             Assert.IsNotNull(path.ReconstructionHints[1].Anchors);
             Assert.AreEqual(points[3], path.ReconstructionHints[2].Start);
             Assert.AreEqual(points[7], path.ReconstructionHints[2].End);
@@ -267,7 +267,7 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             Assert.IsNull(path.ReconstructionHints[2].Anchors);
             Assert.AreEqual(points[7], path.ReconstructionHints[3].Start);
             Assert.AreEqual(points[8], path.ReconstructionHints[3].End);
-            Assert.AreEqual(1 - 1/6d, path.ReconstructionHints[3].StartP, Precision.DOUBLE_EPSILON);
+            Assert.AreEqual(1 - 1/6d, path.ReconstructionHints[3].StartP, Precision.DoubleEpsilon);
             Assert.AreEqual(1, path.ReconstructionHints[3].EndP);
             Assert.IsNotNull(path.ReconstructionHints[3].Anchors);
             Assert.AreEqual(points[8], path.ReconstructionHints[4].Start);

@@ -103,7 +103,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             foreach (TimelineObject tlo in TimelineObjects) {
                 double dist = Math.Abs(tlo.Time - time);
                 if (dist <= closestDist) {
-                    if (needCopyable && !tlo.CanCopy)
+                    if (needCopyable && !(tlo.CanCopy && tlo.HasHitsound))
                         continue;
                     closest = tlo;
                     closestDist = dist;

@@ -15,8 +15,8 @@ namespace Mapping_Tools.Views.SnappingTools {
     public class SnappingToolsOverlay : WpfOverlayPlugin {
         // Used to limit update rates via timestamps 
         // This way we can avoid thread issues with wanting to delay updates
-        private readonly TickEngine _tickEngine = new TickEngine();
-        private bool _isDisposed;
+        private readonly TickEngine tickEngine = new TickEngine();
+        private bool isDisposed;
 
         public CoordinateConverter Converter;
 
@@ -26,9 +26,9 @@ namespace Mapping_Tools.Views.SnappingTools {
 
             OverlayWindow = new OverlayWindow(targetWindow) {ShowInTaskbar = false};
 
-            _tickEngine.Interval = TimeSpan.FromMilliseconds(1000 / 60f);
-            _tickEngine.PreTick += OnPreTick;
-            _tickEngine.Tick += OnTick;
+            tickEngine.Interval = TimeSpan.FromMilliseconds(1000 / 60f);
+            tickEngine.PreTick += OnPreTick;
+            tickEngine.Tick += OnTick;
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Mapping_Tools.Views.SnappingTools {
         /// </summary>
         /// <param name="enabled"></param>
         public void SetBorder(bool enabled) {
-            if (_isDisposed) return;
+            if (isDisposed) return;
 
             if (enabled) {
                 OverlayWindow.BorderBrush = Brushes.GreenYellow;
@@ -48,12 +48,12 @@ namespace Mapping_Tools.Views.SnappingTools {
         }
 
         public override void Enable() {
-            _tickEngine.IsTicking = true;
+            tickEngine.IsTicking = true;
             base.Enable();
         }
 
         public override void Disable() {
-            _tickEngine.IsTicking = false;
+            tickEngine.IsTicking = false;
             base.Disable();
         }
 
@@ -84,11 +84,11 @@ namespace Mapping_Tools.Views.SnappingTools {
             }
         }
 
-        public override void Update() => _tickEngine.Pulse();
+        public override void Update() => tickEngine.Pulse();
 
         // Clear objects
         public override void Dispose() {
-            if (_isDisposed) {
+            if (isDisposed) {
                 return;
             }
 
@@ -100,10 +100,10 @@ namespace Mapping_Tools.Views.SnappingTools {
                 OverlayWindow?.Hide();
                 OverlayWindow?.Close();
                 OverlayWindow = null;
-                _tickEngine.Stop();
+                tickEngine.Stop();
 
                 base.Dispose();
-                _isDisposed = true;
+                isDisposed = true;
             } catch {
                 // ignored
             }

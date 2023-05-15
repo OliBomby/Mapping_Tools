@@ -11,8 +11,8 @@ using System.Collections.Generic;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class IOHelper {
-        private static readonly StructuredOsuMemoryReader pioStructuredReader = StructuredOsuMemoryReader.Instance;
-        private static readonly OsuBaseAddresses osuBaseAddresses = new();
+        private static readonly StructuredOsuMemoryReader PioStructuredReader = StructuredOsuMemoryReader.Instance;
+        private static readonly OsuBaseAddresses OsuBaseAddresses = new();
 
         public static string FolderDialog(string initialDirectory = "") {
             bool restore = initialDirectory == "";
@@ -86,7 +86,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             return openFileDialog.FileName;
         }
 
-        public static string MIDIFileDialog() {
+        public static string MidiFileDialog() {
             OpenFileDialog openFileDialog = new OpenFileDialog {
                 Filter = "MIDI files (*.mid)|*.mid",
                 FilterIndex = 1,
@@ -148,7 +148,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         private static T ReadClassProperty<T>(object readObj, string propName, T defaultValue = default) where T : class {
-            if (pioStructuredReader.TryReadProperty(readObj, propName, out var readResult))
+            if (PioStructuredReader.TryReadProperty(readObj, propName, out var readResult))
                 return (T)readResult;
 
             return defaultValue;
@@ -177,8 +177,8 @@ namespace Mapping_Tools.Classes.SystemTools {
                             @"Can't fetch current in-game beatmap, because there is no Songs path specified in Preferences.");
                     }
 
-                    string folder = ReadString(osuBaseAddresses.Beatmap, nameof(CurrentBeatmap.FolderName));
-                    string filename = ReadString(osuBaseAddresses.Beatmap, nameof(CurrentBeatmap.OsuFileName));
+                    string folder = ReadString(OsuBaseAddresses.Beatmap, nameof(CurrentBeatmap.FolderName));
+                    string filename = ReadString(OsuBaseAddresses.Beatmap, nameof(CurrentBeatmap.OsuFileName));
 
                     if (string.IsNullOrEmpty(folder)) {
                         throw new Exception(@"Can't fetch the folder name of the current in-game beatmap.");

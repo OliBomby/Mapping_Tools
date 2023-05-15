@@ -104,7 +104,7 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
             // Add redlines
             var redlines = timing.Redlines;
             foreach (TimingPoint tp in redlines) {
-                timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness:Precision.DOUBLE_EPSILON));
+                timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness:Precision.DoubleEpsilon));
             }
             UpdateProgressBar(worker, 55);
 
@@ -224,9 +224,9 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
                             int newIndex = tlo.FenoCustomIndex;
                             double latest = double.NegativeInfinity;
                             foreach (TimingPointsChange tpc in timingPointsChanges) {
-                                if (tpc.Index && tpc.MyTP.Offset <= tlo.Time && tpc.MyTP.Offset >= latest) {
-                                    newIndex = tpc.MyTP.SampleIndex;
-                                    latest = tpc.MyTP.Offset;
+                                if (tpc.Index && tpc.MyTp.Offset <= tlo.Time && tpc.MyTp.Offset >= latest) {
+                                    newIndex = tpc.MyTp.SampleIndex;
+                                    latest = tpc.MyTp.Offset;
                                 }
                             }
 

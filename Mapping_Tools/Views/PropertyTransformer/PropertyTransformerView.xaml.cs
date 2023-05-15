@@ -25,8 +25,8 @@ namespace Mapping_Tools.Views.PropertyTransformer {
 
         public PropertyTransformerView() {
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             DataContext = new PropertyTransformerVm();
             ProjectManager.LoadProject(this, message: false);
         }
@@ -73,10 +73,10 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                         }
 
                         // BPM
-                        if (vm.TimingpointBPMMultiplier != 1 || vm.TimingpointBPMOffset != 0) {
+                        if (vm.TimingpointBpmMultiplier != 1 || vm.TimingpointBpmOffset != 0) {
                             if (tp.Uninherited) {
                                 if (Filter(tp.GetBpm(), tp.Offset, vm)) {
-                                    double newBPM = tp.GetBpm() * vm.TimingpointBPMMultiplier + vm.TimingpointBPMOffset;
+                                    double newBPM = tp.GetBpm() * vm.TimingpointBpmMultiplier + vm.TimingpointBpmOffset;
                                     newBPM = vm.ClipProperties
                                         ? MathHelper.Clamp(newBPM, 15, 10000)
                                         : newBPM; // Clip the value if specified
@@ -86,12 +86,12 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                         }
 
                         // Slider Velocity
-                        if (vm.TimingpointSVMultiplier != 1 || vm.TimingpointSVOffset != 0) {
+                        if (vm.TimingpointSvMultiplier != 1 || vm.TimingpointSvOffset != 0) {
                             if (Filter(beatmap.BeatmapTiming.GetSvMultiplierAtTime(tp.Offset), tp.Offset, vm)) {
                                 TimingPoint tpchanger = tp.Copy();
                                 double newSV =
                                     beatmap.BeatmapTiming.GetSvMultiplierAtTime(tp.Offset) *
-                                    vm.TimingpointSVMultiplier + vm.TimingpointSVOffset;
+                                    vm.TimingpointSvMultiplier + vm.TimingpointSvOffset;
                                 newSV = vm.ClipProperties
                                     ? MathHelper.Clamp(newSV, 0.1, 10)
                                     : newSV; // Clip the value if specified
@@ -163,22 +163,34 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     UpdateProgressBar(worker, 40);
 
                     // Storyboarded event time
-                    if (vm.SBEventTimeMultiplier != 1 || vm.SBEventTimeOffset != 0) {
+                    if (vm.SbEventTimeMultiplier != 1 || vm.SbEventTimeOffset != 0) {
                         foreach (Event ev in beatmap.StoryboardLayerBackground.Concat(beatmap.StoryboardLayerFail)
                             .Concat(beatmap.StoryboardLayerPass).Concat(beatmap.StoryboardLayerForeground)
                             .Concat(beatmap.StoryboardLayerOverlay)) {
-                            TransformEventTime(ev, vm.SBEventTimeMultiplier, vm.SBEventTimeOffset, vm);
+                            TransformEventTime(ev, vm.SbEventTimeMultiplier, vm.SbEventTimeOffset, vm);
                         }
                     }
 
                     UpdateProgressBar(worker, 50);
 
                     // Storyboarded sample time
-                    if (vm.SBSampleTimeMultiplier != 1 || vm.SBSampleTimeOffset != 0) {
+                    if (vm.SbSampleTimeMultiplier != 1 || vm.SbSampleTimeOffset != 0) {
                         foreach (StoryboardSoundSample ss in beatmap.StoryboardSoundSamples) {
                             if (Filter(ss.StartTime, ss.StartTime, vm)) {
                                 ss.StartTime =
-                                    (int) Math.Round(ss.StartTime * vm.SBSampleTimeMultiplier + vm.SBSampleTimeOffset);
+                                    (int) Math.Round(ss.StartTime * vm.SbSampleTimeMultiplier + vm.SbSampleTimeOffset);
+                            }
+                        }
+                    }
+
+                    UpdateProgressBar(worker, 55);
+
+                    // Storyboarded sample time
+                    if (vm.SbSampleVolumeMultiplier != 1 || vm.SbSampleVolumeOffset != 0) {
+                        foreach (StoryboardSoundSample ss in beatmap.StoryboardSoundSamples) {
+                            if (Filter(ss.Volume, ss.StartTime, vm)) {
+                                int newVolume = (int) Math.Round(ss.Volume * vm.SbSampleVolumeMultiplier + vm.SbSampleVolumeOffset);
+                                ss.Volume = vm.ClipProperties ? MathHelper.Clamp(newVolume, 8, 100) : newVolume;
                             }
                         }
                     }
@@ -240,22 +252,22 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     StoryBoard storyboard = storyboardEditor.StoryBoard;
                     
                     // Storyboarded event time
-                    if (vm.SBEventTimeMultiplier != 1 || vm.SBEventTimeOffset != 0) {
+                    if (vm.SbEventTimeMultiplier != 1 || vm.SbEventTimeOffset != 0) {
                         foreach (Event ev in storyboard.StoryboardLayerBackground.Concat(storyboard.StoryboardLayerFail)
                             .Concat(storyboard.StoryboardLayerPass).Concat(storyboard.StoryboardLayerForeground)
                             .Concat(storyboard.StoryboardLayerOverlay)) {
-                            TransformEventTime(ev, vm.SBEventTimeMultiplier, vm.SBEventTimeOffset, vm);
+                            TransformEventTime(ev, vm.SbEventTimeMultiplier, vm.SbEventTimeOffset, vm);
                         }
                     }
 
                     UpdateProgressBar(worker, 50);
 
                     // Storyboarded sample time
-                    if (vm.SBSampleTimeMultiplier != 1 || vm.SBSampleTimeOffset != 0) {
+                    if (vm.SbSampleTimeMultiplier != 1 || vm.SbSampleTimeOffset != 0) {
                         foreach (StoryboardSoundSample ss in storyboard.StoryboardSoundSamples) {
                             if (Filter(ss.StartTime, ss.StartTime, vm)) {
                                 ss.StartTime =
-                                    (int)Math.Round(ss.StartTime * vm.SBSampleTimeMultiplier + vm.SBSampleTimeOffset);
+                                    (int)Math.Round(ss.StartTime * vm.SbSampleTimeMultiplier + vm.SbSampleTimeOffset);
                             }
                         }
                     }

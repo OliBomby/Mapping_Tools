@@ -108,7 +108,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 var side = tumourLayer.TumourSidedness == TumourSidedness.AlternatingLeft;
                 var i = 0;
 
-                while (nextDist <= Math.Min(totalLength, tumourEnd) + Precision.DOUBLE_EPSILON && current is not null &&
+                while (nextDist <= Math.Min(totalLength, tumourEnd) + Precision.DoubleEpsilon && current is not null &&
                        (tumourLayer.TumourCount == 0 || i++ < tumourLayer.TumourCount)) {
                     ct.ThrowIfCancellationRequested();
 
@@ -128,7 +128,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     };
 
                     if (endDist >= 0) {
-                        var epsilon = MathHelper.Clamp(length / 2, Precision.DOUBLE_EPSILON, 0.9);
+                        var epsilon = MathHelper.Clamp(length / 2, Precision.DoubleEpsilon, 0.9);
                         var start = PathHelper.FindFirstOccurrenceExact(current, nextDist, epsilon: epsilon);
                         var end = PathHelper.FindLastOccurrenceExact(start, endDist, epsilon: epsilon);
 
@@ -252,7 +252,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
             double endT = endPoint.T;
             double dist = endPoint.CumulativeLength - startPoint.CumulativeLength;
             double distT = endT - startT;
-            double betweenAngle = (endPoint.OgPos - startPoint.OgPos).LengthSquared > Precision.DOUBLE_EPSILON
+            double betweenAngle = (endPoint.OgPos - startPoint.OgPos).LengthSquared > Precision.DoubleEpsilon
                 ? (endPoint.OgPos - startPoint.OgPos).Theta
                 : MathHelper.LerpAngle(startPoint.AvgAngle, endPoint.AvgAngle, 0.5);
             double templateRange = endTemplateT - startTemplateT;
@@ -319,7 +319,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     WrappingMode.Wrap => (point.PreAngle, point.PostAngle),
                     _ => (0, 0),
                 };
-                var isOffsetInThisLayer = Vector2.DistanceSquared(point.OgPos, pos) < Precision.DOUBLE_EPSILON;
+                var isOffsetInThisLayer = Vector2.DistanceSquared(point.OgPos, pos) < Precision.DoubleEpsilon;
                 var red = tumourLayer.WrappingMode switch {
                     WrappingMode.Simple => isCritical || (point.Red && isOffsetInThisLayer),
                     _ => isCritical || point.Red
@@ -331,7 +331,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 // Get the tumour offset
                 var offset = tumourTemplate.GetOffset(templateT);
 
-                if (current == start && start.Previous is not null && offset.LengthSquared > Precision.DOUBLE_EPSILON) {
+                if (current == start && start.Previous is not null && offset.LengthSquared > Precision.DoubleEpsilon) {
                     // Copy point and leave one side at 0 offset
                     var newPos = CalculateNewPos(point, pos, offset, postAngle + rotation);
 
@@ -339,7 +339,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     current.Value = new PathPoint(newPos, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, 0, true);
                     start = current.Previous;
                     hintStart = current;
-                } else if (current == end && end.Next is not null && offset.LengthSquared > Precision.DOUBLE_EPSILON) {
+                } else if (current == end && end.Next is not null && offset.LengthSquared > Precision.DoubleEpsilon) {
                     // Copy point and leave one side at 0 offset
                     var newPos = CalculateNewPos(point, pos, offset, preAngle + rotation);
 
@@ -347,7 +347,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                     current.Value = new PathPoint(point.Pos, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, 2, true);
                     hintEnd = current.Previous;
                 } else if (red && !double.IsNaN(preAngle) && !double.IsNaN(postAngle) && !Precision.AlmostEquals(preAngle, postAngle)
-                           && offset.LengthSquared > Precision.DOUBLE_EPSILON) {
+                           && offset.LengthSquared > Precision.DoubleEpsilon) {
                     // Copy point and offset it by both angles
                     var newPos = CalculateNewPos(point, pos, offset, preAngle + rotation);
                     var newPos2 = CalculateNewPos(point, pos, offset, postAngle + rotation);

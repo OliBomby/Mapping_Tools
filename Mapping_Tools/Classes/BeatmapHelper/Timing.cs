@@ -18,13 +18,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// List of all timing points. This included uninherited timing points and inherited timing points.
         /// This list should be sorted at all times.
         /// </summary>
-        private List<TimingPoint> _timingPoints { get; set; }
-        private List<TimingPoint> _redlines { get; set; }
-        private List<TimingPoint> _greenlines { get; set; }
+        private List<TimingPoint> timingPoints;
+        private List<TimingPoint> redlines;
+        private List<TimingPoint> greenlines;
 
-        public IReadOnlyList<TimingPoint> TimingPoints => _timingPoints;
-        public IReadOnlyList<TimingPoint> Redlines => _redlines;
-        public IReadOnlyList<TimingPoint> Greenlines => _greenlines;
+        public IReadOnlyList<TimingPoint> TimingPoints => timingPoints;
+        public IReadOnlyList<TimingPoint> Redlines => redlines;
+        public IReadOnlyList<TimingPoint> Greenlines => greenlines;
 
         /// <summary>
         /// The global slider multiplier of a <see cref="Beatmap"/>. This is here for convenience sake to calculate absolute slider velocities.
@@ -51,19 +51,19 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <param name="timingPoints"></param>
         public void SetTimingPoints(List<TimingPoint> timingPoints) {
-            _timingPoints = timingPoints ?? new List<TimingPoint>();
-            _timingPoints.Sort();
-            _redlines = _timingPoints.Where(tp => tp.Uninherited).ToList();
-            _greenlines = _timingPoints.Where(tp => !tp.Uninherited).ToList();
+            this.timingPoints = timingPoints ?? new List<TimingPoint>();
+            this.timingPoints.Sort();
+            redlines = this.timingPoints.Where(tp => tp.Uninherited).ToList();
+            greenlines = this.timingPoints.Where(tp => !tp.Uninherited).ToList();
         }
 
         /// <summary>
         /// Sorts all <see cref="TimingPoint"/> in order of time.
         /// </summary>
         public void Sort() {
-            _timingPoints.Sort();
-            _redlines.Sort();
-            _greenlines.Sort();
+            timingPoints.Sort();
+            redlines.Sort();
+            greenlines.Sort();
         }
 
         #region BasicOperations
@@ -71,43 +71,43 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public void Add(TimingPoint tp) {
             if (tp == null) return;
 
-            var index = _timingPoints.BinarySearch(tp);
+            var index = timingPoints.BinarySearch(tp);
             if (index < 0)
                 index = ~index;
 
-            _timingPoints.Insert(index, tp);
+            timingPoints.Insert(index, tp);
 
             if (tp.Uninherited) {
-                index = _redlines.BinarySearch(tp);
+                index = redlines.BinarySearch(tp);
                 if (index < 0)
                     index = ~index;
 
-                _redlines.Insert(index, tp);
+                redlines.Insert(index, tp);
             } else {
-                index = _greenlines.BinarySearch(tp);
+                index = greenlines.BinarySearch(tp);
                 if (index < 0)
                     index = ~index;
 
-                _greenlines.Insert(index, tp);
+                greenlines.Insert(index, tp);
             }
         }
 
         public bool Remove(TimingPoint tp) {
-            var index = _timingPoints.BinarySearch(tp);
+            var index = timingPoints.BinarySearch(tp);
             if (index >= 0) {
-                _timingPoints.RemoveAt(index);
+                timingPoints.RemoveAt(index);
             }
 
             if (tp.Uninherited) {
-                index = _redlines.BinarySearch(tp);
+                index = redlines.BinarySearch(tp);
                 if (index >= 0) {
-                    _redlines.RemoveAt(index);
+                    redlines.RemoveAt(index);
                     return true;
                 }
             } else {
-                index = _greenlines.BinarySearch(tp);
+                index = greenlines.BinarySearch(tp);
                 if (index >= 0) {
-                    _greenlines.RemoveAt(index);
+                    greenlines.RemoveAt(index);
                     return true;
                 }
             }
@@ -122,32 +122,32 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public void CopyTo(TimingPoint[] array, int arrayIndex) {
-            _timingPoints.CopyTo(array, arrayIndex);
+            timingPoints.CopyTo(array, arrayIndex);
         }
 
         bool ICollection<TimingPoint>.Remove(TimingPoint tp) {
             return tp != null && Remove(tp);
         }
 
-        public int Count => _timingPoints.Count;
+        public int Count => timingPoints.Count;
         public bool IsReadOnly => false;
 
         public void Clear() {
-            _timingPoints.Clear();
-            _redlines.Clear();
-            _greenlines.Clear();
+            timingPoints.Clear();
+            redlines.Clear();
+            greenlines.Clear();
         }
 
         public bool Contains(TimingPoint item) {
-            return _timingPoints.Contains(item);
+            return timingPoints.Contains(item);
         }
 
         public void Offset(double offset) {
-            _timingPoints.ForEach(tp => tp.Offset += offset);
+            timingPoints.ForEach(tp => tp.Offset += offset);
         }
 
         public int RemoveAll(Func<TimingPoint, bool> match) {
-            var itemsToRemove = _timingPoints.Where(match).ToList();
+            var itemsToRemove = timingPoints.Where(match).ToList();
 
             foreach (var itemToRemove in itemsToRemove) {
                 Remove(itemToRemove);
@@ -157,7 +157,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public IEnumerator<TimingPoint> GetEnumerator() {
-            return _timingPoints.GetEnumerator();
+            return timingPoints.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() {
@@ -165,7 +165,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public int IndexOf(TimingPoint item) {
-            return _timingPoints.IndexOf(item);
+            return timingPoints.IndexOf(item);
         }
 
         /// <summary>
@@ -176,17 +176,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public void RemoveAt(int index) {
-            var itemToRemove = _timingPoints[index];
+            var itemToRemove = timingPoints[index];
             Remove(itemToRemove);
         }
 
         public TimingPoint this[int index] {
-            get => _timingPoints[index];
-            set => _timingPoints[index] = value;
+            get => timingPoints[index];
+            set => timingPoints[index] = value;
         }
 
         public Timing Copy() {
-            return new Timing(_timingPoints.Select(o => o.Copy()).ToList(), SliderMultiplier);
+            return new Timing(timingPoints.Select(o => o.Copy()).ToList(), SliderMultiplier);
         }
 
         #endregion
@@ -303,14 +303,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (milliseconds >= 0) {
                 TimingPoint firstRedline = GetRedlineAtTime(startBeatTime);
                 TimingPoint lastRedline = firstRedline;
-                int startIndex = GetTimingPointIndexAfterTime(startBeatTime, _redlines);
-                for (int i = startIndex; i < _redlines.Count && i != -1; i++) {
-                    var redline = _redlines[i];
+                int startIndex = GetTimingPointIndexAfterTime(startBeatTime, redlines);
+                for (int i = startIndex; i < redlines.Count && i != -1; i++) {
+                    var redline = redlines[i];
                     var beatDiff = lastRedline == firstRedline ? 
                         redline.Offset - startBeatTime:
                         redline.Offset - lastRedline.Offset;
 
-                    if (beatDiff * lastRedline.MpB > milliseconds + Precision.DOUBLE_EPSILON) {
+                    if (beatDiff * lastRedline.MpB > milliseconds + Precision.DoubleEpsilon) {
                         break;
                     }
 
@@ -321,14 +321,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
                 beatTime += milliseconds / lastRedline.MpB;
             } else {
-                int startIndex = GetTimingPointIndexAtTime(startBeatTime, _redlines);
+                int startIndex = GetTimingPointIndexAtTime(startBeatTime, redlines);
                 double lastBeatTime = startBeatTime;
-                TimingPoint redline = startIndex == -1 ? GetFirstTimingPointExtended() : _redlines[startIndex];
+                TimingPoint redline = startIndex == -1 ? GetFirstTimingPointExtended() : redlines[startIndex];
                 for (int i = startIndex; i >= 0; i--) {
-                    redline = _redlines[i];
+                    redline = redlines[i];
                     double beatDiff = redline.Offset - lastBeatTime;
 
-                    if (beatDiff * redline.MpB < milliseconds - Precision.DOUBLE_EPSILON) {
+                    if (beatDiff * redline.MpB < milliseconds - Precision.DoubleEpsilon) {
                         break;
                     }
 
@@ -356,15 +356,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (beatTime >= 0) {
                 TimingPoint firstRedline = GetRedlineAtTime(originTime);
                 TimingPoint lastRedline = firstRedline;
-                int startIndex = GetTimingPointIndexAfterTime(originTime, _redlines);
-                for (int i = startIndex; i < _redlines.Count && i != -1; i++) {
-                    var redline = _redlines[i];
+                int startIndex = GetTimingPointIndexAfterTime(originTime, redlines);
+                for (int i = startIndex; i < redlines.Count && i != -1; i++) {
+                    var redline = redlines[i];
                     var msDiff = lastRedline == firstRedline ?
                         redline.Offset - originTime :
                         redline.Offset - lastRedline.Offset;
                     var beatDiff = round ? MultiSnapRound(msDiff / lastRedline.MpB, divisors) : msDiff / lastRedline.MpB;
 
-                    if (beatDiff > beatTime + Precision.DOUBLE_EPSILON) {
+                    if (beatDiff > beatTime + Precision.DoubleEpsilon) {
                         break;
                     }
 
@@ -375,15 +375,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 }
                 ms += beatTime * lastRedline.MpB;
             } else {
-                int startIndex = GetTimingPointIndexAtTime(originTime, _redlines);
+                int startIndex = GetTimingPointIndexAtTime(originTime, redlines);
                 double lastBeatTime = originTime;
-                TimingPoint redline = startIndex == -1 ? GetFirstTimingPointExtended() : _redlines[startIndex];
+                TimingPoint redline = startIndex == -1 ? GetFirstTimingPointExtended() : redlines[startIndex];
                 for (int i = startIndex; i >= 0; i--) {
-                    redline = _redlines[i];
+                    redline = redlines[i];
                     double msDiff = redline.Offset - lastBeatTime;
                     var beatDiff = round ? MultiSnapRound(msDiff / redline.MpB, divisors) : msDiff / redline.MpB;
 
-                    if (beatDiff < beatTime - Precision.DOUBLE_EPSILON) {
+                    if (beatDiff < beatTime - Precision.DoubleEpsilon) {
                         break;
                     }
 
@@ -651,11 +651,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public static List<TimingPoint> GetTimingPointsInRange(double startTime, double endTime,
             List<TimingPoint> timingPoints, bool inclusive = true) {
             if (!inclusive) {
-                startTime += Precision.DOUBLE_EPSILON;
-                endTime -= Precision.DOUBLE_EPSILON;
+                startTime += Precision.DoubleEpsilon;
+                endTime -= Precision.DoubleEpsilon;
             } else {
-                startTime -= Precision.DOUBLE_EPSILON;
-                endTime += Precision.DOUBLE_EPSILON;
+                startTime -= Precision.DoubleEpsilon;
+                endTime += Precision.DoubleEpsilon;
             }
 
             var startIndex = BinarySearchUtil.BinarySearch(timingPoints, startTime, tp => tp.Offset, BinarySearchUtil.EqualitySelection.Leftmost);
@@ -675,7 +675,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="time"></param>
         /// <returns></returns>
         public TimingPoint GetTimingPointAtTime(double time) {
-            return GetTimingPointAtTime(time, _timingPoints, GetFirstTimingPointExtended());
+            return GetTimingPointAtTime(time, timingPoints, GetFirstTimingPointExtended());
         }
 
         /// <summary>
@@ -686,7 +686,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="inclusive"></param>
         /// <returns></returns>
         public List<TimingPoint> GetTimingPointsInRange(double startTime, double endTime, bool inclusive = true) {
-            return GetTimingPointsInRange(startTime, endTime, _timingPoints, inclusive);
+            return GetTimingPointsInRange(startTime, endTime, timingPoints, inclusive);
         }
 
         /// <summary>
@@ -697,7 +697,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="inclusive"></param>
         /// <returns></returns>
         public List<TimingPoint> GetRedlinesInRange(double startTime, double endTime, bool inclusive = true) {
-            return GetTimingPointsInRange(startTime, endTime, _redlines, inclusive);
+            return GetTimingPointsInRange(startTime, endTime, redlines, inclusive);
         }
 
         /// <summary>
@@ -724,7 +724,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="time"></param>
         /// <returns></returns>
         public TimingPoint GetGreenlineAtTime(double time) {
-            return GetTimingPointAtTime(time, _greenlines, GetFirstTimingPointExtended());
+            return GetTimingPointAtTime(time, greenlines, GetFirstTimingPointExtended());
         }
 
         /// <summary>
@@ -734,7 +734,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="firstTimingPoint"></param>
         /// <returns></returns>
         public TimingPoint GetRedlineAtTime(double time, TimingPoint firstTimingPoint=null) {
-            return GetTimingPointAtTime(time, _redlines, firstTimingPoint ?? GetFirstTimingPointExtended());
+            return GetTimingPointAtTime(time, redlines, firstTimingPoint ?? GetFirstTimingPointExtended());
         }
 
         /// <summary>
@@ -743,7 +743,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="time"></param>
         /// <returns></returns>
         public TimingPoint GetRedlineAfterTime(double time) {
-            return GetTimingPointAfterTime(time, _redlines);
+            return GetTimingPointAfterTime(time, redlines);
         }
 
         /// <summary>
@@ -764,7 +764,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="time"></param>
         /// <returns></returns>
         public double GetSvAtTime(double time) {
-            var lastTp = GetTimingPointAtTime(time, _timingPoints, null);
+            var lastTp = GetTimingPointAtTime(time, timingPoints, null);
             if (lastTp == null || lastTp.Uninherited) {
                 return -100;
             }
@@ -779,7 +779,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="timingPoint"></param>
         /// <returns>The timing point after specified timing point.</returns>
         public double GetTimingPointEffectiveRange(TimingPoint timingPoint) {
-            var afterTp = GetTimingPointAfterTime(timingPoint.Offset, _timingPoints);
+            var afterTp = GetTimingPointAfterTime(timingPoint.Offset, timingPoints);
             return afterTp?.Offset ?? double.PositiveInfinity;
         }
         
@@ -832,7 +832,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // The value in the greenline will be used as the milliseconds per beat, so for example a 1x SliderVelocity slider will be 600 bpm.
             // The timeline will work like a redline on 0 offset and 1000 milliseconds per beat
 
-            TimingPoint firstTp = _timingPoints.FirstOrDefault();
+            TimingPoint firstTp = timingPoints.FirstOrDefault();
             if( firstTp != null && firstTp.Uninherited ) {
                 return new TimingPoint(firstTp.Offset - firstTp.MpB * firstTp.Meter.TempoDenominator * 10, firstTp.MpB,
                                         firstTp.Meter, firstTp.SampleSet, firstTp.SampleIndex, firstTp.Volume, firstTp.Uninherited, false, false);

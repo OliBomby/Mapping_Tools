@@ -16,22 +16,22 @@ using System.Windows.Input;
 namespace Mapping_Tools.Viewmodels {
     public class HitsoundPreviewHelperVm : INotifyPropertyChanged
     {
-        private ObservableCollection<HitsoundZone> _items;
-        private bool? _isAllItemsSelected = false;
-        private RhythmGuideWindow _rhythmGuideWindow;
+        private ObservableCollection<HitsoundZone> items;
+        private bool? isAllItemsSelected = false;
+        private RhythmGuideWindow rhythmGuideWindow;
 
         public HitsoundPreviewHelperVm() {
-            _items = new ObservableCollection<HitsoundZone>();
+            items = new ObservableCollection<HitsoundZone>();
 
             RhythmGuideCommand = new CommandImplementation(
                 _ => {
                     try {
-                        if (_rhythmGuideWindow == null) {
-                            _rhythmGuideWindow = new RhythmGuideWindow();
-                            _rhythmGuideWindow.Closed += RhythmGuideWindowOnClosed;
-                            _rhythmGuideWindow.Show();
+                        if (rhythmGuideWindow == null) {
+                            rhythmGuideWindow = new RhythmGuideWindow();
+                            rhythmGuideWindow.Closed += RhythmGuideWindowOnClosed;
+                            rhythmGuideWindow.Show();
                         } else {
-                            _rhythmGuideWindow.Focus();
+                            rhythmGuideWindow.Focus();
                         }
                     } catch (Exception ex) { ex.Show(); }
                 });
@@ -72,28 +72,28 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void RhythmGuideWindowOnClosed(object sender, EventArgs e) {
-            _rhythmGuideWindow = null;
+            rhythmGuideWindow = null;
         }
 
         public ObservableCollection<HitsoundZone> Items {
-            get => _items;
+            get => items;
             set {
-                if (_items == value) return;
-                _items = value;
+                if (items == value) return;
+                items = value;
                 OnPropertyChanged();
             }
         }
 
         [JsonIgnore]
         public bool? IsAllItemsSelected {
-            get => _isAllItemsSelected;
+            get => isAllItemsSelected;
             set {
-                if (_isAllItemsSelected == value) return;
+                if (isAllItemsSelected == value) return;
 
-                _isAllItemsSelected = value;
+                isAllItemsSelected = value;
 
-                if (_isAllItemsSelected.HasValue)
-                    SelectAll(_isAllItemsSelected.Value, Items);
+                if (isAllItemsSelected.HasValue)
+                    SelectAll(isAllItemsSelected.Value, Items);
 
                 OnPropertyChanged();
             }

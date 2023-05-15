@@ -29,8 +29,8 @@ namespace Mapping_Tools.Views.TimingCopier {
         public TimingCopierView() {
             InitializeComponent();
             DataContext = new TimingCopierVm();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             ProjectManager.LoadProject(this, message: false);
         }
 
@@ -99,7 +99,7 @@ namespace Mapping_Tools.Views.TimingCopier {
                 // Add redlines
                 var redlines = timingFrom.Redlines;
                 foreach (TimingPoint tp in redlines) {
-                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon));
                 }
 
                 // Apply timing changes
@@ -156,7 +156,7 @@ namespace Mapping_Tools.Views.TimingCopier {
                     // Resnap greenlines
                     foreach (TimingPoint tp in timingTo.Greenlines)
                     {
-                        tp.ResnapSelf(timingTo, arg.BeatDivisors, firstTP: redlines.FirstOrDefault());
+                        tp.ResnapSelf(timingTo, arg.BeatDivisors, firstTp: redlines.FirstOrDefault());
                     }
                     timingTo.Sort();
                 } else {
@@ -170,7 +170,7 @@ namespace Mapping_Tools.Views.TimingCopier {
                     TimingPoint tp = ho.TimingPoint.Copy();
                     tp.Offset = ho.Time;
                     tp.MpB = ho.SliderVelocity;
-                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, fuzzyness: Precision.DOUBLE_EPSILON));
+                    timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, fuzzyness: Precision.DoubleEpsilon));
                 }
 
                 // Apply timing changes

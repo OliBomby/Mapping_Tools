@@ -13,52 +13,52 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public bool Quick { get; set; }
 
-        private bool _showUnloadingObjects = true;
+        private bool showUnloadingObjects = true;
         public bool ShowUnloadingObjects {
-            get => _showUnloadingObjects;
-            set => Set(ref _showUnloadingObjects, value);
+            get => showUnloadingObjects;
+            set => Set(ref showUnloadingObjects, value);
         }
 
-        private bool _showPotentialUnloadingObjects;
+        private bool showPotentialUnloadingObjects;
         public bool ShowPotentialUnloadingObjects {
-            get => _showPotentialUnloadingObjects;
-            set => Set(ref _showPotentialUnloadingObjects, value);
+            get => showPotentialUnloadingObjects;
+            set => Set(ref showPotentialUnloadingObjects, value);
         }
 
-        private bool _showPotentialDisruptors;
+        private bool showPotentialDisruptors;
         public bool ShowPotentialDisruptors {
-            get => _showPotentialDisruptors;
-            set => Set(ref _showPotentialDisruptors, value);
+            get => showPotentialDisruptors;
+            set => Set(ref showPotentialDisruptors, value);
         }
 
-        private double _approachRateOverride = -1;
+        private double approachRateOverride = -1;
         public double ApproachRateOverride {
-            get => _approachRateOverride;
-            set => Set(ref _approachRateOverride, value);
+            get => approachRateOverride;
+            set => Set(ref approachRateOverride, value);
         }
 
-        private double _overallDifficultyOverride = -1;
+        private double overallDifficultyOverride = -1;
         public double OverallDifficultyOverride {
-            get => _overallDifficultyOverride;
-            set => Set(ref _overallDifficultyOverride, value);
+            get => overallDifficultyOverride;
+            set => Set(ref overallDifficultyOverride, value);
         }
 
-        private int _physicsUpdateLeniency = 9;
+        private int physicsUpdateLeniency = 9;
         public int PhysicsUpdateLeniency {
-            get => _physicsUpdateLeniency;
-            set => Set(ref _physicsUpdateLeniency, value);
+            get => physicsUpdateLeniency;
+            set => Set(ref physicsUpdateLeniency, value);
         }
 
-        private bool _getAutoFailFix;
+        private bool getAutoFailFix;
         public bool GetAutoFailFix {
-            get => _getAutoFailFix;
-            set => Set(ref _getAutoFailFix, value);
+            get => getAutoFailFix;
+            set => Set(ref getAutoFailFix, value);
         }
 
-        private bool _autoPlaceFix;
+        private bool autoPlaceFix;
         public bool AutoPlaceFix {
-            get => _autoPlaceFix;
-            set => Set(ref _autoPlaceFix, value);
+            get => autoPlaceFix;
+            set => Set(ref autoPlaceFix, value);
         }
 
         public AutoFailDetectorVm() {

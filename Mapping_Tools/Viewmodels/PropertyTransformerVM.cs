@@ -6,209 +6,221 @@ namespace Mapping_Tools.Viewmodels {
     public class PropertyTransformerVm : BindableBase{
         #region multipliers and offsets
 
-        private double _timingpointOffsetMultiplier;
+        private double timingpointOffsetMultiplier;
         public double TimingpointOffsetMultiplier {
-            get => _timingpointOffsetMultiplier;
+            get => timingpointOffsetMultiplier;
             set {
-                if (Set(ref _timingpointOffsetMultiplier, value) && SyncTimeFields) {
+                if (Set(ref timingpointOffsetMultiplier, value) && SyncTimeFields) {
                     SetAllTimeMultipliers(value);
                 }
             }
         }
 
-        private double _timingpointOffsetOffset;
+        private double timingpointOffsetOffset;
         public double TimingpointOffsetOffset {
-            get => _timingpointOffsetOffset;
+            get => timingpointOffsetOffset;
             set {
-                if (Set(ref _timingpointOffsetOffset, value) && SyncTimeFields) {
+                if (Set(ref timingpointOffsetOffset, value) && SyncTimeFields) {
                     SetAllTimeOffsets(value);
                 }
             }
         }
 
-        private double _timingpointBPMMultiplier;
-        public double TimingpointBPMMultiplier {
-            get => _timingpointBPMMultiplier;
-            set => Set(ref _timingpointBPMMultiplier, value);
+        private double timingpointBpmMultiplier;
+        public double TimingpointBpmMultiplier {
+            get => timingpointBpmMultiplier;
+            set => Set(ref timingpointBpmMultiplier, value);
         }
 
-        private double _timingpointBPMOffset;
-        public double TimingpointBPMOffset {
-            get => _timingpointBPMOffset;
-            set => Set(ref _timingpointBPMOffset, value);
+        private double timingpointBpmOffset;
+        public double TimingpointBpmOffset {
+            get => timingpointBpmOffset;
+            set => Set(ref timingpointBpmOffset, value);
         }
 
-        private double _timingpointSVMultiplier;
-        public double TimingpointSVMultiplier {
-            get => _timingpointSVMultiplier;
-            set => Set(ref _timingpointSVMultiplier, value);
+        private double timingpointSvMultiplier;
+        public double TimingpointSvMultiplier {
+            get => timingpointSvMultiplier;
+            set => Set(ref timingpointSvMultiplier, value);
         }
 
-        private double _timingpointSVOffset;
-        public double TimingpointSVOffset {
-            get => _timingpointSVOffset;
-            set => Set(ref _timingpointSVOffset, value);
+        private double timingpointSvOffset;
+        public double TimingpointSvOffset {
+            get => timingpointSvOffset;
+            set => Set(ref timingpointSvOffset, value);
         }
 
-        private double _timingpointIndexMultiplier;
+        private double timingpointIndexMultiplier;
         public double TimingpointIndexMultiplier {
-            get => _timingpointIndexMultiplier;
-            set => Set(ref _timingpointIndexMultiplier, value);
+            get => timingpointIndexMultiplier;
+            set => Set(ref timingpointIndexMultiplier, value);
         }
 
-        private double _timingpointIndexOffset;
+        private double timingpointIndexOffset;
         public double TimingpointIndexOffset {
-            get => _timingpointIndexOffset;
-            set => Set(ref _timingpointIndexOffset, value);
+            get => timingpointIndexOffset;
+            set => Set(ref timingpointIndexOffset, value);
         }
 
-        private double _timingpointVolumeMultiplier;
+        private double timingpointVolumeMultiplier;
         public double TimingpointVolumeMultiplier {
-            get => _timingpointVolumeMultiplier;
-            set => Set(ref _timingpointVolumeMultiplier, value);
+            get => timingpointVolumeMultiplier;
+            set => Set(ref timingpointVolumeMultiplier, value);
         }
 
-        private double _timingpointVolumeOffset;
+        private double timingpointVolumeOffset;
         public double TimingpointVolumeOffset {
-            get => _timingpointVolumeOffset;
-            set => Set(ref _timingpointVolumeOffset, value);
+            get => timingpointVolumeOffset;
+            set => Set(ref timingpointVolumeOffset, value);
         }
 
-        private double _hitObjectTimeMultiplier;
+        private double hitObjectTimeMultiplier;
         public double HitObjectTimeMultiplier {
-            get => _hitObjectTimeMultiplier;
+            get => hitObjectTimeMultiplier;
             set {
-                if (Set(ref _hitObjectTimeMultiplier, value) && SyncTimeFields) {
+                if (Set(ref hitObjectTimeMultiplier, value) && SyncTimeFields) {
                     SetAllTimeMultipliers(value);
                 }
             }
         }
 
-        private double _hitObjectTimeOffset;
+        private double hitObjectTimeOffset;
         public double HitObjectTimeOffset {
-            get => _hitObjectTimeOffset;
+            get => hitObjectTimeOffset;
             set {
-                if (Set(ref _hitObjectTimeOffset, value) && SyncTimeFields) {
+                if (Set(ref hitObjectTimeOffset, value) && SyncTimeFields) {
                     SetAllTimeOffsets(value);
                 }
             }
         }
 
-        private double _bookmarkTimeMultiplier;
+        private double bookmarkTimeMultiplier;
         public double BookmarkTimeMultiplier {
-            get => _bookmarkTimeMultiplier;
+            get => bookmarkTimeMultiplier;
             set {
-                if (Set(ref _bookmarkTimeMultiplier, value) && SyncTimeFields) {
+                if (Set(ref bookmarkTimeMultiplier, value) && SyncTimeFields) {
                     SetAllTimeMultipliers(value);
                 }
             }
         }
 
-        private double _bookmarkTimeOffset;
+        private double bookmarkTimeOffset;
         public double BookmarkTimeOffset {
-            get => _bookmarkTimeOffset;
+            get => bookmarkTimeOffset;
             set {
-                if (Set(ref _bookmarkTimeOffset, value) && SyncTimeFields) {
+                if (Set(ref bookmarkTimeOffset, value) && SyncTimeFields) {
                     SetAllTimeOffsets(value);
                 }
             }
         }
 
-        private double _sbEventTimeMultiplier;
-        public double SBEventTimeMultiplier {
-            get => _sbEventTimeMultiplier;
+        private double sbEventTimeMultiplier;
+        public double SbEventTimeMultiplier {
+            get => sbEventTimeMultiplier;
             set {
-                if (Set(ref _sbEventTimeMultiplier, value) && SyncTimeFields) {
+                if (Set(ref sbEventTimeMultiplier, value) && SyncTimeFields) {
                     SetAllTimeMultipliers(value);
                 }
             }
         }
 
-        private double _sbEventTimeOffset;
-        public double SBEventTimeOffset {
-            get => _sbEventTimeOffset;
+        private double sbEventTimeOffset;
+        public double SbEventTimeOffset {
+            get => sbEventTimeOffset;
             set {
-                if (Set(ref _sbEventTimeOffset, value) && SyncTimeFields) {
+                if (Set(ref sbEventTimeOffset, value) && SyncTimeFields) {
                     SetAllTimeOffsets(value);
                 }
             }
         }
 
-        private double _sbSampleTimeMultiplier;
-        public double SBSampleTimeMultiplier {
-            get => _sbSampleTimeMultiplier;
+        private double sbSampleTimeMultiplier;
+        public double SbSampleTimeMultiplier {
+            get => sbSampleTimeMultiplier;
             set {
-                if (Set(ref _sbSampleTimeMultiplier, value) && SyncTimeFields) {
+                if (Set(ref sbSampleTimeMultiplier, value) && SyncTimeFields) {
                     SetAllTimeMultipliers(value);
                 }
             }
         }
 
-        private double _sbSampleTimeOffset;
-        public double SBSampleTimeOffset {
-            get => _sbSampleTimeOffset;
+        private double sbSampleTimeOffset;
+        public double SbSampleTimeOffset {
+            get => sbSampleTimeOffset;
             set {
-                if (Set(ref _sbSampleTimeOffset, value) && SyncTimeFields) {
+                if (Set(ref sbSampleTimeOffset, value) && SyncTimeFields) {
                     SetAllTimeOffsets(value);
                 }
             }
         }
 
-        private double _breakTimeMultiplier;
+        private double sbSampleVolumeMultiplier;
+        public double SbSampleVolumeMultiplier {
+            get => sbSampleVolumeMultiplier;
+            set => Set(ref sbSampleVolumeMultiplier, value);
+        }
+
+        private double sbSampleVolumeOffset;
+        public double SbSampleVolumeOffset {
+            get => sbSampleVolumeOffset;
+            set => Set(ref sbSampleVolumeOffset, value);
+        }
+
+        private double breakTimeMultiplier;
         public double BreakTimeMultiplier {
-            get => _breakTimeMultiplier;
+            get => breakTimeMultiplier;
             set {
-                if (Set(ref _breakTimeMultiplier, value) && SyncTimeFields) {
+                if (Set(ref breakTimeMultiplier, value) && SyncTimeFields) {
                     SetAllTimeMultipliers(value);
                 }
             }
         }
 
-        private double _breakTimeOffset;
+        private double breakTimeOffset;
         public double BreakTimeOffset {
-            get => _breakTimeOffset;
+            get => breakTimeOffset;
             set {
-                if (Set(ref _breakTimeOffset, value) && SyncTimeFields) {
+                if (Set(ref breakTimeOffset, value) && SyncTimeFields) {
                     SetAllTimeOffsets(value);
                 }
             }
         }
 
-        private double _videoTimeMultiplier;
+        private double videoTimeMultiplier;
         public double VideoTimeMultiplier {
-            get => _videoTimeMultiplier;
+            get => videoTimeMultiplier;
             set {
-                if (Set(ref _videoTimeMultiplier, value) && SyncTimeFields) {
+                if (Set(ref videoTimeMultiplier, value) && SyncTimeFields) {
                     SetAllTimeMultipliers(value);
                 }
             }
         }
 
-        private double _videoTimeOffset;
+        private double videoTimeOffset;
         public double VideoTimeOffset {
-            get => _videoTimeOffset;
+            get => videoTimeOffset;
             set {
-                if (Set(ref _videoTimeOffset, value) && SyncTimeFields) {
+                if (Set(ref videoTimeOffset, value) && SyncTimeFields) {
                     SetAllTimeOffsets(value);
                 }
             }
         }
 
-        private double _previewTimeMultiplier;
+        private double previewTimeMultiplier;
         public double PreviewTimeMultiplier {
-            get => _previewTimeMultiplier;
+            get => previewTimeMultiplier;
             set {
-                if (Set(ref _previewTimeMultiplier, value) && SyncTimeFields) {
+                if (Set(ref previewTimeMultiplier, value) && SyncTimeFields) {
                     SetAllTimeMultipliers(value);
                 }
             }
         }
 
-        private double _previewTimeOffset;
+        private double previewTimeOffset;
         public double PreviewTimeOffset {
-            get => _previewTimeOffset;
+            get => previewTimeOffset;
             set {
-                if (Set(ref _previewTimeOffset, value) && SyncTimeFields) {
+                if (Set(ref previewTimeOffset, value) && SyncTimeFields) {
                     SetAllTimeOffsets(value);
                 }
             }
@@ -216,46 +228,46 @@ namespace Mapping_Tools.Viewmodels {
 
         #endregion
 
-        private bool _clipProperties;
+        private bool clipProperties;
         public bool ClipProperties {
-            get => _clipProperties;
-            set => Set(ref _clipProperties, value);
+            get => clipProperties;
+            set => Set(ref clipProperties, value);
         }
 
-        private bool _enableFilters;
+        private bool enableFilters;
         public bool EnableFilters {
-            get => _enableFilters;
-            set => Set(ref _enableFilters, value);
+            get => enableFilters;
+            set => Set(ref enableFilters, value);
         }
 
-        private double[] _matchFilter;
+        private double[] matchFilter;
         public double[] MatchFilter {
-            get => _matchFilter;
-            set => Set(ref _matchFilter, value);
+            get => matchFilter;
+            set => Set(ref matchFilter, value);
         }
 
-        private double[] _unmatchFilter;
+        private double[] unmatchFilter;
         public double[] UnmatchFilter {
-            get => _unmatchFilter;
-            set => Set(ref _unmatchFilter, value);
+            get => unmatchFilter;
+            set => Set(ref unmatchFilter, value);
         }
 
-        private double _minTimeFilter;
+        private double minTimeFilter;
         public double MinTimeFilter {
-            get => _minTimeFilter;
-            set => Set(ref _minTimeFilter, value);
+            get => minTimeFilter;
+            set => Set(ref minTimeFilter, value);
         }
 
-        private double _maxTimeFilter;
+        private double maxTimeFilter;
         public double MaxTimeFilter {
-            get => _maxTimeFilter;
-            set => Set(ref _maxTimeFilter, value);
+            get => maxTimeFilter;
+            set => Set(ref maxTimeFilter, value);
         }
 
-        private bool _syncTimeFields;
+        private bool syncTimeFields;
         public bool SyncTimeFields {
-            get => _syncTimeFields;
-            set => Set(ref _syncTimeFields, value);
+            get => syncTimeFields;
+            set => Set(ref syncTimeFields, value);
         }
 
         [JsonIgnore]
@@ -281,10 +293,10 @@ namespace Mapping_Tools.Viewmodels {
         private void ResetMultipliersAndOffsets() {
             TimingpointOffsetMultiplier = 1;
             TimingpointOffsetOffset = 0;
-            TimingpointBPMMultiplier = 1;
-            TimingpointBPMOffset = 0;
-            TimingpointSVMultiplier = 1;
-            TimingpointSVOffset = 0;
+            TimingpointBpmMultiplier = 1;
+            TimingpointBpmOffset = 0;
+            TimingpointSvMultiplier = 1;
+            TimingpointSvOffset = 0;
             TimingpointIndexMultiplier = 1;
             TimingpointIndexOffset = 0;
             TimingpointVolumeMultiplier = 1;
@@ -293,24 +305,26 @@ namespace Mapping_Tools.Viewmodels {
             HitObjectTimeOffset = 0;
             BookmarkTimeMultiplier = 1;
             BookmarkTimeOffset = 0;
-            SBEventTimeMultiplier = 1;
-            SBEventTimeOffset = 0;
-            SBSampleTimeMultiplier = 1;
-            SBSampleTimeOffset = 0;
+            SbEventTimeMultiplier = 1;
+            SbEventTimeOffset = 0;
+            SbSampleTimeMultiplier = 1;
+            SbSampleTimeOffset = 0;
             BreakTimeMultiplier = 1;
             BreakTimeOffset = 0;
             VideoTimeMultiplier = 1;
             VideoTimeOffset = 0;
             PreviewTimeMultiplier = 1;
             PreviewTimeOffset = 0;
+            SbSampleVolumeMultiplier = 1;
+            SbSampleVolumeOffset = 0;
         }
 
         private void SetAllTimeMultipliers(double value) {
             TimingpointOffsetMultiplier = value;
             HitObjectTimeMultiplier = value;
             BookmarkTimeMultiplier = value;
-            SBEventTimeMultiplier = value;
-            SBSampleTimeMultiplier = value;
+            SbEventTimeMultiplier = value;
+            SbSampleTimeMultiplier = value;
             BreakTimeMultiplier = value;
             VideoTimeMultiplier = value;
             PreviewTimeMultiplier = value;
@@ -320,8 +334,8 @@ namespace Mapping_Tools.Viewmodels {
             TimingpointOffsetOffset = value;
             HitObjectTimeOffset = value;
             BookmarkTimeOffset = value;
-            SBEventTimeOffset = value;
-            SBSampleTimeOffset = value;
+            SbEventTimeOffset = value;
+            SbSampleTimeOffset = value;
             BreakTimeOffset = value;
             VideoTimeOffset = value;
             PreviewTimeOffset = value;

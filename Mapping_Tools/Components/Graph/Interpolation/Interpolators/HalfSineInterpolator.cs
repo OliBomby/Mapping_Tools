@@ -6,16 +6,16 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
     [DisplayName("Half sine")]
     [VerticalMirrorInterpolator]
     public class HalfSineInterpolator : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator {
-        private readonly LinearInterpolator _linearDegenerate;
+        private readonly LinearInterpolator linearDegenerate;
 
         public HalfSineInterpolator() {
-            _linearDegenerate = new LinearInterpolator();
+            linearDegenerate = new LinearInterpolator();
             InterpolationFunction = Function;
         }
 
         private double Function(double t) {
-            if (Math.Abs(P) < Precision.DOUBLE_EPSILON) {
-                return _linearDegenerate.GetInterpolation(t);
+            if (Math.Abs(P) < Precision.DoubleEpsilon) {
+                return linearDegenerate.GetInterpolation(t);
             }
 
             var p = MathHelper.Clamp(P, -1, 1);
@@ -41,8 +41,8 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         public double GetDerivative(double t) {
-            if (Math.Abs(P) < Precision.DOUBLE_EPSILON) {
-                return _linearDegenerate.GetDerivative(t);
+            if (Math.Abs(P) < Precision.DoubleEpsilon) {
+                return linearDegenerate.GetDerivative(t);
             }
 
             var p = MathHelper.Clamp(P, -1, 1);
@@ -53,8 +53,8 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         public double GetIntegral(double t1, double t2) {
-            if (Math.Abs(P) < Precision.DOUBLE_EPSILON) {
-                return _linearDegenerate.GetIntegral(t1, t2);
+            if (Math.Abs(P) < Precision.DoubleEpsilon) {
+                return linearDegenerate.GetIntegral(t1, t2);
             }
 
             var p = MathHelper.Clamp(P, -1, 1);

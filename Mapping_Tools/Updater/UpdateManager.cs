@@ -24,8 +24,8 @@ namespace Mapping_Tools.Updater {
     }
 
     public class UpdateManager : IUpdateManager, IDisposable {
-        private bool _hasDownloaded;
-        private Onova.IUpdateManager _updateManager;
+        private bool hasDownloaded;
+        private Onova.IUpdateManager updateManager;
 
         public Progress<double> Progress { get; private set; }
         public IPackageResolver PackageResolver { get; private set; }
@@ -45,12 +45,12 @@ namespace Mapping_Tools.Updater {
         }
 
         private void Setup() {
-            _updateManager = new Onova.UpdateManager(PackageResolver, new ZipPackageExtractor());
+            updateManager = new Onova.UpdateManager(PackageResolver, new ZipPackageExtractor());
             Progress = new Progress<double>();
         }
 
         public async Task<bool> FetchUpdateAsync() {
-            UpdatesResult = await _updateManager.CheckForUpdatesAsync();
+            UpdatesResult = await updateManager.CheckForUpdatesAsync();
 
             return UpdatesResult.CanUpdate;
         }
@@ -65,9 +65,9 @@ namespace Mapping_Tools.Updater {
                 throw new InvalidOperationException("Do not call this method if there are no updates!");
             }
 
-            await _updateManager.PrepareUpdateAsync(UpdatesResult.LastVersion, Progress);
+            await updateManager.PrepareUpdateAsync(UpdatesResult.LastVersion, Progress);
 
-            _hasDownloaded = true;
+            hasDownloaded = true;
         }
 
         /// <exception cref="Onova.Exceptions.LockFileNotAcquiredException"></exception>
@@ -78,17 +78,17 @@ namespace Mapping_Tools.Updater {
                 throw new InvalidOperationException("Do not call this method before fetching updates!");
             }
 
-            if (!_hasDownloaded) {
+            if (!hasDownloaded) {
                 throw new InvalidOperationException("Do not call this method before download has finished!");
             }
 
-            _updateManager.LaunchUpdater(UpdatesResult.LastVersion, RestartAfterUpdate);
+            updateManager.LaunchUpdater(UpdatesResult.LastVersion, RestartAfterUpdate);
         }
 
         public void Dispose() {
             GC.SuppressFinalize(this);
 
-            _updateManager.Dispose();
+            updateManager.Dispose();
         }
     }
 }

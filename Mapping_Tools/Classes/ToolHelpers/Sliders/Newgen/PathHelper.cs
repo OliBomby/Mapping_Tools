@@ -115,10 +115,10 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
                 // Calculate the angles
                 lastAngle = v1.HasValue
-                    ? v1.Value.LengthSquared > Precision.DOUBLE_EPSILON ? v1.Value.Theta : lastAngle
+                    ? v1.Value.LengthSquared > Precision.DoubleEpsilon ? v1.Value.Theta : lastAngle
                     : double.NaN;
                 var nextAngle = v2.HasValue
-                    ? v2.Value.LengthSquared > Precision.DOUBLE_EPSILON ? v2.Value.Theta : lastAngle
+                    ? v2.Value.LengthSquared > Precision.DoubleEpsilon ? v2.Value.Theta : lastAngle
                     : double.NaN;
 
                 // Update the path point of current
@@ -156,11 +156,11 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
 
             // Normalize v1 and v4 to prevent extreme curvature
             double length = Vector2.Distance(v2.Pos, v3.Pos);
-            v1.Pos = (v1.Pos - v2.Pos).LengthSquared > Precision.DOUBLE_EPSILON ? v2.Pos + (v1.Pos - v2.Pos).Normalized() * length : v2.Pos + v2.Pos - v3.Pos;
-            v4.Pos = (v4.Pos - v3.Pos).LengthSquared > Precision.DOUBLE_EPSILON ? v3.Pos + (v4.Pos - v3.Pos).Normalized() * length : v3.Pos + v3.Pos - v2.Pos;
+            v1.Pos = (v1.Pos - v2.Pos).LengthSquared > Precision.DoubleEpsilon ? v2.Pos + (v1.Pos - v2.Pos).Normalized() * length : v2.Pos + v2.Pos - v3.Pos;
+            v4.Pos = (v4.Pos - v3.Pos).LengthSquared > Precision.DoubleEpsilon ? v3.Pos + (v4.Pos - v3.Pos).Normalized() * length : v3.Pos + v3.Pos - v2.Pos;
             double ogLength = Vector2.Distance(v2.OgPos, v3.OgPos);
-            v1.OgPos = (v1.OgPos - v2.OgPos).LengthSquared > Precision.DOUBLE_EPSILON ? v2.OgPos + (v1.OgPos - v2.OgPos).Normalized() * ogLength : v2.OgPos + v2.OgPos - v3.OgPos;
-            v4.OgPos = (v4.OgPos - v3.OgPos).LengthSquared > Precision.DOUBLE_EPSILON ? v3.OgPos + (v4.OgPos - v3.OgPos).Normalized() * ogLength : v3.OgPos + v3.OgPos - v2.OgPos;
+            v1.OgPos = (v1.OgPos - v2.OgPos).LengthSquared > Precision.DoubleEpsilon ? v2.OgPos + (v1.OgPos - v2.OgPos).Normalized() * ogLength : v2.OgPos + v2.OgPos - v3.OgPos;
+            v4.OgPos = (v4.OgPos - v3.OgPos).LengthSquared > Precision.DoubleEpsilon ? v3.OgPos + (v4.OgPos - v3.OgPos).Normalized() * ogLength : v3.OgPos + v3.OgPos - v2.OgPos;
 
             foreach (var t in ts) {
                 var v = PathPoint.Lerp(v2, v3, t);
@@ -384,7 +384,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <returns>The first matching occurrence from start.</returns>
         // Finds the first point from start which matches the distance and T value within the given epsilon.
         // If no such point exists, the point before the wanted distance is returned.
-        public static LinkedListNode<PathPoint> FindFirstOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DOUBLE_EPSILON) {
+        public static LinkedListNode<PathPoint> FindFirstOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DoubleEpsilon) {
             var p = start;
             var prev = start;
 
@@ -432,7 +432,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <param name="t">The wanted T value. If NaN then it is ignored.</param>
         /// <param name="epsilon">The maximum difference in distance or T.</param>
         /// <returns>The last matching occurrence from start.</returns>
-        public static LinkedListNode<PathPoint> FindLastOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DOUBLE_EPSILON) {
+        public static LinkedListNode<PathPoint> FindLastOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DoubleEpsilon) {
             var p = start;
             var prev = start;
 
@@ -480,7 +480,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <param name="t">The wanted T value. If NaN then it is ignored.</param>
         /// <param name="epsilon">The maximum difference in distance or T.</param>
         /// <returns>The first matching occurrence from start.</returns>
-        public static LinkedListNode<PathPoint> FindFirstOccurrenceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DOUBLE_EPSILON) {
+        public static LinkedListNode<PathPoint> FindFirstOccurrenceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DoubleEpsilon) {
             var node = FindFirstOccurrence(start, cumLength, t, epsilon);
 
             if (InsideViableRange(node.Value, cumLength, t, epsilon) || !BeforeWantedPoint(node.Value, cumLength, t) || node.Next is null) {
@@ -509,7 +509,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// <param name="t">The wanted T value. If NaN then it is ignored.</param>
         /// <param name="epsilon">The maximum difference in distance or T.</param>
         /// <returns>The last matching occurrence from start.</returns>
-        public static LinkedListNode<PathPoint> FindLastOccurrenceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DOUBLE_EPSILON) {
+        public static LinkedListNode<PathPoint> FindLastOccurrenceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DoubleEpsilon) {
             var node = FindLastOccurrence(start, cumLength, t, epsilon);
 
             if (InsideViableRange(node.Value, cumLength, t, epsilon) || BeforeWantedPoint(node.Value, cumLength, t) || node.Previous is null) {

@@ -1,5 +1,4 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.Tools;
 using NAudio.Midi;
 using System;
 using System.Collections.Generic;
@@ -333,91 +332,122 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Dictionary<int, int> channelBanks = new Dictionary<int, int>();
             Dictionary<int, int> channelPatches = new Dictionary<int, int>();
 
+            // Channel 10 starts out with a drum kit
+            channelBanks[10] = 128;
+
             // Loop through every event of every track
             for (int track = 0; track < mf.Tracks; track++) {
                 foreach (var midiEvent in mf.Events[track]) {
                     if (midiEvent is PatchChangeEvent pc) {
                         channelPatches[pc.Channel] = pc.Patch;
+                        continue;
                     }
-                    else if (midiEvent is ControlChangeEvent co) {
+
+                    if (midiEvent is ControlChangeEvent co) {
                         if (co.Controller == MidiController.BankSelect) {
-                            channelBanks[co.Channel] = (co.ControllerValue * 128) + (channelBanks.ContainsKey(co.Channel) ? (byte)channelBanks[co.Channel] : 0);
+                            channelBanks[co.Channel] = (co.ControllerValue << 7) + (channelBanks.ContainsKey(co.Channel) ? (byte)channelBanks[co.Channel] & 0x01111111 : 0);
                         }
                         else if (co.Controller == MidiController.BankSelectLsb) {
-                            channelBanks[co.Channel] = co.ControllerValue + (channelBanks.ContainsKey(co.Channel) ? (channelBanks[co.Channel] >> 8) * 128 : 0);
+                            channelBanks[co.Channel] = (co.ControllerValue & 0x01111111) + (channelBanks.ContainsKey(co.Channel) ? (channelBanks[co.Channel] >> 7) << 7 : 0);
                         }
+
+                        continue;
                     }
-                    else if (MidiEvent.IsNoteOn(midiEvent)) {
-                        var on = midiEvent as NoteOnEvent;
 
-                        double time = CalculateTime(on.AbsoluteTime, tempos, cumulativeTime, mf.DeltaTicksPerQuarterNote);
-                        double length = on.OffEvent != null
-                            ? CalculateTime(on.OffEvent.AbsoluteTime,
-                                  tempos,
-                                  cumulativeTime,
-                                  mf.DeltaTicksPerQuarterNote) -
-                              time
-                            : -1;
-                        length = RoundLength(length, lengthRoughness);
+                    if (!MidiEvent.IsNoteOn(midiEvent)) {
+                        continue;
+                    }
 
-                        bool keys = keysounds || on.Channel == 10;
+                    var on = midiEvent as NoteOnEvent;
 
-                        int bank = instruments
-                            ? on.Channel == 10 ? 128 :
-                            channelBanks.ContainsKey(on.Channel) ? channelBanks[on.Channel] : 0
-                            : -1;
-                        int patch = instruments && channelPatches.ContainsKey(on.Channel)
-                            ? channelPatches[on.Channel]
-                            : -1;
-                        int instrument = -1;
-                        int key = keys ? on.NoteNumber : -1;
-                        length = lengths ? length : -1;
-                        int velocity = velocities ? on.Velocity : -1;
-                        velocity = (int)RoundVelocity(velocity, velocityRoughness);
-
-                        string lengthString = Math.Round(length).ToString(CultureInfo.InvariantCulture);
-
-                        string instrumentName = on.Channel == 10 ? "Percussion" :
-                            patch >= 0 && patch <= 127 ? PatchChangeEvent.GetPatchName(patch) : "Undefined";
-                        string keyName = on.NoteName;
-
-                        string name = instrumentName;
-                        if (keysounds)
-                            name += "," + keyName;
-                        if (lengths)
-                            name += "," + lengthString;
-                        if (velocities)
-                            name += "," + velocity;
+                    double time = CalculateTime(on.AbsoluteTime, tempos, cumulativeTime, mf.DeltaTicksPerQuarterNote);
+                    double length = on.OffEvent != null
+                        ? CalculateTime(on.OffEvent.AbsoluteTime,
+                              tempos,
+                              cumulativeTime,
+                              mf.DeltaTicksPerQuarterNote) -
+                          time
+                        : -1;
+                    length = RoundLength(length, lengthRoughness);
 
 
-                        var sampleArgs = new SampleGeneratingArgs(string.Empty, bank, patch, instrument, key, length, velocity);
-                        var importArgs = new LayerImportArgs(ImportType.MIDI) {
-                            Path = path,
-                            Bank = bank,
-                            Patch = patch,
-                            Key = key,
-                            Length = length,
-                            LengthRoughness = lengthRoughness,
-                            Velocity = velocity,
-                            VelocityRoughness = velocityRoughness
-                        };
+                    int bank = instruments
+                        ? channelBanks.ContainsKey(on.Channel) ? channelBanks[on.Channel] : 0
+                        : -1;
 
-                        // Find the hitsoundlayer with this path
-                        HitsoundLayer layer = hitsoundLayers.Find(o => o.ImportArgs == importArgs);
+                    int patch = instruments && channelPatches.ContainsKey(on.Channel)
+                        ? channelPatches[on.Channel]
+                        : -1;
 
-                        if (layer != null) {
-                            // Find hitsound layer with this path and add this time
-                            layer.Times.Add(time + offset);
-                        } else {
-                            // Add new hitsound layer with this path
-                            HitsoundLayer newLayer = new HitsoundLayer(name, SampleSet.Normal, Hitsound.Normal, sampleArgs, importArgs);
-                            newLayer.Times.Add(time + offset);
+                    const int instrument = -1;
 
-                            hitsoundLayers.Add(newLayer);
-                        }
+                    bool keys = keysounds || (instruments && bank == 128);
+                    int key = keys ? on.NoteNumber : -1;
+
+                    length = lengths ? length : -1;
+
+                    int velocity = velocities ? on.Velocity : -1;
+                    velocity = (int)RoundVelocity(velocity, velocityRoughness);
+
+                    // Construct a note name
+                    string lengthString = Math.Round(length).ToString(CultureInfo.InvariantCulture);
+
+                    string instrumentName = bank == 128 ? "Percussion" :
+                        patch is >= 0 and < 128 ? PatchChangeEvent.GetPatchName(patch) : "Undefined";
+
+                    string keyName;
+                    if (bank == 128) {
+                        // Assign a percussion note name
+                        var tempChannel = on.Channel;
+                        on.Channel = 10;
+                        keyName = on.NoteName;
+                        on.Channel = tempChannel;
+                    } else if (on.Channel == 10) {
+                        // Assign an instrument note name
+                        on.Channel = 1;
+                        keyName = on.NoteName;
+                        on.Channel = 10;
+                    } else {
+                        keyName = on.NoteName;
+                    }
+
+                    string name = instrumentName;
+                    if (keys)
+                        name += "," + keyName;
+                    if (lengths)
+                        name += "," + lengthString;
+                    if (velocities)
+                        name += "," + velocity;
+
+                    // Construct hitsound layer properties
+                    var sampleArgs = new SampleGeneratingArgs(string.Empty, bank, patch, instrument, key, length, velocity);
+                    var importArgs = new LayerImportArgs(ImportType.Midi) {
+                        Path = path,
+                        Bank = bank,
+                        Patch = patch,
+                        Key = key,
+                        Length = length,
+                        LengthRoughness = lengthRoughness,
+                        Velocity = velocity,
+                        VelocityRoughness = velocityRoughness
+                    };
+
+                    // Find the hitsoundlayer with this path
+                    HitsoundLayer layer = hitsoundLayers.Find(o => o.ImportArgs == importArgs);
+
+                    if (layer != null) {
+                        // Find hitsound layer with this path and add this time
+                        layer.Times.Add(time + offset);
+                    } else {
+                        // Add new hitsound layer with this path
+                        HitsoundLayer newLayer = new HitsoundLayer(name, SampleSet.Normal, Hitsound.Normal, sampleArgs, importArgs);
+                        newLayer.Times.Add(time + offset);
+
+                        hitsoundLayers.Add(newLayer);
                     }
                 }
             }
+
             // Stretch the velocities to reach 127
             int maxVelocity = hitsoundLayers.Max(o => o.SampleArgs.Velocity);
             foreach (var hsl in hitsoundLayers) {
@@ -442,7 +472,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     return ImportHitsounds(reloadingArgs.Path, reloadingArgs.DiscriminateVolumes, reloadingArgs.DetectDuplicateSamples, reloadingArgs.RemoveDuplicates, false);
                 case ImportType.Storyboard:
                     return ImportStoryboard(reloadingArgs.Path, reloadingArgs.DiscriminateVolumes, reloadingArgs.RemoveDuplicates);
-                case ImportType.MIDI:
+                case ImportType.Midi:
                     return ImportMidi(reloadingArgs.Path,
                         lengthRoughness: reloadingArgs.LengthRoughness,
                         velocityRoughness: reloadingArgs.VelocityRoughness);
@@ -483,7 +513,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
             }
             if (prev == null) {
-                return absoluteTime;
+                return 500d * absoluteTime / dtpq;  // Equates to 120 bpm
             }
 
             double deltaTime = prev.MicrosecondsPerQuarterNote / 1000d * (absoluteTime - prev.AbsoluteTime) / dtpq;

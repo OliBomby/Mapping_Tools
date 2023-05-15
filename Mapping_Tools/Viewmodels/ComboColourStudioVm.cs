@@ -4,15 +4,15 @@ using Mapping_Tools.Classes.Tools.ComboColourStudio;
 namespace Mapping_Tools.Viewmodels {
 
     public class ComboColourStudioVm : BindableBase {
-        private ComboColourProject _project;
+        private ComboColourProject project;
 
         public ComboColourStudioVm() {
             Project = new ComboColourProject();
         }
 
         public ComboColourProject Project {
-            get => _project;
-            set => Set(ref _project, value);
+            get => project;
+            set => Set(ref project, value);
         }
 
         public string ExportPath { get; set; }

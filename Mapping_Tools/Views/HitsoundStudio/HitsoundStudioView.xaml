@@ -14,8 +14,8 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.PopupBox.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <domain:DoubleToStringConverter x:Key="D2SConverter"/>
-            <domain:SampleSetToStringConverter x:Key="SS2SConverter"/>
-            <domain:HitsoundToStringConverter x:Key="HS2SConverter"/>
+            <domain:SampleSetToStringConverter x:Key="Ss2SConverter"/>
+            <domain:HitsoundToStringConverter x:Key="Hs2SConverter"/>
             <domain:VolumeToPercentageConverter x:Key="V2PConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -241,7 +241,7 @@
                                           Content="Remove duplicates"
                                           ToolTip="Remove duplicate values in the Times field."/>
                             </StackPanel>
-                            <StackPanel x:Name="SelectedMIDIPanel">
+                            <StackPanel x:Name="SelectedMidiPanel">
                                 <TextBox x:Name="SelectedImportBankBox" TextChanged="SelectedImportBankBox_TextChanged" Margin="0,5,0,0"
                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Bank"
                                         ToolTip="Bank number of the unique sound this hitsound layer imported from the source MIDI."/>
@@ -367,7 +367,7 @@
                                  <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
                              </Button >
                              <ComboBox Grid.Column="2" x:Name="DefaultSampleSetBox" Width="70" VerticalAlignment="Stretch" Margin="0,0,5,0"
-                                       SelectedValue="{Binding SampleSet, Mode=TwoWay, Converter={StaticResource SS2SConverter}}"
+                                       SelectedValue="{Binding SampleSet, Mode=TwoWay, Converter={StaticResource Ss2SConverter}}"
                                        SelectedValuePath="Content" Cursor="Hand"
                                        ToolTip="Sample set of the default sample.">
                                  <ComboBoxItem Content="None" Cursor="Hand"/>

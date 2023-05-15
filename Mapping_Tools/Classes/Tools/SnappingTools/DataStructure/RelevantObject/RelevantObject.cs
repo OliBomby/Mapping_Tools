@@ -34,11 +34,11 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
             }
         }
 
-        private double _time;
+        private double time;
         public virtual double Time {
-            get => _time;
+            get => time;
             set {
-                _time = value;
+                time = value;
                 if (ChildObjects == null) return;
                 foreach (var relevantObject in ChildObjects) {
                     relevantObject.UpdateTime();
@@ -47,21 +47,21 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
             }
         }
 
-        private double _customTime;
+        private double customTime;
         public double CustomTime {
-            get => _customTime;
+            get => customTime;
             set {
-                _customTime = value;
+                customTime = value;
                 if (Generator?.TemporalPositioning != GeneratorTemporalPositioning.Custom) return;
                 UpdateTime();
             }
         }
 
-        private double _relevancy;
+        private double relevancy;
         public double Relevancy {
-            get => _isSelected ? 1 : _relevancy;
+            get => isSelected ? 1 : relevancy;
             set {
-                _relevancy = value;
+                relevancy = value;
                 if (ChildObjects == null) return;
                 foreach (var relevantObject in ChildObjects) {
                     relevantObject.UpdateRelevancy();
@@ -76,12 +76,12 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
 
         public bool AutoPropagate { get; set; } = true;
 
-        private bool _isSelected;
+        private bool isSelected;
         public virtual bool IsSelected {
-            get => _isSelected;
+            get => isSelected;
             set {
-                if (_isSelected == value) return;
-                _isSelected = value;
+                if (isSelected == value) return;
+                isSelected = value;
                 if (ChildObjects != null) {
                     foreach (var relevantObject in ChildObjects) {
                         relevantObject.UpdateRelevancy();
@@ -92,25 +92,25 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
             }
         }
 
-        private bool _isLocked;
+        private bool isLocked;
         public bool IsLocked {
-            get => _isLocked;
+            get => isLocked;
             set {
-                if (_isLocked == value) return;
-                _isLocked = value;
+                if (isLocked == value) return;
+                isLocked = value;
                 if (!AutoPropagate) return;
                 Layer?.NextLayer?.GenerateNewObjects(true);
             }
         }
 
-        private bool _isInheritable = true;
+        private bool isInheritable = true;
         public bool IsInheritable {
-            get => _isInheritable;
+            get => isInheritable;
             set {
-                if (_isInheritable == value) return;
-                _isInheritable = value;
+                if (isInheritable == value) return;
+                isInheritable = value;
                 if (!AutoPropagate) return;
-                if (_isInheritable) {
+                if (isInheritable) {
                     Layer?.NextLayer?.GenerateNewObjects(true);
                 } else {
                     var objectsToDispose = ChildObjects.ToArray();
@@ -125,11 +125,11 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public RelevantObjectLayer Layer { get; set; }
         public RelevantObjectsGenerator Generator { get; set; }
 
-        private HashSet<IRelevantObject> _parentObjects;
+        private HashSet<IRelevantObject> parentObjects;
         public HashSet<IRelevantObject> ParentObjects {
-            get => _parentObjects;
+            get => parentObjects;
             set {
-                _parentObjects = value;
+                parentObjects = value;
                 UpdateRelevancy();
                 UpdateTime();
             }

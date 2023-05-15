@@ -8,11 +8,11 @@ namespace Mapping_Tools.Components.TimeLine {
     public partial class TimeLineMark :UserControl {
         public double Time { get; set; }
 
-        public TimeLineMark(double m_seconds) {
+        public TimeLineMark(double mSeconds) {
             InitializeComponent();
-            Time = m_seconds;
+            Time = mSeconds;
 
-            TimeSpan ts = TimeSpan.FromMilliseconds(m_seconds);
+            TimeSpan ts = TimeSpan.FromMilliseconds(mSeconds);
             string m = ts.Minutes.ToString();
             if( m.Length < 2 )
                 m = "0" + m;
@@ -20,7 +20,7 @@ namespace Mapping_Tools.Components.TimeLine {
             if( s.Length < 2)
                 s = "0" + s;
 
-            text.Text = string.Format("{0}:{1}", m, s);
+            Text.Text = string.Format("{0}:{1}", m, s);
         }
     }
 }

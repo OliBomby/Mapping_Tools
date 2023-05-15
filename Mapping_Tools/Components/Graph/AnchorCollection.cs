@@ -102,7 +102,7 @@ namespace Mapping_Tools.Components.Graph {
 
             // Calculate the value via interpolation
             var difference = nextAnchor.Pos - previousAnchor.Pos;
-            if (Math.Abs(difference.X) < Precision.DOUBLE_EPSILON) {
+            if (Math.Abs(difference.X) < Precision.DoubleEpsilon) {
                 return previousAnchor.Pos.Y;
             }
 
@@ -129,7 +129,7 @@ namespace Mapping_Tools.Components.Graph {
 
             // Calculate the value via interpolation
             var difference = nextAnchor.Pos - previousAnchor.Pos;
-            if (Math.Abs(difference.X) < Precision.DOUBLE_EPSILON) {
+            if (Math.Abs(difference.X) < Precision.DoubleEpsilon) {
                 return difference.Y > 0 ? double.PositiveInfinity : double.NegativeInfinity;
             }
             
@@ -165,7 +165,7 @@ namespace Mapping_Tools.Components.Graph {
                     var difference = p2 - p1;
                     var differenceC = p2C - p1C;
 
-                    if (differenceC.X < Precision.DOUBLE_EPSILON) {
+                    if (differenceC.X < Precision.DoubleEpsilon) {
                         previousAnchor = anchor;
                         continue;
                     }
@@ -292,7 +292,7 @@ namespace Mapping_Tools.Components.Graph {
 
                     var difference = p2 - p1;
 
-                    if (difference.X < Precision.DOUBLE_EPSILON) {
+                    if (difference.X < Precision.DoubleEpsilon) {
                         previousAnchor = anchor;
                         continue;
                     }
@@ -482,7 +482,7 @@ namespace Mapping_Tools.Components.Graph {
 
                     var difference = p2 - p1;
 
-                    if (difference.X < Precision.DOUBLE_EPSILON) {
+                    if (difference.X < Precision.DoubleEpsilon) {
                         previousAnchor = anchor;
                         continue;
                     }

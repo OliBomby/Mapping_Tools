@@ -16,11 +16,11 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public bool Quick { get; set; }
 
-        private ImportMode _importModeSetting;
+        private ImportMode importModeSetting;
         public ImportMode ImportModeSetting {
-            get => _importModeSetting;
+            get => importModeSetting;
             set {
-                if (Set(ref _importModeSetting, value)) {
+                if (Set(ref importModeSetting, value)) {
                     RaisePropertyChanged(nameof(TimeCodeBoxVisibility));
                 }
             }
@@ -32,37 +32,37 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public Visibility TimeCodeBoxVisibility => ImportModeSetting == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
 
-        private string _timeCode;
+        private string timeCode;
         public string TimeCode {
-            get => _timeCode;
-            set => Set(ref _timeCode, value);
+            get => timeCode;
+            set => Set(ref timeCode, value);
         }
 
-        private ConnectionMode _connectionModeSetting;
+        private ConnectionMode connectionModeSetting;
         public ConnectionMode ConnectionModeSetting {
-            get => _connectionModeSetting;
-            set => Set(ref _connectionModeSetting, value);
+            get => connectionModeSetting;
+            set => Set(ref connectionModeSetting, value);
         }
 
         [JsonIgnore]
         public IEnumerable<ConnectionMode> ConnectionModes => Enum.GetValues(typeof(ConnectionMode)).Cast<ConnectionMode>();
 
-        private double _leniency;
+        private double leniency;
         public double Leniency {
-            get => _leniency;
-            set => Set(ref _leniency, value);
+            get => leniency;
+            set => Set(ref leniency, value);
         }
 
-        private bool _linearOnLinear;
+        private bool linearOnLinear;
         public bool LinearOnLinear {
-            get => _linearOnLinear;
-            set => Set(ref _linearOnLinear, value);
+            get => linearOnLinear;
+            set => Set(ref linearOnLinear, value);
         }
 
-        private bool _mergeOnSliderEnd;
+        private bool mergeOnSliderEnd;
         public bool MergeOnSliderEnd {
-            get => _mergeOnSliderEnd;
-            set => Set(ref _mergeOnSliderEnd, value);
+            get => mergeOnSliderEnd;
+            set => Set(ref mergeOnSliderEnd, value);
         }
 
         #endregion

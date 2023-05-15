@@ -9,19 +9,19 @@ using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {
     public class SnappingToolsSaveSlot : BindableBase, IDisposable {
-        private string _name;
-        private Hotkey _projectHotkey;
+        private string name;
+        private Hotkey projectHotkey;
         [JsonIgnore]
-        private readonly string _hotkeyHandle;
+        private readonly string hotkeyHandle;
 
         public string Name {
-            get => _name;
-            set => Set(ref _name, value);
+            get => name;
+            set => Set(ref name, value);
         }
 
         public Hotkey ProjectHotkey {
-            get => _projectHotkey;
-            set => Set(ref _projectHotkey, value);
+            get => projectHotkey;
+            set => Set(ref projectHotkey, value);
         }
 
         [JsonIgnore]
@@ -39,8 +39,8 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {
             Preferences = new SnappingToolsPreferences();
 
             // Setup hotkey stuff
-            _projectHotkey = new Hotkey(Key.None, ModifierKeys.None);
-            _hotkeyHandle = GenerateActiveHotkeyHandle();
+            projectHotkey = new Hotkey(Key.None, ModifierKeys.None);
+            hotkeyHandle = GenerateActiveHotkeyHandle();
 
             PropertyChanged += OnPropertyChanged;
 
@@ -51,12 +51,12 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {
         }
 
         public void RefreshHotkey() {
-            MainWindow.AppWindow.ListenerManager.RemoveActiveHotkey(_hotkeyHandle);
+            MainWindow.AppWindow.ListenerManager.RemoveActiveHotkey(hotkeyHandle);
             RegisterHotkey();
         }
 
         private void RegisterHotkey() {
-            MainWindow.AppWindow.ListenerManager.AddActiveHotkey(_hotkeyHandle, 
+            MainWindow.AppWindow.ListenerManager.AddActiveHotkey(hotkeyHandle, 
                 new ActionHotkey(ProjectHotkey, () => {
                     if (System.Windows.Application.Current.Dispatcher != null)
                         System.Windows.Application.Current.Dispatcher.Invoke(() => ParentProject?.LoadFromSlot(this));
@@ -64,13 +64,13 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {
         }
 
         private void UnRegisterHotkey() {
-            MainWindow.AppWindow.ListenerManager.RemoveActiveHotkey(_hotkeyHandle);
+            MainWindow.AppWindow.ListenerManager.RemoveActiveHotkey(hotkeyHandle);
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             if (e.PropertyName != "ProjectHotkey") return;
             
-            MainWindow.AppWindow.ListenerManager.ChangeActiveHotkeyHotkey(_hotkeyHandle, ProjectHotkey);
+            MainWindow.AppWindow.ListenerManager.ChangeActiveHotkeyHotkey(hotkeyHandle, ProjectHotkey);
         }
 
         public object Clone() {

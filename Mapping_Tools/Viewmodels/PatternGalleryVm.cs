@@ -22,16 +22,16 @@ using System.Windows.Input;
 
 namespace Mapping_Tools.Viewmodels {
     public class PatternGalleryVm : BindableBase {
-        private string _collectionName;
+        private string collectionName;
         public string CollectionName {
-            get => _collectionName;
-            set => Set(ref _collectionName, value);
+            get => collectionName;
+            set => Set(ref collectionName, value);
         }
 
-        private ObservableCollection<OsuPattern> _patterns;
+        private ObservableCollection<OsuPattern> patterns;
         public ObservableCollection<OsuPattern> Patterns {
-            get => _patterns;
-            set => Set(ref _patterns, value);
+            get => patterns;
+            set => Set(ref patterns, value);
         }
 
         public OsuPatternFileHandler FileHandler { get; set; }
@@ -65,11 +65,11 @@ namespace Mapping_Tools.Viewmodels {
 
         #region Options
 
-        private ExportTimeMode _exportTimeMode;
+        private ExportTimeMode exportTimeMode;
         public ExportTimeMode ExportTimeMode {
-            get => _exportTimeMode;
+            get => exportTimeMode;
             set {
-                if (Set(ref _exportTimeMode, value)) {
+                if (Set(ref exportTimeMode, value)) {
                     RaisePropertyChanged(nameof(CustomExportTimeVisible));
                 }
             }
@@ -79,10 +79,10 @@ namespace Mapping_Tools.Viewmodels {
         public IEnumerable<ExportTimeMode> ExportTimeModes =>
             Enum.GetValues(typeof(ExportTimeMode)).Cast<ExportTimeMode>();
 
-        private double _customExportTime;
+        private double customExportTime;
         public double CustomExportTime {
-            get => _customExportTime;
-            set => Set(ref _customExportTime, value);
+            get => customExportTime;
+            set => Set(ref customExportTime, value);
         }
 
         [JsonIgnore]
@@ -213,7 +213,7 @@ namespace Mapping_Tools.Viewmodels {
 
         public PatternGalleryVm() {
             CollectionName = @"My Pattern Collection";
-            _patterns = new ObservableCollection<OsuPattern>();
+            patterns = new ObservableCollection<OsuPattern>();
             FileHandler = new OsuPatternFileHandler();
             OsuPatternMaker = new OsuPatternMaker();
             OsuPatternPlacer = new OsuPatternPlacer();
@@ -230,7 +230,7 @@ namespace Mapping_Tools.Viewmodels {
                 async _ => {
                     try {
                         var viewModel = new PatternCodeImportVm {
-                            Name = $"Pattern {_patterns.Count + 1}"
+                            Name = $"Pattern {patterns.Count + 1}"
                         };
 
                         var dialog = new CustomDialog(viewModel, 0);
@@ -268,7 +268,7 @@ namespace Mapping_Tools.Viewmodels {
                 async _ => {
                     try {
                         var viewModel = new PatternFileImportVm {
-                            Name = $"Pattern {_patterns.Count + 1}"
+                            Name = $"Pattern {patterns.Count + 1}"
                         };
 
                         var dialog = new CustomDialog(viewModel, 0);
@@ -287,7 +287,7 @@ namespace Mapping_Tools.Viewmodels {
                 async _ => {
                     try {
                         var viewModel = new SelectedPatternImportVm() {
-                            Name = $"Pattern {_patterns.Count + 1}"
+                            Name = $"Pattern {patterns.Count + 1}"
                         };
 
                         var dialog = new CustomDialog(viewModel, 0);

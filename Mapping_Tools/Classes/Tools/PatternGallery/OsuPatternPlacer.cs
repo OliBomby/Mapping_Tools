@@ -77,7 +77,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             }
 
             // Do the offset
-            if (Math.Abs(offset) > Precision.DOUBLE_EPSILON) {
+            if (Math.Abs(offset) > Precision.DoubleEpsilon) {
                 patternBeatmap.OffsetTime(offset);
             }
 
@@ -89,7 +89,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             // Keep just the timing point changes which are inside the parts.
             // These timing point changes have everything that is necessary for inside the parts of the pattern. (even timing)
             timingPointsChanges = timingPointsChanges.Where(tpc => parts.Any(part => 
-                part.StartTime <= tpc.MyTP.Offset && part.EndTime >= tpc.MyTP.Offset)).ToList();
+                part.StartTime <= tpc.MyTp.Offset && part.EndTime >= tpc.MyTp.Offset)).ToList();
 
             // Remove stuff
             if (PatternOverwriteMode != PatternOverwriteMode.NoOverwrite) {
@@ -270,7 +270,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 if (tp.Uninherited) {
                     lastSV = -100;
                 } else {
-                    if (Math.Abs(tp.MpB - lastSV) > Precision.DOUBLE_EPSILON) {
+                    if (Math.Abs(tp.MpB - lastSV) > Precision.DoubleEpsilon) {
                         svChanges.Add(tp.Copy());
                         lastSV = tp.MpB;
                     }
@@ -370,7 +370,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
                 // Minus 1 the offset so its possible to have a custom BPM redline right on the start time if you have 
                 // the default BPM redline before it.
-                var patternDefaultMpb = transformPatternTiming.GetMpBAtTime(startTime - 2 * Precision.DOUBLE_EPSILON);
+                var patternDefaultMpb = transformPatternTiming.GetMpBAtTime(startTime - 2 * Precision.DoubleEpsilon);
 
                 TimingPoint[] inPartRedlines;
                 TimingPoint startPartRedline;
@@ -378,11 +378,11 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     case TimingOverwriteMode.PatternTimingOnly:
                         // Subtract one from the end time to omit BPM changes right on the end of the part.
                         inPartRedlines = transformPatternTiming.GetRedlinesInRange(startTime,
-                            Math.Max(startTime, endTime - 2 * Precision.DOUBLE_EPSILON)).ToArray();
+                            Math.Max(startTime, endTime - 2 * Precision.DoubleEpsilon)).ToArray();
                         startPartRedline = transformPatternTiming.GetRedlineAtTime(startTime);
                         break;
                     case TimingOverwriteMode.InPatternAbsoluteTiming:
-                        var tempInPartRedlines = transformPatternTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DOUBLE_EPSILON);
+                        var tempInPartRedlines = transformPatternTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DoubleEpsilon);
 
                         // Replace all parts in the pattern which have the default BPM to timing from the target beatmap.
                         inPartRedlines = tempInPartRedlines.Select(tp => {
@@ -400,8 +400,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     case TimingOverwriteMode.InPatternRelativeTiming:
                         // Multiply mix the pattern timing and the original timing together.
                         // The pattern timing divided by the default BPM will be used as a scalar for the original timing.
-                        var tempInPartRedlines2 = transformPatternTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DOUBLE_EPSILON);
-                        var tempInOriginalRedlines = transformOriginalTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DOUBLE_EPSILON);
+                        var tempInPartRedlines2 = transformPatternTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DoubleEpsilon);
+                        var tempInOriginalRedlines = transformOriginalTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DoubleEpsilon);
 
                         // Replace all parts in the pattern which have the default BPM to timing from the target beatmap.
                         inPartRedlines = tempInPartRedlines2.Select(tp => {
@@ -420,7 +420,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                     default:  // Original timing only
                         // Subtract one from the end time to omit BPM changes right on the end of the part.
                         inPartRedlines = transformOriginalTiming.GetRedlinesInRange(startTime,
-                            Math.Max(startTime, endTime - 2 * Precision.DOUBLE_EPSILON)).ToArray();
+                            Math.Max(startTime, endTime - 2 * Precision.DoubleEpsilon)).ToArray();
                         startPartRedline = transformOriginalTiming.GetRedlineAtTime(startTime);
                         break;
                 }
@@ -433,9 +433,9 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 // and the redline may be way before that.
                 // This will probably only do something on the PatternTimingOnly mode as the other modes make sure
                 // the BPM at the start of the pattern will be the same as the original beatmap anyways.
-                if (Math.Abs(startPartRedline.MpB * bpmMultiplier - startOriginalRedline.MpB) > Precision.DOUBLE_EPSILON) {
+                if (Math.Abs(startPartRedline.MpB * bpmMultiplier - startOriginalRedline.MpB) > Precision.DoubleEpsilon) {
                     // We dont have to add the redline again if its already during the pattern.
-                    if (Math.Abs(startPartRedline.Offset - startTime) > Precision.DOUBLE_EPSILON) {
+                    if (Math.Abs(startPartRedline.Offset - startTime) > Precision.DoubleEpsilon) {
                         var copy = startPartRedline.Copy();
                         copy.Offset = startTime;
                         newTiming.Add(copy);
@@ -489,9 +489,9 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 // Add a redline at the end of the pattern to make sure the BPM goes back to normal after the pattern.
                 var endOriginalRedline = transformOriginalTiming.GetRedlineAtTime(endTime);
                 var endPartRedline = inPartRedlines.LastOrDefault() ?? startPartRedline;
-                if (Math.Abs(endPartRedline.MpB * bpmMultiplier - endOriginalRedline.MpB) > Precision.DOUBLE_EPSILON) {
+                if (Math.Abs(endPartRedline.MpB * bpmMultiplier - endOriginalRedline.MpB) > Precision.DoubleEpsilon) {
                     // We dont have to add the redline again if its already during the parts in between parts.
-                    if (Math.Abs(endOriginalRedline.Offset - endTime) > Precision.DOUBLE_EPSILON) {
+                    if (Math.Abs(endOriginalRedline.Offset - endTime) > Precision.DoubleEpsilon) {
                         var copy = endOriginalRedline.Copy();
                         copy.Offset = endTime;
                         newTiming.Add(copy);
@@ -507,7 +507,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
                 // Transform back the timing
                 transformNewTiming = newTiming.Copy();
                 foreach (var tp in transformNewTiming.TimingPoints) {
-                    tp.Offset = Math.Floor(newTiming.GetMilliseconds(tp.Offset, patternStartTime) + Precision.DOUBLE_EPSILON);
+                    tp.Offset = Math.Floor(newTiming.GetMilliseconds(tp.Offset, patternStartTime) + Precision.DoubleEpsilon);
                 }
 
                 // Transform back the parts
@@ -547,8 +547,8 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             }
 
             // Apply custom scale and rotate
-            if (Math.Abs(spatialScale - 1) > Precision.DOUBLE_EPSILON ||
-                Math.Abs(CustomRotate) > Precision.DOUBLE_EPSILON) {
+            if (Math.Abs(spatialScale - 1) > Precision.DoubleEpsilon ||
+                Math.Abs(CustomRotate) > Precision.DoubleEpsilon) {
                 // Create a transformation matrix for the custom scale and rotate
                 // The rotation is inverted because the default osu! rotation goes clockwise
                 Matrix2 transform = Matrix2.Mult(Matrix2.CreateScale(spatialScale), Matrix2.CreateRotation(-CustomRotate));
@@ -616,7 +616,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
             // Multiply BPM and divide SV
             foreach (var part in parts) {
-                foreach (var tp in transformNewTiming.GetRedlinesInRange(part.StartTime - 2 * Precision.DOUBLE_EPSILON, part.EndTime, false)) {
+                foreach (var tp in transformNewTiming.GetRedlinesInRange(part.StartTime - 2 * Precision.DoubleEpsilon, part.EndTime, false)) {
                     tp.MpB /= bpmMultiplier;  // MpB is the inverse of the BPM
                 }
 
@@ -629,7 +629,7 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
 
             // Add redlines
             timingPointsChanges = transformNewTiming.Redlines.Select(tp => 
-                new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness:Precision.DOUBLE_EPSILON)).ToList();
+                new TimingPointsChange(tp, mpb: true, meter: true, unInherited: true, omitFirstBarLine: true, fuzzyness:Precision.DoubleEpsilon)).ToList();
 
             // Add SliderVelocity changes for taiko and mania
             if (includePatternSliderVelocity && (targetMode == GameMode.Taiko || targetMode == GameMode.Mania)) {

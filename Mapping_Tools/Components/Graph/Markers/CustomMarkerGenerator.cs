@@ -41,7 +41,7 @@ namespace Mapping_Tools.Components.Graph.Markers {
             double vStart = Math.Ceiling((start - Offset) / step) * step + Offset;
             double v = vStart;
             int i = 0;
-            while (v <= end + Precision.DOUBLE_EPSILON) {
+            while (v <= end + Precision.DoubleEpsilon) {
                 string text = ValueToString != null ? ValueToString(v) : null;
                 yield return new GraphMarker {
                     Orientation = orientation,

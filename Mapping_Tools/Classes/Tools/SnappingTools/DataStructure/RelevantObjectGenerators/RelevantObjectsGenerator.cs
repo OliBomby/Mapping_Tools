@@ -44,18 +44,18 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
                 });
         }
 
-        private MethodInfo[] _generatorMethods;
+        private MethodInfo[] generatorMethods;
         public MethodInfo[] GetGeneratorMethods() {
-            if (_generatorMethods != null) return _generatorMethods;
+            if (generatorMethods != null) return generatorMethods;
             var methods = GetType().GetMethods().Where(m => CustomAttributeExtensions.GetCustomAttribute<RelevantObjectsGeneratorMethodAttribute>((MemberInfo) m) != null)
                 .ToArray();
             if (methods.Length == 0) {
                 throw new InvalidOperationException($@"Type {GetType()} does not have any generator method.");
             }
 
-            _generatorMethods = methods;
+            generatorMethods = methods;
 
-            return _generatorMethods;
+            return generatorMethods;
         }
 
         public static Type[] GetDependencies(MethodInfo generatorMethodInfo) {

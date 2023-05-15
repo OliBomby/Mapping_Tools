@@ -7,38 +7,38 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
     /// 
     /// </summary>
     public class Sample : BindableBase {
-        private SampleGeneratingArgs _sampleArgs;
-        private int _priority;
-        private double _outsideVolume;
-        private SampleSet _sampleSet;
-        private Hitsound _hitsound;
+        private SampleGeneratingArgs sampleArgs;
+        private int priority;
+        private double outsideVolume;
+        private SampleSet sampleSet;
+        private Hitsound hitsound;
 
         /// <summary>
         /// 
         /// </summary>
         public SampleGeneratingArgs SampleArgs {
-            get => _sampleArgs;
-            set => Set(ref _sampleArgs, value);
+            get => sampleArgs;
+            set => Set(ref sampleArgs, value);
         }
 
         public int Priority {
-            get => _priority;
-            set => Set(ref _priority, value);
+            get => priority;
+            set => Set(ref priority, value);
         }
 
         public double OutsideVolume {
-            get => _outsideVolume;
-            set => Set(ref _outsideVolume, value);
+            get => outsideVolume;
+            set => Set(ref outsideVolume, value);
         }
 
         public SampleSet SampleSet {
-            get => _sampleSet;
-            set => Set(ref _sampleSet, value);
+            get => sampleSet;
+            set => Set(ref sampleSet, value);
         }
 
         public Hitsound Hitsound {
-            get => _hitsound;
-            set => Set(ref _hitsound, value);
+            get => hitsound;
+            set => Set(ref hitsound, value);
         }
 
         public bool Normal => Hitsound == Hitsound.Normal;
@@ -47,27 +47,27 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public bool Clap => Hitsound == Hitsound.Clap;
 
         public Sample() {
-            _sampleArgs = new SampleGeneratingArgs();
-            _outsideVolume = 1;
-            _priority = 0;
-            _sampleSet = SampleSet.Normal;
-            _hitsound = Hitsound.Normal;
+            sampleArgs = new SampleGeneratingArgs();
+            outsideVolume = 1;
+            priority = 0;
+            sampleSet = SampleSet.Normal;
+            hitsound = Hitsound.Normal;
         }
 
         public Sample(SampleSet sampleSet, Hitsound hitsound, SampleGeneratingArgs sampleArgs, int priority, double outsideVolume) {
-            _sampleArgs = sampleArgs;
-            _outsideVolume = outsideVolume;
-            _priority = priority;
-            _sampleSet = sampleSet;
-            _hitsound = hitsound;
+            this.sampleArgs = sampleArgs;
+            this.outsideVolume = outsideVolume;
+            this.priority = priority;
+            this.sampleSet = sampleSet;
+            this.hitsound = hitsound;
         }
 
         public Sample(HitsoundLayer hl) {
-            _sampleArgs = hl.SampleArgs.Copy();  // Copy so any changes made to these sample args do not carry over to the layers
-            _outsideVolume = 1;
-            _priority = hl.Priority;
-            _sampleSet = hl.SampleSet;
-            _hitsound = hl.Hitsound;
+            sampleArgs = hl.SampleArgs.Copy();  // Copy so any changes made to these sample args do not carry over to the layers
+            outsideVolume = 1;
+            priority = hl.Priority;
+            sampleSet = hl.SampleSet;
+            hitsound = hl.Hitsound;
         }
 
         /// <summary>

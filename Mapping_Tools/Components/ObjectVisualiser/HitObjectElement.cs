@@ -11,13 +11,13 @@ using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 
 namespace Mapping_Tools.Components.ObjectVisualiser {
     public class HitObjectElement : FrameworkElement {
-        private SliderPath _sliderPath;
-        private List<Vector2> _controlPoints;
-        private Geometry _sliderPathGeometry;
-        private Rect _bounds;
-        private TranslateTransform _figureTranslate;
-        private double _scale;
-        private Transform _figureTransform;
+        private SliderPath sliderPath;
+        private List<Vector2> controlPoints;
+        private Geometry sliderPathGeometry;
+        private Rect bounds;
+        private TranslateTransform figureTranslate;
+        private double scale;
+        private Transform figureTransform;
 
         public const double MaxPixelLength = 1e6;
         public const double MaxSegmentCount = 1e6;
@@ -175,20 +175,20 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         }
 
         private void UpdateBounds() {
-            if (_sliderPathGeometry is null) return;
-            _bounds = _sliderPathGeometry.Bounds;
-            _bounds.Inflate(Thickness * 0.5, Thickness * 0.5);
+            if (sliderPathGeometry is null) return;
+            bounds = sliderPathGeometry.Bounds;
+            bounds.Inflate(Thickness * 0.5, Thickness * 0.5);
             UpdateTransform();
         }
 
         private void UpdateTransform() {
-            _scale = Math.Min(ActualWidth / _bounds.Width,
-                ActualHeight / _bounds.Height);
-            _figureTranslate = new TranslateTransform(-_bounds.Left, -_bounds.Top);
-            _figureTransform = new TransformGroup {
+            scale = Math.Min(ActualWidth / bounds.Width,
+                ActualHeight / bounds.Height);
+            figureTranslate = new TranslateTransform(-bounds.Left, -bounds.Top);
+            figureTransform = new TransformGroup {
                 Children = new TransformCollection {
-                    _figureTranslate,
-                    new ScaleTransform(_scale, _scale, 0, 0)
+                    figureTranslate,
+                    new ScaleTransform(scale, scale, 0, 0)
                 }
             };
             InvalidateVisual();
@@ -199,14 +199,14 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             
             if (HitObject == null) return;
 
-            drawingContext.PushTransform(_figureTransform);
+            drawingContext.PushTransform(figureTransform);
 
             var outlinePen = GetOutlinePen();
             var blackOutlinePen = GetBlackFinePen();
             
-            if (HitObject.IsSlider && _sliderPathGeometry != null) {
-                drawingContext.DrawGeometry(null, GetPathOutlinePen(), _sliderPathGeometry);
-                drawingContext.DrawGeometry(null, GetPathFillPen(), _sliderPathGeometry);
+            if (HitObject.IsSlider && sliderPathGeometry != null) {
+                drawingContext.DrawGeometry(null, GetPathOutlinePen(), sliderPathGeometry);
+                drawingContext.DrawGeometry(null, GetPathFillPen(), sliderPathGeometry);
 
                 DrawCircleAtProgress(drawingContext, Fill, outlinePen, 0);
                 DrawCircleAtProgress(drawingContext, Fill, outlinePen, 1);
@@ -215,9 +215,9 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                     DrawCircleAtProgress(drawingContext, Fill, GetSliderBallPen(), Progress);
                 }
 
-                if (ShowAnchors && _controlPoints.Count <= MaxAnchorCount) {
+                if (ShowAnchors && controlPoints.Count <= MaxAnchorCount) {
                     // Draw the lines between the anchors
-                    var anchors = _controlPoints;
+                    var anchors = controlPoints;
                     var controlPointLinePen = GetWhiteFinePen();
                     for (var i = 0; i < anchors.Count - 1; i++) {
                         DrawLine(drawingContext, controlPointLinePen, anchors[i], anchors[i + 1]);
@@ -263,7 +263,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         }
 
         private void DrawCircleAtProgress(DrawingContext ctx, Brush brush, Pen pen, double progress, double size = 1) {
-            var pos = _sliderPath.PositionAt(progress);
+            var pos = sliderPath.PositionAt(progress);
             DrawCircle(ctx, brush, pen, pos, size);
         }
 
@@ -272,7 +272,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         }
 
         private void DrawSquareAtProgress(DrawingContext ctx, Brush brush, Pen pen, double progress, double size = 1) {
-            var pos = _sliderPath.PositionAt(progress);
+            var pos = sliderPath.PositionAt(progress);
             DrawSquare(ctx, brush, pen, pos, size);
         }
 
@@ -322,13 +322,13 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                     }
                 }
 
-                _sliderPath = path;
-                _controlPoints = path.ControlPoints;
-                _sliderPathGeometry = geom;
+                sliderPath = path;
+                controlPoints = path.ControlPoints;
+                sliderPathGeometry = geom;
                 UpdateBounds();
             } else {
                 var point = new Point(hitObject.Pos.X, hitObject.Pos.Y);
-                _sliderPathGeometry = new LineGeometry(point, point);
+                sliderPathGeometry = new LineGeometry(point, point);
                 UpdateBounds();
             }
         }

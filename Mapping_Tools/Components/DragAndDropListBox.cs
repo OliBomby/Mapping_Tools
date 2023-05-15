@@ -7,7 +7,7 @@ using System.Windows.Media;
 
 namespace Mapping_Tools.Components {
     public class DragAndDropListBox<T> : ListBox where T : class {
-        private Point _dragStartPoint;
+        private Point dragStartPoint;
 
         public DragAndDropListBox() {
             PreviewMouseMove += ListBox_PreviewMouseMove;
@@ -44,7 +44,7 @@ namespace Mapping_Tools.Components {
 
         private void ListBox_PreviewMouseMove(object sender, MouseEventArgs e) {
             var point = e.GetPosition(null);
-            var diff = _dragStartPoint - point;
+            var diff = dragStartPoint - point;
             if (e.LeftButton != MouseButtonState.Pressed ||
                 !(Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance) &&
                 !(Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)) return;
@@ -53,7 +53,7 @@ namespace Mapping_Tools.Components {
         }
 
         private void ListBoxItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
-            _dragStartPoint = e.GetPosition(null);
+            dragStartPoint = e.GetPosition(null);
         }
 
         private void ListBoxItem_Drop(object sender, DragEventArgs e) {

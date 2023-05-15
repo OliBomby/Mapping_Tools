@@ -32,8 +32,8 @@ namespace Mapping_Tools.Views.SliderCompletionator {
         /// <inheritdoc />
         public SliderCompletionatorView() {
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             DataContext = new SliderCompletionatorVm();
             ProjectManager.LoadProject(this, message: false);
         }
@@ -175,8 +175,8 @@ namespace Mapping_Tools.Views.SliderCompletionator {
                             ho.SliderVelocity = arg.RemoveSliderTicks ? double.NaN : -100;
 
                             // Add redlines
-                            timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
-                            timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DOUBLE_EPSILON));
+                            timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon));
+                            timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon));
 
                             ho.Time -= 1;
                         }
@@ -184,7 +184,7 @@ namespace Mapping_Tools.Views.SliderCompletionator {
                         TimingPoint tp = ho.TimingPoint.Copy();
                         tp.Offset = ho.Time;
                         tp.MpB = ho.SliderVelocity;
-                        timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, fuzzyness: Precision.DOUBLE_EPSILON));
+                        timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true, fuzzyness: Precision.DoubleEpsilon));
                     }
                 }
 

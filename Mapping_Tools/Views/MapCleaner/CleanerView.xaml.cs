@@ -20,11 +20,11 @@ namespace Mapping_Tools.Views.MapCleaner {
     [VerticalContentScroll]
     [HorizontalContentScroll]
     public partial class CleanerView : IQuickRun, ISavable<MapCleanerVm> {
-        private List<double> _timingpointsRemoved;
-        private List<double> _timingpointsAdded;
-        private List<double> _timingpointsChanged;
-        private double _endTimeMonitor;
-        private TimeLine _tl;
+        private List<double> timingpointsRemoved;
+        private List<double> timingpointsAdded;
+        private List<double> timingpointsChanged;
+        private double endTimeMonitor;
+        private TimeLine tl;
 
         /// <summary>
         /// 
@@ -46,8 +46,8 @@ namespace Mapping_Tools.Views.MapCleaner {
         /// </summary>
         public CleanerView() {
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             DataContext = new MapCleanerVm();
             ProjectManager.LoadProject(this, message: false);
 
@@ -146,7 +146,7 @@ namespace Mapping_Tools.Views.MapCleaner {
 
         private void Monitor_Differences(IReadOnlyList<TimingPoint> originalTimingPoints, IReadOnlyList<TimingPoint> newTimingPoints) {
             // Take note of all the changes
-            _timingpointsChanged = new List<double>();
+            timingpointsChanged = new List<double>();
 
             var originalInNew = (from first in originalTimingPoints
                                  join second in newTimingPoints
@@ -160,12 +160,12 @@ namespace Mapping_Tools.Views.MapCleaner {
             
             foreach (TimingPoint tp in originalInNew) {
                 bool different = true;
-                List<TimingPoint> newTPs = newInOriginal.Where(o => Math.Abs(o.Offset - tp.Offset) < Precision.DOUBLE_EPSILON).ToList();
+                List<TimingPoint> newTPs = newInOriginal.Where(o => Math.Abs(o.Offset - tp.Offset) < Precision.DoubleEpsilon).ToList();
                 if (newTPs.Count == 0) { different = false; }
                 foreach (TimingPoint newTp in newTPs) {
                     if (tp.Equals(newTp)) { different = false; }
                 }
-                if (different) { _timingpointsChanged.Add(tp.Offset); }
+                if (different) { timingpointsChanged.Add(tp.Offset); }
             }
 
             List<double> originalOffsets = new List<double>();
@@ -177,28 +177,28 @@ namespace Mapping_Tools.Views.MapCleaner {
                 newOffsets.Add(newTimingPoint.Offset);
             }
 
-            _timingpointsRemoved = originalOffsets.Except(newOffsets).ToList();
-            _timingpointsAdded = newOffsets.Except(originalOffsets).ToList();
+            timingpointsRemoved = originalOffsets.Except(newOffsets).ToList();
+            timingpointsAdded = newOffsets.Except(originalOffsets).ToList();
             double endTimeOriginal = originalTimingPoints.Count > 0 ? originalTimingPoints.Last().Offset : 0;
             double endTimeNew = newTimingPoints.Count > 0 ? newTimingPoints.Last().Offset : 0;
-            _endTimeMonitor = Math.Max(endTimeOriginal, endTimeNew);
+            endTimeMonitor = Math.Max(endTimeOriginal, endTimeNew);
         }
 
         private void FillTimeLine() {
-            _tl?.mainCanvas.Children.Clear();
+            tl?.MainCanvas.Children.Clear();
             try {
-                _tl = new TimeLine(MainWindow.AppWindow.MainContentGrid.ActualWidth, 100.0, _endTimeMonitor);
-                foreach (double timingS in _timingpointsAdded) {
-                    _tl.AddElement(timingS, 1);
+                tl = new TimeLine(MainWindow.AppWindow.MainContentGrid.ActualWidth, 100.0, endTimeMonitor);
+                foreach (double timingS in timingpointsAdded) {
+                    tl.AddElement(timingS, 1);
                 }
-                foreach (double timingS in _timingpointsChanged) {
-                    _tl.AddElement(timingS, 2);
+                foreach (double timingS in timingpointsChanged) {
+                    tl.AddElement(timingS, 2);
                 }
-                foreach (double timingS in _timingpointsRemoved) {
-                    _tl.AddElement(timingS, 3);
+                foreach (double timingS in timingpointsRemoved) {
+                    tl.AddElement(timingS, 3);
                 }
-                tl_host.Children.Clear();
-                tl_host.Children.Add(_tl);
+                TlHost.Children.Clear();
+                TlHost.Children.Add(tl);
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
             }

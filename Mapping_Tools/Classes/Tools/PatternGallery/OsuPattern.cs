@@ -12,59 +12,59 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class OsuPattern : BindableBase {
         #region Fields
 
-        private bool _isSelected;
+        private bool isSelected;
         [JsonIgnore]
         public bool IsSelected {
-            get => _isSelected;
-            set => Set(ref _isSelected, value);
+            get => isSelected;
+            set => Set(ref isSelected, value);
         }
 
-        private string _name;
+        private string name;
         public string Name {
-            get => _name;
-            set => Set(ref _name, value);
+            get => name;
+            set => Set(ref name, value);
         }
 
-        private DateTime _creationTime;
+        private DateTime creationTime;
         public DateTime CreationTime {
-            get => _creationTime;
-            set => Set(ref _creationTime, value);
+            get => creationTime;
+            set => Set(ref creationTime, value);
         }
 
-        private DateTime _lastUsedTime;
+        private DateTime lastUsedTime;
         public DateTime LastUsedTime {
-            get => _lastUsedTime;
-            set => Set(ref _lastUsedTime, value);
+            get => lastUsedTime;
+            set => Set(ref lastUsedTime, value);
         }
 
-        private int _useCount;
+        private int useCount;
         public int UseCount {
-            get => _useCount;
-            set => Set(ref _useCount, value);
+            get => useCount;
+            set => Set(ref useCount, value);
         }
 
-        private string _fileName;
+        private string fileName;
         public string FileName {
-            get => _fileName;
-            set => Set(ref _fileName, value);
+            get => fileName;
+            set => Set(ref fileName, value);
         }
 
-        private int _objectCount;
+        private int objectCount;
         public int ObjectCount {
-            get => _objectCount;
-            set => Set(ref _objectCount, value);
+            get => objectCount;
+            set => Set(ref objectCount, value);
         }
 
-        private TimeSpan _duration;
+        private TimeSpan duration;
         public TimeSpan Duration {
-            get => _duration;
-            set => Set(ref _duration, value);
+            get => duration;
+            set => Set(ref duration, value);
         }
 
-        private double _beatLength;
+        private double beatLength;
         public double BeatLength {
-            get => _beatLength;
-            set => Set(ref _beatLength, value);
+            get => beatLength;
+            set => Set(ref beatLength, value);
         }
 
         #endregion

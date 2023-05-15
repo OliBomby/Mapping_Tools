@@ -125,6 +125,11 @@
                     ToolTip="Don't copy storyboarded samples that are already played by the hitsounds. You can use this if you like to have the storyboard play missing hitsounds."
                     Visibility="{Binding Path=IsChecked, ElementName=CopyStoryboardedSamplesBox, UpdateSourceTrigger=PropertyChanged,  
                                  Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
+                <CheckBox IsChecked="{Binding IgnoreWheneverHitsound}"
+                          Content="Ignore samples whenever there is any hitsound" Margin="20,0,0,0"
+                          ToolTip="Don't copy storyboarded samples whenever a hitsound is played. You can use this if you like to have the storyboard play missing hitsounds and hitsounds may be mixed."
+                          Visibility="{Binding Path=IsChecked, ElementName=CopyStoryboardedSamplesBox, UpdateSourceTrigger=PropertyChanged,
+                                 Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"/>
                 <CheckBox IsChecked="{Binding CopyToSliderTicks}" Content="Copy to slider ticks"
                           IsEnabled="{Binding SmartCopyModeSelected}"
                           ToolTip="With this option enabled, Hitsound Copier will try to assign custom samples to slider ticks when there is no other object to copy hitsounds to. New sample files will be generated which you'll have to put in your mapset folder. Only works for 'Overwrite only defined' copy mode."/>

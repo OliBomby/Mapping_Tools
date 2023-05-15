@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d">
-    <Canvas x:Name="mainCanvas" Width="Auto">
+    <Canvas x:Name="MainCanvas" Width="Auto">
         
     </Canvas>
 </UserControl>

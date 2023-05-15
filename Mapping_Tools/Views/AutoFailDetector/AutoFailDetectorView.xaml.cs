@@ -15,11 +15,11 @@ namespace Mapping_Tools.Views.AutoFailDetector {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
     [VerticalContentScroll]
     public partial class AutoFailDetectorView : IQuickRun {
-        private List<double> _unloadingObjects;
-        private List<double> _potentialUnloadingObjects;
-        private List<double> _potentialDisruptors;
-        private double _endTimeMonitor;
-        private TimeLine _tl;
+        private List<double> unloadingObjects;
+        private List<double> potentialUnloadingObjects;
+        private List<double> potentialDisruptors;
+        private double endTimeMonitor;
+        private TimeLine tl;
 
         /// <summary>
         /// 
@@ -41,8 +41,8 @@ namespace Mapping_Tools.Views.AutoFailDetector {
         /// </summary>
         public AutoFailDetectorView() {
             InitializeComponent();
-            Width = MainWindow.AppWindow.content_views.Width;
-            Height = MainWindow.AppWindow.content_views.Height;
+            Width = MainWindow.AppWindow.ContentViews.Width;
+            Height = MainWindow.AppWindow.ContentViews.Height;
             DataContext = new AutoFailDetectorVm();
 
             // It's important to see the results
@@ -131,12 +131,12 @@ namespace Mapping_Tools.Views.AutoFailDetector {
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(67);
 
             // Set the timeline lists
-            _unloadingObjects = args.ShowUnloadingObjects ? autoFailDetector.UnloadingObjects : new List<double>();
-            _potentialUnloadingObjects = args.ShowPotentialUnloadingObjects ? autoFailDetector.PotentialUnloadingObjects : new List<double>();
-            _potentialDisruptors = args.ShowPotentialDisruptors ? autoFailDetector.Disruptors : new List<double>();
+            unloadingObjects = args.ShowUnloadingObjects ? autoFailDetector.UnloadingObjects : new List<double>();
+            potentialUnloadingObjects = args.ShowPotentialUnloadingObjects ? autoFailDetector.PotentialUnloadingObjects : new List<double>();
+            potentialDisruptors = args.ShowPotentialDisruptors ? autoFailDetector.Disruptors : new List<double>();
 
             // Set end time for the timeline
-            _endTimeMonitor = mapEndTime;
+            endTimeMonitor = mapEndTime;
 
             // Complete progressbar
             if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
@@ -151,20 +151,20 @@ namespace Mapping_Tools.Views.AutoFailDetector {
 
 
         private void FillTimeLine() {
-            _tl?.mainCanvas.Children.Clear();
+            tl?.MainCanvas.Children.Clear();
             try {
-                _tl = new TimeLine(MainWindow.AppWindow.MainContentGrid.ActualWidth, 100.0, _endTimeMonitor);
-                foreach (double timingS in _potentialUnloadingObjects) {
-                    _tl.AddElement(timingS, 1);
+                tl = new TimeLine(MainWindow.AppWindow.MainContentGrid.ActualWidth, 100.0, endTimeMonitor);
+                foreach (double timingS in potentialUnloadingObjects) {
+                    tl.AddElement(timingS, 1);
                 }
-                foreach (double timingS in _potentialDisruptors) {
-                    _tl.AddElement(timingS, 4);
+                foreach (double timingS in potentialDisruptors) {
+                    tl.AddElement(timingS, 4);
                 }
-                foreach (double timingS in _unloadingObjects) {
-                    _tl.AddElement(timingS, 3);
+                foreach (double timingS in unloadingObjects) {
+                    tl.AddElement(timingS, 3);
                 }
-                tl_host.Children.Clear();
-                tl_host.Children.Add(_tl);
+                TlHost.Children.Clear();
+                TlHost.Children.Add(tl);
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
             }

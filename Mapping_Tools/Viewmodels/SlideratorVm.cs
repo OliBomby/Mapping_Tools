@@ -18,58 +18,58 @@ using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Viewmodels {
     public class SlideratorVm : BindableBase {
-        private ObservableCollection<HitObject> _loadedHitObjects;
-        private HitObject _visibleHitObject;
-        private int _visibleHitObjectIndex;
-        private double _pixelLength;
-        private double _globalSv;
-        private double _graphBeats;
-        private double _beatsPerMinute;
-        private int _beatSnapDivisor;
-        private TimeSpan _graphDuration;
-        private double _svGraphMultiplier;
-        private ImportMode _importModeSetting;
-        private string _timeCode;
-        private Visibility _timeCodeBoxVisibility;
-        private double _exportTime;
-        private ExportMode _exportModeSetting;
-        private GraphMode _graphModeSetting;
-        private double _velocityLimit;
-        private bool _showRedAnchors;
-        private bool _showGraphAnchors;
-        private bool _manualVelocity;
-        private double _newVelocity;
-        private double _minDendrite;
-        private double _distanceTraveled;
-        private bool _delegateToBpm;
-        private bool _removeSliderTicks;
-        private bool _exportAsNormal;
-        private bool _exportAsStream;
-        private bool _exportAsInvisibleSlider;
+        private ObservableCollection<HitObject> loadedHitObjects;
+        private HitObject visibleHitObject;
+        private int visibleHitObjectIndex;
+        private double pixelLength;
+        private double globalSv;
+        private double graphBeats;
+        private double beatsPerMinute;
+        private int beatSnapDivisor;
+        private TimeSpan graphDuration;
+        private double svGraphMultiplier;
+        private ImportMode importModeSetting;
+        private string timeCode;
+        private Visibility timeCodeBoxVisibility;
+        private double exportTime;
+        private ExportMode exportModeSetting;
+        private GraphMode graphModeSetting;
+        private double velocityLimit;
+        private bool showRedAnchors;
+        private bool showGraphAnchors;
+        private bool manualVelocity;
+        private double newVelocity;
+        private double minDendrite;
+        private double distanceTraveled;
+        private bool delegateToBpm;
+        private bool removeSliderTicks;
+        private bool exportAsNormal;
+        private bool exportAsStream;
+        private bool exportAsInvisibleSlider;
 
         #region Properties
 
         public ObservableCollection<HitObject> LoadedHitObjects {
-            get => _loadedHitObjects;
+            get => loadedHitObjects;
             set => SetLoadedHitObjects(value);
         }
 
         [JsonIgnore]
         public HitObject VisibleHitObject {
-            get => _visibleHitObject;
+            get => visibleHitObject;
             set => SetCurrentHitObject(value);
         }
 
         public int VisibleHitObjectIndex {
-            get => _visibleHitObjectIndex;
+            get => visibleHitObjectIndex;
             set => SetCurrentHitObjectIndex(value);
         }
         
         [JsonIgnore]
         public double PixelLength {
-            get => _pixelLength;
+            get => pixelLength;
             set {
-                if (!Set(ref _pixelLength, value)) return;
+                if (!Set(ref pixelLength, value)) return;
                 UpdateSvGraphMultiplier();
                 if (VisibleHitObject == null) return;
                 VisibleHitObject.PixelLength = value;
@@ -77,9 +77,9 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public double GlobalSv {
-            get => _globalSv;
+            get => globalSv;
             set {
-                if (!Set(ref _globalSv, value)) return;
+                if (!Set(ref globalSv, value)) return;
                 UpdateSvGraphMultiplier();
                 RaisePropertyChanged(nameof(ExpectedSegments));
             } 
@@ -87,9 +87,9 @@ namespace Mapping_Tools.Viewmodels {
         
         [JsonIgnore]
         public double GraphBeats {
-            get => _graphBeats;
+            get => graphBeats;
             set {
-                if (!Set(ref _graphBeats, value)) return;
+                if (!Set(ref graphBeats, value)) return;
                 UpdateAnimationDuration();
                 RaisePropertyChanged(nameof(ExpectedSegments));
                 if (VisibleHitObject == null) return;
@@ -99,9 +99,9 @@ namespace Mapping_Tools.Viewmodels {
         
         [JsonIgnore]
         public double BeatsPerMinute {
-            get => _beatsPerMinute;
+            get => beatsPerMinute;
             set {
-                if (!Set(ref _beatsPerMinute, value)) return;
+                if (!Set(ref beatsPerMinute, value)) return;
                 UpdateAnimationDuration();
                 if (VisibleHitObject == null) return;
                 VisibleHitObject.TemporalLength = GraphBeats / value * 60000;
@@ -110,24 +110,24 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public int BeatSnapDivisor {
-            get => _beatSnapDivisor;
-            set => Set(ref _beatSnapDivisor, value);
+            get => beatSnapDivisor;
+            set => Set(ref beatSnapDivisor, value);
         }
         
         [JsonIgnore]
         public TimeSpan GraphDuration {
-            get => _graphDuration;
-            set => Set(ref _graphDuration, value);
+            get => graphDuration;
+            set => Set(ref graphDuration, value);
         }
         
         [JsonIgnore]
         public double SvGraphMultiplier {
-            get => _svGraphMultiplier;
-            set => Set(ref _svGraphMultiplier, value);
+            get => svGraphMultiplier;
+            set => Set(ref svGraphMultiplier, value);
         }
 
         public ImportMode ImportModeSetting {
-            get => _importModeSetting;
+            get => importModeSetting;
             set => SetImportMode(value);
         }
 
@@ -135,79 +135,79 @@ namespace Mapping_Tools.Viewmodels {
         public IEnumerable<ImportMode> ImportModes => Enum.GetValues(typeof(ImportMode)).Cast<ImportMode>();
 
         public string TimeCode {
-            get => _timeCode;
-            set => Set(ref _timeCode, value);
+            get => timeCode;
+            set => Set(ref timeCode, value);
         }
 
         public Visibility TimeCodeBoxVisibility {
-            get => _timeCodeBoxVisibility;
-            set => Set(ref _timeCodeBoxVisibility, value);
+            get => timeCodeBoxVisibility;
+            set => Set(ref timeCodeBoxVisibility, value);
         }
 
         public double ExportTime {
-            get => _exportTime;
+            get => exportTime;
             set {
-                if (!Set(ref _exportTime, value)) return;
+                if (!Set(ref exportTime, value)) return;
                 if (VisibleHitObject == null) return;
                 VisibleHitObject.Time = value;
             }
         }
 
         public ExportMode ExportModeSetting {
-            get => _exportModeSetting;
-            set => Set(ref _exportModeSetting, value);
+            get => exportModeSetting;
+            set => Set(ref exportModeSetting, value);
         }
         
         [JsonIgnore]
         public IEnumerable<ExportMode> ExportModes => Enum.GetValues(typeof(ExportMode)).Cast<ExportMode>();
 
         public GraphMode GraphModeSetting {
-            get => _graphModeSetting;
-            set => Set(ref _graphModeSetting, value);
+            get => graphModeSetting;
+            set => Set(ref graphModeSetting, value);
         }
 
         public double VelocityLimit {
-            get => _velocityLimit;
-            set => Set(ref _velocityLimit, value);
+            get => velocityLimit;
+            set => Set(ref velocityLimit, value);
         }
 
         public bool ShowRedAnchors {
-            get => _showRedAnchors;
-            set => Set(ref _showRedAnchors, value);
+            get => showRedAnchors;
+            set => Set(ref showRedAnchors, value);
         }
 
         public bool ShowGraphAnchors {
-            get => _showGraphAnchors;
-            set => Set(ref _showGraphAnchors, value);
+            get => showGraphAnchors;
+            set => Set(ref showGraphAnchors, value);
         }
 
         public bool ManualVelocity {
-            get => _manualVelocity;
-            set => Set(ref _manualVelocity, value);
+            get => manualVelocity;
+            set => Set(ref manualVelocity, value);
         }
 
         public double NewVelocity {
-            get => _newVelocity;
+            get => newVelocity;
             set  {
-                if (Set(ref _newVelocity, value)) {
+                if (Set(ref newVelocity, value)) {
                     RaisePropertyChanged(nameof(ExpectedSegments));
                 }
             }
         }
 
         public double MinDendrite {
-            get => _minDendrite;
+            get => minDendrite;
             set {
-                if (Set(ref _minDendrite, value)) {
+                if (Set(ref minDendrite, value)) {
                     RaisePropertyChanged(nameof(ExpectedSegments));
                 }
             }
         }
 
         public double DistanceTraveled {
-            get => _distanceTraveled;
+            get => distanceTraveled;
             set {
-                if (Set(ref _distanceTraveled, value)) {
+                if (Set(ref distanceTraveled, value)) {
                     RaisePropertyChanged(nameof(ExpectedSegments));
                 }
             }
@@ -228,37 +228,37 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         public bool DelegateToBpm {
-            get => _delegateToBpm;
-            set => Set(ref _delegateToBpm, value);
+            get => delegateToBpm;
+            set => Set(ref delegateToBpm, value);
         }
 
         public bool RemoveSliderTicks {
-            get => _removeSliderTicks;
-            set => Set(ref _removeSliderTicks, value);
+            get => removeSliderTicks;
+            set => Set(ref removeSliderTicks, value);
         }
 
         public bool ExportAsNormal {
-            get => _exportAsNormal;
+            get => exportAsNormal;
             set {
-                if (Set(ref _exportAsNormal, value)) {
+                if (Set(ref exportAsNormal, value)) {
                     RaisePropertyChanged(nameof(ExpectedSegments));
                 }
             }
         }
 
         public bool ExportAsStream {
-            get => _exportAsStream;
+            get => exportAsStream;
             set {
-                if (Set(ref _exportAsStream, value)) {
+                if (Set(ref exportAsStream, value)) {
                     RaisePropertyChanged(nameof(ExpectedSegments));
                 }
             }
         }
 
         public bool ExportAsInvisibleSlider {
-            get => _exportAsInvisibleSlider;
+            get => exportAsInvisibleSlider;
             set {
-                if (Set(ref _exportAsInvisibleSlider, value)) {
+                if (Set(ref exportAsInvisibleSlider, value)) {
                     RaisePropertyChanged(nameof(ExpectedSegments));
                 }
             }
@@ -316,7 +316,7 @@ namespace Mapping_Tools.Viewmodels {
             ExportAsNormal = true;
 
             ImportCommand = new CommandImplementation(_ => Import(ImportModeSetting == ImportMode.Selected ? 
-                IOHelper.GetCurrentBeatmapOrCurrentBeatmap() : 
+                IOHelper.GetCurrentBeatmapOrCurrentBeatmap() :
                 MainWindow.AppWindow.GetCurrentMaps()[0])
             );
             MoveLeftCommand = new CommandImplementation(_ => {
@@ -430,7 +430,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void SetLoadedHitObjects(ObservableCollection<HitObject> value) {
-            Set(ref _loadedHitObjects, value, nameof(LoadedHitObjects), () => {
+            Set(ref loadedHitObjects, value, nameof(LoadedHitObjects), () => {
                 LoadedHitObjects.CollectionChanged += LoadedHitObjectsOnCollectionChanged;
                 if (LoadedHitObjects.Count == 0) return;
                 if (VisibleHitObjectIndex == 0) {
@@ -449,7 +449,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void SetCurrentHitObject(HitObject value) {
-            Set(ref _visibleHitObject, value, nameof(VisibleHitObject), () => {
+            Set(ref visibleHitObject, value, nameof(VisibleHitObject), () => {
                 if (VisibleHitObject.UnInheritedTimingPoint == null) return;
                 // Gotta watch out because the BPM and GraphBeats edit the TemporalLength of the VisibleHitObject
                 var temporalLengthTemp = VisibleHitObject.TemporalLength;
@@ -461,7 +461,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void SetCurrentHitObjectIndex(int value) {
-            Set(ref _visibleHitObjectIndex, value, nameof(VisibleHitObjectIndex), () => {
+            Set(ref visibleHitObjectIndex, value, nameof(VisibleHitObjectIndex), () => {
                 if (VisibleHitObjectIndex < 0 || VisibleHitObjectIndex >= LoadedHitObjects.Count) return;
                 VisibleHitObject = LoadedHitObjects[VisibleHitObjectIndex];
             });
@@ -477,7 +477,7 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void SetImportMode(ImportMode value) {
-            if (!Set(ref _importModeSetting, value, nameof(ImportMode))) return;
+            if (!Set(ref importModeSetting, value, nameof(ImportMode))) return;
             TimeCodeBoxVisibility = ImportModeSetting == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
         }
 

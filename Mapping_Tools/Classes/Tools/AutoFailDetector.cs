@@ -9,21 +9,21 @@ using System.Windows;
 namespace Mapping_Tools.Classes.Tools {
     public class AutoFailDetector {
         private class ProblemArea {
-            public int index;
-            public HitObject unloadableHitObject;
-            public HashSet<HitObject> disruptors;
-            public HashSet<int> timesToCheck;
+            public int Index;
+            public HitObject UnloadableHitObject;
+            public HashSet<HitObject> Disruptors;
+            public HashSet<int> TimesToCheck;
 
             public int GetStartTime() {
-                return (int)unloadableHitObject.Time;
+                return (int)UnloadableHitObject.Time;
             }
 
             public int GetEndTime() {
-                return (int)unloadableHitObject.EndTime;
+                return (int)UnloadableHitObject.EndTime;
             }
         }
 
-        private const int maxPaddingCount = 2000;
+        private const int MaxPaddingCount = 2000;
 
         private readonly int mapStartTime;
         private readonly int mapEndTime;
@@ -91,7 +91,7 @@ namespace Mapping_Tools.Classes.Tools {
                 // Added a check for the end time to prevent weird situations with the endIndex caused by negative duration.
                 if (problemAreas.Count > 0 && !negative) {
                     // Lower end time means that it will be loaded alongside the previous problem area.
-                    var lastAdjEndTime = GetAdjustedEndTime(problemAreas.Last().unloadableHitObject);
+                    var lastAdjEndTime = GetAdjustedEndTime(problemAreas.Last().UnloadableHitObject);
                     if (adjEndTime <= lastAdjEndTime) {
                         continue;
                     }
@@ -128,14 +128,14 @@ namespace Mapping_Tools.Classes.Tools {
                 var timesToCheck = new HashSet<int>(timesToCheckStartIndex.GetViewBetween(
                     firstRequiredLoadTime, firstRequiredLoadTime + physicsTime)) {firstRequiredLoadTime + physicsTime};
 
-                problemAreas.Add(new ProblemArea { index = i, unloadableHitObject = ho, disruptors = disruptors, timesToCheck = timesToCheck });
+                problemAreas.Add(new ProblemArea { Index = i, UnloadableHitObject = ho, Disruptors = disruptors, TimesToCheck = timesToCheck });
                 PotentialUnloadingObjects.Add(ho.Time);
             }
 
             int autoFails = 0;
             // Use osu!'s object loading algorithm to find out which objects are actually loaded
             foreach (var problemArea in problemAreas) {
-                foreach (var time in problemArea.timesToCheck) {
+                foreach (var time in problemArea.TimesToCheck) {
                     var minimalLeft = time - approachTime;
                     var minimalRight = time + approachTime;
 
@@ -147,8 +147,8 @@ namespace Mapping_Tools.Classes.Tools {
 
                     var hitObjectsMinimal = hitObjects.GetRange(startIndex, 1 + endIndex - startIndex);
 
-                    if (!hitObjectsMinimal.Contains(problemArea.unloadableHitObject) || time > autoFailCheckTime) {
-                        UnloadingObjects.Add(problemArea.unloadableHitObject.Time);
+                    if (!hitObjectsMinimal.Contains(problemArea.UnloadableHitObject) || time > autoFailCheckTime) {
+                        UnloadingObjects.Add(problemArea.UnloadableHitObject.Time);
                         autoFails++;
                         break;
                     }
@@ -215,7 +215,7 @@ namespace Mapping_Tools.Classes.Tools {
                         ? $"Extra objects before {problemAreas[i].GetStartTime()}: {paddingSolution[i]}"
                         : $"Extra objects between {lastTime} - {problemAreas[i].GetStartTime()}: {paddingSolution[i]}");
                 }
-                lastTime = GetAdjustedEndTime(problemAreas[i].unloadableHitObject) - approachTime;
+                lastTime = GetAdjustedEndTime(problemAreas[i].UnloadableHitObject) - approachTime;
             }
 
             if (!(placementTimes != null && !placementTimes[^1].HasValue) && paddingSolution[^1] > 0) {
@@ -240,7 +240,7 @@ namespace Mapping_Tools.Classes.Tools {
                     }
                 }
 
-                lastTime = GetAdjustedEndTime(problemAreas[i].unloadableHitObject) - approachTime;
+                lastTime = GetAdjustedEndTime(problemAreas[i].UnloadableHitObject) - approachTime;
             }
 
             if (paddingSolution.Last() > 0) {
@@ -267,7 +267,7 @@ namespace Mapping_Tools.Classes.Tools {
                 var t = GetSafePlacementTime(lastTime, problemAreas[i].GetStartTime());
                 allSafePlacementTimes[i] = t;
 
-                lastTime = GetAdjustedEndTime(problemAreas[i].unloadableHitObject) - approachTime;
+                lastTime = GetAdjustedEndTime(problemAreas[i].UnloadableHitObject) - approachTime;
             }
             allSafePlacementTimes[allSafePlacementTimes.Length - 1] = GetSafePlacementTime(lastTime, autoFailCheckTime - physicsTime);
 
@@ -292,7 +292,7 @@ namespace Mapping_Tools.Classes.Tools {
             int padding = startPaddingCount;
             int[] solution;
             while (!SolveAutoFailPadding(padding++, out solution)) {
-                if (padding > maxPaddingCount) {
+                if (padding > MaxPaddingCount) {
                     throw new Exception("No auto-fail fix padding solution found.");
                 }
             }
@@ -437,7 +437,7 @@ namespace Mapping_Tools.Classes.Tools {
         }
 
         private bool ProblemAreaPaddingWorks(ProblemArea problemArea, int left, int right) {
-            foreach (var time in problemArea.timesToCheck) {
+            foreach (var time in problemArea.TimesToCheck) {
                 var minimalLeft = time - approachTime;
                 var minimalRight = time + approachTime;
 
@@ -447,7 +447,7 @@ namespace Mapping_Tools.Classes.Tools {
                     endIndex = hitObjects.Count - 1;
                 }
 
-                if (startIndex > problemArea.index || endIndex < problemArea.index || time > autoFailCheckTime) {
+                if (startIndex > problemArea.Index || endIndex < problemArea.Index || time > autoFailCheckTime) {
                     return false;
                 }
             }

@@ -6,6 +6,6 @@
              UseLayoutRounding="True"
              SnapsToDevicePixels="True"
              mc:Ignorable="d" >
-    <Canvas x:Name="mainCanvas">
+    <Canvas x:Name="MainCanvas">
     </Canvas>
 </UserControl>

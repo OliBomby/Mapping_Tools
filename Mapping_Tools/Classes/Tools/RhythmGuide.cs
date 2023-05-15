@@ -24,17 +24,17 @@ namespace Mapping_Tools.Classes.Tools {
 
             #region private_members
 
-            private string[] _paths = new string[0];
-            private GameMode _outputGameMode = GameMode.Standard;
-            private string _outputName = "Hitsounds";
-            private bool _ncEverything;
-            private SelectionMode _selectionMode = SelectionMode.HitsoundEvents;
+            private string[] paths = new string[0];
+            private GameMode outputGameMode = GameMode.Standard;
+            private string outputName = "Hitsounds";
+            private bool ncEverything;
+            private SelectionMode selectionMode = SelectionMode.HitsoundEvents;
             // ReSharper disable once CoVariantArrayConversion
             // ReSharper disable once RedundantArrayCreationExpression
-            private IBeatDivisor[] _beatDivisors = new RationalBeatDivisor[] {16, 12};
+            private IBeatDivisor[] beatDivisors = new RationalBeatDivisor[] {16, 12};
 
-            private ExportMode _exportMode = ExportMode.NewMap;
-            private string _exportPath = Path.Combine(MainWindow.ExportPath, @"rhythm_guide.osu");
+            private ExportMode exportMode = ExportMode.NewMap;
+            private string exportPath = Path.Combine(MainWindow.ExportPath, @"rhythm_guide.osu");
 
             #endregion
 
@@ -42,61 +42,61 @@ namespace Mapping_Tools.Classes.Tools {
             /// A string of paths to import from.
             /// </summary>
             public string[] Paths {
-                get => _paths;
-                set => Set(ref _paths, value);
+                get => paths;
+                set => Set(ref paths, value);
             }
 
             /// <summary>
             /// The Selected output game mode
             /// </summary>
             public GameMode OutputGameMode {
-                get => _outputGameMode;
-                set => Set(ref _outputGameMode, value);
+                get => outputGameMode;
+                set => Set(ref outputGameMode, value);
             }
 
             /// <summary>
             /// The difficulty name of the output
             /// </summary>
             public string OutputName {
-                get => _outputName;
-                set => Set(ref _outputName, value);
+                get => outputName;
+                set => Set(ref outputName, value);
             }
 
             /// <summary>
             /// If each object should have a new combo.
             /// </summary>
             public bool NcEverything {
-                get => _ncEverything;
-                set => Set(ref _ncEverything, value);
+                get => ncEverything;
+                set => Set(ref ncEverything, value);
             }
 
             /// <summary>
             /// 
             /// </summary>
             public SelectionMode SelectionMode {
-                get => _selectionMode;
-                set => Set(ref _selectionMode, value);
+                get => selectionMode;
+                set => Set(ref selectionMode, value);
             }
 
             /// <summary>
             /// 
             /// </summary>
             public ExportMode ExportMode {
-                get => _exportMode;
-                set => Set(ref _exportMode, value);
+                get => exportMode;
+                set => Set(ref exportMode, value);
             }
 
             /// <summary>
             /// 
             /// </summary>
             public string ExportPath {
-                get => _exportPath;
-                set => Set(ref _exportPath, value);
+                get => exportPath;
+                set => Set(ref exportPath, value);
             }
 
             public IBeatDivisor[] BeatDivisors {
-                get => _beatDivisors;
-                set => Set(ref _beatDivisors, value);
+                get => beatDivisors;
+                set => Set(ref beatDivisors, value);
             }
 
 

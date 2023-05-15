@@ -9,29 +9,29 @@ using System.Windows.Controls;
 
 namespace Mapping_Tools.Views {
     public class ViewCollection {
-        private static readonly Type _acceptableType = typeof(UserControl);
-        private static readonly Type _mappingToolType = typeof(MappingTool);
-        private static readonly Type _quickRunType = typeof(IQuickRun);
+        private static readonly Type AcceptableType = typeof(UserControl);
+        private static readonly Type MappingToolType = typeof(MappingTool);
+        private static readonly Type QuickRunType = typeof(IQuickRun);
 
         public Dictionary<Type, object> Views = new Dictionary<Type, object>();
 
-        private static Type[] _allViewTypes;
+        private static Type[] allViewTypes;
         public static Type[] GetAllViewTypes() {
-            return _allViewTypes ?? (_allViewTypes = AppDomain.CurrentDomain.GetAssemblies()
+            return allViewTypes ?? (allViewTypes = AppDomain.CurrentDomain.GetAssemblies()
                        .SelectMany(x => x.GetTypes())
-                       .Where(x => _acceptableType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract).ToArray());
+                       .Where(x => AcceptableType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract).ToArray());
         }
 
-        private static Type[] _allToolTypes;
+        private static Type[] allToolTypes;
         public static Type[] GetAllToolTypes() {
-            return _allToolTypes ?? (_allToolTypes = GetAllViewTypes()
-                       .Where(x => _mappingToolType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract).ToArray());
+            return allToolTypes ?? (allToolTypes = GetAllViewTypes()
+                       .Where(x => MappingToolType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract).ToArray());
         }
 
-        private static Type[] _allQuickRunTypes;
+        private static Type[] allQuickRunTypes;
         public static Type[] GetAllQuickRunTypes() {
-            return _allQuickRunTypes ?? (_allQuickRunTypes = GetAllToolTypes()
-                       .Where(x => _quickRunType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract).ToArray());
+            return allQuickRunTypes ?? (allQuickRunTypes = GetAllToolTypes()
+                       .Where(x => QuickRunType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract).ToArray());
         }
 
         public static Type[] GetAllQuickRunTypesWithTargets(SmartQuickRunTargets targets) {
