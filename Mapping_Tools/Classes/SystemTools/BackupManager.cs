@@ -11,6 +11,17 @@ using Mapping_Tools.Classes.Tools;
 namespace Mapping_Tools.Classes.SystemTools {
     public static class BackupManager {
         public static bool SaveMapBackup(string fileToCopy, bool forced = false, string filename = null, string backupCode = "") {
+            if (!File.Exists(fileToCopy)) {
+                MessageBox.Show("Selected beatmap file does not exist! Check if you have the correct file selected in the current beatmap field, or try re-selecting the beatmap file.", "Error");
+                return false;
+            }
+
+            string destinationDirectory = SettingsManager.GetBackupsPath();
+            if (!Directory.Exists(destinationDirectory)) {
+                MessageBox.Show("Backups folder does not exist! Check in the Preferences if the path to your backups folder is correct and the folder exists.", "Error");
+                return false;
+            }
+
             try {
                 if (!SettingsManager.GetMakeBackups() && !forced)
                     return false;
@@ -23,7 +34,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 }
 
                 DateTime now = DateTime.Now;
-                string destinationDirectory = SettingsManager.GetBackupsPath();
+
                 var name = now.ToString("yyyy-MM-dd HH-mm-ss") + "_" + backupCode + "__" + filename;
 
                 File.Copy(fileToCopy,
