@@ -196,7 +196,7 @@
                                 <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
                                     <ComboBox x:Name="SelectionComboColorBox" Cursor="Hand" Width="106" Margin="10,0,25,0"
                                               Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Track Color"
-                                              ItemsSource="{Binding AvailableColors}" SelectedItem="{Binding ComboColor}" Visibility="{Binding ShouldShowCCPicker}"
+                                              ItemsSource="{Binding AvailableColors}" SelectedItem="{Binding ComboColor}" Visibility="{Binding ShouldShowCcPicker}"
                                               ToolTip="Pick the combo color to be used in the picture.">
                                     </ComboBox>
                                     <Rectangle Width="30" Height="30" Visibility="{Binding ShouldShowCCPicker}" Fill="{Binding PickedComboColor}" />
@@ -255,7 +255,7 @@
                     </StackPanel>
 
                     <StackPanel>
-                        <Image Name="ImageViewer" Width="440" Source="{Binding BMImage}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                        <Image Name="ImageViewer" Width="440" Source="{Binding BmImage}" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                     </StackPanel>
                 </StackPanel>
                 
