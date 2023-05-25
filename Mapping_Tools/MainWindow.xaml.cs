@@ -437,8 +437,7 @@ namespace Mapping_Tools {
         }
 
         private void SetFullscreen(bool fullscreen, bool actuallyChangeFullscreen = true) {
-            if (FindName("toggle_button") is not Button bt)
-                return;
+            var bt = FindName("ToggleButton") as Button;
 
             if (fullscreen) {
                 if (actuallyChangeFullscreen) {
@@ -447,7 +446,7 @@ namespace Mapping_Tools {
 
                 MasterGrid.Margin = new Thickness(7);
                 WindowBorder.BorderThickness = new Thickness(0);
-                bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
+                if (bt != null) bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
             } else {
                 if (actuallyChangeFullscreen) {
                     WindowState = WindowState.Normal;
@@ -455,8 +454,9 @@ namespace Mapping_Tools {
 
                 MasterGrid.Margin = new Thickness(0);
                 WindowBorder.BorderThickness = new Thickness(1);
-                bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
+                if (bt != null) bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
+
             EnsureOnScreen();
         }
 

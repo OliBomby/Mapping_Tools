@@ -35,7 +35,7 @@ namespace Mapping_Tools.Views.RhythmGuide {
 
                 Top = point.Y - (((FrameworkElement)sender).ActualHeight / 2);
                 WindowState = WindowState.Normal;
-                if (FindName("toggle_button") is Button bt) bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
+                if (FindName("ToggleButton") is Button bt) bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
             this.DragMove();
             //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };

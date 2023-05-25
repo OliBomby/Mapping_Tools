@@ -165,7 +165,7 @@ namespace Mapping_Tools.Views.HitsoundStudio {
         //Enable drag control of window and set icons when docked
         private void DragWin(object sender, MouseButtonEventArgs e) {
             if( e.ChangedButton == MouseButton.Left ) {
-                Button bt = this.FindName("toggle_button") as Button;
+                Button bt = FindName("ToggleButton") as Button;
                 if( WindowState == WindowState.Maximized ) {
                     var point = PointToScreen(e.MouseDevice.GetPosition(this));
 
