@@ -10,12 +10,12 @@ using System.Windows;
 namespace Mapping_Tools.Classes.SystemTools {
     public static class SettingsManager {
         private static string JsonPath { get; set; }
-        private static readonly JsonSerializer Serializer = new JsonSerializer {
+        private static readonly JsonSerializer serializer = new() {
             NullValueHandling = NullValueHandling.Ignore,
             Formatting = Formatting.Indented
         };
 
-        public static readonly Settings Settings = new Settings();
+        public static readonly Settings Settings = new();
         public static bool InstanceComplete;
 
         public static void LoadConfig() {
@@ -28,7 +28,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             try {
                 using( StreamReader sr = new StreamReader(JsonPath)) {
                     using (JsonReader reader = new JsonTextReader(sr)) {
-                        Settings newSettings = Serializer.Deserialize<Settings>(reader);
+                        Settings newSettings = serializer.Deserialize<Settings>(reader);
                         newSettings.CopyTo(Settings);
                     }
                 }
@@ -48,7 +48,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             try {
                 using( StreamWriter sw = new StreamWriter(JsonPath)) {
                     using (JsonWriter writer = new JsonTextWriter(sw)) {
-                        Serializer.Serialize(writer, Settings);
+                        serializer.Serialize(writer, Settings);
                     }
                 }
             }
@@ -67,7 +67,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             try {
                 using( StreamWriter sw = new StreamWriter(JsonPath)) {
                     using (JsonWriter writer = new JsonTextWriter(sw)) {
-                        Serializer.Serialize(writer, Settings);
+                        serializer.Serialize(writer, Settings);
                     }
                 }
             }
@@ -154,8 +154,8 @@ namespace Mapping_Tools.Classes.SystemTools {
             {
                 RegistryKey regKey = parentKey.OpenSubKey(t);
                 try {
-                    if (regKey != null && regKey.GetValue("DisplayName").ToString() == name) {
-                        return Path.GetDirectoryName(regKey.GetValue("UninstallString").ToString());
+                    if (regKey != null && regKey.GetValue("DisplayName")?.ToString() == name) {
+                        return Path.GetDirectoryName(regKey.GetValue("UninstallString")?.ToString());
                     }
                 } catch (NullReferenceException) { }
             }

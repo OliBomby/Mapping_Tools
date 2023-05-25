@@ -126,7 +126,7 @@ namespace Mapping_Tools {
                         ShowActivated = true
                     };
 
-                    updaterWindow.Closed += DisposeUpdateManager;
+                    updaterWindow.Closed += disposeUpdateManager;
 
                     updaterWindow.ActionSelected += async (_, action) => {
                         switch (action) {
@@ -146,7 +146,7 @@ namespace Mapping_Tools {
                                 downloadUpdateTask = updateManager.DownloadUpdateAsync();
 
                                 // Preserve the update manager so it can be used later to download the update
-                                updaterWindow.Closed -= DisposeUpdateManager;
+                                updaterWindow.Closed -= disposeUpdateManager;
 
                                 updaterWindow.Close();
                                 break;
@@ -164,7 +164,7 @@ namespace Mapping_Tools {
                         }
                     };
 
-                    void DisposeUpdateManager(object o, EventArgs eventArgs) {
+                    void disposeUpdateManager(object o, EventArgs eventArgs) {
                         updateManager.Dispose();
                         updateManager = null;
                     }
