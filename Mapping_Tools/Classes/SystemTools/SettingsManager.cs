@@ -128,8 +128,8 @@ namespace Mapping_Tools.Classes.SystemTools {
 
             if (string.IsNullOrWhiteSpace(Settings.BackupsPath)) {
                 Settings.BackupsPath = Path.Combine(MainWindow.AppDataPath, "Backups");
-                Directory.CreateDirectory(Settings.BackupsPath);
             }
+            Directory.CreateDirectory(Settings.BackupsPath);
         }
 
         private static string GetBeatmapDirectory(string configPath) {
