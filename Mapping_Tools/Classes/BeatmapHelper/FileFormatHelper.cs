@@ -53,15 +53,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         public static void FillDictionary(Dictionary<string, TValue> dict, IEnumerable<string> lines) {
-            foreach (var split in lines.Select(SplitKeyValue)) {
-                if (split.Length != 2)
-                    continue;
-                dict[split[0]] = new TValue(split[1]);
+            foreach ((string key, string value) in lines.Select(SplitKeyValue)) {
+                dict[key] = new TValue(value);
             }
         }
 
-        public static string[] SplitKeyValue(string line) {
-            return line.Split(new[] { ':' }, 2);
+        public static (string, string) SplitKeyValue(string line) {
+            int index = line.IndexOf(':');
+            return index == -1 ? (line, string.Empty) : (line[..index], line[(index + 1)..]);
         }
 
         public static IEnumerable<string> GetCategoryLines(IEnumerable<string> lines, string category, string[] categoryIdentifiers=null) {
