@@ -21,7 +21,12 @@ namespace Mapping_Tools.Classes.SystemTools {
         public static void LoadConfig() {
             JsonPath = Path.Combine(MainWindow.AppDataPath, "config.json");
             InstanceComplete = File.Exists(JsonPath) ? LoadFromJson() : CreateJson();
-            DefaultPaths();
+
+            try {
+                DefaultPaths();
+            } catch (Exception e) {
+                e.Show();
+            }
         }
 
         private static bool LoadFromJson() {
