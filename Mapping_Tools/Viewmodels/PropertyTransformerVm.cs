@@ -94,6 +94,18 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        private double hitObjectVolumeMultiplier;
+        public double HitObjectVolumeMultiplier {
+            get => hitObjectVolumeMultiplier;
+            set => Set(ref hitObjectVolumeMultiplier, value);
+        }
+
+        private double hitObjectVolumeOffset;
+        public double HitObjectVolumeOffset {
+            get => hitObjectVolumeOffset;
+            set => Set(ref hitObjectVolumeOffset, value);
+        }
+
         private double bookmarkTimeMultiplier;
         public double BookmarkTimeMultiplier {
             get => bookmarkTimeMultiplier;
@@ -317,6 +329,8 @@ namespace Mapping_Tools.Viewmodels {
             PreviewTimeOffset = 0;
             SbSampleVolumeMultiplier = 1;
             SbSampleVolumeOffset = 0;
+            HitObjectVolumeMultiplier = 1;
+            HitObjectVolumeOffset = 0;
         }
 
         private void SetAllTimeMultipliers(double value) {

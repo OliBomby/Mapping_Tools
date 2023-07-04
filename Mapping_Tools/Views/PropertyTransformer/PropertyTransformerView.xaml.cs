@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+// ReSharper disable CompareOfFloatsByEqualityOperator
 
 namespace Mapping_Tools.Views.PropertyTransformer {
     /// <summary>
@@ -138,6 +139,22 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                                 Filter(oldEndTime, oldEndTime, vm)) {
                                 ho.EndTime = Math.Round(oldEndTime * vm.HitObjectTimeMultiplier + vm.HitObjectTimeOffset);
                             }
+                        }
+                    }
+
+                    UpdateProgressBar(worker, 25);
+
+                    // Hitobject time
+                    if (vm.HitObjectVolumeMultiplier != 1 || vm.HitObjectVolumeOffset != 0) {
+                        foreach (HitObject ho in beatmap.HitObjects) {
+                            if (!Filter(ho.SampleVolume, ho.Time, vm)) {
+                                continue;
+                            }
+
+                            int newVolume =
+                                (int) Math.Round(ho.SampleVolume * vm.HitObjectVolumeMultiplier +
+                                                 vm.HitObjectVolumeOffset);
+                            ho.SampleVolume = vm.ClipProperties ? MathHelper.Clamp(newVolume, 0, 100) : newVolume;
                         }
                     }
 
