@@ -171,7 +171,7 @@
                     <CheckBox x:Name="DetectDuplicateSamplesBox2" Content="Detect duplicate samples" Margin="0,0,0,0"
                               ToolTip="Scan all the sound sample files in the source beatmap folder and merge hitsound layers which produce the exact same sound."/>
                     <CheckBox x:Name="RemoveDuplicatesBox2" Content="Remove duplicate hitsounds" Margin="0,0,0,0"
-                              ToolTip="Remove duplicate values in the Times field. Usefull for importing from mania maps."/>
+                              ToolTip="Remove duplicate values in the Times field. Useful for importing from mania maps."/>
                     <CheckBox x:Name="IncludeStoryboardBox2" Content="Include storyboarded samples" Margin="0,0,0,0"
                               ToolTip="Also import storyboarded samples."/>
                 </StackPanel>
