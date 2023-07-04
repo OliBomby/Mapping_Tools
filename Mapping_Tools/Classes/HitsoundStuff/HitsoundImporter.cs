@@ -429,7 +429,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         Length = length,
                         LengthRoughness = lengthRoughness,
                         Velocity = velocity,
-                        VelocityRoughness = velocityRoughness
+                        VelocityRoughness = velocityRoughness,
+                        Offset = offset
                     };
 
                     // Find the hitsoundlayer with this path
@@ -473,7 +474,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 case ImportType.Storyboard:
                     return ImportStoryboard(reloadingArgs.Path, reloadingArgs.DiscriminateVolumes, reloadingArgs.RemoveDuplicates);
                 case ImportType.MIDI:
-                    return ImportMidi(reloadingArgs.Path,
+                    return ImportMidi(reloadingArgs.Path, reloadingArgs.Offset,
                         lengthRoughness: reloadingArgs.LengthRoughness,
                         velocityRoughness: reloadingArgs.VelocityRoughness);
                 default:

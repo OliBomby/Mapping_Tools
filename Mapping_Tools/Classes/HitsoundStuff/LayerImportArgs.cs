@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Mapping_Tools.Classes.MathUtil;
+// ReSharper disable CompareOfFloatsByEqualityOperator
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
@@ -29,6 +27,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             discriminateVolumes = false;
             DetectDuplicateSamples = false;
             RemoveDuplicates = false;
+            Offset = 0;
         }
 
         /// <inheritdoc />
@@ -48,6 +47,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             discriminateVolumes = false;
             DetectDuplicateSamples = false;
             RemoveDuplicates = false;
+            Offset = 0;
         }
 
         private ImportType importType;
@@ -273,6 +273,20 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        private double offset;
+        /// <summary>
+        ///
+        /// </summary>
+        public double Offset {
+            get => offset;
+            set {
+                if (offset != value) {
+                    offset = value;
+                    NotifyPropertyChanged("Offset");
+                }
+            }
+        }
+
 
         /// <summary>
         /// 
@@ -292,7 +306,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         /// <returns></returns>
         public ImportReloadingArgs GetImportReloadingArgs() {
-            return new ImportReloadingArgs(ImportType, Path, X, Y, LengthRoughness, VelocityRoughness, DiscriminateVolumes, DetectDuplicateSamples, RemoveDuplicates);
+            return new ImportReloadingArgs(ImportType, Path, X, Y, LengthRoughness, VelocityRoughness, DiscriminateVolumes, DetectDuplicateSamples, RemoveDuplicates, Offset);
         }
 
         /// <summary>
@@ -339,7 +353,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 VelocityRoughness == other.VelocityRoughness &&
                 RemoveDuplicates == other.RemoveDuplicates &&
                 DiscriminateVolumes == other.DiscriminateVolumes &&
-                DetectDuplicateSamples == other.DetectDuplicateSamples;
+                DetectDuplicateSamples == other.DetectDuplicateSamples &&
+                Offset == other.Offset;
         }
 
         /// <inheritdoc />
@@ -370,6 +385,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             hashCode = hashCode * -1521134295 + RemoveDuplicates.GetHashCode();
             hashCode = hashCode * -1521134295 + DiscriminateVolumes.GetHashCode();
             hashCode = hashCode * -1521134295 + DetectDuplicateSamples.GetHashCode();
+            hashCode = hashCode * -1521134295 + Offset.GetHashCode();
             return hashCode;
         }
 

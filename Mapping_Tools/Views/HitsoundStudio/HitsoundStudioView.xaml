@@ -263,6 +263,9 @@
                                 <TextBox x:Name="SelectedImportVelocityRoughnessBox" TextChanged="SelectedImportVelocityRoughnessBox_TextChanged" Margin="0,5,0,0"
                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Velocity roughness"
                                         ToolTip="Velocity roughness used to import the unique sound this hitsound layer imported from the source MIDI."/>
+                                <TextBox x:Name="SelectedImportOffsetBox" TextChanged="SelectedImportOffsetBox_TextChanged" Margin="0,5,0,0"
+                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Offset"
+                                         ToolTip="Offset applied to the times of this hitsound layer imported from the source MIDI."/>
                             </StackPanel>
                             <Button Margin="0,20,0,0" Content="Reload from source" FontWeight="Bold" FontSize="16" Click="ReloadFromSource_Click"
                                     ToolTip="Re-import this hitsound layer from the source file and update the Times field."/>
