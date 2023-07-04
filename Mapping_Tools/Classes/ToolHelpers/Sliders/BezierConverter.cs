@@ -22,7 +22,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
             }
         }
 
-        private static readonly List<CircleBezierPreset> CirclePresets = new List<CircleBezierPreset> {
+        private static readonly List<CircleBezierPreset> circlePresets = new() {
             new CircleBezierPreset(0.4993379862754501,
                 GetPoints("1.0:0.0|1.0:0.2549893626632736|0.8778997558480327:0.47884446188920726")),
             new CircleBezierPreset(1.7579419829169447,
@@ -136,8 +136,8 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         /// <param name="cs"></param>
         /// <returns></returns>
         public static List<Vector2> ConvertCircleToBezierAnchors(CircleArc cs) {
-            CircleBezierPreset preset = CirclePresets.Last();
-            foreach (CircleBezierPreset CBP in CirclePresets) {
+            CircleBezierPreset preset = circlePresets.Last();
+            foreach (CircleBezierPreset CBP in circlePresets) {
                 if (CBP.MaxAngle >= cs.ThetaRange) {
                     preset = CBP;
                     break;

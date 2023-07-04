@@ -10,8 +10,8 @@ using OsuMemoryDataProvider.OsuMemoryModels.Direct;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class IOHelper {
-        private static readonly StructuredOsuMemoryReader PioStructuredReader = StructuredOsuMemoryReader.Instance;
-        private static readonly OsuBaseAddresses OsuBaseAddresses = new();
+        private static readonly StructuredOsuMemoryReader pioStructuredReader = StructuredOsuMemoryReader.Instance;
+        private static readonly OsuBaseAddresses osuBaseAddresses = new();
         private static readonly object pioReaderLock = new();
 
         public static string FolderDialog(string initialDirectory = "") {
@@ -149,7 +149,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         private static T ReadClassProperty<T>(object readObj, string propName, T defaultValue = default) where T : class {
             lock (pioReaderLock) {
-                if (PioStructuredReader.TryReadProperty(readObj, propName, out var readResult))
+                if (pioStructuredReader.TryReadProperty(readObj, propName, out var readResult))
                     return (T) readResult;
             }
 
@@ -181,8 +181,8 @@ namespace Mapping_Tools.Classes.SystemTools {
                             @"Can't fetch current in-game beatmap, because there is no Songs path specified in Preferences.");
                     }
 
-                    string folder = ReadString(OsuBaseAddresses.Beatmap, nameof(CurrentBeatmap.FolderName));
-                    string filename = ReadString(OsuBaseAddresses.Beatmap, nameof(CurrentBeatmap.OsuFileName));
+                    string folder = ReadString(osuBaseAddresses.Beatmap, nameof(CurrentBeatmap.FolderName));
+                    string filename = ReadString(osuBaseAddresses.Beatmap, nameof(CurrentBeatmap.OsuFileName));
 
                     if (string.IsNullOrEmpty(folder)) {
                         throw new Exception(@"Can't fetch the folder name of the current in-game beatmap.");

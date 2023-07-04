@@ -19,7 +19,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
 
     public static class EditorReaderStuff
     {
-        private static readonly EditorReader EditorReader = new();
+        private static readonly EditorReader editorReader = new();
         public static string DontCoolSaveWhenMd5EqualsThisString = "";
         public static readonly object EditorReaderLock = new();
 
@@ -29,7 +29,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         /// <returns></returns>
         public static EditorReader GetEditorReader()
         {
-            return EditorReader;
+            return editorReader;
         }
 
         /// <summary>

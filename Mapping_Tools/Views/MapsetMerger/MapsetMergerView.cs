@@ -129,7 +129,7 @@ namespace Mapping_Tools.Views.ComboColourStudio {
 
                 // Save assets in new location
                 foreach (var filename in usedHsFiles) {
-                    var filepath = FindAssetFile(filename, mapset.Path, AudioExtensions);
+                    var filepath = FindAssetFile(filename, mapset.Path, audioExtensions);
 
                     if (filepath == null) {
                         continue;
@@ -156,15 +156,15 @@ namespace Mapping_Tools.Views.ComboColourStudio {
                 }
 
                 foreach (var filename in usedOtherHsFiles) {
-                    SaveAsset(filename, mapset.Path, subf, arg.ExportPath, AudioExtensions2);
+                    SaveAsset(filename, mapset.Path, subf, arg.ExportPath, audioExtensions2);
                 }
 
                 foreach (var filename in usedImageFiles) {
-                    SaveAsset(filename, mapset.Path, subf, arg.ExportPath, ImageExtensions);
+                    SaveAsset(filename, mapset.Path, subf, arg.ExportPath, imageExtensions);
                 }
 
                 foreach (var filename in usedVideoFiles) {
-                    SaveAsset(filename, mapset.Path, subf, arg.ExportPath, VideoExtensions, true);
+                    SaveAsset(filename, mapset.Path, subf, arg.ExportPath, videoExtensions, true);
                 }
 
                 UpdateProgressBar(worker, ++mapsetsMerged * 100 / arg.Mapsets.Count);
@@ -190,10 +190,10 @@ namespace Mapping_Tools.Views.ComboColourStudio {
             File.Copy(filepath, newFilepath, true);
         }
 
-        private static readonly string[] AudioExtensions = { ".wav", ".mp3", ".ogg" };
-        private static readonly string[] AudioExtensions2 = { ".wav", ".ogg", ".mp3" }; // I swear to god, for some reason it prioritizes .ogg if it uses filename
-        private static readonly string[] ImageExtensions = { ".png", ".jpg" };
-        private static readonly string[] VideoExtensions = { ".mp4", ".avi" };
+        private static readonly string[] audioExtensions = { ".wav", ".mp3", ".ogg" };
+        private static readonly string[] audioExtensions2 = { ".wav", ".ogg", ".mp3" }; // I swear to god, for some reason it prioritizes .ogg if it uses filename
+        private static readonly string[] imageExtensions = { ".png", ".jpg" };
+        private static readonly string[] videoExtensions = { ".mp4", ".avi" };
 
         private static string FindAssetFile(string filename, string path, string[] extensions, bool needExtension = false) {
             string filepath = Path.Combine(path, filename);

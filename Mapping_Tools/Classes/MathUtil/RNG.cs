@@ -10,20 +10,20 @@ namespace Mapping_Tools.Classes.MathUtil {
     /// </summary>
     public static class RNG {
         // Base RNG. Maybe expose methods for re-seeding in the future?
-        private static readonly Random Random = new Random();
+        private static readonly Random random = new();
 
         /// <summary>
         /// Returns a non-negative signed integer.
         /// </summary>
         /// <returns>A non-negative signed integer.</returns>
-        public static int Next() => Random.Next();
+        public static int Next() => random.Next();
 
         /// <summary>
         /// Returns a signed integer in the range [0,maxValue).
         /// </summary>
         /// <param name="maxValue">The maximum value that should be returned (exclusive, the highest possible result is maxValue - 1).</param>
         /// <returns>A signed integer in the range [0,maxValue).</returns>
-        public static int Next(int maxValue) => Random.Next(maxValue);
+        public static int Next(int maxValue) => random.Next(maxValue);
 
         /// <summary>
         /// Returns a signed integer in the range [minValue,maxValue).
@@ -31,13 +31,13 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="minValue">The minimum value that should be returned (inclusive).</param>
         /// <param name="maxValue">The maximum value that should be returned (exclusive, the highest possible result is maxValue - 1).</param>
         /// <returns>A signed integer in the range [minValue,maxValue).</returns>
-        public static int Next(int minValue, int maxValue) => Random.Next(minValue, maxValue);
+        public static int Next(int minValue, int maxValue) => random.Next(minValue, maxValue);
 
         /// <summary>
         /// Returns a double-precision floating point number in the range [0,1).
         /// </summary>
         /// <returns>A double-precision floating point number in the range [0,1).</returns>
-        public static double NextDouble() => Random.NextDouble();
+        public static double NextDouble() => random.NextDouble();
 
         /// <summary>
         /// Returns a double-precision floating point number in the range [0,maxValue).
@@ -48,7 +48,7 @@ namespace Mapping_Tools.Classes.MathUtil {
             if( maxValue < 0.0 )
                 throw new ArgumentOutOfRangeException(nameof(maxValue), "The given maximum value must be greater than or equal to 0.");
 
-            return Random.NextDouble() * maxValue;
+            return random.NextDouble() * maxValue;
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Mapping_Tools.Classes.MathUtil {
             if( minValue > maxValue )
                 throw new ArgumentOutOfRangeException(nameof(minValue), "The given minimum value must be less than or equal to the given maximum value.");
 
-            return minValue + Random.NextDouble() * ( maxValue - minValue );
+            return minValue + random.NextDouble() * ( maxValue - minValue );
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Fills the given buffer with random bytes.
         /// </summary>
         /// <param name="buffer">The buffer that should be filled.</param>
-        public static void NextBytes(byte[] buffer) => Random.NextBytes(buffer);
+        public static void NextBytes(byte[] buffer) => random.NextBytes(buffer);
 
         /// <summary>
         /// Creates a new byte array with the given length and fills it with random values.
@@ -127,7 +127,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         public static string RandomString(int length) {
             const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Range(1, length)
-                .Select(_ => chars[Random.Next(chars.Length)]).ToArray());
+                .Select(_ => chars[random.Next(chars.Length)]).ToArray());
         }
     }
 }

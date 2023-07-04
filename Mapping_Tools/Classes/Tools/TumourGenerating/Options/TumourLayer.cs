@@ -11,10 +11,10 @@ using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 
 namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
     public class TumourLayer : BindableBase, ITumourLayer {
-        private static readonly ITumourTemplate TriangleTemplate = new TriangleTemplate();
-        private static readonly ITumourTemplate SquareTemplate = new SquareTemplate();
-        private static readonly ITumourTemplate CircleTemplate = new CircleTemplate();
-        private static readonly ITumourTemplate ParabolaTemplate = new ParabolaTemplate();
+        private static readonly ITumourTemplate triangleTemplate = new TriangleTemplate();
+        private static readonly ITumourTemplate squareTemplate = new SquareTemplate();
+        private static readonly ITumourTemplate circleTemplate = new CircleTemplate();
+        private static readonly ITumourTemplate parabolaTemplate = new ParabolaTemplate();
 
         private TumourTemplate tumourTemplateEnum;
         private WrappingMode wrappingMode;
@@ -44,11 +44,11 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
 
         [JsonIgnore]
         public ITumourTemplate TumourTemplate => tumourTemplateEnum switch {
-            Enums.TumourTemplate.Triangle => TriangleTemplate,
-            Enums.TumourTemplate.Square => SquareTemplate,
-            Enums.TumourTemplate.Circle => CircleTemplate,
-            Enums.TumourTemplate.Parabola => ParabolaTemplate,
-            _ => TriangleTemplate
+            Enums.TumourTemplate.Triangle => triangleTemplate,
+            Enums.TumourTemplate.Square => squareTemplate,
+            Enums.TumourTemplate.Circle => circleTemplate,
+            Enums.TumourTemplate.Parabola => parabolaTemplate,
+            _ => triangleTemplate
         };
 
         public WrappingMode WrappingMode {

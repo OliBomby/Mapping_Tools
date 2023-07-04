@@ -23,15 +23,15 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         private const double MaxPixelLength = 1e6;
         private const int MaxAnchorCount = 5000;
 
-        private static readonly Brush CircleInsideBrush = Brushes.Green;
-        private static readonly Brush CircleOutsideBrush = Brushes.White;
-        private static readonly Brush SliderInsideBrush = Brushes.DarkSlateGray;
-        private static readonly Brush SliderOutsideBrush = Brushes.White;
-        private static readonly Brush ComboTextBrush = Brushes.White;
-        private static readonly Brush SpinnerBrush = Brushes.White;
-        private static readonly Brush FollowPointBrush = Brushes.White;
+        private static readonly Brush circleInsideBrush = Brushes.Green;
+        private static readonly Brush circleOutsideBrush = Brushes.White;
+        private static readonly Brush sliderInsideBrush = Brushes.DarkSlateGray;
+        private static readonly Brush sliderOutsideBrush = Brushes.White;
+        private static readonly Brush comboTextBrush = Brushes.White;
+        private static readonly Brush spinnerBrush = Brushes.White;
+        private static readonly Brush followPointBrush = Brushes.White;
 
-        private static readonly Dictionary<string, BitmapSource> Cache = new();
+        private static readonly Dictionary<string, BitmapSource> cache = new();
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
             // Value is a string for the pattern filename. The parameter is the OsuPatternFileHandler
@@ -40,12 +40,12 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             }
 
             // Check if the pattern is in the cache
-            if (Cache.TryGetValue(filename, out var cachedBitmap)) {
+            if (cache.TryGetValue(filename, out var cachedBitmap)) {
                 return cachedBitmap;
             }
 
             var bitmapSource = DrawBeatmapFromFile(filename, fileHandler);
-            Cache.Add(filename, bitmapSource);
+            cache.Add(filename, bitmapSource);
             return bitmapSource;
         }
 
@@ -83,7 +83,7 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                 var circleSize = Beatmap.GetHitObjectRadius(beatmap.Difficulty["CircleSize"].DoubleValue);
                 var hitObjects = beatmap.HitObjects.TakeWhile(o => o.Time < firstTime + approachTime).Reverse();
                 using var font = new Font(FontFamily.GenericSansSerif, (float) (circleSize * 0.6), FontStyle.Bold);
-                using var followPen = new Pen(FollowPointBrush, (float) circleSize * 0.1f) { DashStyle = DashStyle.Dash };
+                using var followPen = new Pen(followPointBrush, (float) circleSize * 0.1f) { DashStyle = DashStyle.Dash };
 
                 // This is the next position because we are iterating in reverse time order
                 HitObject nextHo = null;
@@ -118,8 +118,8 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
             if (hitObject.IsSlider) {
                 if (!sliderPaths.ContainsKey(hitObject)) return;
 
-                using var outlinePen = new Pen(SliderOutsideBrush, (float) circleSize * 1.95f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
-                using var insidePen = new Pen(SliderInsideBrush, (float) circleSize * 1.65f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
+                using var outlinePen = new Pen(sliderOutsideBrush, (float) circleSize * 1.95f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
+                using var insidePen = new Pen(sliderInsideBrush, (float) circleSize * 1.65f) { LineJoin = LineJoin.Round, StartCap = LineCap.Round, EndCap = LineCap.Round };
                 var path = sliderPaths[hitObject];
 
                 using GraphicsPath gc = new GraphicsPath();
@@ -130,14 +130,14 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
                 gfx.DrawPath(insidePen, gc);
                 //DrawCircleAtProgress(gfx, path, 1, circleSize);
                 DrawCircleAtProgress(gfx, path, 0, circleSize);
-                DrawTextAtPos(gfx, ComboTextBrush, font, hitObject.ComboIndex.ToString(), pos);
+                DrawTextAtPos(gfx, comboTextBrush, font, hitObject.ComboIndex.ToString(), pos);
             } else if (hitObject.IsSpinner) {
-                using var pen = new Pen(SpinnerBrush, (float) circleSize * PenWidth);
+                using var pen = new Pen(spinnerBrush, (float) circleSize * PenWidth);
                 DrawCircleAtPos(gfx, pen, new Vector2(256, 192), 150);
                 DrawCircleAtPos(gfx, pen, new Vector2(256, 192), 5);
             } else {
                 DrawFilledCircleAtPos(gfx, pos, circleSize);
-                DrawTextAtPos(gfx, ComboTextBrush, font, hitObject.ComboIndex.ToString(), pos);
+                DrawTextAtPos(gfx, comboTextBrush, font, hitObject.ComboIndex.ToString(), pos);
             }
         }
 
@@ -147,8 +147,8 @@ namespace Mapping_Tools.Components.ObjectVisualiser {
         }
 
         private void DrawFilledCircleAtPos(Graphics gfx, Vector2 pos, double radius) {
-            DrawFilledCircleAtPos(gfx, CircleOutsideBrush, pos, radius);
-            DrawFilledCircleAtPos(gfx, CircleInsideBrush, pos, radius * 0.846);
+            DrawFilledCircleAtPos(gfx, circleOutsideBrush, pos, radius);
+            DrawFilledCircleAtPos(gfx, circleInsideBrush, pos, radius * 0.846);
         }
 
         private void DrawFilledCircleAtPos(Graphics gfx, Brush brush, Vector2 pos, double radius) {

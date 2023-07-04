@@ -12,7 +12,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         private ProcessingState processingState;
 
         // Buffer sizes for various sample rates. These values were found empirically
-        private static readonly Dictionary<int, int> StartBuffers = new Dictionary<int, int> {
+        private static readonly Dictionary<int, int> startBuffers = new() {
             {48000, 1024}, {44100, 1024}, {32000, 1024}, {22050, 512}, {16000, 512}, {11025, 256}, {8000, 256}
         };
 
@@ -28,7 +28,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             SampleRate = sampleRate;
             Channels = channels;
 
-            if (!StartBuffers.ContainsKey(sampleRate)) 
+            if (!startBuffers.ContainsKey(sampleRate))
                 throw new InvalidOperationException($"Vorbis writer does not support {sampleRate} sample rate.");
 
             // Stores all the static vorbis bitstream settings
@@ -66,7 +66,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             processingState = ProcessingState.Create(info);
 
             // Append some zeros at the start so the result has the same length as the input
-            int bufferSize = StartBuffers[sampleRate];
+            int bufferSize = startBuffers[sampleRate];
 
             float[][] outSamples = new float[channels][];
             for (int ch = 0; ch < channels; ch++)
@@ -128,7 +128,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         public static int GetSupportedSampleRate(int oldSampleRate) {
             int newSampleRate = 48000;
-            foreach (var sampleRate in StartBuffers.Keys) {
+            foreach (var sampleRate in startBuffers.Keys) {
                 if (sampleRate >= oldSampleRate && sampleRate <= newSampleRate) {
                     newSampleRate = sampleRate;
                 }

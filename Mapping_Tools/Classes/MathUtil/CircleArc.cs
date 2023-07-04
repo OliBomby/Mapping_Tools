@@ -187,13 +187,13 @@ namespace Mapping_Tools.Classes.MathUtil {
             return !left.Equals(right);
         }
 
-        private static readonly string ListSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+        private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
         /// Returns a System.string that represents the current CircleArc.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return string.Format("({1}{0} {2}{0} {3}{0} {4}{0} {5}{0} {6})", ListSeparator, Centre, Radius, ThetaStart, ThetaRange, Dir, Stable);
+            return string.Format("({1}{0} {2}{0} {3}{0} {4}{0} {5}{0} {6})", listSeparator, Centre, Radius, ThetaStart, ThetaRange, Dir, Stable);
         }
         
 

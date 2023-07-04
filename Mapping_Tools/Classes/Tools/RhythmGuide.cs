@@ -199,11 +199,11 @@ namespace Mapping_Tools.Classes.Tools {
                     // Handle different selection modes
                     switch (args.SelectionMode) {
                         case SelectionMode.AllEvents:
-                            AddHitObject(timelineObject.Time);
+                            addHitObject(timelineObject.Time);
                             break;
                         case SelectionMode.HitsoundEvents:
                             if (timelineObject.HasHitsound) {
-                                AddHitObject(timelineObject.Time);
+                                addHitObject(timelineObject.Time);
                             }
 
                             break;
@@ -211,14 +211,14 @@ namespace Mapping_Tools.Classes.Tools {
                             var active = timelineObject.IsHoldnoteHead || timelineObject.IsCircle || timelineObject.IsSliderHead;
                             var pos = active ? new Vector2(0, 192) : new Vector2(512, 192);
 
-                            AddHitObject(timelineObject.Time, pos);
+                            addHitObject(timelineObject.Time, pos);
                             break;
                         case SelectionMode.LongNotes:
                             var isStart = timelineObject.IsHoldnoteHead || timelineObject.IsCircle ||
                                           timelineObject.IsSliderHead || timelineObject.IsSpinnerHead;
 
                             if (isStart) {
-                                AddHitObject(timelineObject.Time);
+                                addHitObject(timelineObject.Time);
                             } else if (beatmap.HitObjects.Count > 0) {
                                 // Extend last object
                                 var last = beatmap.HitObjects[^1];
@@ -234,7 +234,7 @@ namespace Mapping_Tools.Classes.Tools {
                 }
             }
 
-            void AddHitObject(double time, Vector2? pos = null) {
+            void addHitObject(double time, Vector2? pos = null) {
                 var t = beatmap.BeatmapTiming.Resnap(time, args.BeatDivisors);
                 var ho = new HitObject(time, 0, SampleSet.None, SampleSet.None) { NewCombo = args.NcEverything };
                 if (pos.HasValue)

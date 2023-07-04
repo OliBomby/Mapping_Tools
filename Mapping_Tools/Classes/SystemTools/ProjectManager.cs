@@ -14,7 +14,7 @@ namespace Mapping_Tools.Classes.SystemTools {
     }
 
     public static class ProjectManager {
-        private static readonly JsonSerializer Serializer = new JsonSerializer {
+        private static readonly JsonSerializer serializer = new() {
             NullValueHandling = NullValueHandling.Ignore,
             TypeNameHandling = TypeNameHandling.Objects,
             TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
@@ -25,7 +25,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public static void WriteJson(StreamWriter streamWriter, object obj) {
             using (JsonTextWriter reader = new JsonTextWriter(streamWriter)) {
-                Serializer.Serialize(reader, obj);
+                serializer.Serialize(reader, obj);
             }
         }
 
@@ -38,7 +38,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         public static T LoadJson<T>(string path) {
             using (StreamReader fs = new StreamReader(path)) {
                 using (JsonReader reader = new JsonTextReader(fs)) {
-                    return Serializer.Deserialize<T>(reader);
+                    return serializer.Deserialize<T>(reader);
                 }
             }
         }
@@ -46,7 +46,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         public static T LoadJson<T>(Stream stream) {
             using (StreamReader fs = new StreamReader(stream)) {
                 using (JsonReader reader = new JsonTextReader(fs)) {
-                    return Serializer.Deserialize<T>(reader);
+                    return serializer.Deserialize<T>(reader);
                 }
             }
         }
