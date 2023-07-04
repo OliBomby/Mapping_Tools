@@ -12,5 +12,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         L, // Loop
         T, // EventType-triggered loop
         P, // Parameters
+        Unknown, // Unknown command type
     }
 }
