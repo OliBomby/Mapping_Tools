@@ -162,7 +162,7 @@ namespace Mapping_Tools.Viewmodels {
                 {HitsoundExporter.SampleExportFormat.WaveIeeeFloat, "IEEE Float (.wav)"},
                 {HitsoundExporter.SampleExportFormat.WavePcm, "PCM 16-bit (.wav)"},
                 {HitsoundExporter.SampleExportFormat.OggVorbis, "Vorbis (.ogg)"},
-                {HitsoundExporter.SampleExportFormat.MidiChords, "Single-chord Midi (.mid)"}
+                {HitsoundExporter.SampleExportFormat.MidiChords, "Single-chord MIDI (.mid)"}
             };
 
         [JsonIgnore]

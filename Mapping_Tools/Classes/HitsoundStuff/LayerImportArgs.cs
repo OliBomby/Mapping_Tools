@@ -90,7 +90,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// 
         /// </summary>
         public Visibility KeysoundVisibility =>
-            ImportType == ImportType.Midi ? Visibility.Visible : Visibility.Collapsed;
+            ImportType == ImportType.MIDI ? Visibility.Visible : Visibility.Collapsed;
 
         /// <summary>
         /// 
@@ -309,7 +309,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     return Path == o.Path && (X == -1 || X == o.X) && (Y == -1 || Y == o.Y);
                 case ImportType.Hitsounds:
                     return Path == o.Path && SamplePath == o.SamplePath && (!discriminateVolumes || Math.Abs(Volume - o.Volume) < Precision.DoubleEpsilon);
-                case ImportType.Midi:
+                case ImportType.MIDI:
                     return Path == o.Path && (Bank == -1 || Bank == o.Bank) && (Patch == -1 || Patch == o.Patch) && (Key == -1 || Key == o.Key)
                                           && (Length == -1 || Length == o.Length) && (Velocity == -1 || Velocity == o.Velocity);
                 case ImportType.Storyboard:
