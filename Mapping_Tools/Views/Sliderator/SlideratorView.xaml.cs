@@ -72,7 +72,7 @@ namespace Mapping_Tools.Views.Sliderator {
             Graph.SetBrush(new SolidColorBrush(Color.FromArgb(255, 0, 255, 255)));
 
             Graph.MoveAnchorTo(Graph.Anchors[0], Vector2.Zero);
-            Graph.MoveAnchorTo(Graph.Anchors[Graph.Anchors.Count - 1], Vector2.One);
+            Graph.MoveAnchorTo(Graph.Anchors[^1], Vector2.One);
 
             Graph.Anchors.CollectionChanged += AnchorsOnCollectionChanged;
             Graph.Anchors.AnchorsChanged += AnchorsOnAnchorsChanged;
@@ -435,7 +435,17 @@ namespace Mapping_Tools.Views.Sliderator {
             var messageBoxResult = MessageBox.Show("Clear the graph?", "Confirm deletion", MessageBoxButton.YesNo);
             if (messageBoxResult != MessageBoxResult.Yes) return;
 
+            ResetGraph();
+        }
+
+        private void ResetGraph() {
+            Graph.MinX = 0;
+            Graph.MaxX = ViewModel.GraphBeats;
+            Graph.MinY = ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Velocity ? -ViewModel.VelocityLimit : 0;
+            Graph.MaxY = ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Velocity ? ViewModel.VelocityLimit : 1;
+
             Graph.Clear();
+
             if (ViewModel.GraphModeSetting == SlideratorVm.GraphMode.Velocity) {
                 var sv = MathHelper.Clamp(ViewModel.PixelLength / ViewModel.GraphBeats / ViewModel.GlobalSv / 100,
                     -ViewModel.VelocityLimit, ViewModel.VelocityLimit);
@@ -806,7 +816,7 @@ namespace Mapping_Tools.Views.Sliderator {
             if (saveData.GraphState != null) {
                 Graph.SetGraphState(saveData.GraphState);
             } else {
-                Graph.Clear();
+                ResetGraph();
             }
             UpdateEverything();
             ViewModel.PropertyChanged += ViewModelOnPropertyChanged;
