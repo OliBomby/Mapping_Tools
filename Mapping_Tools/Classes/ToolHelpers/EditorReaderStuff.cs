@@ -21,6 +21,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
     {
         private static readonly EditorReader EditorReader = new();
         public static string DontCoolSaveWhenMd5EqualsThisString = "";
+        public static readonly object EditorReaderLock = new();
 
         /// <summary>
         /// Don't use this unless you know what you're doing
@@ -205,13 +206,14 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         /// <exception cref="EditorReaderDisabledException"></exception>
         /// <exception cref="InvalidEditorReaderStateException"></exception>
         public static void BetterSave() {
-            var reader = GetFullEditorReader();
+            lock (EditorReaderLock) {
+                var reader = GetFullEditorReader();
+                var path = GetCurrentBeatmap(reader);
+                var editor = GetNewestVersion(path, reader);
 
-            var path = GetCurrentBeatmap(reader);
-            var editor = GetNewestVersion(path, reader);
-
-            BackupManager.SaveMapBackup(path);
-            editor.SaveFile();
+                BackupManager.SaveMapBackup(path);
+                editor.SaveFile();
+            }
 
             Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully saved current beatmap!"));
         }
@@ -291,8 +293,10 @@ namespace Mapping_Tools.Classes.ToolHelpers {
             exception = null;
 
             try {
-                var fullReader = GetFullEditorReader();
-                return GetNewestVersion(path, fullReader, out selected);
+                lock (EditorReaderLock) {
+                    var fullReader = GetFullEditorReader();
+                    return GetNewestVersion(path, fullReader, out selected);
+                }
             } catch (Exception ex) {
                 exception = ex;
             }

@@ -7,12 +7,12 @@ using Mapping_Tools.Classes.ToolHelpers;
 using Microsoft.Win32;
 using OsuMemoryDataProvider.OsuMemoryModels;
 using OsuMemoryDataProvider.OsuMemoryModels.Direct;
-using System.Collections.Generic;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class IOHelper {
         private static readonly StructuredOsuMemoryReader PioStructuredReader = StructuredOsuMemoryReader.Instance;
         private static readonly OsuBaseAddresses OsuBaseAddresses = new();
+        private static readonly object pioReaderLock = new();
 
         public static string FolderDialog(string initialDirectory = "") {
             bool restore = initialDirectory == "";
@@ -148,8 +148,10 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         private static T ReadClassProperty<T>(object readObj, string propName, T defaultValue = default) where T : class {
-            if (PioStructuredReader.TryReadProperty(readObj, propName, out var readResult))
-                return (T)readResult;
+            lock (pioReaderLock) {
+                if (PioStructuredReader.TryReadProperty(readObj, propName, out var readResult))
+                    return (T) readResult;
+            }
 
             return defaultValue;
         }
@@ -160,11 +162,13 @@ namespace Mapping_Tools.Classes.SystemTools {
         public static string GetCurrentBeatmap() {
             string path;
             try {
-                var reader = EditorReaderStuff.GetEditorReader();
-                reader.SetProcess(EditorReaderStuff.GetOsuProcess());
-                reader.FetchHOM();
-                reader.FetchBeatmap();
-                path = EditorReaderStuff.GetCurrentBeatmap(reader);
+                lock (EditorReaderStuff.EditorReaderLock) {
+                    var reader = EditorReaderStuff.GetEditorReader();
+                    reader.SetProcess(EditorReaderStuff.GetOsuProcess());
+                    reader.FetchHOM();
+                    reader.FetchBeatmap();
+                    path = EditorReaderStuff.GetCurrentBeatmap(reader);
+                }
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.Message);
