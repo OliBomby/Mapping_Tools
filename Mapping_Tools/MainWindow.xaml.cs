@@ -64,9 +64,9 @@ namespace Mapping_Tools {
 
                 Setup();
                 SettingsManager.LoadConfig();
-                ListenerManager = new ListenerManager();
 
                 DataContext = new MainWindowVm();
+                ListenerManager = new ListenerManager();
 
                 MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
                 MainSnackbar.MessageQueue = MessageQueue;
