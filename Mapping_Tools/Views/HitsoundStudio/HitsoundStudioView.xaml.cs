@@ -266,6 +266,24 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 MessageBox.Show("Please select a base beatmap first.");
                 return;
             }
+
+            if (!Directory.Exists(settings.ExportFolder))
+            {
+                var folderResult = MessageBox.Show(
+                    $"Folder at path \"{settings.ExportFolder}\" does not exist.\nCreate a new folder?",
+                    "Export path not found.", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (folderResult == MessageBoxResult.Yes) {
+                    try {
+                        Directory.CreateDirectory(settings.ExportFolder);
+                    } catch (Exception ex) {
+                        ex.Show();
+                        return;
+                    }
+                } else {
+                    return;
+                }
+            }
             
             // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
             FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
