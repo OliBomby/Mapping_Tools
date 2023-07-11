@@ -261,9 +261,9 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
             if (!(bool) result) return;
 
-            if (settings.BaseBeatmap == null || settings.DefaultSample == null)
+            if (string.IsNullOrWhiteSpace(settings.BaseBeatmap))
             {
-                MessageBox.Show("Please select a base beatmap and default hitsound first.");
+                MessageBox.Show("Please select a base beatmap first.");
                 return;
             }
             
