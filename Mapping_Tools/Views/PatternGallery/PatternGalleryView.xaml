@@ -87,7 +87,8 @@
                             VirtualizingPanel.CacheLengthUnit="Page"
                             VirtualizingPanel.CacheLength="1,1"
                             VirtualizingPanel.ScrollUnit="Pixel"
-                            VirtualizingPanel.VirtualizationMode="Recycling">
+                            VirtualizingPanel.VirtualizationMode="Recycling"
+                            VirtualizingPanel.IsVirtualizingWhenGrouping="True">
                             <ListBox.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <controls:VirtualizingWrapPanel
@@ -97,6 +98,36 @@
                                         ItemSize="166,166"/>
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
+                            <ListBox.GroupStyle>
+                                <GroupStyle HidesIfEmpty="True">
+                                    <GroupStyle.ContainerStyle>
+                                        <Style TargetType="{x:Type GroupItem}">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate>
+                                                        <Expander IsExpanded="True">
+                                                            <Expander.Header>
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="Gray" FontSize="22" VerticalAlignment="Bottom" />
+                                                                    <TextBlock Text="{Binding ItemCount}" FontSize="22" Foreground="Green" FontWeight="Bold" FontStyle="Italic" Margin="10,0,0,0" VerticalAlignment="Bottom" />
+                                                                    <TextBlock Text=" item(s)" FontSize="22" Foreground="Silver" FontStyle="Italic" VerticalAlignment="Bottom" />
+                                                                </StackPanel>
+                                                            </Expander.Header>
+                                                            <ItemsPresenter />
+                                                        </Expander>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </GroupStyle.ContainerStyle>
+                                    <GroupStyle.Panel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel
+                                                Orientation="Vertical" />
+                                        </ItemsPanelTemplate>
+                                    </GroupStyle.Panel>
+                                </GroupStyle>
+                            </ListBox.GroupStyle>
                             <ListBox.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="_Delete" Command="{Binding RemoveCommand}" Tag="Delete"
@@ -111,6 +142,7 @@
                                             <materialDesign:PackIcon Kind="ArrowTopRightThick"/>
                                         </MenuItem.Icon>
                                     </MenuItem>
+                                    <MenuItem Header="_Group" ItemsSource="{Binding PatternGroupContextMenu}"/>
                                     <MenuItem Header="_Properties" Command="{Binding ShowDetailsCommand}"
                                               ToolTip="View additional properties of the pattern.">
                                     </MenuItem>

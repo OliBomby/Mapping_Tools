@@ -17,8 +17,10 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+// ReSharper disable AsyncVoidLambda
 
 namespace Mapping_Tools.Viewmodels {
     public class PatternGalleryVm : BindableBase {
@@ -59,9 +61,12 @@ namespace Mapping_Tools.Viewmodels {
         public string SortProperty { get => sortProperty; set => SetSortProperty(value); }
 
         [JsonIgnore]
-        private int sortDirection = 0;
+        private int sortDirection;
         [JsonIgnore]
         public int SortDirection { get => sortDirection; set => SetSortDirection(value); }
+
+        [JsonIgnore]
+        public ObservableCollection<FrameworkElement> PatternGroupContextMenu { get; }
 
         #region Options
 
@@ -225,6 +230,10 @@ namespace Mapping_Tools.Viewmodels {
             patternCollectionView = (ListCollectionView) CollectionViewSource.GetDefaultView(Patterns);
             patternCollectionView.Filter = PatternNameFilter;
             patternCollectionView.CustomSort = new CustomPatternSorter { Parent = this };
+            patternCollectionView.GroupDescriptions?.Add(new PropertyGroupDescription(nameof(OsuPattern.Group)));
+
+            PatternGroupContextMenu = new ObservableCollection<FrameworkElement>();
+            patterns.CollectionChanged += (_, _) => UpdateGroupContextMenuItems();
 
             AddCodeCommand = new CommandImplementation(
                 async _ => {
@@ -344,6 +353,90 @@ namespace Mapping_Tools.Viewmodels {
                         pattern.Name = viewModel.Name;
                     } catch (Exception ex) { ex.Show(); }
                 });
+        }
+
+        private void UpdateGroupContextMenuItems() {
+            var groups = patterns.Select(o => o.Group).Distinct().ToList();
+            groups.Sort(StringComparer.Ordinal);
+
+            var existingGroups = PatternGroupContextMenu.OfType<MenuItem>().SkipLast(1).Select(o => {
+                var header = o.Header as string;
+                return header == "None" ? null : header;
+            }).ToList();
+            existingGroups.Sort(StringComparer.Ordinal);
+
+            if (existingGroups.SequenceEqual(groups))
+                return;
+
+            PatternGroupContextMenu.Clear();
+
+            foreach (var group in groups) {
+                var item = new MenuItem {
+                    Header = string.IsNullOrEmpty(group) ? "None" : group,
+                    Command = new CommandImplementation(
+                        _ => {
+                            try {
+                                foreach (var pattern in Patterns.Where(o => o.IsSelected)) {
+                                    pattern.Group = group;
+                                }
+
+                                patternCollectionView.Refresh();
+                                UpdateGroupContextMenuItems();
+                            } catch (Exception ex) { ex.Show(); }
+                        })
+                };
+                PatternGroupContextMenu.Add(item);
+            }
+
+            PatternGroupContextMenu.Add(new Separator());
+
+            var typeNewGroupItem = new MenuItem {
+                Header = "Type new group name...",
+                Command = new CommandImplementation(
+                    async _ => {
+                        try {
+                            var viewModel = new NewGroupVm { GroupName = $"Group {groups.Count}" };
+                            var dialog = new CustomDialog(viewModel, 0);
+                            var result = await DialogHost.Show(dialog, "RootDialog");
+
+                            if (result is not true) return;
+
+                            foreach (var pattern in Patterns.Where(o => o.IsSelected)) {
+                                pattern.Group = viewModel.GroupName;
+                            }
+
+                            patternCollectionView.Refresh();
+                            UpdateGroupContextMenuItems();
+                        } catch (Exception ex) { ex.Show(); }
+                    })
+            };
+
+            var renameGroupItem = new MenuItem {
+                Header = "_Rename group...",
+                Command = new CommandImplementation(
+                    async _ => {
+                        try {
+                            var viewModel = new NewGroupVm { GroupName = $"Group {groups.Count}" };
+                            var dialog = new CustomDialog(viewModel, 0);
+                            var result = await DialogHost.Show(dialog, "RootDialog");
+
+                            if (result is not true) return;
+
+                            string group = Patterns.FirstOrDefault(o => o.IsSelected)?.Group;
+                            foreach (var pattern in Patterns.Where(o => o.Group == group)) {
+                                pattern.Group = viewModel.GroupName;
+                            }
+
+                            patternCollectionView.Refresh();
+                            UpdateGroupContextMenuItems();
+                        } catch (Exception ex) {
+                            ex.Show();
+                        }
+                    })
+            };
+
+            PatternGroupContextMenu.Add(renameGroupItem);
+            PatternGroupContextMenu.Add(typeNewGroupItem);
         }
 
         public void SetSelectAll(bool select) {
