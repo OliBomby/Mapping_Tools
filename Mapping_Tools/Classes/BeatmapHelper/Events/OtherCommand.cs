@@ -17,10 +17,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// </summary>
         public double[] Params { get; set; }
 
+        /// <summary>
+        /// Used to describe <see cref="EventType"/> in case it is Unknown.
+        /// </summary>
+        public string FallbackEventType { get; set; }
+
         public override string GetLine() {
             var builder = new StringBuilder(8 + Params.Length * 2);
 
-            builder.Append(EventType.ToString());
+            builder.Append(EventType == EventType.Unknown ? FallbackEventType : EventType.ToString());
             builder.Append(',');
             builder.Append(((int) Easing).ToInvariant());
             builder.Append(',');
@@ -42,9 +47,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
             var subLine = RemoveIndents(line);
             var values = subLine.Split(',');
 
-            if (Enum.TryParse(values[0], out EventType eventType))
-                EventType = eventType;
-            else throw new BeatmapParsingException("Failed to parse type of command.", line);
+            EventType = Enum.TryParse(values[0], out EventType eventType) ? eventType : EventType.Unknown;
+
+            if (EventType == EventType.Unknown) {
+                FallbackEventType = values[0];
+            }
 
             if (Enum.TryParse(values[1], out EasingType easingType))
                 Easing = easingType;

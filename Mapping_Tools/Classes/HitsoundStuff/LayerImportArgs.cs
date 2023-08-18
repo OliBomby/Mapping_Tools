@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Mapping_Tools.Classes.MathUtil;
+// ReSharper disable CompareOfFloatsByEqualityOperator
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
@@ -29,6 +27,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             discriminateVolumes = false;
             DetectDuplicateSamples = false;
             RemoveDuplicates = false;
+            Offset = 0;
         }
 
         /// <inheritdoc />
@@ -48,6 +47,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             discriminateVolumes = false;
             DetectDuplicateSamples = false;
             RemoveDuplicates = false;
+            Offset = 0;
         }
 
         private ImportType importType;
@@ -90,7 +90,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// 
         /// </summary>
         public Visibility KeysoundVisibility =>
-            ImportType == ImportType.Midi ? Visibility.Visible : Visibility.Collapsed;
+            ImportType == ImportType.MIDI ? Visibility.Visible : Visibility.Collapsed;
 
         /// <summary>
         /// 
@@ -273,6 +273,20 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        private double offset;
+        /// <summary>
+        ///
+        /// </summary>
+        public double Offset {
+            get => offset;
+            set {
+                if (offset != value) {
+                    offset = value;
+                    NotifyPropertyChanged("Offset");
+                }
+            }
+        }
+
 
         /// <summary>
         /// 
@@ -292,7 +306,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         /// <returns></returns>
         public ImportReloadingArgs GetImportReloadingArgs() {
-            return new ImportReloadingArgs(ImportType, Path, X, Y, LengthRoughness, VelocityRoughness, DiscriminateVolumes, DetectDuplicateSamples, RemoveDuplicates);
+            return new ImportReloadingArgs(ImportType, Path, X, Y, LengthRoughness, VelocityRoughness, DiscriminateVolumes, DetectDuplicateSamples, RemoveDuplicates, Offset);
         }
 
         /// <summary>
@@ -309,7 +323,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     return Path == o.Path && (X == -1 || X == o.X) && (Y == -1 || Y == o.Y);
                 case ImportType.Hitsounds:
                     return Path == o.Path && SamplePath == o.SamplePath && (!discriminateVolumes || Math.Abs(Volume - o.Volume) < Precision.DoubleEpsilon);
-                case ImportType.Midi:
+                case ImportType.MIDI:
                     return Path == o.Path && (Bank == -1 || Bank == o.Bank) && (Patch == -1 || Patch == o.Patch) && (Key == -1 || Key == o.Key)
                                           && (Length == -1 || Length == o.Length) && (Velocity == -1 || Velocity == o.Velocity);
                 case ImportType.Storyboard:
@@ -339,7 +353,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 VelocityRoughness == other.VelocityRoughness &&
                 RemoveDuplicates == other.RemoveDuplicates &&
                 DiscriminateVolumes == other.DiscriminateVolumes &&
-                DetectDuplicateSamples == other.DetectDuplicateSamples;
+                DetectDuplicateSamples == other.DetectDuplicateSamples &&
+                Offset == other.Offset;
         }
 
         /// <inheritdoc />
@@ -370,6 +385,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             hashCode = hashCode * -1521134295 + RemoveDuplicates.GetHashCode();
             hashCode = hashCode * -1521134295 + DiscriminateVolumes.GetHashCode();
             hashCode = hashCode * -1521134295 + DetectDuplicateSamples.GetHashCode();
+            hashCode = hashCode * -1521134295 + Offset.GetHashCode();
             return hashCode;
         }
 

@@ -10,25 +10,30 @@ using System.Windows;
 namespace Mapping_Tools.Classes.SystemTools {
     public static class SettingsManager {
         private static string JsonPath { get; set; }
-        private static readonly JsonSerializer Serializer = new JsonSerializer {
+        private static readonly JsonSerializer serializer = new() {
             NullValueHandling = NullValueHandling.Ignore,
             Formatting = Formatting.Indented
         };
 
-        public static readonly Settings Settings = new Settings();
+        public static readonly Settings Settings = new();
         public static bool InstanceComplete;
 
         public static void LoadConfig() {
             JsonPath = Path.Combine(MainWindow.AppDataPath, "config.json");
             InstanceComplete = File.Exists(JsonPath) ? LoadFromJson() : CreateJson();
-            DefaultPaths();
+
+            try {
+                DefaultPaths();
+            } catch (Exception e) {
+                e.Show();
+            }
         }
 
         private static bool LoadFromJson() {
             try {
                 using( StreamReader sr = new StreamReader(JsonPath)) {
                     using (JsonReader reader = new JsonTextReader(sr)) {
-                        Settings newSettings = Serializer.Deserialize<Settings>(reader);
+                        Settings newSettings = serializer.Deserialize<Settings>(reader);
                         newSettings.CopyTo(Settings);
                     }
                 }
@@ -48,7 +53,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             try {
                 using( StreamWriter sw = new StreamWriter(JsonPath)) {
                     using (JsonWriter writer = new JsonTextWriter(sw)) {
-                        Serializer.Serialize(writer, Settings);
+                        serializer.Serialize(writer, Settings);
                     }
                 }
             }
@@ -67,7 +72,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             try {
                 using( StreamWriter sw = new StreamWriter(JsonPath)) {
                     using (JsonWriter writer = new JsonTextWriter(sw)) {
-                        Serializer.Serialize(writer, Settings);
+                        serializer.Serialize(writer, Settings);
                     }
                 }
             }
@@ -128,8 +133,8 @@ namespace Mapping_Tools.Classes.SystemTools {
 
             if (string.IsNullOrWhiteSpace(Settings.BackupsPath)) {
                 Settings.BackupsPath = Path.Combine(MainWindow.AppDataPath, "Backups");
-                Directory.CreateDirectory(Settings.BackupsPath);
             }
+            Directory.CreateDirectory(Settings.BackupsPath);
         }
 
         private static string GetBeatmapDirectory(string configPath) {
@@ -154,8 +159,8 @@ namespace Mapping_Tools.Classes.SystemTools {
             {
                 RegistryKey regKey = parentKey.OpenSubKey(t);
                 try {
-                    if (regKey != null && regKey.GetValue("DisplayName").ToString() == name) {
-                        return Path.GetDirectoryName(regKey.GetValue("UninstallString").ToString());
+                    if (regKey != null && regKey.GetValue("DisplayName")?.ToString() == name) {
+                        return Path.GetDirectoryName(regKey.GetValue("UninstallString")?.ToString());
                     }
                 } catch (NullReferenceException) { }
             }

@@ -261,10 +261,28 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
             if (!(bool) result) return;
 
-            if (settings.BaseBeatmap == null || settings.DefaultSample == null)
+            if (string.IsNullOrWhiteSpace(settings.BaseBeatmap))
             {
-                MessageBox.Show("Please select a base beatmap and default hitsound first.");
+                MessageBox.Show("Please select a base beatmap first.");
                 return;
+            }
+
+            if (!Directory.Exists(settings.ExportFolder))
+            {
+                var folderResult = MessageBox.Show(
+                    $"Folder at path \"{settings.ExportFolder}\" does not exist.\nCreate a new folder?",
+                    "Export path not found.", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (folderResult == MessageBoxResult.Yes) {
+                    try {
+                        Directory.CreateDirectory(settings.ExportFolder);
+                    } catch (Exception ex) {
+                        ex.Show();
+                        return;
+                    }
+                } else {
+                    return;
+                }
             }
             
             // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
@@ -407,6 +425,8 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
                     layers.ForEach(o => o.Reload(importedLayers));
                 }
+
+                UpdateEditingField();
             }
             catch (Exception ex) { ex.Show(); }
         }
@@ -460,13 +480,14 @@ namespace Mapping_Tools.Views.HitsoundStudio
             SelectedImportLengthRoughnessBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.LengthRoughness, CultureInfo.InvariantCulture);
             SelectedImportVelocityBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Velocity);
             SelectedImportVelocityRoughnessBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.VelocityRoughness, CultureInfo.InvariantCulture);
+            SelectedImportOffsetBox.Text = selectedLayers.AllToStringOrDefault(o => o.ImportArgs.Offset, CultureInfo.InvariantCulture);
 
             // Update visibility
             SoundFontArgsPanel.Visibility = selectedLayers.Any(o => o.SampleArgs.UsesSoundFont || string.IsNullOrEmpty(o.SampleArgs.GetExtension())) ? Visibility.Visible : Visibility.Collapsed;
             SelectedStackPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Stack) ? Visibility.Visible : Visibility.Collapsed;
             SelectedHitsoundsPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Hitsounds) ? Visibility.Visible : Visibility.Collapsed;
             SelectedStoryboardPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Storyboard) ? Visibility.Visible : Visibility.Collapsed;
-            SelectedMidiPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.Midi) ? Visibility.Visible : Visibility.Collapsed;
+            SelectedMidiPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.ImportType == ImportType.MIDI) ? Visibility.Visible : Visibility.Collapsed;
             ImportArgsPanel.Visibility = selectedLayers.Any(o => o.ImportArgs.CanImport) ? Visibility.Visible : Visibility.Collapsed;
 
             suppressEvents = false;
@@ -988,6 +1009,17 @@ namespace Mapping_Tools.Views.HitsoundStudio
             foreach (HitsoundLayer hitsoundLayer in selectedLayers)
             {
                 hitsoundLayer.ImportArgs.VelocityRoughness = t;
+            }
+        }
+
+        private void SelectedImportOffsetBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (suppressEvents) return;
+
+            double t = (sender as TextBox).GetDouble(0);
+            foreach (HitsoundLayer hitsoundLayer in selectedLayers)
+            {
+                hitsoundLayer.ImportArgs.Offset = t;
             }
         }
 

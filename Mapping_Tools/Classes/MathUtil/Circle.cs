@@ -157,13 +157,13 @@ namespace Mapping_Tools.Classes.MathUtil {
             return !left.Equals(right);
         }
 
-        private static readonly string ListSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+        private static readonly string listSeparator = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator;
         /// <summary>
         /// Returns a System.string that represents the current Circle.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return string.Format("({1}{0} {2})", ListSeparator, Centre, Radius);
+            return string.Format("({1}{0} {2})", listSeparator, Centre, Radius);
         }
 
 

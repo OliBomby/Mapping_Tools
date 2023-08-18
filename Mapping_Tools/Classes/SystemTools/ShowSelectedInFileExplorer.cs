@@ -8,10 +8,10 @@
     using System.Runtime.InteropServices.ComTypes;
 
     // https://gist.github.com/vbfox/551626
-    static class ShowSelectedInExplorer
+    static internal class ShowSelectedInExplorer
     {
         [Flags]
-        enum SHCONT : ushort
+        private enum SHCONT : ushort
         {
             ShcontfCheckingForChildren = 0x0010,
             ShcontfFolders = 0x0020,
@@ -31,7 +31,7 @@
         Guid("000214E6-0000-0000-C000-000000000046"),
         InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
         ComConversionLoss]
-        interface IShellFolder
+        private interface IShellFolder
         {
             [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
             void ParseDisplayName(IntPtr hwnd, [In, MarshalAs(UnmanagedType.Interface)] IBindCtx pbc, [In, MarshalAs(UnmanagedType.LPWStr)] string pszDisplayName, [Out] out uint pchEaten, [Out] out IntPtr ppidl, [In, Out] ref uint pdwAttributes);
@@ -69,7 +69,7 @@
         [ComImport,
         Guid("000214F2-0000-0000-C000-000000000046"),
         InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        interface IEnumIDList
+        private interface IEnumIDList
         {
             [PreserveSig]
             [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
@@ -88,21 +88,20 @@
             int Clone([MarshalAs(UnmanagedType.Interface)] out IEnumIDList ppenum);
         }
 
-        static class NativeMethods
+        private static class NativeMethods
         {
             [DllImport("shell32.dll", EntryPoint = "SHGetDesktopFolder", CharSet = CharSet.Unicode,
                 SetLastError = true)]
-            static extern int SHGetDesktopFolder_([MarshalAs(UnmanagedType.Interface)] out IShellFolder ppshf);
+            private static extern int SHGetDesktopFolder_([MarshalAs(UnmanagedType.Interface)] out IShellFolder ppshf);
 
             public static IShellFolder ShGetDesktopFolder()
             {
-                IShellFolder result;
-                Marshal.ThrowExceptionForHR(SHGetDesktopFolder_(out result));
+                Marshal.ThrowExceptionForHR(SHGetDesktopFolder_(out IShellFolder result));
                 return result;
             }
 
             [DllImport("shell32.dll", EntryPoint = "SHOpenFolderAndSelectItems")]
-            static extern int SHOpenFolderAndSelectItems_(
+            private static extern int SHOpenFolderAndSelectItems_(
                 [In] IntPtr pidlFolder, uint cidl, [In, Optional, MarshalAs(UnmanagedType.LPArray)] IntPtr[] apidl,
                 int dwFlags);
 
@@ -117,45 +116,42 @@
             public static extern void ILFree([In] IntPtr pidl);
         }
 
-        static IntPtr GetShellFolderChildrenRelativePidl(IShellFolder parentFolder, string displayName)
+        private static IntPtr GetShellFolderChildrenRelativePidl(IShellFolder parentFolder, string displayName)
         {
-            uint pchEaten;
             uint pdwAttributes = 0;
-            IntPtr ppidl;
-            parentFolder.ParseDisplayName(IntPtr.Zero, null, displayName, out pchEaten, out ppidl, ref pdwAttributes);
+            parentFolder.ParseDisplayName(IntPtr.Zero, null, displayName, out uint _, out IntPtr ppidl, ref pdwAttributes);
 
             return ppidl;
         }
 
-        static IntPtr PathToAbsolutePidl(string path)
+        private static IntPtr PathToAbsolutePidl(string path)
         {
             var desktopFolder = NativeMethods.ShGetDesktopFolder();
             return GetShellFolderChildrenRelativePidl(desktopFolder, path);
         }
 
-        static Guid iid_iShellFolder = typeof(IShellFolder).GUID;
+        private static Guid iid_iShellFolder = typeof(IShellFolder).GUID;
 
-        static IShellFolder PidlToShellFolder(IShellFolder parent, IntPtr pidl)
+        private static IShellFolder PidlToShellFolder(IShellFolder parent, IntPtr pidl)
         {
-            IShellFolder folder;
-            var result = parent.BindToObject(pidl, null, ref iid_iShellFolder, out folder);
-            Marshal.ThrowExceptionForHR((int)result);
+            var result = parent.BindToObject(pidl, null, ref iid_iShellFolder, out IShellFolder folder);
+            Marshal.ThrowExceptionForHR(result);
             return folder;
         }
 
-        static IShellFolder PidlToShellFolder(IntPtr pidl)
+        private static IShellFolder PidlToShellFolder(IntPtr pidl)
         {
             return PidlToShellFolder(NativeMethods.ShGetDesktopFolder(), pidl);
         }
 
-        static void ShOpenFolderAndSelectItems(IntPtr pidlFolder, IntPtr[] apidl, bool edit)
+        private static void ShOpenFolderAndSelectItems(IntPtr pidlFolder, IntPtr[] apidl, bool edit)
         {
             NativeMethods.ShOpenFolderAndSelectItems(pidlFolder, apidl, edit ? 1 : 0);
         }
 
         public static void FileOrFolder(string path, bool edit = false)
         {
-            if (path == null) throw new ArgumentNullException("path");
+            if (path == null) throw new ArgumentNullException(nameof(path));
 
             var pidl = PathToAbsolutePidl(path);
             try
@@ -168,7 +164,7 @@
             }
         }
 
-        static IEnumerable<FileSystemInfo> PathToFileSystemInfo(IEnumerable<string> paths)
+        private static IEnumerable<FileSystemInfo> PathToFileSystemInfo(IEnumerable<string> paths)
         {
             foreach (var path in paths)
             {
@@ -190,7 +186,7 @@
                 else
                 {
                     throw new FileNotFoundException
-                        (string.Format("The specified file or folder doesn't exists : {0}", fixedPath),
+                        ($"The specified file or folder doesn't exists : {fixedPath}",
                         fixedPath);
                 }
             }
@@ -198,7 +194,7 @@
 
         public static void FilesOrFolders(string parentDirectory, ICollection<string> filenames)
         {
-            if (filenames == null) throw new ArgumentNullException("filenames");
+            if (filenames == null) throw new ArgumentNullException(nameof(filenames));
             if (filenames.Count == 0) return;
 
             var parentPidl = PathToAbsolutePidl(parentDirectory);
@@ -234,16 +230,16 @@
 
         public static void FilesOrFolders(IEnumerable<string> paths)
         {
-            if (paths == null) throw new ArgumentNullException("paths");
+            if (paths == null) throw new ArgumentNullException(nameof(paths));
 
             FilesOrFolders(PathToFileSystemInfo(paths));
         }
 
         public static void FilesOrFolders(IEnumerable<FileSystemInfo> paths)
         {
-            if (paths == null) throw new ArgumentNullException("paths");
+            if (paths == null) throw new ArgumentNullException(nameof(paths));
             var pathsArray = paths.ToArray();
-            if (pathsArray.Count() == 0) return;
+            if (!pathsArray.Any()) return;
 
             var explorerWindows = pathsArray.GroupBy(p => Path.GetDirectoryName(p.FullName));
 

@@ -9,9 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
+using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Viewmodels {
     public class HitsoundPreviewHelperVm : INotifyPropertyChanged
@@ -38,18 +40,26 @@ namespace Mapping_Tools.Viewmodels {
             AddCommand = new CommandImplementation(
                 _ => {
                     try {
-                        var newZone = new HitsoundZone();
                         if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
-                            var editor = EditorReaderStuff.GetBeatmapEditor(EditorReaderStuff.GetFullEditorReader(),
-                                out var selected);
-                            if (selected.Count > 0) {
-                                newZone.XPos = selected[0].Pos.X;
-                                newZone.YPos = editor.Beatmap.General["Mode"].IntValue == 3 ? -1 : selected[0].Pos.Y;
-                            } else {
+                            var editor = EditorReaderStuff.GetBeatmapEditor(EditorReaderStuff.GetFullEditorReader(), out var selected);
+
+                            if (selected.Count == 0) {
                                 MessageBox.Show("Please select a hit object to fetch the coordinates.");
+                                return;
                             }
+
+                            var positions = selected.Select(o => o.Pos).Distinct();
+
+                            foreach (Vector2 pos in positions) {
+                                var newZone = new HitsoundZone {
+                                    XPos = pos.X,
+                                    YPos = editor.Beatmap.General["Mode"].IntValue == 3 ? -1 : pos.Y
+                                };
+                                Items.Add(newZone);
+                            }
+                        } else {
+                            Items.Add(new HitsoundZone());
                         }
-                        Items.Add(newZone);
                     } catch (Exception ex) { ex.Show(); }
                 });
             CopyCommand = new CommandImplementation(

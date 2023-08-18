@@ -173,6 +173,10 @@ namespace Mapping_Tools.Viewmodels {
         
         #region main loop
         private void UpdateTimerTick(object sender, EventArgs e) {
+            if (!SettingsManager.Settings.UseEditorReader) {
+                return;
+            }
+
             var reader = EditorReaderStuff.GetEditorReader();
             switch (state) {
                 case State.Disabled:

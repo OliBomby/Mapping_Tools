@@ -1,9 +1,10 @@
-﻿namespace Mapping_Tools.Classes.BeatmapHelper.Events {
+﻿// ReSharper disable InconsistentNaming
+namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     public enum EventType {
         F, // Fade
         M, // Move
-        Mx, // Move X
-        My, // Move Y
+        MX, // Move X
+        MY, // Move Y
         S, // Scale
         V, // Vector scale
         R, // Rotate
@@ -11,5 +12,6 @@
         L, // Loop
         T, // EventType-triggered loop
         P, // Parameters
+        Unknown, // Unknown command type
     }
 }

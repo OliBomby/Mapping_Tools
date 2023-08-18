@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+// ReSharper disable CompareOfFloatsByEqualityOperator
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
@@ -16,10 +17,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     x.Y == y.Y;
                 case ImportType.Hitsounds:
                     return x.Path == y.Path;
-                case ImportType.Midi:
+                case ImportType.MIDI:
                     return x.Path == y.Path &&
                     x.LengthRoughness == y.LengthRoughness &&
-                    x.VelocityRoughness == y.VelocityRoughness;
+                    x.VelocityRoughness == y.VelocityRoughness &&
+                    x.Offset == y.Offset;
                 case ImportType.None:
                     return true;
                 default:
@@ -43,10 +45,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 case ImportType.Hitsounds:
                     hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(x.Path);
                     return hashCode;
-                case ImportType.Midi:
+                case ImportType.MIDI:
                     hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(x.Path);
                     hashCode = hashCode * -1521134295 + x.LengthRoughness.GetHashCode();
                     hashCode = hashCode * -1521134295 + x.VelocityRoughness.GetHashCode();
+                    hashCode = hashCode * -1521134295 + x.Offset.GetHashCode();
                     return hashCode;
                 case ImportType.None:
                     return hashCode;

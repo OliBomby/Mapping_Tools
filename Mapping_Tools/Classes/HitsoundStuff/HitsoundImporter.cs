@@ -421,7 +421,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                     // Construct hitsound layer properties
                     var sampleArgs = new SampleGeneratingArgs(string.Empty, bank, patch, instrument, key, length, velocity);
-                    var importArgs = new LayerImportArgs(ImportType.Midi) {
+                    var importArgs = new LayerImportArgs(ImportType.MIDI) {
                         Path = path,
                         Bank = bank,
                         Patch = patch,
@@ -429,7 +429,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         Length = length,
                         LengthRoughness = lengthRoughness,
                         Velocity = velocity,
-                        VelocityRoughness = velocityRoughness
+                        VelocityRoughness = velocityRoughness,
+                        Offset = offset
                     };
 
                     // Find the hitsoundlayer with this path
@@ -472,8 +473,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     return ImportHitsounds(reloadingArgs.Path, reloadingArgs.DiscriminateVolumes, reloadingArgs.DetectDuplicateSamples, reloadingArgs.RemoveDuplicates, false);
                 case ImportType.Storyboard:
                     return ImportStoryboard(reloadingArgs.Path, reloadingArgs.DiscriminateVolumes, reloadingArgs.RemoveDuplicates);
-                case ImportType.Midi:
-                    return ImportMidi(reloadingArgs.Path,
+                case ImportType.MIDI:
+                    return ImportMidi(reloadingArgs.Path, reloadingArgs.Offset,
                         lengthRoughness: reloadingArgs.LengthRoughness,
                         velocityRoughness: reloadingArgs.VelocityRoughness);
                 default:

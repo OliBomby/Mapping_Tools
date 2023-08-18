@@ -6,17 +6,17 @@ using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 
 namespace Mapping_Tools.Components.Graph.Interpolation {
     public class InterpolatorHelper {
-        private static readonly Type InterfaceType = typeof(IGraphInterpolator);
+        private static readonly Type interfaceType = typeof(IGraphInterpolator);
 
         private static Type[] interpolators;
         public static Type[] GetInterpolators() {
             try {
-                return interpolators ?? (interpolators = AppDomain.CurrentDomain.GetAssemblies()
-                           .SelectMany(x => x.GetTypes())
-                           .Where(x => InterfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract &&
-                                       x.GetCustomAttribute<IgnoreInterpolatorAttribute>() == null).OrderBy(GetName, new InterpolatorComparer()).ToArray());
+                return interpolators ??= AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(x => x.GetTypes())
+                    .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract &&
+                                x.GetCustomAttribute<IgnoreInterpolatorAttribute>() == null).OrderBy(GetName, new InterpolatorComparer()).ToArray();
             } catch (ReflectionTypeLoadException) {
-                return new Type[0];
+                return Type.EmptyTypes;
             }
         }
 

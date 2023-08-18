@@ -1,6 +1,5 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
 using System;
-using Mapping_Tools.Classes.BeatmapHelper;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
@@ -23,6 +22,12 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
         public string Name {
             get => name;
             set => Set(ref name, value);
+        }
+
+        private string group;
+        public string Group {
+            get => group;
+            set => Set(ref group, value);
         }
 
         private DateTime creationTime;

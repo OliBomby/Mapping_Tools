@@ -71,7 +71,7 @@ namespace Mapping_Tools.Views.Standard
 
         private void CloseWin(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         //Enable drag control of window and set icons when docked
@@ -79,8 +79,8 @@ namespace Mapping_Tools.Views.Standard
         {
             if (e.ChangedButton == MouseButton.Left)
             {
-                Button bt = this.FindName("toggle_button") as Button;
-                this.DragMove();
+                Button bt = FindName("ToggleButton") as Button;
+                DragMove();
                 //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
             }
         }

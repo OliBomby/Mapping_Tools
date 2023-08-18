@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+// ReSharper disable CompareOfFloatsByEqualityOperator
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
@@ -18,14 +19,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public bool DiscriminateVolumes { get; }
         public bool DetectDuplicateSamples { get; }
         public bool RemoveDuplicates { get; }
+        public double Offset { get; }
 
         /// <inheritdoc />
-        public ImportReloadingArgs(string path) : this(ImportType.None, path, -1, -1, -1, -1, false, false, false) {
+        public ImportReloadingArgs(string path) : this(ImportType.None, path, -1, -1, -1, -1, false, false, false, 0) {
         }
 
         /// <inheritdoc />
         public ImportReloadingArgs(ImportType importType, string path, double x, double y, double lengthRoughness, double velocityRoughness,
-            bool discriminateVolumes, bool detectDuplicateSamples, bool removeDuplicates) {
+            bool discriminateVolumes, bool detectDuplicateSamples, bool removeDuplicates, double offset) {
             ImportType = importType;
             Path = path;
             X = x;
@@ -35,6 +37,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             DiscriminateVolumes = discriminateVolumes;
             DetectDuplicateSamples = detectDuplicateSamples;
             RemoveDuplicates = removeDuplicates;
+            Offset = offset;
         }
 
         /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
@@ -49,7 +52,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 VelocityRoughness == other.VelocityRoughness &&
                 DiscriminateVolumes == other.DiscriminateVolumes &&
                 DetectDuplicateSamples == other.DetectDuplicateSamples &&
-                RemoveDuplicates == other.RemoveDuplicates;
+                RemoveDuplicates == other.RemoveDuplicates &&
+                Offset == other.Offset;
         }
 
         /// <summary>Determines whether the specified object is equal to the current object.</summary>
@@ -76,6 +80,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             hashCode = hashCode * -1521134295 + RemoveDuplicates.GetHashCode();
             hashCode = hashCode * -1521134295 + DiscriminateVolumes.GetHashCode();
             hashCode = hashCode * -1521134295 + DetectDuplicateSamples.GetHashCode();
+            hashCode = hashCode * -1521134295 + Offset.GetHashCode();
             return hashCode;
         }
     }

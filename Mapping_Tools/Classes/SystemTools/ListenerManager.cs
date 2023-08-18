@@ -328,16 +328,15 @@ namespace Mapping_Tools.Classes.SystemTools {
             try
             {
                 FsWatcher.Path = SettingsManager.GetSongsPath();
+                FsWatcher.Filter = "*.osu";
+                FsWatcher.Changed += OnChangedFsWatcher;
+                FsWatcher.EnableRaisingEvents = SettingsManager.Settings.OverrideOsuSave;
+                FsWatcher.IncludeSubdirectories = true;
             }
             catch
             {
                 // ignored
             }
-
-            FsWatcher.Filter = "*.osu";
-            FsWatcher.Changed += OnChangedFsWatcher;
-            FsWatcher.EnableRaisingEvents = SettingsManager.Settings.OverrideOsuSave;
-            FsWatcher.IncludeSubdirectories = true;
         }
 
         private static void OnChangedFsWatcher(object sender, FileSystemEventArgs e)

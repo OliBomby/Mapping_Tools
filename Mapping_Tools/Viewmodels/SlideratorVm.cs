@@ -88,13 +88,13 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public double GraphBeats {
             get => graphBeats;
-            set {
-                if (!Set(ref graphBeats, value)) return;
+            set => Set(ref graphBeats, value, action: () => {
+                if (double.IsNaN(value)) graphBeats = 0;
                 UpdateAnimationDuration();
                 RaisePropertyChanged(nameof(ExpectedSegments));
                 if (VisibleHitObject == null) return;
-                VisibleHitObject.TemporalLength = value / BeatsPerMinute * 60000;
-            }
+                VisibleHitObject.TemporalLength = graphBeats / BeatsPerMinute * 60000;
+            });
         }
         
         [JsonIgnore]

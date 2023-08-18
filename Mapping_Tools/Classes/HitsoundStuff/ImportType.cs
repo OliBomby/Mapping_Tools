@@ -6,7 +6,8 @@
         None = 0,
         Stack = 1,
         Hitsounds = 2,
-        Midi = 3,
+        // ReSharper disable once InconsistentNaming
+        MIDI = 3,
         Storyboard = 4,
     }
 }

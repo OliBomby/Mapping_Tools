@@ -64,9 +64,9 @@ namespace Mapping_Tools {
 
                 Setup();
                 SettingsManager.LoadConfig();
-                ListenerManager = new ListenerManager();
 
                 DataContext = new MainWindowVm();
+                ListenerManager = new ListenerManager();
 
                 MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
                 MainSnackbar.MessageQueue = MessageQueue;
@@ -126,7 +126,7 @@ namespace Mapping_Tools {
                         ShowActivated = true
                     };
 
-                    updaterWindow.Closed += DisposeUpdateManager;
+                    updaterWindow.Closed += disposeUpdateManager;
 
                     updaterWindow.ActionSelected += async (_, action) => {
                         switch (action) {
@@ -146,7 +146,7 @@ namespace Mapping_Tools {
                                 downloadUpdateTask = updateManager.DownloadUpdateAsync();
 
                                 // Preserve the update manager so it can be used later to download the update
-                                updaterWindow.Closed -= DisposeUpdateManager;
+                                updaterWindow.Closed -= disposeUpdateManager;
 
                                 updaterWindow.Close();
                                 break;
@@ -164,7 +164,7 @@ namespace Mapping_Tools {
                         }
                     };
 
-                    void DisposeUpdateManager(object o, EventArgs eventArgs) {
+                    void disposeUpdateManager(object o, EventArgs eventArgs) {
                         updateManager.Dispose();
                         updateManager = null;
                     }
@@ -437,8 +437,7 @@ namespace Mapping_Tools {
         }
 
         private void SetFullscreen(bool fullscreen, bool actuallyChangeFullscreen = true) {
-            if (FindName("toggle_button") is not Button bt)
-                return;
+            var bt = FindName("ToggleButton") as Button;
 
             if (fullscreen) {
                 if (actuallyChangeFullscreen) {
@@ -447,7 +446,7 @@ namespace Mapping_Tools {
 
                 MasterGrid.Margin = new Thickness(7);
                 WindowBorder.BorderThickness = new Thickness(0);
-                bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
+                if (bt != null) bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
             } else {
                 if (actuallyChangeFullscreen) {
                     WindowState = WindowState.Normal;
@@ -455,8 +454,9 @@ namespace Mapping_Tools {
 
                 MasterGrid.Margin = new Thickness(0);
                 WindowBorder.BorderThickness = new Thickness(1);
-                bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
+                if (bt != null) bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }
+
             EnsureOnScreen();
         }
 
