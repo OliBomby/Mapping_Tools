@@ -162,37 +162,37 @@ namespace Mapping_Tools.Classes.SystemTools {
         public static string GetCurrentBeatmap() {
             string path;
             try {
-                lock (EditorReaderStuff.EditorReaderLock) {
-                    var reader = EditorReaderStuff.GetEditorReader();
-                    reader.SetProcess(EditorReaderStuff.GetOsuProcess());
-                    reader.FetchHOM();
-                    reader.FetchBeatmap();
-                    path = EditorReaderStuff.GetCurrentBeatmap(reader);
+                string songs = SettingsManager.GetSongsPath();
+
+                if (string.IsNullOrEmpty(songs)) {
+                    throw new Exception(
+                        @"Can't fetch current in-game beatmap, because there is no Songs path specified in Preferences.");
                 }
+
+                string folder = ReadString(osuBaseAddresses.Beatmap, nameof(CurrentBeatmap.FolderName));
+                string filename = ReadString(osuBaseAddresses.Beatmap, nameof(CurrentBeatmap.OsuFileName));
+
+                if (string.IsNullOrEmpty(folder)) {
+                    throw new Exception(@"Can't fetch the folder name of the current in-game beatmap.");
+                }
+
+                if (string.IsNullOrEmpty(filename)) {
+                    throw new Exception(@"Can't fetch the file name of the current in-game beatmap.");
+                }
+
+                path = Path.Combine(songs, folder, filename);
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
                 try {
-                    string songs = SettingsManager.GetSongsPath();
-
-                    if (string.IsNullOrEmpty(songs)) {
-                        throw new Exception(
-                            @"Can't fetch current in-game beatmap, because there is no Songs path specified in Preferences.");
+                    lock (EditorReaderStuff.EditorReaderLock) {
+                        var reader = EditorReaderStuff.GetEditorReader();
+                        reader.SetProcess(EditorReaderStuff.GetOsuProcess());
+                        reader.FetchHOM();
+                        reader.FetchBeatmap();
+                        path = EditorReaderStuff.GetCurrentBeatmap(reader);
                     }
-
-                    string folder = ReadString(osuBaseAddresses.Beatmap, nameof(CurrentBeatmap.FolderName));
-                    string filename = ReadString(osuBaseAddresses.Beatmap, nameof(CurrentBeatmap.OsuFileName));
-
-                    if (string.IsNullOrEmpty(folder)) {
-                        throw new Exception(@"Can't fetch the folder name of the current in-game beatmap.");
-                    }
-
-                    if (string.IsNullOrEmpty(filename)) {
-                        throw new Exception(@"Can't fetch the file name of the current in-game beatmap.");
-                    }
-
-                    path = Path.Combine(songs, folder, filename);
                 }
                 catch (Exception ex2) {
                     Console.WriteLine(ex2.Message);

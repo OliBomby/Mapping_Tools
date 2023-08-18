@@ -29,6 +29,10 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         /// <returns></returns>
         public static EditorReader GetEditorReader()
         {
+            if (!SettingsManager.Settings.UseEditorReader) {
+                throw new EditorReaderDisabledException();
+            }
+
             return editorReader;
         }
 
