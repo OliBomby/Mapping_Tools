@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.MathUtil;
 
@@ -41,7 +42,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 }
 
                 // Check if i+1 is the first point in the next segment so we know i is a red anchor
-                bool isRedAnchor = segmentIndex < segmentsStarts.Count && i + 1 == segmentsStarts[segmentIndex] && i != 0;
+                bool isRedAnchor = sliderPath.Type == PathType.Linear || (segmentIndex < segmentsStarts.Count && i + 1 == segmentsStarts[segmentIndex] && i != 0);
 
                 // Update cumulative length
                 double dist = 0;
