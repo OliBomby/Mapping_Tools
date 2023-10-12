@@ -239,7 +239,7 @@ namespace Mapping_Tools.Viewmodels {
             TumourLayers = new ObservableCollection<TumourLayer>();
 
             ImportCommand = new CommandImplementation(_ => Import(ImportModeSetting == ImportMode.Selected ?
-                IOHelper.GetCurrentBeatmapOrCurrentBeatmap() :
+                IOHelper.GetCurrentBeatmapOrCurrentBeatmap(false) :
                 MainWindow.AppWindow.GetCurrentMaps()[0])
             );
             AddCommand = new CommandImplementation(

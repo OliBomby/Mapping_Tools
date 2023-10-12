@@ -447,7 +447,7 @@ namespace Mapping_Tools.Viewmodels
 
             UploadFileCommand = new CommandImplementation(_ => SetFile());
             ImportCommand = new CommandImplementation(_ => Import(
-                IOHelper.GetCurrentBeatmapOrCurrentBeatmap()
+                IOHelper.GetCurrentBeatmapOrCurrentBeatmap(false)
             ));
             RemoveCommand = new CommandImplementation(_ => SelectedSlider = null);
         }
