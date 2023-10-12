@@ -27,7 +27,13 @@ namespace Mapping_Tools.Views.SliderCompletionator {
 
         public static readonly string ToolName = "Slider Completionator";
 
-        public static readonly string ToolDescription = $@"Change the length and duration of marked sliders and this tool will automatically handle the SliderVelocity for you.";
+        public static readonly string ToolDescription = "Change the length and duration of selected sliders and this tool will automatically handle the slider velocity for you." +
+                                                        Environment.NewLine + Environment.NewLine +
+                                                        "Input a value of -1 anywhere to indicate that you want to keep that variable unchanged." +
+                                                        Environment.NewLine +
+                                                        "For example, 1 duration and -1 length will change the duration to 1 beat while keeping the length the same." +
+                                                        Environment.NewLine + Environment.NewLine +
+                                                        "Check the tooltips for more information about extra features.";
 
         /// <inheritdoc />
         public SliderCompletionatorView() {
