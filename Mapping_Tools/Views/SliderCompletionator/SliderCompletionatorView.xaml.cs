@@ -74,11 +74,19 @@ namespace Mapping_Tools.Views.SliderCompletionator {
 
         private string Complete_Sliders(SliderCompletionatorVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
             int slidersCompleted = 0;
+            double endTime = arg.EndTime;
 
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
 
             if (arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Selected && editorReaderException1 != null) {
                 throw new Exception("Could not fetch selected hit objects.", editorReaderException1);
+            }
+
+            if (arg.UseCurrentEditorTime) {
+                if (editorReaderException1 != null)
+                    throw new Exception("Could not fetch current editor time.", editorReaderException1);
+
+                endTime = reader.EditorTime();
             }
 
             foreach (string path in arg.Paths) {
@@ -108,7 +116,7 @@ namespace Mapping_Tools.Views.SliderCompletionator {
                         double oldLength = ho.PixelLength;
                         double oldSv = timing.GetSvAtTime(ho.Time);
 
-                        double newDuration = arg.UseEndTime ? arg.EndTime == -1 ? oldDuration : arg.EndTime - ho.Time : 
+                        double newDuration = arg.UseEndTime ? endTime == -1 && !arg.UseCurrentEditorTime ? oldDuration : endTime - ho.Time :
                                                               arg.Duration == -1 ? oldDuration : timing.WalkBeatsInMillisecondTime(arg.Duration, ho.Time) - ho.Time;
                         double newLength = arg.Length == -1 ? oldLength : ho.GetSliderPath(fullLength: true).Distance * arg.Length;
                         double newSv = arg.SliderVelocity == -1 ? oldSv : -100 / arg.SliderVelocity;

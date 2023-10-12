@@ -61,6 +61,10 @@
                     <CheckBox x:Name="UseEndTimeBox" Content="Use slider end time"
                         IsChecked="{Binding UseEndTime}"
                         ToolTip="Lets you input the slider end time instead of the duration. This will replace the duration field with the end time field."/>
+                    <CheckBox x:Name="UseCurrentTimeBox" Content="Use current editor time"
+                              IsEnabled="{Binding UseEndTime}"
+                              IsChecked="{Binding UseCurrentEditorTime}"
+                              ToolTip="Snap the slider ends to the current editor time."/>
 
                     <CheckBox x:Name="DelegateSvToBpmBox" Content="Delegate SV to BPM" Margin="0 0 0 0"
                               ToolTip="Use BPM to determine the velocity of the slider instead of greenline SV."

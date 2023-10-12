@@ -51,7 +51,7 @@ namespace Mapping_Tools.Viewmodels {
         public Visibility DurationBoxVisibility => FreeVariableSetting != FreeVariable.Duration && !UseEndTime ? Visibility.Visible : Visibility.Collapsed;
 
         [JsonIgnore]
-        public Visibility EndTimeBoxVisibility => FreeVariableSetting != FreeVariable.Duration && UseEndTime ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility EndTimeBoxVisibility => FreeVariableSetting != FreeVariable.Duration && UseEndTime && !UseCurrentEditorTime ? Visibility.Visible : Visibility.Collapsed;
 
         [JsonIgnore]
         public Visibility LengthBoxVisibility => FreeVariableSetting != FreeVariable.Length ? Visibility.Visible : Visibility.Collapsed;
@@ -106,6 +106,17 @@ namespace Mapping_Tools.Viewmodels {
             }
         }
 
+        private bool useCurrentEditorTime;
+        public bool UseCurrentEditorTime {
+            get => useCurrentEditorTime;
+            set {
+                if (Set(ref useCurrentEditorTime, value)) {
+                    RaisePropertyChanged(nameof(DurationBoxVisibility));
+                    RaisePropertyChanged(nameof(EndTimeBoxVisibility));
+                }
+            }
+        }
+
         private bool delegateSvToBpm;
         public bool DelegateToBpm {
             get => delegateSvToBpm;
@@ -128,6 +139,7 @@ namespace Mapping_Tools.Viewmodels {
             SliderVelocity = -1;
             MoveAnchors = false;
             UseEndTime = false;
+            UseCurrentEditorTime = false;
             DelegateToBpm = false;
             RemoveSliderTicks = false;
             TimeCode = string.Empty;
