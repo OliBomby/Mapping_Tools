@@ -25,7 +25,10 @@
     FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
     Background="{DynamicResource MaterialDesignPaper}"
     Loaded="MainWindow_OnLoaded"
-    Closing="Window_Closing">
+    Closing="Window_Closing"
+    AllowDrop="True"
+    DragEnter="MainWindow_DragEnter"
+    Drop="MainWindow_Drop">
     <WindowChrome.WindowChrome>
         <WindowChrome
             CaptionHeight="35"
