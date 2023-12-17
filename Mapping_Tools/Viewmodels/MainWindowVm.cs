@@ -317,19 +317,28 @@ namespace Mapping_Tools.Viewmodels {
             if (isSavable) {
                 ProjectMenuVisibility = Visibility.Visible;
 
-                ProjectMenuItems.Add(GetSaveProjectMenuItem());
-                ProjectMenuItems.Add(GetLoadProjectMenuItem());
-                ProjectMenuItems.Add(GetNewProjectMenuItem());
+                AddProjectMenuItem(GetSaveProjectMenuItem());
+                AddProjectMenuItem(GetLoadProjectMenuItem());
+                AddProjectMenuItem(GetNewProjectMenuItem());
             }
 
             if (View is IHaveExtraProjectMenuItems havingExtraProjectMenuItems) {
                 ProjectMenuVisibility = Visibility.Visible;
 
                 foreach (var menuItem in havingExtraProjectMenuItems.GetMenuItems()) {
-                    ProjectMenuItems.Add(menuItem);
+                    AddProjectMenuItem(menuItem);
                 }
             }
         }
+
+        private void AddProjectMenuItem(MenuItem item) {
+            // Set the foreground color to DynamicResource MaterialDesignBody
+            // so that it will change color when the theme changes
+            item.SetResourceReference(Control.ForegroundProperty, "MaterialDesignBody");
+
+            ProjectMenuItems.Add(item);
+        }
+
         private MenuItem GetSaveProjectMenuItem() {
             var menu = new MenuItem {
                 Header = "_Save project",
