@@ -82,7 +82,7 @@
                                 AutomationProperties.Name="HamburgerToggleButton"
                                 ToolTip="Use Ctrl+K to use this toggle anywhere in the program.">
                                 <ToggleButton.Content>
-                                    <materialDesign:PackIcon Width="28" Height="28" Kind="Menu" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                                    <materialDesign:PackIcon Width="28" Height="28" Kind="Menu" Foreground="{StaticResource MaterialDesignBodyLight}"/>
                                 </ToggleButton.Content>
                                 <materialDesign:ToggleButtonAssist.OnContent>
                                     <materialDesign:PackIcon Width="28" Height="28" Kind="Menu"/>
