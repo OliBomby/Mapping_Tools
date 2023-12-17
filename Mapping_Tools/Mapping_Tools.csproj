@@ -73,7 +73,7 @@
     <PackageReference Include="NVorbis" Version="0.10.3" />
     <PackageReference Include="OggVorbisEncoder" Version="1.2.0" />
     <PackageReference Include="Onova" Version="2.6.2" />
-    <PackageReference Include="OsuMemoryDataProvider" Version="0.8.9" />
+    <PackageReference Include="OsuMemoryDataProvider" Version="0.10.1" />
     <PackageReference Include="Overlay.NET" Version="1.0.2" />
     <PackageReference Include="VirtualizingWrapPanel" Version="1.5.7" />
   </ItemGroup>
