@@ -497,5 +497,17 @@ namespace Mapping_Tools {
         private async void MenuItem_OnClick(object sender, RoutedEventArgs e) {
             await Update(false, true);
         }
+
+        private void MainWindow_DragEnter(object sender, DragEventArgs e) {
+            // Check if the dragged data is a file
+            e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Copy : DragDropEffects.None;
+        }
+
+        private void MainWindow_Drop(object sender, DragEventArgs e)
+        {
+            // Get the array of file paths
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            SetCurrentMaps(files);
+        }
     }
 }

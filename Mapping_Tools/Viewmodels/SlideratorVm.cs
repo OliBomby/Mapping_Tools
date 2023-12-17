@@ -316,7 +316,7 @@ namespace Mapping_Tools.Viewmodels {
             ExportAsNormal = true;
 
             ImportCommand = new CommandImplementation(_ => Import(ImportModeSetting == ImportMode.Selected ? 
-                IOHelper.GetCurrentBeatmapOrCurrentBeatmap() :
+                IOHelper.GetCurrentBeatmapOrCurrentBeatmap(false) :
                 MainWindow.AppWindow.GetCurrentMaps()[0])
             );
             MoveLeftCommand = new CommandImplementation(_ => {

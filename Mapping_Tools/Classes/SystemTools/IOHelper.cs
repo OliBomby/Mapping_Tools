@@ -204,13 +204,23 @@ namespace Mapping_Tools.Classes.SystemTools {
             return path;
         }
 
-        public static string GetCurrentBeatmapOrCurrentBeatmap() {
+        public static string GetCurrentBeatmapOrCurrentBeatmap(bool updateCurrentBeatmap = true) {
             try {
                 string path = GetCurrentBeatmap();
-                return File.Exists(path) ? path : MainWindow.AppWindow.GetCurrentMaps()[0];
-            } catch {
-                return MainWindow.AppWindow.GetCurrentMaps()[0];
+
+                if (File.Exists(path)) {
+                    if (updateCurrentBeatmap) {
+                        MainWindow.AppWindow.SetCurrentMapsString(path);
+                    }
+
+                    return path;
+                }
+            } catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
             }
+
+            return MainWindow.AppWindow.GetCurrentMaps()[0];
         }
 
         public static void ReplaceSettingTypePaths(string path, Tuple<string, string>[] replacements) {

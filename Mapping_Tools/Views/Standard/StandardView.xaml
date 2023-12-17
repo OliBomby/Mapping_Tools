@@ -32,10 +32,10 @@
 
             <ListView HorizontalAlignment="Left" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListViewItem>
-                    0. Set the correct path to your Songs folder in [Options] -> [Preferences]
+                    0. Set the correct path to your Songs folder in the [Preferences].
                 </ListViewItem>
                 <ListViewItem>
-                    1. Select a beatmap -> [Open beatmap/Open current beatmap] to select a file from your system OR the current in-game selected beatmap.
+                    1. Select a beatmap [File] -> [Open beatmap/Open current beatmap] to select a file from your system OR the current in-game selected beatmap.
                 </ListViewItem>
                 <ListViewItem>
                     2. Select a tool that you want to use from the navigation menu. (Ctrl+K)
@@ -53,7 +53,7 @@
                     6. Reload your beatmap WITHOUT SAVING by either leaving and re-entering the editor or pressing Ctrl+L, Enter.
                 </ListViewItem>
                 <ListViewItem>
-                    7. If you run into issues, consult the FAQ over at the website.
+                    7. If you run into issues, consult the FAQ over on the [About] -> [Website].
                 </ListViewItem>
             </ListView>
         </Grid>

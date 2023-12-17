@@ -27,7 +27,13 @@ namespace Mapping_Tools.Views.SliderCompletionator {
 
         public static readonly string ToolName = "Slider Completionator";
 
-        public static readonly string ToolDescription = $@"Change the length and duration of marked sliders and this tool will automatically handle the SliderVelocity for you.";
+        public static readonly string ToolDescription = "Change the length and duration of selected sliders and this tool will automatically handle the slider velocity for you." +
+                                                        Environment.NewLine + Environment.NewLine +
+                                                        "Input a value of -1 anywhere to indicate that you want to keep that variable unchanged." +
+                                                        Environment.NewLine +
+                                                        "For example, 1 duration and -1 length will change the duration to 1 beat while keeping the length the same." +
+                                                        Environment.NewLine + Environment.NewLine +
+                                                        "Check the tooltips for more information about extra features.";
 
         /// <inheritdoc />
         public SliderCompletionatorView() {
@@ -74,11 +80,19 @@ namespace Mapping_Tools.Views.SliderCompletionator {
 
         private string Complete_Sliders(SliderCompletionatorVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
             int slidersCompleted = 0;
+            double endTime = arg.EndTime;
 
             var reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException1);
 
             if (arg.ImportModeSetting == SliderCompletionatorVm.ImportMode.Selected && editorReaderException1 != null) {
                 throw new Exception("Could not fetch selected hit objects.", editorReaderException1);
+            }
+
+            if (arg.UseCurrentEditorTime) {
+                if (editorReaderException1 != null)
+                    throw new Exception("Could not fetch current editor time.", editorReaderException1);
+
+                endTime = reader.EditorTime();
             }
 
             foreach (string path in arg.Paths) {
@@ -108,7 +122,7 @@ namespace Mapping_Tools.Views.SliderCompletionator {
                         double oldLength = ho.PixelLength;
                         double oldSv = timing.GetSvAtTime(ho.Time);
 
-                        double newDuration = arg.UseEndTime ? arg.EndTime == -1 ? oldDuration : arg.EndTime - ho.Time : 
+                        double newDuration = arg.UseEndTime ? endTime == -1 && !arg.UseCurrentEditorTime ? oldDuration : endTime - ho.Time :
                                                               arg.Duration == -1 ? oldDuration : timing.WalkBeatsInMillisecondTime(arg.Duration, ho.Time) - ho.Time;
                         double newLength = arg.Length == -1 ? oldLength : ho.GetSliderPath(fullLength: true).Distance * arg.Length;
                         double newSv = arg.SliderVelocity == -1 ? oldSv : -100 / arg.SliderVelocity;
