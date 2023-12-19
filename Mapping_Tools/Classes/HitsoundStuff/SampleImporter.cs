@@ -37,11 +37,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// Imports all samples specified by <see cref="SampleGeneratingArgs"/> and returns a dictionary which maps the <see cref="SampleGeneratingArgs"/>
         /// to their <see cref="SampleSoundGenerator"/>. If a sample couldn't be imported then it has a null instead.
         /// </summary>
-        /// <param name="argsList"></param>
+        /// <param name="argsList">The samples to import.</param>
+        /// <param name="comparer">Custom equality comparer.</param>
         /// <returns></returns>
         public static Dictionary<SampleGeneratingArgs, SampleSoundGenerator> ImportSamples(IEnumerable<SampleGeneratingArgs> argsList, SampleGeneratingArgsComparer comparer = null) {
-            if (comparer == null)
-                comparer = new SampleGeneratingArgsComparer();
+            comparer ??= new SampleGeneratingArgsComparer();
 
             var samples = new Dictionary<SampleGeneratingArgs, SampleSoundGenerator>(comparer);
             var separatedByPath = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
@@ -54,10 +54,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 }
             }
 
-            foreach (var pair in separatedByPath) {
-                var path = pair.Key;
+            foreach ((string path, HashSet<SampleGeneratingArgs> value) in separatedByPath) {
                 if (!ValidateSamplePath(path)) {
-                    foreach (var args in pair.Value) {
+                    foreach (var args in value) {
                         samples.Add(args, null);
                     }
                     continue;
@@ -67,7 +66,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     switch (Path.GetExtension(path).ToLower()) {
                         case ".sf2": {
                             var sf2 = new SoundFont(path);
-                            foreach (var args in pair.Value) {
+                            foreach (var args in value) {
                                 var sample = ImportFromSoundFont(args, sf2);
                                 samples.Add(args, sample);
                             }
@@ -75,14 +74,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                             break;
                         }
                         case ".ogg": {
-                            foreach (var args in pair.Value) {
+                            foreach (var args in value) {
                                 samples.Add(args, ImportFromVorbis(args));
                             }
 
                             break;
                         }
                         default: {
-                            foreach (var args in pair.Value) {
+                            foreach (var args in value) {
                                 samples.Add(args, ImportFromAudio(args));
                             }
 
@@ -90,15 +89,99 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                         }
                     }
                 } catch (Exception ex) {
-                    Console.WriteLine(ex.Message); 
-                    
-                    foreach (var args in pair.Value) {
+                    Console.WriteLine(ex.Message);
+
+                    foreach (var args in value) {
                         samples.Add(args, null);
                     }
                 }
                 GC.Collect();
             }
+
             return samples;
+        }
+
+        /// <summary>
+        /// Imports all samples specified by <see cref="SampleGeneratingArgs"/> and returns a dictionary which maps the <see cref="SampleGeneratingArgs"/>
+        /// to an <see cref="Exception"/> if a sample couldn't be imported for whatever reason.
+        /// </summary>
+        /// <param name="argsList">The samples to validate.</param>
+        /// <param name="comparer">Custom equality comparer.</param>
+        /// <returns></returns>
+        public static Dictionary<SampleGeneratingArgs, Exception> ValidateSamples(IEnumerable<SampleGeneratingArgs> argsList, SampleGeneratingArgsComparer comparer = null) {
+            comparer ??= new SampleGeneratingArgsComparer();
+
+            var sampleExceptions = new Dictionary<SampleGeneratingArgs, Exception>(comparer);
+            var separatedByPath = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
+
+            foreach (var args in argsList) {
+                if (separatedByPath.TryGetValue(args.Path, out HashSet<SampleGeneratingArgs> value)) {
+                    value.Add(args);
+                } else {
+                    separatedByPath.Add(args.Path, new HashSet<SampleGeneratingArgs>(comparer) { args });
+                }
+            }
+
+            foreach ((string path, HashSet<SampleGeneratingArgs> value) in separatedByPath) {
+                if (!File.Exists(path)) {
+                    foreach (var args in value) {
+                        sampleExceptions.Add(args, new FileNotFoundException("File not found", path));
+                    }
+                    continue;
+                }
+
+                if (!ValidateSamplePath(path)) {
+                    foreach (var args in value) {
+                        sampleExceptions.Add(args, new InvalidDataException("Invalid file extension"));
+                    }
+                    continue;
+                }
+
+                switch (Path.GetExtension(path).ToLower()) {
+                    case ".sf2": {
+                        var sf2 = new SoundFont(path);
+
+                        foreach (var args in value) {
+                            try {
+                                ImportFromSoundFont(args, sf2);
+                                sampleExceptions.Add(args, null);
+                            } catch (Exception ex) {
+                                sampleExceptions.Add(args, ex);
+                            }
+                        }
+
+                        break;
+                    }
+                    case ".ogg": {
+                        foreach (var args in value) {
+                            try {
+                                ImportFromVorbis(args);
+                                sampleExceptions.Add(args, null);
+                            } catch (Exception ex) {
+                                sampleExceptions.Add(args, ex);
+                            }
+                        }
+
+                        break;
+                    }
+                    default: {
+                        foreach (var args in value) {
+                            try {
+                                ImportFromAudio(args);
+                                sampleExceptions.Add(args, null);
+                            } catch (Exception ex) {
+                                sampleExceptions.Add(args, ex);
+                            }
+                        }
+
+                        break;
+                    }
+                }
+
+                GC.Collect();
+            }
+
+            return sampleExceptions;
         }
 
         public static SampleSoundGenerator ImportSample(SampleGeneratingArgs args) {

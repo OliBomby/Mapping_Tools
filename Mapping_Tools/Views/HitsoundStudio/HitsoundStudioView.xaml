@@ -321,6 +321,9 @@
                 <materialDesign:PackIcon Kind="KeyboardArrowDown" Height="24" Width="24" />
             </Button>
         </StackPanel>
+        <Button Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,95,30"
+                Content="Validate samples" FontWeight="Bold" FontSize="16" Click="ValidateSamples_Click"
+                 ToolTip="Validate the hitsound samples of all hitsound layers."/>
         <Grid Name="ThirdGrid" Grid.Row="2" Grid.Column="0">
             <Grid>
                 <Grid.RowDefinitions>

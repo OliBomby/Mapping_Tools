@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -709,6 +710,63 @@ namespace Mapping_Tools.Views.HitsoundStudio
             {
                 settings.HitsoundLayers[i].Priority = i;
             }
+        }
+
+        private void ValidateSamples_Click(object sender, RoutedEventArgs e) {
+            var couldNotFind = new List<HitsoundLayer>();
+            var invalidExtension = new List<HitsoundLayer>();
+            var couldNotLoad = new List<(HitsoundLayer, Exception)>();
+
+            var allSampleArgs = settings.HitsoundLayers.Select(o => o.SampleArgs).ToList();
+            var sampleExceptions = SampleImporter.ValidateSamples(allSampleArgs);
+
+            foreach (HitsoundLayer hitsoundLayer in settings.HitsoundLayers) {
+                if (string.IsNullOrEmpty(hitsoundLayer.SampleArgs.Path))
+                    continue;
+
+                if (!sampleExceptions.TryGetValue(hitsoundLayer.SampleArgs, out var exception) || exception == null)
+                    continue;
+
+                switch (exception) {
+                    case FileNotFoundException:
+                        couldNotFind.Add(hitsoundLayer);
+                        break;
+                    case InvalidDataException:
+                        invalidExtension.Add(hitsoundLayer);
+                        break;
+                    default:
+                        couldNotLoad.Add((hitsoundLayer, exception));
+                        break;
+                }
+            }
+
+
+            if (couldNotFind.Count == 0 && invalidExtension.Count == 0 && couldNotLoad.Count == 0) {
+                MessageBox.Show("All samples are valid!");
+                return;
+            }
+
+            var message = new StringBuilder();
+
+            if (couldNotFind.Count > 0) {
+                message.AppendLine("Could not find the following samples:");
+                message.AppendLine(string.Join(Environment.NewLine, couldNotFind.Select(o => o.Name)));
+                message.AppendLine();
+            }
+
+            if (invalidExtension.Count > 0) {
+                message.AppendLine("The following samples have an invalid extension:");
+                message.AppendLine(string.Join(Environment.NewLine, invalidExtension.Select(o => o.Name)));
+                message.AppendLine();
+            }
+
+            if (couldNotLoad.Count > 0) {
+                message.AppendLine("Could not load the following samples because of an exception:");
+                message.AppendLine(string.Join(Environment.NewLine, couldNotLoad.Select(o => $"{o.Item1.Name}: {o.Item2.Message}")));
+                message.AppendLine();
+            }
+
+            MessageBox.Show(message.ToString());
         }
 
         #region HitsoundLayerChangeEventHandlers
