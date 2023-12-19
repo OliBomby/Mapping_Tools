@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -711,6 +712,63 @@ namespace Mapping_Tools.Views.HitsoundStudio
             }
         }
 
+        private void ValidateSamples_Click(object sender, RoutedEventArgs e) {
+            var couldNotFind = new List<HitsoundLayer>();
+            var invalidExtension = new List<HitsoundLayer>();
+            var couldNotLoad = new List<(HitsoundLayer, Exception)>();
+
+            var allSampleArgs = settings.HitsoundLayers.Select(o => o.SampleArgs).ToList();
+            var sampleExceptions = SampleImporter.ValidateSamples(allSampleArgs);
+
+            foreach (HitsoundLayer hitsoundLayer in settings.HitsoundLayers) {
+                if (string.IsNullOrEmpty(hitsoundLayer.SampleArgs.Path))
+                    continue;
+
+                if (!sampleExceptions.TryGetValue(hitsoundLayer.SampleArgs, out var exception) || exception == null)
+                    continue;
+
+                switch (exception) {
+                    case FileNotFoundException:
+                        couldNotFind.Add(hitsoundLayer);
+                        break;
+                    case InvalidDataException:
+                        invalidExtension.Add(hitsoundLayer);
+                        break;
+                    default:
+                        couldNotLoad.Add((hitsoundLayer, exception));
+                        break;
+                }
+            }
+
+
+            if (couldNotFind.Count == 0 && invalidExtension.Count == 0 && couldNotLoad.Count == 0) {
+                MessageBox.Show("All samples are valid!");
+                return;
+            }
+
+            var message = new StringBuilder();
+
+            if (couldNotFind.Count > 0) {
+                message.AppendLine("Could not find the following samples:");
+                message.AppendLine(string.Join(Environment.NewLine, couldNotFind.Select(o => o.Name)));
+                message.AppendLine();
+            }
+
+            if (invalidExtension.Count > 0) {
+                message.AppendLine("The following samples have an invalid extension:");
+                message.AppendLine(string.Join(Environment.NewLine, invalidExtension.Select(o => o.Name)));
+                message.AppendLine();
+            }
+
+            if (couldNotLoad.Count > 0) {
+                message.AppendLine("Could not load the following samples because of an exception:");
+                message.AppendLine(string.Join(Environment.NewLine, couldNotLoad.Select(o => $"{o.Item1.Name}: {o.Item2.Message}")));
+                message.AppendLine();
+            }
+
+            MessageBox.Show(message.ToString());
+        }
+
         #region HitsoundLayerChangeEventHandlers
 
         private void SelectedNameBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -1094,13 +1152,25 @@ namespace Mapping_Tools.Views.HitsoundStudio
         #region IHaveExtraMenuItems members
 
         public MenuItem[] GetMenuItems() {
-            var menu = new MenuItem {
+            var loadSampleSchemaMenu = new MenuItem {
                 Header = "_Load sample schema", Icon = new PackIcon {Kind = PackIconKind.FileMusic},
                 ToolTip = "Load sample schema from a project file."
             };
-            menu.Click += LoadSampleSchemaFromFile;
+            loadSampleSchemaMenu.Click += LoadSampleSchemaFromFile;
 
-            return new[] {menu};
+            var bulkAssignSamplesMenu = new MenuItem {
+                Header = "_Bulk assign samples", Icon = new PackIcon {Kind = PackIconKind.MusicBoxMultiple},
+                ToolTip = "Bulk assign samples to selected hitsound layers. " +
+                          "The file name is expected to be in the following shape: [bank]_[patch]_[key]_[length]_[velocity].[extension]. " +
+                          "Leave a value empty to imply any value. " +
+                          "Example: 0_39__127.wav"
+            };
+            bulkAssignSamplesMenu.Click += BulkAssignSamples;
+
+            return new[] {
+                loadSampleSchemaMenu,
+                bulkAssignSamplesMenu,
+            };
         }
 
         private void LoadSampleSchemaFromFile(object sender, RoutedEventArgs e) {
@@ -1111,6 +1181,39 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully loaded sample schema!"));
             } catch (ArgumentException) { }
             catch (Exception ex) {
+                ex.Show();
+            }
+        }
+
+        private void BulkAssignSamples(object sender, RoutedEventArgs e) {
+            try {
+                var result = IOHelper.AudioFileDialog(true);
+
+                foreach (string path in result) {
+                    // The file name is expected to be in the following shape:
+                    // [bank]_[patch]_[key]_[length]_[velocity].[extension]
+                    // Example: 0_39_256_100.wav
+                    var fileName = Path.GetFileNameWithoutExtension(path);
+                    var split = fileName.Split('_');
+                    int? bank = split.Length > 0 && int.TryParse(split[0], out var bankParsed) ? bankParsed : null;
+                    int? patch = split.Length > 1 && int.TryParse(split[1], out var patchParsed) ? patchParsed : null;
+                    int? key = split.Length > 2 && int.TryParse(split[2], out var keyParsed) ? keyParsed : null;
+                    int? length = split.Length > 3 && int.TryParse(split[3], out var lengthParsed) ? lengthParsed : null;
+                    int? velocity = split.Length > 4 && int.TryParse(split[4], out var velocityParsed) ? velocityParsed : null;
+
+                    foreach (var layer in selectedLayers) {
+                        if (bank.HasValue && bank.Value != layer.ImportArgs.Bank) continue;
+                        if (patch.HasValue && patch.Value != layer.ImportArgs.Patch) continue;
+                        if (key.HasValue && key.Value != layer.ImportArgs.Key) continue;
+                        if (length.HasValue && length.Value != (int)Math.Round(layer.ImportArgs.Length)) continue;
+                        if (velocity.HasValue && velocity.Value != layer.ImportArgs.Velocity) continue;
+
+                        layer.SampleArgs.Path = path;
+                    }
+                }
+
+
+            } catch (Exception ex) {
                 ex.Show();
             }
         }
