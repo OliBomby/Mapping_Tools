@@ -1152,13 +1152,25 @@ namespace Mapping_Tools.Views.HitsoundStudio
         #region IHaveExtraMenuItems members
 
         public MenuItem[] GetMenuItems() {
-            var menu = new MenuItem {
+            var loadSampleSchemaMenu = new MenuItem {
                 Header = "_Load sample schema", Icon = new PackIcon {Kind = PackIconKind.FileMusic},
                 ToolTip = "Load sample schema from a project file."
             };
-            menu.Click += LoadSampleSchemaFromFile;
+            loadSampleSchemaMenu.Click += LoadSampleSchemaFromFile;
 
-            return new[] {menu};
+            var bulkAssignSamplesMenu = new MenuItem {
+                Header = "_Bulk assign samples", Icon = new PackIcon {Kind = PackIconKind.MusicBoxMultiple},
+                ToolTip = "Bulk assign samples to selected hitsound layers. " +
+                          "The file name is expected to be in the following shape: [bank]_[patch]_[key]_[length]_[velocity].[extension]. " +
+                          "Leave a value empty to imply any value. " +
+                          "Example: 0_39__127.wav"
+            };
+            bulkAssignSamplesMenu.Click += BulkAssignSamples;
+
+            return new[] {
+                loadSampleSchemaMenu,
+                bulkAssignSamplesMenu,
+            };
         }
 
         private void LoadSampleSchemaFromFile(object sender, RoutedEventArgs e) {
@@ -1169,6 +1181,39 @@ namespace Mapping_Tools.Views.HitsoundStudio
                 Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully loaded sample schema!"));
             } catch (ArgumentException) { }
             catch (Exception ex) {
+                ex.Show();
+            }
+        }
+
+        private void BulkAssignSamples(object sender, RoutedEventArgs e) {
+            try {
+                var result = IOHelper.AudioFileDialog(true);
+
+                foreach (string path in result) {
+                    // The file name is expected to be in the following shape:
+                    // [bank]_[patch]_[key]_[length]_[velocity].[extension]
+                    // Example: 0_39_256_100.wav
+                    var fileName = Path.GetFileNameWithoutExtension(path);
+                    var split = fileName.Split('_');
+                    int? bank = split.Length > 0 && int.TryParse(split[0], out var bankParsed) ? bankParsed : null;
+                    int? patch = split.Length > 1 && int.TryParse(split[1], out var patchParsed) ? patchParsed : null;
+                    int? key = split.Length > 2 && int.TryParse(split[2], out var keyParsed) ? keyParsed : null;
+                    int? length = split.Length > 3 && int.TryParse(split[3], out var lengthParsed) ? lengthParsed : null;
+                    int? velocity = split.Length > 4 && int.TryParse(split[4], out var velocityParsed) ? velocityParsed : null;
+
+                    foreach (var layer in selectedLayers) {
+                        if (bank.HasValue && bank.Value != layer.ImportArgs.Bank) continue;
+                        if (patch.HasValue && patch.Value != layer.ImportArgs.Patch) continue;
+                        if (key.HasValue && key.Value != layer.ImportArgs.Key) continue;
+                        if (length.HasValue && length.Value != (int)Math.Round(layer.ImportArgs.Length)) continue;
+                        if (velocity.HasValue && velocity.Value != layer.ImportArgs.Velocity) continue;
+
+                        layer.SampleArgs.Path = path;
+                    }
+                }
+
+
+            } catch (Exception ex) {
                 ex.Show();
             }
         }

@@ -108,15 +108,16 @@ namespace Mapping_Tools.Classes.SystemTools {
             return openFileDialog.FileName;
         }
 
-        public static string AudioFileDialog() {
+        public static string[] AudioFileDialog(bool multiselect = false) {
             OpenFileDialog openFileDialog = new OpenFileDialog {
                 Filter = "Audio files (*.wav;*.ogg)|*.wav;*.ogg",
                 FilterIndex = 1,
                 RestoreDirectory = true,
-                CheckFileExists = true
+                CheckFileExists = true,
+                Multiselect = multiselect
             };
             openFileDialog.ShowDialog();
-            return openFileDialog.FileName;
+            return openFileDialog.FileNames;
         }
 
         public static string[] BeatmapFileDialog(bool multiselect = false, bool restore = false) {
