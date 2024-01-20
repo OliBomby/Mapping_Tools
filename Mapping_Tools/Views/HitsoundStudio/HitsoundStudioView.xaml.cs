@@ -15,6 +15,7 @@ using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;
 using NAudio.Wave;
@@ -240,6 +241,30 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
                 if (arg.ExportSamples) {
                     HitsoundExporter.ExportLoadedSamples(loadedSamples, arg.ExportFolder, sampleNames, arg.SingleSampleExportFormat, comparer);
+                }
+            } else if (arg.HitsoundExportModeSetting == HitsoundStudioVm.HitsoundExportMode.Midi) {
+                List<SamplePackage> samplePackages = HitsoundConverter.ZipLayers(arg.HitsoundLayers, arg.DefaultSample, 0, false);
+                var beatmap = EditorReaderStuff.GetNewestVersionOrNot(arg.BaseBeatmap).Beatmap;
+
+                if (arg.ShowResults) {
+                    result = $"Number of notes: {samplePackages.SelectMany(o => o.Samples).Count()}, " +
+                             $"Number of volume changes: {(arg.AddGreenLineVolumeToMidi ? beatmap.BeatmapTiming.TimingPoints.Count : 0)}";
+                }
+
+                UpdateProgressBar(worker, 20);
+
+                if (arg.DeleteAllInExportFirst &&  arg.ExportMap) {
+                    // Delete all files in the export folder before filling it again
+                    DirectoryInfo di = new DirectoryInfo(arg.ExportFolder);
+                    foreach (FileInfo file in di.GetFiles()) {
+                        file.Delete();
+                    }
+                }
+
+                UpdateProgressBar(worker, 40);
+
+                if (arg.ExportMap) {
+                    MidiExporter.ExportAsMidi(samplePackages, beatmap, Path.Combine(arg.ExportFolder, arg.HitsoundDiffName + ".mid"), arg.AddGreenLineVolumeToMidi);
                 }
             }
 

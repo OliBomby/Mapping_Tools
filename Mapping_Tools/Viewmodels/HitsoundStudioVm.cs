@@ -77,6 +77,12 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref addCoincidingRegularHitsounds, value);
         }
 
+        private bool addGreenLineVolumeToMidi;
+        public bool AddGreenLineVolumeToMidi {
+            get => addGreenLineVolumeToMidi;
+            set => Set(ref addGreenLineVolumeToMidi, value);
+        }
+
         public SampleSchema PreviousSampleSchema { get; set; }
 
         private HitsoundExportMode hitsoundExportModeSetting;
@@ -87,6 +93,8 @@ namespace Mapping_Tools.Viewmodels {
                     RaisePropertyChanged(nameof(StandardExtraSettingsVisibility));
                     RaisePropertyChanged(nameof(CoincidingExtraSettingsVisibility));
                     RaisePropertyChanged(nameof(StoryboardExtraSettingsVisibility));
+                    RaisePropertyChanged(nameof(MidiExtraSettingsVisibility));
+                    RaisePropertyChanged(nameof(SampleExportSettingsVisibility));
                 }
             }
         }
@@ -102,6 +110,14 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public Visibility StoryboardExtraSettingsVisibility =>
             HitsoundExportModeSetting == HitsoundExportMode.Storyboard ? Visibility.Visible : Visibility.Collapsed;
+
+        [JsonIgnore]
+        public Visibility MidiExtraSettingsVisibility =>
+            HitsoundExportModeSetting == HitsoundExportMode.Midi ? Visibility.Visible : Visibility.Collapsed;
+
+        [JsonIgnore]
+        public Visibility SampleExportSettingsVisibility =>
+            HitsoundExportModeSetting == HitsoundExportMode.Midi ? Visibility.Collapsed : Visibility.Visible;
         
         public IEnumerable<HitsoundExportMode> HitsoundExportModes => Enum.GetValues(typeof(HitsoundExportMode)).Cast<HitsoundExportMode>();
 
@@ -205,6 +221,7 @@ namespace Mapping_Tools.Viewmodels {
             ExportSamples = true;
             DeleteAllInExportFirst = false;
             AddCoincidingRegularHitsounds = true;
+            AddGreenLineVolumeToMidi = true;
             HitsoundExportModeSetting = HitsoundExportMode.Standard;
             HitsoundExportGameMode = GameMode.Standard;
             ZipLayersLeniency = 15;
@@ -216,7 +233,8 @@ namespace Mapping_Tools.Viewmodels {
         public enum HitsoundExportMode {
             Standard,
             Coinciding,
-            Storyboard
+            Storyboard,
+            Midi,
         }
     }
 }
