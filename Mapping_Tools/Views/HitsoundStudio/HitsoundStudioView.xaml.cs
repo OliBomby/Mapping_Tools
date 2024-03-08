@@ -287,9 +287,17 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
             if (!(bool) result) return;
 
+            // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
+            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
+
             if (string.IsNullOrWhiteSpace(settings.BaseBeatmap))
             {
                 MessageBox.Show("Please select a base beatmap first.");
+                return;
+            }
+
+            if (settings.UsePreviousSampleSchema && settings.PreviousSampleSchema == null) {
+                MessageBox.Show("Can not use previous sample schema, because it has not been set by a previous run. Please run the tool first without 'Use previous sample schema' enabled.");
                 return;
             }
 
@@ -310,9 +318,6 @@ namespace Mapping_Tools.Views.HitsoundStudio
                     return;
                 }
             }
-            
-            // Remove logical focus to trigger LostFocus on any fields that didn't yet update the ViewModel
-            FocusManager.SetFocusedElement(FocusManager.GetFocusScope(this), null);
 
             BackgroundWorker.RunWorkerAsync(settings);
             CanRun = false;
