@@ -149,7 +149,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                 }
             }
 
-            var sourceWaveEncoding = sampleSoundGenerator.Wave.WaveFormat.Encoding;
+            var sourceWaveEncoding = sampleSoundGenerator.Encoding;
 
             // Either if it is the blank sample or the source file is literally what the user wants to be exported
             if (sampleSoundGenerator.BlankSample && sampleGeneratingArgs.GetExtension().ToLower() == ".wav" || 

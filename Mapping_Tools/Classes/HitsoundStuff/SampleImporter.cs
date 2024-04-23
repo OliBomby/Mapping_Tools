@@ -245,14 +245,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 return null;
             }
 
-            if (sounds.Length > 1) {
-                // Synchronize the sample rate and channels for all samples so they can be mixed
-                int maxSampleRate = sounds.Max(o => o.Wave.WaveFormat.SampleRate);
-                int maxChannels = sounds.Max(o => o.Wave.WaveFormat.Channels);
-                foreach (SampleSoundGenerator sound in sounds) {
-                    sound.SampleRate = maxSampleRate;
-                    sound.Channels = maxChannels;
-                }
+            // Synchronize the sample rate and channels for all samples so they can be mixed
+            int maxSampleRate = Math.Min(sounds.Max(o => o.Wave.WaveFormat.SampleRate), 44100);
+            foreach (SampleSoundGenerator sound in sounds) {
+                sound.SampleRate = maxSampleRate;
+                sound.Channels = 2;
             }
 
             // Mix into single sound generator
@@ -341,6 +338,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             double volumeCorrection = args.Velocity != -1 ? (double)args.Velocity / velocity : 1d;
             double attenuationCorrection = Math.Pow(10, zone.Attenuation() / -10d);
             output.AmplitudeCorrection = volumeCorrection * attenuationCorrection;
+            output.Panning = zone.Pan();
 
             return output;
         }

@@ -91,6 +91,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return g?.LowByteAmount ?? 0;
         }
 
+        public static double Pan(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.Pan);
+            return g?.Int16Amount / 500d ?? 0;
+        }
+
         public static double Attenuation(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.InitialAttenuation);
             return g?.Int16Amount / 10d ?? 0;

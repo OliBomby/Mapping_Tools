@@ -31,7 +31,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>
         /// This means that this is the blank sample. There is some special logic for this.
         /// </summary>
-        public bool BlankSample => Wave.TotalTime.Equals(TimeSpan.Zero);
+        public bool BlankSample => Wave is not null ? Wave.TotalTime.Equals(TimeSpan.Zero) : Generators.All(g => g.BlankSample);
+
+        public WaveFormatEncoding Encoding => Wave?.WaveFormat.Encoding ?? WaveFormatEncoding.IeeeFloat;
 
         public SampleSoundGenerator(WaveStream wave) {
             Wave = wave;
