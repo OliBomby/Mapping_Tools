@@ -190,8 +190,6 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 case ".sf2": {
                     SoundFont sf2 = new SoundFont(path);
                     SampleSoundGenerator wave = ImportFromSoundFont(args, sf2);
-                    wave.Panning = args.Panning;
-                    wave.PitchShift = args.PitchShift;
                     GC.Collect();
                     return wave;
                 }
@@ -222,7 +220,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         
         // TODO: format soundfont import to detect file versions and types of files. 
         public static SampleSoundGenerator ImportFromSoundFont(SampleGeneratingArgs args, SoundFont sf2) {
-            SampleSoundGenerator wave = null;
+            SampleSoundGenerator[] sounds = Array.Empty<SampleSoundGenerator>();
 
             foreach (var preset in sf2.Presets) {
                 if (preset.PatchNumber != args.Patch && args.Patch != -1) {
@@ -232,12 +230,38 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     continue;
                 }
 
-                wave = ImportPreset(sf2, preset, args);
-                if (wave != null)
+                sounds = ImportPreset(sf2, preset, args).ToArray();
+                if (sounds.Length > 0)
                     break;
             }
 
-            return wave ?? ImportInstruments(sf2, args);
+            // If there are no presets, import all instruments
+            if (sounds.Length == 0) {
+                sounds = ImportInstruments(sf2, args).ToArray();
+            }
+
+            // If no samples were found, return null
+            if (sounds.Length == 0) {
+                return null;
+            }
+
+            if (sounds.Length > 1) {
+                // Synchronize the sample rate and channels for all samples so they can be mixed
+                int maxSampleRate = sounds.Max(o => o.Wave.WaveFormat.SampleRate);
+                int maxChannels = sounds.Max(o => o.Wave.WaveFormat.Channels);
+                foreach (SampleSoundGenerator sound in sounds) {
+                    sound.SampleRate = maxSampleRate;
+                    sound.Channels = maxChannels;
+                }
+            }
+
+            // Mix into single sound generator
+            var generator = new SampleSoundGenerator(sounds) {
+                Panning = args.Panning,
+                PitchShift = args.PitchShift
+            };
+
+            return generator;
         }
 
         private static void SoundFontDebug(SoundFont sf) {
@@ -247,202 +271,153 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Console.WriteLine(@"Number of instruments: " + sf.SampleHeaders.Length);
         }
 
-        private static SampleSoundGenerator ImportPreset(SoundFont sf2, Preset preset, SampleGeneratingArgs args) {
-            /*
-                == Aproximate Pesdo Code of importing a preset from sf2 ==
-                -    Get all preset zones from soundfont (sf2)
-                -    get the instrument and double check if it's not null (if it is, "continue" the method)
-                -    is the instrument grabbed the same as what args is asking for? (if not, "continue" method)
-                -    get each zone within instrument and create wav file from information
-                    -   get Sample Header of instrument zone and double check if null (if so, "continue")
-                    -   get the Key range of spesified zone and create high and low keys 8 bit's in difference.
-                        -   is the key not the same as what the args asked for? (yes, then "continue")
-                    -   Get the velocity range of spesified zone and create high and low keys 8 bits' in difference.
-                        -   is the velocity not the same as what the args asked for? (yes, then "continue")
-                    -   Find the closest key from instrument zone to the key spesified from args.
-                        - is the closest key lower than the maximum integer value or, is the key of args just not spesified?
-                            - if so, set the closest zone (initial = null) to the current zone, 
-                            - if so, set the bdist (initial = maximum integer value) to the closest key.
-                    -   Is there a zone found from above?
-                        - If so, create a wave from zone information using the SampleData.
-            */
-            return ImportInstruments(sf2, preset.Zones.Select(z => z.Instrument()), args);
+        private static IEnumerable<SampleSoundGenerator> ImportPreset(SoundFont sf2, Preset preset, SampleGeneratingArgs args) {
+            if (args.Instrument != -1)
+                return ImportInstrument(sf2, preset.Zones[args.Instrument].Instrument(), args);
+
+            // Import all layers that match the key range and velocity range
+            return ValidZones(preset.Zones, args).SelectMany(zone => ImportInstrument(sf2, zone.Instrument(), args));
         }
 
-        private static SampleSoundGenerator ImportInstruments(SoundFont sf2, SampleGeneratingArgs args) {
-            return ImportInstruments(sf2, sf2.Instruments, args);
+        private static IEnumerable<Zone> ValidZones(IEnumerable<Zone> zones, SampleGeneratingArgs args) {
+            var validZones = zones.Where(z => IsZoneValid(z, args.Key, args.Velocity)).ToList();
+
+            if (validZones.Count == 0)
+                return validZones;
+
+            if (args.Key != -1 && args.Velocity != -1)
+                return validZones;
+
+            // If there are multiple valid zones, and we have a wildcard key/velocity, we want to select the zones that could occur in a single key/velocity
+            // so we find all the zones with overlap with the first zone
+            var firstZone = validZones[0];
+            return validZones.Where(z =>
+                    RangeOverlap(firstZone.KeyRange(), z.KeyRange()) && RangeOverlap(firstZone.VelocityRange(), z.VelocityRange())).ToList();
         }
 
-        private static SampleSoundGenerator ImportInstruments(SoundFont sf2, IEnumerable<Instrument> instruments, SampleGeneratingArgs args) {
-            Zone closest = null;
-            int i = 0;
-            int bdist = int.MaxValue;
-            
-            foreach (var instrument in instruments) { // perccusion bank likely has more than one instrument here.
-                if (instrument == null)
-                    continue;
-
-                if (i++ != args.Instrument && args.Instrument != -1) {
-                    continue;
-                }
-
-                var iZone = ImportInstrument(instrument, args);
-
-                if (iZone == null) continue;
-
-                // Get closest instrument from the zones in the preset
-                int dist = Math.Abs(args.Key - iZone.Key());
-
-                if (dist < bdist || args.Key == -1) {
-                    closest = iZone;
-                    bdist = dist;
-                }
-            }
-
-            if (closest == null) return null;
-
-            //Console.WriteLine("closest: " + closest.Key());
-            var wave = GenerateSample(closest, sf2.SampleData, args);
-            return wave;
+        private static bool RangeOverlap(ushort range1, ushort range2) {
+            byte low1 = (byte)range1;
+            byte high1 = (byte)(range1 >> 8);
+            byte low2 = (byte)range2;
+            byte high2 = (byte)(range2 >> 8);
+            return range1 == 0 || range2 == 0 || low1 <= high2 && high1 >= low2;
         }
 
-        private static Zone ImportInstrument(Instrument i, SampleGeneratingArgs args) {
-            Zone closest = null;
-            int bdist = int.MaxValue;
+        private static bool IsZoneValid(Zone zone, int key, int velocity) {
+            // Requested key/velocity must also fit in the key/velocity range of the sample
+            ushort keyRange = zone.KeyRange();
+            byte keyLow = (byte)keyRange;
+            byte keyHigh = (byte)(keyRange >> 8);
 
-            // an Instrument contains a set of zones that contain sample headers.
-            foreach (var instrumentZone in i.Zones) {
-                var sh = instrumentZone.SampleHeader();
-                if (sh == null)
-                    continue;
+            ushort velRange = zone.VelocityRange();
+            byte velLow = (byte)velRange;
+            byte velHigh = (byte)(velRange >> 8);
 
-                // Requested key/velocity must also fit in the key/velocity range of the sample
-                ushort keyRange = instrumentZone.KeyRange();
-                byte keyLow = (byte)keyRange;
-                byte keyHigh = (byte)(keyRange >> 8);
-                if (!(args.Key >= keyLow && args.Key <= keyHigh) && args.Key != -1 && keyRange != 0) {
-                    continue;
-                }
-                ushort velRange = instrumentZone.VelocityRange();
-                byte velLow = (byte)velRange;
-                byte velHigh = (byte)(velRange >> 8);
-                if (!(args.Velocity >= velLow && args.Velocity <= velHigh) && args.Velocity != -1 && velRange != 0) {
-                    continue;
-                }
-
-                // Get the closest key possible
-                int dist = Math.Abs(args.Key - instrumentZone.Key());
-
-                if (dist < bdist || args.Key == -1) {
-                    closest = instrumentZone;
-                    bdist = dist;
-                }
-            }
-
-            return closest;
+            return (velRange == 0 || velocity == -1 || velocity >= velLow && velocity <= velHigh) &&
+                   (keyRange == 0 || key      == -1 || key      >= keyLow && key      <= keyHigh);
         }
 
-        private static SampleSoundGenerator GenerateSample(Zone izone, byte[] sample, SampleGeneratingArgs args) {
+        private static IEnumerable<SampleSoundGenerator> ImportInstruments(SoundFont sf2, SampleGeneratingArgs args) {
+            return args.Instrument != -1
+                ? ImportInstrument(sf2, sf2.Instruments[args.Instrument], args).ToList()
+                : sf2.Instruments.SelectMany(i => ImportInstrument(sf2, i, args)).ToList();
+        }
+
+        private static IEnumerable<SampleSoundGenerator> ImportInstrument(SoundFont sf2, Instrument i, SampleGeneratingArgs args) {
+            return ValidZones(i.Zones, args).Where(z => z.SampleHeader() is not null).Select(z => GenerateSample(sf2, z, args));
+        }
+
+        private static SampleSoundGenerator GenerateSample(SoundFont sf2, Zone zone, SampleGeneratingArgs args) {
             // Read the sample mode to apply the correct lengthening algorithm
             // Add volume sample provider for the velocity argument
             
-            var sh = izone.SampleHeader();
-            int sampleMode = izone.SampleModes();
+            var sh = zone.SampleHeader();
+            int sampleMode = zone.SampleModes();
 
-            byte key = izone.Key();
-            byte velocity = izone.Velocity();
+            var output = GetSampleWithLength(sh, zone, sampleMode, sf2.SampleData, args);
+
+            byte velocity = zone.Velocity();
             double volumeCorrection = args.Velocity != -1 ? (double)args.Velocity / velocity : 1d;
-
-            var output = GetSampleWithLength(sh, izone, sampleMode, sample, args);
-
-            // Key correction is 0 to not use the shitty pitch shifter
-            output.KeyCorrection = 0;
             output.VolumeCorrection = volumeCorrection;
 
             return output;
         }
 
-        private static SampleSoundGenerator GetSampleWithLength(SampleHeader sh, Zone izone, int sampleMode, byte[] sample, SampleGeneratingArgs args) {
-            if (sampleMode == 0 || sampleMode == 2) {
-                // Don't loop
-                return GetSampleWithoutLoop(sh, izone, sample, args);
-            } else if (sampleMode == 1) {
-                // Loop continuously
-                return GetSampleContinuous(sh, izone, sample, args);
-            } else {
-                // Loops for the duration of key depression then proceed to play the remainder of the sample
-                return GetSampleRemainder(sh, izone, sample, args);
+        private static SampleSoundGenerator GetSampleWithLength(SampleHeader sh, Zone zone, int sampleMode, byte[] sample, SampleGeneratingArgs args) {
+            switch (sampleMode) {
+                case 1:
+                    // Loop continuously
+                    return GetSampleContinuous(sh, zone, sample, args);
+                case 3:
+                    // Loops for the duration of key depression then proceed to play the remainder of the sample
+                    return GetSampleRemainder(sh, zone, sample, args);
+                default:
+                    // Don't loop
+                    return GetSampleWithoutLoop(sh, zone, sample, args);
             }
         }
 
-        private static SampleSoundGenerator GetSampleWithoutLoop(SampleHeader sh, Zone izone, byte[] sample, SampleGeneratingArgs args) {
-            // Indices in sf2 are numbers of samples, not byte length. So double them
-            int start = (int)sh.Start + izone.FullStartAddressOffset();
-            int end = (int)sh.End + izone.FullEndAddressOffset();
+        private static readonly int bytesPerSample = 2;
 
+        private static SampleSoundGenerator GetSampleWithoutLoop(SampleHeader sh, Zone zone, byte[] sample, SampleGeneratingArgs args) {
+            // Indices in sf2 are numbers of samples, not byte length. So double them
+            int start = (int)sh.Start + zone.FullStartAddressOffset();
+            int end = (int)sh.End + zone.FullEndAddressOffset();
             int length = end - start;
 
-            double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) + 0.4 : length / (double)sh.SampleRate;
+            bool doFade = args.Length >= 0 && args.Length / 1000 < length / (double)sh.SampleRate;
 
             // Sample rate key correction
-            int keyCorrection = args.Key != -1 ? args.Key - izone.Key() : 0;
+            int keyCorrection = args.Key != -1 ? args.Key - zone.Key() : 0;
             double factor = Math.Pow(2, keyCorrection / 12d);
-            lengthInSeconds *= factor;
 
-            lengthInSeconds = Math.Min(lengthInSeconds, length / (double)sh.SampleRate);
-
-            int numberOfSamples = (int)Math.Ceiling(lengthInSeconds * sh.SampleRate);
-            int numberOfBytes = numberOfSamples * 2;
-
+            int numberOfBytes = length * bytesPerSample;
             byte[] buffer = new byte[numberOfBytes];
-            Array.Copy(sample, start * 2, buffer, 0, numberOfBytes);
+            Array.Copy(sample, start * bytesPerSample, buffer, 0, numberOfBytes);
 
             var output = new SampleSoundGenerator(BufferToWaveStream(buffer, (uint)(sh.SampleRate * factor)));
 
-            if (lengthInSeconds <= 0.4) {
-                output.FadeStart = lengthInSeconds * 0.7;
-                output.FadeLength = lengthInSeconds * 0.2;
-            } else {
-                output.FadeStart = lengthInSeconds - 0.4;
-                output.FadeLength = 0.3;
-            }
+            if (!doFade)
+                return output;
+
+            output.FadeStart = args.Length / 1000;
+            output.FadeLength = 0.3;
 
             return output;
         }
 
-        private static SampleSoundGenerator GetSampleContinuous(SampleHeader sh, Zone izone, byte[] sample, SampleGeneratingArgs args) {
+        private static SampleSoundGenerator GetSampleContinuous(SampleHeader sh, Zone zone, byte[] sample, SampleGeneratingArgs args) {
+            if (args.Length < 0)
+                return GetSampleWithoutLoop(sh, zone, sample, args);
+
             // Indices in sf2 are numbers of samples, not byte length. So double them
-            int start = (int)sh.Start + izone.FullStartAddressOffset();
-            int end = (int)sh.End + izone.FullEndAddressOffset();
-            int startLoop = (int)sh.StartLoop + izone.FullStartLoopAddressOffset();
-            int endLoop = (int)sh.EndLoop + izone.FullEndLoopAddressOffset();
+            int start = (int)sh.Start + zone.FullStartAddressOffset();
+            int startLoop = (int)sh.StartLoop + zone.FullStartLoopAddressOffset();
+            int endLoop = (int)sh.EndLoop + zone.FullEndLoopAddressOffset();
 
-            int length = end - start;
-            int lengthBytes = length * 2;
+            int lengthFirstHalf = startLoop - start;
             int loopLength = endLoop - startLoop;
-            int loopLengthBytes = loopLength * 2;
 
-            double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) + 0.4 : length / (double)sh.SampleRate + 0.4;
+            double lengthInSeconds = args.Length / 1000;
 
             // Sample rate key correction
-            int keyCorrection = args.Key != -1 ? args.Key - izone.Key() : 0;
+            int keyCorrection = args.Key != -1 ? args.Key - zone.Key() : 0;
             double factor = Math.Pow(2, keyCorrection / 12d);
             lengthInSeconds *= factor;
+            lengthInSeconds += 0.4;  // The last 0.4 seconds is fade-out
 
             int numberOfSamples = (int)Math.Ceiling(lengthInSeconds * sh.SampleRate);
-            int numberOfLoopSamples = numberOfSamples - length;
+            int numberOfLoopSamples = numberOfSamples - lengthFirstHalf;
 
-            if (numberOfLoopSamples < 0) {
-                return GetSampleWithoutLoop(sh, izone, sample, args);
-            }
-
-            int numberOfBytes = numberOfSamples * 2;
-
+            int lengthFirstHalfBytes = lengthFirstHalf * bytesPerSample;
+            int loopLengthBytes = loopLength * bytesPerSample;
+            int numberOfBytes = numberOfSamples * bytesPerSample;
             byte[] buffer = new byte[numberOfBytes];
 
-            Array.Copy(sample, start * 2, buffer, 0, lengthBytes);
+            Array.Copy(sample, start * bytesPerSample, buffer, 0, lengthFirstHalf * bytesPerSample);
             for (int i = 0; i < (numberOfLoopSamples + loopLength - 1) / loopLength; i++) {
-                Array.Copy(sample, startLoop * 2, buffer, lengthBytes + i * loopLengthBytes, Math.Min(loopLengthBytes, numberOfBytes - (lengthBytes + i * loopLengthBytes)));
+                Array.Copy(sample, startLoop * bytesPerSample, buffer,
+                    lengthFirstHalfBytes + i * loopLengthBytes, Math.Min(loopLengthBytes, numberOfBytes - (lengthFirstHalfBytes + i * loopLengthBytes)));
             }
 
             var output = new SampleSoundGenerator(BufferToWaveStream(buffer, (uint)(sh.SampleRate * factor))) {
@@ -453,50 +428,51 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return output;
         }
 
-        private static SampleSoundGenerator GetSampleRemainder(SampleHeader sh, Zone izone, byte[] sample, SampleGeneratingArgs args) {
-            // Indices in sf2 are numbers of samples, not byte length. So double them
-            int start = (int)sh.Start + izone.FullStartAddressOffset();
-            int end = (int)sh.End + izone.FullEndAddressOffset();
-            int startLoop = (int)sh.StartLoop + izone.FullStartLoopAddressOffset();
-            int endLoop = (int)sh.EndLoop + izone.FullEndLoopAddressOffset();
+        private static SampleSoundGenerator GetSampleRemainder(SampleHeader sh, Zone zone, byte[] sample, SampleGeneratingArgs args) {
+            if (args.Length < 0)
+                return GetSampleWithoutLoop(sh, zone, sample, args);
 
-            int length = end - start;
+            // Indices in sf2 are numbers of samples, not byte length. So double them
+            int start = (int)sh.Start + zone.FullStartAddressOffset();
+            int end = (int)sh.End + zone.FullEndAddressOffset();
+            int startLoop = (int)sh.StartLoop + zone.FullStartLoopAddressOffset();
+            int endLoop = (int)sh.EndLoop + zone.FullEndLoopAddressOffset();
+
             int loopLength = endLoop - startLoop;
-            int loopLengthBytes = loopLength * 2;
+            int loopLengthBytes = loopLength * bytesPerSample;
 
             int lengthFirstHalf = startLoop - start;
-            int lengthFirstHalfBytes = lengthFirstHalf * 2;
+            int lengthFirstHalfBytes = lengthFirstHalf * bytesPerSample;
 
             int lengthSecondHalf = end - endLoop;
-            int lengthSecondHalfBytes = lengthSecondHalf * 2;
+            int lengthSecondHalfBytes = lengthSecondHalf * bytesPerSample;
             
-            double lengthInSeconds = args.Length != -1 ? (args.Length / 1000) : length / (double)sh.SampleRate;
+            double lengthInSeconds = args.Length / 1000;
 
             // Sample rate key correction
-            int keyCorrection = args.Key != -1 ? args.Key - izone.Key() : 0;
+            int keyCorrection = args.Key != -1 ? args.Key - zone.Key() : 0;
             double factor = Math.Pow(2, keyCorrection / 12d);
             lengthInSeconds *= factor;
 
-            int numberOfSamples = (int)Math.Ceiling(lengthInSeconds * sh.SampleRate);
-            numberOfSamples += lengthSecondHalf;
-            int numberOfLoopSamples = numberOfSamples - lengthFirstHalf - lengthSecondHalf;
+            int numberOfSamples = (int) Math.Ceiling(lengthInSeconds * sh.SampleRate);
+            int numberOfLoopSamples = numberOfSamples - lengthFirstHalf;
+            numberOfLoopSamples = (numberOfLoopSamples + loopLength - 1) / loopLength * loopLength;
+            numberOfSamples = lengthFirstHalf + numberOfLoopSamples + lengthSecondHalf;
 
-            if (numberOfLoopSamples < loopLength) {
-                return GetSampleWithoutLoop(sh, izone, sample, args);
-            }
+            if (numberOfLoopSamples <= 0)
+                return GetSampleWithoutLoop(sh, zone, sample, args);
 
-            int numberOfBytes = numberOfSamples * 2;
-            int numberOfLoopBytes = numberOfLoopSamples * 2;
+            int numberOfBytes = numberOfSamples * bytesPerSample;
+            int numberOfLoopBytes = numberOfLoopSamples * bytesPerSample;
 
             byte[] buffer = new byte[numberOfBytes];
-            byte[] bufferLoop = new byte[numberOfLoopBytes];
 
-            Array.Copy(sample, start * 2, buffer, 0, lengthFirstHalfBytes);
-            for (int i = 0; i < (numberOfLoopSamples + loopLength - 1) / loopLength; i++) {
-                Array.Copy(sample, startLoop * 2, bufferLoop, i * loopLengthBytes, Math.Min(loopLengthBytes, numberOfLoopBytes - i * loopLengthBytes));
+            Array.Copy(sample, start * bytesPerSample, buffer, 0, lengthFirstHalfBytes);
+            for (int i = 0; i < numberOfLoopSamples / loopLength; i++) {
+                Array.Copy(sample, startLoop * bytesPerSample, buffer,
+                    lengthFirstHalfBytes + i * loopLengthBytes, loopLengthBytes);
             }
-            bufferLoop.CopyTo(buffer, lengthFirstHalfBytes);
-            Array.Copy(sample, start * 2, buffer, lengthFirstHalfBytes + numberOfLoopBytes, lengthSecondHalfBytes);
+            Array.Copy(sample, endLoop * bytesPerSample, buffer, lengthFirstHalfBytes + numberOfLoopBytes, lengthSecondHalfBytes);
 
             return new SampleSoundGenerator(BufferToWaveStream(buffer, (uint)(sh.SampleRate * factor)));
         }
