@@ -336,9 +336,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             var output = GetSampleWithLength(sh, zone, sampleMode, sf2.SampleData, args);
 
+            // Velocity is a linear multiplier of the amplitude
             byte velocity = zone.Velocity();
-            double volumeCorrection = args.Velocity != -1 ? (double)args.Velocity / velocity : 1d;
-            output.VolumeCorrection = volumeCorrection;
+            double amplitudeCorrection = args.Velocity != -1 ? (double)args.Velocity / velocity : 1d;
+            output.AmplitudeCorrection = amplitudeCorrection;
 
             return output;
         }

@@ -19,6 +19,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// </summary>
         public SampleSoundGenerator[] Generators { get; }
 
+        public double AmplitudeCorrection { get; set; } = 1;
         public double VolumeCorrection { get; set; } = 1;
         public double Panning { get; set; }
         public double PitchShift { get; set; }
@@ -56,6 +57,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             if (!Precision.AlmostEquals(FadeStart, -1) && !Precision.AlmostEquals(FadeLength, -1)) {
                 output = new DelayFadeOutSampleProvider(output);
                 ((DelayFadeOutSampleProvider) output).BeginFadeOut(FadeStart * 1000, FadeLength * 1000);
+            }
+            if (!Precision.AlmostEquals(AmplitudeCorrection, 1)) {
+                output = new VolumeSampleProvider(output) { Volume = (float)AmplitudeCorrection };
             }
             if (!Precision.AlmostEquals(VolumeCorrection, 1)) {
                 output = SampleImporter.VolumeChange(output, VolumeCorrection);
