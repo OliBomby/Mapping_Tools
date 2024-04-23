@@ -101,6 +101,25 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return g?.Int16Amount / 10d ?? 0;
         }
 
+        public static sbyte Correction(this Zone zone) {
+            var sh = zone.SampleHeader();
+            return sh?.PitchCorrection ?? 0;
+        }
+
+        public static short CoarseTune(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.CoarseTune);
+            return g?.Int16Amount ?? 0;
+        }
+
+        public static short FineTune(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.FineTune);
+            return g?.Int16Amount ?? 0;
+        }
+
+        public static int TotalCorrection(this Zone zone) {
+            return Correction(zone) + CoarseTune(zone) * 100 + FineTune(zone);
+        }
+
         public static byte Key(this Zone zone) {
             var sh = zone.SampleHeader();
             if (sh == null)
@@ -108,6 +127,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             byte over = zone.OverridingRootKey();
             return over != 0 ? over : sh.OriginalPitch;
+        }
+
+        public static short ScaleTuning(this Zone zone) {
+            var g = SelectByGenerator(zone, GeneratorEnum.ScaleTuning);
+            return g?.Int16Amount ?? 100;
         }
 
         public static int SampleModes(this Zone zone) {

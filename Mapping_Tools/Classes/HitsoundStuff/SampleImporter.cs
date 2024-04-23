@@ -368,8 +368,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             bool doFade = args.Length >= 0 && args.Length / 1000 < length / (double)sh.SampleRate;
 
             // Sample rate key correction
-            int keyCorrection = args.Key != -1 ? args.Key - zone.Key() : 0;
-            double factor = Math.Pow(2, keyCorrection / 12d);
+            double factor = GetRateFactor(args, zone);
 
             int numberOfBytes = length * bytesPerSample;
             byte[] buffer = new byte[numberOfBytes];
@@ -384,6 +383,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             output.FadeLength = 0.3;
 
             return output;
+        }
+
+        private static double GetRateFactor(SampleGeneratingArgs args, Zone zone) {
+            int keyCorrection = args.Key != -1 ? (args.Key - zone.Key()) * zone.ScaleTuning() : 0;
+            keyCorrection += zone.TotalCorrection();
+            return Math.Pow(2, keyCorrection / 1200d);
         }
 
         private static SampleSoundGenerator GetSampleContinuous(SampleHeader sh, Zone zone, byte[] sample, SampleGeneratingArgs args) {
@@ -401,8 +406,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             double lengthInSeconds = args.Length / 1000;
 
             // Sample rate key correction
-            int keyCorrection = args.Key != -1 ? args.Key - zone.Key() : 0;
-            double factor = Math.Pow(2, keyCorrection / 12d);
+            double factor = GetRateFactor(args, zone);
             lengthInSeconds *= factor;
             lengthInSeconds += 0.4;  // The last 0.4 seconds is fade-out
 
@@ -453,8 +457,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             double lengthInSeconds = args.Length / 1000;
 
             // Sample rate key correction
-            int keyCorrection = args.Key != -1 ? args.Key - zone.Key() : 0;
-            double factor = Math.Pow(2, keyCorrection / 12d);
+            double factor = GetRateFactor(args, zone);
             lengthInSeconds *= factor;
 
             int numberOfSamples = (int) Math.Ceiling(lengthInSeconds * sh.SampleRate);
