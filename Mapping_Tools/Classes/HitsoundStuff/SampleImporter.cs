@@ -273,11 +273,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 return ImportInstrument(sf2, preset.Zones[args.Instrument].Instrument(), args);
 
             // Import all layers that match the key range and velocity range
-            return ValidZones(preset.Zones, args).SelectMany(zone => ImportInstrument(sf2, zone.Instrument(), args));
+            return ValidZones(preset.Zones, args, instrument:true).SelectMany(zone => ImportInstrument(sf2, zone.Instrument(), args));
         }
 
-        private static IEnumerable<Zone> ValidZones(IEnumerable<Zone> zones, SampleGeneratingArgs args) {
-            var validZones = zones.Where(z => IsZoneValid(z, args.Key, args.Velocity)).ToList();
+        private static IEnumerable<Zone> ValidZones(IEnumerable<Zone> zones, SampleGeneratingArgs args, bool instrument = false, bool sampleHeader = false) {
+            var validZones = zones.Where(z => IsZoneValid(z, args.Key, args.Velocity) &&
+                                              (!instrument || z.Instrument() is not null) &&
+                                              (!sampleHeader || z.SampleHeader() is not null)).ToList();
 
             if (validZones.Count == 0)
                 return validZones;
@@ -321,7 +323,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         private static IEnumerable<SampleSoundGenerator> ImportInstrument(SoundFont sf2, Instrument i, SampleGeneratingArgs args) {
-            return ValidZones(i.Zones, args).Where(z => z.SampleHeader() is not null).Select(z => GenerateSample(sf2, z, args));
+            return ValidZones(i.Zones, args, sampleHeader:true).Select(z => GenerateSample(sf2, z, args));
         }
 
         private static SampleSoundGenerator GenerateSample(SoundFont sf2, Zone zone, SampleGeneratingArgs args) {
