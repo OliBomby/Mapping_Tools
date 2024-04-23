@@ -99,7 +99,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public static string SampleFileDialog() {
             OpenFileDialog openFileDialog = new OpenFileDialog {
-                Filter = "Audio files (*.wav;*.ogg)|*.wav;*.ogg|SoundFont files (*.sf2)|*.sf2",
+                Filter = "Sample files (*.wav;*.ogg;*.sf2)|*.wav;*.ogg;*.sf2|SoundFont files (*.sf2)|*.sf2",
                 FilterIndex = 1,
                 RestoreDirectory = true,
                 CheckFileExists = true
