@@ -410,6 +410,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int numberOfSamples = (int)Math.Ceiling(lengthInSeconds * sh.SampleRate);
             int numberOfLoopSamples = numberOfSamples - lengthFirstHalf;
 
+            if (numberOfLoopSamples <= 0)
+                return GetSampleWithoutLoop(sh, zone, sample, args);
+
             int lengthFirstHalfBytes = lengthFirstHalf * bytesPerSample;
             int loopLengthBytes = loopLength * bytesPerSample;
             int numberOfBytes = numberOfSamples * bytesPerSample;

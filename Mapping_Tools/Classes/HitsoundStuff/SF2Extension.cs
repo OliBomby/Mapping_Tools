@@ -7,14 +7,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return g?.Instrument;
         }
 
-        public static ushort StartAddressOffset(this Zone zone) {
+        public static short StartAddressOffset(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.StartAddressOffset);
-            return g?.UInt16Amount ?? (ushort)0;
+            return g?.Int16Amount ?? 0;
         }
 
-        public static ushort StartAddressCoarseOffset(this Zone zone) {
+        public static short StartAddressCoarseOffset(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.StartAddressCoarseOffset);
-            return g?.UInt16Amount ?? (ushort)0;
+            return g?.Int16Amount ?? 0;
         }
 
         public static int FullStartAddressOffset(this Zone zone) {
@@ -23,14 +23,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return g + 0x8000 * gc;
         }
 
-        public static ushort EndAddressOffset(this Zone zone) {
+        public static short EndAddressOffset(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.EndAddressOffset);
-            return g?.UInt16Amount ?? (ushort)0;
+            return g?.Int16Amount ?? 0;
         }
 
-        public static ushort EndAddressCoarseOffset(this Zone zone) {
+        public static short EndAddressCoarseOffset(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.EndAddressCoarseOffset);
-            return g?.UInt16Amount ?? (ushort)0;
+            return g?.Int16Amount ?? 0;
         }
 
         public static int FullEndAddressOffset(this Zone zone) {
@@ -39,14 +39,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return g + 0x8000 * gc;
         }
 
-        public static ushort StartLoopAddressOffset(this Zone zone) {
+        public static short StartLoopAddressOffset(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.StartLoopAddressOffset);
-            return g?.UInt16Amount ?? (ushort)0;
+            return g?.Int16Amount ?? 0;
         }
 
-        public static ushort StartLoopAddressCoarseOffset(this Zone zone) {
+        public static short StartLoopAddressCoarseOffset(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.StartLoopAddressCoarseOffset);
-            return g?.UInt16Amount ?? (ushort)0;
+            return g?.Int16Amount ?? 0;
         }
 
         public static int FullStartLoopAddressOffset(this Zone zone) {
@@ -55,14 +55,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return g + 0x8000 * gc;
         }
 
-        public static ushort EndLoopAddressOffset(this Zone zone) {
+        public static short EndLoopAddressOffset(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.EndLoopAddressOffset);
-            return g?.UInt16Amount ?? (ushort)0;
+            return g?.Int16Amount ?? 0;
         }
 
-        public static ushort EndLoopAddressCoarseOffset(this Zone zone) {
+        public static short EndLoopAddressCoarseOffset(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.EndLoopAddressCoarseOffset);
-            return g?.UInt16Amount ?? (ushort)0;
+            return g?.Int16Amount ?? 0;
         }
 
         public static int FullEndLoopAddressOffset(this Zone zone) {
@@ -73,22 +73,22 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public static ushort KeyRange(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.KeyRange);
-            return g?.UInt16Amount ?? (ushort)0;
+            return g?.UInt16Amount ?? 0;
         }
 
         public static ushort VelocityRange(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.VelocityRange);
-            return g?.UInt16Amount ?? (ushort)0;
+            return g?.UInt16Amount ?? 0;
         }
 
         public static byte Velocity(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.Velocity);
-            return g?.LowByteAmount ?? (byte)127;
+            return g?.LowByteAmount ?? 127;
         }
 
         public static byte OverridingRootKey(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.OverridingRootKey);
-            return g?.LowByteAmount ?? (byte)0;
+            return g?.LowByteAmount ?? 0;
         }
 
         public static byte Key(this Zone zone) {
@@ -102,7 +102,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         public static int SampleModes(this Zone zone) {
             var g = SelectByGenerator(zone, GeneratorEnum.SampleModes);
-            return g?.UInt16Amount ?? (ushort)0;
+            return g?.UInt16Amount ?? 0;
         }
 
         public static SampleHeader SampleHeader(this Zone zone) {
