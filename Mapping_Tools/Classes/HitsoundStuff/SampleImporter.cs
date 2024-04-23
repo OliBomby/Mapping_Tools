@@ -338,8 +338,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
             // Velocity is a linear multiplier of the amplitude
             byte velocity = zone.Velocity();
-            double amplitudeCorrection = args.Velocity != -1 ? (double)args.Velocity / velocity : 1d;
-            output.AmplitudeCorrection = amplitudeCorrection;
+            double volumeCorrection = args.Velocity != -1 ? (double)args.Velocity / velocity : 1d;
+            double attenuationCorrection = Math.Pow(10, zone.Attenuation() / -10d);
+            output.AmplitudeCorrection = volumeCorrection * attenuationCorrection;
 
             return output;
         }
