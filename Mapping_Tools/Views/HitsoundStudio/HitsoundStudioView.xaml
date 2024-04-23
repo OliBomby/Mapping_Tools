@@ -133,7 +133,7 @@
                                 ToolTip="The patch number of the sample."/>
                             <TextBox x:Name="SelectedSampleInstrumentBox" TextChanged="SelectedSampleInstrumentBox_TextChanged" Margin="0,5,0,0"
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Instrument"
-                                ToolTip="The sub-zone index of the patch of the sample."/>
+                                ToolTip="The layer index in the sound font preset or instrument index."/>
                             <TextBox x:Name="SelectedSampleKeyBox" TextChanged="SelectedSampleKeyBox_TextChanged" Margin="0,5,0,0"
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Key"
                                 ToolTip="The key number of the sample."/>
