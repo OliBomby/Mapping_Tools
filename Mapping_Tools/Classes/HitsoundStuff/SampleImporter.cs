@@ -30,7 +30,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public static WaveStream OpenSample(string path) {
-            return Path.GetExtension(path).ToLower() == ".ogg" ? (WaveStream)new VorbisWaveReader(path) : new MediaFoundationReader(path);
+            return Path.GetExtension(path).ToLower() == ".ogg" ? new VorbisWaveReader(path) : new MediaFoundationReader(path);
         }
 
         /// <summary>
@@ -381,14 +381,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private static readonly int bytesPerSample = 2;
 
-        private static SampleSoundGenerator GetSampleWithoutLoop(Generator[] generators, byte[] sample, SampleGeneratingArgs args) {
+        private static SampleSoundGenerator GetSampleWithoutLoop(Generator[] generators, byte[] sample, SampleGeneratingArgs args, bool needsFade = false) {
             // Indices in sf2 are numbers of samples, not byte length. So double them
             var sh = generators.SampleHeader();
             int start = (int)sh.Start + generators.FullStartAddressOffset();
             int end = (int)sh.End + generators.FullEndAddressOffset();
             int length = end - start;
 
-            bool doFade = args.Length >= 0 && args.Length / 1000 < length / (double)sh.SampleRate;
+            double lengthInSeconds = length / (double) sh.SampleRate;
+            bool doFade = (args.Length >= 0 && args.Length / 1000 < lengthInSeconds) || needsFade;
+            double fadeStart = args.Length >= 0 ? needsFade ? Math.Min(args.Length / 1000, lengthInSeconds - 0.3) : args.Length / 1000 : lengthInSeconds - 0.3;
 
             // Sample rate key correction
             double factor = GetRateFactor(args, generators);
@@ -402,7 +404,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             if (!doFade)
                 return output;
 
-            output.FadeStart = args.Length / 1000;
+            output.FadeStart = fadeStart;
             output.FadeLength = 0.3;
 
             return output;
@@ -416,7 +418,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private static SampleSoundGenerator GetSampleContinuous(Generator[] generators, byte[] sample, SampleGeneratingArgs args) {
             if (args.Length < 0)
-                return GetSampleWithoutLoop(generators, sample, args);
+                return GetSampleWithoutLoop(generators, sample, args, true);
 
             // Indices in sf2 are numbers of samples, not byte length. So double them
             var sh = generators.SampleHeader();
@@ -438,7 +440,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int numberOfLoopSamples = numberOfSamples - lengthFirstHalf;
 
             if (numberOfLoopSamples <= 0)
-                return GetSampleWithoutLoop(generators, sample, args);
+                return GetSampleWithoutLoop(generators, sample, args, true);
 
             int lengthFirstHalfBytes = lengthFirstHalf * bytesPerSample;
             int loopLengthBytes = loopLength * bytesPerSample;
