@@ -2,6 +2,7 @@
 using NAudio.Wave.SampleProviders;
 using System;
 using System.Linq;
+using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.HitsoundStuff.Effects;
 using Mapping_Tools.Classes.MathUtil;
 
@@ -13,11 +14,13 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>
         /// The wave stream to generate samples from.
         /// </summary>
-        public WaveStream Wave { get; }
+        [CanBeNull]
+        private WaveStream Wave { get; }
         /// <summary>
         /// Multiple generators to mix and play at the same time.
         /// </summary>
-        public SampleSoundGenerator[] Generators { get; }
+        [CanBeNull]
+        private SampleSoundGenerator[] Generators { get; }
 
         public double AmplitudeCorrection { get; set; } = 1;
         public double VolumeCorrection { get; set; } = 1;
@@ -31,14 +34,37 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>
         /// This means that this is the blank sample. There is some special logic for this.
         /// </summary>
-        public bool BlankSample => Wave is not null ? Wave.TotalTime.Equals(TimeSpan.Zero) : Generators.All(g => g.BlankSample);
+        public bool BlankSample => Wave is not null ? Wave.TotalTime.Equals(TimeSpan.Zero) : Generators!.All(g => g.BlankSample);
 
-        public WaveFormatEncoding Encoding => Wave?.WaveFormat.Encoding ?? WaveFormatEncoding.IeeeFloat;
+        /// <summary>
+        /// The wave encoding of the audio source.
+        /// For mixing sound generators this is just IEEE float to indicate these may contain peaking values.
+        /// </summary>
+        public WaveFormatEncoding SourceWaveEncoding => Wave?.WaveFormat.Encoding ?? WaveFormatEncoding.IeeeFloat;
 
+        /// <summary>
+        /// The sample rate of the output.
+        /// </summary>
+        public int OutputSampleRate => SampleRate > 0 ? SampleRate : Wave?.WaveFormat.SampleRate ?? Generators!.First().OutputSampleRate;
+
+        /// <summary>
+        /// The number of channels of the output.
+        /// </summary>
+        public int OutputChannels => Channels > 0 ? Channels : Wave?.WaveFormat.Channels ?? Generators!.First().OutputChannels;
+
+        /// <summary>
+        /// Creates a new sample sound generator from a wave stream.
+        /// </summary>
+        /// <param name="wave">The wave stream to generate samples from.</param>
         public SampleSoundGenerator(WaveStream wave) {
             Wave = wave;
         }
 
+        /// <summary>
+        /// Creates a new sample sound generator that mixes the output of multiple generators.
+        /// </summary>
+        /// <remarks>The channel counts and sample rates of all input generators have to be equal.</remarks>
+        /// <param name="generators">The generators to mix.</param>
         public SampleSoundGenerator(SampleSoundGenerator[] generators) {
             Generators = generators;
         }
@@ -53,7 +79,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 Wave.Position = 0;
                 output = WaveToSampleProvider(Wave);
             } else {
-                output = new MixingSampleProvider(Generators.Select(g => g.GetSampleProvider()));
+                output = new MixingSampleProvider(Generators!.Select(g => g.GetSampleProvider()));
             }
 
             if (!Precision.AlmostEquals(FadeStart, -1) && !Precision.AlmostEquals(FadeLength, -1)) {

@@ -246,7 +246,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             // Synchronize the sample rate and channels for all samples so they can be mixed
-            int maxSampleRate = Math.Min(sounds.Max(o => o.Wave.WaveFormat.SampleRate), 44100);
+            int maxSampleRate = Math.Min(sounds.Max(o => o.OutputSampleRate), 44100);
             foreach (SampleSoundGenerator sound in sounds) {
                 sound.SampleRate = maxSampleRate;
                 sound.Channels = 2;
