@@ -3,6 +3,7 @@
 Mapping Tools is a collection of tools which help you create osu! beatmaps more easily! 
 [Website](https://mappingtools.github.io/)
 
+Requires [.NET 5 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/5.0)
 
 <p align="left">
   <img src="https://i.imgur.com/7JqvlNY.png" alt="Mapping Tools logo"/>
@@ -23,7 +24,7 @@ Mapping Tools is a collection of tools which help you create osu! beatmaps more 
 - Rhythm Guide by [OliBomby](https://github.com/OliBomby)
 - Geometry Dashboard by [OliBomby](https://github.com/OliBomby) | [CrazyRabbitKGe](https://github.com/CrazyRabbitKGe)
 - Combo Colour Studio by [OliBomby](https://github.com/OliBomby)
-- Sliderator by [OliBomby](https://github.com/OliBomby) | [Karoo](https://github.com/Karoo13)
+- Sliderator by [OliBomby](https://github.com/OliBomby) | [Karoo](https://github.com/Karoo13) | [JPK314](https://github.com/JPK314)
 - Pattern Gallery by [OliBomby](https://github.com/OliBomby)
 - Mapset Merger by [OliBomby](https://github.com/OliBomby)
 - Tumour Generator 2 by [OliBomby](https://github.com/OliBomby)
