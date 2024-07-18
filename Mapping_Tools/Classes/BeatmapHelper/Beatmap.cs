@@ -248,9 +248,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Metadata["ArtistUnicode"] = new TValue(string.Empty);
             Metadata["Creator"] = new TValue(string.Empty);
             Metadata["Version"] = new TValue(string.Empty);
-            Metadata["Source"] = new TValue(string.Empty);
             Metadata["Tags"] = new TValue(string.Empty);
-            Metadata["BeatmapID"] = new TValue("0");
             Metadata["BeatmapSetID"] = new TValue("-1");
 
             Difficulty["HPDrainRate"] = new TValue("5");
@@ -692,27 +690,35 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             FileFormatHelper.AddDictionaryToLines(Difficulty, lines);
             lines.Add("");
             lines.Add("[Events]");
-            lines.Add("//Background and Video events");
+            if (Version < 128)
+                lines.Add("//Background and Video events");
             lines.AddRange(BackgroundAndVideoEvents.Select(e => {
                 e.SaveWithFloatPrecision = SaveWithFloatPrecision;
                 return e.GetLine();
             }));
-            lines.Add("//Break Periods");
+            if (Version < 128)
+                lines.Add("//Break Periods");
             lines.AddRange(BreakPeriods.Select(b => {
                 b.SaveWithFloatPrecision = SaveWithFloatPrecision;
                 return b.GetLine();
             }));
-            lines.Add("//Storyboard Layer 0 (Background)");
+            if (Version < 128)  // Lazer doesn't add these comments for some reason
+                lines.Add("//Storyboard Layer 0 (Background)");
             lines.AddRange(Event.SerializeEventTree(StoryboardLayerBackground, saveWithFloatPrecision: SaveWithFloatPrecision));
-            lines.Add("//Storyboard Layer 1 (Fail)");
+            if (Version < 128)
+                lines.Add("//Storyboard Layer 1 (Fail)");
             lines.AddRange(Event.SerializeEventTree(StoryboardLayerFail, saveWithFloatPrecision: SaveWithFloatPrecision));
-            lines.Add("//Storyboard Layer 2 (Pass)");
+            if (Version < 128)
+                lines.Add("//Storyboard Layer 2 (Pass)");
             lines.AddRange(Event.SerializeEventTree(StoryboardLayerPass, saveWithFloatPrecision: SaveWithFloatPrecision));
-            lines.Add("//Storyboard Layer 3 (Foreground)");
+            if (Version < 128)
+                lines.Add("//Storyboard Layer 3 (Foreground)");
             lines.AddRange(Event.SerializeEventTree(StoryboardLayerForeground, saveWithFloatPrecision: SaveWithFloatPrecision));
-            lines.Add("//Storyboard Layer 4 (Overlay)");
+            if (Version < 128)
+                lines.Add("//Storyboard Layer 4 (Overlay)");
             lines.AddRange(Event.SerializeEventTree(StoryboardLayerOverlay, saveWithFloatPrecision: SaveWithFloatPrecision));
-            lines.Add("//Storyboard Sound Samples");
+            if (Version < 128)
+                lines.Add("//Storyboard Sound Samples");
             lines.AddRange(StoryboardSoundSamples.Select(sbss => {
                 sbss.SaveWithFloatPrecision = SaveWithFloatPrecision;
                 return sbss.GetLine();
@@ -727,8 +733,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (ComboColours.Any()) {
                 lines.Add("");
                 lines.Add("[Colours]");
-                lines.AddRange(ComboColours.Select((t, i) => "Combo" + (i + 1) + " : " + t));
-                lines.AddRange(SpecialColours.Select(specialColour => specialColour.Key + " : " + specialColour.Value));
+                lines.AddRange(ComboColours.Select((t, i) => "Combo" + (i + 1) + (Version < 128 ? " : " : ": ") + t));
+                lines.AddRange(SpecialColours.Select(specialColour => specialColour.Key + (Version < 128 ? " : " : ": ") + specialColour.Value));
             }
             lines.Add("");
             lines.Add("[HitObjects]");

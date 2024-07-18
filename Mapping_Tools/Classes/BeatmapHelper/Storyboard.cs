@@ -84,16 +84,65 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="lines"></param>
         public void SetLines(List<string> lines) {
             // Load up all the stuff
-            IEnumerable<string> backgroundAndVideoEventsLines = FileFormatHelper.GetCategoryLines(lines, "//Background and Video events", new[] { "[", "//" });
-            IEnumerable<string> breakPeriodsLines = FileFormatHelper.GetCategoryLines(lines, "//Break Periods", new[] { "[", "//" });
-            IEnumerable<string> storyboardLayerBackgroundLines = FileFormatHelper.GetCategoryLines(lines, "//Storyboard Layer 0 (Background)", new[] { "[", "//" });
-            IEnumerable<string> storyboardLayerFailLines = FileFormatHelper.GetCategoryLines(lines, "//Storyboard Layer 1 (Fail)", new[] { "[", "//" });
-            IEnumerable<string> storyboardLayerPassLines = FileFormatHelper.GetCategoryLines(lines, "//Storyboard Layer 2 (Pass)", new[] { "[", "//" });
-            IEnumerable<string> storyboardLayerForegroundLines = FileFormatHelper.GetCategoryLines(lines, "//Storyboard Layer 3 (Foreground)", new[] { "[", "//" });
-            IEnumerable<string> storyboardLayerOverlayLines = FileFormatHelper.GetCategoryLines(lines, "//Storyboard Layer 4 (Overlay)", new[] { "[", "//" });
-            IEnumerable<string> storyboardSoundSamplesLines = FileFormatHelper.GetCategoryLines(lines, "//Storyboard Sound Samples", new[] { "[", "//" });
+            var eventLines = FileFormatHelper.GetCategoryLines(lines, "[Events]").ToList();
+            List<string> backgroundAndVideoEventsLines = new List<string>();
+            List<string> breakPeriodsLines = new List<string>();
+            List<string> storyboardLayerBackgroundLines = new List<string>();
+            List<string> storyboardLayerFailLines = new List<string>();
+            List<string> storyboardLayerPassLines = new List<string>();
+            List<string> storyboardLayerForegroundLines = new List<string>();
+            List<string> storyboardLayerOverlayLines = new List<string>();
+            List<string> storyboardSoundSamplesLines =new List<string>();
 
-            ForceAddOverlayLayer = FileFormatHelper.CategoryExists(lines, "//Storyboard Layer 4 (Overlay)");
+            string[] backgroundAndVideoIdentifiers = {
+                "0", "1", "Video"
+            };
+            string[] breakPeriodsIdentifiers = {
+                "2", "Break"
+            };
+            string[] soundSampleIdentifiers = {
+                "5", "Sample"
+            };
+            string[] categoryIdentifiers = {
+                "//Storyboard Layer 0 (Background)",
+                "//Storyboard Layer 1 (Fail)",
+                "//Storyboard Layer 2 (Pass)",
+                "//Storyboard Layer 3 (Foreground)",
+                "//Storyboard Layer 4 (Overlay)"
+            };
+            string lastCategory = categoryIdentifiers[0];
+
+            foreach (string line in eventLines) {
+                if (backgroundAndVideoIdentifiers.Any(line.StartsWith)) {
+                    backgroundAndVideoEventsLines.Add(line);
+                } else if (breakPeriodsIdentifiers.Any(line.StartsWith)) {
+                    breakPeriodsLines.Add(line);
+                } else if (soundSampleIdentifiers.Any(line.StartsWith)) {
+                    storyboardSoundSamplesLines.Add(line);
+                } else if (categoryIdentifiers.Any(line.StartsWith)) {
+                    lastCategory = line;
+                } else if (!line.StartsWith("//")) {
+                    switch (lastCategory) {
+                        case "//Storyboard Layer 0 (Background)":
+                            storyboardLayerBackgroundLines.Add(line);
+                            break;
+                        case "//Storyboard Layer 1 (Fail)":
+                            storyboardLayerFailLines.Add(line);
+                            break;
+                        case "//Storyboard Layer 2 (Pass)":
+                            storyboardLayerPassLines.Add(line);
+                            break;
+                        case "//Storyboard Layer 3 (Foreground)":
+                            storyboardLayerForegroundLines.Add(line);
+                            break;
+                        case "//Storyboard Layer 4 (Overlay)":
+                            storyboardLayerOverlayLines.Add(line);
+                            break;
+                    }
+                }
+            }
+
+            ForceAddOverlayLayer = FileFormatHelper.CategoryExists(eventLines, "//Storyboard Layer 4 (Overlay)");
 
             foreach (string line in backgroundAndVideoEventsLines) {
                 BackgroundAndVideoEvents.Add(Event.MakeEvent(line));

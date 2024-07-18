@@ -9,6 +9,9 @@
     <None Update="Resources\Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].osu">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\THE ORAL CIGARETTES - GET BACK (Nikakis) [Sotarks_ Cataclysm].osu">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Update="Resources\EmptyTestMap.osu">

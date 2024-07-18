@@ -85,6 +85,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        public static IEnumerable<string> GetLinesPrefix(IEnumerable<string> lines, string[] prefixes) {
+            foreach (string line in lines) {
+                if (prefixes.Any(o => line.StartsWith(o))) {
+                    yield return line;
+                }
+            }
+        }
+
         public static bool CategoryExists(IEnumerable<string> lines, string category) {
             return lines.Any(l => l == category);
         }
