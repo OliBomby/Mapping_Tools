@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class SampleImporter {
@@ -111,6 +112,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         public static Dictionary<SampleGeneratingArgs, Exception> ValidateSamples(IEnumerable<SampleGeneratingArgs> argsList, SampleGeneratingArgsComparer comparer = null) {
             comparer ??= new SampleGeneratingArgsComparer();
 
+            // Define the regex pattern that detects sample file names that don't exist but refer to the skin's default samples
+            const string skinSampleRegexPattern = @"^(none|normal|soft|drum)-hit(normal|whistle|finish|clap)-1\.wav$";
+            Regex skinSampleRegex = new Regex(skinSampleRegexPattern, RegexOptions.CultureInvariant);
+
             var sampleExceptions = new Dictionary<SampleGeneratingArgs, Exception>(comparer);
             var separatedByPath = new Dictionary<string, HashSet<SampleGeneratingArgs>>();
 
@@ -123,6 +128,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
 
             foreach ((string path, HashSet<SampleGeneratingArgs> value) in separatedByPath) {
+                if (skinSampleRegex.IsMatch(Path.GetFileName(path))) {
+                    // These refer to the skin's default samples, they are always valid
+                    foreach (var args in value) {
+                        sampleExceptions.Add(args, null);
+                    }
+                    continue;
+                }
+
                 if (!File.Exists(path)) {
                     foreach (var args in value) {
                         sampleExceptions.Add(args, new FileNotFoundException("File not found", path));
