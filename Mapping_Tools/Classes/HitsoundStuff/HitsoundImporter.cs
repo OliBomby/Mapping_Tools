@@ -160,7 +160,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                     } else {
                         // Sample doesn't exist
                         if (!isFilename) {
-                            samplePath = string.Empty;
+                            samplePath = Path.Combine(
+                                Path.GetDirectoryName(samplePath) ?? throw new InvalidOperationException(),
+                                $"{sampleSet.ToString().ToLower()}-hit{hitsound.ToString().ToLower()}-1.wav");
                         }
                     }
                     
