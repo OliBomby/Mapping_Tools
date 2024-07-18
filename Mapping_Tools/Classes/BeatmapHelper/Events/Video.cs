@@ -4,22 +4,17 @@ using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     public class Video : Event, IHasStartTime {
         public string EventType { get; set; }
-        public int StartTime { get; set; }
+        public double StartTime { get; set; }
         public string Filename { get; set; }
-        public int XOffset { get; set; }
-        public int YOffset { get; set; }
-
-        public Vector2 GetOffset() {
-            return new Vector2(XOffset, YOffset);
-        }
+        public Vector2 Pos { get; set; }
 
         public override string GetLine() {
             // Dont write the offset if its 0,0
-            if (XOffset == 0 && YOffset == 0) {
-                return $"{EventType},{StartTime.ToInvariant()},\"{Filename}\"";
+            if (Pos == Vector2.Zero) {
+                return $"{EventType},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},\"{Filename}\"";
             }
 
-            return $"{EventType},{StartTime.ToInvariant()},\"{Filename}\",{XOffset.ToInvariant()},{YOffset.ToInvariant()}";
+            return $"{EventType},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},\"{Filename}\",{Pos.X.ToInvariant()},{Pos.Y.ToInvariant()}";
         }
 
         public override void SetLine(string line) {
@@ -33,7 +28,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
             EventType = values[0];
 
             // This start time is usually 0 for backgrounds but lets parse it anyways
-            if (TryParseInt(values[1], out int startTime))
+            if (TryParseDouble(values[1], out double startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of video.", line);
 
@@ -41,16 +36,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 
             // Writing offset is optional
             if (values.Length > 3) {
-                if (TryParseInt(values[3], out int xOffset))
-                    XOffset = xOffset;
-                else throw new BeatmapParsingException("Failed to parse X offset of video.", line);
+                if (!TryParseDouble(values[3], out double xOffset))
+                    throw new BeatmapParsingException("Failed to parse X offset of video.", line);
 
-                if (TryParseInt(values[4], out int yOffset))
-                    YOffset = yOffset;
-                else throw new BeatmapParsingException("Failed to parse Y offset of video.", line);
+                if (!TryParseDouble(values[4], out double yOffset))
+                    throw new BeatmapParsingException("Failed to parse Y offset of video.", line);
+
+                Pos = new Vector2(xOffset, yOffset);
             } else {
-                XOffset = 0;
-                YOffset = 0;
+                Pos = Vector2.Zero;
             }
         }
     }

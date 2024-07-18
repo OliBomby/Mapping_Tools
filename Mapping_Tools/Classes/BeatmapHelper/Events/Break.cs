@@ -3,8 +3,8 @@
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     public class Break : Event, IHasStartTime, IHasEndTime {
         public string EventType { get; set; }
-        public int StartTime { get; set; }
-        public int EndTime { get; set; }
+        public double StartTime { get; set; }
+        public double EndTime { get; set; }
 
         public Break() { }
 
@@ -13,10 +13,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         }
 
         public override string GetLine() {
-            return $"{EventType},{StartTime.ToInvariant()},{EndTime.ToInvariant()}";
+            return $"{EventType},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{(SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant())}";
         }
 
-        public sealed override void SetLine(string line) {
+        public override sealed void SetLine(string line) {
             string[] values = line.Split(',');
 
             // Either 'Break' or '2' indicates a break. We save the value so we dont accidentally change it.
@@ -26,11 +26,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 
             EventType = values[0];
 
-            if (TryParseInt(values[1], out int startTime))
+            if (TryParseDouble(values[1], out double startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of break.", line);
 
-            if (TryParseInt(values[2], out int endTime))
+            if (TryParseDouble(values[2], out double endTime))
                 EndTime = endTime;
             else throw new BeatmapParsingException("Failed to parse end time of break.", line);
         }

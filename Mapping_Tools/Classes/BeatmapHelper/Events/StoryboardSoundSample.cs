@@ -12,7 +12,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// <summary>
         /// The time when this sound event occurs.
         /// </summary>
-        public int StartTime { get; set; }
+        public double StartTime { get; set; }
 
         /// <summary>
         /// The storyboard layer this event belongs to.
@@ -33,7 +33,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         public StoryboardSoundSample() { }
 
         /// <inheritdoc />
-        public StoryboardSoundSample(int startTime, StoryboardLayer layer, string filePath, double volume) {
+        public StoryboardSoundSample(double startTime, StoryboardLayer layer, string filePath, double volume) {
             StartTime = startTime;
             Layer = layer;
             FilePath = filePath;
@@ -50,7 +50,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// </summary>
         /// <returns></returns>
         public override string GetLine() {
-            return $"Sample,{StartTime.ToInvariant()},{Layer.ToIntInvariant()},\"{FilePath}\",{Volume.ToRoundInvariant()}";
+            return $"Sample,{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{Layer.ToIntInvariant()},\"{FilePath}\",{Volume.ToRoundInvariant()}";
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
                 throw new BeatmapParsingException("This line is not a storyboarded sample.", line);
             }
 
-            if (TryParseInt(values[1], out int t))
+            if (TryParseDouble(values[1], out double t))
                 StartTime = t;
             else throw new BeatmapParsingException("Failed to parse time of storyboarded sample.", line);
 
@@ -94,7 +94,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
                                   Volume == other.Volume);
         }
 
-        public int EndTime { 
+        public double EndTime {
             get => StartTime;
             set => StartTime = value;
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// <summary>
@@ -110,12 +111,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// </summary>
         /// <param name="events">Collection of top level events.</param>
         /// <param name="depth">Indent count for the top level of events.</param>
+        /// <param name="saveWithFloatPrecision">Whether to set SaveWithFloatPrecision to true on the events before serializing.</param>
         /// <returns></returns>
-        public static IEnumerable<string> SerializeEventTree(IEnumerable<Event> events, int depth = 0) {
+        public static IEnumerable<string> SerializeEventTree(IEnumerable<Event> events, int depth = 0, bool saveWithFloatPrecision = false) {
             foreach (var ev in events) {
+                if (saveWithFloatPrecision)
+                    ev.SaveWithFloatPrecision = true;
                 yield return GetIndents(depth) + ev.GetLine();
                 if (ev.ChildEvents.Count > 0) {
-                    foreach (var childLine in SerializeEventTree(ev.ChildEvents, depth + 1)) {
+                    foreach (var childLine in SerializeEventTree(ev.ChildEvents, depth + 1, saveWithFloatPrecision)) {
                         yield return childLine;
                     }
                 }
@@ -141,5 +145,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         public Event ParentEvent { get; set; }
 
         public List<Event> ChildEvents { get; set; }
+
+        /// <summary>
+        /// When true, all coordinates and times will be serialized without rounding.
+        /// </summary>
+        [JsonIgnore]
+        public bool SaveWithFloatPrecision { get; set; }
     }
 }
