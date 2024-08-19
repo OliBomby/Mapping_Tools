@@ -105,7 +105,7 @@ namespace Mapping_Tools.Views.TimingCopier {
                 // Apply timing changes
                 TimingPointsChange.ApplyChanges(timingTo, timingPointsChanges);
 
-                if (arg.ResnapMode == "Number of beats between objects stays the same") {
+                if (arg.ResnapMode == "Number of beats between objects stays the same" && redlines.Count > 0) {
                     redlines = timingTo.Redlines;
                     List<double> newBookmarks = new List<double>();
                     double lastTime = redlines.FirstOrDefault().Offset;
@@ -145,7 +145,7 @@ namespace Mapping_Tools.Views.TimingCopier {
                         }
                     }
                     beatmapTo.SetBookmarks(newBookmarks);
-                } else if (arg.ResnapMode == "Just resnap") {
+                } else if (arg.ResnapMode == "Just resnap" && redlines.Count > 0) {
                     // Resnap hitobjects
                     foreach (HitObject ho in beatmapTo.HitObjects)
                     {
@@ -206,6 +206,9 @@ namespace Mapping_Tools.Views.TimingCopier {
 
             // Sort the markers
             markers = markers.OrderBy(o => o.Time).ToList();
+
+            if (markers.Count == 0)
+                return markers;
 
             // Calculate the beats between this marker and the last marker
             // If there is a redline in between then calculate beats from last marker to the redline and beats from redline to this marker
