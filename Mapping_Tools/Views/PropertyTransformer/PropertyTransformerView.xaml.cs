@@ -121,7 +121,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                         transformProperty(vm.TimingpointOffsetMultiplier, vm.TimingpointOffsetOffset, () => tp.Offset, o => tp.Offset = o, tp.Offset, round: true);
 
                         // BPM
-                        if (tp.Uninherited) transformProperty(vm.TimingpointBpmMultiplier, vm.TimingpointBpmOffset, tp.GetBpm, tp.SetBpm, tp.Offset, 15, 10000, true);
+                        if (tp.Uninherited) transformProperty(vm.TimingpointBpmMultiplier, vm.TimingpointBpmOffset, tp.GetBpm, tp.SetBpm, tp.Offset, 15, 10000);
 
                         // Slider Velocity
                         transformProperty(vm.TimingpointSvMultiplier, vm.TimingpointSvOffset, () => beatmap.BeatmapTiming.GetSvMultiplierAtTime(tp.Offset), o => {
