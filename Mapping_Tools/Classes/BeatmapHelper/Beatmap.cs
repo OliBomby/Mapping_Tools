@@ -14,6 +14,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
     /// Class containing all the data from a .osu beatmap file. It also supports serialization to .osu format and helper methods to get data in specific ways.
     /// </summary>
     public class Beatmap : ITextFile {
+        /// <summary>
+        /// The file format version of the .osu file. This is typically 14, but could be 128 for Lazer beatmaps.
+        /// </summary>
+        public int Version { get; set; }
 
         /// <summary>
         /// Contains all the values in the [General] section of a .osu file. The key is the variable name and the value is the value.
@@ -244,9 +248,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Metadata["ArtistUnicode"] = new TValue(string.Empty);
             Metadata["Creator"] = new TValue(string.Empty);
             Metadata["Version"] = new TValue(string.Empty);
-            Metadata["Source"] = new TValue(string.Empty);
             Metadata["Tags"] = new TValue(string.Empty);
-            Metadata["BeatmapID"] = new TValue("0");
             Metadata["BeatmapSetID"] = new TValue("-1");
 
             Difficulty["HPDrainRate"] = new TValue("5");
@@ -262,6 +264,20 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
         public void SetLines(List<string> lines) {
+            // Parse the version to determine whether this is a Lazer beatmap.
+            Version = FileFormatHelper.TryParseInt(lines[0][17..].Trim(), out int version) ? version : 14;
+
+            // We automatically upgrade beatmaps to at least version 14
+            if (Version < 14) {
+                Version = 14;
+            }
+
+            if (Version >= 128) {
+                // Lazer beatmaps save with float precision
+                // This is a bit of a hacky way to handle Lazer compatibility as some tools might want to save without float precision.
+                SaveWithFloatPrecision = true;
+            }
+
             // Load up all the shit
             IEnumerable<string> generalLines = FileFormatHelper.GetCategoryLines(lines, "[General]");
             IEnumerable<string> editorLines = FileFormatHelper.GetCategoryLines(lines, "[Editor]");
@@ -331,6 +347,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         /// <param name="startIndex"></param>
         /// <param name="endIndex"></param>
+        /// <param name="rounded"></param>
         internal void UpdateStacking(int startIndex = 0, int endIndex = -1, bool rounded = false) {
             if (endIndex == -1)
                 endIndex = HitObjects.Count - 1;
@@ -657,7 +674,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             // Getting all the stuff
             List<string> lines = new List<string>
             {
-                "osu file format v14",
+                "osu file format v" + Version.ToInvariant(),
                 "",
                 "[General]"
             };
@@ -673,22 +690,39 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             FileFormatHelper.AddDictionaryToLines(Difficulty, lines);
             lines.Add("");
             lines.Add("[Events]");
-            lines.Add("//Background and Video events");
-            lines.AddRange(BackgroundAndVideoEvents.Select(e => e.GetLine()));
-            lines.Add("//Break Periods");
-            lines.AddRange(BreakPeriods.Select(b => b.GetLine()));
-            lines.Add("//Storyboard Layer 0 (Background)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerBackground));
-            lines.Add("//Storyboard Layer 1 (Fail)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerFail));
-            lines.Add("//Storyboard Layer 2 (Pass)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerPass));
-            lines.Add("//Storyboard Layer 3 (Foreground)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerForeground));
-            lines.Add("//Storyboard Layer 4 (Overlay)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerOverlay));
-            lines.Add("//Storyboard Sound Samples");
-            lines.AddRange(StoryboardSoundSamples.Select(sbss => sbss.GetLine()));
+            if (Version < 128)
+                lines.Add("//Background and Video events");
+            lines.AddRange(BackgroundAndVideoEvents.Select(e => {
+                e.SaveWithFloatPrecision = SaveWithFloatPrecision;
+                return e.GetLine();
+            }));
+            if (Version < 128)
+                lines.Add("//Break Periods");
+            lines.AddRange(BreakPeriods.Select(b => {
+                b.SaveWithFloatPrecision = SaveWithFloatPrecision;
+                return b.GetLine();
+            }));
+            if (Version < 128)  // Lazer doesn't add these comments for some reason
+                lines.Add("//Storyboard Layer 0 (Background)");
+            lines.AddRange(Event.SerializeEventTree(StoryboardLayerBackground, saveWithFloatPrecision: SaveWithFloatPrecision));
+            if (Version < 128)
+                lines.Add("//Storyboard Layer 1 (Fail)");
+            lines.AddRange(Event.SerializeEventTree(StoryboardLayerFail, saveWithFloatPrecision: SaveWithFloatPrecision));
+            if (Version < 128)
+                lines.Add("//Storyboard Layer 2 (Pass)");
+            lines.AddRange(Event.SerializeEventTree(StoryboardLayerPass, saveWithFloatPrecision: SaveWithFloatPrecision));
+            if (Version < 128)
+                lines.Add("//Storyboard Layer 3 (Foreground)");
+            lines.AddRange(Event.SerializeEventTree(StoryboardLayerForeground, saveWithFloatPrecision: SaveWithFloatPrecision));
+            if (Version < 128)
+                lines.Add("//Storyboard Layer 4 (Overlay)");
+            lines.AddRange(Event.SerializeEventTree(StoryboardLayerOverlay, saveWithFloatPrecision: SaveWithFloatPrecision));
+            if (Version < 128)
+                lines.Add("//Storyboard Sound Samples");
+            lines.AddRange(StoryboardSoundSamples.Select(sbss => {
+                sbss.SaveWithFloatPrecision = SaveWithFloatPrecision;
+                return sbss.GetLine();
+            }));
             lines.Add("");
             lines.Add("[TimingPoints]");
             lines.AddRange(BeatmapTiming.TimingPoints.Where(tp => tp != null).Select(tp => {
@@ -699,8 +733,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             if (ComboColours.Any()) {
                 lines.Add("");
                 lines.Add("[Colours]");
-                lines.AddRange(ComboColours.Select((t, i) => "Combo" + (i + 1) + " : " + t));
-                lines.AddRange(SpecialColours.Select(specialColour => specialColour.Key + " : " + specialColour.Value));
+                lines.AddRange(ComboColours.Select((t, i) => "Combo" + (i + 1) + (Version < 128 ? " : " : ": ") + t));
+                lines.AddRange(SpecialColours.Select(specialColour => specialColour.Key + (Version < 128 ? " : " : ": ") + specialColour.Value));
             }
             lines.Add("");
             lines.Add("[HitObjects]");

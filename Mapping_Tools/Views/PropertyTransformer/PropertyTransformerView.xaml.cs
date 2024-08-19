@@ -74,24 +74,26 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                 setter(newValue);
             }
 
-            void transformEventTime(Event ev, double multiplier, double offset) {
+            void transformEventTime(Beatmap beatmap, Event ev, double multiplier, double offset) {
+                var version = beatmap?.Version ?? 14;
+
                 // Commands under loops use relative time so they shouldn't get offset
                 if (ev.ParentEvent is StandardLoop or TriggerLoop) {
                     if (ev is IHasStartTime st && filter(st.StartTime, st.StartTime)) {
-                        st.StartTime = (int) Math.Round(st.StartTime * multiplier);
+                        st.StartTime = version < 128 ? (int) Math.Round(st.StartTime * multiplier) : st.StartTime * multiplier;
                     }
                     if (ev is IHasEndTime et && filter(et.EndTime, et.EndTime)) {
-                        et.EndTime = (int) Math.Round(et.EndTime * multiplier);
+                        et.EndTime = version < 128 ? (int) Math.Round(et.EndTime * multiplier) : et.EndTime * multiplier;
                     }
                     if (ev is IHasDuration d && filter(d.Duration, double.NaN)) {  // Just a duration doesnt have a time to filter
                         d.Duration *= multiplier;
                     }
                 } else {
                     if (ev is IHasStartTime st && filter(st.StartTime, st.StartTime)) {
-                        st.StartTime = (int)Math.Round(st.StartTime * multiplier + offset);
+                        st.StartTime = version < 128 ? (int) Math.Round(st.StartTime * multiplier + offset) : st.StartTime * multiplier + offset;
                     }
                     if (ev is IHasEndTime et && filter(et.EndTime, et.EndTime)) {
-                        et.EndTime = (int)Math.Round(et.EndTime * multiplier + offset);
+                        et.EndTime = version < 128 ? (int) Math.Round(et.EndTime * multiplier + offset) : et.EndTime * multiplier + offset;
                     }
                     if (ev is IHasDuration d && filter(d.Duration, double.NaN)) {  // Just a duration doesnt have a time to filter
                         d.Duration *= multiplier;
@@ -100,7 +102,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
 
                 // Recurse to also transform all the children events
                 foreach (var child in ev.ChildEvents) {
-                    transformEventTime(child, multiplier, offset);
+                    transformEventTime(beatmap, child, multiplier, offset);
                 }
             }
 
@@ -118,10 +120,10 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
                     foreach (TimingPoint tp in beatmap.BeatmapTiming.TimingPoints) {
                         // Offset
-                        transformProperty(vm.TimingpointOffsetMultiplier, vm.TimingpointOffsetOffset, () => tp.Offset, o => tp.Offset = o, tp.Offset, round: true);
+                        transformProperty(vm.TimingpointOffsetMultiplier, vm.TimingpointOffsetOffset, () => tp.Offset, o => tp.Offset = o, tp.Offset, round: beatmap.Version < 128);
 
                         // BPM
-                        transformProperty(vm.TimingpointBpmMultiplier, vm.TimingpointBpmOffset, tp.GetBpm, tp.SetBpm, tp.Offset, 15, 10000, true);
+                        if (tp.Uninherited) transformProperty(vm.TimingpointBpmMultiplier, vm.TimingpointBpmOffset, tp.GetBpm, tp.SetBpm, tp.Offset, 15, 10000);
 
                         // Slider Velocity
                         transformProperty(vm.TimingpointSvMultiplier, vm.TimingpointSvOffset, () => beatmap.BeatmapTiming.GetSvMultiplierAtTime(tp.Offset), o => {
@@ -146,18 +148,18 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                             double oldEndTime = ho.GetEndTime(false);
 
                             // Transform start time of hitobject
-                            transformProperty(vm.HitObjectTimeMultiplier, vm.HitObjectTimeOffset, () => ho.Time, o => ho.Time = o, ho.Time, round: true);
+                            transformProperty(vm.HitObjectTimeMultiplier, vm.HitObjectTimeOffset, () => ho.Time, o => ho.Time = o, ho.Time, round: beatmap.Version < 128);
 
                             // Transform end time of hold notes and spinner
                             if (ho.IsHoldNote || ho.IsSpinner) {
-                                transformProperty(vm.HitObjectTimeMultiplier, vm.HitObjectTimeOffset, () => oldEndTime, o => ho.EndTime = o, oldEndTime, round: true);
+                                transformProperty(vm.HitObjectTimeMultiplier, vm.HitObjectTimeOffset, () => oldEndTime, o => ho.EndTime = o, oldEndTime, round: beatmap.Version < 128);
                             }
                         }
                     }
 
                     UpdateProgressBar(worker, 25);
 
-                    // Hitobject time
+                    // Hitobject volume
                     if (vm.HitObjectVolumeMultiplier != 1 || vm.HitObjectVolumeOffset != 0) {
                         foreach (HitObject ho in beatmap.HitObjects) {
                             transformProperty(vm.HitObjectVolumeMultiplier, vm.HitObjectVolumeOffset, () => ho.SampleVolume, o => ho.SampleVolume = o, ho.Time, 0, 100, true);
@@ -169,7 +171,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     // Bookmark time
                     if (vm.BookmarkTimeMultiplier != 1 || vm.BookmarkTimeOffset != 0) {
                         List<double> bookmarks = beatmap.GetBookmarks();
-                        List<double> newBookmarks = bookmarks.Select(bookmark => filter(bookmark, bookmark) ? Math.Round(bookmark * vm.BookmarkTimeMultiplier + vm.BookmarkTimeOffset) : bookmark).ToList();
+                        List<double> newBookmarks = bookmarks.Select(bookmark => filter(bookmark, bookmark) ? beatmap.Version < 128 ? Math.Round(bookmark * vm.BookmarkTimeMultiplier + vm.BookmarkTimeOffset) : bookmark * vm.BookmarkTimeMultiplier + vm.BookmarkTimeOffset : bookmark).ToList();
 
                         beatmap.SetBookmarks(newBookmarks);
                     }
@@ -181,7 +183,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                         foreach (Event ev in beatmap.StoryboardLayerBackground.Concat(beatmap.StoryboardLayerFail)
                             .Concat(beatmap.StoryboardLayerPass).Concat(beatmap.StoryboardLayerForeground)
                             .Concat(beatmap.StoryboardLayerOverlay)) {
-                            transformEventTime(ev, vm.SbEventTimeMultiplier, vm.SbEventTimeOffset);
+                            transformEventTime(beatmap, ev, vm.SbEventTimeMultiplier, vm.SbEventTimeOffset);
                         }
                     }
 
@@ -190,7 +192,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     // Storyboarded sample time
                     if (vm.SbSampleTimeMultiplier != 1 || vm.SbSampleTimeOffset != 0) {
                         foreach (StoryboardSoundSample ss in beatmap.StoryboardSoundSamples) {
-                            transformProperty(vm.SbSampleTimeMultiplier, vm.SbSampleTimeOffset, () => ss.StartTime, o => ss.StartTime = (int)o, ss.StartTime, round: true);
+                            transformProperty(vm.SbSampleTimeMultiplier, vm.SbSampleTimeOffset, () => ss.StartTime, o => ss.StartTime = o, ss.StartTime, round: beatmap.Version < 128);
                         }
                     }
 
@@ -199,7 +201,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     // Storyboarded sample volume
                     if (vm.SbSampleVolumeMultiplier != 1 || vm.SbSampleVolumeOffset != 0) {
                         foreach (StoryboardSoundSample ss in beatmap.StoryboardSoundSamples) {
-                            transformProperty(vm.SbSampleVolumeMultiplier, vm.SbSampleVolumeOffset, () => ss.Volume, o => ss.Volume = (int)o, ss.StartTime, 8, 100, true);
+                            transformProperty(vm.SbSampleVolumeMultiplier, vm.SbSampleVolumeOffset, () => ss.Volume, o => ss.Volume = o, ss.StartTime, 8, 100, true);
                         }
                     }
 
@@ -208,8 +210,8 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     // Break time
                     if (vm.BreakTimeMultiplier != 1 || vm.BreakTimeOffset != 0) {
                         foreach (Break br in beatmap.BreakPeriods) {
-                            transformProperty(vm.BreakTimeMultiplier, vm.BreakTimeOffset, () => br.StartTime, o => br.StartTime = (int)o, br.StartTime, round: true);
-                            transformProperty(vm.BreakTimeMultiplier, vm.BreakTimeOffset, () => br.EndTime, o => br.EndTime = (int)o, br.EndTime, round: true);
+                            transformProperty(vm.BreakTimeMultiplier, vm.BreakTimeOffset, () => br.StartTime, o => br.StartTime = o, br.StartTime, round: beatmap.Version < 128);
+                            transformProperty(vm.BreakTimeMultiplier, vm.BreakTimeOffset, () => br.EndTime, o => br.EndTime = o, br.EndTime, round: beatmap.Version < 128);
                         }
                     }
 
@@ -222,7 +224,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                                 continue;
                             }
 
-                            transformProperty(vm.VideoTimeMultiplier, vm.VideoTimeOffset, () => video.StartTime, o => video.StartTime = (int)o, video.StartTime, round: true);
+                            transformProperty(vm.VideoTimeMultiplier, vm.VideoTimeOffset, () => video.StartTime, o => video.StartTime = o, video.StartTime, round: beatmap.Version < 128);
                         }
                     }
 
@@ -232,7 +234,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     if (vm.PreviewTimeMultiplier != 1 || vm.PreviewTimeOffset != 0) {
                         if (beatmap.General.ContainsKey("PreviewTime") && beatmap.General["PreviewTime"].IntValue != -1) {
                             var previewTime = beatmap.General["PreviewTime"].DoubleValue;
-                            transformProperty(vm.PreviewTimeMultiplier, vm.PreviewTimeOffset, () => previewTime, o => beatmap.General["PreviewTime"].SetDouble(o), previewTime, round: true);
+                            transformProperty(vm.PreviewTimeMultiplier, vm.PreviewTimeOffset, () => previewTime, o => beatmap.General["PreviewTime"].SetDouble(o), previewTime, round: beatmap.Version < 128);
                         }
                     }
 
@@ -252,7 +254,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                         foreach (Event ev in storyboard.StoryboardLayerBackground.Concat(storyboard.StoryboardLayerFail)
                             .Concat(storyboard.StoryboardLayerPass).Concat(storyboard.StoryboardLayerForeground)
                             .Concat(storyboard.StoryboardLayerOverlay)) {
-                            transformEventTime(ev, vm.SbEventTimeMultiplier, vm.SbEventTimeOffset);
+                            transformEventTime(null, ev, vm.SbEventTimeMultiplier, vm.SbEventTimeOffset);
                         }
                     }
 
@@ -261,7 +263,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     // Storyboarded sample time
                     if (vm.SbSampleTimeMultiplier != 1 || vm.SbSampleTimeOffset != 0) {
                         foreach (StoryboardSoundSample ss in storyboard.StoryboardSoundSamples) {
-                            transformProperty(vm.SbSampleTimeMultiplier, vm.SbSampleTimeOffset, () => ss.StartTime, o => ss.StartTime = (int)o, ss.StartTime, round: true);
+                            transformProperty(vm.SbSampleTimeMultiplier, vm.SbSampleTimeOffset, () => ss.StartTime, o => ss.StartTime = o, ss.StartTime, round: true);
                         }
                     }
 
@@ -270,7 +272,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                     // Storyboarded sample volume
                     if (vm.SbSampleVolumeMultiplier != 1 || vm.SbSampleVolumeOffset != 0) {
                         foreach (StoryboardSoundSample ss in storyboard.StoryboardSoundSamples) {
-                            transformProperty(vm.SbSampleVolumeMultiplier, vm.SbSampleVolumeOffset, () => ss.Volume, o => ss.Volume = (int)o, ss.StartTime, 8, 100, true);
+                            transformProperty(vm.SbSampleVolumeMultiplier, vm.SbSampleVolumeOffset, () => ss.Volume, o => ss.Volume = o, ss.StartTime, 8, 100, true);
                         }
                     }
 
@@ -283,7 +285,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
                                 continue;
                             }
 
-                            transformProperty(vm.VideoTimeMultiplier, vm.VideoTimeOffset, () => video.StartTime, o => video.StartTime = (int)o, video.StartTime, round: true);
+                            transformProperty(vm.VideoTimeMultiplier, vm.VideoTimeOffset, () => video.StartTime, o => video.StartTime = o, video.StartTime, round: true);
                         }
                     }
 

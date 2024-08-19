@@ -28,6 +28,16 @@ namespace Mapping_Tools_Tests.Classes.BeatmapHelper {
         }
 
         [TestMethod]
+        public void UnchangingLazerMapCodeTest() {
+            var path = "Resources\\THE ORAL CIGARETTES - GET BACK (Nikakis) [Sotarks_ Cataclysm].osu";
+            var lines = File.ReadAllLines(path).ToList();
+            var editor = new BeatmapEditor(path);
+            var lines2 = editor.Beatmap.GetLines();
+
+            CompareLines(lines, lines2);
+        }
+
+        [TestMethod]
         public void UnchangingStoryboardedMapCodeTest() {
             var path = "Resources\\Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].osu";
             var lines = File.ReadAllLines(path).ToList();
@@ -77,11 +87,11 @@ namespace Mapping_Tools_Tests.Classes.BeatmapHelper {
         }
 
         private static void AssertCollectionEqual(IReadOnlyList<string> expected, IReadOnlyList<string> actual) {
+            Assert.AreEqual(expected.Count, actual.Count);
+
             for (int i = 0; i < expected.Count; i++) {
                 Assert.AreEqual(expected[i], actual[i], $"At line {i} expected \"{expected[i]}\" but got \"{actual[i]}\".");
             }
-
-            Assert.AreEqual(expected.Count, actual.Count);
         }
     }
 }

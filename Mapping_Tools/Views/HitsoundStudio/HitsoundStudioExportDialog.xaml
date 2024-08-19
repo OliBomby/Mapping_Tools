@@ -35,19 +35,22 @@
             <CheckBox Content="Export hitsound map" IsChecked="{Binding ExportMap}" Margin="0 15 0 0"
                       ToolTip="Check this to export the hitsound beatmap."/>
             <CheckBox Content="Export hitsound samples" IsChecked="{Binding ExportSamples}"
+                      Visibility="{Binding SampleExportSettingsVisibility}"
                       ToolTip="Check this to export the custom hitsound samples."/>
             <CheckBox Content="Show results" IsChecked="{Binding ShowResults}"
                       ToolTip="Check this to see the resulting number of custom indices, hitsound samples, and index changes."/>
             <CheckBox Content="Delete all files in export folder" IsChecked="{Binding DeleteAllInExportFirst}"
                       ToolTip="Check this to automatically delete all files in the export folder before exporting. When using this be sure there aren't any important files in your export folder."/>
             <CheckBox Name="UsePreviousSampleSchemaBox" Content="Use previous sample schema" IsChecked="{Binding UsePreviousSampleSchema}"
-                      ToolTip="Check this to use the same samples as the previous export."/>
+                      ToolTip="Check this to use the same samples as the previous export."
+                      Visibility="{Binding SampleExportSettingsVisibility}"/>
             <CheckBox Content="Allow growth of previous sample schema" IsChecked="{Binding AllowGrowthPreviousSampleSchema}"
                       IsEnabled="{Binding ElementName=UsePreviousSampleSchemaBox, Path=IsChecked}"
+                      Visibility="{Binding SampleExportSettingsVisibility}"
                       ToolTip="Alows expansion of the previous sample schema to always fit the need of the current export. If you dont check this, then the sample schema of this export needs to be a subset of the previous sample schema."/>
             <ComboBox Margin="0 20 0 0" ItemsSource="{Binding HitsoundExportModes}" SelectedItem="{Binding HitsoundExportModeSetting}"
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Export mode"
-                      ToolTip="Choose which format to export the hitsounds as. The 'Standard' option will generate hitsounds that can be copied to osu! standard beatmaps. The 'Coinciding' option combined with the osu! mania gamemode will export a lossless representation of the hitsound layers."/>
+                      ToolTip="Choose which format to export the hitsounds as. The 'Standard' option will generate hitsounds that can be copied to osu! standard beatmaps. The 'Coinciding' option combined with the osu! mania gamemode will export a lossless representation of the hitsound layers. The 'Midi' option will export a single MIDI file with all the MIDI information of the hitsound layers."/>
             <TextBox Margin="0,5,0,0"
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Note grouping leniency"
                      ToolTip="Maximum time in millisecond that can be between two hitsounds while treated as being at the same time."
@@ -89,15 +92,21 @@
             <CheckBox Content="Add regular hitsounds" IsChecked="{Binding AddCoincidingRegularHitsounds}" Margin="0 5 0 0"
                       Visibility="{Binding CoincidingExtraSettingsVisibility}"
                       ToolTip="Check this to add whistles, claps, finishes, and samplesets ontop of the filename hitsounding used by coinciding export."/>
+            <CheckBox Content="Add green line volume" IsChecked="{Binding AddGreenLineVolumeToMidi}" Margin="0 5 0 0"
+                      Visibility="{Binding MidiExtraSettingsVisibility}"
+                      ToolTip="Check this to add a track to the MIDI with volume changes from timing points."/>
             <ComboBox Margin="0 10 0 0" ItemsSource="{Binding HitsoundExportGameModes}" SelectedItem="{Binding HitsoundExportGameMode}"
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Export gamemode"
+                      Visibility="{Binding SampleExportSettingsVisibility}"
                       ToolTip="Choose the gamemode for the exported hitsound map."/>
 
             <ComboBox Margin="0 15 0 0" ItemsSource="{Binding SampleExportFormatDisplayNames}" SelectedItem="{Binding SingleSampleExportFormatDisplay}"
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Sample file format"
+                      Visibility="{Binding SampleExportSettingsVisibility}"
                       ToolTip="Choose the file format for exported sound samples. Default will match the encoding of the source files."/>
             <ComboBox Margin="0 5 0 0" ItemsSource="{Binding SampleExportFormatDisplayNames}" SelectedItem="{Binding MixedSampleExportFormatDisplay}"
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Mixed sample file format"
+                      Visibility="{Binding SampleExportSettingsVisibility}"
                       ToolTip="Choose the file format for mixed exported sound samples. Mixing only occurs in the Standard hitsound export mode."/>
         </StackPanel>
 

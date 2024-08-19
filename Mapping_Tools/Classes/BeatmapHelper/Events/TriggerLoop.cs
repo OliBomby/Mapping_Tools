@@ -7,11 +7,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
     /// </summary>
     public class TriggerLoop : Command, IHasEndTime {
         public override EventType EventType => EventType.T;
-        public int EndTime { get; set; }
+        public double EndTime { get; set; }
         public string TriggerName { get; set; }
 
         public override string GetLine() {
-            return $"{EventType},{TriggerName},{StartTime.ToInvariant()},{EndTime.ToInvariant()}";
+            return $"{EventType},{TriggerName},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{(SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant())}";
         }
 
         public override void SetLine(string line) {
@@ -20,11 +20,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 
             TriggerName = values[1];
 
-            if (TryParseInt(values[2], out int startTime))
+            if (TryParseDouble(values[2], out double startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of event param.", line);
 
-            if (TryParseInt(values[3], out int endTime))
+            if (TryParseDouble(values[3], out double endTime))
                 EndTime = endTime;
             else throw new BeatmapParsingException("Failed to parse end time of event param.", line);
         }

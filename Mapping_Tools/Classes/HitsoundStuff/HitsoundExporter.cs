@@ -1,5 +1,4 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.Tools;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
@@ -30,7 +29,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
             if (useStoryboard) {
                 beatmap.StoryboardSoundSamples.Clear();
                 foreach (var h in hitsounds.Where(h => !string.IsNullOrEmpty(h.Filename))) {
-                    beatmap.StoryboardSoundSamples.Add(new StoryboardSoundSample((int) Math.Round(h.Time), 0, h.Filename, h.Volume * 100));
+                    beatmap.StoryboardSoundSamples.Add(new StoryboardSoundSample(h.Time, 0, h.Filename, h.Volume * 100));
                 }
             } else {
                 // Make new timing points
@@ -149,7 +148,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                 }
             }
 
-            var sourceWaveEncoding = sampleSoundGenerator.Wave.WaveFormat.Encoding;
+            var sourceWaveEncoding = sampleSoundGenerator.SourceWaveEncoding;
 
             // Either if it is the blank sample or the source file is literally what the user wants to be exported
             if (sampleSoundGenerator.BlankSample && sampleGeneratingArgs.GetExtension().ToLower() == ".wav" || 
@@ -238,8 +237,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff
                 ExportSample(validLoadedSamples.Keys.First(), name, exportFolder, loadedSamples, format);
             } else if (validLoadedSamples.Count > 1) {
                 // Synchronize the sample rate and channels for all samples and get the sample providers
-                int maxSampleRate = validLoadedSamples.Values.Max(o => o.Wave.WaveFormat.SampleRate);
-                int maxChannels = validLoadedSamples.Values.Max(o => o.Wave.WaveFormat.Channels);
+                int maxSampleRate = validLoadedSamples.Values.Max(o => o.OutputSampleRate);
+                int maxChannels = validLoadedSamples.Values.Max(o => o.OutputChannels);
 
                 // Resample to a supported sample rate when exporting in vorbis format
                 if (mixedFormat == SampleExportFormat.OggVorbis) {

@@ -32,6 +32,12 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
             var pathType = sliderPath.Type;
             var anchors = sliderPath.ControlPoints;
 
+            if (Precision.AlmostEquals(newLength, fullLength, 0.01)) {
+                newAnchors.AddRange(anchors);
+                newPathType = pathType;
+                return newAnchors;
+            }
+
             if (newLength > fullLength) {
                 // Extend linearly
                 switch (pathType) {

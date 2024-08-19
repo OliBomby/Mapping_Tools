@@ -88,7 +88,7 @@ namespace Mapping_Tools.Views.SliderCompletionator {
                 throw new Exception("Could not fetch selected hit objects.", editorReaderException1);
             }
 
-            if (arg.UseCurrentEditorTime) {
+            if (arg.UseCurrentEditorTime && arg.UseEndTime) {
                 if (editorReaderException1 != null)
                     throw new Exception("Could not fetch current editor time.", editorReaderException1);
 

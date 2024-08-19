@@ -72,7 +72,7 @@ WizardStyle=modern
 LicenseFile=LICENCE
 //SourceDir=lib
 
-MinVersion=6.0
+MinVersion=6.1
 PrivilegesRequired=admin
 
 // remove next line if you only deploy 32-bit binaries and dependencies

@@ -1,78 +1,111 @@
 ﻿using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
+using System.Linq;
+using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.HitsoundStuff.Effects;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
-    /// TODO: Complete comments.
+    /// Generates sample providers from a cached wave stream, and applies effects to them.
     /// </summary>
     public class SampleSoundGenerator {
-        /// <summary />
-        public WaveStream Wave { get; set; }
         /// <summary>
-        /// 
+        /// The wave stream to generate samples from.
         /// </summary>
-        public int KeyCorrection { get; set; }
-        public double VolumeCorrection { get; set; }
+        [CanBeNull]
+        private WaveStream Wave { get; }
+        /// <summary>
+        /// Multiple generators to mix and play at the same time.
+        /// </summary>
+        [CanBeNull]
+        private SampleSoundGenerator[] Generators { get; }
+
+        public double AmplitudeCorrection { get; set; } = 1;
+        public double VolumeCorrection { get; set; } = 1;
         public double Panning { get; set; }
         public double PitchShift { get; set; }
-        public double FadeStart { get; set; }
-        public double FadeLength { get; set; }
+        public double FadeStart { get; set; } = -1;
+        public double FadeLength { get; set; } = -1;
+        public int SampleRate { get; set; } = -1;
+        public int Channels { get; set; } = -1;
 
         /// <summary>
         /// This means that this is the blank sample. There is some special logic for this.
         /// </summary>
-        public bool BlankSample => Wave.TotalTime.Equals(TimeSpan.Zero);
+        public bool BlankSample => Wave is not null ? Wave.TotalTime.Equals(TimeSpan.Zero) : Generators!.All(g => g.BlankSample);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// The wave encoding of the audio source.
+        /// For mixing sound generators this is just IEEE float to indicate these may contain peaking values.
+        /// </summary>
+        public WaveFormatEncoding SourceWaveEncoding => Wave?.WaveFormat.Encoding ?? WaveFormatEncoding.IeeeFloat;
+
+        /// <summary>
+        /// The sample rate of the output.
+        /// </summary>
+        public int OutputSampleRate => SampleRate > 0 ? SampleRate : Wave?.WaveFormat.SampleRate ?? Generators!.First().OutputSampleRate;
+
+        /// <summary>
+        /// The number of channels of the output.
+        /// </summary>
+        public int OutputChannels => Channels > 0 ? Channels : Wave?.WaveFormat.Channels ?? Generators!.First().OutputChannels;
+
+        /// <summary>
+        /// Creates a new sample sound generator from a wave stream.
+        /// </summary>
+        /// <param name="wave">The wave stream to generate samples from.</param>
         public SampleSoundGenerator(WaveStream wave) {
             Wave = wave;
-            KeyCorrection = 0;
-            VolumeCorrection = 1;
-            Panning = 0;
-            PitchShift = 0;
-            FadeStart = -1;
-            FadeLength = -1;
-        }
-
-        /// <inheritdoc />
-        public SampleSoundGenerator(WaveStream wave, double fadeStart, double fadeLength) {
-            Wave = wave;
-            KeyCorrection = 0;
-            VolumeCorrection = 1;
-            Panning = 0;
-            PitchShift = 0;
-            FadeStart = fadeStart;
-            FadeLength = fadeLength;
         }
 
         /// <summary>
-        /// 
+        /// Creates a new sample sound generator that mixes the output of multiple generators.
+        /// </summary>
+        /// <remarks>The channel counts and sample rates of all input generators have to be equal.</remarks>
+        /// <param name="generators">The generators to mix.</param>
+        public SampleSoundGenerator(SampleSoundGenerator[] generators) {
+            Generators = generators;
+        }
+
+        /// <summary>
+        /// Gets the sample provider with all the effects applied.
         /// </summary>
         /// <returns></returns>
         public ISampleProvider GetSampleProvider() {
-            Wave.Position = 0;
-            ISampleProvider output = WaveToSampleProvider(Wave);
+            ISampleProvider output;
+            if (Wave is not null) {
+                Wave.Position = 0;
+                output = WaveToSampleProvider(Wave);
+            } else {
+                output = new MixingSampleProvider(Generators!.Select(g => g.GetSampleProvider()));
+            }
 
-            if (FadeStart != -1 && FadeLength != -1) {
+            if (!Precision.AlmostEquals(FadeStart, -1) && !Precision.AlmostEquals(FadeLength, -1)) {
                 output = new DelayFadeOutSampleProvider(output);
                 ((DelayFadeOutSampleProvider) output).BeginFadeOut(FadeStart * 1000, FadeLength * 1000);
             }
-            if (KeyCorrection != 0) {
-                output = SampleImporter.PitchShift(output, KeyCorrection);
+            if (!Precision.AlmostEquals(AmplitudeCorrection, 1)) {
+                output = new VolumeSampleProvider(output) { Volume = (float)AmplitudeCorrection };
             }
             if (!Precision.AlmostEquals(VolumeCorrection, 1)) {
                 output = SampleImporter.VolumeChange(output, VolumeCorrection);
             }
             if (!Precision.AlmostEquals(Panning, 0)) {
                 output = SampleImporter.SetChannels(output, 1);
-                output = new PanningSampleProvider(output) {Pan = (float)Panning};
+                output = new PanningSampleProvider(output) { Pan = (float)Panning };
             }
             if (!Precision.AlmostEquals(PitchShift, 0)) {
                 output = SampleImporter.PitchShift(output, PitchShift);
             }
+            if (SampleRate != -1) {
+                output = new WdlResamplingSampleProvider(output, SampleRate);
+            }
+            if (Channels != -1) {
+                output = SampleImporter.SetChannels(output, Channels);
+            }
+
             return output;
         }
 

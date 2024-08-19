@@ -11,14 +11,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         public int LoopCount { get; set; }
 
         public override string GetLine() {
-            return $"{EventType},{StartTime.ToInvariant()},{LoopCount.ToInvariant()}";
+            return $"{EventType},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{LoopCount.ToInvariant()}";
         }
 
         public override void SetLine(string line) {
             var subLine = RemoveIndents(line);
             var values = subLine.Split(',');
 
-            if (TryParseInt(values[1], out int startTime))
+            if (TryParseDouble(values[1], out double startTime))
                 StartTime = startTime;
             else throw new BeatmapParsingException("Failed to parse start time of event param.", line);
 

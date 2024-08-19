@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -14,8 +15,20 @@ namespace Mapping_Tools.Components.Domain {
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            string str = value.ToString();
-            return (Color)ColorConverter.ConvertFromString(str);
+            if (value is not string str)
+                return new ValidationResult(false, "Cannot convert back null.");
+
+            if (str.Length > 0 && str[0] != '#')
+                str = "#" + str;
+
+            try {
+                return (Color)ColorConverter.ConvertFromString(str)!;
+            }
+            catch (Exception e) {
+                Console.WriteLine(e);
+            }
+
+            return new ValidationResult(false, "Color format error.");
         }
     }
 }
