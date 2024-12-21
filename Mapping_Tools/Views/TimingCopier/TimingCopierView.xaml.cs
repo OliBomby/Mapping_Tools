@@ -150,7 +150,8 @@ namespace Mapping_Tools.Views.TimingCopier {
                     foreach (HitObject ho in beatmapTo.HitObjects)
                     {
                         ho.ResnapSelf(timingTo, arg.BeatDivisors, firstTp: redlines.FirstOrDefault());
-                        ho.ResnapEnd(timingTo, arg.BeatDivisors, firstTp: redlines.FirstOrDefault());
+                        // It's not safe to resnap slider ends here because the sliders still assume the old duration and BPM
+                        // And we haven't fixed the SV for new redlines yet
                     }
 
                     // Resnap greenlines
@@ -175,6 +176,16 @@ namespace Mapping_Tools.Views.TimingCopier {
 
                 // Apply timing changes
                 TimingPointsChange.ApplyChanges(timingTo, timingPointsChanges);
+
+                if ((arg.ResnapMode == "Just resnap" || arg.ResnapMode == "Number of beats between objects stays the same") && redlines.Count > 0) {
+                    // Resnap slider ends and spinner ends
+                    beatmapTo.GiveObjectsGreenlines();
+                    beatmapTo.CalculateSliderEndTimes();
+                    foreach (HitObject ho in beatmapTo.HitObjects)
+                    {
+                        ho.ResnapEnd(timingTo, arg.BeatDivisors, firstTp: redlines.FirstOrDefault());
+                    }
+                }
 
                 // Save the file
                 editorTo.SaveFile();
