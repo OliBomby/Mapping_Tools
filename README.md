@@ -1,4 +1,4 @@
-# Mapping Tools [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V2HPH5F)
+# Mapping Tools [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V2HPH5F) [![Github All Releases](https://img.shields.io/github/downloads/OliBomby/Mapping_Tools/total.svg)]()
 
 Mapping Tools is a collection of tools which help you create osu! beatmaps more easily! 
 [Website](https://mappingtools.github.io/)
