@@ -1,0 +1,58 @@
+﻿<local:SingleRunMappingTool x:Class="Mapping_Tools.Views.RadialDesigner.RadialDesignerView"
+                             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                             xmlns:local="clr-namespace:Mapping_Tools.Views"
+                             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                             xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
+                             mc:Ignorable="d" 
+                             x:Name="This"
+                             d:DesignHeight="450" Width="759.5" d:DataContext="{d:DesignData RadialDesignerVM}">
+    <local:SingleRunMappingTool.Resources>
+        <domain:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
+    </local:SingleRunMappingTool.Resources>
+    <Grid Name="MasterGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Name="FirstGrid" Grid.Row="0">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontSize="32" FontWeight="Bold" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                        <Run Text="Radial Designer"/>
+                    </TextBlock>
+                </StackPanel>
+
+                <!-- Add additional UI elements here if needed in the future -->
+
+                <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Margin="10">
+                    <Button
+                        IsEnabled="{Binding ElementName=This, Path=CanRun}"
+                        Style="{StaticResource MaterialDesignFloatingActionButton}"
+                        Click="Start_Click"
+                        ToolTip="Run this tool.">
+                        <materialDesign:PackIcon
+                            Kind="Play" Height="36" Width="36" />
+                    </Button>
+                </Viewbox>
+            </StackPanel>
+        </Grid>
+        <Grid Name="SecondGrid" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <ProgressBar Value="{Binding ElementName=This, Path=Progress}" Margin="20,0,20,0" Height="20" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:SingleRunMappingTool>
