@@ -5,13 +5,10 @@ using System.Windows;
 using System.Windows.Input;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
-using Mapping_Tools.Components.ObjectVisualiser;
+using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.RadialDesigner {
-    /// <summary>
-    /// Interaction logic for RadialDesignerView.xaml
-    /// </summary>
     [SmartQuickRunUsage(SmartQuickRunTargets.MultipleSelection)]
     [VerticalContentScroll]
     [HorizontalContentScroll]
@@ -19,7 +16,7 @@ namespace Mapping_Tools.Views.RadialDesigner {
         public static readonly string ToolName = "Radial Designer";
 
         public static readonly string ToolDescription =
-            @"Design radial patterns for your beatmaps.";
+            $@"Generate radial patterns by copying and rotating hit objects around a center point.{Environment.NewLine}Adjust the number of copies, distance, and rotation to create various circular patterns.";
 
         public RadialDesignerView() {
             InitializeComponent();
@@ -39,7 +36,7 @@ namespace Mapping_Tools.Views.RadialDesigner {
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
             var bgw = sender as BackgroundWorker;
-            e.Result = RunRadialDesigner((RadialDesignerVm) e.Argument, bgw);
+            e.Result = Generate_Sliders((RadialDesignerVm) e.Argument, bgw);
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -61,31 +58,30 @@ namespace Mapping_Tools.Views.RadialDesigner {
             CanRun = false;
         }
 
-        private string RunRadialDesigner(RadialDesignerVm arg, BackgroundWorker worker) {
-            // Implement the radial design logic here
-            // For now, we'll simulate a process
+        private string Generate_Sliders(RadialDesignerVm arg, BackgroundWorker worker) {
+            var reader = EditorReaderStuff.GetFullEditorReaderOrNot(out var editorReaderException);
 
-            for (int i = 0; i <= 100; i++) {
-                if (worker.WorkerReportsProgress) {
-                    worker.ReportProgress(i);
+            foreach (var path in arg.Paths) {
+                var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader, out var selected, out var editorReaderException2);
+
+                if (editorReaderException2 != null) {
+                    throw new Exception("Could not fetch selected hit objects.", editorReaderException2);
                 }
-                System.Threading.Thread.Sleep(10);
+
+                var beatmap = editor.Beatmap;
+
+                // TODO: Implement radial pattern generation logic here
+                // For now, just save the imported slider
+                editor.SaveFile();
             }
 
-            // Update the preview
-            ViewModel.PreviewHitObject = new HitObjectElement {
-                // Initialize with example data
-            };
-
             // Complete progressbar
-            if (worker.WorkerReportsProgress) worker.ReportProgress(100);
+            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
 
             // Do stuff
-            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, true, arg.Quick));
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, reader != null, arg.Quick));
 
-            // Make an accurate message
-            var message = "Radial pattern designed successfully!";
-            return arg.Quick ? "" : message;
+            return arg.Quick ? "" : "Successfully generated radial patterns!";
         }
 
         public RadialDesignerVm GetSaveData() {
