@@ -98,7 +98,7 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <WrapPanel VerticalAlignment="Bottom">
-                    <TextBlock TextWrapping="NoWrap" Text="Made by OliBomby" FontWeight="Bold" Opacity="0.58"/>
+                    <TextBlock TextWrapping="NoWrap" Text="Made by Shaf" FontWeight="Bold" Opacity="0.58"/>
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1">
