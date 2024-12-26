@@ -73,7 +73,7 @@ namespace Mapping_Tools.Views.RadialDesigner {
             }
 
             // Update the preview
-            ViewModel.TumouredPreviewHitObject = new HitObjectElement {
+            ViewModel.PreviewHitObject = new HitObjectElement {
                 // Initialize with example data
             };
 

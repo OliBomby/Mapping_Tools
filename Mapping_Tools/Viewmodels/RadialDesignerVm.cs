@@ -40,10 +40,10 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref globalRotation, value);
         }
 
-        private HitObjectElement tumouredPreviewHitObject;
-        public HitObjectElement TumouredPreviewHitObject {
-            get => tumouredPreviewHitObject;
-            set => Set(ref tumouredPreviewHitObject, value);
+        private HitObjectElement previewHitObject;
+        public HitObjectElement PreviewHitObject {
+            get => previewHitObject;
+            set => Set(ref previewHitObject, value);
         }
 
         #endregion
@@ -53,7 +53,7 @@ namespace Mapping_Tools.Viewmodels {
             Distance = 100;
             LocalRotation = 0;
             GlobalRotation = 0;
-            TumouredPreviewHitObject = new HitObjectElement();
+            PreviewHitObject = new HitObjectElement();
         }
 
         // Add any methods or enums if needed in the future
