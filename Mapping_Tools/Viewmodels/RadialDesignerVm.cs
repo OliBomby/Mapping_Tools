@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Components.ObjectVisualiser;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
@@ -15,12 +16,44 @@ namespace Mapping_Tools.Viewmodels {
             get; set;
         }
 
-        // Add any properties you might need in the future
+        private int copies;
+        public int Copies {
+            get => copies;
+            set => Set(ref copies, value);
+        }
+
+        private double distance;
+        public double Distance {
+            get => distance;
+            set => Set(ref distance, value);
+        }
+
+        private double localRotation;
+        public double LocalRotation {
+            get => localRotation;
+            set => Set(ref localRotation, value);
+        }
+
+        private double globalRotation;
+        public double GlobalRotation {
+            get => globalRotation;
+            set => Set(ref globalRotation, value);
+        }
+
+        private HitObjectElement tumouredPreviewHitObject;
+        public HitObjectElement TumouredPreviewHitObject {
+            get => tumouredPreviewHitObject;
+            set => Set(ref tumouredPreviewHitObject, value);
+        }
 
         #endregion
 
         public RadialDesignerVm() {
-            // Initialize default values if necessary
+            Copies = 1;
+            Distance = 100;
+            LocalRotation = 0;
+            GlobalRotation = 0;
+            TumouredPreviewHitObject = new HitObjectElement();
         }
 
         // Add any methods or enums if needed in the future

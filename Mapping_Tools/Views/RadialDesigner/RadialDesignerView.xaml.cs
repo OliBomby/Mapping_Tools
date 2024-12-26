@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
+using Mapping_Tools.Components.ObjectVisualiser;
 using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.RadialDesigner {
@@ -37,9 +38,8 @@ namespace Mapping_Tools.Views.RadialDesigner {
         }
 
         protected override void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
-            // Implement the background work if needed in the future
-            // Currently, nothing to do since no functionality is implemented
-            e.Result = string.Empty;
+            var bgw = sender as BackgroundWorker;
+            e.Result = RunRadialDesigner((RadialDesignerVm) e.Argument, bgw);
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
@@ -59,6 +59,33 @@ namespace Mapping_Tools.Views.RadialDesigner {
 
             BackgroundWorker.RunWorkerAsync(ViewModel);
             CanRun = false;
+        }
+
+        private string RunRadialDesigner(RadialDesignerVm arg, BackgroundWorker worker) {
+            // Implement the radial design logic here
+            // For now, we'll simulate a process
+
+            for (int i = 0; i <= 100; i++) {
+                if (worker.WorkerReportsProgress) {
+                    worker.ReportProgress(i);
+                }
+                System.Threading.Thread.Sleep(10);
+            }
+
+            // Update the preview
+            ViewModel.TumouredPreviewHitObject = new HitObjectElement {
+                // Initialize with example data
+            };
+
+            // Complete progressbar
+            if (worker.WorkerReportsProgress) worker.ReportProgress(100);
+
+            // Do stuff
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, true, arg.Quick));
+
+            // Make an accurate message
+            var message = "Radial pattern designed successfully!";
+            return arg.Quick ? "" : message;
         }
 
         public RadialDesignerVm GetSaveData() {
