@@ -73,6 +73,7 @@
                     Style="{StaticResource MaterialDesignDiscreteSlider}"
                     ToolTip="Overall rotation applied to the radial pattern."
                     Margin="0,0,0,10"/>
+                <Button Content="Import Slider" Command="{Binding ImportCommand}" Margin="0,10,0,0" Width="100" HorizontalAlignment="Right"/>
             </StackPanel>
         </Grid>
 
