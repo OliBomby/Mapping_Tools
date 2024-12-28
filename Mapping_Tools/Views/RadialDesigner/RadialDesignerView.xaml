@@ -51,29 +51,63 @@
                     IsSnapToTickEnabled="True"
                     Style="{StaticResource MaterialDesignDiscreteSlider}"
                     ToolTip="Number of copies to generate."
-                    Margin="0,0,0,10"/>
+                    />
 
                 <TextBlock Text="Distance" FontWeight="Bold" Margin="0,10,0,0"/>
                 <Slider Value="{Binding Distance, Mode=TwoWay}"
                     Minimum="0" Maximum="500"
                     Style="{StaticResource MaterialDesignDiscreteSlider}"
                     ToolTip="The distance between each copy."
-                    Margin="0,0,0,10"/>
+                    />
 
                 <TextBlock Text="Local Rotation" FontWeight="Bold" Margin="0,10,0,0"/>
                 <Slider Value="{Binding LocalRotation, Mode=TwoWay}"
                     Minimum="0" Maximum="360"
                     Style="{StaticResource MaterialDesignDiscreteSlider}"
                     ToolTip="Rotation applied locally to each copy."
-                    Margin="0,0,0,10"/>
+                    />
 
                 <TextBlock Text="Global Rotation" FontWeight="Bold" Margin="0,10,0,0"/>
                 <Slider Value="{Binding GlobalRotation, Mode=TwoWay}"
                     Minimum="0" Maximum="360"
                     Style="{StaticResource MaterialDesignDiscreteSlider}"
                     ToolTip="Overall rotation applied to the radial pattern."
-                    Margin="0,0,0,10"/>
-                <Button Content="Dummy" Command="{Binding Dummy}" Margin="0,10,0,0" HorizontalAlignment="Right"/>
+                    />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ComboBox Grid.Column="0" ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}" Margin="0 0 5 0"
+                                  ToolTip="Import mode" SelectionChanged="ComboBox_SelectionChanged"/>
+
+                    <TextBox Grid.Column="1" Text="{Binding TimeCode}" Visibility="{Binding TimeCodeBoxVisibility}" Margin="5 0 5 2" Width="100"
+                                 materialDesign:HintAssist.Hint="Time code"
+                                 ToolTip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - "/>
+
+                    <Button Grid.Column="2" Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding DummyCommand}" Margin="5 0 0 0"
+                                ToolTip="Import sliders into the preview." HorizontalAlignment="Right" VerticalAlignment="Top">
+                        Dummy
+                    </Button>
+                </Grid>
+                <ComboBox SelectedItem="{Binding ExportTimeMode}" ItemsSource="{Binding ExportTimeModes}"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.Hint="Export" Margin="0 7 0 0"
+                              ToolTip="Determines at what time to put the pattern."/>
+                <TextBox Margin="0 5 0 0" materialDesign:HintAssist.Hint="Custom export time" Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             ToolTip="Determines at what time to put the pattern." 
+                             Visibility="{Binding CustomExportTimeVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBox.Text>
+                        <Binding Path="CustomExportTime" Mode="TwoWay" UpdateSourceTrigger="LostFocus" NotifyOnValidationError="True">
+                            <Binding.Converter>
+                                <domain:TimeToStringConverter/>
+                            </Binding.Converter>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <!--TODO: add the bindings-->
             </StackPanel>
         </Grid>
 
@@ -98,7 +132,7 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <WrapPanel VerticalAlignment="Bottom">
-                    <TextBlock TextWrapping="NoWrap" Text="Made by Shaf" FontWeight="Bold" Opacity="0.58"/>
+                    <TextBlock TextWrapping="NoWrap" Text="Made by Ferro" FontWeight="Bold" Opacity="0.58"/>
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1">

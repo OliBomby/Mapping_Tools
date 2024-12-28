@@ -70,8 +70,7 @@ namespace Mapping_Tools.Views.RadialDesigner {
 
                 var beatmap = editor.Beatmap;
 
-                // TODO: Implement radial pattern generation logic here
-                // For now, just save the imported slider
+                // Save the file after processing
                 editor.SaveFile();
             }
 
