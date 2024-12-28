@@ -841,19 +841,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         private PathType GetPathType(string[] sliderData) {
             for (var i = sliderData.Length - 1; i >= 0; i--) {
                 // Iterating in reverse to get the last valid letter
-                var letter =
-                    sliderData[i].Any() ? sliderData[i][0] : '0'; // 0 is not a letter so it will get ignored
-                if (char.IsLetter(letter))
-                    switch (letter) {
-                        case 'L':
-                            return PathType.Linear;
-                        case 'B':
-                            return PathType.Bezier;
-                        case 'P':
-                            return PathType.PerfectCurve;
-                        case 'C':
-                            return PathType.Catmull;
-                    }
+                if (sliderData[i].Length == 0 || !char.IsLetter(sliderData[i][0])) continue;
+
+                var letter = sliderData[i][0];
+                switch (letter) {
+                    case 'L':
+                        return PathType.Linear;
+                    case 'B':
+                        if (sliderData[i].Length > 1 && int.TryParse(sliderData[i][1..], out int degree) && degree > 0)
+                            return PathType.BSpline;
+
+                        return PathType.Bezier;
+                    case 'P':
+                        return PathType.PerfectCurve;
+                    case 'C':
+                        return PathType.Catmull;
+                }
             }
 
             // If there is no valid letter it will literally default to catmull
@@ -872,6 +875,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                         allPathTypes.Add((PathType.Linear, i));
                         break;
                     case 'B':
+                        if (sliderData[i].Length > 1 && int.TryParse(sliderData[i][1..], out int degree) && degree > 0) {
+                            allPathTypes.Add((PathType.BSpline, i));
+                            break;
+                        }
+
                         allPathTypes.Add((PathType.Bezier, i));
                         break;
                     case 'P':
@@ -896,6 +904,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     return "C";
                 case PathType.Bezier:
                     return "B";
+                case PathType.BSpline:
+                    return "B4";
                 default:
                     throw new ArgumentOutOfRangeException();
             }
