@@ -18,7 +18,7 @@
     </local:SingleRunMappingTool.Resources>
     <Grid Name="MasterGrid">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" MinWidth="200"/>
+            <ColumnDefinition Width="auto" MinWidth="200"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*" MinWidth="300"/>
         </Grid.ColumnDefinitions>
@@ -81,11 +81,13 @@
                     </Grid.ColumnDefinitions>
 
                     <ComboBox Grid.Column="0" ItemsSource="{Binding ImportModes}" SelectedItem="{Binding ImportModeSetting}" Margin="0 0 5 0"
-                                  ToolTip="Import mode" SelectionChanged="ComboBox_SelectionChanged"/>
+                              ToolTip="Import"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.Hint="Object selection mode"/>
 
                     <TextBox Grid.Column="1" Text="{Binding TimeCode}" Visibility="{Binding TimeCodeBoxVisibility}" Margin="5 0 5 2" Width="100"
-                                 materialDesign:HintAssist.Hint="Time code"
-                                 ToolTip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - "/>
+                             materialDesign:HintAssist.Hint="Time code" 
+                             ToolTip="Input a time code here. Example: 01:23:456 (1,2) " />
 
                     <Button Grid.Column="2" Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding DummyCommand}" Margin="5 0 0 0"
                                 ToolTip="Import sliders into the preview." HorizontalAlignment="Right" VerticalAlignment="Top">
@@ -107,7 +109,6 @@
                         </Binding>
                     </TextBox.Text>
                 </TextBox>
-                <!--TODO: add the bindings-->
             </StackPanel>
         </Grid>
 

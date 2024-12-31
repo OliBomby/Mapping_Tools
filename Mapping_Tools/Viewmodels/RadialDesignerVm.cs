@@ -1,4 +1,8 @@
-﻿using Mapping_Tools.Classes.SystemTools;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using Mapping_Tools.Classes.SystemTools;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
@@ -39,6 +43,36 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref globalRotation, value);
         }
 
+        public enum ImportMode {
+            Selected,
+            Bookmarked,
+            Time,
+            Everything
+        }
+
+        private ImportMode importModeSetting;
+        public ImportMode ImportModeSetting {
+            get => importModeSetting;
+            set {
+                if (Set(ref importModeSetting, value)) {
+                    RaisePropertyChanged(nameof(TimeCodeBoxVisibility));
+                }
+            }
+        }
+
+        [JsonIgnore]
+        public IEnumerable<ImportMode> ImportModes => Enum.GetValues(typeof(ImportMode)).Cast<ImportMode>();
+
+        private string timeCode;
+        public string TimeCode {
+            get => timeCode;
+            set => Set(ref timeCode, value);
+        }
+
+        [JsonIgnore]
+        public Visibility TimeCodeBoxVisibility =>
+            ImportModeSetting == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
+
         #endregion
 
         public RadialDesignerVm() {
@@ -46,6 +80,9 @@ namespace Mapping_Tools.Viewmodels {
             Distance = 0;
             LocalRotation = 0;
             GlobalRotation = 0;
+
+            ImportModeSetting = ImportMode.Selected;
+            TimeCode = "";
         }
     }
 }
