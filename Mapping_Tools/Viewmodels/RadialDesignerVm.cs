@@ -73,6 +73,19 @@ namespace Mapping_Tools.Viewmodels {
         public Visibility TimeCodeBoxVisibility =>
             ImportModeSetting == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
 
+        public enum CenterMode {
+            First,
+            Average
+        }
+
+        private CenterMode centerModeSetting;
+        public CenterMode CenterModeSetting {
+            get => centerModeSetting;
+            set => Set(ref centerModeSetting, value);
+        }
+
+        public IEnumerable<CenterMode> CenterModes => Enum.GetValues(typeof(CenterMode)).Cast<CenterMode>();
+
         #endregion
 
         public RadialDesignerVm() {
