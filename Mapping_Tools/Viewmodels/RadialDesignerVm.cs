@@ -43,6 +43,18 @@ namespace Mapping_Tools.Viewmodels {
             set => Set(ref globalRotation, value);
         }
 
+        private string importTimeCode;
+        public string ImportTimeCode {
+            get => importTimeCode;
+            set => Set(ref importTimeCode, value);
+        }
+
+        private string exportTimeCode;
+        public string ExportTimeCode {
+            get => exportTimeCode;
+            set => Set(ref exportTimeCode, value);
+        }
+
         public enum ImportMode {
             Selected,
             Bookmarked,
@@ -55,7 +67,7 @@ namespace Mapping_Tools.Viewmodels {
             get => importModeSetting;
             set {
                 if (Set(ref importModeSetting, value)) {
-                    RaisePropertyChanged(nameof(TimeCodeBoxVisibility));
+                    RaisePropertyChanged(nameof(ImportTimeCodeBoxVisibility));
                 }
             }
         }
@@ -63,15 +75,33 @@ namespace Mapping_Tools.Viewmodels {
         [JsonIgnore]
         public IEnumerable<ImportMode> ImportModes => Enum.GetValues(typeof(ImportMode)).Cast<ImportMode>();
 
-        private string timeCode;
-        public string TimeCode {
-            get => timeCode;
-            set => Set(ref timeCode, value);
+        [JsonIgnore]
+        public Visibility ImportTimeCodeBoxVisibility =>
+            ImportModeSetting == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
+
+        public enum ExportMode {
+            Auto,
+            Current,
+            Time,
+        }
+
+        private ExportMode exportModeSetting;
+        public ExportMode ExportModeSetting {
+            get => exportModeSetting;
+            set {
+                if (Set(ref exportModeSetting, value)) {
+                    RaisePropertyChanged(nameof(ExportTimeCodeBoxVisibility));
+                }
+            }
         }
 
         [JsonIgnore]
-        public Visibility TimeCodeBoxVisibility =>
-            ImportModeSetting == ImportMode.Time ? Visibility.Visible : Visibility.Collapsed;
+        public IEnumerable<ExportMode> ExportModes => Enum.GetValues(typeof(ExportMode)).Cast<ExportMode>();
+
+        [JsonIgnore]
+        public Visibility ExportTimeCodeBoxVisibility =>
+            ExportModeSetting == ExportMode.Time ? Visibility.Visible : Visibility.Collapsed;
+
 
         public enum CenterMode {
             First,
@@ -95,7 +125,7 @@ namespace Mapping_Tools.Viewmodels {
             GlobalRotation = 0;
 
             ImportModeSetting = ImportMode.Selected;
-            TimeCode = "";
+            ImportTimeCode = "";
         }
     }
 }
