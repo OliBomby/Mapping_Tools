@@ -15,6 +15,7 @@
         <domain:TimeToStringConverter x:Key="TimeToStringConverter"/>
         <domain:CircleSizeToThicknessConverter x:Key="CircleSizeToThicknessConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <domain:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
     </local:SingleRunMappingTool.Resources>
     <Grid Name="MasterGrid">
         <Grid.ColumnDefinitions>
@@ -108,13 +109,6 @@
                     Style="{StaticResource MaterialDesignDiscreteSlider}"
                     ToolTip="Overall rotation applied to the radial pattern."
                     />
-                <ComboBox 
-                    ItemsSource="{Binding CenterModes}" 
-                    SelectedItem="{Binding CenterModeSetting}"
-                    Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-                    materialDesign:HintAssist.Hint="Center Mode"
-                    ToolTip="Determines center of pattern."
-                    Margin="0 5 0 0"/>
             </StackPanel>
         </Grid>
 
