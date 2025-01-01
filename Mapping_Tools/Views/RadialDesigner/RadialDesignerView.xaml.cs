@@ -83,6 +83,10 @@ namespace Mapping_Tools.Views.RadialDesigner {
                         break;
                 }
 
+                if (arg.MoveToCenter) {
+                    // Implement center movement logic
+                }
+
                 // Save after processing
                 editor.SaveFile();
             }

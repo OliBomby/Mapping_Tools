@@ -109,6 +109,11 @@
                     Style="{StaticResource MaterialDesignDiscreteSlider}"
                     ToolTip="Overall rotation applied to the radial pattern."
                     />
+                <CheckBox IsChecked="{Binding MoveToCenter}" 
+                    Margin="0,10,0,0"
+                    ToolTip="Move the pattern to the center of the playfield.">
+                    Move to center
+                </CheckBox>
             </StackPanel>
         </Grid>
 
