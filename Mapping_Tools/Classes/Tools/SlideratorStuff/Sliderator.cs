@@ -306,7 +306,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
                     d => PositionFunction(d) <= (neuron.Nucleus.PathPosition + neuron.Terminal.Nucleus.PathPosition) / 2);
 
                 // Calculate the distribution of dendrites to let the axon pass through the middle at the same time as the position funciton does
-                var leftPortion = MathHelper.Clamp((2 * (middleTime - neuron.Time) - axonWidth) / (2 * (width - axonWidth)), 0, 1);
+                var leftPortion = Precision.AlmostEquals(width, axonWidth) ? 0.5 : MathHelper.Clamp((2 * (middleTime - neuron.Time) - axonWidth) / (2 * (width - axonWidth)), 0, 1);
                 var rightPortion = 1 - leftPortion;
 
                 var dendriteToAddLeft = dendriteToAdd * leftPortion;
