@@ -42,13 +42,6 @@ namespace Mapping_Tools.Viewmodels {
             get => globalRotation;
             set => Set(ref globalRotation, value);
         }
-
-        private bool moveToCenter;
-        public bool MoveToCenter {
-            get => moveToCenter;
-            set => Set(ref moveToCenter, value);
-        }
-
         private string importTimeCode;
         public string ImportTimeCode {
             get => importTimeCode;
