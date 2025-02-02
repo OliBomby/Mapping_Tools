@@ -443,19 +443,42 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
                 // Add tick samples
                 // 10 ms over tick time is tick
-                var t = Time + UnInheritedTimingPoint.MpB / sliderTickRate;
-                while (t + 10 < EndTime) {
+                foreach (var t in GetSliderTickTimes(sliderTickRate))
+                {
                     var bodyTp = Timing.GetTimingPointAtTime(t, BodyHitsounds, TimingPoint);
                     if (includeDefaults || bodyTp.SampleIndex != 0) {
                         var sampleSet = SampleSet == SampleSet.None ? bodyTp.SampleSet : SampleSet;
                         samples.Add(GetSliderFilename(sampleSet, "tick", bodyTp.SampleIndex));
                     }
-
-                    t += UnInheritedTimingPoint.MpB / sliderTickRate;
                 }
             }
 
             return samples;
+        }
+
+        public List<double> GetSliderTickTimes(double sliderTickRate) {
+            // Sliders with NaN velocity don't have ticks
+            if (!IsSlider || double.IsNaN(SliderVelocity)) return new List<double>();
+
+            var ticks = new List<double>();
+            var t = UnInheritedTimingPoint.MpB / sliderTickRate;
+            while (t + 10 < TemporalLength) {
+                ticks.Add(t);
+                t += UnInheritedTimingPoint.MpB / sliderTickRate;
+            }
+
+            // Each repeat does the same tick times but in reverse for reverse passes
+            var allTicks = new List<double>();
+            for (var i = 0; i < Repeat; i++) {
+                int i2 = i;
+                allTicks.AddRange(i % 2 == 0
+                    ? ticks.Select(tick => Time + i2 * TemporalLength + tick)
+                    : ticks.Select(tick => Time + (i2 + 1) * TemporalLength - tick)
+                    );
+                ticks.Reverse();
+            }
+
+            return allTicks;
         }
 
         /// <summary>
