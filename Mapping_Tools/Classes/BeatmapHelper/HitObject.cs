@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -141,13 +142,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public double SampleVolume { get; set; }
         public string Filename { get; set; }
 
-        /// <summary>
-        /// All path types and their index in the curve points array.
-        /// Used for preserving multiple path types in osu! lazer file format.
-        /// </summary>
-        public List<(PathType, int)> AdditionalSliderTypes { get; set; }
-        public PathType SliderType { get; set; }
-        public List<Vector2> CurvePoints { get; set; }
+        public List<PathControlPoint> CurvePoints { get; set; }
 
         public SliderPath SliderPath {
             get => GetSliderPath();
@@ -212,17 +207,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         [JsonProperty]
         public bool IsSelected { get; set; }
 
-        public List<TimingPoint> BodyHitsounds = new List<TimingPoint>();
+        public List<TimingPoint> BodyHitsounds = new();
         private int repeat;
 
         // Special combined with timeline
-        public List<TimelineObject> TimelineObjects = new List<TimelineObject>();
+        public List<TimelineObject> TimelineObjects = new();
 
         /// <summary>
         /// When true, all coordinates and times will be serialized without rounding.
         /// </summary>
         public bool SaveWithFloatPrecision { get; set; }
-
 
         /// <inheritdoc />
         public void SetLine(string line) {
@@ -257,25 +251,50 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
                 var sliderData = values[5].Split('|');
 
-                SliderType = GetPathType(sliderData);
-                AdditionalSliderTypes = GetAdditionalPathTypes(sliderData);
-
-                var points = new List<Vector2>();
+                var points = new List<PathControlPoint>();
+                PathType? pathType = PathType.Bezier;
                 foreach (var value in sliderData) {
-                    var spl = value.Split(':');
+                    if (value.Length == 0 || !char.IsLetter(value[0])) continue;
 
-                    // It has to have 2 coordinates inside
-                    if (spl.Length != 2) continue;
+                    if (char.IsLetter(value[0])) {
+                        var letter = value[0];
+                        switch (letter) {
+                            case 'L':
+                                pathType = PathType.Linear;
+                                break;
+                            case 'B':
+                                if (value.Length > 1 && int.TryParse(value[1..], out int degree) && degree > 0) {
+                                    pathType = new PathType(SplineType.BSpline) { Degree = degree };
+                                    break;
+                                }
 
-                    if (TryParseDouble(spl[0], out var ax) && TryParseDouble(spl[1], out var ay))
-                        points.Add(new Vector2(ax, ay));
-                    else throw new BeatmapParsingException("Failed to parse coordinate of slider anchor.", line);
+                                pathType = PathType.Bezier;
+                                break;
+                            case 'P':
+                                pathType = PathType.PerfectCurve;
+                                break;
+                            case 'C':
+                                pathType = PathType.Catmull;
+                                break;
+                        }
+                    } else {
+                        var spl = value.Split(':');
+
+                        // It has to have 2 coordinates inside
+                        if (spl.Length != 2) continue;
+
+                        if (TryParseDouble(spl[0], out var ax) && TryParseDouble(spl[1], out var ay))
+                            points.Add(new PathControlPoint(new Vector2(ax, ay), pathType));
+                        else throw new BeatmapParsingException("Failed to parse coordinate of slider anchor.", line);
+
+                        pathType = null;
+                    }
                 }
 
                 CurvePoints = points;
 
-                if (TryParseInt(values[6], out var repeat))
-                    Repeat = repeat;
+                if (TryParseInt(values[6], out var r))
+                    Repeat = r;
                 else throw new BeatmapParsingException("Failed to parse repeat number of slider.", line);
 
                 if (TryParseDouble(values[7], out var pixelLength))
@@ -345,6 +364,215 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+
+        private PathType ConvertPathType(string input)
+        {
+            switch (input[0])
+            {
+                default:
+                case 'C':
+                    return PathType.CATMULL;
+
+                case 'B':
+                    if (input.Length > 1 && int.TryParse(input.AsSpan(1), out int degree) && degree > 0)
+                        return PathType.BSpline(degree);
+
+                    return PathType.BEZIER;
+
+                case 'L':
+                    return PathType.LINEAR;
+
+                case 'P':
+                    return PathType.PERFECT_CURVE;
+            }
+        }
+
+        /// <summary>
+        /// Converts a given point string into a set of path control points.
+        /// </summary>
+        /// <remarks>
+        /// A point string takes the form: X|1:1|2:2|2:2|3:3|Y|1:1|2:2.
+        /// This has three segments:
+        /// <list type="number">
+        ///     <item>
+        ///         <description>X: { (1,1), (2,2) } (implicit segment)</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>X: { (2,2), (3,3) } (implicit segment)</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>Y: { (3,3), (1,1), (2, 2) } (explicit segment)</description>
+        ///     </item>
+        /// </list>
+        /// </remarks>
+        /// <param name="pointString">The point string.</param>
+        /// <param name="offset">The positional offset to apply to the control points.</param>
+        /// <returns>All control points in the resultant path.</returns>
+        private PathControlPoint[] ConvertPathString(string pointString, Vector2 offset)
+        {
+            // This code takes on the responsibility of handling explicit segments of the path ("X" & "Y" from above). Implicit segments are handled by calls to convertPoints().
+            string[] pointStringSplit = pointString.Split('|');
+
+            var pointsBuffer = ArrayPool<Vector2>.Shared.Rent(pointStringSplit.Length);
+            var segmentsBuffer = ArrayPool<(PathType Type, int StartIndex)>.Shared.Rent(pointStringSplit.Length);
+            int currentPointsIndex = 0;
+            int currentSegmentsIndex = 0;
+
+            try
+            {
+                foreach (string s in pointStringSplit)
+                {
+                    if (char.IsLetter(s[0]))
+                    {
+                        // The start of a new segment(indicated by having an alpha character at position 0).
+                        var pathType = ConvertPathType(s);
+                        segmentsBuffer[currentSegmentsIndex++] = (pathType, currentPointsIndex);
+
+                        // First segment is prepended by an extra zero point
+                        if (currentPointsIndex == 0)
+                            pointsBuffer[currentPointsIndex++] = Vector2.Zero;
+                    }
+                    else
+                    {
+                        pointsBuffer[currentPointsIndex++] = readPoint(s, offset);
+                    }
+                }
+
+                int pointsCount = currentPointsIndex;
+                int segmentsCount = currentSegmentsIndex;
+                var controlPoints = new List<ArraySegment<PathControlPoint>>(pointsCount);
+                var allPoints = new ArraySegment<Vector2>(pointsBuffer, 0, pointsCount);
+
+                for (int i = 0; i < segmentsCount; i++)
+                {
+                    if (i < segmentsCount - 1)
+                    {
+                        int startIndex = segmentsBuffer[i].StartIndex;
+                        int endIndex = segmentsBuffer[i + 1].StartIndex;
+                        controlPoints.AddRange(ConvertPoints(segmentsBuffer[i].Type, allPoints.Slice(startIndex, endIndex - startIndex), pointsBuffer[endIndex]));
+                    }
+                    else
+                    {
+                        int startIndex = segmentsBuffer[i].StartIndex;
+                        controlPoints.AddRange(ConvertPoints(segmentsBuffer[i].Type, allPoints.Slice(startIndex), null));
+                    }
+                }
+
+                return MergeControlPointsLists(controlPoints);
+            }
+            finally
+            {
+                ArrayPool<Vector2>.Shared.Return(pointsBuffer);
+                ArrayPool<(PathType, int)>.Shared.Return(segmentsBuffer);
+            }
+
+            static Vector2 readPoint(string value, Vector2 startPos)
+            {
+                string[] vertexSplit = value.Split(':');
+
+                Vector2 pos = new Vector2((int)Parsing.ParseDouble(vertexSplit[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(vertexSplit[1], Parsing.MAX_COORDINATE_VALUE)) - startPos;
+                return pos;
+            }
+        }
+
+        /// <summary>
+        /// Converts a given point list into a set of path segments.
+        /// </summary>
+        /// <param name="type">The path type of the point list.</param>
+        /// <param name="points">The point list.</param>
+        /// <param name="endPoint">Any extra endpoint to consider as part of the points. This will NOT be returned.</param>
+        /// <returns>The set of points contained by <paramref name="points"/> as one or more segments of the path.</returns>
+        private IEnumerable<ArraySegment<PathControlPoint>> ConvertPoints(PathType type, ArraySegment<Vector2> points, Vector2? endPoint)
+        {
+            var vertices = new PathControlPoint[points.Count];
+
+            // Parse into control points.
+            for (int i = 0; i < points.Count; i++)
+                vertices[i] = new PathControlPoint { Position = points[i] };
+
+            // Edge-case rules (to match stable).
+            if (type == PathType.PERFECT_CURVE)
+            {
+                int endPointLength = endPoint == null ? 0 : 1;
+
+                if (formatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
+                {
+                    if (vertices.Length + endPointLength != 3)
+                        type = PathType.BEZIER;
+                    else if (isLinear(points[0], points[1], endPoint ?? points[2]))
+                    {
+                        // osu-stable special-cased colinear perfect curves to a linear path
+                        type = PathType.LINEAR;
+                    }
+                }
+                else if (vertices.Length + endPointLength > 3)
+                    // Lazer supports perfect curves with less than 3 points and colinear points
+                    type = PathType.BEZIER;
+            }
+
+            // The first control point must have a definite type.
+            vertices[0].Type = type;
+
+            // A path can have multiple implicit segments of the same type if there are two sequential control points with the same position.
+            // To handle such cases, this code may return multiple path segments with the final control point in each segment having a non-null type.
+            // For the point string X|1:1|2:2|2:2|3:3, this code returns the segments:
+            // X: { (1,1), (2, 2) }
+            // X: { (3, 3) }
+            // Note: (2, 2) is not returned in the second segments, as it is implicit in the path.
+            int startIndex = 0;
+            int endIndex = 0;
+
+            while (++endIndex < vertices.Length)
+            {
+                // Keep incrementing while an implicit segment doesn't need to be started.
+                if (vertices[endIndex].Position != vertices[endIndex - 1].Position)
+                    continue;
+
+                // Legacy CATMULL sliders don't support multiple segments, so adjacent CATMULL segments should be treated as a single one.
+                // Importantly, this is not applied to the first control point, which may duplicate the slider path's position
+                // resulting in a duplicate (0,0) control point in the resultant list.
+                if (type == PathType.CATMULL && endIndex > 1 && formatVersion < LegacyBeatmapEncoder.FIRST_LAZER_VERSION)
+                    continue;
+
+                // The last control point of each segment is not allowed to start a new implicit segment.
+                if (endIndex == vertices.Length - 1)
+                    continue;
+
+                // Force a type on the last point, and return the current control point set as a segment.
+                vertices[endIndex - 1].Type = type;
+                yield return new ArraySegment<PathControlPoint>(vertices, startIndex, endIndex - startIndex);
+
+                // Skip the current control point - as it's the same as the one that's just been returned.
+                startIndex = endIndex + 1;
+            }
+
+            if (startIndex < endIndex)
+                yield return new ArraySegment<PathControlPoint>(vertices, startIndex, endIndex - startIndex);
+
+            static bool isLinear(Vector2 p0, Vector2 p1, Vector2 p2)
+                => Precision.AlmostEquals(0, (p1.Y - p0.Y) * (p2.X - p0.X)
+                                             - (p1.X - p0.X) * (p2.Y - p0.Y));
+        }
+
+        private PathControlPoint[] MergeControlPointsLists(List<ArraySegment<PathControlPoint>> controlPointList)
+        {
+            int totalCount = 0;
+
+            foreach (var arr in controlPointList)
+                totalCount += arr.Count;
+
+            var mergedArray = new PathControlPoint[totalCount];
+            int copyIndex = 0;
+
+            foreach (var arr in controlPointList)
+            {
+                arr.AsSpan().CopyTo(mergedArray.AsSpan(copyIndex));
+                copyIndex += arr.Count;
+            }
+
+            return mergedArray;
+        }
+
         /// <inheritdoc />
         public string GetLine() {
             var values = new List<string> {
@@ -357,37 +585,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
             if (IsSlider) {
                 var builder = new StringBuilder();
-                if (AdditionalSliderTypes is not null && AdditionalSliderTypes.Count > 1) {
-                    int i = 0;
-                    int i2 = 0;
-                    bool first = true;
-                    foreach (var p in CurvePoints) {
-                        while (i2 < AdditionalSliderTypes.Count && AdditionalSliderTypes[i2].Item2 <= i) {
-                            if (!first)
-                                builder.Append('|');
-
-                            builder.Append(GetPathTypeString(AdditionalSliderTypes[i2].Item1));
-                            i++;
-                            i2++;
-                            first = false;
-                        }
-
-                        if (!first)
-                            builder.Append('|');
-
-                        builder.Append($"{(SaveWithFloatPrecision ? p.X.ToInvariant() : p.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? p.Y.ToInvariant() : p.Y.ToRoundInvariant())}");
-                        i++;
-                        first = false;
-                    }
-                    while (i2 < AdditionalSliderTypes.Count && AdditionalSliderTypes[i2].Item2 <= i) {
-                        if (!first)
-                            builder.Append('|');
-
-                        builder.Append(GetPathTypeString(AdditionalSliderTypes[i2].Item1));
-                        i++;
-                        i2++;
-                        first = false;
-                    }
+                if (SaveWithFloatPrecision) {
+                    builder.Append(GetPathTypeString(SliderType));
+                    foreach (var p in CurvePoints)
+                        builder.Append($"|{(SaveWithFloatPrecision ? p.X.ToInvariant() : p.X.ToRoundInvariant())}:{(SaveWithFloatPrecision ? p.Y.ToInvariant() : p.Y.ToRoundInvariant())}");
                 } else {
                     builder.Append(GetPathTypeString(SliderType));
                     foreach (var p in CurvePoints)
@@ -918,17 +1119,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         private string GetPathTypeString(PathType pathType) {
-            switch (pathType) {
-                case PathType.Linear:
+            switch (pathType.Type) {
+                case SplineType.Linear:
                     return "L";
-                case PathType.PerfectCurve:
+                case SplineType.PerfectCurve:
                     return "P";
-                case PathType.Catmull:
+                case SplineType.Catmull:
                     return "C";
-                case PathType.Bezier:
+                case SplineType.BSpline:
+                    if (pathType.Degree.HasValue)
+                        return "B" + pathType.Degree;
                     return "B";
-                case PathType.BSpline:
-                    return "B4";
                 default:
                     throw new ArgumentOutOfRangeException();
             }
