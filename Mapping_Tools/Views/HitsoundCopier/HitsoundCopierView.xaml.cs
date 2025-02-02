@@ -313,24 +313,24 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 // Save the file
                 editorTo.SaveFile();
 
-                // Export the sample schema if there are samples
-                if (sampleSchema.Count > 0) {
-                    string exportFolder = MainWindow.ExportPath;
-
-                    DirectoryInfo di = new DirectoryInfo(exportFolder);
-                    foreach (FileInfo file in di.GetFiles()) {
-                        file.Delete();
-                    }
-
-                    HitsoundExporter.ExportSampleSchema(sampleSchema, exportFolder);
-
-                    System.Diagnostics.Process.Start("explorer.exe", exportFolder);
-                }
-
                 // Update progressbar
                 if (worker != null && worker.WorkerReportsProgress) {
                     worker.ReportProgress(++mapsDone * 100 / paths.Length);
                 }
+            }
+
+            // Export the sample schema if there are samples
+            if (sampleSchema.Count > 0) {
+                string exportFolder = MainWindow.ExportPath;
+
+                DirectoryInfo di = new DirectoryInfo(exportFolder);
+                foreach (FileInfo file in di.GetFiles()) {
+                    file.Delete();
+                }
+
+                HitsoundExporter.ExportSampleSchema(sampleSchema, exportFolder);
+
+                System.Diagnostics.Process.Start("explorer.exe", exportFolder);
             }
 
             return "Done!";
