@@ -56,7 +56,7 @@ namespace Mapping_Tools.Views.SliderCompletionator {
             // Get the current beatmap if the selection mode is 'Selected' because otherwise the selection would always fail
             RunTool(SelectionModeBox.SelectedIndex == 0
                 ? new[] {IOHelper.GetCurrentBeatmapOrCurrentBeatmap()}
-                : MainWindow.AppWindow.GetCurrentMaps());
+                : MainWindow.AppWindow.GetCurrentMaps(), SettingsManager.Settings.AlwaysQuickRun);
         }
 
         public void QuickRun() {

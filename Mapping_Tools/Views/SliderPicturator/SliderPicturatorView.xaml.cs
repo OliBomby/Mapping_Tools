@@ -47,7 +47,7 @@ namespace Mapping_Tools.Views.SliderPicturator {
 
        
         private void Start_Click(object sender, RoutedEventArgs e) {
-            RunTool(MainWindow.AppWindow.GetCurrentMaps()[0]);
+            RunTool(MainWindow.AppWindow.GetCurrentMaps()[0], SettingsManager.Settings.AlwaysQuickRun);
         }
 
         public void QuickRun() {

@@ -58,6 +58,12 @@ namespace Mapping_Tools.Classes.SystemTools {
             set => Set(ref autoReload, value);
         }
 
+        private bool alwaysQuickRun;
+        public bool AlwaysQuickRun {
+            get => alwaysQuickRun;
+            set => Set(ref alwaysQuickRun, value);
+        }
+
         private Hotkey quickRunHotkey;
         public Hotkey QuickRunHotkey {
             get => quickRunHotkey;
@@ -146,6 +152,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             UseEditorReader = true;
             OverrideOsuSave = false;
             AutoReload = true;
+            AlwaysQuickRun = false;
             SmartQuickRunEnabled = true;
             NoneQuickRunTool = "<Current Tool>";
             SingleQuickRunTool = "<Current Tool>";

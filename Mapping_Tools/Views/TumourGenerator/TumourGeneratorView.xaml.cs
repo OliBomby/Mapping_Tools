@@ -50,7 +50,7 @@ To get started, select a slider in your beatmap and click 'Preview slider' to pr
         private void Start_Click(object sender, RoutedEventArgs e) {
             RunTool(SelectionModeBox.SelectedIndex == 0
                 ? new[] {IOHelper.GetCurrentBeatmapOrCurrentBeatmap()}
-                : MainWindow.AppWindow.GetCurrentMaps());
+                : MainWindow.AppWindow.GetCurrentMaps(), SettingsManager.Settings.AlwaysQuickRun, SettingsManager.Settings.AlwaysQuickRun);
         }
 
         private bool ValidateToolInput(out string message) {

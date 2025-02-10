@@ -66,7 +66,7 @@ namespace Mapping_Tools.Views.PatternGallery {
         {
             RunTool(ViewModel.ExportTimeMode == ExportTimeMode.Current
                 ? new[] { IOHelper.GetCurrentBeatmapOrCurrentBeatmap() }
-                : MainWindow.AppWindow.GetCurrentMaps(), quick: false);
+                : MainWindow.AppWindow.GetCurrentMaps(), quick: SettingsManager.Settings.AlwaysQuickRun);
         }
 
         public void QuickRun()

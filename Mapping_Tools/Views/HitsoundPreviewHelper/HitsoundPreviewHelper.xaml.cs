@@ -122,7 +122,7 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
 
         private void Start_Click(object sender, RoutedEventArgs e)
         {
-            RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
+            RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: SettingsManager.Settings.AlwaysQuickRun);
         }
 
         public void QuickRun()

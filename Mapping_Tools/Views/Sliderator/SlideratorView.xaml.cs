@@ -531,7 +531,7 @@ namespace Mapping_Tools.Views.Sliderator {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            RunTool(MainWindow.AppWindow.GetCurrentMaps()[0]);
+            RunTool(MainWindow.AppWindow.GetCurrentMaps()[0], SettingsManager.Settings.AlwaysQuickRun, SettingsManager.Settings.AlwaysQuickRun);
         }
 
         private async void RunTool(string path, bool quick = false, bool reload = false) {
