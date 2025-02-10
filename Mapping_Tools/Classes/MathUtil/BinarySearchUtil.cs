@@ -15,6 +15,16 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <param name="checkFunc">Function which checks the validity of an instance of <see cref="T"/></param>
         /// <returns></returns>
         public static T ContinuousBinarySearch<T>(T lower, T upper, double epsilon, Func<T, T, double> distanceFunc, Func<T, T, T> midFunc, Func<T,bool> checkFunc) {
+            if (!checkFunc(lower) && checkFunc(upper))
+                // Bounds seem to be reversed
+                (lower, upper) = (upper, lower);
+
+            if (!checkFunc(lower))
+                return lower;
+
+            if (checkFunc(upper))
+                return upper;
+
             while (distanceFunc(lower, upper) > epsilon) {
                 var mid = midFunc(lower, upper);
 

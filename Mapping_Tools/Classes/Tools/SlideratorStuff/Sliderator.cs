@@ -156,7 +156,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
         private void GenerateNeurons() {
             // These values are placeholders. Experimentation has to be done to find better parameters
             const double maxOvershot = 32;  // Max error in wantedLength
-            const double epsilon = 0.01;  // Resolution for for speed differentiation
+            const double epsilon = 0.01;  // Resolution for speed differentiation
             const double deltaT = 0.02;  // Size of time step
 
             slider = new List<Neuron>();
@@ -184,7 +184,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
                     var newNeuron = new Neuron(nearestLatticePoint, time);
                     currentNeuron.Terminal = newNeuron;
 
-                    currentNeuron.WantedLength = actualLength;
+                    currentNeuron.WantedLength += actualLength;
                     slider.Add(currentNeuron);
 
                     currentNeuron = newNeuron;
