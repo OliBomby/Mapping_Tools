@@ -296,7 +296,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 if (line.Substring(0, 5) == "Combo") {
                     ComboColours.Add(new ComboColour(line));
                 } else {
-                    SpecialColours[FileFormatHelper.SplitKeyValue(line).Item1.Trim()] = new ComboColour(line);
+                    SpecialColours[FileFormatHelper.SplitKeyValue(line).Item1] = new ComboColour(line);
                 }
             }
 
