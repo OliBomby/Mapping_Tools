@@ -92,6 +92,8 @@
                           ToolTip="Automatically BetterSave after every osu! save. As a side-effect, this will also overwrite manual .osu changes if you have the editor open."/>
                 <CheckBox HorizontalAlignment="Left" Content="Auto reload after QuickRun" IsChecked="{Binding AutoReload, Mode=TwoWay}" 
                           ToolTip="Enable this to automatically reload the editor after every QuickRun."/>
+                <CheckBox HorizontalAlignment="Left" Content="Always use QuickRun" IsChecked="{Binding AlwaysQuickRun, Mode=TwoWay}"
+                          ToolTip="Enable this to use QuickRun even when you press the button to run normally."/>
             </StackPanel>
 
             <StackPanel Margin="5 10 0 0">

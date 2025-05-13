@@ -313,24 +313,24 @@ namespace Mapping_Tools.Views.HitsoundCopier {
                 // Save the file
                 editorTo.SaveFile();
 
-                // Export the sample schema if there are samples
-                if (sampleSchema.Count > 0) {
-                    string exportFolder = MainWindow.ExportPath;
-
-                    DirectoryInfo di = new DirectoryInfo(exportFolder);
-                    foreach (FileInfo file in di.GetFiles()) {
-                        file.Delete();
-                    }
-
-                    HitsoundExporter.ExportSampleSchema(sampleSchema, exportFolder);
-
-                    System.Diagnostics.Process.Start("explorer.exe", exportFolder);
-                }
-
                 // Update progressbar
                 if (worker != null && worker.WorkerReportsProgress) {
                     worker.ReportProgress(++mapsDone * 100 / paths.Length);
                 }
+            }
+
+            // Export the sample schema if there are samples
+            if (sampleSchema.Count > 0) {
+                string exportFolder = MainWindow.ExportPath;
+
+                DirectoryInfo di = new DirectoryInfo(exportFolder);
+                foreach (FileInfo file in di.GetFiles()) {
+                    file.Delete();
+                }
+
+                HitsoundExporter.ExportSampleSchema(sampleSchema, exportFolder);
+
+                System.Diagnostics.Process.Start("explorer.exe", exportFolder);
             }
 
             return "Done!";
@@ -524,22 +524,21 @@ namespace Mapping_Tools.Views.HitsoundCopier {
         }
 
         private static bool FindSliderTickInRange(Beatmap beatmap, double startTime, double endTime, out double sliderTickTime, out HitObject tickSlider) {
-            var tickrate = beatmap.Difficulty.ContainsKey("SliderTickRate")
-                ? beatmap.Difficulty["SliderTickRate"].DoubleValue : 1.0;
+            var tickrate = beatmap.Difficulty.TryGetValue("SliderTickRate", out TValue tickRateValue)
+                ? tickRateValue.DoubleValue : 1.0;
 
             // Check all sliders in range and exclude those which have NaN SV, because those dont have slider ticks
             foreach (var slider in beatmap.HitObjects.Where(o => o.IsSlider && 
                                                                  !double.IsNaN(o.SliderVelocity) && 
                                                                  (o.Time < endTime || o.EndTime > startTime))) {
-                var timeBetweenTicks = slider.UnInheritedTimingPoint.MpB / tickrate;
-
-                sliderTickTime = slider.Time + timeBetweenTicks;
-                while (sliderTickTime < slider.EndTime - 5) {  // This -5 is to make sure the +5 ms timingpoint that reverts the change is still inside the slider
-                    if (sliderTickTime >= startTime && sliderTickTime <= endTime) {
-                        tickSlider = slider;
-                        return true;
+                foreach (var t in slider.GetSliderTickTimes(tickrate)) {
+                    if (!(t >= startTime && t <= endTime)) {
+                        continue;
                     }
-                    sliderTickTime += timeBetweenTicks;
+
+                    sliderTickTime = t;
+                    tickSlider = slider;
+                    return true;
                 }
             }
 

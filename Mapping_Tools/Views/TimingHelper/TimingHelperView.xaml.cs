@@ -43,7 +43,7 @@ namespace Mapping_Tools.Views.TimingHelper {
         }
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            RunTool(MainWindow.AppWindow.GetCurrentMaps());
+            RunTool(MainWindow.AppWindow.GetCurrentMaps(), SettingsManager.Settings.AlwaysQuickRun);
         }
 
         public void QuickRun() {

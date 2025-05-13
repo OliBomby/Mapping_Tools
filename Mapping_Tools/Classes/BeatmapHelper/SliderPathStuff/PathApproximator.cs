@@ -23,18 +23,49 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
         /// Creates a piecewise-linear approximation of a bezier curve, by adaptively repeatedly subdividing
         /// the control points until their approximation error vanishes below a given threshold.
         /// </summary>
+        /// <param name="controlPoints">The control points.</param>
         /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-        public static List<Vector2> ApproximateBezier(List<Vector2> controlPoints) {
+        public static List<Vector2> ApproximateBezier(List<Vector2> controlPoints)
+        {
+            return ApproximateBSpline(controlPoints, Math.Max(1, controlPoints.Count - 1));
+        }
+
+        /// <summary>
+        /// Creates a piecewise-linear approximation of a clamped uniform B-spline with polynomial order <paramref name="degree"/>,
+        /// by dividing it into a series of bezier control points at its knots, then adaptively repeatedly
+        /// subdividing those until their approximation error vanishes below a given threshold.
+        /// </summary>
+        /// <remarks>
+        /// Does nothing if <paramref name="controlPoints"/> has zero points or one point.
+        /// Generalises to bezier approximation functionality when <paramref name="degree"/> is too large to create knots.
+        /// Algorithm unsuitable for large values of <paramref name="degree"/> with many knots.
+        /// </remarks>
+        /// <param name="controlPoints">The control points.</param>
+        /// <param name="degree">The polynomial order.</param>
+        /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="degree"/> was less than 1.</exception>
+        public static List<Vector2> ApproximateBSpline(List<Vector2> controlPoints, int degree)
+        {
+            // Zero-th degree splines would be piecewise-constant, which cannot be represented by the piecewise-
+            // linear output of this function. Negative degrees would require rational splines which this code
+            // does not support.
+            if (degree < 1)
+                throw new ArgumentOutOfRangeException(nameof(degree), @"Degree must be at least 1.");
+
+            // Spline fitting does not make sense when the input contains no points or just one point. In this case
+            // the user likely wants this function to behave like a no-op.
+            if (controlPoints.Count < 2)
+                return controlPoints.Count == 0 ? new List<Vector2>() : new List<Vector2> { controlPoints[0] };
+
+            // With fewer control points than the degree, splines can not be unambiguously fitted. Rather than erroring
+            // out, we set the degree to the minimal number that permits a unique fit to avoid special casing in
+            // incremental spline building algorithms that call this function.
+            degree = Math.Min(degree, controlPoints.Count - 1);
+
             List<Vector2> output = new List<Vector2>();
-            int count = controlPoints.Count;
+            int pointCount = controlPoints.Count - 1;
 
-            if( count == 0 )
-                return output;
-
-            var subdivisionBuffer1 = new Vector2[count];
-            var subdivisionBuffer2 = new Vector2[count * 2 - 1];
-
-            Stack<Vector2[]> toFlatten = new Stack<Vector2[]>();
+            Stack<Vector2[]> toFlatten = BSplineToBezierInternal(controlPoints, ref degree);
             Stack<Vector2[]> freeBuffers = new Stack<Vector2[]>();
 
             // "toFlatten" contains all the curves which are not yet approximated well enough.
@@ -42,18 +73,23 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
             // (More specifically, we iteratively and adaptively refine our curve with a
             // <a href="https://en.wikipedia.org/wiki/Depth-first_search">Depth-first search</a>
             // over the tree resulting from the subdivisions we make.)
-            toFlatten.Push(controlPoints.ToArray());
+
+            var subdivisionBuffer1 = new Vector2[degree + 1];
+            var subdivisionBuffer2 = new Vector2[degree * 2 + 1];
 
             Vector2[] leftChild = subdivisionBuffer2;
 
-            while( toFlatten.Count > 0 ) {
+            while (toFlatten.Count > 0)
+            {
                 Vector2[] parent = toFlatten.Pop();
-                if( BezierIsFlatEnough(parent) ) {
+
+                if (BezierIsFlatEnough(parent))
+                {
                     // If the control points we currently operate on are sufficiently "flat", we use
                     // an extension to De Casteljau's algorithm to obtain a piecewise-linear approximation
                     // of the bezier curve represented by our control points, consisting of the same amount
                     // of points as there are control points.
-                    BezierApproximate(parent, output, subdivisionBuffer1, subdivisionBuffer2, count);
+                    BezierApproximate(parent, output, subdivisionBuffer1, subdivisionBuffer2, degree + 1);
 
                     freeBuffers.Push(parent);
                     continue;
@@ -61,18 +97,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
 
                 // If we do not yet have a sufficiently "flat" (in other words, detailed) approximation we keep
                 // subdividing the curve we are currently operating on.
-                Vector2[] rightChild = freeBuffers.Count > 0 ? freeBuffers.Pop() : new Vector2[count];
-                BezierSubdivide(parent, leftChild, rightChild, subdivisionBuffer1, count);
+                Vector2[] rightChild = freeBuffers.Count > 0 ? freeBuffers.Pop() : new Vector2[degree + 1];
+                BezierSubdivide(parent, leftChild, rightChild, subdivisionBuffer1, degree + 1);
 
                 // We re-use the buffer of the parent for one of the children, so that we save one allocation per iteration.
-                for( int i = 0; i < count; ++i )
+                for (int i = 0; i < degree + 1; ++i)
                     parent[i] = leftChild[i];
 
                 toFlatten.Push(rightChild);
                 toFlatten.Push(parent);
             }
 
-            output.Add(controlPoints[count - 1]);
+            output.Add(controlPoints[pointCount]);
             return output;
         }
 
@@ -180,6 +216,55 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
 
             foreach( var c in controlPoints )
                 result.Add(c);
+
+            return result;
+        }
+
+        private static Stack<Vector2[]> BSplineToBezierInternal(List<Vector2> controlPoints, ref int degree)
+        {
+            Stack<Vector2[]> result = new Stack<Vector2[]>();
+
+            // With fewer control points than the degree, splines can not be unambiguously fitted. Rather than erroring
+            // out, we set the degree to the minimal number that permits a unique fit to avoid special casing in
+            // incremental spline building algorithms that call this function.
+            degree = Math.Min(degree, controlPoints.Count - 1);
+
+            int pointCount = controlPoints.Count - 1;
+            var points = controlPoints.ToArray();
+
+            if (degree == pointCount)
+            {
+                // B-spline subdivision unnecessary, degenerate to single bezier.
+                result.Push(points);
+            }
+            else
+            {
+                // Subdivide B-spline into bezier control points at knots.
+                for (int i = 0; i < pointCount - degree; i++)
+                {
+                    var subBezier = new Vector2[degree + 1];
+                    subBezier[0] = points[i];
+
+                    // Destructively insert the knot degree-1 times via Boehm's algorithm.
+                    for (int j = 0; j < degree - 1; j++)
+                    {
+                        subBezier[j + 1] = points[i + 1];
+
+                        for (int k = 1; k < degree - j; k++)
+                        {
+                            int l = Math.Min(k, pointCount - degree - i);
+                            points[i + k] = (l * points[i + k] + points[i + k + 1]) / (l + 1);
+                        }
+                    }
+
+                    subBezier[degree] = points[i + 1];
+                    result.Push(subBezier);
+                }
+
+                result.Push(points[(pointCount - degree)..]);
+                // Reverse the stack so elements can be accessed in order.
+                result = new Stack<Vector2[]>(result);
+            }
 
             return result;
         }

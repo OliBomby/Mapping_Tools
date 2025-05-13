@@ -60,7 +60,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         public static (string, string) SplitKeyValue(string line) {
             int index = line.IndexOf(':');
-            return index == -1 ? (line, string.Empty) : (line[..index], line[(index + 1)..]);
+            return index == -1 ? (line.Trim(), string.Empty) : (line[..index].Trim(), line[(index + 1)..].Trim());
         }
 
         public static IEnumerable<string> GetCategoryLines(IEnumerable<string> lines, string category, string[] categoryIdentifiers=null) {

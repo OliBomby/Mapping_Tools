@@ -443,19 +443,42 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
                 // Add tick samples
                 // 10 ms over tick time is tick
-                var t = Time + UnInheritedTimingPoint.MpB / sliderTickRate;
-                while (t + 10 < EndTime) {
+                foreach (var t in GetSliderTickTimes(sliderTickRate))
+                {
                     var bodyTp = Timing.GetTimingPointAtTime(t, BodyHitsounds, TimingPoint);
                     if (includeDefaults || bodyTp.SampleIndex != 0) {
                         var sampleSet = SampleSet == SampleSet.None ? bodyTp.SampleSet : SampleSet;
                         samples.Add(GetSliderFilename(sampleSet, "tick", bodyTp.SampleIndex));
                     }
-
-                    t += UnInheritedTimingPoint.MpB / sliderTickRate;
                 }
             }
 
             return samples;
+        }
+
+        public List<double> GetSliderTickTimes(double sliderTickRate) {
+            // Sliders with NaN velocity don't have ticks
+            if (!IsSlider || double.IsNaN(SliderVelocity)) return new List<double>();
+
+            var ticks = new List<double>();
+            var t = UnInheritedTimingPoint.MpB / sliderTickRate;
+            while (t + 10 < TemporalLength) {
+                ticks.Add(t);
+                t += UnInheritedTimingPoint.MpB / sliderTickRate;
+            }
+
+            // Each repeat does the same tick times but in reverse for reverse passes
+            var allTicks = new List<double>();
+            for (var i = 0; i < Repeat; i++) {
+                int i2 = i;
+                allTicks.AddRange(i % 2 == 0
+                    ? ticks.Select(tick => Time + i2 * TemporalLength + tick)
+                    : ticks.Select(tick => Time + (i2 + 1) * TemporalLength - tick)
+                    );
+                ticks.Reverse();
+            }
+
+            return allTicks;
         }
 
         /// <summary>
@@ -841,19 +864,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         private PathType GetPathType(string[] sliderData) {
             for (var i = sliderData.Length - 1; i >= 0; i--) {
                 // Iterating in reverse to get the last valid letter
-                var letter =
-                    sliderData[i].Any() ? sliderData[i][0] : '0'; // 0 is not a letter so it will get ignored
-                if (char.IsLetter(letter))
-                    switch (letter) {
-                        case 'L':
-                            return PathType.Linear;
-                        case 'B':
-                            return PathType.Bezier;
-                        case 'P':
-                            return PathType.PerfectCurve;
-                        case 'C':
-                            return PathType.Catmull;
-                    }
+                if (sliderData[i].Length == 0 || !char.IsLetter(sliderData[i][0])) continue;
+
+                var letter = sliderData[i][0];
+                switch (letter) {
+                    case 'L':
+                        return PathType.Linear;
+                    case 'B':
+                        if (sliderData[i].Length > 1 && int.TryParse(sliderData[i][1..], out int degree) && degree > 0)
+                            return PathType.BSpline;
+
+                        return PathType.Bezier;
+                    case 'P':
+                        return PathType.PerfectCurve;
+                    case 'C':
+                        return PathType.Catmull;
+                }
             }
 
             // If there is no valid letter it will literally default to catmull
@@ -872,6 +898,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                         allPathTypes.Add((PathType.Linear, i));
                         break;
                     case 'B':
+                        if (sliderData[i].Length > 1 && int.TryParse(sliderData[i][1..], out int degree) && degree > 0) {
+                            allPathTypes.Add((PathType.BSpline, i));
+                            break;
+                        }
+
                         allPathTypes.Add((PathType.Bezier, i));
                         break;
                     case 'P':
@@ -896,6 +927,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     return "C";
                 case PathType.Bezier:
                     return "B";
+                case PathType.BSpline:
+                    return "B4";
                 default:
                     throw new ArgumentOutOfRangeException();
             }

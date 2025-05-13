@@ -238,6 +238,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
                     return subpath;
                 case PathType.Catmull:
                     return PathApproximator.ApproximateCatmull(subControlPoints);
+                case PathType.BSpline:
+                    return PathApproximator.ApproximateBSpline(subControlPoints, 4);
             }
 
             return PathApproximator.ApproximateBezier(subControlPoints);

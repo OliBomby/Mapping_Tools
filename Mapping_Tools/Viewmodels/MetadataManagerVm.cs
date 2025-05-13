@@ -135,15 +135,15 @@ namespace Mapping_Tools.Viewmodels {
                 var editor = new BeatmapEditor(importPath);
                 var beatmap = editor.Beatmap;
 
-                Artist = beatmap.Metadata["ArtistUnicode"].Value;
-                RomanisedArtist = beatmap.Metadata["Artist"].Value;
-                Title = beatmap.Metadata["TitleUnicode"].Value;
-                RomanisedTitle = beatmap.Metadata["Title"].Value;
-                BeatmapCreator = beatmap.Metadata["Creator"].Value;
-                Source = beatmap.Metadata["Source"].Value;
-                Tags = beatmap.Metadata["Tags"].Value;
+                Artist = beatmap.Metadata.TryGetValue("ArtistUnicode", out TValue artistUnicodeValue) ? artistUnicodeValue.Value : string.Empty;
+                RomanisedArtist = beatmap.Metadata.TryGetValue("Artist", out TValue artistValue) ? artistValue.Value : string.Empty;
+                Title = beatmap.Metadata.TryGetValue("TitleUnicode", out TValue titleUnicodeValue) ? titleUnicodeValue.Value : string.Empty;
+                RomanisedTitle = beatmap.Metadata.TryGetValue("Title", out TValue titleValue) ? titleValue.Value : string.Empty;
+                BeatmapCreator = beatmap.Metadata.TryGetValue("Creator", out TValue creatorValue) ? creatorValue.Value : string.Empty;
+                Source = beatmap.Metadata.TryGetValue("Source", out TValue sourceValue) ? sourceValue.Value : string.Empty;
+                Tags = beatmap.Metadata.TryGetValue("Tags", out TValue tagsValue) ? tagsValue.Value : string.Empty;
 
-                PreviewTime = beatmap.General["PreviewTime"].DoubleValue;
+                PreviewTime = beatmap.General.TryGetValue("PreviewTime", out TValue previewTimeValue) ? previewTimeValue.DoubleValue : -1;
                 ComboColours = new ObservableCollection<ComboColour>(beatmap.ComboColours);
                 SpecialColours.Clear();
                 foreach (var specialColour in beatmap.SpecialColours) {

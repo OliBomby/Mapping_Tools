@@ -51,7 +51,7 @@ namespace Mapping_Tools.Views.SliderMerger {
             // Get the current beatmap if the selection mode is 'Selected' because otherwise the selection would always fail
             RunTool(SelectionModeBox.SelectedIndex == 0
                 ? new[] {IOHelper.GetCurrentBeatmapOrCurrentBeatmap()}
-                : MainWindow.AppWindow.GetCurrentMaps());
+                : MainWindow.AppWindow.GetCurrentMaps(), SettingsManager.Settings.AlwaysQuickRun);
         }
 
         private void RunTool(string[] paths, bool quick = false) {

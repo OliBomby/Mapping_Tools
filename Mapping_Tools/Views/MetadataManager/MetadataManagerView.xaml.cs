@@ -7,7 +7,6 @@ using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Viewmodels;
 
 namespace Mapping_Tools.Views.MetadataManager {
@@ -60,13 +59,13 @@ namespace Mapping_Tools.Views.MetadataManager {
                 var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
                 var beatmap = editor.Beatmap;
 
-                beatmap.Metadata["ArtistUnicode"].Value = arg.Artist;
-                beatmap.Metadata["Artist"].Value = arg.RomanisedArtist;
-                beatmap.Metadata["TitleUnicode"].Value = arg.Title;
-                beatmap.Metadata["Title"].Value = arg.RomanisedTitle;
-                beatmap.Metadata["Creator"].Value = arg.BeatmapCreator;
-                beatmap.Metadata["Source"].Value = arg.Source;
-                beatmap.Metadata["Tags"].Value = arg.Tags;
+                beatmap.Metadata["ArtistUnicode"] = new TValue(arg.Artist);
+                beatmap.Metadata["Artist"] = new TValue(arg.RomanisedArtist);
+                beatmap.Metadata["TitleUnicode"] = new TValue(arg.Title);
+                beatmap.Metadata["Title"] = new TValue(arg.RomanisedTitle);
+                beatmap.Metadata["Creator"] = new TValue(arg.BeatmapCreator);
+                beatmap.Metadata["Source"] = new TValue(arg.Source);
+                beatmap.Metadata["Tags"] = new TValue(arg.Tags);
 
                 beatmap.General["PreviewTime"] = new TValue(arg.PreviewTime.ToRoundInvariant());
                 if (arg.UseComboColours) {
@@ -78,8 +77,8 @@ namespace Mapping_Tools.Views.MetadataManager {
                 }
 
                 if (arg.ResetIds) {
-                    beatmap.Metadata["BeatmapID"].Value = @"0";
-                    beatmap.Metadata["BeatmapSetID"].Value = @"-1";
+                    beatmap.Metadata["BeatmapID"] = new TValue(@"0");
+                    beatmap.Metadata["BeatmapSetID"] = new TValue(@"-1");
                 }
 
                 // Save the file with name update because we updated the metadata

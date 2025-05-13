@@ -25,6 +25,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Enums {
         /// <summary>
         /// 
         /// </summary>
-        PerfectCurve
+        PerfectCurve,
+
+        /// <summary>
+        /// B-spline curve from lazer
+        /// </summary>
+        BSpline,
     }
 }

@@ -296,7 +296,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 if (line.Substring(0, 5) == "Combo") {
                     ComboColours.Add(new ComboColour(line));
                 } else {
-                    SpecialColours[FileFormatHelper.SplitKeyValue(line).Item1.Trim()] = new ComboColour(line);
+                    SpecialColours[FileFormatHelper.SplitKeyValue(line).Item1] = new ComboColour(line);
                 }
             }
 
@@ -854,7 +854,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns>String of file name.</returns>
         public string GetFileName() {
             return GetFileName(Metadata["Artist"].Value, Metadata["Title"].Value,
-                Metadata["Creator"].Value, Metadata["Version"].Value);
+                Metadata["Creator"].Value, Metadata["Version"].Value, Version);
         }
 
         /// <summary>
@@ -863,12 +863,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <c>Artist - Title (Host) [Difficulty].osu</c>
         /// </summary>
         /// <returns>String of file name.</returns>
-        public static string GetFileName(string artist, string title, string creator, string version) {
+        public static string GetFileName(string artist, string title, string creator, string version, int formatVersion = 14) {
             string fileName = $"{artist} - {title} ({creator}) [{version}]";
 
             string regexSearch = new string(Path.GetInvalidFileNameChars());
             Regex r = new Regex($"[{Regex.Escape(regexSearch)}]");
-            fileName = r.Replace(fileName, "");
+            string replacement = formatVersion < 128 ? "" : "_";  // Lazer replaces with _ instead of empty string
+            fileName = r.Replace(fileName, replacement);
 
             return fileName.Substring(0, Math.Min(184, fileName.Length)) + ".osu";
         }

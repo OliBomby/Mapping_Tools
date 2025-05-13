@@ -58,7 +58,7 @@ namespace Mapping_Tools.Views.MapCleaner {
         public MapCleanerVm ViewModel => (MapCleanerVm) DataContext;
 
         private void Start_Click(object sender, RoutedEventArgs e) {
-            RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: false);
+            RunTool(MainWindow.AppWindow.GetCurrentMaps(), quick: SettingsManager.Settings.AlwaysQuickRun);
         }
 
         /// <summary>
