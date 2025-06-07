@@ -8,6 +8,7 @@ using Mapping_Tools.Components.Dialogs.CustomDialog;
 using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
@@ -193,7 +194,52 @@ namespace Mapping_Tools.Views.PatternGallery {
             };
             exportMenu.Click += DoExportCollection;
 
-            return new[] { renameMenu, importMenu, exportMenu };
+            var restoreMenu = new MenuItem {
+                Header = "_Restore collection", Icon = new PackIcon { Kind = PackIconKind.Restore },
+                ToolTip = "Restore the collection from the pattern files directory. " +
+                          "This will remove any patterns that have missing files, and add any patterns that have not been indexed. " +
+                          "Make sure to back-up your collection before restoring it."
+            };
+            restoreMenu.Click += DoRestoreCollection;
+
+            return new[] { renameMenu, importMenu, exportMenu, restoreMenu };
+        }
+
+        private async void DoRestoreCollection(object sender, RoutedEventArgs e) {
+            try {
+                var result = MessageBox.Show(
+                    "This will restore the collection from the pattern files directory. " +
+                    "This will remove any patterns that have missing files, and add any patterns that have not been indexed. " +
+                    "Make sure to back-up your collection before restoring it.",
+                    "Restore collection", MessageBoxButton.YesNo);
+
+                if (result != MessageBoxResult.Yes) return;
+
+                // Get all the filenames that are currently in the collection
+                var indexedPatternFiles = ViewModel.Patterns.Select(o => o.FileName).ToHashSet();
+
+                // Get all the pattern files in the collection folder
+                var actualPatternFiles = Directory.GetFiles(ViewModel.FileHandler.GetPatternFilesFolderPath()).Select(Path.GetFileName).ToHashSet();
+
+                // Remove all patterns that are not in the actual pattern files
+                foreach (var pattern in ViewModel.Patterns.Where(o => !actualPatternFiles.Contains(o.FileName)).ToList()) {
+                    ViewModel.Patterns.Remove(pattern);
+                }
+
+                // Add all patterns that are in the actual pattern files but not in the indexed patterns
+                actualPatternFiles.ExceptWith(indexedPatternFiles);
+                foreach (var patternFileName in actualPatternFiles) {
+                    var patternPath = ViewModel.FileHandler.GetPatternPath(patternFileName);
+                    var patternName = Path.GetFileNameWithoutExtension(patternFileName).Split("__")[^1];
+                    var pattern = ViewModel.OsuPatternMaker.FromFile(patternPath, patternName, retainFilename: true);
+                    ViewModel.Patterns.Add(pattern);
+                }
+
+                await Task.Factory.StartNew(() => MainWindow.MessageQueue.Enqueue("Successfully restored the collection!"));
+            }
+            catch (Exception exception) {
+                exception.Show();
+            }
         }
 
         private async void DoRenameCollection(object sender, RoutedEventArgs e) {
