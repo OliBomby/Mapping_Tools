@@ -32,6 +32,7 @@ using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
 using MessageBox = System.Windows.MessageBox;
 using System.Diagnostics;
+using Mapping_Tools.Annotations;
 
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm : IDisposable
@@ -81,7 +82,7 @@ namespace Mapping_Tools.Viewmodels {
         private readonly CoordinateConverter coordinateConverter;
         private readonly FileSystemWatcher configWatcher;
 
-        private SnappingToolsOverlay overlay;
+        [CanBeNull] private SnappingToolsOverlay overlay;
         private ProcessSharp processSharp;
         private IWindow osuWindow;
 
@@ -208,6 +209,7 @@ namespace Mapping_Tools.Viewmodels {
                     if (reader.ProcessNeedsReload()) {
                         state = State.LookingForProcess;
                         overlay?.Dispose();
+                        overlay = null;
                         return;
                     }
 
@@ -219,6 +221,7 @@ namespace Mapping_Tools.Viewmodels {
                     catch (ArgumentException) {
                         state = State.LookingForProcess;
                         overlay?.Dispose();
+                        overlay = null;
                         return;
                     }
 
@@ -255,12 +258,14 @@ namespace Mapping_Tools.Viewmodels {
 
                     if (reader.ProcessNeedsReload()) {
                         state = State.LookingForProcess;
-                        overlay.Dispose();
+                        overlay?.Dispose();
+                        overlay = null;
                         return;
                     }
                     if (reader.EditorNeedsReload()) {
                         state = State.LookingForEditor;
-                        overlay.Dispose();
+                        overlay?.Dispose();
+                        overlay = null;
                         return;
                     }
 
@@ -309,7 +314,7 @@ namespace Mapping_Tools.Viewmodels {
                         Debug.WriteLine(ex);
                     }
                     
-                    overlay.Update();
+                    overlay?.Update();
 
                     // Don't do hotkeys if osu is deactivated
                     if (!osuActivated)
@@ -318,7 +323,7 @@ namespace Mapping_Tools.Viewmodels {
                     if (!autoSnapTimer.IsEnabled && IsHotkeyDown(Preferences.SnapHotkey)) {
                         // Update overlay but not on parents only view mode, because that one updates on his own terms
                         if (HotkeyDownRedrawsOverlay)
-                            overlay.OverlayWindow.InvalidateVisual();
+                            overlay?.OverlayWindow.InvalidateVisual();
 
                         // Reset last snapped relevant object to trigger an overlay update in the snap timer tick
                         lastSnappedRelevantObject = null;
@@ -496,7 +501,7 @@ namespace Mapping_Tools.Viewmodels {
                 return;
             }
 
-            overlay.OverlayWindow.InvalidateVisual();
+            overlay?.OverlayWindow.InvalidateVisual();
         }
 
 
@@ -599,7 +604,7 @@ namespace Mapping_Tools.Viewmodels {
                 // Set the last snapped relevant object
                 lastSnappedRelevantObject = nearest;
                 // Update overlay
-                overlay.OverlayWindow.InvalidateVisual();
+                overlay?.OverlayWindow.InvalidateVisual();
             }
 
             // CONVERT THIS TO CURSOR POSITION
@@ -639,7 +644,7 @@ namespace Mapping_Tools.Viewmodels {
             lastSelectedRelevantDrawables.Add(nearest);
 
             // Redraw overlay
-            overlay.OverlayWindow.InvalidateVisual();
+            overlay?.OverlayWindow.InvalidateVisual();
         }
 
         private void LockTimerTick(object sender, EventArgs e) {
@@ -681,7 +686,7 @@ namespace Mapping_Tools.Viewmodels {
             lastLockedRelevantDrawables.Add(nearest);
 
             // Redraw overlay
-            overlay.OverlayWindow.InvalidateVisual();
+            overlay?.OverlayWindow.InvalidateVisual();
         }
 
         private void InheritTimerTick(object sender, EventArgs e) {
@@ -713,7 +718,7 @@ namespace Mapping_Tools.Viewmodels {
             lastInheritRelevantDrawables.Add(nearest);
 
             // Redraw overlay
-            overlay.OverlayWindow.InvalidateVisual();
+            overlay?.OverlayWindow.InvalidateVisual();
         }
         
         #endregion
@@ -785,7 +790,7 @@ namespace Mapping_Tools.Viewmodels {
                         }
 
                         // Redraw the overlay
-                        overlay.OverlayWindow.InvalidateVisual();
+                        overlay?.OverlayWindow.InvalidateVisual();
                     }
 
                     break;
@@ -804,7 +809,7 @@ namespace Mapping_Tools.Viewmodels {
                         LayerCollection.GetRootLayer().GenerateNewObjects(true);
 
                         // Redraw the overlay
-                        overlay.OverlayWindow.InvalidateVisual();
+                        overlay?.OverlayWindow.InvalidateVisual();
                     }
 
                     break;
@@ -871,7 +876,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
                 }
                 LayerCollection.GetRootLayer().GenerateNewObjects(true);
-                overlay.OverlayWindow.InvalidateVisual();
+                overlay?.OverlayWindow.InvalidateVisual();
             });
             LockedToggleCommand = new CommandImplementation(_ => {
                 var virtualObjects = LayerCollection.GetAllRelevantDrawables();
@@ -896,7 +901,7 @@ namespace Mapping_Tools.Viewmodels {
                     relevantObject.Dispose();
                 }
                 LayerCollection.GetRootLayer().GenerateNewObjects(true);
-                overlay.OverlayWindow.InvalidateVisual();
+                overlay?.OverlayWindow.InvalidateVisual();
             });
             InheritableToggleCommand = new CommandImplementation(_ => {
                 var virtualObjects = LayerCollection.GetAllRelevantDrawables();
@@ -920,7 +925,7 @@ namespace Mapping_Tools.Viewmodels {
                     }
                 }
                 LayerCollection.GetRootLayer().GenerateNewObjects(true);
-                overlay.OverlayWindow.InvalidateVisual();
+                overlay?.OverlayWindow.InvalidateVisual();
             });
         }
 
@@ -968,7 +973,7 @@ namespace Mapping_Tools.Viewmodels {
         public void SetLockedObjects(RelevantObjectCollection objects) {
             LayerCollection.GetRootLayer().Objects.MergeWith(objects);
 
-            overlay.OverlayWindow.InvalidateVisual();
+            overlay?.OverlayWindow.InvalidateVisual();
         }
 
         #endregion
@@ -978,6 +983,7 @@ namespace Mapping_Tools.Viewmodels {
         public void Dispose() {
             updateTimer.Stop();
             overlay?.Dispose();
+            overlay = null;
             configWatcher?.Dispose();
             processSharp?.Dispose();
             osuWindow?.Dispose();
@@ -1012,6 +1018,7 @@ namespace Mapping_Tools.Viewmodels {
 
             state = State.Disabled;
             overlay?.Dispose();
+            overlay = null;
 
             Project?.Deactivate();
         }
