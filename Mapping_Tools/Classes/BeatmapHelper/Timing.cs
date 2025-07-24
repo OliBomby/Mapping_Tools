@@ -323,7 +323,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             } else {
                 int startIndex = GetTimingPointIndexAtTime(startBeatTime, redlines);
                 double lastBeatTime = startBeatTime;
-                TimingPoint redline = startIndex == -1 ? GetFirstTimingPointExtended() : redlines[startIndex];
+                TimingPoint redline = startIndex == -1 ? GetFirstTimingPointExtended(true) : redlines[startIndex];
                 for (int i = startIndex; i >= 0; i--) {
                     redline = redlines[i];
                     double beatDiff = redline.Offset - lastBeatTime;
@@ -377,7 +377,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             } else {
                 int startIndex = GetTimingPointIndexAtTime(originTime, redlines);
                 double lastBeatTime = originTime;
-                TimingPoint redline = startIndex == -1 ? GetFirstTimingPointExtended() : redlines[startIndex];
+                TimingPoint redline = startIndex == -1 ? GetFirstTimingPointExtended(true) : redlines[startIndex];
                 for (int i = startIndex; i >= 0; i--) {
                     redline = redlines[i];
                     double msDiff = redline.Offset - lastBeatTime;
@@ -734,7 +734,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="firstTimingPoint"></param>
         /// <returns></returns>
         public TimingPoint GetRedlineAtTime(double time, TimingPoint firstTimingPoint=null) {
-            return GetTimingPointAtTime(time, redlines, firstTimingPoint ?? GetFirstTimingPointExtended());
+            return GetTimingPointAtTime(time, redlines, firstTimingPoint ?? GetFirstTimingPointExtended(true));
         }
 
         /// <summary>
@@ -825,7 +825,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return timingLines.Select(line => new TimingPoint(line));
         }
 
-        public TimingPoint GetFirstTimingPointExtended() {
+        public TimingPoint GetFirstTimingPointExtended(bool needRedline = false) {
             // Add an extra timingpoint that is the same as the first redline but like 10 x meter beats earlier so any objects before the first redline can use that thing
 
             // When you have a greenline before the first redline, the greenline will act like the first redline and you can snap objects to the greenline's bpm. 
@@ -835,12 +835,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TimingPoint firstTp = timingPoints.FirstOrDefault();
             if( firstTp != null && firstTp.Uninherited ) {
                 return new TimingPoint(firstTp.Offset - firstTp.MpB * firstTp.Meter.TempoDenominator * 10, firstTp.MpB,
-                                        firstTp.Meter, firstTp.SampleSet, firstTp.SampleIndex, firstTp.Volume, firstTp.Uninherited, false, false);
+                                        firstTp.Meter, firstTp.SampleSet, firstTp.SampleIndex, firstTp.Volume, needRedline || firstTp.Uninherited, false, false);
             }
 
             if (firstTp != null)
                 return new TimingPoint(0, 1000, firstTp.Meter, firstTp.SampleSet, firstTp.SampleIndex, firstTp.Volume,
-                    firstTp.Uninherited, false, false);
+                    needRedline || firstTp.Uninherited, false, false);
 
             return new TimingPoint(0, 0, 0, SampleSet.None, 0, 0, true, false, false);
         }

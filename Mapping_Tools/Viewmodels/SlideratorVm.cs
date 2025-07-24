@@ -453,7 +453,9 @@ namespace Mapping_Tools.Viewmodels {
                 if (VisibleHitObject.UnInheritedTimingPoint == null) return;
                 // Gotta watch out because the BPM and GraphBeats edit the TemporalLength of the VisibleHitObject
                 var temporalLengthTemp = VisibleHitObject.TemporalLength;
-                BeatsPerMinute = VisibleHitObject.UnInheritedTimingPoint.GetBpm();
+                BeatsPerMinute = VisibleHitObject.UnInheritedTimingPoint.GetBpm() > 0
+                    ? VisibleHitObject.UnInheritedTimingPoint.GetBpm()
+                    : 180; // Default BPM if the hitobject has no valid timing
                 GraphBeats = temporalLengthTemp * BeatsPerMinute / 60000;
                 ExportTime = VisibleHitObject.Time;
                 PixelLength = VisibleHitObject.PixelLength;
