@@ -20,8 +20,12 @@ namespace Mapping_Tools.Components.Graph.Markers {
 
         public IEnumerable<GraphMarker> GenerateMarkers(double start, double end, Orientation orientation, int maxMarkers) {
             var markers = new List<GraphMarker>();
-
             double step = 1d / BeatDivisor;
+
+            if (step <= 0) {
+                return markers;
+            }
+
             while ((end - start) / step > maxMarkers) {
                 step *= 2;
             }

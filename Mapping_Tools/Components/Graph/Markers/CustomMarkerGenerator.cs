@@ -27,6 +27,10 @@ namespace Mapping_Tools.Components.Graph.Markers {
         public CustomMarkerGenerator() { }
 
         public IEnumerable<GraphMarker> GenerateMarkers(double start, double end, Orientation orientation, int maxMarkers) {
+            if (StepSize <= 0) {
+                yield break;
+            }
+
             double step = StepSize;
             if ((end - start) / step > maxMarkers) {
                 if (Reduce) {

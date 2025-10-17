@@ -81,11 +81,11 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             return FromBeatmap(patternBeatmap, name);
         }
 
-        public OsuPattern FromFile(string filePath, string name) {
+        public OsuPattern FromFile(string filePath, string name, bool retainFilename = false) {
             // Read some stuff from the pattern
             var patternBeatmap = new BeatmapEditor(filePath).Beatmap;
 
-            return FromBeatmap(patternBeatmap, name);
+            return FromBeatmap(patternBeatmap, name, filename: retainFilename ? Path.GetFileName(filePath) : null);
         }
 
         public OsuPattern FromObjectsWithSave(List<HitObject> hitObjects, List<TimingPoint> timingPoints, OsuPatternFileHandler fileHandler,
@@ -108,10 +108,10 @@ namespace Mapping_Tools.Classes.Tools.PatternGallery {
             return FromBeatmap(patternBeatmap, name);
         }
 
-        public OsuPattern FromBeatmap(Beatmap beatmap, string name) {
+        public OsuPattern FromBeatmap(Beatmap beatmap, string name, string filename = null) {
             // Generate a file name and save the pattern
             var now = DateTime.Now;
-            var fileName = GenerateUniquePatternFileName(name, now);
+            var fileName = filename ?? GenerateUniquePatternFileName(name, now);
 
             var startTime = beatmap.GetHitObjectStartTime();
             var endTime = beatmap.GetHitObjectEndTime();
