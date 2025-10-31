@@ -105,5 +105,5 @@ jobs:
           files: |
             Mapping_Tools/bin/Release/net5.0-windows/win-x86/publish/release.zip
             Mapping_Tools/bin/Release/net5.0-windows/win-x64/publish/release_x64.zip
-            **\mapping_tools_installer_x86.exe
-            **\mapping_tools_installer_x64.exe
+            **/mapping_tools_installer_x86.exe
+            **/mapping_tools_installer_x64.exe
