@@ -65,11 +65,11 @@ jobs:
           $c = $c -replace '(?<=<FileVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
           $c | Set-Content $p -Encoding UTF8
 
-      - name: Build x86
-        run: dotnet build Mapping_Tools -c Release /p:Platform=x86 --no-restore
-
-      - name: Build AnyCPU (x64)
-        run: dotnet build Mapping_Tools -c Release /p:Platform=AnyCPU --no-restore
+      - name: Publish x86
+        run: dotnet publish Mapping_Tools -c Release -r win-x86 --no-restore --self-contained false
+      
+      - name: Publish x64
+        run: dotnet publish Mapping_Tools -c Release -r win-x64 --no-restore --self-contained false
 
       - name: Install Inno Setup
         shell: pwsh
@@ -86,13 +86,13 @@ jobs:
       - name: Zip x86 app
         shell: pwsh
         run: |
-          $outDir = "Mapping_Tools/bin/x86/Release/net5.0-windows"
+          $outDir = "Mapping_Tools/bin/Release/net5.0-windows/win-x86/publish"
           Compress-Archive -Path "$outDir/*" -DestinationPath "$outDir/release.zip" -Force
-
+      
       - name: Zip x64 app
         shell: pwsh
         run: |
-          $outDir = "Mapping_Tools/bin/Release/net5.0-windows"
+          $outDir = "Mapping_Tools/bin/Release/net5.0-windows/win-x64/publish"
           Compress-Archive -Path "$outDir/*" -DestinationPath "$outDir/release_x64.zip" -Force
 
       - name: Publish GitHub Release
@@ -103,7 +103,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            Mapping_Tools/bin/x86/Release/net5.0-windows/release.zip
-            Mapping_Tools/bin/Release/net5.0-windows/release_x64.zip
+            Mapping_Tools/bin/Release/net5.0-windows/win-x86/publish/release.zip
+            Mapping_Tools/bin/Release/net5.0-windows/win-x64/publish/release_x64.zip
             **\mapping_tools_installer_x86.exe
             **\mapping_tools_installer_x64.exe
