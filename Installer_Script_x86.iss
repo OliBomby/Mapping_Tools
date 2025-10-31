@@ -371,7 +371,6 @@ Source: "{#BuildFolderPath}\Mapping Tools.dll"; DestDir: "{app}"; Flags: ignorev
 Source: "{#BuildFolderPath}\Mapping Tools.dll.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildFolderPath}\Mapping Tools.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildFolderPath}\Mapping Tools.pdb"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Mapping Tools.runtimeconfig.dev.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildFolderPath}\Mapping Tools.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildFolderPath}\MaterialDesignColors.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildFolderPath}\MaterialDesignThemes.Wpf.dll"; DestDir: "{app}"; Flags: ignoreversion
