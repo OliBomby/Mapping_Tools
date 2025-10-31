@@ -5,6 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
+    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
     <AssemblyVersion>1.12.25</AssemblyVersion>
     <FileVersion>1.12.25</FileVersion>
     <AssemblyName>Mapping Tools</AssemblyName>
