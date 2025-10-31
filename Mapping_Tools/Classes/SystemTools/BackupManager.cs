@@ -6,7 +6,6 @@ using System.Windows;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.Tools;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public static class BackupManager {
@@ -28,18 +27,21 @@ namespace Mapping_Tools.Classes.SystemTools {
 
                 if (string.IsNullOrEmpty(filename))
                     filename = Path.GetFileName(fileToCopy);
-
-                if (SettingsManager.Settings.UseEditorReader && Path.GetExtension(fileToCopy) == ".osu") {
-                    fileToCopy = GetNewestVersionPath(fileToCopy);
-                }
-
+                
+                // Save normal copy
                 DateTime now = DateTime.Now;
-
                 var name = now.ToString("yyyy-MM-dd HH-mm-ss") + "_" + backupCode + "__" + filename;
+                File.Copy(fileToCopy,Path.Combine(destinationDirectory, name), true);
 
-                File.Copy(fileToCopy,
-                    Path.Combine(destinationDirectory, name),
-                    true);
+                // Save second copy with newest version if possible
+                if (SettingsManager.Settings.UseEditorReader && Path.GetExtension(fileToCopy) == ".osu") {
+                    fileToCopy = GetNewestVersionPath(fileToCopy, out var exception);
+                    
+                    if (exception == null) {
+                        name = now.ToString("yyyy-MM-dd HH-mm-ss") + "_" + backupCode + "_2_" + filename;
+                        File.Copy(fileToCopy, Path.Combine(destinationDirectory, name), true);
+                    }
+                }
 
                 // Delete old files if the number of backup files are over the limit
                 foreach (var fi in new DirectoryInfo(SettingsManager.GetBackupsPath()).GetFiles().OrderByDescending(x => x.CreationTime).Skip(SettingsManager.Settings.MaxBackupFiles))
@@ -88,7 +90,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 var backupFile = new DirectoryInfo(SettingsManager.GetBackupsPath()).GetFiles().OrderByDescending(x => x.CreationTime).FirstOrDefault();
                 if (backupFile != null) {
                     try {
-                        LoadMapBackup(backupFile.FullName, path, false);
+                        LoadMapBackup(backupFile.FullName, path);
                     } catch (BeatmapIncompatibleException ex) {
                         ex.Show();
                         var result = MessageBox.Show("Do you want to load the backup anyways?", "Load backup",
@@ -115,8 +117,8 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// </summary>
         /// <param name="mapPath"></param>
         /// <returns></returns>
-        private static string GetNewestVersionPath(string mapPath) {
-            var editor = EditorReaderStuff.GetNewestVersionOrNot(mapPath);
+        private static string GetNewestVersionPath(string mapPath, out Exception exception) {
+            var editor = EditorReaderStuff.GetNewestVersionOrNot(mapPath, out _, out exception);
 
             // Save temp version
             var tempPath = Path.Combine(MainWindow.AppDataPath, "temp.osu");
