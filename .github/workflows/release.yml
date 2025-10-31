@@ -4,71 +4,106 @@ on:
   push:
     tags:
       - "v*.*.*"
-      
+
+permissions:
+  contents: write   # needed for creating releases
+
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Get latest release version number
-      id: get_version
-      uses: battila7/get-version-action@v2
+      - name: Determine version from tag
+        shell: pwsh
+        run: |
+          # e.g. GITHUB_REF_NAME = v1.2.3 -> VERSION = 1.2.3
+          $version = "${env:GITHUB_REF_NAME}".TrimStart('v')
+          "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "Version: $version"
 
-    - name: Replace x86 Installer version
-      run: sed -i 's/#define MyAppVersion \"\b[0-9]*.\b[0-9]*.\b[0-9]*\"/#define MyAppVersion \"${{ steps.get_version.outputs.version-without-v }}\"/' Installer_Script_x86.iss
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'   # 8.x SDK can build net5.0 projects
 
-    - name: Replace x64 Installer version
-      run: sed -i 's/#define MyAppVersion \"\b[0-9]*.\b[0-9]*.\b[0-9]*\"/#define MyAppVersion \"${{ steps.get_version.outputs.version-without-v }}\"/' Installer_Script_x64.iss
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
-    - name: Replace Assembly version
-      run: sed -i 's/<AssemblyVersion>\b[0-9]*.\b[0-9]*.\b[0-9]*/<AssemblyVersion>${{ steps.get_version.outputs.version-without-v }}/' Mapping_Tools/Mapping_Tools.csproj
+      - name: Restore dependencies
+        run: dotnet restore Mapping_Tools
 
-    - name: Replace File version
-      run: sed -i 's/<FileVersion>\b[0-9]*.\b[0-9]*.\b[0-9]*/<FileVersion>${{ steps.get_version.outputs.version-without-v }}/' Mapping_Tools/Mapping_Tools.csproj
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.x
+      # Update versions in installer scripts and .csproj using PowerShell regex
+      - name: Set version in Inno Setup (x86)
+        shell: pwsh
+        run: |
+          (Get-Content -Raw Installer_Script_x86.iss) `
+            -replace '(?<=#define\s+MyAppVersion\s+")\d+\.\d+\.\d+(?=")', "${env:VERSION}" `
+            | Set-Content Installer_Script_x86.iss -Encoding UTF8
 
-    - name: Restore dependencies
-      run: dotnet restore Mapping_Tools
-      
-    - name: Build x86
-      run: dotnet build Mapping_Tools -c Release /p:Platform=x86 --no-restore
-      
-    - name: Build x64
-      run: dotnet build Mapping_Tools -c Release /p:Platform=AnyCPU --no-restore
-      
-    - name: Build x86 Installer
-      run: iscc Installer_Script_x86.iss
-      
-    - name: Build x64 Installer
-      run: iscc Installer_Script_x64.iss
+      - name: Set version in Inno Setup (x64)
+        shell: pwsh
+        run: |
+          (Get-Content -Raw Installer_Script_x64.iss) `
+            -replace '(?<=#define\s+MyAppVersion\s+")\d+\.\d+\.\d+(?=")', "${env:VERSION}" `
+            | Set-Content Installer_Script_x64.iss -Encoding UTF8
 
-    - name: Create x86 release.zip
-      uses: thedoctor0/zip-release@master
-      with:
-        type: 'zip'
-        filename: 'release.zip'
-        directory: 'Mapping_Tools/bin/x86/Release/net5.0-windows/'
+      - name: Set AssemblyVersion/FileVersion in csproj
+        shell: pwsh
+        run: |
+          $p = "Mapping_Tools/Mapping_Tools.csproj"
+          $c = Get-Content -Raw $p
+          $c = $c -replace '(?<=<AssemblyVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
+          $c = $c -replace '(?<=<FileVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
+          $c | Set-Content $p -Encoding UTF8
 
-    - name: Create x64 release_x64.zip
-      uses: thedoctor0/zip-release@master
-      with:
-        type: 'zip'
-        filename: 'release_x64.zip'
-        directory: 'Mapping_Tools/bin/Release/net5.0-windows/'
+      - name: Build x86
+        run: dotnet build Mapping_Tools -c Release /p:Platform=x86 --no-restore
 
-    - uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        prerelease: false
-        title: Release version ${{ steps.get_version.outputs.version-without-v }}
-        files: |
-          Mapping_Tools/bin/x86/Release/net5.0-windows/release.zip
-          Mapping_Tools/bin/Release/net5.0-windows/release_x64.zip
-          mapping_tools_installer_x86.exe
-          mapping_tools_installer_x64.exe
+      - name: Build AnyCPU (x64)
+        run: dotnet build Mapping_Tools -c Release /p:Platform=AnyCPU --no-restore
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --yes
+
+      - name: Build x86 Installer
+        shell: pwsh
+        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "Installer_Script_x86.iss"'
+
+      - name: Build x64 Installer
+        shell: pwsh
+        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "Installer_Script_x64.iss"'
+
+      - name: Zip x86 app
+        shell: pwsh
+        run: |
+          $outDir = "Mapping_Tools/bin/x86/Release/net5.0-windows"
+          Compress-Archive -Path "$outDir/*" -DestinationPath "$outDir/release.zip" -Force
+
+      - name: Zip x64 app
+        shell: pwsh
+        run: |
+          $outDir = "Mapping_Tools/bin/Release/net5.0-windows"
+          Compress-Archive -Path "$outDir/*" -DestinationPath "$outDir/release_x64.zip" -Force
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release version ${{ env.VERSION }}
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            Mapping_Tools/bin/x86/Release/net5.0-windows/release.zip
+            Mapping_Tools/bin/Release/net5.0-windows/release_x64.zip
+            **\mapping_tools_installer_x86.exe
+            **\mapping_tools_installer_x64.exe
