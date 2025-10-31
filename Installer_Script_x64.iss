@@ -44,7 +44,7 @@
 #define MyAppPublisher "OliBomby"
 #define MyAppURL "https://mappingtools.github.io/"
 #define MyAppExeName "Mapping Tools.exe"
-#define BuildFolderPath "Mapping_Tools\bin\Release\net5.0-windows"
+#define BuildFolderPath "Mapping_Tools\bin\Release\net5.0-windows\win-x64\publish"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
