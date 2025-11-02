@@ -6,8 +6,8 @@
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
     <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
-    <AssemblyVersion>1.12.25</AssemblyVersion>
-    <FileVersion>1.12.25</FileVersion>
+    <AssemblyVersion>1.12.27</AssemblyVersion>
+    <FileVersion>1.12.27</FileVersion>
     <AssemblyName>Mapping Tools</AssemblyName>
     <ApplicationIcon>Data\mt_icon.ico</ApplicationIcon>
     <Platforms>AnyCPU;x86;x64</Platforms>
