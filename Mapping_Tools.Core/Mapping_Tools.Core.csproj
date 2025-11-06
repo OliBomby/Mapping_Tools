@@ -1,0 +1,176 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PackageTags>osu! mapping tools reader writer map cleaner transformer timing hitsounds copier helper</PackageTags>
+    <Description>osu! mapping utility library built for Mapping Tools.</Description>
+    <Authors>OliBomby</Authors>
+    <PackageId>MappingTools.Core</PackageId>
+    <RepositoryUrl>https://github.com/OliBomby/Mapping_Tools_Core</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <ApplicationIcon>mt_icon.ico</ApplicationIcon>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Version>0.0.7</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Tools\**" />
+    <EmbeddedResource Remove="Tools\**" />
+    <None Remove="Tools\**" />
+    <Compile Include="Tools\AutoFailDetector.cs" />
+    <Compile Include="Tools\ComboColourStudio\ColourHaxExporter.cs" />
+    <Compile Include="Tools\ComboColourStudio\ColourHaxImporter.cs" />
+    <Compile Include="Tools\ComboColourStudio\ColourPoint.cs" />
+    <Compile Include="Tools\ComboColourStudio\ColourPointMode.cs" />
+    <Compile Include="Tools\ComboColourStudio\ComboColourProject.cs" />
+    <Compile Include="Tools\ComboColourStudio\IColourPoint.cs" />
+    <Compile Include="Tools\ComboColourStudio\IHasColourPoints.cs" />
+    <Compile Include="Tools\ComboColourStudio\IComboColourProject.cs" />
+    <Compile Include="Tools\HitsoundCopierStuff\HasCopiedContext.cs" />
+    <Compile Include="Tools\HitsoundCopierStuff\HitsoundCopier.cs" />
+    <Compile Include="Tools\HitsoundCopierStuff\SliderendSilencer.cs" />
+    <Compile Include="Tools\HitsoundPreviewHelper\HitsoundZone.cs" />
+    <Compile Include="Tools\HitsoundStudio\ExportHelpers.cs" />
+    <Compile Include="Tools\HitsoundStudio\Exporting\HitsoundExporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\Exporting\IHitsoundExporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\Helpers.cs" />
+    <Compile Include="Tools\HitsoundStudio\HitsoundConverter.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\HitsoundsLayerImporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\IBeatmapLayerImporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\IHitsoundsLayerImporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\IMidiLayerImporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\IStackLayerImporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\IStoryboardLayerImporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\MidiLayerImporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\StackLayerImporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\LayerImporters\StoryboardLayerImporter.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\CompleteHitsounds.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\CustomIndex.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\HitsoundEvent.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\HitsoundLayer.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\ICompleteHitsounds.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\ICustomIndex.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\IHitsoundEvent.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\IHitsoundLayer.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\ISample.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\ISamplePackage.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\ISampleSchema.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\HitsoundsLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IFileLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IHitsoundsLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\ILayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IMidiLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\ISampleMapLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IStackLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\IStoryboardLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\MidiLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\StackLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerImportArgs\StoryboardLayerImportArgs.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\HitsoundsLayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IFileLayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IHitsoundsLayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\ILayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IMidiLayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\ISampleMapLayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IStackLayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\IStoryboardLayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\MidiLayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\StackLayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\LayerSourceRef\StoryboardLayerSourceRef.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\Sample.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\SamplePackage.cs" />
+    <Compile Include="Tools\HitsoundStudio\Model\SampleSchema.cs" />
+    <Compile Include="Tools\MapCleanerStuff\IMapCleanerArgs.cs" />
+    <Compile Include="Tools\MapCleanerStuff\IMapCleanerResult.cs" />
+    <Compile Include="Tools\MapCleanerStuff\MapCleaner.cs" />
+    <Compile Include="Tools\MapCleanerStuff\MapCleanerArgs.cs" />
+    <Compile Include="Tools\MapCleanerStuff\MapCleanerResult.cs" />
+    <Compile Include="Tools\PatternGallery\ExportTimeMode.cs" />
+    <Compile Include="Tools\PatternGallery\IOsuPattern.cs" />
+    <Compile Include="Tools\PatternGallery\IOsuPatternFileHandler.cs" />
+    <Compile Include="Tools\PatternGallery\OsuPattern.cs" />
+    <Compile Include="Tools\PatternGallery\OsuPatternFileHandler.cs" />
+    <Compile Include="Tools\PatternGallery\OsuPatternMaker.cs" />
+    <Compile Include="Tools\PatternGallery\OsuPatternPlacer.cs" />
+    <Compile Include="Tools\PatternGallery\PatternOverwriteMode.cs" />
+    <Compile Include="Tools\PatternGallery\TimingOverwriteMode.cs" />
+    <Compile Include="Tools\RhythmGuide\ExportMode.cs" />
+    <Compile Include="Tools\RhythmGuide\IRhythmGuideArgs.cs" />
+    <Compile Include="Tools\RhythmGuide\RhythmGuideArgs.cs" />
+    <Compile Include="Tools\RhythmGuide\RhythmGuideGenerator.cs" />
+    <Compile Include="Tools\RhythmGuide\SelectionMode.cs" />
+    <Compile Include="Tools\SlideratorStuff\PositionFunctionDelegate.cs" />
+    <Compile Include="Tools\SlideratorStuff\Sliderator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\LayerCollection.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\Layers\RelevantObjectLayer.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectCollection\RelevantObjectCollection.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Allocation\RelevantObjectPairGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Allocation\RelevantObjectsGeneratorMethodAttribute.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorCollection\RelevantObjectsGeneratorCollection.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorGroupComparer.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorInputSelection\SelectionPredicate.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorInputSelection\SelectionPredicateCollection.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettings.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettingses\ScaleRotateGeneratorSettings.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettingses\SinglePointCircleGeneratorSettings.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettingses\SliderPathGeneratorSettings.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorSettingses\SymmetryGeneratorSettings.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\AnchorPointGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\AngleBisectorGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\AveragePointGenerator2.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\AveragePointGenerator3.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\EqualSpacingGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\IntersectionGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\LastAnchorGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\LinearLineGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\LineGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\ParallelismGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\PerfectCircleBlanketGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\PerfectCircleGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\PerpendicularGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\PointBisectorGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator2.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator3.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator3Reversed.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SameTransformGenerator4.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\ScaleRotateGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SinglePointCircleGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SliderEndGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SliderPathGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SquareGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SquareGenerator2.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\StartPointGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\SymmetryGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\TriangleGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\Generators\TriangleGenerator2.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorTypes\GeneratorTemporalPositioning.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\GeneratorTypes\GeneratorType.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObjectGenerators\RelevantObjectsGenerator.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObject\IRelevantDrawable.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObject\IRelevantObject.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObject\RelevantDrawable.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObject\RelevantObject.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObject\RelevantObjectPreferences.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObject\RelevantObjects\RelevantCircle.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObject\RelevantObjects\RelevantHitObject.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObject\RelevantObjects\RelevantLine.cs" />
+    <Compile Include="Tools\SnappingTools\DataStructure\RelevantObject\RelevantObjects\RelevantPoint.cs" />
+    <Compile Include="Tools\SnappingTools\Serialization\SnappingToolsPreferences.cs" />
+    <Compile Include="Tools\SnappingTools\Serialization\SnappingToolsProject.cs" />
+    <Compile Include="Tools\SnappingTools\Serialization\SnappingToolsSaveSlot.cs" />
+    <Compile Include="Tools\UnusedSampleDetector.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
+    <PackageReference Include="NAudio.Core" Version="2.0.0" />
+    <PackageReference Include="NAudio.Midi" Version="2.0.1" />
+    <PackageReference Include="NAudio.Vorbis" Version="1.3.1" />
+    <PackageReference Include="NLayer.NAudioSupport" Version="1.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="OggVorbisEncoder" Version="1.2.0" />
+  </ItemGroup>
+</Project>
