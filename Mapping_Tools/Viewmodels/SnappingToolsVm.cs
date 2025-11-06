@@ -2,7 +2,6 @@
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.Domain;
 using Mapping_Tools.Views.SnappingTools;
 using Process.NET;

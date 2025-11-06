@@ -19,7 +19,6 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.ToolHelpers.Sliders;
-using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Classes.Tools.SlideratorStuff;
 using Mapping_Tools.Components.Dialogs;
 using Mapping_Tools.Components.Graph;

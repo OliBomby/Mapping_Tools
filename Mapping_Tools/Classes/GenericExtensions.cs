@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using NAudio.Utils;
 
 namespace Mapping_Tools.Classes {
     public static class GenericExtensions

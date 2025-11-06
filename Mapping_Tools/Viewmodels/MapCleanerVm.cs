@@ -1,5 +1,4 @@
-﻿using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Classes.Tools.MapCleanerStuff;
+﻿using Mapping_Tools.Classes.Tools.MapCleanerStuff;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {

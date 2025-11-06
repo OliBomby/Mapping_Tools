@@ -1,10 +1,7 @@
 ﻿using System;
-using Mapping_Tools.Classes.SystemTools;
-using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Views;
 

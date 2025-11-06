@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Xml.Serialization;
 
 namespace Mapping_Tools.Classes.MathUtil {
     /// <summary>Represents a CircleArc as could be defined by 3 points.</summary>

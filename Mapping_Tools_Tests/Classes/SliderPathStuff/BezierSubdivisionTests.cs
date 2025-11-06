@@ -3,7 +3,6 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.ToolHelpers.Sliders;
 
 namespace Mapping_Tools_Tests.Classes.SliderPathStuff {

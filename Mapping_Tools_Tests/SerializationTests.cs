@@ -1,7 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Versioning;
 using System.Windows.Input;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
@@ -9,7 +7,6 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGene
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
 using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
-using Mapping_Tools.Views;
 using NUnit.Framework;
 
 namespace Mapping_Tools_Tests {

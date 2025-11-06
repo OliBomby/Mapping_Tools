@@ -1,5 +1,4 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Linq;
 using System.Collections.Generic;

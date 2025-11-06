@@ -6,7 +6,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 
 namespace Mapping_Tools.Components.ObjectVisualiser {

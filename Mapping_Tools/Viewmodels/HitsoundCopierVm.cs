@@ -4,10 +4,8 @@ using System.Linq;
 using System.IO;
 using System.Text.Json.Serialization;
 using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 

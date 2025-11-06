@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Xml.Serialization;
 
 namespace Mapping_Tools.Classes.MathUtil {
     /// <summary>Represents a Circle as could be defined by a centre point and a radius.</summary>

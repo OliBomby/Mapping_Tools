@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Components.Domain;
