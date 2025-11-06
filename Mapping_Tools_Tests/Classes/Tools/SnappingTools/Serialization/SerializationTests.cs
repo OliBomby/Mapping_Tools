@@ -9,7 +9,7 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGene
 using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 using NUnit.Framework;
 
-namespace Mapping_Tools_Tests {
+namespace Mapping_Tools_Tests.Classes.Tools.SnappingTools.Serialization {
     
     [TestFixture]
     public class SerializationTests {

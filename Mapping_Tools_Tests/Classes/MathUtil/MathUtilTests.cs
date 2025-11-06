@@ -1,7 +1,7 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
 using NUnit.Framework;
 
-namespace Mapping_Tools_Tests {
+namespace Mapping_Tools_Tests.Classes.MathUtil {
     [TestFixture]
     public class MathUtilTests {
         [Test]
@@ -12,7 +12,7 @@ namespace Mapping_Tools_Tests {
 
             var actual = v1 + v2;
 
-            Assert.That(actual, Is.EqualTo(expected).Within("Epic Fail"));
+            Assert.That(actual, Is.EqualTo(expected));
         }
     }
 }
