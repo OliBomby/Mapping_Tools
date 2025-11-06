@@ -1,5 +1,4 @@
-﻿using Mapping_Tools.Core;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
 namespace Mapping_Tools.Core.Tests;

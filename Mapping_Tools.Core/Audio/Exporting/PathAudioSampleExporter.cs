@@ -1,5 +1,4 @@
-﻿using NAudio.FileFormats.Wav;
-using NAudio.Wave;
+﻿using NAudio.Wave;
 using System;
 using System.IO;
 

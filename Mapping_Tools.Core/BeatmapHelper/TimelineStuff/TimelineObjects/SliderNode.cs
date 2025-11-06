@@ -1,6 +1,5 @@
 ﻿using System;
 using JetBrains.Annotations;
-using Mapping_Tools.Core.BeatmapHelper.Events;
 using Mapping_Tools.Core.BeatmapHelper.HitObjects;
 using Mapping_Tools.Core.BeatmapHelper.HitObjects.Objects;
 

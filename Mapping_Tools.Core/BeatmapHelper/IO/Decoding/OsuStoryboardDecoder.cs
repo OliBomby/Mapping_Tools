@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Core.BeatmapHelper.Events;
 using Mapping_Tools.Core.BeatmapHelper.Types;

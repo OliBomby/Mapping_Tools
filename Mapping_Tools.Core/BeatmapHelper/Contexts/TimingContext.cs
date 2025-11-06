@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using JetBrains.Annotations;
 using Mapping_Tools.Core.BeatmapHelper.HitObjects;
 using Mapping_Tools.Core.BeatmapHelper.TimingStuff;

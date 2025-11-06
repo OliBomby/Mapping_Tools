@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using Mapping_Tools.Core.Audio.DuplicateDetection;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
-using Mapping_Tools.Core.BeatmapHelper.Contexts;
 
 namespace Mapping_Tools.Core.Tests.Tools.MapCleanerStuff;
 

@@ -1,5 +1,4 @@
-﻿using Mapping_Tools.Core.Audio.SampleGeneration.Decorators;
-using Mapping_Tools.Core.Audio.Exporting;
+﻿using Mapping_Tools.Core.Audio.Exporting;
 using NAudio.Wave;
 
 namespace Mapping_Tools.Core.Audio.SampleGeneration;

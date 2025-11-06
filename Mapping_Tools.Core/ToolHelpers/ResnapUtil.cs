@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.HitObjects;

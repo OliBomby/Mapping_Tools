@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Mapping_Tools.Core.BeatmapHelper;
 
 namespace Mapping_Tools.Core.Audio.DuplicateDetection;
