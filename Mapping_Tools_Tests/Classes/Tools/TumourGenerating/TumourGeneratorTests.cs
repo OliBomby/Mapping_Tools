@@ -4,21 +4,21 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Classes.Tools.TumourGenerating;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating {
-    [TestClass]
+    [TestFixture]
     public class TumourGeneratorTests {
         private HitObject hitObject;
         private PathWithHints pathWithHints;
 
-        [TestInitialize]
+        [SetUp]
         public void Initialize() {
             hitObject = new HitObject("0,0,384,2,0,B|192:0|192:0|192:192,1,384");
             pathWithHints = PathHelper.CreatePathWithHints(hitObject.GetSliderPath());
         }
 
-        [TestMethod]
+        [Test]
         public void TestPlaceTumour() {
             const int res = 10;
             var tumourGenerator = new TumourGenerator {

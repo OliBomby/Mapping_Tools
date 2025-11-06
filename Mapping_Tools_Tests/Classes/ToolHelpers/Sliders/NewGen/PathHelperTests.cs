@@ -6,12 +6,12 @@ using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
-    [TestClass]
+    [TestFixture]
     public class PathHelperTests {
-        [TestMethod]
+        [Test]
         public void CreatePathWithHintsTest() {
             var slider =
                 new HitObject("42,179,300,2,0,B|135:234|219:171|219:171|194:100|194:100|266:53|345:48|405:117,1,500");
@@ -25,9 +25,9 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
                 Console.WriteLine(++i + " : " + pathPoint);
                 if (pathPoint.Pos == new Vector2(219, 171) ||
                     pathPoint.Pos == new Vector2(194, 100)) {
-                    Assert.IsTrue(pathPoint.Red, $"point {i} should be a red anchor");
+                    Assert.That(pathPoint.Red, Is.True, $"point {i} should be a red anchor");
                 } else {
-                    Assert.IsFalse(pathPoint.Red, $"point {i} should not be a red anchor");
+                    Assert.That(pathPoint.Red, Is.False, $"point {i} should not be a red anchor");
                 }
             }
 
@@ -39,10 +39,10 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
                 }
             }
 
-            Assert.AreEqual(2, result.Path.Count(o => o.Red));
+            Assert.That(result.Path.Count(o => o.Red), Is.EqualTo(2));
         }
 
-        [TestMethod]
+        [Test]
         public void CreatePathWithHintsMultiRedTest() {
             var slider =
                 new HitObject("42,179,300,2,0,B|42:179|42:179|42:179|42:179|135:234|219:171|219:171|219:171|219:171|194:100|194:100|194:100|194:100|194:100|194:100|266:53|345:48|405:117|405:117|405:117|405:117|405:117|405:117|405:117,1,450");
@@ -56,9 +56,9 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
                 Console.WriteLine(++i + " : " + pathPoint);
                 if (pathPoint.Pos == new Vector2(219, 171) ||
                     pathPoint.Pos == new Vector2(194, 100)) {
-                    Assert.IsTrue(pathPoint.Red, $"point {i} should be a red anchor");
+                    Assert.That(pathPoint.Red, Is.True, $"point {i} should be a red anchor");
                 } else {
-                    Assert.IsFalse(pathPoint.Red, $"point {i} should not be a red anchor");
+                    Assert.That(pathPoint.Red, Is.False, $"point {i} should not be a red anchor");
                 }
             }
 
@@ -68,13 +68,13 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
                 foreach (Vector2 anchor in hint.Anchors) {
                     Console.WriteLine(anchor);
                 }
-                Assert.IsTrue(hint.Anchors.Count > 1, $"hint {i} does not have enough anchors");
+                Assert.That(hint.Anchors.Count > 1, Is.True, $"hint {i} does not have enough anchors");
             }
 
-            Assert.AreEqual(2, result.Path.Count(o => o.Red));
+            Assert.That(result.Path.Count(o => o.Red), Is.EqualTo(2));
         }
 
-        [TestMethod]
+        [Test]
         public void InterpolateTest() {
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
@@ -109,7 +109,7 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             }
         }
 
-        [TestMethod]
+        [Test]
         public void SubdivideTest() {
             var path = new LinkedList<PathPoint>(new[] {
                 new PathPoint(new Vector2(-9, 0)),
@@ -124,16 +124,16 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             var end = path.Last;
             var added = path.Subdivide(start, end, 5);
 
-            Assert.AreEqual(4, added);
+            Assert.That(added, Is.EqualTo(4));
 
-            Assert.IsTrue(start!.Next!.Value > start.Value);
-            Assert.AreSame(middle, start.Next);
-            Assert.IsTrue(start.Next.Next!.Value > start.Next.Value);
-            Assert.IsTrue(start.Next.Next.Next!.Value > start.Next.Next.Value);
-            Assert.IsTrue(start.Next.Next.Next.Next!.Value > start.Next.Next.Next.Value);
-            Assert.IsTrue(start.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Value);
-            Assert.IsTrue(start.Next.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Next.Value);
-            Assert.AreSame(end, start.Next.Next.Next.Next.Next.Next);
+            Assert.That(start!.Next!.Value > start.Value, Is.True);
+            Assert.That(start.Next, Is.SameAs(middle));
+            Assert.That(start.Next.Next!.Value > start.Next.Value, Is.True);
+            Assert.That(start.Next.Next.Next!.Value > start.Next.Next.Value, Is.True);
+            Assert.That(start.Next.Next.Next.Next!.Value > start.Next.Next.Next.Value, Is.True);
+            Assert.That(start.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Value, Is.True);
+            Assert.That(start.Next.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Next.Value, Is.True);
+            Assert.That(start.Next.Next.Next.Next.Next.Next, Is.SameAs(end));
         }
     }
 }

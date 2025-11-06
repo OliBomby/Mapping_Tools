@@ -10,11 +10,11 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGene
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
 using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Views;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-[assembly: SupportedOSPlatform("Windows7.0")]
 namespace Mapping_Tools_Tests {
-    [TestClass]
+    
+    [TestFixture]
     public class SerializationTests {
         private static T LoadJsonDynamic<T>(string path, T _) {
             return ProjectManager.LoadJson<T>(path);
@@ -23,7 +23,7 @@ namespace Mapping_Tools_Tests {
             return ProjectManager.LoadJson<T>(path);
         }
 
-        [TestMethod]
+        [Test]
         public void SelectionPredicateSerializationTest() {
             const string path = "SelectionPredicateSave.json";
 
@@ -42,7 +42,7 @@ namespace Mapping_Tools_Tests {
             Assert.AreEqual(expected, actual);
         }
 
-        [TestMethod]
+        [Test]
         public void SelectionPredicateDynamicSerializationTest() {
             const string path = "SelectionPredicateDynamicSave.json";
 
@@ -61,7 +61,7 @@ namespace Mapping_Tools_Tests {
             Assert.AreEqual(expected, (SelectionPredicate)actual);
         }
 
-        [TestMethod]
+        [Test]
         public void SelectionPredicateCollectionDynamicSerializationTest() {
             const string path = "SelectionPredicateCollectionDynamicSave.json";
 
@@ -90,7 +90,7 @@ namespace Mapping_Tools_Tests {
             Assert.AreEqual(expected, (SelectionPredicateCollection)actual);
         }
 
-        [TestMethod]
+        [Test]
         public void GeometryDashboardSerializationTest() {
             var tool = new SnappingToolsSavable();
 
@@ -155,7 +155,7 @@ namespace Mapping_Tools_Tests {
             public string DefaultSaveFolder => "nuffin";
         }
 
-        [TestMethod]
+        [Test]
         public void GeneratorSettingsCopyToTest() {
             var expected = new GeneratorSettings {IsDeep = true, IsActive = true, RelevancyRatio = 0.77};
             expected.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true});
@@ -172,7 +172,7 @@ namespace Mapping_Tools_Tests {
             Assert.AreEqual(expected.InputPredicate, actual.InputPredicate);
         }
 
-        [TestMethod]
+        [Test]
         public void SymmetryGeneratorSettingsCopyToTest() {
             GeneratorSettings expected = new SymmetryGeneratorSettings {IsDeep = true, IsActive = true, RelevancyRatio = 0.77};
             ((SymmetryGeneratorSettings)expected).OtherInputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true, MinRelevancy = 0.06});
@@ -187,7 +187,7 @@ namespace Mapping_Tools_Tests {
             Assert.AreEqual(((SymmetryGeneratorSettings)expected).OtherInputPredicate, ((SymmetryGeneratorSettings)actual).OtherInputPredicate);
         }
 
-        [TestMethod]
+        [Test]
         public void SerializationTypeRetentionTest() {
             const string path = "SerializationTypeRetentionTestSave.json";
 

@@ -1,17 +1,17 @@
 ﻿using Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Mapping_Tools_Tests.Classes.Tools.TumourGenerating.Options.TumourTemplates {
-    [TestClass]
+    [TestFixture]
     public class ParabolaGeneratorTests {
-        [TestMethod]
+        [Test]
         public void TestDistanceFunction() {
             var template = new ParabolaTemplate { Length = 1, Width = 1 };
             var distanceFunc = template.GetDistanceRelation();
 
-            Assert.AreEqual(0, distanceFunc(0));
-            Assert.AreEqual(0.5, distanceFunc(0.5));
-            Assert.AreEqual(1, distanceFunc(1));
+            Assert.That(distanceFunc(0), Is.EqualTo(0));
+            Assert.That(distanceFunc(0.5), Is.EqualTo(0.5));
+            Assert.That(distanceFunc(1), Is.EqualTo(1));
         }
     }
 }

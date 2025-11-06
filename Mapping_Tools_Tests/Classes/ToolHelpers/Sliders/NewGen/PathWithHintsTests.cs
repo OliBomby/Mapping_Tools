@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
-    [TestClass]
+    [TestFixture]
     public class PathWithHintsTests {
         private PathWithHints path;
         private List<LinkedListNode<PathPoint>> points;
         private const int NumPoints = 11;
 
-        [TestInitialize]
+        [SetUp]
         public void Initialize() {
             points = new List<LinkedListNode<PathPoint>>();
             path = new PathWithHints();
@@ -26,16 +26,16 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             }, PathType.Linear));
         }
 
-        [TestMethod]
+        [Test]
         public void TestZeroLengthHint() {
-            Assert.ThrowsException<ArgumentException>(() => path.AddReconstructionHint(new ReconstructionHint(points[2], points[2], 0, new List<Vector2> {
+            Assert.Throws<ArgumentException>(() => path.AddReconstructionHint(new ReconstructionHint(points[2], points[2], 0, new List<Vector2> {
                 new(2,0),
                 new(2, 1),
                 new(2,0)
             })));
         }
 
-        [TestMethod]
+        [Test]
         public void TestBasicOverlaps() {
             path.AddReconstructionHint(new ReconstructionHint(points[2], points[8], 0, new List<Vector2> {
                 new(2,0),
@@ -43,22 +43,22 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
                 new(8,0)
             }));
 
-            Assert.AreEqual(3, path.ReconstructionHints.Count);
-            Assert.AreEqual(points[0], path.ReconstructionHints[0].Start);
-            Assert.AreEqual(points[2], path.ReconstructionHints[0].End);
-            Assert.AreEqual(0, path.ReconstructionHints[0].StartP);
-            Assert.AreEqual(0.2, path.ReconstructionHints[0].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[0].Anchors);
-            Assert.AreEqual(points[2], path.ReconstructionHints[1].Start);
-            Assert.AreEqual(points[8], path.ReconstructionHints[1].End);
-            Assert.AreEqual(0, path.ReconstructionHints[1].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[1].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[1].Anchors);
-            Assert.AreEqual(points[8], path.ReconstructionHints[2].Start);
-            Assert.AreEqual(points[10], path.ReconstructionHints[2].End);
-            Assert.AreEqual(0.8, path.ReconstructionHints[2].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[2].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[2].Anchors);
+            Assert.That(path.ReconstructionHints.Count, Is.EqualTo(3));
+            Assert.That(path.ReconstructionHints[0].Start, Is.EqualTo(points[0]));
+            Assert.That(path.ReconstructionHints[0].End, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[0].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[0].EndP, Is.EqualTo(0.2));
+            Assert.That(path.ReconstructionHints[0].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[1].Start, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[1].End, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[1].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[1].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[1].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[2].Start, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[2].End, Is.EqualTo(points[10]));
+            Assert.That(path.ReconstructionHints[2].StartP, Is.EqualTo(0.8));
+            Assert.That(path.ReconstructionHints[2].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[2].Anchors, Is.Not.Null);
 
             path.AddReconstructionHint(new ReconstructionHint(points[0], points[1], 0, new List<Vector2> {
                 new(0,0),
@@ -66,27 +66,27 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
                 new(1,0)
             }));
 
-            Assert.AreEqual(4, path.ReconstructionHints.Count);
-            Assert.AreEqual(points[0], path.ReconstructionHints[0].Start);
-            Assert.AreEqual(points[1], path.ReconstructionHints[0].End);
-            Assert.AreEqual(0, path.ReconstructionHints[0].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[0].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[0].Anchors);
-            Assert.AreEqual(points[1], path.ReconstructionHints[1].Start);
-            Assert.AreEqual(points[2], path.ReconstructionHints[1].End);
-            Assert.AreEqual(0.1, path.ReconstructionHints[1].StartP);
-            Assert.AreEqual(0.2, path.ReconstructionHints[1].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[1].Anchors);
-            Assert.AreEqual(points[2], path.ReconstructionHints[2].Start);
-            Assert.AreEqual(points[8], path.ReconstructionHints[2].End);
-            Assert.AreEqual(0, path.ReconstructionHints[2].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[2].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[2].Anchors);
-            Assert.AreEqual(points[8], path.ReconstructionHints[3].Start);
-            Assert.AreEqual(points[10], path.ReconstructionHints[3].End);
-            Assert.AreEqual(0.8, path.ReconstructionHints[3].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[3].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[3].Anchors);
+            Assert.That(path.ReconstructionHints.Count, Is.EqualTo(4));
+            Assert.That(path.ReconstructionHints[0].Start, Is.EqualTo(points[0]));
+            Assert.That(path.ReconstructionHints[0].End, Is.EqualTo(points[1]));
+            Assert.That(path.ReconstructionHints[0].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[0].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[0].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[1].Start, Is.EqualTo(points[1]));
+            Assert.That(path.ReconstructionHints[1].End, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[1].StartP, Is.EqualTo(0.1));
+            Assert.That(path.ReconstructionHints[1].EndP, Is.EqualTo(0.2));
+            Assert.That(path.ReconstructionHints[1].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[2].Start, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[2].End, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[2].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[2].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[2].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[3].Start, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[3].End, Is.EqualTo(points[10]));
+            Assert.That(path.ReconstructionHints[3].StartP, Is.EqualTo(0.8));
+            Assert.That(path.ReconstructionHints[3].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[3].Anchors, Is.Not.Null);
 
             path.AddReconstructionHint(new ReconstructionHint(points[9], points[10], 0, new List<Vector2> {
                 new(9,0),
@@ -94,64 +94,64 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
                 new(10,0)
             }));
 
-            Assert.AreEqual(5, path.ReconstructionHints.Count);
-            Assert.AreEqual(points[0], path.ReconstructionHints[0].Start);
-            Assert.AreEqual(points[1], path.ReconstructionHints[0].End);
-            Assert.AreEqual(0, path.ReconstructionHints[0].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[0].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[0].Anchors);
-            Assert.AreEqual(points[1], path.ReconstructionHints[1].Start);
-            Assert.AreEqual(points[2], path.ReconstructionHints[1].End);
-            Assert.AreEqual(0.1, path.ReconstructionHints[1].StartP);
-            Assert.AreEqual(0.2, path.ReconstructionHints[1].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[1].Anchors);
-            Assert.AreEqual(points[2], path.ReconstructionHints[2].Start);
-            Assert.AreEqual(points[8], path.ReconstructionHints[2].End);
-            Assert.AreEqual(0, path.ReconstructionHints[2].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[2].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[2].Anchors);
-            Assert.AreEqual(points[8], path.ReconstructionHints[3].Start);
-            Assert.AreEqual(points[9], path.ReconstructionHints[3].End);
-            Assert.AreEqual(0.8, path.ReconstructionHints[3].StartP);
-            Assert.AreEqual(0.9, path.ReconstructionHints[3].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[3].Anchors);
-            Assert.AreEqual(points[9], path.ReconstructionHints[4].Start);
-            Assert.AreEqual(points[10], path.ReconstructionHints[4].End);
-            Assert.AreEqual(0, path.ReconstructionHints[4].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[4].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[4].Anchors);
+            Assert.That(path.ReconstructionHints.Count, Is.EqualTo(5));
+            Assert.That(path.ReconstructionHints[0].Start, Is.EqualTo(points[0]));
+            Assert.That(path.ReconstructionHints[0].End, Is.EqualTo(points[1]));
+            Assert.That(path.ReconstructionHints[0].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[0].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[0].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[1].Start, Is.EqualTo(points[1]));
+            Assert.That(path.ReconstructionHints[1].End, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[1].StartP, Is.EqualTo(0.1));
+            Assert.That(path.ReconstructionHints[1].EndP, Is.EqualTo(0.2));
+            Assert.That(path.ReconstructionHints[1].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[2].Start, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[2].End, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[2].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[2].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[2].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[3].Start, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[3].End, Is.EqualTo(points[9]));
+            Assert.That(path.ReconstructionHints[3].StartP, Is.EqualTo(0.8));
+            Assert.That(path.ReconstructionHints[3].EndP, Is.EqualTo(0.9));
+            Assert.That(path.ReconstructionHints[3].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[4].Start, Is.EqualTo(points[9]));
+            Assert.That(path.ReconstructionHints[4].End, Is.EqualTo(points[10]));
+            Assert.That(path.ReconstructionHints[4].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[4].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[4].Anchors, Is.Not.Null);
 
             path.AddReconstructionHint(new ReconstructionHint(points[1], points[2], 0, null));
 
-            Assert.AreEqual(5, path.ReconstructionHints.Count);
-            Assert.AreEqual(points[0], path.ReconstructionHints[0].Start);
-            Assert.AreEqual(points[1], path.ReconstructionHints[0].End);
-            Assert.AreEqual(0, path.ReconstructionHints[0].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[0].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[0].Anchors);
-            Assert.AreEqual(points[1], path.ReconstructionHints[1].Start);
-            Assert.AreEqual(points[2], path.ReconstructionHints[1].End);
-            Assert.AreEqual(0, path.ReconstructionHints[1].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[1].EndP);
-            Assert.IsNull(path.ReconstructionHints[1].Anchors);
-            Assert.AreEqual(points[2], path.ReconstructionHints[2].Start);
-            Assert.AreEqual(points[8], path.ReconstructionHints[2].End);
-            Assert.AreEqual(0, path.ReconstructionHints[2].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[2].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[2].Anchors);
-            Assert.AreEqual(points[8], path.ReconstructionHints[3].Start);
-            Assert.AreEqual(points[9], path.ReconstructionHints[3].End);
-            Assert.AreEqual(0.8, path.ReconstructionHints[3].StartP);
-            Assert.AreEqual(0.9, path.ReconstructionHints[3].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[3].Anchors);
-            Assert.AreEqual(points[9], path.ReconstructionHints[4].Start);
-            Assert.AreEqual(points[10], path.ReconstructionHints[4].End);
-            Assert.AreEqual(0, path.ReconstructionHints[4].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[4].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[4].Anchors);
+            Assert.That(path.ReconstructionHints.Count, Is.EqualTo(5));
+            Assert.That(path.ReconstructionHints[0].Start, Is.EqualTo(points[0]));
+            Assert.That(path.ReconstructionHints[0].End, Is.EqualTo(points[1]));
+            Assert.That(path.ReconstructionHints[0].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[0].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[0].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[1].Start, Is.EqualTo(points[1]));
+            Assert.That(path.ReconstructionHints[1].End, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[1].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[1].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[1].Anchors, Is.Null);
+            Assert.That(path.ReconstructionHints[2].Start, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[2].End, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[2].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[2].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[2].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[3].Start, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[3].End, Is.EqualTo(points[9]));
+            Assert.That(path.ReconstructionHints[3].StartP, Is.EqualTo(0.8));
+            Assert.That(path.ReconstructionHints[3].EndP, Is.EqualTo(0.9));
+            Assert.That(path.ReconstructionHints[3].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[4].Start, Is.EqualTo(points[9]));
+            Assert.That(path.ReconstructionHints[4].End, Is.EqualTo(points[10]));
+            Assert.That(path.ReconstructionHints[4].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[4].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[4].Anchors, Is.Not.Null);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSameLayerOverlapsLeft() {
             path.AddReconstructionHint(new ReconstructionHint(points[2], points[8], 0, new List<Vector2> {
                 new(2,0),
@@ -165,35 +165,35 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
                 new(3, 0)
             }));
 
-            Assert.AreEqual(5, path.ReconstructionHints.Count);
-            Assert.AreEqual(points[0], path.ReconstructionHints[0].Start);
-            Assert.AreEqual(points[1], path.ReconstructionHints[0].End);
-            Assert.AreEqual(0, path.ReconstructionHints[0].StartP);
-            Assert.AreEqual(0.1, path.ReconstructionHints[0].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[0].Anchors);
-            Assert.AreEqual(points[1], path.ReconstructionHints[1].Start);
-            Assert.AreEqual(points[2], path.ReconstructionHints[1].End);
-            Assert.AreEqual(0, path.ReconstructionHints[1].StartP);
-            Assert.AreEqual(0.5, path.ReconstructionHints[1].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[1].Anchors);
-            Assert.AreEqual(points[2], path.ReconstructionHints[2].Start);
-            Assert.AreEqual(points[3], path.ReconstructionHints[2].End);
-            Assert.AreEqual(0, path.ReconstructionHints[2].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[2].EndP);
-            Assert.IsNull(path.ReconstructionHints[2].Anchors);
-            Assert.AreEqual(points[3], path.ReconstructionHints[3].Start);
-            Assert.AreEqual(points[8], path.ReconstructionHints[3].End);
-            Assert.AreEqual(1/6d, path.ReconstructionHints[3].StartP, Precision.DoubleEpsilon);
-            Assert.AreEqual(1, path.ReconstructionHints[3].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[3].Anchors);
-            Assert.AreEqual(points[8], path.ReconstructionHints[4].Start);
-            Assert.AreEqual(points[10], path.ReconstructionHints[4].End);
-            Assert.AreEqual(0.8, path.ReconstructionHints[4].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[4].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[4].Anchors);
+            Assert.That(path.ReconstructionHints.Count, Is.EqualTo(5));
+            Assert.That(path.ReconstructionHints[0].Start, Is.EqualTo(points[0]));
+            Assert.That(path.ReconstructionHints[0].End, Is.EqualTo(points[1]));
+            Assert.That(path.ReconstructionHints[0].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[0].EndP, Is.EqualTo(0.1));
+            Assert.That(path.ReconstructionHints[0].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[1].Start, Is.EqualTo(points[1]));
+            Assert.That(path.ReconstructionHints[1].End, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[1].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[1].EndP, Is.EqualTo(0.5));
+            Assert.That(path.ReconstructionHints[1].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[2].Start, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[2].End, Is.EqualTo(points[3]));
+            Assert.That(path.ReconstructionHints[2].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[2].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[2].Anchors, Is.Null);
+            Assert.That(path.ReconstructionHints[3].Start, Is.EqualTo(points[3]));
+            Assert.That(path.ReconstructionHints[3].End, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[3].StartP, Is.EqualTo(1/6d).Within(1e-12));
+            Assert.That(path.ReconstructionHints[3].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[3].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[4].Start, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[4].End, Is.EqualTo(points[10]));
+            Assert.That(path.ReconstructionHints[4].StartP, Is.EqualTo(0.8));
+            Assert.That(path.ReconstructionHints[4].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[4].Anchors, Is.Not.Null);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSameLayerOverlapsRight() {
             path.AddReconstructionHint(new ReconstructionHint(points[2], points[8], 0, new List<Vector2> {
                 new(2,0),
@@ -207,35 +207,35 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
                 new(9, 0)
             }));
 
-            Assert.AreEqual(5, path.ReconstructionHints.Count);
-            Assert.AreEqual(points[0], path.ReconstructionHints[0].Start);
-            Assert.AreEqual(points[2], path.ReconstructionHints[0].End);
-            Assert.AreEqual(0, path.ReconstructionHints[0].StartP);
-            Assert.AreEqual(0.2, path.ReconstructionHints[0].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[0].Anchors);
-            Assert.AreEqual(points[2], path.ReconstructionHints[1].Start);
-            Assert.AreEqual(points[7], path.ReconstructionHints[1].End);
-            Assert.AreEqual(0, path.ReconstructionHints[1].StartP);
-            Assert.AreEqual(1 - 1/6d, path.ReconstructionHints[1].EndP, Precision.DoubleEpsilon);
-            Assert.IsNotNull(path.ReconstructionHints[1].Anchors);
-            Assert.AreEqual(points[7], path.ReconstructionHints[2].Start);
-            Assert.AreEqual(points[8], path.ReconstructionHints[2].End);
-            Assert.AreEqual(0, path.ReconstructionHints[2].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[2].EndP);
-            Assert.IsNull(path.ReconstructionHints[2].Anchors);
-            Assert.AreEqual(points[8], path.ReconstructionHints[3].Start);
-            Assert.AreEqual(points[9], path.ReconstructionHints[3].End);
-            Assert.AreEqual(0.5, path.ReconstructionHints[3].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[3].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[3].Anchors);
-            Assert.AreEqual(points[9], path.ReconstructionHints[4].Start);
-            Assert.AreEqual(points[10], path.ReconstructionHints[4].End);
-            Assert.AreEqual(0.9, path.ReconstructionHints[4].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[4].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[4].Anchors);
+            Assert.That(path.ReconstructionHints.Count, Is.EqualTo(5));
+            Assert.That(path.ReconstructionHints[0].Start, Is.EqualTo(points[0]));
+            Assert.That(path.ReconstructionHints[0].End, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[0].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[0].EndP, Is.EqualTo(0.2));
+            Assert.That(path.ReconstructionHints[0].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[1].Start, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[1].End, Is.EqualTo(points[7]));
+            Assert.That(path.ReconstructionHints[1].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[1].EndP, Is.EqualTo(1 - 1/6d).Within(1e-12));
+            Assert.That(path.ReconstructionHints[1].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[2].Start, Is.EqualTo(points[7]));
+            Assert.That(path.ReconstructionHints[2].End, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[2].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[2].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[2].Anchors, Is.Null);
+            Assert.That(path.ReconstructionHints[3].Start, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[3].End, Is.EqualTo(points[9]));
+            Assert.That(path.ReconstructionHints[3].StartP, Is.EqualTo(0.5));
+            Assert.That(path.ReconstructionHints[3].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[3].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[4].Start, Is.EqualTo(points[9]));
+            Assert.That(path.ReconstructionHints[4].End, Is.EqualTo(points[10]));
+            Assert.That(path.ReconstructionHints[4].StartP, Is.EqualTo(0.9));
+            Assert.That(path.ReconstructionHints[4].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[4].Anchors, Is.Not.Null);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSameLayerOverlapsMiddle() {
             path.AddReconstructionHint(new ReconstructionHint(points[2], points[8], 0, new List<Vector2> {
                 new(2,0),
@@ -249,32 +249,32 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
                 new(7, 0)
             }));
 
-            Assert.AreEqual(5, path.ReconstructionHints.Count);
-            Assert.AreEqual(points[0], path.ReconstructionHints[0].Start);
-            Assert.AreEqual(points[2], path.ReconstructionHints[0].End);
-            Assert.AreEqual(0, path.ReconstructionHints[0].StartP);
-            Assert.AreEqual(0.2, path.ReconstructionHints[0].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[0].Anchors);
-            Assert.AreEqual(points[2], path.ReconstructionHints[1].Start);
-            Assert.AreEqual(points[3], path.ReconstructionHints[1].End);
-            Assert.AreEqual(0, path.ReconstructionHints[1].StartP);
-            Assert.AreEqual(1/6d, path.ReconstructionHints[1].EndP, Precision.DoubleEpsilon);
-            Assert.IsNotNull(path.ReconstructionHints[1].Anchors);
-            Assert.AreEqual(points[3], path.ReconstructionHints[2].Start);
-            Assert.AreEqual(points[7], path.ReconstructionHints[2].End);
-            Assert.AreEqual(0, path.ReconstructionHints[2].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[2].EndP);
-            Assert.IsNull(path.ReconstructionHints[2].Anchors);
-            Assert.AreEqual(points[7], path.ReconstructionHints[3].Start);
-            Assert.AreEqual(points[8], path.ReconstructionHints[3].End);
-            Assert.AreEqual(1 - 1/6d, path.ReconstructionHints[3].StartP, Precision.DoubleEpsilon);
-            Assert.AreEqual(1, path.ReconstructionHints[3].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[3].Anchors);
-            Assert.AreEqual(points[8], path.ReconstructionHints[4].Start);
-            Assert.AreEqual(points[10], path.ReconstructionHints[4].End);
-            Assert.AreEqual(0.8, path.ReconstructionHints[4].StartP);
-            Assert.AreEqual(1, path.ReconstructionHints[4].EndP);
-            Assert.IsNotNull(path.ReconstructionHints[4].Anchors);
+            Assert.That(path.ReconstructionHints.Count, Is.EqualTo(5));
+            Assert.That(path.ReconstructionHints[0].Start, Is.EqualTo(points[0]));
+            Assert.That(path.ReconstructionHints[0].End, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[0].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[0].EndP, Is.EqualTo(0.2));
+            Assert.That(path.ReconstructionHints[0].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[1].Start, Is.EqualTo(points[2]));
+            Assert.That(path.ReconstructionHints[1].End, Is.EqualTo(points[3]));
+            Assert.That(path.ReconstructionHints[1].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[1].EndP, Is.EqualTo(1/6d).Within(1e-12));
+            Assert.That(path.ReconstructionHints[1].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[2].Start, Is.EqualTo(points[3]));
+            Assert.That(path.ReconstructionHints[2].End, Is.EqualTo(points[7]));
+            Assert.That(path.ReconstructionHints[2].StartP, Is.EqualTo(0));
+            Assert.That(path.ReconstructionHints[2].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[2].Anchors, Is.Null);
+            Assert.That(path.ReconstructionHints[3].Start, Is.EqualTo(points[7]));
+            Assert.That(path.ReconstructionHints[3].End, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[3].StartP, Is.EqualTo(1 - 1/6d).Within(1e-12));
+            Assert.That(path.ReconstructionHints[3].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[3].Anchors, Is.Not.Null);
+            Assert.That(path.ReconstructionHints[4].Start, Is.EqualTo(points[8]));
+            Assert.That(path.ReconstructionHints[4].End, Is.EqualTo(points[10]));
+            Assert.That(path.ReconstructionHints[4].StartP, Is.EqualTo(0.8));
+            Assert.That(path.ReconstructionHints[4].EndP, Is.EqualTo(1));
+            Assert.That(path.ReconstructionHints[4].Anchors, Is.Not.Null);
         }
     }
 }

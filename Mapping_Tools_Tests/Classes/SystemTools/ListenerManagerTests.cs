@@ -1,21 +1,21 @@
 ﻿using System.Windows.Input;
 using Mapping_Tools.Classes.SystemTools;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Mapping_Tools_Tests.Classes.SystemTools {
-    [TestClass]
+    [TestFixture]
     public class ListenerManagerTests {
-        [TestMethod]
+        [Test]
         public void RemoveActiveHotkeyTest() {
             var listenerManager = new ListenerManager();
 
-            listenerManager.AddActiveHotkey("testKey", new ActionHotkey(new Hotkey(Key.A, ModifierKeys.Alt), () => {}));
+            listenerManager.AddActiveHotkey("testKey", new ActionHotkey(new Hotkey(Key.A, ModifierKeys.Alt), () => { }));
 
-            Assert.IsTrue(listenerManager.ActiveHotkeys.ContainsKey("testKey"));
+            Assert.That(listenerManager.ActiveHotkeys.ContainsKey("testKey"), Is.True);
 
             listenerManager.RemoveActiveHotkey("testKey");
 
-            Assert.IsFalse(listenerManager.ActiveHotkeys.ContainsKey("testKey"));
+            Assert.That(listenerManager.ActiveHotkeys.ContainsKey("testKey"), Is.False);
         }
     }
 }

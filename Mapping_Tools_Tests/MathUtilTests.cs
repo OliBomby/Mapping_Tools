@@ -1,10 +1,10 @@
 ﻿using Mapping_Tools.Classes.MathUtil;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Mapping_Tools_Tests {
-    [TestClass]
+    [TestFixture]
     public class MathUtilTests {
-        [TestMethod]
+        [Test]
         public void Vector2AddTest() {
             var v1 = new Vector2(1, -4);
             var v2 = new Vector2(-8, 16);
@@ -12,7 +12,7 @@ namespace Mapping_Tools_Tests {
 
             var actual = v1 + v2;
 
-            Assert.AreEqual(expected, actual, "Epic Fail");
+            Assert.That(actual, Is.EqualTo(expected).Within("Epic Fail"));
         }
     }
 }

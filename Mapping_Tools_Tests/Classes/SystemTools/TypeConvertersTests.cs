@@ -1,22 +1,22 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Mapping_Tools_Tests.Classes.SystemTools {
-    [TestClass]
+    [TestFixture]
     public class TypeConvertersTests {
-        [TestMethod]
+        [Test]
         public void TimestampParserTest() {
             var test1 = TypeConverters.ParseOsuTimestamp("00:00:891 (1) - ");
-            Assert.AreEqual(891, test1.TotalMilliseconds);
+            Assert.That(test1.TotalMilliseconds, Is.EqualTo(891));
 
             var test2 = TypeConverters.ParseOsuTimestamp("60:00:074 (2,4) - ");
-            Assert.AreEqual(3600074, test2.TotalMilliseconds);
+            Assert.That(test2.TotalMilliseconds, Is.EqualTo(3600074));
 
             var test3 = TypeConverters.ParseOsuTimestamp("60:00:074 - ");
-            Assert.AreEqual(3600074, test3.TotalMilliseconds);
+            Assert.That(test3.TotalMilliseconds, Is.EqualTo(3600074));
 
             var test4 = TypeConverters.ParseOsuTimestamp("00:-01:-230 (1) - ");
-            Assert.AreEqual(-1230, test4.TotalMilliseconds);
+            Assert.That(test4.TotalMilliseconds, Is.EqualTo(-1230));
         }
     }
 }
