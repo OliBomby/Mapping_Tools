@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mapping_Tools.Components.Dialogs.CustomDialog {
-    public class InvariantCultureAttribute : Attribute {
-    }
+namespace Mapping_Tools.Components.Dialogs.CustomDialog;
+
+public class InvariantCultureAttribute : Attribute {
 }

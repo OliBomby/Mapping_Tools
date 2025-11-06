@@ -1,9 +1,8 @@
-﻿namespace Mapping_Tools.Components.Domain
+﻿namespace Mapping_Tools.Components.Domain;
+
+public sealed class BooleanInvertConverter : BooleanConverter<bool>
 {
-    public sealed class BooleanInvertConverter : BooleanConverter<bool>
-    {
-        public BooleanInvertConverter() :
-            base(false, true)
-        { }
-    }
+    public BooleanInvertConverter() :
+        base(false, true)
+    { }
 }

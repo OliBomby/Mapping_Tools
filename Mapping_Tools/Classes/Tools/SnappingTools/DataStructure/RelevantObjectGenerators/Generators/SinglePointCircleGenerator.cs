@@ -5,29 +5,29 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGene
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
-namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
-    public class SinglePointCircleGenerator : RelevantObjectsGenerator {
-        public override string Name => "Circle from Single Point";
-        public override string Tooltip => "Generates circles with a specified radius on every virtual point.";
-        public override GeneratorType GeneratorType => GeneratorType.Intermediate;
+namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
 
-        private SinglePointCircleGeneratorSettings MySettings => (SinglePointCircleGeneratorSettings) Settings;
+public class SinglePointCircleGenerator : RelevantObjectsGenerator {
+    public override string Name => "Circle from Single Point";
+    public override string Tooltip => "Generates circles with a specified radius on every virtual point.";
+    public override GeneratorType GeneratorType => GeneratorType.Intermediate;
 
-        /// <summary>
-        /// Initializes SinglePointCircleGenerator with a custom settings object
-        /// </summary>
-        public SinglePointCircleGenerator() : base(new SinglePointCircleGeneratorSettings()) {
-            Settings.Generator = this;
+    private SinglePointCircleGeneratorSettings MySettings => (SinglePointCircleGeneratorSettings) Settings;
 
-            Settings.IsActive = false;
-            Settings.IsDeep = false;
-            Settings.InputPredicate.Predicates.Add(new SelectionPredicate { NeedSelected = true, MinRelevancy = 0.5 });
-            MySettings.Radius = 100;
-        }
+    /// <summary>
+    /// Initializes SinglePointCircleGenerator with a custom settings object
+    /// </summary>
+    public SinglePointCircleGenerator() : base(new SinglePointCircleGeneratorSettings()) {
+        Settings.Generator = this;
 
-        [RelevantObjectsGeneratorMethod]
-        public RelevantCircle GetRelevantObjects(RelevantPoint point) {
-            return new RelevantCircle(new Circle(point.Child, MySettings.Radius));
-        }
+        Settings.IsActive = false;
+        Settings.IsDeep = false;
+        Settings.InputPredicate.Predicates.Add(new SelectionPredicate { NeedSelected = true, MinRelevancy = 0.5 });
+        MySettings.Radius = 100;
+    }
+
+    [RelevantObjectsGeneratorMethod]
+    public RelevantCircle GetRelevantObjects(RelevantPoint point) {
+        return new RelevantCircle(new Circle(point.Child, MySettings.Radius));
     }
 }

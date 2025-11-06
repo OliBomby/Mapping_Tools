@@ -7,94 +7,94 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 using Newtonsoft.Json;
 
-namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {
-    public class SnappingToolsSaveSlot : BindableBase, IDisposable {
-        private string name;
-        private Hotkey projectHotkey;
-        [JsonIgnore]
-        private readonly string hotkeyHandle;
+namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 
-        public string Name {
-            get => name;
-            set => Set(ref name, value);
-        }
+public class SnappingToolsSaveSlot : BindableBase, IDisposable {
+    private string name;
+    private Hotkey projectHotkey;
+    [JsonIgnore]
+    private readonly string hotkeyHandle;
 
-        public Hotkey ProjectHotkey {
-            get => projectHotkey;
-            set => Set(ref projectHotkey, value);
-        }
+    public string Name {
+        get => name;
+        set => Set(ref name, value);
+    }
 
-        [JsonIgnore]
-        public CommandImplementation SaveCommand { get; }
-        [JsonIgnore]
-        public CommandImplementation LoadCommand { get; }
+    public Hotkey ProjectHotkey {
+        get => projectHotkey;
+        set => Set(ref projectHotkey, value);
+    }
 
-        [JsonIgnore]
-        [CanBeNull]
-        public SnappingToolsProject ParentProject { get; set; }
+    [JsonIgnore]
+    public CommandImplementation SaveCommand { get; }
+    [JsonIgnore]
+    public CommandImplementation LoadCommand { get; }
 
-        public SnappingToolsPreferences Preferences { get; set; }
+    [JsonIgnore]
+    [CanBeNull]
+    public SnappingToolsProject ParentProject { get; set; }
 
-        public SnappingToolsSaveSlot() {
-            Preferences = new SnappingToolsPreferences();
+    public SnappingToolsPreferences Preferences { get; set; }
 
-            // Setup hotkey stuff
-            projectHotkey = new Hotkey(Key.None, ModifierKeys.None);
-            hotkeyHandle = GenerateActiveHotkeyHandle();
+    public SnappingToolsSaveSlot() {
+        Preferences = new SnappingToolsPreferences();
 
-            PropertyChanged += OnPropertyChanged;
+        // Setup hotkey stuff
+        projectHotkey = new Hotkey(Key.None, ModifierKeys.None);
+        hotkeyHandle = GenerateActiveHotkeyHandle();
 
-            // SaveCommand takes the CurrentPreferences and copies it to this instance.
-            SaveCommand = new CommandImplementation(o => ParentProject?.SaveToSlot(this));
-            // LoadCommand takes this instance and copies it to ProjectWindow's CurrentPreferences.
-            LoadCommand = new CommandImplementation(o => ParentProject?.LoadFromSlot(this));
-        }
+        PropertyChanged += OnPropertyChanged;
 
-        public void RefreshHotkey() {
-            MainWindow.AppWindow.ListenerManager.RemoveActiveHotkey(hotkeyHandle);
-            RegisterHotkey();
-        }
+        // SaveCommand takes the CurrentPreferences and copies it to this instance.
+        SaveCommand = new CommandImplementation(o => ParentProject?.SaveToSlot(this));
+        // LoadCommand takes this instance and copies it to ProjectWindow's CurrentPreferences.
+        LoadCommand = new CommandImplementation(o => ParentProject?.LoadFromSlot(this));
+    }
 
-        private void RegisterHotkey() {
-            MainWindow.AppWindow.ListenerManager.AddActiveHotkey(hotkeyHandle, 
-                new ActionHotkey(ProjectHotkey, () => {
-                    if (System.Windows.Application.Current.Dispatcher != null)
-                        System.Windows.Application.Current.Dispatcher.Invoke(() => ParentProject?.LoadFromSlot(this));
-                }));
-        }
+    public void RefreshHotkey() {
+        MainWindow.AppWindow.ListenerManager.RemoveActiveHotkey(hotkeyHandle);
+        RegisterHotkey();
+    }
 
-        private void UnRegisterHotkey() {
-            MainWindow.AppWindow.ListenerManager.RemoveActiveHotkey(hotkeyHandle);
-        }
+    private void RegisterHotkey() {
+        MainWindow.AppWindow.ListenerManager.AddActiveHotkey(hotkeyHandle, 
+            new ActionHotkey(ProjectHotkey, () => {
+                if (System.Windows.Application.Current.Dispatcher != null)
+                    System.Windows.Application.Current.Dispatcher.Invoke(() => ParentProject?.LoadFromSlot(this));
+            }));
+    }
 
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName != "ProjectHotkey") return;
+    private void UnRegisterHotkey() {
+        MainWindow.AppWindow.ListenerManager.RemoveActiveHotkey(hotkeyHandle);
+    }
+
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        if (e.PropertyName != "ProjectHotkey") return;
             
-            MainWindow.AppWindow.ListenerManager.ChangeActiveHotkeyHotkey(hotkeyHandle, ProjectHotkey);
-        }
+        MainWindow.AppWindow.ListenerManager.ChangeActiveHotkeyHotkey(hotkeyHandle, ProjectHotkey);
+    }
 
-        public object Clone() {
-            return new SnappingToolsSaveSlot {Name = Name, ProjectHotkey = (Hotkey)ProjectHotkey?.Clone(), Preferences = (SnappingToolsPreferences)Preferences.Clone()};
-        }
+    public object Clone() {
+        return new SnappingToolsSaveSlot {Name = Name, ProjectHotkey = (Hotkey)ProjectHotkey?.Clone(), Preferences = (SnappingToolsPreferences)Preferences.Clone()};
+    }
 
-        public void Dispose() {
-            UnRegisterHotkey();
-        }
+    public void Dispose() {
+        UnRegisterHotkey();
+    }
 
-        private static string GenerateActiveHotkeyHandle() {
-            var number = RNG.Next();
-            while (MainWindow.AppWindow.ListenerManager.ActiveHotkeys.ContainsKey($"SaveSlot - {number}")) {
-                number = RNG.Next();
-            }
-            return $"SaveSlot - {number}";
+    private static string GenerateActiveHotkeyHandle() {
+        var number = RNG.Next();
+        while (MainWindow.AppWindow.ListenerManager.ActiveHotkeys.ContainsKey($"SaveSlot - {number}")) {
+            number = RNG.Next();
         }
+        return $"SaveSlot - {number}";
+    }
 
-        public void Activate() {
-            RegisterHotkey();
-        }
+    public void Activate() {
+        RegisterHotkey();
+    }
 
-        public void Deactivate() {
-            UnRegisterHotkey();
-        }
+    public void Deactivate() {
+        UnRegisterHotkey();
     }
 }

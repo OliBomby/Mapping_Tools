@@ -7,46 +7,46 @@ using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 
-namespace Mapping_Tools.Components.Domain {
-    public class GraphStateToDoubleConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (value is not GraphState state) {
-                return 0;
-            }
+namespace Mapping_Tools.Components.Domain;
 
-            var first = state.Anchors.FirstOrDefault();
-            if (first is null) {
-                return 0;
-            }
-
-            // Check if its constant
-            if (state.Anchors.TrueForAll(o => Precision.AlmostEquals(o.Pos.Y, first.Pos.Y))) {
-                return first.Pos.Y;
-            }
-
-            // Get average value
-            var average = state.GetIntegral(state.MinX, state.MaxX) / (state.MaxX - state.MinX);
-
-            return average;
+public class GraphStateToDoubleConverter : IValueConverter {
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+        if (value is not GraphState state) {
+            return 0;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (value is not double doubleValue) {
-                return null;
-            }
-
-            var state = new GraphState {
-                MinX = 0,
-                MinY = Math.Min(0, doubleValue * 2),
-                MaxX = 1,
-                MaxY = Math.Max(1, doubleValue * 2),
-                Anchors = new List<AnchorState>() {
-                    new() { Pos = new Vector2(0, doubleValue), Interpolator = new SingleCurveInterpolator() },
-                    new() { Pos = new Vector2(1, doubleValue), Interpolator = new SingleCurveInterpolator() }
-                }
-            };
-            state.Freeze();
-            return state;
+        var first = state.Anchors.FirstOrDefault();
+        if (first is null) {
+            return 0;
         }
+
+        // Check if its constant
+        if (state.Anchors.TrueForAll(o => Precision.AlmostEquals(o.Pos.Y, first.Pos.Y))) {
+            return first.Pos.Y;
+        }
+
+        // Get average value
+        var average = state.GetIntegral(state.MinX, state.MaxX) / (state.MaxX - state.MinX);
+
+        return average;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+        if (value is not double doubleValue) {
+            return null;
+        }
+
+        var state = new GraphState {
+            MinX = 0,
+            MinY = Math.Min(0, doubleValue * 2),
+            MaxX = 1,
+            MaxY = Math.Max(1, doubleValue * 2),
+            Anchors = new List<AnchorState>() {
+                new() { Pos = new Vector2(0, doubleValue), Interpolator = new SingleCurveInterpolator() },
+                new() { Pos = new Vector2(1, doubleValue), Interpolator = new SingleCurveInterpolator() }
+            }
+        };
+        state.Freeze();
+        return state;
     }
 }

@@ -3,22 +3,22 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGene
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
-namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
-    public class AveragePointGenerator3 : RelevantObjectsGenerator {
-        public override string Name => "Average of Three Points";
-        public override string Tooltip => "Takes three virtual points and calculates the average of the points.";
-        public override GeneratorType GeneratorType => GeneratorType.Intermediate;
+namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
 
-        public AveragePointGenerator3() {
-            Settings.IsActive = true;
-            Settings.IsSequential = true;
-            Settings.IsDeep = true;
-            Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true, MinRelevancy = 0.8});
-        }
+public class AveragePointGenerator3 : RelevantObjectsGenerator {
+    public override string Name => "Average of Three Points";
+    public override string Tooltip => "Takes three virtual points and calculates the average of the points.";
+    public override GeneratorType GeneratorType => GeneratorType.Intermediate;
 
-        [RelevantObjectsGeneratorMethod]
-        public RelevantPoint GetRelevantObjects(RelevantPoint point1, RelevantPoint point2, RelevantPoint point3) {
-            return new RelevantPoint((point1.Child + point2.Child + point3.Child) / 3);
-        }
+    public AveragePointGenerator3() {
+        Settings.IsActive = true;
+        Settings.IsSequential = true;
+        Settings.IsDeep = true;
+        Settings.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true, MinRelevancy = 0.8});
+    }
+
+    [RelevantObjectsGeneratorMethod]
+    public RelevantPoint GetRelevantObjects(RelevantPoint point1, RelevantPoint point2, RelevantPoint point3) {
+        return new RelevantPoint((point1.Child + point2.Child + point3.Child) / 3);
     }
 }

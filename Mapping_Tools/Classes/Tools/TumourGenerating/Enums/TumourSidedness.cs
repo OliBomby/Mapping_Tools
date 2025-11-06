@@ -1,9 +1,9 @@
-﻿namespace Mapping_Tools.Classes.Tools.TumourGenerating.Enums {
-    public enum TumourSidedness {
-        Left,
-        Right,
-        AlternatingLeft,
-        AlternatingRight,
-        Random
-    }
+﻿namespace Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
+
+public enum TumourSidedness {
+    Left,
+    Right,
+    AlternatingLeft,
+    AlternatingRight,
+    Random
 }

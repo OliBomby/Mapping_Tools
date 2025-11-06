@@ -4,33 +4,33 @@ using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
 using Newtonsoft.Json;
 
-namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
-    public abstract class TumourTemplateBase : ITumourTemplate {
-        [JsonIgnore]
-        public double Length { get; set; }
+namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates;
 
-        [JsonIgnore]
-        public double Width { get; set; }
+public abstract class TumourTemplateBase : ITumourTemplate {
+    [JsonIgnore]
+    public double Length { get; set; }
 
-        [JsonIgnore]
-        public double Parameter { get; set; }
+    [JsonIgnore]
+    public double Width { get; set; }
 
-        public virtual bool NeedsParameter => false;
+    [JsonIgnore]
+    public double Parameter { get; set; }
 
-        public abstract Vector2 GetOffset(double t);
+    public virtual bool NeedsParameter => false;
 
-        public abstract double GetLength();
+    public abstract Vector2 GetOffset(double t);
 
-        public abstract double GetDefaultSpan();
+    public abstract double GetLength();
 
-        public abstract int GetDetailLevel();
+    public abstract double GetDefaultSpan();
 
-        public abstract IEnumerable<double> GetCriticalPoints();
+    public abstract int GetDetailLevel();
 
-        public abstract List<Vector2> GetReconstructionHint();
+    public abstract IEnumerable<double> GetCriticalPoints();
 
-        public abstract PathType GetReconstructionHintPathType();
+    public abstract List<Vector2> GetReconstructionHint();
 
-        public abstract Func<double, double> GetDistanceRelation();
-    }
+    public abstract PathType GetReconstructionHintPathType();
+
+    public abstract Func<double, double> GetDistanceRelation();
 }

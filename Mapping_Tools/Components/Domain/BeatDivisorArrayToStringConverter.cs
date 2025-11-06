@@ -8,61 +8,61 @@ using System.Windows.Data;
 using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Classes.SystemTools;
 
-namespace Mapping_Tools.Components.Domain {
-    internal class BeatDivisorArrayToStringConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (!(value is IBeatDivisor[] beatDivisors)) return string.Empty;
+namespace Mapping_Tools.Components.Domain;
 
-            var builder = new StringBuilder();
-            bool first = true;
-            foreach (var beatDivisor in beatDivisors) {
-                if (!first) {
-                    builder.Append(", ");
-                }
+internal class BeatDivisorArrayToStringConverter : IValueConverter {
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+        if (!(value is IBeatDivisor[] beatDivisors)) return string.Empty;
 
-                switch (beatDivisor) {
-                    case RationalBeatDivisor rbd:
-                        builder.Append($"{rbd.Numerator.ToInvariant()}/{rbd.Denominator.ToInvariant()}");
-                        break;
-                    case IrrationalBeatDivisor ibd:
-                        builder.Append(ibd.GetValue().ToInvariant());
-                        break;
-                }
-
-                first = false;
+        var builder = new StringBuilder();
+        bool first = true;
+        foreach (var beatDivisor in beatDivisors) {
+            if (!first) {
+                builder.Append(", ");
             }
 
-            return builder.ToString();
+            switch (beatDivisor) {
+                case RationalBeatDivisor rbd:
+                    builder.Append($"{rbd.Numerator.ToInvariant()}/{rbd.Denominator.ToInvariant()}");
+                    break;
+                case IrrationalBeatDivisor ibd:
+                    builder.Append(ibd.GetValue().ToInvariant());
+                    break;
+            }
+
+            first = false;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (!(value is string str)) return new IBeatDivisor[0];
+        return builder.ToString();
+    }
 
-            var vals = str.Split(',');
-            var beatDivisors = new IBeatDivisor[vals.Length];
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+        if (!(value is string str)) return new IBeatDivisor[0];
 
-            for (int i = 0; i < vals.Length; i++) {
-                var val = vals[i];
+        var vals = str.Split(',');
+        var beatDivisors = new IBeatDivisor[vals.Length];
 
-                // Check if it is a positive rational and non-zero and not dividing by zero
-                if (Regex.IsMatch(val, "^[\\s]*[1-9][0-9]*[\\s]*/[\\s]*[1-9][0-9]*[\\s]*$")) {
-                    var ndSplit = val.Split('/');
-                    beatDivisors[i] = new RationalBeatDivisor(int.Parse(ndSplit[0], CultureInfo.InvariantCulture),
-                                                            int.Parse(ndSplit[1], CultureInfo.InvariantCulture));
+        for (int i = 0; i < vals.Length; i++) {
+            var val = vals[i];
+
+            // Check if it is a positive rational and non-zero and not dividing by zero
+            if (Regex.IsMatch(val, "^[\\s]*[1-9][0-9]*[\\s]*/[\\s]*[1-9][0-9]*[\\s]*$")) {
+                var ndSplit = val.Split('/');
+                beatDivisors[i] = new RationalBeatDivisor(int.Parse(ndSplit[0], CultureInfo.InvariantCulture),
+                    int.Parse(ndSplit[1], CultureInfo.InvariantCulture));
+            } else {
+                var valid = TypeConverters.TryParseDouble(val, out double doubleValue);
+                if (valid) {
+                    if (doubleValue <= 0)
+                        return new ValidationResult(false, "Beat divisor must be greater than zero.");
+
+                    beatDivisors[i] = new IrrationalBeatDivisor(doubleValue);
                 } else {
-                    var valid = TypeConverters.TryParseDouble(val, out double doubleValue);
-                    if (valid) {
-                        if (doubleValue <= 0)
-                            return new ValidationResult(false, "Beat divisor must be greater than zero.");
-
-                        beatDivisors[i] = new IrrationalBeatDivisor(doubleValue);
-                    } else {
-                        return new ValidationResult(false, "Double format error.");
-                    }
+                    return new ValidationResult(false, "Double format error.");
                 }
             }
-
-            return beatDivisors;
         }
+
+        return beatDivisors;
     }
 }

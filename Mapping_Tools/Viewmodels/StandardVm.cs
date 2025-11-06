@@ -1,7 +1,7 @@
-﻿namespace Mapping_Tools.Viewmodels {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class StandardVm {
-    }
+﻿namespace Mapping_Tools.Viewmodels;
+
+/// <summary>
+/// 
+/// </summary>
+public class StandardVm {
 }

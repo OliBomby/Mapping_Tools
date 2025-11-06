@@ -1,67 +1,67 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
 using Newtonsoft.Json;
 
-namespace Mapping_Tools.Viewmodels {
-    /// <summary>
-    /// Auto-fail detector View Model
-    /// </summary>
-    public class AutoFailDetectorVm : BindableBase {
-        [JsonIgnore]
-        public string[] Paths { get; set; }
+namespace Mapping_Tools.Viewmodels;
 
-        [JsonIgnore]
-        public bool Quick { get; set; }
+/// <summary>
+/// Auto-fail detector View Model
+/// </summary>
+public class AutoFailDetectorVm : BindableBase {
+    [JsonIgnore]
+    public string[] Paths { get; set; }
 
-        private bool showUnloadingObjects = true;
-        public bool ShowUnloadingObjects {
-            get => showUnloadingObjects;
-            set => Set(ref showUnloadingObjects, value);
-        }
+    [JsonIgnore]
+    public bool Quick { get; set; }
 
-        private bool showPotentialUnloadingObjects;
-        public bool ShowPotentialUnloadingObjects {
-            get => showPotentialUnloadingObjects;
-            set => Set(ref showPotentialUnloadingObjects, value);
-        }
+    private bool showUnloadingObjects = true;
+    public bool ShowUnloadingObjects {
+        get => showUnloadingObjects;
+        set => Set(ref showUnloadingObjects, value);
+    }
 
-        private bool showPotentialDisruptors;
-        public bool ShowPotentialDisruptors {
-            get => showPotentialDisruptors;
-            set => Set(ref showPotentialDisruptors, value);
-        }
+    private bool showPotentialUnloadingObjects;
+    public bool ShowPotentialUnloadingObjects {
+        get => showPotentialUnloadingObjects;
+        set => Set(ref showPotentialUnloadingObjects, value);
+    }
 
-        private double approachRateOverride = -1;
-        public double ApproachRateOverride {
-            get => approachRateOverride;
-            set => Set(ref approachRateOverride, value);
-        }
+    private bool showPotentialDisruptors;
+    public bool ShowPotentialDisruptors {
+        get => showPotentialDisruptors;
+        set => Set(ref showPotentialDisruptors, value);
+    }
 
-        private double overallDifficultyOverride = -1;
-        public double OverallDifficultyOverride {
-            get => overallDifficultyOverride;
-            set => Set(ref overallDifficultyOverride, value);
-        }
+    private double approachRateOverride = -1;
+    public double ApproachRateOverride {
+        get => approachRateOverride;
+        set => Set(ref approachRateOverride, value);
+    }
 
-        private int physicsUpdateLeniency = 9;
-        public int PhysicsUpdateLeniency {
-            get => physicsUpdateLeniency;
-            set => Set(ref physicsUpdateLeniency, value);
-        }
+    private double overallDifficultyOverride = -1;
+    public double OverallDifficultyOverride {
+        get => overallDifficultyOverride;
+        set => Set(ref overallDifficultyOverride, value);
+    }
 
-        private bool getAutoFailFix;
-        public bool GetAutoFailFix {
-            get => getAutoFailFix;
-            set => Set(ref getAutoFailFix, value);
-        }
+    private int physicsUpdateLeniency = 9;
+    public int PhysicsUpdateLeniency {
+        get => physicsUpdateLeniency;
+        set => Set(ref physicsUpdateLeniency, value);
+    }
 
-        private bool autoPlaceFix;
-        public bool AutoPlaceFix {
-            get => autoPlaceFix;
-            set => Set(ref autoPlaceFix, value);
-        }
+    private bool getAutoFailFix;
+    public bool GetAutoFailFix {
+        get => getAutoFailFix;
+        set => Set(ref getAutoFailFix, value);
+    }
 
-        public AutoFailDetectorVm() {
+    private bool autoPlaceFix;
+    public bool AutoPlaceFix {
+        get => autoPlaceFix;
+        set => Set(ref autoPlaceFix, value);
+    }
+
+    public AutoFailDetectorVm() {
             
-        }
     }
 }

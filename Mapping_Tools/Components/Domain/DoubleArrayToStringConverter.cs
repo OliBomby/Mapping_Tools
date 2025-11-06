@@ -6,45 +6,45 @@ using System.Text;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Mapping_Tools.Components.Domain {
-    internal class DoubleArrayToStringConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (!(value is double[] beatDivisors)) return string.Empty;
+namespace Mapping_Tools.Components.Domain;
 
-            var builder = new StringBuilder();
-            bool first = true;
-            foreach (var d in beatDivisors) {
-                if (!first) {
-                    builder.Append(", ");
-                }
+internal class DoubleArrayToStringConverter : IValueConverter {
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+        if (!(value is double[] beatDivisors)) return string.Empty;
 
-                builder.Append(d.ToInvariant());
-
-                first = false;
+        var builder = new StringBuilder();
+        bool first = true;
+        foreach (var d in beatDivisors) {
+            if (!first) {
+                builder.Append(", ");
             }
 
-            return builder.ToString();
+            builder.Append(d.ToInvariant());
+
+            first = false;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (!(value is string str)) return new double[0];
-            if (string.IsNullOrWhiteSpace(str)) return new double[0];
+        return builder.ToString();
+    }
 
-            var vals = str.Split(',');
-            var beatDivisors = new double[vals.Length];
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+        if (!(value is string str)) return new double[0];
+        if (string.IsNullOrWhiteSpace(str)) return new double[0];
 
-            for (int i = 0; i < vals.Length; i++) {
-                var val = vals[i];
+        var vals = str.Split(',');
+        var beatDivisors = new double[vals.Length];
 
-                var valid = TypeConverters.TryParseDouble(val, out double doubleValue);
-                if (valid) {
-                    beatDivisors[i] = doubleValue;
-                } else {
-                    return new ValidationResult(false, "Double format error.");
-                }
+        for (int i = 0; i < vals.Length; i++) {
+            var val = vals[i];
+
+            var valid = TypeConverters.TryParseDouble(val, out double doubleValue);
+            if (valid) {
+                beatDivisors[i] = doubleValue;
+            } else {
+                return new ValidationResult(false, "Double format error.");
             }
-
-            return beatDivisors;
         }
+
+        return beatDivisors;
     }
 }

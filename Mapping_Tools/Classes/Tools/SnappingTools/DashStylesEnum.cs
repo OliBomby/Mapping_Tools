@@ -1,8 +1,9 @@
-﻿namespace Mapping_Tools.Classes.Tools.SnappingTools {
-    /// <summary>
-    /// The <see cref="System.Enum"/> of the styles of dashes shown on the SnappingTools overlay.
-    /// </summary>
-    public enum DashStylesEnum {
+﻿namespace Mapping_Tools.Classes.Tools.SnappingTools;
+
+/// <summary>
+/// The <see cref="System.Enum"/> of the styles of dashes shown on the SnappingTools overlay.
+/// </summary>
+public enum DashStylesEnum {
     /// <summary />
     Dash = 0,
 
@@ -17,5 +18,4 @@
 
     /// <summary />
     Solid = 4
-    }
 }

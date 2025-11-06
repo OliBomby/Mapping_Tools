@@ -4,23 +4,23 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.Rel
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 
-namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators {
-    public class PerfectCircleBlanketGenerator : RelevantObjectsGenerator {
-        public override string Name => "Points on Blanket Centers";
-        public override string Tooltip => "Takes a circular arc slider and generates a virtual point on its blanket center.";
-        public override GeneratorType GeneratorType => GeneratorType.Basic;
+namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
 
-        public PerfectCircleBlanketGenerator() {
-            Settings.RelevancyRatio = 0.8;
-            Settings.IsActive = true;
-        }
+public class PerfectCircleBlanketGenerator : RelevantObjectsGenerator {
+    public override string Name => "Points on Blanket Centers";
+    public override string Tooltip => "Takes a circular arc slider and generates a virtual point on its blanket center.";
+    public override GeneratorType GeneratorType => GeneratorType.Basic;
 
-        [RelevantObjectsGeneratorMethod]
-        public RelevantPoint GetRelevantObjects(RelevantHitObject relevantHitObject) {
-            var ho = relevantHitObject.HitObject;
-            return ho.IsSlider && ho.SliderType == PathType.PerfectCurve && ho.CurvePoints.Count == 2
-                ? new RelevantPoint(new Circle(new CircleArc(ho.GetAllCurvePoints())).Centre)
-                : null;
-        }
+    public PerfectCircleBlanketGenerator() {
+        Settings.RelevancyRatio = 0.8;
+        Settings.IsActive = true;
+    }
+
+    [RelevantObjectsGeneratorMethod]
+    public RelevantPoint GetRelevantObjects(RelevantHitObject relevantHitObject) {
+        var ho = relevantHitObject.HitObject;
+        return ho.IsSlider && ho.SliderType == PathType.PerfectCurve && ho.CurvePoints.Count == 2
+            ? new RelevantPoint(new Circle(new CircleArc(ho.GetAllCurvePoints())).Centre)
+            : null;
     }
 }

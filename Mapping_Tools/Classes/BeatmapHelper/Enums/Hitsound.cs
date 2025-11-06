@@ -1,18 +1,18 @@
-﻿namespace Mapping_Tools.Classes.BeatmapHelper.Enums {
-    /// <summary>
-    /// The hitsound placed into the hitobject.
-    /// </summary>
-    public enum Hitsound {
-        /// <summary />
-        Normal = 0,
+﻿namespace Mapping_Tools.Classes.BeatmapHelper.Enums;
 
-        /// <summary />
-        Whistle = 1,
+/// <summary>
+/// The hitsound placed into the hitobject.
+/// </summary>
+public enum Hitsound {
+    /// <summary />
+    Normal = 0,
 
-        /// <summary />
-        Finish = 2,
+    /// <summary />
+    Whistle = 1,
 
-        /// <summary />
-        Clap = 3
-    }
+    /// <summary />
+    Finish = 2,
+
+    /// <summary />
+    Clap = 3
 }

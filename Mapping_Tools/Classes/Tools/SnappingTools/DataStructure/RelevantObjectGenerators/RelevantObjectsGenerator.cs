@@ -6,64 +6,64 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGene
 using Mapping_Tools.Components.Domain;
 using Mapping_Tools.Views.SnappingTools;
 
-namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators {
-    public abstract class RelevantObjectsGenerator
-    {
-        public GeneratorSettings Settings { get; }
+namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
+
+public abstract class RelevantObjectsGenerator
+{
+    public GeneratorSettings Settings { get; }
         
-        public CommandImplementation GeneratorSettingsCommand { get; }
+    public CommandImplementation GeneratorSettingsCommand { get; }
 
-        public abstract string Name { get; }
-        public abstract string Tooltip { get; }
-        public abstract GeneratorType GeneratorType { get; }
-        public virtual GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.Average;
+    public abstract string Name { get; }
+    public abstract string Tooltip { get; }
+    public abstract GeneratorType GeneratorType { get; }
+    public virtual GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.Average;
 
-        protected RelevantObjectsGenerator() {
-            Settings = new GeneratorSettings(this);
+    protected RelevantObjectsGenerator() {
+        Settings = new GeneratorSettings(this);
 
-            // Make command
-            GeneratorSettingsCommand = new CommandImplementation(
-                e => {
-                    try {
-                        var settingsWindow = new GeneratorSettingsWindow(Settings);
-                        settingsWindow.ShowDialog();
-                    } catch (Exception ex) { ex.Show(); }
-                });
+        // Make command
+        GeneratorSettingsCommand = new CommandImplementation(
+            e => {
+                try {
+                    var settingsWindow = new GeneratorSettingsWindow(Settings);
+                    settingsWindow.ShowDialog();
+                } catch (Exception ex) { ex.Show(); }
+            });
+    }
+
+    protected RelevantObjectsGenerator(GeneratorSettings settings) {
+        Settings = settings;
+
+        // Make command
+        GeneratorSettingsCommand = new CommandImplementation(
+            e => {
+                try {
+                    var settingsWindow = new GeneratorSettingsWindow(Settings);
+                    settingsWindow.ShowDialog();
+                } catch (Exception ex) { ex.Show(); }
+            });
+    }
+
+    private MethodInfo[] generatorMethods;
+    public MethodInfo[] GetGeneratorMethods() {
+        if (generatorMethods != null) return generatorMethods;
+        var methods = GetType().GetMethods().Where(m => CustomAttributeExtensions.GetCustomAttribute<RelevantObjectsGeneratorMethodAttribute>((MemberInfo) m) != null)
+            .ToArray();
+        if (methods.Length == 0) {
+            throw new InvalidOperationException($@"Type {GetType()} does not have any generator method.");
         }
 
-        protected RelevantObjectsGenerator(GeneratorSettings settings) {
-            Settings = settings;
+        generatorMethods = methods;
 
-            // Make command
-            GeneratorSettingsCommand = new CommandImplementation(
-                e => {
-                    try {
-                        var settingsWindow = new GeneratorSettingsWindow(Settings);
-                        settingsWindow.ShowDialog();
-                    } catch (Exception ex) { ex.Show(); }
-                });
-        }
+        return generatorMethods;
+    }
 
-        private MethodInfo[] generatorMethods;
-        public MethodInfo[] GetGeneratorMethods() {
-            if (generatorMethods != null) return generatorMethods;
-            var methods = GetType().GetMethods().Where(m => CustomAttributeExtensions.GetCustomAttribute<RelevantObjectsGeneratorMethodAttribute>((MemberInfo) m) != null)
-                .ToArray();
-            if (methods.Length == 0) {
-                throw new InvalidOperationException($@"Type {GetType()} does not have any generator method.");
-            }
+    public static Type[] GetDependencies(MethodInfo generatorMethodInfo) {
+        return generatorMethodInfo.GetParameters().Select(o => o.ParameterType).ToArray();
+    }
 
-            generatorMethods = methods;
-
-            return generatorMethods;
-        }
-
-        public static Type[] GetDependencies(MethodInfo generatorMethodInfo) {
-            return generatorMethodInfo.GetParameters().Select(o => o.ParameterType).ToArray();
-        }
-
-        public static Type GetReturnType(MethodInfo generatorMethodInfo) {
-            return generatorMethodInfo.ReturnType;
-        }
+    public static Type GetReturnType(MethodInfo generatorMethodInfo) {
+        return generatorMethodInfo.ReturnType;
     }
 }

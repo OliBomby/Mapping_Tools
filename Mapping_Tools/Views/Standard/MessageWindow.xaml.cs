@@ -5,75 +5,74 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Mapping_Tools.Views.Standard
+namespace Mapping_Tools.Views.Standard;
+
+/// <summary>
+/// Interaction logic for MessageWindow.xaml
+/// </summary>
+public partial class MessageWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MessageWindow.xaml
-    /// </summary>
-    public partial class MessageWindow : Window
+    public MessageWindow()
     {
-        public MessageWindow()
+        InitializeComponent();
+    }
+
+    public MessageWindow(ErrorType errorType, String message = null, string title = null, RunWorkerCompletedEventArgs eventArg = null)
+    {
+        InitializeComponent();
+        if(errorType == ErrorType.Success && title != null)
         {
-            InitializeComponent();
+            LoadSuccessWindow(message,title);
+        }
+        else if (errorType == ErrorType.Success && title == null)
+        {
+            LoadSuccessWindow(message);
+        }
+        else if (errorType == ErrorType.Error)
+        {
+            LoadErrorWindow(eventArg);
         }
 
-        public MessageWindow(ErrorType errorType, String message = null, string title = null, RunWorkerCompletedEventArgs eventArg = null)
+    }
+
+    private void LoadErrorWindow(RunWorkerCompletedEventArgs e)
+    {
+        MessageTitle.Content = "Error";
+        MessageText.Text = e.Error.Message;
+        ExceptionDetails.Text = e.Error.StackTrace;
+    }
+
+    private void LoadSuccessWindow(string message)
+    {
+        //Since we are only showing the Success of an event, we don't need the Expander
+        ErrorExpander.Visibility = Visibility.Hidden;
+
+        MessageTitle.Content = "Success";
+        MessageText.Text = message;
+    }
+
+    private void LoadSuccessWindow(string message, string title)
+    {
+        //Since we are only showing the Success of an event, we don't need the Expander
+        ErrorExpander.Visibility = Visibility.Hidden;
+
+        MessageTitle.Content = title;
+        MessageText.Text = message;
+    }
+
+    private void CloseWin(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
+    //Enable drag control of window and set icons when docked
+    private void DragWin(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Left)
         {
-            InitializeComponent();
-            if(errorType == ErrorType.Success && title != null)
-            {
-                LoadSuccessWindow(message,title);
-            }
-            else if (errorType == ErrorType.Success && title == null)
-            {
-                LoadSuccessWindow(message);
-            }
-            else if (errorType == ErrorType.Error)
-            {
-                LoadErrorWindow(eventArg);
-            }
-
-        }
-
-        private void LoadErrorWindow(RunWorkerCompletedEventArgs e)
-        {
-            MessageTitle.Content = "Error";
-            MessageText.Text = e.Error.Message;
-            ExceptionDetails.Text = e.Error.StackTrace;
-        }
-
-        private void LoadSuccessWindow(string message)
-        {
-            //Since we are only showing the Success of an event, we don't need the Expander
-            ErrorExpander.Visibility = Visibility.Hidden;
-
-            MessageTitle.Content = "Success";
-            MessageText.Text = message;
-        }
-
-        private void LoadSuccessWindow(string message, string title)
-        {
-            //Since we are only showing the Success of an event, we don't need the Expander
-            ErrorExpander.Visibility = Visibility.Hidden;
-
-            MessageTitle.Content = title;
-            MessageText.Text = message;
-        }
-
-        private void CloseWin(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        //Enable drag control of window and set icons when docked
-        private void DragWin(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                Button bt = FindName("ToggleButton") as Button;
-                DragMove();
-                //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
-            }
+            Button bt = FindName("ToggleButton") as Button;
+            DragMove();
+            //bt.Content = new PackIcon { Kind = PackIconKind.WindowRestore };
         }
     }
 }
