@@ -81,15 +81,19 @@ public abstract class TimelineObject : ContextableBase {
         if (Hitsounds.Normal) {
             return Hitsound.Normal;
         }
+
         if (Hitsounds.Whistle) {
             return Hitsound.Whistle;
         }
+
         if (Hitsounds.Finish) {
             return Hitsound.Finish;
         }
+
         if (Hitsounds.Clap) {
             return Hitsound.Clap;
         }
+
         return Hitsound.Normal;
     }
 

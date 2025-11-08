@@ -23,7 +23,7 @@ public enum PathType {
     Linear,
 
     /// <summary>
-    ///
+    /// The slider curve using a circular arc
     /// </summary>
     PerfectCurve,
 }

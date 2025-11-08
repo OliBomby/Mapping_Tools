@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Domain.Beatmaps.Enums;
+using Mapping_Tools.Domain.MathUtil;
 
 namespace Mapping_Tools.Domain.Beatmaps.HitObjects;
 
@@ -41,7 +42,7 @@ public class HitSampleInfo : IEquatable<HitSampleInfo> {
     /// <summary>
     /// An optional filename to provide priority lookup. Falls back to <see cref="Hitsound"/>.
     /// </summary>
-    public string Filename { get; set; }
+    public string Filename { get; set; } = string.Empty;
 
     /// <summary>
     /// The sample volume.
@@ -67,20 +68,20 @@ public class HitSampleInfo : IEquatable<HitSampleInfo> {
         }
     }
 
-    public HitSampleInfo Clone() => (HitSampleInfo)MemberwiseClone();
+    public HitSampleInfo Clone() => (HitSampleInfo) MemberwiseClone();
 
-    public bool Equals(HitSampleInfo other) {
+    public bool Equals(HitSampleInfo? other) {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return SampleSet == other.SampleSet &&
-               AdditionSet == other.AdditionSet &&
-               Normal == other.Normal &&
-               Whistle == other.Whistle &&
-               Finish == other.Finish &&
-               Clap == other.Clap &&
-               CustomIndex == other.CustomIndex &&
-               Filename == other.Filename &&
-               Volume == other.Volume;
+        return SampleSet == other.SampleSet
+               && AdditionSet == other.AdditionSet
+               && Normal == other.Normal
+               && Whistle == other.Whistle
+               && Finish == other.Finish
+               && Clap == other.Clap
+               && CustomIndex == other.CustomIndex
+               && Filename == other.Filename
+               && Math.Abs(Volume - other.Volume) < Precision.DoubleEpsilon;
     }
 
     public override string ToString() {

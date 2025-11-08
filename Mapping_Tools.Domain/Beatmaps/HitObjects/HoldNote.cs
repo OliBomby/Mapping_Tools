@@ -12,11 +12,8 @@ public class HoldNote : HitObject, IDuration, IHasTimelineObjects {
 
     public override double EndTime => endTime;
 
-    public HoldNote() {
-
+    protected override void DeepCloneAdd(HitObject clonedHitObject) {
     }
-
-    protected override void DeepCloneAdd(HitObject clonedHitObject) { }
 
     public void SetDuration(double duration) {
         SetEndTime(StartTime + duration);

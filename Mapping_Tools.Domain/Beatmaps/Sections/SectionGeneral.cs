@@ -6,13 +6,14 @@ namespace Mapping_Tools.Domain.Beatmaps.Sections;
 /// Contains all the values in the [General] section of a .osu file.
 /// </summary>
 public class SectionGeneral {
-    public string AudioFilename { get; set; }
+    public string? AudioFilename { get; set; }
     public int AudioLeadIn { get; set; } = 0;
 
     /// <summary>
     /// Audio expected MD5. (legacy)
     /// </summary>
-    public string AudioHash { get; set; }
+    public string? AudioHash { get; set; }
+
     public int PreviewTime { get; set; } = -1;
     public Countdown Countdown { get; set; }
 
@@ -20,12 +21,14 @@ public class SectionGeneral {
     /// Default sample set.
     /// </summary>
     public SampleSet SampleSet { get; set; } = SampleSet.Normal;
+
     public float StackLeniency { get; set; } = 0.7f;
 
     /// <summary>
     /// Play mode.
     /// </summary>
     public GameMode Mode { get; set; } = GameMode.Standard;
+
     public bool LetterboxInBreaks { get; set; } = false;
     public bool StoryFireInFront { get; set; } = true;
     public bool UseSkinSprites { get; set; }
@@ -43,6 +46,7 @@ public class SectionGeneral {
     /// Used for 7+1 & 5+1 in mania.
     /// </summary>
     public bool SpecialStyle { get; set; }
+
     public bool WidescreenStoryboard { get; set; }
     public bool SamplesMatchPlaybackRate { get; set; }
 

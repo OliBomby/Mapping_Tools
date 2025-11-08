@@ -8,8 +8,7 @@ public record HitObjectReference(int? ComboIndex = null, int? Time = null, int? 
 /// <summary>
 /// Utility class for parsing timestamps as seen in osu! clipboard functionality and modding.
 /// </summary>
-public static partial class TimestampParser
-{
+public static partial class TimestampParser {
     // Matches:
     //   <time>                      e.g. "00:00:891", "60:00:074", "00:-01:-230"
     //   optional " ( ... ) "        e.g. "(1)" or "(57031|2,57411|1)"
@@ -39,8 +38,7 @@ public static partial class TimestampParser
     /// <param name="timestamp">The timestamp to parse.</param>
     /// <returns>(TimeSpan time, List&lt;HitObjectReference&gt; references)</returns>
     /// <exception cref="ArgumentException">Thrown when the input is malformed.</exception>
-    public static (TimeSpan, List<HitObjectReference>) ParseTimestamp(string timestamp)
-    {
+    public static (TimeSpan, List<HitObjectReference>) ParseTimestamp(string timestamp) {
         if (timestamp is null)
             throw new ArgumentException("Timestamp cannot be null.", nameof(timestamp));
 
@@ -57,16 +55,11 @@ public static partial class TimestampParser
         // Map from right to left: ... days? : hours? : minutes : seconds : milliseconds
         // Allow signed parts; compute total milliseconds to support mixed signs safely.
         int[] nums;
-        try
-        {
+        try {
             nums = timeParts.Select(ParseIntStrict).ToArray();
-        }
-        catch (OverflowException ex)
-        {
+        } catch (OverflowException ex) {
             throw new ArgumentException("One of the time parts is too large.", nameof(timestamp), ex);
-        }
-        catch (FormatException ex)
-        {
+        } catch (FormatException ex) {
             throw new ArgumentException("Time parts must be integers.", nameof(timestamp), ex);
         }
 
@@ -75,14 +68,14 @@ public static partial class TimestampParser
         int sec = nums[^2];
         int min = nums[^3];
         int hours = nums.Length >= 4 ? nums[^4] : 0;
-        int days  = nums.Length == 5 ? nums[^5] : 0;
+        int days = nums.Length == 5 ? nums[^5] : 0;
 
         // Convert to total milliseconds (long to avoid overflow), then to TimeSpan.
         long totalMs =
-              (long)days  * 24 * 60 * 60 * 1000
-            + (long)hours * 60 * 60 * 1000
-            + (long)min   * 60 * 1000
-            + (long)sec   * 1000
+            (long) days * 24 * 60 * 60 * 1000
+            + (long) hours * 60 * 60 * 1000
+            + (long) min * 60 * 1000
+            + (long) sec * 1000
             + ms;
 
         // TimeSpan.FromMilliseconds handles negative totals as expected.
@@ -99,8 +92,7 @@ public static partial class TimestampParser
         // Allow empty between commas? No: treat as error if malformed token appears.
         var items = refsText.Split(',');
         var refItemRegex = RefItemRegex();
-        foreach (var raw in items)
-        {
+        foreach (var raw in items) {
             var s = raw.Trim();
             if (s.Length == 0)
                 throw new ArgumentException("Empty reference item found.", nameof(timestamp));
@@ -113,14 +105,11 @@ public static partial class TimestampParser
             var bGroup = rm.Groups["b"];
             int a = ParseIntStrict(aText);
 
-            if (bGroup.Success)
-            {
+            if (bGroup.Success) {
                 // Format: time(ms)|columnIndex -> ComboIndex = -1 (not used)
                 int b = ParseIntStrict(bGroup.Value);
                 refs.Add(new HitObjectReference(Time: a, ColumnIndex: b));
-            }
-            else
-            {
+            } else {
                 // Single number -> combo index; mark Time/ColumnIndex as -1 (sentinel)
                 refs.Add(new HitObjectReference(ComboIndex: a));
             }
@@ -129,11 +118,10 @@ public static partial class TimestampParser
         return (time, refs);
     }
 
-    private static int ParseIntStrict(string s)
-    {
+    private static int ParseIntStrict(string s) {
         // Reject whitespace and non-integers explicitly.
         if (!int.TryParse(s, NumberStyles.AllowLeadingSign,
-                          CultureInfo.InvariantCulture, out int value))
+                CultureInfo.InvariantCulture, out int value))
             throw new FormatException($"Invalid integer: '{s}'.");
         return value;
     }

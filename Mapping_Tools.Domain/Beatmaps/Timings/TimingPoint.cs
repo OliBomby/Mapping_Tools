@@ -33,7 +33,7 @@ public class TimingPoint : IComparable<TimingPoint> {
     public int SampleIndex { get; set; }
 
     /// <summary>
-    /// The volume based from 0 - 100 %
+    /// The volume based from 0 to 100 %
     /// </summary>
     public double Volume { get; set; }
 
@@ -95,8 +95,7 @@ public class TimingPoint : IComparable<TimingPoint> {
     /// <param name="uninherited"></param>
     /// <param name="kiai"></param>
     /// <param name="omitFirstBarLine"></param>
-    public TimingPoint(double offset, double mpb, TempoSignature meter, SampleSet sampleSet, int sampleIndex, double volume, bool uninherited, bool kiai, bool omitFirstBarLine)
-    {
+    public TimingPoint(double offset, double mpb, TempoSignature meter, SampleSet sampleSet, int sampleIndex, double volume, bool uninherited, bool kiai, bool omitFirstBarLine) {
         Offset = offset;
         MpB = mpb;
         Meter = meter;
@@ -108,11 +107,10 @@ public class TimingPoint : IComparable<TimingPoint> {
         OmitFirstBarLine = omitFirstBarLine;
     }
 
-    public TimingPoint()
-    {
+    public TimingPoint() {
         MpB = 60000;
         Offset = 0;
-        Meter = new TempoSignature(4,4);
+        Meter = new TempoSignature(4, 4);
         SampleSet = new SampleSet();
         SampleIndex = 0;
         Volume = 100;
@@ -128,7 +126,8 @@ public class TimingPoint : IComparable<TimingPoint> {
     /// <returns></returns>
     public override string ToString() {
         int style = MathHelper.GetIntFromBitArray(new BitArray([Kiai, false, false, OmitFirstBarLine]));
-        return $"{Offset.ToInvariant()},{MpB.ToInvariant()},{Meter.TempoNumerator.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{Volume.ToInvariant()},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
+        return
+            $"{Offset.ToInvariant()},{MpB.ToInvariant()},{Meter.TempoNumerator.ToInvariant()},{SampleSet.ToIntInvariant()},{SampleIndex.ToInvariant()},{Volume.ToInvariant()},{Convert.ToInt32(Uninherited).ToInvariant()},{style.ToInvariant()}";
     }
 
     /// <summary>
@@ -140,32 +139,23 @@ public class TimingPoint : IComparable<TimingPoint> {
     }
 
     public bool Equals(TimingPoint tp) {
-        return Offset == tp.Offset &&
-               MpB == tp.MpB &&
-               Meter == tp.Meter &&
-               SampleSet == tp.SampleSet &&
-               SampleIndex == tp.SampleIndex &&
-               Volume == tp.Volume &&
-               Uninherited == tp.Uninherited &&
-               Kiai == tp.Kiai &&
-               OmitFirstBarLine == tp.OmitFirstBarLine;
+        return Math.Abs(Offset - tp.Offset) < Precision.DoubleEpsilon
+               && Math.Abs(MpB - tp.MpB) < Precision.DoubleEpsilon
+               && Meter == tp.Meter
+               && SampleSet == tp.SampleSet
+               && SampleIndex == tp.SampleIndex
+               && Math.Abs(Volume - tp.Volume) < Precision.DoubleEpsilon
+               && Uninherited == tp.Uninherited
+               && Kiai == tp.Kiai
+               && OmitFirstBarLine == tp.OmitFirstBarLine;
     }
 
     public bool SameEffect(TimingPoint tp) {
         if (tp.Uninherited && !Uninherited) {
-            return MpB == -100 &&
-                   Meter == tp.Meter &&
-                   SampleSet == tp.SampleSet &&
-                   SampleIndex == tp.SampleIndex &&
-                   Volume == tp.Volume &&
-                   Kiai == tp.Kiai;
+            return Precision.AlmostEquals(MpB, -100) && Meter == tp.Meter && SampleSet == tp.SampleSet && SampleIndex == tp.SampleIndex && Precision.AlmostEquals(Volume, tp.Volume) && Kiai == tp.Kiai;
         }
-        return MpB == tp.MpB &&
-               Meter == tp.Meter &&
-               SampleSet == tp.SampleSet &&
-               SampleIndex == tp.SampleIndex &&
-               Volume == tp.Volume &&
-               Kiai == tp.Kiai;
+
+        return Precision.AlmostEquals(MpB, tp.MpB) && Meter == tp.Meter && SampleSet == tp.SampleSet && SampleIndex == tp.SampleIndex && Precision.AlmostEquals(Volume, tp.Volume) && Kiai == tp.Kiai;
     }
 
     /// <summary>
@@ -174,7 +164,7 @@ public class TimingPoint : IComparable<TimingPoint> {
     /// </summary>
     /// <returns></returns>
     public double GetBpm() {
-        if( Uninherited ) {
+        if (Uninherited) {
             return 60000 / MpB;
         }
 
@@ -217,7 +207,7 @@ public class TimingPoint : IComparable<TimingPoint> {
         }
     }
 
-    public int CompareTo(TimingPoint other) {
+    public int CompareTo(TimingPoint? other) {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;
         var offsetComparison = Offset.CompareTo(other.Offset);

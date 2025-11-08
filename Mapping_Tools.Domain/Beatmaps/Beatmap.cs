@@ -86,7 +86,7 @@ public class Beatmap {
     public Beatmap Clone() => (Beatmap) MemberwiseClone();
 
     public Beatmap DeepClone() {
-        var newBeatmap = (Beatmap)MemberwiseClone();
+        var newBeatmap = (Beatmap) MemberwiseClone();
         newBeatmap.HitObjects = HitObjects.Select(h => h.DeepClone()).ToList();
         newBeatmap.BeatmapTiming = new Timing(BeatmapTiming.TimingPoints.Select(t => t.Copy()).ToList(), BeatmapTiming.GlobalSliderMultiplier);
         newBeatmap.GiveObjectsTimingContext();
@@ -418,7 +418,7 @@ public static class BeatmapExtensions {
     /// Assumes a <see cref="ComboContext"/> is present for all hit objects.
     /// </summary>
     public static void FixComboSkip(this Beatmap beatmap) {
-        HitObject previousHitObject = null;
+        HitObject? previousHitObject = null;
         int colourIndex = 0;
 
         // If there are no combo colours use the default combo colours so the hitobjects still have something
@@ -599,7 +599,10 @@ public static class BeatmapExtensions {
                 // Find by combo index
                 int comboNumber = hitObjectReference.ComboIndex!.Value;
 
-                while (comboNumber != -1 && objectIndex >= 0 && objectIndex < beatmap.HitObjects.Count && beatmap.HitObjects[objectIndex].GetContext<ComboContext>().ComboIndex != comboNumber) {
+                while (comboNumber != -1
+                       && objectIndex >= 0
+                       && objectIndex < beatmap.HitObjects.Count
+                       && beatmap.HitObjects[objectIndex].GetContext<ComboContext>().ComboIndex != comboNumber) {
                     objectIndex++;
                 }
 
@@ -620,9 +623,9 @@ public static class BeatmapExtensions {
     }
 
     public static int GetColumnIndex(this Beatmap beatmap, double x) {
-        int columnCount = (int)beatmap.Difficulty.CircleSize;
+        int columnCount = (int) beatmap.Difficulty.CircleSize;
         double columnWidth = 512.0 / columnCount;
-        int columnIndex = (int)(x / columnWidth);
+        int columnIndex = (int) (x / columnWidth);
         return MathHelper.Clamp(columnIndex, 0, columnCount - 1);
     }
 

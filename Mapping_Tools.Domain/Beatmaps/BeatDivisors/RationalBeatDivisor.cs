@@ -26,18 +26,18 @@ public class RationalBeatDivisor(int numerator, int denominator) : IBeatDivisor 
         return (double) Numerator / Denominator;
     }
 
-    protected bool Equals(RationalBeatDivisor other) {
-        return Numerator == other.Numerator && Denominator == other.Denominator;
+    protected bool Equals(RationalBeatDivisor? other) {
+        return other is not null && Numerator == other.Numerator && Denominator == other.Denominator;
     }
 
-    public bool Equals(IBeatDivisor other) {
+    public bool Equals(IBeatDivisor? other) {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
         if (other is RationalBeatDivisor otherRational) return Equals(otherRational);
         return false;
     }
 
-    public override bool Equals(object obj) {
+    public override bool Equals(object? obj) {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
         return obj.GetType() == GetType() && Equals((RationalBeatDivisor) obj);

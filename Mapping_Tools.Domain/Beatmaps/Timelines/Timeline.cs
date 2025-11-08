@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Mapping_Tools.Domain.Beatmaps.Contexts;
+﻿using Mapping_Tools.Domain.Beatmaps.Contexts;
 using Mapping_Tools.Domain.Beatmaps.HitObjects;
 using Mapping_Tools.Domain.Beatmaps.Timings;
 using Mapping_Tools.Domain.Beatmaps.Types;
@@ -13,8 +12,7 @@ public class Timeline {
     /// <summary>
     /// All timeline objects of the timeline.
     /// </summary>
-    [NotNull]
-    public List<TimelineObject> TimelineObjects { get; set; }
+    public List<TimelineObject> TimelineObjects { get; }
 
     public Timeline(IEnumerable<HitObject> hitObjects) {
         var timelineObjects = hitObjects.Where(ho => ho is IHasTimelineObjects)
@@ -24,7 +22,7 @@ public class Timeline {
         TimelineObjects = timelineObjects.OrderBy(o => o.Time).ToList();
     }
 
-    public Timeline([NotNull]List<TimelineObject> timeLineObjects) {
+    public Timeline(List<TimelineObject> timeLineObjects) {
         TimelineObjects = timeLineObjects;
     }
 
@@ -54,37 +52,30 @@ public class Timeline {
     }
 
     /// <summary>
-    /// Finds the timeline objects that is closest to the given time.
-    /// </summary>
-    /// <param name="time">The target time.</param>
-    /// <returns></returns>
-    public TimelineObject GetNearestTlo(double time) {
-        return GetNearestTlo(time, o => true);
-    }
-
-    /// <summary>
     /// Finds the timeline objects that is closest to the given time and matches the predicate.
     /// </summary>
     /// <param name="time">The target time.</param>
     /// <param name="predicate">The predicate to filter timeline objects.</param>
     /// <returns></returns>
-    public TimelineObject GetNearestTlo(double time, Func<TimelineObject, bool> predicate) {
+    public TimelineObject? GetNearestTlo(double time, Func<TimelineObject, bool>? predicate = null) {
         if (TimelineObjects.Count == 0) {
             return null;
         }
 
-        TimelineObject closest = null;
+        TimelineObject? closest = null;
         double closestDist = double.PositiveInfinity;
         foreach (TimelineObject tlo in TimelineObjects) {
             double dist = Math.Abs(tlo.Time - time);
 
-            if (dist <= closestDist) {
-                if (!predicate(tlo))
-                    continue;
-
-                closest = tlo;
-                closestDist = dist;
+            if (dist > closestDist) {
+                continue;
             }
+
+            if (predicate is not null && !predicate(tlo))
+                continue;
+
+            closest = tlo;
+            closestDist = dist;
         }
 
         return closest;

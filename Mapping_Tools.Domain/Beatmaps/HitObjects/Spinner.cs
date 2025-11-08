@@ -17,11 +17,8 @@ public class Spinner : HitObject, IDuration, IHasTimelineObjects {
 
     public override int ComboIncrement => 0;
 
-    public Spinner() {
-
+    protected override void DeepCloneAdd(HitObject clonedHitObject) {
     }
-
-    protected override void DeepCloneAdd(HitObject clonedHitObject) { }
 
     public void SetDuration(double duration) {
         SetEndTime(StartTime + duration);

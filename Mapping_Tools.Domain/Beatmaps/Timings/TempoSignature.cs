@@ -5,12 +5,12 @@ public class TempoSignature : IEquatable<TempoSignature>
     /// <summary>
     /// The bottom value of the time signature.
     /// </summary>
-    public int TempoDenominator { get; set; }
+    public int TempoDenominator { get; init; }
 
     /// <summary>
     /// The top value of the time signature.
     /// </summary>
-    public int TempoNumerator { get; set; }
+    public int TempoNumerator { get; init; }
 
     /// <summary>
     /// The constructor for a new Tempo Signature
@@ -39,15 +39,15 @@ public class TempoSignature : IEquatable<TempoSignature>
     /// <remarks>
     /// The number 5 is specified as a partial measure allowance.
     /// </remarks>
-    public bool PartialMeasure { get; set; }
+    public bool PartialMeasure { get; init; }
 
-    public bool Equals(TempoSignature other)
+    public bool Equals(TempoSignature? other)
     {
-        return other != null &&
+        return other is not null &&
                TempoDenominator == other.TempoDenominator &&
                TempoNumerator == other.TempoNumerator;
     }
-    public override bool Equals(object obj) {
+    public override bool Equals(object? obj) {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
         return obj.GetType() == GetType() && Equals((TempoSignature) obj);

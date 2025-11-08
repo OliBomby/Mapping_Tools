@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Domain.Beatmaps.Parsing.V14.HitObjects;
+using Mapping_Tools.Domain.MathUtil;
 
 namespace Mapping_Tools.Domain.Beatmaps.HitObjects;
 
@@ -9,7 +10,7 @@ public class HitObjectComparer(bool checkIsSelected = false, bool checkPosition 
     public bool CheckPosition { get; set; } = checkPosition;
     public bool CheckTime { get; set; } = checkTime;
 
-    public bool Equals(HitObject x, HitObject y) {
+    public bool Equals(HitObject? x, HitObject? y) {
         if (x == null && y == null)
             return true;
         if (x == null || y == null)
@@ -18,7 +19,7 @@ public class HitObjectComparer(bool checkIsSelected = false, bool checkPosition 
             return false;
         if (CheckPosition && x.Pos != y.Pos)
             return false;
-        if (CheckTime && x.StartTime != y.StartTime)
+        if (CheckTime && Math.Abs(x.StartTime - y.StartTime) > Precision.DoubleEpsilon)
             return false;
         if (!(x.Hitsounds.Equals(y.Hitsounds) &&
               x.NewCombo == y.NewCombo &&
@@ -30,10 +31,10 @@ public class HitObjectComparer(bool checkIsSelected = false, bool checkPosition 
                                                        (!CheckPosition ||
                                                         sliderX.CurvePoints.SequenceEqual(sliderY.CurvePoints)) &&
                                                        sliderX.RepeatCount == sliderY.RepeatCount &&
-                                                       sliderX.PixelLength == sliderY.PixelLength &&
+                                                       Math.Abs(sliderX.PixelLength - sliderY.PixelLength) < Precision.DoubleEpsilon &&
                                                        sliderX.EdgeHitsounds.SequenceEqual(sliderY.EdgeHitsounds),
-            Spinner spinnerX when y is Spinner spinnerY => spinnerX.EndTime == spinnerY.EndTime,
-            HoldNote holdNoteX when y is HoldNote holdNoteY => holdNoteX.EndTime == holdNoteY.EndTime,
+            Spinner spinnerX when y is Spinner spinnerY => Math.Abs(spinnerX.EndTime - spinnerY.EndTime) < Precision.DoubleEpsilon,
+            HoldNote holdNoteX when y is HoldNote holdNoteY => Math.Abs(holdNoteX.EndTime - holdNoteY.EndTime) < Precision.DoubleEpsilon,
             _ => false,
         };
 

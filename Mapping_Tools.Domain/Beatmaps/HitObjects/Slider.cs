@@ -73,8 +73,7 @@ public class Slider : HitObject, IRepeats, IHasTimelineObjects {
     /// Whether the slider extras should be written in the .osu file.
     /// </summary>
     public bool NeedSliderExtras() {
-        return EdgeHitsounds.Any(o => !o.Equals(Hitsounds)) ||
-               !Hitsounds.Equals(new HitSampleInfo());
+        return EdgeHitsounds.Any(o => !o.Equals(Hitsounds)) || !Hitsounds.Equals(new HitSampleInfo());
     }
 
     /// <summary>
@@ -104,9 +103,9 @@ public class Slider : HitObject, IRepeats, IHasTimelineObjects {
         }
 
         // Get sliderslide hitsounds for every timingpoint in the slider
-        if (includeDefaults || timing.TimingPoint.SampleIndex != 0) {
-            var firstSampleSet = Hitsounds.SampleSet == SampleSet.None ? timing.TimingPoint.SampleSet : Hitsounds.SampleSet;
-            yield return GetSliderFilename(firstSampleSet, "slide", timing.TimingPoint.SampleIndex);
+        if (includeDefaults || timing!.TimingPoint.SampleIndex != 0) {
+            var firstSampleSet = Hitsounds.SampleSet == SampleSet.None ? timing!.TimingPoint.SampleSet : Hitsounds.SampleSet;
+            yield return GetSliderFilename(firstSampleSet, "slide", timing!.TimingPoint.SampleIndex);
             if (Hitsounds.Whistle)
                 yield return GetSliderFilename(firstSampleSet, "whistle", timing.TimingPoint.SampleIndex);
         }
@@ -170,7 +169,7 @@ public class Slider : HitObject, IRepeats, IHasTimelineObjects {
     /// Sets the actual end time of the slider by changing the <see cref="PixelLength"/>.
     /// </summary>
     /// <param name="endTime">The new end time in milliseconds.</param>
-    public void SetEndTimeBySliderVelocity (double endTime) {
+    public void SetEndTimeBySliderVelocity(double endTime) {
         SetSpanDurationBySliderVelocity((endTime - StartTime) / SpanCount);
     }
 
@@ -200,7 +199,7 @@ public class Slider : HitObject, IRepeats, IHasTimelineObjects {
 
     public override void Move(Vector2 delta) {
         base.Move(delta);
-        for (var i = 0; i < CurvePoints.Count; i++) CurvePoints[i] = CurvePoints[i] + delta;
+        for (var i = 0; i < CurvePoints.Count; i++) CurvePoints[i] += delta;
     }
 
     public override void Transform(Matrix2 mat) {
@@ -237,9 +236,7 @@ public class Slider : HitObject, IRepeats, IHasTimelineObjects {
     /// </summary>
     /// <returns></returns>
     public bool IsInvisible() {
-        return PixelLength != 0 && PixelLength <= 0.0001 ||
-               double.IsNaN(PixelLength) ||
-               CurvePoints.All(o => o == Pos);
+        return PixelLength != 0 && PixelLength <= 0.0001 || double.IsNaN(PixelLength) || CurvePoints.All(o => o == Pos);
     }
 
     protected override void DeepCloneAdd(HitObject clonedHitObject) {
@@ -258,18 +255,19 @@ public class Slider : HitObject, IRepeats, IHasTimelineObjects {
             context.TimelineObjects.Add(tlo);
             yield return tlo;
         }
+
         SetContext(context);
     }
 
-    private TimelineObject createTimelineObject(double time, HitSampleInfo hitsounds, int nodeIndex) {
+    private TimelineObject CreateTimelineObject(double time, HitSampleInfo hitsounds, int nodeIndex) {
         if (nodeIndex == 0) {
-            return new SliderHead(time, GetNodeSamples(nodeIndex).Clone(), nodeIndex) {Origin = this};
+            return new SliderHead(time, GetNodeSamples(nodeIndex).Clone(), nodeIndex) { Origin = this };
         }
 
         if (nodeIndex == SpanCount) {
-            return new SliderTail(time, GetNodeSamples(nodeIndex).Clone(), nodeIndex) {Origin = this};
+            return new SliderTail(time, GetNodeSamples(nodeIndex).Clone(), nodeIndex) { Origin = this };
         }
 
-        return new SliderNode(time, GetNodeSamples(nodeIndex).Clone(), nodeIndex) {Origin = this};
+        return new SliderNode(time, GetNodeSamples(nodeIndex).Clone(), nodeIndex) { Origin = this };
     }
 }

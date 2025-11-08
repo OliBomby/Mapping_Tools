@@ -27,7 +27,7 @@ public static class PathApproximator {
         List<Vector2> output = [];
         int count = controlPoints.Count;
 
-        if( count == 0 )
+        if (count == 0)
             return output;
 
         var subdivisionBuffer1 = new Vector2[count];
@@ -45,9 +45,9 @@ public static class PathApproximator {
 
         Vector2[] leftChild = subdivisionBuffer2;
 
-        while( toFlatten.Count > 0 ) {
+        while (toFlatten.Count > 0) {
             Vector2[] parent = toFlatten.Pop();
-            if( BezierIsFlatEnough(parent) ) {
+            if (BezierIsFlatEnough(parent)) {
                 // If the control points we currently operate on are sufficiently "flat", we use
                 // an extension to De Casteljau's algorithm to obtain a piecewise-linear approximation
                 // of the bezier curve represented by our control points, consisting of the same amount
@@ -64,7 +64,7 @@ public static class PathApproximator {
             BezierSubdivide(parent, leftChild, rightChild, subdivisionBuffer1, count);
 
             // We re-use the buffer of the parent for one of the children, so that we save one allocation per iteration.
-            for( int i = 0; i < count; ++i )
+            for (int i = 0; i < count; ++i)
                 parent[i] = leftChild[i];
 
             toFlatten.Push(rightChild);
@@ -80,17 +80,17 @@ public static class PathApproximator {
     /// </summary>
     /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
     public static List<Vector2> ApproximateCatmull(List<Vector2> controlPoints) {
-        var result = new List<Vector2>(( controlPoints.Length() - 1 ) * CatmullDetail * 2);
+        var result = new List<Vector2>((controlPoints.Length() - 1) * CatmullDetail * 2);
 
-        for( int i = 0; i < controlPoints.Length() - 1; i++ ) {
+        for (int i = 0; i < controlPoints.Length() - 1; i++) {
             var v1 = i > 0 ? controlPoints[i - 1] : controlPoints[i];
             var v2 = controlPoints[i];
             var v3 = i < controlPoints.Length() - 1 ? controlPoints[i + 1] : v2 + v2 - v1;
             var v4 = i < controlPoints.Length() - 2 ? controlPoints[i + 2] : v3 + v3 - v2;
 
-            for( int c = 0; c < CatmullDetail; c++ ) {
+            for (int c = 0; c < CatmullDetail; c++) {
                 result.Add(CatmullFindPoint(ref v1, ref v2, ref v3, ref v4, (double) c / CatmullDetail));
-                result.Add(CatmullFindPoint(ref v1, ref v2, ref v3, ref v4, (double) ( c + 1 ) / CatmullDetail));
+                result.Add(CatmullFindPoint(ref v1, ref v2, ref v3, ref v4, (double) (c + 1) / CatmullDetail));
             }
         }
 
@@ -106,27 +106,27 @@ public static class PathApproximator {
         Vector2 b = controlPoints[1];
         Vector2 c = controlPoints[2];
 
-        double aSq = ( b - c ).LengthSquared;
-        double bSq = ( a - c ).LengthSquared;
-        double cSq = ( a - b ).LengthSquared;
+        double aSq = (b - c).LengthSquared;
+        double bSq = (a - c).LengthSquared;
+        double cSq = (a - b).LengthSquared;
 
         // If we have a degenerate triangle where a side-length is almost zero, then give up and fall
         // back to a more numerically stable method.
-        if( Precision.AlmostEquals(aSq, 0) || Precision.AlmostEquals(bSq, 0) || Precision.AlmostEquals(cSq, 0) )
+        if (Precision.AlmostEquals(aSq, 0) || Precision.AlmostEquals(bSq, 0) || Precision.AlmostEquals(cSq, 0))
             return [];
 
-        double s = aSq * ( bSq + cSq - aSq );
-        double t = bSq * ( aSq + cSq - bSq );
-        double u = cSq * ( aSq + bSq - cSq );
+        double s = aSq * (bSq + cSq - aSq);
+        double t = bSq * (aSq + cSq - bSq);
+        double u = cSq * (aSq + bSq - cSq);
 
         double sum = s + t + u;
 
         // If we have a degenerate triangle with an almost-zero size, then give up and fall
         // back to a more numerically stable method.
-        if( Precision.AlmostEquals(sum, 0) )
+        if (Precision.AlmostEquals(sum, 0))
             return [];
 
-        Vector2 centre = ( s * a + t * b + u * c ) / sum;
+        Vector2 centre = (s * a + t * b + u * c) / sum;
         Vector2 dA = a - centre;
         Vector2 dC = c - centre;
 
@@ -135,7 +135,7 @@ public static class PathApproximator {
         double thetaStart = Math.Atan2(dA.Y, dA.X);
         double thetaEnd = Math.Atan2(dC.Y, dC.X);
 
-        while( thetaEnd < thetaStart )
+        while (thetaEnd < thetaStart)
             thetaEnd += 2 * Math.PI;
 
         double dir = 1;
@@ -145,7 +145,7 @@ public static class PathApproximator {
         // AC B lies.
         Vector2 orthoAtoC = c - a;
         orthoAtoC = new Vector2(orthoAtoC.Y, -orthoAtoC.X);
-        if( Vector2.Dot(orthoAtoC, b - a) < 0 ) {
+        if (Vector2.Dot(orthoAtoC, b - a) < 0) {
             dir = -dir;
             thetaRange = 2 * Math.PI - thetaRange;
         }
@@ -155,12 +155,12 @@ public static class PathApproximator {
         // is: 2 * Math.Acos(1 - TOLERANCE / r)
         // The special case is required for extremely short sliders where the radius is smaller than
         // the tolerance. This is a pathological rather than a realistic case.
-        int amountPoints = 2 * r <= CircularArcTolerance ? 2 : Math.Max(2, (int) Math.Ceiling(thetaRange / ( 2 * Math.Acos(1 - CircularArcTolerance / r) )));
+        int amountPoints = 2 * r <= CircularArcTolerance ? 2 : Math.Max(2, (int) Math.Ceiling(thetaRange / (2 * Math.Acos(1 - CircularArcTolerance / r))));
 
         List<Vector2> output = new List<Vector2>(amountPoints);
 
-        for( int i = 0; i < amountPoints; ++i ) {
-            double fract = (double) i / ( amountPoints - 1 );
+        for (int i = 0; i < amountPoints; ++i) {
+            double fract = (double) i / (amountPoints - 1);
             double theta = thetaStart + dir * fract * thetaRange;
             Vector2 o = new Vector2(Math.Cos(theta), Math.Sin(theta)) * r;
             output.Add(centre + o);
@@ -177,7 +177,7 @@ public static class PathApproximator {
     public static List<Vector2> ApproximateLinear(List<Vector2> controlPoints) {
         var result = new List<Vector2>(controlPoints.Length());
 
-        foreach( var c in controlPoints )
+        foreach (var c in controlPoints)
             result.Add(c);
 
         return result;
@@ -192,8 +192,8 @@ public static class PathApproximator {
     /// <param name="controlPoints">The control points to check for flatness.</param>
     /// <returns>Whether the control points are flat enough.</returns>
     private static bool BezierIsFlatEnough(Vector2[] controlPoints) {
-        for( int i = 1; i < controlPoints.Length - 1; i++ )
-            if( ( controlPoints[i - 1] - 2 * controlPoints[i] + controlPoints[i + 1] ).LengthSquared > BezierTolerance * BezierTolerance * 4 )
+        for (int i = 1; i < controlPoints.Length - 1; i++)
+            if ((controlPoints[i - 1] - 2 * controlPoints[i] + controlPoints[i + 1]).LengthSquared > BezierTolerance * BezierTolerance * 4)
                 return false;
 
         return true;
@@ -212,15 +212,15 @@ public static class PathApproximator {
     private static void BezierSubdivide(Vector2[] controlPoints, Vector2[] l, Vector2[] r, Vector2[] subdivisionBuffer, int count) {
         Vector2[] midPoints = subdivisionBuffer;
 
-        for( int i = 0; i < count; ++i )
+        for (int i = 0; i < count; ++i)
             midPoints[i] = controlPoints[i];
 
-        for( int i = 0; i < count; i++ ) {
+        for (int i = 0; i < count; i++) {
             l[i] = midPoints[0];
             r[count - i - 1] = midPoints[count - i - 1];
 
-            for( int j = 0; j < count - i - 1; j++ )
-                midPoints[j] = ( midPoints[j] + midPoints[j + 1] ) / 2;
+            for (int j = 0; j < count - i - 1; j++)
+                midPoints[j] = (midPoints[j] + midPoints[j + 1]) / 2;
         }
     }
 
@@ -239,13 +239,13 @@ public static class PathApproximator {
 
         BezierSubdivide(controlPoints, l, r, subdivisionBuffer1, count);
 
-        for( int i = 0; i < count - 1; ++i )
+        for (int i = 0; i < count - 1; ++i)
             l[count + i] = r[i + 1];
 
         output.Add(controlPoints[0]);
-        for( int i = 1; i < count - 1; ++i ) {
+        for (int i = 1; i < count - 1; ++i) {
             int index = 2 * i;
-            Vector2 p = 0.25f * ( l[index - 1] + 2 * l[index] + l[index + 1] );
+            Vector2 p = 0.25f * (l[index - 1] + 2 * l[index] + l[index + 1]);
             output.Add(p);
         }
     }
@@ -265,8 +265,8 @@ public static class PathApproximator {
 
         Vector2 result = new Vector2
         (
-            0.5f * ( 2f * vec2.X + ( -vec1.X + vec3.X ) * t + ( 2f * vec1.X - 5f * vec2.X + 4f * vec3.X - vec4.X ) * t2 + ( -vec1.X + 3f * vec2.X - 3f * vec3.X + vec4.X ) * t3 ),
-            0.5f * ( 2f * vec2.Y + ( -vec1.Y + vec3.Y ) * t + ( 2f * vec1.Y - 5f * vec2.Y + 4f * vec3.Y - vec4.Y ) * t2 + ( -vec1.Y + 3f * vec2.Y - 3f * vec3.Y + vec4.Y ) * t3 )
+            0.5f * (2f * vec2.X + (-vec1.X + vec3.X) * t + (2f * vec1.X - 5f * vec2.X + 4f * vec3.X - vec4.X) * t2 + (-vec1.X + 3f * vec2.X - 3f * vec3.X + vec4.X) * t3),
+            0.5f * (2f * vec2.Y + (-vec1.Y + vec3.Y) * t + (2f * vec1.Y - 5f * vec2.Y + 4f * vec3.Y - vec4.Y) * t2 + (-vec1.Y + 3f * vec2.Y - 3f * vec3.Y + vec4.Y) * t3)
         );
 
         return result;

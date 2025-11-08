@@ -18,14 +18,14 @@ public class IrrationalBeatDivisor(double value) : IBeatDivisor {
         return Value.Equals(other.Value);
     }
 
-    public bool Equals(IBeatDivisor other) {
+    public bool Equals(IBeatDivisor? other) {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
         if (other is IrrationalBeatDivisor otherIrrational) return Equals(otherIrrational);
         return false;
     }
 
-    public override bool Equals(object obj) {
+    public override bool Equals(object? obj) {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
         return obj.GetType() == GetType() && Equals((IrrationalBeatDivisor) obj);

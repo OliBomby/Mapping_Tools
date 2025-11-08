@@ -5,7 +5,7 @@ public abstract class ContextableBase {
     /// Additional properties.
     /// The objects always have the type of their key.
     /// </summary>
-    protected Dictionary<Type, IContext> contexts = new();
+    protected Dictionary<Type, IContext> Contexts = new();
 
     /// <summary>
     /// Checks whether this object has the context with type T.
@@ -13,7 +13,7 @@ public abstract class ContextableBase {
     /// <typeparam name="T">The type to check the context of.</typeparam>
     /// <returns>Whether the context object with type T exists in this object.</returns>
     public bool HasContext<T>() where T : IContext {
-        return contexts.ContainsKey(typeof(T));
+        return Contexts.ContainsKey(typeof(T));
     }
 
     /// <summary>
@@ -23,7 +23,7 @@ public abstract class ContextableBase {
     /// <exception cref="KeyNotFoundException">If the context does not exist in this hit object.</exception>
     /// <returns>The context object with type T.</returns>
     public T GetContext<T>() where T : IContext {
-        return (T)contexts[typeof(T)];
+        return (T)Contexts[typeof(T)];
     }
 
     /// <summary>
@@ -32,8 +32,8 @@ public abstract class ContextableBase {
     /// <param name="context">The found context with type T.</param>
     /// <typeparam name="T">The type to get the context of.</typeparam>
     /// <returns>Whether the context exists in this hit object.</returns>
-    public bool TryGetContext<T>(out T context) where T : IContext {
-        if (contexts.TryGetValue(typeof(T), out var context2)) {
+    public bool TryGetContext<T>(out T? context) where T : IContext {
+        if (Contexts.TryGetValue(typeof(T), out var context2)) {
             context = (T)context2;
             return true;
         }
@@ -48,7 +48,7 @@ public abstract class ContextableBase {
     /// <typeparam name="T">The context type to set.</typeparam>
     /// <param name="context">The context object to store in this hit object.</param>
     public void SetContext<T>(T context) where T : IContext {
-        contexts[typeof(T)] = context;
+        Contexts[typeof(T)] = context;
     }
 
     /// <summary>
@@ -66,6 +66,6 @@ public abstract class ContextableBase {
     /// <param name="t">The type to remove the context of.</param>
     /// <returns>Whether a context was removed.</returns>
     public bool RemoveContext(Type t) {
-        return contexts.Remove(t);
+        return Contexts.Remove(t);
     }
 }

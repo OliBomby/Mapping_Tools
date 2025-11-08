@@ -133,9 +133,9 @@ public abstract class HitObject : ContextableBase, IComparable<HitObject>, IHasP
     public HitObject DeepClone() {
         var newHitObject = (HitObject) MemberwiseClone();
 
-        newHitObject.contexts = new Dictionary<Type, IContext>();
-        foreach (var (type, context) in contexts) {
-            newHitObject.contexts.Add(type, context.Copy());
+        newHitObject.Contexts = new Dictionary<Type, IContext>();
+        foreach (var (type, context) in Contexts) {
+            newHitObject.Contexts.Add(type, context.Copy());
         }
 
         // Deep clone for the types inheriting HitObject
@@ -149,7 +149,7 @@ public abstract class HitObject : ContextableBase, IComparable<HitObject>, IHasP
     public int CompareTo(HitObject? other) {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;
-        if (StartTime == other.StartTime) return other.NewCombo.CompareTo(NewCombo);
+        if (Math.Abs(StartTime - other.StartTime) < Precision.DoubleEpsilon) return other.NewCombo.CompareTo(NewCombo);
         return StartTime.CompareTo(other.StartTime);
     }
 }

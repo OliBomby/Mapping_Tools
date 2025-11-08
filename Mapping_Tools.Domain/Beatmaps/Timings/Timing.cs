@@ -16,16 +16,17 @@ public class Timing : IList<TimingPoint> {
     /// List of all timing points. This included uninherited timing points and inherited timing points.
     /// This list should be sorted at all times.
     /// </summary>
-    private List<TimingPoint> timingPoints;
-    private List<TimingPoint> redlines;
-    private List<TimingPoint> greenlines;
+    private List<TimingPoint> timingPoints = null!;
+
+    private List<TimingPoint> redlines = null!;
+    private List<TimingPoint> greenlines = null!;
 
     public IReadOnlyList<TimingPoint> TimingPoints => timingPoints;
     public IReadOnlyList<TimingPoint> Redlines => redlines;
     public IReadOnlyList<TimingPoint> Greenlines => greenlines;
 
     /// <summary>
-    /// The global slider multiplier of a <see cref="Beatmap"/>. This is here for convenience sake to calculate absolute slider velocities.
+    /// The global slider multiplier of a <see cref="Beatmap"/>. This is here for convenience’s sake to calculate absolute slider velocities.
     /// </summary>
     public double GlobalSliderMultiplier { get; set; }
 
@@ -40,14 +41,14 @@ public class Timing : IList<TimingPoint> {
     }
 
     /// <summary>
-    /// Replaces all the timingpoints and sorts again.
+    /// Replaces all the timing points and sorts again.
     /// </summary>
-    /// <param name="timingPoints"></param>
-    public void SetTimingPoints(List<TimingPoint> timingPoints) {
-        this.timingPoints = timingPoints ?? [];
-        this.timingPoints.Sort();
-        redlines = this.timingPoints.Where(tp => tp.Uninherited).ToList();
-        greenlines = this.timingPoints.Where(tp => !tp.Uninherited).ToList();
+    /// <param name="newTimingPoints"></param>
+    public void SetTimingPoints(List<TimingPoint>? newTimingPoints) {
+        timingPoints = newTimingPoints ?? [];
+        timingPoints.Sort();
+        redlines = timingPoints.Where(tp => tp.Uninherited).ToList();
+        greenlines = timingPoints.Where(tp => !tp.Uninherited).ToList();
     }
 
     /// <summary>
@@ -62,8 +63,6 @@ public class Timing : IList<TimingPoint> {
     #region BasicOperations
 
     public void Add(TimingPoint tp) {
-        if (tp == null) return;
-
         var index = timingPoints.BinarySearch(tp);
         if (index < 0)
             index = ~index;
@@ -108,8 +107,8 @@ public class Timing : IList<TimingPoint> {
         return false;
     }
 
-    public void AddRange(IEnumerable<TimingPoint> timingPoints) {
-        foreach (var timingPoint in timingPoints) {
+    public void AddRange(IEnumerable<TimingPoint> newTimingPoints) {
+        foreach (var timingPoint in newTimingPoints) {
             Add(timingPoint);
         }
     }
@@ -119,7 +118,7 @@ public class Timing : IList<TimingPoint> {
     }
 
     bool ICollection<TimingPoint>.Remove(TimingPoint tp) {
-        return tp != null && Remove(tp);
+        return Remove(tp);
     }
 
     public int Count => timingPoints.Count;
@@ -193,28 +192,27 @@ public class Timing : IList<TimingPoint> {
     /// <param name="round">To round the number of beats to a snap divisor.</param>
     /// <param name="divisors">The beat divisors to round to. If null, the default beat divisors will be used.</param>
     /// <returns></returns>
-    public double GetBeatLength(double startTime, double endTime, bool round = false, IBeatDivisor[] divisors = null) {
+    public double GetBeatLength(double startTime, double endTime, bool round = false, IBeatDivisor[]? divisors = null) {
         bool reverse = false;
         if (startTime > endTime) {
-            var endTimeTemp = endTime;
-            endTime = startTime;
-            startTime = endTimeTemp;
+            (endTime, startTime) = (startTime, endTime);
             reverse = true;
         }
 
-        var redlines = GetRedlinesInRange(startTime, endTime, false);
+        var redlinesInRange = GetRedlinesInRange(startTime, endTime, false);
         divisors ??= RationalBeatDivisor.GetDefaultBeatDivisors();
 
         double beats = 0;
         double lastTime = startTime;
         var lastRedline = GetRedlineAtTime(startTime);
-        foreach (var redline in redlines) {
+        foreach (var redline in redlinesInRange) {
             var inc1 = (redline.Offset - lastTime) / lastRedline.MpB;
             beats += round ? MultiSnapRound(inc1, divisors) : inc1;
 
             lastTime = redline.Offset;
             lastRedline = redline;
         }
+
         var inc2 = (endTime - lastTime) / lastRedline.MpB;
         beats += round ? MultiSnapRound(inc2, divisors) : inc2;
 
@@ -247,40 +245,45 @@ public class Timing : IList<TimingPoint> {
     /// <param name="round"></param>
     /// <param name="divisors"></param>
     /// <returns></returns>
-    public double GetMilliseconds(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[] divisors = null) {
+    public double GetMilliseconds(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[]? divisors = null) {
         double ms = originTime;
 
+        if (round && divisors is null)
+            throw new ArgumentNullException(nameof(divisors), "Divisors cannot be null when rounding is enabled.");
+
         if (beatTime >= 0) {
-            var redlines = GetRedlinesInRange(0, beatTime, false);
+            var redlinesInRange = GetRedlinesInRange(0, beatTime, false);
             TimingPoint lastRedline = GetRedlineAtTime(0);
             ms += round
-                ? MultiSnapRound(lastRedline.Offset, divisors) * lastRedline.MpB
+                ? MultiSnapRound(lastRedline.Offset, divisors!) * lastRedline.MpB
                 : lastRedline.Offset * lastRedline.MpB;
-            foreach (var redline in redlines) {
+            foreach (var redline in redlinesInRange) {
                 ms += round
-                    ? MultiSnapRound(redline.Offset - lastRedline.Offset, divisors) * lastRedline.MpB
+                    ? MultiSnapRound(redline.Offset - lastRedline.Offset, divisors!) * lastRedline.MpB
                     : (redline.Offset - lastRedline.Offset) * lastRedline.MpB;
 
                 lastRedline = redline;
             }
+
             ms += round
-                ? MultiSnapRound(beatTime - lastRedline.Offset, divisors) * lastRedline.MpB
+                ? MultiSnapRound(beatTime - lastRedline.Offset, divisors!) * lastRedline.MpB
                 : (beatTime - lastRedline.Offset) * lastRedline.MpB;
         } else {
-            var redlines = GetRedlinesInRange(beatTime, 0, false);
+            var redlinesInRange = GetRedlinesInRange(beatTime, 0, false);
             TimingPoint lastRedline = GetRedlineAtTime(beatTime);
             ms += round
-                ? MultiSnapRound(beatTime - lastRedline.Offset, divisors) * lastRedline.MpB
+                ? MultiSnapRound(beatTime - lastRedline.Offset, divisors!) * lastRedline.MpB
                 : (beatTime - lastRedline.Offset) * lastRedline.MpB;
-            foreach (var redline in redlines) {
+            foreach (var redline in redlinesInRange) {
                 ms -= round
-                    ? MultiSnapRound(redline.Offset - lastRedline.Offset, divisors) * lastRedline.MpB
+                    ? MultiSnapRound(redline.Offset - lastRedline.Offset, divisors!) * lastRedline.MpB
                     : (redline.Offset - lastRedline.Offset) * lastRedline.MpB;
 
                 lastRedline = redline;
             }
+
             ms += round
-                ? MultiSnapRound(lastRedline.Offset, divisors) * lastRedline.MpB
+                ? MultiSnapRound(lastRedline.Offset, divisors!) * lastRedline.MpB
                 : lastRedline.Offset * lastRedline.MpB;
         }
 
@@ -301,9 +304,7 @@ public class Timing : IList<TimingPoint> {
             int startIndex = GetTimingPointIndexAfterTime(startBeatTime, redlines);
             for (int i = startIndex; i < redlines.Count && i != -1; i++) {
                 var redline = redlines[i];
-                var beatDiff = lastRedline == firstRedline ?
-                    redline.Offset - startBeatTime:
-                    redline.Offset - lastRedline.Offset;
+                var beatDiff = lastRedline == firstRedline ? redline.Offset - startBeatTime : redline.Offset - lastRedline.Offset;
 
                 if (beatDiff * lastRedline.MpB > milliseconds + Precision.DoubleEpsilon) {
                     break;
@@ -314,6 +315,7 @@ public class Timing : IList<TimingPoint> {
 
                 lastRedline = redline;
             }
+
             beatTime += milliseconds / lastRedline.MpB;
         } else {
             int startIndex = GetTimingPointIndexAtTime(startBeatTime, redlines);
@@ -332,6 +334,7 @@ public class Timing : IList<TimingPoint> {
 
                 lastBeatTime = redline.Offset;
             }
+
             beatTime += milliseconds / redline.MpB;
         }
 
@@ -347,8 +350,11 @@ public class Timing : IList<TimingPoint> {
     /// <param name="round"></param>
     /// <param name="divisors"></param>
     /// <returns></returns>
-    public double WalkBeatsInMillisecondTime(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[] divisors = null) {
+    public double WalkBeatsInMillisecondTime(double beatTime, double originTime = 0, bool round = false, IBeatDivisor[]? divisors = null) {
         double ms = originTime;
+
+        if (round && divisors is null)
+            throw new ArgumentNullException(nameof(divisors), "Divisors cannot be null when rounding is enabled.");
 
         if (beatTime >= 0) {
             TimingPoint firstRedline = GetRedlineAtTime(originTime);
@@ -356,10 +362,8 @@ public class Timing : IList<TimingPoint> {
             int startIndex = GetTimingPointIndexAfterTime(originTime, redlines);
             for (int i = startIndex; i < redlines.Count && i != -1; i++) {
                 var redline = redlines[i];
-                var msDiff = lastRedline == firstRedline ?
-                    redline.Offset - originTime :
-                    redline.Offset - lastRedline.Offset;
-                var beatDiff = round ? MultiSnapRound(msDiff / lastRedline.MpB, divisors) : msDiff / lastRedline.MpB;
+                var msDiff = lastRedline == firstRedline ? redline.Offset - originTime : redline.Offset - lastRedline.Offset;
+                var beatDiff = round ? MultiSnapRound(msDiff / lastRedline.MpB, divisors!) : msDiff / lastRedline.MpB;
 
                 if (beatDiff > beatTime + Precision.DoubleEpsilon) {
                     break;
@@ -370,6 +374,7 @@ public class Timing : IList<TimingPoint> {
 
                 lastRedline = redline;
             }
+
             ms += beatTime * lastRedline.MpB;
         } else {
             int startIndex = GetTimingPointIndexAtTime(originTime, redlines);
@@ -378,7 +383,7 @@ public class Timing : IList<TimingPoint> {
             for (int i = startIndex; i >= 0; i--) {
                 redline = redlines[i];
                 double msDiff = redline.Offset - lastBeatTime;
-                var beatDiff = round ? MultiSnapRound(msDiff / redline.MpB, divisors) : msDiff / redline.MpB;
+                var beatDiff = round ? MultiSnapRound(msDiff / redline.MpB, divisors!) : msDiff / redline.MpB;
 
                 if (beatDiff < beatTime - Precision.DoubleEpsilon) {
                     break;
@@ -389,6 +394,7 @@ public class Timing : IList<TimingPoint> {
 
                 lastBeatTime = redline.Offset;
             }
+
             ms += beatTime * redline.MpB;
         }
 
@@ -402,11 +408,11 @@ public class Timing : IList<TimingPoint> {
     /// </summary>
     /// <param name="time"></param>
     /// <param name="timingPoints">All the timing points.</param>
-    /// <param name="firstTimingpoint">The first timing point to start searching from.</param>
+    /// <param name="firstTimingPoint">The first timing point to start searching from.</param>
     /// <returns></returns>
-    public static TimingPoint GetTimingPointAtTime(double time, IReadOnlyList<TimingPoint> timingPoints, TimingPoint firstTimingpoint) {
+    public static TimingPoint? GetTimingPointAtTime(double time, IReadOnlyList<TimingPoint> timingPoints, TimingPoint? firstTimingPoint) {
         var index = GetTimingPointIndexAtTime(time, timingPoints);
-        return index != -1 ? timingPoints[index] : firstTimingpoint;
+        return index != -1 ? timingPoints[index] : firstTimingPoint;
     }
 
     /// <summary>
@@ -431,7 +437,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="time"></param>
     /// <param name="timingPoints"></param>
     /// <returns></returns>
-    public static TimingPoint GetTimingPointAfterTime(double time, IReadOnlyList<TimingPoint> timingPoints) {
+    public static TimingPoint? GetTimingPointAfterTime(double time, IReadOnlyList<TimingPoint> timingPoints) {
         var index = GetTimingPointIndexAfterTime(time, timingPoints);
         return index != -1 ? timingPoints[index] : null;
     }
@@ -480,7 +486,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="time"></param>
     /// <returns></returns>
     public TimingPoint GetTimingPointAtTime(double time) {
-        return GetTimingPointAtTime(time, timingPoints, GetFirstTimingPointExtended());
+        return GetTimingPointAtTime(time, timingPoints, GetFirstTimingPointExtended())!;
     }
 
     /// <summary>
@@ -529,7 +535,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="time"></param>
     /// <returns></returns>
     public TimingPoint GetGreenlineAtTime(double time) {
-        return GetTimingPointAtTime(time, greenlines, GetFirstTimingPointExtended());
+        return GetTimingPointAtTime(time, greenlines, GetFirstTimingPointExtended())!;
     }
 
     /// <summary>
@@ -538,8 +544,8 @@ public class Timing : IList<TimingPoint> {
     /// <param name="time"></param>
     /// <param name="firstTimingPoint"></param>
     /// <returns></returns>
-    public TimingPoint GetRedlineAtTime(double time, TimingPoint firstTimingPoint=null) {
-        return GetTimingPointAtTime(time, redlines, firstTimingPoint ?? GetFirstTimingPointExtended());
+    public TimingPoint GetRedlineAtTime(double time, TimingPoint? firstTimingPoint = null) {
+        return GetTimingPointAtTime(time, redlines, firstTimingPoint ?? GetFirstTimingPointExtended())!;
     }
 
     /// <summary>
@@ -547,7 +553,7 @@ public class Timing : IList<TimingPoint> {
     /// </summary>
     /// <param name="time"></param>
     /// <returns></returns>
-    public TimingPoint GetRedlineAfterTime(double time) {
+    public TimingPoint? GetRedlineAfterTime(double time) {
         return GetTimingPointAfterTime(time, redlines);
     }
 
@@ -600,14 +606,14 @@ public class Timing : IList<TimingPoint> {
     }
 
     public TimingPoint GetFirstTimingPointExtended() {
-        // Add an extra timingpoint that is the same as the first redline but 128 x meter beats earlier so any objects before the first redline can use that thing
+        // Add an extra timing point that is the same as the first redline but 128 x meter beats earlier so any objects before the first redline can use that thing
 
-        // When you have a greenline before the first redline, the greenline will act like the first redline and you can snap objects to the greenline's bpm.
+        // When you have a greenline before the first redline, the greenline will act like the first redline, and you can snap objects to the greenline's bpm.
         // The value in the greenline will be used as the milliseconds per beat, so for example a 1x SliderVelocity slider will be 600 bpm.
         // The timeline will work like a redline on 0 offset and 1000 milliseconds per beat
 
-        TimingPoint firstTp = timingPoints.FirstOrDefault();
-        if( firstTp != null && firstTp.Uninherited ) {
+        TimingPoint? firstTp = timingPoints.FirstOrDefault();
+        if (firstTp is { Uninherited: true }) {
             return new TimingPoint(firstTp.Offset - firstTp.MpB * firstTp.Meter.TempoDenominator * 128, firstTp.MpB,
                 firstTp.Meter, firstTp.SampleSet, firstTp.SampleIndex, firstTp.Volume, firstTp.Uninherited, false, false);
         }

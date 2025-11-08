@@ -5,9 +5,9 @@
 /// </summary>
 public class SectionMetadata {
     public string Artist { get; set; } = string.Empty;
-    public string ArtistUnicode { get; set; }
+    public string? ArtistUnicode { get; set; }
     public string Title { get; set; } = string.Empty;
-    public string TitleUnicode { get; set; }
+    public string? TitleUnicode { get; set; }
     public string Creator { get; set; } = string.Empty;
     public string Version { get; set; } = string.Empty;
     public string Tags { get; set; } = string.Empty;
