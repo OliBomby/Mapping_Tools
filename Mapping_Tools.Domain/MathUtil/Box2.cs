@@ -94,12 +94,12 @@ public struct Box2 :IEquatable<Box2> {
     /// <summary>
     /// Gets a double describing the width of the Box2 structure.
     /// </summary>
-    public double Width { get { return System.Math.Abs(Right - Left); } }
+    public double Width { get { return Math.Abs(Right - Left); } }
 
     /// <summary>
     /// Gets a double describing the height of the Box2 structure.
     /// </summary>
-    public double Height { get { return System.Math.Abs(Bottom - Top); } }
+    public double Height { get { return Math.Abs(Bottom - Top); } }
 
     /// <summary>
     /// Returns whether the box contains the specified point on the closed region described by this Box2.
@@ -179,10 +179,10 @@ public struct Box2 :IEquatable<Box2> {
     /// </summary>
     public override int GetHashCode() {
         unchecked {
-            var hashCode = this.Left.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Right.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Top.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Bottom.GetHashCode();
+            var hashCode = Left.GetHashCode();
+            hashCode = hashCode * 397 ^ Right.GetHashCode();
+            hashCode = hashCode * 397 ^ Top.GetHashCode();
+            hashCode = hashCode * 397 ^ Bottom.GetHashCode();
             return hashCode;
         }
     }

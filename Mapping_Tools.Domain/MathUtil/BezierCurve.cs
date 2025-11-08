@@ -44,7 +44,7 @@ public struct BezierCurve {
         }
 
         this.points = [..points];
-        this.Parallel = 0.0f;
+        Parallel = 0.0f;
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public struct BezierCurve {
         }
 
         this.points = [..points];
-        this.Parallel = 0.0f;
+        Parallel = 0.0f;
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public struct BezierCurve {
             throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
         }
 
-        this.Parallel = parallel;
+        Parallel = parallel;
         this.points = [..points];
     }
 
@@ -84,7 +84,7 @@ public struct BezierCurve {
             throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
         }
 
-        this.Parallel = parallel;
+        Parallel = parallel;
         this.points = [..points];
     }
 
@@ -95,7 +95,7 @@ public struct BezierCurve {
     /// <param name="t">The t value, between 0.0f and 1.0f.</param>
     /// <returns>Resulting point.</returns>
     public Vector2 CalculatePoint(double t) {
-        return BezierCurve.CalculatePoint(points, t, Parallel);
+        return CalculatePoint(points, t, Parallel);
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public struct BezierCurve {
     /// <remarks>The precision gets better as the <paramref name="precision"/>
     /// value gets smaller.</remarks>
     public double CalculateLength(double precision) {
-        return BezierCurve.CalculateLength(points, precision, Parallel);
+        return CalculateLength(points, precision, Parallel);
     }
 
     /// <summary>
@@ -117,7 +117,7 @@ public struct BezierCurve {
     /// <returns>The precision gets better as the <paramref name="precision"/>
     /// value gets smaller.</returns>
     public static double CalculateLength(IList<Vector2> points, double precision) {
-        return BezierCurve.CalculateLength(points, precision, 0.0f);
+        return CalculateLength(points, precision, 0.0f);
     }
 
     /// <summary>
@@ -135,7 +135,7 @@ public struct BezierCurve {
     /// of 5.0f to the orignal curve.</para></remarks>
     public static double CalculateLength(IList<Vector2> points, double precision, double parallel) {
         double length = 0.0f;
-        Vector2 old = BezierCurve.CalculatePoint(points, 0.0f, parallel);
+        Vector2 old = CalculatePoint(points, 0.0f, parallel);
 
         for( double i = precision; i < 1.0f + precision; i += precision ) {
             Vector2 n = CalculatePoint(points, i, parallel);
@@ -153,7 +153,7 @@ public struct BezierCurve {
     /// <param name="t">The t parameter, a value between 0.0f and 1.0f.</param>
     /// <returns>Resulting point.</returns>
     public static Vector2 CalculatePoint(IList<Vector2> points, double t) {
-        return BezierCurve.CalculatePoint(points, t, 0.0f);
+        return CalculatePoint(points, t, 0.0f);
     }
 
     /// <summary>
@@ -174,8 +174,8 @@ public struct BezierCurve {
         int i = 0;
 
         foreach( Vector2 pt in points ) {
-            temp = MathHelper.BinomialCoefficient(points.Count - 1, i) * System.Math.Pow(t, i) *
-                   System.Math.Pow(c, points.Count - 1 - i);
+            temp = MathHelper.BinomialCoefficient(points.Count - 1, i) * Math.Pow(t, i) *
+                   Math.Pow(c, points.Count - 1 - i);
 
             r.X += temp * pt.X;
             r.Y += temp * pt.Y;
@@ -211,8 +211,8 @@ public struct BezierCurve {
         int i = 0;
 
         foreach( Vector2 pt in points ) {
-            temp = MathHelper.BinomialCoefficient(points.Count - 2, i) * System.Math.Pow(t, i) *
-                   System.Math.Pow(c, points.Count - 2 - i);
+            temp = MathHelper.BinomialCoefficient(points.Count - 2, i) * Math.Pow(t, i) *
+                   Math.Pow(c, points.Count - 2 - i);
 
             r.X += temp * pt.X;
             r.Y += temp * pt.Y;

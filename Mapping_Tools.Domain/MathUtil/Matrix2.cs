@@ -166,14 +166,14 @@ public struct Matrix2 : IEquatable<Matrix2> {
     /// Converts this instance to it's transpose.
     /// </summary>
     public void Transpose() {
-        this = Matrix2.Transpose(this);
+        this = Transpose(this);
     }
 
     /// <summary>
     /// Converts this instance into its inverse.
     /// </summary>
     public void Invert() {
-        this = Matrix2.Invert(this);
+        this = Invert(this);
     }
 
     /// <summary>
@@ -182,8 +182,8 @@ public struct Matrix2 : IEquatable<Matrix2> {
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix2 instance.</param>
     public static void CreateRotation(double angle, out Matrix2 result) {
-        double cos = System.Math.Cos(angle);
-        double sin = System.Math.Sin(angle);
+        double cos = Math.Cos(angle);
+        double sin = Math.Sin(angle);
 
         result.Row0.X = cos;
         result.Row0.Y = sin;
@@ -621,7 +621,7 @@ public struct Matrix2 : IEquatable<Matrix2> {
     /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
     public override int GetHashCode() {
         unchecked {
-            return this.Row0.GetHashCode() * 397 ^ this.Row1.GetHashCode();
+            return Row0.GetHashCode() * 397 ^ Row1.GetHashCode();
         }
     }
 
@@ -635,7 +635,7 @@ public struct Matrix2 : IEquatable<Matrix2> {
             return false;
         }
 
-        return this.Equals((Matrix2) obj);
+        return Equals((Matrix2) obj);
     }
 
     /// <summary>Indicates whether the current matrix is equal to another matrix.</summary>

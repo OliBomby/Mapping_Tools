@@ -75,7 +75,7 @@ public class SectionDifficulty {
     /// <param name="approachRate">The approach rate difficulty setting.</param>
     /// <returns>The time in milliseconds between a hit object appearing on screen and getting perfectly hit.</returns>
     public static double GetApproachTime(double approachRate) {
-        return SectionDifficulty.DifficultyRange(approachRate, 1800, 1200, 450);
+        return DifficultyRange(approachRate, 1800, 1200, 450);
     }
 
     /// <summary>

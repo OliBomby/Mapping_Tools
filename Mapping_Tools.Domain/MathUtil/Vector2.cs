@@ -172,7 +172,7 @@ public struct Vector2 :IEquatable<Vector2> {
     /// Scales the Vector2 to unit length.
     /// </summary>
     public void Normalize() {
-        double scale = 1.0f / this.Length;
+        double scale = 1.0f / Length;
         X *= scale;
         Y *= scale;
     }

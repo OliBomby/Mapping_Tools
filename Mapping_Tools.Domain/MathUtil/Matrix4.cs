@@ -322,14 +322,14 @@ public struct Matrix4 :IEquatable<Matrix4> {
     /// Converts this instance into its inverse.
     /// </summary>
     public void Invert() {
-        this = Matrix4.Invert(this);
+        this = Invert(this);
     }
 
     /// <summary>
     /// Converts this instance into its transpose.
     /// </summary>
     public void Transpose() {
-        this = Matrix4.Transpose(this);
+        this = Transpose(this);
     }
 
     /// <summary>
@@ -345,7 +345,7 @@ public struct Matrix4 :IEquatable<Matrix4> {
     /// Divides each element in the Matrix by the <see cref="Determinant"/>.
     /// </summary>
     public void Normalize() {
-        var determinant = this.Determinant;
+        var determinant = Determinant;
         Row0 /= determinant;
         Row1 /= determinant;
         Row2 /= determinant;
@@ -490,8 +490,8 @@ public struct Matrix4 :IEquatable<Matrix4> {
         double axisX = axis.X, axisY = axis.Y, axisZ = axis.Z;
 
         // calculate angles
-        double cos = System.Math.Cos(-angle);
-        double sin = System.Math.Sin(-angle);
+        double cos = Math.Cos(-angle);
+        double sin = Math.Sin(-angle);
         double t = 1.0f - cos;
 
         // do the conversion math once
@@ -558,8 +558,8 @@ public struct Matrix4 :IEquatable<Matrix4> {
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix4 instance.</param>
     public static void CreateRotationX(double angle, out Matrix4 result) {
-        double cos = System.Math.Cos(angle);
-        double sin = System.Math.Sin(angle);
+        double cos = Math.Cos(angle);
+        double sin = Math.Sin(angle);
 
         result = Identity;
         result.Row1.Y = cos;
@@ -584,8 +584,8 @@ public struct Matrix4 :IEquatable<Matrix4> {
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix4 instance.</param>
     public static void CreateRotationY(double angle, out Matrix4 result) {
-        double cos = System.Math.Cos(angle);
-        double sin = System.Math.Sin(angle);
+        double cos = Math.Cos(angle);
+        double sin = Math.Sin(angle);
 
         result = Identity;
         result.Row0.X = cos;
@@ -610,8 +610,8 @@ public struct Matrix4 :IEquatable<Matrix4> {
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix4 instance.</param>
     public static void CreateRotationZ(double angle, out Matrix4 result) {
-        double cos = System.Math.Cos(angle);
-        double sin = System.Math.Sin(angle);
+        double cos = Math.Cos(angle);
+        double sin = Math.Sin(angle);
 
         result = Identity;
         result.Row0.X = cos;
@@ -846,7 +846,7 @@ public struct Matrix4 :IEquatable<Matrix4> {
             throw new ArgumentOutOfRangeException("zFar");
         }
 
-        double yMax = zNear * System.Math.Tan(0.5f * fovy);
+        double yMax = zNear * Math.Tan(0.5f * fovy);
         double yMin = -yMax;
         double xMin = yMin * aspect;
         double xMax = yMax * aspect;
@@ -1147,7 +1147,7 @@ public struct Matrix4 :IEquatable<Matrix4> {
                 if( pivotIdx[j] != 0 ) {
                     for( int k = 0; k < 4; ++k ) {
                         if( pivotIdx[k] == -1 ) {
-                            double absVal = System.Math.Abs(inverse[j, k]);
+                            double absVal = Math.Abs(inverse[j, k]);
                             if( absVal > maxPivot ) {
                                 maxPivot = absVal;
                                 irow = j;
@@ -1270,7 +1270,7 @@ public struct Matrix4 :IEquatable<Matrix4> {
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix4 which holds the result of the multiplication</returns>
     public static Matrix4 operator *(Matrix4 left, Matrix4 right) {
-        return Matrix4.Mult(left, right);
+        return Mult(left, right);
     }
 
     /// <summary>
@@ -1280,7 +1280,7 @@ public struct Matrix4 :IEquatable<Matrix4> {
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix4 which holds the result of the multiplication</returns>
     public static Matrix4 operator *(Matrix4 left, double right) {
-        return Matrix4.Mult(left, right);
+        return Mult(left, right);
     }
 
     /// <summary>
@@ -1290,7 +1290,7 @@ public struct Matrix4 :IEquatable<Matrix4> {
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix4 which holds the result of the addition</returns>
     public static Matrix4 operator +(Matrix4 left, Matrix4 right) {
-        return Matrix4.Add(left, right);
+        return Add(left, right);
     }
 
     /// <summary>
@@ -1300,7 +1300,7 @@ public struct Matrix4 :IEquatable<Matrix4> {
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix4 which holds the result of the subtraction</returns>
     public static Matrix4 operator -(Matrix4 left, Matrix4 right) {
-        return Matrix4.Subtract(left, right);
+        return Subtract(left, right);
     }
 
     /// <summary>
@@ -1337,10 +1337,10 @@ public struct Matrix4 :IEquatable<Matrix4> {
     /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
     public override int GetHashCode() {
         unchecked {
-            var hashCode = this.Row0.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Row1.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Row2.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Row3.GetHashCode();
+            var hashCode = Row0.GetHashCode();
+            hashCode = hashCode * 397 ^ Row1.GetHashCode();
+            hashCode = hashCode * 397 ^ Row2.GetHashCode();
+            hashCode = hashCode * 397 ^ Row3.GetHashCode();
             return hashCode;
         }
     }
@@ -1355,7 +1355,7 @@ public struct Matrix4 :IEquatable<Matrix4> {
             return false;
         }
 
-        return this.Equals((Matrix4) obj);
+        return Equals((Matrix4) obj);
     }
 
     /// <summary>Indicates whether the current matrix is equal to another matrix.</summary>

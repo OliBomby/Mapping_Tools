@@ -229,7 +229,7 @@ public struct Matrix3X4 :IEquatable<Matrix3X4> {
     /// Converts this instance into its inverse.
     /// </summary>
     public void Invert() {
-        this = Matrix3X4.Invert(this);
+        this = Invert(this);
     }
 
     /// <summary>
@@ -242,8 +242,8 @@ public struct Matrix3X4 :IEquatable<Matrix3X4> {
         axis.Normalize();
         double axisX = axis.X, axisY = axis.Y, axisZ = axis.Z;
 
-        double cos = System.Math.Cos(angle);
-        double sin = System.Math.Sin(angle);
+        double cos = Math.Cos(angle);
+        double sin = Math.Sin(angle);
         double t = 1.0f - cos;
 
         double tXX = t * axisX * axisX,
@@ -329,8 +329,8 @@ public struct Matrix3X4 :IEquatable<Matrix3X4> {
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix4 instance.</param>
     public static void CreateRotationX(double angle, out Matrix3X4 result) {
-        double cos = System.Math.Cos(angle);
-        double sin = System.Math.Sin(angle);
+        double cos = Math.Cos(angle);
+        double sin = Math.Sin(angle);
 
         result.Row0.X = 1;
         result.Row0.Y = 0;
@@ -362,8 +362,8 @@ public struct Matrix3X4 :IEquatable<Matrix3X4> {
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix4 instance.</param>
     public static void CreateRotationY(double angle, out Matrix3X4 result) {
-        double cos = System.Math.Cos(angle);
-        double sin = System.Math.Sin(angle);
+        double cos = Math.Cos(angle);
+        double sin = Math.Sin(angle);
 
         result.Row0.X = cos;
         result.Row0.Y = 0;
@@ -395,8 +395,8 @@ public struct Matrix3X4 :IEquatable<Matrix3X4> {
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix4 instance.</param>
     public static void CreateRotationZ(double angle, out Matrix3X4 result) {
-        double cos = System.Math.Cos(angle);
-        double sin = System.Math.Sin(angle);
+        double cos = Math.Cos(angle);
+        double sin = Math.Sin(angle);
 
         result.Row0.X = cos;
         result.Row0.Y = sin;
@@ -740,7 +740,7 @@ public struct Matrix3X4 :IEquatable<Matrix3X4> {
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix3 which holds the result of the multiplication</returns>
     public static Matrix3 operator *(Matrix3X4 left, Matrix4X3 right) {
-        return Matrix3X4.Mult(left, right);
+        return Mult(left, right);
     }
 
     /// <summary>
@@ -750,7 +750,7 @@ public struct Matrix3X4 :IEquatable<Matrix3X4> {
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix3x4 which holds the result of the multiplication</returns>
     public static Matrix3X4 operator *(Matrix3X4 left, Matrix3X4 right) {
-        return Matrix3X4.Mult(left, right);
+        return Mult(left, right);
     }
 
     /// <summary>
@@ -760,7 +760,7 @@ public struct Matrix3X4 :IEquatable<Matrix3X4> {
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix3x4 which holds the result of the multiplication</returns>
     public static Matrix3X4 operator *(Matrix3X4 left, double right) {
-        return Matrix3X4.Mult(left, right);
+        return Mult(left, right);
     }
 
     /// <summary>
@@ -770,7 +770,7 @@ public struct Matrix3X4 :IEquatable<Matrix3X4> {
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix3x4 which holds the result of the addition</returns>
     public static Matrix3X4 operator +(Matrix3X4 left, Matrix3X4 right) {
-        return Matrix3X4.Add(left, right);
+        return Add(left, right);
     }
 
     /// <summary>
@@ -780,7 +780,7 @@ public struct Matrix3X4 :IEquatable<Matrix3X4> {
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix3x4 which holds the result of the subtraction</returns>
     public static Matrix3X4 operator -(Matrix3X4 left, Matrix3X4 right) {
-        return Matrix3X4.Subtract(left, right);
+        return Subtract(left, right);
     }
 
     /// <summary>
@@ -817,9 +817,9 @@ public struct Matrix3X4 :IEquatable<Matrix3X4> {
     /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
     public override int GetHashCode() {
         unchecked {
-            var hashCode = this.Row0.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Row1.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Row2.GetHashCode();
+            var hashCode = Row0.GetHashCode();
+            hashCode = hashCode * 397 ^ Row1.GetHashCode();
+            hashCode = hashCode * 397 ^ Row2.GetHashCode();
             return hashCode;
         }
     }
@@ -834,7 +834,7 @@ public struct Matrix3X4 :IEquatable<Matrix3X4> {
             return false;
         }
 
-        return this.Equals((Matrix3X4) obj);
+        return Equals((Matrix3X4) obj);
     }
 
     /// <summary>

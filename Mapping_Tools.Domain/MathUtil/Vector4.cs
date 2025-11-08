@@ -204,7 +204,7 @@ public struct Vector4 :IEquatable<Vector4> {
     /// <seealso cref="LengthSquared"/>
     public double Length {
         get {
-            return System.Math.Sqrt(X * X + Y * Y + Z * Z + W * W);
+            return Math.Sqrt(X * X + Y * Y + Z * Z + W * W);
         }
     }
 
@@ -251,7 +251,7 @@ public struct Vector4 :IEquatable<Vector4> {
     /// Scales the Vector4 to unit length.
     /// </summary>
     public void Normalize() {
-        double scale = 1.0f / this.Length;
+        double scale = 1.0f / Length;
         X *= scale;
         Y *= scale;
         Z *= scale;
@@ -1275,7 +1275,7 @@ public struct Vector4 :IEquatable<Vector4> {
     /// <param name="mat">The desired transformation</param>
     /// <returns>The transformed vector</returns>
     public static Vector4 operator *(Vector4 vec, Matrix4 mat) {
-        Vector4.Transform(ref vec, ref mat, out Vector4 result);
+        Transform(ref vec, ref mat, out Vector4 result);
         return result;
     }
 
@@ -1286,7 +1286,7 @@ public struct Vector4 :IEquatable<Vector4> {
     /// <param name="vec">The vector to transform</param>
     /// <returns>The transformed vector</returns>
     public static Vector4 operator *(Matrix4 mat, Vector4 vec) {
-        Vector4.Transform(ref mat, ref vec, out Vector4 result);
+        Transform(ref mat, ref vec, out Vector4 result);
         return result;
     }
 
@@ -1297,7 +1297,7 @@ public struct Vector4 :IEquatable<Vector4> {
     /// <param name="vec">The vector to transform.</param>
     /// <returns>The transformed vector</returns>
     public static Vector4 operator *(Quaternion quat, Vector4 vec) {
-        Vector4.Transform(ref vec, ref quat, out Vector4 result);
+        Transform(ref vec, ref quat, out Vector4 result);
         return result;
     }
 
@@ -1370,10 +1370,10 @@ public struct Vector4 :IEquatable<Vector4> {
     /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
     public override int GetHashCode() {
         unchecked {
-            var hashCode = this.X.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Y.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Z.GetHashCode();
-            hashCode = hashCode * 397 ^ this.W.GetHashCode();
+            var hashCode = X.GetHashCode();
+            hashCode = hashCode * 397 ^ Y.GetHashCode();
+            hashCode = hashCode * 397 ^ Z.GetHashCode();
+            hashCode = hashCode * 397 ^ W.GetHashCode();
             return hashCode;
         }
     }
@@ -1388,7 +1388,7 @@ public struct Vector4 :IEquatable<Vector4> {
             return false;
         }
 
-        return this.Equals((Vector4) obj);
+        return Equals((Vector4) obj);
     }
 
     /// <summary>Indicates whether the current vector is equal to another vector.</summary>

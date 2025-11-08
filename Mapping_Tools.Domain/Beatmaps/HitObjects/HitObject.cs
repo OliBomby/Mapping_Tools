@@ -146,7 +146,7 @@ public abstract class HitObject : ContextableBase, IComparable<HitObject>, IHasP
 
     protected abstract void DeepCloneAdd(HitObject clonedHitObject);
 
-    public int CompareTo(HitObject other) {
+    public int CompareTo(HitObject? other) {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;
         if (StartTime == other.StartTime) return other.NewCombo.CompareTo(NewCombo);

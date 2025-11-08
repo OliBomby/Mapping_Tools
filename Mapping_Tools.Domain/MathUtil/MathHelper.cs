@@ -74,7 +74,7 @@ public static class MathHelper {
         if( n < 0 ) {
             throw new ArgumentOutOfRangeException("n", "Must be positive.");
         }
-        return (long) System.Math.Pow(2, System.Math.Ceiling(System.Math.Log(n, 2)));
+        return (long) Math.Pow(2, Math.Ceiling(Math.Log(n, 2)));
     }
 
     /// <summary>
@@ -86,7 +86,7 @@ public static class MathHelper {
         if( n < 0 ) {
             throw new ArgumentOutOfRangeException("n", "Must be positive.");
         }
-        return (int) System.Math.Pow(2, System.Math.Ceiling(System.Math.Log(n, 2)));
+        return (int) Math.Pow(2, Math.Ceiling(Math.Log(n, 2)));
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public static class MathHelper {
         if( n < 0 ) {
             throw new ArgumentOutOfRangeException("n", "Must be positive.");
         }
-        return System.Math.Pow(2, System.Math.Ceiling(System.Math.Log((double)n, 2)));
+        return Math.Pow(2, Math.Ceiling(Math.Log((double)n, 2)));
     }
 
     /// <summary>Calculates the factorial of a given natural number.
@@ -153,7 +153,7 @@ public static class MathHelper {
     /// <param name="degrees">An angle in degrees</param>
     /// <returns>The angle expressed in radians</returns>
     public static double DegreesToRadians(double degrees) {
-        const double degToRad = System.Math.PI / 180.0f;
+        const double degToRad = Math.PI / 180.0f;
         return degrees * degToRad;
     }
 
@@ -163,7 +163,7 @@ public static class MathHelper {
     /// <param name="radians">An angle in radians</param>
     /// <returns>The angle expressed in degrees</returns>
     public static double RadiansToDegrees(double radians) {
-        const double radToDeg = 180.0f / System.Math.PI;
+        const double radToDeg = 180.0f / Math.PI;
         return radians * radToDeg;
     }
 

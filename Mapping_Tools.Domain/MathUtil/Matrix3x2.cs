@@ -178,8 +178,8 @@ public struct Matrix3X2 :IEquatable<Matrix3X2> {
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix3x2 instance.</param>
     public static void CreateRotation(double angle, out Matrix3X2 result) {
-        double cos = System.Math.Cos(angle);
-        double sin = System.Math.Sin(angle);
+        double cos = Math.Cos(angle);
+        double sin = Math.Sin(angle);
 
         result.Row0.X = cos;
         result.Row0.Y = sin;
@@ -584,9 +584,9 @@ public struct Matrix3X2 :IEquatable<Matrix3X2> {
     /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
     public override int GetHashCode() {
         unchecked {
-            var hashCode = this.Row0.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Row1.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Row2.GetHashCode();
+            var hashCode = Row0.GetHashCode();
+            hashCode = hashCode * 397 ^ Row1.GetHashCode();
+            hashCode = hashCode * 397 ^ Row2.GetHashCode();
             return hashCode;
         }
     }
@@ -601,7 +601,7 @@ public struct Matrix3X2 :IEquatable<Matrix3X2> {
             return false;
         }
 
-        return this.Equals((Matrix3X2) obj);
+        return Equals((Matrix3X2) obj);
     }
 
     /// <summary>

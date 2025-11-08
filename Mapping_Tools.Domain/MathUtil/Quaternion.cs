@@ -136,9 +136,9 @@ public struct Quaternion :IEquatable<Quaternion> {
 
         Vector4 result = new Vector4
         {
-            W = 2.0f * System.Math.Acos(q.W) // angle
+            W = 2.0f * Math.Acos(q.W) // angle
         };
-        double den = System.Math.Sqrt(1.0 - q.W * q.W);
+        double den = Math.Sqrt(1.0 - q.W * q.W);
         if( den > 0.0001f ) {
             result.Xyz = q.Xyz / den;
         }
@@ -157,7 +157,7 @@ public struct Quaternion :IEquatable<Quaternion> {
     /// <seealso cref="LengthSquared"/>
     public double Length {
         get {
-            return System.Math.Sqrt(W * W + Xyz.LengthSquared);
+            return Math.Sqrt(W * W + Xyz.LengthSquared);
         }
     }
 
@@ -199,7 +199,7 @@ public struct Quaternion :IEquatable<Quaternion> {
     /// Scales the Quaternion to unit length.
     /// </summary>
     public void Normalize() {
-        double scale = 1.0f / this.Length;
+        double scale = 1.0f / Length;
         Xyz *= scale;
         W *= scale;
     }
@@ -386,8 +386,8 @@ public struct Quaternion :IEquatable<Quaternion> {
 
         angle *= 0.5f;
         axis.Normalize();
-        result.Xyz = axis * System.Math.Sin(angle);
-        result.W = System.Math.Cos(angle);
+        result.Xyz = axis * Math.Sin(angle);
+        result.W = Math.Cos(angle);
 
         return Normalize(result);
     }
@@ -534,11 +534,11 @@ public struct Quaternion :IEquatable<Quaternion> {
         double blendB;
         if( cosHalfAngle < 0.99f ) {
             // do proper slerp for big angles
-            double halfAngle = System.Math.Acos(cosHalfAngle);
-            double sinHalfAngle = System.Math.Sin(halfAngle);
+            double halfAngle = Math.Acos(cosHalfAngle);
+            double sinHalfAngle = Math.Sin(halfAngle);
             double oneOverSinHalfAngle = 1.0f / sinHalfAngle;
-            blendA = System.Math.Sin(halfAngle * (1.0f - blend)) * oneOverSinHalfAngle;
-            blendB = System.Math.Sin(halfAngle * blend) * oneOverSinHalfAngle;
+            blendA = Math.Sin(halfAngle * (1.0f - blend)) * oneOverSinHalfAngle;
+            blendB = Math.Sin(halfAngle * blend) * oneOverSinHalfAngle;
         }
         else {
             // do lerp if angle is really small.
@@ -657,7 +657,7 @@ public struct Quaternion :IEquatable<Quaternion> {
     /// <returns>A hash code formed from the bitwise XOR of this objects members.</returns>
     public override int GetHashCode() {
         unchecked {
-            return this.Xyz.GetHashCode() * 397 ^ this.W.GetHashCode();
+            return Xyz.GetHashCode() * 397 ^ W.GetHashCode();
         }
     }
 

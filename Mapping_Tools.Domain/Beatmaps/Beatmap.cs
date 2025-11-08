@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Mapping_Tools.Domain.Beatmaps.Contexts;
 using Mapping_Tools.Domain.Beatmaps.Enums;
 using Mapping_Tools.Domain.Beatmaps.Events;
@@ -63,7 +62,7 @@ public class Beatmap {
     /// <param name="globalSv"></param>
     /// <param name="gameMode"></param>
     public Beatmap(List<HitObject> hitObjects, List<TimingPoint> timingPoints,
-        TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard) : this() {
+        TimingPoint? firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard) : this() {
         // Set the hit objects
         HitObjects = hitObjects;
 
@@ -71,7 +70,7 @@ public class Beatmap {
         BeatmapTiming.SetTimingPoints(timingPoints);
         BeatmapTiming.GlobalSliderMultiplier = globalSv;
 
-        if (!BeatmapTiming.Contains(firstUnInheritedTimingPoint)) {
+        if (firstUnInheritedTimingPoint is not null && !BeatmapTiming.Contains(firstUnInheritedTimingPoint)) {
             BeatmapTiming.Add(firstUnInheritedTimingPoint);
         }
 
@@ -376,7 +375,7 @@ public static class BeatmapExtensions {
         const double autoBreakGapSize = 5000;
 
         var approachTime = beatmap.Difficulty.ApproachTime;
-        var newBreakPeriods = new List<Events.Break>(beatmap.Storyboard.BreakPeriods.Count);
+        var newBreakPeriods = new List<Break>(beatmap.Storyboard.BreakPeriods.Count);
 
         // Add new break periods
         for (int i = 0; i < beatmap.HitObjects.Count - 1; i++) {
@@ -406,7 +405,7 @@ public static class BeatmapExtensions {
                 }
             } else if (!Precision.DefinitelySmaller(next.StartTime - prev.EndTime, autoBreakGapSize)) {
                 // Add new break
-                newBreakPeriods.Add(new Events.Break(prev.EndTime + minLeftMargin, next.StartTime - approachTime));
+                newBreakPeriods.Add(new Break(prev.EndTime + minLeftMargin, next.StartTime - approachTime));
             }
         }
 

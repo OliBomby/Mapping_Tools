@@ -141,7 +141,7 @@ public struct Vector3 :IEquatable<Vector3> {
     /// <seealso cref="LengthSquared"/>
     public double Length {
         get {
-            return System.Math.Sqrt(X * X + Y * Y + Z * Z);
+            return Math.Sqrt(X * X + Y * Y + Z * Z);
         }
     }
 
@@ -188,7 +188,7 @@ public struct Vector3 :IEquatable<Vector3> {
     /// Scales the Vector3 to unit length.
     /// </summary>
     public void Normalize() {
-        double scale = 1.0f / this.Length;
+        double scale = 1.0f / Length;
         X *= scale;
         Y *= scale;
         Z *= scale;
@@ -777,7 +777,7 @@ public struct Vector3 :IEquatable<Vector3> {
     /// <param name="result">The transformed normal</param>
     public static void TransformNormal(ref Vector3 norm, ref Matrix4 mat, out Vector3 result) {
         Matrix4 Inverse = Matrix4.Invert(mat);
-        Vector3.TransformNormalInverse(ref norm, ref Inverse, out result);
+        TransformNormalInverse(ref norm, ref Inverse, out result);
     }
 
     /// <summary>Transform a Normal by the (transpose of the) given Matrix</summary>
@@ -885,12 +885,12 @@ public struct Vector3 :IEquatable<Vector3> {
         // Since vec.W == 0, we can optimize quat * vec * quat^-1 as follows:
         // vec + 2.0 * cross(quat.xyz, cross(quat.xyz, vec) + quat.w * vec)
         Vector3 xyz = quat.Xyz;
-        Vector3.Cross(ref xyz, ref vec, out Vector3 temp);
-        Vector3.Multiply(ref vec, quat.W, out Vector3 temp2);
-        Vector3.Add(ref temp, ref temp2, out temp);
-        Vector3.Cross(ref xyz, ref temp, out temp);
-        Vector3.Multiply(ref temp, 2, out temp);
-        Vector3.Add(ref vec, ref temp, out result);
+        Cross(ref xyz, ref vec, out Vector3 temp);
+        Multiply(ref vec, quat.W, out Vector3 temp2);
+        Add(ref temp, ref temp2, out temp);
+        Cross(ref xyz, ref temp, out temp);
+        Multiply(ref temp, 2, out temp);
+        Add(ref vec, ref temp, out result);
     }
 
     /// <summary>Transform a Vector by the given Matrix using right-handed notation</summary>
@@ -950,8 +950,8 @@ public struct Vector3 :IEquatable<Vector3> {
     /// <param name="result">Angle (in radians) between the vectors.</param>
     /// <remarks>Note that the returned angle is never bigger than the constant Pi.</remarks>
     public static void CalculateAngle(ref Vector3 first, ref Vector3 second, out double result) {
-        Vector3.Dot(ref first, ref second, out double temp);
-        result = System.Math.Acos(MathHelper.Clamp(temp / (first.Length * second.Length), -1.0, 1.0));
+        Dot(ref first, ref second, out double temp);
+        result = Math.Acos(MathHelper.Clamp(temp / (first.Length * second.Length), -1.0, 1.0));
     }
 
     /// <summary>
@@ -1208,7 +1208,7 @@ public struct Vector3 :IEquatable<Vector3> {
     /// <param name="mat">The desired transformation</param>
     /// <returns>The transformed vector</returns>
     public static Vector3 operator *(Vector3 vec, Matrix3 mat) {
-        Vector3.Transform(ref vec, ref mat, out Vector3 result);
+        Transform(ref vec, ref mat, out Vector3 result);
         return result;
     }
 
@@ -1219,7 +1219,7 @@ public struct Vector3 :IEquatable<Vector3> {
     /// <param name="vec">The vector to transform</param>
     /// <returns>The transformed vector</returns>
     public static Vector3 operator *(Matrix3 mat, Vector3 vec) {
-        Vector3.Transform(ref mat, ref vec, out Vector3 result);
+        Transform(ref mat, ref vec, out Vector3 result);
         return result;
     }
 
@@ -1230,7 +1230,7 @@ public struct Vector3 :IEquatable<Vector3> {
     /// <param name="quat">The quaternion to rotate the vector by.</param>
     /// <returns></returns>
     public static Vector3 operator *(Quaternion quat, Vector3 vec) {
-        Vector3.Transform(ref vec, ref quat, out Vector3 result);
+        Transform(ref vec, ref quat, out Vector3 result);
         return result;
     }
 
@@ -1282,9 +1282,9 @@ public struct Vector3 :IEquatable<Vector3> {
     /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
     public override int GetHashCode() {
         unchecked {
-            var hashCode = this.X.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Y.GetHashCode();
-            hashCode = hashCode * 397 ^ this.Z.GetHashCode();
+            var hashCode = X.GetHashCode();
+            hashCode = hashCode * 397 ^ Y.GetHashCode();
+            hashCode = hashCode * 397 ^ Z.GetHashCode();
             return hashCode;
         }
     }
@@ -1299,7 +1299,7 @@ public struct Vector3 :IEquatable<Vector3> {
             return false;
         }
 
-        return this.Equals((Vector3) obj);
+        return Equals((Vector3) obj);
     }
 
     /// <summary>Indicates whether the current vector is equal to another vector.</summary>
