@@ -55,8 +55,8 @@ public class MapCleanerService {
         Timeline timeline = beatmap.GetTimeline();
 
         // Collect Kiai toggles and SliderVelocity changes for mania/taiko
-        List<TimingPoint> kiaiToggles = new List<TimingPoint>();
-        List<TimingPoint> svChanges = new List<TimingPoint>();
+        List<TimingPoint> kiaiToggles = [];
+        List<TimingPoint> svChanges = [];
         bool lastKiai = false;
         double lastSV = -100;
         foreach (TimingPoint tp in timing.TimingPoints) {
@@ -124,7 +124,7 @@ public class MapCleanerService {
         }
 
         // Make new timingpoints
-        List<ControlChange> timingPointsChanges = new List<ControlChange>();
+        List<ControlChange> timingPointsChanges = [];
 
         // Add redlines
         var redlines = timing.Redlines;
@@ -339,7 +339,7 @@ public class MapCleanerService {
         allFilenames = allFilenames.Select(removeExtension).ToHashSet();
 
         // Find which of the available samples are unused
-        List<string> unusedSamples = new List<string>();
+        List<string> unusedSamples = [];
         foreach (string samplePath in sampleLookup.Keys) {
             string extless = removeExtension(samplePath);
 

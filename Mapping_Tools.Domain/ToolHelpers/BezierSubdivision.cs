@@ -61,7 +61,7 @@ public class BezierSubdivision(List<Vector2> points, int level = 0, int index = 
 
     public BezierSubdivision Next() // Next index at current level
     {
-        var next = new BezierSubdivision(new List<Vector2>(Points), Level, Index + 1);
+        var next = new BezierSubdivision([..Points], Level, Index + 1);
         next.ScaleLeft(2);
         next.Reverse();
         return next;
@@ -69,7 +69,7 @@ public class BezierSubdivision(List<Vector2> points, int level = 0, int index = 
 
     public BezierSubdivision Prev() // Previous index at current level
     {
-        var next = new BezierSubdivision(new List<Vector2>(Points), Level, Index - 1);
+        var next = new BezierSubdivision([..Points], Level, Index - 1);
         next.ScaleRight(-1);
         next.Reverse();
         return next;
@@ -77,7 +77,7 @@ public class BezierSubdivision(List<Vector2> points, int level = 0, int index = 
 
     public BezierSubdivision Parent() // Parent subdivision (inverse of BezierSubdivide)
     {
-        var parent = new BezierSubdivision(new List<Vector2>(Points), Level - 1, Index >> 1);
+        var parent = new BezierSubdivision([..Points], Level - 1, Index >> 1);
         if ((Index & 1) == 0)
             parent.ScaleRight(2);
         else

@@ -32,7 +32,7 @@ public readonly struct ControlChange(
     public void AddChange(Timing timing, bool allAfter = false) {
         TimingPoint? addingTimingPoint = null;
         TimingPoint? prevTimingPoint = null;
-        List<TimingPoint> onTimingPoints = new List<TimingPoint>();
+        List<TimingPoint> onTimingPoints = [];
         bool onHasRed = false;
         bool onHasGreen = false;
 

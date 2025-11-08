@@ -200,10 +200,9 @@ public static class BezierConverter
     /// <returns></returns>
     public static List<Vector2> ConvertCatmullToBezierAnchors(List<Vector2> pts)
     {
-        List<Vector2> cubics = new List<Vector2>
-        {
+        List<Vector2> cubics = [
             pts[0],
-        };
+        ];
         int iLen = pts.Count;
         for (int i = 0; i < iLen - 1; i++)
         {

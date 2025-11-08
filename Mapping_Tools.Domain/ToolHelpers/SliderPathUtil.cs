@@ -163,7 +163,7 @@ public static class SliderPathUtil {
 
     public static IEnumerable<BezierSubdivision> ChopAnchorsLinear(List<Vector2> anchors) {
         for (int i = 1; i < anchors.Count; i++) {
-            var subdivision = new BezierSubdivision(new List<Vector2> {anchors[i - 1], anchors[i]});
+            var subdivision = new BezierSubdivision([anchors[i - 1], anchors[i]]);
             yield return subdivision;
         }
     }
