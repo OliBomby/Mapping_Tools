@@ -1,6 +1,6 @@
 ﻿namespace Mapping_Tools.Domain.Beatmaps.Events;
 
-public enum EventType {
+public enum CommandType {
     F, // Fade
     M, // Move
     MX, // Move X

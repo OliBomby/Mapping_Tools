@@ -3,6 +3,7 @@ using Mapping_Tools.Domain.Beatmaps.Enums;
 using Mapping_Tools.Domain.Beatmaps.HitObjects;
 using Mapping_Tools.Domain.Beatmaps.Parsing.V14.HitObjects;
 using Mapping_Tools.Domain.Beatmaps.Timings;
+using Mapping_Tools.Domain.MathUtil;
 
 namespace Mapping_Tools.Domain.Beatmaps.Parsing.V14;
 
@@ -68,7 +69,7 @@ public class BeatmapEncoder(
         builder.AppendLine("DistanceSpacing: " + beatmap.Editor.DistanceSpacing.ToInvariant());
         builder.AppendLine("BeatDivisor: " + beatmap.Editor.BeatDivisor.ToInvariant());
         builder.AppendLine("GridSize: " + beatmap.Editor.GridSize.ToInvariant());
-        if (beatmap.BeatmapVersion > 10 || beatmap.Editor.TimelineZoom != 1f)
+        if (beatmap.BeatmapVersion > 10 || Math.Abs(beatmap.Editor.TimelineZoom - 1f) > Precision.FloatEpsilon)
             builder.AppendLine("TimelineZoom: " + beatmap.Editor.TimelineZoom.ToInvariant());
         builder.AppendLine();
 

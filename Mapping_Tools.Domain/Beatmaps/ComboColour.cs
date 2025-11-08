@@ -1,6 +1,4 @@
-﻿using Mapping_Tools.Domain.Beatmaps.Parsing;
-
-namespace Mapping_Tools.Domain.Beatmaps;
+﻿namespace Mapping_Tools.Domain.Beatmaps;
 
 /// <summary>
 /// Combo colour or special color value type used in osu! beatmaps.

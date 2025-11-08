@@ -13,6 +13,11 @@ public static class Precision {
     public const double DoubleEpsilon = 1e-7;
 
     /// <summary>
+    /// Default error margin for float precision numbers.
+    /// </summary>
+    public const float FloatEpsilon = 1e-5f;
+
+    /// <summary>
     /// Checks if value1 is bigger than value2 by some margin.
     /// </summary>
     public static bool DefinitelyBigger(double value1, double value2, double acceptableDifference = DoubleEpsilon) {

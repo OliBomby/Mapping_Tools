@@ -1,7 +1,4 @@
-﻿using System.Text;
-using Mapping_Tools.Domain.Beatmaps.Parsing;
-using Mapping_Tools.Domain.Beatmaps.Types;
-using Mapping_Tools.Domain.MathUtil;
+﻿using Mapping_Tools.Domain.Beatmaps.Types;
 
 namespace Mapping_Tools.Domain.Beatmaps.Events;
 
@@ -17,70 +14,5 @@ public class OtherCommand : Command, IHasDuration {
     /// <summary>
     /// All other parameters
     /// </summary>
-    public double[] Params { get; set; }
-
-    public override string GetLine() {
-        var builder = new StringBuilder(8 + Params.Length * 2);
-
-        builder.Append(EventType.ToString());
-        builder.Append(',');
-        builder.Append(((int) Easing).ToInvariant());
-        builder.Append(',');
-        builder.Append(StartTime.ToRoundInvariant());
-        builder.Append(',');
-        if (!Precision.AlmostEquals(EndTime, StartTime))
-            builder.Append(EndTime.ToRoundInvariant());
-
-        if (Params.Length == 0) {
-            builder.Append(',');
-        } else {
-            foreach (var param in Params) {
-                builder.Append(',');
-                builder.Append(param.ToInvariant());
-            }
-        }
-
-        return builder.ToString();
-    }
-
-    public override void SetLine(string line) {
-        var subLine = RemoveIndents(line);
-        var values = subLine.Split(',');
-
-        if (Enum.TryParse(values[0], out EventType eventType))
-            EventType = eventType;
-        else throw new BeatmapParsingException("Failed to parse type of command.", line);
-
-        if (Enum.TryParse(values[1], out EasingType easingType))
-            Easing = easingType;
-        else throw new BeatmapParsingException("Failed to parse easing of command.", line);
-
-        if (FileFormatHelper.TryParseDouble(values[2], out double startTime))
-            StartTime = startTime;
-        else throw new BeatmapParsingException("Failed to parse start time of command.", line);
-
-        // Set end time to start time if empty. This accounts for the shorthand
-        if (string.IsNullOrEmpty(values[3])) {
-            EndTime = StartTime;
-        }
-        else {
-            if (FileFormatHelper.TryParseDouble(values[3], out double endTime))
-                EndTime = endTime;
-            else throw new BeatmapParsingException("Failed to parse end time of command.", line);
-        }
-
-        if (values.Length <= 4 || string.IsNullOrWhiteSpace(values[4])) {
-            Params = [];
-        } else {
-            Params = new double[values.Length - 4];
-            for (int i = 4; i < values.Length; i++) {
-                var stringValue = values[i];
-                int index = i - 4;
-
-                if (FileFormatHelper.TryParseDouble(stringValue, out double value))
-                    Params[index] = value;
-                else throw new BeatmapParsingException($"Failed to parse value at position {i} of command.", line);
-            }
-        }
-    }
+    public required double[] Params { get; set; }
 }

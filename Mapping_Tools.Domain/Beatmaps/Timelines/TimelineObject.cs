@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Mapping_Tools.Domain.Beatmaps.Contexts;
+﻿using Mapping_Tools.Domain.Beatmaps.Contexts;
 using Mapping_Tools.Domain.Beatmaps.Enums;
 using Mapping_Tools.Domain.Beatmaps.HitObjects;
 using Mapping_Tools.Domain.MathUtil;
