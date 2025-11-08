@@ -6,5 +6,5 @@ public class HoldNoteTail(double time, HitSampleInfo hitsounds) : TimelineObject
     public override bool HasHitsound => false;
     public override bool CanCustoms => false;
 
-    public override void HitsoundsToOrigin() { }
+    public override void HitsoundsToOrigin(HitSampleInfo hitsounds, bool copyCustoms = false) { }
 }

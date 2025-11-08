@@ -6,7 +6,7 @@ namespace Mapping_Tools.Domain.Beatmaps.Sections;
 /// Contains all the values in the [General] section of a .osu file.
 /// </summary>
 public class SectionGeneral {
-    public string? AudioFilename { get; set; }
+    public string AudioFilename { get; set; } = string.Empty;
     public int AudioLeadIn { get; set; } = 0;
 
     /// <summary>

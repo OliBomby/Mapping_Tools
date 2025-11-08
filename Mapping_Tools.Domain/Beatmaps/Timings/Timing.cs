@@ -408,9 +408,20 @@ public class Timing : IList<TimingPoint> {
     /// </summary>
     /// <param name="time"></param>
     /// <param name="timingPoints">All the timing points.</param>
+    /// <returns></returns>
+    public static TimingPoint? GetTimingPointAtTime(double time, IReadOnlyList<TimingPoint> timingPoints) {
+        var index = GetTimingPointIndexAtTime(time, timingPoints);
+        return index != -1 ? timingPoints[index] : null;
+    }
+
+    /// <summary>
+    /// Finds the timing point which is in effect at a given time with a custom set of timing points.
+    /// </summary>
+    /// <param name="time"></param>
+    /// <param name="timingPoints">All the timing points.</param>
     /// <param name="firstTimingPoint">The first timing point to start searching from.</param>
     /// <returns></returns>
-    public static TimingPoint? GetTimingPointAtTime(double time, IReadOnlyList<TimingPoint> timingPoints, TimingPoint? firstTimingPoint) {
+    public static TimingPoint GetTimingPointAtTime(double time, IReadOnlyList<TimingPoint> timingPoints, TimingPoint firstTimingPoint) {
         var index = GetTimingPointIndexAtTime(time, timingPoints);
         return index != -1 ? timingPoints[index] : firstTimingPoint;
     }
@@ -486,7 +497,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="time"></param>
     /// <returns></returns>
     public TimingPoint GetTimingPointAtTime(double time) {
-        return GetTimingPointAtTime(time, timingPoints, GetFirstTimingPointExtended())!;
+        return GetTimingPointAtTime(time, timingPoints, GetFirstTimingPointExtended());
     }
 
     /// <summary>
@@ -535,7 +546,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="time"></param>
     /// <returns></returns>
     public TimingPoint GetGreenlineAtTime(double time) {
-        return GetTimingPointAtTime(time, greenlines, GetFirstTimingPointExtended())!;
+        return GetTimingPointAtTime(time, greenlines, GetFirstTimingPointExtended());
     }
 
     /// <summary>
@@ -545,7 +556,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="firstTimingPoint"></param>
     /// <returns></returns>
     public TimingPoint GetRedlineAtTime(double time, TimingPoint? firstTimingPoint = null) {
-        return GetTimingPointAtTime(time, redlines, firstTimingPoint ?? GetFirstTimingPointExtended())!;
+        return GetTimingPointAtTime(time, redlines, firstTimingPoint ?? GetFirstTimingPointExtended());
     }
 
     /// <summary>

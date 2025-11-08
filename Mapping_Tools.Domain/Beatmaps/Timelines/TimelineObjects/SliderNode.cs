@@ -14,11 +14,11 @@ public class SliderNode(double time, HitSampleInfo hitsounds, int nodeIndex) : T
     /// </summary>
     public int NodeIndex { get; set; } = nodeIndex;
 
-    public override void HitsoundsToOrigin() {
-        if (!(Origin is Slider slider))
+    public override void HitsoundsToOrigin(HitSampleInfo hitsounds, bool copyCustoms = false) {
+        if (Origin is not Slider slider)
             throw new InvalidOperationException(
                 $"Invalid origin. Can not assign slider node hitsounds to a {Origin?.GetType()}: {Origin}.");
 
-        Hitsounds.CopyTo(slider.GetNodeSamples(NodeIndex));
+        hitsounds.CopyTo(slider.GetNodeSamples(NodeIndex));
     }
 }

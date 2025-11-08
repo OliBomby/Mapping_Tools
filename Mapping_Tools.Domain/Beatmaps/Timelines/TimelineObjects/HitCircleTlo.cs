@@ -6,11 +6,11 @@ public class HitCircleTlo(double time, HitSampleInfo hitsounds) : TimelineObject
     public override bool HasHitsound => true;
     public override bool CanCustoms => true;
 
-    public override void HitsoundsToOrigin() {
-        if (!(Origin is HitCircle))
+    public override void HitsoundsToOrigin(HitSampleInfo hitsounds, bool copyCustoms = false) {
+        if (Origin is not HitCircle)
             throw new InvalidOperationException(
-                $"Invalid origin. Can not assign hitcircle hitsounds to a {Origin?.GetType()}: {Origin}.");
+                $"Invalid origin. Can not assign hit circle hitsounds to a {Origin?.GetType()}: {Origin}.");
 
-        Hitsounds.CopyTo(Origin.Hitsounds);
+        hitsounds.CopyTo(Origin.Hitsounds);
     }
 }

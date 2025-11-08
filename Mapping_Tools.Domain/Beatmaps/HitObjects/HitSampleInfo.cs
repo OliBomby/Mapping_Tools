@@ -54,13 +54,14 @@ public class HitSampleInfo : IEquatable<HitSampleInfo> {
     /// </summary>
     /// <param name="other">The object to copy to.</param>
     /// <param name="copyCustoms">Whether to copy the <see cref="CustomIndex"/>, <see cref="Filename"/>, and <see cref="Volume"/> properties.</param>
-    public void CopyTo(HitSampleInfo other, bool copyCustoms = true) {
+    public void CopyTo(HitSampleInfo other, bool copyCustoms = false) {
         other.SampleSet = SampleSet;
         other.AdditionSet = AdditionSet;
         other.Normal = Normal;
         other.Whistle = Whistle;
         other.Finish = Finish;
         other.Clap = Clap;
+
         if (copyCustoms) {
             other.CustomIndex = CustomIndex;
             other.Filename = Filename;

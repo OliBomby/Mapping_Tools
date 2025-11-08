@@ -6,11 +6,11 @@ public class HoldNoteHead(double time, HitSampleInfo hitsounds) : TimelineObject
     public override bool HasHitsound => true;
     public override bool CanCustoms => false;
 
-    public override void HitsoundsToOrigin() {
-        if (!(Origin is HoldNote))
+    public override void HitsoundsToOrigin(HitSampleInfo hitsounds, bool copyCustoms = false) {
+        if (Origin is not HoldNote)
             throw new InvalidOperationException(
                 $"Invalid origin. Can not assign hold note head hitsounds to a {Origin?.GetType()}: {Origin}.");
 
-        Hitsounds.CopyTo(Origin.Hitsounds);
+        hitsounds.CopyTo(Origin.Hitsounds);
     }
 }

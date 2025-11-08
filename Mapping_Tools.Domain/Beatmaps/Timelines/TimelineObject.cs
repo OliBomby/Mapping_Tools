@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Domain.Beatmaps.Contexts;
+﻿using Mapping_Tools.Domain.Audio;
+using Mapping_Tools.Domain.Beatmaps.Contexts;
 using Mapping_Tools.Domain.Beatmaps.Enums;
 using Mapping_Tools.Domain.Beatmaps.HitObjects;
 using Mapping_Tools.Domain.MathUtil;
@@ -35,6 +36,21 @@ public abstract class TimelineObject : ContextableBase {
     /// Whether this timeline object attempts to use the <see cref="HitSampleInfo.Filename"/> to determine its hitsound.
     /// </summary>
     public bool UsesFilename => !string.IsNullOrEmpty(Hitsounds.Filename) && CanCustoms;
+
+    /// <summary>
+    /// The actual hitsounds used by this timeline object. Includes <see cref="TimingContext"/>.
+    /// </summary>
+    public HitSampleInfo FenoHitsounds => new() {
+        Normal = Hitsounds.Normal,
+        Whistle = Hitsounds.Whistle,
+        Finish = Hitsounds.Finish,
+        Clap = Hitsounds.Clap,
+        SampleSet = FenoSampleSet,
+        AdditionSet = FenoAdditionSet,
+        CustomIndex = FenoCustomIndex,
+        Volume = FenoSampleVolume,
+        Filename = Hitsounds.Filename,
+    };
 
     /// <summary>
     /// The actual sampleset used by this timeline object. Includes <see cref="TimingContext"/>.
@@ -130,70 +146,45 @@ public abstract class TimelineObject : ContextableBase {
     }
 
     /// <summary>
-    /// Grabs the playing filenames of this timeline object.
+    /// Grabs the lookup filenames of this timeline object.
     /// Actual playing samples may differ based on the existence of sample files.
+    /// Also returns a fallback filename to play if the main one is not found.
     /// </summary>
-    /// <param name="mode">The gamemode the timeline object is playing in.</param>
+    /// <param name="mode">The game mode the timeline object is playing in.</param>
     /// <param name="includeDefaults">Whether to include fictional filenames that represent skin samples.</param>
     /// <returns></returns>
-    public IEnumerable<string> GetPlayingFilenames(GameMode mode = GameMode.Standard, bool includeDefaults = true) {
+    public IEnumerable<List<string>> GetLookupFilenames(GameMode mode = GameMode.Standard, bool includeDefaults = true) {
         if (UsesFilename) {
-            yield return Hitsounds.Filename;
+            yield return [Hitsounds.Filename];
         } else if (FenoCustomIndex != 0) {
-            foreach (var (sampleSet, hitsound, index) in GetPlayingHitsounds(mode)) {
-                yield return GetFileName(sampleSet, hitsound, index, mode);
+            foreach ((SampleSet sampleSet, Hitsound hitsound, int index) in GetPlayingHitsounds(mode)) {
+                if (includeDefaults) {
+                    yield return [GetFileName(sampleSet, hitsound, index, mode), GetFileName(sampleSet, hitsound, -1, mode)];
+                } else {
+                    yield return [GetFileName(sampleSet, hitsound, index, mode)];
+                }
             }
         } else if (includeDefaults && FenoCustomIndex == 0) {
-            foreach (var (sampleSet, hitsound, _) in GetPlayingHitsounds(mode)) {
-                yield return GetFileName(sampleSet, hitsound, -1, mode);
+            foreach ((SampleSet sampleSet, Hitsound hitsound, _) in GetPlayingHitsounds(mode)) {
+                yield return [GetFileName(sampleSet, hitsound, -1, mode)];
             }
         }
     }
 
-    /*/// <summary>
-    /// Grabs the playing filenames of this timeline object and uses <see cref="IDuplicateSampleMap"/> to get only the first sample that makes the same sound.
-    /// </summary>
-    /// <param name="mode">The gamemode the timeline object is playing in.</param>
-    /// <param name="mapDir">Path from the beatmap set root to the folder containing the beatmap.</param>
-    /// <param name="sampleMap">The analyzed samples.</param>
-    /// <param name="includeDefaults">Whether to include fictional filenames that represent skin samples.</param>
-    /// <returns></returns>
-    public IEnumerable<string> GetFirstPlayingFilenames(GameMode mode, string mapDir, IDuplicateSampleMap sampleMap, bool includeDefaults = true) {
-        // If the filename is used, only that sample will play and nothing will play if the file doesn't exist
-        if (UsesFilename) {
-            // Get the first occurence of this sound to not get duplicated
-            string samplePath = Path.Combine(mapDir, Hitsounds.Filename);
-            var firstSample = sampleMap.GetOriginalSample(samplePath);
+    public IEnumerable<string> GetPlayingFilenames(ISampleLookup sampleLookup, GameMode mode = GameMode.Standard, bool includeDefaults = true) {
+        return GetLookupFilenames(mode, includeDefaults)
+            .Select(o => GetPlayingSample(o, sampleLookup))
+            .Where(o => o is not null)!;
+    }
 
-            if (firstSample != null) {
-                yield return firstSample.Filename;
-            }
-        } else if (FenoCustomIndex != 0) {
-            foreach (var (sampleSet, hitsound, index) in GetPlayingHitsounds(mode)) {
-                string filename = GetFileName(sampleSet, hitsound, index, mode);
-                string samplePath = Path.Combine(mapDir, filename);
-                var firstSample = sampleMap.GetOriginalSample(samplePath);
-
-                if (firstSample != null) {
-                    yield return firstSample.Filename;
-                } else {
-                    // Sample doesn't exist
-                    if (includeDefaults) {
-                        yield return GetFileName(sampleSet, hitsound, -1, mode);
-                    }
-                }
-            }
-        } else if (FenoCustomIndex == 0 && includeDefaults) {
-            foreach (var (sampleSet, hitsound, _) in GetPlayingHitsounds(mode)) {
-                yield return GetFileName(sampleSet, hitsound, -1, mode);
-            }
-        }
-    }*/
+    private static string? GetPlayingSample(List<string> lookupFilenames, ISampleLookup sampleLookup) {
+        return lookupFilenames.FirstOrDefault(sampleLookup.ContainsKey);
+    }
 
     /// <summary>
     /// Assigns the hitsounds of this timeline object to the <see cref="Origin"/>.
     /// </summary>
-    public abstract void HitsoundsToOrigin();
+    public abstract void HitsoundsToOrigin(HitSampleInfo hitsounds, bool copyCustoms = false);
 
     /// <summary>
     /// Grabs the playing file name of the object.

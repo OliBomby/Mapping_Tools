@@ -97,38 +97,56 @@ public class Slider : HitObject, IRepeats, IHasTimelineObjects {
         endPos = GetSliderPath().PositionAt(1);
     }
 
-    public IEnumerable<string> GetPlayingBodyFilenames(double sliderTickRate, bool includeDefaults = true) {
+    public IEnumerable<List<string>> GetPlayingBodyFilenames(double sliderTickRate, bool includeDefaults = true) {
         if (!TryGetContext<TimingContext>(out var timing)) {
             throw new InvalidOperationException("Slider is not initialized with timing context. Can not get the playing body filenames.");
         }
 
-        // Get sliderslide hitsounds for every timingpoint in the slider
-        if (includeDefaults || timing!.TimingPoint.SampleIndex != 0) {
-            var firstSampleSet = Hitsounds.SampleSet == SampleSet.None ? timing!.TimingPoint.SampleSet : Hitsounds.SampleSet;
-            yield return GetSliderFilename(firstSampleSet, "slide", timing!.TimingPoint.SampleIndex);
-            if (Hitsounds.Whistle)
-                yield return GetSliderFilename(firstSampleSet, "whistle", timing.TimingPoint.SampleIndex);
+        // Get slider slide hitsounds for every timing point in the slider
+        foreach (var lookupFilenames in getLookupBodyFilenamesForTp(timing!.TimingPoint)) {
+            yield return lookupFilenames;
         }
 
-        foreach (var bodyTp in timing.BodyHitsounds)
-            if (includeDefaults || bodyTp.SampleIndex != 0) {
-                var sampleSet = Hitsounds.SampleSet == SampleSet.None ? bodyTp.SampleSet : Hitsounds.SampleSet;
-                yield return GetSliderFilename(sampleSet, "slide", bodyTp.SampleIndex);
-                if (Hitsounds.Whistle)
-                    yield return GetSliderFilename(sampleSet, "whistle", bodyTp.SampleIndex);
-            }
+        foreach (var lookupFilenames in timing.BodyHitsounds.SelectMany(getLookupBodyFilenamesForTp))
+            yield return lookupFilenames;
 
         // Add tick samples
         // 10 ms over tick time is tick
         var t = StartTime + timing.UninheritedTimingPoint.MpB / sliderTickRate;
         while (t + 10 < EndTime) {
             var bodyTp = Timing.GetTimingPointAtTime(t, timing.BodyHitsounds, timing.TimingPoint);
-            if (includeDefaults || bodyTp.SampleIndex != 0) {
-                var sampleSet = Hitsounds.SampleSet == SampleSet.None ? bodyTp.SampleSet : Hitsounds.SampleSet;
-                yield return GetSliderFilename(sampleSet, "tick", bodyTp.SampleIndex);
+            var sampleSet = Hitsounds.SampleSet == SampleSet.None ? bodyTp.SampleSet : Hitsounds.SampleSet;
+            if (bodyTp.SampleIndex != 0) {
+                if (includeDefaults)
+                    yield return [GetSliderFilename(sampleSet, "tick", bodyTp.SampleIndex), GetSliderFilename(sampleSet, "tick", -1)];
+                else
+                    yield return [GetSliderFilename(sampleSet, "tick", bodyTp.SampleIndex)];
+            } else if (includeDefaults) {
+                yield return [GetSliderFilename(sampleSet, "tick", -1)];
             }
 
             t += timing.UninheritedTimingPoint.MpB / sliderTickRate;
+        }
+
+        yield break;
+
+        IEnumerable<List<string>> getLookupBodyFilenamesForTp(TimingPoint timingPoint) {
+            var firstSampleSet = Hitsounds.SampleSet == SampleSet.None ? timingPoint.SampleSet : Hitsounds.SampleSet;
+            if (timingPoint.SampleIndex != 0) {
+                if (includeDefaults) {
+                    yield return [GetSliderFilename(firstSampleSet, "slide", timingPoint.SampleIndex), GetSliderFilename(firstSampleSet, "slide", -1)];
+                    if (Hitsounds.Whistle)
+                        yield return [GetSliderFilename(firstSampleSet, "whistle", timingPoint.SampleIndex), GetSliderFilename(firstSampleSet, "whistle", -1)];
+                } else {
+                    yield return [GetSliderFilename(firstSampleSet, "slide", timingPoint.SampleIndex)];
+                    if (Hitsounds.Whistle)
+                        yield return [GetSliderFilename(firstSampleSet, "whistle", timingPoint.SampleIndex)];
+                }
+            } else if (includeDefaults) {
+                yield return [GetSliderFilename(firstSampleSet, "slide", -1)];
+                if (Hitsounds.Whistle)
+                    yield return [GetSliderFilename(firstSampleSet, "whistle", -1)];
+            }
         }
     }
 

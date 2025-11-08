@@ -134,7 +134,7 @@ public abstract class HitObject : ContextableBase, IComparable<HitObject>, IHasP
         var newHitObject = (HitObject) MemberwiseClone();
 
         newHitObject.Contexts = new Dictionary<Type, IContext>();
-        foreach (var (type, context) in Contexts) {
+        foreach ((Type type, IContext context) in Contexts) {
             newHitObject.Contexts.Add(type, context.Copy());
         }
 
