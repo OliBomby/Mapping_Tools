@@ -9,9 +9,14 @@ namespace Mapping_Tools.Domain.Beatmaps.Parsing.V14;
 public class BeatmapEncoder(
     IEncoder<Storyboard> storyboardEncoder,
     IEncoder<HitObject> hitObjectEncoder,
-    IEncoder<TimingPoint> timingPointEncoder)
+    IEncoder<TimingPoint> timingPointEncoder,
+    IEncoder<ComboColour> comboColourEncoder)
     : IEncoder<Beatmap> {
-    public BeatmapEncoder() : this(new StoryboardEncoder(), new HitObjectEncoder(), new TimingPointEncoder()) {
+    public BeatmapEncoder() : this(
+        new StoryboardEncoder(),
+        new HitObjectEncoder(),
+        new TimingPointEncoder(),
+        new ComboColourEncoder()) {
     }
 
     public string Encode(Beatmap beatmap) {
@@ -104,9 +109,9 @@ public class BeatmapEncoder(
             builder.AppendLine();
             builder.AppendLine("[Colours]");
             foreach (string s in beatmap.ComboColoursList.Select((comboColour, i) =>
-                         $"Combo{i + 1} : {ComboColour.SerializeComboColour(comboColour)}"))
+                         $"Combo{i + 1} : {comboColourEncoder.Encode(comboColour)}"))
                 builder.AppendLine(s);
-            foreach (string s in beatmap.SpecialColours.Select(specialColour => specialColour.Key + " : " + ComboColour.SerializeComboColour(specialColour.Value)))
+            foreach (string s in beatmap.SpecialColours.Select(specialColour => specialColour.Key + " : " + comboColourEncoder.Encode(specialColour.Value)))
                 builder.AppendLine(s);
         }
 

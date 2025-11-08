@@ -7,9 +7,17 @@ using static Mapping_Tools.Domain.Beatmaps.Parsing.FileFormatHelper;
 
 namespace Mapping_Tools.Domain.Beatmaps.Parsing.V14;
 
-public class BeatmapDecoder(IDecoder<Storyboard> storyboardDecoder, IDecoder<HitObject> hitObjectDecoder, IDecoder<TimingPoint> timingPointDecoder)
+public class BeatmapDecoder(
+    IDecoder<Storyboard> storyboardDecoder,
+    IDecoder<HitObject> hitObjectDecoder,
+    IDecoder<TimingPoint> timingPointDecoder,
+    IDecoder<ComboColour> comboColourDecoder)
     : IDecoder<Beatmap> {
-    public BeatmapDecoder() : this(new StoryboardDecoder(), new HitObjectDecoder(), new TimingPointDecoder()) {
+    public BeatmapDecoder() : this(
+        new StoryboardDecoder(),
+        new HitObjectDecoder(),
+        new TimingPointDecoder(),
+        new ComboColourDecoder()) {
     }
 
     public Beatmap Decode(string code) {
@@ -39,9 +47,10 @@ public class BeatmapDecoder(IDecoder<Storyboard> storyboardDecoder, IDecoder<Hit
 
         foreach (string line in colourLines) {
             if (Regex.IsMatch(line[..6], "^Combo[1-8]$")) {
-                beatmap.ComboColoursList.Add(new ComboColour(line));
+                beatmap.ComboColoursList.Add(comboColourDecoder.Decode(line));
             } else {
-                beatmap.SpecialColours[SplitKeyValue(line).Item1] = new ComboColour(line);
+                var specialColourSplit = SplitKeyValue(line);
+                beatmap.SpecialColours[specialColourSplit.Item1] = comboColourDecoder.Decode(specialColourSplit.Item2);
             }
         }
 

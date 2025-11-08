@@ -44,58 +44,8 @@ public class ComboColour {
     /// <param name="b">The blue component</param>
     public ComboColour(int r, int g, int b) : this((byte)r, (byte) g, (byte) b) { }
 
-    /// <summary>
-    /// Constructs a new combo colour from the provided line of .osu code.
-    /// </summary>
-    /// <param name="line">The line of .osu code</param>
-    public ComboColour(string line) {
-        string[] split = line.Split(':');
-        string[] commaSplit = split[1].Split(',');
-
-        if (!FileFormatHelper.TryParseInt(commaSplit[0], out int r))
-            throw new BeatmapParsingException("Failed to parse red component of colour.", line);
-
-        if (!FileFormatHelper.TryParseInt(commaSplit[1], out int g))
-            throw new BeatmapParsingException("Failed to parse green component of colour.", line);
-
-        if (!FileFormatHelper.TryParseInt(commaSplit[2], out int b))
-            throw new BeatmapParsingException("Failed to parse blue component of colour.", line);
-
-        R = (byte)r;
-        G = (byte)g;
-        B = (byte)b;
-    }
-
-    /// <summary>
-    /// Converts an <see cref="ComboColour"/> to .osu code.
-    /// </summary>
-    /// <param name="comboColour">The combo colour to serialize</param>
-    /// <returns></returns>
-    public static string SerializeComboColour(ComboColour comboColour) {
-        return $"{comboColour.R.ToInvariant()},{comboColour.G.ToInvariant()},{comboColour.B.ToInvariant()}";
-    }
-
     public object Clone() {
         return MemberwiseClone();
-    }
-
-    /// <summary>Returns a string that represents the current object.</summary>
-    /// <returns>A string that represents the current object.</returns>
-    public override string ToString() {
-        return SerializeComboColour(this);
-    }
-
-    /// <summary>
-    /// Returns the 4 default combo colours of osu!
-    /// </summary>
-    /// <returns></returns>
-    public static ComboColour[] GetDefaultComboColours() {
-        return [
-            new ComboColour(255, 192, 0),
-            new ComboColour(0, 202, 0),
-            new ComboColour(18, 124, 255),
-            new ComboColour(242, 24, 57),
-        ];
     }
 
     public bool Equals(ComboColour? other) {

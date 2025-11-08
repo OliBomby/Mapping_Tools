@@ -93,6 +93,19 @@ public class Beatmap {
         newBeatmap.GiveObjectsTimingContext();
         return newBeatmap;
     }
+
+    /// <summary>
+    /// Returns the 4 default combo colours of osu!
+    /// </summary>
+    /// <returns></returns>
+    public static ComboColour[] GetDefaultComboColours() {
+        return [
+            new ComboColour(255, 192, 0),
+            new ComboColour(0, 202, 0),
+            new ComboColour(18, 124, 255),
+            new ComboColour(242, 24, 57),
+        ];
+    }
 }
 
 public static class BeatmapExtensions {
@@ -330,7 +343,7 @@ public static class BeatmapExtensions {
 
         // If there are no combo colours use the default combo colours so the hitobjects still have something
         var actingComboColours = comboColours is null || comboColours.Length == 0
-            ? ComboColour.GetDefaultComboColours()
+            ? Beatmap.GetDefaultComboColours()
             : comboColours;
 
         foreach (var hitObject in hitObjects) {
@@ -411,7 +424,7 @@ public static class BeatmapExtensions {
 
         // If there are no combo colours use the default combo colours so the hitobjects still have something
         var actingComboColours = beatmap.ComboColoursList.Count == 0
-            ? ComboColour.GetDefaultComboColours()
+            ? Beatmap.GetDefaultComboColours()
             : beatmap.ComboColoursList.ToArray();
 
         foreach (var hitObject in beatmap.HitObjects) {
