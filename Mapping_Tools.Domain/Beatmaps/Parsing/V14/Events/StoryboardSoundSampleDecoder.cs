@@ -28,6 +28,7 @@ public class StoryboardSoundSampleDecoder : IDecoder<StoryboardSoundSample>
 
         return new StoryboardSoundSample
         {
+            EventType = values[0],
             StartTime = t,
             Layer = layer,
             FilePath = filePath,

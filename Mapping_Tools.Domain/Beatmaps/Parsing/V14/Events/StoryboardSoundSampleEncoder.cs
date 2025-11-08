@@ -6,6 +6,6 @@ public class StoryboardSoundSampleEncoder : IEncoder<StoryboardSoundSample>
 {
     public string Encode(StoryboardSoundSample obj)
     {
-        return $"Sample,{obj.StartTime.ToInvariant()},{obj.Layer.ToIntInvariant()},\"{obj.FilePath}\",{obj.Volume.ToRoundInvariant()}";
+        return $"{obj.EventType},{obj.StartTime.ToInvariant()},{obj.Layer.ToIntInvariant()},\"{obj.FilePath}\",{obj.Volume.ToRoundInvariant()}";
     }
 }

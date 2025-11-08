@@ -58,11 +58,17 @@ Sprite,Foreground,Centre,"Taiko BG.png",320,240
  M,0,0,,320,240
  S,0,0,,0.8054399
  F,0,0,122303,1
+4,Foreground,Custom,"Taiko BG.png",420,340
+ M,0,0,,320,240
+ S,0,0,,0.8054399
+ F,0,0,122303,1
 //Storyboard Layer 4 (Overlay)
 //Storyboard Sound Samples
 Sample,0,0,"normal-hitnormal3.wav",0
+5,1000,0,"normal-hitnormal3.wav",100
 //Background Colour Transformations
 3,100,163,162,255
+Colour,200,255,162,255
 
 [TimingPoints]
 15,255.79045645807,3,1,0,100,1,0

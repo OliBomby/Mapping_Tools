@@ -599,11 +599,11 @@ public static class BeatmapExtensions {
                 // Find by combo index
                 int comboNumber = hitObjectReference.ComboIndex!.Value;
 
-                while (comboNumber != -1 && objectIndex < beatmap.HitObjects.Count && beatmap.HitObjects[objectIndex].GetContext<ComboContext>().ComboIndex != comboNumber) {
+                while (comboNumber != -1 && objectIndex >= 0 && objectIndex < beatmap.HitObjects.Count && beatmap.HitObjects[objectIndex].GetContext<ComboContext>().ComboIndex != comboNumber) {
                     objectIndex++;
                 }
 
-                if (objectIndex < beatmap.HitObjects.Count && objectIndex > 0)
+                if (objectIndex < beatmap.HitObjects.Count && objectIndex >= 0)
                     yield return beatmap.HitObjects[objectIndex++];
             } else {
                 // Find mania time and column index

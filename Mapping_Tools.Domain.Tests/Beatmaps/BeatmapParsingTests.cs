@@ -8,19 +8,11 @@ namespace Mapping_Tools.Domain.Tests.Beatmaps;
 
 [TestFixture]
 public class BeatmapParsingTests {
-    [Test]
-    public void UnchangingEmptyMapCodeTest() {
-        var path = Path.Join("Resources", "EmptyTestMap.osu");
-        var lines = File.ReadAllText(path);
-        var decoder = new BeatmapDecoder();
-        var encoder = new BeatmapEncoder();
-
-        TestUnchanging(lines, decoder, encoder);
-    }
-
-    [Test]
-    public void UnchangingComplicatedMapCodeTest() {
-        var path = Path.Join("Resources", "ComplicatedTestMap.osu");
+    [TestCase("EmptyTestMap.osu")]
+    [TestCase("ComplicatedTestMap.osu")]
+    [TestCase("ManiaTestMap.osu")]
+    public void Beatmap_Encode_Decode_Remains_Unchanged(string mapName) {
+        var path = Path.Join("Resources", mapName);
         var lines = File.ReadAllText(path);
         var decoder = new BeatmapDecoder();
         var encoder = new BeatmapEncoder();
@@ -32,8 +24,8 @@ public class BeatmapParsingTests {
         var map = decoder.Decode(lines);
         var lines2 = encoder.Encode(map);
 
-        Debug.Print(lines);
-        Debug.Print(lines2);
+        Console.WriteLine(lines);
+        Console.WriteLine(lines2);
 
         // Split equal asserting to lines so we know where the difference is
         var linesSplit = lines.Split(Environment.NewLine);
@@ -41,18 +33,14 @@ public class BeatmapParsingTests {
 
         for (int i = 0; i < linesSplit.Length; i++) {
             Assert.That(i, Is.LessThan(lines2Split.Length));
-            Assert.That(lines2Split[i], Is.EqualTo(linesSplit[i]), $"Line equality fail at line {i+1}!");
+            Assert.That(lines2Split[i], Is.EqualTo(linesSplit[i]), $"Line equality fail at line {i+1}!\nExpected:\n{GetLinesArea(linesSplit, i)}\n\nActual:\n{GetLinesArea(lines2Split, i)}\n");
         }
     }
 
-    [Test]
-    public void ManiaParseTest() {
-        var path = Path.Join("Resources", "ManiaTestMap.osu");
-        var lines = File.ReadAllText(path);
-        var decoder = new BeatmapDecoder();
-        var encoder = new BeatmapEncoder();
-
-        TestUnchanging(lines, decoder, encoder);
+    private static string GetLinesArea(string[] lines, int middleIndex, int areaSize = 2) {
+        int start = Math.Max(0, middleIndex - areaSize);
+        int end = Math.Min(lines.Length - 1, middleIndex + areaSize);
+        return string.Join(Environment.NewLine, lines[start..(end + 1)]);
     }
 
     [Test]

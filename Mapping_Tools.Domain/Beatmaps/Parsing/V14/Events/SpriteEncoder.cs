@@ -6,6 +6,6 @@ public class SpriteEncoder : IEncoder<Sprite>
 {
     public string Encode(Sprite obj)
     {
-        return $"Sprite,{obj.Layer},{obj.Origin},\"{obj.FilePath}\",{obj.Pos.X.ToRoundInvariant()},{obj.Pos.Y.ToRoundInvariant()}";
+        return $"{obj.EventType},{obj.Layer},{obj.Origin},\"{obj.FilePath}\",{obj.Pos.X.ToRoundInvariant()},{obj.Pos.Y.ToRoundInvariant()}";
     }
 }

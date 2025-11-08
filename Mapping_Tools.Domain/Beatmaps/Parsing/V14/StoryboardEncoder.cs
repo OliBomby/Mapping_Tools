@@ -30,7 +30,6 @@ public class StoryboardEncoder(IEncoder<Event> eventEncoder) : IEncoder<Storyboa
             foreach (string s in obj.BackgroundColourTransformations.Select(eventEncoder.Encode)) builder.AppendLine(s);
         }
 
-        builder.AppendLine();
         return builder.ToString();
     }
 

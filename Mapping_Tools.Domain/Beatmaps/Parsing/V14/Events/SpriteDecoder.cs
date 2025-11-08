@@ -30,6 +30,7 @@ public class SpriteDecoder : IDecoder<Sprite>
 
         return new Sprite
         {
+            EventType = values[0],
             Layer = layer,
             Origin = origin,
             FilePath = filePath,

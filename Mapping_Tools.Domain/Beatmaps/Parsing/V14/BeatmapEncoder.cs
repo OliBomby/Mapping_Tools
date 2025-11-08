@@ -100,6 +100,7 @@ public class BeatmapEncoder(
         builder.AppendLine();
 
         builder.AppendLine(storyboardEncoder.Encode(beatmap.Storyboard));
+
         builder.AppendLine("[TimingPoints]");
         foreach (TimingPoint tp in beatmap.BeatmapTiming.TimingPoints) {
             builder.AppendLine(timingPointEncoder.Encode(tp));

@@ -25,6 +25,7 @@ public class BackgroundColourTransformationDecoder : IDecoder<BackgroundColourTr
 
         return new BackgroundColourTransformation
         {
+            EventType = values[0],
             StartTime = startTime,
             R = r,
             G = g,

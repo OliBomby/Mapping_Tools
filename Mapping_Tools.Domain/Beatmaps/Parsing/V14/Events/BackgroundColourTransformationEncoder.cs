@@ -6,6 +6,6 @@ public class BackgroundColourTransformationEncoder : IEncoder<BackgroundColourTr
 {
     public string Encode(BackgroundColourTransformation obj)
     {
-        return $"3,{obj.StartTime.ToRoundInvariant()},{obj.R.ToRoundInvariant()},{obj.G.ToRoundInvariant()},{obj.B.ToRoundInvariant()}";
+        return $"{obj.EventType},{obj.StartTime.ToRoundInvariant()},{obj.R.ToRoundInvariant()},{obj.G.ToRoundInvariant()},{obj.B.ToRoundInvariant()}";
     }
 }
