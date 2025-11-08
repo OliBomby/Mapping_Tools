@@ -207,27 +207,27 @@ public struct Vector3 :IEquatable<Vector3> {
     /// <summary>
     /// Defines a unit-length Vector3 that points towards the X-axis.
     /// </summary>
-    public static readonly Vector3 UnitX = new Vector3(1, 0, 0);
+    public static readonly Vector3 UnitX = new(1, 0, 0);
 
     /// <summary>
     /// Defines a unit-length Vector3 that points towards the Y-axis.
     /// </summary>
-    public static readonly Vector3 UnitY = new Vector3(0, 1, 0);
+    public static readonly Vector3 UnitY = new(0, 1, 0);
 
     /// <summary>
     /// Defines a unit-length Vector3 that points towards the Z-axis.
     /// </summary>
-    public static readonly Vector3 UnitZ = new Vector3(0, 0, 1);
+    public static readonly Vector3 UnitZ = new(0, 0, 1);
 
     /// <summary>
     /// Defines a zero-length Vector3.
     /// </summary>
-    public static readonly Vector3 Zero = new Vector3(0, 0, 0);
+    public static readonly Vector3 Zero = new(0, 0, 0);
 
     /// <summary>
     /// Defines an instance with all components set to 1.
     /// </summary>
-    public static readonly Vector3 One = new Vector3(1, 1, 1);
+    public static readonly Vector3 One = new(1, 1, 1);
 
     /// <summary>
     /// Defines the size of the Vector3 struct in bytes.
@@ -999,9 +999,9 @@ public struct Vector3 :IEquatable<Vector3> {
 
         result /= result.W;
 
-        result.X = x + ( width * ( ( result.X + 1.0f ) / 2.0f ) );
-        result.Y = y + ( height * ( ( result.Y + 1.0f ) / 2.0f ) );
-        result.Z = minZ + ( ( maxZ - minZ ) * ( ( result.Z + 1.0f ) / 2.0f ) );
+        result.X = x + width * ( ( result.X + 1.0f ) / 2.0f );
+        result.Y = y + height * ( ( result.Y + 1.0f ) / 2.0f );
+        result.Z = minZ + ( maxZ - minZ ) * ( ( result.Z + 1.0f ) / 2.0f );
 
         return new Vector3(result.X, result.Y, result.Z);
     }
@@ -1025,9 +1025,9 @@ public struct Vector3 :IEquatable<Vector3> {
     public static Vector3 Unproject(Vector3 vector, double x, double y, double width, double height, double minZ, double maxZ, Matrix4 inverseWorldViewProjection) {
         Vector4 result;
 
-        result.X = ( ( ( ( vector.X - x ) / width ) * 2.0f ) - 1.0f );
-        result.Y = ( ( ( ( vector.Y - y ) / height ) * 2.0f ) - 1.0f );
-        result.Z = ( ( ( vector.Z / ( maxZ - minZ ) ) * 2.0f ) - 1.0f );
+        result.X = ( vector.X - x ) / width * 2.0f - 1.0f;
+        result.Y = ( vector.Y - y ) / height * 2.0f - 1.0f;
+        result.Z = vector.Z / ( maxZ - minZ ) * 2.0f - 1.0f;
 
         result.X =
             result.X * inverseWorldViewProjection.M11 +
@@ -1283,8 +1283,8 @@ public struct Vector3 :IEquatable<Vector3> {
     public override int GetHashCode() {
         unchecked {
             var hashCode = this.X.GetHashCode();
-            hashCode = ( hashCode * 397 ) ^ this.Y.GetHashCode();
-            hashCode = ( hashCode * 397 ) ^ this.Z.GetHashCode();
+            hashCode = hashCode * 397 ^ this.Y.GetHashCode();
+            hashCode = hashCode * 397 ^ this.Z.GetHashCode();
             return hashCode;
         }
     }

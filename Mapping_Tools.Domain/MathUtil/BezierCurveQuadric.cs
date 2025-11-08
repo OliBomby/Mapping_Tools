@@ -73,8 +73,8 @@ public struct BezierCurveQuadric {
         Vector2 r = new Vector2();
         double c = 1.0f - t;
 
-        r.X = ( c * c * StartAnchor.X ) + ( 2 * t * c * ControlPoint.X ) + ( t * t * EndAnchor.X );
-        r.Y = ( c * c * StartAnchor.Y ) + ( 2 * t * c * ControlPoint.Y ) + ( t * t * EndAnchor.Y );
+        r.X = c * c * StartAnchor.X + 2 * t * c * ControlPoint.X + t * t * EndAnchor.X;
+        r.Y = c * c * StartAnchor.Y + 2 * t * c * ControlPoint.Y + t * t * EndAnchor.Y;
 
         if( Parallel == 0.0f ) {
             return r;
@@ -118,7 +118,7 @@ public struct BezierCurveQuadric {
         double length = 0.0f;
         Vector2 old = CalculatePoint(0.0f);
 
-        for( double i = precision; i < ( 1.0f + precision ); i += precision ) {
+        for( double i = precision; i < 1.0f + precision; i += precision ) {
             Vector2 n = CalculatePoint(i);
             length += ( n - old ).Length;
             old = n;

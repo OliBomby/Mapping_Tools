@@ -6,12 +6,12 @@ public class HitSampleInfo : IEquatable<HitSampleInfo> {
     /// <summary>
     /// The sampleset to load the normal sample from.
     /// </summary>
-    public SampleSet SampleSet { get; set; }
+    public SampleSet SampleSet { get; set; } = SampleSet.None;
 
     /// <summary>
     /// The sampleset to load the addition samples from.
     /// </summary>
-    public SampleSet AdditionSet { get; set; }
+    public SampleSet AdditionSet { get; set; } = SampleSet.None;
 
     /// <summary>
     /// Whether to play the hitnormal sample.
@@ -47,11 +47,6 @@ public class HitSampleInfo : IEquatable<HitSampleInfo> {
     /// The sample volume.
     /// </summary>
     public double Volume { get; set; }
-
-    public HitSampleInfo() {
-        SampleSet = SampleSet.None;
-        AdditionSet = SampleSet.None;
-    }
 
     /// <summary>
     /// Copies all properties of this to the other.

@@ -1,5 +1,4 @@
-﻿using Mapping_Tools.Domain.Beatmaps.IO;
-using Mapping_Tools.Domain.Beatmaps.Parsing;
+﻿using Mapping_Tools.Domain.Beatmaps.Parsing;
 using Mapping_Tools.Domain.Beatmaps.Types;
 
 namespace Mapping_Tools.Domain.Beatmaps.Events;
@@ -90,10 +89,10 @@ public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, I
     /// <returns>true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.</returns>
     public bool Equals(StoryboardSoundSample other) {
         return
-            other != null && (StartTime == other.StartTime &&
-                              Layer == other.Layer &&
-                              FilePath == other.FilePath &&
-                              Volume == other.Volume);
+            other != null && StartTime == other.StartTime &&
+            Layer == other.Layer &&
+            FilePath == other.FilePath &&
+            Volume == other.Volume;
     }
 
     public int CompareTo(StoryboardSoundSample other) {

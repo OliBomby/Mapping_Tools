@@ -2,13 +2,9 @@
 
 namespace Mapping_Tools.Domain.Beatmaps.BeatDivisors;
 
-public class IrrationalBeatDivisor : IBeatDivisor {
-    public double Value { get; }
-
-    [JsonConstructor]
-    public IrrationalBeatDivisor(double value) {
-        Value = value;
-    }
+[method: JsonConstructor]
+public class IrrationalBeatDivisor(double value) : IBeatDivisor {
+    public double Value { get; } = value;
 
     public static implicit operator IrrationalBeatDivisor(double value) {
         return new IrrationalBeatDivisor(value);

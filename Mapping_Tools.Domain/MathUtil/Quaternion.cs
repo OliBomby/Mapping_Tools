@@ -214,7 +214,7 @@ public struct Quaternion :IEquatable<Quaternion> {
     /// <summary>
     /// Defines the identity quaternion.
     /// </summary>
-    public static readonly Quaternion Identity = new Quaternion(0, 0, 0, 1);
+    public static readonly Quaternion Identity = new(0, 0, 0, 1);
 
     /// <summary>
     /// Add two quaternions
@@ -657,7 +657,7 @@ public struct Quaternion :IEquatable<Quaternion> {
     /// <returns>A hash code formed from the bitwise XOR of this objects members.</returns>
     public override int GetHashCode() {
         unchecked {
-            return ( this.Xyz.GetHashCode() * 397 ) ^ this.W.GetHashCode();
+            return this.Xyz.GetHashCode() * 397 ^ this.W.GetHashCode();
         }
     }
 

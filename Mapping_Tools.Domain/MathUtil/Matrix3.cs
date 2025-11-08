@@ -48,12 +48,12 @@ public struct Matrix3 :IEquatable<Matrix3> {
     /// <summary>
     /// The identity matrix.
     /// </summary>
-    public static Matrix3 Identity { get => new Matrix3(Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ); }
+    public static Matrix3 Identity { get => new(Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ); }
 
     /// <summary>
     /// The zero matrix.
     /// </summary>
-    public static Matrix3 Zero { get => new Matrix3(Vector3.Zero, Vector3.Zero, Vector3.Zero); }
+    public static Matrix3 Zero { get => new(Vector3.Zero, Vector3.Zero, Vector3.Zero); }
 
 
 
@@ -312,12 +312,12 @@ public struct Matrix3 :IEquatable<Matrix3> {
     /// Returns the rotation component of this instance. Quite slow.
     /// </summary>
     /// <param name="row_normalise">Whether the method should row-normalise (i.e. remove scale from) the Matrix. Pass false if you know it's already normalised.</param>
-    public Quaternion ExtractRotation(bool row_normalise = true) {
+    public Quaternion ExtractRotation(bool rowNormalise = true) {
         var row0 = Row0;
         var row1 = Row1;
         var row2 = Row2;
 
-        if( row_normalise ) {
+        if( rowNormalise ) {
             row0 = row0.Normalized();
             row1 = row1.Normalized();
             row2 = row2.Normalized();
@@ -644,15 +644,15 @@ public struct Matrix3 :IEquatable<Matrix3> {
             rM21 = right.Row1.X, rM22 = right.Row1.Y, rM23 = right.Row1.Z,
             rM31 = right.Row2.X, rM32 = right.Row2.Y, rM33 = right.Row2.Z;
 
-        result.Row0.X = ( ( lM11 * rM11 ) + ( lM12 * rM21 ) ) + ( lM13 * rM31 );
-        result.Row0.Y = ( ( lM11 * rM12 ) + ( lM12 * rM22 ) ) + ( lM13 * rM32 );
-        result.Row0.Z = ( ( lM11 * rM13 ) + ( lM12 * rM23 ) ) + ( lM13 * rM33 );
-        result.Row1.X = ( ( lM21 * rM11 ) + ( lM22 * rM21 ) ) + ( lM23 * rM31 );
-        result.Row1.Y = ( ( lM21 * rM12 ) + ( lM22 * rM22 ) ) + ( lM23 * rM32 );
-        result.Row1.Z = ( ( lM21 * rM13 ) + ( lM22 * rM23 ) ) + ( lM23 * rM33 );
-        result.Row2.X = ( ( lM31 * rM11 ) + ( lM32 * rM21 ) ) + ( lM33 * rM31 );
-        result.Row2.Y = ( ( lM31 * rM12 ) + ( lM32 * rM22 ) ) + ( lM33 * rM32 );
-        result.Row2.Z = ( ( lM31 * rM13 ) + ( lM32 * rM23 ) ) + ( lM33 * rM33 );
+        result.Row0.X = lM11 * rM11 + lM12 * rM21 + lM13 * rM31;
+        result.Row0.Y = lM11 * rM12 + lM12 * rM22 + lM13 * rM32;
+        result.Row0.Z = lM11 * rM13 + lM12 * rM23 + lM13 * rM33;
+        result.Row1.X = lM21 * rM11 + lM22 * rM21 + lM23 * rM31;
+        result.Row1.Y = lM21 * rM12 + lM22 * rM22 + lM23 * rM32;
+        result.Row1.Z = lM21 * rM13 + lM22 * rM23 + lM23 * rM33;
+        result.Row2.X = lM31 * rM11 + lM32 * rM21 + lM33 * rM31;
+        result.Row2.Y = lM31 * rM12 + lM32 * rM22 + lM33 * rM32;
+        result.Row2.Z = lM31 * rM13 + lM32 * rM23 + lM33 * rM33;
     }
 
 
@@ -664,9 +664,9 @@ public struct Matrix3 :IEquatable<Matrix3> {
     /// <param name="result">The inverse of the given matrix if it has one, or the input if it is singular</param>
     /// <exception cref="System.InvalidOperationException">Thrown if the Matrix3 is singular.</exception>
     public static void Invert(ref Matrix3 mat, out Matrix3 result) {
-        int[] colIdx = { 0, 0, 0 };
-        int[] rowIdx = { 0, 0, 0 };
-        int[] pivotIdx = { -1, -1, -1 };
+        int[] colIdx = [0, 0, 0];
+        int[] rowIdx = [0, 0, 0];
+        int[] pivotIdx = [-1, -1, -1];
 
         double[,] inverse = {{mat.Row0.X, mat.Row0.Y, mat.Row0.Z},
             {mat.Row1.X, mat.Row1.Y, mat.Row1.Z},
@@ -695,7 +695,7 @@ public struct Matrix3 :IEquatable<Matrix3> {
                 }
             }
 
-            ++( pivotIdx[icol] );
+            ++pivotIdx[icol];
 
             if( irow != icol ) {
                 for( int k = 0; k < 3; ++k ) {
@@ -844,8 +844,8 @@ public struct Matrix3 :IEquatable<Matrix3> {
     public override int GetHashCode() {
         unchecked {
             var hashCode = this.Row0.GetHashCode();
-            hashCode = ( hashCode * 397 ) ^ this.Row1.GetHashCode();
-            hashCode = ( hashCode * 397 ) ^ this.Row2.GetHashCode();
+            hashCode = hashCode * 397 ^ this.Row1.GetHashCode();
+            hashCode = hashCode * 397 ^ this.Row2.GetHashCode();
             return hashCode;
         }
     }

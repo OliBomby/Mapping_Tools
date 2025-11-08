@@ -1,7 +1,6 @@
 ﻿using Mapping_Tools.Domain.Beatmaps.Contexts;
 using Mapping_Tools.Domain.Beatmaps.Events;
-using Mapping_Tools.Domain.Beatmaps.HitObjects.Objects;
-using Mapping_Tools.Domain.Beatmaps.Parsing.Encoding.HitObjects;
+using Mapping_Tools.Domain.Beatmaps.Parsing.V14.HitObjects;
 using Mapping_Tools.Domain.Beatmaps.Types;
 using Mapping_Tools.Domain.MathUtil;
 
@@ -48,8 +47,7 @@ public abstract class HitObject : ContextableBase, IComparable<HitObject>, IHasP
     /// <summary>
     /// The hitsounds of this hit object.
     /// </summary>
-    [NotNull]
-    public HitSampleInfo Hitsounds { get; set; }
+    public HitSampleInfo Hitsounds { get; set; } = new();
 
     /// <summary>
     /// The duration of this hit object.
@@ -66,10 +64,6 @@ public abstract class HitObject : ContextableBase, IComparable<HitObject>, IHasP
     /// </summary>
     public virtual Vector2 EndPos => Pos;
 
-    protected HitObject() {
-        Hitsounds = new HitSampleInfo();
-    }
-
     /// <summary>
     /// Removes all hitounds and sets samplesets to auto.
     /// Also clears hitsounds from timeline objects and clears body hitsounds.
@@ -84,7 +78,7 @@ public abstract class HitObject : ContextableBase, IComparable<HitObject>, IHasP
     /// <param name="floor">Whether to truncate it to an integer.</param>
     /// <returns>The end time.</returns>
     public virtual double GetEndTime(bool floor = false) {
-        return floor ? Math.Floor(EndTime + Precision.DOUBLE_EPSILON) : EndTime;
+        return floor ? Math.Floor(EndTime + Precision.DoubleEpsilon) : EndTime;
     }
 
     /// <summary>
@@ -115,13 +109,13 @@ public abstract class HitObject : ContextableBase, IComparable<HitObject>, IHasP
     /// <param name="previousHitObject">The hit object that comes directly before this hit object.</param>
     /// <param name="breaks">All the break periods in the beatmap.</param>
     /// <returns>Whether this hit object actually has a new combo.</returns>
-    public bool IsActualNewCombo([CanBeNull] HitObject previousHitObject, [CanBeNull] IEnumerable<Break> breaks) {
+    public bool IsActualNewCombo(HitObject? previousHitObject, IEnumerable<Break>? breaks) {
         return NewCombo ||
                this is Spinner ||
                previousHitObject == null ||
                previousHitObject is Spinner ||
-               (breaks is not null && breaks.Any(b =>
-                   previousHitObject.StartTime <= b.EndTime && Precision.DefinitelySmaller(b.EndTime, StartTime)));
+               breaks is not null && breaks.Any(b =>
+                   previousHitObject.StartTime <= b.EndTime && Precision.DefinitelySmaller(b.EndTime, StartTime));
     }
 
     /// <summary>

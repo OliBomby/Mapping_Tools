@@ -1,14 +1,14 @@
-﻿using System.Numerics;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using Mapping_Tools.Domain.Beatmaps.Contexts;
 using Mapping_Tools.Domain.Beatmaps.Enums;
 using Mapping_Tools.Domain.Beatmaps.Events;
 using Mapping_Tools.Domain.Beatmaps.HitObjects;
-using Mapping_Tools.Domain.Beatmaps.HitObjects.Objects;
 using Mapping_Tools.Domain.Beatmaps.Sections;
-using Mapping_Tools.Domain.Beatmaps.TimelineStuff;
-using Mapping_Tools.Domain.Beatmaps.TimingStuff;
+using Mapping_Tools.Domain.Beatmaps.Timelines;
+using Mapping_Tools.Domain.Beatmaps.Timings;
 using Mapping_Tools.Domain.Beatmaps.Types;
+using Mapping_Tools.Domain.MathUtil;
 
 namespace Mapping_Tools.Domain.Beatmaps;
 
@@ -47,10 +47,10 @@ public class Beatmap {
         Editor = new SectionEditor();
         Metadata = new SectionMetadata();
         Difficulty = new SectionDifficulty();
-        ComboColoursList = new List<ComboColour>();
+        ComboColoursList = [];
         SpecialColours = new Dictionary<string, ComboColour>();
         Storyboard = new Storyboard();
-        HitObjects = new List<HitObject>();
+        HitObjects = [];
         BeatmapTiming = new Timing(1.4);
     }
 
@@ -204,7 +204,7 @@ public static class BeatmapExtensions {
                     break;
 
                 if (Vector2.Distance(stackBaseObject.Pos, objectN.Pos) < stackLenience
-                    || (stackBaseObject is Slider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < stackLenience)) {
+                    || stackBaseObject is Slider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < stackLenience) {
                     stackBaseIndex = n;
 
                     // HitObjects after the specified update range haven't been reset yet
@@ -323,9 +323,8 @@ public static class BeatmapExtensions {
     /// Calculates the combo index and combo colours for each hit object.
     /// This includes cases where the previous hit object is a spinner or doesnt exist.
     /// </summary>
-    public static void CalculateHitObjectComboStuff(this IEnumerable<HitObject> hitObjects, [CanBeNull] IComboColour[] comboColours = null,
-        [CanBeNull] ICollection<Break> breakPeriods = null) {
-        HitObject previousHitObject = null;
+    public static void CalculateHitObjectComboStuff(this IEnumerable<HitObject> hitObjects, ComboColour[]? comboColours = null, ICollection<Break>? breakPeriods = null) {
+        HitObject? previousHitObject = null;
         int colourIndex = 0;
         int comboIndex = 0;
 
@@ -427,7 +426,7 @@ public static class BeatmapExtensions {
                 if (diff > 0) {
                     hitObject.ComboSkip = diff;
                 } else if (diff < 0) {
-                    hitObject.ComboSkip = (actingComboColours.Length + diff);
+                    hitObject.ComboSkip = actingComboColours.Length + diff;
                 }
 
                 int newColourIncrement = hitObject.ComboIncrement + hitObject.ComboSkip;
@@ -507,7 +506,7 @@ public static class BeatmapExtensions {
     /// <returns>A list of hit objects that have a bookmark in their range.</returns>
     public static List<HitObject> GetBookmarkedObjects(this Beatmap beatmap) {
         List<double> bookmarks = beatmap.Editor.Bookmarks;
-        List<HitObject> markedObjects = beatmap.HitObjects.FindAll(ho => bookmarks.Exists(o => (ho.StartTime <= o && o <= ho.EndTime)));
+        List<HitObject> markedObjects = beatmap.HitObjects.FindAll(ho => bookmarks.Exists(o => ho.StartTime <= o && o <= ho.EndTime));
         return markedObjects;
     }
 
@@ -570,53 +569,49 @@ public static class BeatmapExtensions {
     }
 
     /// <summary>
-    /// Finds the objects refered by specified time code.
+    /// Finds the objects referred by specified time code.
     /// </summary>
     /// <example>Example time code: 00:56:823 (1,2,1,2) - </example>
     /// <param name="beatmap">The beatmap to query from.</param>
     /// <param name="code">The time code.</param>
     /// <returns></returns>
     public static IEnumerable<HitObject> QueryTimeCode(this Beatmap beatmap, string code) {
-        var startBracketIndex = code.IndexOf("(", StringComparison.Ordinal);
-        var endBracketIndex = code.IndexOf(")", StringComparison.Ordinal);
-
-        // Extract the list of combo numbers from the code
-        IEnumerable<int> comboNumbers;
-        if (startBracketIndex == -1) {
-            // If there is not start bracket, then we assume that there is no list of combo numbers in the code
-            // -1 means just get any combo number
-            comboNumbers = new[] { -1 };
-        } else {
-            if (endBracketIndex == -1) {
-                endBracketIndex = code.Length - 1;
-            }
-
-            // Get the part of the code between the brackets
-            var comboNumbersString = code.Substring(startBracketIndex + 1, endBracketIndex - startBracketIndex - 1);
-
-            comboNumbers = comboNumbersString.Split(',').Select(int.Parse);
-        }
-
         // Parse the time span in the code
-        var time = InputParsers.ParseOsuTimestamp(code).TotalMilliseconds;
+        (TimeSpan timestampTime, List<HitObjectReference> hitObjectReferences) = TimestampParser.ParseTimestamp(code);
 
         // Enumerate through the hit objects from the first object at the time
-        int objectIndex = beatmap.HitObjects.FindIndex(h => h.StartTime >= time);
+        int objectIndex = beatmap.HitObjects.FindIndex(h => h.StartTime >= timestampTime.TotalMilliseconds);
 
-        if (objectIndex < 0) {
-            yield break;
-        }
+        foreach (var hitObjectReference in hitObjectReferences) {
+            if (hitObjectReference.ComboIndex.HasValue) {
+                // Find by combo index
+                int comboNumber = hitObjectReference.ComboIndex!.Value;
 
-        foreach (var comboNumber in comboNumbers) {
-            while (comboNumber != -1 && objectIndex < beatmap.HitObjects.Count && beatmap.HitObjects[objectIndex].GetContext<ComboContext>().ComboIndex != comboNumber) {
-                objectIndex++;
+                while (comboNumber != -1 && objectIndex < beatmap.HitObjects.Count && beatmap.HitObjects[objectIndex].GetContext<ComboContext>().ComboIndex != comboNumber) {
+                    objectIndex++;
+                }
+
+                if (objectIndex < beatmap.HitObjects.Count && objectIndex > 0)
+                    yield return beatmap.HitObjects[objectIndex++];
+            } else {
+                // Find mania time and column index
+                int maniaColumnIndex = hitObjectReference.ColumnIndex!.Value;
+                int time = hitObjectReference.Time!.Value;
+
+                var result = beatmap.HitObjects.FirstOrDefault(o =>
+                    Math.Abs(o.StartTime - time) < 0.5 && beatmap.GetColumnIndex(o.Pos.X) == maniaColumnIndex);
+
+                if (result is not null)
+                    yield return result;
             }
-
-            if (objectIndex >= beatmap.HitObjects.Count)
-                yield break;
-
-            yield return beatmap.HitObjects[objectIndex++];
         }
+    }
+
+    public static int GetColumnIndex(this Beatmap beatmap, double x) {
+        int columnCount = (int)beatmap.Difficulty.CircleSize;
+        double columnWidth = 512.0 / columnCount;
+        int columnIndex = (int)(x / columnWidth);
+        return MathHelper.Clamp(columnIndex, 0, columnCount - 1);
     }
 
     /// <summary>
@@ -638,7 +633,7 @@ public static class BeatmapExtensions {
     public static string GetFileName(string artist, string title, string creator, string version) {
         string fileName = $"{artist} - {title} ({creator}) [{version}].osu";
 
-        string regexSearch = new string(Path.GetInvalidFileNameChars());
+        string regexSearch = new(Path.GetInvalidFileNameChars());
         Regex r = new Regex($"[{Regex.Escape(regexSearch)}]");
         fileName = r.Replace(fileName, "");
         return fileName;

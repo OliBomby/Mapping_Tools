@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Domain", "Map
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Infrastructure", "Mapping_Tools.Infrastructure\Mapping_Tools.Infrastructure.csproj", "{3A51EE68-B116-4B99-94C7-C45995600729}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Domain.Tests", "Mapping_Tools.Domain.Tests\Mapping_Tools.Domain.Tests.csproj", "{355148E5-7C6E-40AE-99EC-A91BDFF56E3E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -154,6 +156,18 @@ Global
 		{3A51EE68-B116-4B99-94C7-C45995600729}.Release|x64.Build.0 = Release|Any CPU
 		{3A51EE68-B116-4B99-94C7-C45995600729}.Release|x86.ActiveCfg = Release|Any CPU
 		{3A51EE68-B116-4B99-94C7-C45995600729}.Release|x86.Build.0 = Release|Any CPU
+		{355148E5-7C6E-40AE-99EC-A91BDFF56E3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{355148E5-7C6E-40AE-99EC-A91BDFF56E3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{355148E5-7C6E-40AE-99EC-A91BDFF56E3E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{355148E5-7C6E-40AE-99EC-A91BDFF56E3E}.Debug|x64.Build.0 = Debug|Any CPU
+		{355148E5-7C6E-40AE-99EC-A91BDFF56E3E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{355148E5-7C6E-40AE-99EC-A91BDFF56E3E}.Debug|x86.Build.0 = Debug|Any CPU
+		{355148E5-7C6E-40AE-99EC-A91BDFF56E3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{355148E5-7C6E-40AE-99EC-A91BDFF56E3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{355148E5-7C6E-40AE-99EC-A91BDFF56E3E}.Release|x64.ActiveCfg = Release|Any CPU
+		{355148E5-7C6E-40AE-99EC-A91BDFF56E3E}.Release|x64.Build.0 = Release|Any CPU
+		{355148E5-7C6E-40AE-99EC-A91BDFF56E3E}.Release|x86.ActiveCfg = Release|Any CPU
+		{355148E5-7C6E-40AE-99EC-A91BDFF56E3E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

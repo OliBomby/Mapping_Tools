@@ -2,26 +2,21 @@
 
 namespace Mapping_Tools.Domain.Beatmaps.Contexts;
 
-public class StackingContext : IContext {
+public class StackingContext(int stackCount, Vector2 stackVector) : IContext {
     /// <summary>
     /// The stack count indicates the number of hit objects that this object is stacked upon.
     /// Used for calculating stack offset.
     /// </summary>
-    public int StackCount { get; set; }
+    public int StackCount { get; set; } = stackCount;
 
     /// <summary>
     /// The offset from the original position to the stacked position per stack count.
     /// </summary>
-    public Vector2 StackVector { get; set; }
+    public Vector2 StackVector { get; set; } = stackVector;
 
     public StackingContext() : this(0, Vector2.Zero) { }
 
     public StackingContext(Vector2 stackVector) : this(0, stackVector) { }
-
-    public StackingContext(int stackCount, Vector2 stackVector) {
-        StackCount = stackCount;
-        StackVector = stackVector;
-    }
 
     /// <summary>
     /// Gets the total offset from the original position to the stacked position.

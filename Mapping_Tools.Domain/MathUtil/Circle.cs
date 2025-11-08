@@ -42,7 +42,7 @@ public struct Circle : IEquatable<Circle> {
     /// <summary>
     /// Defines a Circle that is a unit circle.
     /// </summary>
-    public static readonly Circle UnitCircle = new Circle(Vector2.Zero, 1);
+    public static readonly Circle UnitCircle = new(Vector2.Zero, 1);
 
     /// <summary>
     /// Calculates the intersection(s) between a Circle and a Line.
@@ -64,22 +64,22 @@ public struct Circle : IEquatable<Circle> {
         double c = d2 * p1 - d1 * p2 - d2 * c1 + d1 * c2;
         double disc = r * r * ds - c * c;
 
-        if (disc <= -Precision.DOUBLE_EPSILON) {
-            intersections = new Vector2[0];
+        if (disc <= -Precision.DoubleEpsilon) {
+            intersections = [];
             return false;
         }
 
-        if (Math.Abs(disc) < Precision.DOUBLE_EPSILON) {
-            intersections = new Vector2[1] { new Vector2(c * d2 / ds + c1, -c * d1 / ds + c2) };
+        if (Math.Abs(disc) < Precision.DoubleEpsilon) {
+            intersections = [new(c * d2 / ds + c1, -c * d1 / ds + c2)];
             return true;
         }
 
         var root = Math.Sqrt(disc);
 
-        intersections = new Vector2[2] {
-            new Vector2((c * d2 - d1 * root) / ds + c1, (-c * d1 - d2 * root) / ds + c2),
-            new Vector2((c * d2 + d1 * root) / ds + c1, (-c * d1 + d2 * root) / ds + c2),
-        };
+        intersections = [
+            new((c * d2 - d1 * root) / ds + c1, (-c * d1 - d2 * root) / ds + c2),
+            new((c * d2 + d1 * root) / ds + c1, (-c * d1 + d2 * root) / ds + c2),
+        ];
         return true;
     }
 
@@ -101,18 +101,18 @@ public struct Circle : IEquatable<Circle> {
         var p2 = left.Centre + a * (right.Centre - left.Centre) / d;
         var h = Math.Sqrt(left.Radius * left.Radius - a * a);
 
-        if (Math.Abs(d - (left.Radius + right.Radius)) < Precision.DOUBLE_EPSILON) {
+        if (Math.Abs(d - (left.Radius + right.Radius)) < Precision.DoubleEpsilon) {
             // One solution
-            intersections = new[] {
-                p2
-            };
+            intersections = [
+                p2,
+            ];
             return true;
         }
         var b = h * (right.Centre - left.Centre) / d;
-        intersections = new[] {
+        intersections = [
             p2 + b.PerpendicularLeft,
-            p2 + b.PerpendicularRight
-        };
+            p2 + b.PerpendicularRight,
+        ];
         return true;
     }
 

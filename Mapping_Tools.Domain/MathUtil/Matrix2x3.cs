@@ -25,7 +25,7 @@ namespace Mapping_Tools.Domain.MathUtil;
 /// <summary>
 /// Represents a 2x3 matrix.
 /// </summary>
-public struct Matrix2x3 :IEquatable<Matrix2x3> {
+public struct Matrix2X3 :IEquatable<Matrix2X3> {
     /// <summary>
     /// Top row of the matrix.
     /// </summary>
@@ -39,14 +39,14 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <summary>
     /// The zero matrix.
     /// </summary>
-    public static readonly Matrix2x3 Zero = new Matrix2x3(Vector3.Zero, Vector3.Zero);
+    public static readonly Matrix2X3 Zero = new(Vector3.Zero, Vector3.Zero);
 
     /// <summary>
     /// Constructs a new instance.
     /// </summary>
     /// <param name="row0">Top row of the matrix.</param>
     /// <param name="row1">Bottom row of the matrix.</param>
-    public Matrix2x3(Vector3 row0, Vector3 row1) {
+    public Matrix2X3(Vector3 row0, Vector3 row1) {
         Row0 = row0;
         Row1 = row1;
     }
@@ -60,7 +60,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="m10">First item of the second row of the matrix.</param>
     /// <param name="m11">Second item of the second row of the matrix.</param>
     /// <param name="m12">Third item of the second row of the matrix.</param>
-    public Matrix2x3(
+    public Matrix2X3(
         double m00, double m01, double m02,
         double m10, double m11, double m12) {
         Row0 = new Vector3(m00, m01, m02);
@@ -170,7 +170,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix2x3 instance.</param>
-    public static void CreateRotation(double angle, out Matrix2x3 result) {
+    public static void CreateRotation(double angle, out Matrix2X3 result) {
         double cos = System.Math.Cos(angle);
         double sin = System.Math.Sin(angle);
 
@@ -187,8 +187,8 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <returns>The resulting Matrix2x3 instance.</returns>
-    public static Matrix2x3 CreateRotation(double angle) {
-        CreateRotation(angle, out Matrix2x3 result);
+    public static Matrix2X3 CreateRotation(double angle) {
+        CreateRotation(angle, out Matrix2X3 result);
         return result;
     }
 
@@ -197,7 +197,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// </summary>
     /// <param name="scale">Single scale factor for the x, y, and z axes.</param>
     /// <param name="result">A scale matrix.</param>
-    public static void CreateScale(double scale, out Matrix2x3 result) {
+    public static void CreateScale(double scale, out Matrix2X3 result) {
         result.Row0.X = scale;
         result.Row0.Y = 0;
         result.Row0.Z = 0;
@@ -211,8 +211,8 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// </summary>
     /// <param name="scale">Single scale factor for the x and y axes.</param>
     /// <returns>A scale matrix.</returns>
-    public static Matrix2x3 CreateScale(double scale) {
-        CreateScale(scale, out Matrix2x3 result);
+    public static Matrix2X3 CreateScale(double scale) {
+        CreateScale(scale, out Matrix2X3 result);
         return result;
     }
 
@@ -221,7 +221,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// </summary>
     /// <param name="scale">Scale factors for the x and y axes.</param>
     /// <param name="result">A scale matrix.</param>
-    public static void CreateScale(Vector2 scale, out Matrix2x3 result) {
+    public static void CreateScale(Vector2 scale, out Matrix2X3 result) {
         result.Row0.X = scale.X;
         result.Row0.Y = 0;
         result.Row0.Z = 0;
@@ -235,8 +235,8 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// </summary>
     /// <param name="scale">Scale factors for the x and y axes.</param>
     /// <returns>A scale matrix.</returns>
-    public static Matrix2x3 CreateScale(Vector2 scale) {
-        CreateScale(scale, out Matrix2x3 result);
+    public static Matrix2X3 CreateScale(Vector2 scale) {
+        CreateScale(scale, out Matrix2X3 result);
         return result;
     }
 
@@ -246,7 +246,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="x">Scale factor for the x axis.</param>
     /// <param name="y">Scale factor for the y axis.</param>
     /// <param name="result">A scale matrix.</param>
-    public static void CreateScale(double x, double y, out Matrix2x3 result) {
+    public static void CreateScale(double x, double y, out Matrix2X3 result) {
         result.Row0.X = x;
         result.Row0.Y = 0;
         result.Row0.Z = 0;
@@ -261,8 +261,8 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="x">Scale factor for the x axis.</param>
     /// <param name="y">Scale factor for the y axis.</param>
     /// <returns>A scale matrix.</returns>
-    public static Matrix2x3 CreateScale(double x, double y) {
-        CreateScale(x, y, out Matrix2x3 result);
+    public static Matrix2X3 CreateScale(double x, double y) {
+        CreateScale(x, y, out Matrix2X3 result);
         return result;
     }
 
@@ -272,7 +272,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication.</param>
-    public static void Mult(ref Matrix2x3 left, double right, out Matrix2x3 result) {
+    public static void Mult(ref Matrix2X3 left, double right, out Matrix2X3 result) {
         result.Row0.X = left.Row0.X * right;
         result.Row0.Y = left.Row0.Y * right;
         result.Row0.Z = left.Row0.Z * right;
@@ -287,8 +287,8 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication.</returns>
-    public static Matrix2x3 Mult(Matrix2x3 left, double right) {
-        Mult(ref left, right, out Matrix2x3 result);
+    public static Matrix2X3 Mult(Matrix2X3 left, double right) {
+        Mult(ref left, right, out Matrix2X3 result);
         return result;
     }
 
@@ -298,17 +298,17 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication.</param>
-    public static void Mult(ref Matrix2x3 left, ref Matrix3x2 right, out Matrix2 result) {
+    public static void Mult(ref Matrix2X3 left, ref Matrix3X2 right, out Matrix2 result) {
         double lM11 = left.Row0.X, lM12 = left.Row0.Y, lM13 = left.Row0.Z,
             lM21 = left.Row1.X, lM22 = left.Row1.Y, lM23 = left.Row1.Z,
             rM11 = right.Row0.X, rM12 = right.Row0.Y,
             rM21 = right.Row1.X, rM22 = right.Row1.Y,
             rM31 = right.Row2.X, rM32 = right.Row2.Y;
 
-        result.Row0.X = ( ( lM11 * rM11 ) + ( lM12 * rM21 ) ) + ( lM13 * rM31 );
-        result.Row0.Y = ( ( lM11 * rM12 ) + ( lM12 * rM22 ) ) + ( lM13 * rM32 );
-        result.Row1.X = ( ( lM21 * rM11 ) + ( lM22 * rM21 ) ) + ( lM23 * rM31 );
-        result.Row1.Y = ( ( lM21 * rM12 ) + ( lM22 * rM22 ) ) + ( lM23 * rM32 );
+        result.Row0.X = lM11 * rM11 + lM12 * rM21 + lM13 * rM31;
+        result.Row0.Y = lM11 * rM12 + lM12 * rM22 + lM13 * rM32;
+        result.Row1.X = lM21 * rM11 + lM22 * rM21 + lM23 * rM31;
+        result.Row1.Y = lM21 * rM12 + lM22 * rM22 + lM23 * rM32;
     }
 
     /// <summary>
@@ -317,7 +317,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication.</returns>
-    public static Matrix2 Mult(Matrix2x3 left, Matrix3x2 right) {
+    public static Matrix2 Mult(Matrix2X3 left, Matrix3X2 right) {
         Mult(ref left, ref right, out Matrix2 result);
         return result;
     }
@@ -328,19 +328,19 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication.</param>
-    public static void Mult(ref Matrix2x3 left, ref Matrix3 right, out Matrix2x3 result) {
+    public static void Mult(ref Matrix2X3 left, ref Matrix3 right, out Matrix2X3 result) {
         double lM11 = left.Row0.X, lM12 = left.Row0.Y, lM13 = left.Row0.Z,
             lM21 = left.Row1.X, lM22 = left.Row1.Y, lM23 = left.Row1.Z,
             rM11 = right.Row0.X, rM12 = right.Row0.Y, rM13 = right.Row0.Z,
             rM21 = right.Row1.X, rM22 = right.Row1.Y, rM23 = right.Row1.Z,
             rM31 = right.Row2.X, rm32 = right.Row2.Y, rM33 = right.Row2.Z;
 
-        result.Row0.X = ( ( lM11 * rM11 ) + ( lM12 * rM21 ) ) + ( lM13 * rM31 );
-        result.Row0.Y = ( ( lM11 * rM12 ) + ( lM12 * rM22 ) ) + ( lM13 * rm32 );
-        result.Row0.Z = ( ( lM11 * rM13 ) + ( lM12 * rM23 ) ) + ( lM13 * rM33 );
-        result.Row1.X = ( ( lM21 * rM11 ) + ( lM22 * rM21 ) ) + ( lM23 * rM31 );
-        result.Row1.Y = ( ( lM21 * rM12 ) + ( lM22 * rM22 ) ) + ( lM23 * rm32 );
-        result.Row1.Z = ( ( lM21 * rM13 ) + ( lM22 * rM23 ) ) + ( lM23 * rM33 );
+        result.Row0.X = lM11 * rM11 + lM12 * rM21 + lM13 * rM31;
+        result.Row0.Y = lM11 * rM12 + lM12 * rM22 + lM13 * rm32;
+        result.Row0.Z = lM11 * rM13 + lM12 * rM23 + lM13 * rM33;
+        result.Row1.X = lM21 * rM11 + lM22 * rM21 + lM23 * rM31;
+        result.Row1.Y = lM21 * rM12 + lM22 * rM22 + lM23 * rm32;
+        result.Row1.Z = lM21 * rM13 + lM22 * rM23 + lM23 * rM33;
     }
 
     /// <summary>
@@ -349,8 +349,8 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication.</returns>
-    public static Matrix2x3 Mult(Matrix2x3 left, Matrix3 right) {
-        Mult(ref left, ref right, out Matrix2x3 result);
+    public static Matrix2X3 Mult(Matrix2X3 left, Matrix3 right) {
+        Mult(ref left, ref right, out Matrix2X3 result);
         return result;
     }
 
@@ -360,21 +360,21 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication.</param>
-    public static void Mult(ref Matrix2x3 left, ref Matrix3x4 right, out Matrix2x4 result) {
+    public static void Mult(ref Matrix2X3 left, ref Matrix3X4 right, out Matrix2X4 result) {
         double lM11 = left.Row0.X, lM12 = left.Row0.Y, lM13 = left.Row0.Z,
             lM21 = left.Row1.X, lM22 = left.Row1.Y, lM23 = left.Row1.Z,
             rM11 = right.Row0.X, rM12 = right.Row0.Y, rM13 = right.Row0.Z, rM14 = right.Row0.W,
             rM21 = right.Row1.X, rM22 = right.Row1.Y, rM23 = right.Row1.Z, rM24 = right.Row1.W,
             rM31 = right.Row2.X, rm32 = right.Row2.Y, rM33 = right.Row2.Z, rM34 = right.Row2.W;
 
-        result.Row0.X = ( ( lM11 * rM11 ) + ( lM12 * rM21 ) ) + ( lM13 * rM31 );
-        result.Row0.Y = ( ( lM11 * rM12 ) + ( lM12 * rM22 ) ) + ( lM13 * rm32 );
-        result.Row0.Z = ( ( lM11 * rM13 ) + ( lM12 * rM23 ) ) + ( lM13 * rM33 );
-        result.Row0.W = ( ( lM11 * rM14 ) + ( lM12 * rM24 ) ) + ( lM13 * rM34 );
-        result.Row1.X = ( ( lM21 * rM11 ) + ( lM22 * rM21 ) ) + ( lM23 * rM31 );
-        result.Row1.Y = ( ( lM21 * rM12 ) + ( lM22 * rM22 ) ) + ( lM23 * rm32 );
-        result.Row1.Z = ( ( lM21 * rM13 ) + ( lM22 * rM23 ) ) + ( lM23 * rM33 );
-        result.Row1.W = ( ( lM21 * rM14 ) + ( lM22 * rM24 ) ) + ( lM23 * rM34 );
+        result.Row0.X = lM11 * rM11 + lM12 * rM21 + lM13 * rM31;
+        result.Row0.Y = lM11 * rM12 + lM12 * rM22 + lM13 * rm32;
+        result.Row0.Z = lM11 * rM13 + lM12 * rM23 + lM13 * rM33;
+        result.Row0.W = lM11 * rM14 + lM12 * rM24 + lM13 * rM34;
+        result.Row1.X = lM21 * rM11 + lM22 * rM21 + lM23 * rM31;
+        result.Row1.Y = lM21 * rM12 + lM22 * rM22 + lM23 * rm32;
+        result.Row1.Z = lM21 * rM13 + lM22 * rM23 + lM23 * rM33;
+        result.Row1.W = lM21 * rM14 + lM22 * rM24 + lM23 * rM34;
     }
 
     /// <summary>
@@ -383,8 +383,8 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication.</returns>
-    public static Matrix2x4 Mult(Matrix2x3 left, Matrix3x4 right) {
-        Mult(ref left, ref right, out Matrix2x4 result);
+    public static Matrix2X4 Mult(Matrix2X3 left, Matrix3X4 right) {
+        Mult(ref left, ref right, out Matrix2X4 result);
         return result;
     }
 
@@ -394,7 +394,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The left operand of the addition.</param>
     /// <param name="right">The right operand of the addition.</param>
     /// <param name="result">A new instance that is the result of the addition.</param>
-    public static void Add(ref Matrix2x3 left, ref Matrix2x3 right, out Matrix2x3 result) {
+    public static void Add(ref Matrix2X3 left, ref Matrix2X3 right, out Matrix2X3 result) {
         result.Row0.X = left.Row0.X + right.Row0.X;
         result.Row0.Y = left.Row0.Y + right.Row0.Y;
         result.Row0.Z = left.Row0.Z + right.Row0.Z;
@@ -409,8 +409,8 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The left operand of the addition.</param>
     /// <param name="right">The right operand of the addition.</param>
     /// <returns>A new instance that is the result of the addition.</returns>
-    public static Matrix2x3 Add(Matrix2x3 left, Matrix2x3 right) {
-        Add(ref left, ref right, out Matrix2x3 result);
+    public static Matrix2X3 Add(Matrix2X3 left, Matrix2X3 right) {
+        Add(ref left, ref right, out Matrix2X3 result);
         return result;
     }
 
@@ -420,7 +420,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The left operand of the subtraction.</param>
     /// <param name="right">The right operand of the subtraction.</param>
     /// <param name="result">A new instance that is the result of the subtraction.</param>
-    public static void Subtract(ref Matrix2x3 left, ref Matrix2x3 right, out Matrix2x3 result) {
+    public static void Subtract(ref Matrix2X3 left, ref Matrix2X3 right, out Matrix2X3 result) {
         result.Row0.X = left.Row0.X - right.Row0.X;
         result.Row0.Y = left.Row0.Y - right.Row0.Y;
         result.Row0.Z = left.Row0.Z - right.Row0.Z;
@@ -435,8 +435,8 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The left operand of the subtraction.</param>
     /// <param name="right">The right operand of the subtraction.</param>
     /// <returns>A new instance that is the result of the subtraction.</returns>
-    public static Matrix2x3 Subtract(Matrix2x3 left, Matrix2x3 right) {
-        Subtract(ref left, ref right, out Matrix2x3 result);
+    public static Matrix2X3 Subtract(Matrix2X3 left, Matrix2X3 right) {
+        Subtract(ref left, ref right, out Matrix2X3 result);
         return result;
     }
 
@@ -445,7 +445,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// </summary>
     /// <param name="mat">The matrix to transpose.</param>
     /// <param name="result">The transpose of the given matrix.</param>
-    public static void Transpose(ref Matrix2x3 mat, out Matrix3x2 result) {
+    public static void Transpose(ref Matrix2X3 mat, out Matrix3X2 result) {
         result.Row0.X = mat.Row0.X;
         result.Row0.Y = mat.Row1.X;
         result.Row1.X = mat.Row0.Y;
@@ -459,8 +459,8 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// </summary>
     /// <param name="mat">The matrix to transpose.</param>
     /// <returns>The transpose of the given matrix.</returns>
-    public static Matrix3x2 Transpose(Matrix2x3 mat) {
-        Transpose(ref mat, out Matrix3x2 result);
+    public static Matrix3X2 Transpose(Matrix2X3 mat) {
+        Transpose(ref mat, out Matrix3X2 result);
         return result;
     }
 
@@ -470,7 +470,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x3 which holds the result of the multiplication</returns>
-    public static Matrix2x3 operator *(double left, Matrix2x3 right) {
+    public static Matrix2X3 operator *(double left, Matrix2X3 right) {
         return Mult(right, left);
     }
 
@@ -480,7 +480,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x3 which holds the result of the multiplication</returns>
-    public static Matrix2x3 operator *(Matrix2x3 left, double right) {
+    public static Matrix2X3 operator *(Matrix2X3 left, double right) {
         return Mult(left, right);
     }
 
@@ -490,7 +490,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2 which holds the result of the multiplication</returns>
-    public static Matrix2 operator *(Matrix2x3 left, Matrix3x2 right) {
+    public static Matrix2 operator *(Matrix2X3 left, Matrix3X2 right) {
         return Mult(left, right);
     }
 
@@ -500,7 +500,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x3 which holds the result of the multiplication</returns>
-    public static Matrix2x3 operator *(Matrix2x3 left, Matrix3 right) {
+    public static Matrix2X3 operator *(Matrix2X3 left, Matrix3 right) {
         return Mult(left, right);
     }
 
@@ -510,7 +510,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x4 which holds the result of the multiplication</returns>
-    public static Matrix2x4 operator *(Matrix2x3 left, Matrix3x4 right) {
+    public static Matrix2X4 operator *(Matrix2X3 left, Matrix3X4 right) {
         return Mult(left, right);
     }
 
@@ -520,7 +520,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x3 which holds the result of the addition</returns>
-    public static Matrix2x3 operator +(Matrix2x3 left, Matrix2x3 right) {
+    public static Matrix2X3 operator +(Matrix2X3 left, Matrix2X3 right) {
         return Add(left, right);
     }
 
@@ -530,7 +530,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x3 which holds the result of the subtraction</returns>
-    public static Matrix2x3 operator -(Matrix2x3 left, Matrix2x3 right) {
+    public static Matrix2X3 operator -(Matrix2X3 left, Matrix2X3 right) {
         return Subtract(left, right);
     }
 
@@ -540,7 +540,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The first instance.</param>
     /// <param name="right">The second instance.</param>
     /// <returns>True, if left equals right; false otherwise.</returns>
-    public static bool operator ==(Matrix2x3 left, Matrix2x3 right) {
+    public static bool operator ==(Matrix2X3 left, Matrix2X3 right) {
         return left.Equals(right);
     }
 
@@ -550,7 +550,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="left">The first instance.</param>
     /// <param name="right">The second instance.</param>
     /// <returns>True, if left does not equal right; false otherwise.</returns>
-    public static bool operator !=(Matrix2x3 left, Matrix2x3 right) {
+    public static bool operator !=(Matrix2X3 left, Matrix2X3 right) {
         return !left.Equals(right);
     }
 
@@ -568,7 +568,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
     public override int GetHashCode() {
         unchecked {
-            return ( this.Row0.GetHashCode() * 397 ) ^ this.Row1.GetHashCode();
+            return this.Row0.GetHashCode() * 397 ^ this.Row1.GetHashCode();
         }
     }
 
@@ -578,11 +578,11 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// <param name="obj">The object to compare tresult.</param>
     /// <returns>True if the instances are equal; false otherwise.</returns>
     public override bool Equals(object obj) {
-        if( !( obj is Matrix2x3 ) ) {
+        if( !( obj is Matrix2X3 ) ) {
             return false;
         }
 
-        return this.Equals((Matrix2x3) obj);
+        return this.Equals((Matrix2X3) obj);
     }
 
     /// <summary>
@@ -590,7 +590,7 @@ public struct Matrix2x3 :IEquatable<Matrix2x3> {
     /// </summary>
     /// <param name="other">An matrix to compare with this matrix.</param>
     /// <returns>true if the current matrix is equal to the matrix parameter; otherwise, false.</returns>
-    public bool Equals(Matrix2x3 other) {
+    public bool Equals(Matrix2X3 other) {
         return
             Row0 == other.Row0 &&
             Row1 == other.Row1;

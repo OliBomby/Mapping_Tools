@@ -13,23 +13,21 @@ public static class FileFormatHelper {
     /// </summary>
     /// <param name="line">The string with a key and value separated by ": ".</param>
     /// <returns></returns>
-    public static Tuple<string, string> SplitKeyValue(string line) {
+    public static (string, string) SplitKeyValue(string line) {
         int index = line.IndexOf(':');
 
         if (index < 0) {
-            return null;
+            return (line, string.Empty);
         }
 
         string left = line.Remove(index).Trim();
         string right = line.Remove(0, index + 1).Trim();
 
-        return new Tuple<string, string>(left, right);
+        return (left, right);
     }
 
-    public static IEnumerable<string> GetCategoryLines(IEnumerable<string> lines, string category, string[] categoryIdentifiers=null) {
-        if (categoryIdentifiers == null)
-            categoryIdentifiers = new[] { "[" };
-
+    public static IEnumerable<string> GetCategoryLines(IEnumerable<string> lines, string category, string[]? categoryIdentifiers=null) {
+        categoryIdentifiers ??= ["["];
         bool atCategory = false;
 
         foreach (string line in lines) {
@@ -71,10 +69,28 @@ public static class FileFormatHelper {
     /// <summary>
     /// Converts the object to a string with invariant culture.
     /// </summary>
-    /// <param name="obj"></param>
+    /// <param name="obj">The object to convert to string.</param>
     /// <returns></returns>
     public static string ToInvariant(this object obj) {
-        return Convert.ToString(obj, CultureInfo.InvariantCulture);
+        return Convert.ToString(obj, CultureInfo.InvariantCulture)!;
+    }
+
+    /// <summary>
+    /// Converts the double to a string with invariant culture.
+    /// </summary>
+    /// <param name="obj">The double to convert to string.</param>
+    /// <returns></returns>
+    public static string ToInvariant(this double obj) {
+        return Convert.ToString(obj, CultureInfo.InvariantCulture)!;
+    }
+
+    /// <summary>
+    /// Converts the int to a string with invariant culture.
+    /// </summary>
+    /// <param name="obj">The int to convert to string.</param>
+    /// <returns></returns>
+    public static string ToInvariant(this int obj) {
+        return Convert.ToString(obj, CultureInfo.InvariantCulture)!;
     }
 
     /// <summary>

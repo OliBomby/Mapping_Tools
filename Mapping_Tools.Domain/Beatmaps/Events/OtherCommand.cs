@@ -1,7 +1,7 @@
 ﻿using System.Text;
-using Mapping_Tools.Domain.Beatmaps.IO;
 using Mapping_Tools.Domain.Beatmaps.Parsing;
 using Mapping_Tools.Domain.Beatmaps.Types;
+using Mapping_Tools.Domain.MathUtil;
 
 namespace Mapping_Tools.Domain.Beatmaps.Events;
 
@@ -70,7 +70,7 @@ public class OtherCommand : Command, IHasDuration {
         }
 
         if (values.Length <= 4 || string.IsNullOrWhiteSpace(values[4])) {
-            Params = Array.Empty<double>();
+            Params = [];
         } else {
             Params = new double[values.Length - 4];
             for (int i = 4; i < values.Length; i++) {

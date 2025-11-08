@@ -43,7 +43,7 @@ public struct BezierCurve {
             throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
         }
 
-        this.points = new List<Vector2>(points);
+        this.points = [..points];
         this.Parallel = 0.0f;
     }
 
@@ -56,7 +56,7 @@ public struct BezierCurve {
             throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
         }
 
-        this.points = new List<Vector2>(points);
+        this.points = [..points];
         this.Parallel = 0.0f;
     }
 
@@ -71,7 +71,7 @@ public struct BezierCurve {
         }
 
         this.Parallel = parallel;
-        this.points = new List<Vector2>(points);
+        this.points = [..points];
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public struct BezierCurve {
         }
 
         this.Parallel = parallel;
-        this.points = new List<Vector2>(points);
+        this.points = [..points];
     }
 
 
@@ -137,7 +137,7 @@ public struct BezierCurve {
         double length = 0.0f;
         Vector2 old = BezierCurve.CalculatePoint(points, 0.0f, parallel);
 
-        for( double i = precision; i < ( 1.0f + precision ); i += precision ) {
+        for( double i = precision; i < 1.0f + precision; i += precision ) {
             Vector2 n = CalculatePoint(points, i, parallel);
             length += ( n - old ).Length;
             old = n;
@@ -175,7 +175,7 @@ public struct BezierCurve {
 
         foreach( Vector2 pt in points ) {
             temp = MathHelper.BinomialCoefficient(points.Count - 1, i) * System.Math.Pow(t, i) *
-                   System.Math.Pow(c, (points.Count - 1) - i);
+                   System.Math.Pow(c, points.Count - 1 - i);
 
             r.X += temp * pt.X;
             r.Y += temp * pt.Y;
@@ -212,7 +212,7 @@ public struct BezierCurve {
 
         foreach( Vector2 pt in points ) {
             temp = MathHelper.BinomialCoefficient(points.Count - 2, i) * System.Math.Pow(t, i) *
-                   System.Math.Pow(c, (points.Count - 2) - i);
+                   System.Math.Pow(c, points.Count - 2 - i);
 
             r.X += temp * pt.X;
             r.Y += temp * pt.Y;

@@ -2,7 +2,7 @@
 
 public static class MyExtensions {
     public static int WordCount(this string str) {
-        return str.Split(new char[] { ' ', '.', '?' },
+        return str.Split([' ', '.', '?'],
             StringSplitOptions.RemoveEmptyEntries).Length;
     }
 
@@ -12,7 +12,7 @@ public static class MyExtensions {
 
     public static List<Vector2> Copy(this List<Vector2> list)
     {
-        List<Vector2> newList = new List<Vector2>();
+        List<Vector2> newList = [];
         newList.AddRange(list);
         return newList;
     }

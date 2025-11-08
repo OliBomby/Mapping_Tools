@@ -17,7 +17,7 @@ public class GradientDescentUtil {
         for (int i = 0; i < maxSteps; i++) {
             var gradient = (func(x + d) - func(x)) / d;
 
-            if (Math.Abs(gradient) < Precision.DOUBLE_EPSILON) {
+            if (Math.Abs(gradient) < Precision.DoubleEpsilon) {
                 break;
             }
 
@@ -43,7 +43,7 @@ public class GradientDescentUtil {
         for (int i = 0; i < maxSteps; i++) {
             var gradient = (func(x + d) - func(x)) / d;
 
-            if (Math.Abs(gradient) < Precision.DOUBLE_EPSILON) {
+            if (Math.Abs(gradient) < Precision.DoubleEpsilon) {
                 break;
             }
 

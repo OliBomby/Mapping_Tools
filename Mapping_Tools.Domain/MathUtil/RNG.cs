@@ -8,7 +8,7 @@ namespace Mapping_Tools.Domain.MathUtil;
 /// </summary>
 public static class RNG {
     // Base RNG. Maybe expose methods for re-seeding in the future?
-    private static readonly Random random = new Random();
+    private static readonly Random random = new();
 
     /// <summary>
     /// Returns a non-negative signed integer.

@@ -1,9 +1,9 @@
-﻿using Mapping_Tools.Domain.Beatmaps.IO;
-using Mapping_Tools.Domain.Beatmaps.Parsing;
+﻿using Mapping_Tools.Domain.Beatmaps.Parsing;
 
 namespace Mapping_Tools.Domain.Beatmaps;
 
 /// <summary>
+/// Combo colour or special color value type used in osu! beatmaps.
 /// The british alternative because main developer wants to keep the spelling.
 /// Its spelled "Colours" in the game.
 /// </summary>
@@ -67,7 +67,7 @@ public class ComboColour {
     }
 
     /// <summary>
-    /// Converts an <see cref="IComboColour"/> to .osu code.
+    /// Converts an <see cref="ComboColour"/> to .osu code.
     /// </summary>
     /// <param name="comboColour">The combo colour to serialize</param>
     /// <returns></returns>
@@ -75,7 +75,6 @@ public class ComboColour {
         return $"{comboColour.R.ToInvariant()},{comboColour.G.ToInvariant()},{comboColour.B.ToInvariant()}";
     }
 
-    ///<inheritdoc/>
     public object Clone() {
         return MemberwiseClone();
     }
@@ -91,21 +90,22 @@ public class ComboColour {
     /// </summary>
     /// <returns></returns>
     public static ComboColour[] GetDefaultComboColours() {
-        return new []{new ComboColour(255, 192, 0),
+        return [
+            new ComboColour(255, 192, 0),
             new ComboColour(0, 202, 0),
             new ComboColour(18, 124, 255),
-            new ComboColour(242, 24, 57)};
+            new ComboColour(242, 24, 57),
+        ];
     }
 
-    ///<inheritdoc/>
-    public bool Equals(ComboColour other) {
+    public bool Equals(ComboColour? other) {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
         return R == other.R && G == other.G && B == other.B;
     }
 
     ///<inheritdoc/>
-    public override bool Equals(object obj) {
+    public override bool Equals(object? obj) {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
         return obj.GetType() == GetType() && Equals((ComboColour) obj);
@@ -115,8 +115,8 @@ public class ComboColour {
     public override int GetHashCode() {
         unchecked {
             var hashCode = R.GetHashCode();
-            hashCode = (hashCode * 397) ^ G.GetHashCode();
-            hashCode = (hashCode * 397) ^ B.GetHashCode();
+            hashCode = hashCode * 397 ^ G.GetHashCode();
+            hashCode = hashCode * 397 ^ B.GetHashCode();
             return hashCode;
         }
     }

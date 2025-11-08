@@ -39,12 +39,12 @@ public struct Matrix2 : IEquatable<Matrix2> {
     /// <summary>
     /// The identity matrix.
     /// </summary>
-    public static Matrix2 Identity { get => new Matrix2(Vector2.UnitX, Vector2.UnitY); }
+    public static Matrix2 Identity { get => new(Vector2.UnitX, Vector2.UnitY); }
 
     /// <summary>
     /// The zero matrix.
     /// </summary>
-    public static Matrix2 Zero { get => new Matrix2(Vector2.Zero, Vector2.Zero); }
+    public static Matrix2 Zero { get => new(Vector2.Zero, Vector2.Zero); }
 
     /// <summary>
     /// Constructs a new instance.
@@ -317,8 +317,8 @@ public struct Matrix2 : IEquatable<Matrix2> {
             lM21 = left.Row1.X, lM22 = left.Row1.Y,
             rM11 = right.X, rM12 = right.Y;
 
-        result.X = (lM11 * rM11) + (lM12 * rM12);
-        result.Y = (lM21 * rM11) + (lM22 * rM12);
+        result.X = lM11 * rM11 + lM12 * rM12;
+        result.Y = lM21 * rM11 + lM22 * rM12;
     }
 
     /// <summary>
@@ -333,10 +333,10 @@ public struct Matrix2 : IEquatable<Matrix2> {
             rM11 = right.Row0.X, rM12 = right.Row0.Y,
             rM21 = right.Row1.X, rM22 = right.Row1.Y;
 
-        result.Row0.X = ( lM11 * rM11 ) + ( lM12 * rM21 );
-        result.Row0.Y = ( lM11 * rM12 ) + ( lM12 * rM22 );
-        result.Row1.X = ( lM21 * rM11 ) + ( lM22 * rM21 );
-        result.Row1.Y = ( lM21 * rM12 ) + ( lM22 * rM22 );
+        result.Row0.X = lM11 * rM11 + lM12 * rM21;
+        result.Row0.Y = lM11 * rM12 + lM12 * rM22;
+        result.Row1.X = lM21 * rM11 + lM22 * rM21;
+        result.Row1.Y = lM21 * rM12 + lM22 * rM22;
     }
 
     /// <summary>
@@ -356,18 +356,18 @@ public struct Matrix2 : IEquatable<Matrix2> {
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication.</param>
-    public static void Mult(ref Matrix2 left, ref Matrix2x3 right, out Matrix2x3 result) {
+    public static void Mult(ref Matrix2 left, ref Matrix2X3 right, out Matrix2X3 result) {
         double lM11 = left.Row0.X, lM12 = left.Row0.Y,
             lM21 = left.Row1.X, lM22 = left.Row1.Y,
             rM11 = right.Row0.X, rM12 = right.Row0.Y, rM13 = right.Row0.Z,
             rM21 = right.Row1.X, rM22 = right.Row1.Y, rM23 = right.Row1.Z;
 
-        result.Row0.X = ( lM11 * rM11 ) + ( lM12 * rM21 );
-        result.Row0.Y = ( lM11 * rM12 ) + ( lM12 * rM22 );
-        result.Row0.Z = ( lM11 * rM13 ) + ( lM12 * rM23 );
-        result.Row1.X = ( lM21 * rM11 ) + ( lM22 * rM21 );
-        result.Row1.Y = ( lM21 * rM12 ) + ( lM22 * rM22 );
-        result.Row1.Z = ( lM21 * rM13 ) + ( lM22 * rM23 );
+        result.Row0.X = lM11 * rM11 + lM12 * rM21;
+        result.Row0.Y = lM11 * rM12 + lM12 * rM22;
+        result.Row0.Z = lM11 * rM13 + lM12 * rM23;
+        result.Row1.X = lM21 * rM11 + lM22 * rM21;
+        result.Row1.Y = lM21 * rM12 + lM22 * rM22;
+        result.Row1.Z = lM21 * rM13 + lM22 * rM23;
     }
 
     /// <summary>
@@ -376,8 +376,8 @@ public struct Matrix2 : IEquatable<Matrix2> {
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication.</returns>
-    public static Matrix2x3 Mult(Matrix2 left, Matrix2x3 right) {
-        Mult(ref left, ref right, out Matrix2x3 result);
+    public static Matrix2X3 Mult(Matrix2 left, Matrix2X3 right) {
+        Mult(ref left, ref right, out Matrix2X3 result);
         return result;
     }
 
@@ -387,20 +387,20 @@ public struct Matrix2 : IEquatable<Matrix2> {
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication.</param>
-    public static void Mult(ref Matrix2 left, ref Matrix2x4 right, out Matrix2x4 result) {
+    public static void Mult(ref Matrix2 left, ref Matrix2X4 right, out Matrix2X4 result) {
         double lM11 = left.Row0.X, lM12 = left.Row0.Y,
             lM21 = left.Row1.X, lM22 = left.Row1.Y,
             rM11 = right.Row0.X, rM12 = right.Row0.Y, rM13 = right.Row0.Z, rM14 = right.Row0.W,
             rM21 = right.Row1.X, rM22 = right.Row1.Y, rM23 = right.Row1.Z, rM24 = right.Row1.W;
 
-        result.Row0.X = ( lM11 * rM11 ) + ( lM12 * rM21 );
-        result.Row0.Y = ( lM11 * rM12 ) + ( lM12 * rM22 );
-        result.Row0.Z = ( lM11 * rM13 ) + ( lM12 * rM23 );
-        result.Row0.W = ( lM11 * rM14 ) + ( lM12 * rM24 );
-        result.Row1.X = ( lM21 * rM11 ) + ( lM22 * rM21 );
-        result.Row1.Y = ( lM21 * rM12 ) + ( lM22 * rM22 );
-        result.Row1.Z = ( lM21 * rM13 ) + ( lM22 * rM23 );
-        result.Row1.W = ( lM21 * rM14 ) + ( lM22 * rM24 );
+        result.Row0.X = lM11 * rM11 + lM12 * rM21;
+        result.Row0.Y = lM11 * rM12 + lM12 * rM22;
+        result.Row0.Z = lM11 * rM13 + lM12 * rM23;
+        result.Row0.W = lM11 * rM14 + lM12 * rM24;
+        result.Row1.X = lM21 * rM11 + lM22 * rM21;
+        result.Row1.Y = lM21 * rM12 + lM22 * rM22;
+        result.Row1.Z = lM21 * rM13 + lM22 * rM23;
+        result.Row1.W = lM21 * rM14 + lM22 * rM24;
     }
 
     /// <summary>
@@ -409,8 +409,8 @@ public struct Matrix2 : IEquatable<Matrix2> {
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication.</returns>
-    public static Matrix2x4 Mult(Matrix2 left, Matrix2x4 right) {
-        Mult(ref left, ref right, out Matrix2x4 result);
+    public static Matrix2X4 Mult(Matrix2 left, Matrix2X4 right) {
+        Mult(ref left, ref right, out Matrix2X4 result);
         return result;
     }
 
@@ -553,7 +553,7 @@ public struct Matrix2 : IEquatable<Matrix2> {
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x3 which holds the result of the multiplication</returns>
-    public static Matrix2x3 operator *(Matrix2 left, Matrix2x3 right) {
+    public static Matrix2X3 operator *(Matrix2 left, Matrix2X3 right) {
         return Mult(left, right);
     }
 
@@ -563,7 +563,7 @@ public struct Matrix2 : IEquatable<Matrix2> {
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x4 which holds the result of the multiplication</returns>
-    public static Matrix2x4 operator *(Matrix2 left, Matrix2x4 right) {
+    public static Matrix2X4 operator *(Matrix2 left, Matrix2X4 right) {
         return Mult(left, right);
     }
 
@@ -621,7 +621,7 @@ public struct Matrix2 : IEquatable<Matrix2> {
     /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
     public override int GetHashCode() {
         unchecked {
-            return ( this.Row0.GetHashCode() * 397 ) ^ this.Row1.GetHashCode();
+            return this.Row0.GetHashCode() * 397 ^ this.Row1.GetHashCode();
         }
     }
 

@@ -211,27 +211,27 @@ public struct Vector2 :IEquatable<Vector2> {
     /// <summary>
     /// Defines a unit-length Vector2 that points towards the X-axis.
     /// </summary>
-    public static readonly Vector2 UnitX = new Vector2(1, 0);
+    public static readonly Vector2 UnitX = new(1, 0);
 
     /// <summary>
     /// Defines a unit-length Vector2 that points towards the Y-axis.
     /// </summary>
-    public static readonly Vector2 UnitY = new Vector2(0, 1);
+    public static readonly Vector2 UnitY = new(0, 1);
 
     /// <summary>
     /// Defines a zero-length Vector2.
     /// </summary>
-    public static readonly Vector2 Zero = new Vector2(0, 0);
+    public static readonly Vector2 Zero = new(0, 0);
 
     /// <summary>
     /// Defines an instance with all components set to 1.
     /// </summary>
-    public static readonly Vector2 One = new Vector2(1, 1);
+    public static readonly Vector2 One = new(1, 1);
 
     /// <summary>
     /// Defines an instance with all components set to NaN.
     /// </summary>
-    public static readonly Vector2 NaN = new Vector2(double.NaN, double.NaN);
+    public static readonly Vector2 NaN = new(double.NaN, double.NaN);
 
     /// <summary>
     /// Defines the size of the Vector2 struct in bytes.
@@ -1019,7 +1019,7 @@ public struct Vector2 :IEquatable<Vector2> {
     /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
     public override int GetHashCode() {
         unchecked {
-            return (X.GetHashCode() * 397 ) ^ Y.GetHashCode();
+            return X.GetHashCode() * 397 ^ Y.GetHashCode();
         }
     }
 

@@ -1,5 +1,5 @@
 ﻿using Mapping_Tools.Domain.Beatmaps.HitObjects;
-using Mapping_Tools.Domain.Beatmaps.TimingStuff;
+using Mapping_Tools.Domain.Beatmaps.Timings;
 
 namespace Mapping_Tools.Domain.Beatmaps.Contexts;
 
@@ -22,27 +22,23 @@ public class TimingContext : IContext {
     /// The timing point active at the start time of this hit object.
     /// Usefull for determining slider velocity.
     /// </summary>
-    [NotNull]
     public TimingPoint TimingPoint { get; set; }
 
     /// <summary>
     /// The timing point active 5 milliseconds after the start time of this hit object.
     /// This is the timing point determining the hitsounds for this hit object at the start time.
     /// </summary>
-    [NotNull]
     public TimingPoint HitsoundTimingPoint { get; set; }
 
     /// <summary>
     /// The uninherited timing point active at the start time of this hit object.
     /// Determines the BPM at the start time of this hit object.
     /// </summary>
-    [NotNull]
     public TimingPoint UninheritedTimingPoint { get; set; }
 
     /// <summary>
     /// Other timing points that occur during the duration of the hit object.
     /// </summary>
-    [NotNull]
     public List<TimingPoint> BodyHitsounds { get; set; }
 
     /// <summary>

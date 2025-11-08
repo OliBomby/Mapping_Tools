@@ -3,26 +3,19 @@ using System.Text.Json.Serialization;
 
 namespace Mapping_Tools.Domain.Beatmaps.BeatDivisors;
 
-public class RationalBeatDivisor : IBeatDivisor {
+[method: JsonConstructor]
+public class RationalBeatDivisor(int numerator, int denominator) : IBeatDivisor {
     /// <summary>
     /// The number above the line in a vulgar fraction showing how many of the parts indicated by the denominator are taken, for example, 2 in 2/3.
     /// </summary>
-    public int Numerator { get; }
+    public int Numerator { get; } = numerator;
 
     /// <summary>
     /// The number below the line in a vulgar fraction; a divisor.
     /// </summary>
-    public int Denominator { get; }
+    public int Denominator { get; } = denominator;
 
-    public RationalBeatDivisor(int denominator) {
-        Numerator = 1;
-        Denominator = denominator;
-    }
-
-    [JsonConstructor]
-    public RationalBeatDivisor(int numerator, int denominator) {
-        Numerator = numerator;
-        Denominator = denominator;
+    public RationalBeatDivisor(int denominator) : this(1, denominator) {
     }
 
     public static implicit operator RationalBeatDivisor(int denominator) {
@@ -52,11 +45,11 @@ public class RationalBeatDivisor : IBeatDivisor {
 
     public override int GetHashCode() {
         unchecked {
-            return (Numerator * 397) ^ Denominator;
+            return Numerator * 397 ^ Denominator;
         }
     }
 
     public static IBeatDivisor[] GetDefaultBeatDivisors() {
-        return new IBeatDivisor[] {new RationalBeatDivisor(16), new RationalBeatDivisor(12)};
+        return [new RationalBeatDivisor(16), new RationalBeatDivisor(12)];
     }
 }

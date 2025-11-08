@@ -132,7 +132,7 @@ public struct CircleArc :IEquatable<CircleArc> {
     /// <summary>
     /// Defines a CircleArc that is a unit circle.
     /// </summary>
-    public static readonly CircleArc UnitCircle = new CircleArc(Vector2.Zero, 1, 0, 2 * Math.PI, 1);
+    public static readonly CircleArc UnitCircle = new(Vector2.Zero, 1, 0, 2 * Math.PI, 1);
 
     /// <summary>
     /// Gets the rotator matrix for the CircleArc.
@@ -141,8 +141,8 @@ public struct CircleArc :IEquatable<CircleArc> {
     {
         get
         {
-            return new Matrix2(new Vector2(Math.Cos(ThetaStart), (-Math.Sin(ThetaStart) * Dir)),
-                new Vector2(Math.Sin(ThetaStart), (Math.Cos(ThetaStart) * Dir))) * Radius;
+            return new Matrix2(new Vector2(Math.Cos(ThetaStart), -Math.Sin(ThetaStart) * Dir),
+                new Vector2(Math.Sin(ThetaStart), Math.Cos(ThetaStart) * Dir)) * Radius;
         }
     }
 

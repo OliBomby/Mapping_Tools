@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Domain.Beatmaps.TimelineStuff;
+﻿using Mapping_Tools.Domain.Beatmaps.Timelines;
 
 namespace Mapping_Tools.Domain.Beatmaps.Types;
 

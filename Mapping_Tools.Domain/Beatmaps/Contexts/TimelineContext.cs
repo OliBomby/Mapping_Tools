@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Domain.Beatmaps.TimelineStuff;
+﻿using Mapping_Tools.Domain.Beatmaps.Timelines;
 using Mapping_Tools.Domain.Beatmaps.Types;
 
 namespace Mapping_Tools.Domain.Beatmaps.Contexts;
@@ -7,11 +7,10 @@ public class TimelineContext : IContext {
     /// <summary>
     /// The timeline objects associated with this hit object.
     /// </summary>
-    [NotNull]
     public List<TimelineObject> TimelineObjects { get; set; }
 
     public TimelineContext() {
-        TimelineObjects = new List<TimelineObject>();
+        TimelineObjects = [];
     }
 
     public TimelineContext(IEnumerable<TimelineObject> timelineObjects) {

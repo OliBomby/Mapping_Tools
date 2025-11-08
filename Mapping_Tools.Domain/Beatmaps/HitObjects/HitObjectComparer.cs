@@ -1,20 +1,13 @@
-﻿using Mapping_Tools.Domain.Beatmaps.HitObjects.Objects;
-using Mapping_Tools.Domain.Beatmaps.Parsing.Encoding.HitObjects;
+﻿using Mapping_Tools.Domain.Beatmaps.Parsing.V14.HitObjects;
 
 namespace Mapping_Tools.Domain.Beatmaps.HitObjects;
 
-public class HitObjectComparer : IEqualityComparer<HitObject> {
-    private readonly HitObjectEncoder hitObjectEncoder = new HitObjectEncoder();
+public class HitObjectComparer(bool checkIsSelected = false, bool checkPosition = true, bool checkTime = true) : IEqualityComparer<HitObject> {
+    private readonly HitObjectEncoder hitObjectEncoder = new();
 
-    public bool CheckIsSelected { get; set; }
-    public bool CheckPosition { get; set; }
-    public bool CheckTime { get; set; }
-
-    public HitObjectComparer(bool checkIsSelected = false, bool checkPosition = true, bool checkTime = true) {
-        CheckIsSelected = checkIsSelected;
-        CheckPosition = checkPosition;
-        CheckTime = checkTime;
-    }
+    public bool CheckIsSelected { get; set; } = checkIsSelected;
+    public bool CheckPosition { get; set; } = checkPosition;
+    public bool CheckTime { get; set; } = checkTime;
 
     public bool Equals(HitObject x, HitObject y) {
         if (x == null && y == null)

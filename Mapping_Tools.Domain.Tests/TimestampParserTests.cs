@@ -26,7 +26,7 @@ public class TimestampParserTests
         Assert.That(t.TotalMilliseconds, Is.EqualTo(891));
         Assert.That(refs, Is.EqualTo(new List<HitObjectReference>
         {
-            new(ComboIndex: 1, Time: -1, ColumnIndex: -1)
+            new(ComboIndex: 1),
         }));
     }
 
@@ -37,8 +37,8 @@ public class TimestampParserTests
         Assert.That(t.TotalMilliseconds, Is.EqualTo(Ms(minutes: 60, millis: 74)));
         Assert.That(refs, Is.EqualTo(new List<HitObjectReference>
         {
-            new(ComboIndex: 2, Time: -1, ColumnIndex: -1),
-            new(ComboIndex: 4, Time: -1, ColumnIndex: -1),
+            new(ComboIndex: 2),
+            new(ComboIndex: 4),
         }));
     }
 
@@ -62,7 +62,7 @@ public class TimestampParserTests
         Assert.That(t.TotalMilliseconds, Is.EqualTo(-1230)); // -1s - 230ms
         Assert.That(refs, Is.EqualTo(new List<HitObjectReference>
         {
-            new(ComboIndex: 1, Time: -1, ColumnIndex: -1)
+            new(ComboIndex: 1),
         }));
     }
 
@@ -76,11 +76,11 @@ public class TimestampParserTests
 
         var expected = new List<HitObjectReference>
         {
-            new(-1, 57031, 2),
-            new(-1, 57411, 1),
-            new(-1, 57790, 0),
-            new(-1, 58170, 2),
-            new(-1, 58170, 3),
+            new(Time: 57031, ColumnIndex: 2),
+            new(Time: 57411, ColumnIndex: 1),
+            new(Time: 57790, ColumnIndex: 0),
+            new(Time: 58170, ColumnIndex: 2),
+            new(Time: 58170, ColumnIndex: 3),
         };
         Assert.That(refs, Is.EqualTo(expected));
     }
@@ -106,8 +106,8 @@ public class TimestampParserTests
         Assert.That(t.TotalMilliseconds, Is.EqualTo(891));
         Assert.That(refs, Is.EqualTo(new List<HitObjectReference>
         {
-            new(1, -1, -1),
-            new(2, -1, -1),
+            new(ComboIndex: 1),
+            new(ComboIndex: 2),
         }));
     }
 

@@ -55,32 +55,32 @@ public struct Vector4 :IEquatable<Vector4> {
     /// <summary>
     /// Defines a unit-length Vector4 that points towards the X-axis.
     /// </summary>
-    public static readonly Vector4 UnitX = new Vector4(1, 0, 0, 0);
+    public static readonly Vector4 UnitX = new(1, 0, 0, 0);
 
     /// <summary>
     /// Defines a unit-length Vector4 that points towards the Y-axis.
     /// </summary>
-    public static readonly Vector4 UnitY = new Vector4(0, 1, 0, 0);
+    public static readonly Vector4 UnitY = new(0, 1, 0, 0);
 
     /// <summary>
     /// Defines a unit-length Vector4 that points towards the Z-axis.
     /// </summary>
-    public static readonly Vector4 UnitZ = new Vector4(0, 0, 1, 0);
+    public static readonly Vector4 UnitZ = new(0, 0, 1, 0);
 
     /// <summary>
     /// Defines a unit-length Vector4 that points towards the W-axis.
     /// </summary>
-    public static readonly Vector4 UnitW = new Vector4(0, 0, 0, 1);
+    public static readonly Vector4 UnitW = new(0, 0, 0, 1);
 
     /// <summary>
     /// Defines a zero-length Vector4.
     /// </summary>
-    public static readonly Vector4 Zero = new Vector4(0, 0, 0, 0);
+    public static readonly Vector4 Zero = new(0, 0, 0, 0);
 
     /// <summary>
     /// Defines an instance with all components set to 1.
     /// </summary>
-    public static readonly Vector4 One = new Vector4(1, 1, 1, 1);
+    public static readonly Vector4 One = new(1, 1, 1, 1);
 
     /// <summary>
     /// Defines the size of the Vector4 struct in bytes.
@@ -1371,9 +1371,9 @@ public struct Vector4 :IEquatable<Vector4> {
     public override int GetHashCode() {
         unchecked {
             var hashCode = this.X.GetHashCode();
-            hashCode = ( hashCode * 397 ) ^ this.Y.GetHashCode();
-            hashCode = ( hashCode * 397 ) ^ this.Z.GetHashCode();
-            hashCode = ( hashCode * 397 ) ^ this.W.GetHashCode();
+            hashCode = hashCode * 397 ^ this.Y.GetHashCode();
+            hashCode = hashCode * 397 ^ this.Z.GetHashCode();
+            hashCode = hashCode * 397 ^ this.W.GetHashCode();
             return hashCode;
         }
     }

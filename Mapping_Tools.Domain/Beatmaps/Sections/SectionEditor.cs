@@ -6,6 +6,5 @@ public class SectionEditor {
     public int GridSize { get; set; } = 32;
     public float TimelineZoom { get; set; } = 1f;
 
-    [NotNull]
-    public List<double> Bookmarks { get; set; } = new List<double>();
+    public List<double> Bookmarks { get; set; } = [];
 }

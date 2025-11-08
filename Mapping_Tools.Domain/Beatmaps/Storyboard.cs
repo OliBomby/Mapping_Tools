@@ -29,15 +29,15 @@ public class Storyboard {
     /// Initializes an empty storyboard.
     /// </summary>
     public Storyboard() {
-        BackgroundAndVideoEvents = new List<Event>();
-        BreakPeriods = new List<Break>();
-        StoryboardLayerBackground = new List<Event>();
-        StoryboardLayerPass = new List<Event>();
-        StoryboardLayerFail = new List<Event>();
-        StoryboardLayerForeground = new List<Event>();
-        StoryboardLayerOverlay = new List<Event>();
-        StoryboardSoundSamples = new List<StoryboardSoundSample>();
-        BackgroundColourTransformations = new List<BackgroundColourTransformation>();
+        BackgroundAndVideoEvents = [];
+        BreakPeriods = [];
+        StoryboardLayerBackground = [];
+        StoryboardLayerPass = [];
+        StoryboardLayerFail = [];
+        StoryboardLayerForeground = [];
+        StoryboardLayerOverlay = [];
+        StoryboardSoundSamples = [];
+        BackgroundColourTransformations = [];
     }
 
     /// <summary>
@@ -49,9 +49,17 @@ public class Storyboard {
     public static string GetFileName(string artist, string title, string creator) {
         string fileName = $"{artist} - {title} ({creator}).osb";
 
-        string regexSearch = new string(Path.GetInvalidFileNameChars());
+        string regexSearch = new(Path.GetInvalidFileNameChars());
         Regex r = new Regex($"[{Regex.Escape(regexSearch)}]");
         fileName = r.Replace(fileName, "");
         return fileName;
+    }
+}
+
+public static class StoryboardExtensions {
+    public static IEnumerable<Event> EnumerateAllEvents(this Storyboard sb) {
+        return sb.BackgroundAndVideoEvents.Concat(sb.BreakPeriods).Concat(sb.StoryboardSoundSamples)
+            .Concat(sb.StoryboardLayerFail).Concat(sb.StoryboardLayerPass).Concat(sb.StoryboardLayerBackground)
+            .Concat(sb.StoryboardLayerForeground).Concat(sb.StoryboardLayerOverlay).Concat(sb.BackgroundColourTransformations);
     }
 }

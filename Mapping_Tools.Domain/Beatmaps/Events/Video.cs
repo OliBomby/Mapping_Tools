@@ -1,6 +1,6 @@
-﻿using Mapping_Tools.Domain.Beatmaps.IO;
-using Mapping_Tools.Domain.Beatmaps.Parsing;
+﻿using Mapping_Tools.Domain.Beatmaps.Parsing;
 using Mapping_Tools.Domain.Beatmaps.Types;
+using Mapping_Tools.Domain.MathUtil;
 
 namespace Mapping_Tools.Domain.Beatmaps.Events;
 

@@ -5,11 +5,7 @@ public abstract class ContextableBase {
     /// Additional properties.
     /// The objects always have the type of their key.
     /// </summary>
-    protected Dictionary<Type, IContext> contexts;
-
-    protected ContextableBase() {
-        contexts = new Dictionary<Type, IContext>();
-    }
+    protected Dictionary<Type, IContext> contexts = new();
 
     /// <summary>
     /// Checks whether this object has the context with type T.

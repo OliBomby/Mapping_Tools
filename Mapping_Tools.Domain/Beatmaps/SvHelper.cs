@@ -27,7 +27,7 @@ public static class SvHelper {
     /// <param name="globalSv">The global slider velocity.</param>
     /// <returns>The duration of one span of the slider in milliseconds.</returns>
     public static double CalculateSliderDuration(double pixelLength, double mpb, double sv, double globalSv) {
-        return (pixelLength * mpb) / (100 * globalSv * FilterSv(sv));
+        return pixelLength * mpb / (100 * globalSv * FilterSv(sv));
     }
 
     /// <summary>
@@ -51,6 +51,6 @@ public static class SvHelper {
     /// <param name="globalSv">The global slider velocity.</param>
     /// <returns>The greenline slider velocity multiplier of the slider.</returns>
     public static double CalculateSliderVelocity(double pixelLength, double mpb, double duration, double globalSv) {
-        return (pixelLength * mpb) / (duration * 100 * globalSv);
+        return pixelLength * mpb / (duration * 100 * globalSv);
     }
 }

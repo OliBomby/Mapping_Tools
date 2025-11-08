@@ -5,9 +5,10 @@
 /// TODO: When actually doing storyboard stuff some of the types should have child and parent events instead of indents, so we get a tree structure.
 /// </summary>
 public abstract class Event {
-    protected Event() {
-        ChildEvents = new List<Event>();
-    }
+
+    public Event? ParentEvent { get; set; }
+
+    public List<Event> ChildEvents { get; } = [];
 
     /// <summary>
     /// Factory method for making an <see cref="Event"/> from a serialized line of .osu code.
@@ -15,7 +16,6 @@ public abstract class Event {
     /// </summary>
     /// <param name="line"></param>
     /// <returns></returns>
-    [CanBeNull]
     public static Event MakeEvent(string line) {
         string[] values = line.Split(',');
         string eventType = values[0].Trim();
@@ -85,7 +85,7 @@ public abstract class Event {
     /// <param name="lines"></param>
     /// <returns></returns>
     public static IEnumerable<Event> ParseEventTree(IEnumerable<string> lines) {
-        LinkedList<Event> parentEvents = new LinkedList<Event>();
+        LinkedList<Event> parentEvents = new();
         Event lastEvent = null;
         int lastIndents = -1;  // -1 is below the lowest possible indents, so this will always trigger adding null in the parent events
         foreach (var line in lines) {
@@ -150,14 +150,10 @@ public abstract class Event {
     }
 
     public static string RemoveIndents(string line) {
-        return line.Substring(ParseIndents(line));
+        return line[ParseIndents(line)..];
     }
 
     public abstract string GetLine();
 
     public abstract void SetLine(string line);
-
-    public Event ParentEvent { get; set; }
-
-    public List<Event> ChildEvents { get; set; }
 }
