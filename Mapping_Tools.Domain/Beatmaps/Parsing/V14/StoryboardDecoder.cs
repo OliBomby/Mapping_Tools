@@ -5,58 +5,6 @@ using static Mapping_Tools.Domain.Beatmaps.Parsing.FileFormatHelper;
 namespace Mapping_Tools.Domain.Beatmaps.Parsing.V14;
 
 public class StoryboardDecoder : IDecoder<Storyboard> {
-    public void Decode(Storyboard obj, string code) {
-        var lines = code.Split('\n').Select(l => l.Trim('\r')).ToList();
-
-        IEnumerable<string> eventsLines = GetCategoryLines(lines, "[Events]");
-
-        foreach (var section in EnumerateSections(eventsLines)) {
-            var events = Event.ParseEventTree(section);
-            foreach (var ev in events) {
-                switch (ev) {
-                    case Background:
-                    case Video:
-                        obj.BackgroundAndVideoEvents.Add(ev);
-                        break;
-                    case Break b:
-                        obj.BreakPeriods.Add(b);
-                        break;
-                    case StoryboardSoundSample sbss:
-                        obj.StoryboardSoundSamples.Add(sbss);
-                        break;
-                    case BackgroundColourTransformation bct:
-                        obj.BackgroundColourTransformations.Add(bct);
-                        break;
-                    case IHasStoryboardLayer l:
-                        switch (l.Layer) {
-                            case StoryboardLayer.Background:
-                                obj.StoryboardLayerBackground.Add(ev);
-                                break;
-                            case StoryboardLayer.Fail:
-                                obj.StoryboardLayerFail.Add(ev);
-                                break;
-                            case StoryboardLayer.Pass:
-                                obj.StoryboardLayerPass.Add(ev);
-                                break;
-                            case StoryboardLayer.Foreground:
-                                obj.StoryboardLayerForeground.Add(ev);
-                                break;
-                            case StoryboardLayer.Overlay:
-                                obj.StoryboardLayerOverlay.Add(ev);
-                                break;
-                            default:
-                                // Unexpected layer. Event gets placed nowhere
-                                break;
-                        }
-                        break;
-                    default:
-                        // Unexpected command. Can be warned but its no big deal.
-                        break;
-                }
-            }
-        }
-    }
-
     private IEnumerable<IEnumerable<string>> EnumerateSections(IEnumerable<string> lines) {
         var em = lines.GetEnumerator();
         while (em.MoveNext()) {
@@ -90,7 +38,56 @@ public class StoryboardDecoder : IDecoder<Storyboard> {
 
     public Storyboard Decode(string code) {
         var storyboard = new Storyboard();
-        Decode(storyboard, code);
+        
+        var lines = code.Split('\n').Select(l => l.Trim('\r')).ToList();
+
+        IEnumerable<string> eventsLines = GetCategoryLines(lines, "[Events]");
+
+        foreach (var section in EnumerateSections(eventsLines)) {
+            var events = Event.ParseEventTree(section);
+            foreach (var ev in events) {
+                switch (ev) {
+                    case Background:
+                    case Video:
+                        storyboard.BackgroundAndVideoEvents.Add(ev);
+                        break;
+                    case Break b:
+                        storyboard.BreakPeriods.Add(b);
+                        break;
+                    case StoryboardSoundSample sbss:
+                        storyboard.StoryboardSoundSamples.Add(sbss);
+                        break;
+                    case BackgroundColourTransformation bct:
+                        storyboard.BackgroundColourTransformations.Add(bct);
+                        break;
+                    case IHasStoryboardLayer l:
+                        switch (l.Layer) {
+                            case StoryboardLayer.Background:
+                                storyboard.StoryboardLayerBackground.Add(ev);
+                                break;
+                            case StoryboardLayer.Fail:
+                                storyboard.StoryboardLayerFail.Add(ev);
+                                break;
+                            case StoryboardLayer.Pass:
+                                storyboard.StoryboardLayerPass.Add(ev);
+                                break;
+                            case StoryboardLayer.Foreground:
+                                storyboard.StoryboardLayerForeground.Add(ev);
+                                break;
+                            case StoryboardLayer.Overlay:
+                                storyboard.StoryboardLayerOverlay.Add(ev);
+                                break;
+                            default:
+                                // Unexpected layer. Event gets placed nowhere
+                                break;
+                        }
+                        break;
+                    default:
+                        // Unexpected command. Can be warned but its no big deal.
+                        break;
+                }
+            }
+        }
 
         return storyboard;
     }

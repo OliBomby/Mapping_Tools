@@ -7,7 +7,7 @@ namespace Mapping_Tools.Domain.Beatmaps.Parsing.V14;
 /// <summary>
 /// Decoder for timing points.
 /// </summary>
-public class TimingPointIDecoder : IDecoderWithDefaults<TimingPoint> {
+public class TimingPointDecoder : IDecoderWithDefaults<TimingPoint> {
     public TimingPoint Decode(string code, IDictionary<string, object> defaultValues) {
         var tp = new TimingPoint();
         string[] values = code.Split(',');

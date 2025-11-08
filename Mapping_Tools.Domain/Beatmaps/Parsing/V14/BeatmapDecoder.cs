@@ -9,10 +9,12 @@ namespace Mapping_Tools.Domain.Beatmaps.Parsing.V14;
 
 public class BeatmapDecoder(IDecoder<Storyboard> storyboardDecoder, IDecoder<HitObject> hitObjectDecoder, IDecoder<TimingPoint> timingPointDecoder)
     : IDecoder<Beatmap> {
-    public BeatmapDecoder() : this(new StoryboardDecoder(), new HitObjectDecoder(), new TimingPointIDecoder()) {
+    public BeatmapDecoder() : this(new StoryboardDecoder(), new HitObjectDecoder(), new TimingPointDecoder()) {
     }
 
-    public void Decode(Beatmap beatmap, string code) {
+    public Beatmap Decode(string code) {
+        var beatmap = new Beatmap();
+
         var lines = code.Split('\n').Select(l => l.Trim('\r')).ToList();
 
         // Get the beatmap version
@@ -67,11 +69,6 @@ public class BeatmapDecoder(IDecoder<Storyboard> storyboardDecoder, IDecoder<Hit
         beatmap.SortHitObjects();
         beatmap.CalculateHitObjectComboStuff();
         beatmap.GiveObjectsTimingContext();
-    }
-
-    public Beatmap Decode(string code) {
-        var beatmap = new Beatmap();
-        Decode(beatmap, code);
 
         return beatmap;
     }

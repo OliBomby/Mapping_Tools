@@ -125,7 +125,7 @@ public static class HitObjectDecodingHelper {
         return line.Split(',');
     }
 
-    public static string JoinLine(string[] values) {
+    private static string JoinLine(string[] values) {
         return string.Join(',', values);
     }
 }
