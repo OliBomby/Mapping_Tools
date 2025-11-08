@@ -100,6 +100,6 @@ public class BinarySearchUtil {
     public enum EqualitySelection {
         FirstFound,
         Leftmost,
-        Rightmost
+        Rightmost,
     }
 }

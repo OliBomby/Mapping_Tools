@@ -25,5 +25,5 @@ public enum PathType {
     /// <summary>
     ///
     /// </summary>
-    PerfectCurve
+    PerfectCurve,
 }

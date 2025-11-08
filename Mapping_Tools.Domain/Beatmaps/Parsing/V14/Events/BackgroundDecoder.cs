@@ -33,7 +33,7 @@ public class BackgroundDecoder : IDecoder<Background>
             StartTime = startTime,
             Filename = filename,
             XOffset = xOffset,
-            YOffset = yOffset
+            YOffset = yOffset,
         };
     }
 }

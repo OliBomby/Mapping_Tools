@@ -33,7 +33,7 @@ public class SpriteDecoder : IDecoder<Sprite>
             Layer = layer,
             Origin = origin,
             FilePath = filePath,
-            Pos = pos
+            Pos = pos,
         };
     }
 }

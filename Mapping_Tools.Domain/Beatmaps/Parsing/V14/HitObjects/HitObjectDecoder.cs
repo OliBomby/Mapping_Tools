@@ -19,7 +19,7 @@ public class HitObjectDecoder(
             HitObjectType.Slider => sliderDecoder.Decode(code),
             HitObjectType.Spinner => spinnerDecoder.Decode(code),
             HitObjectType.HoldNote => holdNoteDecoder.Decode(code),
-            _ => throw new BeatmapParsingException("Unrecognized hit object type.", code)
+            _ => throw new BeatmapParsingException("Unrecognized hit object type.", code),
         };
     }
 }

@@ -33,7 +33,7 @@ public class VideoDecoder : IDecoder<Video>
             StartTime = startTime,
             Filename = filename,
             XOffset = xOffset,
-            YOffset = yOffset
+            YOffset = yOffset,
         };
     }
 }

@@ -54,7 +54,7 @@ public class OtherCommandDecoder : IDecoder<OtherCommand>
             Easing = easingType,
             StartTime = startTime,
             EndTime = endTime,
-            Params = parameters
+            Params = parameters,
         };
     }
 }

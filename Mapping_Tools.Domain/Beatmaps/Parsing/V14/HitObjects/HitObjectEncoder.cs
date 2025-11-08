@@ -20,7 +20,7 @@ public class HitObjectEncoder(
             Slider slider => sliderEncoder.Encode(slider),
             Spinner spinner => spinnerEncoder.Encode(spinner),
             HoldNote holdNote => holdNoteEncoder.Encode(holdNote),
-            _ => throw new ArgumentOutOfRangeException(nameof(obj))
+            _ => throw new ArgumentOutOfRangeException(nameof(obj)),
         };
     }
 }

@@ -46,7 +46,7 @@ public class EventDecoder(
             "L" => standardLoopDecoder.Decode(code),
             "T" => triggerLoopDecoder.Decode(code),
             "F" or "M" or "MX" or "MY" or "S" or "V" or "R" or "C" => otherCommandDecoder.Decode(code),
-            _ => throw new BeatmapParsingException("Unknown event type.", code)
+            _ => throw new BeatmapParsingException("Unknown event type.", code),
         };
     }
 }

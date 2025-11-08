@@ -4,5 +4,5 @@ public enum HitObjectType {
     Circle,
     Slider,
     Spinner,
-    HoldNote
+    HoldNote,
 }

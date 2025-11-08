@@ -8,6 +8,13 @@ public class Break : Event, IHasStartTime, IHasDuration, IComparable<Break> {
     public double Duration => EndTime - StartTime;
     public double EndTime { get; set; }
 
+    public Break() { }
+
+    public Break(double startTime, double endTime) {
+        StartTime = startTime;
+        EndTime = endTime;
+    }
+
     /// <inheritdoc/>
     public int CompareTo(Break? other) {
         return other == null ? 1 : StartTime.CompareTo(other.StartTime);

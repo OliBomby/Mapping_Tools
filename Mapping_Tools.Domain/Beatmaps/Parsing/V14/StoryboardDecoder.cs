@@ -50,8 +50,7 @@ public class StoryboardDecoder(IDecoder<Event> eventDecoder) : IDecoder<Storyboa
                             case StoryboardLayer.Overlay:
                                 storyboard.StoryboardLayerOverlay.Add(ev);
                                 break;
-                            default:
-                                throw new BeatmapParsingException();
+                            // Other layers get ignored
                         }
                         break;
                     default:
@@ -106,7 +105,6 @@ public class StoryboardDecoder(IDecoder<Event> eventDecoder) : IDecoder<Storyboa
         int lastIndents = -1;  // -1 is below the lowest possible indents, so this will always trigger adding null in the parent events
         foreach (var line in lines) {
             int indents = ParseIndents(line);
-            var ev = eventDecoder.Decode(line[indents..]);
 
             if (indents > lastIndents && lastEvent is not null) {
                 // Go deeper in the tree
@@ -119,13 +117,23 @@ public class StoryboardDecoder(IDecoder<Event> eventDecoder) : IDecoder<Storyboa
                 }
             }
 
-            // Add this event to the tree or return it if it's at the top level
-            var parent = parentEvents.Last?.Value;
-            if (parent == null) {
-                yield return ev;
-            } else {
-                parent.ChildEvents.Add(ev);
-                ev.ParentEvent = parent;
+            Event? ev = null;
+            try {
+                ev = eventDecoder.Decode(line[indents..]);
+            } catch (BeatmapParsingException) {
+                // Invalid events are skipped by osu! so we do the same here
+            }
+
+            if (ev is not null) {
+                // Add this event to the parent node or return it if it's at the top level
+                var parent = parentEvents.Last?.Value;
+
+                if (parent is null) {
+                    yield return ev;
+                } else {
+                    parent.ChildEvents.Add(ev);
+                    ev.ParentEvent = parent;
+                }
             }
 
             lastEvent = ev;

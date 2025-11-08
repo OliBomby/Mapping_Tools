@@ -10,5 +10,5 @@ public enum Origin {
     Custom,
     CentreRight,
     BottomLeft,
-    BottomRight
+    BottomRight,
 }

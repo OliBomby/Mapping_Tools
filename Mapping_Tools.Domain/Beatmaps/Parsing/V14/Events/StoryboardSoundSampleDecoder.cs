@@ -31,7 +31,7 @@ public class StoryboardSoundSampleDecoder : IDecoder<StoryboardSoundSample>
             StartTime = t,
             Layer = layer,
             FilePath = filePath,
-            Volume = volume
+            Volume = volume,
         };
     }
 }

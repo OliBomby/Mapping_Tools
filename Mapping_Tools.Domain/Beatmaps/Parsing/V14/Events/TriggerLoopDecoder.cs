@@ -31,7 +31,7 @@ public class TriggerLoopDecoder : IDecoder<TriggerLoop>
             TriggerName = triggerName,
             DurationDefined = durationDefined,
             StartTime = startTime,
-            EndTime = endTime
+            EndTime = endTime,
         };
     }
 }

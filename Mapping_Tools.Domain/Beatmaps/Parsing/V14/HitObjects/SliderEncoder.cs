@@ -39,7 +39,7 @@ public class SliderEncoder(bool encodeWithFloatPrecision = false) : HitObjectEnc
             PathType.PerfectCurve => "P",
             PathType.Catmull => "C",
             PathType.Bezier => "B",
-            _ => throw new ArgumentOutOfRangeException(nameof(sliderType))
+            _ => throw new ArgumentOutOfRangeException(nameof(sliderType)),
         };
     }
 }

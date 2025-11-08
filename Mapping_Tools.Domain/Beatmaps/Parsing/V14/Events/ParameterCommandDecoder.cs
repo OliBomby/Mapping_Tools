@@ -32,7 +32,7 @@ public class ParameterCommandDecoder : IDecoder<ParameterCommand>
             Easing = easingType,
             StartTime = startTime,
             EndTime = endTime,
-            Parameter = parameter
+            Parameter = parameter,
         };
     }
 }

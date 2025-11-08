@@ -21,7 +21,7 @@ public class BreakDecoder : IDecoder<Break>
         {
             EventType = values[0],
             StartTime = startTime,
-            EndTime = endTime
+            EndTime = endTime,
         };
     }
 }

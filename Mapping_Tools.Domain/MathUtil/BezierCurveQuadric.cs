@@ -101,7 +101,7 @@ public struct BezierCurveQuadric {
         Vector2 r = new Vector2
         {
             X = (1.0f - t) * StartAnchor.X + t * ControlPoint.X,
-            Y = (1.0f - t) * StartAnchor.Y + t * ControlPoint.Y
+            Y = (1.0f - t) * StartAnchor.Y + t * ControlPoint.Y,
         };
 
         return r;

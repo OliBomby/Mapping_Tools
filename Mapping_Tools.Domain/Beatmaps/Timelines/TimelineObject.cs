@@ -204,7 +204,7 @@ public abstract class TimelineObject : ContextableBase {
         return index switch {
             0 => $"{taiko}{sampleSet.ToString().ToLower()}-hit{hitsound.ToString().ToLower()}-default",
             1 => $"{taiko}{sampleSet.ToString().ToLower()}-hit{hitsound.ToString().ToLower()}",
-            _ => $"{taiko}{sampleSet.ToString().ToLower()}-hit{hitsound.ToString().ToLower()}{index}"
+            _ => $"{taiko}{sampleSet.ToString().ToLower()}-hit{hitsound.ToString().ToLower()}{index}",
         };
     }
 

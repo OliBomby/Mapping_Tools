@@ -34,7 +34,7 @@ public class HitObjectComparer(bool checkIsSelected = false, bool checkPosition 
                                                        sliderX.EdgeHitsounds.SequenceEqual(sliderY.EdgeHitsounds),
             Spinner spinnerX when y is Spinner spinnerY => spinnerX.EndTime == spinnerY.EndTime,
             HoldNote holdNoteX when y is HoldNote holdNoteY => holdNoteX.EndTime == holdNoteY.EndTime,
-            _ => false
+            _ => false,
         };
 
         // Types dont match

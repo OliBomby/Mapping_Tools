@@ -17,7 +17,7 @@ public class StandardLoopDecoder : IDecoder<StandardLoop>
         return new StandardLoop
         {
             StartTime = startTime,
-            LoopCount = loopCount
+            LoopCount = loopCount,
         };
     }
 }

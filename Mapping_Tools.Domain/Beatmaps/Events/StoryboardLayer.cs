@@ -34,5 +34,5 @@ public enum StoryboardLayer
     /// </summary>
     DifficultyFail = 6,
     DifficultyForeground = 7,
-    DifficultyOverlay = 8
+    DifficultyOverlay = 8,
 }

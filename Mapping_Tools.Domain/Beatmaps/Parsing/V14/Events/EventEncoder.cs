@@ -43,6 +43,6 @@ public class EventEncoder(
         StandardLoop stdLoop => standardLoopEncoder.Encode(stdLoop),
         TriggerLoop triggerLoop => triggerLoopEncoder.Encode(triggerLoop),
         OtherCommand other => otherCommandEncoder.Encode(other),
-        _ => throw new ArgumentOutOfRangeException(nameof(obj))
+        _ => throw new ArgumentOutOfRangeException(nameof(obj)),
     };
 }

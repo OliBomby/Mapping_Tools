@@ -136,7 +136,7 @@ public struct Quaternion :IEquatable<Quaternion> {
 
         Vector4 result = new Vector4
         {
-            W = 2.0f * Math.Acos(q.W) // angle
+            W = 2.0f * Math.Acos(q.W), // angle
         };
         double den = Math.Sqrt(1.0 - q.W * q.W);
         if( den > 0.0001f ) {

@@ -405,10 +405,7 @@ public static class BeatmapExtensions {
                 }
             } else if (!Precision.DefinitelySmaller(next.StartTime - prev.EndTime, autoBreakGapSize)) {
                 // Add new break
-                newBreakPeriods.Add(new Break {
-                    StartTime = prev.EndTime + minLeftMargin,
-                    EndTime = next.StartTime - approachTime,
-                });
+                newBreakPeriods.Add(new Break(prev.EndTime + minLeftMargin, next.StartTime - approachTime));
             }
         }
 

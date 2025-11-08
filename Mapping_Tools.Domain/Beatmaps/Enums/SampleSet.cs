@@ -20,5 +20,5 @@ public enum SampleSet {
     /// <summary>
     /// The sampleset of Drum.
     /// </summary>
-    Drum = 3
+    Drum = 3,
 }

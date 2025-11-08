@@ -28,7 +28,7 @@ public class BackgroundColourTransformationDecoder : IDecoder<BackgroundColourTr
             StartTime = startTime,
             R = r,
             G = g,
-            B = b
+            B = b,
         };
     }
 }

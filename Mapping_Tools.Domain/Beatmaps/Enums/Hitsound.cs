@@ -14,5 +14,5 @@ public enum Hitsound {
     Finish = 2,
 
     /// <summary />
-    Clap = 3
+    Clap = 3,
 }
