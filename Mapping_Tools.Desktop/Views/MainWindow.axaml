@@ -15,6 +15,14 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Spacing="8">
+            <Button Content="Home"     Command="{Binding GoHomeCommand}" />
+            <Button Content="Settings" Command="{Binding GoSettingsCommand}" />
+        </StackPanel>
+
+        <!-- This is the “navigation”. Changing CurrentViewModel switches the view -->
+        <ContentControl Content="{Binding CurrentViewModel}"/>
+    </DockPanel>
 
 </Window>
