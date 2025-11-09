@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Mapping_Tools.Desktop;
 
-class Program {
+static internal class Program {
     public static IHost AppHost { get; private set; } = default!;
 
     // Initialization code. Don't use any Avalonia, third-party APIs or any
@@ -18,6 +18,7 @@ class Program {
         AppHost = Host.CreateDefaultBuilder(args)
             .ConfigureServices(services => {
                 services.AddPlatformServices();
+                services.AddHostedService<UpdateChecker>();
 
                 services.AddSingleton<MainWindowViewModel>();
                 services.AddTransient<HomeViewModel>();
@@ -29,7 +30,7 @@ class Program {
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp()
+    private static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .With(new Win32PlatformOptions { AllowEglInitialization = true })
