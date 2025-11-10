@@ -25,6 +25,15 @@
         <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-rc.2.25502.107" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0-rc.2.25502.107" />
+        <PackageReference Include="ReactiveUI.SourceGenerators" Version="2.5.1">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="XamlNameReferenceGenerator" Version="1.6.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Mapping_Tools.Application\Mapping_Tools.Application.csproj" />
+      <ProjectReference Include="..\Mapping_Tools.Infrastructure\Mapping_Tools.Infrastructure.csproj" />
     </ItemGroup>
 </Project>

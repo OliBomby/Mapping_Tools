@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Mapping_Tools.Desktop.ViewModels;
@@ -7,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop;
 
-public partial class App : Application {
+public partial class App : Avalonia.Application {
     public override void Initialize() {
         AvaloniaXamlLoader.Load(this);
     }
