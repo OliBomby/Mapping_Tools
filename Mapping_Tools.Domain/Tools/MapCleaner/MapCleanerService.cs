@@ -30,6 +30,11 @@ public record MapCleanerArgs(
     bool SampleSetSliders
 );
 
+public sealed record MapCleaningProgress(
+    string Phase,
+    int? Percent, // optional; domain is allowed to omit
+    string? Message = null);
+
 public class MapCleanerService {
     /// <summary>
     /// Cleans a beatmap of unused timing points and various other stuff.
@@ -39,8 +44,8 @@ public class MapCleanerService {
     /// <param name="sampleLookup">A mapping from all available custom samples to their content hash. Used for determining which custom samples exist and which sounds they make.</param>
     /// <param name="progress">The callback for updating progress.</param>
     /// <returns>Statistics of how much has changed.</returns>
-    public MapCleanerResult CleanMap(Beatmap beatmap, MapCleanerArgs args, ISampleLookup? sampleLookup = null, IProgress<int>? progress = null) {
-        progress?.Report(0);
+    public MapCleanerResult CleanMap(Beatmap beatmap, MapCleanerArgs args, ISampleLookup? sampleLookup = null, IProgress<MapCleaningProgress>? progress = null) {
+        progress?.Report(new MapCleaningProgress("Starting", 0, "Starting map cleaning process."));
 
         Timing timing = beatmap.BeatmapTiming;
         GameMode mode = beatmap.General.Mode;
@@ -53,6 +58,8 @@ public class MapCleanerService {
         // are still valid and the tlo's get the correct hitsounds and offsets.
         // Resnapping of the hit objects will move the tlo's aswell
         Timeline timeline = beatmap.GetTimeline();
+
+        progress?.Report(new MapCleaningProgress("Collecting timing changes", 3, "Collecting Kiai toggles and SV changes."));
 
         // Collect Kiai toggles and SliderVelocity changes for mania/taiko
         List<TimingPoint> kiaiToggles = [];
@@ -77,10 +84,9 @@ public class MapCleanerService {
             }
         }
 
-        progress?.Report(9);
-
         // Resnap shit
         if (args.ResnapObjects) {
+            progress?.Report(new MapCleaningProgress("Resnapping objects", 15, "Resnapping all hit objects."));
             // Resnap all objects
             foreach (HitObject ho in beatmap.HitObjects) {
                 bool resnapped = ho.ResnapSelf(timing, args.BeatDivisors);
@@ -94,24 +100,21 @@ public class MapCleanerService {
                 ho.ResnapPosition(mode, circleSize);
             }
 
-            progress?.Report(18);
-
+            progress?.Report(new MapCleaningProgress("Resnapping Kiai toggles", 25, "Resnapping Kiai toggles."));
             // Resnap Kiai toggles
             foreach (TimingPoint tp in kiaiToggles) {
                 tp.ResnapSelf(timing, args.BeatDivisors);
             }
 
-            progress?.Report(27);
-
+            progress?.Report(new MapCleaningProgress("Resnapping SV changes", 35, "Resnapping SliderVelocity changes."));
             // Resnap SliderVelocity changes
             foreach (TimingPoint tp in svChanges) {
                 tp.ResnapSelf(timing, args.BeatDivisors);
             }
-
-            progress?.Report(36);
         }
 
         if (args.ResnapBookmarks) {
+            progress?.Report(new MapCleaningProgress("Resnapping bookmarks", 40, "Resnapping bookmarks."));
             // Resnap the bookmarks
             List<double> bookmarks = beatmap.Editor.Bookmarks;
             List<double> newBookmarks = bookmarks.Select(o => timing.Resnap(o, args.BeatDivisors)).ToList();
@@ -119,9 +122,9 @@ public class MapCleanerService {
             // Remove duplicate bookmarks
             newBookmarks = newBookmarks.Distinct().ToList();
             beatmap.Editor.Bookmarks = newBookmarks;
-
-            progress?.Report(45);
         }
+
+        progress?.Report(new MapCleaningProgress("Adding redlines", 50, "Adding redlines."));
 
         // Make new timingpoints
         List<ControlChange> timingPointsChanges = [];
@@ -132,24 +135,24 @@ public class MapCleanerService {
             timingPointsChanges.Add(new ControlChange(tp, mpb: true, meter: true, uninherited: true, omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon));
         }
 
-        progress?.Report(55);
+        // Add redlines
+        progress?.Report(new MapCleaningProgress("Adding redlines", 50, "About to add redlines."));
 
         // Add SliderVelocity changes for taiko and mania
+        progress?.Report(new MapCleaningProgress("Adding SV changes", 55, "Adding SliderVelocity changes for taiko/mania."));
         if (mode == GameMode.Taiko || mode == GameMode.Mania) {
             foreach (TimingPoint tp in svChanges) {
                 timingPointsChanges.Add(new ControlChange(tp, mpb: true, fuzzyness: 0.4));
             }
         }
 
-        progress?.Report(60);
-
+        progress?.Report(new MapCleaningProgress("Adding Kiai toggles", 60, "Adding Kiai toggles."));
         // Add Kiai toggles
         foreach (TimingPoint tp in kiaiToggles) {
             timingPointsChanges.Add(new ControlChange(tp, kiai: true));
         }
 
-        progress?.Report(65);
-
+        progress?.Report(new MapCleaningProgress("Adding hitobject timing", 65, "Adding slider body hitsounds and velocity changes."));
         // Add Hitobject stuff
         foreach (HitObject ho in beatmap.HitObjects) {
             var timingContext = ho.GetContext<TimingContext>();
@@ -199,8 +202,7 @@ public class MapCleanerService {
             }
         }
 
-        progress?.Report(75);
-
+        progress?.Report(new MapCleaningProgress("Adding timeline hitsounds", 75, "Adding timeline hitsounds."));
         if (!args.RemoveHitsounds) {
             // Add timeline hitsounds
             foreach (TimelineObject tlo in timeline.TimelineObjects) {
@@ -262,20 +264,17 @@ public class MapCleanerService {
             }
         }
 
-        progress?.Report(85);
-
+        progress?.Report(new MapCleaningProgress("Replacing timing points", 85, "Replacing old timing points."));
         // Replace the old timing points
         timing.Clear();
         ControlChange.ApplyChanges(timing, timingPointsChanges);
         beatmap.GiveObjectsTimingContext();
 
-        progress?.Report(90);
-
+        progress?.Report(new MapCleaningProgress("Finalizing", 90, "Finalizing timing and context."));
         // Fix this extremely specific thing
         Fix2BDoubleTaps(beatmap);
 
-        // Complete progressbar
-        progress?.Report(100);
+        progress?.Report(new MapCleaningProgress("Complete", 100, "Map cleaning complete."));
 
         int timingPointsRemoved = oldTimingPointsCount - beatmap.BeatmapTiming.TimingPoints.Count;
         return new MapCleanerResult(objectsResnapped, timingPointsRemoved);
