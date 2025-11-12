@@ -51,7 +51,7 @@ static internal class Program {
     private static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .With(new Win32PlatformOptions { AllowEglInitialization = true })
+            .With(new Win32PlatformOptions())
             .With(new X11PlatformOptions())
             .With(new MacOSPlatformOptions())
             .LogToTrace()

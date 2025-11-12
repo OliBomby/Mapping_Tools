@@ -1,6 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Mapping_Tools.Application.Persistence;
+﻿using Mapping_Tools.Application.Persistence;
 using Mapping_Tools.Desktop.Models;
 using ReactiveUI;
 

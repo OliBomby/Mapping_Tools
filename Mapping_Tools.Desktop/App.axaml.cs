@@ -6,19 +6,26 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop;
 
-public partial class App : Avalonia.Application {
-    public override void Initialize() {
+public partial class App : Avalonia.Application
+{
+    public override void Initialize()
+    {
         AvaloniaXamlLoader.Load(this);
     }
 
-    public override void OnFrameworkInitializationCompleted() {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
-            desktop.MainWindow = new MainWindow {
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.MainWindow = new MainWindow
+            {
                 DataContext = Program.AppHost.Services.GetRequiredService<MainWindowViewModel>(),
             };
-        } else if (ApplicationLifetime is ISingleViewApplicationLifetime singleView) {
+        } else if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
+        {
             // Mobile/Web: set the *MainView* instead of a window.
-            singleView.MainView = new MainWindow {
+            singleView.MainView = new MainWindow
+            {
                 DataContext = Program.AppHost.Services.GetRequiredService<MainWindowViewModel>(),
             };
         }

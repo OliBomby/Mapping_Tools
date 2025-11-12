@@ -9,26 +9,31 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <TrimmerRootAssembly Include="Avalonia.Themes.Fluent"/>
+        <TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.18"/>
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.18"/>
+        <PackageReference Include="Avalonia" Version="11.3.8" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.8" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.18"/>
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18"/>
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.8" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.8" />
+        <PackageReference Include="DialogHost.Avalonia" Version="0.9.3" />
+        <PackageReference Include="Material.Avalonia" Version="3.13.3" />
+        <PackageReference Include="Material.Avalonia.DataGrid" Version="3.13.3" />
+        <PackageReference Include="Material.Avalonia.Dialogs" Version="3.13.3" />
+        <PackageReference Include="Material.Avalonia.TreeDataGrid" Version="3.13.3" />
+        <PackageReference Include="Material.Icons.Avalonia" Version="2.4.1" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-rc.2.25502.107" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0-rc.2.25502.107" />
         <PackageReference Include="ReactiveUI.SourceGenerators" Version="2.5.1">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="XamlNameReferenceGenerator" Version="1.6.1"/>
     </ItemGroup>
 
     <ItemGroup>

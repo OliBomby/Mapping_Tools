@@ -15,5 +15,7 @@
         <TextBlock>Welcome to Settings!</TextBlock>
         <TextBox Text="{Binding Note, Mode=TwoWay}"></TextBox>
         <TextBox Text="{Binding Counter, Mode=TwoWay}"></TextBox>
+        <TextBlock>test</TextBlock>
     </StackPanel>
+
 </UserControl>
