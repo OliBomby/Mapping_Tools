@@ -1,11 +1,10 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Mapping_Tools.Application.Persistence;
+﻿using Mapping_Tools.Application.Persistence;
+using Mapping_Tools.Desktop.Models;
 using ReactiveUI;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
-public class HomeViewModel(IStateStore store) : ViewModelBase, IPersistable {
+public class HomeViewModel(IStateStore store) : ViewModelBase, IHasModel<HomeModel> {
     private int counter;
 
     public int Counter {
@@ -19,33 +18,15 @@ public class HomeViewModel(IStateStore store) : ViewModelBase, IPersistable {
         get => note;
         set => this.RaiseAndSetIfChanged(ref note, value);
     }
+    
+    public HomeViewModel() : this(null!) {
+    }
 
-    public async Task LoadAsync(CancellationToken ct = default)
+    public HomeModel GetModel() => new(Note, Counter);
+
+    public void SetModel(HomeModel model)
     {
-        var dto = await store.LoadAsync<HomeState>("home", ct) ?? new HomeState();
-        Note    = dto.Note;
-        Counter = dto.Counter;
-    }
-
-    public Task SaveAsync(CancellationToken ct = default)
-        => store.SaveAsync("home", new HomeState(Note, Counter), ct);
-}
-
-public record HomeState(string? Note = null, int Counter = 0);
-
-public class DesignHomeViewModel : HomeViewModel {
-    public DesignHomeViewModel() : base(null) {
-        Note    = "This is a design-time note 2.";
-        Counter = 43;
-    }
-}
-
-public class FakeStateStore : IStateStore {
-    public Task<T?> LoadAsync<T>(string key, CancellationToken ct = default) {
-        throw new System.NotImplementedException();
-    }
-
-    public Task SaveAsync<T>(string key, T value, CancellationToken ct = default) {
-        throw new System.NotImplementedException();
+        Note    = model.Note;
+        Counter = model.Counter;
     }
 }

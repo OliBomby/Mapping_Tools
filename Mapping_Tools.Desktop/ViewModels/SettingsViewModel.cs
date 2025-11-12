@@ -1,11 +1,12 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Mapping_Tools.Application.Persistence;
+using Mapping_Tools.Desktop.Models;
 using ReactiveUI;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
-public partial class SettingsViewModel(IStateStore store) : ViewModelBase, IPersistable {
+public partial class SettingsViewModel(IStateStore store) : ViewModelBase, IHasModel<SettingsModel> {
 
     private int counter;
 
@@ -24,15 +25,11 @@ public partial class SettingsViewModel(IStateStore store) : ViewModelBase, IPers
     public SettingsViewModel() : this(null!) {
     }
 
-    public async Task LoadAsync(CancellationToken ct = default)
+    public SettingsModel GetModel() => new(Note, Counter);
+
+    public void SetModel(SettingsModel model)
     {
-        var dto = await store.LoadAsync<SettingsState>("settings", ct) ?? new SettingsState();
-        Note    = dto.Note;
-        Counter = dto.Counter;
+        Note    = model.Note;
+        Counter = model.Counter;
     }
-
-    public Task SaveAsync(CancellationToken ct = default)
-        => store.SaveAsync("settings", new SettingsState(Note, Counter), ct);
 }
-
-public record SettingsState(string? Note = null, int Counter = 0);

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 namespace Mapping_Tools.Infrastructure;
 
 public sealed class JsonStateStore : IStateStore {
+    private readonly KeyedAsyncLock _lock = new();
     private readonly ILogger<JsonStateStore> logger;
     private readonly string basePath;
     private static readonly JsonSerializerOptions jsonOpts = new() { WriteIndented = true };
@@ -16,25 +17,40 @@ public sealed class JsonStateStore : IStateStore {
         basePath = Path.Combine(appData, "Mapping Tools 2", "Test");
         Directory.CreateDirectory(basePath);
     }
+    
+    private string PathFor(string key) => Path.Combine(basePath, $"{key}.json");
 
     public async Task<T?> LoadAsync<T>(string key, CancellationToken ct = default)
     {
-        var path = Path.Combine(basePath, $"{key}.json");
+        using var _ = await _lock.AcquireAsync(key, ct).ConfigureAwait(false);
+        
+        var path = PathFor(key);
         if (!File.Exists(path)) return default;
+        
         // Simulate a delay for demonstration purposes
         await Task.Delay(200, ct);
-        await using var s = File.OpenRead(path);
-        return await JsonSerializer.DeserializeAsync<T>(s, jsonOpts, ct);
+        
+        await using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true);
+        var state = await JsonSerializer.DeserializeAsync<T>(fs, options: jsonOpts, cancellationToken: ct).ConfigureAwait(false);
+        return state;
     }
 
-    public async Task SaveAsync<T>(string key, T value, CancellationToken ct = default)
+    public async Task SaveAsync<T>(string key, T state, CancellationToken ct = default)
     {
-        var path = Path.Combine(basePath, $"{key}.json");
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        using var _ = await _lock.AcquireAsync(key, ct).ConfigureAwait(false);
+        
+        var path = PathFor(key);
+        
         // Simulate a delay for demonstration purposes
         await Task.Delay(1000, ct);
-        await using var s = File.Create(path);
-        await JsonSerializer.SerializeAsync(s, value, jsonOpts, ct);
+        
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        await using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 8192, useAsync: true))
+        {
+            await JsonSerializer.SerializeAsync(fs, state, options: jsonOpts, cancellationToken: ct).ConfigureAwait(false);
+            await fs.FlushAsync(ct).ConfigureAwait(false);
+        }
+        
         logger.LogInformation("Saved state to {Path}", path);
     }
 }
