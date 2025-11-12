@@ -1,7 +1,6 @@
 ﻿using System.Reactive;
 using System.Threading.Tasks;
 using ReactiveUI;
-using ReactiveUI.SourceGenerators;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -20,11 +19,19 @@ public class MainWindowViewModel : ViewModelBase {
             this.RaiseAndSetIfChanged(ref currentViewModel, value);
         }
     }
+    
+    private bool isBusy;
 
-    [Reactive] public string? Note { get; set; }
+    public bool IsBusy
+    {
+        get => isBusy;
+        private set => this.RaiseAndSetIfChanged(ref isBusy, value);
+    }
 
     public ReactiveCommand<Unit, Unit>? GoHomeCommand { get; }
     public ReactiveCommand<Unit, Unit>? GoSettingsCommand { get; }
+    
+    public MainWindowViewModel() : this(null!) { }
 
     public MainWindowViewModel(NavigationService navigationService) {
         this.navigationService = navigationService;
@@ -32,7 +39,13 @@ public class MainWindowViewModel : ViewModelBase {
         this.navigationService.OnNavigate += vm => CurrentViewModel = vm;
         Task.Run(() => this.navigationService.NavigateAsync<HomeViewModel>());
         
-        GoHomeCommand = ReactiveCommand.CreateFromTask(navigationService.NavigateAsync<HomeViewModel>);
-        GoSettingsCommand = ReactiveCommand.CreateFromTask(navigationService.NavigateAsync<SettingsViewModel>);
+        GoHomeCommand = ReactiveCommand.CreateFromTask(NavigateAsync<HomeViewModel>);
+        GoSettingsCommand = ReactiveCommand.CreateFromTask(NavigateAsync<SettingsViewModel>);
+    }
+    
+    private async Task NavigateAsync<T>() where T : ViewModelBase {
+        IsBusy = true;
+        await navigationService.NavigateAsync<T>();
+        IsBusy = false;
     }
 }

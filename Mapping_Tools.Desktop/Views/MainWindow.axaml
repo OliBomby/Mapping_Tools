@@ -20,7 +20,6 @@
             <Button Content="Home"     Command="{Binding GoHomeCommand}" />
             <Button Content="Settings" Command="{Binding GoSettingsCommand}" />
             <TextBlock>Text</TextBlock>
-            <TextBox Text="{Binding Note}"></TextBox>
         </StackPanel>
 
         <!-- This is the “navigation”. Changing CurrentViewModel switches the view -->
