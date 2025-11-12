@@ -18,9 +18,6 @@ public class NavigationService(IServiceProvider serviceProvider, IStateStore sta
     {
         var viewModel = await Task.Run(async () =>
         {
-            // Mouse pointer load animation
-            
-            
             var viewModel = serviceProvider.GetRequiredService<T>();
 
             if (!TryGetModelType(viewModel, out var modelType))
@@ -50,15 +47,18 @@ public class NavigationService(IServiceProvider serviceProvider, IStateStore sta
     {
         if (currentViewModel is null) return;
 
-        if (TryGetModelType(currentViewModel, out var modelType))
+        await Task.Run(async () =>
         {
-            // Get the Model from the viewmodel and save it to the state store
-            var prop = currentViewModel.GetType().GetMethod(nameof(IHasModel<ViewModelBase>.GetModel), BindingFlags.Public | BindingFlags.Instance)!;
-            object model = prop.Invoke(currentViewModel, [])!;
-            
-            var saveMethod = typeof(IStateStore).GetMethod(nameof(IStateStore.SaveAsync))?.MakeGenericMethod(modelType!)!;
-            await (Task) saveMethod.Invoke(stateStore, [modelType!.Name, model, null])!;
-        }
+            if (TryGetModelType(currentViewModel, out var modelType))
+            {
+                // Get the Model from the viewmodel and save it to the state store
+                var prop = currentViewModel.GetType().GetMethod(nameof(IHasModel<ViewModelBase>.GetModel), BindingFlags.Public | BindingFlags.Instance)!;
+                object model = prop.Invoke(currentViewModel, [])!;
+
+                var saveMethod = typeof(IStateStore).GetMethod(nameof(IStateStore.SaveAsync))?.MakeGenericMethod(modelType!)!;
+                await (Task) saveMethod.Invoke(stateStore, [modelType!.Name, model, null])!;
+            }
+        });
     }
 
     private static bool TryGetModelType(object obj, out Type? modelType)

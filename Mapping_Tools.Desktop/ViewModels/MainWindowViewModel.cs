@@ -1,5 +1,6 @@
 ﻿using System.Reactive;
 using System.Threading.Tasks;
+using Mapping_Tools.Application;
 using ReactiveUI;
 
 namespace Mapping_Tools.Desktop.ViewModels;
@@ -31,12 +32,15 @@ public class MainWindowViewModel : ViewModelBase {
     public ReactiveCommand<Unit, Unit>? GoHomeCommand { get; }
     public ReactiveCommand<Unit, Unit>? GoSettingsCommand { get; }
     
-    public MainWindowViewModel() : this(null!) { }
+    public MainWindowViewModel() : this(null!, null!) { }
 
-    public MainWindowViewModel(NavigationService navigationService) {
+    public MainWindowViewModel(NavigationService navigationService, IAppLifecycle appLifecycle) {
         this.navigationService = navigationService;
-        
         this.navigationService.OnNavigate += vm => CurrentViewModel = vm;
+        
+        // Ensure current view model is disposed on app exit
+        appLifecycle.UICleanup.Register(() => navigationService.DisposeCurrentAsync(CurrentViewModel).GetAwaiter().GetResult());
+        
         Task.Run(() => this.navigationService.NavigateAsync<HomeViewModel>());
         
         GoHomeCommand = ReactiveCommand.CreateFromTask(NavigateAsync<HomeViewModel>);

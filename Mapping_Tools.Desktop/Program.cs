@@ -9,13 +9,13 @@ using Microsoft.Extensions.Hosting;
 namespace Mapping_Tools.Desktop;
 
 static internal class Program {
-    public static IHost AppHost { get; private set; } = default!;
+    public static IHost AppHost { get; private set; } = null!;
 
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [STAThread]
-    public static int Main(string[] args) {
+    public static async Task<int> Main(string[] args) {
         AppHost = Host.CreateDefaultBuilder(args)
             .ConfigureServices((ctx, services) => {
                 services.AddApplicationServices();
@@ -28,15 +28,21 @@ static internal class Program {
         var appLifetime = AppHost.Services.GetRequiredService<IHostApplicationLifetime>();
         var lifecycle = AppHost.Services.GetRequiredService<IAppLifecycle>();
 
-        Task.Run(async () => await lifecycle.OnStartAsync()).GetAwaiter().GetResult();
-
-        // Run Avalonia app
-        int exitCode = BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        appLifetime.ApplicationStarted.Register(() =>
+        {
+            Task.Run(async () => await lifecycle.OnStartAsync()).GetAwaiter().GetResult();
+        });
 
         appLifetime.ApplicationStopping.Register(() =>
         {
+            // Has to be run in a different thread to avoid deadlocks
             Task.Run(async () => await lifecycle.OnShutdownAsync()).GetAwaiter().GetResult();
         });
+
+        // Run Avalonia app
+        await AppHost.StartAsync();
+        int exitCode = BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        await AppHost.StopAsync();
 
         return exitCode;
     }
