@@ -32,11 +32,18 @@ public sealed class JsonStateStore : IStateStore {
         
         await using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true);
         var state = await JsonSerializer.DeserializeAsync<T>(fs, options: jsonOpts, cancellationToken: ct).ConfigureAwait(false);
+        
+        logger.LogDebug("Loaded state {Type} from {Path}", typeof(T).Name, path);
         return state;
     }
 
     public async Task SaveAsync<T>(string key, T state, CancellationToken ct = default)
     {
+        if (state == null) {
+            logger.LogWarning("Tried to save null state for key {Key}, skipping", key);
+            return;
+        }
+        
         using var _ = await _lock.AcquireAsync(key, ct).ConfigureAwait(false);
         
         var path = PathFor(key);
@@ -51,6 +58,6 @@ public sealed class JsonStateStore : IStateStore {
             await fs.FlushAsync(ct).ConfigureAwait(false);
         }
         
-        logger.LogInformation("Saved state to {Path}", path);
+        logger.LogDebug("Saved state {Type} to {Path}", typeof(T).Name, path);
     }
 }
