@@ -3,6 +3,8 @@
              xmlns:local="using:Mapping_Tools.Desktop"
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:helpers="clr-namespace:Mapping_Tools.Desktop.Helpers"
              x:Class="Mapping_Tools.Desktop.App">
 
     <Application.DataTemplates>
@@ -11,7 +13,14 @@
 
     <Application.Styles>
         <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Lime" />
-        
+
+        <avalonia:MaterialIconStyles />
         <dialogHostAvalonia:DialogHostStyles />
     </Application.Styles>
+
+    <Application.Resources>
+        <helpers:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter" />
+        <helpers:MapPathStringAddNewLinesConverter  x:Key="MapPathStringAddNewLinesConverter" />
+        <helpers:MapPathStringJustFilenameConverter x:Key="MapPathStringJustFilenameConverter" />
+    </Application.Resources>
 </Application>
