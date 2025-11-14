@@ -18,4 +18,19 @@ public partial class MainWindow : Window {
                     Cursor = busy ? new Cursor(StandardCursorType.Wait) : null); // null = inherit/default
         });
     }
+    
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+
+        if (XpfWpfAbstraction.IsRunningOnXpf)
+        {
+            if (XpfWpfAbstraction.GetAvaloniaWindowForWindow(this) is { } window)
+            {
+                window.ExtendClientAreaToDecorationsHint = true;
+                // window.ExtendClientAreaChromeHints = Avalonia.Platform.ExtendClientAreaChromeHints.NoChrome;
+            }
+
+        }
+    }
 }
