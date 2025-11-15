@@ -57,6 +57,10 @@
             <Setter Property="Foreground" Value="#9A9A9A"/>
             <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
         </Style>
+
+        <Style Selector="Separator">
+            <Setter Property="Foreground" Value="#41ffffff"/>
+        </Style>
     </Application.Styles>
 
     <Application.Resources>

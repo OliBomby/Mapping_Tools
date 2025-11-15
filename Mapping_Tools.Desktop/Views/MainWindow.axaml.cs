@@ -5,11 +5,13 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Mapping_Tools.Desktop.ViewModels;
 using Material.Icons;
 using Material.Icons.Avalonia;
@@ -67,8 +69,6 @@ public partial class MainWindow : Window {
         ExportPath = Path.Combine(AppDataPath, "Exports");
         HttpClient = new HttpClient();
         HttpClient.DefaultRequestHeaders.Add("user-agent", "Mapping Tools");
-
-        InitializeComponent();
 
         // if (SettingsManager.Settings.MainWindowRestoreBounds.HasValue) {
         // SetToRect(SettingsManager.Settings.MainWindowRestoreBounds.Value);
@@ -346,5 +346,18 @@ public partial class MainWindow : Window {
         // Get the array of file paths
         if (e.DataTransfer.Items[0].TryGetRaw(DataFormat.File) is string[] { Length: > 0 } files)
             SetCurrentMaps(files);
+    }
+
+    private void ToolsMenu_OnPointerReleased(object? sender, PointerReleasedEventArgs e) {
+        // Find the ListBoxItem that was actually clicked
+        var source = e.Source as Control;
+        var container = source?.FindAncestorOfType<ListBoxItem>();
+
+        // Get the command you bound via Tag
+        if (container?.Tag is ICommand cmd && cmd.CanExecute(null))
+        {
+            cmd.Execute(null);
+            e.Handled = true;
+        }
     }
 }

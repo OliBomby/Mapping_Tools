@@ -9,10 +9,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Mapping_Tools.Application;
+using Mapping_Tools.Desktop.Helpers;
 using Material.Icons;
 using Material.Icons.Avalonia;
 using ReactiveUI;
@@ -67,22 +67,36 @@ public class MainWindowViewModel : ViewModelBase {
         projectMenuItems = [];
 
         GoToSelectedPage = ReactiveCommand.Create(() => {
-            var item = selectedPageItem;
-            if (item?.Content == null) return;
-            string? name = item.Tag!.ToString();
-            if (string.IsNullOrEmpty(name)) return;
-            NavigateTo(name);
+            var item = NavigationItems.Count == 1 ? NavigationItems[0] : selectedPageItem;
+            if (item == null) return;
+            item.ClickCommand?.Execute(null);
             SearchKeyword = string.Empty;
         });
 
         SelectedPageUp = ReactiveCommand.Create(() => {
-            // SelectedPageItem = navigationItemsView.CurrentItem as ListBoxItem;
-            SelectedPageItem?.Focus();
+            if (NavigationItems.Count == 0) return;
+            // Look for previous selectable item
+            var index = SelectedPageIndex;
+            do {
+                index--;
+                if (index < 0) {
+                    index = NavigationItems.Count - 1;
+                }
+            } while (!NavigationItems[index].IsSelectable && index != SelectedPageIndex);
+            SelectedPageIndex = index;
         });
 
         SelectedPageDown = ReactiveCommand.Create(() => {
-            // SelectedPageItem = navigationItemsView.CurrentItem as ListBoxItem;
-            SelectedPageItem?.Focus();
+            if (NavigationItems.Count == 0) return;
+            // Look for next selectable item
+            var index = SelectedPageIndex;
+            do {
+                index++;
+                if (index >= NavigationItems.Count) {
+                    index = 0;
+                }
+            } while (!NavigationItems[index].IsSelectable && index != SelectedPageIndex);
+            SelectedPageIndex = index;
         });
 
         ClearSearchBox = ReactiveCommand.Create(() => {
@@ -108,13 +122,13 @@ public class MainWindowViewModel : ViewModelBase {
         IsBusy = false;
     }
     
-    private readonly ObservableCollection<Control> allNavigationItems = [];
+    private readonly ObservableCollection<NavigationItem> allNavigationItems = [];
 
-    public ObservableCollection<Control> NavigationItems { get; } = [];
+    public ObservableCollection<NavigationItem> NavigationItems { get; } = [];
 
-    private List<Control> defaultItems = null!;
-    private List<Control> toolItems = null!;
-    private List<Control> favoriteItems = null!;
+    private List<NavigationItem> defaultItems = null!;
+    private List<NavigationItem> toolItems = null!;
+    private List<NavigationItem> favoriteItems = null!;
 
     private string header = "Mapping Tools";
     public string Header {
@@ -140,8 +154,8 @@ public class MainWindowViewModel : ViewModelBase {
         set => this.RaiseAndSetIfChanged(ref selectedPageIndex, value);
     }
 
-    private ListBoxItem? selectedPageItem;
-    public ListBoxItem? SelectedPageItem {
+    private NavigationItem? selectedPageItem;
+    public NavigationItem? SelectedPageItem {
         get => selectedPageItem;
         set => this.RaiseAndSetIfChanged(ref selectedPageItem, value);
     }
@@ -223,10 +237,10 @@ public class MainWindowViewModel : ViewModelBase {
     }
 
     private void UpdateNavigationItems() {
-        var items = defaultItems.Concat([new Separator()]);
+        var items = defaultItems.Concat([new SeparatorItem()]);
 
         if (favoriteItems.Count > 0) {
-            items = items.Concat(favoriteItems).Concat([new Separator()]);
+            items = items.Concat(favoriteItems).Concat([new SeparatorItem()]);
         }
 
         items = items.Concat(toolItems);
@@ -247,52 +261,44 @@ public class MainWindowViewModel : ViewModelBase {
         SelectedPageIndex = 0;
     }
 
-    private ListBoxItem CreateNavigationItem(Type type, double verticalMargin=4) {
+    private NavigationItem CreateNavigationItem(Type type, double verticalMargin=4) {
         var name = type.Name;
-        var content = new TextBlock { Text = name, Margin = new Thickness(10, verticalMargin, 0, verticalMargin) };
-        var item = new ListBoxItem { Tag = name, Content = content};
-        ToolTip.SetTip(item, $"Open {name}.");
-        CreateContextMenu(item, name);
-        item.PointerReleased += NavigationClicked;
-        return item;
+        return new NormalItem {
+            Text = name,
+            Margin = new Thickness(10, verticalMargin, 0, verticalMargin),
+            ToolTip = $"Open {name}.",
+            ClickCommand = ReactiveCommand.Create(() => NavigateTo(name)),
+            ContextMenu = CreateContextMenu(name),
+        };
     }
 
-    private void NavigationClicked(object? sender, PointerReleasedEventArgs e) {
-        if (sender is not ListBoxItem item)
-            return;
-
-        selectedPageItem = item;
-        string requestedName = item.Tag!.ToString()!;
-        NavigateTo(requestedName);
-        e.Handled = true;
-    }
-
-    private void CreateContextMenu(Control item, string name) {
+    private ContextMenu CreateContextMenu(string name) {
         var cm = new ContextMenu();
-        var menuItem = new MenuItem { Tag = item };
+        var menuItem = new MenuItem { Tag = name };
         // UpdateMenuItem(menuItem, SettingsManager.Settings.FavoriteTools.Contains(name));
         UpdateMenuItem(menuItem, false);
         menuItem.Click += FavoriteItem_OnClick;
         cm.Items.Add(menuItem);
-        item.ContextMenu = cm;
+        return cm;
     }
 
     private void FavoriteItem_OnClick(object? sender, RoutedEventArgs e) {
-        if (sender is MenuItem { Tag: ListBoxItem { Tag: string name } } mi) {
-            // Toggle favorite
-            // Update context menu
-            // if (SettingsManager.Settings.FavoriteTools.Contains(name)) {
-            //     SettingsManager.Settings.FavoriteTools.Remove(name);
-            //     UpdateMenuItem(mi, false);
-            // } else {
-            //     SettingsManager.Settings.FavoriteTools.Add(name);
-            //     UpdateMenuItem(mi, true);
-            // }
-            // Update favorite list in UI
-            GenerateFavoriteToolItems();
-            GenerateToolItems();
-            UpdateNavigationItems();
-        }
+        if (sender is not MenuItem { Tag: string name } mi)
+            return;
+
+        // Toggle favorite
+        // Update context menu
+        // if (SettingsManager.Settings.FavoriteTools.Contains(name)) {
+        //     SettingsManager.Settings.FavoriteTools.Remove(name);
+        //     UpdateMenuItem(mi, false);
+        // } else {
+        //     SettingsManager.Settings.FavoriteTools.Add(name);
+        //     UpdateMenuItem(mi, true);
+        // }
+        // Update favorite list in UI
+        GenerateFavoriteToolItems();
+        GenerateToolItems();
+        UpdateNavigationItems();
     }
 
     private static void UpdateMenuItem(MenuItem mi, bool isFavorite) {
@@ -302,13 +308,13 @@ public class MainWindowViewModel : ViewModelBase {
         mi.Header = isFavorite ? "_Unfavorite" : "_Favorite";
     }
 
-    private bool SearchItemsFilter(object obj) {
+    private bool SearchItemsFilter(NavigationItem obj) {
         if (string.IsNullOrWhiteSpace(SearchKeyword)) {
             return true;
         }
 
-        return obj is Control { Tag: not null } item &&
-               item.Tag!.ToString()!.Contains(SearchKeyword, StringComparison.CurrentCultureIgnoreCase);
+        return obj is NormalItem item &&
+               item.Text.Contains(SearchKeyword, StringComparison.CurrentCultureIgnoreCase);
     }
 
     private void ViewChanged() {

@@ -22,8 +22,7 @@
         Background="{DynamicResource MaterialDesignPaper}"
         SystemDecorations="BorderOnly"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
-        >
+        ExtendClientAreaChromeHints="NoChrome">
 
     <Window.KeyBindings>
         <KeyBinding Gesture="Ctrl+K" Command="{Binding OpenNavigationDrawer}" />
@@ -303,7 +302,7 @@
                                     <KeyBinding Gesture="Down"
                                                 Command="{Binding SelectedPageDown}" />
                                     <KeyBinding Gesture="Escape"
-                                                Command="{Binding ClearSearchBox}"/>
+                                                Command="{Binding ClearSearchBox}" />
                                 </TextBox.KeyBindings>
                             </TextBox>
 
@@ -314,7 +313,8 @@
                                 SelectedItem="{Binding SelectedPageItem, UpdateSourceTrigger=PropertyChanged}"
                                 ItemsSource="{Binding NavigationItems}"
                                 AutomationProperties.Name="ToolsMenu"
-                                IsTextSearchEnabled="True">
+                                IsTextSearchEnabled="True"
+                                PointerReleased="ToolsMenu_OnPointerReleased">
                                 <ListBox.KeyBindings>
                                     <KeyBinding Gesture="Enter"
                                                 Command="{Binding GoToSelectedPage}" />
@@ -324,10 +324,36 @@
                                         <StackPanel />
                                     </ItemsPanelTemplate>
                                 </ListBox.ItemsPanel>
+                                <ListBox.ItemContainerTheme>
+                                    <ControlTheme TargetType="ListBoxItem"
+                                                  BasedOn="{StaticResource MaterialListBoxItem}"
+                                                  x:DataType="helpers:NavigationItem">
+                                        <!-- Use the VM to decide if it can be clicked / focused -->
+                                        <Setter Property="IsHitTestVisible" Value="{Binding IsSelectable}" />
+                                        <Setter Property="Focusable" Value="{Binding IsSelectable}" />
+                                        <!-- Make separators short by using ContainerHeight -->
+                                        <Setter Property="MinHeight" Value="{Binding ContainerHeight}" />
+                                        <Setter Property="Padding" Value="10 1" />
+
+                                        <Setter Property="ToolTip.Tip" Value="{Binding ToolTip}" />
+                                        <Setter Property="Tag" Value="{Binding ClickCommand}" />
+                                        <Setter Property="ContextMenu" Value="{Binding ContextMenu}" />
+                                    </ControlTheme>
+                                </ListBox.ItemContainerTheme>
+                                <ListBox.DataTemplates>
+                                    <DataTemplate DataType="helpers:NormalItem">
+                                        <TextBlock
+                                            Text="{Binding Text}"
+                                            Padding="0 7"
+                                            Margin="{Binding Margin}" />
+                                    </DataTemplate>
+                                    <DataTemplate DataType="helpers:SeparatorItem">
+                                        <Separator />
+                                    </DataTemplate>
+                                </ListBox.DataTemplates>
                             </ListBox>
                         </DockPanel>
                     </controls:NavigationDrawer.LeftDrawerContent>
-
 
                     <Grid x:Name="MainContentGrid" PointerPressed="DragWin">
                         <Grid.RowDefinitions>
