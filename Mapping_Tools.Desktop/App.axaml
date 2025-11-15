@@ -31,11 +31,15 @@
             <Setter Property="FontWeight" Value="Medium" />
         </Style>
 
-        <Style Selector="controls|ColorZone[Mode=PrimaryMid] MenuItem">
+        <Style Selector="controls|ColorZone[Mode=PrimaryMid] helpers|ShadowMenuItem">
             <Setter Property="Foreground" Value="White"/>
         </Style>
         <Style Selector="controls|ColorZone[Mode=PrimaryMid] material|MaterialIcon">
             <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <Style Selector="ContextMenu">
+            <Setter Property="WindowManagerAddShadowHint" Value="True" />
         </Style>
     </Application.Styles>
 

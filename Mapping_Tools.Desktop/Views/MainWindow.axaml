@@ -95,7 +95,7 @@
 
                             <Menu
                                 Foreground="{DynamicResource PrimaryHueMidForegroundBrush}">
-                                <MenuItem Header="_File" MinWidth="50" Height="35">
+                                <helpers:ShadowMenuItem Header="_File" MinWidth="50" Height="35">
                                     <MenuItem Header="_Open beatmap" Click="OpenBeatmap"
                                               Foreground="{DynamicResource MaterialDesignBody}"
                                               ToolTip.Tip="Select the current beatmap with File Explorer.">
@@ -131,9 +131,9 @@
                                             <material:MaterialIcon Kind="ContentSave" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                </MenuItem>
+                                </helpers:ShadowMenuItem>
                                 <Separator />
-                                <MenuItem Header="_About" MinWidth="67" Height="35">
+                                <helpers:ShadowMenuItem Header="_About" MinWidth="67" Height="35">
                                     <MenuItem Header="_Open Mapping Tools folder" Click="OpenConfig"
                                               Foreground="{DynamicResource MaterialDesignBody}"
                                               ToolTip.Tip="Open the Mapping Tools folder.">
@@ -182,10 +182,10 @@
                                             <material:MaterialIcon Kind="InfoCircle" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                </MenuItem>
-                                <MenuItem IsVisible="{Binding ProjectMenuVisibility}"
-                                          Header="_Project" Height="35" MinWidth="67"
-                                          ItemsSource="{Binding ProjectMenuItems}" />
+                                </helpers:ShadowMenuItem>
+                                <helpers:ShadowMenuItem IsVisible="{Binding ProjectMenuVisibility}"
+                                                        Header="_Project" Height="35" MinWidth="67"
+                                                        ItemsSource="{Binding ProjectMenuItems}" />
                             </Menu>
                         </StackPanel>
 
