@@ -20,6 +20,9 @@
         MinHeight="200"
         ShowInTaskbar="True"
         Background="{DynamicResource MaterialDesignPaper}"
+        SystemDecorations="BorderOnly"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
         >
 
     <Window.KeyBindings>
