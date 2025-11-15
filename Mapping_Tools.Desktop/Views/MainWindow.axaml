@@ -18,12 +18,7 @@
         Height="800"
         MinWidth="500"
         MinHeight="200"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        TextElement.FontWeight="Medium"
-        TextElement.FontSize="14"
-        ShowInTaskbar="True"
-        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
-        Background="{DynamicResource MaterialDesignPaper}">
+        ShowInTaskbar="True">
 
     <Window.KeyBindings>
         <KeyBinding Gesture="Ctrl+K" Command="{Binding OpenNavigationDrawer}" />
@@ -38,14 +33,33 @@
 
     <Window.Styles>
 
-        <Style Selector="ToggleButton.icon-button:checked > material|MaterialIcon">
-            <Setter Property="Kind" Value="Menu" />
-            <Setter Property="Foreground" Value="{DynamicResource MaterialSecondaryForegroundColor}" />
+        <Style Selector="ToggleButton.icon-toggle">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+
+            <Setter Property="Template">
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border Background="Transparent"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
         </Style>
 
-        <Style Selector="ToggleButton.icon-button:not(:checked) > material|MaterialIcon">
+        <Style Selector="ToggleButton.icon-toggle:checked > material|MaterialIcon">
             <Setter Property="Kind" Value="Menu" />
-            <Setter Property="Foreground" Value="{DynamicResource MaterialThemePrimary}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <Style Selector="ToggleButton.icon-toggle:unchecked > material|MaterialIcon">
+            <Setter Property="Kind" Value="Menu" />
+            <Setter Property="Foreground" Value="LightGray" />
         </Style>
 
     </Window.Styles>
@@ -69,15 +83,14 @@
                             <ToggleButton
                                 x:Name="MenuToggleButton"
                                 VerticalAlignment="Center"
-                                Margin="5 0"
-                                Classes="icon-button"
                                 Height="35"
+                                Padding="10 4"
+                                Classes="icon-toggle"
                                 IsChecked="{Binding DrawerOpen}"
-                                AutomationProperties.Name="HamburgerToggleButton"
+                                assists:ShadowAssist.ShadowDepth="Depth0"
                                 ToolTip.Tip="Use Ctrl+K to use this toggle anywhere in the program.">
 
-                                <material:MaterialIcon Width="28" Height="28" Kind="Menu"
-                                                       Foreground="{DynamicResource MaterialForegroundColor}" />
+                                <material:MaterialIcon Width="28" Height="28" Kind="Menu"/>
                             </ToggleButton>
 
                             <Menu
@@ -177,7 +190,7 @@
                         </StackPanel>
 
                         <StackPanel DockPanel.Dock="Right"
-                                    Panel.ZIndex="5"
+                                    ZIndex="5"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Top"
                                     Orientation="Horizontal">
@@ -212,6 +225,7 @@
                             Margin="10 0"
                             CornerRadius="2"
                             Padding="5"
+                            assists:ShadowAssist.ShadowDepth="Depth0"
                             Mode="PrimaryDark">
                             <controls:ColorZone.ContextMenu>
                                 <ContextMenu>

@@ -3,8 +3,9 @@
              xmlns:local="using:Mapping_Tools.Desktop"
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
-             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:helpers="clr-namespace:Mapping_Tools.Desktop.Helpers"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              x:Class="Mapping_Tools.Desktop.App">
 
     <Application.DataTemplates>
@@ -14,8 +15,28 @@
     <Application.Styles>
         <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Lime" />
 
-        <avalonia:MaterialIconStyles />
+        <material:MaterialIconStyles />
         <dialogHostAvalonia:DialogHostStyles />
+
+        <Style Selector="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Medium" />
+        </Style>
+        <Style Selector="TextElement">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Medium" />
+        </Style>
+        <Style Selector="Menu">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Medium" />
+        </Style>
+
+        <Style Selector="controls|ColorZone[Mode=PrimaryMid] MenuItem">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style Selector="controls|ColorZone[Mode=PrimaryMid] material|MaterialIcon">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
     </Application.Styles>
 
     <Application.Resources>
