@@ -18,7 +18,9 @@
         Height="800"
         MinWidth="500"
         MinHeight="200"
-        ShowInTaskbar="True">
+        ShowInTaskbar="True"
+        Background="{DynamicResource MaterialDesignPaper}"
+        >
 
     <Window.KeyBindings>
         <KeyBinding Gesture="Ctrl+K" Command="{Binding OpenNavigationDrawer}" />
@@ -84,7 +86,7 @@
                                 x:Name="MenuToggleButton"
                                 VerticalAlignment="Center"
                                 Height="35"
-                                Padding="10 4"
+                                Padding="8 4"
                                 Classes="icon-toggle"
                                 IsChecked="{Binding DrawerOpen}"
                                 assists:ShadowAssist.ShadowDepth="Depth0"
@@ -278,6 +280,7 @@
 
                 <controls:NavigationDrawer
                     Grid.Row="1"
+                    LeftDrawerWidth="200"
                     LeftDrawerOpened="{Binding DrawerOpen, FallbackValue=True}">
                     <controls:NavigationDrawer.LeftDrawerContent>
                         <DockPanel MinWidth="200" MaxWidth="200">
@@ -285,12 +288,10 @@
                                 x:Name="ToolSearchBox"
                                 Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"
                                 DockPanel.Dock="Top"
-                                Margin="16 16 16 0"
-                                Padding="8"
+                                Margin="16 8 16 0"
                                 helpers:FocusExtension.IsFocused="{Binding SearchFocused}"
-                                Theme="{StaticResource OutlineTextBox}"
                                 assists:TextFieldAssist.Label="Search"
-                                Classes="clearButton">
+                                Classes="clearButton outline">
                                 <TextBox.KeyBindings>
                                     <KeyBinding Gesture="Enter"
                                                 Command="{Binding GoToSelectedPage}" />
@@ -337,7 +338,5 @@
                 </controls:NavigationDrawer>
             </Grid>
         </dialogHostAvalonia:DialogHost>
-        <Border Name="WindowBorder" BorderThickness="1" Background="{x:Null}"
-                BorderBrush="{DynamicResource PrimaryHueDarkBrush}" />
     </Grid>
 </Window>

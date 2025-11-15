@@ -273,6 +273,7 @@ public class MainWindowViewModel : ViewModelBase {
         var cm = new ContextMenu();
         var menuItem = new MenuItem { Tag = item };
         // UpdateMenuItem(menuItem, SettingsManager.Settings.FavoriteTools.Contains(name));
+        UpdateMenuItem(menuItem, false);
         menuItem.Click += FavoriteItem_OnClick;
         cm.Items.Add(menuItem);
         item.ContextMenu = cm;
