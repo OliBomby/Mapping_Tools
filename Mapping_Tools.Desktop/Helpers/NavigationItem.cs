@@ -17,6 +17,7 @@ public sealed class NormalItem  : NavigationItem
     public required string Text { get; set; }
     public required Thickness Margin { get; set; }
 }
+
 public sealed class SeparatorItem  : NavigationItem
 {
     public override bool IsSelectable => false;
