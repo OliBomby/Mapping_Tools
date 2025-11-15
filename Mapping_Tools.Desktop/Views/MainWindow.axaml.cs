@@ -279,24 +279,18 @@ public partial class MainWindow : Window {
     }
 
     private void SetFullscreen(bool fullscreen, bool actuallyChangeFullscreen = true) {
-        var bt = ToggleButton;
-
         if (fullscreen) {
             if (actuallyChangeFullscreen) {
                 WindowState = WindowState.Maximized;
             }
 
-            MasterGrid.Margin = new Thickness(7);
-            WindowBorder.BorderThickness = new Thickness(0);
-            if (bt != null) bt.Content = new MaterialIcon { Kind = MaterialIconKind.WindowRestore };
+            ToggleButton.Content = new MaterialIcon { Kind = MaterialIconKind.WindowRestore };
         } else {
             if (actuallyChangeFullscreen) {
                 WindowState = WindowState.Normal;
             }
 
-            MasterGrid.Margin = new Thickness(0);
-            WindowBorder.BorderThickness = new Thickness(1);
-            if (bt != null) bt.Content = new MaterialIcon { Kind = MaterialIconKind.WindowMaximize };
+            ToggleButton.Content = new MaterialIcon { Kind = MaterialIconKind.WindowMaximize };
         }
 
         EnsureOnScreen();
@@ -331,9 +325,6 @@ public partial class MainWindow : Window {
             return;
 
         if (WindowState == WindowState.Maximized) {
-            var point = this.PointToScreen(e.GetPosition(this));
-            var top = point.Y - ((Control) sender).Height / 2;
-            Position = new PixelPoint(Position.X, (int) top);
             SetFullscreen(false);
         }
 

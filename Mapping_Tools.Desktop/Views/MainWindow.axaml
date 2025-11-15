@@ -34,9 +34,9 @@
     <Window.Styles>
 
         <Style Selector="ToggleButton.icon-toggle">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
 
             <Setter Property="Template">
                 <ControlTemplate TargetType="ToggleButton">
@@ -90,7 +90,7 @@
                                 assists:ShadowAssist.ShadowDepth="Depth0"
                                 ToolTip.Tip="Use Ctrl+K to use this toggle anywhere in the program.">
 
-                                <material:MaterialIcon Width="28" Height="28" Kind="Menu"/>
+                                <material:MaterialIcon Width="28" Height="28" Kind="Menu" />
                             </ToggleButton>
 
                             <Menu
