@@ -144,7 +144,7 @@ public class NavigationService {
     }
 
     public string GetName(Type type) {
-        return type.GetField("ToolName") == null ? type.ToString() : (string)type.GetField("ToolName")!.GetValue(null)!;
+        return type.GetField("ToolName") == null ? type.Name : (string)type.GetField("ToolName")!.GetValue(null)!;
     }
 
     public string GetDescription(Type type) {

@@ -13,7 +13,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Mapping_Tools.Application;
-using Mapping_Tools.Desktop.Models;
 using Material.Icons;
 using Material.Icons.Avalonia;
 using ReactiveUI;
@@ -44,8 +43,11 @@ public class MainWindowViewModel : ViewModelBase {
         private set => this.RaiseAndSetIfChanged(ref isBusy, value);
     }
 
-    public ReactiveCommand<Unit, Unit>? GoHomeCommand { get; }
-    public ReactiveCommand<Unit, Unit>? GoSettingsCommand { get; }
+    public ReactiveCommand<Unit, Unit>? GoToSelectedPage { get; }
+    public ReactiveCommand<Unit, Unit>? SelectedPageUp { get; }
+    public ReactiveCommand<Unit, Unit>? SelectedPageDown { get; }
+    public ReactiveCommand<Unit, Unit>? ClearSearchBox { get; }
+    public ReactiveCommand<Unit, Unit>? OpenNavigationDrawer { get; }
     
     public MainWindowViewModel() : this(null!, null!) { }
 
@@ -61,9 +63,6 @@ public class MainWindowViewModel : ViewModelBase {
 
         // Generate Standard view model to show on startup
         Task.Run(() => this.navigationService.NavigateAsync<HomeViewModel>());
-        
-        GoHomeCommand = ReactiveCommand.CreateFromTask(NavigateAsync<HomeViewModel>);
-        GoSettingsCommand = ReactiveCommand.CreateFromTask(NavigateAsync<SettingsViewModel>);
 
         projectMenuItems = [];
 
@@ -72,7 +71,7 @@ public class MainWindowViewModel : ViewModelBase {
             if (item?.Content == null) return;
             string? name = item.Tag!.ToString();
             if (string.IsNullOrEmpty(name)) return;
-            Task.Run(() => this.navigationService.NavigateAsync(name));
+            NavigateTo(name);
             SearchKeyword = string.Empty;
         });
 
@@ -103,22 +102,21 @@ public class MainWindowViewModel : ViewModelBase {
         SearchFocused = true;
     }
     
-    private async Task NavigateAsync<T>() where T : ViewModelBase {
+    private void NavigateTo(string name) {
         IsBusy = true;
-        await navigationService.NavigateAsync<T>();
+        Task.Run(() => navigationService.NavigateAsync(name));
         IsBusy = false;
     }
-    
     
     private readonly ObservableCollection<Control> allNavigationItems = [];
 
     public ObservableCollection<Control> NavigationItems { get; } = [];
 
-    private List<Control> defaultItems;
-    private List<Control> toolItems;
-    private List<Control> favoriteItems;
+    private List<Control> defaultItems = null!;
+    private List<Control> toolItems = null!;
+    private List<Control> favoriteItems = null!;
 
-    private string header;
+    private string header = "Mapping Tools";
     public string Header {
         get => header;
         set => this.RaiseAndSetIfChanged(ref header, value);
@@ -148,7 +146,7 @@ public class MainWindowViewModel : ViewModelBase {
         set => this.RaiseAndSetIfChanged(ref selectedPageItem, value);
     }
 
-    private string searchKeyword;
+    private string searchKeyword = string.Empty;
     public string SearchKeyword {
         get => searchKeyword;
         set {
@@ -187,17 +185,11 @@ public class MainWindowViewModel : ViewModelBase {
         set => this.RaiseAndSetIfChanged(ref projectMenuItems, value);
     }
 
-    private string currentBeatmaps;
+    private string currentBeatmaps = string.Empty;
     public string CurrentBeatmaps {
         get => currentBeatmaps;
         set => this.RaiseAndSetIfChanged(ref currentBeatmaps, value);
     }
-
-    public ReactiveCommand<Unit, Unit>? GoToSelectedPage { get; }
-    public ReactiveCommand<Unit, Unit>? SelectedPageUp { get; }
-    public ReactiveCommand<Unit, Unit>? SelectedPageDown { get; }
-    public ReactiveCommand<Unit, Unit>? ClearSearchBox { get; }
-    public ReactiveCommand<Unit, Unit>? OpenNavigationDrawer { get; }
 
     private void GenerateDefaultItems() {
         defaultItems = [
@@ -261,16 +253,17 @@ public class MainWindowViewModel : ViewModelBase {
         var item = new ListBoxItem { Tag = name, Content = content};
         ToolTip.SetTip(item, $"Open {name}.");
         CreateContextMenu(item, name);
-        item.PointerPressed += ItemOnPreviewMouseLeftButtonDown;
+        item.PointerReleased += NavigationClicked;
         return item;
     }
 
-    private void ItemOnPreviewMouseLeftButtonDown(object? sender, PointerPressedEventArgs e) {
+    private void NavigationClicked(object? sender, PointerReleasedEventArgs e) {
         if (sender is not ListBoxItem item)
             return;
 
         selectedPageItem = item;
-        GoToSelectedPage?.Execute();
+        string requestedName = item.Tag!.ToString()!;
+        NavigateTo(requestedName);
         e.Handled = true;
     }
 
@@ -306,7 +299,7 @@ public class MainWindowViewModel : ViewModelBase {
         mi.Icon = isFavorite ?
             new MaterialIcon { Kind = MaterialIconKind.Star } :
             new MaterialIcon { Kind = MaterialIconKind.StarBorder };
-        mi.Header = isFavorite ? @"_Unfavorite" : @"_Favorite";
+        mi.Header = isFavorite ? "_Unfavorite" : "_Favorite";
     }
 
     private bool SearchItemsFilter(object obj) {

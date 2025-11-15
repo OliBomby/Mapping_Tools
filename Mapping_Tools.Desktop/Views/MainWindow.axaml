@@ -12,7 +12,7 @@
         x:Class="Mapping_Tools.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Mapping Tools 2"
+        Title="{Binding Header}"
         CanResize="True"
         Width="1500"
         Height="800"
