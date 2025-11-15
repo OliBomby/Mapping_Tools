@@ -86,6 +86,10 @@ public class MainWindowViewModel : ViewModelBase {
             SelectedPageItem?.Focus();
         });
 
+        ClearSearchBox = ReactiveCommand.Create(() => {
+            SearchKeyword = string.Empty;
+        });
+
         OpenNavigationDrawer = ReactiveCommand.Create(() => {
             DrawerOpen = true;
             SearchFocused = false;
@@ -192,6 +196,7 @@ public class MainWindowViewModel : ViewModelBase {
     public ReactiveCommand<Unit, Unit>? GoToSelectedPage { get; }
     public ReactiveCommand<Unit, Unit>? SelectedPageUp { get; }
     public ReactiveCommand<Unit, Unit>? SelectedPageDown { get; }
+    public ReactiveCommand<Unit, Unit>? ClearSearchBox { get; }
     public ReactiveCommand<Unit, Unit>? OpenNavigationDrawer { get; }
 
     private void GenerateDefaultItems() {

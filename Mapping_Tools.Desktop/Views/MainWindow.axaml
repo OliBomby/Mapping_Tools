@@ -302,6 +302,8 @@
                                                 Command="{Binding SelectedPageUp}" />
                                     <KeyBinding Gesture="Down"
                                                 Command="{Binding SelectedPageDown}" />
+                                    <KeyBinding Gesture="Escape"
+                                                Command="{Binding ClearSearchBox}"/>
                                 </TextBox.KeyBindings>
                             </TextBox>
 
