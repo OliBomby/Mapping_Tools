@@ -317,6 +317,11 @@
                                     <KeyBinding Gesture="Enter"
                                                 Command="{Binding GoToSelectedPage}" />
                                 </ListBox.KeyBindings>
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
                             </ListBox>
                         </DockPanel>
                     </controls:NavigationDrawer.LeftDrawerContent>
