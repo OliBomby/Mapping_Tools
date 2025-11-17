@@ -5,14 +5,14 @@ using Microsoft.Extensions.Logging;
 namespace Mapping_Tools.Application;
 
 public sealed class AppLifecycle(IPersistenceCoordinator persistence, ILogger<AppLifecycle> logger) : IAppLifecycle {
-    private CancellationTokenSource uiCleanupCts = null!;
+    private CancellationTokenSource _uiCleanupCts = null!;
     
     public async Task OnStartAsync(CancellationToken ct = default) {
         logger.LogInformation("Starting app lifecycle");
         
         // load state, prime caches, run migrations, etc.
-        uiCleanupCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        UICleanup = uiCleanupCts.Token;
+        _uiCleanupCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        UICleanup = _uiCleanupCts.Token;
         
         // Register any application services that need to be persisted here.
         await persistence.LoadAllAsync(ct);
@@ -22,7 +22,7 @@ public sealed class AppLifecycle(IPersistenceCoordinator persistence, ILogger<Ap
     {
         logger.LogInformation("Stopping app lifecycle");
         
-        await uiCleanupCts.CancelAsync();
+        await _uiCleanupCts.CancelAsync();
         await persistence.SaveAllAsync(ct);
     }
 

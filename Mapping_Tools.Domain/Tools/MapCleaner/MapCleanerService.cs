@@ -65,7 +65,7 @@ public class MapCleanerService {
         List<TimingPoint> kiaiToggles = [];
         List<TimingPoint> svChanges = [];
         bool lastKiai = false;
-        double lastSV = -100;
+        double lastSv = -100;
         foreach (TimingPoint tp in timing.TimingPoints) {
             if (tp.Kiai != lastKiai) {
                 kiaiToggles.Add(tp.Copy());
@@ -73,14 +73,14 @@ public class MapCleanerService {
             }
 
             if (tp.Uninherited) {
-                lastSV = -100;
+                lastSv = -100;
             } else {
-                if (Precision.AlmostEquals(tp.MpB, lastSV)) {
+                if (Precision.AlmostEquals(tp.MpB, lastSv)) {
                     continue;
                 }
 
                 svChanges.Add(tp.Copy());
-                lastSV = tp.MpB;
+                lastSv = tp.MpB;
             }
         }
 
@@ -335,21 +335,21 @@ public class MapCleanerService {
             allFilenames.UnionWith(["spinnerspin", "spinnerbonus"]);
 
         // We don't do extensions in osu!
-        allFilenames = allFilenames.Select(removeExtension).ToHashSet();
+        allFilenames = allFilenames.Select(RemoveExtension).ToHashSet();
 
         // Find which of the available samples are unused
         List<string> unusedSamples = [];
         foreach (string samplePath in sampleLookup.Keys) {
-            string extless = removeExtension(samplePath);
+            string extless = RemoveExtension(samplePath);
 
-            if (!(allFilenames.Contains(extless) || beatmapSkinnableSamples.Any(o => Regex.IsMatch(extless, o)))) {
+            if (!(allFilenames.Contains(extless) || BeatmapSkinnableSamples.Any(o => Regex.IsMatch(extless, o)))) {
                 unusedSamples.Add(samplePath);
             }
         }
 
         return unusedSamples;
 
-        string removeExtension(string path) {
+        string RemoveExtension(string path) {
             int lastPeriod = path.LastIndexOf('.');
             return lastPeriod < 0
                 ? path
@@ -358,7 +358,7 @@ public class MapCleanerService {
         }
     }
 
-    private static readonly string[] beatmapSkinnableSamples = [
+    private static readonly string[] BeatmapSkinnableSamples = [
         "count1s",
         "count2s",
         "count3s",

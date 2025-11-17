@@ -6,42 +6,42 @@ namespace Mapping_Tools.Domain.ToolHelpers;
 /// This class can generate bezier anchors which approximate arbitrary paths
 /// </summary>
 public class PathGenerator {
-    private List<Vector2> pathPoints = null!; // input path
-    private List<Vector2> deltas = null!; // path segments
-    private List<double> angles = null!; // path segment angles
-    private List<double> deltaLengths = null!; // length of segments
-    private List<double> cumulativeLengths = null!; // cumulative length
+    private List<Vector2> _pathPoints = null!; // input path
+    private List<Vector2> _deltas = null!; // path segments
+    private List<double> _angles = null!; // path segment angles
+    private List<double> _deltaLengths = null!; // length of segments
+    private List<double> _cumulativeLengths = null!; // cumulative length
 
     public PathGenerator(List<Vector2> newPathPoints) {
         SetPath(newPathPoints);
     }
 
     public void SetPath(List<Vector2> newPathPoints) {
-        pathPoints = [newPathPoints[0]];
-        deltas = [];
-        angles = [];
-        deltaLengths = [];
+        _pathPoints = [newPathPoints[0]];
+        _deltas = [];
+        _angles = [];
+        _deltaLengths = [];
         double sum = 0;
-        cumulativeLengths = [sum];
+        _cumulativeLengths = [sum];
 
         foreach (var point in newPathPoints.Skip(1)) {
-            var delta = point - pathPoints.Last();
+            var delta = point - _pathPoints.Last();
             var dist = delta.Length;
 
             if (dist < Precision.DoubleEpsilon) continue;
 
-            pathPoints.Add(point);
-            deltas.Add(delta);
-            angles.Add(delta.Theta);
-            deltaLengths.Add(dist);
+            _pathPoints.Add(point);
+            _deltas.Add(delta);
+            _angles.Add(delta.Theta);
+            _deltaLengths.Add(dist);
             sum += dist;
-            cumulativeLengths.Add(sum);
+            _cumulativeLengths.Add(sum);
         }
 
         // Add last member again so these lists have the same number of elements as path
-        deltas.Add(deltas.Last());
-        angles.Add(angles.Last());
-        deltaLengths.Add(deltaLengths.Last());
+        _deltas.Add(_deltas.Last());
+        _angles.Add(_angles.Last());
+        _deltaLengths.Add(_deltaLengths.Last());
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public class PathGenerator {
     /// <param name="maxAngle"></param>
     /// <returns></returns>
     public IEnumerable<Vector2> GeneratePath(double maxAngle = Math.PI * 1 / 4) {
-        return GeneratePath(0, pathPoints.Count - 1, maxAngle);
+        return GeneratePath(0, _pathPoints.Count - 1, maxAngle);
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public class PathGenerator {
         var p2 = GetContinuousPosition(endIndex);
 
         const int numTestPoints = 100;
-        var labels = pathPoints.GetRange((int) startIndex, (int) Math.Ceiling(endIndex) - (int) startIndex + 1);
+        var labels = _pathPoints.GetRange((int) startIndex, (int) Math.Ceiling(endIndex) - (int) startIndex + 1);
 
         Vector2?[] middles = [
             TangentIntersectionApproximation(startIndex, endIndex),
@@ -199,7 +199,7 @@ public class PathGenerator {
             (endIndex, startIndex) = (startIndex, endIndex);
         }
 
-        endIndex = MathHelper.Clamp(endIndex, 0, angles.Count - 1);
+        endIndex = MathHelper.Clamp(endIndex, 0, _angles.Count - 1);
 
         int startIndexInt = (int) Math.Ceiling(startIndex);
         int endIndexInt = (int) Math.Floor(endIndex);
@@ -213,8 +213,8 @@ public class PathGenerator {
         // Loop through the whole path and divide it into sub-ranges at every inflection point
         //Console.WriteLine($"Iterating from {startIndexInt} to {endIndexInt}");
         for (int i = startIndexInt; i <= endIndexInt; i++) {
-            var pos = pathPoints[i];
-            var angle = angles[i];
+            var pos = _pathPoints[i];
+            var angle = _angles[i];
             var angleChange = GetSmallestAngle(angle, lastAngle);
             //Console.WriteLine("Angle change: " + angleChange);
 
@@ -278,7 +278,7 @@ public class PathGenerator {
             // Loop through the sub-range and count the angle change to make even divisions of the angle
             //Console.WriteLine($"Iterating subrange from {segmentStartIndexInt} to {segmentEndIndexInt}");
             for (int i = segmentStartIndexInt; i <= segmentEndIndexInt; i++) {
-                var angle = angles[i];
+                var angle = _angles[i];
                 var angleChange = GetSmallestAngle(angle, lastAngle);
 
                 segmentAngleChange += Math.Abs(angleChange);
@@ -319,36 +319,36 @@ public class PathGenerator {
         int segmentIndex = (int) Math.Floor(index);
         double segmentProgression = index - segmentIndex;
 
-        return Math.Abs(segmentProgression) < Precision.DoubleEpsilon ? pathPoints[segmentIndex] :
-            Math.Abs(segmentProgression - 1) < Precision.DoubleEpsilon ? pathPoints[segmentIndex + 1] :
-            Vector2.Lerp(pathPoints[segmentIndex], pathPoints[segmentIndex + 1], segmentProgression);
+        return Math.Abs(segmentProgression) < Precision.DoubleEpsilon ? _pathPoints[segmentIndex] :
+            Math.Abs(segmentProgression - 1) < Precision.DoubleEpsilon ? _pathPoints[segmentIndex + 1] :
+            Vector2.Lerp(_pathPoints[segmentIndex], _pathPoints[segmentIndex + 1], segmentProgression);
     }
 
     public double GetContinuousAngle(double index) {
-        int segmentIndex = MathHelper.Clamp((int) Math.Floor(index + Precision.DoubleEpsilon), 0, angles.Count - 1);
+        int segmentIndex = MathHelper.Clamp((int) Math.Floor(index + Precision.DoubleEpsilon), 0, _angles.Count - 1);
 
-        return angles[segmentIndex];
+        return _angles[segmentIndex];
     }
 
     public double GetContinuousDistance(double index) {
         int segmentIndex = (int) Math.Floor(index);
         double segmentProgression = index - segmentIndex;
 
-        return Math.Abs(segmentProgression) < Precision.DoubleEpsilon ? cumulativeLengths[segmentIndex] :
-            Math.Abs(segmentProgression - 1) < Precision.DoubleEpsilon ? cumulativeLengths[segmentIndex + 1] :
-            (1 - segmentProgression) * cumulativeLengths[segmentIndex] + segmentProgression * cumulativeLengths[segmentIndex + 1];
+        return Math.Abs(segmentProgression) < Precision.DoubleEpsilon ? _cumulativeLengths[segmentIndex] :
+            Math.Abs(segmentProgression - 1) < Precision.DoubleEpsilon ? _cumulativeLengths[segmentIndex + 1] :
+            (1 - segmentProgression) * _cumulativeLengths[segmentIndex] + segmentProgression * _cumulativeLengths[segmentIndex + 1];
     }
 
     public double GetIndexAtDistance(double distance) {
-        var index = cumulativeLengths.BinarySearch(distance);
+        var index = _cumulativeLengths.BinarySearch(distance);
         if (index >= 0) {
             return index;
         }
 
         var i2 = ~index;
         var i1 = i2 - 1;
-        var d1 = cumulativeLengths[i1];
-        var d2 = cumulativeLengths[i2];
+        var d1 = _cumulativeLengths[i1];
+        var d2 = _cumulativeLengths[i2];
 
         return (distance - d1) / (d2 - d1) + i1;
     }

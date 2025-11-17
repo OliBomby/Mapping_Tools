@@ -7,18 +7,18 @@ namespace Mapping_Tools.Desktop.ViewModels;
 
 public partial class SettingsViewModel(IStateStore store) : ViewModelBase, IHasModel<SettingsModel> {
 
-    private int counter;
+    private int _counter;
 
     public int Counter {
-        get => counter;
-        set => this.RaiseAndSetIfChanged(ref counter, value);
+        get => _counter;
+        set => this.RaiseAndSetIfChanged(ref _counter, value);
     }
 
-    private string? note;
+    private string? _note;
 
     public string? Note {
-        get => note;
-        set => this.RaiseAndSetIfChanged(ref note, value);
+        get => _note;
+        set => this.RaiseAndSetIfChanged(ref _note, value);
     }
 
     public SettingsViewModel() : this(null!) { }

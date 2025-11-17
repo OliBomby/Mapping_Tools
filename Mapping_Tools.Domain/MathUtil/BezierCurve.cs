@@ -13,7 +13,7 @@ namespace Mapping_Tools.Domain.MathUtil;
 /// </summary>
 [Serializable]
 public struct BezierCurve {
-    private readonly List<Vector2> points;
+    private readonly List<Vector2> _points;
 
     /// <summary>
     /// The parallel value.
@@ -30,7 +30,7 @@ public struct BezierCurve {
     /// <remarks>The first point and the last points represent the anchor points.</remarks>
     public IList<Vector2> Points {
         get {
-            return points;
+            return _points;
         }
     }
 
@@ -43,7 +43,7 @@ public struct BezierCurve {
             throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
         }
 
-        this.points = [..points];
+        this._points = [..points];
         Parallel = 0.0f;
     }
 
@@ -56,7 +56,7 @@ public struct BezierCurve {
             throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
         }
 
-        this.points = [..points];
+        this._points = [..points];
         Parallel = 0.0f;
     }
 
@@ -71,7 +71,7 @@ public struct BezierCurve {
         }
 
         Parallel = parallel;
-        this.points = [..points];
+        this._points = [..points];
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public struct BezierCurve {
         }
 
         Parallel = parallel;
-        this.points = [..points];
+        this._points = [..points];
     }
 
 
@@ -95,7 +95,7 @@ public struct BezierCurve {
     /// <param name="t">The t value, between 0.0f and 1.0f.</param>
     /// <returns>Resulting point.</returns>
     public Vector2 CalculatePoint(double t) {
-        return CalculatePoint(points, t, Parallel);
+        return CalculatePoint(_points, t, Parallel);
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ public struct BezierCurve {
     /// <remarks>The precision gets better as the <paramref name="precision"/>
     /// value gets smaller.</remarks>
     public double CalculateLength(double precision) {
-        return CalculateLength(points, precision, Parallel);
+        return CalculateLength(_points, precision, Parallel);
     }
 
     /// <summary>

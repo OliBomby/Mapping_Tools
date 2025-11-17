@@ -3,8 +3,8 @@
 public enum CommandType {
     F, // Fade
     M, // Move
-    MX, // Move X
-    MY, // Move Y
+    Mx, // Move X
+    My, // Move Y
     S, // Scale
     V, // Vector scale
     R, // Rotate

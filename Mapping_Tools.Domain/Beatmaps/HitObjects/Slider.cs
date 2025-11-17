@@ -33,7 +33,7 @@ public class Slider : HitObject, IRepeats, IHasTimelineObjects {
     /// <summary>
     /// Cache for end position.
     /// </summary>
-    private Vector2? endPos;
+    private Vector2? _endPos;
 
     public void SetDuration(double duration) {
         SetSpanDurationByPixelLength(duration / SpanCount);
@@ -82,19 +82,19 @@ public class Slider : HitObject, IRepeats, IHasTimelineObjects {
     /// </summary>
     /// <returns></returns>
     public Vector2 GetEndPosition() {
-        if (!endPos.HasValue) {
+        if (!_endPos.HasValue) {
             RecalculateEndPosition();
         }
 
-        Debug.Assert(endPos != null, nameof(endPos) + " != null");
-        return endPos.Value;
+        Debug.Assert(_endPos != null, nameof(_endPos) + " != null");
+        return _endPos.Value;
     }
 
     /// <summary>
-    /// Recalculates the <see cref="endPos"/> from the control points and pixel length.
+    /// Recalculates the <see cref="_endPos"/> from the control points and pixel length.
     /// </summary>
     public void RecalculateEndPosition() {
-        endPos = GetSliderPath().PositionAt(1);
+        _endPos = GetSliderPath().PositionAt(1);
     }
 
     public IEnumerable<List<string>> GetPlayingBodyFilenames(double sliderTickRate, bool includeDefaults = true) {
@@ -103,11 +103,11 @@ public class Slider : HitObject, IRepeats, IHasTimelineObjects {
         }
 
         // Get slider slide hitsounds for every timing point in the slider
-        foreach (var lookupFilenames in getLookupBodyFilenamesForTp(timing!.TimingPoint)) {
+        foreach (var lookupFilenames in GetLookupBodyFilenamesForTp(timing!.TimingPoint)) {
             yield return lookupFilenames;
         }
 
-        foreach (var lookupFilenames in timing.BodyHitsounds.SelectMany(getLookupBodyFilenamesForTp))
+        foreach (var lookupFilenames in timing.BodyHitsounds.SelectMany(GetLookupBodyFilenamesForTp))
             yield return lookupFilenames;
 
         // Add tick samples
@@ -130,7 +130,7 @@ public class Slider : HitObject, IRepeats, IHasTimelineObjects {
 
         yield break;
 
-        IEnumerable<List<string>> getLookupBodyFilenamesForTp(TimingPoint timingPoint) {
+        IEnumerable<List<string>> GetLookupBodyFilenamesForTp(TimingPoint timingPoint) {
             var firstSampleSet = Hitsounds.SampleSet == SampleSet.None ? timingPoint.SampleSet : Hitsounds.SampleSet;
             if (timingPoint.SampleIndex != 0) {
                 if (includeDefaults) {

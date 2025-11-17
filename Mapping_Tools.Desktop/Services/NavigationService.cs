@@ -13,30 +13,30 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Mapping_Tools.Desktop.Services;
 
 public class NavigationService {
-    private readonly IServiceProvider serviceProvider1;
-    private readonly IStateStore stateStore1;
+    private readonly IServiceProvider _serviceProvider1;
+    private readonly IStateStore _stateStore1;
 
-    private static readonly Type acceptableType = typeof(ViewModelBase);
-    private static readonly Type mappingToolType = typeof(MappingTool);
-    private static readonly Type quickRunType = typeof(IQuickRun);
+    private static readonly Type AcceptableType = typeof(ViewModelBase);
+    private static readonly Type MappingToolType = typeof(MappingTool);
+    private static readonly Type QuickRunType = typeof(IQuickRun);
 
     public Type[] AllViewTypes { get; }
     public Type[] AllToolTypes { get; }
     public Type[] AllQuickRunTypes { get; }
 
     public NavigationService(IServiceProvider serviceProvider, IStateStore stateStore) {
-        serviceProvider1 = serviceProvider;
-        stateStore1 = stateStore;
+        _serviceProvider1 = serviceProvider;
+        _stateStore1 = stateStore;
 
         AllViewTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
-                .Where(x => acceptableType.IsAssignableFrom(x) && x is { IsInterface: false, IsAbstract: false }).ToArray();
+                .Where(x => AcceptableType.IsAssignableFrom(x) && x is { IsInterface: false, IsAbstract: false }).ToArray();
 
         AllToolTypes = AllViewTypes
-                .Where(x => mappingToolType.IsAssignableFrom(x) && x is { IsInterface: false, IsAbstract: false }).ToArray();
+                .Where(x => MappingToolType.IsAssignableFrom(x) && x is { IsInterface: false, IsAbstract: false }).ToArray();
 
         AllQuickRunTypes = AllToolTypes
-                .Where(x => quickRunType.IsAssignableFrom(x) && x is { IsInterface: false, IsAbstract: false }).ToArray();
+                .Where(x => QuickRunType.IsAssignableFrom(x) && x is { IsInterface: false, IsAbstract: false }).ToArray();
     }
 
     public event Action<ViewModelBase>? OnNavigate;
@@ -53,7 +53,7 @@ public class NavigationService {
 
             // Load the Model from the state store
             var loadMethod = typeof(IStateStore).GetMethod(nameof(IStateStore.LoadAsync))?.MakeGenericMethod(modelType!)!;
-            var loadTask = (Task) loadMethod.Invoke(stateStore1, [modelType!.Name, null])!;
+            var loadTask = (Task) loadMethod.Invoke(_stateStore1, [modelType!.Name, null])!;
             await loadTask;
             var resultProperty = loadTask.GetType().GetProperty("Result")!;
             object? model = resultProperty.GetValue(loadTask);
@@ -83,13 +83,13 @@ public class NavigationService {
 
     public async Task NavigateAsync(Type viewModelType)
     {
-        var viewModel = serviceProvider1.GetRequiredService(viewModelType);
+        var viewModel = _serviceProvider1.GetRequiredService(viewModelType);
         await NavigateAsync(viewModel);
     }
 
     public async Task NavigateAsync<T>() where T : ViewModelBase
     {
-        var viewModel = serviceProvider1.GetRequiredService<T>();
+        var viewModel = _serviceProvider1.GetRequiredService<T>();
         await NavigateAsync(viewModel);
     }
 
@@ -106,7 +106,7 @@ public class NavigationService {
                 object model = prop.Invoke(currentViewModel, [])!;
 
                 var saveMethod = typeof(IStateStore).GetMethod(nameof(IStateStore.SaveAsync))?.MakeGenericMethod(modelType!)!;
-                await (Task) saveMethod.Invoke(stateStore1, [modelType!.Name, model, null])!;
+                await (Task) saveMethod.Invoke(_stateStore1, [modelType!.Name, model, null])!;
             }
         });
     }

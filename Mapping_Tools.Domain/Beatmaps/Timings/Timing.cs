@@ -16,14 +16,14 @@ public class Timing : IList<TimingPoint> {
     /// List of all timing points. This included uninherited timing points and inherited timing points.
     /// This list should be sorted at all times.
     /// </summary>
-    private List<TimingPoint> timingPoints = null!;
+    private List<TimingPoint> _timingPoints = null!;
 
-    private List<TimingPoint> redlines = null!;
-    private List<TimingPoint> greenlines = null!;
+    private List<TimingPoint> _redlines = null!;
+    private List<TimingPoint> _greenlines = null!;
 
-    public IReadOnlyList<TimingPoint> TimingPoints => timingPoints;
-    public IReadOnlyList<TimingPoint> Redlines => redlines;
-    public IReadOnlyList<TimingPoint> Greenlines => greenlines;
+    public IReadOnlyList<TimingPoint> TimingPoints => _timingPoints;
+    public IReadOnlyList<TimingPoint> Redlines => _redlines;
+    public IReadOnlyList<TimingPoint> Greenlines => _greenlines;
 
     /// <summary>
     /// The global slider multiplier of a <see cref="Beatmap"/>. This is here for convenience’s sake to calculate absolute slider velocities.
@@ -45,61 +45,61 @@ public class Timing : IList<TimingPoint> {
     /// </summary>
     /// <param name="newTimingPoints"></param>
     public void SetTimingPoints(List<TimingPoint>? newTimingPoints) {
-        timingPoints = newTimingPoints ?? [];
-        timingPoints.Sort();
-        redlines = timingPoints.Where(tp => tp.Uninherited).ToList();
-        greenlines = timingPoints.Where(tp => !tp.Uninherited).ToList();
+        _timingPoints = newTimingPoints ?? [];
+        _timingPoints.Sort();
+        _redlines = _timingPoints.Where(tp => tp.Uninherited).ToList();
+        _greenlines = _timingPoints.Where(tp => !tp.Uninherited).ToList();
     }
 
     /// <summary>
     /// Sorts all <see cref="TimingPoint"/> in order of time.
     /// </summary>
     public void Sort() {
-        timingPoints.Sort();
-        redlines.Sort();
-        greenlines.Sort();
+        _timingPoints.Sort();
+        _redlines.Sort();
+        _greenlines.Sort();
     }
 
     #region BasicOperations
 
     public void Add(TimingPoint tp) {
-        var index = timingPoints.BinarySearch(tp);
+        var index = _timingPoints.BinarySearch(tp);
         if (index < 0)
             index = ~index;
 
-        timingPoints.Insert(index, tp);
+        _timingPoints.Insert(index, tp);
 
         if (tp.Uninherited) {
-            index = redlines.BinarySearch(tp);
+            index = _redlines.BinarySearch(tp);
             if (index < 0)
                 index = ~index;
 
-            redlines.Insert(index, tp);
+            _redlines.Insert(index, tp);
         } else {
-            index = greenlines.BinarySearch(tp);
+            index = _greenlines.BinarySearch(tp);
             if (index < 0)
                 index = ~index;
 
-            greenlines.Insert(index, tp);
+            _greenlines.Insert(index, tp);
         }
     }
 
     public bool Remove(TimingPoint tp) {
-        var index = timingPoints.BinarySearch(tp);
+        var index = _timingPoints.BinarySearch(tp);
         if (index >= 0) {
-            timingPoints.RemoveAt(index);
+            _timingPoints.RemoveAt(index);
         }
 
         if (tp.Uninherited) {
-            index = redlines.BinarySearch(tp);
+            index = _redlines.BinarySearch(tp);
             if (index >= 0) {
-                redlines.RemoveAt(index);
+                _redlines.RemoveAt(index);
                 return true;
             }
         } else {
-            index = greenlines.BinarySearch(tp);
+            index = _greenlines.BinarySearch(tp);
             if (index >= 0) {
-                greenlines.RemoveAt(index);
+                _greenlines.RemoveAt(index);
                 return true;
             }
         }
@@ -114,32 +114,32 @@ public class Timing : IList<TimingPoint> {
     }
 
     public void CopyTo(TimingPoint[] array, int arrayIndex) {
-        timingPoints.CopyTo(array, arrayIndex);
+        _timingPoints.CopyTo(array, arrayIndex);
     }
 
     bool ICollection<TimingPoint>.Remove(TimingPoint tp) {
         return Remove(tp);
     }
 
-    public int Count => timingPoints.Count;
+    public int Count => _timingPoints.Count;
     public bool IsReadOnly => false;
 
     public void Clear() {
-        timingPoints.Clear();
-        redlines.Clear();
-        greenlines.Clear();
+        _timingPoints.Clear();
+        _redlines.Clear();
+        _greenlines.Clear();
     }
 
     public bool Contains(TimingPoint item) {
-        return timingPoints.Contains(item);
+        return _timingPoints.Contains(item);
     }
 
     public void Offset(double offset) {
-        timingPoints.ForEach(tp => tp.Offset += offset);
+        _timingPoints.ForEach(tp => tp.Offset += offset);
     }
 
     public int RemoveAll(Func<TimingPoint, bool> match) {
-        var itemsToRemove = timingPoints.Where(match).ToList();
+        var itemsToRemove = _timingPoints.Where(match).ToList();
 
         foreach (var itemToRemove in itemsToRemove) {
             Remove(itemToRemove);
@@ -149,7 +149,7 @@ public class Timing : IList<TimingPoint> {
     }
 
     public IEnumerator<TimingPoint> GetEnumerator() {
-        return timingPoints.GetEnumerator();
+        return _timingPoints.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() {
@@ -157,7 +157,7 @@ public class Timing : IList<TimingPoint> {
     }
 
     public int IndexOf(TimingPoint item) {
-        return timingPoints.IndexOf(item);
+        return _timingPoints.IndexOf(item);
     }
 
     /// <summary>
@@ -168,17 +168,17 @@ public class Timing : IList<TimingPoint> {
     }
 
     public void RemoveAt(int index) {
-        var itemToRemove = timingPoints[index];
+        var itemToRemove = _timingPoints[index];
         Remove(itemToRemove);
     }
 
     public TimingPoint this[int index] {
-        get => timingPoints[index];
-        set => timingPoints[index] = value;
+        get => _timingPoints[index];
+        set => _timingPoints[index] = value;
     }
 
     public Timing Copy() {
-        return new Timing(timingPoints.Select(o => o.Copy()).ToList(), GlobalSliderMultiplier);
+        return new Timing(_timingPoints.Select(o => o.Copy()).ToList(), GlobalSliderMultiplier);
     }
 
     #endregion
@@ -301,9 +301,9 @@ public class Timing : IList<TimingPoint> {
         if (milliseconds >= 0) {
             TimingPoint firstRedline = GetRedlineAtTime(startBeatTime);
             TimingPoint lastRedline = firstRedline;
-            int startIndex = GetTimingPointIndexAfterTime(startBeatTime, redlines);
-            for (int i = startIndex; i < redlines.Count && i != -1; i++) {
-                var redline = redlines[i];
+            int startIndex = GetTimingPointIndexAfterTime(startBeatTime, _redlines);
+            for (int i = startIndex; i < _redlines.Count && i != -1; i++) {
+                var redline = _redlines[i];
                 var beatDiff = lastRedline == firstRedline ? redline.Offset - startBeatTime : redline.Offset - lastRedline.Offset;
 
                 if (beatDiff * lastRedline.MpB > milliseconds + Precision.DoubleEpsilon) {
@@ -318,11 +318,11 @@ public class Timing : IList<TimingPoint> {
 
             beatTime += milliseconds / lastRedline.MpB;
         } else {
-            int startIndex = GetTimingPointIndexAtTime(startBeatTime, redlines);
+            int startIndex = GetTimingPointIndexAtTime(startBeatTime, _redlines);
             double lastBeatTime = startBeatTime;
-            TimingPoint redline = startIndex == -1 ? GetFirstTimingPointExtended() : redlines[startIndex];
+            TimingPoint redline = startIndex == -1 ? GetFirstTimingPointExtended() : _redlines[startIndex];
             for (int i = startIndex; i >= 0; i--) {
-                redline = redlines[i];
+                redline = _redlines[i];
                 double beatDiff = redline.Offset - lastBeatTime;
 
                 if (beatDiff * redline.MpB < milliseconds - Precision.DoubleEpsilon) {
@@ -359,9 +359,9 @@ public class Timing : IList<TimingPoint> {
         if (beatTime >= 0) {
             TimingPoint firstRedline = GetRedlineAtTime(originTime);
             TimingPoint lastRedline = firstRedline;
-            int startIndex = GetTimingPointIndexAfterTime(originTime, redlines);
-            for (int i = startIndex; i < redlines.Count && i != -1; i++) {
-                var redline = redlines[i];
+            int startIndex = GetTimingPointIndexAfterTime(originTime, _redlines);
+            for (int i = startIndex; i < _redlines.Count && i != -1; i++) {
+                var redline = _redlines[i];
                 var msDiff = lastRedline == firstRedline ? redline.Offset - originTime : redline.Offset - lastRedline.Offset;
                 var beatDiff = round ? MultiSnapRound(msDiff / lastRedline.MpB, divisors!) : msDiff / lastRedline.MpB;
 
@@ -377,11 +377,11 @@ public class Timing : IList<TimingPoint> {
 
             ms += beatTime * lastRedline.MpB;
         } else {
-            int startIndex = GetTimingPointIndexAtTime(originTime, redlines);
+            int startIndex = GetTimingPointIndexAtTime(originTime, _redlines);
             double lastBeatTime = originTime;
-            TimingPoint redline = startIndex == -1 ? GetFirstTimingPointExtended() : redlines[startIndex];
+            TimingPoint redline = startIndex == -1 ? GetFirstTimingPointExtended() : _redlines[startIndex];
             for (int i = startIndex; i >= 0; i--) {
-                redline = redlines[i];
+                redline = _redlines[i];
                 double msDiff = redline.Offset - lastBeatTime;
                 var beatDiff = round ? MultiSnapRound(msDiff / redline.MpB, divisors!) : msDiff / redline.MpB;
 
@@ -497,7 +497,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="time"></param>
     /// <returns></returns>
     public TimingPoint GetTimingPointAtTime(double time) {
-        return GetTimingPointAtTime(time, timingPoints, GetFirstTimingPointExtended());
+        return GetTimingPointAtTime(time, _timingPoints, GetFirstTimingPointExtended());
     }
 
     /// <summary>
@@ -508,7 +508,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="inclusive"></param>
     /// <returns></returns>
     public List<TimingPoint> GetTimingPointsInRange(double startTime, double endTime, bool inclusive = true) {
-        return GetTimingPointsInRange(startTime, endTime, timingPoints, inclusive);
+        return GetTimingPointsInRange(startTime, endTime, _timingPoints, inclusive);
     }
 
     /// <summary>
@@ -519,7 +519,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="inclusive"></param>
     /// <returns></returns>
     public List<TimingPoint> GetRedlinesInRange(double startTime, double endTime, bool inclusive = true) {
-        return GetTimingPointsInRange(startTime, endTime, redlines, inclusive);
+        return GetTimingPointsInRange(startTime, endTime, _redlines, inclusive);
     }
 
     /// <summary>
@@ -546,7 +546,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="time"></param>
     /// <returns></returns>
     public TimingPoint GetGreenlineAtTime(double time) {
-        return GetTimingPointAtTime(time, greenlines, GetFirstTimingPointExtended());
+        return GetTimingPointAtTime(time, _greenlines, GetFirstTimingPointExtended());
     }
 
     /// <summary>
@@ -556,7 +556,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="firstTimingPoint"></param>
     /// <returns></returns>
     public TimingPoint GetRedlineAtTime(double time, TimingPoint? firstTimingPoint = null) {
-        return GetTimingPointAtTime(time, redlines, firstTimingPoint ?? GetFirstTimingPointExtended());
+        return GetTimingPointAtTime(time, _redlines, firstTimingPoint ?? GetFirstTimingPointExtended());
     }
 
     /// <summary>
@@ -565,7 +565,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="time"></param>
     /// <returns></returns>
     public TimingPoint? GetRedlineAfterTime(double time) {
-        return GetTimingPointAfterTime(time, redlines);
+        return GetTimingPointAfterTime(time, _redlines);
     }
 
     /// <summary>
@@ -576,7 +576,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="time"></param>
     /// <returns></returns>
     public double GetSvAtTime(double time) {
-        var lastTp = GetTimingPointAtTime(time, timingPoints, null);
+        var lastTp = GetTimingPointAtTime(time, _timingPoints, null);
         if (lastTp == null || lastTp.Uninherited) {
             return 1;
         }
@@ -591,7 +591,7 @@ public class Timing : IList<TimingPoint> {
     /// <param name="timingPoint"></param>
     /// <returns>The timing point after specified timing point.</returns>
     public double GetTimingPointEffectiveRange(TimingPoint timingPoint) {
-        var afterTp = GetTimingPointAfterTime(timingPoint.Offset, timingPoints);
+        var afterTp = GetTimingPointAfterTime(timingPoint.Offset, _timingPoints);
         return afterTp?.Offset ?? double.PositiveInfinity;
     }
 
@@ -623,7 +623,7 @@ public class Timing : IList<TimingPoint> {
         // The value in the greenline will be used as the milliseconds per beat, so for example a 1x SliderVelocity slider will be 600 bpm.
         // The timeline will work like a redline on 0 offset and 1000 milliseconds per beat
 
-        TimingPoint? firstTp = timingPoints.FirstOrDefault();
+        TimingPoint? firstTp = _timingPoints.FirstOrDefault();
         if (firstTp is { Uninherited: true }) {
             return new TimingPoint(firstTp.Offset - firstTp.MpB * firstTp.Meter.TempoDenominator * 128, firstTp.MpB,
                 firstTp.Meter, firstTp.SampleSet, firstTp.SampleIndex, firstTp.Volume, firstTp.Uninherited, false, false);

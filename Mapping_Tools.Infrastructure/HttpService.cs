@@ -4,17 +4,17 @@ namespace Mapping_Tools.Infrastructure;
 
 public class HttpService : IHttpService
 {
-    private readonly HttpClient httpClient;
+    private readonly HttpClient _httpClient;
 
     public HttpService()
     {
-        httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.Add("user-agent", "Mapping Tools");
+        _httpClient = new HttpClient();
+        _httpClient.DefaultRequestHeaders.Add("user-agent", "Mapping Tools");
     }
     
     public async Task<string> GetStringAsync(string url)
     {
-        var response = await httpClient.GetAsync(url);
+        var response = await _httpClient.GetAsync(url);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync();
     }

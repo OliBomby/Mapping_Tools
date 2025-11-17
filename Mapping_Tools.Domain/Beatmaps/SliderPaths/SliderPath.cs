@@ -18,12 +18,12 @@ public struct SliderPath : IEquatable<SliderPath> {
     /// </summary>
     public readonly PathType Type;
 
-    private Vector2[] controlPoints;
+    private Vector2[] _controlPoints;
 
-    private List<Vector2>? calculatedPath;
-    private List<double>? cumulativeLength;
+    private List<Vector2>? _calculatedPath;
+    private List<double>? _cumulativeLength;
 
-    private bool isInitialised;
+    private bool _isInitialised;
 
     /// <summary>
     /// Creates a new <see cref="SliderPath"/>.
@@ -35,7 +35,7 @@ public struct SliderPath : IEquatable<SliderPath> {
     /// If null, the path will use the true distance between all <paramref name="controlPoints"/>.</param>
     public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null) {
         this = default;
-        this.controlPoints = controlPoints;
+        this._controlPoints = controlPoints;
 
         Type = type;
         ExpectedDistance = expectedDistance;
@@ -49,7 +49,7 @@ public struct SliderPath : IEquatable<SliderPath> {
     public List<Vector2> ControlPoints {
         get {
             EnsureInitialised();
-            return controlPoints.ToList();
+            return _controlPoints.ToList();
         }
     }
 
@@ -59,7 +59,7 @@ public struct SliderPath : IEquatable<SliderPath> {
     public double Distance {
         get {
             EnsureInitialised();
-            return cumulativeLength!.Count == 0 ? 0 : cumulativeLength[^1];
+            return _cumulativeLength!.Count == 0 ? 0 : _cumulativeLength[^1];
         }
     }
 
@@ -79,13 +79,13 @@ public struct SliderPath : IEquatable<SliderPath> {
         path.Clear();
 
         int i = 0;
-        for (; i < calculatedPath!.Count && cumulativeLength![i] < d0; ++i) {
+        for (; i < _calculatedPath!.Count && _cumulativeLength![i] < d0; ++i) {
         }
 
         path.Add(InterpolateVertices(i, d0));
 
-        for (; i < calculatedPath.Count && cumulativeLength![i] <= d1; ++i)
-            path.Add(calculatedPath[i]);
+        for (; i < _calculatedPath.Count && _cumulativeLength![i] <= d1; ++i)
+            path.Add(_calculatedPath[i]);
 
         path.Add(InterpolateVertices(i, d1));
     }
@@ -104,13 +104,13 @@ public struct SliderPath : IEquatable<SliderPath> {
     }
 
     private void EnsureInitialised() {
-        if (isInitialised)
+        if (_isInitialised)
             return;
-        isInitialised = true;
+        _isInitialised = true;
 
-        controlPoints ??= [];
-        calculatedPath = [];
-        cumulativeLength = [];
+        _controlPoints ??= [];
+        _calculatedPath = [];
+        _cumulativeLength = [];
 
         CalculatePath();
         CalculateCumulativeLength();
@@ -141,7 +141,7 @@ public struct SliderPath : IEquatable<SliderPath> {
     }
 
     private void CalculatePath() {
-        calculatedPath!.Clear();
+        _calculatedPath!.Clear();
 
         // Sliders may consist of various subpaths separated by two consecutive vertices
         // with the same position. The following loop parses these subpaths and computes
@@ -157,8 +157,8 @@ public struct SliderPath : IEquatable<SliderPath> {
                 List<Vector2> cpSpan = ControlPoints.GetRange(start, end - start);
 
                 foreach (Vector2 t in CalculateSubpath(cpSpan))
-                    if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
-                        calculatedPath.Add(t);
+                    if (_calculatedPath.Count == 0 || _calculatedPath.Last() != t)
+                        _calculatedPath.Add(t);
 
                 start = end;
             }
@@ -168,42 +168,42 @@ public struct SliderPath : IEquatable<SliderPath> {
     private void CalculateCumulativeLength() {
         double l = 0;
 
-        cumulativeLength!.Clear();
-        cumulativeLength.Add(l);
+        _cumulativeLength!.Clear();
+        _cumulativeLength.Add(l);
 
-        for (int i = 0; i < calculatedPath!.Count - 1; ++i) {
-            Vector2 diff = calculatedPath[i + 1] - calculatedPath[i];
+        for (int i = 0; i < _calculatedPath!.Count - 1; ++i) {
+            Vector2 diff = _calculatedPath[i + 1] - _calculatedPath[i];
             double d = diff.Length;
 
             // Shorted slider paths that are too long compared to the expected distance
             if (ExpectedDistance.HasValue && ExpectedDistance - l < d) {
-                calculatedPath[i + 1] = calculatedPath[i] + diff * (double) ((ExpectedDistance - l) / d);
-                calculatedPath.RemoveRange(i + 2, calculatedPath.Count - 2 - i);
+                _calculatedPath[i + 1] = _calculatedPath[i] + diff * (double) ((ExpectedDistance - l) / d);
+                _calculatedPath.RemoveRange(i + 2, _calculatedPath.Count - 2 - i);
 
                 l = ExpectedDistance.Value;
-                cumulativeLength.Add(l);
+                _cumulativeLength.Add(l);
                 break;
             }
 
             l += d;
-            cumulativeLength.Add(l);
+            _cumulativeLength.Add(l);
         }
 
         // Lengthen slider paths that are too short compared to the expected distance
-        if (ExpectedDistance.HasValue && l < ExpectedDistance && calculatedPath.Count > 1) {
-            Vector2 diff = calculatedPath[^1] - calculatedPath[^2];
+        if (ExpectedDistance.HasValue && l < ExpectedDistance && _calculatedPath.Count > 1) {
+            Vector2 diff = _calculatedPath[^1] - _calculatedPath[^2];
             double d = diff.Length;
 
             if (d <= 0)
                 return;
 
-            calculatedPath[^1] += diff * (double) ((ExpectedDistance - l) / d);
-            cumulativeLength[calculatedPath.Count - 1] = ExpectedDistance.Value;
+            _calculatedPath[^1] += diff * (double) ((ExpectedDistance - l) / d);
+            _cumulativeLength[_calculatedPath.Count - 1] = ExpectedDistance.Value;
         }
     }
 
     private int IndexOfDistance(double d) {
-        int i = cumulativeLength!.BinarySearch(d);
+        int i = _cumulativeLength!.BinarySearch(d);
         if (i < 0)
             i = ~i;
 
@@ -215,19 +215,19 @@ public struct SliderPath : IEquatable<SliderPath> {
     }
 
     private Vector2 InterpolateVertices(int i, double d) {
-        if (calculatedPath!.Count == 0)
+        if (_calculatedPath!.Count == 0)
             return Vector2.Zero;
 
         if (i <= 0)
-            return calculatedPath.First();
-        if (i >= calculatedPath.Count)
-            return calculatedPath.Last();
+            return _calculatedPath.First();
+        if (i >= _calculatedPath.Count)
+            return _calculatedPath.Last();
 
-        Vector2 p0 = calculatedPath[i - 1];
-        Vector2 p1 = calculatedPath[i];
+        Vector2 p0 = _calculatedPath[i - 1];
+        Vector2 p1 = _calculatedPath[i];
 
-        double d0 = cumulativeLength![i - 1];
-        double d1 = cumulativeLength[i];
+        double d0 = _cumulativeLength![i - 1];
+        double d1 = _cumulativeLength[i];
 
         // Avoid division by and almost-zero number in case two points are extremely close to each other.
         if (Precision.AlmostEquals(d0, d1))
@@ -259,7 +259,7 @@ public struct SliderPath : IEquatable<SliderPath> {
         var hashCode = -1383746172;
         hashCode = hashCode * -1521134295 + EqualityComparer<double?>.Default.GetHashCode(ExpectedDistance ?? -1);
         hashCode = hashCode * -1521134295 + Type.GetHashCode();
-        hashCode = hashCode * -1521134295 + EqualityComparer<Vector2[]>.Default.GetHashCode(controlPoints);
+        hashCode = hashCode * -1521134295 + EqualityComparer<Vector2[]>.Default.GetHashCode(_controlPoints);
         return hashCode;
     }
 }

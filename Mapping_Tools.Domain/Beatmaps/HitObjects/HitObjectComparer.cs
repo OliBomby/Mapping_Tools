@@ -4,7 +4,7 @@ using Mapping_Tools.Domain.MathUtil;
 namespace Mapping_Tools.Domain.Beatmaps.HitObjects;
 
 public class HitObjectComparer(bool checkIsSelected = false, bool checkPosition = true, bool checkTime = true) : IEqualityComparer<HitObject> {
-    private readonly HitObjectEncoder hitObjectEncoder = new();
+    private readonly HitObjectEncoder _hitObjectEncoder = new();
 
     public bool CheckIsSelected { get; set; } = checkIsSelected;
     public bool CheckPosition { get; set; } = checkPosition;
@@ -42,6 +42,6 @@ public class HitObjectComparer(bool checkIsSelected = false, bool checkPosition 
     }
 
     public int GetHashCode(HitObject obj) {
-        return EqualityComparer<string>.Default.GetHashCode(hitObjectEncoder.Encode(obj));
+        return EqualityComparer<string>.Default.GetHashCode(_hitObjectEncoder.Encode(obj));
     }
 }

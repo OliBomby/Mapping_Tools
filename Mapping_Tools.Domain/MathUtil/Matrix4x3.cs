@@ -254,26 +254,26 @@ public struct Matrix4X3 :IEquatable<Matrix4X3> {
         double sin = Math.Sin(-angle);
         double t = 1.0f - cos;
 
-        double tXX = t * axisX * axisX,
-            tXY = t * axisX * axisY,
-            tXZ = t * axisX * axisZ,
-            tYY = t * axisY * axisY,
-            tYZ = t * axisY * axisZ,
-            tZZ = t * axisZ * axisZ;
+        double tXx = t * axisX * axisX,
+            tXy = t * axisX * axisY,
+            tXz = t * axisX * axisZ,
+            tYy = t * axisY * axisY,
+            tYz = t * axisY * axisZ,
+            tZz = t * axisZ * axisZ;
 
         double sinX = sin * axisX,
             sinY = sin * axisY,
             sinZ = sin * axisZ;
 
-        result.Row0.X = tXX + cos;
-        result.Row0.Y = tXY - sinZ;
-        result.Row0.Z = tXZ + sinY;
-        result.Row1.X = tXY + sinZ;
-        result.Row1.Y = tYY + cos;
-        result.Row1.Z = tYZ - sinX;
-        result.Row2.X = tXZ - sinY;
-        result.Row2.Y = tYZ + sinX;
-        result.Row2.Z = tZZ + cos;
+        result.Row0.X = tXx + cos;
+        result.Row0.Y = tXy - sinZ;
+        result.Row0.Z = tXz + sinY;
+        result.Row1.X = tXy + sinZ;
+        result.Row1.Y = tYy + cos;
+        result.Row1.Z = tYz - sinX;
+        result.Row2.X = tXz - sinY;
+        result.Row2.Y = tYz + sinX;
+        result.Row2.Z = tZz + cos;
         result.Row3.X = 0;
         result.Row3.Y = 0;
         result.Row3.Z = 0;

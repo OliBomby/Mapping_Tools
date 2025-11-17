@@ -15,7 +15,7 @@ internal struct CircleBezierPreset(double maxAngle, List<Vector2> points) {
 /// </summary>
 public static class BezierConverter
 {
-    private static readonly List<CircleBezierPreset> circlePresets = [
+    private static readonly List<CircleBezierPreset> CirclePresets = [
         new(0.4993379862754501, GetPoints("1.0:0.0|1.0:0.2549893626632736|0.8778997558480327:0.47884446188920726")),
         new(1.7579419829169447, GetPoints("1.0:0.0|1.0:0.6263026|0.42931178:1.0990661|-0.18605515:0.9825393")),
         new(3.1385246920140215, GetPoints("1.0:0.0|1.0:0.87084764|0.002304826:1.5033062|-0.9973236:0.8739115|-0.9999953:0.0030679568")),
@@ -121,12 +121,12 @@ public static class BezierConverter
     /// <returns></returns>
     public static List<Vector2> ConvertCircleToBezierAnchors(CircleArc cs)
     {
-        CircleBezierPreset preset = circlePresets.Last();
-        foreach (CircleBezierPreset CBP in circlePresets)
+        CircleBezierPreset preset = CirclePresets.Last();
+        foreach (CircleBezierPreset cbp in CirclePresets)
         {
-            if (CBP.MaxAngle >= cs.ThetaRange)
+            if (cbp.MaxAngle >= cs.ThetaRange)
             {
-                preset = CBP;
+                preset = cbp;
                 break;
             }
         }

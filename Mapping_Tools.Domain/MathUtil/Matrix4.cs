@@ -495,28 +495,28 @@ public struct Matrix4 :IEquatable<Matrix4> {
         double t = 1.0f - cos;
 
         // do the conversion math once
-        double tXX = t * axisX * axisX,
-            tXY = t * axisX * axisY,
-            tXZ = t * axisX * axisZ,
-            tYY = t * axisY * axisY,
-            tYZ = t * axisY * axisZ,
-            tZZ = t * axisZ * axisZ;
+        double tXx = t * axisX * axisX,
+            tXy = t * axisX * axisY,
+            tXz = t * axisX * axisZ,
+            tYy = t * axisY * axisY,
+            tYz = t * axisY * axisZ,
+            tZz = t * axisZ * axisZ;
 
         double sinX = sin * axisX,
             sinY = sin * axisY,
             sinZ = sin * axisZ;
 
-        result.Row0.X = tXX + cos;
-        result.Row0.Y = tXY - sinZ;
-        result.Row0.Z = tXZ + sinY;
+        result.Row0.X = tXx + cos;
+        result.Row0.Y = tXy - sinZ;
+        result.Row0.Z = tXz + sinY;
         result.Row0.W = 0;
-        result.Row1.X = tXY + sinZ;
-        result.Row1.Y = tYY + cos;
-        result.Row1.Z = tYZ - sinX;
+        result.Row1.X = tXy + sinZ;
+        result.Row1.Y = tYy + cos;
+        result.Row1.Z = tYz - sinX;
         result.Row1.W = 0;
-        result.Row2.X = tXZ - sinY;
-        result.Row2.Y = tYZ + sinX;
-        result.Row2.Z = tZZ + cos;
+        result.Row2.X = tXz - sinY;
+        result.Row2.Y = tYz + sinX;
+        result.Row2.Z = tZz + cos;
         result.Row2.W = 0;
         result.Row3 = Vector4.UnitW;
     }
@@ -786,17 +786,17 @@ public struct Matrix4 :IEquatable<Matrix4> {
     public static void CreateOrthographicOffCenter(double left, double right, double bottom, double top, double zNear, double zFar, out Matrix4 result) {
         result = Identity;
 
-        double invRL = 1.0f / ( right - left );
-        double invTB = 1.0f / ( top - bottom );
-        double invFN = 1.0f / ( zFar - zNear );
+        double invRl = 1.0f / ( right - left );
+        double invTb = 1.0f / ( top - bottom );
+        double invFn = 1.0f / ( zFar - zNear );
 
-        result.Row0.X = 2 * invRL;
-        result.Row1.Y = 2 * invTB;
-        result.Row2.Z = -2 * invFN;
+        result.Row0.X = 2 * invRl;
+        result.Row1.Y = 2 * invTb;
+        result.Row2.Z = -2 * invFn;
 
-        result.Row3.X = -( right + left ) * invRL;
-        result.Row3.Y = -( top + bottom ) * invTB;
-        result.Row3.Z = -( zFar + zNear ) * invFN;
+        result.Row3.X = -( right + left ) * invRl;
+        result.Row3.Y = -( top + bottom ) * invTb;
+        result.Row3.Z = -( zFar + zNear ) * invFn;
     }
 
     /// <summary>

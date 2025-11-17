@@ -6,18 +6,18 @@ using ReactiveUI;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 public class HomeViewModel(IStateStore store) : ViewModelBase, IHasModel<HomeModel> {
-    private int counter;
+    private int _counter;
 
     public int Counter {
-        get => counter;
-        set => this.RaiseAndSetIfChanged(ref counter, value);
+        get => _counter;
+        set => this.RaiseAndSetIfChanged(ref _counter, value);
     }
 
-    private string? note;
+    private string? _note;
 
     public string? Note {
-        get => note;
-        set => this.RaiseAndSetIfChanged(ref note, value);
+        get => _note;
+        set => this.RaiseAndSetIfChanged(ref _note, value);
     }
     
     public HomeViewModel() : this(null!) { }

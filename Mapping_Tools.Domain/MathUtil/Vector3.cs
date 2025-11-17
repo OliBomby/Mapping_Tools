@@ -776,8 +776,8 @@ public struct Vector3 :IEquatable<Vector3> {
     /// <param name="mat">The desired transformation</param>
     /// <param name="result">The transformed normal</param>
     public static void TransformNormal(ref Vector3 norm, ref Matrix4 mat, out Vector3 result) {
-        Matrix4 Inverse = Matrix4.Invert(mat);
-        TransformNormalInverse(ref norm, ref Inverse, out result);
+        Matrix4 inverse = Matrix4.Invert(mat);
+        TransformNormalInverse(ref norm, ref inverse, out result);
     }
 
     /// <summary>Transform a Normal by the (transpose of the) given Matrix</summary>

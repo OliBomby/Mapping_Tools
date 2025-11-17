@@ -6,11 +6,11 @@ using Mapping_Tools.Domain.Beatmaps.Types;
 namespace Mapping_Tools.Domain.Beatmaps.HitObjects;
 
 public class HoldNote : HitObject, IDuration, IHasTimelineObjects {
-    private double endTime;
+    private double _endTime;
 
     public override double Duration => EndTime - StartTime;
 
-    public override double EndTime => endTime;
+    public override double EndTime => _endTime;
 
     protected override void DeepCloneAdd(HitObject clonedHitObject) {
     }
@@ -20,11 +20,11 @@ public class HoldNote : HitObject, IDuration, IHasTimelineObjects {
     }
 
     public void SetEndTime(double newEndTime) {
-        endTime = newEndTime;
+        _endTime = newEndTime;
     }
 
     public override void MoveTime(double deltaTime) {
-        endTime += deltaTime;
+        _endTime += deltaTime;
 
         base.MoveTime(deltaTime);
     }

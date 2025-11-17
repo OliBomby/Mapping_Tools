@@ -65,7 +65,7 @@ public struct Box2 :IEquatable<Box2> {
     /// <param name="right">The position of the right boundary.</param>
     /// <param name="bottom">The position of the bottom boundary.</param>
     /// <returns>A new osuTK.Box2 with the specfied dimensions.</returns>
-    public static Box2 FromTLRB(double top, double left, double right, double bottom) {
+    public static Box2 FromTlrb(double top, double left, double right, double bottom) {
         return new Box2(left, top, right, bottom);
     }
 
@@ -117,15 +117,15 @@ public struct Box2 :IEquatable<Box2> {
     /// <param name="closedRegion">Whether to include the box boundary in the test region.</param>
     /// <returns>Whether this box contains the point.</returns>
     public bool Contains(Vector2 point, bool closedRegion) {
-        bool xOK = closedRegion == Left <= Right ?
+        bool xOk = closedRegion == Left <= Right ?
             point.X >= Left != point.X > Right :
             point.X > Left != point.X >= Right;
 
-        bool yOK = closedRegion == Top <= Bottom ?
+        bool yOk = closedRegion == Top <= Bottom ?
             point.Y >= Top != point.Y > Bottom :
             point.Y > Top != point.Y >= Bottom;
 
-        return xOK && yOK;
+        return xOk && yOk;
     }
 
     /// <summary>
