@@ -39,7 +39,7 @@
                                         </Button>
 
                                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Message}" TextWrapping="Wrap" />
-                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CreatedAt, Converter={StaticResource TimeAgoConverter}}" FontStyle="Italic" FontSize="10" />
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding RelativeTime}" FontStyle="Italic" FontSize="10" />
                                     </Grid>
                                 </controls:Card>
                             </DataTemplate>

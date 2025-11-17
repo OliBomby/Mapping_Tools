@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Collections.Specialized;
+using Avalonia.Threading;
 using Mapping_Tools.Application.Types;
 using ReactiveUI;
 using Material.Icons;
@@ -20,6 +21,13 @@ namespace Mapping_Tools.Desktop.ViewModels
 
         public MaterialIconKind IconKind { get; }
         public IBrush IconBrush { get; }
+
+        private string _relativeTime = string.Empty;
+        public string RelativeTime
+        {
+            get => _relativeTime;
+            private set => this.RaiseAndSetIfChanged(ref _relativeTime, value);
+        }
 
         public NotificationItemViewModel(INotification n)
         {
@@ -49,20 +57,35 @@ namespace Mapping_Tools.Desktop.ViewModels
                     IconBrush = Brushes.Gray;
                     break;
             }
+
+            UpdateRelativeTime();
+        }
+
+        public void UpdateRelativeTime()
+        {
+            var now = DateTime.Now;
+            var ts = now - CreatedAt;
+            if (ts.TotalSeconds < 5) RelativeTime = "just now";
+            else if (ts.TotalSeconds < 60) RelativeTime = $"{Math.Floor(ts.TotalSeconds)}s ago";
+            else if (ts.TotalMinutes < 60) RelativeTime = $"{Math.Floor(ts.TotalMinutes)}m ago";
+            else if (ts.TotalHours < 24) RelativeTime = $"{Math.Floor(ts.TotalHours)}h ago";
+            else if (ts.TotalDays < 7) RelativeTime = $"{Math.Floor(ts.TotalDays)}d ago";
+            else if (ts.TotalDays < 30) RelativeTime = $"{Math.Floor(ts.TotalDays / 7)}w ago";
+            else if (ts.TotalDays < 365) RelativeTime = $"{Math.Floor(ts.TotalDays / 30)}mo ago";
+            else RelativeTime = $"{Math.Floor(ts.TotalDays / 365)}y ago";
         }
     }
 
-    public class NotificationsViewModel : ViewModelBase
+    public class NotificationsViewModel : ReactiveObject
     {
         private readonly INotificationService _notificationService;
+        private readonly DispatcherTimer _timer;
 
         public ObservableCollection<NotificationItemViewModel> Notifications { get; } = new ObservableCollection<NotificationItemViewModel>();
 
         public ReactiveCommand<Unit, Unit> ClearAll { get; }
         public ReactiveCommand<Guid, Unit> Remove { get; }
 
-        public NotificationsViewModel() : this(null!) { }
-        
         public NotificationsViewModel(INotificationService notificationService)
         {
             _notificationService = notificationService;
@@ -85,6 +108,14 @@ namespace Mapping_Tools.Desktop.ViewModels
 
             ClearAll = ReactiveCommand.Create(() => _notificationService.ClearNotifications());
             Remove = ReactiveCommand.Create<Guid>(id => _notificationService.RemoveNotification(id));
+
+            // Ticker to update RelativeTime display every second
+            _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _timer.Tick += (_, _) => {
+                foreach (var item in Notifications)
+                    item.UpdateRelativeTime();
+            };
+            _timer.Start();
         }
 
         private void NotificationsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
