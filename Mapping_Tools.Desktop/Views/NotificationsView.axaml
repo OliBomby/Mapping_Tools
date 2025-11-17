@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Mapping_Tools.Desktop.Views.NotificationsView"
              x:DataType="vm:NotificationsViewModel">
@@ -20,13 +21,13 @@
             </Button>
         </StackPanel>
 
-        <Border Grid.Row="1" Margin="0 8 0 0" Background="{DynamicResource MaterialDesignPaper}" CornerRadius="4" Padding="8">
+        <Border Grid.Row="1" Margin="0 8 0 0" CornerRadius="4" Padding="8">
             <ScrollViewer>
                 <StackPanel>
                     <ItemsControl ItemsSource="{Binding Notifications}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:NotificationItemViewModel">
-                                <NotificationCard Margin="0 0 0 8" Padding="8" Background="{DynamicResource MaterialDesignPaper}" CornerRadius="4">
+                                <controls:Card Margin="0 0 0 8" Padding="8">
                                     <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
                                         <StackPanel Grid.RowSpan="2" Orientation="Vertical" Margin="0 0 8 0" VerticalAlignment="Top">
                                             <avalonia:MaterialIcon Width="28" Height="28" Kind="{Binding IconKind}" Foreground="{Binding IconBrush}" />
@@ -40,7 +41,7 @@
                                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Message}" TextWrapping="Wrap" />
                                         <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CreatedAt}" FontStyle="Italic" FontSize="10" />
                                     </Grid>
-                                </NotificationCard>
+                                </controls:Card>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

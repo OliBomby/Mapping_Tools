@@ -61,6 +61,8 @@ namespace Mapping_Tools.Desktop.ViewModels
         public ReactiveCommand<Unit, Unit> ClearAll { get; }
         public ReactiveCommand<Guid, Unit> Remove { get; }
 
+        public NotificationsViewModel() : this(null!) { }
+        
         public NotificationsViewModel(INotificationService notificationService)
         {
             _notificationService = notificationService;
