@@ -1,4 +1,5 @@
 ﻿using Mapping_Tools.Application.Persistence;
+using Mapping_Tools.Application.Types;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,7 @@ public static class ServiceCollectionExtensions {
         // e.g., s.AddScoped<IOrderRepository, SqlOrderRepository>();
         //       s.AddSingleton<IUiStateStore, JsonUiStateStore>();
         s.AddSingleton<IStateStore, JsonStateStore>();
+        s.AddSingleton<IHttpService, HttpService>();
         return s;
     }
 

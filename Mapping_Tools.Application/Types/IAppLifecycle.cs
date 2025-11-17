@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Application;
+﻿namespace Mapping_Tools.Application.Types;
 
 public interface IAppLifecycle
 {

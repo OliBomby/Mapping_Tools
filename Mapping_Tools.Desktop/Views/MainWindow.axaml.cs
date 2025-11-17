@@ -22,17 +22,7 @@ using ReactiveUI;
 namespace Mapping_Tools.Desktop.Views;
 
 public partial class MainWindow : Window {
-    private bool autoSave = true;
-    private bool updateAfterClose;
-    private Task downloadUpdateTask;
-
     private MainWindowViewModel ViewModel => (MainWindowViewModel) DataContext;
-
-    public static MainWindow AppWindow { get; set; }
-    public static string AppCommon { get; set; }
-    public static string AppDataPath { get; set; }
-    public static string ExportPath { get; set; }
-    public static HttpClient HttpClient { get; set; }
 
     public delegate void CurrentBeatmapUpdateHandler(object sender, string currentBeatmaps);
 
@@ -62,14 +52,6 @@ public partial class MainWindow : Window {
                     Cursor = busy ? new Cursor(StandardCursorType.Wait) : null); // null = inherit/default
         });
 
-
-        AppWindow = this;
-        AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
-        ExportPath = Path.Combine(AppDataPath, "Exports");
-        HttpClient = new HttpClient();
-        HttpClient.DefaultRequestHeaders.Add("user-agent", "Mapping Tools");
-
         // if (SettingsManager.Settings.MainWindowRestoreBounds.HasValue) {
         // SetToRect(SettingsManager.Settings.MainWindowRestoreBounds.Value);
         // }
@@ -86,7 +68,7 @@ public partial class MainWindow : Window {
 
     //Close window without saving
     private void CloseWinNoSave(object sender, RoutedEventArgs e) {
-        autoSave = false;
+        // autoSave = false;
         Close();
     }
 

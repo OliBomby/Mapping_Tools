@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Application.Persistence;
+﻿namespace Mapping_Tools.Application.Types;
 
 public interface IStateStore
 {

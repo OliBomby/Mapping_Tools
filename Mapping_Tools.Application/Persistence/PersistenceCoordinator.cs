@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Mapping_Tools.Application.Types;
+using Microsoft.Extensions.Logging;
 
 namespace Mapping_Tools.Application.Persistence;
 
