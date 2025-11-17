@@ -1,7 +1,7 @@
 ﻿using Mapping_Tools.Application.Types;
 using Microsoft.Extensions.Logging;
 
-namespace Mapping_Tools.Application.Persistence;
+namespace Mapping_Tools.Application.Services;
 
 public sealed class PersistenceCoordinator(ILogger<PersistenceCoordinator> logger) : IPersistenceCoordinator {
     private readonly List<IPersistable> _persistables = [];
