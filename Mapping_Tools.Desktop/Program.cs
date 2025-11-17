@@ -3,6 +3,7 @@ using Avalonia.ReactiveUI;
 using System;
 using System.Threading.Tasks;
 using Mapping_Tools.Application;
+using Mapping_Tools.Desktop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 

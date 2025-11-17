@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -10,7 +9,7 @@ using Mapping_Tools.Desktop.Types;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Mapping_Tools.Desktop;
+namespace Mapping_Tools.Desktop.Services;
 
 public class NavigationService {
     private readonly IServiceProvider serviceProvider1;

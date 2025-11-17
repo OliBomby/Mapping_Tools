@@ -4,7 +4,7 @@ using Mapping_Tools.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Mapping_Tools.Desktop;
+namespace Mapping_Tools.Desktop.Services;
 
 public static class ServiceCollectionExtensions {
     public static IServiceCollection AddInfrastructure(this IServiceCollection s, IConfiguration cfg) {
