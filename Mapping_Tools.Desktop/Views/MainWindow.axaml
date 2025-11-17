@@ -204,7 +204,14 @@
                                           ToolTip.Tip="Show notifications"
                                           VerticalAlignment="Center">
                                 <Grid>
-                                    <material:MaterialIcon Width="20" Height="20" Kind="BellOutline" />
+                                    <material:MaterialIcon Width="20" Height="20">
+                                        <material:MaterialIcon.Kind>
+                                            <MultiBinding Converter="{StaticResource NotificationBellIconKindConverter}">
+                                                <Binding Path="NotificationsDrawerOpen" />
+                                                <Binding Path="HasUnreadNotifications" />
+                                            </MultiBinding>
+                                        </material:MaterialIcon.Kind>
+                                    </material:MaterialIcon>
                                 </Grid>
                             </ToggleButton>
                             
@@ -394,4 +401,3 @@
         </dialogHostAvalonia:DialogHost>
     </Grid>
 </Window>
-

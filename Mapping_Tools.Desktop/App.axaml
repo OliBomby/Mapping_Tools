@@ -73,5 +73,7 @@
         <helpers:MapArrayToCountStringConverter x:Key="MapArrayToCountStringConverter" />
         <helpers:MapArrayJoinNewLinesConverter  x:Key="MapArrayJoinNewLinesConverter" />
         <helpers:MapArrayToFilenameConverter x:Key="MapArrayToFilenameConverter" />
+        <helpers:TimeAgoConverter x:Key="TimeAgoConverter" />
+        <helpers:NotificationBellIconKindConverter x:Key="NotificationBellIconKindConverter" />
     </Application.Resources>
 </Application>
