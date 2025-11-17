@@ -9,7 +9,7 @@ public class UserSettingsService
 {
     public UserSettings Settings { get; }
 
-    public UserSettingsService(IStateStore stateStore, IAppLifecycle appLifecycle)
+    public UserSettingsService(IStateStore stateStore, IAppLifecycle appLifecycle, INotificationService notificationService)
     {
         try
         {
@@ -17,10 +17,10 @@ public class UserSettingsService
         } catch (Exception e)
         {
             Settings = new UserSettings();
-
-            // var model = new SnackbarModel("Failed to load user settings, default settings will be used. Error: " + e.Message,
-            //     TimeSpan.FromSeconds(10));
-            // SnackbarHost.Post(model, "MainSnackbar", DispatcherPriority.Normal);
+            
+            notificationService.AddNotification("Error loading user settings",
+                "Failed to load user settings, default settings will be used. Error: " + e.Message,
+                NotificationType.Error);
         }
 
         appLifecycle.UICleanup.Register(() => stateStore.SaveAsync("user_settings", Settings).GetAwaiter().GetResult());
