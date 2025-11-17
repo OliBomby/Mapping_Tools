@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mapping_Tools.Desktop.ViewModels;
+namespace Mapping_Tools.Desktop.Types;
 
 /// <summary>
 /// 

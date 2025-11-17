@@ -13,6 +13,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Mapping_Tools.Application;
 using Mapping_Tools.Desktop.Helpers;
+using Mapping_Tools.Desktop.Types;
 using Material.Icons;
 using Material.Icons.Avalonia;
 using ReactiveUI;
