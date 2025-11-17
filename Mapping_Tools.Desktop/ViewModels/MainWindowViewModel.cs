@@ -182,13 +182,18 @@ public partial class MainWindowViewModel : ViewModelBase {
         });
 
         OpenNavigationDrawer = ReactiveCommand.Create(() => {
-            DrawerOpen = true;
-            SearchFocused = false;
-            SearchFocused = true;
+            if (DrawerOpen && SearchFocused) {
+                DrawerOpen = false;
+                SearchFocused = false;
+            } else {
+                DrawerOpen = true;
+                SearchFocused = false;
+                SearchFocused = true;
+            }
         });
 
         OpenNotificationsDrawer = ReactiveCommand.Create(() => {
-            NotificationsDrawerOpen = true;
+            NotificationsDrawerOpen = !NotificationsDrawerOpen;
         });
 
         GenerateNavigationItems();
