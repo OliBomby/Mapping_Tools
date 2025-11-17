@@ -26,6 +26,7 @@
 
     <Window.KeyBindings>
         <KeyBinding Gesture="Ctrl+K" Command="{Binding OpenNavigationDrawer}" />
+        <KeyBinding Gesture="Ctrl+N" Command="{Binding OpenNotificationsDrawer}" />
     </Window.KeyBindings>
 
     <Design.DataContext>
