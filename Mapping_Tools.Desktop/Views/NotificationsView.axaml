@@ -1,0 +1,54 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Mapping_Tools.Desktop.Views.NotificationsView"
+             x:DataType="vm:NotificationsViewModel">
+
+    <Design.DataContext>
+        <vm:NotificationsViewModel/>
+    </Design.DataContext>
+
+    <Grid Margin="8" RowDefinitions="Auto, *">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+            <TextBlock Text="Notifications" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" />
+            <Button Margin="8 0 0 0" Command="{Binding ClearAll}">
+                <avalonia:MaterialIcon Kind="DeleteSweep" />
+            </Button>
+        </StackPanel>
+
+        <Border Grid.Row="1" Margin="0 8 0 0" Background="{DynamicResource MaterialDesignPaper}" CornerRadius="4" Padding="8">
+            <ScrollViewer>
+                <StackPanel>
+                    <ItemsControl ItemsSource="{Binding Notifications}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:NotificationItemViewModel">
+                                <NotificationCard Margin="0 0 0 8" Padding="8" Background="{DynamicResource MaterialDesignPaper}" CornerRadius="4">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                                        <StackPanel Grid.RowSpan="2" Orientation="Vertical" Margin="0 0 8 0" VerticalAlignment="Top">
+                                            <avalonia:MaterialIcon Width="28" Height="28" Kind="{Binding IconKind}" Foreground="{Binding IconBrush}" />
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Title}" FontWeight="Bold" />
+                                        <Button Grid.Column="2" Grid.Row="0" Command="{Binding DataContext.Remove, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Id}">
+                                            <avalonia:MaterialIcon Kind="Close" />
+                                        </Button>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Message}" TextWrapping="Wrap" />
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CreatedAt}" FontStyle="Italic" FontSize="10" />
+                                    </Grid>
+                                </NotificationCard>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock IsVisible="{Binding HasNoNotifications}" Text="No new notifications" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+
+</UserControl>

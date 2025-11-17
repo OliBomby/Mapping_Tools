@@ -33,6 +33,7 @@ public static class ServiceCollectionExtensions {
         s.AddSingleton<NavigationService>();
         
         s.AddSingleton<MainWindowViewModel>();
+        s.AddTransient<NotificationsViewModel>();
         s.AddTransient<HomeViewModel>();
         s.AddTransient<SettingsViewModel>();
 

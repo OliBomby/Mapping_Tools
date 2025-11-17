@@ -26,6 +26,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase {
     private readonly NavigationService _navigationService;
     private readonly UserSettingsService _userSettingsService;
+    private readonly INotificationService _notificationService;
 
     private List<NavigationItem> _defaultItems = null!;
     private List<NavigationItem> _toolItems = null!;
@@ -70,6 +71,15 @@ public partial class MainWindowViewModel : ViewModelBase {
 
     [Reactive]
     private ObservableCollection<MenuItem> _projectMenuItems = [];
+
+    // Notification drawer state
+    [Reactive]
+    private bool _notificationsDrawerOpen;
+
+    [Reactive]
+    private bool _hasUnreadNotifications;
+
+    public NotificationsViewModel NotificationsViewModel { get; }
     
     public UserSettings UserSettings => _userSettingsService.Settings;
 
@@ -79,12 +89,28 @@ public partial class MainWindowViewModel : ViewModelBase {
     public ReactiveCommand<Unit, Unit>? ClearSearchBox { get; }
     public ReactiveCommand<Unit, Unit>? OpenNavigationDrawer { get; }
     
-    public MainWindowViewModel() : this(null!, null!, null!) { }
+    public MainWindowViewModel() : this(null!, null!, null!, null!, null!) { }
 
-    public MainWindowViewModel(NavigationService navigationService, IAppLifecycle appLifecycle, UserSettingsService userSettingsService) {
+    public MainWindowViewModel(
+        NavigationService navigationService,
+        IAppLifecycle appLifecycle,
+        UserSettingsService userSettingsService,
+        INotificationService notificationService,
+        NotificationsViewModel notificationsViewModel
+        ) {
         _navigationService = navigationService;
         _userSettingsService = userSettingsService;
-        
+        _notificationService = notificationService;
+        NotificationsViewModel = notificationsViewModel;
+
+        // Wire notifications: mark unread when a new notification arrives and drawer is closed
+        HasUnreadNotifications = _notificationService.GetNotifications().Any();
+        _notificationService.NotificationAdded += (_, _) => {
+            if (!NotificationsDrawerOpen) {
+                HasUnreadNotifications = true;
+            }
+        };
+
         // Subscribe to navigation events and change the current view model accordingly
         _navigationService.OnNavigate += vm => CurrentViewModel = vm;
 
@@ -94,6 +120,12 @@ public partial class MainWindowViewModel : ViewModelBase {
             {
                 case nameof(CurrentViewModel):
                     Task.Run(() => navigationService.DisposeCurrentAsync(_currentViewModel));
+                    break;
+                case nameof(NotificationsDrawerOpen):
+                    // When opening notifications drawer, mark notifications as read
+                    if (NotificationsDrawerOpen) {
+                        HasUnreadNotifications = false;
+                    }
                     break;
             }
         };

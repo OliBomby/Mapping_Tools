@@ -13,6 +13,7 @@ public class UserSettingsService
     {
         try
         {
+            throw new Exception("test");
             Settings = stateStore.LoadAsync<UserSettings>("user_settings").GetAwaiter().GetResult() ?? new UserSettings();
         } catch (Exception e)
         {

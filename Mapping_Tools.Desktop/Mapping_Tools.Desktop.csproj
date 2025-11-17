@@ -40,4 +40,11 @@
       <ProjectReference Include="..\Mapping_Tools.Application\Mapping_Tools.Application.csproj" />
       <ProjectReference Include="..\Mapping_Tools.Infrastructure\Mapping_Tools.Infrastructure.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Views\NotificationsView.axaml.cs">
+        <DependentUpon>Notifications.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

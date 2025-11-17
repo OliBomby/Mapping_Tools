@@ -8,6 +8,7 @@
         xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:helpers="clr-namespace:Mapping_Tools.Desktop.Helpers"
+        xmlns:desktop="clr-namespace:Mapping_Tools.Desktop"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Mapping_Tools.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -56,12 +57,10 @@
         </Style>
 
         <Style Selector="ToggleButton.icon-toggle:checked > material|MaterialIcon">
-            <Setter Property="Kind" Value="Menu" />
             <Setter Property="Foreground" Value="White" />
         </Style>
 
         <Style Selector="ToggleButton.icon-toggle:unchecked > material|MaterialIcon">
-            <Setter Property="Kind" Value="Menu" />
             <Setter Property="Foreground" Value="LightGray" />
         </Style>
 
@@ -89,7 +88,7 @@
                                 Height="35"
                                 Padding="8 4"
                                 Classes="icon-toggle"
-                                IsChecked="{Binding DrawerOpen}"
+                                IsChecked="{Binding DrawerOpen, Mode=TwoWay}"
                                 assists:ShadowAssist.ShadowDepth="Depth0"
                                 ToolTip.Tip="Use Ctrl+K to use this toggle anywhere in the program.">
 
@@ -195,8 +194,20 @@
                         <StackPanel DockPanel.Dock="Right"
                                     ZIndex="5"
                                     HorizontalAlignment="Right"
-                                    VerticalAlignment="Top"
+                                    VerticalAlignment="Center"
                                     Orientation="Horizontal">
+
+                            <!-- Notifications toggle button -->
+                            <ToggleButton x:Name="NotificationsToggle"
+                                          Classes="icon-toggle"
+                                          IsChecked="{Binding NotificationsDrawerOpen, Mode=TwoWay}"
+                                          ToolTip.Tip="Show notifications"
+                                          VerticalAlignment="Center">
+                                <Grid>
+                                    <material:MaterialIcon Width="20" Height="20" Kind="BellOutline" />
+                                </Grid>
+                            </ToggleButton>
+                            
                             <Button Classes="Flat"
                                     Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
                                     Click="MinimizeWin">
@@ -282,7 +293,9 @@
                 <controls:NavigationDrawer
                     Grid.Row="1"
                     LeftDrawerWidth="200"
-                    LeftDrawerOpened="{Binding DrawerOpen, FallbackValue=True}">
+                    LeftDrawerOpened="{Binding DrawerOpen, FallbackValue=True, Mode=TwoWay}"
+                    RightDrawerWidth="320"
+                    RightDrawerOpened="{Binding NotificationsDrawerOpen, Mode=TwoWay}">
                     <controls:NavigationDrawer.LeftDrawerContent>
                         <DockPanel MinWidth="200" MaxWidth="200">
                             <TextBox
@@ -354,6 +367,12 @@
                         </DockPanel>
                     </controls:NavigationDrawer.LeftDrawerContent>
 
+                    <controls:NavigationDrawer.RightDrawerContent>
+                        <DockPanel Width="320" Background="{DynamicResource MaterialDesignPaper}">
+                            <ContentControl Content="{Binding NotificationsViewModel}" Margin="8"/>
+                        </DockPanel>
+                    </controls:NavigationDrawer.RightDrawerContent>
+
                     <Grid x:Name="MainContentGrid" PointerPressed="DragWin">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
@@ -375,3 +394,4 @@
         </dialogHostAvalonia:DialogHost>
     </Grid>
 </Window>
+

@@ -7,10 +7,16 @@
              xmlns:helpers="clr-namespace:Mapping_Tools.Desktop.Helpers"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:viewModels="clr-namespace:Mapping_Tools.Desktop.ViewModels"
+             xmlns:views="clr-namespace:Mapping_Tools.Desktop.Views"
              x:Class="Mapping_Tools.Desktop.App">
 
     <Application.DataTemplates>
         <local:ViewLocator/>
+        
+        <DataTemplate DataType="viewModels:NotificationsViewModel">
+            <views:NotificationsView/>
+        </DataTemplate>
     </Application.DataTemplates>
 
     <Application.Styles>
