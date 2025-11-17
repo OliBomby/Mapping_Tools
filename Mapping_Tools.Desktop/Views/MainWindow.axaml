@@ -14,14 +14,13 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="{Binding Header}"
         CanResize="True"
-        Width="1500"
-        Height="800"
         MinWidth="500"
         MinHeight="200"
         ShowInTaskbar="True"
         Background="{DynamicResource MaterialDesignPaper}"
         SystemDecorations="BorderOnly"
         ExtendClientAreaToDecorationsHint="True"
+        WindowStartupLocation="Manual"
         ExtendClientAreaChromeHints="NoChrome">
 
     <Window.KeyBindings>
@@ -224,7 +223,7 @@
 
                         <controls:ColorZone
                             PointerPressed="DragWin"
-                            ToolTip.Tip="{Binding CurrentBeatmaps, Converter={StaticResource MapPathStringAddNewLinesConverter}}"
+                            ToolTip.Tip="{Binding UserSettings.CurrentBeatmaps, Converter={StaticResource MapArrayJoinNewLinesConverter}}"
                             VerticalAlignment="Center"
                             Margin="10 0"
                             CornerRadius="2"
@@ -267,14 +266,14 @@
                                     TextWrapping="NoWrap"
                                     TextTrimming="None"
                                     FontWeight="Normal"
-                                    Text="{Binding CurrentBeatmaps, Converter={StaticResource MapPathStringJustFilenameConverter}, Mode=OneWay}" />
+                                    Text="{Binding UserSettings.CurrentBeatmaps, Converter={StaticResource MapArrayToFilenameConverter}, Mode=OneWay}" />
                                 <TextBlock
                                     Grid.Column="1"
                                     Margin="2 0 0 0"
                                     Padding="0 0 4 0"
                                     FontStyle="Italic"
                                     FontWeight="ExtraBold"
-                                    Text="{Binding CurrentBeatmaps, Converter={StaticResource MapPathStringToCountStringConverter}, Mode=OneWay}" />
+                                    Text="{Binding UserSettings.CurrentBeatmaps, Converter={StaticResource MapArrayToCountStringConverter}, Mode=OneWay}" />
                             </Grid>
                         </controls:ColorZone>
                     </DockPanel>

@@ -11,40 +11,67 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml.MarkupExtensions;
-using Mapping_Tools.Application;
 using Mapping_Tools.Application.Types;
 using Mapping_Tools.Desktop.Helpers;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Types;
 using Material.Icons;
 using Material.Icons.Avalonia;
 using ReactiveUI;
+using ReactiveUI.SourceGenerators;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase {
-    private readonly NavigationService navigationService;
-    private ViewModelBase? currentViewModel;
+public partial class MainWindowViewModel : ViewModelBase {
+    private readonly NavigationService _navigationService;
+    private readonly UserSettingsService _userSettingsService;
 
-    public ViewModelBase? CurrentViewModel {
-        get => currentViewModel;
-        set
-        {
-            // Capture local variable to prevent currentViewModel from changing before DisposeCurrentAsync is called
-            var previousViewModel = currentViewModel;
-            Task.Run(() => navigationService.DisposeCurrentAsync(previousViewModel));
-            
-            this.RaiseAndSetIfChanged(ref currentViewModel, value);
-        }
-    }
+    private List<NavigationItem> _defaultItems = null!;
+    private List<NavigationItem> _toolItems = null!;
+    private List<NavigationItem> _favoriteItems = null!;
     
-    private bool isBusy;
+    private readonly ObservableCollection<NavigationItem> _allNavigationItems = [];
 
-    public bool IsBusy
-    {
-        get => isBusy;
-        private set => this.RaiseAndSetIfChanged(ref isBusy, value);
-    }
+    public ObservableCollection<NavigationItem> NavigationItems { get; } = [];
+    
+    [Reactive]
+    private ViewModelBase? _currentViewModel;
+    
+    [Reactive]
+    private bool _isBusy;
+
+    [Reactive]
+    private string _header = "Mapping Tools";
+
+    [Reactive]
+    private bool _drawerOpen = true;
+
+    [Reactive]
+    private bool _searchFocused = true;
+
+    [Reactive]
+    private int _selectedPageIndex;
+
+    [Reactive]
+    private NavigationItem? _selectedPageItem;
+
+    [Reactive]
+    private string _searchKeyword = string.Empty;
+
+    [Reactive]
+    private ScrollBarVisibility _horizontalContentScrollBarVisibility;
+
+    [Reactive]
+    private ScrollBarVisibility _verticalContentScrollBarVisibility;
+
+    [Reactive]
+    private bool _projectMenuVisibility;
+
+    [Reactive]
+    private ObservableCollection<MenuItem> _projectMenuItems = [];
+    
+    public UserSettings UserSettings => _userSettingsService.Settings;
 
     public ReactiveCommand<Unit, Unit>? GoToSelectedPage { get; }
     public ReactiveCommand<Unit, Unit>? SelectedPageUp { get; }
@@ -52,25 +79,40 @@ public class MainWindowViewModel : ViewModelBase {
     public ReactiveCommand<Unit, Unit>? ClearSearchBox { get; }
     public ReactiveCommand<Unit, Unit>? OpenNavigationDrawer { get; }
     
-    public MainWindowViewModel() : this(null!, null!) { }
+    public MainWindowViewModel() : this(null!, null!, null!) { }
 
-    public MainWindowViewModel(NavigationService navigationService, IAppLifecycle appLifecycle) {
-        this.navigationService = navigationService;
-        this.navigationService.OnNavigate += vm => {
-            CurrentViewModel = vm;
-            ViewChanged();
+    public MainWindowViewModel(NavigationService navigationService, IAppLifecycle appLifecycle, UserSettingsService userSettingsService) {
+        _navigationService = navigationService;
+        _userSettingsService = userSettingsService;
+        
+        // Subscribe to navigation events and change the current view model accordingly
+        _navigationService.OnNavigate += vm => CurrentViewModel = vm;
+
+        PropertyChanging += (_, e) =>
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(CurrentViewModel):
+                    Task.Run(() => navigationService.DisposeCurrentAsync(_currentViewModel));
+                    break;
+            }
+        };
+
+        PropertyChanged += (_, e) =>
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(CurrentViewModel):
+                    ViewChanged();
+                    break;
+                case nameof(SearchKeyword):
+                    ApplyFilter();
+                    break;
+            }
         };
         
-        // Ensure current view model is disposed on app exit
-        appLifecycle.UICleanup.Register(() => navigationService.DisposeCurrentAsync(CurrentViewModel).GetAwaiter().GetResult());
-
-        // Generate Standard view model to show on startup
-        Task.Run(() => this.navigationService.NavigateAsync<HomeViewModel>());
-
-        projectMenuItems = [];
-
         GoToSelectedPage = ReactiveCommand.Create(() => {
-            var item = NavigationItems.Count == 1 ? NavigationItems[0] : selectedPageItem;
+            var item = NavigationItems.Count == 1 ? NavigationItems[0] : _selectedPageItem;
             if (item == null) return;
             item.ClickCommand?.Execute(null);
             SearchKeyword = string.Empty;
@@ -114,102 +156,26 @@ public class MainWindowViewModel : ViewModelBase {
 
         GenerateNavigationItems();
         UpdateNavigationItems();
+        
+        // Ensure current view model is disposed on app exit
+        appLifecycle.UICleanup.Register(() => navigationService.DisposeCurrentAsync(CurrentViewModel).GetAwaiter().GetResult());
 
-        DrawerOpen = true;
-        SearchFocused = true;
+        // Generate Standard view model to show on startup
+        Task.Run(() => _navigationService.NavigateAsync<HomeViewModel>());
+    }
+    
+    public void SetCurrentBeatmaps(string[] paths) {
+        _userSettingsService.SetCurrentBeatmaps(paths);
     }
     
     private void NavigateTo(string name) {
         IsBusy = true;
-        Task.Run(() => navigationService.NavigateAsync(name));
+        Task.Run(() => _navigationService.NavigateAsync(name));
         IsBusy = false;
-    }
-    
-    private readonly ObservableCollection<NavigationItem> allNavigationItems = [];
-
-    public ObservableCollection<NavigationItem> NavigationItems { get; } = [];
-
-    private List<NavigationItem> defaultItems = null!;
-    private List<NavigationItem> toolItems = null!;
-    private List<NavigationItem> favoriteItems = null!;
-
-    private string header = "Mapping Tools";
-    public string Header {
-        get => header;
-        set => this.RaiseAndSetIfChanged(ref header, value);
-    }
-
-    private bool drawerOpen;
-    public bool DrawerOpen {
-        get => drawerOpen;
-        set => this.RaiseAndSetIfChanged(ref drawerOpen, value);
-    }
-
-    private bool searchFocused;
-    public bool SearchFocused {
-        get => searchFocused;
-        set => this.RaiseAndSetIfChanged(ref searchFocused, value);
-    }
-
-    private int selectedPageIndex;
-    public int SelectedPageIndex {
-        get => selectedPageIndex;
-        set => this.RaiseAndSetIfChanged(ref selectedPageIndex, value);
-    }
-
-    private NavigationItem? selectedPageItem;
-    public NavigationItem? SelectedPageItem {
-        get => selectedPageItem;
-        set => this.RaiseAndSetIfChanged(ref selectedPageItem, value);
-    }
-
-    private string searchKeyword = string.Empty;
-    public string SearchKeyword {
-        get => searchKeyword;
-        set {
-            if (searchKeyword == value) {
-                return;
-            }
-
-            this.RaisePropertyChanging();
-            searchKeyword = value;
-            this.RaisePropertyChanged();
-            ApplyFilter();
-        }
-    }
-
-    private ScrollBarVisibility horizontalScrollBarVisibility;
-    public ScrollBarVisibility HorizontalContentScrollBarVisibility {
-        get => horizontalScrollBarVisibility;
-        set => this.RaiseAndSetIfChanged(ref horizontalScrollBarVisibility, value);
-    }
-
-    private ScrollBarVisibility verticalScrollBarVisibility;
-    public ScrollBarVisibility VerticalContentScrollBarVisibility {
-        get => verticalScrollBarVisibility;
-        set => this.RaiseAndSetIfChanged(ref verticalScrollBarVisibility, value);
-    }
-
-    private bool projectMenuVisibility;
-    public bool ProjectMenuVisibility {
-        get => projectMenuVisibility;
-        set => this.RaiseAndSetIfChanged(ref projectMenuVisibility, value);
-    }
-
-    private ObservableCollection<MenuItem> projectMenuItems;
-    public ObservableCollection<MenuItem> ProjectMenuItems {
-        get => projectMenuItems;
-        set => this.RaiseAndSetIfChanged(ref projectMenuItems, value);
-    }
-
-    private string currentBeatmaps = string.Empty;
-    public string CurrentBeatmaps {
-        get => currentBeatmaps;
-        set => this.RaiseAndSetIfChanged(ref currentBeatmaps, value);
     }
 
     private void GenerateDefaultItems() {
-        defaultItems = [
+        _defaultItems = [
             CreateNavigationItem(typeof(HomeViewModel)),
             CreateNavigationItem(typeof(SettingsViewModel)),
         ];
@@ -221,7 +187,7 @@ public class MainWindowViewModel : ViewModelBase {
         //                 !SettingsManager.Settings.FavoriteTools.Contains(ViewCollection.GetName(o)))
         //     .OrderBy(ViewCollection.GetName);
         // toolItems = tools.Select(o => (Control)CreateNavigationItem(o, 2)).ToList();
-        toolItems = [];
+        _toolItems = [];
     }
 
     private void GenerateFavoriteToolItems() {
@@ -230,7 +196,7 @@ public class MainWindowViewModel : ViewModelBase {
                         // SettingsManager.Settings.FavoriteTools.Contains(ViewCollection.GetName(o)))
             // .OrderBy(ViewCollection.GetName);
         // favoriteItems = tools.Select(o => (Control)CreateNavigationItem(o, 2)).ToList();
-        favoriteItems = [];
+        _favoriteItems = [];
     }
 
     private void GenerateNavigationItems() {
@@ -240,17 +206,17 @@ public class MainWindowViewModel : ViewModelBase {
     }
 
     private void UpdateNavigationItems() {
-        var items = defaultItems.Concat([new SeparatorItem()]);
+        var items = _defaultItems.Concat([new SeparatorItem()]);
 
-        if (favoriteItems.Count > 0) {
-            items = items.Concat(favoriteItems).Concat([new SeparatorItem()]);
+        if (_favoriteItems.Count > 0) {
+            items = items.Concat(_favoriteItems).Concat([new SeparatorItem()]);
         }
 
-        items = items.Concat(toolItems);
+        items = items.Concat(_toolItems);
 
-        allNavigationItems.Clear();
+        _allNavigationItems.Clear();
         foreach (var item in items)
-            allNavigationItems.Add(item);
+            _allNavigationItems.Add(item);
         ApplyFilter();
     }
 
@@ -258,7 +224,7 @@ public class MainWindowViewModel : ViewModelBase {
     {
         NavigationItems.Clear();
 
-        foreach (var item in allNavigationItems.Where(SearchItemsFilter))
+        foreach (var item in _allNavigationItems.Where(SearchItemsFilter))
             NavigationItems.Add(item);
 
         SelectedPageIndex = 0;
@@ -323,13 +289,13 @@ public class MainWindowViewModel : ViewModelBase {
     private void ViewChanged() {
         //DrawerOpen = false;
 
-        if (currentViewModel == null)
+        if (_currentViewModel == null)
             return;
 
         ProjectMenuVisibility = false;
         ProjectMenuItems.Clear();
 
-        var isSavable = NavigationService.TryGetModelType(currentViewModel, out _);
+        var isSavable = NavigationService.TryGetModelType(_currentViewModel, out _);
         if (isSavable) {
             ProjectMenuVisibility = true;
 
@@ -338,7 +304,7 @@ public class MainWindowViewModel : ViewModelBase {
             AddProjectMenuItem(GetNewProjectMenuItem());
         }
 
-        if (currentViewModel is IHaveExtraProjectMenuItems havingExtraProjectMenuItems) {
+        if (_currentViewModel is IHaveExtraProjectMenuItems havingExtraProjectMenuItems) {
             ProjectMenuVisibility = true;
 
             foreach (var menuItem in havingExtraProjectMenuItems.GetMenuItems()) {
@@ -346,8 +312,8 @@ public class MainWindowViewModel : ViewModelBase {
             }
         }
 
-        var type = currentViewModel.GetType();
-        Header = type.GetCustomAttribute<DontShowTitleAttribute>() == null ? $"Mapping Tools - {navigationService.GetName(type)}" : "Mapping Tools";
+        var type = _currentViewModel.GetType();
+        Header = type.GetCustomAttribute<DontShowTitleAttribute>() == null ? $"Mapping Tools - {_navigationService.GetName(type)}" : "Mapping Tools";
 
         VerticalContentScrollBarVisibility = type.GetCustomAttribute<VerticalContentScrollAttribute>() != null ?
             ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled;

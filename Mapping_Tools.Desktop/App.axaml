@@ -64,8 +64,8 @@
     </Application.Styles>
 
     <Application.Resources>
-        <helpers:MapPathStringToCountStringConverter x:Key="MapPathStringToCountStringConverter" />
-        <helpers:MapPathStringAddNewLinesConverter  x:Key="MapPathStringAddNewLinesConverter" />
-        <helpers:MapPathStringJustFilenameConverter x:Key="MapPathStringJustFilenameConverter" />
+        <helpers:MapArrayToCountStringConverter x:Key="MapArrayToCountStringConverter" />
+        <helpers:MapArrayJoinNewLinesConverter  x:Key="MapArrayJoinNewLinesConverter" />
+        <helpers:MapArrayToFilenameConverter x:Key="MapArrayToFilenameConverter" />
     </Application.Resources>
 </Application>

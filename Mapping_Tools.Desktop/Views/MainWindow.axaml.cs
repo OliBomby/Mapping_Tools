@@ -1,44 +1,30 @@
 using System;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mapping_Tools.Desktop.ViewModels;
 using Material.Icons;
 using Material.Icons.Avalonia;
-using Material.Styles.Controls;
-using Material.Styles.Models;
 using ReactiveUI;
 
 namespace Mapping_Tools.Desktop.Views;
 
-public partial class MainWindow : Window {
-    private MainWindowViewModel ViewModel => (MainWindowViewModel) DataContext;
-
-    public delegate void CurrentBeatmapUpdateHandler(object sender, string currentBeatmaps);
-
-    public event CurrentBeatmapUpdateHandler OnUpdateCurrentBeatmap;
-
-    public void UpdateCurrentBeatmap(string currentBeatmaps) {
-        // Make sure someone is listening to event
-        if (OnUpdateCurrentBeatmap == null) return;
-        OnUpdateCurrentBeatmap(this, currentBeatmaps);
-    }
-
-    public MainWindow() {
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
         InitializeComponent();
 
-        PropertyChanged += (_, e) => {
-            if (e.Property == WindowStateProperty) {
+        PropertyChanged += (_, e) =>
+        {
+            if (e.Property == WindowStateProperty)
+            {
                 Window_StateChanged();
             }
         };
@@ -46,62 +32,47 @@ public partial class MainWindow : Window {
         AddHandler(DragDrop.DragEnterEvent, MainWindow_DragEnter);
         AddHandler(DragDrop.DropEvent, MainWindow_Drop);
 
-        this.GetObservable(DataContextProperty).Subscribe(dc => {
-            if (dc is MainWindowViewModel vm)
-                vm.WhenAnyValue(x => x.IsBusy).Subscribe(busy =>
-                    Cursor = busy ? new Cursor(StandardCursorType.Wait) : null); // null = inherit/default
-        });
+        // Handle window position restoration
+        this.GetObservable(DataContextProperty).Subscribe(dc =>
+        {
+            if (dc is not MainWindowViewModel vm)
+                return;
 
-        // if (SettingsManager.Settings.MainWindowRestoreBounds.HasValue) {
-        // SetToRect(SettingsManager.Settings.MainWindowRestoreBounds.Value);
-        // }
+            vm.WhenAnyValue(x => x.IsBusy).Subscribe(busy =>
+                Cursor = busy ? new Cursor(StandardCursorType.Wait) : null); // null = inherit/default
+            
+            if (vm.UserSettings.MainWindowRestoreBounds is not null)
+                SetPositionRect(vm.UserSettings.MainWindowRestoreBounds);
+        });
 
         // SetFullscreen(SettingsManager.Settings.MainWindowMaximized);
 
         // SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
     }
 
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        base.OnClosing(e);
+        
+        if (DataContext is MainWindowViewModel vm) 
+            vm.UserSettings.MainWindowRestoreBounds = GetPositionRect();
+    }
+
     //Close window
-    private void CloseWin(object sender, RoutedEventArgs e) {
+    private void CloseWin(object sender, RoutedEventArgs e)
+    {
         Close();
     }
 
     //Close window without saving
-    private void CloseWinNoSave(object sender, RoutedEventArgs e) {
+    private void CloseWinNoSave(object sender, RoutedEventArgs e)
+    {
         // autoSave = false;
         Close();
     }
 
-    public void SetCurrentMaps(string[] paths) {
-        string strPaths = string.Join("|", paths);
-        ViewModel.CurrentBeatmaps = strPaths;
-        UpdateCurrentBeatmap(strPaths);
-        // SettingsManager.AddRecentMap(paths, DateTime.Now);
-    }
-
-    public void SetCurrentMapsString(string paths) {
-        ViewModel.CurrentBeatmaps = paths;
-        UpdateCurrentBeatmap(paths);
-        // SettingsManager.AddRecentMap(paths.Split('|'), DateTime.Now);
-    }
-
-    public string[] GetCurrentMaps() {
-        var maps = ViewModel.CurrentBeatmaps.Split('|');
-
-        if (maps.Any(o => !File.Exists(o))) {
-            var model = new SnackbarModel("It seems like one of the selected beatmaps does not exist. Please re-select the file with 'File > Open beatmap'.",
-                TimeSpan.FromSeconds(10));
-            SnackbarHost.Post(model, "MainSnackbar", DispatcherPriority.Normal);
-        }
-
-        return maps;
-    }
-
-    public string GetCurrentMapsString() {
-        return string.Join("|", GetCurrentMaps());
-    }
-
-    private void OpenBeatmap(object sender, RoutedEventArgs e) {
+    private void OpenBeatmap(object sender, RoutedEventArgs e)
+    {
         // try {
         //     string[] paths = IOHelper.BeatmapFileDialog(true);
         //     if( paths.Length != 0 ) {
@@ -113,7 +84,8 @@ public partial class MainWindow : Window {
         // }
     }
 
-    private async void OpenGetCurrentBeatmap(object sender, RoutedEventArgs e) {
+    private async void OpenGetCurrentBeatmap(object sender, RoutedEventArgs e)
+    {
         // try {
         //     string path = await Task.Run(() => IOHelper.GetCurrentBeatmap());
         //     if (path != "") {
@@ -124,7 +96,8 @@ public partial class MainWindow : Window {
         // }
     }
 
-    private async void SaveBackup(object sender, RoutedEventArgs e) {
+    private async void SaveBackup(object sender, RoutedEventArgs e)
+    {
         // try {
         //     var paths = GetCurrentMaps();
         //     var result = await Task.Run(() => BackupManager.SaveMapBackup(paths, true, "UB"));  // UB stands for User Backup
@@ -136,7 +109,8 @@ public partial class MainWindow : Window {
         // }
     }
 
-    private async void LoadBackup(object sender, RoutedEventArgs e) {
+    private async void LoadBackup(object sender, RoutedEventArgs e)
+    {
         // try {
         //     var paths = GetCurrentMaps();
         //     if (paths.Length > 1) {
@@ -168,7 +142,8 @@ public partial class MainWindow : Window {
     }
 
     //Open backup folder in file explorer
-    private void OpenBackups(object sender, RoutedEventArgs e) {
+    private void OpenBackups(object sender, RoutedEventArgs e)
+    {
         // try {
         //     System.Diagnostics.Process.Start("explorer.exe", SettingsManager.GetBackupsPath());
         // }
@@ -177,7 +152,8 @@ public partial class MainWindow : Window {
         // }
     }
 
-    private void OpenConfig(object sender, RoutedEventArgs e) {
+    private void OpenConfig(object sender, RoutedEventArgs e)
+    {
         // try {
         //     System.Diagnostics.Process.Start("explorer.exe", AppDataPath);
         // }
@@ -186,11 +162,13 @@ public partial class MainWindow : Window {
         // }
     }
 
-    private void OpenWebsite(object sender, RoutedEventArgs e) {
+    private void OpenWebsite(object sender, RoutedEventArgs e)
+    {
         Launcher.LaunchUriAsync(new Uri("https://mappingtools.github.io")).GetAwaiter().GetResult();
     }
 
-    private async void CoolSave(object sender, RoutedEventArgs e) {
+    private async void CoolSave(object sender, RoutedEventArgs e)
+    {
         // try {
         //     await Task.Run(() => EditorReaderStuff.BetterSave());
         // } catch (Exception ex) {
@@ -199,17 +177,20 @@ public partial class MainWindow : Window {
     }
 
     //Open project in browser
-    private void OpenGitHub(object sender, RoutedEventArgs e) {
+    private void OpenGitHub(object sender, RoutedEventArgs e)
+    {
         Launcher.LaunchUriAsync(new Uri("https://github.com/OliBomby/Mapping_Tools")).GetAwaiter().GetResult();
     }
 
     //Open project in browser
-    private void OpenDonate(object sender, RoutedEventArgs e) {
+    private void OpenDonate(object sender, RoutedEventArgs e)
+    {
         Launcher.LaunchUriAsync(new Uri("https://ko-fi.com/olibomby")).GetAwaiter().GetResult();
     }
 
     //Open info screen
-    private void OpenInfo(object sender, RoutedEventArgs e) {
+    private void OpenInfo(object sender, RoutedEventArgs e)
+    {
         var version = Assembly.GetEntryAssembly()?.GetName().Version;
         var builder = new StringBuilder();
         builder.AppendLine($"Mapping Tools {version}");
@@ -239,9 +220,10 @@ public partial class MainWindow : Window {
         MessageBox.Show(this, builder.ToString(), "Info");
     }
 
-    //Change top right icons on changed window state and set state variable
-    private void Window_StateChanged() {
-        switch (WindowState) {
+    private void Window_StateChanged()
+    {
+        switch (WindowState)
+        {
             case WindowState.Maximized:
                 SetFullscreen(true, false);
                 break;
@@ -255,82 +237,85 @@ public partial class MainWindow : Window {
         }
     }
 
-    //Clickevent for top right maximize/minimize button
-    private void ToggleWin(object sender, RoutedEventArgs e) {
+    private void ToggleWin(object sender, RoutedEventArgs e)
+    {
         SetFullscreen(WindowState != WindowState.Maximized);
     }
 
-    private void SetFullscreen(bool fullscreen, bool actuallyChangeFullscreen = true) {
-        if (fullscreen) {
-            if (actuallyChangeFullscreen) {
+    private void SetFullscreen(bool fullscreen, bool actuallyChangeFullscreen = true)
+    {
+        if (fullscreen)
+        {
+            if (actuallyChangeFullscreen)
+            {
                 WindowState = WindowState.Maximized;
             }
 
             ToggleButton.Content = new MaterialIcon { Kind = MaterialIconKind.WindowRestore };
-        } else {
-            if (actuallyChangeFullscreen) {
+        } else
+        {
+            if (actuallyChangeFullscreen)
+            {
                 WindowState = WindowState.Normal;
             }
 
             ToggleButton.Content = new MaterialIcon { Kind = MaterialIconKind.WindowMaximize };
         }
-
-        EnsureOnScreen();
     }
 
-    private void SetToRect(PixelRect rect) {
+    private void SetPositionRect(int[] rect)
+    {
         if (Screens.ScreenCount == 0)
             return;
 
         var screenBounds = Screens.All.Aggregate(Screens.Primary!.Bounds, (current, screen) => current.Union(screen.Bounds));
 
         Position = new PixelPoint(
-            Math.Clamp(rect.X, screenBounds.X, screenBounds.Right - 300),
-            Math.Clamp(rect.Y, screenBounds.Y, screenBounds.Bottom - 100)
+            Math.Clamp(rect[0], screenBounds.X, screenBounds.Right - 300),
+            Math.Clamp(rect[1], screenBounds.Y, screenBounds.Bottom - 100)
         );
-        Width = Math.Max(rect.Width, 300);
-        Height = Math.Max(rect.Height, 100);
+        Width = Math.Max(rect[2], 300);
+        Height = Math.Max(rect[3], 100);
+    }
+    
+    private int[] GetPositionRect()
+    {
+        return [Position.X, Position.Y, (int)Width, (int)Height];
     }
 
-    private void EnsureOnScreen() {
-        SetToRect(new PixelRect(Position.X, Position.Y, (int) Width, (int) Height));
-    }
-
-    //Minimize window on click
-    private void MinimizeWin(object sender, RoutedEventArgs e) {
+    private void MinimizeWin(object sender, RoutedEventArgs e)
+    {
         WindowState = WindowState.Minimized;
     }
 
-    //Enable drag control of window and set icons when docked
-    private void DragWin(object sender, PointerPressedEventArgs e) {
+    private void DragWin(object sender, PointerPressedEventArgs e)
+    {
         if (!e.Properties.IsLeftButtonPressed)
             return;
 
-        if (WindowState == WindowState.Maximized) {
+        if (WindowState == WindowState.Maximized)
             SetFullscreen(false);
-        }
 
         BeginMoveDrag(e);
 
         e.Handled = true;
     }
 
-    private void CheckForUpdates(object sender, RoutedEventArgs e) {
-        // await Update(false, true);
-    }
-
-    private void MainWindow_DragEnter(object? sender, DragEventArgs e) {
+    private void MainWindow_DragEnter(object? sender, DragEventArgs e)
+    {
         // Check if the dragged data is a file
         e.DragEffects = e.DataTransfer.Formats.Any(o => o.Equals(DataFormat.File)) ? DragDropEffects.Copy : DragDropEffects.None;
     }
 
-    private void MainWindow_Drop(object? sender, DragEventArgs e) {
+    private void MainWindow_Drop(object? sender, DragEventArgs e)
+    {
         // Get the array of file paths
         if (e.DataTransfer.Items[0].TryGetRaw(DataFormat.File) is string[] { Length: > 0 } files)
-            SetCurrentMaps(files);
+            (DataContext as MainWindowViewModel)?.SetCurrentBeatmaps(files);
     }
 
-    private void ToolsMenu_OnPointerReleased(object? sender, PointerReleasedEventArgs e) {
+    private void ToolsMenu_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
         // Find the ListBoxItem that was actually clicked
         var source = e.Source as Control;
         var container = source?.FindAncestorOfType<ListBoxItem>();
@@ -341,5 +326,10 @@ public partial class MainWindow : Window {
             cmd.Execute(null);
             e.Handled = true;
         }
+    }
+
+    private void CheckForUpdates(object? sender, RoutedEventArgs e)
+    {
+        throw new NotImplementedException();
     }
 }

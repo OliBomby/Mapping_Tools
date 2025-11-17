@@ -30,9 +30,10 @@ public static class ServiceCollectionExtensions {
 
         s.AddHostedService<UpdateChecker>();
 
+        s.AddSingleton<UserSettingsService>();
         s.AddSingleton<NavigationService>();
-        s.AddSingleton<MainWindowViewModel>();
         
+        s.AddSingleton<MainWindowViewModel>();
         s.AddTransient<HomeViewModel>();
         s.AddTransient<SettingsViewModel>();
 

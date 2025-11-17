@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Avalonia;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
@@ -8,13 +7,16 @@ namespace Mapping_Tools.Desktop.Models;
 
 public partial class UserSettings : ReactiveObject {
     [Reactive]
+    private string[] _currentBeatmaps;
+    
+    [Reactive]
     private List<string[]> _recentMaps;
 
     [Reactive]
     private List<string> _favoriteTools;
 
     [Reactive]
-    private Rect? _mainWindowRestoreBounds;
+    private int[]? _mainWindowRestoreBounds;
 
     [Reactive]
     private bool _mainWindowMaximized;
@@ -86,6 +88,7 @@ public partial class UserSettings : ReactiveObject {
     /// Makes a new Settings objects and initializes default settings.
     /// </summary>
     public UserSettings() {
+        _currentBeatmaps = [];
         _recentMaps = [];
         _favoriteTools = [];
         _mainWindowRestoreBounds = null;

@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using Avalonia.Data.Converters;
 
 namespace Mapping_Tools.Desktop.Helpers;
 
-internal class MapPathStringJustFilenameConverter : IValueConverter {
+internal class MapArrayJoinNewLinesConverter : IValueConverter {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) {
-        return value is not string str ? string.Empty : string.Join(" | ", str.Split('|').Select(Path.GetFileName));
+        if (value is not string[] pathArray) return string.Empty;
+        return string.Join('\n', pathArray);
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) {
-        throw new InvalidOperationException("MapPathStringJustFilenameConverter can not convert back values.");
+        if (value is not string str) return Array.Empty<string>();
+        return str.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries);
     }
 }
