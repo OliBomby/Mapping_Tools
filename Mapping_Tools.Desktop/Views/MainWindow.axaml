@@ -8,7 +8,7 @@
         xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:helpers="clr-namespace:Mapping_Tools.Desktop.Helpers"
-        xmlns:desktop="clr-namespace:Mapping_Tools.Desktop"
+        xmlns:customControls="clr-namespace:Mapping_Tools.Desktop.CustomControls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Mapping_Tools.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -98,7 +98,7 @@
 
                             <Menu
                                 Foreground="{DynamicResource PrimaryHueMidForegroundBrush}">
-                                <helpers:ShadowMenuItem Header="_File" MinWidth="50" Height="35">
+                                <customControls:ShadowMenuItem Header="_File" MinWidth="50" Height="35">
                                     <MenuItem Header="_Open beatmap" Click="OpenBeatmap"
                                               Foreground="{DynamicResource MaterialDesignBody}"
                                               ToolTip.Tip="Select the current beatmap with File Explorer.">
@@ -134,9 +134,9 @@
                                             <material:MaterialIcon Kind="ContentSave" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                </helpers:ShadowMenuItem>
+                                </customControls:ShadowMenuItem>
                                 <Separator />
-                                <helpers:ShadowMenuItem Header="_About" MinWidth="67" Height="35">
+                                <customControls:ShadowMenuItem Header="_About" MinWidth="67" Height="35">
                                     <MenuItem Header="_Open Mapping Tools folder" Click="OpenConfig"
                                               Foreground="{DynamicResource MaterialDesignBody}"
                                               ToolTip.Tip="Open the Mapping Tools folder.">
@@ -185,8 +185,8 @@
                                             <material:MaterialIcon Kind="InfoCircle" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                </helpers:ShadowMenuItem>
-                                <helpers:ShadowMenuItem IsVisible="{Binding ProjectMenuVisibility}"
+                                </customControls:ShadowMenuItem>
+                                <customControls:ShadowMenuItem IsVisible="{Binding ProjectMenuVisibility}"
                                                         Header="_Project" Height="35" MinWidth="67"
                                                         ItemsSource="{Binding ProjectMenuItems}" />
                             </Menu>
@@ -347,7 +347,7 @@
                                 <ListBox.ItemContainerTheme>
                                     <ControlTheme TargetType="ListBoxItem"
                                                   BasedOn="{StaticResource MaterialListBoxItem}"
-                                                  x:DataType="helpers:NavigationItem">
+                                                  x:DataType="vm:NavigationItem">
                                         <!-- Use the VM to decide if it can be clicked / focused -->
                                         <Setter Property="IsHitTestVisible" Value="{Binding IsSelectable}" />
                                         <Setter Property="Focusable" Value="{Binding IsSelectable}" />
@@ -361,13 +361,13 @@
                                     </ControlTheme>
                                 </ListBox.ItemContainerTheme>
                                 <ListBox.DataTemplates>
-                                    <DataTemplate DataType="helpers:NormalItem">
+                                    <DataTemplate DataType="vm:NormalItem">
                                         <TextBlock
                                             Text="{Binding Text}"
                                             Padding="0 7"
                                             Margin="{Binding Margin}" />
                                     </DataTemplate>
-                                    <DataTemplate DataType="helpers:SeparatorItem">
+                                    <DataTemplate DataType="vm:SeparatorItem">
                                         <Separator />
                                     </DataTemplate>
                                 </ListBox.DataTemplates>

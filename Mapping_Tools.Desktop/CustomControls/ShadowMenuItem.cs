@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 
-namespace Mapping_Tools.Desktop.Helpers;
+namespace Mapping_Tools.Desktop.CustomControls;
 
 
 public class ShadowMenuItem : MenuItem

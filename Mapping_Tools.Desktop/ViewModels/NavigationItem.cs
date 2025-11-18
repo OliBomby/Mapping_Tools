@@ -2,7 +2,7 @@
 using Avalonia;
 using Avalonia.Controls;
 
-namespace Mapping_Tools.Desktop.Helpers;
+namespace Mapping_Tools.Desktop.ViewModels;
 
 public abstract class NavigationItem {
     public virtual bool IsSelectable => true;

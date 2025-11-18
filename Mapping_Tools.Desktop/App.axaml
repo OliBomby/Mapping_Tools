@@ -9,6 +9,7 @@
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:viewModels="clr-namespace:Mapping_Tools.Desktop.ViewModels"
              xmlns:views="clr-namespace:Mapping_Tools.Desktop.Views"
+             xmlns:customControls="clr-namespace:Mapping_Tools.Desktop.CustomControls"
              x:Class="Mapping_Tools.Desktop.App">
 
     <Application.DataTemplates>
@@ -39,7 +40,7 @@
         </Style>
 
         <!-- Make text in top color bar white -->
-        <Style Selector="controls|ColorZone[Mode=PrimaryMid] helpers|ShadowMenuItem">
+        <Style Selector="controls|ColorZone[Mode=PrimaryMid] customControls|ShadowMenuItem">
             <Setter Property="Foreground" Value="White"/>
         </Style>
         <Style Selector="controls|ColorZone[Mode=PrimaryMid] material|MaterialIcon">
