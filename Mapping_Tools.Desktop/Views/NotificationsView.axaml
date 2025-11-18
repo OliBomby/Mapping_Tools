@@ -9,10 +9,6 @@
              x:Class="Mapping_Tools.Desktop.Views.NotificationsView"
              x:DataType="vm:NotificationsViewModel">
 
-    <Design.DataContext>
-        <vm:NotificationsViewModel/>
-    </Design.DataContext>
-
     <Grid Margin="8" RowDefinitions="Auto, *">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
             <TextBlock Text="Notifications" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" />

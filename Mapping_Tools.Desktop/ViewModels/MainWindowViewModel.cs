@@ -90,8 +90,6 @@ public partial class MainWindowViewModel : ViewModelBase {
     public ReactiveCommand<Unit, Unit>? OpenNavigationDrawer { get; }
     public ReactiveCommand<Unit, Unit>? OpenNotificationsDrawer { get; }
     
-    public MainWindowViewModel() : this(null!, null!, null!, null!, null!) { }
-
     public MainWindowViewModel(
         NavigationService navigationService,
         IAppLifecycle appLifecycle,

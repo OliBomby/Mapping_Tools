@@ -18,8 +18,6 @@ public class HomeViewModel(IStateStore store) : ViewModelBase, IHasModel<HomeMod
         get => _note;
         set => this.RaiseAndSetIfChanged(ref _note, value);
     }
-    
-    public HomeViewModel() : this(null!) { }
 
     public HomeModel GetModel() => new(Note, Counter);
 

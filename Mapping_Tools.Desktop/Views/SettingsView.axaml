@@ -7,10 +7,6 @@
              x:Class="Mapping_Tools.Desktop.Views.SettingsView"
              x:DataType="vm:SettingsViewModel">
 
-    <Design.DataContext>
-        <vm:SettingsViewModel/>
-    </Design.DataContext>
-
     <StackPanel>
         <TextBlock>Welcome to Settings!</TextBlock>
         <TextBox Text="{Binding Note, Mode=TwoWay}"></TextBox>

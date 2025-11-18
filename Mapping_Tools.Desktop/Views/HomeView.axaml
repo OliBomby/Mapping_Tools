@@ -7,10 +7,6 @@
              x:Class="Mapping_Tools.Desktop.Views.HomeView"
              x:DataType="vm:HomeViewModel">
 
-    <Design.DataContext>
-        <vm:HomeViewModel/>
-    </Design.DataContext>
-
     <StackPanel>
         <TextBlock>Welcome to Home!</TextBlock>
         <TextBox Text="{Binding Note, Mode=TwoWay}"></TextBox>

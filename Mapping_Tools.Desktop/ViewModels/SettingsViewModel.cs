@@ -20,8 +20,6 @@ public partial class SettingsViewModel(IStateStore store) : ViewModelBase, IHasM
         set => this.RaiseAndSetIfChanged(ref _note, value);
     }
 
-    public SettingsViewModel() : this(null!) { }
-
     public SettingsModel GetModel() => new(Note, Counter);
 
     public void SetModel(SettingsModel model)
