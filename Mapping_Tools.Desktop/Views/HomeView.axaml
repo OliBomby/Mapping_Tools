@@ -3,6 +3,8 @@
              xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:customControls="clr-namespace:Mapping_Tools.Desktop.CustomControls"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Mapping_Tools.Desktop.Views.HomeView"
              x:DataType="vm:HomeViewModel">
@@ -12,6 +14,18 @@
         <TextBox Text="{Binding Note, Mode=TwoWay}"></TextBox>
         <TextBox Text="{Binding Counter, Mode=TwoWay}"></TextBox>
         <TextBlock>test</TextBlock>
+        <controls:NavigationDrawer Width="800" Height="100" LeftDrawerOpened="True">
+            <controls:NavigationDrawer.LeftDrawerContent>
+                <TextBlock HorizontalAlignment="Center">left drawer</TextBlock>
+            </controls:NavigationDrawer.LeftDrawerContent>
+            <TextBlock HorizontalAlignment="Center">drawer content</TextBlock>
+        </controls:NavigationDrawer>
+        <customControls:RightScrimNavigationDrawer Width="800" Height="100" LeftDrawerOpened="True">
+            <customControls:RightScrimNavigationDrawer.LeftDrawerContent>
+                <TextBlock HorizontalAlignment="Center">left drawer</TextBlock>
+            </customControls:RightScrimNavigationDrawer.LeftDrawerContent>
+            <TextBlock HorizontalAlignment="Center">drawer content</TextBlock>
+        </customControls:RightScrimNavigationDrawer>
     </StackPanel>
 
 </UserControl>

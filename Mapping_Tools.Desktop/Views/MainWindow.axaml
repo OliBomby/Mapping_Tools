@@ -291,13 +291,13 @@
                     </DockPanel>
                 </controls:ColorZone>
 
-                <controls:NavigationDrawer
+                <customControls:RightScrimNavigationDrawer
                     Grid.Row="1"
                     LeftDrawerWidth="200"
                     LeftDrawerOpened="{Binding DrawerOpen, FallbackValue=True, Mode=TwoWay}"
                     RightDrawerWidth="320"
                     RightDrawerOpened="{Binding NotificationsDrawerOpen, Mode=TwoWay}">
-                    <controls:NavigationDrawer.LeftDrawerContent>
+                    <customControls:RightScrimNavigationDrawer.LeftDrawerContent>
                         <DockPanel MinWidth="200" MaxWidth="200">
                             <TextBox
                                 x:Name="ToolSearchBox"
@@ -366,13 +366,13 @@
                                 </ListBox.DataTemplates>
                             </ListBox>
                         </DockPanel>
-                    </controls:NavigationDrawer.LeftDrawerContent>
+                    </customControls:RightScrimNavigationDrawer.LeftDrawerContent>
 
-                    <controls:NavigationDrawer.RightDrawerContent>
+                    <customControls:RightScrimNavigationDrawer.RightDrawerContent>
                         <DockPanel Width="320" Background="{DynamicResource MaterialDesignPaper}">
                             <ContentControl Content="{Binding NotificationsViewModel}" Margin="8"/>
                         </DockPanel>
-                    </controls:NavigationDrawer.RightDrawerContent>
+                    </customControls:RightScrimNavigationDrawer.RightDrawerContent>
 
                     <Grid x:Name="MainContentGrid" PointerPressed="DragWin">
                         <Grid.RowDefinitions>
@@ -390,7 +390,7 @@
                             </ScrollViewer>
                         </controls:SnackbarHost>
                     </Grid>
-                </controls:NavigationDrawer>
+                </customControls:RightScrimNavigationDrawer>
             </Grid>
         </dialogHostAvalonia:DialogHost>
     </Grid>

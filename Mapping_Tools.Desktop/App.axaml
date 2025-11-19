@@ -13,10 +13,10 @@
              x:Class="Mapping_Tools.Desktop.App">
 
     <Application.DataTemplates>
-        <local:ViewLocator/>
-        
+        <local:ViewLocator />
+
         <DataTemplate DataType="viewModels:NotificationsViewModel">
-            <views:NotificationsView/>
+            <views:NotificationsView />
         </DataTemplate>
     </Application.DataTemplates>
 
@@ -41,10 +41,10 @@
 
         <!-- Make text in top color bar white -->
         <Style Selector="controls|ColorZone[Mode=PrimaryMid] customControls|ShadowMenuItem">
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Foreground" Value="White" />
         </Style>
         <Style Selector="controls|ColorZone[Mode=PrimaryMid] material|MaterialIcon">
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Foreground" Value="White" />
         </Style>
 
         <!-- Give shadows to context menus -->
@@ -54,25 +54,35 @@
 
         <!-- Match background color for left navigation bar, and add a new shadow -->
         <Style Selector="controls|NavigationDrawer /template/ Border#PART_LeftDrawerBorder">
-            <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}"/>
-            <Setter Property="assists:ShadowAssist.ShadowDepth" Value="CenterDepth1"/>
+            <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
+            <Setter Property="assists:ShadowAssist.ShadowDepth" Value="CenterDepth1" />
+        </Style>
+        <Style Selector="customControls|RightScrimNavigationDrawer /template/ Border#PART_LeftDrawerBorder">
+            <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
+            <Setter Property="assists:ShadowAssist.ShadowDepth" Value="CenterDepth1" />
         </Style>
 
         <!-- Prevent textbox outline from crossing the label text, and match old color -->
         <Style Selector="TextBox /template/ TextBlock#PART_LabelText">
             <Setter Property="Padding" Value="2" />
-            <Setter Property="Foreground" Value="#9A9A9A"/>
+            <Setter Property="Foreground" Value="#9A9A9A" />
             <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
         </Style>
 
         <Style Selector="Separator">
-            <Setter Property="Foreground" Value="#41ffffff"/>
+            <Setter Property="Foreground" Value="#41ffffff" />
         </Style>
     </Application.Styles>
 
     <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://Mapping_Tools.Desktop/CustomControls/RightScrimNavigationDrawer.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
         <helpers:MapArrayToCountStringConverter x:Key="MapArrayToCountStringConverter" />
-        <helpers:MapArrayJoinNewLinesConverter  x:Key="MapArrayJoinNewLinesConverter" />
+        <helpers:MapArrayJoinNewLinesConverter x:Key="MapArrayJoinNewLinesConverter" />
         <helpers:MapArrayToFilenameConverter x:Key="MapArrayToFilenameConverter" />
         <helpers:NotificationBellIconKindConverter x:Key="NotificationBellIconKindConverter" />
     </Application.Resources>
