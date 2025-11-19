@@ -84,6 +84,9 @@ public partial class UserSettings : ReactiveObject {
     [Reactive]
     private Version? _skipVersion;
 
+    [Reactive]
+    private bool _autoOpenNotifications;
+
     /// <summary>
     /// Makes a new Settings objects and initializes default settings.
     /// </summary>
@@ -111,6 +114,7 @@ public partial class UserSettings : ReactiveObject {
         _periodicBackupInterval = TimeSpan.FromMinutes(10);
         _currentBeatmapDefaultFolder = true;
         _skipVersion = null;
+        _autoOpenNotifications = true;
     }
 
     public void CopyTo(UserSettings other) {

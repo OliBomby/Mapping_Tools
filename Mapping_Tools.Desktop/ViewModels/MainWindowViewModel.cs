@@ -11,6 +11,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Threading;
 using Mapping_Tools.Application.Types;
 using Mapping_Tools.Desktop.Helpers;
 using Mapping_Tools.Desktop.Models;
@@ -104,10 +105,17 @@ public partial class MainWindowViewModel : ViewModelBase {
 
         // Wire notifications: mark unread when a new notification arrives and drawer is closed
         HasUnreadNotifications = _notificationService.GetNotifications().Any();
-        _notificationService.NotificationAdded += (_, _) => {
-            if (!NotificationsDrawerOpen) {
-                HasUnreadNotifications = true;
-            }
+        
+        _notificationService.NotificationAdded += (_, n) => {
+            // If auto-open is enabled in settings, open the notifications drawer.
+            // Otherwise mark as unread so the toggle button shows the badge.
+            Dispatcher.UIThread.Post(() => {
+                if (_userSettingsService.Settings.AutoOpenNotifications) {
+                    NotificationsDrawerOpen = true;
+                } else {
+                    if (!NotificationsDrawerOpen) HasUnreadNotifications = true;
+                }
+            });
         };
 
         // Subscribe to navigation events and change the current view model accordingly
@@ -122,9 +130,8 @@ public partial class MainWindowViewModel : ViewModelBase {
                     break;
                 case nameof(NotificationsDrawerOpen):
                     // When opening notifications drawer, mark notifications as read
-                    if (NotificationsDrawerOpen) {
-                        HasUnreadNotifications = false;
-                    }
+                    // Note: PropertyChanging runs before the value changes and thus reads the old value.
+                    // We'll clear the unread flag in PropertyChanged when the drawer is actually open.
                     break;
             }
         };
@@ -138,6 +145,12 @@ public partial class MainWindowViewModel : ViewModelBase {
                     break;
                 case nameof(SearchKeyword):
                     ApplyFilter();
+                    break;
+                case nameof(NotificationsDrawerOpen):
+                    // When the notifications drawer is opened, clear unread indicator
+                    if (NotificationsDrawerOpen) {
+                        HasUnreadNotifications = false;
+                    }
                     break;
             }
         };

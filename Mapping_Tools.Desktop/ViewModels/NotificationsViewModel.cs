@@ -3,11 +3,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Collections.Specialized;
+using Avalonia.Controls;
 using Avalonia.Threading;
 using Mapping_Tools.Application.Types;
 using ReactiveUI;
 using Material.Icons;
 using Avalonia.Media;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services;
 
 namespace Mapping_Tools.Desktop.ViewModels
 {
@@ -79,31 +82,37 @@ namespace Mapping_Tools.Desktop.ViewModels
     public class NotificationsViewModel : ReactiveObject
     {
         private readonly INotificationService _notificationService;
+        private readonly UserSettingsService _userSettingsService;
         private readonly DispatcherTimer _timer;
 
-        public ObservableCollection<NotificationItemViewModel> Notifications { get; } = new ObservableCollection<NotificationItemViewModel>();
+        public ObservableCollection<NotificationItemViewModel> Notifications { get; } = [];
+        
+        public UserSettings Settings => _userSettingsService.Settings;
 
         public ReactiveCommand<Unit, Unit> ClearAll { get; }
         public ReactiveCommand<Guid, Unit> Remove { get; }
 
-        public NotificationsViewModel(INotificationService notificationService)
+        public NotificationsViewModel(INotificationService notificationService, UserSettingsService userSettingsService)
         {
             _notificationService = notificationService;
+            _userSettingsService = userSettingsService;
 
-            // load existing notifications
+            // load existing notifications (newest first)
             foreach (var n in _notificationService.GetNotifications().OrderByDescending(o => o.CreatedAt))
                 Notifications.Add(new NotificationItemViewModel(n));
 
             Notifications.CollectionChanged += NotificationsOnCollectionChanged;
 
             _notificationService.NotificationAdded += (_, n) => {
-                // newest at top
-                Notifications.Insert(0, new NotificationItemViewModel(n));
+                // newest at top — ensure update on UI thread
+                Dispatcher.UIThread.Post(() => Notifications.Insert(0, new NotificationItemViewModel(n)));
             };
 
             _notificationService.NotificationRemoved += (_, n) => {
-                var item = Notifications.FirstOrDefault(o => o.Id == n.Id);
-                if (item != null) Notifications.Remove(item);
+                Dispatcher.UIThread.Post(() => {
+                    var item = Notifications.FirstOrDefault(o => o.Id == n.Id);
+                    if (item != null) Notifications.Remove(item);
+                });
             };
 
             ClearAll = ReactiveCommand.Create(() => _notificationService.ClearNotifications());

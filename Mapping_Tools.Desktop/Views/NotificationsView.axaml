@@ -15,6 +15,10 @@
             <Button Margin="8 0 0 0" Command="{Binding ClearAll}">
                 <avalonia:MaterialIcon Kind="DeleteSweep" />
             </Button>
+            <!-- Auto-open toggle: controls whether the drawer opens automatically for new notifications -->
+            <ToggleButton Margin="8 0 0 0" IsChecked="{Binding Settings.AutoOpenNotifications, Mode=TwoWay}" ToolTip.Tip="Auto-open notifications drawer for new notifications">
+                <avalonia:MaterialIcon Kind="Bell" />
+            </ToggleButton>
         </StackPanel>
 
         <Border Grid.Row="1" Margin="0 8 0 0" CornerRadius="4" Padding="8">

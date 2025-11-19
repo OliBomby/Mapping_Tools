@@ -14,6 +14,7 @@
         <TextBox Text="{Binding Note, Mode=TwoWay}"></TextBox>
         <TextBox Text="{Binding Counter, Mode=TwoWay}"></TextBox>
         <TextBlock>test</TextBlock>
+        <Button Content="Add notification" Command="{Binding AddTestNotification}" Margin="0 8 0 8" />
         <controls:NavigationDrawer Width="800" Height="100" LeftDrawerOpened="True">
             <controls:NavigationDrawer.LeftDrawerContent>
                 <TextBlock HorizontalAlignment="Center">left drawer</TextBlock>
