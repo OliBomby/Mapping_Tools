@@ -48,14 +48,14 @@
                     </Border>
                 </ControlTemplate>
             </Setter>
-        </Style>
 
-        <Style Selector="ToggleButton.icon-toggle:checked > material|MaterialIcon">
-            <Setter Property="Foreground" Value="White" />
-        </Style>
+            <Style Selector="^.navigation-drawer-toggle material|MaterialIcon">
+                <Setter Property="Kind" Value="MenuClose" />
+            </Style>
 
-        <Style Selector="ToggleButton.icon-toggle:unchecked > material|MaterialIcon">
-            <Setter Property="Foreground" Value="LightGray" />
+            <Style Selector="^.navigation-drawer-toggle:checked material|MaterialIcon">
+                <Setter Property="Kind" Value="MenuOpen" />
+            </Style>
         </Style>
 
     </Window.Styles>
@@ -81,12 +81,12 @@
                                 VerticalAlignment="Center"
                                 Height="35"
                                 Padding="8 4"
-                                Classes="icon-toggle"
+                                Classes="icon-toggle navigation-drawer-toggle"
                                 IsChecked="{Binding DrawerOpen, Mode=TwoWay}"
                                 assists:ShadowAssist.ShadowDepth="Depth0"
                                 ToolTip.Tip="Use Ctrl+K to use this toggle anywhere in the program.">
 
-                                <material:MaterialIcon Width="28" Height="28" Kind="Menu" />
+                                <material:MaterialIcon Width="28" Height="28" />
                             </ToggleButton>
 
                             <Menu
