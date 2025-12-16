@@ -304,7 +304,7 @@
                                 Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"
                                 DockPanel.Dock="Top"
                                 Margin="16 8 16 0"
-                                helpers:FocusExtension.IsFocused="{Binding SearchFocused}"
+                                helpers:FocusExtension.IsFocused="{Binding SearchFocused, Mode=TwoWay}"
                                 assists:TextFieldAssist.Label="Search"
                                 Classes="clearButton outline">
                                 <TextBox.KeyBindings>
