@@ -17,6 +17,7 @@ using Mapping_Tools.Desktop.Helpers;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Types;
+using Mapping_Tools.Desktop.Views;
 using Material.Icons;
 using Material.Icons.Avalonia;
 using ReactiveUI;
@@ -90,6 +91,8 @@ public partial class MainWindowViewModel : ViewModelBase {
     public ReactiveCommand<Unit, Unit>? ClearSearchBox { get; }
     public ReactiveCommand<Unit, Unit>? OpenNavigationDrawer { get; }
     public ReactiveCommand<Unit, Unit>? OpenNotificationsDrawer { get; }
+
+    public ReactiveCommand<Unit, Unit>? OpenInfoDialog { get; }
     
     public MainWindowViewModel(
         NavigationService navigationService,
@@ -205,6 +208,10 @@ public partial class MainWindowViewModel : ViewModelBase {
 
         OpenNotificationsDrawer = ReactiveCommand.Create(() => {
             NotificationsDrawerOpen = !NotificationsDrawerOpen;
+        });
+
+        OpenInfoDialog = ReactiveCommand.CreateFromTask(async () => {
+            await MessageBox.ShowOnMain("test message\nyeah\nyeah\nyeah\nyeah\nyeah\nyeah\nyeah\nyeah\nyeah\nyeah\n", "Mapping Tools Info");
         });
 
         GenerateNavigationItems();

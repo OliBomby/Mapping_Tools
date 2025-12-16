@@ -11,7 +11,6 @@
         xmlns:customControls="clr-namespace:Mapping_Tools.Desktop.CustomControls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Mapping_Tools.Desktop.Views.MainWindow"
-        x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="{Binding Header}"
         CanResize="True"
@@ -22,7 +21,8 @@
         SystemDecorations="BorderOnly"
         ExtendClientAreaToDecorationsHint="True"
         WindowStartupLocation="Manual"
-        ExtendClientAreaChromeHints="NoChrome">
+        ExtendClientAreaChromeHints="NoChrome"
+        d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=False}">
 
     <Window.KeyBindings>
         <KeyBinding Gesture="Ctrl+K" Command="{Binding OpenNavigationDrawer}" />
@@ -63,7 +63,7 @@
     <Grid x:Name="MasterGrid">
         <dialogHostAvalonia:DialogHost Identifier="RootDialog">
 
-            <Grid PointerPressed="DragWin">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -172,7 +172,7 @@
                                             <material:MaterialIcon Kind="Heart" />
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="_About" Click="OpenInfo"
+                                    <MenuItem Header="_About" Command="{Binding OpenInfoDialog}"
                                               Foreground="{DynamicResource MaterialDesignBody}">
                                         <MenuItem.Icon>
                                             <material:MaterialIcon Kind="InfoCircle" />
@@ -180,8 +180,8 @@
                                     </MenuItem>
                                 </customControls:ShadowMenuItem>
                                 <customControls:ShadowMenuItem IsVisible="{Binding ProjectMenuVisibility}"
-                                                        Header="_Project" Height="35" MinWidth="67"
-                                                        ItemsSource="{Binding ProjectMenuItems}" />
+                                                               Header="_Project" Height="35" MinWidth="67"
+                                                               ItemsSource="{Binding ProjectMenuItems}" />
                             </Menu>
                         </StackPanel>
 
@@ -200,7 +200,8 @@
                                 <Grid>
                                     <material:MaterialIcon Width="20" Height="20">
                                         <material:MaterialIcon.Kind>
-                                            <MultiBinding Converter="{StaticResource NotificationBellIconKindConverter}">
+                                            <MultiBinding
+                                                Converter="{StaticResource NotificationBellIconKindConverter}">
                                                 <Binding Path="NotificationsDrawerOpen" />
                                                 <Binding Path="HasUnreadNotifications" />
                                             </MultiBinding>
@@ -208,7 +209,7 @@
                                     </material:MaterialIcon>
                                 </Grid>
                             </ToggleButton>
-                            
+
                             <Button Classes="Flat"
                                     Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
                                     Click="MinimizeWin">
@@ -233,61 +234,62 @@
                             </Button>
                         </StackPanel>
 
-                        <controls:ColorZone
-                            PointerPressed="DragWin"
-                            ToolTip.Tip="{Binding UserSettings.CurrentBeatmaps, Converter={StaticResource MapArrayJoinNewLinesConverter}}"
-                            VerticalAlignment="Center"
-                            Margin="10 0"
-                            CornerRadius="2"
-                            Padding="5"
-                            assists:ShadowAssist.ShadowDepth="Depth0"
-                            Mode="PrimaryDark">
-                            <controls:ColorZone.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="_Open beatmap" Click="OpenBeatmap"
-                                              ToolTip.Tip="Select the current beatmap with File Explorer.">
-                                        <material:MaterialIcon Kind="Folder" />
-                                    </MenuItem>
-                                    <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap"
-                                              ToolTip.Tip="Set the current beatmap to the selected beatmap in your osu! client.">
-                                        <material:MaterialIcon Kind="RestoreFromTrash" />
-                                    </MenuItem>
-                                    <MenuItem Header="_Generate backup" Click="SaveBackup"
-                                              ToolTip.Tip="Save a backup of the current beatmap to the backups folder.">
-                                        <material:MaterialIcon Kind="Backup" />
-                                    </MenuItem>
-                                    <MenuItem Header="_Load backup" Click="LoadBackup"
-                                              ToolTip.Tip="Load a backup from the backups folder into the current beatmap.">
-                                        <material:MaterialIcon Kind="BackupRestore" />
-                                    </MenuItem>
-                                    <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave"
-                                              ToolTip.Tip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated.">
-                                        <material:MaterialIcon Kind="ContentSave" />
-                                    </MenuItem>
-                                </ContextMenu>
-                            </controls:ColorZone.ContextMenu>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock
-                                    Grid.Column="0"
-                                    Name="CurrentMaps"
-                                    HorizontalAlignment="Center"
-                                    TextWrapping="NoWrap"
-                                    TextTrimming="None"
-                                    FontWeight="Normal"
-                                    Text="{Binding UserSettings.CurrentBeatmaps, Converter={StaticResource MapArrayToFilenameConverter}, Mode=OneWay}" />
-                                <TextBlock
-                                    Grid.Column="1"
-                                    Margin="2 0 0 0"
-                                    Padding="0 0 4 0"
-                                    FontStyle="Italic"
-                                    FontWeight="ExtraBold"
-                                    Text="{Binding UserSettings.CurrentBeatmaps, Converter={StaticResource MapArrayToCountStringConverter}, Mode=OneWay}" />
-                            </Grid>
-                        </controls:ColorZone>
+                        <Panel PointerPressed="DragWin" Background="Transparent">
+                            <controls:ColorZone
+                                ToolTip.Tip="{Binding UserSettings.CurrentBeatmaps, Converter={StaticResource MapArrayJoinNewLinesConverter}}"
+                                VerticalAlignment="Center"
+                                Margin="10 0"
+                                CornerRadius="2"
+                                Padding="5"
+                                assists:ShadowAssist.ShadowDepth="Depth0"
+                                Mode="PrimaryDark">
+                                <controls:ColorZone.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="_Open beatmap" Click="OpenBeatmap"
+                                                  ToolTip.Tip="Select the current beatmap with File Explorer.">
+                                            <material:MaterialIcon Kind="Folder" />
+                                        </MenuItem>
+                                        <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap"
+                                                  ToolTip.Tip="Set the current beatmap to the selected beatmap in your osu! client.">
+                                            <material:MaterialIcon Kind="RestoreFromTrash" />
+                                        </MenuItem>
+                                        <MenuItem Header="_Generate backup" Click="SaveBackup"
+                                                  ToolTip.Tip="Save a backup of the current beatmap to the backups folder.">
+                                            <material:MaterialIcon Kind="Backup" />
+                                        </MenuItem>
+                                        <MenuItem Header="_Load backup" Click="LoadBackup"
+                                                  ToolTip.Tip="Load a backup from the backups folder into the current beatmap.">
+                                            <material:MaterialIcon Kind="BackupRestore" />
+                                        </MenuItem>
+                                        <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave"
+                                                  ToolTip.Tip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated.">
+                                            <material:MaterialIcon Kind="ContentSave" />
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </controls:ColorZone.ContextMenu>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Name="CurrentMaps"
+                                        HorizontalAlignment="Center"
+                                        TextWrapping="NoWrap"
+                                        TextTrimming="None"
+                                        FontWeight="Normal"
+                                        Text="{Binding UserSettings.CurrentBeatmaps, Converter={StaticResource MapArrayToFilenameConverter}, Mode=OneWay}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="2 0 0 0"
+                                        Padding="0 0 4 0"
+                                        FontStyle="Italic"
+                                        FontWeight="ExtraBold"
+                                        Text="{Binding UserSettings.CurrentBeatmaps, Converter={StaticResource MapArrayToCountStringConverter}, Mode=OneWay}" />
+                                </Grid>
+                            </controls:ColorZone>
+                        </Panel>
                     </DockPanel>
                 </controls:ColorZone>
 
@@ -370,11 +372,11 @@
 
                     <customControls:RightScrimNavigationDrawer.RightDrawerContent>
                         <DockPanel Width="320" Background="{DynamicResource MaterialDesignPaper}">
-                            <ContentControl Content="{Binding NotificationsViewModel}" Margin="8"/>
+                            <ContentControl Content="{Binding NotificationsViewModel}" Margin="8" />
                         </DockPanel>
                     </customControls:RightScrimNavigationDrawer.RightDrawerContent>
 
-                    <Grid x:Name="MainContentGrid" PointerPressed="DragWin">
+                    <Grid x:Name="MainContentGrid">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>

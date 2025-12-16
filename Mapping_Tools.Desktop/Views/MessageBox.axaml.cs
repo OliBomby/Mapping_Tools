@@ -17,9 +17,9 @@ public partial class MessageBox : Window {
         Close(true);
     }
 
-    public static async Task<bool?> Show(Window owner, string message, string title = "Message")
+    public static async Task<bool?> ShowOnMain(string message, string title = "Message")
     {
         var box = new MessageBox(message, title);
-        return await box.ShowDialog<bool?>(owner);
+        return await box.ShowDialog<bool?>(Program.MainWindow);
     }
 }

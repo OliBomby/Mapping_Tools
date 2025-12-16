@@ -12,6 +12,7 @@ using Mapping_Tools.Desktop.ViewModels;
 using Material.Icons;
 using Material.Icons.Avalonia;
 using ReactiveUI;
+using Avalonia.Controls.Primitives; // for ToggleButton, ScrollBar, etc.
 
 namespace Mapping_Tools.Desktop.Views;
 
@@ -20,6 +21,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        Program.MainWindow = this;
 
         PropertyChanged += (_, e) =>
         {
@@ -217,7 +220,7 @@ public partial class MainWindow : Window
         builder.AppendLine("Coppertine");
         builder.AppendLine("JPK314");
 
-        MessageBox.Show(this, builder.ToString(), "Info");
+        MessageBox.ShowOnMain(builder.ToString(), "Info");
     }
 
     private void Window_StateChanged()

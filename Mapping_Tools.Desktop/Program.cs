@@ -2,6 +2,7 @@
 using Avalonia.ReactiveUI;
 using System;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using Mapping_Tools.Application;
 using Mapping_Tools.Application.Services;
 using Mapping_Tools.Application.Types;
@@ -13,6 +14,7 @@ namespace Mapping_Tools.Desktop;
 
 static internal class Program {
     public static IHost AppHost { get; private set; } = null!;
+    public static Window MainWindow { get; set; } = null!;
 
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
