@@ -29,6 +29,7 @@ Requires [.NET 5 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/do
 - Mapset Merger by [OliBomby](https://github.com/OliBomby)
 - Tumour Generator 2 by [OliBomby](https://github.com/OliBomby)
 - Slider Picturator by [JPK314](https://github.com/JPK314)
+- AR Calculator by [Redplcs](https://github.com/Redplcs)
 
 ## Future implementations
 See the [Trello board](https://trello.com/b/iTmmw3eP/mapping-tools).
