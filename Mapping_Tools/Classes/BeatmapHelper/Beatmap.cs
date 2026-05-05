@@ -678,16 +678,16 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 "",
                 "[General]"
             };
-            FileFormatHelper.AddDictionaryToLines(General, lines);
+            FileFormatHelper.AddDictionaryToLines(General, lines, spaceBeforeValue: true);
             lines.Add("");
             lines.Add("[Editor]");
-            FileFormatHelper.AddDictionaryToLines(Editor, lines);
+            FileFormatHelper.AddDictionaryToLines(Editor, lines, spaceBeforeValue: true);
             lines.Add("");
             lines.Add("[Metadata]");
-            FileFormatHelper.AddDictionaryToLines(Metadata, lines);
+            FileFormatHelper.AddDictionaryToLines(Metadata, lines, spaceBeforeValue: Version >= 128);
             lines.Add("");
             lines.Add("[Difficulty]");
-            FileFormatHelper.AddDictionaryToLines(Difficulty, lines);
+            FileFormatHelper.AddDictionaryToLines(Difficulty, lines, spaceBeforeValue: Version >= 128);
             lines.Add("");
             lines.Add("[Events]");
             if (Version < 128)
@@ -729,7 +729,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 tp.SaveWithFloatPrecision = SaveWithFloatPrecision;
                 return tp.GetLine();
             }));
-            lines.Add("");
+            if (Version < 128)
+                lines.Add("");
             if (ComboColours.Any()) {
                 lines.Add("");
                 lines.Add("[Colours]");
@@ -742,6 +743,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 ho.SaveWithFloatPrecision = SaveWithFloatPrecision;
                 return ho.GetLine();
             }));
+            lines.Add("");
 
             return lines;
         }

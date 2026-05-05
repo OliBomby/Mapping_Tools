@@ -9,6 +9,51 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
     /// Helper class for File Formats
     /// </summary>
     public static class FileFormatHelper {
+        private static readonly string[] osuDictionaryKeyOrder = {
+            "AudioFilename",
+            "AudioLeadIn",
+            "AudioHash",
+            "PreviewTime",
+            "Countdown",
+            "SampleSet",
+            "StackLeniency",
+            "Mode",
+            "LetterboxInBreaks",
+            "StoryFireInFront",
+            "UseSkinSprites",
+            "AlwaysShowPlayfield",
+            "OverlayPosition",
+            "SkinPreference",
+            "EpilepsyWarning",
+            "CountdownOffset",
+            "SpecialStyle",
+            "WidescreenStoryboard",
+            "SamplesMatchPlaybackRate",
+            "Bookmarks",
+            "DistanceSpacing",
+            "BeatDivisor",
+            "GridSize",
+            "TimelineZoom",
+            "Title",
+            "TitleUnicode",
+            "Artist",
+            "ArtistUnicode",
+            "Creator",
+            "Version",
+            "Source",
+            "Tags",
+            "BeatmapID",
+            "BeatmapSetID",
+            "HPDrainRate",
+            "CircleSize",
+            "OverallDifficulty",
+            "ApproachRate",
+            "SliderMultiplier",
+            "SliderTickRate",
+        };
+
+        private static readonly HashSet<string> osuDictionaryKeyOrderSet = new(osuDictionaryKeyOrder, StringComparer.Ordinal);
+
         /// <summary>
         /// Converts the object to an Invariant string.
         /// </summary>
@@ -48,8 +93,20 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return int.TryParse(str, NumberStyles.Integer, CultureInfo.InvariantCulture, out result);
         }
 
-        public static void AddDictionaryToLines(Dictionary<string, TValue> dict, List<string> lines) {
-            lines.AddRange(dict.Select(kvp => kvp.Key + ":" + kvp.Value.Value));
+        public static void AddDictionaryToLines(Dictionary<string, TValue> dict, List<string> lines, bool spaceBeforeValue = false) {
+            foreach (string key in osuDictionaryKeyOrder) {
+                if (dict.TryGetValue(key, out TValue value)) {
+                    lines.Add(key + GetSpacer(spaceBeforeValue) + value.Value);
+                }
+            }
+
+            lines.AddRange(dict
+                .Where(kvp => !osuDictionaryKeyOrderSet.Contains(kvp.Key))
+                .Select(kvp => kvp.Key + GetSpacer(spaceBeforeValue) + kvp.Value.Value));
+        }
+
+        private static string GetSpacer(bool spaceBeforeValue) {
+            return spaceBeforeValue ? ": " : ":";
         }
 
         public static void FillDictionary(Dictionary<string, TValue> dict, IEnumerable<string> lines) {
