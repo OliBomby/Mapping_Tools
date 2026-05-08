@@ -27,7 +27,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'   # 8.x SDK can build net5.0 projects
+          dotnet-version: '10.0.x'
 
       - name: Cache NuGet
         uses: actions/cache@v4
@@ -86,13 +86,13 @@ jobs:
       - name: Zip x86 app
         shell: pwsh
         run: |
-          $outDir = "Mapping_Tools/bin/Release/net5.0-windows/win-x86/publish"
+          $outDir = "Mapping_Tools/bin/Release/net10.0-windows/win-x86/publish"
           Compress-Archive -Path "$outDir/*" -DestinationPath "$outDir/release.zip" -Force
       
       - name: Zip x64 app
         shell: pwsh
         run: |
-          $outDir = "Mapping_Tools/bin/Release/net5.0-windows/win-x64/publish"
+          $outDir = "Mapping_Tools/bin/Release/net10.0-windows/win-x64/publish"
           Compress-Archive -Path "$outDir/*" -DestinationPath "$outDir/release_x64.zip" -Force
 
       - name: Publish GitHub Release
@@ -103,7 +103,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            Mapping_Tools/bin/Release/net5.0-windows/win-x86/publish/release.zip
-            Mapping_Tools/bin/Release/net5.0-windows/win-x64/publish/release_x64.zip
+            Mapping_Tools/bin/Release/net10.0-windows/win-x86/publish/release.zip
+            Mapping_Tools/bin/Release/net10.0-windows/win-x64/publish/release_x64.zip
             **/mapping_tools_installer_x86.exe
             **/mapping_tools_installer_x64.exe
