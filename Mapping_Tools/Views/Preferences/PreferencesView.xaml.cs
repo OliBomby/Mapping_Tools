@@ -34,14 +34,14 @@ namespace Mapping_Tools.Views.Preferences
         
         private void MakeDark(object sender, RoutedEventArgs e) {
             var theme = new PaletteHelper().GetTheme();
-            theme.SetBaseTheme(Theme.Dark);
+            theme.SetBaseTheme(BaseTheme.Dark);
             new PaletteHelper().SetTheme(theme);
         }
 
         
         private void MakeLight(object sender, RoutedEventArgs e) {
             var theme = new PaletteHelper().GetTheme();
-            theme.SetBaseTheme(Theme.Light);
+            theme.SetBaseTheme(BaseTheme.Light);
             new PaletteHelper().SetTheme(theme);
         }
 

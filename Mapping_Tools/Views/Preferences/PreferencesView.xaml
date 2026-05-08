@@ -16,7 +16,7 @@
     </UserControl.Resources>
     <Grid>
         <StackPanel Margin="0,0,100,0">
-            <TextBlock Foreground="{DynamicResource PrimaryHueMidBrush}" FontSize="32" FontWeight="Bold"><Run Text="Preferences"/></TextBlock>
+            <TextBlock Foreground="{DynamicResource MaterialDesign.Brush.Primary}" FontSize="32" FontWeight="Bold"><Run Text="Preferences"/></TextBlock>
 
             <Grid Margin="0,20,0,0">
                 <Grid.ColumnDefinitions>
@@ -27,7 +27,7 @@
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="osu! folder"
                     ToolTip="Select the path to your osu! folder."/>
                 <Button Grid.Column="1" Cursor="Hand" Click="Button_LoadGameImport_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
-                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                 </Button >
             </Grid>
 
@@ -40,7 +40,7 @@
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Songs folder"
                     ToolTip="Select the path to your osu! songs folder."/>
                 <Button Grid.Column="1" Cursor="Hand" Click="Button_LoadSongsImport_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
-                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                 </Button >
             </Grid>
 
@@ -53,7 +53,7 @@
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="osu! user config file"
                          ToolTip="Select the path to your osu! user config file. This file usually contains the name of your PC account."/>
                 <Button Grid.Column="1" Cursor="Hand" Click="Button_LoadConfigImport_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
-                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                 </Button >
             </Grid>
 
@@ -66,7 +66,7 @@
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Backups folder"
                     ToolTip="Select the path to your backups folder. This is where Mapping Tools will save backups."/>
                 <Button Grid.Column="1" Cursor="Hand" Click="Button_LoadBackupImport_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom">
-                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                    <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                 </Button >
             </Grid>
 
@@ -88,7 +88,7 @@
                           ToolTip="Enable this to get the current beatmap folder as the default folder whenever you open a file explorer in a tool which doesn't use current beatmap (e.g. Hitsound Copier). Else it will default to the last used folder."/>
                 <CheckBox HorizontalAlignment="Left" Content="Enable Editor Reader" IsChecked="{Binding UseEditorReader, Mode=TwoWay}" 
                           ToolTip="Enable functionality of Editor Reader. Editor Reader reads the memory of your osu! client to get live data from your editor. It can sometimes break, so you can choose to not use it."/>
-                <CheckBox HorizontalAlignment="Left" Content="Override osu! save with BetterSave™" IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}" 
+                <CheckBox HorizontalAlignment="Left" Content="Override osu! save with BetterSave&#x2122;" IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}"
                           ToolTip="Automatically BetterSave after every osu! save. As a side-effect, this will also overwrite manual .osu changes if you have the editor open."/>
                 <CheckBox HorizontalAlignment="Left" Content="Auto reload after QuickRun" IsChecked="{Binding AutoReload, Mode=TwoWay}" 
                           ToolTip="Enable this to automatically reload the editor after every QuickRun."/>
@@ -129,7 +129,7 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Width="150" VerticalAlignment="Center" Text="BetterSave™ hotkey:" 
+                    <TextBlock Width="150" VerticalAlignment="Center" Text="BetterSave&#x2122; hotkey:"
                                ToolTip="BetterSave saves the current map with proper rounding instead of truncating values."/>
                     <components:HotkeyEditorControl Width="150" Hotkey="{Binding BetterSaveHotkey, UpdateSourceTrigger=LostFocus}"/>
                 </StackPanel>

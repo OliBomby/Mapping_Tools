@@ -1,4 +1,4 @@
-﻿<Window x:Class="Mapping_Tools.Views.HitsoundStudio.HitsoundLayerImportWindow"
+<Window x:Class="Mapping_Tools.Views.HitsoundStudio.HitsoundLayerImportWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -10,12 +10,12 @@
         ResizeMode="CanResize"
         AllowsTransparency="False"
         WindowStartupLocation="CenterScreen"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         MouseDown="DragWin" 
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
-        Background="{DynamicResource MaterialDesignPaper}">
+        Background="{DynamicResource MaterialDesign.Brush.Background}">
     <WindowChrome.WindowChrome>
         <WindowChrome 
             CaptionHeight="35"
@@ -70,7 +70,7 @@
                             ToolTip="The path to the sound sample of the new hitsound layer."/>
                         <Button Grid.Column="1" Cursor="Hand" Click="SampleBrowse0_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                 ToolTip="Select files with File Explorer.">
-                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                         </Button >
                     </Grid>
                 </StackPanel>
@@ -105,7 +105,7 @@
                             ToolTip="The path to the sound sample of the new hitsound layer."/>
                         <Button Grid.Column="1" Cursor="Hand" Click="SampleBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                 ToolTip="Select files with File Explorer.">
-                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                         </Button >
                     </Grid>
                     <Grid Margin="0,15,0,0">
@@ -120,11 +120,11 @@
                             ToolTip="The source beatmap to import the hitsound stack from."/>
                         <Button Grid.Column="1" Cursor="Hand" Click="BeatmapLoad_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                 ToolTip="Fetch the selected beatmap from your osu! client.">
-                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                         </Button >
                         <Button Grid.Column="3" Cursor="Hand" Click="BeatmapBrowse_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                 ToolTip="Select beatmaps with File Explorer.">
-                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                         </Button >
                     </Grid>
                     <Grid>
@@ -159,11 +159,11 @@
                             ToolTip="The source beatmap to import all the hitsounds from."/>
                         <Button Grid.Column="1" Cursor="Hand" Click="BeatmapLoad2_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                 ToolTip="Fetch the selected beatmap from your osu! client.">
-                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                         </Button >
                         <Button Grid.Column="3" Cursor="Hand" Click="BeatmapBrowse2_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                 ToolTip="Select beatmaps with File Explorer.">
-                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                         </Button >
                     </Grid>
                     <CheckBox x:Name="VolumesBox2" Content="Discriminate volumes" Margin="0,15,0,0"
@@ -191,7 +191,7 @@
                             ToolTip="The MIDI file to import the piece from."/>
                         <Button Grid.Column="1" Cursor="Hand" Click="MIDIBrowse3_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                 ToolTip="Select files with File Explorer.">
-                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                         </Button >
                     </Grid>
                     <TextBox x:Name="OffsetBox3" Margin="0,15,0,0"
@@ -244,11 +244,11 @@
                             ToolTip="The source beatmap to import the storyboarded samples from."/>
                         <Button Grid.Column="1" Cursor="Hand" Click="BeatmapLoad4_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                 ToolTip="Fetch the selected beatmap from your osu! client.">
-                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="RestoreFromTrash" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                         </Button >
                         <Button Grid.Column="3" Cursor="Hand" Click="BeatmapBrowse4_Click" Style="{StaticResource IconButton}" VerticalAlignment="Bottom"
                                 ToolTip="Select beatmaps with File Explorer.">
-                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                            <materialDesign:PackIcon Width="30" Height="30" Cursor="Hand" Kind="Folder" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                         </Button >
                     </Grid>
                     <CheckBox x:Name="VolumesBox4" Content="Discriminate volumes" Margin="0,15,0,0"
@@ -270,6 +270,6 @@
             </Grid>
         </materialDesign:ColorZone>
 
-        <Border Name="WindowBorder" BorderThickness="1" Grid.RowSpan="3" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
+        <Border Name="WindowBorder" BorderThickness="1" Grid.RowSpan="3" Background="{x:Null}" BorderBrush="{DynamicResource MaterialDesign.Brush.Primary.Dark}"/>
     </Grid>
 </Window>

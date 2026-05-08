@@ -1,4 +1,4 @@
-﻿<Window
+<Window
     StateChanged="Window_StateChanged"
     x:Class="Mapping_Tools.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -18,12 +18,12 @@
     MinWidth="500"
     MinHeight="200"
     AllowsTransparency="False"
-    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+    TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
     TextElement.FontWeight="Medium"
     TextElement.FontSize="14"
     ShowInTaskbar="True"
     FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
-    Background="{DynamicResource MaterialDesignPaper}"
+    Background="{DynamicResource MaterialDesign.Brush.Background}"
     Loaded="MainWindow_OnLoaded"
     Closing="Window_Closing"
     AllowDrop="True"
@@ -67,7 +67,7 @@
                     Grid.Row="0"
                     Padding="0"
                     Height="35"
-                    materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                    materialDesign:ElevationAssist.Elevation="Dp2"
                     Mode="PrimaryMid">
                     <DockPanel>
                         <StackPanel Orientation="Horizontal">
@@ -82,7 +82,7 @@
                                 AutomationProperties.Name="HamburgerToggleButton"
                                 ToolTip="Use Ctrl+K to use this toggle anywhere in the program.">
                                 <ToggleButton.Content>
-                                    <materialDesign:PackIcon Width="28" Height="28" Kind="Menu" Foreground="{StaticResource MaterialDesignBodyLight}"/>
+                                    <materialDesign:PackIcon Width="28" Height="28" Kind="Menu" Foreground="{DynamicResource MaterialDesign.Brush.Primary.Foreground}"/>
                                 </ToggleButton.Content>
                                 <materialDesign:ToggleButtonAssist.OnContent>
                                     <materialDesign:PackIcon Width="28" Height="28" Kind="Menu"/>
@@ -92,46 +92,46 @@
                             <Menu 
                                 WindowChrome.IsHitTestVisibleInChrome="true" 
                                 IsMainMenu="True"
-                                Foreground="{DynamicResource PrimaryHueMidForegroundBrush}">
+                                Foreground="{DynamicResource MaterialDesign.Brush.Primary.Foreground}">
                                 <MenuItem Header="_File" MinWidth="50" Height="35">
                                     <MenuItem Header="_Open beatmap" Click="OpenBeatmap" Icon="{materialDesign:PackIcon Folder}"
-                                              Foreground="{DynamicResource MaterialDesignBody}"
+                                              Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                               ToolTip="Select the current beatmap with File Explorer." />
                                     <MenuItem Header="_Open current beatmap" Click="OpenGetCurrentBeatmap" Icon="{materialDesign:PackIcon RestoreFromTrash}"
-                                              Foreground="{DynamicResource MaterialDesignBody}"
+                                              Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                               ToolTip="Set the current beatmap to the selected beatmap in your osu! client." />
                                     <MenuItem Header="_Generate backup" Click="SaveBackup" Icon="{materialDesign:PackIcon Backup}"
-                                              Foreground="{DynamicResource MaterialDesignBody}"
+                                              Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                               ToolTip="Save a backup of the current beatmap to the backups folder." />
                                     <MenuItem Header="_Load backup" Click="LoadBackup" Icon="{materialDesign:PackIcon BackupRestore}"
-                                              Foreground="{DynamicResource MaterialDesignBody}"
+                                              Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                               ToolTip="Load a backup from the backups folder into the current beatmap." />
-                                    <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
-                                              Foreground="{DynamicResource MaterialDesignBody}"
-                                              ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated." />
+                                    <MenuItem Header="_BetterSave&#x2122; current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
+                                              Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+                                              ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave&#x2122; saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated." />
                                 </MenuItem>
                                 <Separator/>
                                 <MenuItem Header="_About" MinWidth="67" Height="35">
                                     <MenuItem Header="_Open Mapping Tools folder" Click="OpenConfig" Icon="{materialDesign:PackIcon FolderOpen}"
-                                              Foreground="{DynamicResource MaterialDesignBody}"
+                                              Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                         ToolTip="Open the Mapping Tools folder." />
                                     <MenuItem Header="_Open backups folder" Click="OpenBackups" Icon="{materialDesign:PackIcon FolderOpen}"
-                                              Foreground="{DynamicResource MaterialDesignBody}"
+                                              Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                         ToolTip="Open the backups folder." />
                                     <MenuItem Header="_Check for updates" Click="MenuItem_OnClick" Icon="{materialDesign:PackIcon Update}"
-                                              Foreground="{DynamicResource MaterialDesignBody}"
+                                              Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                         ToolTip="Check if there are updates available." />
                                     <MenuItem Header="_Website" Click="OpenWebsite" Icon="{materialDesign:PackIcon OpenInBrowser}"
-                                              Foreground="{DynamicResource MaterialDesignBody}"
+                                              Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                         ToolTip="Open the official Mapping Tools website in your browser." />
                                     <MenuItem Header="_Github" Click="OpenGitHub" Icon="{materialDesign:PackIcon Github}"
-                                              Foreground="{DynamicResource MaterialDesignBody}"
+                                              Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                         ToolTip="Go to the Mapping Tools Github." />
                                     <MenuItem Header="_Donate" Click="OpenDonate" Icon="{materialDesign:PackIcon Heart}"
-                                              Foreground="{DynamicResource MaterialDesignBody}"
+                                              Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                               ToolTip="Support Mapping Tools." />
                                     <MenuItem Header="_About" Click="OpenInfo" Icon="{materialDesign:PackIcon InfoCircle}"
-                                              Foreground="{DynamicResource MaterialDesignBody}"/>
+                                              Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"/>
                                 </MenuItem>
                                 <MenuItem Visibility="{Binding ProjectMenuVisibility}"
                                           Header="_Project" Height="35" MinWidth="67"
@@ -147,16 +147,16 @@
                                     Orientation="Horizontal">
                             <Button Style="{DynamicResource MaterialDesignFlatButton}" 
                                     Content="{materialDesign:PackIcon WindowMinimize}" 
-                                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                    Foreground="{DynamicResource MaterialDesign.Brush.Primary.Foreground}"
                                     Click="MinimizeWin" />
                             <Button x:Name="ToggleButton" 
                                     Style="{DynamicResource MaterialDesignFlatButton}" 
                                     Content="{materialDesign:PackIcon WindowMaximize}" 
-                                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                    Foreground="{DynamicResource MaterialDesign.Brush.Primary.Foreground}"
                                     Click="ToggleWin" />
                             <Button Style="{DynamicResource MaterialDesignFlatButton}" 
                                     Content="{materialDesign:PackIcon WindowCLose}" 
-                                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                    Foreground="{DynamicResource MaterialDesign.Brush.Primary.Foreground}"
                                     Click="CloseWin">
                                 <Button.ContextMenu>
                                     <ContextMenu>
@@ -186,8 +186,8 @@
                                         ToolTip="Save a backup of the current beatmap to the backups folder." />
                                     <MenuItem Header="_Load backup" Click="LoadBackup" Icon="{materialDesign:PackIcon BackupRestore}"
                                         ToolTip="Load a backup from the backups folder into the current beatmap." />
-                                    <MenuItem Header="_BetterSave™ current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
-                                        ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave™ saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated." />
+                                    <MenuItem Header="_BetterSave&#x2122; current beatmap" Click="CoolSave" Icon="{materialDesign:PackIcon ContentSave}"
+                                        ToolTip="Save the beatmap which is currently open in your osu! editor. BetterSave&#x2122; saves the beatmap just like the vanilla editor, but decimal values get rounded instead of truncated." />
                                 </ContextMenu>
                             </materialDesign:ColorZone.ContextMenu>
                             <Grid>
@@ -224,12 +224,12 @@
                             Margin="16 16 16 0"
                             Padding="8"
                             Width="Auto"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
                             domain:FocusExtension.IsFocused="{Binding SearchFocused}"
                             materialDesign:HintAssist.Hint="Search"
                             materialDesign:HintAssist.IsFloating="True"
+                            materialDesign:HintAssist.HintOpacity="0.56"
                             materialDesign:TextFieldAssist.HasClearButton="True"
-                            materialDesign:TextFieldAssist.HasOutlinedTextField="True"
-                            materialDesign:TextFieldAssist.DecorationVisibility="Collapsed"
                             materialDesign:TextFieldAssist.TextFieldCornerRadius="4">
                                 <TextBox.InputBindings>
                                     <KeyBinding Key="Return" 
@@ -281,6 +281,6 @@
                 </materialDesign:DrawerHost>
             </Grid>
         </materialDesign:DialogHost>
-        <Border Name="WindowBorder" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}" />
+        <Border Name="WindowBorder" BorderThickness="1" Background="{x:Null}" BorderBrush="{DynamicResource MaterialDesign.Brush.Primary.Dark}" />
     </Grid>
 </Window>

@@ -1,4 +1,4 @@
-﻿<Window x:Class="Mapping_Tools.Views.RhythmGuide.RhythmGuideWindow"
+<Window x:Class="Mapping_Tools.Views.RhythmGuide.RhythmGuideWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -10,12 +10,12 @@
         ResizeMode="CanResize"
         AllowsTransparency="False"
         WindowStartupLocation="CenterScreen"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         MouseDown="DragWin" 
         SizeChanged="RhythmGuideWindow_OnSizeChanged"
-        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}">
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesign.Brush.Background}">
     <WindowChrome.WindowChrome>
         <WindowChrome 
             CaptionHeight="35"
@@ -31,7 +31,7 @@
 
         <Grid VerticalAlignment="Top" Grid.Row="0">
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" Height="35" VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Horizontal">
-                <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" HorizontalAlignment="Right" Height="35" Foreground="{DynamicResource MaterialDesignBody}"/>
+                <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseWin" HorizontalAlignment="Right" Height="35" Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"/>
             </StackPanel>
         </Grid>
 
@@ -39,6 +39,6 @@
             <ContentControl Name="ContentControl" Content="{Binding}" Margin="10"/>
         </Grid>
 
-        <Border Name="WindowBorder" BorderThickness="1" Grid.Row="0" Grid.RowSpan="2" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
+        <Border Name="WindowBorder" BorderThickness="1" Grid.Row="0" Grid.RowSpan="2" Background="{x:Null}" BorderBrush="{DynamicResource MaterialDesign.Brush.Primary.Dark}"/>
     </Grid>
 </Window>

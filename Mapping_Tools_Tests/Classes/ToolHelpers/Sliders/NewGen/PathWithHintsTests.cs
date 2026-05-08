@@ -28,7 +28,7 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
 
         [TestMethod]
         public void TestZeroLengthHint() {
-            Assert.ThrowsException<ArgumentException>(() => path.AddReconstructionHint(new ReconstructionHint(points[2], points[2], 0, new List<Vector2> {
+            Assert.Throws<ArgumentException>(() => path.AddReconstructionHint(new ReconstructionHint(points[2], points[2], 0, new List<Vector2> {
                 new(2,0),
                 new(2, 1),
                 new(2,0)

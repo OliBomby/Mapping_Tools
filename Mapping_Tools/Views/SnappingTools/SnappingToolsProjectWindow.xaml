@@ -1,4 +1,4 @@
-﻿<Window x:Class="Mapping_Tools.Views.SnappingTools.SnappingToolsProjectWindow"
+<Window x:Class="Mapping_Tools.Views.SnappingTools.SnappingToolsProjectWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -15,8 +15,8 @@
         WindowStartupLocation="CenterScreen"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Background="{DynamicResource MaterialDesign.Brush.Background}"
         d:DataContext="{d:DesignData SnappingToolsProjectWindow}">
     
     <WindowChrome.WindowChrome>
@@ -43,11 +43,11 @@
                         <ImageBrush ImageSource="/Data/mt_logo_white_24.png"/>
                     </materialDesign:ColorZone.OpacityMask>
                 </materialDesign:ColorZone>
-                <TextBlock Text="Savestates" Foreground="{DynamicResource MaterialDesignBody}" Margin="8,11,0,0" FontWeight="Normal"/>
+                <TextBlock Text="Savestates" Foreground="{DynamicResource MaterialDesign.Brush.Foreground}" Margin="8,11,0,0" FontWeight="Normal"/>
             </StackPanel>
 
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="true" HorizontalAlignment="Right" Orientation="Horizontal">
-                <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseButton_Click" HorizontalAlignment="Right" Height="35" Foreground="{DynamicResource MaterialDesignBody}"/>
+                <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="{materialDesign:PackIcon WindowCLose}" Click="CloseButton_Click" HorizontalAlignment="Right" Height="35" Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"/>
             </StackPanel>
         </Grid>
 
@@ -116,6 +116,6 @@
             </Button>
         </StackPanel>
 
-        <Border BorderThickness="1" Grid.Row="0" Grid.RowSpan="4" Background="{x:Null}" BorderBrush="{DynamicResource PrimaryHueDarkBrush}"/>
+        <Border BorderThickness="1" Grid.Row="0" Grid.RowSpan="4" Background="{x:Null}" BorderBrush="{DynamicResource MaterialDesign.Brush.Primary.Dark}"/>
     </Grid>
 </Window>
