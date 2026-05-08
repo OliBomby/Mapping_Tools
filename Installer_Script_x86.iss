@@ -12,7 +12,7 @@
 //#define UseDotNet48
 
 // requires netcorecheck.exe and netcorecheck_x64.exe (see download link below)
-#define UseNetCoreCheck
+//#define UseNetCoreCheck
 #ifdef UseNetCoreCheck
   //#define UseNetCore31
   //#define UseNetCore31Asp
@@ -365,45 +365,7 @@ Source: "lib\netcorecheck_x64.exe"; Flags: dontcopy noencryption
 Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
 #endif
 
-Source: "{#BuildFolderPath}\EditorReader.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Mapping Tools.deps.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Mapping Tools.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Mapping Tools.dll.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Mapping Tools.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Mapping Tools.pdb"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Mapping Tools.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\MaterialDesignColors.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\MaterialDesignThemes.Wpf.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Microsoft.WindowsAPICodePack.Shell.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\NAudio.Asio.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\NAudio.Core.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\NAudio.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\NAudio.Midi.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\NAudio.Vorbis.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\NAudio.Wasapi.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\NAudio.WinForms.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\NAudio.WinMM.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Newtonsoft.Json.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\NonInvasiveKeyboardHookLibrary.Core.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\NVorbis.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\OggVorbisEncoder.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Onova.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\OsuMemoryDataProvider.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Overlay.NET.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Process.NET.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\ProcessMemoryDataFinder.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\SharpDX.Direct2D1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\SharpDX.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\SharpDX.DXGI.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\SHARPDX.Mathematics.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Xceed.Wpf.Toolkit.NET5.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Xceed.Wpf.AvalonDock.NET5.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Xceed.Wpf.AvalonDock.Themes.VS2010.NET5.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Xceed.Wpf.AvalonDock.Themes.Metro.NET5.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Xceed.Wpf.AvalonDock.Themes.Aero.NET5.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\VirtualizingWrapPanel.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#BuildFolderPath}\Microsoft.Xaml.Behaviors.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildFolderPath}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.zip"
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

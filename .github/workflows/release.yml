@@ -66,10 +66,10 @@ jobs:
           $c | Set-Content $p -Encoding UTF8
 
       - name: Publish x86
-        run: dotnet publish Mapping_Tools -c Release -r win-x86 --no-restore --self-contained false
+        run: dotnet publish Mapping_Tools -c Release -r win-x86 --no-restore --self-contained true
       
       - name: Publish x64
-        run: dotnet publish Mapping_Tools -c Release -r win-x64 --no-restore --self-contained false
+        run: dotnet publish Mapping_Tools -c Release -r win-x64 --no-restore --self-contained true
 
       - name: Install Inno Setup
         shell: pwsh
