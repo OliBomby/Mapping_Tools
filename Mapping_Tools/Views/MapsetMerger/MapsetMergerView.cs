@@ -50,6 +50,8 @@ namespace Mapping_Tools.Views.MapsetMerger {
             CanRun = false;
         }
 
+        [GeneratedRegex("^(normal|soft|drum)-(hit(normal|whistle|finish|clap)|slidertick|sliderslide|sliderwhistle)")]
+        private static partial Regex HitsoundSampleFilenameRegex();
 
         private static string MergeMapsets(MapsetMergerVm arg, BackgroundWorker worker, DoWorkEventArgs _) {
             int mapsetsMerged = 0;
@@ -138,17 +140,15 @@ namespace Mapping_Tools.Views.MapsetMerger {
                     var ext = Path.GetExtension(filepath);
                     var extLess = Path.GetFileNameWithoutExtension(filepath);
 
-                    var match = Regex.Match(extLess, "^(normal|soft|drum)-(hit(normal|whistle|finish|clap)|slidertick|sliderslide)");
+                    var match = HitsoundSampleFilenameRegex().Match(extLess);
 
-                    var remainder = extLess.Substring(match.Index + match.Length);
+                    var remainder = extLess[(match.Index + match.Length)..];
                     int index = 1;
                     if (!string.IsNullOrWhiteSpace(remainder) && !FileFormatHelper.TryParseInt(remainder, out index)) {
                         continue;
                     }
 
-                    var newFilename = indices[index] == 1 ?
-                        extLess.Substring(0, match.Length) + ext :
-                        extLess.Substring(0, match.Length) + indices[index] + ext;
+                    var newFilename = match.Value + (indices[index] == 1 ? string.Empty : indices[index]) + ext;
                     var newFilepath = Path.Combine(arg.ExportPath, newFilename);
 
                     Directory.CreateDirectory(Path.GetDirectoryName(newFilepath));
@@ -186,14 +186,14 @@ namespace Mapping_Tools.Views.MapsetMerger {
             var extLess = Path.ChangeExtension(filename, null);
             var newFilepath = Path.Combine(exportPath, subf, extLess + ext);
 
-            Directory.CreateDirectory(Path.GetDirectoryName(newFilepath));
+            Directory.CreateDirectory(Path.GetDirectoryName(newFilepath)!);
             File.Copy(filepath, newFilepath, true);
         }
 
-        private static readonly string[] audioExtensions = { ".wav", ".mp3", ".ogg" };
-        private static readonly string[] audioExtensions2 = { ".wav", ".ogg", ".mp3" }; // I swear to god, for some reason it prioritizes .ogg if it uses filename
-        private static readonly string[] imageExtensions = { ".png", ".jpg" };
-        private static readonly string[] videoExtensions = { ".mp4", ".avi" };
+        private static readonly string[] audioExtensions = [".wav", ".mp3", ".ogg"];
+        private static readonly string[] audioExtensions2 = [".wav", ".ogg", ".mp3"]; // I swear to god, for some reason it prioritizes .ogg if it uses filename
+        private static readonly string[] imageExtensions = [".png", ".jpg"];
+        private static readonly string[] videoExtensions = [".mp4", ".avi"];
 
         private static string FindAssetFile(string filename, string path, string[] extensions, bool needExtension = false) {
             string filepath = Path.Combine(path, filename);
@@ -203,9 +203,9 @@ namespace Mapping_Tools.Views.MapsetMerger {
             if (!string.IsNullOrEmpty(originalExt) || needExtension) {
                 if (!string.IsNullOrEmpty(originalExt) && extensions.Contains(originalExt) && File.Exists(filepath)) {
                     return filepath;
-                } else {
-                    return null;
                 }
+
+                return null;
             }
 
             foreach (var ext in extensions) {
@@ -235,7 +235,7 @@ namespace Mapping_Tools.Views.MapsetMerger {
                         for (int i = 0; i < animation.FrameCount; i++) {
                             usedImageFiles.Add(Path.GetFileNameWithoutExtension(animation.FilePath) + i);
                         }
-                        animation.FilePath = Path.Combine(subf, animation.FilePath);
+                        animation.FilePath = Path.Combine(subf, animation.FilePath!);
                         break;
                     case Sprite sprite:
                         usedImageFiles.Add(sprite.FilePath);
