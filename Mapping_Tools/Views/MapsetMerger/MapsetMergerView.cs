@@ -1,9 +1,4 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.BeatmapHelper.Events;
-using Mapping_Tools.Classes.SystemTools;
-using Mapping_Tools.Viewmodels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -11,8 +6,13 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Classes.BeatmapHelper.Events;
+using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Viewmodels;
 
-namespace Mapping_Tools.Views.ComboColourStudio {
+namespace Mapping_Tools.Views.MapsetMerger {
     /// <summary>
     /// Interactielogica voor MapsetMergerView.xaml
     /// </summary>
