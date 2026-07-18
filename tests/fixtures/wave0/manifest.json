@@ -123,6 +123,13 @@
                          "purpose":  "Stable IDs for unavailable editor, denied storage, missing media, offline network, and picker cancellation."
                      },
                      {
+                         "id":  "GD-SAVE-VIRTUAL-OBJECTS-001",
+                         "group":  "geometry-dashboard",
+                         "path":  "geometry-dashboard/save-virtual-objects.json",
+                         "sha256":  "7EEF7F15EFD735CE63FE7106941B92DDED61EB350BD706D96D2B0211A0ABDBB1",
+                         "purpose":  "Editor-coupled baseline for generating, locking, and exporting Geometry Dashboard virtual objects."
+                     },
+                     {
                          "id":  "PROJECT-CORRUPT-001",
                          "group":  "project",
                          "path":  "projects/corrupt.json",
@@ -240,6 +247,13 @@
                          "path":  "projects/snappingtoolsproject.json",
                          "sha256":  "CE97833C0ECEF56CD522568D3865514CB58B91DB71B600074B96964B842C5FD2",
                          "purpose":  "Sanitized real-world legacy snappingtoolsproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-GEOMETRYDASHBOARDPROJECT",
+                         "group":  "project",
+                         "path":  "projects/geometrydashboardproject.json",
+                         "sha256":  "45792F8F7D71ACACEE4F6B332F5B38B32857B0B0EC09D317E877BF369CBB4D89",
+                         "purpose":  "Sanitized real-world legacy geometrydashboardproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-HSSTUDIOPROJECT",
@@ -758,6 +772,20 @@
                          "path":  "transformations/expected/auto-fail-detector.json",
                          "sha256":  "AF8B091CB79E47EA82F063C42A7AA2A48A8AF29129054A3A36F7E18BFD5BFF8F",
                          "purpose":  "Exact legacy auto-fail-detector analysis result."
+                     },
+                     {
+                         "id":  "GD-SAVE-VIRTUAL-OBJECTS-001-output",
+                         "group":  "geometry-dashboard",
+                         "path":  "geometry-dashboard/expected/locked-virtual-objects.json",
+                         "sha256":  "F58B3ACCFCE312E0D45E441CFCA5BB59D554040FB177F3AA4AA739B6665084E1",
+                         "purpose":  "Accepted locked virtual-object export from the deterministic editor state."
+                     },
+                     {
+                         "id":  "GD-SAVE-VIRTUAL-OBJECTS-001-report",
+                         "group":  "geometry-dashboard",
+                         "path":  "geometry-dashboard/save-virtual-objects-report.md",
+                         "sha256":  "6F0705DC461FA7FE6EAD793006120885D669280B3C8B5C65DC481873F62938FD",
+                         "purpose":  "Semantic counts and user acceptance evidence for the Geometry Dashboard export."
                      }
                  ],
     "destructiveFeatures":  [

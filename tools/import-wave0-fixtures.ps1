@@ -67,6 +67,7 @@ $projectFiles = @(
     'combocolourproject.json',
     'mapsetmergerproject.json',
     'snappingtoolsproject.json',
+    'geometrydashboardproject.json',
     'hsstudioproject.json',
     'patterngalleryproject.json'
 )
@@ -216,6 +217,7 @@ Add-FixtureManifestEntry 'AUD-OGG-001' 'audio' 'audio\soft-hitwhistle6.ogg' 'Sma
 Add-FixtureManifestEntry 'SET-LEGACY-001' 'settings' 'settings\legacy-config.json' 'Sanitized representative legacy settings including paths, favorites, bounds, and hotkeys.'
 Add-FixtureManifestEntry 'SET-CORRUPT-001' 'settings' 'settings\corrupt.json' 'Intentionally malformed settings input.'
 Add-FixtureManifestEntry 'FAILURES-001' 'platform-failure' 'platform-failures\scenarios.json' 'Stable IDs for unavailable editor, denied storage, missing media, offline network, and picker cancellation.'
+Add-FixtureManifestEntry 'GD-SAVE-VIRTUAL-OBJECTS-001' 'geometry-dashboard' 'geometry-dashboard\save-virtual-objects.json' 'Editor-coupled baseline for generating, locking, and exporting Geometry Dashboard virtual objects.'
 Add-FixtureManifestEntry 'PROJECT-CORRUPT-001' 'project' 'projects\corrupt.json' 'Intentionally malformed legacy project JSON.'
 
 foreach ($projectFile in $projectFiles) {
@@ -251,6 +253,16 @@ Get-ChildItem -LiteralPath (Join-Path $fixtureRoot 'transformations\expected') -
     $featureId = $_.BaseName
     $relativePath = "transformations\expected\$($_.Name)"
     Add-FixtureManifestEntry "TR-$featureId-result" 'transformation' $relativePath "Exact legacy $featureId analysis result."
+}
+
+$geometryDashboardExpected = Join-Path $fixtureRoot 'geometry-dashboard\expected\locked-virtual-objects.json'
+if (Test-Path -LiteralPath $geometryDashboardExpected -PathType Leaf) {
+    Add-FixtureManifestEntry 'GD-SAVE-VIRTUAL-OBJECTS-001-output' 'geometry-dashboard' 'geometry-dashboard\expected\locked-virtual-objects.json' 'Accepted locked virtual-object export from the deterministic editor state.'
+}
+
+$geometryDashboardReport = Join-Path $fixtureRoot 'geometry-dashboard\save-virtual-objects-report.md'
+if (Test-Path -LiteralPath $geometryDashboardReport -PathType Leaf) {
+    Add-FixtureManifestEntry 'GD-SAVE-VIRTUAL-OBJECTS-001-report' 'geometry-dashboard' 'geometry-dashboard\save-virtual-objects-report.md' 'Semantic counts and user acceptance evidence for the Geometry Dashboard export.'
 }
 
 $manifest = [ordered]@{

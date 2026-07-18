@@ -17,7 +17,7 @@ public sealed class WaveZeroFixtureTests
         string[] requiredGroups =
         [
             "beatmap", "storyboard", "transformation", "project", "pattern",
-            "audio", "mapset", "settings", "platform-failure"
+            "audio", "mapset", "settings", "platform-failure", "geometry-dashboard"
         ];
 
         var actualGroups = manifest.Fixtures.Select(fixture => fixture.Group).ToHashSet(StringComparer.Ordinal);
@@ -114,6 +114,34 @@ public sealed class WaveZeroFixtureTests
         }
 
         Assert.AreEqual(0, failures.Count, string.Join(Environment.NewLine, failures));
+    }
+
+    [TestMethod]
+    public void GeometryDashboardExportContainsTheAcceptedLockedObjects()
+    {
+        var path = Path.Combine(RepositoryRoot, "tests", "fixtures", "wave0", "geometry-dashboard",
+            "expected", "locked-virtual-objects.json");
+        using var document = JsonDocument.Parse(File.ReadAllText(path));
+
+        var counts = new Dictionary<string, int>(StringComparer.Ordinal);
+        var exportedObjects = new List<JsonElement>();
+        foreach (var property in document.RootElement.EnumerateObject().Where(property => property.Name != "$type"))
+        {
+            var typeName = property.Name.Split(',')[0].Split('.').Last();
+            var items = property.Value.EnumerateArray().ToArray();
+            counts[typeName] = items.Length;
+            exportedObjects.AddRange(items);
+        }
+
+        Assert.AreEqual(0, counts["RelevantHitObject"]);
+        Assert.AreEqual(10, counts["RelevantPoint"]);
+        Assert.AreEqual(2, counts["RelevantCircle"]);
+        Assert.AreEqual(12, exportedObjects.Count);
+        Assert.IsTrue(exportedObjects.All(item => item.GetProperty("IsLocked").GetBoolean()));
+        Assert.IsTrue(exportedObjects.All(item => !item.GetProperty("IsSelected").GetBoolean()));
+        Assert.IsTrue(exportedObjects.All(item => item.GetProperty("IsInheritable").GetBoolean()));
+        Assert.IsTrue(exportedObjects.All(item => !item.GetProperty("Disposed").GetBoolean()));
+        Assert.IsTrue(exportedObjects.All(item => item.GetProperty("DoNotDispose").GetBoolean()));
     }
 
     private static FixtureManifest LoadManifest()
