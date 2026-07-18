@@ -1,12 +1,16 @@
 {
     "id":  "TR-slider-completionator",
     "feature":  "Slider Completionator",
-    "status":  "pending-capture",
+    "status":  "accepted",
     "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
-    "options":  "../projects/slidercompletionatorproject.json",
-    "expectedOutput":  null,
+    "options":  "slider-completionator.options.json",
+    "expectedOutput":  "expected/slider-completionator.osu",
+    "expectedOutputSha256":  "D7A646118B8EE2E3A1C51B92D2E6A40B447E004522AA2C9FEEF0BB29B003B078",
     "legacyVersion":  "1.12.30",
-    "reviewer":  null,
-    "reviewedOn":  null,
-    "notes":  "Run the legacy feature against a disposable copy, then record and review the exact output."
+    "reviewer":  "Olivier",
+    "reviewedOn":  "2026-07-19",
+    "capturedOn":  "2026-07-19",
+    "observedMessage":  "Successfully completed 7 sliders!",
+    "backupSha256":  "9DDBE49058712E1211DCEAA52BCBE3D8FF903562EEF5DD0587945407439AC341",
+    "notes":  "The backup exactly matched the target seed. Accepted after all seven sliders were resized to 75% of their full paths and recalculated to last 1.5 beats."
 }

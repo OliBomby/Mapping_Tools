@@ -1,0 +1,13 @@
+{
+  "Target": "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+  "ImportMode": "Everything",
+  "FreeVariable": "Velocity",
+  "DurationBeats": 1.5,
+  "LengthFraction": 0.75,
+  "MoveAnchors": true,
+  "UseEndTime": false,
+  "DelegateToBpm": false,
+  "RemoveSliderTicks": false,
+  "UseEditorReader": false,
+  "MakeBackups": true
+}

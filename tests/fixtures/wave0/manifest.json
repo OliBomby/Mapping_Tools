@@ -308,7 +308,7 @@
                          "id":  "TR-slider-completionator",
                          "group":  "transformation",
                          "path":  "transformations/slider-completionator.json",
-                         "sha256":  "60F45C5A8356A36665E3E55EF749960D637B0164B60FFB541BFEF43896815D2D",
+                         "sha256":  "F58F06E8A409AB50E2E9C8718058AA859CB22C87E9F94F1D61889436A0606CAD",
                          "purpose":  "Legacy before/after capture record for Slider Completionator."
                      },
                      {
@@ -343,7 +343,7 @@
                          "id":  "TR-combo-colour-studio",
                          "group":  "transformation",
                          "path":  "transformations/combo-colour-studio.json",
-                         "sha256":  "F836BE9F3B61573CC7C847FE7F6333B8B31676006E71E0856A646C072484D9C4",
+                         "sha256":  "FA163B2EAFDD321E5CF823CB4EF5D864B550E52E57B7B6AEA0297EE330002AC3",
                          "purpose":  "Legacy before/after capture record for Combo Colour Studio."
                      },
                      {
@@ -438,6 +438,20 @@
                          "purpose":  "Exact legacy rhythm-guide capture settings."
                      },
                      {
+                         "id":  "TR-slider-completionator-options",
+                         "group":  "transformation",
+                         "path":  "transformations/slider-completionator.options.json",
+                         "sha256":  "A6B0AD3F692CD1EABCCC3DFE4612A37166B16CFD108EBCCB22EF081EB47CB012",
+                         "purpose":  "Exact legacy slider-completionator capture settings."
+                     },
+                     {
+                         "id":  "TR-slider-merger-options",
+                         "group":  "transformation",
+                         "path":  "transformations/slider-merger.options.json",
+                         "sha256":  "C009D901D1CDBF0233DF5DAB2A591B05D745B1D157C9B33AD5F9547C6151214A",
+                         "purpose":  "Exact legacy slider-merger capture settings."
+                     },
+                     {
                          "id":  "TR-timing-copier-options",
                          "group":  "transformation",
                          "path":  "transformations/timing-copier.options.json",
@@ -450,6 +464,13 @@
                          "path":  "transformations/timing-helper.options.json",
                          "sha256":  "452BEEC27C62C4E660A9AB987A1DFFDA737ADF5EE18950AAE03D11A0006F83A7",
                          "purpose":  "Exact legacy timing-helper capture settings."
+                     },
+                     {
+                         "id":  "TR-combo-colour-studio-report",
+                         "group":  "transformation",
+                         "path":  "transformations/combo-colour-studio-report.md",
+                         "sha256":  "FEAFBF8861690833A317AB7B67C0255C71A3382B5F60D1C28D3E7E7B3D4F9A38",
+                         "purpose":  "Semantic comparison and capture evidence for combo-colour-studio."
                      },
                      {
                          "id":  "TR-hitsound-copier-report",
@@ -508,6 +529,13 @@
                          "purpose":  "Semantic comparison and capture evidence for rhythm-guide."
                      },
                      {
+                         "id":  "TR-slider-completionator-report",
+                         "group":  "transformation",
+                         "path":  "transformations/slider-completionator-report.md",
+                         "sha256":  "760AFABC72AC189EAEB2226B6D65957EC669B1345084E8F9A8EFC368411058C5",
+                         "purpose":  "Semantic comparison and capture evidence for slider-completionator."
+                     },
+                     {
                          "id":  "TR-timing-copier-report",
                          "group":  "transformation",
                          "path":  "transformations/timing-copier-report.md",
@@ -527,6 +555,13 @@
                          "path":  "transformations/mapset-merger.output.json",
                          "sha256":  "571FF2825B508A8879595C6849616F10496B186129A97C21CE86BF5CAB96FEAE",
                          "purpose":  "Exact legacy multi-file output manifest for mapset-merger."
+                     },
+                     {
+                         "id":  "TR-combo-colour-studio-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/combo-colour-studio.osu",
+                         "sha256":  "63BB178B68EF8EB3029C8341FBB746F312E26D510EB1F33497DBA1D53EC18B78",
+                         "purpose":  "Exact legacy combo-colour-studio output."
                      },
                      {
                          "id":  "TR-hitsound-copier-output",
@@ -576,6 +611,13 @@
                          "path":  "transformations/expected/rhythm-guide.osu",
                          "sha256":  "3BFB3DCDB9021B8DD82FDBDC31B0EC6BBFB30E3F65384F0CD7097F9B6160E394",
                          "purpose":  "Exact legacy rhythm-guide output."
+                     },
+                     {
+                         "id":  "TR-slider-completionator-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/slider-completionator.osu",
+                         "sha256":  "D7A646118B8EE2E3A1C51B92D2E6A40B447E004522AA2C9FEEF0BB29B003B078",
+                         "purpose":  "Exact legacy slider-completionator output."
                      },
                      {
                          "id":  "TR-timing-copier-output",
