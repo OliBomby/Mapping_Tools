@@ -336,7 +336,7 @@
                          "id":  "TR-sliderator",
                          "group":  "transformation",
                          "path":  "transformations/sliderator.json",
-                         "sha256":  "C1347279477A77705D0FFB37002338D7BF173CD9705063ACA368A9A623FC51A7",
+                         "sha256":  "4B82EDD67C6D0A856A9E1B5038D718D89C484963903F43D168AC41273044410B",
                          "purpose":  "Legacy before/after capture record for Sliderator."
                      },
                      {
@@ -357,7 +357,7 @@
                          "id":  "TR-pattern-gallery",
                          "group":  "transformation",
                          "path":  "transformations/pattern-gallery.json",
-                         "sha256":  "467AD24C86CC462ACBF078EF2D4ACF87C8ADD69567D140FE384C4730BABD965E",
+                         "sha256":  "927E17723FD72A82664D3F66EB19A538C6A7947B4875007D81F98CBE5EFE4363",
                          "purpose":  "Legacy before/after capture record for Pattern Gallery."
                      },
                      {
@@ -436,6 +436,13 @@
                          "path":  "transformations/metadata-manager.options.json",
                          "sha256":  "89DC6EDF5432763051CC6CCE78F22D96BAD6F54D5E07F7E79C87A471B9297DB8",
                          "purpose":  "Exact legacy metadata-manager capture settings."
+                     },
+                     {
+                         "id":  "TR-pattern-gallery-options",
+                         "group":  "transformation",
+                         "path":  "transformations/pattern-gallery.options.json",
+                         "sha256":  "F221330124A24ECFC7A9E5CC2C78FDA278AF7B9CD9E73AC6D2E8899E9B508493",
+                         "purpose":  "Exact legacy pattern-gallery capture settings."
                      },
                      {
                          "id":  "TR-property-transformer-options",
@@ -592,6 +599,13 @@
                          "purpose":  "Semantic comparison and capture evidence for slider-picturator."
                      },
                      {
+                         "id":  "TR-sliderator-report",
+                         "group":  "transformation",
+                         "path":  "transformations/sliderator-report.md",
+                         "sha256":  "3CEA8AF3FBBCBAE2E98D2CD0B7BC45EB19E12CEB5319C3CF1B967165BB4BC361",
+                         "purpose":  "Semantic comparison and capture evidence for sliderator."
+                     },
+                     {
                          "id":  "TR-timing-copier-report",
                          "group":  "transformation",
                          "path":  "transformations/timing-copier-report.md",
@@ -695,6 +709,13 @@
                          "path":  "transformations/expected/slider-picturator.osu",
                          "sha256":  "193DD7875260CDE0E76ADC41FA118E777BFB9C07944B8242ED5DF2EF3871C754",
                          "purpose":  "Exact legacy slider-picturator output."
+                     },
+                     {
+                         "id":  "TR-sliderator-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/sliderator.osu",
+                         "sha256":  "E55B75CA4C918940E6244EB4141C47CEBBFEB565694720EC7A86BCF32626A81A",
+                         "purpose":  "Exact legacy sliderator output."
                      },
                      {
                          "id":  "TR-timing-copier-output",

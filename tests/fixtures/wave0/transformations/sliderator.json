@@ -1,12 +1,16 @@
 {
     "id":  "TR-sliderator",
     "feature":  "Sliderator",
-    "status":  "pending-capture",
+    "status":  "accepted",
     "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
     "options":  "sliderator.options.json",
-    "expectedOutput":  null,
+    "expectedOutput":  "expected/sliderator.osu",
+    "expectedOutputSha256":  "E55B75CA4C918940E6244EB4141C47CEBBFEB565694720EC7A86BCF32626A81A",
     "legacyVersion":  "1.12.30",
-    "reviewer":  null,
-    "reviewedOn":  null,
-    "notes":  "Run the legacy feature against a disposable copy, then record and review the exact output."
+    "reviewer":  "Olivier",
+    "reviewedOn":  "2026-07-19",
+    "capturedOn":  "2026-07-19",
+    "observedMessage":  "Done!",
+    "backupSha256":  "9DDBE49058712E1211DCEAA52BCBE3D8FF903562EEF5DD0587945407439AC341",
+    "notes":  "The backup exactly matched the target seed. The accepted Add export places a variable-velocity slider at 2500 ms using the bounded three-anchor position graph."
 }
