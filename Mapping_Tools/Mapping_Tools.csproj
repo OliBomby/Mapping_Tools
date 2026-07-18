@@ -80,6 +80,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Mapping_Tools.Application\Mapping_Tools.Application.csproj" />
+    <ProjectReference Include="..\Mapping_Tools.Infrastructure\Mapping_Tools.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Data\mt_icon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
