@@ -266,7 +266,7 @@
                          "id":  "TR-property-transformer",
                          "group":  "transformation",
                          "path":  "transformations/property-transformer.json",
-                         "sha256":  "69D973B36B7D9DC11D519F0FC0C9BDB1C90E99432131EB7F48E669ABA6881827",
+                         "sha256":  "D2EE9BD88DC1F08BF80A2F49C06A542E77EDEFB4458EE94A28EA3584CC9B52C0",
                          "purpose":  "Legacy before/after capture record for Property Transformer."
                      },
                      {
@@ -280,7 +280,7 @@
                          "id":  "TR-timing-helper",
                          "group":  "transformation",
                          "path":  "transformations/timing-helper.json",
-                         "sha256":  "0B006DF09729943F870495C53D4430BDDE0A492FCB1B8DDBC70EDF99362BA383",
+                         "sha256":  "087761E74F269B36BFEF99B6FBFF8238F6B9E4738A23508081F971383C3B1DE5",
                          "purpose":  "Legacy before/after capture record for Timing Helper."
                      },
                      {
@@ -382,6 +382,13 @@
                          "purpose":  "Exact legacy map-cleaner capture settings."
                      },
                      {
+                         "id":  "TR-property-transformer-options",
+                         "group":  "transformation",
+                         "path":  "transformations/property-transformer.options.json",
+                         "sha256":  "BB6C5AC72617040C1EFE52E44E4EC1E5BB7ADD7EA0FD77CD3E75CB627DEB239F",
+                         "purpose":  "Exact legacy property-transformer capture settings."
+                     },
+                     {
                          "id":  "TR-timing-helper-options",
                          "group":  "transformation",
                          "path":  "transformations/timing-helper.options.json",
@@ -396,10 +403,17 @@
                          "purpose":  "Semantic comparison and capture evidence for map-cleaner."
                      },
                      {
+                         "id":  "TR-property-transformer-report",
+                         "group":  "transformation",
+                         "path":  "transformations/property-transformer-report.md",
+                         "sha256":  "67D8134A64EA335AF11E277B5E39CC0816A3856C47F1E237D7AA51044B430EDA",
+                         "purpose":  "Semantic comparison and capture evidence for property-transformer."
+                     },
+                     {
                          "id":  "TR-timing-helper-report",
                          "group":  "transformation",
                          "path":  "transformations/timing-helper-report.md",
-                         "sha256":  "6043E2C01EC0229CD74180542A71734E4A0B2463D6FBF842692ED20877CF9DCB",
+                         "sha256":  "A85A42810588D8D336008E488DCFE8A64B1CC72CBB08217F85B15F3664E753C3",
                          "purpose":  "Semantic comparison and capture evidence for timing-helper."
                      },
                      {
@@ -408,6 +422,13 @@
                          "path":  "transformations/expected/map-cleaner.osu",
                          "sha256":  "33040289283130D5E417D4303EA198DD19FD07412D3985216D25C5B1A0521C57",
                          "purpose":  "Exact legacy map-cleaner output."
+                     },
+                     {
+                         "id":  "TR-property-transformer-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/property-transformer.osu",
+                         "sha256":  "7DD458E8AF4924ABEDD285D41A5668C65CB5C473087EC0B9DB006F8F9D57A0F5",
+                         "purpose":  "Exact legacy property-transformer output."
                      },
                      {
                          "id":  "TR-timing-helper-output",

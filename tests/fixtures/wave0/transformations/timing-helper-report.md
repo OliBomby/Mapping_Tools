@@ -19,4 +19,4 @@
 
 The operation added exactly the reported number of redlines without removing greenlines, hit objects, or bookmarks. Bookmark timestamps were unchanged. The backup is byte-identical to the seed.
 
-Status: captured, awaiting mapper acceptance.
+Status: accepted by Olivier on 2026-07-18.
