@@ -1,0 +1,83 @@
+osu file format v14
+
+[General]
+AudioFilename: audio.mp3
+AudioLeadIn: 0
+PreviewTime: 1517
+Countdown: 3
+SampleSet: Drum
+StackLeniency: 0.2
+Mode: 0
+LetterboxInBreaks: 1
+StoryFireInFront: 0
+UseSkinSprites: 1
+AlwaysShowPlayfield: 1
+OverlayPosition: Above
+SkinPreference: - elohere x Seouless
+EpilepsyWarning: 1
+CountdownOffset: 1
+SpecialStyle: 1
+WidescreenStoryboard: 1
+SamplesMatchPlaybackRate: 1
+
+[Editor]
+DistanceSpacing: 2
+BeatDivisor: 16
+GridSize: 4
+TimelineZoom: 0.8000059
+
+[Metadata]
+Title:Why you have to be mad?
+TitleUnicode:Why you have to be mad?
+Artist:idk
+ArtistUnicode:idk
+Creator:OliBomby
+Version:complicated
+Source:
+Tags:ilya bryzgalov simple visualisation
+BeatmapID:0
+BeatmapSetID:727066
+
+[Difficulty]
+HPDrainRate:4.2
+CircleSize:4.4
+OverallDifficulty:8.3
+ApproachRate:8.9
+SliderMultiplier:2.79999990463257
+SliderTickRate:0.5
+
+[Events]
+//Background and Video events
+0,0,"maxresdefault (4).jpg",0,0
+//Break Periods
+//Storyboard Layer 0 (Background)
+//Storyboard Layer 1 (Fail)
+//Storyboard Layer 2 (Pass)
+//Storyboard Layer 3 (Foreground)
+//Storyboard Layer 4 (Overlay)
+//Storyboard Sound Samples
+Sample,0,0,"normal-hitnormal3.wav",0
+
+[TimingPoints]
+15,255.79045645807,3,1,0,100,1,0
+334,-83.3333333333333,3,1,0,100,0,0
+526,333.333333333333,5,2,2,5,1,8
+942,-25,5,3,1,67,0,9
+1359,750,7,3,1,67,1,0
+2109,759.493670886076,7,3,1,67,1,0
+2109,-100,7,2,3,80,0,0
+13590.5,750,7,3,1,67,1,0
+13690.3,-100,7,3,1,67,0,0
+
+
+[Colours]
+Combo1 : 255,192,0
+Combo2 : 0,202,0
+Combo3 : 18,124,255
+Combo4 : 242,24,57
+
+[HitObjects]
+234,141,15,38,6,B|214:211|128:244|57:192|51:124|51:124|94:109|94:109|367:44|367:44|378:113|378:113|367:44|367:44|344:110|344:110|451:306|451:306|342:339|351:314|334:314|323:314|318:318|318:327|318:327|254:338|254:338|203:291|203:291|135:277|135:277|70:300|70:300|63:309|63:309|42:354|42:354|71:252|71:252|79:245|79:245|21:157|21:157|10:149|10:149|28:109|28:109|151:0|151:0|122:102|122:102|114:109|114:109|172:197|172:197|183:205|183:205|122:342,1,2218.352855009654,8|0,0:0|0:0,0:0:0:0:
+256,192,1275,12,14,1859,0:0:0:0:
+452,42,1525,6,0,B|458:118|458:118|486:205|486:205|6:67|6:67|20:64|57:43|88:51|88:51|119:59|157:106|192:114|192:114|227:122|263:103|299:98,1,947.0749034011825,0|12,0:0|1:3,0:0:0:0:
+

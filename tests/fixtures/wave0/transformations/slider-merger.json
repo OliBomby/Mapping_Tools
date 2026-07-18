@@ -1,12 +1,16 @@
 {
     "id":  "TR-slider-merger",
     "feature":  "Slider Merger",
-    "status":  "pending-capture",
+    "status":  "accepted",
     "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
-    "options":  "../projects/slidermergerproject.json",
-    "expectedOutput":  null,
+    "options":  "slider-merger.options.json",
+    "expectedOutput":  "expected/slider-merger.osu",
+    "expectedOutputSha256":  "0EF86314B44A53B84F546D64A716D19516B18EDDD074BB228503B59E90C4FA49",
     "legacyVersion":  "1.12.30",
-    "reviewer":  null,
-    "reviewedOn":  null,
-    "notes":  "Run the legacy feature against a disposable copy, then record and review the exact output."
+    "reviewer":  "Olivier",
+    "reviewedOn":  "2026-07-19",
+    "capturedOn":  "2026-07-19",
+    "observedMessage":  "Successfully merged 16 sliders!",
+    "backupSha256":  "9DDBE49058712E1211DCEAA52BCBE3D8FF903562EEF5DD0587945407439AC341",
+    "notes":  "The backup exactly matched the target seed. Accepted after the objects before and after the spinner were merged into two Bézier sliders using linear gap connections."
 }

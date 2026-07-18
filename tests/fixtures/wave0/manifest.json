@@ -11,6 +11,13 @@
                          "purpose":  "Real-world standard map with bookmarks, inherited timing, samples, colours, and complex hit objects."
                      },
                      {
+                         "id":  "BM-STD-AUTOFAIL-001",
+                         "group":  "beatmap",
+                         "path":  "beatmaps/standard-autofail-2b.osu",
+                         "sha256":  "3B69F876B00AD2DBB90B7CD6ADC6997702A4141CF4FEE5D745E935B8ADF21947",
+                         "purpose":  "Real-world 2B standard map that triggers known auto-fail unloading behavior."
+                     },
+                     {
                          "id":  "BM-TAIKO-001",
                          "group":  "beatmap",
                          "path":  "beatmaps/taiko.osu",
@@ -315,7 +322,7 @@
                          "id":  "TR-slider-merger",
                          "group":  "transformation",
                          "path":  "transformations/slider-merger.json",
-                         "sha256":  "67C11C7C80DEDDDD81EF9CC60AF41E37476A3B23341B5D491C58CA46EA09E040",
+                         "sha256":  "5FF8DF77AFE889BB59F9A56403C7B179C12A287F1CB91137D9A4795132D69BC2",
                          "purpose":  "Legacy before/after capture record for Slider Merger."
                      },
                      {
@@ -336,7 +343,7 @@
                          "id":  "TR-tumour-generator",
                          "group":  "transformation",
                          "path":  "transformations/tumour-generator.json",
-                         "sha256":  "2D30766125A2A3DA9C58FA28AF9C21CA00B99BF8FFB9FF5A897CD99375FCFDBA",
+                         "sha256":  "EFCF64552F7162CD584749030D0191F383953473230AFFCAE6479AC66879E57F",
                          "purpose":  "Legacy before/after capture record for Tumour Generator 2."
                      },
                      {
@@ -371,8 +378,15 @@
                          "id":  "TR-auto-fail-detector",
                          "group":  "transformation",
                          "path":  "transformations/auto-fail-detector.json",
-                         "sha256":  "1CA0F4E2BB5C5DA40151251A2DFCE9A6C0C0596CB4E8C0ED0793032A562E2A37",
+                         "sha256":  "53171DB63D124A27F4282476D339582F1EA0F602C25886439EF8C857AE424E5C",
                          "purpose":  "Legacy before/after capture record for Auto-fail Detector."
+                     },
+                     {
+                         "id":  "TR-auto-fail-detector-options",
+                         "group":  "transformation",
+                         "path":  "transformations/auto-fail-detector.options.json",
+                         "sha256":  "28BCAE77FDA96D6F395D870832B11D750E4D6563C970CA15351D9531A5D5FB5B",
+                         "purpose":  "Exact legacy auto-fail-detector capture settings."
                      },
                      {
                          "id":  "TR-combo-colour-studio-options",
@@ -452,6 +466,13 @@
                          "purpose":  "Exact legacy slider-merger capture settings."
                      },
                      {
+                         "id":  "TR-slider-picturator-options",
+                         "group":  "transformation",
+                         "path":  "transformations/slider-picturator.options.json",
+                         "sha256":  "B554F86C9BDFD8ADDA2C5C3A2526F6C8A2EA1128F7FEBFDFE394567103B8964E",
+                         "purpose":  "Exact legacy slider-picturator capture settings."
+                     },
+                     {
                          "id":  "TR-timing-copier-options",
                          "group":  "transformation",
                          "path":  "transformations/timing-copier.options.json",
@@ -464,6 +485,20 @@
                          "path":  "transformations/timing-helper.options.json",
                          "sha256":  "452BEEC27C62C4E660A9AB987A1DFFDA737ADF5EE18950AAE03D11A0006F83A7",
                          "purpose":  "Exact legacy timing-helper capture settings."
+                     },
+                     {
+                         "id":  "TR-tumour-generator-options",
+                         "group":  "transformation",
+                         "path":  "transformations/tumour-generator.options.json",
+                         "sha256":  "E7023131BD890EEB9DD5B7E20B27F5DD2132EBC0D7239CCFA7BA3864E291D027",
+                         "purpose":  "Exact legacy tumour-generator capture settings."
+                     },
+                     {
+                         "id":  "TR-auto-fail-detector-report",
+                         "group":  "transformation",
+                         "path":  "transformations/auto-fail-detector-report.md",
+                         "sha256":  "4BDC476E51C54583DB09142C2B14E5DDC6BC27C12E2450E9B1BF34A2AB4DFF94",
+                         "purpose":  "Semantic comparison and capture evidence for auto-fail-detector."
                      },
                      {
                          "id":  "TR-combo-colour-studio-report",
@@ -536,6 +571,13 @@
                          "purpose":  "Semantic comparison and capture evidence for slider-completionator."
                      },
                      {
+                         "id":  "TR-slider-merger-report",
+                         "group":  "transformation",
+                         "path":  "transformations/slider-merger-report.md",
+                         "sha256":  "69013FA15BD9EE40510E16EEB1F884B483D3D04558B8191108A4ABD5892352DF",
+                         "purpose":  "Semantic comparison and capture evidence for slider-merger."
+                     },
+                     {
                          "id":  "TR-timing-copier-report",
                          "group":  "transformation",
                          "path":  "transformations/timing-copier-report.md",
@@ -548,6 +590,13 @@
                          "path":  "transformations/timing-helper-report.md",
                          "sha256":  "A85A42810588D8D336008E488DCFE8A64B1CC72CBB08217F85B15F3664E753C3",
                          "purpose":  "Semantic comparison and capture evidence for timing-helper."
+                     },
+                     {
+                         "id":  "TR-tumour-generator-report",
+                         "group":  "transformation",
+                         "path":  "transformations/tumour-generator-report.md",
+                         "sha256":  "A77C09DC4E72556B45B39356836D49C1C5482A53E79328FE35989071BDEAED6D",
+                         "purpose":  "Semantic comparison and capture evidence for tumour-generator."
                      },
                      {
                          "id":  "TR-mapset-merger-output-manifest",
@@ -620,6 +669,13 @@
                          "purpose":  "Exact legacy slider-completionator output."
                      },
                      {
+                         "id":  "TR-slider-merger-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/slider-merger.osu",
+                         "sha256":  "0EF86314B44A53B84F546D64A716D19516B18EDDD074BB228503B59E90C4FA49",
+                         "purpose":  "Exact legacy slider-merger output."
+                     },
+                     {
                          "id":  "TR-timing-copier-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/timing-copier.osu",
@@ -632,6 +688,20 @@
                          "path":  "transformations/expected/timing-helper.osu",
                          "sha256":  "FF0BBA48D8E8C55DC23D7A3B0AD7A8A0303BF595387C6B5ADCB5E8B18CC1D31A",
                          "purpose":  "Exact legacy timing-helper output."
+                     },
+                     {
+                         "id":  "TR-tumour-generator-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/tumour-generator.osu",
+                         "sha256":  "BE26A9D99683DD8F31713DA20B27E34449F3510CD06AFC2B375D28A37EF8BF55",
+                         "purpose":  "Exact legacy tumour-generator output."
+                     },
+                     {
+                         "id":  "TR-auto-fail-detector-result",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/auto-fail-detector.json",
+                         "sha256":  "AF8B091CB79E47EA82F063C42A7AA2A48A8AF29129054A3A36F7E18BFD5BFF8F",
+                         "purpose":  "Exact legacy auto-fail-detector analysis result."
                      }
                  ],
     "destructiveFeatures":  [

@@ -1,12 +1,16 @@
 {
     "id":  "TR-tumour-generator",
     "feature":  "Tumour Generator 2",
-    "status":  "pending-capture",
+    "status":  "accepted",
     "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
-    "options":  "../projects/tumourgeneratorproject.json",
-    "expectedOutput":  null,
+    "options":  "tumour-generator.options.json",
+    "expectedOutput":  "expected/tumour-generator.osu",
+    "expectedOutputSha256":  "BE26A9D99683DD8F31713DA20B27E34449F3510CD06AFC2B375D28A37EF8BF55",
     "legacyVersion":  "1.12.30",
-    "reviewer":  null,
-    "reviewedOn":  null,
-    "notes":  "Run the legacy feature against a disposable copy, then record and review the exact output."
+    "reviewer":  "Olivier",
+    "reviewedOn":  "2026-07-19",
+    "capturedOn":  "2026-07-19",
+    "observedMessage":  "Successfully generated tumours on 7 sliders!",
+    "backupSha256":  "9DDBE49058712E1211DCEAA52BCBE3D8FF903562EEF5DD0587945407439AC341",
+    "notes":  "The backup exactly matched the target seed. Accepted after the real-world triangle layer was applied to all seven sliders and SV was reconstructed."
 }

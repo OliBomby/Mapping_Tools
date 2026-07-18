@@ -103,6 +103,10 @@ $beatmaps = @(
         Destination = 'beatmaps\standard-feature-rich.osu'
     },
     @{
+        Source = '90935 IOSYS - Endless Tewi-ma Park\IOSYS - Endless Tewi-ma Park (Lanturn) [Tewi 2B Expert Edition].osu'
+        Destination = 'beatmaps\standard-autofail-2b.osu'
+    },
+    @{
         Source = "100019 Owl City & Carly Rae Jepsen - Good Time\Owl City & Carly Rae Jepsen - Good Time (Gero) [Mancuso's Muzukashii].osu"
         Destination = 'beatmaps\taiko.osu'
     },
@@ -194,6 +198,7 @@ function Add-FixtureManifestEntry {
 }
 
 Add-FixtureManifestEntry 'BM-STD-RICH-001' 'beatmap' 'beatmaps\standard-feature-rich.osu' 'Real-world standard map with bookmarks, inherited timing, samples, colours, and complex hit objects.'
+Add-FixtureManifestEntry 'BM-STD-AUTOFAIL-001' 'beatmap' 'beatmaps\standard-autofail-2b.osu' 'Real-world 2B standard map that triggers known auto-fail unloading behavior.'
 Add-FixtureManifestEntry 'BM-TAIKO-001' 'beatmap' 'beatmaps\taiko.osu' 'Real-world taiko-mode map.'
 Add-FixtureManifestEntry 'BM-CATCH-001' 'beatmap' 'beatmaps\catch.osu' 'Real-world catch-mode map with bookmarks.'
 Add-FixtureManifestEntry 'BM-MANIA-001' 'beatmap' 'beatmaps\mania.osu' 'Real-world mania-mode map with bookmarks.'
@@ -241,6 +246,11 @@ Get-ChildItem -LiteralPath (Join-Path $fixtureRoot 'transformations\expected') -
     $featureId = $_.BaseName
     $relativePath = "transformations\expected\$($_.Name)"
     Add-FixtureManifestEntry "TR-$featureId-output" 'transformation' $relativePath "Exact legacy $featureId output."
+}
+Get-ChildItem -LiteralPath (Join-Path $fixtureRoot 'transformations\expected') -File -Filter '*.json' | ForEach-Object {
+    $featureId = $_.BaseName
+    $relativePath = "transformations\expected\$($_.Name)"
+    Add-FixtureManifestEntry "TR-$featureId-result" 'transformation' $relativePath "Exact legacy $featureId analysis result."
 }
 
 $manifest = [ordered]@{
