@@ -1,12 +1,15 @@
 {
     "id":  "TR-mapset-merger",
     "feature":  "Mapset Merger",
-    "status":  "pending-capture",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
-    "options":  "../projects/mapsetmergerproject.json",
-    "expectedOutput":  null,
+    "status":  "accepted",
+    "seedInput":  "../mapsets/multi-difficulty/normal.osu",
+    "secondaryInput":  "../mapsets/multi-difficulty/expert.osu",
+    "options":  "mapset-merger.options.json",
+    "expectedOutput":  "mapset-merger.output.json",
     "legacyVersion":  "1.12.30",
-    "reviewer":  null,
-    "reviewedOn":  null,
-    "notes":  "Run the legacy feature against a disposable copy, then record and review the exact output."
+    "reviewer":  "Olivier",
+    "reviewedOn":  "2026-07-18",
+    "capturedOn":  "2026-07-18",
+    "observedMessage":  "Successfully merged 2 mapsets!",
+    "notes":  "Accepted after verifying both rewritten beatmaps, isolated audio/background paths, and collision-free custom hitsound indices. This export-only tool does not create backups."
 }

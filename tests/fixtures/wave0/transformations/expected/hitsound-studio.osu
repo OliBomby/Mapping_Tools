@@ -1,0 +1,82 @@
+osu file format v14
+
+[General]
+AudioFilename: audio.mp3
+AudioLeadIn: 0
+PreviewTime: 1517
+Countdown: 3
+SampleSet: Drum
+StackLeniency: 0.0
+Mode: 0
+LetterboxInBreaks: 1
+StoryFireInFront: 0
+UseSkinSprites: 1
+AlwaysShowPlayfield: 1
+OverlayPosition: Above
+SkinPreference: - elohere x Seouless
+EpilepsyWarning: 1
+CountdownOffset: 1
+SpecialStyle: 1
+WidescreenStoryboard: 1
+SamplesMatchPlaybackRate: 1
+
+[Editor]
+DistanceSpacing: 2
+BeatDivisor: 16
+GridSize: 4
+TimelineZoom: 0.8000059
+
+[Metadata]
+Title:Why you have to be mad?
+TitleUnicode:Why you have to be mad?
+Artist:idk
+ArtistUnicode:idk
+Creator:OliBomby
+Version:Wave 0 Hitsounds
+Source:
+Tags:ilya bryzgalov simple visualisation
+BeatmapID:0
+BeatmapSetID:727066
+
+[Difficulty]
+HPDrainRate:4.2
+CircleSize:4
+OverallDifficulty:8.3
+ApproachRate:8.9
+SliderMultiplier:2.79999990463257
+SliderTickRate:0.5
+
+[Events]
+//Background and Video events
+0,0,"maxresdefault (4).jpg",0,0
+//Break Periods
+//Storyboard Layer 0 (Background)
+//Storyboard Layer 1 (Fail)
+//Storyboard Layer 2 (Pass)
+//Storyboard Layer 3 (Foreground)
+//Storyboard Layer 4 (Overlay)
+//Storyboard Sound Samples
+Sample,0,0,"normal-hitnormal3.wav",0
+
+[TimingPoints]
+15,255.79045645807,3,1,1,100,1,0
+526,333.333333333333,5,1,1,5,1,8
+942,-100,5,1,1,67,0,8
+1359,750,7,1,1,67,1,0
+2109,759.493670886076,7,1,1,80,1,0
+13590.5,750,7,1,1,80,1,0
+
+
+[Colours]
+Combo1 : 255,192,0
+Combo2 : 0,202,0
+Combo3 : 18,124,255
+Combo4 : 242,24,57
+
+[HitObjects]
+256,192,15,5,0,1:1:0:0:
+256,192,334,5,0,1:1:0:0:
+256,192,526,5,0,1:1:0:0:
+256,192,942,5,0,1:1:0:0:
+256,192,2109,5,0,1:1:0:0:
+

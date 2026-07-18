@@ -1,12 +1,17 @@
 {
     "id":  "TR-hitsound-studio",
     "feature":  "Hitsound Studio",
-    "status":  "pending-capture",
+    "status":  "accepted",
     "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
-    "options":  "../projects/hsstudioproject.json",
-    "expectedOutput":  null,
+    "secondaryInput":  "../audio/drum-hitnormal60.wav",
+    "options":  "hitsound-studio.options.json",
+    "expectedOutput":  "expected/hitsound-studio.osu",
+    "expectedOutputSha256":  "2DC96A9639E1E78F0931A02D50B6A7453018AED968FC28C81BF84DAEAA54AB99",
     "legacyVersion":  "1.12.30",
-    "reviewer":  null,
-    "reviewedOn":  null,
-    "notes":  "Run the legacy feature against a disposable copy, then record and review the exact output."
+    "reviewer":  "Olivier",
+    "reviewedOn":  "2026-07-18",
+    "capturedOn":  "2026-07-18",
+    "observedMessage":  "Number of sample indices: 1, Number of samples: 1, Number of greenlines: 1",
+    "exportedSampleSha256":  "08965C7225457205B4D8CA9EACE5195CEE1CE77D7BA548F41DFC7F1E0DC33E23",
+    "notes":  "Accepted after the generated map and PCM sample matched the single-layer, five-event export configuration. This export-only tool does not create backups and opens the export folder on completion."
 }

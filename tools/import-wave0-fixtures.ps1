@@ -232,6 +232,11 @@ Get-ChildItem -LiteralPath (Join-Path $fixtureRoot 'transformations') -File -Fil
     $relativePath = "transformations\$($_.Name)"
     Add-FixtureManifestEntry "TR-$featureId-report" 'transformation' $relativePath "Semantic comparison and capture evidence for $featureId."
 }
+Get-ChildItem -LiteralPath (Join-Path $fixtureRoot 'transformations') -File -Filter '*.output.json' | ForEach-Object {
+    $featureId = $_.BaseName -replace '\.output$', ''
+    $relativePath = "transformations\$($_.Name)"
+    Add-FixtureManifestEntry "TR-$featureId-output-manifest" 'transformation' $relativePath "Exact legacy multi-file output manifest for $featureId."
+}
 Get-ChildItem -LiteralPath (Join-Path $fixtureRoot 'transformations\expected') -File -Filter '*.osu' | ForEach-Object {
     $featureId = $_.BaseName
     $relativePath = "transformations\expected\$($_.Name)"
