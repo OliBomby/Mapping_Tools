@@ -1,0 +1,19 @@
+{
+  "Source": "../beatmaps/standard-feature-rich.osu",
+  "Target": "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+  "Artist": "Wave Zero Artist",
+  "RomanisedArtist": "Wave Zero Artist",
+  "Title": "Wave Zero Metadata Baseline",
+  "RomanisedTitle": "Wave Zero Metadata Baseline",
+  "BeatmapCreator": "Fixture Mapper",
+  "SourceMetadata": "Wave 0",
+  "Tags": "wave zero metadata fixture wave",
+  "DoRemoveDuplicateTags": true,
+  "ResetIds": true,
+  "PreviewTime": 12345.0,
+  "UseComboColours": true,
+  "ComboColours": ["#FFFF3366", "#FF33CCFF", "#FFFFCC33"],
+  "SpecialColours": [],
+  "UseEditorReader": false,
+  "MakeBackups": true
+}

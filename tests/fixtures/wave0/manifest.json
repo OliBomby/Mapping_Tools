@@ -259,21 +259,21 @@
                          "id":  "TR-metadata-manager",
                          "group":  "transformation",
                          "path":  "transformations/metadata-manager.json",
-                         "sha256":  "FFE59DBE2E62ED063278CCED4DE0ECCAA6399F066369943A08BF7D3C5DA535C8",
+                         "sha256":  "467114BD17C8A0DCC59A35F9A00A59B965F3F8B6857B8F0CC8E84522B0BBC7EC",
                          "purpose":  "Legacy before/after capture record for Metadata Manager."
                      },
                      {
                          "id":  "TR-property-transformer",
                          "group":  "transformation",
                          "path":  "transformations/property-transformer.json",
-                         "sha256":  "D2EE9BD88DC1F08BF80A2F49C06A542E77EDEFB4458EE94A28EA3584CC9B52C0",
+                         "sha256":  "CA3B02F10F038711527CD36667C799FF41DAA9AF4314F1911056D32F3558D9D3",
                          "purpose":  "Legacy before/after capture record for Property Transformer."
                      },
                      {
                          "id":  "TR-timing-copier",
                          "group":  "transformation",
                          "path":  "transformations/timing-copier.json",
-                         "sha256":  "475A98F529F17D974FDF1C2C7A4FD5DB81CDE4E3E38399576AD28FA3A8DA8DE8",
+                         "sha256":  "209A30A1BFCDA18C7DE5DAD41DADF3A86E31BFDBFE62166115AD9CD559CBF44C",
                          "purpose":  "Legacy before/after capture record for Timing Copier."
                      },
                      {
@@ -301,7 +301,7 @@
                          "id":  "TR-hitsound-copier",
                          "group":  "transformation",
                          "path":  "transformations/hitsound-copier.json",
-                         "sha256":  "3C9D2B759F87A330896B6B6C06C610A2A845401FF314B8A1035E4267FC827758",
+                         "sha256":  "06670280C7445A4F0906BCB749AE5160A72BA07D20469DF892BBF495D3C56E8C",
                          "purpose":  "Legacy before/after capture record for Hitsound Copier."
                      },
                      {
@@ -375,11 +375,25 @@
                          "purpose":  "Legacy before/after capture record for Auto-fail Detector."
                      },
                      {
+                         "id":  "TR-hitsound-copier-options",
+                         "group":  "transformation",
+                         "path":  "transformations/hitsound-copier.options.json",
+                         "sha256":  "E88D7D2C6A00784F4B0E5CF84AF777CDA12EE59F07711EF3A2F724B0F0324CC0",
+                         "purpose":  "Exact legacy hitsound-copier capture settings."
+                     },
+                     {
                          "id":  "TR-map-cleaner-options",
                          "group":  "transformation",
                          "path":  "transformations/map-cleaner.options.json",
                          "sha256":  "5014C41F62A001279FF5AB962D0C61BFA868331460F19991356DC84494562D28",
                          "purpose":  "Exact legacy map-cleaner capture settings."
+                     },
+                     {
+                         "id":  "TR-metadata-manager-options",
+                         "group":  "transformation",
+                         "path":  "transformations/metadata-manager.options.json",
+                         "sha256":  "89DC6EDF5432763051CC6CCE78F22D96BAD6F54D5E07F7E79C87A471B9297DB8",
+                         "purpose":  "Exact legacy metadata-manager capture settings."
                      },
                      {
                          "id":  "TR-property-transformer-options",
@@ -389,11 +403,32 @@
                          "purpose":  "Exact legacy property-transformer capture settings."
                      },
                      {
+                         "id":  "TR-rhythm-guide-options",
+                         "group":  "transformation",
+                         "path":  "transformations/rhythm-guide.options.json",
+                         "sha256":  "9C87B6840E67E983F578B116CFE472D1B8A960B6FFAE9EF1E74BA1E67900DC9A",
+                         "purpose":  "Exact legacy rhythm-guide capture settings."
+                     },
+                     {
+                         "id":  "TR-timing-copier-options",
+                         "group":  "transformation",
+                         "path":  "transformations/timing-copier.options.json",
+                         "sha256":  "519B2909A8B5BD10CCBA0423C91AFECABA3A341BE12299D5061490C03C6184E4",
+                         "purpose":  "Exact legacy timing-copier capture settings."
+                     },
+                     {
                          "id":  "TR-timing-helper-options",
                          "group":  "transformation",
                          "path":  "transformations/timing-helper.options.json",
                          "sha256":  "452BEEC27C62C4E660A9AB987A1DFFDA737ADF5EE18950AAE03D11A0006F83A7",
                          "purpose":  "Exact legacy timing-helper capture settings."
+                     },
+                     {
+                         "id":  "TR-hitsound-copier-report",
+                         "group":  "transformation",
+                         "path":  "transformations/hitsound-copier-report.md",
+                         "sha256":  "07C8ED2BED52659601A75C07E2553024D4443DF26044FB00F64DCAF0980F292C",
+                         "purpose":  "Semantic comparison and capture evidence for hitsound-copier."
                      },
                      {
                          "id":  "TR-map-cleaner-report",
@@ -403,11 +438,25 @@
                          "purpose":  "Semantic comparison and capture evidence for map-cleaner."
                      },
                      {
+                         "id":  "TR-metadata-manager-report",
+                         "group":  "transformation",
+                         "path":  "transformations/metadata-manager-report.md",
+                         "sha256":  "1C1488E262FF454766899DB6D59952D9419EED25905EEA51EAD0AD93467FFF61",
+                         "purpose":  "Semantic comparison and capture evidence for metadata-manager."
+                     },
+                     {
                          "id":  "TR-property-transformer-report",
                          "group":  "transformation",
                          "path":  "transformations/property-transformer-report.md",
-                         "sha256":  "67D8134A64EA335AF11E277B5E39CC0816A3856C47F1E237D7AA51044B430EDA",
+                         "sha256":  "174CD7928B9D83531B3BF5120357262E904E23EEC29D01141403A58E7C7BB931",
                          "purpose":  "Semantic comparison and capture evidence for property-transformer."
+                     },
+                     {
+                         "id":  "TR-timing-copier-report",
+                         "group":  "transformation",
+                         "path":  "transformations/timing-copier-report.md",
+                         "sha256":  "14817F84879AFDFF9E962E7C383A6D2C7A0446A2D4A1F437B649BE204085DD7D",
+                         "purpose":  "Semantic comparison and capture evidence for timing-copier."
                      },
                      {
                          "id":  "TR-timing-helper-report",
@@ -417,6 +466,13 @@
                          "purpose":  "Semantic comparison and capture evidence for timing-helper."
                      },
                      {
+                         "id":  "TR-hitsound-copier-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/hitsound-copier.osu",
+                         "sha256":  "6B75E2932AED26F1C73B290362B4BA1355FD297D2B63526828365AE08C11F2FE",
+                         "purpose":  "Exact legacy hitsound-copier output."
+                     },
+                     {
                          "id":  "TR-map-cleaner-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/map-cleaner.osu",
@@ -424,11 +480,25 @@
                          "purpose":  "Exact legacy map-cleaner output."
                      },
                      {
+                         "id":  "TR-metadata-manager-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/metadata-manager.osu",
+                         "sha256":  "0F9EF22EEC9843B684C7D2EB76433E3356025F5186CBBA0313BD2724373B26E2",
+                         "purpose":  "Exact legacy metadata-manager output."
+                     },
+                     {
                          "id":  "TR-property-transformer-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/property-transformer.osu",
                          "sha256":  "7DD458E8AF4924ABEDD285D41A5668C65CB5C473087EC0B9DB006F8F9D57A0F5",
                          "purpose":  "Exact legacy property-transformer output."
+                     },
+                     {
+                         "id":  "TR-timing-copier-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/timing-copier.osu",
+                         "sha256":  "014BE30D61715042DE03222EFE5FB4232460BAFBB4197CE5E8F8E5CB0C48C51D",
+                         "purpose":  "Exact legacy timing-copier output."
                      },
                      {
                          "id":  "TR-timing-helper-output",

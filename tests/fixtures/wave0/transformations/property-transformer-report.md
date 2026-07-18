@@ -17,4 +17,4 @@
 
 The operation changed every bookmark by exactly the configured +5 ms. The beatmap serializer also normalized whitespace around several General and Editor property separators and inserted one blank line; these are textual changes without changed values. The backup is byte-identical to the seed.
 
-Status: captured, awaiting mapper acceptance.
+Status: accepted by Olivier on 2026-07-18.
