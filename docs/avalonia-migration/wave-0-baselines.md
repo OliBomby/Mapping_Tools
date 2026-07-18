@@ -14,4 +14,6 @@ The initial records intentionally use the existing compact beatmap fixtures. Fea
 4. Record the legacy Mapping Tools version, output SHA-256, reviewer, date, and any known legacy defect.
 5. Mark the baseline `accepted` only after inspecting the semantic change and confirming recovery from the untouched seed.
 
-The Wave 0 user gate remains open until every baseline is accepted. CI checks coverage and drift; user acceptance supplies trust.
+## Gate status
+
+Closed on 2026-07-19. Olivier reviewed and accepted all 18 destructive-feature baselines. Every record has a versioned expected result and capture evidence; CI continues to check coverage and fixture drift.

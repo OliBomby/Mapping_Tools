@@ -357,7 +357,7 @@
                          "id":  "TR-pattern-gallery",
                          "group":  "transformation",
                          "path":  "transformations/pattern-gallery.json",
-                         "sha256":  "927E17723FD72A82664D3F66EB19A538C6A7947B4875007D81F98CBE5EFE4363",
+                         "sha256":  "E28E90115BBA3B99DF72E19E0DA711C2DE12691DD2AFCD872C60B5B5A9B5F3AF",
                          "purpose":  "Legacy before/after capture record for Pattern Gallery."
                      },
                      {
@@ -564,6 +564,13 @@
                          "purpose":  "Semantic comparison and capture evidence for metadata-manager."
                      },
                      {
+                         "id":  "TR-pattern-gallery-report",
+                         "group":  "transformation",
+                         "path":  "transformations/pattern-gallery-report.md",
+                         "sha256":  "F8669E2044D64FCFAA9CB53D883D39F75E15418F3C1E169D4CF45F331201ABE6",
+                         "purpose":  "Semantic comparison and capture evidence for pattern-gallery."
+                     },
+                     {
                          "id":  "TR-property-transformer-report",
                          "group":  "transformation",
                          "path":  "transformations/property-transformer-report.md",
@@ -674,6 +681,13 @@
                          "path":  "transformations/expected/metadata-manager.osu",
                          "sha256":  "0F9EF22EEC9843B684C7D2EB76433E3356025F5186CBBA0313BD2724373B26E2",
                          "purpose":  "Exact legacy metadata-manager output."
+                     },
+                     {
+                         "id":  "TR-pattern-gallery-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/pattern-gallery.osu",
+                         "sha256":  "1CE4FE8A14AC41FB718B50C167DA139FBA5C458A5410C4629E0EE36644BEDDD6",
+                         "purpose":  "Exact legacy pattern-gallery output."
                      },
                      {
                          "id":  "TR-property-transformer-output",
