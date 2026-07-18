@@ -280,7 +280,7 @@
                          "id":  "TR-timing-helper",
                          "group":  "transformation",
                          "path":  "transformations/timing-helper.json",
-                         "sha256":  "9A2D76F9191A26541679356934C692CA6BB38855736B1561460C53AB0CFD339B",
+                         "sha256":  "0B006DF09729943F870495C53D4430BDDE0A492FCB1B8DDBC70EDF99362BA383",
                          "purpose":  "Legacy before/after capture record for Timing Helper."
                      },
                      {
@@ -379,21 +379,42 @@
                          "group":  "transformation",
                          "path":  "transformations/map-cleaner.options.json",
                          "sha256":  "5014C41F62A001279FF5AB962D0C61BFA868331460F19991356DC84494562D28",
-                         "purpose":  "Exact legacy Map Cleaner capture settings."
+                         "purpose":  "Exact legacy map-cleaner capture settings."
+                     },
+                     {
+                         "id":  "TR-timing-helper-options",
+                         "group":  "transformation",
+                         "path":  "transformations/timing-helper.options.json",
+                         "sha256":  "452BEEC27C62C4E660A9AB987A1DFFDA737ADF5EE18950AAE03D11A0006F83A7",
+                         "purpose":  "Exact legacy timing-helper capture settings."
                      },
                      {
                          "id":  "TR-map-cleaner-report",
                          "group":  "transformation",
                          "path":  "transformations/map-cleaner-report.md",
                          "sha256":  "A6882CCD6DDA79A9EB31BAEEA4F20588077146107F01EA5CF578C3DB5616C81F",
-                         "purpose":  "Semantic comparison and capture evidence for Map Cleaner."
+                         "purpose":  "Semantic comparison and capture evidence for map-cleaner."
+                     },
+                     {
+                         "id":  "TR-timing-helper-report",
+                         "group":  "transformation",
+                         "path":  "transformations/timing-helper-report.md",
+                         "sha256":  "6043E2C01EC0229CD74180542A71734E4A0B2463D6FBF842692ED20877CF9DCB",
+                         "purpose":  "Semantic comparison and capture evidence for timing-helper."
                      },
                      {
                          "id":  "TR-map-cleaner-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/map-cleaner.osu",
                          "sha256":  "33040289283130D5E417D4303EA198DD19FD07412D3985216D25C5B1A0521C57",
-                         "purpose":  "Exact legacy Map Cleaner output."
+                         "purpose":  "Exact legacy map-cleaner output."
+                     },
+                     {
+                         "id":  "TR-timing-helper-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/timing-helper.osu",
+                         "sha256":  "FF0BBA48D8E8C55DC23D7A3B0AD7A8A0303BF595387C6B5ADCB5E8B18CC1D31A",
+                         "purpose":  "Exact legacy timing-helper output."
                      }
                  ],
     "destructiveFeatures":  [

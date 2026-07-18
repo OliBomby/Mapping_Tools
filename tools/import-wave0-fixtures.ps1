@@ -222,17 +222,20 @@ foreach ($feature in $destructiveFeatures) {
     Add-FixtureManifestEntry "TR-$($feature.Id)" 'transformation' "transformations\$($feature.Id).json" "Legacy before/after capture record for $($feature.Name)."
 }
 
-$mapCleanerOptions = 'transformations\map-cleaner.options.json'
-if (Test-Path -LiteralPath (Join-Path $fixtureRoot $mapCleanerOptions)) {
-    Add-FixtureManifestEntry 'TR-map-cleaner-options' 'transformation' $mapCleanerOptions 'Exact legacy Map Cleaner capture settings.'
+Get-ChildItem -LiteralPath (Join-Path $fixtureRoot 'transformations') -File -Filter '*.options.json' | ForEach-Object {
+    $featureId = $_.BaseName -replace '\.options$', ''
+    $relativePath = "transformations\$($_.Name)"
+    Add-FixtureManifestEntry "TR-$featureId-options" 'transformation' $relativePath "Exact legacy $featureId capture settings."
 }
-$mapCleanerReport = 'transformations\map-cleaner-report.md'
-if (Test-Path -LiteralPath (Join-Path $fixtureRoot $mapCleanerReport)) {
-    Add-FixtureManifestEntry 'TR-map-cleaner-report' 'transformation' $mapCleanerReport 'Semantic comparison and capture evidence for Map Cleaner.'
+Get-ChildItem -LiteralPath (Join-Path $fixtureRoot 'transformations') -File -Filter '*-report.md' | ForEach-Object {
+    $featureId = $_.BaseName -replace '-report$', ''
+    $relativePath = "transformations\$($_.Name)"
+    Add-FixtureManifestEntry "TR-$featureId-report" 'transformation' $relativePath "Semantic comparison and capture evidence for $featureId."
 }
-$mapCleanerOutput = 'transformations\expected\map-cleaner.osu'
-if (Test-Path -LiteralPath (Join-Path $fixtureRoot $mapCleanerOutput)) {
-    Add-FixtureManifestEntry 'TR-map-cleaner-output' 'transformation' $mapCleanerOutput 'Exact legacy Map Cleaner output.'
+Get-ChildItem -LiteralPath (Join-Path $fixtureRoot 'transformations\expected') -File -Filter '*.osu' | ForEach-Object {
+    $featureId = $_.BaseName
+    $relativePath = "transformations\expected\$($_.Name)"
+    Add-FixtureManifestEntry "TR-$featureId-output" 'transformation' $relativePath "Exact legacy $featureId output."
 }
 
 $manifest = [ordered]@{

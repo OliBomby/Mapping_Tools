@@ -1,0 +1,13 @@
+{
+  "Objects": true,
+  "Bookmarks": true,
+  "Greenlines": true,
+  "Redlines": true,
+  "OmitBarline": false,
+  "Leniency": 10.0,
+  "BeatsBetween": 1.0,
+  "BeatDivisors": ["1/4"],
+  "UseEditorReader": false,
+  "AlwaysQuickRun": false,
+  "MakeBackups": true
+}
