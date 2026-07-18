@@ -33,7 +33,7 @@ Never add references to `System.Windows`, `System.Windows.Forms`, `MaterialDesig
 6. Implement a ReactiveUI view model in `Mapping_Tools.Desktop/ViewModels`. Use `ReactiveObject`, `RaiseAndSetIfChanged`, and `ReactiveCommand` only when the verified 12.1-compatible documentation supports the pattern. Keep services constructor-injected and expose bindable state rather than controls.
 7. Implement the Avalonia view in `Mapping_Tools.Desktop/Views` with compiled bindings and an explicit `x:DataType`. Use Material.Avalonia resources already registered in `App.axaml`. Do not translate WPF triggers, dependency properties, event names, or dialog APIs mechanically.
 8. Register the feature in the Avalonia shell using the smallest navigation change required. Do not remove or redirect the WPF feature yet.
-9. Build the new frontend, run focused tests, and manually verify behavior parity. If visual interaction matters, launch and inspect the view rather than relying on compilation alone.
+9. Build the new frontend and run focused tests. Use `$render-desktop-view` to capture the WPF view and Avalonia port with identical deterministic state and dimensions, inspect both PNGs, and resolve or record visible differences. Use a real desktop run for native dialogs, overlays, global input, audio, or other platform behavior.
 10. Report migrated behavior, intentionally deferred behavior, platform limitations, tests run, and the exact Avalonia 12.1 documentation pages consulted.
 
 ## Completion criteria

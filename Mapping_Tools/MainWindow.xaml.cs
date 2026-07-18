@@ -51,33 +51,49 @@ namespace Mapping_Tools {
             OnUpdateCurrentBeatmap(this, currentBeatmaps);
         }
 
-        public MainWindow() {
+        public MainWindow() : this(initializeRuntimeServices: true) {
+        }
+
+        // Used by off-screen designer/test hosts. The window and its view model are
+        // initialized, but no persistence, hooks, listeners, or update services run.
+        internal MainWindow(bool initializeRuntimeServices) {
             try {
                 AppWindow = this;
-                AppCommon = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                AppDataPath = Path.Combine(AppCommon, "Mapping Tools");
+                AppCommon = initializeRuntimeServices
+                    ? Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+                    : Path.GetTempPath();
+                AppDataPath = initializeRuntimeServices
+                    ? Path.Combine(AppCommon, "Mapping Tools")
+                    : Path.Combine(AppCommon, "MappingToolsViewRenderer");
                 ExportPath = Path.Combine(AppDataPath, "Exports");
-                HttpClient = new HttpClient();
-                HttpClient.DefaultRequestHeaders.Add("user-agent", "Mapping Tools");
+                if (initializeRuntimeServices || HttpClient == null) {
+                    HttpClient = new HttpClient();
+                    HttpClient.DefaultRequestHeaders.Add("user-agent", "Mapping Tools");
+                }
 
                 InitializeComponent();
 
-                Setup();
-                SettingsManager.LoadConfig();
+                if (initializeRuntimeServices) {
+                    Setup();
+                    SettingsManager.LoadConfig();
+                }
 
                 DataContext = new MainWindowVm();
-                ListenerManager = new ListenerManager();
 
                 MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
                 MainSnackbar.MessageQueue = MessageQueue;
 
-                if (SettingsManager.Settings.MainWindowRestoreBounds.HasValue) {
-                    SetToRect(SettingsManager.Settings.MainWindowRestoreBounds.Value);
+                if (initializeRuntimeServices) {
+                    ListenerManager = new ListenerManager();
+
+                    if (SettingsManager.Settings.MainWindowRestoreBounds.HasValue) {
+                        SetToRect(SettingsManager.Settings.MainWindowRestoreBounds.Value);
+                    }
+
+                    SetFullscreen(SettingsManager.Settings.MainWindowMaximized);
+
+                    SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
                 }
-
-                SetFullscreen(SettingsManager.Settings.MainWindowMaximized);
-
-                SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
             }
             catch( Exception ex ) {
                 ex.Show();

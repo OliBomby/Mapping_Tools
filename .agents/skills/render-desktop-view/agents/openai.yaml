@@ -1,0 +1,4 @@
+interface:
+  display_name: "Render Desktop View"
+  short_description: "Render WPF and Avalonia views to PNG for parity checks"
+  default_prompt: "Use $render-desktop-view to render the legacy and Avalonia versions of a view and inspect their visual parity."
