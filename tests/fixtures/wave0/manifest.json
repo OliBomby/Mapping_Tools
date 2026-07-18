@@ -294,7 +294,7 @@
                          "id":  "TR-hitsound-preview",
                          "group":  "transformation",
                          "path":  "transformations/hitsound-preview.json",
-                         "sha256":  "E88A52714D28B03EE4438B58851E7690A6E912E124F345BEE0DC5F9480753E4D",
+                         "sha256":  "B142C15F2BC5383264A76346EDB26089612206C7D11E36F838F160AB08538919",
                          "purpose":  "Legacy before/after capture record for Hitsound Preview Helper."
                      },
                      {
@@ -375,11 +375,25 @@
                          "purpose":  "Legacy before/after capture record for Auto-fail Detector."
                      },
                      {
+                         "id":  "TR-combo-colour-studio-options",
+                         "group":  "transformation",
+                         "path":  "transformations/combo-colour-studio.options.json",
+                         "sha256":  "1D755DFC79794855BC0D49FDCA8A974630D197C6B1A8F37F580BF9F0D6174C12",
+                         "purpose":  "Exact legacy combo-colour-studio capture settings."
+                     },
+                     {
                          "id":  "TR-hitsound-copier-options",
                          "group":  "transformation",
                          "path":  "transformations/hitsound-copier.options.json",
                          "sha256":  "E88D7D2C6A00784F4B0E5CF84AF777CDA12EE59F07711EF3A2F724B0F0324CC0",
                          "purpose":  "Exact legacy hitsound-copier capture settings."
+                     },
+                     {
+                         "id":  "TR-hitsound-preview-options",
+                         "group":  "transformation",
+                         "path":  "transformations/hitsound-preview.options.json",
+                         "sha256":  "892D05E35D0BBF11B9799BB2D5F5D49C38595FF35729C9189FA967C565313621",
+                         "purpose":  "Exact legacy hitsound-preview capture settings."
                      },
                      {
                          "id":  "TR-hitsound-studio-options",
@@ -443,6 +457,13 @@
                          "path":  "transformations/hitsound-copier-report.md",
                          "sha256":  "07C8ED2BED52659601A75C07E2553024D4443DF26044FB00F64DCAF0980F292C",
                          "purpose":  "Semantic comparison and capture evidence for hitsound-copier."
+                     },
+                     {
+                         "id":  "TR-hitsound-preview-report",
+                         "group":  "transformation",
+                         "path":  "transformations/hitsound-preview-report.md",
+                         "sha256":  "91372DDC127B7240B891C140F628DAC536E3E7CBFEBB3CDA14EAA82F68DA0E3B",
+                         "purpose":  "Semantic comparison and capture evidence for hitsound-preview."
                      },
                      {
                          "id":  "TR-hitsound-studio-report",
@@ -513,6 +534,13 @@
                          "path":  "transformations/expected/hitsound-copier.osu",
                          "sha256":  "6B75E2932AED26F1C73B290362B4BA1355FD297D2B63526828365AE08C11F2FE",
                          "purpose":  "Exact legacy hitsound-copier output."
+                     },
+                     {
+                         "id":  "TR-hitsound-preview-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/hitsound-preview.osu",
+                         "sha256":  "D5AEA2DE97F874B5558863E47EC7C0BB3B81156FFDD41CFCAD33A9BB55F32991",
+                         "purpose":  "Exact legacy hitsound-preview output."
                      },
                      {
                          "id":  "TR-hitsound-studio-output",
