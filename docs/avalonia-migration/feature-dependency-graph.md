@@ -2,6 +2,8 @@
 
 Status: initial repository-wide migration baseline, 2026-07-18.
 
+User acceptance gates and feature-level scenarios are defined in [user-acceptance-test-plan.md](user-acceptance-test-plan.md).
+
 This document inventories the user-visible features in the WPF application, defines the shared subsystems they depend on, and orders their migration to `Mapping_Tools.Desktop` (Avalonia 12.1.0). It is based on static inspection of `Mapping_Tools/Views`, `Mapping_Tools/Viewmodels`, `Mapping_Tools/Components`, `Mapping_Tools/Classes`, the application shell, and the current test suite.
 
 ## Scope and graph semantics
