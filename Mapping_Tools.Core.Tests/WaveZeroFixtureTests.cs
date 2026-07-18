@@ -83,8 +83,12 @@ public sealed class WaveZeroFixtureTests
     public void BaselineRecordsReferenceVersionedSeedAndOptionFiles()
     {
         var failures = new List<string>();
+        var manifest = LoadManifest();
+        var baselineIds = manifest.DestructiveFeatures
+            .Select(feature => feature.BaselineFixtureId)
+            .ToHashSet(StringComparer.Ordinal);
 
-        foreach (var fixture in LoadManifest().Fixtures.Where(fixture => fixture.Group == "transformation"))
+        foreach (var fixture in manifest.Fixtures.Where(fixture => baselineIds.Contains(fixture.Id)))
         {
             var recordPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(ManifestPath)!, fixture.Path));
             var record = JsonSerializer.Deserialize<BaselineRecord>(File.ReadAllText(recordPath), new JsonSerializerOptions
@@ -96,6 +100,11 @@ public sealed class WaveZeroFixtureTests
             if (record.Options is not null)
             {
                 VerifyRelativeFile(recordPath, record.Options, $"{fixture.Id} options", failures);
+            }
+
+            if (record.ExpectedOutput is not null)
+            {
+                VerifyRelativeFile(recordPath, record.ExpectedOutput, $"{fixture.Id} output", failures);
             }
 
             if (record.Status == "accepted" && record.ExpectedOutput is null)

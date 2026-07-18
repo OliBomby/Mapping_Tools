@@ -164,7 +164,10 @@ foreach ($feature in $destructiveFeatures) {
         reviewedOn = $null
         notes = 'Run the legacy feature against a disposable copy, then record and review the exact output.'
     }
-    Write-Utf8Json -Value $record -Destination (Join-Path $fixtureRoot "transformations\$($feature.Id).json")
+    $recordPath = Join-Path $fixtureRoot "transformations\$($feature.Id).json"
+    if (-not (Test-Path -LiteralPath $recordPath)) {
+        Write-Utf8Json -Value $record -Destination $recordPath
+    }
 }
 
 $fixtures = [System.Collections.Generic.List[object]]::new()
@@ -217,6 +220,19 @@ foreach ($projectFile in $projectFiles) {
 
 foreach ($feature in $destructiveFeatures) {
     Add-FixtureManifestEntry "TR-$($feature.Id)" 'transformation' "transformations\$($feature.Id).json" "Legacy before/after capture record for $($feature.Name)."
+}
+
+$mapCleanerOptions = 'transformations\map-cleaner.options.json'
+if (Test-Path -LiteralPath (Join-Path $fixtureRoot $mapCleanerOptions)) {
+    Add-FixtureManifestEntry 'TR-map-cleaner-options' 'transformation' $mapCleanerOptions 'Exact legacy Map Cleaner capture settings.'
+}
+$mapCleanerReport = 'transformations\map-cleaner-report.md'
+if (Test-Path -LiteralPath (Join-Path $fixtureRoot $mapCleanerReport)) {
+    Add-FixtureManifestEntry 'TR-map-cleaner-report' 'transformation' $mapCleanerReport 'Semantic comparison and capture evidence for Map Cleaner.'
+}
+$mapCleanerOutput = 'transformations\expected\map-cleaner.osu'
+if (Test-Path -LiteralPath (Join-Path $fixtureRoot $mapCleanerOutput)) {
+    Add-FixtureManifestEntry 'TR-map-cleaner-output' 'transformation' $mapCleanerOutput 'Exact legacy Map Cleaner output.'
 }
 
 $manifest = [ordered]@{

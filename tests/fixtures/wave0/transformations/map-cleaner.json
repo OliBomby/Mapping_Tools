@@ -1,12 +1,16 @@
 {
     "id":  "TR-map-cleaner",
     "feature":  "Map Cleaner",
-    "status":  "pending-capture",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
-    "options":  "../projects/mapcleanerproject.json",
-    "expectedOutput":  null,
+    "status":  "accepted",
+    "seedInput":  "../beatmaps/standard-feature-rich.osu",
+    "options":  "map-cleaner.options.json",
+    "expectedOutput":  "expected/map-cleaner.osu",
+    "expectedOutputSha256":  "33040289283130D5E417D4303EA198DD19FD07412D3985216D25C5B1A0521C57",
     "legacyVersion":  "1.12.30",
-    "reviewer":  null,
-    "reviewedOn":  null,
-    "notes":  "Run the legacy feature against a disposable copy, then record and review the exact output."
+    "reviewer":  "Olivier",
+    "reviewedOn":  "2026-07-18",
+    "capturedOn":  "2026-07-18",
+    "observedMessage":  "Successfully removed 16 greenlines and resnapped 20 objects!",
+    "backupSha256":  "E19766C9D9DE19CE9C9BC89F850BE2B1E86D3FBD57832F025031EAC6B53C9EE8",
+    "notes":  "No warning or error was shown. The central backup exactly matched the seed input. Accepted after reviewing the semantic summary."
 }

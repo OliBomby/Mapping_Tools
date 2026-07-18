@@ -252,7 +252,7 @@
                          "id":  "TR-map-cleaner",
                          "group":  "transformation",
                          "path":  "transformations/map-cleaner.json",
-                         "sha256":  "DBC9E71ABCCF955EB9CDAF29A94F8CB384D5F6242A6C7E7141CB952325898A77",
+                         "sha256":  "D974B5E208582C92CF3C9763A337401A5BBBBF9EB42AA92E6FCACDA77651E971",
                          "purpose":  "Legacy before/after capture record for Map Cleaner."
                      },
                      {
@@ -373,6 +373,27 @@
                          "path":  "transformations/auto-fail-detector.json",
                          "sha256":  "1CA0F4E2BB5C5DA40151251A2DFCE9A6C0C0596CB4E8C0ED0793032A562E2A37",
                          "purpose":  "Legacy before/after capture record for Auto-fail Detector."
+                     },
+                     {
+                         "id":  "TR-map-cleaner-options",
+                         "group":  "transformation",
+                         "path":  "transformations/map-cleaner.options.json",
+                         "sha256":  "5014C41F62A001279FF5AB962D0C61BFA868331460F19991356DC84494562D28",
+                         "purpose":  "Exact legacy Map Cleaner capture settings."
+                     },
+                     {
+                         "id":  "TR-map-cleaner-report",
+                         "group":  "transformation",
+                         "path":  "transformations/map-cleaner-report.md",
+                         "sha256":  "A6882CCD6DDA79A9EB31BAEEA4F20588077146107F01EA5CF578C3DB5616C81F",
+                         "purpose":  "Semantic comparison and capture evidence for Map Cleaner."
+                     },
+                     {
+                         "id":  "TR-map-cleaner-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/map-cleaner.osu",
+                         "sha256":  "33040289283130D5E417D4303EA198DD19FD07412D3985216D25C5B1A0521C57",
+                         "purpose":  "Exact legacy Map Cleaner output."
                      }
                  ],
     "destructiveFeatures":  [
