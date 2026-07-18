@@ -1,0 +1,27 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.RhythmGuideVm, Mapping Tools",
+  "GuideGeneratorArgs": {
+    "$type": "Mapping_Tools.Classes.Tools.RhythmGuide+RhythmGuideGeneratorArgs, Mapping Tools",
+    "Paths": [
+      "%USERPROFILE%\\AppData\\Local\\osu!\\Songs\\Kou! & KASOKUKI_Collective - Hatatagami Software - Collab - Hs\\Kou! & KASOKUKICollective - Hatatagami Software (OliBomby) [Rabbit Hole Collab].osu"
+    ],
+    "OutputGameMode": 3,
+    "OutputName": "Hitsound Layers",
+    "NcEverything": false,
+    "SelectionMode": 1,
+    "ExportMode": 0,
+    "ExportPath": "%USERPROFILE%\\AppData\\Local\\osu!\\Songs\\Kou! & KASOKUKI_Collective - Hatatagami Software - Collab - Hs\\Kou! & KASOKUKICollective - Hatatagami Software (OliBomby) [Hitsoun Layers].osu",
+    "BeatDivisors": [
+      {
+        "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+        "Numerator": 1,
+        "Denominator": 16
+      },
+      {
+        "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+        "Numerator": 1,
+        "Denominator": 12
+      }
+    ]
+  }
+}

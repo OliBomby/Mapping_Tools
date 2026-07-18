@@ -1,0 +1,8 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.SliderMergerVm, Mapping Tools",
+  "ImportModeSetting": 0,
+  "ConnectionModeSetting": 0,
+  "Leniency": 999999.0,
+  "LinearOnLinear": false,
+  "MergeOnSliderEnd": true
+}

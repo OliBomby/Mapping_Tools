@@ -1,0 +1,64 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.MetadataManagerVm, Mapping Tools",
+  "ImportPath": "%USERPROFILE%\\AppData\\Local\\osu!\\Songs\\Kou! & KASOKUKI_Collective - Hatatagami Software - Collab\\Kou! & KASOKUKICollective - Hatatagami Software (OliBomby) [Rabbit Hole Collab].osu",
+  "ExportPath": "%USERPROFILE%\\AppData\\Local\\osu!\\Songs\\Kou! & KASOKUKI_Collective - Hatatagami Software - Collab\\Kou! & KASOKUKICollective - Hatatagami Software (OliBomby) [Rabbit Hole Collab].osu",
+  "Artist": "Kou! & KASOKUKI:Collective",
+  "RomanisedArtist": "Kou! & KASOKUKI:Collective",
+  "Title": "髴ｹ髱ら･槭た繝輔ヨ繧ｦ繧ｧ繧｢",
+  "RomanisedTitle": "Hatatagami Software",
+  "BeatmapCreator": "OliBomby",
+  "Source": "",
+  "Tags": "hardcore utopia 5 v hekirekijin sofutouea 髱帝㍽繧ｳ繧ｦ 遒ｧ髻ｳ繧ｳ繧ｦ aono electronic instrumental full flavor oriental j-core dubstep high-speed neurofunk frenchcore crossbreed colour future bass psytrance jungle breakcore chiptune dariacore schranz trance hitech hardbass jersey club xtra raw melodic trap artcore uptempo speedcore mechakuchacore technical hybrid marathon OliBomby Jan0301 schtang KoNoah kongehund Jarran Voxell iLyne HoshiKuzuTora Charlotte Teo skeppy_poo_poo ralsricat Diarrhea indo btmc TrungSabito0159 wiwit beari22 paladynee",
+  "DoRemoveDuplicateTags": true,
+  "ResetIds": false,
+  "PreviewTime": 315111.0,
+  "UseComboColours": true,
+  "ComboColours": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools",
+      "Color": "#FFFF0DD5"
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools",
+      "Color": "#FF24DEFF"
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools",
+      "Color": "#FFD000FD"
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools",
+      "Color": "#FF0D7AFF"
+    }
+  ],
+  "SpecialColours": [],
+  "BeatmapFileNameOverflowErrorVisibility": 2,
+  "TagsOverflowErrorVisibility": 2,
+  "ImportLoadCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "ImportBrowseCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "ImportCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "ExportLoadCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "ExportBrowseCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "AddCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "RemoveCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "AddSpecialCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "RemoveSpecialCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  }
+}

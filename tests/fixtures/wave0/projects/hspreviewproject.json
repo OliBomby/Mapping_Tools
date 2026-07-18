@@ -1,0 +1,203 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.HitsoundPreviewHelperVm, Mapping Tools",
+  "Items": [
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "",
+      "Name": "guide",
+      "XPos": 14.0,
+      "YPos": -1.0,
+      "Hitsound": 0,
+      "SampleSet": 2,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "electronic02",
+      "Name": "hard kick",
+      "XPos": 42.0,
+      "YPos": -1.0,
+      "Hitsound": 0,
+      "SampleSet": 1,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "dih02",
+      "Name": "lead melody",
+      "XPos": 241.0,
+      "YPos": -1.0,
+      "Hitsound": 1,
+      "SampleSet": 2,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "special02",
+      "Name": "SHEEEESSHHH",
+      "XPos": 497.0,
+      "YPos": -1.0,
+      "Hitsound": 2,
+      "SampleSet": 2,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "default-soft",
+      "Name": "wubs",
+      "XPos": 213.0,
+      "YPos": -1.0,
+      "Hitsound": 1,
+      "SampleSet": 2,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "electronic18",
+      "Name": "skeet",
+      "XPos": 184.0,
+      "YPos": -1.0,
+      "Hitsound": 3,
+      "SampleSet": 2,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "lemon tom",
+      "Name": "lemon tom",
+      "XPos": 99.0,
+      "YPos": -1.0,
+      "Hitsound": 2,
+      "SampleSet": 3,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "noiseEEE",
+      "Name": "noise finish",
+      "XPos": 469.0,
+      "YPos": -1.0,
+      "Hitsound": 2,
+      "SampleSet": 2,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "Full BRRR",
+      "Name": "not so hard kick",
+      "XPos": 71.0,
+      "YPos": -1.0,
+      "Hitsound": 0,
+      "SampleSet": 1,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "soft-hitnormal3",
+      "Name": "hat",
+      "XPos": 412.0,
+      "YPos": -1.0,
+      "Hitsound": 0,
+      "SampleSet": 2,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "hihat02",
+      "Name": "open hat",
+      "XPos": 384.0,
+      "YPos": -1.0,
+      "Hitsound": 1,
+      "SampleSet": 3,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "electronic03",
+      "Name": "kok snare",
+      "XPos": 128.0,
+      "YPos": -1.0,
+      "Hitsound": 3,
+      "SampleSet": 2,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "tom04_loud",
+      "Name": "tom low",
+      "XPos": 270.0,
+      "YPos": -1.0,
+      "Hitsound": 2,
+      "SampleSet": 3,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "tom03_loud",
+      "Name": "tom mid",
+      "XPos": 298.0,
+      "YPos": -1.0,
+      "Hitsound": 2,
+      "SampleSet": 3,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "tom02_loud",
+      "Name": "tom high",
+      "XPos": 327.0,
+      "YPos": -1.0,
+      "Hitsound": 3,
+      "SampleSet": 3,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "drum-hitclap3",
+      "Name": "beat snare",
+      "XPos": 156.0,
+      "YPos": -1.0,
+      "Hitsound": 3,
+      "SampleSet": 2,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "tom01_loud",
+      "Name": "tom highest",
+      "XPos": 355.0,
+      "YPos": -1.0,
+      "Hitsound": 3,
+      "SampleSet": 3,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "dih03L",
+      "Name": "lead short",
+      "XPos": 440.0,
+      "YPos": -1.0,
+      "Hitsound": 1,
+      "SampleSet": 2,
+      "AdditionsSet": 0,
+      "CustomIndex": 0
+    }
+  ]
+}

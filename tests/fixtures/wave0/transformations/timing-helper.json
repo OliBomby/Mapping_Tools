@@ -1,0 +1,12 @@
+{
+    "id":  "TR-timing-helper",
+    "feature":  "Timing Helper",
+    "status":  "pending-capture",
+    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "options":  "../projects/timinghelperproject.json",
+    "expectedOutput":  null,
+    "legacyVersion":  "1.12.30",
+    "reviewer":  null,
+    "reviewedOn":  null,
+    "notes":  "Run the legacy feature against a disposable copy, then record and review the exact output."
+}

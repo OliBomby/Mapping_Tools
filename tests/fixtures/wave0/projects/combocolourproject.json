@@ -1,0 +1,794 @@
+{
+  "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourProject, Mapping Tools",
+  "ColourPoints": [
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 68.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 20278.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        }
+      ],
+      "Mode": 1
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 30383.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        }
+      ],
+      "Mode": 1
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 40489.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 46015.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 50594.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        }
+      ],
+      "Mode": 1
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 50752.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 60699.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        }
+      ],
+      "Mode": 1
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 61962.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 68278.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 71910.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 75857.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 78068.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 80910.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 85962.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 90699.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 92278.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 96068.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 98278.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 103646.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 131436.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        }
+      ],
+      "Mode": 1
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 131594.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 141541.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        }
+      ],
+      "Mode": 1
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 151646.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 166962.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 169173.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        }
+      ],
+      "Mode": 1
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 169331.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        }
+      ],
+      "Mode": 1
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 176910.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 181646.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 184489.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 184962.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFFFFFF"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 189383.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FFBF7070"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FFFF9E9E"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo4",
+          "Color": "#FF625757"
+        }
+      ],
+      "Mode": 0
+    }
+  ],
+  "ComboColours": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+      "Name": "Combo1",
+      "Color": "#FFFFFFFF"
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+      "Name": "Combo2",
+      "Color": "#FFBF7070"
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+      "Name": "Combo3",
+      "Color": "#FFFF9E9E"
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+      "Name": "Combo4",
+      "Color": "#FF625757"
+    }
+  ],
+  "MaxBurstLength": 1,
+  "AddColourPointCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "RemoveColourPointCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "AddComboCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  },
+  "RemoveComboCommand": {
+    "$type": "Mapping_Tools.Components.Domain.CommandImplementation, Mapping Tools"
+  }
+}

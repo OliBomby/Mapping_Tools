@@ -1,0 +1,17 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.TimingHelperVm, Mapping Tools",
+  "Objects": true,
+  "Bookmarks": true,
+  "Greenlines": true,
+  "Redlines": true,
+  "OmitBarline": false,
+  "Leniency": 10.0,
+  "BeatsBetween": 1.0,
+  "BeatDivisors": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 4
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore Mapping_Tools.sln
+
+      - name: Build both frontends
+        run: dotnet build Mapping_Tools.sln --configuration Release --no-restore
+
+      - name: Architecture guardrails
+        run: dotnet test Mapping_Tools.Architecture.Tests/Mapping_Tools.Architecture.Tests.csproj --configuration Release --no-build
+
+      - name: Core and fixture tests
+        run: dotnet test Mapping_Tools.Core.Tests/Mapping_Tools.Core.Tests.csproj --configuration Release --no-build
+
+      - name: Legacy WPF tests
+        run: dotnet test Mapping_Tools_Tests/Mapping_Tools_Tests.csproj --configuration Release --no-build

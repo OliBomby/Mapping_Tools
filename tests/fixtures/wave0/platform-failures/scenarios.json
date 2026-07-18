@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "scenarios": [
+    { "id": "PF-OSU-ABSENT", "effect": "osu! process is not running" },
+    { "id": "PF-EDITORREADER-UNAVAILABLE", "effect": "live editor integration cannot connect" },
+    { "id": "PF-STORAGE-DENIED", "effect": "destination rejects writes" },
+    { "id": "PF-SOURCE-MISSING", "effect": "selected source disappears before use" },
+    { "id": "PF-FILE-LOCKED", "effect": "destination is held by another process" },
+    { "id": "PF-AUDIO-DEVICE-ABSENT", "effect": "no playback device is available" },
+    { "id": "PF-NETWORK-OFFLINE", "effect": "network request cannot connect" },
+    { "id": "PF-PICKER-CANCELLED", "effect": "user cancels a file or folder picker" }
+  ]
+}

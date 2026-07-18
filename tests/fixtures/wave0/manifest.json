@@ -1,0 +1,452 @@
+{
+    "schemaVersion":  1,
+    "generatedOn":  "2026-07-18",
+    "safety":  "Originals are read-only. Copy fixtures to a per-run directory before mutation.",
+    "fixtures":  [
+                     {
+                         "id":  "BM-STD-RICH-001",
+                         "group":  "beatmap",
+                         "path":  "beatmaps/standard-feature-rich.osu",
+                         "sha256":  "E19766C9D9DE19CE9C9BC89F850BE2B1E86D3FBD57832F025031EAC6B53C9EE8",
+                         "purpose":  "Real-world standard map with bookmarks, inherited timing, samples, colours, and complex hit objects."
+                     },
+                     {
+                         "id":  "BM-TAIKO-001",
+                         "group":  "beatmap",
+                         "path":  "beatmaps/taiko.osu",
+                         "sha256":  "31AA6F3685F8394096BEC3AF7D0A94D63C9C257497E4592ED3C5D72251C3E974",
+                         "purpose":  "Real-world taiko-mode map."
+                     },
+                     {
+                         "id":  "BM-CATCH-001",
+                         "group":  "beatmap",
+                         "path":  "beatmaps/catch.osu",
+                         "sha256":  "2E40E511267985414FB78FB18A52C1A7DC2D1F23098B532BA9E3B80357671369",
+                         "purpose":  "Real-world catch-mode map with bookmarks."
+                     },
+                     {
+                         "id":  "BM-MANIA-001",
+                         "group":  "beatmap",
+                         "path":  "beatmaps/mania.osu",
+                         "sha256":  "378CC43278110713A4DF5EF802184ECC195AEAB29235A6C64B1E51C24BB2C461",
+                         "purpose":  "Real-world mania-mode map with bookmarks."
+                     },
+                     {
+                         "id":  "BM-COMPACT-001",
+                         "group":  "beatmap",
+                         "path":  "../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+                         "sha256":  "9DDBE49058712E1211DCEAA52BCBE3D8FF903562EEF5DD0587945407439AC341",
+                         "purpose":  "Compact standard map used by legacy parser and round-trip tests."
+                     },
+                     {
+                         "id":  "BM-EMPTY-001",
+                         "group":  "beatmap",
+                         "path":  "../../../Mapping_Tools_Tests/Resources/EmptyTestMap.osu",
+                         "sha256":  "6B3280C36264E2D5920A8DB2AD9491FFB4F5475E89340F2DB193AF04CC93032E",
+                         "purpose":  "Valid empty standard map for empty-selection and no-op cases."
+                     },
+                     {
+                         "id":  "SB-LARGE-001",
+                         "group":  "storyboard",
+                         "path":  "../../../Mapping_Tools_Tests/Resources/TestStoryboard.osb",
+                         "sha256":  "6D8BBE29BDE5283C19892496F1A2B2F01EFFA9673193409E33D7B354417B199B",
+                         "purpose":  "Large real-world storyboard command and serialization baseline."
+                     },
+                     {
+                         "id":  "MAPSET-MULTI-001-N",
+                         "group":  "mapset",
+                         "path":  "mapsets/multi-difficulty/normal.osu",
+                         "sha256":  "D90B9D010D2D732A4A7CEE0B360E05BBA8589A90920AC53EFA9BD1D2E5CC3EBD",
+                         "purpose":  "Normal difficulty in a real-world shared mapset."
+                     },
+                     {
+                         "id":  "MAPSET-MULTI-001-X",
+                         "group":  "mapset",
+                         "path":  "mapsets/multi-difficulty/expert.osu",
+                         "sha256":  "02C45633AA1310F7C561CB8AC499639CE7076440159806E99FB8820F5864CB27",
+                         "purpose":  "Expert difficulty in the same real-world shared mapset."
+                     },
+                     {
+                         "id":  "PAT-COLLECTION-001",
+                         "group":  "pattern",
+                         "path":  "patterns/legacy-collection/project.json",
+                         "sha256":  "9F207180AAACD90B65581D0FDF0355DED287F148EC6AF2A5FE35AA874A22FB65",
+                         "purpose":  "Legacy Pattern Gallery collection metadata."
+                     },
+                     {
+                         "id":  "PAT-FILE-001",
+                         "group":  "pattern",
+                         "path":  "patterns/legacy-collection/Pattern Files/2025-06-07 21-32-54_NEsChy2u__Pattern 1.osu",
+                         "sha256":  "AFF8607558E84809439C1E455F40B7D13A7D8BC3DFD97EE843921992D53758A8",
+                         "purpose":  "Loose pattern beatmap referenced by the legacy collection."
+                     },
+                     {
+                         "id":  "AUD-WAV-001",
+                         "group":  "audio",
+                         "path":  "audio/drum-hitnormal60.wav",
+                         "sha256":  "08965C7225457205B4D8CA9EACE5195CEE1CE77D7BA548F41DFC7F1E0DC33E23",
+                         "purpose":  "Small generated hitsound sample in WAV format."
+                     },
+                     {
+                         "id":  "AUD-OGG-001",
+                         "group":  "audio",
+                         "path":  "audio/soft-hitwhistle6.ogg",
+                         "sha256":  "3D517389CAE0B473C5A1A5531836B11038E2ED3D382DA2DD38AAC6D05A950769",
+                         "purpose":  "Small generated hitsound sample in OGG format."
+                     },
+                     {
+                         "id":  "SET-LEGACY-001",
+                         "group":  "settings",
+                         "path":  "settings/legacy-config.json",
+                         "sha256":  "C2773667F3DB101B1AA7BE71976F95CD7E4F1A987E3196D9142D981443E09858",
+                         "purpose":  "Sanitized representative legacy settings including paths, favorites, bounds, and hotkeys."
+                     },
+                     {
+                         "id":  "SET-CORRUPT-001",
+                         "group":  "settings",
+                         "path":  "settings/corrupt.json",
+                         "sha256":  "830092F52BA54687F3C2DC7740D974F10C9618DD1684AF36D99F7558C9F63113",
+                         "purpose":  "Intentionally malformed settings input."
+                     },
+                     {
+                         "id":  "FAILURES-001",
+                         "group":  "platform-failure",
+                         "path":  "platform-failures/scenarios.json",
+                         "sha256":  "8929D502F23ADF7A85958F548F237DB1379D0F9C1DA51300DF85760175F63AB2",
+                         "purpose":  "Stable IDs for unavailable editor, denied storage, missing media, offline network, and picker cancellation."
+                     },
+                     {
+                         "id":  "PROJECT-CORRUPT-001",
+                         "group":  "project",
+                         "path":  "projects/corrupt.json",
+                         "sha256":  "DCE514E2BCF3B912A497BA0E01A6E265322568E79E4ADB007C892657995A4A3C",
+                         "purpose":  "Intentionally malformed legacy project JSON."
+                     },
+                     {
+                         "id":  "PROJECT-MAPCLEANERPROJECT",
+                         "group":  "project",
+                         "path":  "projects/mapcleanerproject.json",
+                         "sha256":  "A298DD0947E92CCBF013BE35FE12E0CC99F761B0BD551AA98BE33628F60A34AE",
+                         "purpose":  "Sanitized real-world legacy mapcleanerproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-PROPERTYTRANSFORMERPROJECT",
+                         "group":  "project",
+                         "path":  "projects/propertytransformerproject.json",
+                         "sha256":  "E92688E47FD309D62A64D2B90901F02F0FCD9F26F8AF5AB4C0B411ABAC36259E",
+                         "purpose":  "Sanitized real-world legacy propertytransformerproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-TIMINGCOPIERPROJECT",
+                         "group":  "project",
+                         "path":  "projects/timingcopierproject.json",
+                         "sha256":  "6097FE22AC1E6494226D2E2846AB992461D9628D0568B58147FF5F7F623CD850",
+                         "purpose":  "Sanitized real-world legacy timingcopierproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-TIMINGHELPERPROJECT",
+                         "group":  "project",
+                         "path":  "projects/timinghelperproject.json",
+                         "sha256":  "1044D744E713EA2D5DE00C5C6AB1D35D46BD7720CB5EECC16AC09E866CFF19F6",
+                         "purpose":  "Sanitized real-world legacy timinghelperproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-SLIDERMERGERPROJECT",
+                         "group":  "project",
+                         "path":  "projects/slidermergerproject.json",
+                         "sha256":  "6D8D98FE6EBDF81DF01C753EEFAF4843206A474ED80D18307E89E5B67E9396CD",
+                         "purpose":  "Sanitized real-world legacy slidermergerproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-SLIDERCOMPLETIONATORPROJECT",
+                         "group":  "project",
+                         "path":  "projects/slidercompletionatorproject.json",
+                         "sha256":  "16C5283D45A95782E0DCF033270B796EB43BD8D502D5EE69A655BD48D018E005",
+                         "purpose":  "Sanitized real-world legacy slidercompletionatorproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-SLIDERPICTURATORPROJECT",
+                         "group":  "project",
+                         "path":  "projects/sliderpicturatorproject.json",
+                         "sha256":  "61FE8F39880ADF8D2EB6333A22A5C2D7728734438935A52D444875DA7F34A9EE",
+                         "purpose":  "Sanitized real-world legacy sliderpicturatorproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-RHYTHMGUIDEPROJECT",
+                         "group":  "project",
+                         "path":  "projects/rhythmguideproject.json",
+                         "sha256":  "9DA7C9B1665D5BF499A7625810484E10A23567CFE4346D521B35220FE7685404",
+                         "purpose":  "Sanitized real-world legacy rhythmguideproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-HITSOUNDCOPIERPROJECT",
+                         "group":  "project",
+                         "path":  "projects/hitsoundcopierproject.json",
+                         "sha256":  "FAFA27EAA71C88935E0D575758A3321206E26902B0E9A669109C7B14158D6AC7",
+                         "purpose":  "Sanitized real-world legacy hitsoundcopierproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-HSPREVIEWPROJECT",
+                         "group":  "project",
+                         "path":  "projects/hspreviewproject.json",
+                         "sha256":  "53AA7AF6BFFC77B6DE8B76B7A4964760C12FD51615A03CE97FBCBD125B2D1C4C",
+                         "purpose":  "Sanitized real-world legacy hspreviewproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-METADATAPROJECT",
+                         "group":  "project",
+                         "path":  "projects/metadataproject.json",
+                         "sha256":  "1E92F0D3FE0C19FCF6B9571F9C412AC2F4DA9F5162498E144C7BD717F38A8C8D",
+                         "purpose":  "Sanitized real-world legacy metadataproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-SLIDERATORPROJECT",
+                         "group":  "project",
+                         "path":  "projects/slideratorproject.json",
+                         "sha256":  "072BBDB5618B28005B7070B6C12FE8DF7F95668FA359E95BC685E0C9DC937596",
+                         "purpose":  "Sanitized real-world legacy slideratorproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-TUMOURGENERATORPROJECT",
+                         "group":  "project",
+                         "path":  "projects/tumourgeneratorproject.json",
+                         "sha256":  "3A30AA17C21B673104E6651AB1F27F6222DFAAEFFAAD86FBFB999309ADFD6832",
+                         "purpose":  "Sanitized real-world legacy tumourgeneratorproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-COMBOCOLOURPROJECT",
+                         "group":  "project",
+                         "path":  "projects/combocolourproject.json",
+                         "sha256":  "7FF6C1D3CAD82DBF32548B193B2C3194E77B2D9DC360AD2019131D4035255DC6",
+                         "purpose":  "Sanitized real-world legacy combocolourproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-MAPSETMERGERPROJECT",
+                         "group":  "project",
+                         "path":  "projects/mapsetmergerproject.json",
+                         "sha256":  "C2E1E6C958E21B491FFF53A7502EFB6B46043FA19F861047DD7A8DB1D1D015D5",
+                         "purpose":  "Sanitized real-world legacy mapsetmergerproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-SNAPPINGTOOLSPROJECT",
+                         "group":  "project",
+                         "path":  "projects/snappingtoolsproject.json",
+                         "sha256":  "CE97833C0ECEF56CD522568D3865514CB58B91DB71B600074B96964B842C5FD2",
+                         "purpose":  "Sanitized real-world legacy snappingtoolsproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-HSSTUDIOPROJECT",
+                         "group":  "project",
+                         "path":  "projects/hsstudioproject.json",
+                         "sha256":  "391A79DE383C75451636BF15B9C92C9B292FEA5632C5A1B7FFBC320679A18629",
+                         "purpose":  "Sanitized real-world legacy hsstudioproject.json configuration."
+                     },
+                     {
+                         "id":  "PROJECT-PATTERNGALLERYPROJECT",
+                         "group":  "project",
+                         "path":  "projects/patterngalleryproject.json",
+                         "sha256":  "E270130324F89A37478602399DA4C266B734C0FD0A1827ED726B097563FA983F",
+                         "purpose":  "Sanitized real-world legacy patterngalleryproject.json configuration."
+                     },
+                     {
+                         "id":  "TR-map-cleaner",
+                         "group":  "transformation",
+                         "path":  "transformations/map-cleaner.json",
+                         "sha256":  "DBC9E71ABCCF955EB9CDAF29A94F8CB384D5F6242A6C7E7141CB952325898A77",
+                         "purpose":  "Legacy before/after capture record for Map Cleaner."
+                     },
+                     {
+                         "id":  "TR-metadata-manager",
+                         "group":  "transformation",
+                         "path":  "transformations/metadata-manager.json",
+                         "sha256":  "FFE59DBE2E62ED063278CCED4DE0ECCAA6399F066369943A08BF7D3C5DA535C8",
+                         "purpose":  "Legacy before/after capture record for Metadata Manager."
+                     },
+                     {
+                         "id":  "TR-property-transformer",
+                         "group":  "transformation",
+                         "path":  "transformations/property-transformer.json",
+                         "sha256":  "69D973B36B7D9DC11D519F0FC0C9BDB1C90E99432131EB7F48E669ABA6881827",
+                         "purpose":  "Legacy before/after capture record for Property Transformer."
+                     },
+                     {
+                         "id":  "TR-timing-copier",
+                         "group":  "transformation",
+                         "path":  "transformations/timing-copier.json",
+                         "sha256":  "475A98F529F17D974FDF1C2C7A4FD5DB81CDE4E3E38399576AD28FA3A8DA8DE8",
+                         "purpose":  "Legacy before/after capture record for Timing Copier."
+                     },
+                     {
+                         "id":  "TR-timing-helper",
+                         "group":  "transformation",
+                         "path":  "transformations/timing-helper.json",
+                         "sha256":  "9A2D76F9191A26541679356934C692CA6BB38855736B1561460C53AB0CFD339B",
+                         "purpose":  "Legacy before/after capture record for Timing Helper."
+                     },
+                     {
+                         "id":  "TR-rhythm-guide",
+                         "group":  "transformation",
+                         "path":  "transformations/rhythm-guide.json",
+                         "sha256":  "0822C5A1FC507CDB8E2AE493935435FC448E7D3BF3575C4A058392E0A1BAA236",
+                         "purpose":  "Legacy before/after capture record for Rhythm Guide."
+                     },
+                     {
+                         "id":  "TR-hitsound-preview",
+                         "group":  "transformation",
+                         "path":  "transformations/hitsound-preview.json",
+                         "sha256":  "E88A52714D28B03EE4438B58851E7690A6E912E124F345BEE0DC5F9480753E4D",
+                         "purpose":  "Legacy before/after capture record for Hitsound Preview Helper."
+                     },
+                     {
+                         "id":  "TR-hitsound-copier",
+                         "group":  "transformation",
+                         "path":  "transformations/hitsound-copier.json",
+                         "sha256":  "3C9D2B759F87A330896B6B6C06C610A2A845401FF314B8A1035E4267FC827758",
+                         "purpose":  "Legacy before/after capture record for Hitsound Copier."
+                     },
+                     {
+                         "id":  "TR-slider-completionator",
+                         "group":  "transformation",
+                         "path":  "transformations/slider-completionator.json",
+                         "sha256":  "60F45C5A8356A36665E3E55EF749960D637B0164B60FFB541BFEF43896815D2D",
+                         "purpose":  "Legacy before/after capture record for Slider Completionator."
+                     },
+                     {
+                         "id":  "TR-slider-merger",
+                         "group":  "transformation",
+                         "path":  "transformations/slider-merger.json",
+                         "sha256":  "67C11C7C80DEDDDD81EF9CC60AF41E37476A3B23341B5D491C58CA46EA09E040",
+                         "purpose":  "Legacy before/after capture record for Slider Merger."
+                     },
+                     {
+                         "id":  "TR-slider-picturator",
+                         "group":  "transformation",
+                         "path":  "transformations/slider-picturator.json",
+                         "sha256":  "C79ACE0B6B1AE4A2F4384F1D5791136359F4C8CC492A6167D3FF18A8E79439B0",
+                         "purpose":  "Legacy before/after capture record for Slider Picturator."
+                     },
+                     {
+                         "id":  "TR-sliderator",
+                         "group":  "transformation",
+                         "path":  "transformations/sliderator.json",
+                         "sha256":  "2743A1FF198757D85EFC30C3C48118C2B5839CDC7EB0145313EA7A1668415E6E",
+                         "purpose":  "Legacy before/after capture record for Sliderator."
+                     },
+                     {
+                         "id":  "TR-tumour-generator",
+                         "group":  "transformation",
+                         "path":  "transformations/tumour-generator.json",
+                         "sha256":  "2D30766125A2A3DA9C58FA28AF9C21CA00B99BF8FFB9FF5A897CD99375FCFDBA",
+                         "purpose":  "Legacy before/after capture record for Tumour Generator 2."
+                     },
+                     {
+                         "id":  "TR-combo-colour-studio",
+                         "group":  "transformation",
+                         "path":  "transformations/combo-colour-studio.json",
+                         "sha256":  "F836BE9F3B61573CC7C847FE7F6333B8B31676006E71E0856A646C072484D9C4",
+                         "purpose":  "Legacy before/after capture record for Combo Colour Studio."
+                     },
+                     {
+                         "id":  "TR-pattern-gallery",
+                         "group":  "transformation",
+                         "path":  "transformations/pattern-gallery.json",
+                         "sha256":  "467AD24C86CC462ACBF078EF2D4ACF87C8ADD69567D140FE384C4730BABD965E",
+                         "purpose":  "Legacy before/after capture record for Pattern Gallery."
+                     },
+                     {
+                         "id":  "TR-mapset-merger",
+                         "group":  "transformation",
+                         "path":  "transformations/mapset-merger.json",
+                         "sha256":  "11E1948A6E5285B100EBD709A661206B0F228DD082F67DE37C5536F0B01E62D8",
+                         "purpose":  "Legacy before/after capture record for Mapset Merger."
+                     },
+                     {
+                         "id":  "TR-hitsound-studio",
+                         "group":  "transformation",
+                         "path":  "transformations/hitsound-studio.json",
+                         "sha256":  "6F7B6C2F3C1248F1F0ECAB8564B51AFDF50A3AB9D989410495359C4EFE01ED99",
+                         "purpose":  "Legacy before/after capture record for Hitsound Studio."
+                     },
+                     {
+                         "id":  "TR-auto-fail-detector",
+                         "group":  "transformation",
+                         "path":  "transformations/auto-fail-detector.json",
+                         "sha256":  "1CA0F4E2BB5C5DA40151251A2DFCE9A6C0C0596CB4E8C0ED0793032A562E2A37",
+                         "purpose":  "Legacy before/after capture record for Auto-fail Detector."
+                     }
+                 ],
+    "destructiveFeatures":  [
+                                {
+                                    "id":  "map-cleaner",
+                                    "baselineFixtureId":  "TR-map-cleaner"
+                                },
+                                {
+                                    "id":  "metadata-manager",
+                                    "baselineFixtureId":  "TR-metadata-manager"
+                                },
+                                {
+                                    "id":  "property-transformer",
+                                    "baselineFixtureId":  "TR-property-transformer"
+                                },
+                                {
+                                    "id":  "timing-copier",
+                                    "baselineFixtureId":  "TR-timing-copier"
+                                },
+                                {
+                                    "id":  "timing-helper",
+                                    "baselineFixtureId":  "TR-timing-helper"
+                                },
+                                {
+                                    "id":  "rhythm-guide",
+                                    "baselineFixtureId":  "TR-rhythm-guide"
+                                },
+                                {
+                                    "id":  "hitsound-preview",
+                                    "baselineFixtureId":  "TR-hitsound-preview"
+                                },
+                                {
+                                    "id":  "hitsound-copier",
+                                    "baselineFixtureId":  "TR-hitsound-copier"
+                                },
+                                {
+                                    "id":  "slider-completionator",
+                                    "baselineFixtureId":  "TR-slider-completionator"
+                                },
+                                {
+                                    "id":  "slider-merger",
+                                    "baselineFixtureId":  "TR-slider-merger"
+                                },
+                                {
+                                    "id":  "slider-picturator",
+                                    "baselineFixtureId":  "TR-slider-picturator"
+                                },
+                                {
+                                    "id":  "sliderator",
+                                    "baselineFixtureId":  "TR-sliderator"
+                                },
+                                {
+                                    "id":  "tumour-generator",
+                                    "baselineFixtureId":  "TR-tumour-generator"
+                                },
+                                {
+                                    "id":  "combo-colour-studio",
+                                    "baselineFixtureId":  "TR-combo-colour-studio"
+                                },
+                                {
+                                    "id":  "pattern-gallery",
+                                    "baselineFixtureId":  "TR-pattern-gallery"
+                                },
+                                {
+                                    "id":  "mapset-merger",
+                                    "baselineFixtureId":  "TR-mapset-merger"
+                                },
+                                {
+                                    "id":  "hitsound-studio",
+                                    "baselineFixtureId":  "TR-hitsound-studio"
+                                },
+                                {
+                                    "id":  "auto-fail-detector",
+                                    "baselineFixtureId":  "TR-auto-fail-detector"
+                                }
+                            ]
+}

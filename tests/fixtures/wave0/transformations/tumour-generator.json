@@ -1,0 +1,12 @@
+{
+    "id":  "TR-tumour-generator",
+    "feature":  "Tumour Generator 2",
+    "status":  "pending-capture",
+    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "options":  "../projects/tumourgeneratorproject.json",
+    "expectedOutput":  null,
+    "legacyVersion":  "1.12.30",
+    "reviewer":  null,
+    "reviewedOn":  null,
+    "notes":  "Run the legacy feature against a disposable copy, then record and review the exact output."
+}
