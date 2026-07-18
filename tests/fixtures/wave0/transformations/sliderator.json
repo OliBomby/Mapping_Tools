@@ -3,7 +3,7 @@
     "feature":  "Sliderator",
     "status":  "pending-capture",
     "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
-    "options":  "../projects/slideratorproject.json",
+    "options":  "sliderator.options.json",
     "expectedOutput":  null,
     "legacyVersion":  "1.12.30",
     "reviewer":  null,

@@ -329,14 +329,14 @@
                          "id":  "TR-slider-picturator",
                          "group":  "transformation",
                          "path":  "transformations/slider-picturator.json",
-                         "sha256":  "C79ACE0B6B1AE4A2F4384F1D5791136359F4C8CC492A6167D3FF18A8E79439B0",
+                         "sha256":  "53027897410AB296602D21B60525F16AC54C8E139AC1F862EF2913FE746D1F5D",
                          "purpose":  "Legacy before/after capture record for Slider Picturator."
                      },
                      {
                          "id":  "TR-sliderator",
                          "group":  "transformation",
                          "path":  "transformations/sliderator.json",
-                         "sha256":  "2743A1FF198757D85EFC30C3C48118C2B5839CDC7EB0145313EA7A1668415E6E",
+                         "sha256":  "C1347279477A77705D0FFB37002338D7BF173CD9705063ACA368A9A623FC51A7",
                          "purpose":  "Legacy before/after capture record for Sliderator."
                      },
                      {
@@ -473,6 +473,13 @@
                          "purpose":  "Exact legacy slider-picturator capture settings."
                      },
                      {
+                         "id":  "TR-sliderator-options",
+                         "group":  "transformation",
+                         "path":  "transformations/sliderator.options.json",
+                         "sha256":  "930A43469B2BD81AAFE1FCCA815E56AF008C2FDD8A3CEF10F72C9C032FBE6375",
+                         "purpose":  "Exact legacy sliderator capture settings."
+                     },
+                     {
                          "id":  "TR-timing-copier-options",
                          "group":  "transformation",
                          "path":  "transformations/timing-copier.options.json",
@@ -578,6 +585,13 @@
                          "purpose":  "Semantic comparison and capture evidence for slider-merger."
                      },
                      {
+                         "id":  "TR-slider-picturator-report",
+                         "group":  "transformation",
+                         "path":  "transformations/slider-picturator-report.md",
+                         "sha256":  "2ACD406743C6B72B0264E610981DFFBEF67768929351C3BABE47B639712EC302",
+                         "purpose":  "Semantic comparison and capture evidence for slider-picturator."
+                     },
+                     {
                          "id":  "TR-timing-copier-report",
                          "group":  "transformation",
                          "path":  "transformations/timing-copier-report.md",
@@ -674,6 +688,13 @@
                          "path":  "transformations/expected/slider-merger.osu",
                          "sha256":  "0EF86314B44A53B84F546D64A716D19516B18EDDD074BB228503B59E90C4FA49",
                          "purpose":  "Exact legacy slider-merger output."
+                     },
+                     {
+                         "id":  "TR-slider-picturator-output",
+                         "group":  "transformation",
+                         "path":  "transformations/expected/slider-picturator.osu",
+                         "sha256":  "193DD7875260CDE0E76ADC41FA118E777BFB9C07944B8242ED5DF2EF3871C754",
+                         "purpose":  "Exact legacy slider-picturator output."
                      },
                      {
                          "id":  "TR-timing-copier-output",

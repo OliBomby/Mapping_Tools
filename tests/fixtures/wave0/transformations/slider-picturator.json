@@ -1,12 +1,16 @@
 {
     "id":  "TR-slider-picturator",
     "feature":  "Slider Picturator",
-    "status":  "pending-capture",
+    "status":  "accepted",
     "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
-    "options":  "../projects/sliderpicturatorproject.json",
-    "expectedOutput":  null,
+    "options":  "slider-picturator.options.json",
+    "expectedOutput":  "expected/slider-picturator.osu",
+    "expectedOutputSha256":  "193DD7875260CDE0E76ADC41FA118E777BFB9C07944B8242ED5DF2EF3871C754",
     "legacyVersion":  "1.12.30",
-    "reviewer":  null,
-    "reviewedOn":  null,
-    "notes":  "Run the legacy feature against a disposable copy, then record and review the exact output."
+    "reviewer":  "Olivier",
+    "reviewedOn":  "2026-07-19",
+    "capturedOn":  "2026-07-19",
+    "observedMessage":  "Done!",
+    "backupSha256":  "9DDBE49058712E1211DCEAA52BCBE3D8FF903562EEF5DD0587945407439AC341",
+    "notes":  "The backup exactly matched the target seed. The accepted output contains the generated picture slider, its colour overrides, and the timing points needed by the legacy export."
 }
