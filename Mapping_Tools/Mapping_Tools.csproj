@@ -80,6 +80,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Mapping_Tools.Core\Mapping_Tools.Core.csproj" />
     <ProjectReference Include="..\Mapping_Tools.Application\Mapping_Tools.Application.csproj" />
     <ProjectReference Include="..\Mapping_Tools.Infrastructure\Mapping_Tools.Infrastructure.csproj" />
   </ItemGroup>
