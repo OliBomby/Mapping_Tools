@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Classes.HitsoundStuff;
+#nullable disable
 using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections;

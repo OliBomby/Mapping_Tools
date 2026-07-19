@@ -35,6 +35,24 @@ namespace Mapping_Tools_Tests {
             }
         }
 
+        [TestMethod]
+        public void HitObjectSerializationPreservesLegacyProjectType() {
+            string path = System.IO.Path.GetTempFileName();
+            try {
+                const string line = "256,192,1000,1,2,0:0:0:0:";
+                var expected = new Mapping_Tools.Classes.BeatmapHelper.HitObject(line);
+
+                ProjectManager.SaveJson(path, expected);
+                string json = System.IO.File.ReadAllText(path);
+                var actual = ProjectManager.LoadJson<Mapping_Tools.Classes.BeatmapHelper.HitObject>(path);
+
+                StringAssert.Contains(json, "Mapping_Tools.Classes.BeatmapHelper.HitObject, Mapping Tools");
+                Assert.AreEqual(line, actual.GetLine());
+            } finally {
+                System.IO.File.Delete(path);
+            }
+        }
+
         private static T LoadJsonDynamic<T>(string path, T _) {
             return ProjectManager.LoadJson<T>(path);
         }

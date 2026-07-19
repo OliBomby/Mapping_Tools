@@ -33,12 +33,14 @@ namespace Mapping_Tools.Classes.SystemTools {
                 if (assemblyName == "Mapping Tools") {
                     if (typeName == typeof(ComboColour).FullName) return typeof(ComboColour);
                     if (typeName == typeof(SpecialColour).FullName) return typeof(SpecialColour);
+                    if (typeName == typeof(HitObject).FullName) return typeof(HitObject);
                 }
                 return fallback.BindToType(assemblyName, typeName);
             }
 
             public void BindToName(Type serializedType, out string assemblyName, out string typeName) {
-                if (serializedType == typeof(ComboColour) || serializedType == typeof(SpecialColour)) {
+                if (serializedType == typeof(ComboColour) || serializedType == typeof(SpecialColour) ||
+                    serializedType == typeof(HitObject)) {
                     assemblyName = "Mapping Tools";
                     typeName = serializedType.FullName;
                     return;
