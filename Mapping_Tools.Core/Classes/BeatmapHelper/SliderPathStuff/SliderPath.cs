@@ -8,6 +8,8 @@ using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
+#nullable disable
+
     public struct SliderPath :IEquatable<SliderPath> {
         /// <summary>
         /// The user-set distance of the path. If non-null, <see cref="Distance"/> will match this value,
