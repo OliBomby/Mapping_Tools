@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
+#nullable disable
+
     /// <summary>
     /// The timing of a beatmap. This objects contains all the timing points (data from the [TimingPoints] section) plus the global slider multiplier.
     /// This also has a number of helper methods to fetch data from the timing points.
@@ -550,18 +552,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// Calculates the snapped time for a given time and makes sure the snapped time is not outside the time range of a hit object.
-        /// This can be used to resnap stuff that has to be within the time range of a slider. For example volume changes inside a slider body.
+        /// Calculates the snapped time for a given time and makes sure the snapped time remains inside the specified time range.
         /// </summary>
         /// <param name="time"></param>
         /// <param name="beatDivisors"></param>
-        /// <param name="ho">The hit object with a time range that the specified time has to stay inside.</param>
+        /// <param name="rangeStart">The exclusive lower boundary for the snapped time.</param>
+        /// <param name="rangeEnd">The exclusive upper boundary for the snapped time.</param>
         /// <param name="floor">Whether or not to floor the time after snapping.</param>
         /// <param name="tp">The uninherited timing point to snap to. Leave null for automatic selection.</param>
         /// <param name="firstTp">Overwrites the timing for anything that happens before the first timing point.
         ///     You can set this to avoid bad timing when there could be an inherited timing point before the first red line.</param>
         /// <returns>The snapped time.</returns>
-        public double ResnapInRange(double time, IEnumerable<IBeatDivisor> beatDivisors, HitObject ho, bool floor=true, TimingPoint tp=null, TimingPoint firstTp=null) {
+        public double ResnapInRange(double time, IEnumerable<IBeatDivisor> beatDivisors, double rangeStart, double rangeEnd, bool floor=true, TimingPoint tp=null, TimingPoint firstTp=null) {
             TimingPoint beforeTp = tp ?? GetRedlineAtTime(time, firstTp);
             TimingPoint afterTp = tp == null ? GetRedlineAfterTime(time) : null;
 
@@ -583,7 +585,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
 
             // Don't resnap if it would move outside
-            if (newTime <= ho.Time + 1 || newTime >= ho.EndTime - 1) {
+            if (newTime <= rangeStart + 1 || newTime >= rangeEnd - 1) {
                 newTime = time;
             }
 

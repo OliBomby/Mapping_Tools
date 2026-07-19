@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
+#nullable disable
+
     public class TimingPoint : ITextLine, IComparable<TimingPoint> {
         // Offset, Milliseconds per Beat, Meter, Sample Set, Sample Index, Volume, Inherited, Kiai Mode
         /// <summary>
@@ -115,31 +117,6 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Uninherited = uninherited;
             Kiai = kiai;
             OmitFirstBarLine = omitFirstBarLine;
-        }
-
-        /// <summary>
-        /// Creates a new Timing Point from the <see cref="Editor_Reader.ControlPoint"/>.
-        /// </summary>
-        /// <param name="cp">The control point value from <see cref="Editor_Reader"/></param>
-        public TimingPoint(Editor_Reader.ControlPoint cp) {
-            MpB = cp.BeatLength;
-            Offset = cp.Offset;
-            SampleIndex = cp.CustomSamples;
-            SampleSet = (SampleSet)cp.SampleSet;
-            Meter = new TempoSignature(cp.TimeSignature);
-            Volume = cp.Volume;
-            Kiai = (cp.EffectFlags & 1) > 0;
-            OmitFirstBarLine = (cp.EffectFlags & 8) > 0;
-            Uninherited = cp.TimingChange;
-        }
-
-        /// <summary>
-        /// Creates a new Timing Point from the <see cref="Editor_Reader.ControlPoint"/>
-        /// </summary>
-        /// <param name="cp">A <see cref="Editor_Reader.ControlPoint"/> from the <see cref="Beatmap"/>.</param>
-        /// <returns></returns>
-        public static explicit operator TimingPoint(Editor_Reader.ControlPoint cp) {
-            return new TimingPoint(cp);
         }
 
         /// <summary>

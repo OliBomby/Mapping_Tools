@@ -393,7 +393,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         {
             beatmap.SetBookmarks(reader.bookmarks.Select<int, double>(o => o).ToList());
 
-            beatmap.BeatmapTiming.SetTimingPoints(reader.controlPoints.Select(o => (TimingPoint)o).ToList());
+            beatmap.BeatmapTiming.SetTimingPoints(reader.controlPoints.Select(ConvertControlPoint).ToList());
 
             List<HitObject> selected = new List<HitObject>();
             beatmap.HitObjects = reader.hitObjects.Select(o => {
@@ -417,6 +417,19 @@ namespace Mapping_Tools.Classes.ToolHelpers {
             beatmap.GiveObjectsGreenlines();
 
             return selected;
+        }
+
+        private static TimingPoint ConvertControlPoint(Editor_Reader.ControlPoint controlPoint) {
+            return new TimingPoint(
+                controlPoint.Offset,
+                controlPoint.BeatLength,
+                controlPoint.TimeSignature,
+                (SampleSet)controlPoint.SampleSet,
+                controlPoint.CustomSamples,
+                controlPoint.Volume,
+                controlPoint.TimingChange,
+                (controlPoint.EffectFlags & 1) > 0,
+                (controlPoint.EffectFlags & 8) > 0);
         }
 
         /// <summary>
