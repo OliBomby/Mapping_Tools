@@ -23,6 +23,8 @@ Use only official Avalonia documentation, the Avalonia 12.1.0 tagged source/rele
 
 Never add references to `System.Windows`, `System.Windows.Forms`, `MaterialDesignThemes.Wpf`, or Avalonia/ReactiveUI packages to Core, Application, or Infrastructure. Infrastructure may contain an explicitly Windows-specific adapter only when the feature inherently requires Windows; keep its interface platform-neutral and call out the limitation.
 
+Copy code from the WPF project exactly whenever possible, this will make manual review easier.
+
 ## Workflow
 
 1. Inspect the selected WPF XAML, code-behind, view model, converters, custom controls, and services. Trace every static dependency such as `MainWindow.AppWindow`, dialogs, dispatcher calls, clipboard, cursor, keyboard hooks, and settings singletons.
