@@ -1,73 +1,30 @@
-﻿using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.ApplicationServices.Abstractions;
+using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Classes.Tools;
 using System.Collections.Generic;
 using System.IO;
-using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.ApplicationServices.Abstractions;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
-    public class BeatmapEditor : Editor
-    {
-        public Beatmap Beatmap => (Beatmap)TextFile;
+    /// <summary>
+    /// WPF compatibility wrapper that adds editor-reader MD5 coordination.
+    /// </summary>
+    public class BeatmapEditor : BeatmapEditor2 {
+        public BeatmapEditor(List<string> lines) : base(lines, LegacyFileStore.Default) { }
 
-        public BeatmapEditor(List<string> lines)
-        {
-            TextFile = new Beatmap(lines);
-        }
+        public BeatmapEditor(List<string> lines, ITextFileStore fileStore) : base(lines, fileStore) { }
 
-        public BeatmapEditor(List<string> lines, ITextFileStore fileStore) : base(fileStore)
-        {
-            TextFile = new Beatmap(lines);
-        }
+        public BeatmapEditor(string path) : base(path, LegacyFileStore.Default) { }
 
-        public BeatmapEditor(string path)
-        {
-            Path = path;
-            TextFile = new Beatmap(ReadFile(Path));
-        }
+        public BeatmapEditor(string path, ITextFileStore fileStore) : base(path, fileStore) { }
 
-        public BeatmapEditor(string path, ITextFileStore fileStore) : base(fileStore)
-        {
-            Path = path;
-            TextFile = new Beatmap(ReadFile(Path));
-        }
-
-        /// <summary>
-        /// Saves the beatmap just like <see cref="SaveFile()"/> but also updates the filename according to the metadata of the <see cref="Beatmap"/>
-        /// </summary>
-        /// <remarks>This method also updates the Path property</remarks>
-        public void SaveFileWithNameUpdate() {
-            // Remove the beatmap with the old filename
-            FileStore.Delete(Path);
-
-            // Save beatmap with the new filename
-            Path = System.IO.Path.Combine(GetParentFolder(), Beatmap.GetFileName());
-            SaveFile();
-        }
-
-        public override void SaveFile() {
-            GenerateBetterSaveMd5(TextFile.GetLines());
-            base.SaveFile();
-        }
-
-        public override void SaveFile(string path) {
-            GenerateBetterSaveMd5(TextFile.GetLines());
-            base.SaveFile(path);
-        }
-
-        public override void SaveFile(List<string> lines) {
-            GenerateBetterSaveMd5(lines);
-            base.SaveFile(lines);
-        }
-
-        private static void GenerateBetterSaveMd5(List<string> lines) {
+        protected override void BeforeSave(List<string> lines) {
             var tempPath = System.IO.Path.Combine(MainWindow.AppDataPath, "temp.osu");
 
-            if (!File.Exists(tempPath))
-            {
+            if (!File.Exists(tempPath)) {
                 File.Create(tempPath).Dispose();
             }
-            File.WriteAllLines(tempPath, lines);
 
+            File.WriteAllLines(tempPath, lines);
             EditorReaderStuff.DontCoolSaveWhenMd5EqualsThisString = EditorReaderStuff.GetMd5FromPath(tempPath);
         }
     }

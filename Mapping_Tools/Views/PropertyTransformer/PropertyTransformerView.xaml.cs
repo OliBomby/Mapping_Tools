@@ -107,7 +107,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
             }
 
             foreach (string path in vm.ExportPaths) {
-                Editor editor;
+                Editor2 editor;
                 if (Path.GetExtension(path).ToLower() == ".osb") {
                     editor = new StoryboardEditor(path);
                 } else {

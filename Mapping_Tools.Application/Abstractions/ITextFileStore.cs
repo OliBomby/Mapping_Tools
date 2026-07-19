@@ -5,4 +5,5 @@ public interface ITextFileStore {
     void WriteAllLines(string path, IEnumerable<string> lines);
     void Delete(string path);
     string GetParentFolder(string path);
+    string CombinePath(string parent, string child);
 }

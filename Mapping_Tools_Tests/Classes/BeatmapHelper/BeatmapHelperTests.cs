@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -50,15 +50,28 @@ namespace Mapping_Tools_Tests.Classes.BeatmapHelper {
         }
 
         [TestMethod]
-        public void StoryboardEditorUsesInjectedTextFileStore() {
+        public void StoryboardEditor2UsesInjectedTextFileStore() {
             const string path = "virtual.osb";
             var sourceLines = File.ReadAllLines("Resources\\TestStoryboard.osb");
             var store = new FakeTextFileStore(path, sourceLines);
 
-            var editor = new StoryboardEditor(path, store);
+            var editor = new StoryboardEditor2(path, store);
             editor.SaveFile();
 
             CollectionAssert.AreEqual(editor.StoryBoard.GetLines(), store.WrittenLines);
+            Assert.AreEqual(path, store.WrittenPath);
+        }
+
+        [TestMethod]
+        public void BeatmapEditor2LoadsAndSavesThroughFileStore() {
+            const string path = "virtual.osu";
+            var sourceLines = File.ReadAllLines("Resources\\EmptyTestMap.osu");
+            var store = new FakeTextFileStore(path, sourceLines);
+            var editor = new BeatmapEditor2(path, store);
+            editor.SaveFile();
+
+            Assert.AreEqual("Why you have to be mad?", editor.Beatmap.Metadata["Title"].Value);
+            CollectionAssert.AreEqual(editor.Beatmap.GetLines(), store.WrittenLines);
             Assert.AreEqual(path, store.WrittenPath);
         }
 
@@ -87,6 +100,8 @@ namespace Mapping_Tools_Tests.Classes.BeatmapHelper {
             public void Delete(string path) { }
 
             public string GetParentFolder(string path) => "virtual";
+
+            public string CombinePath(string parent, string child) => $"{parent}/{child}";
         }
 
         private static void AssertEquals(string expectedContent, string actualContent) {

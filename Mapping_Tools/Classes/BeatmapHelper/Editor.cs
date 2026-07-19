@@ -1,62 +1,29 @@
-using System;
 using System.Collections.Generic;
 using Mapping_Tools.ApplicationServices.Abstractions;
-using Mapping_Tools.Infrastructure.Files;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
-    /// Legacy compatibility wrapper around an <see cref="ITextFile"/> and its persistence adapter.
+    /// WPF compatibility wrapper that uses the local filesystem by default.
     /// </summary>
-    public class Editor {
-        private static readonly ITextFileStore DefaultFileStore = new FileSystemTextFileStore();
+    public class Editor : Editor2 {
+        public Editor() : base(LegacyFileStore.Default) { }
 
-        protected ITextFileStore FileStore { get; }
+        public Editor(ITextFileStore fileStore) : base(fileStore) { }
 
-        public string Path { get; set; }
+        public Editor(List<string> lines) : base(lines, LegacyFileStore.Default) { }
 
-        public ITextFile TextFile { get; set; }
+        public Editor(List<string> lines, ITextFileStore fileStore) : base(lines, fileStore) { }
 
-        public Editor() : this(DefaultFileStore) { }
+        public Editor(string path) : base(path, LegacyFileStore.Default) { }
 
-        public Editor(ITextFileStore fileStore) {
-            FileStore = fileStore ?? throw new ArgumentNullException(nameof(fileStore));
-        }
-
-        public Editor(List<string> lines) : this(lines, DefaultFileStore) { }
-
-        public Editor(List<string> lines, ITextFileStore fileStore) : this(fileStore) {
-            TextFile = new Beatmap(lines);
-        }
-
-        public Editor(string path) : this(path, DefaultFileStore) { }
-
-        public Editor(string path, ITextFileStore fileStore) : this(fileStore) {
-            Path = path;
-            TextFile = System.IO.Path.GetExtension(path).ToLowerInvariant() == ".osb"
-                ? new StoryBoard(ReadFile(path))
-                : new Beatmap(ReadFile(path));
-        }
-
-        public List<string> ReadFile(string path) => new(FileStore.ReadAllLines(path));
-
-        public virtual void SaveFile(string path) {
-            FileStore.WriteAllLines(path, TextFile.GetLines());
-        }
-
-        public virtual void SaveFile(List<string> lines) {
-            FileStore.WriteAllLines(Path, lines);
-        }
-
-        public virtual void SaveFile() {
-            FileStore.WriteAllLines(Path, TextFile.GetLines());
-        }
+        public Editor(string path, ITextFileStore fileStore) : base(path, fileStore) { }
 
         public static void SaveFile(string path, List<string> lines) {
-            DefaultFileStore.WriteAllLines(path, lines);
+            Editor2.SaveFile(LegacyFileStore.Default, path, lines);
         }
 
-        public string GetParentFolder() => FileStore.GetParentFolder(Path);
-
-        public static string GetParentFolder(string path) => DefaultFileStore.GetParentFolder(path);
+        public static string GetParentFolder(string path) {
+            return Editor2.GetParentFolder(LegacyFileStore.Default, path);
+        }
     }
 }
