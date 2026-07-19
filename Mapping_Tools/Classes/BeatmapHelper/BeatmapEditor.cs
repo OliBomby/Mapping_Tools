@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.ApplicationServices.Abstractions;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     public class BeatmapEditor : Editor
@@ -13,7 +14,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TextFile = new Beatmap(lines);
         }
 
+        public BeatmapEditor(List<string> lines, ITextFileStore fileStore) : base(fileStore)
+        {
+            TextFile = new Beatmap(lines);
+        }
+
         public BeatmapEditor(string path)
+        {
+            Path = path;
+            TextFile = new Beatmap(ReadFile(Path));
+        }
+
+        public BeatmapEditor(string path, ITextFileStore fileStore) : base(fileStore)
         {
             Path = path;
             TextFile = new Beatmap(ReadFile(Path));
@@ -25,7 +37,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <remarks>This method also updates the Path property</remarks>
         public void SaveFileWithNameUpdate() {
             // Remove the beatmap with the old filename
-            File.Delete(Path);
+            FileStore.Delete(Path);
 
             // Save beatmap with the new filename
             Path = System.IO.Path.Combine(GetParentFolder(), Beatmap.GetFileName());

@@ -49,6 +49,46 @@ namespace Mapping_Tools_Tests.Classes.BeatmapHelper {
             AssertEquals(expectedContent, actualContent);
         }
 
+        [TestMethod]
+        public void StoryboardEditorUsesInjectedTextFileStore() {
+            const string path = "virtual.osb";
+            var sourceLines = File.ReadAllLines("Resources\\TestStoryboard.osb");
+            var store = new FakeTextFileStore(path, sourceLines);
+
+            var editor = new StoryboardEditor(path, store);
+            editor.SaveFile();
+
+            CollectionAssert.AreEqual(editor.StoryBoard.GetLines(), store.WrittenLines);
+            Assert.AreEqual(path, store.WrittenPath);
+        }
+
+        private sealed class FakeTextFileStore : Mapping_Tools.ApplicationServices.Abstractions.ITextFileStore {
+            private readonly string sourcePath;
+            private readonly IReadOnlyList<string> sourceLines;
+
+            public FakeTextFileStore(string sourcePath, IReadOnlyList<string> sourceLines) {
+                this.sourcePath = sourcePath;
+                this.sourceLines = sourceLines;
+            }
+
+            public string WrittenPath { get; private set; }
+            public List<string> WrittenLines { get; private set; }
+
+            public IReadOnlyList<string> ReadAllLines(string path) {
+                Assert.AreEqual(sourcePath, path);
+                return sourceLines;
+            }
+
+            public void WriteAllLines(string path, IEnumerable<string> lines) {
+                WrittenPath = path;
+                WrittenLines = lines.ToList();
+            }
+
+            public void Delete(string path) { }
+
+            public string GetParentFolder(string path) => "virtual";
+        }
+
         private static void AssertEquals(string expectedContent, string actualContent) {
             if (string.Equals(expectedContent, actualContent, StringComparison.Ordinal)) {
                 return;

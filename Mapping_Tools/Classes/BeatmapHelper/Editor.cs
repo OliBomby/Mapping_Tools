@@ -1,104 +1,62 @@
-﻿using System.Collections.Generic;
-using System.IO;
+using System;
+using System.Collections.Generic;
+using Mapping_Tools.ApplicationServices.Abstractions;
+using Mapping_Tools.Infrastructure.Files;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
-    /// This is a class that sits around a <see cref="ITextFile"/> and gives it IO helper methods. This makes the <see cref="ITextFile"/> more like an actual file.
+    /// Legacy compatibility wrapper around an <see cref="ITextFile"/> and its persistence adapter.
     /// </summary>
     public class Editor {
-        /// <summary>
-        /// The file path to the beatmap or storyboard file.
-        /// </summary>
+        private static readonly ITextFileStore DefaultFileStore = new FileSystemTextFileStore();
+
+        protected ITextFileStore FileStore { get; }
+
         public string Path { get; set; }
 
-        /// <summary>
-        /// The text file interface used as an object.
-        /// </summary>
         public ITextFile TextFile { get; set; }
 
-        /// <inheritdoc />
-        public Editor() {
+        public Editor() : this(DefaultFileStore) { }
 
+        public Editor(ITextFileStore fileStore) {
+            FileStore = fileStore ?? throw new ArgumentNullException(nameof(fileStore));
         }
 
-        /// <inheritdoc />
-        public Editor(List<string> lines) {
+        public Editor(List<string> lines) : this(lines, DefaultFileStore) { }
+
+        public Editor(List<string> lines, ITextFileStore fileStore) : this(fileStore) {
             TextFile = new Beatmap(lines);
         }
 
-        /// <inheritdoc />
-        public Editor(string path) {
+        public Editor(string path) : this(path, DefaultFileStore) { }
+
+        public Editor(string path, ITextFileStore fileStore) : this(fileStore) {
             Path = path;
-            if (System.IO.Path.GetExtension(path).ToLower() == ".osb") {
-                TextFile = new StoryBoard(ReadFile(path));
-            } else {
-                TextFile = new Beatmap(ReadFile(path));
-            }
+            TextFile = System.IO.Path.GetExtension(path).ToLowerInvariant() == ".osb"
+                ? new StoryBoard(ReadFile(path))
+                : new Beatmap(ReadFile(path));
         }
 
-        /// <summary>
-        /// Reads the text file into string formats. with the 
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public List<string> ReadFile(string path) {
-            // Get contents of the file
-            var lines = File.ReadAllLines(path);
-            return new List<string>(lines);
-        }
+        public List<string> ReadFile(string path) => new(FileStore.ReadAllLines(path));
 
-        /// <summary>
-        /// Saves the lines of string into the path provided.
-        /// </summary>
-        /// <param name="path"></param>
         public virtual void SaveFile(string path) {
-            SaveFile(path, TextFile.GetLines());
+            FileStore.WriteAllLines(path, TextFile.GetLines());
         }
 
-        /// <summary>
-        /// Saves the lines of string into the path provided.
-        /// </summary>
-        /// <param name="lines"></param>
         public virtual void SaveFile(List<string> lines) {
-            SaveFile(Path, lines);
+            FileStore.WriteAllLines(Path, lines);
         }
 
-        /// <summary>
-        /// Saves the beatmap files.
-        /// </summary>
         public virtual void SaveFile() {
-            SaveFile(Path, TextFile.GetLines());
+            FileStore.WriteAllLines(Path, TextFile.GetLines());
         }
 
-        /// <summary>
-        /// Deletes existing files, creates a new one and writes all lines into the file.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="lines"></param>
         public static void SaveFile(string path, List<string> lines) {
-            if (!File.Exists(path)) {
-                File.Create(path).Dispose();
-            }
-
-            File.WriteAllLines(path, lines);
+            DefaultFileStore.WriteAllLines(path, lines);
         }
 
-        /// <summary>
-        /// Grab the parent folder as absolute.
-        /// </summary>
-        /// <returns></returns>
-        public string GetParentFolder() {
-            return Directory.GetParent(Path).FullName;
-        }
+        public string GetParentFolder() => FileStore.GetParentFolder(Path);
 
-        /// <summary>
-        /// Grab the parent folder as absolute.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string GetParentFolder(string path)
-        {
-            return Directory.GetParent(path).FullName;
-        }
+        public static string GetParentFolder(string path) => DefaultFileStore.GetParentFolder(path);
     }
 }
