@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
+using Mapping_Tools.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Components.Domain
 {
@@ -23,6 +24,10 @@ namespace Mapping_Tools.Components.Domain
             if (value is Color color)
             {
                 return new SolidColorBrush(color);
+            }
+            if (value is RgbaColour rgba)
+            {
+                return new SolidColorBrush(Color.FromArgb(rgba.A, rgba.R, rgba.G, rgba.B));
             }
             return Binding.DoNothing;
         }

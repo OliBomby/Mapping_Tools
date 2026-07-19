@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using Mapping_Tools.Classes.JsonConverters;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Newtonsoft.Json.Serialization;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public enum ErrorType
@@ -20,8 +22,30 @@ namespace Mapping_Tools.Classes.SystemTools {
             TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
             Formatting = Formatting.Indented,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore, 
+            SerializationBinder = new LegacyProjectTypeBinder(),
             Converters = { new Vector2Converter()}
         };
+
+        private sealed class LegacyProjectTypeBinder : ISerializationBinder {
+            private readonly DefaultSerializationBinder fallback = new();
+
+            public Type BindToType(string assemblyName, string typeName) {
+                if (assemblyName == "Mapping Tools") {
+                    if (typeName == typeof(ComboColour).FullName) return typeof(ComboColour);
+                    if (typeName == typeof(SpecialColour).FullName) return typeof(SpecialColour);
+                }
+                return fallback.BindToType(assemblyName, typeName);
+            }
+
+            public void BindToName(Type serializedType, out string assemblyName, out string typeName) {
+                if (serializedType == typeof(ComboColour) || serializedType == typeof(SpecialColour)) {
+                    assemblyName = "Mapping Tools";
+                    typeName = serializedType.FullName;
+                    return;
+                }
+                fallback.BindToName(serializedType, out assemblyName, out typeName);
+            }
+        }
 
         public static void WriteJson(StreamWriter streamWriter, object obj) {
             using (JsonTextWriter reader = new JsonTextWriter(streamWriter)) {

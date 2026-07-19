@@ -16,6 +16,25 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools_Tests {
     [TestClass]
     public class SerializationTests {
+        [TestMethod]
+        public void ComboColourSerializationPreservesLegacyProjectFormat() {
+            string path = System.IO.Path.GetTempFileName();
+            try {
+                var expected = new Mapping_Tools.Classes.BeatmapHelper.ComboColour(
+                    Mapping_Tools.Classes.BeatmapHelper.RgbaColour.FromArgb(0x7F, 0x12, 0x34, 0x56));
+
+                ProjectManager.SaveJson(path, expected);
+                string json = System.IO.File.ReadAllText(path);
+                var actual = ProjectManager.LoadJson<Mapping_Tools.Classes.BeatmapHelper.ComboColour>(path);
+
+                StringAssert.Contains(json, "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools");
+                StringAssert.Contains(json, "\"Color\": \"#7F123456\"");
+                Assert.AreEqual(expected.Color, actual.Color);
+            } finally {
+                System.IO.File.Delete(path);
+            }
+        }
+
         private static T LoadJsonDynamic<T>(string path, T _) {
             return ProjectManager.LoadJson<T>(path);
         }

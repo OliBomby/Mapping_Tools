@@ -55,7 +55,7 @@ namespace Mapping_Tools.Classes.Tools.ComboColourStudio {
                     cm.Items.Add(new MenuItem {
                         Header = comboColour.Name,
                         Icon = new PackIcon
-                            {Kind = PackIconKind.Circle, Foreground = new SolidColorBrush(comboColour.Color)},
+                            {Kind = PackIconKind.Circle, Foreground = new SolidColorBrush(Color.FromArgb(comboColour.Color.A, comboColour.Color.R, comboColour.Color.G, comboColour.Color.B))},
                         Command = new CommandImplementation(_ => {
                             ColourSequence.Add(comboColour);
                         }),

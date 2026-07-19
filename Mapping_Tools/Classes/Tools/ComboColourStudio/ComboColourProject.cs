@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows.Input;
-using System.Windows.Media;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
@@ -54,7 +53,7 @@ namespace Mapping_Tools.Classes.Tools.ComboColourStudio {
                 if (ComboColours.Count >= 8) return;
                 ComboColours.Add(ComboColours.Count > 0
                     ? new SpecialColour(ComboColours[ComboColours.Count - 1].Color, $"Combo{ComboColours.Count + 1}")
-                    : new SpecialColour(Colors.White, $"Combo{ComboColours.Count + 1}"));
+                    : new SpecialColour(RgbaColour.White, $"Combo{ComboColours.Count + 1}"));
             });
 
             RemoveComboCommand = new CommandImplementation(_ => {
