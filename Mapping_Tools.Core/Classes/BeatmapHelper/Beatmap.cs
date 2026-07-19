@@ -1,4 +1,5 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper.Enums;
+﻿#nullable disable
+using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
@@ -348,7 +349,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="startIndex"></param>
         /// <param name="endIndex"></param>
         /// <param name="rounded"></param>
-        internal void UpdateStacking(int startIndex = 0, int endIndex = -1, bool rounded = false) {
+        public void UpdateStacking(int startIndex = 0, int endIndex = -1, bool rounded = false) {
             if (endIndex == -1)
                 endIndex = HitObjects.Count - 1;
 

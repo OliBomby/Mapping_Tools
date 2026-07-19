@@ -22,6 +22,12 @@
     <None Include="..\Mapping_Tools_Tests\Resources\TestStoryboard.osb" Link="Resources\TestStoryboard.osb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\Mapping_Tools_Tests\Resources\EmptyTestMap.osu" Link="Resources\EmptyTestMap.osu">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Mapping_Tools_Tests\Resources\ComplicatedTestMap.osu" Link="Resources\ComplicatedTestMap.osu">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
