@@ -4,7 +4,7 @@ Wave 0 keeps the legacy WPF suite runnable while creating explicit homes for mig
 
 | Test project | Ownership | Current contents |
 |---|---|---|
-| `Mapping_Tools.Core.Tests` | Framework-neutral domain tests and versioned fixture contracts | Fixture catalog completeness, stable IDs, hashes, destructive-feature baseline coverage, and migrated C2 mathematics tests |
+| `Mapping_Tools.Core.Tests` | Framework-neutral domain tests and versioned fixture contracts | Fixture catalog completeness, stable IDs, hashes, destructive-feature baseline coverage, migrated C2 mathematics tests, and C1 storyboard round-trip/error tests |
 | `Mapping_Tools.Architecture.Tests` | Cross-project dependency policy | Core/Application source, package, and project-reference guardrails |
 | `Mapping_Tools_Tests` | Legacy WPF characterization and integration | Existing beatmap, math, slider, tumour, serialization, listener, converter, and project tests |
 

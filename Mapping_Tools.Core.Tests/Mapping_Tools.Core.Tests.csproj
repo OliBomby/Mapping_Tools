@@ -18,4 +18,10 @@
     <ProjectReference Include="..\Mapping_Tools.Core\Mapping_Tools.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\Mapping_Tools_Tests\Resources\TestStoryboard.osb" Link="Resources\TestStoryboard.osb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

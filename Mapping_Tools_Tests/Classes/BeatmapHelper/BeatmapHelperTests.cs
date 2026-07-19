@@ -49,16 +49,6 @@ namespace Mapping_Tools_Tests.Classes.BeatmapHelper {
             AssertEquals(expectedContent, actualContent);
         }
 
-        [TestMethod]
-        public void UnchangingStoryboardCodeTest() {
-            var path = "Resources\\TestStoryboard.osb";
-            var expectedContent = File.ReadAllText(path);
-            var editor = new StoryboardEditor(path);
-            var actualContent = SerializeLines(editor.StoryBoard.GetLines());
-
-            AssertEquals(expectedContent, actualContent);
-        }
-
         private static void AssertEquals(string expectedContent, string actualContent) {
             if (string.Equals(expectedContent, actualContent, StringComparison.Ordinal)) {
                 return;
