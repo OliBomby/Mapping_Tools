@@ -1,2 +1,2 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Auto-detect text files and use LF in both the repository and working tree.
+* text=auto eol=lf
