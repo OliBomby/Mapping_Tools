@@ -18,6 +18,10 @@ public sealed class SettingsServiceTests
         ApplicationSettings settings = store.Load();
 
         Assert.AreEqual(20, settings.RecentMaps.Count);
+        StringAssert.EndsWith(
+            settings.RecentMaps[0].Path,
+            "[3  (2^n) - 2].osu");
+        Assert.AreEqual("18/07/2026 17:38:50", settings.RecentMaps[0].DisplayDate);
         Assert.AreEqual(7, settings.FavoriteTools.Count);
         Assert.AreEqual(
             new WindowBounds(440, 256, 1407, 855),
@@ -55,6 +59,12 @@ public sealed class SettingsServiceTests
         Assert.AreEqual(
             "00:10:00",
             root.GetProperty("PeriodicBackupInterval").GetString());
+        JsonElement firstRecent = root.GetProperty("RecentMaps")[0];
+        Assert.AreEqual(JsonValueKind.Array, firstRecent.ValueKind);
+        Assert.AreEqual(2, firstRecent.GetArrayLength());
+        Assert.AreEqual(
+            settings.RecentMaps[0].DisplayDate,
+            firstRecent[1].GetString());
     }
 
     [TestMethod]

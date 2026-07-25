@@ -1,6 +1,7 @@
 using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Projects;
 using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.ApplicationServices.Workspace;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
@@ -8,6 +9,7 @@ using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Platform;
 using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Settings;
+using Mapping_Tools.Infrastructure.Workspace;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop.Composition;
@@ -49,6 +51,12 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<ISettingsPathEnvironment, WindowsSettingsPathEnvironment>();
         services.AddSingleton<ISettingsPathService, SettingsPathService>();
         services.AddSingleton<ISettingsService, SettingsService>();
+        services.AddSingleton(provider =>
+            provider.GetRequiredService<ISettingsService>().LoadOrCreate().Settings);
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<IBeatmapFileSystem, PhysicalBeatmapFileSystem>();
+        services.AddSingleton<ICurrentBeatmapLocator, UnavailableCurrentBeatmapLocator>();
+        services.AddSingleton<IBeatmapWorkspace, BeatmapWorkspace>();
         services.AddSingleton<IProjectSerializer, LegacyProjectJsonSerializer>();
         services.AddSingleton<IProjectStore, FileSystemProjectStore>();
         services.AddSingleton<IProjectService, ProjectService>();

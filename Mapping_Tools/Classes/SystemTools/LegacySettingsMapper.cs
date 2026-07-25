@@ -1,4 +1,5 @@
 using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.ApplicationServices.Workspace;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Mapping_Tools.Classes.SystemTools {
         public static ApplicationSettings ToApplication(Settings source) {
             return new ApplicationSettings {
                 RecentMaps = source.RecentMaps
-                    .Select(paths => paths.ToArray())
+                    .Select(paths => new RecentBeatmap(paths[0], paths[1]))
                     .ToList(),
                 FavoriteTools = new List<string>(source.FavoriteTools),
                 MainWindowRestoreBounds = source.MainWindowRestoreBounds is { } bounds
@@ -43,7 +44,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public static void Apply(ApplicationSettings source, Settings destination) {
             destination.RecentMaps = source.RecentMaps
-                .Select(paths => paths.ToArray())
+                .Select(recent => new[] { recent.Path, recent.DisplayDate })
                 .ToList();
             destination.FavoriteTools = new List<string>(source.FavoriteTools);
             destination.MainWindowRestoreBounds = source.MainWindowRestoreBounds is { } bounds

@@ -1,3 +1,5 @@
+using Mapping_Tools.ApplicationServices.Workspace;
+
 namespace Mapping_Tools.ApplicationServices.Settings;
 
 /// <summary>
@@ -7,144 +9,145 @@ namespace Mapping_Tools.ApplicationServices.Settings;
 public sealed class ApplicationSettings
 {
     /// <summary>
-    /// Gets or sets recent-map entries as <c>[path, display date]</c> pairs,
-    /// ordered from most to least recently opened.
+    /// Maintains recent-map entries from most to least recently selected while
+    /// Infrastructure preserves their legacy two-element JSON-array representation.
     /// </summary>
-    public List<string[]> RecentMaps { get; set; } = [];
+    public List<RecentBeatmap> RecentMaps { get; set; } = [];
 
     /// <summary>
-    /// Gets or sets the tool names pinned as favorites.
+    /// Lists tool names pinned into the shell's favorites section.
     /// </summary>
     public List<string> FavoriteTools { get; set; } = [];
 
     /// <summary>
-    /// Gets or sets the main-window bounds restored when the window is not maximized.
+    /// Defines the main window's last non-maximized position and size.
     /// </summary>
     public WindowBounds? MainWindowRestoreBounds { get; set; }
 
     /// <summary>
-    /// Gets or sets whether the main window was maximized at shutdown.
+    /// Indicates that the next session should restore the main window maximized.
     /// </summary>
     public bool MainWindowMaximized { get; set; }
 
     /// <summary>
-    /// Gets or sets the osu! installation directory.
+    /// Identifies the directory containing the osu! executable and user configuration.
     /// </summary>
     public string OsuPath { get; set; } = "";
 
     /// <summary>
-    /// Gets or sets the directory containing installed beatmap folders.
+    /// Identifies osu!'s configured beatmap library, normally the <c>Songs</c> directory.
     /// </summary>
     public string SongsPath { get; set; } = "";
 
     /// <summary>
-    /// Gets or sets the directory in which Mapping Tools stores map backups.
+    /// Identifies the destination for automatic and user-requested map backups.
     /// </summary>
     public string BackupsPath { get; set; } = "";
 
     /// <summary>
-    /// Gets or sets the current user's <c>osu!.{user}.cfg</c> path.
+    /// Identifies the current user's <c>osu!.{user}.cfg</c> file used to discover the beatmap library.
     /// </summary>
     public string OsuConfigPath { get; set; } = "";
 
     /// <summary>
-    /// Gets or sets whether tools create safety backups before modifying maps.
+    /// Requires destructive tools to create safety backups before modifying maps.
     /// </summary>
     public bool MakeBackups { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets whether operations may use live state exposed by Editor Reader.
+    /// Allows operations to prefer unsaved editor state exposed by Editor Reader.
     /// </summary>
     public bool UseEditorReader { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets whether Mapping Tools may replace the editor's on-disk save.
+    /// Allows Mapping Tools to replace the editor's on-disk save when reconciling live state.
     /// </summary>
     public bool OverrideOsuSave { get; set; }
 
     /// <summary>
-    /// Gets or sets whether tools reload their input when the current map changes.
+    /// Requests that active tools reload their input after the workspace selection changes.
     /// </summary>
     public bool AutoReload { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets whether the QuickRun hotkey invokes the selected tool without
-    /// first evaluating smart target rules.
+    /// Makes the QuickRun hotkey invoke the selected tool without first
+    /// evaluating smart target rules.
     /// </summary>
     public bool AlwaysQuickRun { get; set; }
 
     /// <summary>
-    /// Gets or sets the global hotkey assigned to QuickRun.
+    /// Defines the global key combination assigned to QuickRun.
     /// </summary>
     public HotkeySettings? QuickRunHotkey { get; set; }
 
     /// <summary>
-    /// Gets or sets whether QuickRun selects a tool based on the current map count.
+    /// Enables selection-count-based QuickRun target resolution.
     /// </summary>
     public bool SmartQuickRunEnabled { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the QuickRun target used when no current beatmap is selected.
+    /// Names the QuickRun target used when the workspace has no selected beatmap.
     /// </summary>
     public string NoneQuickRunTool { get; set; } = "<Current Tool>";
 
     /// <summary>
-    /// Gets or sets the QuickRun target used for one selected beatmap.
+    /// Names the QuickRun target used when exactly one beatmap is selected.
     /// </summary>
     public string SingleQuickRunTool { get; set; } = "<Current Tool>";
 
     /// <summary>
-    /// Gets or sets the QuickRun target used for multiple selected beatmaps.
+    /// Names the QuickRun target used when multiple beatmaps are selected.
     /// </summary>
     public string MultipleQuickRunTool { get; set; } = "<Current Tool>";
 
     /// <summary>
-    /// Gets or sets the global hotkey assigned to BetterSave.
+    /// Defines the global key combination assigned to BetterSave.
     /// </summary>
     public HotkeySettings? BetterSaveHotkey { get; set; }
 
     /// <summary>
-    /// Gets or sets the maximum number of automatic backup files retained.
+    /// Limits the retained automatic backup set before older files are pruned.
     /// </summary>
     public int MaxBackupFiles { get; set; } = 1000;
 
     /// <summary>
-    /// Gets or sets whether backups are created periodically while editing.
+    /// Enables timer-driven backups while an osu! editing session is active.
     /// </summary>
     public bool MakePeriodicBackups { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the elapsed time between periodic backups.
+    /// Defines the elapsed time between timer-driven backup attempts.
     /// </summary>
     public TimeSpan PeriodicBackupInterval { get; set; } = TimeSpan.FromMinutes(10);
 
     /// <summary>
-    /// Gets or sets whether file pickers default to the current beatmap's directory.
+    /// Makes beatmap pickers start beside the first selected map, falling back
+    /// to the configured Songs directory.
     /// </summary>
     public bool CurrentBeatmapDefaultFolder { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the global hotkey assigned to QuickUndo.
+    /// Defines the global key combination assigned to QuickUndo.
     /// </summary>
     public HotkeySettings? QuickUndoHotkey { get; set; }
 
     /// <summary>
-    /// Gets or sets the updater version the user chose to skip, or
+    /// Identifies the updater version the user chose to skip, or
     /// <see langword="null"/> when no version is skipped.
     /// </summary>
     public string? SkipVersion { get; set; }
 }
 
 /// <summary>
-/// Stores a frontend-neutral keyboard key and modifier combination using the
-/// numeric values preserved by the legacy settings format.
+/// Encodes a frontend-neutral keyboard key and modifier combination with the
+/// numeric values required by the legacy settings format.
 /// </summary>
 /// <param name="Key">The numeric key value.</param>
 /// <param name="Modifiers">The bitwise combination of modifier values.</param>
 public sealed record HotkeySettings(int Key, int Modifiers);
 
 /// <summary>
-/// Stores a window's normal-state position and size in device-independent pixels.
+/// Captures a window's normal-state position and size in device-independent pixels.
 /// </summary>
 /// <param name="X">The horizontal position of the left edge.</param>
 /// <param name="Y">The vertical position of the top edge.</param>

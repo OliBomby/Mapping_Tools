@@ -211,7 +211,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
                 if (File.Exists(path)) {
                     if (updateCurrentBeatmap) {
-                        MainWindow.AppWindow.SetCurrentMapsString(path);
+                        MainWindow.AppWindow.SetCurrentMapFromEditor(path);
                     }
 
                     return path;

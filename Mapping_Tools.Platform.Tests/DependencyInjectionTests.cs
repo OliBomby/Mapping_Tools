@@ -1,6 +1,7 @@
 using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Projects;
 using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.ApplicationServices.Workspace;
 using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
@@ -32,6 +33,11 @@ public sealed class DependencyInjectionTests
             typeof(ISettingsPathEnvironment),
             typeof(ISettingsPathService),
             typeof(ISettingsService),
+            typeof(ApplicationSettings),
+            typeof(TimeProvider),
+            typeof(IBeatmapFileSystem),
+            typeof(ICurrentBeatmapLocator),
+            typeof(IBeatmapWorkspace),
             typeof(IProjectSerializer),
             typeof(IProjectStore),
             typeof(IProjectService)

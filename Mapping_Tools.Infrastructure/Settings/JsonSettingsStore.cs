@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.ApplicationServices.Workspace;
 
 namespace Mapping_Tools.Infrastructure.Settings;
 
@@ -30,13 +31,12 @@ public sealed class JsonSettingsStore : ISettingsStore
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
         _options.Converters.Add(new WindowBoundsJsonConverter());
+        _options.Converters.Add(new RecentBeatmapJsonConverter());
     }
 
-    /// <summary>
     /// <inheritdoc/>
     public bool Exists => File.Exists(_directories.ConfigurationFile);
 
-    /// <summary>
     /// <inheritdoc/>
     /// <exception cref="JsonException">The file is empty, malformed, or contains invalid legacy bounds.</exception>
     public ApplicationSettings Load()
@@ -46,7 +46,6 @@ public sealed class JsonSettingsStore : ISettingsStore
             ?? throw new JsonException("The settings document contained no JSON value.");
     }
 
-    /// <summary>
     /// <inheritdoc/>
     /// <remarks>
     /// Serialization first targets a sibling <c>.tmp</c> file, which is moved
@@ -79,11 +78,9 @@ public sealed class JsonSettingsStore : ISettingsStore
     private sealed class WindowBoundsJsonConverter : JsonConverter<WindowBounds>
     {
         /// <summary>
-        /// <summary>
         /// Parses the comma-separated <c>x,y,width,height</c> representation
         /// emitted for the legacy WPF <c>Rect</c> property.
         /// </summary>
-        /// <inheritdoc/>
         public override WindowBounds Read(
             ref Utf8JsonReader reader,
             Type typeToConvert,
@@ -115,11 +112,9 @@ public sealed class JsonSettingsStore : ISettingsStore
         }
 
         /// <summary>
-        /// <summary>
         /// Writes bounds in the invariant comma-separated form understood by
         /// both the old Newtonsoft/WPF model and the new settings model.
         /// </summary>
-        /// <inheritdoc/>
         public override void Write(
             Utf8JsonWriter writer,
             WindowBounds value,
@@ -131,6 +126,52 @@ public sealed class JsonSettingsStore : ISettingsStore
                 value.Y.ToString(CultureInfo.InvariantCulture),
                 value.Width.ToString(CultureInfo.InvariantCulture),
                 value.Height.ToString(CultureInfo.InvariantCulture)));
+        }
+    }
+
+    private sealed class RecentBeatmapJsonConverter : JsonConverter<RecentBeatmap>
+    {
+        public override RecentBeatmap Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options)
+        {
+            if (reader.TokenType != JsonTokenType.StartArray ||
+                !reader.Read() ||
+                reader.TokenType != JsonTokenType.String)
+            {
+                throw new JsonException(
+                    "A recent beatmap must be a [path, display date] string array.");
+            }
+
+            string path = reader.GetString()
+                ?? throw new JsonException("A recent beatmap path cannot be null.");
+            if (!reader.Read() || reader.TokenType != JsonTokenType.String)
+            {
+                throw new JsonException(
+                    "A recent beatmap must include its display date as the second value.");
+            }
+
+            string displayDate = reader.GetString()
+                ?? throw new JsonException("A recent beatmap display date cannot be null.");
+            if (!reader.Read() || reader.TokenType != JsonTokenType.EndArray)
+            {
+                throw new JsonException(
+                    "A recent beatmap must contain exactly two string values.");
+            }
+
+            return new RecentBeatmap(path, displayDate);
+        }
+
+        public override void Write(
+            Utf8JsonWriter writer,
+            RecentBeatmap value,
+            JsonSerializerOptions options)
+        {
+            writer.WriteStartArray();
+            writer.WriteStringValue(value.Path);
+            writer.WriteStringValue(value.DisplayDate);
+            writer.WriteEndArray();
         }
     }
 }

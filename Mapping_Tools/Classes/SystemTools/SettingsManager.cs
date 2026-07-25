@@ -1,5 +1,6 @@
 using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.ApplicationServices.Workspace;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Settings;
 using System;
@@ -118,6 +119,12 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public static List<string[]> GetRecentMaps() {
             return Settings.RecentMaps;
+        }
+
+        internal static void ReplaceRecentMaps(IEnumerable<RecentBeatmap> recentMaps) {
+            Settings.RecentMaps = recentMaps
+                .Select(recent => new[] { recent.Path, recent.DisplayDate })
+                .ToList();
         }
 
         public static string[] GetLatestCurrentMaps() {

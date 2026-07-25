@@ -2,7 +2,9 @@
 using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.ApplicationServices.Workspace;
 using Mapping_Tools.Infrastructure.Files;
+using Mapping_Tools.Infrastructure.Workspace;
 using Mapping_Tools.Updater;
 using Mapping_Tools.Viewmodels;
 using Mapping_Tools.Views;
@@ -28,6 +30,7 @@ namespace Mapping_Tools {
         private bool updateAfterClose;
         private Task downloadUpdateTask;
         private UpdateManager updateManager;
+        private IBeatmapWorkspace beatmapWorkspace;
 
         private MainWindowVm ViewModel => (MainWindowVm)DataContext;
 
@@ -76,6 +79,13 @@ namespace Mapping_Tools {
                 }
 
                 DataContext = new MainWindowVm();
+                beatmapWorkspace = new BeatmapWorkspace(
+                    LegacySettingsMapper.ToApplication(SettingsManager.Settings),
+                    new LegacyBeatmapFilePicker(),
+                    new PhysicalBeatmapFileSystem(),
+                    new LegacyCurrentBeatmapLocator(),
+                    TimeProvider.System);
+                beatmapWorkspace.SelectionChanged += BeatmapWorkspaceOnSelectionChanged;
 
                 MessageQueue = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
                 MainSnackbar.MessageQueue = MessageQueue;
@@ -89,7 +99,7 @@ namespace Mapping_Tools {
 
                     SetFullscreen(SettingsManager.Settings.MainWindowMaximized);
 
-                    SetCurrentMaps(SettingsManager.GetLatestCurrentMaps()); // Set currentmap to previously opened map
+                    beatmapWorkspace.RestoreMostRecent();
                 }
             }
             catch( Exception ex ) {
@@ -255,22 +265,32 @@ namespace Mapping_Tools {
         }
 
         public void SetCurrentMaps(string[] paths) {
-            string strPaths = string.Join("|", paths);
-            ViewModel.CurrentBeatmaps = strPaths;
-            UpdateCurrentBeatmap(strPaths);
-            SettingsManager.AddRecentMap(paths, DateTime.Now);
+            beatmapWorkspace.SetSelection(paths);
+        }
+
+        public void SetCurrentMapsFromRecent(string[] paths) {
+            beatmapWorkspace.SetSelection(
+                paths,
+                BeatmapSelectionSource.RecentHistory);
+        }
+
+        public void SetCurrentMapFromEditor(string path) {
+            beatmapWorkspace.SetSelection(
+                [path],
+                BeatmapSelectionSource.CurrentEditor);
         }
 
         public void SetCurrentMapsString(string paths) {
-            ViewModel.CurrentBeatmaps = paths;
-            UpdateCurrentBeatmap(paths);
-            SettingsManager.AddRecentMap(paths.Split('|'), DateTime.Now);
+            beatmapWorkspace.SetSelection(paths.Split('|'));
         }
 
         public string[] GetCurrentMaps() {
-            var maps = ViewModel.CurrentBeatmaps.Split('|');
+            string[] maps = beatmapWorkspace.SelectedPaths.ToArray();
+            if (maps.Length == 0) {
+                return [""];
+            }
             
-            if (maps.Any(o => !File.Exists(o))) {
+            if (beatmapWorkspace.GetMissingSelectedPaths().Count > 0) {
                 MessageQueue.Enqueue("It seems like one of the selected beatmaps does not exist. Please re-select the file with 'File > Open beatmap'.", true);
             }
 
@@ -281,11 +301,22 @@ namespace Mapping_Tools {
             return string.Join("|", GetCurrentMaps());
         }
 
+        private void BeatmapWorkspaceOnSelectionChanged(
+            object sender,
+            BeatmapSelectionChangedEventArgs args) {
+            string currentBeatmaps = string.Join("|", args.Paths);
+            ViewModel.CurrentBeatmaps = currentBeatmaps;
+            SettingsManager.ReplaceRecentMaps(beatmapWorkspace.RecentMaps);
+            UpdateCurrentBeatmap(currentBeatmaps);
+        }
+
         private void OpenBeatmap(object sender, RoutedEventArgs e) {
             try {
                 string[] paths = IOHelper.BeatmapFileDialog(true);
                 if( paths.Length != 0 ) {
-                    SetCurrentMaps(paths);
+                    beatmapWorkspace.SetSelection(
+                        paths,
+                        BeatmapSelectionSource.FilePicker);
                 }
             }
             catch( Exception ex ) {
@@ -513,7 +544,9 @@ namespace Mapping_Tools {
         {
             // Get the array of file paths
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            SetCurrentMaps(files);
+            beatmapWorkspace.SetSelection(
+                files,
+                BeatmapSelectionSource.DragAndDrop);
         }
     }
 }

@@ -75,7 +75,7 @@ namespace Mapping_Tools.Views.Standard {
             }
 
             if (items.Count > 0)
-                MainWindow.AppWindow.SetCurrentMaps(items.ToArray());
+                MainWindow.AppWindow.SetCurrentMapsFromRecent(items.ToArray());
         }
     }
 }
