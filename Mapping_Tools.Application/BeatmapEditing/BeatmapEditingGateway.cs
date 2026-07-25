@@ -1,5 +1,6 @@
 using System.Globalization;
 using Mapping_Tools.ApplicationServices.Abstractions;
+using Mapping_Tools.ApplicationServices.Backups;
 using Mapping_Tools.ApplicationServices.Settings;
 using Mapping_Tools.Classes.BeatmapHelper;
 
@@ -12,6 +13,7 @@ namespace Mapping_Tools.ApplicationServices.BeatmapEditing;
 public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
 {
     private readonly ITextFileStore _fileStore;
+    private readonly IBeatmapBackupService _backupService;
     private readonly ILiveBeatmapReader _liveReader;
     private readonly IEditorReloadService _reloadService;
     private readonly ApplicationSettings _settings;
@@ -21,16 +23,21 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     /// and the newer, potentially unsaved state held by osu!.
     /// </summary>
     /// <param name="fileStore">Persistence used by every returned document editor.</param>
+    /// <param name="backupService">
+    /// Creates the durable pre-save snapshot that must succeed before an existing document is overwritten.
+    /// </param>
     /// <param name="liveReader">The platform adapter that reads osu!'s editor memory.</param>
     /// <param name="reloadService">The platform adapter that refreshes osu! after a save.</param>
     /// <param name="settings">The current preference controlling Editor Reader use.</param>
     public BeatmapEditingGateway(
         ITextFileStore fileStore,
+        IBeatmapBackupService backupService,
         ILiveBeatmapReader liveReader,
         IEditorReloadService reloadService,
         ApplicationSettings settings)
     {
         _fileStore = fileStore ?? throw new ArgumentNullException(nameof(fileStore));
+        _backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
         _liveReader = liveReader ?? throw new ArgumentNullException(nameof(liveReader));
         _reloadService = reloadService ?? throw new ArgumentNullException(nameof(reloadService));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -124,6 +131,13 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(editor);
+        cancellationToken.ThrowIfCancellationRequested();
+        await _backupService.CreateAsync(
+                [editor.Path],
+                BeatmapBackupReason.Automatic,
+                force: true,
+                cancellationToken)
+            .ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
         editor.SaveFile();
 

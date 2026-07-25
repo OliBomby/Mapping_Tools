@@ -1,4 +1,5 @@
 using Mapping_Tools.ApplicationServices.Abstractions;
+using Mapping_Tools.ApplicationServices.Backups;
 using Mapping_Tools.ApplicationServices.BeatmapEditing;
 using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Projects;
@@ -9,6 +10,7 @@ using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Editor;
+using Mapping_Tools.Infrastructure.Backups;
 using Mapping_Tools.Infrastructure.Platform;
 using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Settings;
@@ -58,6 +60,8 @@ internal static class DesktopServiceRegistration
             provider.GetRequiredService<ISettingsService>().LoadOrCreate().Settings);
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ITextFileStore, FileSystemFileStore>();
+        services.AddSingleton<IBeatmapBackupStore, FileSystemBeatmapBackupStore>();
+        services.AddSingleton<IBeatmapBackupService, BeatmapBackupService>();
         services.AddSingleton<WindowsEditorReaderAdapter>();
         services.AddSingleton<ILiveBeatmapReader>(provider =>
             provider.GetRequiredService<WindowsEditorReaderAdapter>());

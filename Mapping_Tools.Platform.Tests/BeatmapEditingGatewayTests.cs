@@ -1,4 +1,5 @@
 using Mapping_Tools.ApplicationServices.Abstractions;
+using Mapping_Tools.ApplicationServices.Backups;
 using Mapping_Tools.ApplicationServices.BeatmapEditing;
 using Mapping_Tools.ApplicationServices.Settings;
 using Mapping_Tools.Classes.BeatmapHelper;
@@ -144,10 +145,12 @@ public sealed class BeatmapEditingGatewayTests
     {
         MemoryTextFileStore store = CreateStore();
         RecordingReloadService reload = new(store);
+        RecordingBackupService backup = new(store);
         BeatmapEditingGateway gateway = CreateGateway(
             store,
             new FakeLiveBeatmapReader((LiveBeatmapSnapshot?)null),
-            reloadService: reload);
+            reloadService: reload,
+            backupService: backup);
         BeatmapEditingSession session = await gateway.OpenBeatmapAsync(
             MapPath,
             LiveBeatmapPreference.DiskOnly);
@@ -156,9 +159,35 @@ public sealed class BeatmapEditingGatewayTests
         await gateway.SaveAsync(session.Editor, reloadEditor: true);
 
         Assert.AreEqual(1, store.WriteCount);
+        Assert.AreEqual(1, backup.CreateCount);
+        Assert.IsTrue(backup.BackupPrecededWrite);
         Assert.AreEqual(1, reload.ReloadCount);
         Assert.IsTrue(reload.FileHadBeenWritten);
         Assert.IsTrue(store.Files[MapPath].Any(line => line == "Version:Edited"));
+    }
+
+    [TestMethod]
+    public async Task SaveDoesNotWriteOrReloadWhenMandatoryBackupFails()
+    {
+        MemoryTextFileStore store = CreateStore();
+        RecordingReloadService reload = new(store);
+        IOException failure = new("backup volume unavailable");
+        RecordingBackupService backup = new(store, failure);
+        BeatmapEditingGateway gateway = CreateGateway(
+            store,
+            new FakeLiveBeatmapReader((LiveBeatmapSnapshot?)null),
+            reloadService: reload,
+            backupService: backup);
+        BeatmapEditingSession session = await gateway.OpenBeatmapAsync(
+            MapPath,
+            LiveBeatmapPreference.DiskOnly);
+
+        IOException exception = await Assert.ThrowsExceptionAsync<IOException>(
+            () => gateway.SaveAsync(session.Editor, reloadEditor: true));
+
+        Assert.AreSame(failure, exception);
+        Assert.AreEqual(0, store.WriteCount);
+        Assert.AreEqual(0, reload.ReloadCount);
     }
 
     [TestMethod]
@@ -183,13 +212,84 @@ public sealed class BeatmapEditingGatewayTests
         MemoryTextFileStore store,
         FakeLiveBeatmapReader reader,
         ApplicationSettings? settings = null,
-        RecordingReloadService? reloadService = null)
+        RecordingReloadService? reloadService = null,
+        RecordingBackupService? backupService = null)
     {
         return new BeatmapEditingGateway(
             store,
+            backupService ?? new RecordingBackupService(store),
             reader,
             reloadService ?? new RecordingReloadService(store),
             settings ?? new ApplicationSettings());
+    }
+
+    private sealed class RecordingBackupService : IBeatmapBackupService
+    {
+        private readonly MemoryTextFileStore _store;
+        private readonly Exception? _failure;
+
+        public RecordingBackupService(
+            MemoryTextFileStore store,
+            Exception? failure = null)
+        {
+            _store = store;
+            _failure = failure;
+        }
+
+        public int CreateCount { get; private set; }
+
+        public bool BackupPrecededWrite { get; private set; }
+
+        public Task<BeatmapBackupResult> CreateAsync(
+            IEnumerable<string> sourcePaths,
+            BeatmapBackupReason reason,
+            bool force = false,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            CreateCount++;
+            BackupPrecededWrite = _store.WriteCount == 0;
+            if (_failure is not null)
+            {
+                return Task.FromException<BeatmapBackupResult>(_failure);
+            }
+
+            BeatmapBackupArtifact artifact = new(
+                "backup.osu",
+                sourcePaths.Single(),
+                reason,
+                false,
+                DateTimeOffset.UnixEpoch);
+            return Task.FromResult(
+                new BeatmapBackupResult([artifact], false));
+        }
+
+        public Task<BeatmapBackupResult> CreateAsync(
+            BeatmapEditingSession session,
+            BeatmapBackupReason reason,
+            bool force = false,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<BeatmapBackupArtifact?> CreatePeriodicIfChangedAsync(
+            BeatmapEditingSession session,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<BeatmapRestoreResult> RestoreAsync(
+            string backupPath,
+            string destinationPath,
+            bool allowDifferentFilename = false,
+            bool reloadEditor = false,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<BeatmapRestoreResult?> QuickUndoAsync(
+            string destinationPath,
+            bool allowDifferentFilename = false,
+            bool reloadEditor = false,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
     }
 
     private static MemoryTextFileStore CreateStore()

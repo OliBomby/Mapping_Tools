@@ -235,12 +235,19 @@ public interface IBeatmapEditingGateway
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Persists the editor's current document and optionally asks osu! to reload it.
+    /// Persists the editor's current document only after a mandatory safety
+    /// backup succeeds, then optionally asks osu! to reload it.
     /// </summary>
     /// <param name="editor">The beatmap or storyboard editor to save.</param>
     /// <param name="reloadEditor">Whether an active osu! editor should be refreshed after the write.</param>
     /// <param name="cancellationToken">Cancels before saving or before requesting the reload.</param>
-    /// <returns>A task that completes after persistence and any requested reload.</returns>
+    /// <returns>A task that completes after backup, persistence, and any requested reload.</returns>
+    /// <exception cref="IOException">
+    /// The safety copy or document write fails; a backup failure leaves the source untouched.
+    /// </exception>
+    /// <exception cref="OperationCanceledException">
+    /// Cancellation occurs before backup, save, or a requested reload completes.
+    /// </exception>
     Task SaveAsync(
         Editor2 editor,
         bool reloadEditor = false,

@@ -1,4 +1,5 @@
 using Mapping_Tools.ApplicationServices.Abstractions;
+using Mapping_Tools.ApplicationServices.Backups;
 using Mapping_Tools.ApplicationServices.BeatmapEditing;
 using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Projects;
@@ -38,6 +39,8 @@ public sealed class DependencyInjectionTests
             typeof(ApplicationSettings),
             typeof(TimeProvider),
             typeof(ITextFileStore),
+            typeof(IBeatmapBackupStore),
+            typeof(IBeatmapBackupService),
             typeof(ILiveBeatmapReader),
             typeof(IEditorReloadService),
             typeof(IBeatmapEditingGateway),
