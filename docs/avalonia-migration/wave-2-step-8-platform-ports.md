@@ -23,9 +23,13 @@ an initialized window and all missing-capability cases fail explicitly.
 - application directories rooted at
   `%LOCALAPPDATA%\Mapping Tools`, with exports at its `Exports` child.
 
-The Avalonia composition root registers these adapters in
-`DesktopPlatformServices`. The WPF `IOHelper`, `ShowSelectedInExplorer`, and
-direct legacy call sites remain unchanged for migration compatibility.
+The Avalonia composition root registers these adapters with
+`Microsoft.Extensions.DependencyInjection`. The root container owns the shell
+and platform-service singletons, validates registrations at startup, and is
+disposed when the desktop lifetime exits. Consumers receive only the explicit
+interfaces in their constructors; the service provider is not exposed as a
+service locator. The WPF `IOHelper`, `ShowSelectedInExplorer`, and direct
+legacy call sites remain unchanged for migration compatibility.
 
 ## Behavior and limitations
 
@@ -76,3 +80,12 @@ feature that consumes each port.
 The launcher adapter uses the `TopLevel.Launcher` accessor and the
 `ILauncher`/`LauncherExtensions` APIs supplied by the pinned Avalonia 12.1.0
 packages.
+
+## Deferred Generic Host migration
+
+The desktop currently uses the lightweight `ServiceCollection` and root
+`ServiceProvider` directly. Move the composition root to the .NET Generic Host
+when Wave 2 step 14 (A6 tool execution) introduces logging, configuration,
+hosted background work, and coordinated shutdown. Until those capabilities
+exist, adding `Microsoft.Extensions.Hosting` would provide little value beyond
+the DI container already in use.

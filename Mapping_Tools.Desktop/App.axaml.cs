@@ -1,16 +1,17 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Mapping_Tools.Desktop.Platform;
+using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
-using Mapping_Tools.Infrastructure.Files;
-using Mapping_Tools.Infrastructure.Platform;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop;
 
 public partial class App : Application
 {
+    private ServiceProvider? _serviceProvider;
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -20,23 +21,30 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            MainWindow mainWindow = new()
+            ServiceCollection services = new();
+            services.AddMappingToolsDesktop();
+
+            // TODO Wave 2/A6: move this composition root to the .NET Generic Host
+            // when tool execution adds logging, configuration, hosted work, and
+            // coordinated application shutdown.
+            _serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions
             {
-                DataContext = new MainViewModel(),
-            };
+                ValidateOnBuild = true,
+                ValidateScopes = true
+            });
 
-            PlatformServices = new DesktopPlatformServices(
-                new AvaloniaFilePicker(() => mainWindow.StorageProvider),
-                new AvaloniaClipboardService(() => mainWindow.Clipboard),
-                new AvaloniaPlatformLauncher(() => mainWindow.Launcher),
-                new WindowsFileRevealService(),
-                new ApplicationDirectories());
-
+            MainWindow mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+            mainWindow.DataContext = _serviceProvider.GetRequiredService<MainViewModel>();
             desktop.MainWindow = mainWindow;
+            desktop.Exit += (_, _) => DisposeServices();
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    public DesktopPlatformServices? PlatformServices { get; private set; }
+    private void DisposeServices()
+    {
+        _serviceProvider?.Dispose();
+        _serviceProvider = null;
+    }
 }
