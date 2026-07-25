@@ -81,11 +81,9 @@ The launcher adapter uses the `TopLevel.Launcher` accessor and the
 `ILauncher`/`LauncherExtensions` APIs supplied by the pinned Avalonia 12.1.0
 packages.
 
-## Deferred Generic Host migration
+## Generic Host follow-up
 
-The desktop currently uses the lightweight `ServiceCollection` and root
-`ServiceProvider` directly. Move the composition root to the .NET Generic Host
-when Wave 2 step 14 (A6 tool execution) introduces logging, configuration,
-hosted background work, and coordinated shutdown. Until those capabilities
-exist, adding `Microsoft.Extensions.Hosting` would provide little value beyond
-the DI container already in use.
+Wave 2 step 14 completed the planned move from a directly built root
+`ServiceProvider` to the .NET Generic Host. The A8 adapters keep the same
+desktop lifetimes while the host now owns configuration, logging, background
+work, and coordinated shutdown.

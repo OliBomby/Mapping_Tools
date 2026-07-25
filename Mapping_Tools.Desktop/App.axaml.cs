@@ -2,20 +2,22 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Mapping_Tools.Desktop.Composition;
+using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Mapping_Tools.Desktop;
 
 /// <summary>
-/// Owns Avalonia resource initialization and the desktop dependency-injection scope.
+/// Owns Avalonia resource initialization and bridges its classic desktop
+/// lifetime to the .NET Generic Host.
 /// </summary>
 public partial class App : Application
 {
-    private ServiceProvider? _serviceProvider;
+    private IHost? _host;
 
-    /// <summary>
     /// <inheritdoc/>
     public override void Initialize()
     {
@@ -23,38 +25,52 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// <summary>
-    /// Builds and validates the desktop service provider, resolves the main
-    /// window, and disposes services when the desktop lifetime exits.
+    /// Starts hosted services after Avalonia initialization, resolves the main
+    /// window from the host, and joins host shutdown to the desktop Exit event.
     /// </summary>
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            ServiceCollection services = new();
-            services.AddMappingToolsDesktop();
-
-            // TODO Wave 2/A6: move this composition root to the .NET Generic Host
-            // when tool execution adds logging, configuration, hosted work, and
-            // coordinated application shutdown.
-            _serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions
+            _host = DesktopHostFactory.Create(desktop.Args ?? []);
+            try
             {
-                ValidateOnBuild = true,
-                ValidateScopes = true
-            });
-
-            MainWindow mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-            mainWindow.DataContext = _serviceProvider.GetRequiredService<MainViewModel>();
-            desktop.MainWindow = mainWindow;
-            desktop.Exit += (_, _) => DisposeServices();
+                _host.Start();
+                MainWindow mainWindow =
+                    _host.Services.GetRequiredService<MainWindow>();
+                mainWindow.DataContext =
+                    _host.Services.GetRequiredService<MainViewModel>();
+                desktop.MainWindow = mainWindow;
+                desktop.Exit += (_, _) => StopHost();
+            }
+            catch
+            {
+                _host.Dispose();
+                _host = null;
+                throw;
+            }
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    private void DisposeServices()
+    private void StopHost()
     {
-        _serviceProvider?.Dispose();
-        _serviceProvider = null;
+        if (_host is null)
+        {
+            return;
+        }
+
+        try
+        {
+            _host.StopAsync(TimeSpan.FromSeconds(5))
+                .GetAwaiter()
+                .GetResult();
+        }
+        finally
+        {
+            _host.Dispose();
+            _host = null;
+        }
     }
 }

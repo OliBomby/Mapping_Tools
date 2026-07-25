@@ -19,8 +19,8 @@ environment adapter that locates osu! through the registry and reads
 `BeatmapDirectory` from the user config.
 
 The Avalonia composition root registers the store, path environment, path
-service, and settings service as DI singletons. The full .NET Generic Host
-remains deferred to Wave 2 step 14, as recorded in the step 8 note.
+service, and settings service as DI singletons. Wave 2 step 14 subsequently
+moved that composition root into the .NET Generic Host.
 
 The WPF frontend now uses a compatibility mapper between its bindable
 `Settings` object and the framework-neutral document. Its existing preference

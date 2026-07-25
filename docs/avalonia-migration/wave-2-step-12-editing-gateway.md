@@ -95,9 +95,10 @@ changed, so no render baseline applies.
 ## Deferred work and limitations
 
 This step introduces the save/reload boundary but does not migrate BetterSave,
-backups, QuickUndo, file-watcher save reconciliation, hotkeys, or individual
-tool call sites. Backups are Wave 2 step 13; execution, interaction reporting,
-and the previously noted .NET Generic Host migration remain Wave 2 step 14.
+QuickUndo hotkeys, file-watcher save reconciliation, or individual tool call
+sites. Wave 2 steps 13 and 14 subsequently supplied backup policy, shared tool
+execution and interaction reporting, and the .NET Generic Host composition
+root.
 
 Editor Reader and the reload gesture support osu!stable on Windows only.
 `FetchAll` is synchronous inside the vendor library: cancellation can prevent

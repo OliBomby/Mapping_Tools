@@ -120,12 +120,13 @@ behavioral oracle.
 The focused platform suite passes 72 tests. This step changes no view or
 AXAML, so no render baseline applies.
 
-## Deferred work
+## Follow-up and deferred work
 
-The service contains periodic change detection but does not own a timer.
-Timer lifetime, coordinated cancellation, notifications, typed confirmation
-dialogs, and the previously noted .NET Generic Host migration belong to Wave
-2 step 14. QuickUndo's global hotkey remains step 15.
+Wave 2 step 14 now schedules periodic change detection as hosted background
+work, coordinates cancellation, supplies frontend-neutral notifications, and
+owns the Avalonia composition root through the .NET Generic Host. Typed
+confirmation dialogs remain a Wave 3 concern, and QuickUndo's global hotkey
+remains step 15.
 
 Wave 3 step 19 will expose explicit backup, restore, QuickUndo, and backups
 folder actions through the Avalonia shell using the existing file picker,

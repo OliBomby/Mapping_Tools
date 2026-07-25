@@ -103,4 +103,5 @@ No new Avalonia API was introduced in this step. Project dialogs reuse the A8
 - <https://docs.avaloniaui.net/docs/services/storage/file-picker-options>
 - <https://github.com/AvaloniaUI/Avalonia/tree/12.1.0>
 
-The full .NET Generic Host migration remains deferred to Wave 2 step 14.
+Wave 2 step 14 subsequently moved the Avalonia composition root into the .NET
+Generic Host.
