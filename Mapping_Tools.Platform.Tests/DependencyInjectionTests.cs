@@ -4,6 +4,7 @@ using Mapping_Tools.ApplicationServices.BeatmapEditing;
 using Mapping_Tools.ApplicationServices.Execution;
 using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Projects;
+using Mapping_Tools.ApplicationServices.QuickRun;
 using Mapping_Tools.ApplicationServices.Settings;
 using Mapping_Tools.ApplicationServices.Workspace;
 using Mapping_Tools.Desktop.Composition;
@@ -44,8 +45,12 @@ public sealed class DependencyInjectionTests
             typeof(ITextFileStore),
             typeof(IUserNotificationService),
             typeof(IToolExecutionService),
+            typeof(IQuickRunCommandRegistry),
+            typeof(IQuickRunService),
+            typeof(IGlobalHotkeyService),
             typeof(IBeatmapBackupStore),
             typeof(IBeatmapBackupService),
+            typeof(IQuickUndoCommandService),
             typeof(ILiveBeatmapReader),
             typeof(IEditorReloadService),
             typeof(IBeatmapEditingGateway),
@@ -96,7 +101,7 @@ public sealed class DependencyInjectionTests
         ServiceDescriptor[] hosted = services
             .Where(descriptor => descriptor.ServiceType == typeof(IHostedService))
             .ToArray();
-        Assert.AreEqual(2, hosted.Length);
+        Assert.AreEqual(3, hosted.Length);
         Assert.IsTrue(hosted.All(
             descriptor => descriptor.Lifetime == ServiceLifetime.Singleton));
     }
@@ -114,6 +119,53 @@ public sealed class DependencyInjectionTests
         await host.StopAsync();
 
         Assert.AreEqual(1, execution.StopCount);
+    }
+
+    [TestMethod]
+    public async Task QuickRunHostedServiceConnectsGlobalBindingAndStopsListener()
+    {
+        RecordingGlobalHotkeyService hotkeys = new();
+        RecordingQuickRunService quickRun = new();
+        ApplicationSettings settings = new()
+        {
+            QuickRunHotkey = new HotkeySettings(56, 2),
+            QuickUndoHotkey = new HotkeySettings(69, 6)
+        };
+        RecordingQuickUndoCommandService quickUndo = new();
+        GlobalHotkeyHostedService service = new(
+            hotkeys,
+            quickRun,
+            quickUndo,
+            settings);
+
+        await service.StartAsync(CancellationToken.None);
+        Assert.IsTrue(hotkeys.Started);
+        Assert.AreEqual(settings.QuickRunHotkey, hotkeys.Hotkeys["quick-run"]);
+        Assert.AreEqual(settings.QuickUndoHotkey, hotkeys.Hotkeys["quick-undo"]);
+
+        await hotkeys.Callbacks["quick-run"](CancellationToken.None);
+        await hotkeys.Callbacks["quick-undo"](CancellationToken.None);
+        await service.StopAsync(CancellationToken.None);
+
+        Assert.AreEqual(1, quickRun.RunCount);
+        Assert.AreEqual(1, quickUndo.RunCount);
+        Assert.IsTrue(hotkeys.Stopped);
+    }
+
+    private sealed class RecordingQuickUndoCommandService
+        : IQuickUndoCommandService
+    {
+        public int RunCount { get; private set; }
+
+        public Task<QuickUndoCommandResult> ExecuteAsync(
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            RunCount++;
+            return Task.FromResult(
+                new QuickUndoCommandResult(
+                    QuickUndoCommandStatus.NoBackup));
+        }
     }
 
     private sealed class RecordingToolExecutionService : IToolExecutionService
@@ -139,5 +191,45 @@ public sealed class DependencyInjectionTests
             StopCount++;
             return Task.CompletedTask;
         }
+    }
+
+    private sealed class RecordingQuickRunService : IQuickRunService
+    {
+        public int RunCount { get; private set; }
+
+        public Task<QuickRunResult> RunAsync(
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            RunCount++;
+            return Task.FromResult(
+                new QuickRunResult(QuickRunStatus.Executed, "tool"));
+        }
+    }
+
+    private sealed class RecordingGlobalHotkeyService : IGlobalHotkeyService
+    {
+        public Dictionary<string, HotkeySettings?> Hotkeys { get; } =
+            new(StringComparer.Ordinal);
+
+        public Dictionary<string, Func<CancellationToken, Task>> Callbacks { get; } =
+            new(StringComparer.Ordinal);
+
+        public bool Started { get; private set; }
+
+        public bool Stopped { get; private set; }
+
+        public void SetBinding(
+            string id,
+            HotkeySettings? hotkey,
+            Func<CancellationToken, Task> callback)
+        {
+            Hotkeys[id] = hotkey;
+            Callbacks[id] = callback;
+        }
+
+        public void Start() => Started = true;
+
+        public void Stop() => Stopped = true;
     }
 }

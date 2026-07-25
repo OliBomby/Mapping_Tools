@@ -15,6 +15,10 @@
       <HintPath>..\lib\EditorReader.dll</HintPath>
       <Private>true</Private>
     </Reference>
+    <Reference Include="NonInvasiveKeyboardHookLibrary.Core">
+      <HintPath>..\lib\NonInvasiveKeyboardHookLibrary.Core.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

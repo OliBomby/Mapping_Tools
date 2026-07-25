@@ -224,7 +224,8 @@ Exit: Core can load, modify, and round-trip representative maps without referenc
 
 Exit: a headless Application use case can select/load/edit/backup/save a map and report a result without a Window or UserControl.
 
-Implementation status: steps 8 through 14 are complete. Their contracts, adapters,
+Implementation status: steps 8 through 15 are complete and the Wave 2 exit
+condition has an automated headless acceptance test. Their contracts, adapters,
 behavior, limitations, tests, and compatibility decisions are recorded in
 [wave-2-step-8-platform-ports.md](wave-2-step-8-platform-ports.md),
 [wave-2-step-9-settings.md](wave-2-step-9-settings.md),
@@ -232,7 +233,9 @@ behavior, limitations, tests, and compatibility decisions are recorded in
 [wave-2-step-11-beatmap-workspace.md](wave-2-step-11-beatmap-workspace.md),
 [wave-2-step-12-editing-gateway.md](wave-2-step-12-editing-gateway.md),
 [wave-2-step-13-backup-restore-undo.md](wave-2-step-13-backup-restore-undo.md),
-and [wave-2-step-14-tool-execution-host.md](wave-2-step-14-tool-execution-host.md).
+[wave-2-step-14-tool-execution-host.md](wave-2-step-14-tool-execution-host.md),
+[wave-2-step-15-quickrun-hotkeys.md](wave-2-step-15-quickrun-hotkeys.md),
+and [wave-2-completion-validation.md](wave-2-completion-validation.md).
 The Avalonia composition root now uses the .NET Generic Host for DI,
 configuration, logging, periodic backups, and coordinated tool cancellation
 during shutdown.
@@ -243,7 +246,8 @@ during shutdown.
 17. **D1 shell and Get started.** Explicit feature registry, navigation/search/favorites, notifications, activation, and window persistence.
 18. **Preferences, pass 1.** Paths, backup policy, editor-reader toggle, theme, and settings persistence.
 19. **Current-map, backup, and project lifecycle UI.** Map chooser/recent maps, drag/drop, backup operations, and per-feature New/Open/Save.
-20. **Preferences, pass 2 and QuickRun UI.** Hotkey editor, smart targets, BetterSave, QuickUndo, and global-hook enablement.
+20. **Preferences, pass 2 and QuickRun UI.** Hotkey editor, smart-target
+    configuration, live hotkey rebinding, BetterSave, and QuickUndo controls.
 
 Exit: the Avalonia shell can host independently registered features and exercise all cross-cutting workflows without static WPF state.
 

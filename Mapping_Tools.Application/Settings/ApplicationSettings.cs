@@ -70,8 +70,8 @@ public sealed class ApplicationSettings
     public bool AutoReload { get; set; } = true;
 
     /// <summary>
-    /// Makes the QuickRun hotkey invoke the selected tool without first
-    /// evaluating smart target rules.
+    /// Makes an ordinary tool Run action use that feature's quick path; global
+    /// shortcut routing remains controlled by <see cref="SmartQuickRunEnabled"/>.
     /// </summary>
     public bool AlwaysQuickRun { get; set; }
 
@@ -86,17 +86,17 @@ public sealed class ApplicationSettings
     public bool SmartQuickRunEnabled { get; set; } = true;
 
     /// <summary>
-    /// Names the QuickRun target used when the workspace has no selected beatmap.
+    /// Names the QuickRun target used when osu! has no selected hit objects.
     /// </summary>
     public string NoneQuickRunTool { get; set; } = "<Current Tool>";
 
     /// <summary>
-    /// Names the QuickRun target used when exactly one beatmap is selected.
+    /// Names the QuickRun target used when osu! has exactly one selected hit object.
     /// </summary>
     public string SingleQuickRunTool { get; set; } = "<Current Tool>";
 
     /// <summary>
-    /// Names the QuickRun target used when multiple beatmaps are selected.
+    /// Names the QuickRun target used when osu! has multiple selected hit objects.
     /// </summary>
     public string MultipleQuickRunTool { get; set; } = "<Current Tool>";
 
@@ -139,11 +139,11 @@ public sealed class ApplicationSettings
 }
 
 /// <summary>
-/// Encodes a frontend-neutral keyboard key and modifier combination with the
-/// numeric values required by the legacy settings format.
+/// Preserves the numeric WPF <c>Key</c> and <c>ModifierKeys</c> values written
+/// by legacy settings while platform adapters translate them to native input.
 /// </summary>
-/// <param name="Key">The numeric key value.</param>
-/// <param name="Modifiers">The bitwise combination of modifier values.</param>
+/// <param name="Key">The persisted WPF key-enum value; zero disables the binding.</param>
+/// <param name="Modifiers">Persisted Alt, Control, Shift, and Windows flag bits.</param>
 public sealed record HotkeySettings(int Key, int Modifiers);
 
 /// <summary>

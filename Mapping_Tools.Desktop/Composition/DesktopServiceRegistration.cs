@@ -4,6 +4,7 @@ using Mapping_Tools.ApplicationServices.BeatmapEditing;
 using Mapping_Tools.ApplicationServices.Execution;
 using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Projects;
+using Mapping_Tools.ApplicationServices.QuickRun;
 using Mapping_Tools.ApplicationServices.Settings;
 using Mapping_Tools.ApplicationServices.Workspace;
 using Mapping_Tools.Desktop.Platform;
@@ -65,8 +66,16 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<ToolExecutionService>();
         services.AddSingleton<IToolExecutionService>(provider =>
             provider.GetRequiredService<ToolExecutionService>());
+        services.AddSingleton<QuickRunCommandRegistry>();
+        services.AddSingleton<IQuickRunCommandRegistry>(provider =>
+            provider.GetRequiredService<QuickRunCommandRegistry>());
+        services.AddSingleton<QuickRunService>();
+        services.AddSingleton<IQuickRunService>(provider =>
+            provider.GetRequiredService<QuickRunService>());
+        services.AddSingleton<IGlobalHotkeyService, WindowsGlobalHotkeyService>();
         services.AddSingleton<IBeatmapBackupStore, FileSystemBeatmapBackupStore>();
         services.AddSingleton<IBeatmapBackupService, BeatmapBackupService>();
+        services.AddSingleton<IQuickUndoCommandService, QuickUndoCommandService>();
         services.AddSingleton<WindowsEditorReaderAdapter>();
         services.AddSingleton<ILiveBeatmapReader>(provider =>
             provider.GetRequiredService<WindowsEditorReaderAdapter>());
