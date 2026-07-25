@@ -1,9 +1,12 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Windows.Input;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
@@ -50,6 +53,30 @@ namespace Mapping_Tools_Tests {
                 Assert.AreEqual(line, actual.GetLine());
             } finally {
                 System.IO.File.Delete(path);
+            }
+        }
+
+        [TestMethod]
+        public void AllMigratedCoreTypesPreserveLegacyProjectAssemblyName() {
+            object[] migratedValues = {
+                new RationalBeatDivisor(4),
+                new Sample(),
+                new TimingPoint("1000,500,4,1,0,100,1,0"),
+                new HitsoundZone()
+            };
+
+            foreach (object expected in migratedValues) {
+                string path = System.IO.Path.GetTempFileName();
+                try {
+                    ProjectManager.SaveJson(path, expected);
+                    string json = System.IO.File.ReadAllText(path);
+                    object actual = ProjectManager.LoadJson<object>(path);
+
+                    StringAssert.Contains(json, $"{expected.GetType().FullName}, Mapping Tools");
+                    Assert.AreEqual(expected.GetType(), actual.GetType());
+                } finally {
+                    System.IO.File.Delete(path);
+                }
             }
         }
 

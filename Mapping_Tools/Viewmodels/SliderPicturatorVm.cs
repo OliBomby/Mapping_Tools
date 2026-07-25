@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -110,7 +111,11 @@ namespace Mapping_Tools.Viewmodels
             get
             {
                 try {
-                    var path = MainWindow.AppWindow.GetCurrentMaps()[0];
+                    var path = MainWindow.AppWindow.GetCurrentMaps().FirstOrDefault();
+                    if (string.IsNullOrEmpty(path) || !File.Exists(path)) {
+                        return Enumerable.Empty<Color>();
+                    }
+
                     var beatmap = new BeatmapEditor(path).Beatmap;
                     var comboColors = beatmap.ComboColours;
 

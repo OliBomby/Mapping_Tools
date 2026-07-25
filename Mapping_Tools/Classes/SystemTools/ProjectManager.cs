@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
@@ -28,20 +28,20 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         private sealed class LegacyProjectTypeBinder : ISerializationBinder {
             private readonly DefaultSerializationBinder fallback = new();
+            private static readonly System.Reflection.Assembly MigratedCoreAssembly = typeof(Beatmap).Assembly;
 
             public Type BindToType(string assemblyName, string typeName) {
                 if (assemblyName == "Mapping Tools") {
-                    if (typeName == typeof(ComboColour).FullName) return typeof(ComboColour);
-                    if (typeName == typeof(SpecialColour).FullName) return typeof(SpecialColour);
-                    if (typeName == typeof(HitObject).FullName) return typeof(HitObject);
-                    if (typeName == typeof(Beatmap).FullName) return typeof(Beatmap);
+                    // Wave 1 moved domain types from the WPF executable into Core.
+                    // Existing project files still identify those types as belonging to "Mapping Tools".
+                    Type migratedType = MigratedCoreAssembly.GetType(typeName);
+                    if (migratedType != null) return migratedType;
                 }
                 return fallback.BindToType(assemblyName, typeName);
             }
 
             public void BindToName(Type serializedType, out string assemblyName, out string typeName) {
-                if (serializedType == typeof(ComboColour) || serializedType == typeof(SpecialColour) ||
-                    serializedType == typeof(HitObject) || serializedType == typeof(Beatmap)) {
+                if (serializedType.Assembly == MigratedCoreAssembly) {
                     assemblyName = "Mapping Tools";
                     typeName = serializedType.FullName;
                     return;
