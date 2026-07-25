@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,7 +98,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             SampleGeneratingArgsComparer comparer = null) {
 
             var indices = packages.Select(o => o.GetCustomIndex(comparer)).ToList();
-            indices.ForEach(o => o.CleanInvalids(loadedSamples, validateSampleFile));
+            indices.ForEach(o => o.CleanInvalids(
+                sample => SampleImporter.ValidateSampleArgs(sample, loadedSamples, validateSampleFile)));
             return indices;
         }
 

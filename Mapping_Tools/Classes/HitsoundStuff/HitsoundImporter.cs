@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper;
 using NAudio.Midi;
 using System;
 using System.Collections.Generic;
@@ -265,50 +265,15 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         public static SampleSet GetSamplesetFromFilename(string filename) {
-            string[] split = filename.Split('-');
-            if (split.Length < 1)
-                return SampleSet.Soft;
-            string sampleset = split[0];
-            switch (sampleset) {
-                case "auto":
-                    return SampleSet.None;
-                case "normal":
-                    return SampleSet.Normal;
-                case "soft":
-                    return SampleSet.Soft;
-                case "drum":
-                    return SampleSet.Drum;
-                default:
-                    return SampleSet.Soft;
-            }
+            return HitsoundFilename.GetSampleSet(filename);
         }
 
         public static Hitsound GetHitsoundFromFilename(string filename) {
-            string[] split = filename.Split('-');
-            if (split.Length < 2)
-                return Hitsound.Normal;
-            string hitsound = split[1];
-            if (hitsound.Contains("hitnormal"))
-                return Hitsound.Normal;
-            if (hitsound.Contains("hitwhistle"))
-                return Hitsound.Whistle;
-            if (hitsound.Contains("hitfinish"))
-                return Hitsound.Finish;
-            if (hitsound.Contains("hitclap"))
-                return Hitsound.Clap;
-            return Hitsound.Normal;
+            return HitsoundFilename.GetHitsound(filename);
         }
 
         public static int GetIndexFromFilename(string filename) {
-            var match = Regex.Match(filename, "^(normal|soft|drum)-(hit(normal|whistle|finish|clap)|slidertick|sliderslide)");
-
-            var remainder = filename.Substring(match.Index + match.Length);
-            int index = 0;
-            if (!string.IsNullOrEmpty(remainder)) {
-                FileFormatHelper.TryParseInt(remainder, out index);
-            }
-
-            return index;
+            return HitsoundFilename.GetIndex(filename);
         }
 
         public static List<HitsoundLayer> ImportMidi(string path, double offset=0, bool instruments=true, bool keysounds=true, bool lengths=true, double lengthRoughness=1, bool velocities=true, double velocityRoughness=1) {

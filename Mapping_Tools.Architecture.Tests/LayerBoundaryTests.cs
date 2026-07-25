@@ -22,6 +22,8 @@ public sealed class LayerBoundaryTests
         "Avalonia",
         "ReactiveUI",
         "MaterialDesignThemes",
+        "NAudio",
+        "OggVorbisEncoder",
         "System.Diagnostics.Process",
         "ProcessStartInfo",
         "OpenFileDialog",
@@ -37,11 +39,13 @@ public sealed class LayerBoundaryTests
         "ReactiveUI",
         "Material.Avalonia",
         "MaterialDesign",
+        "NAudio",
+        "OggVorbisEncoder",
         "Microsoft-WindowsAPICodePack"
     ];
 
     [TestMethod]
-    public void CoreAndApplicationDoNotContainFrontendOrProcessApis()
+    public void CoreAndApplicationDoNotContainFrontendProcessOrAudioApis()
     {
         var violations = FrameworkNeutralProjects
             .SelectMany(project => Directory.EnumerateFiles(
