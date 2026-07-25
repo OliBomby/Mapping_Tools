@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Unit Tests"
+  short_description: "Write consistent .NET unit tests"
+  default_prompt: "Use $write-unit-tests to add or migrate unit tests to the repository conventions."

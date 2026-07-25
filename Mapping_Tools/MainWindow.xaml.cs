@@ -520,7 +520,7 @@ namespace Mapping_Tools {
 
             if (WindowState == WindowState.Maximized) {
                 var point = PointToScreen(e.MouseDevice.GetPosition(this));
-                Top = point.Y - (((FrameworkElement)sender).ActualHeight / 2);
+                Top = point.Y - ((FrameworkElement)sender).ActualHeight / 2;
                 SetFullscreen(false);
             }
 

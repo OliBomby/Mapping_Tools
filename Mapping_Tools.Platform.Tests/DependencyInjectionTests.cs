@@ -21,11 +21,10 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class DependencyInjectionTests
 {
     [TestMethod]
-    public void DesktopCompositionRootRegistersExpectedSingletons()
+    public void AddMappingToolsDesktop_DefaultRegistration_RegistersExpectedSingletons()
     {
+        // Arrange
         ServiceCollection services = new();
-
-        services.AddMappingToolsDesktop();
 
         Type[] expectedSingletons =
         [
@@ -62,25 +61,28 @@ public sealed class DependencyInjectionTests
             typeof(IProjectService)
         ];
 
+        // Act
+        services.AddMappingToolsDesktop();
+
+        // Assert
         foreach (Type serviceType in expectedSingletons)
         {
             ServiceDescriptor? registration = services.SingleOrDefault(
                 descriptor => descriptor.ServiceType == serviceType);
 
-            Assert.IsNotNull(registration, $"{serviceType.Name} is not registered.");
-            Assert.AreEqual(
-                ServiceLifetime.Singleton,
-                registration.Lifetime,
-                $"{serviceType.Name} has the wrong lifetime.");
+            registration.Should().NotBeNull($"{serviceType.Name} is not registered.");
+            registration.Lifetime.Should().Be(ServiceLifetime.Singleton, $"{serviceType.Name} has the wrong lifetime.");
         }
     }
 
     [TestMethod]
-    public void DesktopCompositionRootPassesContainerValidation()
+    public void BuildServiceProvider_WithDesktopRegistrations_PassesValidation()
     {
+        // Arrange
         ServiceCollection services = new();
         services.AddMappingToolsDesktop();
 
+        // Act
         using ServiceProvider provider = services.BuildServiceProvider(
             new ServiceProviderOptions
             {
@@ -88,42 +90,50 @@ public sealed class DependencyInjectionTests
                 ValidateScopes = true
             });
 
-        Assert.IsNotNull(provider);
+        // Assert
+        provider.Should().NotBeNull();
     }
 
     [TestMethod]
-    public void DesktopHostRegistersExecutionAndPeriodicBackupLifecycles()
+    public void AddMappingToolsHostedServices_DefaultRegistration_RegistersExpectedLifecycles()
     {
+        // Arrange
         ServiceCollection services = new();
 
         services.AddMappingToolsHostedServices();
 
+        // Act
         ServiceDescriptor[] hosted = services
             .Where(descriptor => descriptor.ServiceType == typeof(IHostedService))
             .ToArray();
-        Assert.AreEqual(3, hosted.Length);
-        Assert.IsTrue(hosted.All(
-            descriptor => descriptor.Lifetime == ServiceLifetime.Singleton));
+        // Assert
+        hosted.Length.Should().Be(3);
+        hosted.All(
+            descriptor => descriptor.Lifetime == ServiceLifetime.Singleton).Should().BeTrue();
     }
 
     [TestMethod]
-    public async Task GenericHostStopsToolExecutionDuringApplicationShutdown()
+    public async Task StopAsync_DuringHostShutdown_StopsToolExecution()
     {
+        // Arrange
         RecordingToolExecutionService execution = new();
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         builder.Services.AddSingleton<IToolExecutionService>(execution);
         builder.Services.AddHostedService<ToolExecutionHostedService>();
         using IHost host = builder.Build();
 
+        // Act
         await host.StartAsync();
         await host.StopAsync();
 
-        Assert.AreEqual(1, execution.StopCount);
+        // Assert
+        execution.StopCount.Should().Be(1);
     }
 
     [TestMethod]
-    public async Task QuickRunHostedServiceConnectsGlobalBindingAndStopsListener()
+    public async Task QuickRunHostedService_StartAndStop_ConnectsBindingAndStopsListener()
     {
+        // Arrange
         RecordingGlobalHotkeyService hotkeys = new();
         RecordingQuickRunService quickRun = new();
         ApplicationSettings settings = new()
@@ -138,18 +148,20 @@ public sealed class DependencyInjectionTests
             quickUndo,
             settings);
 
+        // Act
         await service.StartAsync(CancellationToken.None);
-        Assert.IsTrue(hotkeys.Started);
-        Assert.AreEqual(settings.QuickRunHotkey, hotkeys.Hotkeys["quick-run"]);
-        Assert.AreEqual(settings.QuickUndoHotkey, hotkeys.Hotkeys["quick-undo"]);
+        // Assert
+        hotkeys.Started.Should().BeTrue();
+        hotkeys.Hotkeys["quick-run"].Should().Be(settings.QuickRunHotkey);
+        hotkeys.Hotkeys["quick-undo"].Should().Be(settings.QuickUndoHotkey);
 
         await hotkeys.Callbacks["quick-run"](CancellationToken.None);
         await hotkeys.Callbacks["quick-undo"](CancellationToken.None);
         await service.StopAsync(CancellationToken.None);
 
-        Assert.AreEqual(1, quickRun.RunCount);
-        Assert.AreEqual(1, quickUndo.RunCount);
-        Assert.IsTrue(hotkeys.Stopped);
+        quickRun.RunCount.Should().Be(1);
+        quickUndo.RunCount.Should().Be(1);
+        hotkeys.Stopped.Should().BeTrue();
     }
 
     private sealed class RecordingQuickUndoCommandService

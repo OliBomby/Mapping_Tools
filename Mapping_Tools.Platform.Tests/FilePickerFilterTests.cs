@@ -7,27 +7,30 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class FilePickerFilterTests
 {
     [TestMethod]
-    public void ConstructorCleansAndDeduplicatesValues()
+    public void Constructor_WithDirtyDuplicateValues_CleansAndDeduplicates()
     {
+        // Arrange
+        // Act
         FilePickerFilter filter = new(
             "Beatmaps",
             ["*.osu", "", "*.OSU", "  *.osb  "],
             ["application/x-osu-beatmap", " "],
             ["public.data"]);
 
-        CollectionAssert.AreEqual(new[] { "*.osu", "*.osb" }, filter.Patterns.ToArray());
-        CollectionAssert.AreEqual(
-            new[] { "application/x-osu-beatmap" },
-            filter.MimeTypes.ToArray());
-        CollectionAssert.AreEqual(
-            new[] { "public.data" },
-            filter.AppleUniformTypeIdentifiers.ToArray());
+        // Assert
+        filter.Patterns.ToArray().Should().Equal(new[] { "*.osu", "*.osb" });
+        filter.MimeTypes.ToArray().Should().Equal(new[] { "application/x-osu-beatmap" });
+        filter.AppleUniformTypeIdentifiers.ToArray().Should().Equal(new[] { "public.data" });
     }
 
     [TestMethod]
-    public void ConstructorRejectsEmptyPatterns()
+    public void Constructor_WithEmptyPatterns_ThrowsArgumentException()
     {
-        Assert.ThrowsException<ArgumentException>(
-            () => new FilePickerFilter("Beatmaps", ["", " "]));
+        // Arrange
+        // Act
+        Action act1 = () => new FilePickerFilter("Beatmaps", ["", " "]);
+
+        // Assert
+        act1.Should().Throw<ArgumentException>();
     }
 }

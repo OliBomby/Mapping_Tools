@@ -43,7 +43,7 @@ namespace Mapping_Tools.Components.TimeLine {
             MainCanvas.Children.Add(te);
 
             Canvas.SetTop(te, elementTop);
-            Canvas.SetLeft(te, ( timeLineWidth * ( mSeconds - startMSeconds ) / ( endMSeconds - startMSeconds ) ) - 1);
+            Canvas.SetLeft(te, timeLineWidth * ( mSeconds - startMSeconds ) / ( endMSeconds - startMSeconds ) - 1);
         }
 
         private void GenerateMarkerElements() {
@@ -52,7 +52,7 @@ namespace Mapping_Tools.Components.TimeLine {
                 elements.Add(te);
                 MainCanvas.Children.Add(te);
                 Canvas.SetTop(te, elementTop);
-                Canvas.SetLeft(te, ( timeLineWidth * ( tMark_s.Time - startMSeconds ) / ( endMSeconds - startMSeconds ) ) - 1);
+                Canvas.SetLeft(te, timeLineWidth * ( tMark_s.Time - startMSeconds ) / ( endMSeconds - startMSeconds ) - 1);
             }
         }
 
@@ -63,9 +63,9 @@ namespace Mapping_Tools.Components.TimeLine {
             MainCanvas.Children.Add(tmStart);
 
             // Create middle marks
-            double intervalCount = ( ( endMSeconds - startMSeconds ) / intervalMSeconds ) - 1;
+            double intervalCount = ( endMSeconds - startMSeconds ) / intervalMSeconds - 1;
             for( int i = 1; i <= intervalCount; i++ ) {
-                TimeLineMark tm = new TimeLineMark(startMSeconds + ( intervalMSeconds * i ));
+                TimeLineMark tm = new TimeLineMark(startMSeconds + intervalMSeconds * i);
                 marks.Add(tm);
                 MainCanvas.Children.Add(tm);
             }
@@ -78,7 +78,7 @@ namespace Mapping_Tools.Components.TimeLine {
             // Setup spacing
             spacing = timeLineWidth / ( marks.Count - 1 );
             for( int k = 0; k < marks.Count; k++ ) {
-                Canvas.SetLeft(marks[k], ( spacing * k ));
+                Canvas.SetLeft(marks[k], spacing * k);
                 Canvas.SetTop(marks[k], 1);
             }
 

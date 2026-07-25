@@ -10,99 +10,95 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class SettingsServiceTests
 {
     [TestMethod]
-    public void LegacySettingsDocumentLoadsWithoutDataLoss()
+    public void Load_WithLegacyDocument_PreservesData()
     {
+        // Arrange
         using TestDirectory test = TestDirectory.FromFixture("legacy-config.json");
         JsonSettingsStore store = new(test.Directories);
 
+        // Act
         ApplicationSettings settings = store.Load();
 
-        Assert.AreEqual(20, settings.RecentMaps.Count);
-        StringAssert.EndsWith(
-            settings.RecentMaps[0].Path,
-            "[3  (2^n) - 2].osu");
-        Assert.AreEqual("18/07/2026 17:38:50", settings.RecentMaps[0].DisplayDate);
-        Assert.AreEqual(7, settings.FavoriteTools.Count);
-        Assert.AreEqual(
-            new WindowBounds(440, 256, 1407, 855),
-            settings.MainWindowRestoreBounds);
-        Assert.AreEqual(56, settings.QuickRunHotkey?.Key);
-        Assert.AreEqual(1, settings.QuickRunHotkey?.Modifiers);
-        Assert.AreEqual(62, settings.BetterSaveHotkey?.Key);
-        Assert.AreEqual(6, settings.BetterSaveHotkey?.Modifiers);
-        Assert.AreEqual(TimeSpan.FromMinutes(10), settings.PeriodicBackupInterval);
-        Assert.AreEqual("1.12.1", settings.SkipVersion);
+        // Assert
+        settings.RecentMaps.Count.Should().Be(20);
+        settings.RecentMaps[0].Path.Should().EndWith("[3  (2^n) - 2].osu");
+        settings.RecentMaps[0].DisplayDate.Should().Be("18/07/2026 17:38:50");
+        settings.FavoriteTools.Count.Should().Be(7);
+        settings.MainWindowRestoreBounds.Should().Be(new WindowBounds(440, 256, 1407, 855));
+        (settings.QuickRunHotkey?.Key).Should().Be(56);
+        (settings.QuickRunHotkey?.Modifiers).Should().Be(1);
+        (settings.BetterSaveHotkey?.Key).Should().Be(62);
+        (settings.BetterSaveHotkey?.Modifiers).Should().Be(6);
+        settings.PeriodicBackupInterval.Should().Be(TimeSpan.FromMinutes(10));
+        settings.SkipVersion.Should().Be("1.12.1");
     }
 
     [TestMethod]
-    public void LegacySettingsRoundTripPreservesJsonShapes()
+    public void SaveAndLoad_LegacySettings_PreservesJsonShapes()
     {
+        // Arrange
         using TestDirectory test = TestDirectory.FromFixture("legacy-config.json");
         JsonSettingsStore store = new(test.Directories);
         ApplicationSettings settings = store.Load();
 
+        // Act
         store.Save(settings);
         ApplicationSettings reloaded = store.Load();
 
-        Assert.AreEqual(settings.MainWindowRestoreBounds, reloaded.MainWindowRestoreBounds);
-        Assert.AreEqual(settings.QuickUndoHotkey, reloaded.QuickUndoHotkey);
+        // Assert
+        reloaded.MainWindowRestoreBounds.Should().Be(settings.MainWindowRestoreBounds);
+        reloaded.QuickUndoHotkey.Should().Be(settings.QuickUndoHotkey);
 
         using JsonDocument document = JsonDocument.Parse(
             File.ReadAllText(test.Directories.ConfigurationFile));
         JsonElement root = document.RootElement;
-        Assert.AreEqual(
-            "440,256,1407,855",
-            root.GetProperty("MainWindowRestoreBounds").GetString());
-        Assert.AreEqual(
-            JsonValueKind.Number,
-            root.GetProperty("QuickRunHotkey").GetProperty("Key").ValueKind);
-        Assert.AreEqual(
-            "00:10:00",
-            root.GetProperty("PeriodicBackupInterval").GetString());
+        root.GetProperty("MainWindowRestoreBounds").GetString().Should().Be("440,256,1407,855");
+        root.GetProperty("QuickRunHotkey").GetProperty("Key").ValueKind.Should().Be(JsonValueKind.Number);
+        root.GetProperty("PeriodicBackupInterval").GetString().Should().Be("00:10:00");
         JsonElement firstRecent = root.GetProperty("RecentMaps")[0];
-        Assert.AreEqual(JsonValueKind.Array, firstRecent.ValueKind);
-        Assert.AreEqual(2, firstRecent.GetArrayLength());
-        Assert.AreEqual(
-            settings.RecentMaps[0].DisplayDate,
-            firstRecent[1].GetString());
+        firstRecent.ValueKind.Should().Be(JsonValueKind.Array);
+        firstRecent.GetArrayLength().Should().Be(2);
+        firstRecent[1].GetString().Should().Be(settings.RecentMaps[0].DisplayDate);
     }
 
     [TestMethod]
-    public void CorruptSettingsDocumentIsRejected()
+    public void Load_WithCorruptDocument_ThrowsJsonException()
     {
+        // Arrange
         using TestDirectory test = TestDirectory.FromFixture("corrupt.json");
         JsonSettingsStore store = new(test.Directories);
 
-        Assert.ThrowsException<JsonException>(() => store.Load());
+        // Act
+        Action act1 = () => store.Load();
+
+        // Assert
+        act1.Should().Throw<JsonException>();
     }
 
     [TestMethod]
-    public void LoadOrCreatePersistsDefaultsBeforeApplyingMachinePaths()
+    public void LoadOrCreate_WithoutFile_PersistsDefaultsBeforeMachinePaths()
     {
+        // Arrange
         using TestDirectory test = TestDirectory.Empty();
         FakeSettingsPathEnvironment environment = new();
         SettingsPathService paths = new(test.Directories, environment);
         JsonSettingsStore store = new(test.Directories);
         SettingsService service = new(store, paths);
 
+        // Act
         SettingsLoadResult result = service.LoadOrCreate();
 
-        Assert.IsTrue(result.WasCreated);
-        Assert.IsTrue(result.UsedFallbackOsuPath);
-        Assert.AreEqual(
-            Path.Combine(test.Directories.LocalApplicationData, "osu!"),
-            result.Settings.OsuPath);
-        Assert.AreEqual(
-            Path.Combine(test.Directories.ApplicationData, "Backups"),
-            result.Settings.BackupsPath);
-        Assert.AreEqual(
-            Path.Combine(result.Settings.OsuPath, "Custom Songs"),
-            result.Settings.SongsPath);
-        Assert.IsTrue(environment.CreatedDirectories.Contains(result.Settings.BackupsPath));
+        // Assert
+        result.WasCreated.Should().BeTrue();
+        result.UsedFallbackOsuPath.Should().BeTrue();
+        result.Settings.OsuPath.Should().Be(Path.Combine(test.Directories.LocalApplicationData, "osu!"));
+        result.Settings.BackupsPath.Should().Be(Path.Combine(test.Directories.ApplicationData, "Backups"));
+        result.Settings.SongsPath.Should().Be(Path.Combine(result.Settings.OsuPath, "Custom Songs"));
+        environment.CreatedDirectories.Contains(result.Settings.BackupsPath).Should().BeTrue();
 
         ApplicationSettings persistedDefaults = store.Load();
-        Assert.AreEqual("", persistedDefaults.OsuPath);
-        Assert.AreEqual("", persistedDefaults.BackupsPath);
+        persistedDefaults.OsuPath.Should().Be("");
+        persistedDefaults.BackupsPath.Should().Be("");
     }
 
     private sealed class FakeSettingsPathEnvironment : ISettingsPathEnvironment

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
@@ -166,7 +166,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
                 var angleChange = current == start || current == end || current.Value.Red ? 0 : MathHelper.AngleDifference(current.Value.PreAngle, current.Value.PostAngle);
 
                 // Check for inflection point or red anchors
-                if ((angleChange * lastAngleChange < -1E-5D && current != startSubRange && current.Previous != startSubRange) ||
+                if (angleChange * lastAngleChange < -1E-5D && current != startSubRange && current.Previous != startSubRange ||
                     current.Value.Red && current != startSubRange) {
                     subRanges.Add((startSubRange, current, subRangeAngleChange));
 

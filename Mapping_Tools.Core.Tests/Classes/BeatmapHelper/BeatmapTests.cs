@@ -9,25 +9,31 @@ public class BeatmapTests {
     [DataRow("EmptyTestMap.osu")]
     [DataRow("ComplicatedTestMap.osu")]
     public void BeatmapDocument_ParsesAndRoundTripsFixture(string filename) {
+        // Arrange
         string path = Path.Combine(AppContext.BaseDirectory, "Resources", filename);
         string expected = File.ReadAllText(path);
 
+        // Act
         var beatmap = new Beatmap(File.ReadAllLines(path).ToList());
         string actual = string.Join(Environment.NewLine, beatmap.GetLines());
 
-        Assert.AreEqual(expected, actual);
+        // Assert
+        actual.Should().Be(expected);
     }
 
     [TestMethod]
     public void QueryTimeCode_SelectsRequestedComboObjects() {
+        // Arrange
         var beatmap = new Beatmap(new List<HitObject> {
             new("64,96,1000,5,0,0:0:0:0:"),
             new("128,96,1100,1,0,0:0:0:0:"),
             new("192,96,1200,1,0,0:0:0:0:")
         }, new List<TimingPoint>(), globalSv: 1.4);
 
+        // Act
         var matches = beatmap.QueryTimeCode("00:01:000 (1,2) - ").ToList();
 
-        CollectionAssert.AreEqual(new[] { beatmap.HitObjects[0], beatmap.HitObjects[1] }, matches);
+        // Assert
+        matches.Should().Equal(new[] { beatmap.HitObjects[0], beatmap.HitObjects[1] });
     }
 }

@@ -1,4 +1,4 @@
-using Mapping_Tools.Annotations;
+﻿using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
@@ -615,7 +615,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
             // Check if this tlo has hitsounds
             if (tloTo.Whistle || tloTo.Finish || tloTo.Clap || 
-                (arg.MutedSampleSet != SampleSet.None && tloTo.FenoSampleSet != arg.MutedSampleSet)) {
+                arg.MutedSampleSet != SampleSet.None && tloTo.FenoSampleSet != arg.MutedSampleSet) {
                 return false;
             }
 

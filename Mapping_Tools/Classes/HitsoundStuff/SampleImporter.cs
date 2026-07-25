@@ -402,7 +402,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             int length = end - start;
 
             double lengthInSeconds = length / (double) sh.SampleRate;
-            bool doFade = (args.Length >= 0 && args.Length / 1000 < lengthInSeconds) || needsFade;
+            bool doFade = args.Length >= 0 && args.Length / 1000 < lengthInSeconds || needsFade;
             double fadeStart = args.Length >= 0 ? needsFade ? Math.Min(args.Length / 1000, lengthInSeconds - 0.3) : args.Length / 1000 : lengthInSeconds - 0.3;
 
             // Sample rate key correction

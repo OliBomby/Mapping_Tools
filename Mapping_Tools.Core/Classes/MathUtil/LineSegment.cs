@@ -65,7 +65,7 @@ namespace Mapping_Tools.Classes.MathUtil {
 
             if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
                 // Collision detected
-                result = new Vector2(left.P1.X + (t * s1.X), left.P1.Y + (t * s1.Y));
+                result = new Vector2(left.P1.X + t * s1.X, left.P1.Y + t * s1.Y);
                 return true;
             }
 
@@ -138,7 +138,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
         public override int GetHashCode() {
             unchecked {
-                return ((P1.GetHashCode()) * 397) ^ P2.GetHashCode();
+                return P1.GetHashCode() * 397 ^ P2.GetHashCode();
             }
         }
 

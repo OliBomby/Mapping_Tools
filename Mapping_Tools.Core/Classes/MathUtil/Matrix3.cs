@@ -644,15 +644,15 @@ namespace Mapping_Tools.Classes.MathUtil {
             rM21 = right.Row1.X, rM22 = right.Row1.Y, rM23 = right.Row1.Z,
             rM31 = right.Row2.X, rM32 = right.Row2.Y, rM33 = right.Row2.Z;
 
-            result.Row0.X = ( ( lM11 * rM11 ) + ( lM12 * rM21 ) ) + ( lM13 * rM31 );
-            result.Row0.Y = ( ( lM11 * rM12 ) + ( lM12 * rM22 ) ) + ( lM13 * rM32 );
-            result.Row0.Z = ( ( lM11 * rM13 ) + ( lM12 * rM23 ) ) + ( lM13 * rM33 );
-            result.Row1.X = ( ( lM21 * rM11 ) + ( lM22 * rM21 ) ) + ( lM23 * rM31 );
-            result.Row1.Y = ( ( lM21 * rM12 ) + ( lM22 * rM22 ) ) + ( lM23 * rM32 );
-            result.Row1.Z = ( ( lM21 * rM13 ) + ( lM22 * rM23 ) ) + ( lM23 * rM33 );
-            result.Row2.X = ( ( lM31 * rM11 ) + ( lM32 * rM21 ) ) + ( lM33 * rM31 );
-            result.Row2.Y = ( ( lM31 * rM12 ) + ( lM32 * rM22 ) ) + ( lM33 * rM32 );
-            result.Row2.Z = ( ( lM31 * rM13 ) + ( lM32 * rM23 ) ) + ( lM33 * rM33 );
+            result.Row0.X = lM11 * rM11 + lM12 * rM21 + lM13 * rM31;
+            result.Row0.Y = lM11 * rM12 + lM12 * rM22 + lM13 * rM32;
+            result.Row0.Z = lM11 * rM13 + lM12 * rM23 + lM13 * rM33;
+            result.Row1.X = lM21 * rM11 + lM22 * rM21 + lM23 * rM31;
+            result.Row1.Y = lM21 * rM12 + lM22 * rM22 + lM23 * rM32;
+            result.Row1.Z = lM21 * rM13 + lM22 * rM23 + lM23 * rM33;
+            result.Row2.X = lM31 * rM11 + lM32 * rM21 + lM33 * rM31;
+            result.Row2.Y = lM31 * rM12 + lM32 * rM22 + lM33 * rM32;
+            result.Row2.Z = lM31 * rM13 + lM32 * rM23 + lM33 * rM33;
         }
 
 
@@ -695,7 +695,7 @@ namespace Mapping_Tools.Classes.MathUtil {
                     }
                 }
 
-                ++( pivotIdx[icol] );
+                ++pivotIdx[icol];
 
                 if( irow != icol ) {
                     for( int k = 0; k < 3; ++k ) {
@@ -844,8 +844,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         public override int GetHashCode() {
             unchecked {
                 var hashCode = this.Row0.GetHashCode();
-                hashCode = ( hashCode * 397 ) ^ this.Row1.GetHashCode();
-                hashCode = ( hashCode * 397 ) ^ this.Row2.GetHashCode();
+                hashCode = hashCode * 397 ^ this.Row1.GetHashCode();
+                hashCode = hashCode * 397 ^ this.Row2.GetHashCode();
                 return hashCode;
             }
         }

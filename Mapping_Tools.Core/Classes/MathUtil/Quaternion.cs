@@ -657,7 +657,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>A hash code formed from the bitwise XOR of this objects members.</returns>
         public override int GetHashCode() {
             unchecked {
-                return ( this.Xyz.GetHashCode() * 397 ) ^ this.W.GetHashCode();
+                return this.Xyz.GetHashCode() * 397 ^ this.W.GetHashCode();
             }
         }
 

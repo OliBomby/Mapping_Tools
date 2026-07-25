@@ -36,7 +36,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         private static double Primitive(double t, double p) {
             var b = 2 * Math.Acos(1 / (Math.Sqrt(2) * Math.Abs(p) - Math.Abs(p) + 1));
             return p > 0 ?
-                (-(MathHelper.Cosec(b) * (Math.Cos(b * t) - 1))) / b :
+                -(MathHelper.Cosec(b) * (Math.Cos(b * t) - 1)) / b :
                 MathHelper.Cosec(b) * (Math.Cos(b) - Math.Cos(b - b * t)) / b + t;
         }
 

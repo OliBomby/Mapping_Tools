@@ -318,8 +318,8 @@ namespace Mapping_Tools.Classes.MathUtil {
                 lM21 = left.Row1.X, lM22 = left.Row1.Y,
                 rM11 = right.X, rM12 = right.Y;
 
-            result.X = (lM11 * rM11) + (lM12 * rM12);
-            result.Y = (lM21 * rM11) + (lM22 * rM12);
+            result.X = lM11 * rM11 + lM12 * rM12;
+            result.Y = lM21 * rM11 + lM22 * rM12;
         }
 
         /// <summary>
@@ -334,10 +334,10 @@ namespace Mapping_Tools.Classes.MathUtil {
                 rM11 = right.Row0.X, rM12 = right.Row0.Y,
                 rM21 = right.Row1.X, rM22 = right.Row1.Y;
 
-            result.Row0.X = ( lM11 * rM11 ) + ( lM12 * rM21 );
-            result.Row0.Y = ( lM11 * rM12 ) + ( lM12 * rM22 );
-            result.Row1.X = ( lM21 * rM11 ) + ( lM22 * rM21 );
-            result.Row1.Y = ( lM21 * rM12 ) + ( lM22 * rM22 );
+            result.Row0.X = lM11 * rM11 + lM12 * rM21;
+            result.Row0.Y = lM11 * rM12 + lM12 * rM22;
+            result.Row1.X = lM21 * rM11 + lM22 * rM21;
+            result.Row1.Y = lM21 * rM12 + lM22 * rM22;
         }
 
         /// <summary>
@@ -363,12 +363,12 @@ namespace Mapping_Tools.Classes.MathUtil {
                 rM11 = right.Row0.X, rM12 = right.Row0.Y, rM13 = right.Row0.Z,
                 rM21 = right.Row1.X, rM22 = right.Row1.Y, rM23 = right.Row1.Z;
 
-            result.Row0.X = ( lM11 * rM11 ) + ( lM12 * rM21 );
-            result.Row0.Y = ( lM11 * rM12 ) + ( lM12 * rM22 );
-            result.Row0.Z = ( lM11 * rM13 ) + ( lM12 * rM23 );
-            result.Row1.X = ( lM21 * rM11 ) + ( lM22 * rM21 );
-            result.Row1.Y = ( lM21 * rM12 ) + ( lM22 * rM22 );
-            result.Row1.Z = ( lM21 * rM13 ) + ( lM22 * rM23 );
+            result.Row0.X = lM11 * rM11 + lM12 * rM21;
+            result.Row0.Y = lM11 * rM12 + lM12 * rM22;
+            result.Row0.Z = lM11 * rM13 + lM12 * rM23;
+            result.Row1.X = lM21 * rM11 + lM22 * rM21;
+            result.Row1.Y = lM21 * rM12 + lM22 * rM22;
+            result.Row1.Z = lM21 * rM13 + lM22 * rM23;
         }
 
         /// <summary>
@@ -394,14 +394,14 @@ namespace Mapping_Tools.Classes.MathUtil {
                 rM11 = right.Row0.X, rM12 = right.Row0.Y, rM13 = right.Row0.Z, rM14 = right.Row0.W,
                 rM21 = right.Row1.X, rM22 = right.Row1.Y, rM23 = right.Row1.Z, rM24 = right.Row1.W;
 
-            result.Row0.X = ( lM11 * rM11 ) + ( lM12 * rM21 );
-            result.Row0.Y = ( lM11 * rM12 ) + ( lM12 * rM22 );
-            result.Row0.Z = ( lM11 * rM13 ) + ( lM12 * rM23 );
-            result.Row0.W = ( lM11 * rM14 ) + ( lM12 * rM24 );
-            result.Row1.X = ( lM21 * rM11 ) + ( lM22 * rM21 );
-            result.Row1.Y = ( lM21 * rM12 ) + ( lM22 * rM22 );
-            result.Row1.Z = ( lM21 * rM13 ) + ( lM22 * rM23 );
-            result.Row1.W = ( lM21 * rM14 ) + ( lM22 * rM24 );
+            result.Row0.X = lM11 * rM11 + lM12 * rM21;
+            result.Row0.Y = lM11 * rM12 + lM12 * rM22;
+            result.Row0.Z = lM11 * rM13 + lM12 * rM23;
+            result.Row0.W = lM11 * rM14 + lM12 * rM24;
+            result.Row1.X = lM21 * rM11 + lM22 * rM21;
+            result.Row1.Y = lM21 * rM12 + lM22 * rM22;
+            result.Row1.Z = lM21 * rM13 + lM22 * rM23;
+            result.Row1.W = lM21 * rM14 + lM22 * rM24;
         }
 
         /// <summary>
@@ -622,7 +622,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
         public override int GetHashCode() {
             unchecked {
-                return ( this.Row0.GetHashCode() * 397 ) ^ this.Row1.GetHashCode();
+                return this.Row0.GetHashCode() * 397 ^ this.Row1.GetHashCode();
             }
         }
 

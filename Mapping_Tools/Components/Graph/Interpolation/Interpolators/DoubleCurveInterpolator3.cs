@@ -24,7 +24,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         private static double F(double t, double k) {
-            return (Math.Exp(k) * t) / ((Math.Exp(k) - 1) * t + 1);
+            return Math.Exp(k) * t / ((Math.Exp(k) - 1) * t + 1);
         }
 
         private static double Derivative(double t, double p) {
@@ -33,7 +33,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
 
         private static double Primitive(double t, double p) {
             return t < 0.5 ? 
-                (-(Math.Exp(p) * (Math.Log(2 * t * (Math.Exp(p) - 1) + 1) - 2 * t * (Math.Exp(p) - 1)))) /
+                -(Math.Exp(p) * (Math.Log(2 * t * (Math.Exp(p) - 1) + 1) - 2 * t * (Math.Exp(p) - 1))) /
                 (4 * Math.Pow(Math.Exp(p) - 1, 2)) : 
                 (2 * t * (Math.Exp(p) - 2) * (Math.Exp(p) - 1) - 
                  Math.Exp(p) * (Math.Log(-Math.Exp(-p) * (2 * t * Math.Exp(p) - 2 * Math.Exp(p) - 2 * t + 1)) - 

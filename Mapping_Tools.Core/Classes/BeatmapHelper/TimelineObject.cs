@@ -389,7 +389,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Writes this expanded edge's sample edits back into the appropriate origin object or slider-edge fields.
         /// </summary>
         public void HitsoundsToOrigin() {
-            if (Origin.IsCircle || (Origin.IsSpinner && Repeat == 1) || (Origin.IsHoldNote && Repeat == 0)) {
+            if (Origin.IsCircle || Origin.IsSpinner && Repeat == 1 || Origin.IsHoldNote && Repeat == 0) {
                 Origin.Hitsounds = GetHitsounds();
                 Origin.SampleSet = SampleSet;
                 Origin.AdditionSet = AdditionSet;

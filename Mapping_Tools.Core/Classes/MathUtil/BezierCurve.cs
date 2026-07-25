@@ -139,7 +139,7 @@ namespace Mapping_Tools.Classes.MathUtil {
             double length = 0.0f;
             Vector2 old = BezierCurve.CalculatePoint(points, 0.0f, parallel);
 
-            for( double i = precision; i < ( 1.0f + precision ); i += precision ) {
+            for( double i = precision; i < 1.0f + precision; i += precision ) {
                 Vector2 n = CalculatePoint(points, i, parallel);
                 length += ( n - old ).Length;
                 old = n;
@@ -177,7 +177,7 @@ namespace Mapping_Tools.Classes.MathUtil {
 
             foreach( Vector2 pt in points ) {
                 temp = MathHelper.BinomialCoefficient(points.Count - 1, i) * System.Math.Pow(t, i) *
-                        System.Math.Pow(c, (points.Count - 1) - i);
+                        System.Math.Pow(c, points.Count - 1 - i);
 
                 r.X += temp * pt.X;
                 r.Y += temp * pt.Y;
@@ -214,7 +214,7 @@ namespace Mapping_Tools.Classes.MathUtil {
 
             foreach( Vector2 pt in points ) {
                 temp = MathHelper.BinomialCoefficient(points.Count - 2, i) * System.Math.Pow(t, i) *
-                        System.Math.Pow(c, (points.Count - 2) - i);
+                        System.Math.Pow(c, points.Count - 2 - i);
 
                 r.X += temp * pt.X;
                 r.Y += temp * pt.Y;

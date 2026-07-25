@@ -107,7 +107,7 @@
 
             public static void ShOpenFolderAndSelectItems(IntPtr pidlFolder, IntPtr[] apidl, int dwFlags)
             {
-                var cidl = (apidl != null) ? (uint)apidl.Length : 0U;
+                var cidl = apidl != null ? (uint)apidl.Length : 0U;
                 var result = SHOpenFolderAndSelectItems_(pidlFolder, cidl, apidl, dwFlags);
                 Marshal.ThrowExceptionForHR(result);
             }

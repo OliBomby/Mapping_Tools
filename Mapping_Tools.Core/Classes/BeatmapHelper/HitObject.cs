@@ -987,9 +987,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         private bool GetSliderExtras() {
             var hitsounds = GetHitsounds();
-            return (EdgeHitsounds != null && EdgeHitsounds.Any(o => o != hitsounds)) ||
-                   (EdgeSampleSets != null && EdgeSampleSets.Any(o => o != SampleSet.None)) ||
-                   (EdgeAdditionSets != null && EdgeAdditionSets.Any(o => o != SampleSet.None)) ||
+            return EdgeHitsounds != null && EdgeHitsounds.Any(o => o != hitsounds) ||
+                   EdgeSampleSets != null && EdgeSampleSets.Any(o => o != SampleSet.None) ||
+                   EdgeAdditionSets != null && EdgeAdditionSets.Any(o => o != SampleSet.None) ||
                    SampleSet != SampleSet.None || AdditionSet != SampleSet.None || CustomIndex != 0 || 
                    Math.Abs(SampleVolume) > Precision.DoubleEpsilon || !string.IsNullOrEmpty(Filename);
         }

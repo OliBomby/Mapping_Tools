@@ -906,8 +906,8 @@ namespace Mapping_Tools.Classes.MathUtil {
                 throw new ArgumentOutOfRangeException("zNear");
             }
 
-            double x = ( 2.0f * zNear ) / ( right - left );
-            double y = ( 2.0f * zNear ) / ( top - bottom );
+            double x = 2.0f * zNear / ( right - left );
+            double y = 2.0f * zNear / ( top - bottom );
             double a = ( right + left ) / ( right - left );
             double b = ( top + bottom ) / ( top - bottom );
             double c = -( zFar + zNear ) / ( zFar - zNear );
@@ -980,9 +980,9 @@ namespace Mapping_Tools.Classes.MathUtil {
             result.Row2.Y = y.Z;
             result.Row2.Z = z.Z;
             result.Row2.W = 0;
-            result.Row3.X = -( ( x.X * eye.X ) + ( x.Y * eye.Y ) + ( x.Z * eye.Z ) );
-            result.Row3.Y = -( ( y.X * eye.X ) + ( y.Y * eye.Y ) + ( y.Z * eye.Z ) );
-            result.Row3.Z = -( ( z.X * eye.X ) + ( z.Y * eye.Y ) + ( z.Z * eye.Z ) );
+            result.Row3.X = -( x.X * eye.X + x.Y * eye.Y + x.Z * eye.Z );
+            result.Row3.Y = -( y.X * eye.X + y.Y * eye.Y + y.Z * eye.Z );
+            result.Row3.Z = -( z.X * eye.X + z.Y * eye.Y + z.Z * eye.Z );
             result.Row3.W = 1;
 
             return result;
@@ -1080,22 +1080,22 @@ namespace Mapping_Tools.Classes.MathUtil {
                 rM31 = right.Row2.X, rM32 = right.Row2.Y, rM33 = right.Row2.Z, rM34 = right.Row2.W,
                 rM41 = right.Row3.X, rM42 = right.Row3.Y, rM43 = right.Row3.Z, rM44 = right.Row3.W;
 
-            result.Row0.X = ( ( ( lM11 * rM11 ) + ( lM12 * rM21 ) ) + ( lM13 * rM31 ) ) + ( lM14 * rM41 );
-            result.Row0.Y = ( ( ( lM11 * rM12 ) + ( lM12 * rM22 ) ) + ( lM13 * rM32 ) ) + ( lM14 * rM42 );
-            result.Row0.Z = ( ( ( lM11 * rM13 ) + ( lM12 * rM23 ) ) + ( lM13 * rM33 ) ) + ( lM14 * rM43 );
-            result.Row0.W = ( ( ( lM11 * rM14 ) + ( lM12 * rM24 ) ) + ( lM13 * rM34 ) ) + ( lM14 * rM44 );
-            result.Row1.X = ( ( ( lM21 * rM11 ) + ( lM22 * rM21 ) ) + ( lM23 * rM31 ) ) + ( lM24 * rM41 );
-            result.Row1.Y = ( ( ( lM21 * rM12 ) + ( lM22 * rM22 ) ) + ( lM23 * rM32 ) ) + ( lM24 * rM42 );
-            result.Row1.Z = ( ( ( lM21 * rM13 ) + ( lM22 * rM23 ) ) + ( lM23 * rM33 ) ) + ( lM24 * rM43 );
-            result.Row1.W = ( ( ( lM21 * rM14 ) + ( lM22 * rM24 ) ) + ( lM23 * rM34 ) ) + ( lM24 * rM44 );
-            result.Row2.X = ( ( ( lM31 * rM11 ) + ( lM32 * rM21 ) ) + ( lM33 * rM31 ) ) + ( lM34 * rM41 );
-            result.Row2.Y = ( ( ( lM31 * rM12 ) + ( lM32 * rM22 ) ) + ( lM33 * rM32 ) ) + ( lM34 * rM42 );
-            result.Row2.Z = ( ( ( lM31 * rM13 ) + ( lM32 * rM23 ) ) + ( lM33 * rM33 ) ) + ( lM34 * rM43 );
-            result.Row2.W = ( ( ( lM31 * rM14 ) + ( lM32 * rM24 ) ) + ( lM33 * rM34 ) ) + ( lM34 * rM44 );
-            result.Row3.X = ( ( ( lM41 * rM11 ) + ( lM42 * rM21 ) ) + ( lM43 * rM31 ) ) + ( lM44 * rM41 );
-            result.Row3.Y = ( ( ( lM41 * rM12 ) + ( lM42 * rM22 ) ) + ( lM43 * rM32 ) ) + ( lM44 * rM42 );
-            result.Row3.Z = ( ( ( lM41 * rM13 ) + ( lM42 * rM23 ) ) + ( lM43 * rM33 ) ) + ( lM44 * rM43 );
-            result.Row3.W = ( ( ( lM41 * rM14 ) + ( lM42 * rM24 ) ) + ( lM43 * rM34 ) ) + ( lM44 * rM44 );
+            result.Row0.X = lM11 * rM11 + lM12 * rM21 + lM13 * rM31 + lM14 * rM41;
+            result.Row0.Y = lM11 * rM12 + lM12 * rM22 + lM13 * rM32 + lM14 * rM42;
+            result.Row0.Z = lM11 * rM13 + lM12 * rM23 + lM13 * rM33 + lM14 * rM43;
+            result.Row0.W = lM11 * rM14 + lM12 * rM24 + lM13 * rM34 + lM14 * rM44;
+            result.Row1.X = lM21 * rM11 + lM22 * rM21 + lM23 * rM31 + lM24 * rM41;
+            result.Row1.Y = lM21 * rM12 + lM22 * rM22 + lM23 * rM32 + lM24 * rM42;
+            result.Row1.Z = lM21 * rM13 + lM22 * rM23 + lM23 * rM33 + lM24 * rM43;
+            result.Row1.W = lM21 * rM14 + lM22 * rM24 + lM23 * rM34 + lM24 * rM44;
+            result.Row2.X = lM31 * rM11 + lM32 * rM21 + lM33 * rM31 + lM34 * rM41;
+            result.Row2.Y = lM31 * rM12 + lM32 * rM22 + lM33 * rM32 + lM34 * rM42;
+            result.Row2.Z = lM31 * rM13 + lM32 * rM23 + lM33 * rM33 + lM34 * rM43;
+            result.Row2.W = lM31 * rM14 + lM32 * rM24 + lM33 * rM34 + lM34 * rM44;
+            result.Row3.X = lM41 * rM11 + lM42 * rM21 + lM43 * rM31 + lM44 * rM41;
+            result.Row3.Y = lM41 * rM12 + lM42 * rM22 + lM43 * rM32 + lM44 * rM42;
+            result.Row3.Z = lM41 * rM13 + lM42 * rM23 + lM43 * rM33 + lM44 * rM43;
+            result.Row3.W = lM41 * rM14 + lM42 * rM24 + lM43 * rM34 + lM44 * rM44;
         }
 
         /// <summary>
@@ -1162,7 +1162,7 @@ namespace Mapping_Tools.Classes.MathUtil {
                     }
                 }
 
-                ++( pivotIdx[icol] );
+                ++pivotIdx[icol];
 
                 // Swap rows over so pivot is on diagonal
                 if( irow != icol ) {
@@ -1338,9 +1338,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         public override int GetHashCode() {
             unchecked {
                 var hashCode = this.Row0.GetHashCode();
-                hashCode = ( hashCode * 397 ) ^ this.Row1.GetHashCode();
-                hashCode = ( hashCode * 397 ) ^ this.Row2.GetHashCode();
-                hashCode = ( hashCode * 397 ) ^ this.Row3.GetHashCode();
+                hashCode = hashCode * 397 ^ this.Row1.GetHashCode();
+                hashCode = hashCode * 397 ^ this.Row2.GetHashCode();
+                hashCode = hashCode * 397 ^ this.Row3.GetHashCode();
                 return hashCode;
             }
         }

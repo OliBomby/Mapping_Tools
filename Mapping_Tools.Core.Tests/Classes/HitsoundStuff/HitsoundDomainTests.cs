@@ -9,15 +9,19 @@ namespace Mapping_Tools.Core.Tests.Classes.HitsoundStuff;
 public class HitsoundDomainTests {
     [TestMethod]
     public void HitsoundFilename_ParsesStandardSampleName() {
+        // Arrange
+        // Act
         const string filename = "drum-hitclap12";
 
-        Assert.AreEqual(SampleSet.Drum, HitsoundFilename.GetSampleSet(filename));
-        Assert.AreEqual(Hitsound.Clap, HitsoundFilename.GetHitsound(filename));
-        Assert.AreEqual(12, HitsoundFilename.GetIndex(filename));
+        // Assert
+        HitsoundFilename.GetSampleSet(filename).Should().Be(SampleSet.Drum);
+        HitsoundFilename.GetHitsound(filename).Should().Be(Hitsound.Clap);
+        HitsoundFilename.GetIndex(filename).Should().Be(12);
     }
 
     [TestMethod]
     public void SampleGeneratingArgs_CopyPreservesGenerationSettings() {
+        // Arrange
         var source = new SampleGeneratingArgs(
             "samples/piano.sf2",
             volume: 0.75,
@@ -29,32 +33,39 @@ public class HitsoundDomainTests {
             key: 60,
             length: 500);
 
+        // Act
         SampleGeneratingArgs copy = source.Copy();
 
-        Assert.AreEqual(source, copy);
-        Assert.AreNotSame(source, copy);
-        Assert.IsTrue(copy.UsesSoundFont);
-        StringAssert.Contains(copy.GetFilename(), "piano");
+        // Assert
+        copy.Should().Be(source);
+        copy.Should().NotBeSameAs(source);
+        copy.UsesSoundFont.Should().BeTrue();
+        copy.GetFilename().Should().Contain("piano");
     }
 
     [TestMethod]
     public void HitsoundZone_DistanceHonoursWildcardAxesAndCopyIsIndependent() {
+        // Arrange
+        // Act
         var zone = new HitsoundZone(
             false, "centre line", "normal-hitnormal.wav",
             xPos: -1, yPos: 100,
             Hitsound.Normal, SampleSet.Normal, SampleSet.None, 1);
 
-        Assert.AreEqual(20, zone.Distance(new Vector2(400, 80)), 0.0001);
+        // Assert
+        zone.Distance(new Vector2(400, 80)).Should().BeApproximately(20, 0.0001);
 
         HitsoundZone copy = zone.Copy();
         copy.YPos = 120;
 
-        Assert.AreEqual(100, zone.YPos);
-        Assert.AreEqual(120, copy.YPos);
+        zone.YPos.Should().Be(100);
+        copy.YPos.Should().Be(120);
     }
 
     [TestMethod]
     public void LayerImportArgs_ExposesFrontendNeutralVisibilityAndReloadRules() {
+        // Arrange
+        // Act
         var stack = new LayerImportArgs(ImportType.Stack) {
             Path = "map.osu",
             X = -1,
@@ -66,59 +77,70 @@ public class HitsoundDomainTests {
             Y = 192
         };
 
-        Assert.IsTrue(stack.CoordinateVisibility);
-        Assert.IsFalse(stack.KeysoundVisibility);
-        Assert.IsTrue(stack.ReloadCompatible(matchingStack));
+        // Assert
+        stack.CoordinateVisibility.Should().BeTrue();
+        stack.KeysoundVisibility.Should().BeFalse();
+        stack.ReloadCompatible(matchingStack).Should().BeTrue();
     }
 
     [TestMethod]
     public void HitsoundLayer_RemoveDuplicatesUsesDomainPrecision() {
+        // Arrange
         var layer = new HitsoundLayer {
             Times = new List<double> { 1000, 1000, 1250, 1250 }
         };
 
+        // Act
         layer.RemoveDuplicates();
 
-        CollectionAssert.AreEqual(new List<double> { 1000, 1250 }, layer.Times);
+        // Assert
+        layer.Times.Should().Equal(new List<double> { 1000, 1250 });
     }
 
     [TestMethod]
     public void SampleSchema_RoundTripsCustomIndexAssignments() {
+        // Arrange
         var sample = new SampleGeneratingArgs("kick.wav");
         var schema = new SampleSchema {
             ["normal-hitnormal3"] = new List<SampleGeneratingArgs> { sample }
         };
 
+        // Act
         List<CustomIndex> indices = schema.GetCustomIndices();
         var restored = new SampleSchema(indices);
 
-        Assert.AreEqual(1, indices.Count);
-        Assert.AreEqual(3, indices[0].Index);
-        Assert.IsTrue(indices[0].Samples["normal-hitnormal"].Contains(sample));
-        Assert.IsTrue(restored.ContainsKey("normal-hitnormal3"));
+        // Assert
+        indices.Count.Should().Be(1);
+        indices[0].Index.Should().Be(3);
+        indices[0].Samples["normal-hitnormal"].Contains(sample).Should().BeTrue();
+        restored.ContainsKey("normal-hitnormal3").Should().BeTrue();
     }
 
     [TestMethod]
     public void CustomIndex_CleanInvalidsUsesCallerValidationPolicy() {
+        // Arrange
         var valid = new SampleGeneratingArgs("valid.wav");
         var invalid = new SampleGeneratingArgs("invalid.wav");
         var customIndex = new CustomIndex(2);
         customIndex.Samples["normal-hitnormal"].Add(valid);
         customIndex.Samples["normal-hitnormal"].Add(invalid);
 
+        // Act
         customIndex.CleanInvalids(sample => sample.Path == "valid.wav");
 
-        CollectionAssert.AreEquivalent(
-            new[] { valid },
-            customIndex.Samples["normal-hitnormal"].ToArray());
+        // Assert
+        customIndex.Samples["normal-hitnormal"].ToArray().Should().BeEquivalentTo(new[] { valid });
     }
 
     [TestMethod]
     public void HitsoundEvent_EncodesWhistleFinishAndClapBits() {
+        // Arrange
+        // Act
         var hitsound = new HitsoundEvent(
             1000, 1, SampleSet.Normal, SampleSet.Drum, 2,
             whistle: true, finish: false, clap: true);
 
-        Assert.AreEqual(10, hitsound.GetHitsounds());
+        // Assert
+        hitsound.GetHitsounds().Should().Be(10);
     }
 }

@@ -33,8 +33,8 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
 
         private static double Primitive(double t, double p) {
             return t < 0.5 ? 
-                ((Math.Pow(4, p * t)) / (p * Math.Log(4)) - t) / (2 * (Math.Pow(2, p) - 1)) : 
-                ((Math.Pow(2, p + 2) - 2) * t + (Math.Pow(2, p) * (Math.Pow(2, p - 2 * p * t) - p * Math.Log(4))) /
+                (Math.Pow(4, p * t) / (p * Math.Log(4)) - t) / (2 * (Math.Pow(2, p) - 1)) : 
+                ((Math.Pow(2, p + 2) - 2) * t + Math.Pow(2, p) * (Math.Pow(2, p - 2 * p * t) - p * Math.Log(4)) /
                    (p * Math.Log(2))) / (4 * (Math.Pow(2, p) - 1));
         }
 

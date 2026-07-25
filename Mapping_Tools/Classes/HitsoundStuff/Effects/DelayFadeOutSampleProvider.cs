@@ -38,7 +38,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff.Effects {
         public void BeginFadeIn(double fadeDurationInMilliseconds) {
             lock (lockObject) {
                 fadeSamplePosition = 0;
-                fadeSampleCount = (int)((fadeDurationInMilliseconds * source.WaveFormat.SampleRate) / 1000);
+                fadeSampleCount = (int)(fadeDurationInMilliseconds * source.WaveFormat.SampleRate / 1000);
                 fadeState = FadeState.FadingIn;
             }
         }
@@ -51,8 +51,8 @@ namespace Mapping_Tools.Classes.HitsoundStuff.Effects {
         public void BeginFadeOut(double fadeAfterMilliseconds, double fadeDurationInMilliseconds) {
             lock (lockObject) {
                 fadeSamplePosition = 0;
-                fadeSampleCount = (int)((fadeDurationInMilliseconds * source.WaveFormat.SampleRate) / 1000);
-                fadeOutDelaySamples = (int)((fadeAfterMilliseconds * source.WaveFormat.SampleRate) / 1000);
+                fadeSampleCount = (int)(fadeDurationInMilliseconds * source.WaveFormat.SampleRate / 1000);
+                fadeOutDelaySamples = (int)(fadeAfterMilliseconds * source.WaveFormat.SampleRate / 1000);
                 fadeOutDelayPosition = 0;
 
                 fadeState = FadeState.Waiting;
@@ -106,7 +106,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff.Effects {
         private void FadeOut(float[] buffer, int offset, int sourceSamplesRead) {
             int sample = 0;
             while (sample < sourceSamplesRead) {
-                float multiplier = 1.0f - (fadeSamplePosition / (float)fadeSampleCount);
+                float multiplier = 1.0f - fadeSamplePosition / (float)fadeSampleCount;
                 if (fadeSamplePosition < 0) {
                     multiplier = 1.0f;
                 }
@@ -126,7 +126,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff.Effects {
         private void FadeIn(float[] buffer, int offset, int sourceSamplesRead) {
             int sample = 0;
             while (sample < sourceSamplesRead) {
-                float multiplier = (fadeSamplePosition / (float)fadeSampleCount);
+                float multiplier = fadeSamplePosition / (float)fadeSampleCount;
                 for (int ch = 0; ch < source.WaveFormat.Channels; ch++) {
                     buffer[offset + sample++] *= multiplier;
                 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.MathUtil;
@@ -246,8 +246,8 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
                 //Console.WriteLine("Angle change: " + angleChange);
 
                 // Check for inflection point or red anchors
-                if ((angleChange * lastAngleChange < -Precision.DoubleEpsilon && Math.Abs(startSubRange - i) > 1) ||
-                    ((pos - pos.Rounded()).LengthSquared < Precision.DoubleEpsilon && Math.Abs(angleChange) > Precision.DoubleEpsilon)) {
+                if (angleChange * lastAngleChange < -Precision.DoubleEpsilon && Math.Abs(startSubRange - i) > 1 ||
+                    (pos - pos.Rounded()).LengthSquared < Precision.DoubleEpsilon && Math.Abs(angleChange) > Precision.DoubleEpsilon) {
                     subRanges.Add(new Tuple<double, double, double>(startSubRange, i, subRangeAngleChange));
 
                     //Console.WriteLine($"Adding segment for inflection point or red: {startSubRange} to {i}");

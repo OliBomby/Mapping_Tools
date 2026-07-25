@@ -23,7 +23,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators {
         }
 
         private static double F(double t, double k) {
-            return (Math.Exp(k) * t) / ((Math.Exp(k) - 1) * t + 1);
+            return Math.Exp(k) * t / ((Math.Exp(k) - 1) * t + 1);
         }
 
         public double GetDerivative(double t) {

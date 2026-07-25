@@ -648,7 +648,7 @@ namespace Mapping_Tools.Classes.MathUtil {
 
         public override int GetHashCode() {
             unchecked {
-                return ( this.Xyz.GetHashCode() * 397 ) ^ this.W.GetHashCode();
+                return this.Xyz.GetHashCode() * 397 ^ this.W.GetHashCode();
             }
         }
 

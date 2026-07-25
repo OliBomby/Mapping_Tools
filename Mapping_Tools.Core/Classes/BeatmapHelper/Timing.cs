@@ -900,7 +900,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="sv">The sv.</param>
         /// <returns>The duration of one slider span in milliseconds.</returns>
         public double CalculateSliderTemporalLength(double time, double length, double sv) {
-            return (length * GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : MathHelper.Clamp(sv, -1000, -10))) / 
+            return length * GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : MathHelper.Clamp(sv, -1000, -10)) / 
                    (-10000 * SliderMultiplier);
         }
 
@@ -911,7 +911,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="sv">The sv.</param>
         /// <returns>The duration as a number of beats.</returns>
         public double CalculateSliderBeatLength(double length, double sv) {
-            return (length * (double.IsNaN(sv) ? -100 : MathHelper.Clamp(sv, -1000, -10))) / 
+            return length * (double.IsNaN(sv) ? -100 : MathHelper.Clamp(sv, -1000, -10)) / 
                    (-10000 * SliderMultiplier);
         }
 
@@ -923,7 +923,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <returns></returns>
         public double CalculateSliderLength(double time, double temporalLength) {
             var sv = GetSvAtTime(time);
-            return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) );
+            return -10000 * temporalLength * SliderMultiplier / ( GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) );
         }
 
         /// <summary>
@@ -934,7 +934,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <param name="sv">The sv.</param>
         /// <returns>The slider pixel length.</returns>
         public double CalculateSliderLengthCustomSv(double time, double temporalLength, double sv) {
-            return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) );
+            return -10000 * temporalLength * SliderMultiplier / ( GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) );
         }
 
         private static IEnumerable<TimingPoint> GetTimingPoints(IEnumerable<string> timingLines) {

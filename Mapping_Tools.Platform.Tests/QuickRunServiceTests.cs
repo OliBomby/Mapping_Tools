@@ -12,8 +12,9 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class QuickRunServiceTests
 {
     [TestMethod]
-    public void RegistryRejectsAmbiguityAndFiltersConfigurationChoices()
+    public void Register_WithAmbiguousCommands_ThrowsAndFiltersChoices()
     {
+        // Arrange
         QuickRunCommandRegistry registry = new();
         registry.Register(Command("current", "Current", QuickRunTargets.Always));
         registry.Register(Command(
@@ -21,45 +22,49 @@ public sealed class QuickRunServiceTests
             "Slider",
             QuickRunTargets.AnySelection));
 
-        Assert.ThrowsException<InvalidOperationException>(
-            () => registry.Register(
-                Command("current", "Other", QuickRunTargets.Always)));
-        Assert.ThrowsException<InvalidOperationException>(
-            () => registry.Register(
-                Command("other", "Slider", QuickRunTargets.Always)));
-        CollectionAssert.AreEqual(
-            new[] { "current" },
-            registry.GetCommandsFor(QuickRunTargets.NoSelection)
-                .Select(command => command.Id)
-                .ToArray());
-        CollectionAssert.AreEqual(
-            new[] { "current", "slider" },
-            registry.GetCommandsFor(QuickRunTargets.SingleSelection)
-                .Select(command => command.Id)
-                .ToArray());
+        // Act
+        Action act1 = () => registry.Register(
+                Command("current", "Other", QuickRunTargets.Always));
+
+        // Assert
+        act1.Should().Throw<InvalidOperationException>();
+        Action act2 = () => registry.Register(
+                Command("other", "Slider", QuickRunTargets.Always));
+
+        act2.Should().Throw<InvalidOperationException>();
+        registry.GetCommandsFor(QuickRunTargets.NoSelection)
+            .Select(command => command.Id)
+            .ToArray().Should().Equal(new[] { "current" });
+        registry.GetCommandsFor(QuickRunTargets.SingleSelection)
+            .Select(command => command.Id)
+            .ToArray().Should().Equal(new[] { "current", "slider" });
     }
 
     [TestMethod]
-    public void RemovingCurrentCommandClearsSelection()
+    public void Remove_WithCurrentCommand_ClearsSelection()
     {
+        // Arrange
+        // Act
         QuickRunCommandRegistry registry = new();
         registry.Register(Command("cleaner", "Map Cleaner", QuickRunTargets.Always));
-        Assert.IsTrue(registry.SelectCurrent("cleaner"));
+        // Assert
+        registry.SelectCurrent("cleaner").Should().BeTrue();
 
-        Assert.IsTrue(registry.Remove("cleaner"));
+        registry.Remove("cleaner").Should().BeTrue();
 
-        Assert.IsNull(registry.CurrentCommandId);
-        Assert.IsFalse(registry.SelectCurrent("missing"));
+        registry.CurrentCommandId.Should().BeNull();
+        registry.SelectCurrent("missing").Should().BeFalse();
     }
 
     [DataTestMethod]
     [DataRow(0, "none")]
     [DataRow(1, "single")]
     [DataRow(2, "multiple")]
-    public async Task SmartRoutingUsesLiveSelectedHitObjectCount(
+    public async Task RunAsync_WithSelectedHitObjectCount_SelectsExpectedCommand(
         int selectedCount,
         string expectedId)
     {
+        // Arrange
         List<string> invoked = [];
         QuickRunCommandRegistry registry = RegistryWithRoutingCommands(invoked);
         ApplicationSettings settings = new()
@@ -74,16 +79,19 @@ public sealed class QuickRunServiceTests
             new FakeLiveReader(Snapshot(selectedCount)),
             settings);
 
+        // Act
         QuickRunResult result = await service.RunAsync();
 
-        Assert.AreEqual(QuickRunStatus.Executed, result.Status);
-        Assert.AreEqual(expectedId, result.CommandId);
-        CollectionAssert.AreEqual(new[] { expectedId }, invoked);
+        // Assert
+        result.Status.Should().Be(QuickRunStatus.Executed);
+        result.CommandId.Should().Be(expectedId);
+        invoked.Should().Equal(new[] { expectedId });
     }
 
     [TestMethod]
-    public async Task DisabledSmartRoutingUsesCurrentCommandWithoutReadingEditor()
+    public async Task RunAsync_WithSmartRoutingDisabled_UsesCurrentWithoutReader()
     {
+        // Arrange
         int invoked = 0;
         QuickRunCommandRegistry registry = new();
         registry.Register(
@@ -104,16 +112,19 @@ public sealed class QuickRunServiceTests
             reader,
             new ApplicationSettings { SmartQuickRunEnabled = false });
 
+        // Act
         QuickRunResult result = await service.RunAsync();
 
-        Assert.AreEqual(QuickRunStatus.Executed, result.Status);
-        Assert.AreEqual(1, invoked);
-        Assert.AreEqual(0, reader.ReadCount);
+        // Assert
+        result.Status.Should().Be(QuickRunStatus.Executed);
+        invoked.Should().Be(1);
+        reader.ReadCount.Should().Be(0);
     }
 
     [TestMethod]
-    public async Task CurrentToolSentinelUsesCurrentCommandAfterSmartSelection()
+    public async Task RunAsync_WithCurrentToolSentinel_UsesCurrentAfterSmartSelection()
     {
+        // Arrange
         int invoked = 0;
         QuickRunCommandRegistry registry = new();
         registry.Register(
@@ -136,16 +147,19 @@ public sealed class QuickRunServiceTests
                 MultipleQuickRunTool = "<Current Tool>"
             });
 
+        // Act
         QuickRunResult result = await service.RunAsync();
 
-        Assert.AreEqual(QuickRunStatus.Executed, result.Status);
-        Assert.AreEqual("active", result.CommandId);
-        Assert.AreEqual(1, invoked);
+        // Assert
+        result.Status.Should().Be(QuickRunStatus.Executed);
+        result.CommandId.Should().Be("active");
+        invoked.Should().Be(1);
     }
 
     [TestMethod]
-    public async Task MissingEditorAndStaleToolReturnTypedOutcomesAndWarnings()
+    public async Task RunAsync_WithMissingEditorOrStaleTool_ReturnsTypedWarnings()
     {
+        // Arrange
         List<UserNotification> notifications = [];
         UserNotificationService notificationService = new();
         notificationService.Published +=
@@ -157,9 +171,11 @@ public sealed class QuickRunServiceTests
             new ApplicationSettings(),
             notificationService);
 
+        // Act
         QuickRunResult unavailableResult = await unavailable.RunAsync();
 
-        Assert.AreEqual(QuickRunStatus.EditorUnavailable, unavailableResult.Status);
+        // Assert
+        unavailableResult.Status.Should().Be(QuickRunStatus.EditorUnavailable);
         QuickRunService stale = CreateService(
             registry,
             new FakeLiveReader(Snapshot(1)),
@@ -171,15 +187,16 @@ public sealed class QuickRunServiceTests
 
         QuickRunResult staleResult = await stale.RunAsync();
 
-        Assert.AreEqual(QuickRunStatus.CommandNotFound, staleResult.Status);
-        Assert.AreEqual(2, notifications.Count);
-        Assert.IsTrue(notifications.All(
-            notification => notification.Severity == UserNotificationSeverity.Warning));
+        staleResult.Status.Should().Be(QuickRunStatus.CommandNotFound);
+        notifications.Count.Should().Be(2);
+        notifications.All(
+            notification => notification.Severity == UserNotificationSeverity.Warning).Should().BeTrue();
     }
 
     [TestMethod]
-    public async Task ReaderAndCommandFailuresAreCapturedAndReported()
+    public async Task RunAsync_WhenReaderOrCommandFails_ReturnsReportedFailure()
     {
+        // Arrange
         List<UserNotification> notifications = [];
         UserNotificationService notificationService = new();
         notificationService.Published +=
@@ -191,10 +208,12 @@ public sealed class QuickRunServiceTests
             new ApplicationSettings(),
             notificationService);
 
+        // Act
         QuickRunResult readerResult = await readerService.RunAsync();
 
-        Assert.AreEqual(QuickRunStatus.Failed, readerResult.Status);
-        Assert.AreSame(readerFailure, readerResult.Exception);
+        // Assert
+        readerResult.Status.Should().Be(QuickRunStatus.Failed);
+        readerResult.Exception.Should().BeSameAs(readerFailure);
 
         InvalidOperationException commandFailure = new("Tool validation failed.");
         QuickRunCommandRegistry registry = new();
@@ -213,16 +232,17 @@ public sealed class QuickRunServiceTests
 
         QuickRunResult commandResult = await commandService.RunAsync();
 
-        Assert.AreEqual(QuickRunStatus.Failed, commandResult.Status);
-        Assert.AreSame(commandFailure, commandResult.Exception);
-        Assert.AreEqual(2, notifications.Count);
-        Assert.IsTrue(notifications.All(
-            notification => notification.Severity == UserNotificationSeverity.Error));
+        commandResult.Status.Should().Be(QuickRunStatus.Failed);
+        commandResult.Exception.Should().BeSameAs(commandFailure);
+        notifications.Count.Should().Be(2);
+        notifications.All(
+            notification => notification.Severity == UserNotificationSeverity.Error).Should().BeTrue();
     }
 
     [TestMethod]
-    public async Task CallerCancellationIsNotConvertedIntoQuickRunFailure()
+    public async Task RunAsync_WithCallerCancellation_PropagatesCancellation()
     {
+        // Arrange
         using CancellationTokenSource source = new();
         source.Cancel();
         QuickRunService service = CreateService(
@@ -230,24 +250,25 @@ public sealed class QuickRunServiceTests
             new FakeLiveReader(Snapshot(0)),
             new ApplicationSettings());
 
-        await Assert.ThrowsExceptionAsync<OperationCanceledException>(
-            () => service.RunAsync(source.Token));
+        // Act
+        Func<Task> act3 = () => service.RunAsync(source.Token);
+
+        // Assert
+        await act3.Should().ThrowAsync<OperationCanceledException>();
     }
 
     [TestMethod]
-    public void WindowsAdapterTranslatesLegacyFixtureHotkeys()
+    public void ConvertLegacyKeyToVirtualKey_WithLegacyHotkeys_MapsValuesAndRejectsInvalid()
     {
-        Assert.AreEqual(
-            0x4D,
-            WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(56));
-        Assert.AreEqual(
-            0x53,
-            WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(62));
-        Assert.AreEqual(
-            0x5A,
-            WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(69));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(
-            () => WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(-1));
+        // Arrange
+        // Act
+        // Assert
+        WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(56).Should().Be(0x4D);
+        WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(62).Should().Be(0x53);
+        WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(69).Should().Be(0x5A);
+        Action act4 = () => WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(-1);
+
+        act4.Should().Throw<ArgumentOutOfRangeException>();
     }
 
     private static QuickRunCommand Command(

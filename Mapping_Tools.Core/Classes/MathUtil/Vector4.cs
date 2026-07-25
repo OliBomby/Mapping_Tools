@@ -1371,9 +1371,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         public override int GetHashCode() {
             unchecked {
                 var hashCode = this.X.GetHashCode();
-                hashCode = ( hashCode * 397 ) ^ this.Y.GetHashCode();
-                hashCode = ( hashCode * 397 ) ^ this.Z.GetHashCode();
-                hashCode = ( hashCode * 397 ) ^ this.W.GetHashCode();
+                hashCode = hashCode * 397 ^ this.Y.GetHashCode();
+                hashCode = hashCode * 397 ^ this.Z.GetHashCode();
+                hashCode = hashCode * 397 ^ this.W.GetHashCode();
                 return hashCode;
             }
         }

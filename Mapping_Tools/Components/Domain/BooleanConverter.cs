@@ -14,7 +14,7 @@ namespace Mapping_Tools.Components.Domain {
         public T False { get; set; }
 
         public virtual object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            return value is bool && ((bool)value) ? True : False;
+            return value is bool && (bool)value ? True : False;
         }
 
         public virtual object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
@@ -23,7 +23,7 @@ namespace Mapping_Tools.Components.Domain {
 
         public virtual object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            return values[0] is bool && ((bool)values[0]) ? True : False;
+            return values[0] is bool && (bool)values[0] ? True : False;
         }
 
         public virtual object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

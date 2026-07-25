@@ -46,10 +46,10 @@ namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject
         public override int GetHashCode() {
             unchecked {
                 var hashCode = needSelected.GetHashCode();
-                hashCode = (hashCode * 397) ^ needLocked.GetHashCode();
-                hashCode = (hashCode * 397) ^ needGeneratedByThis.GetHashCode();
-                hashCode = (hashCode * 397) ^ needGeneratedNotByThis.GetHashCode();
-                hashCode = (hashCode * 397) ^ minRelevancy.GetHashCode();
+                hashCode = hashCode * 397 ^ needLocked.GetHashCode();
+                hashCode = hashCode * 397 ^ needGeneratedByThis.GetHashCode();
+                hashCode = hashCode * 397 ^ needGeneratedNotByThis.GetHashCode();
+                hashCode = hashCode * 397 ^ minRelevancy.GetHashCode();
                 return hashCode;
             }
         }

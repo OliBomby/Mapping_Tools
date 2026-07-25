@@ -7,17 +7,22 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class AvaloniaClipboardServiceTests
 {
     [TestMethod]
-    public async Task MissingTopLevelHasExplicitFailure()
+    public async Task ReadTextAsync_WithoutTopLevel_ThrowsInvalidOperationException()
     {
+        // Arrange
         AvaloniaClipboardService clipboard = new(() => null);
 
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(
-            () => clipboard.ReadTextAsync());
+        // Act
+        Func<Task> act1 = () => clipboard.ReadTextAsync();
+
+        // Assert
+        await act1.Should().ThrowAsync<InvalidOperationException>();
     }
 
     [TestMethod]
-    public async Task PreCancelledOperationDoesNotAccessPlatform()
+    public async Task ClearAsync_WithPreCancelledToken_ThrowsWithoutPlatformAccess()
     {
+        // Arrange
         bool accessed = false;
         AvaloniaClipboardService clipboard = new(() =>
         {
@@ -27,9 +32,12 @@ public sealed class AvaloniaClipboardServiceTests
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
 
-        await Assert.ThrowsExceptionAsync<OperationCanceledException>(
-            () => clipboard.ClearAsync(cancellation.Token));
+        // Act
+        Func<Task> act2 = () => clipboard.ClearAsync(cancellation.Token);
 
-        Assert.IsFalse(accessed);
+        // Assert
+        await act2.Should().ThrowAsync<OperationCanceledException>();
+
+        accessed.Should().BeFalse();
     }
 }

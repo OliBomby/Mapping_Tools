@@ -8,27 +8,35 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class AvaloniaFilePickerTests
 {
     [TestMethod]
-    public void CapabilitiesAreFalseBeforeTopLevelIsAvailable()
+    public void Capabilities_WithoutTopLevel_AreFalse()
     {
+        // Arrange
+        // Act
         AvaloniaFilePicker picker = new(() => null);
 
-        Assert.IsFalse(picker.CanOpenFiles);
-        Assert.IsFalse(picker.CanSaveFiles);
-        Assert.IsFalse(picker.CanPickFolders);
+        // Assert
+        picker.CanOpenFiles.Should().BeFalse();
+        picker.CanSaveFiles.Should().BeFalse();
+        picker.CanPickFolders.Should().BeFalse();
     }
 
     [TestMethod]
-    public async Task UnsupportedPickerOperationHasExplicitFailure()
+    public async Task PickOpenFilesAsync_WithoutTopLevel_ThrowsPlatformNotSupportedException()
     {
+        // Arrange
         AvaloniaFilePicker picker = new(() => null);
 
-        await Assert.ThrowsExceptionAsync<PlatformNotSupportedException>(
-            () => picker.PickOpenFilesAsync(new OpenFilePickerRequest()));
+        // Act
+        Func<Task> act1 = () => picker.PickOpenFilesAsync(new OpenFilePickerRequest());
+
+        // Assert
+        await act1.Should().ThrowAsync<PlatformNotSupportedException>();
     }
 
     [TestMethod]
-    public async Task PreCancelledPickerOperationDoesNotAccessPlatform()
+    public async Task PickFoldersAsync_WithPreCancelledToken_ThrowsWithoutPlatformAccess()
     {
+        // Arrange
         bool accessed = false;
         AvaloniaFilePicker picker = new(() =>
         {
@@ -38,30 +46,34 @@ public sealed class AvaloniaFilePickerTests
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
 
-        await Assert.ThrowsExceptionAsync<OperationCanceledException>(
-            () => picker.PickFoldersAsync(
+        // Act
+        Func<Task> act2 = () => picker.PickFoldersAsync(
                 new OpenFolderPickerRequest(),
-                cancellation.Token));
+                cancellation.Token);
 
-        Assert.IsFalse(accessed);
+        // Assert
+        await act2.Should().ThrowAsync<OperationCanceledException>();
+
+        accessed.Should().BeFalse();
     }
 
     [TestMethod]
-    public void FiltersMapAllCrossPlatformIdentifiers()
+    public void MapFilters_WithCrossPlatformIdentifiers_MapsAllValues()
     {
+        // Arrange
         FilePickerFilter filter = new(
             "Audio",
             ["*.wav", "*.ogg"],
             ["audio/wav", "audio/ogg"],
             ["com.microsoft.waveform-audio"]);
 
+        // Act
         var mapped = AvaloniaFilePicker.MapFilters([filter]).Single();
 
-        Assert.AreEqual("Audio", mapped.Name);
-        CollectionAssert.AreEqual(filter.Patterns.ToArray(), mapped.Patterns!.ToArray());
-        CollectionAssert.AreEqual(filter.MimeTypes.ToArray(), mapped.MimeTypes!.ToArray());
-        CollectionAssert.AreEqual(
-            filter.AppleUniformTypeIdentifiers.ToArray(),
-            mapped.AppleUniformTypeIdentifiers!.ToArray());
+        // Assert
+        mapped.Name.Should().Be("Audio");
+        mapped.Patterns!.ToArray().Should().Equal(filter.Patterns.ToArray());
+        mapped.MimeTypes!.ToArray().Should().Equal(filter.MimeTypes.ToArray());
+        mapped.AppleUniformTypeIdentifiers!.ToArray().Should().Equal(filter.AppleUniformTypeIdentifiers.ToArray());
     }
 }

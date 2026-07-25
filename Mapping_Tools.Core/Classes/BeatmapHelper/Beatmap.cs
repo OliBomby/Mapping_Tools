@@ -391,7 +391,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                         break;
 
                     if (Vector2.Distance(stackBaseObject.Pos, objectN.Pos) < stackLenience ||
-                        (stackBaseObject.IsSlider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < stackLenience)) {
+                        stackBaseObject.IsSlider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < stackLenience) {
                         stackBaseIndex = n;
 
                         // HitObjects after the specified update range haven't been reset yet
@@ -554,7 +554,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                     if (diff > 0) {
                         hitObject.ComboSkip = diff;
                     } else if (diff < 0) {
-                        hitObject.ComboSkip = (actingComboColours.Length + diff);
+                        hitObject.ComboSkip = actingComboColours.Length + diff;
                     }
 
                     int newColourIncrement = hitObject.IsSpinner ? hitObject.ComboSkip : hitObject.ComboSkip + 1;

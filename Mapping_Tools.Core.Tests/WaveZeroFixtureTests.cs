@@ -11,8 +11,9 @@ public sealed class WaveZeroFixtureTests
     private static readonly string ManifestPath = Path.Combine(RepositoryRoot, "tests", "fixtures", "wave0", "manifest.json");
 
     [TestMethod]
-    public void ManifestContainsEveryRequiredFixtureGroup()
+    public void LoadManifest_RequiredFixtureGroups_ContainsAll()
     {
+        // Arrange
         var manifest = LoadManifest();
         string[] requiredGroups =
         [
@@ -20,28 +21,34 @@ public sealed class WaveZeroFixtureTests
             "audio", "mapset", "settings", "platform-failure", "geometry-dashboard"
         ];
 
+        // Act
         var actualGroups = manifest.Fixtures.Select(fixture => fixture.Group).ToHashSet(StringComparer.Ordinal);
         var missing = requiredGroups.Where(group => !actualGroups.Contains(group)).ToArray();
 
-        Assert.AreEqual(0, missing.Length, $"Missing fixture groups: {string.Join(", ", missing)}");
+        // Assert
+        missing.Length.Should().Be(0, $"Missing fixture groups: {string.Join(", ", missing)}");
     }
 
     [TestMethod]
-    public void FixtureIdsAndPathsAreUnique()
+    public void LoadManifest_FixtureIdsAndPaths_AreUnique()
     {
+        // Arrange
+        // Act
         var fixtures = LoadManifest().Fixtures;
         var duplicateIds = fixtures.GroupBy(fixture => fixture.Id, StringComparer.Ordinal)
             .Where(group => group.Count() > 1).Select(group => group.Key).ToArray();
         var duplicatePaths = fixtures.GroupBy(fixture => fixture.Path, StringComparer.OrdinalIgnoreCase)
             .Where(group => group.Count() > 1).Select(group => group.Key).ToArray();
 
-        Assert.AreEqual(0, duplicateIds.Length, $"Duplicate fixture IDs: {string.Join(", ", duplicateIds)}");
-        Assert.AreEqual(0, duplicatePaths.Length, $"Duplicate fixture paths: {string.Join(", ", duplicatePaths)}");
+        // Assert
+        duplicateIds.Length.Should().Be(0, $"Duplicate fixture IDs: {string.Join(", ", duplicateIds)}");
+        duplicatePaths.Length.Should().Be(0, $"Duplicate fixture paths: {string.Join(", ", duplicatePaths)}");
     }
 
     [TestMethod]
-    public void EveryVersionedFixtureMatchesItsRecordedHash()
+    public void LoadManifest_VersionedFixtures_MatchRecordedHashes()
     {
+        // Arrange
         var failures = new List<string>();
 
         foreach (var fixture in LoadManifest().Fixtures.Where(fixture => fixture.Sha256 is not null))
@@ -53,19 +60,23 @@ public sealed class WaveZeroFixtureTests
                 continue;
             }
 
+            // Act
             var actualHash = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path)));
             if (!actualHash.Equals(fixture.Sha256, StringComparison.OrdinalIgnoreCase))
             {
                 failures.Add($"{fixture.Id}: expected {fixture.Sha256}, actual {actualHash}");
+            // Assert
             }
         }
 
-        Assert.AreEqual(0, failures.Count, string.Join(Environment.NewLine, failures));
+        failures.Count.Should().Be(0, string.Join(Environment.NewLine, failures));
     }
 
     [TestMethod]
-    public void EveryDestructiveFeatureHasABaselineRecord()
+    public void LoadManifest_DestructiveFeatures_HaveBaselineRecords()
     {
+        // Arrange
+        // Act
         var manifest = LoadManifest();
         var baselineIds = manifest.Fixtures
             .Where(fixture => fixture.Group == "transformation")
@@ -76,12 +87,14 @@ public sealed class WaveZeroFixtureTests
             .Select(feature => feature.Id)
             .ToArray();
 
-        Assert.AreEqual(0, missing.Length, $"Features without baseline records: {string.Join(", ", missing)}");
+        // Assert
+        missing.Length.Should().Be(0, $"Features without baseline records: {string.Join(", ", missing)}");
     }
 
     [TestMethod]
-    public void BaselineRecordsReferenceVersionedSeedAndOptionFiles()
+    public void LoadManifest_BaselineRecords_ReferenceVersionedFiles()
     {
+        // Arrange
         var failures = new List<string>();
         var manifest = LoadManifest();
         var baselineIds = manifest.DestructiveFeatures
@@ -107,22 +120,26 @@ public sealed class WaveZeroFixtureTests
                 VerifyRelativeFile(recordPath, record.ExpectedOutput, $"{fixture.Id} output", failures);
             }
 
+            // Act
             if (record.Status == "accepted" && record.ExpectedOutput is null)
             {
                 failures.Add($"{fixture.Id}: accepted baseline has no expected output.");
+            // Assert
             }
         }
 
-        Assert.AreEqual(0, failures.Count, string.Join(Environment.NewLine, failures));
+        failures.Count.Should().Be(0, string.Join(Environment.NewLine, failures));
     }
 
     [TestMethod]
-    public void GeometryDashboardExportContainsTheAcceptedLockedObjects()
+    public void LoadManifest_GeometryDashboardExport_ContainsAcceptedLockedObjects()
     {
+        // Arrange
         var path = Path.Combine(RepositoryRoot, "tests", "fixtures", "wave0", "geometry-dashboard",
             "expected", "locked-virtual-objects.json");
         using var document = JsonDocument.Parse(File.ReadAllText(path));
 
+        // Act
         var counts = new Dictionary<string, int>(StringComparer.Ordinal);
         var exportedObjects = new List<JsonElement>();
         foreach (var property in document.RootElement.EnumerateObject().Where(property => property.Name != "$type"))
@@ -131,17 +148,18 @@ public sealed class WaveZeroFixtureTests
             var items = property.Value.EnumerateArray().ToArray();
             counts[typeName] = items.Length;
             exportedObjects.AddRange(items);
+        // Assert
         }
 
-        Assert.AreEqual(0, counts["RelevantHitObject"]);
-        Assert.AreEqual(10, counts["RelevantPoint"]);
-        Assert.AreEqual(2, counts["RelevantCircle"]);
-        Assert.AreEqual(12, exportedObjects.Count);
-        Assert.IsTrue(exportedObjects.All(item => item.GetProperty("IsLocked").GetBoolean()));
-        Assert.IsTrue(exportedObjects.All(item => !item.GetProperty("IsSelected").GetBoolean()));
-        Assert.IsTrue(exportedObjects.All(item => item.GetProperty("IsInheritable").GetBoolean()));
-        Assert.IsTrue(exportedObjects.All(item => !item.GetProperty("Disposed").GetBoolean()));
-        Assert.IsTrue(exportedObjects.All(item => item.GetProperty("DoNotDispose").GetBoolean()));
+        counts["RelevantHitObject"].Should().Be(0);
+        counts["RelevantPoint"].Should().Be(10);
+        counts["RelevantCircle"].Should().Be(2);
+        exportedObjects.Count.Should().Be(12);
+        exportedObjects.All(item => item.GetProperty("IsLocked").GetBoolean()).Should().BeTrue();
+        exportedObjects.All(item => !item.GetProperty("IsSelected").GetBoolean()).Should().BeTrue();
+        exportedObjects.All(item => item.GetProperty("IsInheritable").GetBoolean()).Should().BeTrue();
+        exportedObjects.All(item => !item.GetProperty("Disposed").GetBoolean()).Should().BeTrue();
+        exportedObjects.All(item => item.GetProperty("DoNotDispose").GetBoolean()).Should().BeTrue();
     }
 
     private static FixtureManifest LoadManifest()

@@ -11,8 +11,9 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class QuickUndoCommandServiceTests
 {
     [TestMethod]
-    public async Task MissingCurrentMapStopsBeforeBackupLookup()
+    public async Task ExecuteAsync_WithoutCurrentMap_StopsBeforeBackupLookup()
     {
+        // Arrange
         RecordingBackupService backups = new();
         List<UserNotification> notifications = [];
         QuickUndoCommandService service = CreateService(
@@ -20,18 +21,19 @@ public sealed class QuickUndoCommandServiceTests
             backups,
             notifications);
 
+        // Act
         QuickUndoCommandResult result = await service.ExecuteAsync();
 
-        Assert.AreEqual(
-            QuickUndoCommandStatus.NoCurrentBeatmap,
-            result.Status);
-        Assert.AreEqual(0, backups.QuickUndoCount);
-        Assert.AreEqual(UserNotificationSeverity.Warning, notifications[0].Severity);
+        // Assert
+        result.Status.Should().Be(QuickUndoCommandStatus.NoCurrentBeatmap);
+        backups.QuickUndoCount.Should().Be(0);
+        notifications[0].Severity.Should().Be(UserNotificationSeverity.Warning);
     }
 
     [TestMethod]
-    public async Task MissingBackupReturnsTypedWarningAndForwardsReloadPreference()
+    public async Task ExecuteAsync_WithoutBackup_ReturnsWarningAndForwardsReload()
     {
+        // Arrange
         RecordingBackupService backups = new();
         List<UserNotification> notifications = [];
         QuickUndoCommandService service = CreateService(
@@ -40,17 +42,20 @@ public sealed class QuickUndoCommandServiceTests
             notifications,
             autoReload: true);
 
+        // Act
         QuickUndoCommandResult result = await service.ExecuteAsync();
 
-        Assert.AreEqual(QuickUndoCommandStatus.NoBackup, result.Status);
-        Assert.AreEqual(1, backups.QuickUndoCount);
-        Assert.IsTrue(backups.ReloadEditor);
-        Assert.AreEqual(UserNotificationSeverity.Warning, notifications[0].Severity);
+        // Assert
+        result.Status.Should().Be(QuickUndoCommandStatus.NoBackup);
+        backups.QuickUndoCount.Should().Be(1);
+        backups.ReloadEditor.Should().BeTrue();
+        notifications[0].Severity.Should().Be(UserNotificationSeverity.Warning);
     }
 
     [TestMethod]
-    public async Task SuccessfulRestoreReturnsMetadataAndPublishesSuccess()
+    public async Task ExecuteAsync_WithSuccessfulRestore_ReturnsMetadataAndPublishesSuccess()
     {
+        // Arrange
         BeatmapBackupArtifact safety = new(
             "safety.osu",
             "map.osu",
@@ -68,16 +73,19 @@ public sealed class QuickUndoCommandServiceTests
             backups,
             notifications);
 
+        // Act
         QuickUndoCommandResult result = await service.ExecuteAsync();
 
-        Assert.AreEqual(QuickUndoCommandStatus.Restored, result.Status);
-        Assert.AreSame(restore, result.Restore);
-        Assert.AreEqual(UserNotificationSeverity.Success, notifications[0].Severity);
+        // Assert
+        result.Status.Should().Be(QuickUndoCommandStatus.Restored);
+        result.Restore.Should().BeSameAs(restore);
+        notifications[0].Severity.Should().Be(UserNotificationSeverity.Success);
     }
 
     [TestMethod]
-    public async Task RestoreFailureIsCapturedAndPublished()
+    public async Task ExecuteAsync_WhenRestoreFails_CapturesAndPublishesFailure()
     {
+        // Arrange
         IOException failure = new("Backup is locked.");
         RecordingBackupService backups = new() { Failure = failure };
         List<UserNotification> notifications = [];
@@ -86,12 +94,14 @@ public sealed class QuickUndoCommandServiceTests
             backups,
             notifications);
 
+        // Act
         QuickUndoCommandResult result = await service.ExecuteAsync();
 
-        Assert.AreEqual(QuickUndoCommandStatus.Failed, result.Status);
-        Assert.AreSame(failure, result.Exception);
-        Assert.AreEqual(UserNotificationSeverity.Error, notifications[0].Severity);
-        Assert.AreSame(failure, notifications[0].Exception);
+        // Assert
+        result.Status.Should().Be(QuickUndoCommandStatus.Failed);
+        result.Exception.Should().BeSameAs(failure);
+        notifications[0].Severity.Should().Be(UserNotificationSeverity.Error);
+        notifications[0].Exception.Should().BeSameAs(failure);
     }
 
     private static QuickUndoCommandService CreateService(

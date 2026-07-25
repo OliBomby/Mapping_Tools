@@ -14,7 +14,7 @@ namespace Mapping_Tools.Components.Domain{
 
         /// <inheritdoc />
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            return value != null && ((bool)value) ? parameter : Binding.DoNothing;
+            return value != null && (bool)value ? parameter : Binding.DoNothing;
         }
     }
 }

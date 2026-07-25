@@ -15,8 +15,9 @@ public sealed class BeatmapEditingGatewayTests
     private const string MapPath = @"C:\osu!\Songs\123 Artist - Title\map.osu";
 
     [TestMethod]
-    public async Task PreferLiveOverlaysMatchingStateAndPreservesSelectedObjectIdentity()
+    public async Task OpenBeatmapAsync_WithMatchingLiveState_OverlaysAndPreservesSelection()
     {
+        // Arrange
         MemoryTextFileStore store = CreateStore();
         HitObject selected = new()
         {
@@ -44,42 +45,44 @@ public sealed class BeatmapEditingGatewayTests
         FakeLiveBeatmapReader reader = new(snapshot);
         BeatmapEditingGateway gateway = CreateGateway(store, reader);
 
+        // Act
         BeatmapEditingSession session = await gateway.OpenBeatmapAsync(MapPath);
 
-        Assert.AreEqual(BeatmapEditingSource.LiveEditor, session.Source);
-        CollectionAssert.AreEqual(
-            new[] { 1500d, 2500d },
-            session.Editor.Beatmap.HitObjects.Select(item => item.Time).ToArray());
-        Assert.AreEqual(1, session.SelectedHitObjects.Count);
-        Assert.AreSame(selected, session.SelectedHitObjects[0]);
-        Assert.IsTrue(session.Editor.Beatmap.HitObjects.Contains(selected));
-        Assert.AreEqual(1234, session.Editor.Beatmap.General["PreviewTime"].IntValue);
-        Assert.AreEqual(1.8, session.Editor.Beatmap.BeatmapTiming.SliderMultiplier);
-        CollectionAssert.AreEqual(
-            new[] { 750d },
-            session.Editor.Beatmap.Bookmarks.ToArray());
+        // Assert
+        session.Source.Should().Be(BeatmapEditingSource.LiveEditor);
+        session.Editor.Beatmap.HitObjects.Select(item => item.Time).ToArray().Should().Equal(new[] { 1500d, 2500d });
+        session.SelectedHitObjects.Count.Should().Be(1);
+        session.SelectedHitObjects[0].Should().BeSameAs(selected);
+        session.Editor.Beatmap.HitObjects.Contains(selected).Should().BeTrue();
+        session.Editor.Beatmap.General["PreviewTime"].IntValue.Should().Be(1234);
+        session.Editor.Beatmap.BeatmapTiming.SliderMultiplier.Should().Be(1.8);
+        session.Editor.Beatmap.Bookmarks.ToArray().Should().Equal(new[] { 750d });
     }
 
     [TestMethod]
-    public async Task DiskOnlyDoesNotTouchLiveReader()
+    public async Task OpenBeatmapAsync_WithDiskOnly_DoesNotReadLiveEditor()
     {
+        // Arrange
         MemoryTextFileStore store = CreateStore();
         FakeLiveBeatmapReader reader = new(
             new InvalidOperationException("Reader must not be called."));
         BeatmapEditingGateway gateway = CreateGateway(store, reader);
 
+        // Act
         BeatmapEditingSession session = await gateway.OpenBeatmapAsync(
             MapPath,
             LiveBeatmapPreference.DiskOnly);
 
-        Assert.AreEqual(BeatmapEditingSource.Disk, session.Source);
-        Assert.AreEqual(0, reader.ReadCount);
-        Assert.IsNull(session.LiveReadFailure);
+        // Assert
+        session.Source.Should().Be(BeatmapEditingSource.Disk);
+        reader.ReadCount.Should().Be(0);
+        session.LiveReadFailure.Should().BeNull();
     }
 
     [TestMethod]
-    public async Task PreferLiveKeepsDiskWhenOsuIsEditingAnotherMap()
+    public async Task OpenBeatmapAsync_WhenLiveMapDiffers_KeepsDiskDocument()
     {
+        // Arrange
         MemoryTextFileStore store = CreateStore();
         LiveBeatmapSnapshot snapshot = new(
             MapPath.ToUpperInvariant(),
@@ -93,16 +96,19 @@ public sealed class BeatmapEditingGatewayTests
             store,
             new FakeLiveBeatmapReader(snapshot));
 
+        // Act
         BeatmapEditingSession session = await gateway.OpenBeatmapAsync(MapPath);
 
-        Assert.AreEqual(BeatmapEditingSource.Disk, session.Source);
-        Assert.IsTrue(session.Editor.Beatmap.HitObjects.Count > 0);
-        Assert.AreNotEqual(0, session.Editor.Beatmap.HitObjects[0].ObjectType);
+        // Assert
+        session.Source.Should().Be(BeatmapEditingSource.Disk);
+        (session.Editor.Beatmap.HitObjects.Count > 0).Should().BeTrue();
+        session.Editor.Beatmap.HitObjects[0].ObjectType.Should().NotBe(0);
     }
 
     [TestMethod]
-    public async Task PreferLiveRecordsFailureWhileRequireLiveReportsIt()
+    public async Task OpenBeatmapAsync_WhenLiveReadFails_RecordsFallbackAndReportsRequiredFailure()
     {
+        // Arrange
         MemoryTextFileStore store = CreateStore();
         InvalidDataException failure = new("corrupt memory");
         BeatmapEditingGateway gateway = CreateGateway(
@@ -110,19 +116,22 @@ public sealed class BeatmapEditingGatewayTests
             new FakeLiveBeatmapReader(failure));
 
         BeatmapEditingSession fallback = await gateway.OpenBeatmapAsync(MapPath);
-        LiveBeatmapUnavailableException required = await Assert.ThrowsExceptionAsync<
-            LiveBeatmapUnavailableException>(
-            () => gateway.OpenBeatmapAsync(
+        // Act
+        Func<Task> act1 = () => gateway.OpenBeatmapAsync(
                 MapPath,
-                LiveBeatmapPreference.RequireLive));
+                LiveBeatmapPreference.RequireLive);
 
-        Assert.AreSame(failure, fallback.LiveReadFailure);
-        Assert.AreSame(failure, required.InnerException);
+        // Assert
+        LiveBeatmapUnavailableException required = (await act1.Should().ThrowAsync<LiveBeatmapUnavailableException>()).Which;
+
+        fallback.LiveReadFailure.Should().BeSameAs(failure);
+        required.InnerException.Should().BeSameAs(failure);
     }
 
     [TestMethod]
-    public async Task RequireLiveReportsDisabledPreferenceWithoutReadingProcessMemory()
+    public async Task OpenBeatmapAsync_WithDisabledLivePreference_ReportsWithoutReaderAccess()
     {
+        // Arrange
         MemoryTextFileStore store = CreateStore();
         FakeLiveBeatmapReader reader = new((LiveBeatmapSnapshot?)null);
         BeatmapEditingGateway gateway = CreateGateway(
@@ -130,19 +139,22 @@ public sealed class BeatmapEditingGatewayTests
             reader,
             new ApplicationSettings { UseEditorReader = false });
 
-        LiveBeatmapUnavailableException exception = await Assert.ThrowsExceptionAsync<
-            LiveBeatmapUnavailableException>(
-            () => gateway.OpenBeatmapAsync(
+        // Act
+        Func<Task> act2 = () => gateway.OpenBeatmapAsync(
                 MapPath,
-                LiveBeatmapPreference.RequireLive));
+                LiveBeatmapPreference.RequireLive);
 
-        StringAssert.Contains(exception.Message, "disabled");
-        Assert.AreEqual(0, reader.ReadCount);
+        // Assert
+        LiveBeatmapUnavailableException exception = (await act2.Should().ThrowAsync<LiveBeatmapUnavailableException>()).Which;
+
+        exception.Message.Should().Contain("disabled");
+        reader.ReadCount.Should().Be(0);
     }
 
     [TestMethod]
-    public async Task SaveWritesCurrentDocumentBeforeRequestingReload()
+    public async Task SaveAsync_WithReload_WritesBeforeReload()
     {
+        // Arrange
         MemoryTextFileStore store = CreateStore();
         RecordingReloadService reload = new(store);
         RecordingBackupService backup = new(store);
@@ -156,19 +168,22 @@ public sealed class BeatmapEditingGatewayTests
             LiveBeatmapPreference.DiskOnly);
         session.Editor.Beatmap.Metadata["Version"] = new TValue("Edited");
 
+        // Act
         await gateway.SaveAsync(session.Editor, reloadEditor: true);
 
-        Assert.AreEqual(1, store.WriteCount);
-        Assert.AreEqual(1, backup.CreateCount);
-        Assert.IsTrue(backup.BackupPrecededWrite);
-        Assert.AreEqual(1, reload.ReloadCount);
-        Assert.IsTrue(reload.FileHadBeenWritten);
-        Assert.IsTrue(store.Files[MapPath].Any(line => line == "Version:Edited"));
+        // Assert
+        store.WriteCount.Should().Be(1);
+        backup.CreateCount.Should().Be(1);
+        backup.BackupPrecededWrite.Should().BeTrue();
+        reload.ReloadCount.Should().Be(1);
+        reload.FileHadBeenWritten.Should().BeTrue();
+        store.Files[MapPath].Any(line => line == "Version:Edited").Should().BeTrue();
     }
 
     [TestMethod]
-    public async Task SaveDoesNotWriteOrReloadWhenMandatoryBackupFails()
+    public async Task SaveAsync_WhenMandatoryBackupFails_DoesNotWriteOrReload()
     {
+        // Arrange
         MemoryTextFileStore store = CreateStore();
         RecordingReloadService reload = new(store);
         IOException failure = new("backup volume unavailable");
@@ -182,30 +197,37 @@ public sealed class BeatmapEditingGatewayTests
             MapPath,
             LiveBeatmapPreference.DiskOnly);
 
-        IOException exception = await Assert.ThrowsExceptionAsync<IOException>(
-            () => gateway.SaveAsync(session.Editor, reloadEditor: true));
+        // Act
+        Func<Task> act3 = () => gateway.SaveAsync(session.Editor, reloadEditor: true);
 
-        Assert.AreSame(failure, exception);
-        Assert.AreEqual(0, store.WriteCount);
-        Assert.AreEqual(0, reload.ReloadCount);
+        // Assert
+        IOException exception = (await act3.Should().ThrowAsync<IOException>()).Which;
+
+        exception.Should().BeSameAs(failure);
+        store.WriteCount.Should().Be(0);
+        reload.ReloadCount.Should().Be(0);
     }
 
     [TestMethod]
-    public async Task CancellationBeforeOpenAvoidsDiskAndLiveReads()
+    public async Task OpenBeatmapAsync_WithPreCancelledToken_AvoidsDiskAndLiveReads()
     {
+        // Arrange
         MemoryTextFileStore store = CreateStore();
         FakeLiveBeatmapReader reader = new((LiveBeatmapSnapshot?)null);
         BeatmapEditingGateway gateway = CreateGateway(store, reader);
         using CancellationTokenSource source = new();
         source.Cancel();
 
-        await Assert.ThrowsExceptionAsync<OperationCanceledException>(
-            () => gateway.OpenBeatmapAsync(
+        // Act
+        Func<Task> act4 = () => gateway.OpenBeatmapAsync(
                 MapPath,
-                cancellationToken: source.Token));
+                cancellationToken: source.Token);
 
-        Assert.AreEqual(0, store.ReadCount);
-        Assert.AreEqual(0, reader.ReadCount);
+        // Assert
+        await act4.Should().ThrowAsync<OperationCanceledException>();
+
+        store.ReadCount.Should().Be(0);
+        reader.ReadCount.Should().Be(0);
     }
 
     private static BeatmapEditingGateway CreateGateway(

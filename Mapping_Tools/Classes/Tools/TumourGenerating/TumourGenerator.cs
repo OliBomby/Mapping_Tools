@@ -321,7 +321,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 };
                 var isOffsetInThisLayer = Vector2.DistanceSquared(point.OgPos, pos) < Precision.DoubleEpsilon;
                 var red = tumourLayer.WrappingMode switch {
-                    WrappingMode.Simple => isCritical || (point.Red && isOffsetInThisLayer),
+                    WrappingMode.Simple => isCritical || point.Red && isOffsetInThisLayer,
                     _ => isCritical || point.Red
                 };
 
@@ -421,8 +421,8 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating {
                 }
 
                 // Add the red points to the anchors if this is a valid hint
-                if ((currentHint is { Anchors: { }, Layer: >= 0 } && current.Value.Red &&
-                     current != currentHint.Value.Start && current != currentHint.Value.End) || current == pathWithHints.Path.First || current == pathWithHints.Path.Last) {
+                if (currentHint is { Anchors: { }, Layer: >= 0 } && current.Value.Red &&
+                    current != currentHint.Value.Start && current != currentHint.Value.End || current == pathWithHints.Path.First || current == pathWithHints.Path.Last) {
                     anchors.Add(current.Value.Pos);
                 }
 

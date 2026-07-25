@@ -8,8 +8,9 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class FileSystemBeatmapBackupStoreTests
 {
     [TestMethod]
-    public async Task CopyAndSnapshotWritesReplaceAtomicallyWithoutLeavingTemporaryFiles()
+    public async Task CopyAndWriteLinesAsync_WithExistingDestination_ReplacesAtomicallyWithoutTemporaryFiles()
     {
+        // Arrange
         string directory = Path.Combine(
             Path.GetTempPath(),
             $"MappingToolsBackupStore-{Guid.NewGuid():N}");
@@ -22,19 +23,16 @@ public sealed class FileSystemBeatmapBackupStoreTests
             await File.WriteAllLinesAsync(destination, ["previous"]);
             FileSystemBeatmapBackupStore store = new();
 
+            // Act
             await store.CopyAsync(source, destination);
-            CollectionAssert.AreEqual(
-                new[] { "source" },
-                await File.ReadAllLinesAsync(destination));
+            // Assert
+            (await File.ReadAllLinesAsync(destination)).Should().Equal(new[] { "source" });
 
             await store.WriteLinesAsync(destination, ["snapshot", "complete"]);
-            CollectionAssert.AreEqual(
-                new[] { "snapshot", "complete" },
-                await File.ReadAllLinesAsync(destination));
-            Assert.IsFalse(
-                Directory.EnumerateFiles(directory)
-                    .Any(path => Path.GetFileName(path)
-                        .Contains(".mapping-tools-", StringComparison.Ordinal)));
+            (await File.ReadAllLinesAsync(destination)).Should().Equal(new[] { "snapshot", "complete" });
+            Directory.EnumerateFiles(directory)
+                .Any(path => Path.GetFileName(path)
+                    .Contains(".mapping-tools-", StringComparison.Ordinal)).Should().BeFalse();
         }
         finally
         {
@@ -43,8 +41,9 @@ public sealed class FileSystemBeatmapBackupStoreTests
     }
 
     [TestMethod]
-    public async Task FailedCopyPreservesExistingDestination()
+    public async Task CopyAsync_WithMissingSource_PreservesExistingDestination()
     {
+        // Arrange
         string directory = Path.Combine(
             Path.GetTempPath(),
             $"MappingToolsBackupStore-{Guid.NewGuid():N}");
@@ -55,15 +54,16 @@ public sealed class FileSystemBeatmapBackupStoreTests
             await File.WriteAllLinesAsync(destination, ["previous"]);
             FileSystemBeatmapBackupStore store = new();
 
-            await Assert.ThrowsExceptionAsync<FileNotFoundException>(
-                () => store.CopyAsync(
+            // Act
+            Func<Task> act1 = () => store.CopyAsync(
                     Path.Combine(directory, "missing.osu"),
-                    destination));
+                    destination);
 
-            CollectionAssert.AreEqual(
-                new[] { "previous" },
-                await File.ReadAllLinesAsync(destination));
-            Assert.AreEqual(1, Directory.EnumerateFiles(directory).Count());
+            // Assert
+            await act1.Should().ThrowAsync<FileNotFoundException>();
+
+            (await File.ReadAllLinesAsync(destination)).Should().Equal(new[] { "previous" });
+            Directory.EnumerateFiles(directory).Count().Should().Be(1);
         }
         finally
         {
@@ -72,8 +72,9 @@ public sealed class FileSystemBeatmapBackupStoreTests
     }
 
     [TestMethod]
-    public async Task ListOrdersNewestFirstAndDeleteRemovesOnlyRequestedBackup()
+    public async Task ListAndDeleteAsync_WithMultipleBackups_OrdersAndDeletesRequestedFile()
     {
+        // Arrange
         string directory = Path.Combine(
             Path.GetTempPath(),
             $"MappingToolsBackupStore-{Guid.NewGuid():N}");
@@ -88,13 +89,15 @@ public sealed class FileSystemBeatmapBackupStoreTests
             File.SetCreationTimeUtc(newer, DateTime.UtcNow.AddMinutes(-1));
             FileSystemBeatmapBackupStore store = new();
 
+            // Act
             IReadOnlyList<StoredBeatmapBackup> files =
                 await store.ListAsync(directory);
             await store.DeleteAsync(older);
 
-            Assert.AreEqual(newer, files[0].Path);
-            Assert.IsFalse(File.Exists(older));
-            Assert.IsTrue(File.Exists(newer));
+            // Assert
+            files[0].Path.Should().Be(newer);
+            File.Exists(older).Should().BeFalse();
+            File.Exists(newer).Should().BeTrue();
         }
         finally
         {

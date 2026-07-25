@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
@@ -149,8 +149,8 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             while (current is not null) {
                 if (segmentStart is not null && (
                         currentHint.HasValue && current == currentHint.Value.End ||
-                        (nextHint < hints.Count && current == hints[nextHint].Start) ||
-                        (!currentHint.HasValue && current.Value.Red) ||
+                        nextHint < hints.Count && current == hints[nextHint].Start ||
+                        !currentHint.HasValue && current.Value.Red ||
                         current.Next is null)) {
                     // End of hint and hint active or its the start of hint and there is no hint active
                     // Create between start and this

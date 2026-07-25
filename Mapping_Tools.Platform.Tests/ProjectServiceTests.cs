@@ -8,43 +8,51 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class ProjectServiceTests
 {
     [TestMethod]
-    public void DefinitionRejectsPathsThatEscapeApplicationData()
+    public void Constructor_WithEscapingPaths_ThrowsArgumentException()
     {
-        Assert.ThrowsException<ArgumentException>(
-            () => new ProjectDefinition<string>("nested/project.json", "Projects", () => ""));
-        Assert.ThrowsException<ArgumentException>(
-            () => new ProjectDefinition<string>("project.json", "../Projects", () => ""));
+        // Arrange
+        // Act
+        Action act1 = () => new ProjectDefinition<string>("nested/project.json", "Projects", () => "");
+
+        // Assert
+        act1.Should().Throw<ArgumentException>();
+        Action act2 = () => new ProjectDefinition<string>("project.json", "../Projects", () => "");
+
+        act2.Should().Throw<ArgumentException>();
     }
 
     [TestMethod]
-    public void PathsPreserveLegacyApplicationDataLayout()
+    public void GetPrimaryPath_DefaultDefinition_PreservesLegacyLayout()
     {
+        // Arrange
+        // Act
         TestDirectories directories = new(@"C:\MappingToolsData");
         ProjectService service = new(directories, new FakeFilePicker(), new FakeProjectStore());
         ProjectDefinition<TestProject> definition = CreateDefinition();
 
-        Assert.AreEqual(
-            Path.Combine(directories.ApplicationData, "featureproject.json"),
-            service.GetAutoSavePath(definition));
-        Assert.AreEqual(
-            Path.Combine(directories.ApplicationData, "Feature Projects"),
-            service.GetProjectFolder(definition));
+        // Assert
+        service.GetAutoSavePath(definition).Should().Be(Path.Combine(directories.ApplicationData, "featureproject.json"));
+        service.GetProjectFolder(definition).Should().Be(Path.Combine(directories.ApplicationData, "Feature Projects"));
     }
 
     [TestMethod]
-    public void CreateNewUsesFeatureFactoryWithoutKnowingPresentationState()
+    public void CreateNew_DefaultDefinition_UsesFeatureFactory()
     {
+        // Arrange
         ProjectService service = CreateService(new FakeFilePicker(), new FakeProjectStore());
         ProjectDefinition<TestProject> definition = CreateDefinition();
 
+        // Act
         TestProject project = service.CreateNew(definition);
 
-        Assert.AreEqual("new project", project.Name);
+        // Assert
+        project.Name.Should().Be("new project");
     }
 
     [TestMethod]
-    public async Task AutoSaveWritesPrimaryThenDistinctAdditionalTargets()
+    public async Task AutoSaveAsync_WithAdditionalTargets_WritesPrimaryThenDistinctTargets()
     {
+        // Arrange
         FakeProjectStore store = new();
         TestDirectories directories = new(Path.GetTempPath());
         ProjectService service = new(directories, new FakeFilePicker(), store);
@@ -52,86 +60,100 @@ public sealed class ProjectServiceTests
         string primary = service.GetAutoSavePath(definition);
         string collection = Path.Combine(directories.ApplicationData, "Collection", "project.json");
 
+        // Act
         await service.AutoSaveAsync(
             definition,
             new TestProject("snapshot"),
             [collection, primary]);
 
-        CollectionAssert.AreEqual(
-            new[] { Path.GetFullPath(primary), Path.GetFullPath(collection) },
-            store.SavedPaths.ToArray());
-        Assert.IsTrue(store.SavedProjects.All(project => project.Name == "snapshot"));
+        // Assert
+        store.SavedPaths.ToArray().Should().Equal(new[] { Path.GetFullPath(primary), Path.GetFullPath(collection) });
+        store.SavedProjects.All(project => project.Name == "snapshot").Should().BeTrue();
     }
 
     [TestMethod]
-    public async Task PreCancelledAutoSaveWritesNoTarget()
+    public async Task AutoSaveAsync_WithPreCancelledToken_WritesNothing()
     {
+        // Arrange
         FakeProjectStore store = new();
         ProjectService service = CreateService(new FakeFilePicker(), store);
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
 
-        await Assert.ThrowsExceptionAsync<OperationCanceledException>(
-            () => service.AutoSaveAsync(
+        // Act
+        Func<Task> act3 = () => service.AutoSaveAsync(
                 CreateDefinition(),
                 new TestProject("cancelled"),
-                cancellationToken: cancellation.Token));
+                cancellationToken: cancellation.Token);
 
-        Assert.AreEqual(0, store.SavedPaths.Count);
+        // Assert
+        await act3.Should().ThrowAsync<OperationCanceledException>();
+
+        store.SavedPaths.Count.Should().Be(0);
     }
 
     [TestMethod]
-    public async Task CancelledSaveAsDoesNotWrite()
+    public async Task SaveAsAsync_WhenPickerCancelled_DoesNotWrite()
     {
+        // Arrange
         FakeFilePicker picker = new() { SavePath = null };
         FakeProjectStore store = new();
         ProjectService service = CreateService(picker, store);
 
+        // Act
         string? path = await service.SaveAsAsync(
             CreateDefinition(),
             new TestProject("unsaved"),
             "example.json");
 
-        Assert.IsNull(path);
-        Assert.AreEqual(0, store.SavedPaths.Count);
-        Assert.AreEqual(1, store.EnsuredDirectories.Count);
-        Assert.AreEqual("example.json", picker.LastSaveRequest?.SuggestedFileName);
-        Assert.AreEqual("json", picker.LastSaveRequest?.DefaultExtension);
+        // Assert
+        path.Should().BeNull();
+        store.SavedPaths.Count.Should().Be(0);
+        store.EnsuredDirectories.Count.Should().Be(1);
+        (picker.LastSaveRequest?.SuggestedFileName).Should().Be("example.json");
+        (picker.LastSaveRequest?.DefaultExtension).Should().Be("json");
     }
 
     [TestMethod]
-    public async Task SaveAsWritesSelectedPath()
+    public async Task SaveAsAsync_WithSelectedPath_WritesSelectedPath()
     {
+        // Arrange
         string selectedPath = Path.Combine(Path.GetTempPath(), "chosen.json");
         FakeFilePicker picker = new() { SavePath = selectedPath };
         FakeProjectStore store = new();
         ProjectService service = CreateService(picker, store);
 
+        // Act
         string? path = await service.SaveAsAsync(
             CreateDefinition(),
             new TestProject("chosen"));
 
-        Assert.AreEqual(selectedPath, path);
-        CollectionAssert.AreEqual(new[] { selectedPath }, store.SavedPaths.ToArray());
+        // Assert
+        path.Should().Be(selectedPath);
+        store.SavedPaths.ToArray().Should().Equal(new[] { selectedPath });
     }
 
     [TestMethod]
-    public async Task CancelledOpenDoesNotRead()
+    public async Task OpenAsync_WhenPickerCancelled_DoesNotRead()
     {
+        // Arrange
         FakeFilePicker picker = new() { OpenPaths = [] };
         FakeProjectStore store = new();
         ProjectService service = CreateService(picker, store);
 
+        // Act
         ProjectOpenResult<TestProject>? result =
             await service.OpenAsync(CreateDefinition());
 
-        Assert.IsNull(result);
-        Assert.AreEqual(0, store.LoadedPaths.Count);
+        // Assert
+        result.Should().BeNull();
+        store.LoadedPaths.Count.Should().Be(0);
     }
 
     [TestMethod]
-    public async Task OpenReturnsDataWithoutInstallingItInAView()
+    public async Task OpenAsync_WithSelectedProject_ReturnsDataWithoutPresentationState()
     {
+        // Arrange
         string selectedPath = Path.Combine(Path.GetTempPath(), "opened.json");
         FakeFilePicker picker = new() { OpenPaths = [selectedPath] };
         FakeProjectStore store = new()
@@ -140,14 +162,16 @@ public sealed class ProjectServiceTests
         };
         ProjectService service = CreateService(picker, store);
 
+        // Act
         ProjectOpenResult<TestProject>? result =
             await service.OpenAsync(CreateDefinition());
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(selectedPath, result.Path);
-        Assert.AreEqual("loaded", result.Project.Name);
-        CollectionAssert.AreEqual(new[] { selectedPath }, store.LoadedPaths.ToArray());
-        Assert.AreEqual(false, picker.LastOpenRequest?.AllowMultiple);
+        // Assert
+        result.Should().NotBeNull();
+        result.Path.Should().Be(selectedPath);
+        result.Project.Name.Should().Be("loaded");
+        store.LoadedPaths.ToArray().Should().Equal(new[] { selectedPath });
+        (picker.LastOpenRequest?.AllowMultiple).Should().Be(false);
     }
 
     private static ProjectDefinition<TestProject> CreateDefinition()

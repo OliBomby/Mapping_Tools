@@ -45,8 +45,10 @@ public sealed class LayerBoundaryTests
     ];
 
     [TestMethod]
-    public void CoreAndApplicationDoNotContainFrontendProcessOrAudioApis()
+    public void FindTokenViolations_CoreAndApplicationSources_ReturnsNoForbiddenApis()
     {
+        // Arrange
+        // Act
         var violations = FrameworkNeutralProjects
             .SelectMany(project => Directory.EnumerateFiles(
                 Path.Combine(RepositoryRoot, project), "*.cs", SearchOption.AllDirectories))
@@ -54,23 +56,28 @@ public sealed class LayerBoundaryTests
             .SelectMany(path => FindTokenViolations(path, File.ReadAllText(path)))
             .ToArray();
 
-        Assert.AreEqual(0, violations.Length, string.Join(Environment.NewLine, violations));
+        // Assert
+        violations.Length.Should().Be(0, string.Join(Environment.NewLine, violations));
     }
 
     [TestMethod]
-    public void CoreAndApplicationDoNotReferenceFrontendPackages()
+    public void FindForbiddenPackages_CoreAndApplicationProjects_ReturnsNoForbiddenPackages()
     {
+        // Arrange
+        // Act
         var violations = FrameworkNeutralProjects
             .Select(project => Path.Combine(RepositoryRoot, project, $"{project}.csproj"))
             .SelectMany(FindForbiddenPackages)
             .ToArray();
 
-        Assert.AreEqual(0, violations.Length, string.Join(Environment.NewLine, violations));
+        // Assert
+        violations.Length.Should().Be(0, string.Join(Environment.NewLine, violations));
     }
 
     [TestMethod]
-    public void ProjectReferencesFollowTheTargetDependencyDirection()
+    public void ProjectReferences_TargetDependencyDirection_MatchesExpectedReferences()
     {
+        // Arrange
         var expectedReferences = new Dictionary<string, string[]>(StringComparer.Ordinal)
         {
             ["Mapping_Tools.Core"] = [],
@@ -79,6 +86,7 @@ public sealed class LayerBoundaryTests
 
         var violations = new List<string>();
 
+        // Act
         foreach (var (project, expected) in expectedReferences)
         {
             var projectPath = Path.Combine(RepositoryRoot, project, $"{project}.csproj");
@@ -96,7 +104,8 @@ public sealed class LayerBoundaryTests
             }
         }
 
-        Assert.AreEqual(0, violations.Count, string.Join(Environment.NewLine, violations));
+        // Assert
+        violations.Count.Should().Be(0, string.Join(Environment.NewLine, violations));
     }
 
     private static IEnumerable<string> FindTokenViolations(string path, string source)

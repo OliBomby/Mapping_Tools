@@ -1018,7 +1018,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
         public override int GetHashCode() {
             unchecked {
-                return (X.GetHashCode() * 397 ) ^ Y.GetHashCode();
+                return X.GetHashCode() * 397 ^ Y.GetHashCode();
             }
         }
 

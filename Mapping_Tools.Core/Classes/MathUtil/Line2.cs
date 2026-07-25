@@ -165,10 +165,10 @@ namespace Mapping_Tools.Classes.MathUtil {
                 candidates.Add(line.PointOnLine((rect.Bottom - line.PositionVector.Y) / line.DirectionVector.Y));
             }
 
-            intersections = candidates.Where(p => (p[0] > rect.Left - Precision.DoubleEpsilon) &&
-                                                  (p[0] < rect.Right + Precision.DoubleEpsilon) &&
-                                                  (p[1] > rect.Top - Precision.DoubleEpsilon) &&
-                                                  (p[1] < rect.Bottom + Precision.DoubleEpsilon)).ToArray();
+            intersections = candidates.Where(p => p[0] > rect.Left - Precision.DoubleEpsilon &&
+                                                  p[0] < rect.Right + Precision.DoubleEpsilon &&
+                                                  p[1] > rect.Top - Precision.DoubleEpsilon &&
+                                                  p[1] < rect.Bottom + Precision.DoubleEpsilon).ToArray();
             return intersections.Length >= 2;
         }
 
@@ -207,7 +207,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <returns>A System.Int32 containing the unique hashcode for this instance.</returns>
         public override int GetHashCode() {
             unchecked {
-                return ((PositionVector.GetHashCode() * 397 ) ^ DirectionVector.GetHashCode()) * 397;
+                return (PositionVector.GetHashCode() * 397 ^ DirectionVector.GetHashCode()) * 397;
             }
         }
 

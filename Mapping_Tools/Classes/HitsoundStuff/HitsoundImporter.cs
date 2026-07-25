@@ -1,4 +1,4 @@
-using Mapping_Tools.Classes.BeatmapHelper;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
 using NAudio.Midi;
 using System;
 using System.Collections.Generic;
@@ -313,7 +313,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                             channelBanks[co.Channel] = (co.ControllerValue << 7) + (channelBanks.ContainsKey(co.Channel) ? (byte)channelBanks[co.Channel] & 0x01111111 : 0);
                         }
                         else if (co.Controller == MidiController.BankSelectLsb) {
-                            channelBanks[co.Channel] = (co.ControllerValue & 0x01111111) + (channelBanks.ContainsKey(co.Channel) ? (channelBanks[co.Channel] >> 7) << 7 : 0);
+                            channelBanks[co.Channel] = (co.ControllerValue & 0x01111111) + (channelBanks.ContainsKey(co.Channel) ? channelBanks[co.Channel] >> 7 << 7 : 0);
                         }
 
                         continue;
@@ -346,7 +346,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
                     const int instrument = -1;
 
-                    bool keys = keysounds || (instruments && bank == 128);
+                    bool keys = keysounds || instruments && bank == 128;
                     int key = keys ? on.NoteNumber : -1;
 
                     length = lengths ? length : -1;

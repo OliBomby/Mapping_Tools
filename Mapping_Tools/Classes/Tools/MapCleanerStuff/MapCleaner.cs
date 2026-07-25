@@ -139,9 +139,9 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
                 }
 
                 // Body hitsounds
-                bool vol = (ho.IsSlider && args.VolumeSliders) || (ho.IsSpinner && args.VolumeSpinners);
-                bool sam = (ho.IsSlider && args.SampleSetSliders && ho.SampleSet == 0);
-                bool ind = (ho.IsSlider && args.SampleSetSliders);
+                bool vol = ho.IsSlider && args.VolumeSliders || ho.IsSpinner && args.VolumeSpinners;
+                bool sam = ho.IsSlider && args.SampleSetSliders && ho.SampleSet == 0;
+                bool ind = ho.IsSlider && args.SampleSetSliders;
                 bool samplesetActuallyChanged = false;
                 foreach (TimingPoint tp in ho.BodyHitsounds) {
                     if (tp.Volume == 5 && args.RemoveMuting) {
@@ -152,7 +152,7 @@ namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
                     if (tp.SampleSet != ho.HitsoundTimingPoint.SampleSet) {
                         samplesetActuallyChanged = args.SampleSetSliders && ho.SampleSet == 0; }  // True for sampleset change in sliderbody
                 }
-                if (ho.IsSlider && (!samplesetActuallyChanged) && ho.SampleSet == 0)  // Case can put sampleset on sliderbody
+                if (ho.IsSlider && !samplesetActuallyChanged && ho.SampleSet == 0)  // Case can put sampleset on sliderbody
                 {
                     ho.SampleSet = ho.HitsoundTimingPoint.SampleSet;
                 }

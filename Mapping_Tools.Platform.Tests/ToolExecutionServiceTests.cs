@@ -9,8 +9,9 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class ToolExecutionServiceTests
 {
     [TestMethod]
-    public async Task SuccessRunsOffCallerThreadReportsProgressReloadsAndPublishesSummary()
+    public async Task ExecuteAsync_WithSuccessfulTool_RunsOffThreadAndPublishesSummary()
     {
+        // Arrange
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
         notifications.Published += (_, args) => published.Add(args.Notification);
@@ -37,26 +38,29 @@ public sealed class ToolExecutionServiceTests
                         reloadEditor: true));
             });
 
+        // Act
         ToolExecutionResult<int> result = await service.ExecuteAsync(
             request,
             new InlineProgress<ToolExecutionProgress>(progress.Add));
 
-        Assert.AreEqual(ToolExecutionStatus.Succeeded, result.Status);
-        Assert.AreEqual(42, result.Value);
-        Assert.AreNotEqual(callerThread, operationThread);
-        Assert.AreEqual(2, progress.Count);
-        Assert.AreEqual(100, progress[1].Percent);
-        Assert.AreEqual(1, reload.ReloadCount);
-        Assert.IsTrue(result.EditorReloaded);
-        Assert.AreEqual(1, published.Count);
-        Assert.AreEqual(UserNotificationSeverity.Success, published[0].Severity);
-        Assert.AreEqual("Removed 3 greenlines.", published[0].Message);
-        Assert.IsFalse(service.IsRunning("cleaner"));
+        // Assert
+        result.Status.Should().Be(ToolExecutionStatus.Succeeded);
+        result.Value.Should().Be(42);
+        operationThread.Should().NotBe(callerThread);
+        progress.Count.Should().Be(2);
+        progress[1].Percent.Should().Be(100);
+        reload.ReloadCount.Should().Be(1);
+        result.EditorReloaded.Should().BeTrue();
+        published.Count.Should().Be(1);
+        published[0].Severity.Should().Be(UserNotificationSeverity.Success);
+        published[0].Message.Should().Be("Removed 3 greenlines.");
+        service.IsRunning("cleaner").Should().BeFalse();
     }
 
     [TestMethod]
-    public async Task AutoReloadPreferenceSuppressesRequestedReload()
+    public async Task ExecuteAsync_WithAutoReloadDisabled_SuppressesRequestedReload()
     {
+        // Arrange
         RecordingReloadService reload = new();
         ToolExecutionService service = CreateService(
             new UserNotificationService(),
@@ -70,16 +74,19 @@ public sealed class ToolExecutionServiceTests
                     1,
                     reloadEditor: true)));
 
+        // Act
         ToolExecutionResult<int> result = await service.ExecuteAsync(request);
 
-        Assert.AreEqual(ToolExecutionStatus.Succeeded, result.Status);
-        Assert.AreEqual(0, reload.ReloadCount);
-        Assert.IsFalse(result.EditorReloaded);
+        // Assert
+        result.Status.Should().Be(ToolExecutionStatus.Succeeded);
+        reload.ReloadCount.Should().Be(0);
+        result.EditorReloaded.Should().BeFalse();
     }
 
     [TestMethod]
-    public async Task FailureBecomesTypedResultAndErrorNotification()
+    public async Task ExecuteAsync_WhenToolFails_ReturnsFailureAndNotification()
     {
+        // Arrange
         UserNotificationService notifications = new();
         UserNotification? published = null;
         notifications.Published += (_, args) => published = args.Notification;
@@ -93,18 +100,21 @@ public sealed class ToolExecutionServiceTests
             "Timing Helper",
             _ => Task.FromException<ToolExecutionOutput<int>>(failure));
 
+        // Act
         ToolExecutionResult<int> result = await service.ExecuteAsync(request);
 
-        Assert.AreEqual(ToolExecutionStatus.Failed, result.Status);
-        Assert.AreSame(failure, result.Exception);
-        Assert.IsNotNull(published);
-        Assert.AreEqual(UserNotificationSeverity.Error, published.Severity);
-        Assert.AreSame(failure, published.Exception);
+        // Assert
+        result.Status.Should().Be(ToolExecutionStatus.Failed);
+        result.Exception.Should().BeSameAs(failure);
+        published.Should().NotBeNull();
+        published.Severity.Should().Be(UserNotificationSeverity.Error);
+        published.Exception.Should().BeSameAs(failure);
     }
 
     [TestMethod]
-    public async Task BrokenNotificationSubscriberDoesNotChangeSuccessfulResult()
+    public async Task ExecuteAsync_WithBrokenNotificationSubscriber_PreservesSuccess()
     {
+        // Arrange
         UserNotificationService notifications = new();
         notifications.Published += (_, _) =>
             throw new InvalidOperationException("Presentation failed.");
@@ -117,15 +127,18 @@ public sealed class ToolExecutionServiceTests
                     4,
                     "Removed four redundant timing points.")));
 
+        // Act
         ToolExecutionResult<int> result = await service.ExecuteAsync(request);
 
-        Assert.AreEqual(ToolExecutionStatus.Succeeded, result.Status);
-        Assert.AreEqual(4, result.Value);
+        // Assert
+        result.Status.Should().Be(ToolExecutionStatus.Succeeded);
+        result.Value.Should().Be(4);
     }
 
     [TestMethod]
-    public async Task DuplicateOperationReturnsBusyWithoutStartingSecondDelegate()
+    public async Task ExecuteAsync_WithDuplicateOperation_ReturnsBusyWithoutSecondDelegate()
     {
+        // Arrange
         ToolExecutionService service = CreateService();
         TaskCompletionSource firstStarted =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -152,21 +165,22 @@ public sealed class ToolExecutionServiceTests
                 return Task.FromResult(new ToolExecutionOutput<int>(2));
             });
 
+        // Act
         ToolExecutionResult<int> duplicateResult =
             await service.ExecuteAsync(duplicate);
         release.SetResult();
         ToolExecutionResult<int> firstResult = await firstTask;
 
-        Assert.AreEqual(
-            ToolExecutionStatus.AlreadyRunning,
-            duplicateResult.Status);
-        Assert.AreEqual(0, secondRuns);
-        Assert.AreEqual(ToolExecutionStatus.Succeeded, firstResult.Status);
+        // Assert
+        duplicateResult.Status.Should().Be(ToolExecutionStatus.AlreadyRunning);
+        secondRuns.Should().Be(0);
+        firstResult.Status.Should().Be(ToolExecutionStatus.Succeeded);
     }
 
     [TestMethod]
-    public async Task TargetedCancelSignalsContextAndReturnsCancelledResult()
+    public async Task Cancel_WithTargetedOperation_CancelsContextAndReturnsCancelled()
     {
+        // Arrange
         ToolExecutionService service = CreateService();
         TaskCompletionSource started =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -182,17 +196,20 @@ public sealed class ToolExecutionServiceTests
         Task<ToolExecutionResult<int>> execution = service.ExecuteAsync(request);
         await started.Task;
 
+        // Act
         bool cancelled = service.Cancel("picturator");
         ToolExecutionResult<int> result = await execution;
 
-        Assert.IsTrue(cancelled);
-        Assert.AreEqual(ToolExecutionStatus.Cancelled, result.Status);
-        Assert.IsFalse(service.Cancel("picturator"));
+        // Assert
+        cancelled.Should().BeTrue();
+        result.Status.Should().Be(ToolExecutionStatus.Cancelled);
+        service.Cancel("picturator").Should().BeFalse();
     }
 
     [TestMethod]
-    public async Task CallerCancellationReturnsCancelledResult()
+    public async Task ExecuteAsync_WithCallerCancellation_ReturnsCancelled()
     {
+        // Arrange
         ToolExecutionService service = CreateService();
         using CancellationTokenSource source = new();
         ToolExecutionRequest<int> request = new(
@@ -205,16 +222,19 @@ public sealed class ToolExecutionServiceTests
                 return new ToolExecutionOutput<int>(1);
             });
 
+        // Act
         ToolExecutionResult<int> result = await service.ExecuteAsync(
             request,
             cancellationToken: source.Token);
 
-        Assert.AreEqual(ToolExecutionStatus.Cancelled, result.Status);
+        // Assert
+        result.Status.Should().Be(ToolExecutionStatus.Cancelled);
     }
 
     [TestMethod]
-    public async Task StopCancelsAndJoinsEveryActiveOperation()
+    public async Task StopAsync_WithActiveOperations_CancelsAndJoinsAll()
     {
+        // Arrange
         ToolExecutionService service = CreateService();
         TaskCompletionSource firstStarted =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -226,44 +246,56 @@ public sealed class ToolExecutionServiceTests
             BlockingRequest("two", secondStarted));
         await Task.WhenAll(firstStarted.Task, secondStarted.Task);
 
+        // Act
         await service.StopAsync();
         ToolExecutionResult<int>[] results = await Task.WhenAll(first, second);
 
-        Assert.IsTrue(results.All(
-            result => result.Status == ToolExecutionStatus.Cancelled));
-        Assert.IsFalse(service.IsRunning("one"));
-        Assert.IsFalse(service.IsRunning("two"));
+        // Assert
+        results.All(
+            result => result.Status == ToolExecutionStatus.Cancelled).Should().BeTrue();
+        service.IsRunning("one").Should().BeFalse();
+        service.IsRunning("two").Should().BeFalse();
     }
 
     [TestMethod]
-    public void ProgressRejectsNaNAndOutOfRangeValues()
+    public void Constructor_WithInvalidProgress_ThrowsArgumentOutOfRangeException()
     {
-        Assert.ThrowsException<ArgumentOutOfRangeException>(
-            () => new ToolExecutionProgress(double.NaN));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(
-            () => new ToolExecutionProgress(-0.01));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(
-            () => new ToolExecutionProgress(100.01));
+        // Arrange
+        // Act
+        Action act1 = () => new ToolExecutionProgress(double.NaN);
+
+        // Assert
+        act1.Should().Throw<ArgumentOutOfRangeException>();
+        Action act2 = () => new ToolExecutionProgress(-0.01);
+
+        act2.Should().Throw<ArgumentOutOfRangeException>();
+        Action act3 = () => new ToolExecutionProgress(100.01);
+
+        act3.Should().Throw<ArgumentOutOfRangeException>();
     }
 
     [TestMethod]
-    public async Task NotificationCancellationPreventsPublication()
+    public async Task PublishAsync_WithCancellation_DoesNotPublish()
     {
+        // Arrange
         UserNotificationService notifications = new();
         int published = 0;
         notifications.Published += (_, _) => published++;
         using CancellationTokenSource source = new();
         source.Cancel();
 
-        await Assert.ThrowsExceptionAsync<OperationCanceledException>(
-            () => notifications.PublishAsync(
+        // Act
+        Func<Task> act4 = () => notifications.PublishAsync(
                 new UserNotification(
                     UserNotificationSeverity.Information,
                     "Title",
                     "Message"),
-                source.Token));
+                source.Token);
 
-        Assert.AreEqual(0, published);
+        // Assert
+        await act4.Should().ThrowAsync<OperationCanceledException>();
+
+        published.Should().Be(0);
     }
 
     private static ToolExecutionRequest<int> BlockingRequest(

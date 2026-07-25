@@ -18,8 +18,9 @@ public sealed class Wave2CompletionTests
         @"C:\osu!\Songs\123 Artist - Title\map.osu";
 
     [TestMethod]
-    public async Task HeadlessQuickRunSelectsLoadsEditsBacksUpSavesAndReports()
+    public async Task RunAsync_HeadlessQuickRun_CompletesFullWorkflow()
     {
+        // Arrange
         ApplicationSettings settings = new()
         {
             SmartQuickRunEnabled = false,
@@ -91,21 +92,21 @@ public sealed class Wave2CompletionTests
             settings,
             notifications);
 
+        // Act
         QuickRunResult quickRunResult = await quickRun.RunAsync();
 
-        Assert.AreEqual(CurrentBeatmapSelectionStatus.Selected, selection.Status);
-        CollectionAssert.AreEqual(
-            new[] { MapPath },
-            workspace.SelectedPaths.ToArray());
-        Assert.AreEqual(QuickRunStatus.Executed, quickRunResult.Status);
-        Assert.IsNotNull(toolResult);
-        Assert.AreEqual(ToolExecutionStatus.Succeeded, toolResult.Status);
-        Assert.AreEqual(MapPath, toolResult.Value);
-        Assert.AreEqual(1, backups.CreateCount);
-        Assert.IsTrue(backups.BackupPrecededWrite);
-        Assert.IsTrue(store.Files[MapPath].Contains("Version:Wave 2 validated"));
-        Assert.AreEqual(1, published.Count);
-        Assert.AreEqual(UserNotificationSeverity.Success, published[0].Severity);
+        // Assert
+        selection.Status.Should().Be(CurrentBeatmapSelectionStatus.Selected);
+        workspace.SelectedPaths.ToArray().Should().Equal(new[] { MapPath });
+        quickRunResult.Status.Should().Be(QuickRunStatus.Executed);
+        toolResult.Should().NotBeNull();
+        toolResult.Status.Should().Be(ToolExecutionStatus.Succeeded);
+        toolResult.Value.Should().Be(MapPath);
+        backups.CreateCount.Should().Be(1);
+        backups.BackupPrecededWrite.Should().BeTrue();
+        store.Files[MapPath].Contains("Version:Wave 2 validated").Should().BeTrue();
+        published.Count.Should().Be(1);
+        published[0].Severity.Should().Be(UserNotificationSeverity.Success);
     }
 
     private static MemoryTextFileStore CreateStore()

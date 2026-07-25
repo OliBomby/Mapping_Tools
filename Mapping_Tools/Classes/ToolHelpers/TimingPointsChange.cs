@@ -65,7 +65,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
                 }
                 onTimingPoints.Add(addingTimingPoint);
             }
-            if (!UnInherited && (onTimingPoints.Count == 0 || (MpB && !onHasGreen))) {
+            if (!UnInherited && (onTimingPoints.Count == 0 || MpB && !onHasGreen)) {
                 // Make new greenline (based on prev)
                 if (prevTimingPoint == null) {
                     addingTimingPoint = MyTp.Copy();

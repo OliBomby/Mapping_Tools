@@ -48,7 +48,7 @@ namespace Mapping_Tools.Classes.SystemTools {
 
         public override int GetHashCode() {
             unchecked {
-                return ((int) Key * 397) ^ (int) Modifiers;
+                return (int) Key * 397 ^ (int) Modifiers;
             }
         }
     }

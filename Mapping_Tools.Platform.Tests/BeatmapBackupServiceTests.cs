@@ -16,8 +16,9 @@ public sealed class BeatmapBackupServiceTests
         new(2026, 7, 25, 14, 5, 6, TimeSpan.FromHours(2));
 
     [TestMethod]
-    public async Task UserBackupUsesLegacyNameAndPrunesOldestUnprotectedFile()
+    public async Task CreateAsync_UserBackup_UsesLegacyNameAndPrunesOldestUnprotectedFile()
     {
+        // Arrange
         MemoryBackupStore store = CreateStore();
         store.AddFile(
             Path.Combine(BackupDirectory, "old-1.osu"),
@@ -36,25 +37,29 @@ public sealed class BeatmapBackupServiceTests
             BeatmapBackupReason.User,
             force: true);
 
+        // Act
         string expected = Path.Combine(
             BackupDirectory,
             "2026-07-25 14-05-06_UB__map.osu");
-        Assert.AreEqual(expected, result.Artifacts.Single().Path);
-        Assert.IsTrue(store.Files.ContainsKey(expected));
-        Assert.IsFalse(store.Files.ContainsKey(
-            Path.Combine(BackupDirectory, "old-1.osu")));
-        Assert.IsTrue(store.Files.ContainsKey(
-            Path.Combine(BackupDirectory, "old-2.osu")));
+        // Assert
+        result.Artifacts.Single().Path.Should().Be(expected);
+        store.Files.ContainsKey(expected).Should().BeTrue();
+        store.Files.ContainsKey(
+            Path.Combine(BackupDirectory, "old-1.osu")).Should().BeFalse();
+        store.Files.ContainsKey(
+            Path.Combine(BackupDirectory, "old-2.osu")).Should().BeTrue();
     }
 
     [TestMethod]
-    public async Task AutomaticBackupCanRespectPreferenceOrBeForcedByDestructiveSave()
+    public async Task CreateAsync_AutomaticBackup_RespectsPreferenceUnlessDestructive()
     {
+        // Arrange
         MemoryBackupStore store = CreateStore();
         ApplicationSettings settings = CreateSettings();
         settings.MakeBackups = false;
         BeatmapBackupService service = CreateService(store, settings);
 
+        // Act
         BeatmapBackupResult skipped = await service.CreateAsync(
             [MapPath],
             BeatmapBackupReason.Automatic);
@@ -63,18 +68,21 @@ public sealed class BeatmapBackupServiceTests
             BeatmapBackupReason.Automatic,
             force: true);
 
-        Assert.IsTrue(skipped.SkippedByPreference);
-        Assert.AreEqual(0, skipped.Artifacts.Count);
-        Assert.IsFalse(forced.SkippedByPreference);
-        Assert.AreEqual(1, forced.Artifacts.Count);
+        // Assert
+        skipped.SkippedByPreference.Should().BeTrue();
+        skipped.Artifacts.Count.Should().Be(0);
+        forced.SkippedByPreference.Should().BeFalse();
+        forced.Artifacts.Count.Should().Be(1);
     }
 
     [TestMethod]
-    public async Task SameSecondBackupsDoNotOverwriteAnEarlierSafetyCopy()
+    public async Task CreateAsync_SameSecondBackups_DoesNotOverwriteEarlierCopy()
     {
+        // Arrange
         MemoryBackupStore store = CreateStore();
         BeatmapBackupService service = CreateService(store, CreateSettings());
 
+        // Act
         BeatmapBackupResult first = await service.CreateAsync(
             [MapPath],
             BeatmapBackupReason.Automatic,
@@ -84,33 +92,37 @@ public sealed class BeatmapBackupServiceTests
             BeatmapBackupReason.Automatic,
             force: true);
 
-        Assert.AreNotEqual(
-            first.Artifacts.Single().Path,
-            second.Artifacts.Single().Path);
-        StringAssert.Contains(second.Artifacts.Single().Path, "_C2_map.osu");
-        Assert.IsTrue(store.Files.ContainsKey(first.Artifacts.Single().Path));
-        Assert.IsTrue(store.Files.ContainsKey(second.Artifacts.Single().Path));
+        // Assert
+        second.Artifacts.Single().Path.Should().NotBe(first.Artifacts.Single().Path);
+        second.Artifacts.Single().Path.Should().Contain("_C2_map.osu");
+        store.Files.ContainsKey(first.Artifacts.Single().Path).Should().BeTrue();
+        store.Files.ContainsKey(second.Artifacts.Single().Path).Should().BeTrue();
     }
 
     [TestMethod]
-    public async Task MissingBackupDirectoryStopsRequestBeforeSourceCopy()
+    public async Task CreateAsync_WithMissingDirectory_ThrowsBeforeCopy()
     {
+        // Arrange
         MemoryBackupStore store = CreateStore();
         store.Directories.Clear();
         BeatmapBackupService service = CreateService(store, CreateSettings());
 
-        await Assert.ThrowsExceptionAsync<DirectoryNotFoundException>(
-            () => service.CreateAsync(
+        // Act
+        Func<Task> act1 = () => service.CreateAsync(
                 [MapPath],
                 BeatmapBackupReason.Automatic,
-                force: true));
+                force: true);
 
-        Assert.AreEqual(0, store.CopyOperations.Count);
+        // Assert
+        await act1.Should().ThrowAsync<DirectoryNotFoundException>();
+
+        store.CopyOperations.Count.Should().Be(0);
     }
 
     [TestMethod]
-    public async Task LiveSessionCreatesDiskAndUnsavedCompanionSnapshots()
+    public async Task CreateAsync_WithLiveSession_CreatesDiskAndUnsavedSnapshots()
     {
+        // Arrange
         MemoryBackupStore store = CreateStore();
         BeatmapEditor2 editor = new(MapPath, store);
         editor.Beatmap.Metadata["Version"] = new TValue("Unsaved");
@@ -120,25 +132,28 @@ public sealed class BeatmapBackupServiceTests
             []);
         BeatmapBackupService service = CreateService(store, CreateSettings());
 
+        // Act
         BeatmapBackupResult result = await service.CreateAsync(
             session,
             BeatmapBackupReason.User,
             force: true);
 
-        Assert.AreEqual(2, result.Artifacts.Count);
-        Assert.IsFalse(result.Artifacts[0].ContainsUnsavedState);
-        Assert.IsTrue(result.Artifacts[1].ContainsUnsavedState);
-        StringAssert.Contains(result.Artifacts[0].Path, "_UB__map.osu");
-        StringAssert.Contains(result.Artifacts[1].Path, "_UB_2_map.osu");
-        Assert.IsFalse(store.Files[result.Artifacts[0].Path]
-            .Any(line => line == "Version:Unsaved"));
-        Assert.IsTrue(store.Files[result.Artifacts[1].Path]
-            .Any(line => line == "Version:Unsaved"));
+        // Assert
+        result.Artifacts.Count.Should().Be(2);
+        result.Artifacts[0].ContainsUnsavedState.Should().BeFalse();
+        result.Artifacts[1].ContainsUnsavedState.Should().BeTrue();
+        result.Artifacts[0].Path.Should().Contain("_UB__map.osu");
+        result.Artifacts[1].Path.Should().Contain("_UB_2_map.osu");
+        store.Files[result.Artifacts[0].Path]
+            .Any(line => line == "Version:Unsaved").Should().BeFalse();
+        store.Files[result.Artifacts[1].Path]
+            .Any(line => line == "Version:Unsaved").Should().BeTrue();
     }
 
     [TestMethod]
-    public async Task PeriodicBackupSkipsUnchangedSerializationAndTracksEachMapSeparately()
+    public async Task CreatePeriodicIfChangedAsync_WithMultipleMaps_SkipsUnchangedAndTracksSeparately()
     {
+        // Arrange
         MemoryBackupStore store = CreateStore();
         BeatmapEditor2 editor = new(MapPath, store);
         BeatmapEditingSession session = new(
@@ -147,6 +162,7 @@ public sealed class BeatmapBackupServiceTests
             []);
         BeatmapBackupService service = CreateService(store, CreateSettings());
 
+        // Act
         BeatmapBackupArtifact? first =
             await service.CreatePeriodicIfChangedAsync(session);
         BeatmapBackupArtifact? unchanged =
@@ -155,16 +171,18 @@ public sealed class BeatmapBackupServiceTests
         BeatmapBackupArtifact? changed =
             await service.CreatePeriodicIfChangedAsync(session);
 
-        Assert.IsNotNull(first);
-        Assert.IsNull(unchanged);
-        Assert.IsNotNull(changed);
-        StringAssert.Contains(first.Path, "_PB__map.osu");
-        Assert.AreEqual(2, store.WriteOperations.Count);
+        // Assert
+        first.Should().NotBeNull();
+        unchanged.Should().BeNull();
+        changed.Should().NotBeNull();
+        first.Path.Should().Contain("_PB__map.osu");
+        store.WriteOperations.Count.Should().Be(2);
     }
 
     [TestMethod]
-    public async Task IncompatibleRestoreDoesNotCreateSafetyBackupOrOverwriteDestination()
+    public async Task RestoreAsync_WithIncompatibleBackup_DoesNotBackupOrOverwrite()
     {
+        // Arrange
         MemoryBackupStore store = CreateStore();
         string incompatible = Path.Combine(BackupDirectory, "other.osu");
         store.AddFile(
@@ -174,18 +192,21 @@ public sealed class BeatmapBackupServiceTests
         List<string> original = store.Files[MapPath].ToList();
         BeatmapBackupService service = CreateService(store, CreateSettings());
 
-        BeatmapBackupIncompatibleException exception =
-            await Assert.ThrowsExceptionAsync<BeatmapBackupIncompatibleException>(
-                () => service.RestoreAsync(incompatible, MapPath));
+        // Act
+        Func<Task> act2 = () => service.RestoreAsync(incompatible, MapPath);
 
-        StringAssert.Contains(exception.BackupFileName, "[Other]");
-        CollectionAssert.AreEqual(original, store.Files[MapPath]);
-        Assert.AreEqual(0, store.CopyOperations.Count);
+        // Assert
+        BeatmapBackupIncompatibleException exception = (await act2.Should().ThrowAsync<BeatmapBackupIncompatibleException>()).Which;
+
+        exception.BackupFileName.Should().Contain("[Other]");
+        store.Files[MapPath].Should().Equal(original);
+        store.CopyOperations.Count.Should().Be(0);
     }
 
     [TestMethod]
-    public async Task RestorePreservesDestinationBeforeOverwriteAndReloadsLast()
+    public async Task RestoreAsync_WithCompatibleBackup_PreservesDestinationAndReloadsLast()
     {
+        // Arrange
         MemoryBackupStore store = CreateStore();
         string backup = Path.Combine(BackupDirectory, "chosen.osu");
         List<string> restoredLines = store.Files[MapPath].ToList();
@@ -201,23 +222,26 @@ public sealed class BeatmapBackupServiceTests
             settings,
             reload);
 
+        // Act
         BeatmapRestoreResult result = await service.RestoreAsync(
             backup,
             MapPath,
             reloadEditor: true);
 
-        Assert.IsTrue(result.SafetyBackup.Path.Contains("_RU__map.osu"));
-        Assert.IsTrue(store.Files.ContainsKey(backup));
-        Assert.AreEqual(2, store.CopyOperations.Count);
-        Assert.AreEqual(MapPath, store.CopyOperations[1].Destination);
-        Assert.IsTrue(store.Files[MapPath].Contains("PreviewTime:9876"));
-        Assert.AreEqual(1, reload.ReloadCount);
-        Assert.IsTrue(reload.ReloadFollowedRestore);
+        // Assert
+        result.SafetyBackup.Path.Contains("_RU__map.osu").Should().BeTrue();
+        store.Files.ContainsKey(backup).Should().BeTrue();
+        store.CopyOperations.Count.Should().Be(2);
+        store.CopyOperations[1].Destination.Should().Be(MapPath);
+        store.Files[MapPath].Contains("PreviewTime:9876").Should().BeTrue();
+        reload.ReloadCount.Should().Be(1);
+        reload.ReloadFollowedRestore.Should().BeTrue();
     }
 
     [TestMethod]
-    public async Task QuickUndoSelectsNewestBeforeCreatingItsRestoreSafetyCopy()
+    public async Task QuickUndoAsync_WithMultipleBackups_SelectsNewestBeforeSafetyCopy()
     {
+        // Arrange
         MemoryBackupStore store = CreateStore();
         string older = Path.Combine(BackupDirectory, "older.osu");
         string newer = Path.Combine(BackupDirectory, "newer.osu");
@@ -233,47 +257,56 @@ public sealed class BeatmapBackupServiceTests
         store.AddFile(newer, newerLines, Now.AddMinutes(-1));
         BeatmapBackupService service = CreateService(store, CreateSettings());
 
+        // Act
         BeatmapRestoreResult? result = await service.QuickUndoAsync(MapPath);
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual(newer, result.BackupPath);
-        Assert.IsTrue(store.Files[MapPath].Contains("PreviewTime:2222"));
-        Assert.IsTrue(store.Files.ContainsKey(result.SafetyBackup.Path));
+        // Assert
+        result.Should().NotBeNull();
+        result.BackupPath.Should().Be(newer);
+        store.Files[MapPath].Contains("PreviewTime:2222").Should().BeTrue();
+        store.Files.ContainsKey(result.SafetyBackup.Path).Should().BeTrue();
     }
 
     [TestMethod]
-    public async Task RetentionNeverDeletesTheSafetyCopyRequiredForTheCurrentSave()
+    public async Task CreateAsync_WhenRetentionRuns_PreservesCurrentSafetyCopy()
     {
+        // Arrange
         MemoryBackupStore store = CreateStore();
         ApplicationSettings settings = CreateSettings();
         settings.MaxBackupFiles = 0;
         BeatmapBackupService service = CreateService(store, settings);
 
+        // Act
         BeatmapBackupResult result = await service.CreateAsync(
             [MapPath],
             BeatmapBackupReason.Automatic,
             force: true);
 
-        Assert.IsTrue(store.Files.ContainsKey(result.Artifacts.Single().Path));
+        // Assert
+        store.Files.ContainsKey(result.Artifacts.Single().Path).Should().BeTrue();
     }
 
     [TestMethod]
-    public async Task PreCancelledRequestDoesNotCreateOrDeleteFiles()
+    public async Task CreateAsync_WithPreCancelledToken_DoesNotCreateOrDeleteFiles()
     {
+        // Arrange
         MemoryBackupStore store = CreateStore();
         BeatmapBackupService service = CreateService(store, CreateSettings());
         using CancellationTokenSource source = new();
         source.Cancel();
 
-        await Assert.ThrowsExceptionAsync<OperationCanceledException>(
-            () => service.CreateAsync(
+        // Act
+        Func<Task> act3 = () => service.CreateAsync(
                 [MapPath],
                 BeatmapBackupReason.Automatic,
                 force: true,
-                source.Token));
+                source.Token);
 
-        Assert.AreEqual(0, store.CopyOperations.Count);
-        Assert.AreEqual(0, store.DeletedPaths.Count);
+        // Assert
+        await act3.Should().ThrowAsync<OperationCanceledException>();
+
+        store.CopyOperations.Count.Should().Be(0);
+        store.DeletedPaths.Count.Should().Be(0);
     }
 
     private static BeatmapBackupService CreateService(

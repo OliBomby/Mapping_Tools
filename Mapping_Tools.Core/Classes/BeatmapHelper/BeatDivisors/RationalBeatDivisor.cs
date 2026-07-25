@@ -92,7 +92,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.BeatDivisors {
         /// <returns>A hash code consistent with component-wise equality.</returns>
         public override int GetHashCode() {
             unchecked {
-                return (Numerator * 397) ^ Denominator;
+                return Numerator * 397 ^ Denominator;
             }
         }
 

@@ -12,8 +12,9 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class ProjectPersistenceTests
 {
     [TestMethod]
-    public void LegacyCoreTypeMetadataResolvesToMigratedAssembly()
+    public void Deserialize_WithLegacyCoreTypeMetadata_ResolvesMigratedAssembly()
     {
+        // Arrange
         string fixture = Path.Combine(
             AppContext.BaseDirectory,
             "Fixtures",
@@ -25,98 +26,119 @@ public sealed class ProjectPersistenceTests
             .GetRawText();
         LegacyProjectJsonSerializer serializer = new();
 
+        // Act
         HitObject hitObject = serializer.Deserialize<HitObject>(hitObjectJson);
 
-        Assert.AreEqual(331598, hitObject.Time);
-        Assert.AreEqual(484, hitObject.Pos.X);
-        Assert.AreEqual(8, hitObject.Pos.Y);
+        // Assert
+        hitObject.Time.Should().Be(331598);
+        hitObject.Pos.X.Should().Be(484);
+        hitObject.Pos.Y.Should().Be(8);
     }
 
     [TestMethod]
-    public void MigratedCoreTypesKeepLegacyAssemblyNameWhenSaved()
+    public void Serialize_WithMigratedCoreTypes_UsesLegacyAssemblyName()
     {
+        // Arrange
         LegacyProjectJsonSerializer serializer = new();
 
+        // Act
         string json = serializer.Serialize(new TimingPoint
         {
             Offset = 1250,
             MpB = 500
         });
 
-        StringAssert.Contains(
-            json,
-            "\"$type\": \"Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools\"");
+        // Assert
+        json.Should().Contain("\"$type\": \"Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools\"");
     }
 
     [TestMethod]
-    public void VectorRepresentationMatchesLegacyProjects()
+    public void SerializeAndDeserialize_VectorDocument_MatchesLegacyRepresentation()
     {
+        // Arrange
         LegacyProjectJsonSerializer serializer = new();
         VectorDocument original = new()
         {
             Position = new Vector2(12.5, -7.25)
         };
 
+        // Act
         string json = serializer.Serialize(original);
         VectorDocument roundTrip = serializer.Deserialize<VectorDocument>(json);
 
-        StringAssert.Contains(json, "\"X\": 12.5");
-        StringAssert.Contains(json, "\"Y\": -7.25");
-        Assert.AreEqual(original.Position, roundTrip.Position);
+        // Assert
+        json.Should().Contain("\"X\": 12.5");
+        json.Should().Contain("\"Y\": -7.25");
+        roundTrip.Position.Should().Be(original.Position);
     }
 
     [TestMethod]
-    public void UnknownPropertiesAreIgnoredForForwardCompatibleRoundTrips()
+    public void Deserialize_WithUnknownProperties_IgnoresThemForRoundTrip()
     {
+        // Arrange
         LegacyProjectJsonSerializer serializer = new();
 
+        // Act
         SimpleDocument project = serializer.Deserialize<SimpleDocument>(
             """{"Name":"known","FutureOption":{"Enabled":true}}""");
 
-        Assert.AreEqual("known", project.Name);
+        // Assert
+        project.Name.Should().Be("known");
     }
 
     [TestMethod]
-    public void MalformedAndNullDocumentsAreRejected()
+    public void Deserialize_WithMalformedOrNullDocuments_Throws()
     {
+        // Arrange
         LegacyProjectJsonSerializer serializer = new();
 
-        Assert.ThrowsException<JsonSerializationException>(
-            () => serializer.Deserialize<SimpleDocument>("{"));
-        Assert.ThrowsException<InvalidDataException>(
-            () => serializer.Deserialize<SimpleDocument>("null"));
+        // Act
+        Action act1 = () => serializer.Deserialize<SimpleDocument>("{");
+
+        // Assert
+        act1.Should().Throw<JsonSerializationException>();
+        Action act2 = () => serializer.Deserialize<SimpleDocument>("null");
+
+        act2.Should().Throw<InvalidDataException>();
     }
 
     [TestMethod]
-    public async Task StoreRoundTripOverwritesAtomicallyAndLeavesNoTemporaryFile()
+    public async Task SaveAsync_RoundTrip_OverwritesAtomicallyWithoutTemporaryFiles()
     {
+        // Arrange
         using TestDirectory test = new();
         FileSystemProjectStore store = new(new LegacyProjectJsonSerializer());
         string path = Path.Combine(test.Root, "nested", "project.json");
         SimpleDocument original = new() { Name = "persisted" };
 
+        // Act
         await store.SaveAsync(path, original);
         await store.SaveAsync(path, new SimpleDocument { Name = "replaced" });
         SimpleDocument loaded = await store.LoadAsync<SimpleDocument>(path);
 
-        Assert.AreEqual("replaced", loaded.Name);
-        Assert.AreEqual(0, Directory.GetFiles(
+        // Assert
+        loaded.Name.Should().Be("replaced");
+        Directory.GetFiles(
             Path.GetDirectoryName(path)!,
-            "*.tmp").Length);
+            "*.tmp").Length.Should().Be(0);
     }
 
     [TestMethod]
-    public async Task SerializationFailureDoesNotReplaceExistingProject()
+    public async Task SaveAsync_WhenSerializationFails_PreservesExistingProject()
     {
+        // Arrange
         using TestDirectory test = new();
         string path = Path.Combine(test.Root, "project.json");
         await File.WriteAllTextAsync(path, "previous");
         FileSystemProjectStore store = new(new ThrowingSerializer());
 
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(
-            () => store.SaveAsync(path, new SimpleDocument()));
+        // Act
+        Func<Task> act3 = () => store.SaveAsync(path, new SimpleDocument());
 
-        Assert.AreEqual("previous", await File.ReadAllTextAsync(path));
+        // Assert
+        await act3.Should().ThrowAsync<InvalidOperationException>();
+
+        (await File.ReadAllTextAsync(path)).Should().Be("previous");
     }
 
     public sealed class VectorDocument

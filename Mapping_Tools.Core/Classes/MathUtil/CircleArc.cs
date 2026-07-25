@@ -145,8 +145,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         {
             get
             {
-                return new Matrix2(new Vector2(Math.Cos(ThetaStart), (-Math.Sin(ThetaStart) * Dir)),
-                                   new Vector2(Math.Sin(ThetaStart), (Math.Cos(ThetaStart) * Dir))) * Radius;
+                return new Matrix2(new Vector2(Math.Cos(ThetaStart), -Math.Sin(ThetaStart) * Dir),
+                                   new Vector2(Math.Sin(ThetaStart), Math.Cos(ThetaStart) * Dir)) * Radius;
             }
         }
 

@@ -36,7 +36,7 @@ namespace Mapping_Tools.Components.Graph.Interpolation.Interpolators.Helper_Inte
 
         public double GetDerivative(double t) {
             var p = -MathHelper.Clamp(P, -1, 1) * 10;
-            return (p * ((y2 - y1) * Math.Exp(p * t) + y1 * Math.Exp(p) - y2)) /
+            return p * ((y2 - y1) * Math.Exp(p * t) + y1 * Math.Exp(p) - y2) /
                    (y1 * Math.Exp(p) * (p - 1) + y1 + y2 * (-p + Math.Exp(p) - 1));
         }
     }

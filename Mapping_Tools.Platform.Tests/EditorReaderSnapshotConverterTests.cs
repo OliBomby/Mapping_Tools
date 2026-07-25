@@ -9,8 +9,9 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class EditorReaderSnapshotConverterTests
 {
     [TestMethod]
-    public void ConvertPreservesSelectionAndLegacySliderEdgeDefaults()
+    public void Convert_WithLegacySliderData_PreservesSelectionAndDefaults()
     {
+        // Arrange
         EditorReader reader = CreateValidReader();
         reader.hitObjects[0] = new HitObject
         {
@@ -34,57 +35,60 @@ public sealed class EditorReaderSnapshotConverterTests
             SampleSetAdditionsList = [2]
         };
 
+        // Act
         LiveBeatmapSnapshot snapshot = EditorReaderSnapshotConverter.Convert(
             reader,
             @"C:\osu!\Songs");
         Mapping_Tools.Classes.BeatmapHelper.HitObject converted =
             snapshot.HitObjects[0];
 
-        Assert.AreEqual(
-            Path.Combine(
+        // Assert
+        snapshot.Path.Should().Be(Path.Combine(
                 @"C:\osu!\Songs",
                 "123 Artist - Title",
-                "map.osu"),
-            snapshot.Path);
-        Assert.IsTrue(converted.IsSelected);
-        Assert.AreEqual(2, converted.Repeat);
-        Assert.AreEqual(2, converted.CurvePoints.Count);
-        Assert.AreEqual(3, converted.EdgeHitsounds.Count);
-        CollectionAssert.AreEqual(
-            new[] { 2, 0, 0 },
-            converted.EdgeHitsounds.ToArray());
-        Assert.AreEqual(3, converted.EdgeSampleSets.Count);
-        Assert.AreEqual(3, converted.EdgeAdditionSets.Count);
+                "map.osu"));
+        converted.IsSelected.Should().BeTrue();
+        converted.Repeat.Should().Be(2);
+        converted.CurvePoints.Count.Should().Be(2);
+        converted.EdgeHitsounds.Count.Should().Be(3);
+        converted.EdgeHitsounds.ToArray().Should().Equal(new[] { 2, 0, 0 });
+        converted.EdgeSampleSets.Count.Should().Be(3);
+        converted.EdgeAdditionSets.Count.Should().Be(3);
     }
 
     [TestMethod]
-    public void ConvertRejectsReaderCountsThatNoLongerMatchAfterRepair()
+    public void Convert_WithMismatchedReaderCounts_ThrowsInvalidDataException()
     {
+        // Arrange
         EditorReader reader = CreateValidReader();
         reader.hitObjects[0].Type = 0;
 
-        Assert.ThrowsException<InvalidDataException>(
-            () => EditorReaderSnapshotConverter.Convert(
+        // Act
+        Action act1 = () => EditorReaderSnapshotConverter.Convert(
                 reader,
-                @"C:\osu!\Songs"));
+                @"C:\osu!\Songs");
+
+        // Assert
+        act1.Should().Throw<InvalidDataException>();
     }
 
     [TestMethod]
-    public void ConvertMapsTimingEffectsAndBookmarks()
+    public void Convert_WithTimingEffectsAndBookmarks_MapsValues()
     {
+        // Arrange
         EditorReader reader = CreateValidReader();
         reader.bookmarks = [250, 500];
         reader.controlPoints[0].EffectFlags = 9;
 
+        // Act
         LiveBeatmapSnapshot snapshot = EditorReaderSnapshotConverter.Convert(
             reader,
             @"C:\osu!\Songs");
 
-        CollectionAssert.AreEqual(
-            new[] { 250d, 500d },
-            snapshot.Bookmarks.ToArray());
-        Assert.IsTrue(snapshot.TimingPoints[0].Kiai);
-        Assert.IsTrue(snapshot.TimingPoints[0].OmitFirstBarLine);
+        // Assert
+        snapshot.Bookmarks.ToArray().Should().Equal(new[] { 250d, 500d });
+        snapshot.TimingPoints[0].Kiai.Should().BeTrue();
+        snapshot.TimingPoints[0].OmitFirstBarLine.Should().BeTrue();
     }
 
     private static EditorReader CreateValidReader()

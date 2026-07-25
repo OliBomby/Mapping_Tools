@@ -1,4 +1,4 @@
-using Mapping_Tools.Classes.BeatmapHelper;
+﻿using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
@@ -49,7 +49,7 @@ namespace Mapping_Tools.Views.PropertyTransformer {
 
                 return (!doFilterMatch || vm.MatchFilter.Any(o => Precision.AlmostEquals(value, o, 0.001))) &&
                        (!doFilterUnmatch || !vm.UnmatchFilter.Any(o => Precision.AlmostEquals(value, o, 0.001))) &&
-                       (!doFilterRange || (time >= min && time <= max));
+                       (!doFilterRange || time >= min && time <= max);
             }
 
             void transformProperty(double multiplier, double offset, Func<double> getter, Action<double> setter, double time, double? min = null, double? max = null, bool round = false) {

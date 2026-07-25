@@ -5,18 +5,21 @@ namespace Mapping_Tools.Core.Tests.Classes.SystemTools {
     [TestClass]
     public class TypeConvertersTests {
         [TestMethod]
-        public void TimestampParserTest() {
+        public void ParseOsuTimestamp_ValidTimestamps_ReturnsExpectedTimes() {
+            // Arrange
+            // Act
             var test1 = TypeConverters.ParseOsuTimestamp("00:00:891 (1) - ");
-            Assert.AreEqual(891, test1.TotalMilliseconds);
+            // Assert
+            test1.TotalMilliseconds.Should().Be(891);
 
             var test2 = TypeConverters.ParseOsuTimestamp("60:00:074 (2,4) - ");
-            Assert.AreEqual(3600074, test2.TotalMilliseconds);
+            test2.TotalMilliseconds.Should().Be(3600074);
 
             var test3 = TypeConverters.ParseOsuTimestamp("60:00:074 - ");
-            Assert.AreEqual(3600074, test3.TotalMilliseconds);
+            test3.TotalMilliseconds.Should().Be(3600074);
 
             var test4 = TypeConverters.ParseOsuTimestamp("00:-01:-230 (1) - ");
-            Assert.AreEqual(-1230, test4.TotalMilliseconds);
+            test4.TotalMilliseconds.Should().Be(-1230);
         }
     }
 }

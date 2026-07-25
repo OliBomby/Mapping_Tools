@@ -13,7 +13,7 @@ namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates {
         private static double CalculateIntegral(double t, double a, double b) {
             var x = b * (1 - 2 * t);
             return -(4 * a * x * Math.Sqrt(16 * Math.Pow(a, 2) * Math.Pow(x, 2) + Math.Pow(b, 4)) + Math.Pow(b, 4) *
-                MathHelper.HArcsin((4 * a * x) / Math.Pow(b, 2)))/(16 * a * Math.Pow(b, 2));
+                MathHelper.HArcsin(4 * a * x / Math.Pow(b, 2)))/(16 * a * Math.Pow(b, 2));
         }
 
         private static double CalculateLength(double t, double a, double b) {

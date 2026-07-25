@@ -46,7 +46,7 @@ namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
             // First ms travel adds SNAPTOL
             curMsPath.Add(sbPositions[0]);
             curMsPath.Add(new Vector2((float)(67141632 + maxXY.X), (float)sbPositions[0].Y));
-            curMsPath.Add(new Vector2((float)(67141632 + maxXY.X), (float)(33587200 - (Snaptol / 6) + maxXY.Y)));
+            curMsPath.Add(new Vector2((float)(67141632 + maxXY.X), (float)(33587200 - Snaptol / 6 + maxXY.Y)));
             curMsPath.Add(new Vector2((float)(67141632 + maxXY.X), (float)msLastSegStart[1].Y));
             curMsPath.Add(msLastSegStart[1]);
             curMsPath.Add(sbPositions[1]);

@@ -1,6 +1,5 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
@@ -12,70 +11,66 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
     [TestClass]
     public class PathHelperTests {
         [TestMethod]
-        public void CreatePathWithHintsTest() {
+        public void CreatePathWithHints_StandardPath_MarksExpectedRedAnchors() {
+            // Arrange
             var slider =
                 new HitObject("42,179,300,2,0,B|135:234|219:171|219:171|194:100|194:100|266:53|345:48|405:117,1,500");
 
             var sliderPath = slider.GetSliderPath();
 
+            // Act
             var result = PathHelper.CreatePathWithHints(sliderPath);
 
+            // Assert
             int i = 0;
             foreach (PathPoint pathPoint in result.Path) {
-                Console.WriteLine(++i + " : " + pathPoint);
+                i++;
                 if (pathPoint.Pos == new Vector2(219, 171) ||
                     pathPoint.Pos == new Vector2(194, 100)) {
-                    Assert.IsTrue(pathPoint.Red, $"point {i} should be a red anchor");
+                    pathPoint.Red.Should().BeTrue($"point {i} should be a red anchor");
                 } else {
-                    Assert.IsFalse(pathPoint.Red, $"point {i} should not be a red anchor");
+                    pathPoint.Red.Should().BeFalse($"point {i} should not be a red anchor");
                 }
             }
 
-            i = 0;
-            foreach (var hint in result.ReconstructionHints) {
-                Console.WriteLine(++i + " : " + hint.Layer);
-                foreach (Vector2 anchor in hint.Anchors) {
-                    Console.WriteLine(anchor);
-                }
-            }
-
-            Assert.AreEqual(2, result.Path.Count(o => o.Red));
+            result.Path.Count(o => o.Red).Should().Be(2);
         }
 
         [TestMethod]
-        public void CreatePathWithHintsMultiRedTest() {
+        public void CreatePathWithHints_RepeatedRedAnchors_CreatesValidHints() {
+            // Arrange
             var slider =
                 new HitObject("42,179,300,2,0,B|42:179|42:179|42:179|42:179|135:234|219:171|219:171|219:171|219:171|194:100|194:100|194:100|194:100|194:100|194:100|266:53|345:48|405:117|405:117|405:117|405:117|405:117|405:117|405:117,1,450");
 
             var sliderPath = slider.GetSliderPath();
 
+            // Act
             var result = PathHelper.CreatePathWithHints(sliderPath);
 
+            // Assert
             int i = 0;
             foreach (PathPoint pathPoint in result.Path) {
-                Console.WriteLine(++i + " : " + pathPoint);
+                i++;
                 if (pathPoint.Pos == new Vector2(219, 171) ||
                     pathPoint.Pos == new Vector2(194, 100)) {
-                    Assert.IsTrue(pathPoint.Red, $"point {i} should be a red anchor");
+                    pathPoint.Red.Should().BeTrue($"point {i} should be a red anchor");
                 } else {
-                    Assert.IsFalse(pathPoint.Red, $"point {i} should not be a red anchor");
+                    pathPoint.Red.Should().BeFalse($"point {i} should not be a red anchor");
                 }
             }
 
             i = 0;
             foreach (var hint in result.ReconstructionHints) {
-                Console.WriteLine(++i + " : " + hint.Layer);
-                foreach (Vector2 anchor in hint.Anchors) {
-                    Console.WriteLine(anchor);
-                }
-                Assert.IsTrue(hint.Anchors.Count > 1, $"hint {i} does not have enough anchors");
+                i++;
+                (hint.Anchors.Count > 1).Should().BeTrue($"hint {i} does not have enough anchors");
             }
 
-            Assert.AreEqual(2, result.Path.Count(o => o.Red));
+            result.Path.Count(o => o.Red).Should().Be(2);
         }
 
         [TestMethod]
-        public void InterpolateTest() {
+        public void Interpolate_WithAndWithoutRedSuccessor_InsertsExpectedPoints() {
+            // Arrange
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
             var path = new LinkedList<PathPoint>(new[] {
@@ -86,13 +81,6 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             });
             PathHelper.Recalculate(path);
 
-            var p1 = path.First!.Next;
-            PathHelper.Interpolate(p1, Enumerable.Range(1, 9).Select(i => i / 10d));
-
-            foreach (var p in path) {
-                Debug.WriteLine(p.Pos.ToInvariant());
-            }
-
             var path2 = new LinkedList<PathPoint>(new[] {
                 new PathPoint(new Vector2(-9, 0)),
                 new PathPoint(new Vector2(1, 0)),
@@ -101,16 +89,23 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             });
             PathHelper.Recalculate(path2);
 
+            // Act
+            var p1 = path.First!.Next;
+            PathHelper.Interpolate(p1, Enumerable.Range(1, 9).Select(i => i / 10d));
+
             var p2 = path2.First!.Next;
             PathHelper.Interpolate(p2, Enumerable.Range(1, 9).Select(i => i / 10d));
 
-            foreach (var p in path2) {
-                Debug.WriteLine(p.Pos.ToInvariant());
-            }
+            // Assert
+            path.Should().HaveCount(13);
+            path.Should().OnlyContain(point => !point.Red);
+            path2.Should().HaveCount(13);
+            path2.Count(point => point.Red).Should().Be(1);
         }
 
         [TestMethod]
-        public void SubdivideTest() {
+        public void Subdivide_FourPointPath_InsertsOrderedPoints() {
+            // Arrange
             var path = new LinkedList<PathPoint>(new[] {
                 new PathPoint(new Vector2(-9, 0)),
                 new PathPoint(new Vector2(1, 0)),
@@ -119,21 +114,23 @@ namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
             });
             PathHelper.Recalculate(path);
 
+            // Act
             var start = path.First!.Next;
             var middle = start!.Next;
             var end = path.Last;
             var added = path.Subdivide(start, end, 5);
 
-            Assert.AreEqual(4, added);
+            // Assert
+            added.Should().Be(4);
 
-            Assert.IsTrue(start!.Next!.Value > start.Value);
-            Assert.AreSame(middle, start.Next);
-            Assert.IsTrue(start.Next.Next!.Value > start.Next.Value);
-            Assert.IsTrue(start.Next.Next.Next!.Value > start.Next.Next.Value);
-            Assert.IsTrue(start.Next.Next.Next.Next!.Value > start.Next.Next.Next.Value);
-            Assert.IsTrue(start.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Value);
-            Assert.IsTrue(start.Next.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Next.Value);
-            Assert.AreSame(end, start.Next.Next.Next.Next.Next.Next);
+            (start!.Next!.Value > start.Value).Should().BeTrue();
+            start.Next.Should().BeSameAs(middle);
+            (start.Next.Next!.Value > start.Next.Value).Should().BeTrue();
+            (start.Next.Next.Next!.Value > start.Next.Next.Value).Should().BeTrue();
+            (start.Next.Next.Next.Next!.Value > start.Next.Next.Next.Value).Should().BeTrue();
+            (start.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Value).Should().BeTrue();
+            (start.Next.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Next.Value).Should().BeTrue();
+            start.Next.Next.Next.Next.Next.Next.Should().BeSameAs(end);
         }
     }
 }

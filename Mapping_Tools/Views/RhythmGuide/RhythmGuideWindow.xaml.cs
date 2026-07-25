@@ -31,9 +31,9 @@ namespace Mapping_Tools.Views.RhythmGuide {
                 else if (point.X >= RestoreBounds.Width)
                     Left = point.X - (RestoreBounds.Width - (this.ActualWidth - point.X));
                 else
-                    Left = point.X - (RestoreBounds.Width / 2);
+                    Left = point.X - RestoreBounds.Width / 2;
 
-                Top = point.Y - (((FrameworkElement)sender).ActualHeight / 2);
+                Top = point.Y - ((FrameworkElement)sender).ActualHeight / 2;
                 WindowState = WindowState.Normal;
                 if (FindName("ToggleButton") is Button bt) bt.Content = new PackIcon { Kind = PackIconKind.WindowMaximize };
             }

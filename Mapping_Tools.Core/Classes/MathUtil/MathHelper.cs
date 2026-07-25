@@ -142,7 +142,7 @@ namespace Mapping_Tools.Classes.MathUtil {
                 int i = *(int*) &x;              // Read bits as integer.
                 i = 0x5f375a86 - ( i >> 1 );      // Make an initial guess for Newton-Raphson approximation
                 x = *(double*) &i;                // Convert bits back to double
-                x *= ( 1.5f - xhalf * x * x ); // Perform left single Newton-Raphson step.
+                x *= 1.5f - xhalf * x * x; // Perform left single Newton-Raphson step.
                 return x;
             }
         }
@@ -247,7 +247,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         private static unsafe int DoubleToInt32Bits(double f) {
-            return *( (int*) &f );
+            return *(int*) &f;
         }
 
         /// <summary>
@@ -273,7 +273,7 @@ namespace Mapping_Tools.Classes.MathUtil {
             }
 
             long intDiff = Math.Abs(aInt - bInt);
-            return intDiff <= ( 1 << maxDeltaBits );
+            return intDiff <= 1 << maxDeltaBits;
         }
 
         /// <summary>
@@ -299,11 +299,11 @@ namespace Mapping_Tools.Classes.MathUtil {
             if( a == 0.0f || b == 0.0f || diff < doubleNormal ) {
                 // a or b is zero, or both are extremely close to it.
                 // relative error is less meaningful here
-                return diff < ( epsilon * doubleNormal );
+                return diff < epsilon * doubleNormal;
             }
 
             // use relative error
-            return diff / Math.Min(( absA + absB ), double.MaxValue) < epsilon;
+            return diff / Math.Min(absA + absB, double.MaxValue) < epsilon;
         }
 
         /// <summary>

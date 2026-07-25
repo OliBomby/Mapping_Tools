@@ -98,10 +98,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// <returns>true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.</returns>
         public bool Equals(StoryboardSoundSample other) {
             return
-                other != null && (StartTime == other.StartTime &&
-                                  Layer == other.Layer &&
-                                  FilePath == other.FilePath &&
-                                  Volume == other.Volume);
+                other != null && StartTime == other.StartTime &&
+                Layer == other.Layer &&
+                FilePath == other.FilePath &&
+                Volume == other.Volume;
         }
 
         /// <summary>

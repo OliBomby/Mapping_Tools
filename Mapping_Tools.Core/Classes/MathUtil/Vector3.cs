@@ -999,9 +999,9 @@ namespace Mapping_Tools.Classes.MathUtil {
 
             result /= result.W;
 
-            result.X = x + ( width * ( ( result.X + 1.0f ) / 2.0f ) );
-            result.Y = y + ( height * ( ( result.Y + 1.0f ) / 2.0f ) );
-            result.Z = minZ + ( ( maxZ - minZ ) * ( ( result.Z + 1.0f ) / 2.0f ) );
+            result.X = x + width * ( ( result.X + 1.0f ) / 2.0f );
+            result.Y = y + height * ( ( result.Y + 1.0f ) / 2.0f );
+            result.Z = minZ + ( maxZ - minZ ) * ( ( result.Z + 1.0f ) / 2.0f );
 
             return new Vector3(result.X, result.Y, result.Z);
         }
@@ -1025,9 +1025,9 @@ namespace Mapping_Tools.Classes.MathUtil {
         public static Vector3 Unproject(Vector3 vector, double x, double y, double width, double height, double minZ, double maxZ, Matrix4 inverseWorldViewProjection) {
             Vector4 result;
 
-            result.X = ( ( ( ( vector.X - x ) / width ) * 2.0f ) - 1.0f );
-            result.Y = ( ( ( ( vector.Y - y ) / height ) * 2.0f ) - 1.0f );
-            result.Z = ( ( ( vector.Z / ( maxZ - minZ ) ) * 2.0f ) - 1.0f );
+            result.X = ( vector.X - x ) / width * 2.0f - 1.0f;
+            result.Y = ( vector.Y - y ) / height * 2.0f - 1.0f;
+            result.Z = vector.Z / ( maxZ - minZ ) * 2.0f - 1.0f;
 
             result.X =
                 result.X * inverseWorldViewProjection.M11 +
@@ -1283,8 +1283,8 @@ namespace Mapping_Tools.Classes.MathUtil {
         public override int GetHashCode() {
             unchecked {
                 var hashCode = this.X.GetHashCode();
-                hashCode = ( hashCode * 397 ) ^ this.Y.GetHashCode();
-                hashCode = ( hashCode * 397 ) ^ this.Z.GetHashCode();
+                hashCode = hashCode * 397 ^ this.Y.GetHashCode();
+                hashCode = hashCode * 397 ^ this.Z.GetHashCode();
                 return hashCode;
             }
         }
