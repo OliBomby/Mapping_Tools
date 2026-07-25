@@ -6,31 +6,31 @@ using Mapping_Tools.Classes.BeatmapHelper;
 namespace Mapping_Tools.Classes.HitsoundStuff {
 
     /// <summary>
-    /// 
+    /// Describes the source mixes assigned to all twelve standard hitsound slots for one custom sample index.
     /// </summary>
     public class CustomIndex {
 
         /// <summary>
-        /// 
+        /// The osu! custom index, or -1 while the requirement is unassigned.
         /// </summary>
         public int Index;
 
         private SampleGeneratingArgsComparer comparer;
 
         /// <summary>
-        /// 
+        /// Source mixes keyed by names such as <c>normal-hitclap</c>.
         /// </summary>
         public Dictionary<string, HashSet<SampleGeneratingArgs>> Samples;
         
         /// <summary>
-        /// 
+        /// The complete normal/soft/drum by normal/whistle/finish/clap key space.
         /// </summary>
         public static readonly List<string> AllKeys = new List<string> { "normal-hitnormal", "normal-hitwhistle", "normal-hitfinish", "normal-hitclap",
                                                                          "soft-hitnormal", "soft-hitwhistle", "soft-hitfinish", "soft-hitclap",
                                                                          "drum-hitnormal", "drum-hitwhistle", "drum-hitfinish", "drum-hitclap" };
 
         /// <summary>
-        /// 
+        /// Creates an assigned, initially empty custom-index requirement.
         /// </summary>
         /// <param name="index"></param>
         public CustomIndex(int index, SampleGeneratingArgsComparer comparer = null) {
@@ -43,7 +43,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Creates an unassigned, initially empty custom-index requirement.
         /// </summary>
         public CustomIndex(SampleGeneratingArgsComparer comparer = null) {
             Index = -1;
@@ -55,7 +55,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Tests whether an existing slot supports a requested slot exactly or the request is empty.
         /// </summary>
         /// <param name="s1"></param>
         /// <param name="s2"></param>
@@ -66,7 +66,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Tests whether two slots can merge because at least one is empty or both source sets match.
         /// </summary>
         /// <param name="s1"></param>
         /// <param name="s2"></param>
@@ -77,7 +77,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Determines whether every non-empty requirement in another index is already supported by this index.
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
@@ -92,7 +92,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Determines whether two custom-index requirements can combine without conflicting source mixes.
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
@@ -107,7 +107,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Unions another compatible requirement into this instance and adopts its assigned index when needed.
         /// </summary>
         /// <param name="other"></param>
         public void MergeWith(CustomIndex other) {
@@ -122,7 +122,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Creates a combined requirement using the larger assigned index.
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
@@ -135,7 +135,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Copies every slot with the same sample-argument comparer.
         /// </summary>
         /// <returns></returns>
         public CustomIndex Copy() {
@@ -145,7 +145,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Removes invalid sources and leaves an empty-argument sentinel when an occupied slot loses every source.
         /// </summary>
         /// <param name="isValid">Validation policy supplied by the caller.</param>
         public void CleanInvalids(Func<SampleGeneratingArgs, bool> isValid) {
@@ -166,7 +166,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Formats every standard slot and its source mix for diagnostics.
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
@@ -183,6 +183,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return accumulator.ToString();
         }
 
+        /// <summary>
+        /// Formats the custom-index suffix used in standard osu! sample filenames.
+        /// </summary>
+        /// <returns>An empty suffix for index one; otherwise the invariant decimal index.</returns>
         public string GetNumberExtension() {
             return Index == 1 ? string.Empty : Index.ToInvariant();
         }

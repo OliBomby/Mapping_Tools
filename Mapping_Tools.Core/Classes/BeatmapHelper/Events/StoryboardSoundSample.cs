@@ -32,9 +32,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// </summary>
         public double Volume { get; set; }
 
+        /// <summary>
+        /// Creates an empty sound event for property-based construction.
+        /// </summary>
         public StoryboardSoundSample() { }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Creates a storyboard sound event from explicit values.
+        /// </summary>
+        /// <param name="startTime">The playback time in milliseconds.</param>
+        /// <param name="layer">The storyboard layer that owns the sound.</param>
+        /// <param name="filePath">The sample path relative to the beatmap folder.</param>
+        /// <param name="volume">The playback volume from 0 through 100.</param>
         public StoryboardSoundSample(double startTime, StoryboardLayer layer, string filePath, double volume) {
             StartTime = startTime;
             Layer = layer;
@@ -42,23 +51,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
             Volume = volume;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Parses a storyboard sound event from an osu! event line.
+        /// </summary>
+        /// <param name="line">A <c>Sample</c> or legacy <c>5</c> event line.</param>
         public StoryboardSoundSample(string line) {
             SetLine(line);
         }
 
         /// <summary>
-        /// Serializes this object to .osu code.
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public override string GetLine() {
             return $"Sample,{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{Layer.ToIntInvariant()},\"{FilePath}\",{Volume.ToRoundInvariant()}";
         }
 
         /// <summary>
-        /// Deserializes a string of .osu code and populates the properties of this object.
-        /// </summary>
-        /// <param name="line"></param>
+        /// <inheritdoc/>
         public sealed override void SetLine(string line) {
             string[] values = line.Split(',');
 
@@ -96,11 +104,19 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
                                   Volume == other.Volume);
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// <remarks>A sound sample is instantaneous, so changing its end time also changes its start time.</remarks>
         public double EndTime {
             get => StartTime;
             set => StartTime = value;
         }
 
+        /// <summary>
+        /// Orders sound events chronologically by <see cref="StartTime"/>.
+        /// </summary>
+        /// <param name="other">The sound event to compare.</param>
+        /// <returns>A signed value indicating the relative playback order.</returns>
         public int CompareTo(StoryboardSoundSample other) {
             if (ReferenceEquals(this, other)) return 0;
             if (ReferenceEquals(null, other)) return 1;

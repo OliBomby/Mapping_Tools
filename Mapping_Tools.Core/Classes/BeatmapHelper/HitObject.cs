@@ -13,12 +13,21 @@ using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
+    /// Represents an osu! hit object and its parsed gameplay, timing, geometry,
+    /// hitsound, and slider data.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public class HitObject : ITextLine, IComparable<HitObject> {
 
+        /// <summary>
+        /// Creates an uninitialized object for serializers and incremental construction.
+        /// </summary>
         public HitObject() { }
 
+        /// <summary>
+        /// Parses one comma-separated line from an osu! <c>[HitObjects]</c> section.
+        /// </summary>
+        /// <param name="line">The complete hit-object line, including type-specific fields and sample extras.</param>
         public HitObject(string line) {
             // Example lines:
             // 74,183,57308,2,0,B|70:236,1,53.9999983520508,4|0,0:3|0:0,0:0:0:0:
@@ -30,6 +39,23 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             SetLine(line);
         }
 
+        /// <summary>
+        /// Creates a hit object from decoded type and hitsound flags.
+        /// </summary>
+        /// <param name="pos">The object position in the 512 by 384 osu! playfield.</param>
+        /// <param name="time">The start time in milliseconds.</param>
+        /// <param name="type">The gameplay object kind.</param>
+        /// <param name="newCombo">Whether this object starts a combo.</param>
+        /// <param name="comboSkip">The number of extra combo colours to skip, from zero through seven.</param>
+        /// <param name="normal">Whether the normal sample layer plays.</param>
+        /// <param name="whistle">Whether the whistle addition plays.</param>
+        /// <param name="finish">Whether the finish addition plays.</param>
+        /// <param name="clap">Whether the clap addition plays.</param>
+        /// <param name="sampleSet">The normal-layer sample set, or auto.</param>
+        /// <param name="additionSet">The addition-layer sample set, or auto.</param>
+        /// <param name="index">The custom sample index; zero delegates to the active timing point.</param>
+        /// <param name="volume">The sample volume percentage; zero delegates to the active timing point.</param>
+        /// <param name="filename">An optional beatmap-relative custom sample filename.</param>
         public HitObject(Vector2 pos, double time, HitObjectType type, bool newCombo, int comboSkip,
             bool normal, bool whistle, bool finish, bool clap, SampleSet sampleSet, SampleSet additionSet,
             int index, double volume, string filename) {
@@ -51,6 +77,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Filename = filename;
         }
 
+        /// <summary>
+        /// Creates a hit object from the packed osu! type and hitsound bit fields.
+        /// </summary>
+        /// <param name="pos">The object position in osu! playfield coordinates.</param>
+        /// <param name="time">The start time in milliseconds.</param>
+        /// <param name="type">The packed type, new-combo, and combo-skip flags from the file format.</param>
+        /// <param name="hitsounds">The packed normal, whistle, finish, and clap flags.</param>
+        /// <param name="sampleSet">The normal-layer sample set, or auto.</param>
+        /// <param name="additionSet">The addition-layer sample set, or auto.</param>
+        /// <param name="index">The custom sample index; zero delegates to timing.</param>
+        /// <param name="volume">The sample volume percentage; zero delegates to timing.</param>
+        /// <param name="filename">An optional custom sample filename.</param>
         public HitObject(Vector2 pos, double time, int type, int hitsounds, SampleSet sampleSet, SampleSet additionSet,
             int index, double volume, string filename) {
             Pos = pos;
@@ -66,6 +104,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Filename = filename;
         }
 
+        /// <summary>
+        /// Creates a centered hitsounding circle for timeline and hitsound-generation workflows.
+        /// </summary>
+        /// <param name="time">The circle time in milliseconds.</param>
+        /// <param name="hitsounds">The packed normal, whistle, finish, and clap flags.</param>
+        /// <param name="sampleSet">The normal-layer sample set.</param>
+        /// <param name="additions">The addition-layer sample set.</param>
         public HitObject(double time, int hitsounds, SampleSet sampleSet, SampleSet additions) {
             // Basic hitsoundind circle
             Pos = new Vector2(256, 192);
@@ -81,6 +126,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Filename = string.Empty;
         }
 
+        /// <summary>
+        /// Gets or sets the complete osu! hit-object line through <see cref="GetLine"/> and <see cref="SetLine"/>.
+        /// </summary>
         [JsonProperty]
         public string Line {
             get => GetLine();
@@ -107,39 +155,96 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         public Vector2 StackedEndPos { get; set; }
 
+        /// <summary>
+        /// Gets or sets the start time in milliseconds.
+        /// </summary>
         public double Time { get; set; }
 
+        /// <summary>
+        /// Gets or sets the packed osu! type, combo, and combo-skip bit field.
+        /// </summary>
         public int ObjectType {
             get => GetObjectType();
             set => SetObjectType(value);
         }
 
+        /// <summary>
+        /// Indicates that the object uses circle gameplay and serialization fields.
+        /// </summary>
         public bool IsCircle { get; set; }
+        /// <summary>
+        /// Indicates that the object carries a slider path, repeats, and edge samples.
+        /// </summary>
         public bool IsSlider { get; set; }
+        /// <summary>
+        /// Indicates that the object begins a new combo.
+        /// </summary>
         public bool NewCombo { get; set; }
+        /// <summary>
+        /// Indicates that the object has a spinner end time.
+        /// </summary>
         public bool IsSpinner { get; set; }
+        /// <summary>
+        /// Gets or sets how many additional combo colours are skipped when starting a new combo.
+        /// </summary>
         public int ComboSkip { get; set; }
+        /// <summary>
+        /// Indicates that the object is an osu!mania hold note with its end time stored in extras.
+        /// </summary>
         public bool IsHoldNote { get; set; }
 
+        /// <summary>
+        /// Gets or sets the packed normal, whistle, finish, and clap sample flags.
+        /// </summary>
         public int Hitsounds {
             get => GetHitsounds();
             set => SetHitsounds(value);
         }
 
+        /// <summary>
+        /// Indicates that the normal sample layer plays; this is bit zero of <see cref="Hitsounds"/>.
+        /// </summary>
         public bool Normal { get; set; }
+        /// <summary>
+        /// Indicates that the whistle addition layer plays.
+        /// </summary>
         public bool Whistle { get; set; }
+        /// <summary>
+        /// Indicates that the finish addition layer plays.
+        /// </summary>
         public bool Finish { get; set; }
+        /// <summary>
+        /// Indicates that the clap addition layer plays.
+        /// </summary>
         public bool Clap { get; set; }
 
+        /// <summary>
+        /// Gets or sets the colon-separated sample extras, including hold-note end time when applicable.
+        /// </summary>
         public string Extras {
             get => GetExtras();
             set => SetExtras(value);
         }
 
+        /// <summary>
+        /// Gets or sets the normal-layer sample set; <see cref="SampleSet.None"/> means inherit from timing.
+        /// </summary>
         public SampleSet SampleSet { get; set; }
+        /// <summary>
+        /// Gets or sets the whistle/finish/clap sample set; <see cref="SampleSet.None"/> means inherit.
+        /// </summary>
         public SampleSet AdditionSet { get; set; }
+        /// <summary>
+        /// Gets or sets the custom sample index; zero means inherit from the active timing point.
+        /// </summary>
         public int CustomIndex { get; set; }
+        /// <summary>
+        /// Gets or sets the sample volume percentage; zero means inherit from the active timing point.
+        /// </summary>
         public double SampleVolume { get; set; }
+        /// <summary>
+        /// Gets or sets the optional beatmap-relative custom sample filename.
+        /// </summary>
         public string Filename { get; set; }
 
         /// <summary>
@@ -147,44 +252,97 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// Used for preserving multiple path types in osu! lazer file format.
         /// </summary>
         public List<(PathType, int)> AdditionalSliderTypes { get; set; }
+        /// <summary>
+        /// Gets or sets the primary curve algorithm used to interpret slider control points.
+        /// </summary>
         public PathType SliderType { get; set; }
+        /// <summary>
+        /// Gets or sets slider control points after the object's starting <see cref="Pos"/>.
+        /// </summary>
         public List<Vector2> CurvePoints { get; set; }
 
+        /// <summary>
+        /// Gets or replaces the geometric path assembled from the start position, curve points, type, and pixel length.
+        /// </summary>
         public SliderPath SliderPath {
             get => GetSliderPath();
             set => SetSliderPath(value);
         }
 
+        /// <summary>
+        /// Gets or sets the number of slider spans; circles report zero and other non-slider objects report one.
+        /// </summary>
         public int Repeat {
             get => IsSlider ? repeat : IsCircle ? 0 : 1;
             set => repeat = value;
         }
 
+        /// <summary>
+        /// Gets or sets the requested slider path distance in osu! pixels.
+        /// </summary>
         public double PixelLength { get; set; }
+        /// <summary>
+        /// Gets or sets packed hitsound flags for the slider head, repeat points, and tail.
+        /// </summary>
         public List<int> EdgeHitsounds { get; set; }
+        /// <summary>
+        /// Gets or sets normal-layer sample-set overrides for each slider edge.
+        /// </summary>
         public List<SampleSet> EdgeSampleSets { get; set; }
+        /// <summary>
+        /// Gets or sets addition-layer sample-set overrides for each slider edge.
+        /// </summary>
         public List<SampleSet> EdgeAdditionSets { get; set; }
 
+        /// <summary>
+        /// Indicates whether slider-edge or object-level sample data must be serialized.
+        /// </summary>
         public bool SliderExtras => GetSliderExtras();
         
+        /// <summary>
+        /// Gets or sets the new-combo state after mode-specific and sequence processing.
+        /// </summary>
         [JsonProperty]
         public bool ActualNewCombo { get; set; }
+        /// <summary>
+        /// Gets or sets the object's zero-based position within its combo.
+        /// </summary>
         [JsonProperty]
         public int ComboIndex { get; set; }
+        /// <summary>
+        /// Gets or sets the resolved index into the beatmap combo-colour palette.
+        /// </summary>
         [JsonProperty]
         public int ColourIndex { get; set; }
+        /// <summary>
+        /// Gets or sets the combo colour resolved by beatmap processing.
+        /// </summary>
         [JsonProperty]
         public ComboColour Colour { get; set; }
 
+        /// <summary>
+        /// Gets or sets the playable slider length after degenerate-path corrections.
+        /// </summary>
         public double TrueLength { get; set; } // Requires more calculation
+        /// <summary>
+        /// Gets or sets the duration in milliseconds of one slider span or one duration-bearing object.
+        /// </summary>
         [JsonProperty]
         public double TemporalLength { get; set; } // Duration of one repeat
 
+        /// <summary>
+        /// Gets or adjusts the object's final time in milliseconds.
+        /// </summary>
         public double EndTime {
             get => GetEndTime();
             set => SetEndTime(value);
         } // Includes all repeats
 
+        /// <summary>
+        /// Calculates the final time from the start, per-span duration, and span count.
+        /// </summary>
+        /// <param name="floor">Whether to floor the calculated file-format time with an epsilon correction.</param>
+        /// <returns><see cref="Time"/> plus one span duration for every <see cref="Repeat"/>.</returns>
         public double GetEndTime(bool floor = true) {
             var endTime = Time + TemporalLength * Repeat;
             return floor ? Math.Floor(endTime + Precision.DoubleEpsilon) : endTime;
@@ -201,22 +359,43 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public int StackCount { get; set; }
 
         // Special combined with greenline
+        /// <summary>
+        /// Gets or sets the inherited slider-velocity multiplier encoded by the active greenline.
+        /// </summary>
         [JsonProperty]
         public double SliderVelocity { get; set; }
+        /// <summary>
+        /// Gets or sets the effective timing point used for slider velocity and samples at the object start.
+        /// </summary>
         [JsonProperty]
         public TimingPoint TimingPoint { get; set; }
+        /// <summary>
+        /// Gets or sets the timing point that supplies inherited hitsound settings at the object start.
+        /// </summary>
         [JsonProperty]
         public TimingPoint HitsoundTimingPoint { get; set; }
+        /// <summary>
+        /// Gets or sets the active uninherited timing point that supplies beat length.
+        /// </summary>
         [JsonProperty]
         public TimingPoint UnInheritedTimingPoint { get; set; }
         
+        /// <summary>
+        /// Gets or sets editor selection state; it is not part of the osu! file format.
+        /// </summary>
         [JsonProperty]
         public bool IsSelected { get; set; }
 
+        /// <summary>
+        /// Timing changes inside the slider body that affect slide, whistle, or tick samples.
+        /// </summary>
         public List<TimingPoint> BodyHitsounds = new List<TimingPoint>();
         private int repeat;
 
         // Special combined with timeline
+        /// <summary>
+        /// Expanded head, repeat, and tail events derived from this object's gameplay timeline.
+        /// </summary>
         public List<TimelineObject> TimelineObjects = new List<TimelineObject>();
 
         /// <summary>
@@ -423,6 +602,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return string.Join(",", values);
         }
 
+        /// <summary>
+        /// Enumerates slider-body slide, whistle, and tick filenames that can play.
+        /// </summary>
+        /// <param name="sliderTickRate">The beat subdivisions per span used to place ticks.</param>
+        /// <param name="includeDefaults">Whether inherited index-zero filenames are included.</param>
+        /// <returns>Filenames in playback occurrence order; duplicates are retained.</returns>
         public List<string> GetPlayingBodyFilenames(double sliderTickRate, bool includeDefaults = true) {
             var samples = new List<string>();
             if (IsSlider) {
@@ -457,6 +642,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return samples;
         }
 
+        /// <summary>
+        /// Calculates tick times across all slider spans, reversing their within-span order on reverse passes.
+        /// </summary>
+        /// <param name="sliderTickRate">The number of tick intervals per uninherited beat.</param>
+        /// <returns>Absolute tick times in milliseconds, excluding ticks within 10 ms of a span end.</returns>
         public List<double> GetSliderTickTimes(double sliderTickRate) {
             // Sliders with NaN velocity don't have ticks
             if (!IsSlider || double.IsNaN(SliderVelocity)) return new List<double>();
@@ -504,6 +694,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return $"{sampleSet.ToString().ToLower()}-slider{sampleName}{index}.wav";
         }
 
+        /// <summary>
+        /// Expands the object into the times at which timeline objects should exist.
+        /// </summary>
+        /// <param name="timing">Timing data used to derive slider span duration.</param>
+        /// <returns>Circle start; every slider edge; or start and end for spinners and hold notes.</returns>
         public List<double> GetAllTloTimes(Timing timing) {
             var times = new List<double>();
 
@@ -556,8 +751,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
+        /// Moves the hit object and its timeline objects by a time offset.
         /// </summary>
-        /// <param name="deltaTime"></param>
+        /// <param name="deltaTime">The time offset in milliseconds.</param>
         public void MoveTime(double deltaTime) {
             Time += deltaTime;
 
@@ -567,6 +763,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             BodyHitsounds.RemoveAll(s => s.Offset >= EndTime || s.Offset <= Time);
         }
 
+        /// <summary>
+        /// Moves the final edge while keeping the start fixed and updating slider length when necessary.
+        /// </summary>
+        /// <param name="timing">Timing data used to translate duration changes into slider pixels.</param>
+        /// <param name="deltaTime">The desired final-time change in milliseconds.</param>
         public void MoveEndTime(Timing timing, double deltaTime) {
             if (Repeat == 0) return;
 
@@ -588,6 +789,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return length;
         }
 
+        /// <summary>
+        /// Resolves the playable slider length, correcting degenerate and duplicate-ended linear paths.
+        /// </summary>
         public void CalculateSliderTrueLength() {            
             if (!IsSlider || double.IsNaN(PixelLength) || PixelLength < 0 || CurvePoints.All(o => o == Pos)) {
                 TrueLength = 0;
@@ -602,6 +806,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             TrueLength = PixelLength;
         }
 
+        /// <summary>
+        /// Recalculates one slider span's duration from its corrected geometry and timing.
+        /// </summary>
+        /// <param name="timing">The beatmap timing model.</param>
+        /// <param name="useOwnSv">Whether to use this object's cached <see cref="SliderVelocity"/> instead of resolving timing again.</param>
         public void CalculateSliderTemporalLength(Timing timing, bool useOwnSv) {
             if (!IsSlider) return;
 
@@ -612,6 +821,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 : timing.CalculateSliderTemporalLength(Time, TrueLength);
         }
 
+        /// <summary>
+        /// Changes one span's duration and keeps slider geometry and expanded timeline data consistent.
+        /// </summary>
+        /// <param name="timing">Timing data used to convert milliseconds to slider pixels.</param>
+        /// <param name="deltaTemporalTime">The per-span duration change in milliseconds.</param>
         public void ChangeTemporalTime(Timing timing, double deltaTemporalTime) {
             if (Repeat == 0) return;
 
@@ -631,6 +845,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             BodyHitsounds.RemoveAll(s => s.Offset >= EndTime);
         }
 
+        /// <summary>
+        /// Repositions existing head, repeat, and tail timeline objects from the current span duration.
+        /// </summary>
         public void UpdateTimelineObjectTimes() {
             for (int i = 0; i < Math.Min(Repeat + 1, TimelineObjects.Count); i++) {
                 double time = Math.Floor(Time + TemporalLength * i);
@@ -646,8 +863,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
+        /// Moves the hit object and all slider control points by a position offset.
         /// </summary>
-        /// <param name="delta"></param>
+        /// <param name="delta">The position offset.</param>
         public void Move(Vector2 delta) {
             Pos += delta;
             if (!IsSlider) return;
@@ -657,13 +875,22 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <summary>
         /// Apply a 2x2 transformation matrix to the positions and curve points.
         /// </summary>
-        /// <param name="mat"></param>
+        /// <param name="mat">The linear transform applied about the coordinate origin.</param>
         public void Transform(Matrix2 mat) {
             Pos = Matrix2.Mult(mat, Pos);
             if (!IsSlider) return;
             for (var i = 0; i < CurvePoints.Count; i++) CurvePoints[i] = Matrix2.Mult(mat, CurvePoints[i]);
         }
 
+        /// <summary>
+        /// Snaps the start to the nearest permitted beat subdivision and shifts all derived events by the same amount.
+        /// </summary>
+        /// <param name="timing">The beatmap timing model.</param>
+        /// <param name="beatDivisors">Permitted fractions of a beat.</param>
+        /// <param name="floor">Whether the snapped file-format time is floored.</param>
+        /// <param name="tp">An optional timing point from which to begin the search.</param>
+        /// <param name="firstTp">An optional lower timing boundary.</param>
+        /// <returns><see langword="true"/> when the object moved by more than numeric tolerance.</returns>
         public bool ResnapSelf(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
             TimingPoint firstTp = null) {
             var newTime = GetResnappedTime(timing, beatDivisors, floor, tp, firstTp);
@@ -672,6 +899,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return Math.Abs(deltaTime) > Precision.DoubleEpsilon;
         }
 
+        /// <summary>
+        /// Snaps the object's end using direct end-time snapping when timing changes occur inside a slider, otherwise using classic duration snapping.
+        /// </summary>
+        /// <param name="timing">The beatmap timing model.</param>
+        /// <param name="beatDivisors">Permitted fractions of a beat.</param>
+        /// <param name="floor">Whether direct snapped end times are floored.</param>
+        /// <param name="tp">An optional timing point from which to begin the search.</param>
+        /// <param name="firstTp">An optional lower timing boundary.</param>
+        /// <returns><see langword="true"/> when the end changed by more than numeric tolerance.</returns>
         public bool ResnapEnd(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
             TimingPoint firstTp = null) {
             // If there is a redline in the sliderbody then the sliderend gets snapped to a tick of the latest redline
@@ -681,6 +917,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return ResnapEndClassic(timing, beatDivisors, firstTp);
         }
 
+        /// <summary>
+        /// Snaps the absolute end time, then applies the resulting duration change.
+        /// </summary>
+        /// <param name="timing">The beatmap timing model.</param>
+        /// <param name="beatDivisors">Permitted fractions of a beat.</param>
+        /// <param name="floor">Whether the snapped file-format time is floored.</param>
+        /// <param name="tp">An optional timing point from which to begin the search.</param>
+        /// <param name="firstTp">An optional lower timing boundary.</param>
+        /// <returns><see langword="true"/> when the end changed by more than numeric tolerance.</returns>
         public bool ResnapEndTime(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
             TimingPoint firstTp = null) {
             var newTime = timing.Resnap(EndTime, beatDivisors, floor, tp: tp, firstTp: firstTp);
@@ -691,6 +936,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return Math.Abs(deltaTime) > Precision.DoubleEpsilon;
         }
 
+        /// <summary>
+        /// Snaps one span's duration relative to the object's start, preserving the slider's timing model.
+        /// </summary>
+        /// <param name="timing">The beatmap timing model.</param>
+        /// <param name="beatDivisors">Permitted fractions of a beat.</param>
+        /// <param name="firstTp">An optional lower timing boundary.</param>
+        /// <returns><see langword="true"/> when the span duration changed by more than numeric tolerance.</returns>
         public bool ResnapEndClassic(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, TimingPoint firstTp = null) {
             var newTemporalLength = timing.ResnapDuration(Time, TemporalLength, beatDivisors, false, firstTp: firstTp);
 
@@ -700,6 +952,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return Math.Abs(deltaTime) > Precision.DoubleEpsilon;
         }
 
+        /// <summary>
+        /// Centers an osu!mania object in its nearest column and on the standard vertical coordinate.
+        /// </summary>
+        /// <param name="mode">The beatmap mode; only mania objects are changed.</param>
+        /// <param name="circleSize">The mania key count encoded by circle size.</param>
+        /// <returns><see langword="true"/> when the position changed.</returns>
         public bool ResnapPosition(GameMode mode, double circleSize) {
             if (mode != GameMode.Mania) return false;
             // Resnap X to the middle of the columns and Y to 192
@@ -713,6 +971,15 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return Math.Abs(dX) > Precision.DoubleEpsilon || Math.Abs(dY) > Precision.DoubleEpsilon;
         }
 
+        /// <summary>
+        /// Calculates the snapped start time without mutating the object.
+        /// </summary>
+        /// <param name="timing">The beatmap timing model.</param>
+        /// <param name="beatDivisors">Permitted fractions of a beat.</param>
+        /// <param name="floor">Whether the result is floored to file-format milliseconds.</param>
+        /// <param name="tp">An optional timing point from which to begin the search.</param>
+        /// <param name="firstTp">An optional lower timing boundary.</param>
+        /// <returns>The nearest permitted start time in milliseconds.</returns>
         public double GetResnappedTime(Timing timing, IEnumerable<IBeatDivisor> beatDivisors, bool floor = true, TimingPoint tp = null,
             TimingPoint firstTp = null) {
             return timing.Resnap(Time, beatDivisors, floor, tp: tp, firstTp: firstTp);
@@ -727,16 +994,28 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                    Math.Abs(SampleVolume) > Precision.DoubleEpsilon || !string.IsNullOrEmpty(Filename);
         }
 
+        /// <summary>
+        /// Serializes the object as an osu! hit-object line.
+        /// </summary>
+        /// <returns>The same representation as <see cref="GetLine"/>.</returns>
         public override string ToString() {
             return GetLine();
         }
 
+        /// <summary>
+        /// Packs gameplay kind, new-combo state, and combo-skip count into the osu! type bit field.
+        /// </summary>
+        /// <returns>The integer written in the hit-object type column.</returns>
         public int GetObjectType() {
             var cs = new BitArray(new[] {ComboSkip});
             return MathHelper.GetIntFromBitArray(new BitArray(new[]
                 {IsCircle, IsSlider, NewCombo, IsSpinner, cs[0], cs[1], cs[2], IsHoldNote}));
         }
 
+        /// <summary>
+        /// Decodes an osu! type bit field into gameplay, combo, and combo-skip properties.
+        /// </summary>
+        /// <param name="type">The packed integer from the hit-object type column.</param>
         public void SetObjectType(int type) {
             var b = new BitArray(new[] {type});
             IsCircle = b[0];
@@ -748,6 +1027,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             IsHoldNote = b[7];
         }
 
+        /// <summary>
+        /// Selects one gameplay kind while clearing all other kind flags.
+        /// </summary>
+        /// <param name="type">The gameplay object kind.</param>
         public void SetObjectType(HitObjectType type) {
             IsCircle = false;
             IsSlider = false;
@@ -770,10 +1053,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// Packs the four sample-layer flags into the osu! hitsound bit field.
+        /// </summary>
+        /// <returns>The integer written in the hit-object hitsound column.</returns>
         public int GetHitsounds() {
             return MathHelper.GetIntFromBitArray(new BitArray(new[] {Normal, Whistle, Finish, Clap}));
         }
 
+        /// <summary>
+        /// Decodes an osu! hitsound bit field into its normal, whistle, finish, and clap flags.
+        /// </summary>
+        /// <param name="hitsounds">The packed integer from the hit-object hitsound column.</param>
         public void SetHitsounds(int hitsounds) {
             var b = new BitArray(new[] {hitsounds});
             Normal = b[0];
@@ -782,6 +1073,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Clap = b[3];
         }
 
+        /// <summary>
+        /// Serializes object-level sample overrides, prefixing the end time for mania hold notes.
+        /// </summary>
+        /// <returns>The colon-separated extras field used by the osu! file format.</returns>
         public string GetExtras() {
             if (IsHoldNote)
                 return string.Join(":", SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant(), SampleSet.ToIntInvariant(),
@@ -790,6 +1085,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 SampleVolume.ToRoundInvariant(), Filename);
         }
 
+        /// <summary>
+        /// Parses object-level sample overrides and the optional mania hold-note end time.
+        /// </summary>
+        /// <param name="extras">The colon-separated extras field from a hit-object line.</param>
+        /// <exception cref="BeatmapParsingException">A required numeric field is malformed.</exception>
         public void SetExtras(string extras) {
             // Extras has an extra value at the start if it's a hold note
             var split = extras.Split(':');
@@ -822,6 +1122,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Filename = split[i + 4];
         }
 
+        /// <summary>
+        /// Resets sample overrides to inherited defaults and initializes hold-note duration when applicable.
+        /// </summary>
         public void SetExtras() {
             // Set it to the default values
             if (IsHoldNote) {
@@ -838,12 +1141,21 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Filename = "";
         }
 
+        /// <summary>
+        /// Builds a geometric path from the object's complete control-point list.
+        /// </summary>
+        /// <param name="fullLength">When true, do not truncate or extend the path to <see cref="PixelLength"/>.</param>
+        /// <returns>A newly constructed slider path.</returns>
         public SliderPath GetSliderPath(bool fullLength = false) {
             return fullLength
                 ? new SliderPath(SliderType, GetAllCurvePoints().ToArray())
                 : new SliderPath(SliderType, GetAllCurvePoints().ToArray(), PixelLength);
         }
 
+        /// <summary>
+        /// Replaces slider type, control points, and pixel length from a geometric path.
+        /// </summary>
+        /// <param name="sliderPath">The path whose values become this object's serialized slider data.</param>
         public void SetSliderPath(SliderPath sliderPath) {
             var controlPoints = sliderPath.ControlPoints;
             SetAllCurvePoints(controlPoints);
@@ -851,12 +1163,20 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             PixelLength = sliderPath.Distance;
         }
 
+        /// <summary>
+        /// Combines the object start position with its remaining slider control points.
+        /// </summary>
+        /// <returns>A new list whose first item is <see cref="Pos"/>.</returns>
         public List<Vector2> GetAllCurvePoints() {
             var controlPoints = new List<Vector2> {Pos};
             controlPoints.AddRange(CurvePoints);
             return controlPoints;
         }
 
+        /// <summary>
+        /// Splits a complete slider control-point list into start position and trailing curve points.
+        /// </summary>
+        /// <param name="controlPoints">A non-empty list whose first point becomes <see cref="Pos"/>.</param>
         public void SetAllCurvePoints(List<Vector2> controlPoints) {
             Pos = controlPoints.First();
             CurvePoints = controlPoints.GetRange(1, controlPoints.Count - 1);
@@ -938,13 +1258,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// <summary>
         /// Detects a failure in the slider path algorithm causing a slider to become invisible.
         /// </summary>
-        /// <returns></returns>
+        /// <returns><see langword="true"/> for zero-area, NaN-length, or effectively zero-length slider geometry.</returns>
         public bool IsInvisible() {
             return PixelLength != 0 && PixelLength <= 0.0001 ||
                    double.IsNaN(PixelLength) ||
                    CurvePoints.All(o => o == Pos);
         }
 
+        /// <summary>
+        /// Copies the hit object and duplicates all mutable nested timing, geometry, edge, timeline, and colour data.
+        /// </summary>
+        /// <returns>An independently mutable hit object.</returns>
         public HitObject DeepCopy() {
             var newHitObject = (HitObject) MemberwiseClone();
             newHitObject.BodyHitsounds = BodyHitsounds?.Select(o => o.Copy()).ToList();
@@ -963,6 +1287,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return newHitObject;
         }
 
+        /// <summary>
+        /// Writes the serialized object and its derived body/timeline hitsound state to standard output.
+        /// </summary>
         public void Debug() {
             Console.WriteLine(GetLine());
             foreach (var tp in BodyHitsounds) {
@@ -984,6 +1311,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// Orders objects chronologically, placing new-combo objects before other objects at the same time.
+        /// </summary>
+        /// <param name="other">The object to compare, or <see langword="null"/>.</param>
+        /// <returns>A standard sort value; any instance sorts after <see langword="null"/>.</returns>
         public int CompareTo(HitObject other) {
             if (ReferenceEquals(this, other)) return 0;
             if (ReferenceEquals(null, other)) return 1;

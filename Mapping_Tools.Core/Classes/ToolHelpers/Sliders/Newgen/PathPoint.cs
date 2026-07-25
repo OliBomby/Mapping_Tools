@@ -2,11 +2,29 @@ using System;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
+    /// <summary>
+    /// Carries a sampled path position together with reconstruction geometry and stable path ordering.
+    /// </summary>
     public struct PathPoint : IComparable<PathPoint> {
+        /// <summary>
+        /// The current, possibly edited position.
+        /// </summary>
         public Vector2 Pos;
+        /// <summary>
+        /// The original sampled position used to measure reconstruction error.
+        /// </summary>
         public Vector2 OgPos;
+        /// <summary>
+        /// Incoming tangent angle in radians, or NaN at an undefined boundary.
+        /// </summary>
         public double PreAngle;
+        /// <summary>
+        /// Outgoing tangent angle in radians, or NaN at an undefined boundary.
+        /// </summary>
         public double PostAngle;
+        /// <summary>
+        /// Distance along the sampled path from its first point.
+        /// </summary>
         public double CumulativeLength;
         /// <summary>
         /// Used to define distance between points which are on the same position. [0,1]
@@ -17,9 +35,28 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// </summary>
         public bool Red;
 
+        /// <summary>
+        /// Creates a point whose original and current positions are identical.
+        /// </summary>
+        /// <param name="pos">The pos.</param>
+        /// <param name="preAngle">The pre angle.</param>
+        /// <param name="postAngle">The post angle.</param>
+        /// <param name="cumulativeLength">The cumulative length.</param>
+        /// <param name="t">The ordering parameter for points at equal cumulative distance.</param>
+        /// <param name="red">The red.</param>
         public PathPoint(Vector2 pos, double preAngle = 0, double postAngle = 0, double cumulativeLength = 0,
             double t = double.NaN, bool red = false) : this(pos, pos, preAngle, postAngle, cumulativeLength, t, red) { }
 
+        /// <summary>
+        /// Creates a point with separate edited and original positions.
+        /// </summary>
+        /// <param name="pos">The pos.</param>
+        /// <param name="ogPos">The og pos.</param>
+        /// <param name="preAngle">The pre angle.</param>
+        /// <param name="postAngle">The post angle.</param>
+        /// <param name="cumulativeLength">The cumulative length.</param>
+        /// <param name="t">The ordering parameter for points at equal cumulative distance.</param>
+        /// <param name="red">The red.</param>
         public PathPoint(Vector2 pos, Vector2 ogPos, double preAngle = 0, double postAngle = 0, double cumulativeLength = 0, double t = double.NaN, bool red = false) {
             Pos = pos;
             OgPos = ogPos;
@@ -30,13 +67,26 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             Red = red;
         }
 
+        /// <summary>
+        /// Gets the available tangent or the shortest-angle midpoint between incoming and outgoing tangents.
+        /// </summary>
         public double AvgAngle => double.IsNaN(PreAngle) ? PostAngle :
             double.IsNaN(PostAngle) ? PreAngle : MathHelper.LerpAngle(PreAngle, PostAngle, 0.5);
 
+        /// <summary>
+        /// Returns a copy with a new same-position ordering parameter.
+        /// </summary>
+        /// <param name="t">The replacement same-position ordering parameter.</param>
+        /// <returns>A point differing only in <see cref="T"/>.</returns>
         public PathPoint SetT(double t) {
             return new PathPoint(Pos, OgPos, PreAngle, PostAngle, CumulativeLength, t, Red);
         }
 
+        /// <summary>
+        /// Returns a copy with updated curvature-discontinuity state.
+        /// </summary>
+        /// <param name="red">The red.</param>
+        /// <returns>A point differing only in <see cref="Red"/>.</returns>
         public PathPoint SetRed(bool red) {
             return new PathPoint(Pos, OgPos, PreAngle, PostAngle, CumulativeLength, T, red);
         }
@@ -145,27 +195,60 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             return a;
         }
 
+        /// <summary>
+        /// Formats reconstruction geometry for diagnostics.
+        /// </summary>
+        /// <returns>Current/original positions, tangents, distance, ordering parameter, and red state.</returns>
         public override string ToString() {
             return $"{Pos} {OgPos} ({PreAngle}, {PostAngle}) {CumulativeLength} {T} {Red}";
         }
 
+        /// <summary>
+        /// Orders points by cumulative distance and then by <see cref="T"/> at coincident positions.
+        /// </summary>
+        /// <param name="other">The point to compare.</param>
+        /// <returns>A standard sort value.</returns>
         public int CompareTo(PathPoint other) {
             var cumulativeLengthComparison = CumulativeLength.CompareTo(other.CumulativeLength);
             return cumulativeLengthComparison != 0 ? cumulativeLengthComparison : T.CompareTo(other.T);
         }
 
+        /// <summary>
+        /// Applies the &lt; operator.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns><see langword="true"/> when the left point precedes the right in path order.</returns>
         public static bool operator <(PathPoint left, PathPoint right) {
             return left.CompareTo(right) < 0;
         }
 
+        /// <summary>
+        /// Applies the &gt; operator.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns><see langword="true"/> when the left point follows the right in path order.</returns>
         public static bool operator >(PathPoint left, PathPoint right) {
             return left.CompareTo(right) > 0;
         }
 
+        /// <summary>
+        /// Applies the &lt;= operator.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns><see langword="true"/> when the left point does not follow the right.</returns>
         public static bool operator <=(PathPoint left, PathPoint right) {
             return left.CompareTo(right) <= 0;
         }
 
+        /// <summary>
+        /// Applies the &gt;= operator.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns><see langword="true"/> when the left point does not precede the right.</returns>
         public static bool operator >=(PathPoint left, PathPoint right) {
             return left.CompareTo(right) >= 0;
         }

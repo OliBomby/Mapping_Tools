@@ -12,6 +12,11 @@ public static class HitsoundFilename {
         "^(normal|soft|drum)-(hit(normal|whistle|finish|clap)|slidertick|sliderslide)",
         RegexOptions.Compiled);
 
+    /// <summary>
+    /// Reads the sample-family prefix from a standard hitsound filename.
+    /// </summary>
+    /// <param name="filename">A filename beginning with <c>auto-</c>, <c>normal-</c>, <c>soft-</c>, or <c>drum-</c>.</param>
+    /// <returns>The decoded set; unknown prefixes fall back to soft for legacy compatibility.</returns>
     public static SampleSet GetSampleSet(string filename) {
         string[] split = filename.Split('-');
         if (split.Length < 1) {
@@ -27,6 +32,11 @@ public static class HitsoundFilename {
         };
     }
 
+    /// <summary>
+    /// Detects the whistle, finish, or clap token in a standard filename.
+    /// </summary>
+    /// <param name="filename">A standard hyphen-separated sample filename.</param>
+    /// <returns>The detected addition, or normal when no recognized addition appears.</returns>
     public static Hitsound GetHitsound(string filename) {
         string[] split = filename.Split('-');
         if (split.Length < 2) {
@@ -49,6 +59,11 @@ public static class HitsoundFilename {
         return Hitsound.Normal;
     }
 
+    /// <summary>
+    /// Parses the numeric suffix after the recognized standard sample name.
+    /// </summary>
+    /// <param name="filename">A standard hitsound filename, with or without extension.</param>
+    /// <returns>The parsed suffix, or zero when absent or malformed.</returns>
     public static int GetIndex(string filename) {
         Match match = StandardName.Match(filename);
         string remainder = filename.Substring(match.Index + match.Length);

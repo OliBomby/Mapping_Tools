@@ -4,21 +4,48 @@ using System.Collections.Generic;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
-    /// 
+    /// Captures the subset of import settings that determines whether cached source data must be reloaded.
     /// </summary>
     public class ImportReloadingArgs : IEquatable<ImportReloadingArgs> {
         /// <summary>
-        /// 
+        /// Gets the source interpretation mode.
         /// </summary>
         public ImportType ImportType { get; }
+        /// <summary>
+        /// Gets the imported beatmap, MIDI, stack, or hitsound source path.
+        /// </summary>
         public string Path { get; }
+        /// <summary>
+        /// Gets the stack X filter, or -1 for any coordinate.
+        /// </summary>
         public double X { get; }
+        /// <summary>
+        /// Gets the stack Y filter, or -1 for any coordinate.
+        /// </summary>
         public double Y { get; }
+        /// <summary>
+        /// Gets the MIDI note-length grouping tolerance.
+        /// </summary>
         public double LengthRoughness { get; }
+        /// <summary>
+        /// Gets the MIDI velocity grouping tolerance.
+        /// </summary>
         public double VelocityRoughness { get; }
+        /// <summary>
+        /// Indicates whether hitsound imports split otherwise identical samples by volume.
+        /// </summary>
         public bool DiscriminateVolumes { get; }
+        /// <summary>
+        /// Indicates whether audio content is inspected for duplicate samples.
+        /// </summary>
         public bool DetectDuplicateSamples { get; }
+        /// <summary>
+        /// Indicates whether detected duplicate imports are discarded.
+        /// </summary>
         public bool RemoveDuplicates { get; }
+        /// <summary>
+        /// Gets the millisecond offset applied to imported events.
+        /// </summary>
         public double Offset { get; }
 
         /// <inheritdoc />

@@ -5,8 +5,17 @@ using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 #nullable disable
 
+    /// <summary>
+    /// Represents a storyboard animation whose image path expands into numbered frames.
+    /// </summary>
     public class Animation : Event, IHasDuration {
+        /// <summary>
+        /// Gets or sets the storyboard layer on which frames are drawn.
+        /// </summary>
         public StoryboardLayer Layer { get; set; }
+        /// <summary>
+        /// Gets or sets the texture point anchored to <see cref="Pos"/>.
+        /// </summary>
         public Origin Origin { get; set; }
 
         /// <summary>
@@ -14,24 +23,32 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// </summary>
         public string FilePath { get; set; }
 
+        /// <summary>
+        /// Gets or sets the animation's storyboard-space anchor position.
+        /// </summary>
         public Vector2 Pos { get; set; }
 
+        /// <summary>
+        /// Gets or sets the number of numbered image frames.
+        /// </summary>
         public int FrameCount { get; set; }
+        /// <summary>
+        /// Gets or sets the time between frames in milliseconds.
+        /// </summary>
         public double FrameDelay { get; set; }
+        /// <summary>
+        /// Gets or sets whether frame playback repeats or stops after one cycle.
+        /// </summary>
         public LoopType LoopType { get; set; }
 
         /// <summary>
-        /// Serializes this object to .osu code.
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public override string GetLine() {
             return $"Animation,{Layer},{Origin},\"{FilePath}\",{Pos.X.ToInvariant()},{Pos.Y.ToInvariant()},{FrameCount.ToInvariant()},{FrameDelay.ToInvariant()},{LoopType}";
         }
 
         /// <summary>
-        /// Deserializes a string of .osu code and populates the properties of this object.
-        /// </summary>
-        /// <param name="line"></param>
+        /// <inheritdoc/>
         public override void SetLine(string line) {
             string[] values = line.Split(',');
 
@@ -70,6 +87,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
             else throw new BeatmapParsingException("Failed to parse loop type of animation.", line);
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// <remarks>This legacy model treats one frame delay as the animation duration.</remarks>
         public double Duration { 
             get => FrameDelay;
             set => FrameDelay = value;

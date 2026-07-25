@@ -232,6 +232,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             FillBasicMetadata();
         }
 
+        /// <summary>
+        /// Populates required general, metadata, difficulty, and editor keys with new-beatmap defaults.
+        /// </summary>
         public void FillBasicMetadata() {
             General["AudioFilename"] = new TValue(string.Empty);
             General["AudioLeadIn"] = new TValue("0");
@@ -562,6 +565,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// Applies osu!'s effective combo-boundary rules, including spinner boundaries.
+        /// </summary>
+        /// <param name="hitObject">The hit object.</param>
+        /// <param name="previousHitObject">The previous hit object.</param>
+        /// <returns><see langword="true"/> for explicit new combos, spinners, the first object, or an object after a spinner.</returns>
         public static bool IsNewCombo(HitObject hitObject, HitObject previousHitObject) {
             return hitObject.NewCombo || hitObject.IsSpinner || previousHitObject == null || previousHitObject.IsSpinner;
         }
@@ -605,6 +614,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return (109 - 9 * circleSize) / 2;
         }
 
+        /// <summary>
+        /// Calculates the per-stack positional displacement from circle size.
+        /// </summary>
+        /// <param name="circleSize">The circle size.</param>
+        /// <returns>One tenth of the hit-object radius in playfield pixels.</returns>
         public static double GetStackOffset(double circleSize) {
             return GetHitObjectRadius(circleSize) / 10;
         }
@@ -749,14 +763,26 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return lines;
         }
 
+        /// <summary>
+        /// Finds the earliest hit-object start.
+        /// </summary>
+        /// <returns>The minimum start time in milliseconds.</returns>
         public double GetHitObjectStartTime() {
             return HitObjects.Min(h => h.Time);
         }
 
+        /// <summary>
+        /// Finds the latest hit-object end.
+        /// </summary>
+        /// <returns>The maximum end time in milliseconds.</returns>
         public double GetHitObjectEndTime() {
             return HitObjects.Max(h => h.EndTime);
         }
 
+        /// <summary>
+        /// Shifts timing points, hit objects, and their derived timelines by a millisecond offset.
+        /// </summary>
+        /// <param name="offset">The offset.</param>
         public void OffsetTime(double offset) {
             BeatmapTiming.Offset(offset);
             HitObjects?.ForEach(h => h.MoveTime(offset));
@@ -768,6 +794,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                 .Concat(StoryboardLayerForeground).Concat(StoryboardLayerOverlay);
         }
 
+        /// <summary>
+        /// Calculates enough pre-map time for configured lead-in, early events, approach time, the OD50 window, and a safety second.
+        /// </summary>
+        /// <returns>The required lead-in duration in milliseconds.</returns>
         public double GetLeadInTime() {
             var leadInTime = General["AudioLeadIn"].DoubleValue;
             var od = Difficulty["OverallDifficulty"].DoubleValue;
@@ -782,10 +812,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return leadInTime + window50 + 1000;
         }
 
+        /// <summary>
+        /// Expresses the beginning of playback as a negative lead-in timestamp.
+        /// </summary>
+        /// <returns>The negative value of <see cref="GetLeadInTime"/>.</returns>
         public double GetMapStartTime() {
             return -GetLeadInTime();
         }
 
+        /// <summary>
+        /// Calculates the playback end from hit-object tail padding and storyboard/event durations.
+        /// </summary>
+        /// <returns>The latest required playback time in milliseconds.</returns>
         public double GetMapEndTime() {
             var endTime = HitObjects.Count > 0
                 ? Math.Max(GetHitObjectEndTime() + 200, HitObjects.Last().EndTime + 3000)
@@ -877,6 +915,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return fileName.Substring(0, Math.Min(184, fileName.Length)) + ".osu";
         }
 
+        /// <summary>
+        /// Copies mutable gameplay and timing data, then rebinds each copied object to copied timing points.
+        /// </summary>
+        /// <returns>A beatmap whose hit objects and timing points can be edited independently.</returns>
         public Beatmap DeepCopy() {
             var newBeatmap = (Beatmap)MemberwiseClone();
             newBeatmap.HitObjects = HitObjects?.Select(h => h.DeepCopy()).ToList();

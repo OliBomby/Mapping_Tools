@@ -9,6 +9,9 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     /// Its a path with reconstruction hints.
     /// </summary>
     public class PathWithHints {
+        /// <summary>
+        /// Gets the stable linked-list path whose nodes are referenced by reconstruction hints.
+        /// </summary>
         [NotNull]
         public LinkedList<PathPoint> Path { get; } = new();
 
@@ -18,9 +21,16 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         [NotNull]
         private readonly List<ReconstructionHint> reconstructionHints = new();
 
+        /// <summary>
+        /// Gets non-overlapping hints sorted by path interval.
+        /// </summary>
         [NotNull]
         public IReadOnlyList<ReconstructionHint> ReconstructionHints => reconstructionHints;
 
+        /// <summary>
+        /// Inserts a hint and resolves overlaps by layer, splitting or voiding equal/lower-precedence intervals.
+        /// </summary>
+        /// <param name="hint">A forward, non-empty interval over nodes in <see cref="Path"/>.</param>
         public void AddReconstructionHint(ReconstructionHint hint) {
             if (hint.Start.Value >= hint.End.Value) {
                 throw new ArgumentException("Hint start must be before end.");

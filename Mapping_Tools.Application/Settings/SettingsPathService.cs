@@ -2,11 +2,20 @@ using Mapping_Tools.ApplicationServices.Platform;
 
 namespace Mapping_Tools.ApplicationServices.Settings;
 
+/// <summary>
+/// Derives missing osu!, Songs, config, and backup paths while preserving every
+/// non-blank path explicitly chosen by the user.
+/// </summary>
 public sealed class SettingsPathService : ISettingsPathService
 {
     private readonly IApplicationDirectories _directories;
     private readonly ISettingsPathEnvironment _environment;
 
+    /// <summary>
+    /// Creates the path initializer.
+    /// </summary>
+    /// <param name="directories">Mapping Tools' owned filesystem locations.</param>
+    /// <param name="environment">Machine-specific osu! discovery and filesystem access.</param>
     public SettingsPathService(
         IApplicationDirectories directories,
         ISettingsPathEnvironment environment)
@@ -15,6 +24,11 @@ public sealed class SettingsPathService : ISettingsPathService
         _environment = environment ?? throw new ArgumentNullException(nameof(environment));
     }
 
+    /// <summary>
+    /// Applies path defaults in dependency order: osu!, user config, Songs, then backups.
+    /// </summary>
+    /// <param name="settings">The settings instance to mutate.</param>
+    /// <returns>Whether the conventional fallback osu! path had to be used.</returns>
     public SettingsPathResult ApplyDefaults(ApplicationSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);

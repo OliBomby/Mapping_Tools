@@ -6,7 +6,7 @@ using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
-    /// 
+    /// Holds bindable filters and sample-generation settings for one hitsound import layer.
     /// </summary>
     public class LayerImportArgs : INotifyPropertyChanged, IEquatable<LayerImportArgs> {
         /// <inheritdoc />
@@ -51,7 +51,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private ImportType importType;
         /// <summary>
-        /// 
+        /// Gets or sets how the source is interpreted and updates mode-dependent UI visibility.
         /// </summary>
         public ImportType ImportType {
             get { return importType; }
@@ -67,7 +67,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private string path;
         /// <summary>
-        /// 
+        /// Gets or sets the imported beatmap, stack, MIDI, or hitsound source path.
         /// </summary>
         public string Path {
             get => path;
@@ -80,23 +80,23 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Indicates that stack-coordinate filters apply to the selected import mode.
         /// </summary>
         public bool CoordinateVisibility => ImportType == ImportType.Stack;
 
         /// <summary>
-        /// 
+        /// Indicates that SoundFont/MIDI note filters apply to the selected import mode.
         /// </summary>
         public bool KeysoundVisibility => ImportType == ImportType.MIDI;
 
         /// <summary>
-        /// 
+        /// Indicates that a concrete import mode has been selected.
         /// </summary>
         public bool CanImport => ImportType != ImportType.None;
 
         private double x;
         /// <summary>
-        /// 
+        /// Gets or sets the stack X filter, or -1 to accept any X coordinate.
         /// </summary>
         public double X {
             get => x;
@@ -110,7 +110,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private double y;
         /// <summary>
-        /// 
+        /// Gets or sets the stack Y filter, or -1 to accept any Y coordinate.
         /// </summary>
         public double Y {
             get => y;
@@ -124,7 +124,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private string samplePath;
         /// <summary>
-        /// 
+        /// Gets or sets the audio file or SoundFont used to render imported events.
         /// </summary>
         public string SamplePath {
             get => samplePath;
@@ -137,6 +137,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         private double volume;
+        /// <summary>
+        /// Gets or sets linear sample gain and updates the derived MIDI <see cref="Velocity"/>.
+        /// </summary>
         public double Volume {
             get => volume;
             set {
@@ -148,6 +151,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         private bool discriminateVolumes;
+        /// <summary>
+        /// Controls whether otherwise matching hitsound imports remain separate when their volumes differ.
+        /// </summary>
         public bool DiscriminateVolumes {
             get => discriminateVolumes;
             set {
@@ -158,6 +164,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         private bool detectDuplicateSamples;
+        /// <summary>
+        /// Controls whether imported audio content is compared to detect duplicate files.
+        /// </summary>
         public bool DetectDuplicateSamples {
             get => detectDuplicateSamples;
             set {
@@ -168,6 +177,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         private bool removeDuplicates;
+        /// <summary>
+        /// Controls whether detected duplicate import events are removed.
+        /// </summary>
         public bool RemoveDuplicates {
             get => removeDuplicates;
             set {
@@ -179,7 +191,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private int bank;
         /// <summary>
-        /// 
+        /// Gets or sets the SoundFont bank, or -1 to accept any bank.
         /// </summary>
         public int Bank {
             get => bank;
@@ -193,7 +205,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private int patch;
         /// <summary>
-        /// 
+        /// Gets or sets the SoundFont patch, or -1 to accept any patch.
         /// </summary>
         public int Patch {
             get => patch;
@@ -206,6 +218,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         private int key;
+        /// <summary>
+        /// Gets or sets the MIDI key, or -1 to accept any note.
+        /// </summary>
         public int Key {
             get { return key; }
             set {
@@ -218,7 +233,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private double length;
         /// <summary>
-        /// 
+        /// Gets or sets the MIDI note length, or -1 to accept any length.
         /// </summary>
         public double Length {
             get => length;
@@ -232,7 +247,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private double lengthRoughness;
         /// <summary>
-        /// 
+        /// Gets or sets the tolerance used when grouping MIDI note lengths.
         /// </summary>
         public double LengthRoughness {
             get => lengthRoughness;
@@ -245,7 +260,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Gets or sets MIDI velocity through the linear <see cref="Volume"/> scale.
         /// </summary>
         public int Velocity {
             get => (int)Math.Round(Volume * 127);
@@ -258,7 +273,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private double velocityRoughness;
         /// <summary>
-        /// 
+        /// Gets or sets the tolerance used when grouping MIDI velocities.
         /// </summary>
         public double VelocityRoughness {
             get => velocityRoughness;
@@ -272,7 +287,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
         private double offset;
         /// <summary>
-        ///
+        /// Gets or sets the millisecond offset applied to imported events.
         /// </summary>
         public double Offset {
             get => offset;
@@ -286,12 +301,12 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
 
 
         /// <summary>
-        /// 
+        /// Notifies binding clients after an import option changes.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
-        /// 
+        /// Raises <see cref="PropertyChanged"/> for a named import option.
         /// </summary>
         /// <param name="propName"></param>
         public void NotifyPropertyChanged(string propName) {
@@ -299,7 +314,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Captures the subset of settings that controls source-data cache invalidation.
         /// </summary>
         /// <returns></returns>
         public ImportReloadingArgs GetImportReloadingArgs() {
@@ -307,7 +322,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Determines whether cached imported data can be reused for another layer configuration, honoring wildcard filters.
         /// </summary>
         /// <param name="o"></param>
         /// <returns></returns>
@@ -386,10 +401,22 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return hashCode;
         }
 
+        /// <summary>
+        /// Applies the == operator.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns><see langword="true"/> when all import and sample-generation settings match.</returns>
         public static bool operator ==(LayerImportArgs left, object right) {
             return left.Equals(right);
         }
 
+        /// <summary>
+        /// Applies the != operator.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns><see langword="true"/> when any import or sample-generation setting differs.</returns>
         public static bool operator !=(LayerImportArgs left, object right) {
             return !left.Equals(right);
         }

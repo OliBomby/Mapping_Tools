@@ -10,6 +10,9 @@ using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 namespace Mapping_Tools.Classes.BeatmapHelper {
 #nullable disable
 
+    /// <summary>
+    /// Models one redline or greenline from an osu! <c>[TimingPoints]</c> section.
+    /// </summary>
     public class TimingPoint : ITextLine, IComparable<TimingPoint> {
         // Offset, Milliseconds per Beat, Meter, Sample Set, Sample Index, Volume, Inherited, Kiai Mode
         /// <summary>
@@ -127,6 +130,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             SetLine(line);
         }
 
+        /// <summary>
+        /// Creates the legacy default redline used when no timing data is available.
+        /// </summary>
         public TimingPoint()
         {
             MpB = 60000;
@@ -218,6 +224,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return deltaTime != 0;
         }
 
+        /// <summary>
+        /// Compares every serialized timing effect, using numeric tolerance for offsets, beat length, and volume.
+        /// </summary>
+        /// <param name="tp">The timing point to compare.</param>
+        /// <returns><see langword="true"/> when all timing and sample fields match.</returns>
         public bool Equals(TimingPoint tp) {
             return Precision.AlmostEquals(Offset, tp.Offset) &&
                    Precision.AlmostEquals(MpB, tp.MpB) &&
@@ -230,6 +241,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
                    OmitFirstBarLine == tp.OmitFirstBarLine;
         }
 
+        /// <summary>
+        /// Determines whether two points produce the same effective timing after redline/greenline normalization.
+        /// </summary>
+        /// <param name="tp">The point whose effect is compared.</param>
+        /// <returns><see langword="true"/> when their inherited timing and sample behavior is equivalent.</returns>
         public bool SameEffect(TimingPoint tp) {
             if (tp.Uninherited && !Uninherited) {
                 return Precision.AlmostEquals(MpB, -100) &&
@@ -259,6 +275,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return -100 / MpB;
         }
 
+        /// <summary>
+        /// Converts BPM to milliseconds per beat for redlines or negative slider velocity for greenlines.
+        /// </summary>
+        /// <param name="bpm">The bpm.</param>
         public void SetBpm(double bpm) {
             if (Uninherited) {
                 MpB = 60000 / bpm;
@@ -267,6 +287,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// Orders timing points by offset, placing uninherited redlines before greenlines at the same time.
+        /// </summary>
+        /// <param name="other">The timing point to compare, or null.</param>
+        /// <returns>A standard chronological sort value.</returns>
         public int CompareTo(TimingPoint other) {
             if (ReferenceEquals(this, other)) return 0;
             if (ReferenceEquals(null, other)) return 1;

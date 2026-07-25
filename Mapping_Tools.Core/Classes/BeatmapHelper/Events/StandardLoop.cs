@@ -8,14 +8,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 #nullable disable
 
     public class StandardLoop : Command {
+        /// <summary>
+        /// Gets the standard-loop command token.
+        /// </summary>
         public override EventType EventType => EventType.L;
 
+        /// <summary>
+        /// Gets or sets how many times the nested command group repeats.
+        /// </summary>
         public int LoopCount { get; set; }
 
+        /// <summary>
+        /// <inheritdoc/>
         public override string GetLine() {
             return $"{EventType},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{LoopCount.ToInvariant()}";
         }
 
+        /// <summary>
+        /// <inheritdoc/>
         public override void SetLine(string line) {
             var subLine = RemoveIndents(line);
             var values = subLine.Split(',');

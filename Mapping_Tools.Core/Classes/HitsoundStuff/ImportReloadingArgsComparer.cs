@@ -3,9 +3,15 @@ using System.Collections.Generic;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
-    /// 
+    /// Supplies dictionary equality for cached import-reload descriptors.
     /// </summary>
     public class ImportReloadingArgsComparer : IEqualityComparer<ImportReloadingArgs> {
+        /// <summary>
+        /// Compares reload requests by the fields that determine imported sample content and placement.
+        /// </summary>
+        /// <param name="x">The first reload descriptor.</param>
+        /// <param name="y">The second reload descriptor.</param>
+        /// <returns><see langword="true"/> when both requests would reload the same import.</returns>
         public bool Equals(ImportReloadingArgs x, ImportReloadingArgs y) {
             if (x.ImportType != y.ImportType)
                 return false;

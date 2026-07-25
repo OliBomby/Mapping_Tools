@@ -7,9 +7,12 @@ using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
-    /// 
+    /// Describes how one source file or SoundFont note must be transformed to generate an exported sample.
     /// </summary>
     public class SampleGeneratingArgs : BindableBase, IEquatable<SampleGeneratingArgs> {
+        /// <summary>
+        /// Creates an empty, unity-volume sample specification with all SoundFont selectors unset.
+        /// </summary>
         public SampleGeneratingArgs() {
             Path = "";
             Volume = 1;
@@ -22,6 +25,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Length = -1;
         }
 
+        /// <summary>
+        /// Creates an unmodified sample-file specification.
+        /// </summary>
+        /// <param name="path">The source audio or SoundFont path.</param>
         public SampleGeneratingArgs(string path) {
             Path = path;
             Volume = 1;
@@ -34,6 +41,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Length = -1;
         }
 
+        /// <summary>
+        /// Creates a complete sample specification for persisted settings and editing.
+        /// </summary>
+        /// <param name="path">The source audio or SoundFont path.</param>
+        /// <param name="volume">Linear gain, where one is unchanged.</param>
+        /// <param name="panning">Stereo pan applied during rendering.</param>
+        /// <param name="pitchShift">Pitch adjustment applied during rendering.</param>
+        /// <param name="bank">The SoundFont bank, or -1 when unused.</param>
+        /// <param name="patch">The SoundFont patch, or -1 when unused.</param>
+        /// <param name="instrument">The SoundFont instrument, or -1 when unused.</param>
+        /// <param name="key">The MIDI note number, or -1 when unused.</param>
+        /// <param name="length">The generated note length, or -1 when unused.</param>
         public SampleGeneratingArgs(string path, double volume, double panning, double pitchShift, int bank, int patch, int instrument, int key, double length) {
             Path = path;
             Volume = volume;
@@ -46,6 +65,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             Length = length;
         }
 
+        /// <summary>
+        /// Creates a SoundFont-note specification using MIDI-style velocity.
+        /// </summary>
+        /// <param name="path">The <c>.sf2</c> source path.</param>
+        /// <param name="bank">The SoundFont bank.</param>
+        /// <param name="patch">The SoundFont patch.</param>
+        /// <param name="instrument">The SoundFont instrument.</param>
+        /// <param name="key">The MIDI note number.</param>
+        /// <param name="length">The generated note length.</param>
+        /// <param name="velocity">The MIDI velocity from 0 through 127.</param>
         public SampleGeneratingArgs(string path, int bank, int patch, int instrument, int key, double length, int velocity) {
             Path = path;
             Panning = 0;
@@ -73,12 +102,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                                     Math.Abs(PitchShift) < Precision.DoubleEpsilon;
 
         private string path;
+        /// <summary>
+        /// Gets or sets the source audio or SoundFont path.
+        /// </summary>
         public string Path {
             get => path;
             set => Set(ref path, value);
         }
 
         private double volume;
+        /// <summary>
+        /// Gets or sets linear gain and notifies bindings that derived <see cref="Velocity"/> changed.
+        /// </summary>
         public double Volume {
             get => volume;
             set {
@@ -89,47 +124,71 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         private double panning;
+        /// <summary>
+        /// Gets or sets the stereo pan applied during generation.
+        /// </summary>
         public double Panning {
             get => panning;
             set => Set(ref panning, value);
         }
 
         private double pitchShift;
+        /// <summary>
+        /// Gets or sets the pitch adjustment applied during generation.
+        /// </summary>
         public double PitchShift {
             get => pitchShift;
             set => Set(ref pitchShift, value);
         }
 
         private int bank;
+        /// <summary>
+        /// Gets or sets the SoundFont bank; -1 denotes an unused selector.
+        /// </summary>
         public int Bank {
             get => bank;
             set => Set(ref bank, value);
         }
 
         private int patch;
+        /// <summary>
+        /// Gets or sets the SoundFont patch; -1 denotes an unused selector.
+        /// </summary>
         public int Patch {
             get => patch;
             set => Set(ref patch, value);
         }
 
         private int instrument;
+        /// <summary>
+        /// Gets or sets the SoundFont instrument; -1 denotes an unused selector.
+        /// </summary>
         public int Instrument {
             get => instrument;
             set => Set(ref instrument, value);
         }
 
         private int key;
+        /// <summary>
+        /// Gets or sets the MIDI note number; -1 denotes an unused selector.
+        /// </summary>
         public int Key {
             get => key;
             set => Set(ref key, value);
         }
 
         private double length;
+        /// <summary>
+        /// Gets or sets the generated SoundFont note length; -1 denotes an unspecified length.
+        /// </summary>
         public double Length {
             get => length;
             set => Set(ref length, value);
         }
 
+        /// <summary>
+        /// Converts between <see cref="Volume"/> and MIDI velocity on a 0-to-127 scale.
+        /// </summary>
         [JsonIgnore]
         public int Velocity {
             get => (int) Math.Round(Volume * 127);
@@ -154,7 +213,7 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         /// <summary>
         /// Gets the extension of the file in <see cref="Path"/>
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The extension including its leading period, or an empty string.</returns>
         public string GetExtension() {
             return System.IO.Path.GetExtension(Path);
         }
@@ -167,10 +226,19 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                 $"{Path} {Volume * 100}% p{Panning:N1} s{PitchShift:N2}";
         }
 
+        /// <summary>
+        /// Copies all rendering parameters into a new bindable instance.
+        /// </summary>
+        /// <returns>An independently mutable sample specification.</returns>
         public SampleGeneratingArgs Copy() {
             return new SampleGeneratingArgs(Path, Volume, Panning, PitchShift, Bank, Patch, Instrument, Key, Length);
         }
 
+        /// <summary>
+        /// Compares paths and all transformation/SoundFont fields, using numeric tolerance for doubles.
+        /// </summary>
+        /// <param name="other">The specification to compare.</param>
+        /// <returns><see langword="true"/> when both specifications generate the same configured sample.</returns>
         public bool Equals(SampleGeneratingArgs other) {
             if (other is null) return false;
 
@@ -185,6 +253,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
                    Math.Abs(Length - other.Length) < Precision.DoubleEpsilon;
         }
 
+        /// <summary>
+        /// Determines whether an object is an equivalent sample specification.
+        /// </summary>
+        /// <param name="obj">The object to compare.</param>
+        /// <returns><see langword="true"/> when it is an equal <see cref="SampleGeneratingArgs"/>.</returns>
         public override bool Equals(object obj) {
             if (!(obj is SampleGeneratingArgs)) {
                 return false;
@@ -209,10 +282,22 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return hashCode;
         }
 
+        /// <summary>
+        /// Applies the == operator.
+        /// </summary>
+        /// <param name="left">The sample specification.</param>
+        /// <param name="right">The value to compare.</param>
+        /// <returns><see langword="true"/> when the left instance is non-null and equal to the right value.</returns>
         public static bool operator ==(SampleGeneratingArgs left, object right) {
             return !(left is null) && left.Equals(right);
         }
 
+        /// <summary>
+        /// Applies the != operator.
+        /// </summary>
+        /// <param name="left">The sample specification.</param>
+        /// <param name="right">The value to compare.</param>
+        /// <returns><see langword="true"/> when the values are not equal.</returns>
         public static bool operator !=(SampleGeneratingArgs left, object right) {
             return left is null || !left.Equals(right);
         }

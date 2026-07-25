@@ -11,25 +11,49 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         private RgbaColour color;
         private bool hasAlpha;
 
+        /// <summary>
+        /// Gets or sets the RGBA value and raises <see cref="PropertyChanged"/> when it changes.
+        /// </summary>
         public RgbaColour Color {
             get => color;
             set => Set(ref color, value);
         }
 
+        /// <summary>
+        /// Notifies binding clients after <see cref="Color"/> changes.
+        /// </summary>
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        /// <summary>
+        /// Creates a fully transparent black combo colour.
+        /// </summary>
         public ComboColour() {
             Color = default;
         }
 
+        /// <summary>
+        /// Creates a combo colour from an RGBA value.
+        /// </summary>
+        /// <param name="color">The value exposed by <see cref="Color"/>.</param>
         public ComboColour(RgbaColour color) {
             Color = color;
         }
 
+        /// <summary>
+        /// Creates an opaque combo colour from individual RGB channels.
+        /// </summary>
+        /// <param name="r">The red channel.</param>
+        /// <param name="g">The green channel.</param>
+        /// <param name="b">The blue channel.</param>
         public ComboColour(byte r, byte g, byte b) {
             Color = RgbaColour.FromRgb(r, g, b);
         }
 
+        /// <summary>
+        /// Parses the value after the colon in an osu! <c>ComboN : R,G,B[,A]</c> line.
+        /// </summary>
+        /// <param name="line">A complete combo-colour line from the <c>[Colours]</c> section.</param>
+        /// <exception cref="BeatmapParsingException">A channel is not an integer.</exception>
         public ComboColour(string line) {
             string[] split = line.Split(':');
             string[] commaSplit = split[1].Split(',');
@@ -51,8 +75,20 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// Creates a shallow copy suitable for editing independently in a view model.
+        /// </summary>
+        /// <returns>A new combo-colour instance with the same value and alpha-format flag.</returns>
         public ComboColour Copy() => (ComboColour)MemberwiseClone();
 
+        /// <summary>
+        /// Updates a backing field and raises <see cref="PropertyChanged"/> only when its value changes.
+        /// </summary>
+        /// <typeparam name="T">The property value type.</typeparam>
+        /// <param name="field">The backing field to update.</param>
+        /// <param name="value">The proposed value.</param>
+        /// <param name="propertyName">The property name reported to binding clients.</param>
+        /// <returns><see langword="true"/> when the field changed; otherwise <see langword="false"/>.</returns>
         protected bool Set<T>(ref T field, T value, [CallerMemberName] string? propertyName = null) {
             if (EqualityComparer<T>.Default.Equals(field, value))
                 return false;
@@ -61,12 +97,20 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return true;
         }
 
+        /// <summary>
+        /// Serializes the colour channels for the right-hand side of an osu! colour line.
+        /// </summary>
+        /// <returns><c>R,G,B</c>, or <c>R,G,B,A</c> when the source line explicitly contained alpha.</returns>
         public override string ToString() {
             if (hasAlpha)
                 return $"{Color.R.ToInvariant()},{Color.G.ToInvariant()},{Color.B.ToInvariant()},{Color.A.ToInvariant()}";
             return $"{Color.R.ToInvariant()},{Color.G.ToInvariant()},{Color.B.ToInvariant()}";
         }
 
+        /// <summary>
+        /// Returns the four-colour palette used when a beatmap does not define combo colours.
+        /// </summary>
+        /// <returns>Fresh orange, green, blue, and red combo-colour instances.</returns>
         public static ComboColour[] GetDefaultComboColours() {
             return new[] {
                 new ComboColour(255, 192, 0),

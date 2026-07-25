@@ -3,22 +3,38 @@ using Mapping_Tools.ApplicationServices.Platform;
 
 namespace Mapping_Tools.Desktop.Platform;
 
+/// <summary>
+/// Maps portable picker requests to Avalonia storage-provider dialogs and
+/// rejects selections that cannot be represented as local filesystem paths.
+/// </summary>
 public sealed class AvaloniaFilePicker : IFilePicker
 {
     private readonly Func<IStorageProvider?> _storageProviderAccessor;
 
+    /// <summary>
+    /// Creates an adapter that resolves the storage provider lazily from a top-level window.
+    /// </summary>
+    /// <param name="storageProviderAccessor">Returns the current storage provider, if initialized.</param>
     public AvaloniaFilePicker(Func<IStorageProvider?> storageProviderAccessor)
     {
         _storageProviderAccessor = storageProviderAccessor
             ?? throw new ArgumentNullException(nameof(storageProviderAccessor));
     }
 
+    /// <summary>
+    /// <inheritdoc/>
     public bool CanOpenFiles => _storageProviderAccessor()?.CanOpen == true;
 
+    /// <summary>
+    /// <inheritdoc/>
     public bool CanSaveFiles => _storageProviderAccessor()?.CanSave == true;
 
+    /// <summary>
+    /// <inheritdoc/>
     public bool CanPickFolders => _storageProviderAccessor()?.CanPickFolder == true;
 
+    /// <summary>
+    /// <inheritdoc/>
     public async Task<IReadOnlyList<string>> PickOpenFilesAsync(
         OpenFilePickerRequest request,
         CancellationToken cancellationToken = default)
@@ -44,6 +60,8 @@ public sealed class AvaloniaFilePicker : IFilePicker
         return GetLocalPaths(files);
     }
 
+    /// <summary>
+    /// <inheritdoc/>
     public async Task<string?> PickSaveFileAsync(
         SaveFilePickerRequest request,
         CancellationToken cancellationToken = default)
@@ -71,6 +89,8 @@ public sealed class AvaloniaFilePicker : IFilePicker
         return file is null ? null : GetLocalPath(file);
     }
 
+    /// <summary>
+    /// <inheritdoc/>
     public async Task<IReadOnlyList<string>> PickFoldersAsync(
         OpenFolderPickerRequest request,
         CancellationToken cancellationToken = default)

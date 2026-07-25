@@ -8,8 +8,17 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     /// Version of <see cref="PathGenerator"/> but working with <see cref="PathPoint"/> instead.
     /// </summary>
     public class PathGenerator2 {
+        /// <summary>
+        /// Gets or sets the maximum tangent-angle change allowed in one generated segment, in radians.
+        /// </summary>
         public double MaxAngle { get; set; } = Math.PI * 1 / 3;
+        /// <summary>
+        /// Gets or sets the construction strategy used for each non-inflecting interval.
+        /// </summary>
         public ApproximationMode Approximation { get; set; } = ApproximationMode.Best;
+        /// <summary>
+        /// Gets or sets how many interior samples are used to compare candidate reconstruction loss.
+        /// </summary>
         public int NumTestPoints { get; set; } = 10;
 
         /// <summary>
@@ -249,9 +258,21 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             return middle;
         }
 
+        /// <summary>
+        /// Defines values for approximation mode.
+        /// </summary>
         public enum ApproximationMode {
+            /// <summary>
+            /// Use the intersection of endpoint tangents as the Bézier control construction.
+            /// </summary>
             TangentIntersection,
+            /// <summary>
+            /// Join two curve pieces around an estimated middle point.
+            /// </summary>
             DoubleMiddle,
+            /// <summary>
+            /// Evaluate both constructions and retain the lower-loss result.
+            /// </summary>
             Best
         }
     }

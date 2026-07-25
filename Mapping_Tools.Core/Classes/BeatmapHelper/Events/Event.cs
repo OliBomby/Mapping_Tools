@@ -11,6 +11,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 #nullable disable
 
     public abstract class Event : ITextLine {
+        /// <summary>
+        /// Initializes an event with an empty child-command collection.
+        /// </summary>
         protected Event() {
             ChildEvents = new List<Event>();
         }
@@ -128,24 +131,54 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
             }
         }
 
+        /// <summary>
+        /// Creates the whitespace prefix used for a storyboard command depth.
+        /// </summary>
+        /// <param name="count">The number of spaces.</param>
+        /// <returns>A string containing exactly <paramref name="count"/> spaces.</returns>
         public static string GetIndents(int count) {
             return new string(' ', count);
         }
 
+        /// <summary>
+        /// Counts leading whitespace in a serialized event line.
+        /// </summary>
+        /// <param name="line">The serialized event line.</param>
+        /// <returns>The command's indentation depth.</returns>
         public static int ParseIndents(string line) {
             return line.TakeWhile(char.IsWhiteSpace).Count();
         }
 
+        /// <summary>
+        /// Removes all leading whitespace from a serialized event line.
+        /// </summary>
+        /// <param name="line">The serialized event line.</param>
+        /// <returns>The event data beginning at its command token.</returns>
         public static string RemoveIndents(string line) {
             return line.Substring(ParseIndents(line));
         }
 
+        /// <summary>
+        /// Serializes the event without parent-tree indentation.
+        /// </summary>
+        /// <returns>The osu! event line.</returns>
         public abstract string GetLine();
 
+        /// <summary>
+        /// Replaces this event's state by parsing an osu! event line.
+        /// </summary>
+        /// <param name="line">The serialized event line, optionally indented.</param>
         public abstract void SetLine(string line);
 
+        /// <summary>
+        /// Gets or sets the containing loop or trigger, or <see langword="null"/>
+        /// for a top-level event.
+        /// </summary>
         public Event ParentEvent { get; set; }
 
+        /// <summary>
+        /// Gets or sets commands nested directly beneath this event.
+        /// </summary>
         public List<Event> ChildEvents { get; set; }
 
         /// <summary>

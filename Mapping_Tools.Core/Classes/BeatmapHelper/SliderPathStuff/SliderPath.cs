@@ -10,6 +10,9 @@ using Mapping_Tools.Classes.MathUtil;
 namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
 #nullable disable
 
+    /// <summary>
+    /// Lazily approximates an osu! slider curve and applies its optional serialized pixel-length constraint.
+    /// </summary>
     public struct SliderPath :IEquatable<SliderPath> {
         /// <summary>
         /// The user-set distance of the path. If non-null, <see cref="Distance"/> will match this value,
@@ -68,6 +71,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
             }
         }
 
+        /// <summary>
+        /// Gets the polyline approximation after truncation or extension to <see cref="ExpectedDistance"/>.
+        /// </summary>
         public IReadOnlyList<Vector2> CalculatedPath {
             get {
                 EnsureInitialised();
@@ -75,6 +81,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
             }
         }
 
+        /// <summary>
+        /// Gets cumulative polyline distance for each corresponding <see cref="CalculatedPath"/> point.
+        /// </summary>
         public IReadOnlyList<double> CumulativeLength {
             get {
                 EnsureInitialised();
@@ -82,6 +91,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
             }
         }
 
+        /// <summary>
+        /// Gets polyline indexes at which red-anchor-delimited curve segments begin.
+        /// </summary>
         public IReadOnlyList<int> SegmentStarts {
             get {
                 EnsureInitialised();
@@ -347,6 +359,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
             return p0 + ( p1 - p0 ) * w;
         }
 
+        /// <summary>
+        /// Compares serialized curve identity: path type, requested distance, and ordered control points.
+        /// </summary>
+        /// <param name="other">The path to compare.</param>
+        /// <returns><see langword="true"/> when the inputs that define both paths match.</returns>
         public bool Equals(SliderPath other) {
             if( ControlPoints == null && other.ControlPoints != null )
                 return false;
@@ -356,20 +373,41 @@ namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
             return ControlPoints.SequenceEqual(other.ControlPoints) && ExpectedDistance.Equals(other.ExpectedDistance) && Type == other.Type;
         }
 
+        /// <summary>
+        /// Determines whether an object is a slider path with equal serialized curve identity.
+        /// </summary>
+        /// <param name="obj">The object to compare.</param>
+        /// <returns><see langword="true"/> for an equal <see cref="SliderPath"/>.</returns>
         public override bool Equals(object obj) {
             if( obj is null )
                 return false;
             return obj is SliderPath other && Equals(other);
         }
 
+        /// <summary>
+        /// Applies the == operator.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns><see langword="true"/> when the serialized curve inputs match.</returns>
         public static bool operator ==(SliderPath left, SliderPath right) {
             return left.Equals(right);
         }
 
+        /// <summary>
+        /// Applies the != operator.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns><see langword="true"/> when the serialized curve inputs differ.</returns>
         public static bool operator !=(SliderPath left, SliderPath right) {
             return !left.Equals(right);
         }
 
+        /// <summary>
+        /// Combines requested distance, path type, and control-point array identity into a hash.
+        /// </summary>
+        /// <returns>A hash code for this path value.</returns>
         public override int GetHashCode()
         {
             var hashCode = -1383746172;

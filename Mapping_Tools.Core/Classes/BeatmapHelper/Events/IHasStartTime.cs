@@ -5,6 +5,9 @@
 #nullable disable
 
     public interface IHasStartTime {
+        /// <summary>
+        /// Gets or sets the absolute start time in milliseconds.
+        /// </summary>
         double StartTime { get; set; }
     }
 }

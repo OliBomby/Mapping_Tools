@@ -14,10 +14,22 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         private List<double> diffL; // length of segments
         private List<double> pathL; // cumulative length
 
+        /// <summary>
+        /// Builds cached segment, angle, and cumulative-distance data from a sampled path.
+        /// </summary>
+        /// <param name="path">Ordered samples of the curve to approximate.</param>
         public PathGenerator(List<Vector2> path) {
             SetPath(path);
         }
 
+        /// <summary>
+        /// Reuses precomputed path-analysis arrays when reconstructing a generator.
+        /// </summary>
+        /// <param name="path">Ordered samples of the curve to approximate.</param>
+        /// <param name="diff">The diff.</param>
+        /// <param name="angle">The angle.</param>
+        /// <param name="diffL">The diff l.</param>
+        /// <param name="pathL">The path l.</param>
         public PathGenerator(List<Vector2> path, List<Vector2> diff, List<double> angle, List<double> diffL, List<double> pathL) {
             this.path = path;
             this.diff = diff;
@@ -26,6 +38,10 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
             this.pathL = pathL;
         }
 
+        /// <summary>
+        /// Replaces the sampled path and rebuilds all derived segment data, removing consecutive duplicate points.
+        /// </summary>
+        /// <param name="pathPoints">The path points.</param>
         public void SetPath(List<Vector2> pathPoints) {
             path = new List<Vector2> { pathPoints.First() };
             diff = new List<Vector2>();
@@ -326,6 +342,11 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
             return segments;
         }
 
+        /// <summary>
+        /// Interpolates a position at a fractional sample index.
+        /// </summary>
+        /// <param name="index">A fractional sample index, clamped at path endpoints.</param>
+        /// <returns>The linear interpolation between the surrounding samples.</returns>
         public Vector2 GetContinuousPosition(double index) {
             int segmentIndex = (int) Math.Floor(index);
             double segmentProgression = index - segmentIndex;
@@ -337,12 +358,22 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
                 Vector2.Lerp(path[segmentIndex], path[segmentIndex + 1], segmentProgression);
         }
 
+        /// <summary>
+        /// Reads the segment direction associated with a fractional sample index.
+        /// </summary>
+        /// <param name="index">A fractional sample index.</param>
+        /// <returns>The clamped segment angle in radians.</returns>
         public double GetContinuousAngle(double index) {
             int segmentIndex = MathHelper.Clamp((int)Math.Floor(index + Precision.DoubleEpsilon), 0, angle.Count - 1);
 
             return angle[segmentIndex];
         }
 
+        /// <summary>
+        /// Converts a fractional sample index to cumulative polyline distance.
+        /// </summary>
+        /// <param name="index">A fractional sample index.</param>
+        /// <returns>The interpolated distance from the first path sample.</returns>
         public double GetContinuousDistance(double index) {
             int segmentIndex = (int)Math.Floor(index);
             double segmentProgression = index - segmentIndex;
@@ -354,6 +385,11 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
                     (1 - segmentProgression) * pathL[segmentIndex] + segmentProgression * pathL[segmentIndex + 1];
         }
 
+        /// <summary>
+        /// Converts cumulative polyline distance back to a fractional sample index.
+        /// </summary>
+        /// <param name="distance">The distance.</param>
+        /// <returns>An exact vertex index or an interpolation between the surrounding vertices.</returns>
         public double GetIndexAtDistance(double distance) {
             var index = pathL.BinarySearch(distance);
             if (index >= 0) {
@@ -376,6 +412,11 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
             return Modulo(a2 - a1 + Math.PI, 2 * Math.PI) - Math.PI;
         }
 
+        /// <summary>
+        /// Measures a polyline by summing consecutive anchor distances.
+        /// </summary>
+        /// <param name="anchors">Polyline vertices in traversal order.</param>
+        /// <returns>The total Euclidean length.</returns>
         public static double CalculatePathLength(List<Vector2> anchors) {
             double length = 0;
 
@@ -397,9 +438,21 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
             return length;
         }
 
+        /// <summary>
+        /// Defines values for approximation mode.
+        /// </summary>
         public enum ApproximationMode {
+            /// <summary>
+            /// Construct each segment from the intersection of its endpoint tangents.
+            /// </summary>
             TangentIntersection,
+            /// <summary>
+            /// Use a two-curve construction meeting near the segment midpoint.
+            /// </summary>
             DoubleMiddle,
+            /// <summary>
+            /// Select the lower-loss construction for each segment.
+            /// </summary>
             Best
         }
     }

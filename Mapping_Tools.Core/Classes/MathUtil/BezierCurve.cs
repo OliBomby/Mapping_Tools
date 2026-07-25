@@ -39,7 +39,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Constructs a new <see cref="BezierCurve"/>.
         /// </summary>
-        /// <param name="points">The points.</param>
+        /// <param name="points">Control points from the start anchor through the end anchor.</param>
         public BezierCurve(IEnumerable<Vector2> points) {
             if( points == null ) {
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
@@ -52,7 +52,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Constructs a new <see cref="BezierCurve"/>.
         /// </summary>
-        /// <param name="points">The points.</param>
+        /// <param name="points">Control points from the start anchor through the end anchor.</param>
         public BezierCurve(params Vector2[] points) {
             if( points == null ) {
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
@@ -66,7 +66,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Constructs a new <see cref="BezierCurve"/>.
         /// </summary>
         /// <param name="parallel">The parallel value.</param>
-        /// <param name="points">The points.</param>
+        /// <param name="points">Control points from the start anchor through the end anchor.</param>
         public BezierCurve(double parallel, params Vector2[] points) {
             if( points == null ) {
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
@@ -80,7 +80,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// Constructs a new <see cref="BezierCurve"/>.
         /// </summary>
         /// <param name="parallel">The parallel value.</param>
-        /// <param name="points">The points.</param>
+        /// <param name="points">Control points from the start anchor through the end anchor.</param>
         public BezierCurve(double parallel, IEnumerable<Vector2> points) {
             if( points == null ) {
                 throw new ArgumentNullException("points", "Must point to a valid list of Vector2 structures.");
@@ -114,7 +114,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Calculates the length of the specified bezier curve.
         /// </summary>
-        /// <param name="points">The points.</param>
+        /// <param name="points">The ordered Bézier control polygon.</param>
         /// <param name="precision">The precision value.</param>
         /// <returns>The precision gets better as the <paramref name="precision"/>
         /// value gets smaller.</returns>
@@ -125,7 +125,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Calculates the length of the specified bezier curve.
         /// </summary>
-        /// <param name="points">The points.</param>
+        /// <param name="points">The ordered Bézier control polygon.</param>
         /// <param name="precision">The precision value.</param>
         /// <param name="parallel">The parallel value.</param>
         /// <returns>Length of curve.</returns>
@@ -151,7 +151,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Calculates the point on the given bezier curve with the specified t parameter.
         /// </summary>
-        /// <param name="points">The points.</param>
+        /// <param name="points">The ordered Bézier control polygon.</param>
         /// <param name="t">The t parameter, a value between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
         public static Vector2 CalculatePoint(IList<Vector2> points, double t) {
@@ -161,7 +161,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Calculates the point on the given bezier curve with the specified t parameter.
         /// </summary>
-        /// <param name="points">The points.</param>
+        /// <param name="points">The ordered Bézier control polygon.</param>
         /// <param name="t">The t parameter, a value between 0.0f and 1.0f.</param>
         /// <param name="parallel">The parallel value.</param>
         /// <returns>Resulting point.</returns>
@@ -203,7 +203,7 @@ namespace Mapping_Tools.Classes.MathUtil {
         /// <summary>
         /// Calculates the point with the specified t of the derivative of the given bezier function.
         /// </summary>
-        /// <param name="points">The points.</param>
+        /// <param name="points">The control polygon whose derivative is evaluated.</param>
         /// <param name="t">The t parameter, value between 0.0f and 1.0f.</param>
         /// <returns>Resulting point.</returns>
         private static Vector2 CalculatePointOfDerivative(IList<Vector2> points, double t) {

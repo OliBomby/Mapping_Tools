@@ -3,16 +3,26 @@ using Mapping_Tools.ApplicationServices.Platform;
 
 namespace Mapping_Tools.Desktop.Platform;
 
+/// <summary>
+/// Adapts the launcher owned by an initialized Avalonia top-level window to
+/// the application's URI, file, and directory launch contract.
+/// </summary>
 public sealed class AvaloniaPlatformLauncher : IPlatformLauncher
 {
     private readonly Func<ILauncher?> _launcherAccessor;
 
+    /// <summary>
+    /// Creates an adapter that resolves the launcher lazily, after the window exists.
+    /// </summary>
+    /// <param name="launcherAccessor">Returns the current top-level launcher, if initialized.</param>
     public AvaloniaPlatformLauncher(Func<ILauncher?> launcherAccessor)
     {
         _launcherAccessor = launcherAccessor
             ?? throw new ArgumentNullException(nameof(launcherAccessor));
     }
 
+    /// <summary>
+    /// <inheritdoc/>
     public async Task<bool> OpenUriAsync(Uri uri, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(uri);
@@ -27,6 +37,8 @@ public sealed class AvaloniaPlatformLauncher : IPlatformLauncher
         return launched;
     }
 
+    /// <summary>
+    /// <inheritdoc/>
     public async Task<bool> OpenFileAsync(string path, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
@@ -42,6 +54,8 @@ public sealed class AvaloniaPlatformLauncher : IPlatformLauncher
         return launched;
     }
 
+    /// <summary>
+    /// <inheritdoc/>
     public async Task<bool> OpenFolderAsync(string path, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);

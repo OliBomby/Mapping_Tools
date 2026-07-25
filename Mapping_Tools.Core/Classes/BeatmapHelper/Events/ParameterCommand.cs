@@ -10,11 +10,25 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 #nullable disable
 
     public class ParameterCommand : Command, IHasEndTime {
+        /// <summary>
+        /// Gets the storyboard parameter-command token.
+        /// </summary>
         public override EventType EventType => EventType.P;
+        /// <summary>
+        /// Gets or sets the interpolation curve applied to the parameter toggle.
+        /// </summary>
         public EasingType Easing { get; set; }
+        /// <summary>
+        /// <inheritdoc/>
         public double EndTime { get; set; }
+        /// <summary>
+        /// Gets or sets the storyboard parameter token, such as additive blending
+        /// or horizontal/vertical flipping.
+        /// </summary>
         public string Parameter { get; set; }
 
+        /// <summary>
+        /// <inheritdoc/>
         public override string GetLine() {
             var builder = new StringBuilder(9);
 
@@ -34,6 +48,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
             return builder.ToString();
         }
 
+        /// <summary>
+        /// <inheritdoc/>
         public override void SetLine(string line) {
             var subLine = RemoveIndents(line);
             var values = subLine.Split(',');

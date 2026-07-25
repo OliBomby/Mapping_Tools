@@ -48,6 +48,11 @@ static Control CreateParameterlessView(string name)
 
 internal sealed record RenderOptions(string View, string Output, double Width, double Height, bool List)
 {
+    /// <summary>
+    /// Parses renderer command-line options and supplies deterministic defaults.
+    /// </summary>
+    /// <param name="args">The renderer command-line arguments.</param>
+    /// <returns>The requested view, output path, dimensions, and list mode.</returns>
     public static RenderOptions Parse(string[] args)
     {
         string? Value(string key) => args.SkipWhile(value => value != key).Skip(1).FirstOrDefault();

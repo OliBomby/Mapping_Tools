@@ -327,6 +327,11 @@ namespace Mapping_Tools.Classes.MathUtil {
             return diff <= tolerance;
         }
 
+        /// <summary>
+        /// Packs up to 32 little-endian bits into a signed integer.
+        /// </summary>
+        /// <param name="bitArray">Bits whose index corresponds to the integer bit position.</param>
+        /// <returns>The packed integer.</returns>
         public static int GetIntFromBitArray(BitArray bitArray) {
             if (bitArray.Length > 32)
                 throw new ArgumentException("Argument length shall be at most 32 bits.");
@@ -337,30 +342,55 @@ namespace Mapping_Tools.Classes.MathUtil {
         }
 
         // Secant 
+        /// <summary>
+        /// Computes the secant of an angle in radians.
+        /// </summary>
+        /// <param name="x">The angle in radians.</param>
+        /// <returns><c>1 / cos(x)</c>.</returns>
         public static double Sec(double x)
         {
             return 1/Math.Cos(x);
         }
 
         // Cosecant
+        /// <summary>
+        /// Computes the cosecant of an angle in radians.
+        /// </summary>
+        /// <param name="x">The angle in radians.</param>
+        /// <returns><c>1 / sin(x)</c>.</returns>
         public static double Cosec(double x)
         {
             return 1/Math.Sin(x);
         }
 
         // Cotangent 
+        /// <summary>
+        /// Computes the cotangent of an angle in radians.
+        /// </summary>
+        /// <param name="x">The angle in radians.</param>
+        /// <returns><c>1 / tan(x)</c>.</returns>
         public static double Cotan(double x)
         {
             return 1/Math.Tan(x);
         }
 
         // Inverse Sine 
+        /// <summary>
+        /// Computes the principal inverse sine using the ratio identity.
+        /// </summary>
+        /// <param name="x">The ratio whose principal inverse angle is requested.</param>
+        /// <returns>An angle in radians.</returns>
         public static double Arcsin(double x)
         {
             return Math.Atan(x / Math.Sqrt(-x * x + 1));
         }
 
         // Inverse Cosine 
+        /// <summary>
+        /// Computes the principal inverse cosine using the ratio identity.
+        /// </summary>
+        /// <param name="x">The ratio whose principal inverse angle is requested.</param>
+        /// <returns>An angle in radians.</returns>
         public static double Arccos(double x)
         {
             return Math.Atan(-x / Math.Sqrt(-x * x + 1)) + 2 * Math.Atan(1);
@@ -368,96 +398,177 @@ namespace Mapping_Tools.Classes.MathUtil {
 
 
         // Inverse Secant 
+        /// <summary>
+        /// Computes the principal inverse secant.
+        /// </summary>
+        /// <param name="x">The secant value whose principal inverse angle is requested.</param>
+        /// <returns>An angle in radians.</returns>
         public static double Arcsec(double x)
         {
             return 2 * Math.Atan(1) - Math.Atan(Math.Sign(x) / Math.Sqrt(x * x - 1));
         }
 
         // Inverse Cosecant 
+        /// <summary>
+        /// Computes the principal inverse cosecant.
+        /// </summary>
+        /// <param name="x">The cosecant value whose principal inverse angle is requested.</param>
+        /// <returns>An angle in radians.</returns>
         public static double Arccosec(double x)
         {
             return Math.Atan(Math.Sign(x) / Math.Sqrt(x * x - 1));
         }
 
         // Inverse Cotangent 
+        /// <summary>
+        /// Computes the principal inverse cotangent.
+        /// </summary>
+        /// <param name="x">The cotangent value whose principal inverse angle is requested.</param>
+        /// <returns>An angle in radians.</returns>
         public static double Arccotan(double x)
         {
             return 2 * Math.Atan(1) - Math.Atan(x);
         } 
 
         // Hyperbolic Sine 
+        /// <summary>
+        /// Computes the hyperbolic sine.
+        /// </summary>
+        /// <param name="x">The real hyperbolic argument.</param>
+        /// <returns><c>(e^x - e^-x) / 2</c>.</returns>
         public static double HSin(double x)
         {
             return (Math.Exp(x) - Math.Exp(-x)) / 2 ;
         }
 
         // Hyperbolic Cosine 
+        /// <summary>
+        /// Computes the hyperbolic cosine.
+        /// </summary>
+        /// <param name="x">The real hyperbolic argument.</param>
+        /// <returns><c>(e^x + e^-x) / 2</c>.</returns>
         public static double HCos(double x)
         {
             return (Math.Exp(x) + Math.Exp(-x)) / 2 ;
         }
 
         // Hyperbolic Tangent 
+        /// <summary>
+        /// Computes the hyperbolic tangent.
+        /// </summary>
+        /// <param name="x">The real hyperbolic argument.</param>
+        /// <returns>The ratio of hyperbolic sine to hyperbolic cosine.</returns>
         public static double HTan(double x)
         {
             return (Math.Exp(x) - Math.Exp(-x)) / (Math.Exp(x) + Math.Exp(-x));
         } 
 
         // Hyperbolic Secant 
+        /// <summary>
+        /// Computes the hyperbolic secant.
+        /// </summary>
+        /// <param name="x">The real hyperbolic argument.</param>
+        /// <returns>The reciprocal of hyperbolic cosine.</returns>
         public static double HSec(double x)
         {
             return 2 / (Math.Exp(x) + Math.Exp(-x));
         } 
 
         // Hyperbolic Cosecant 
+        /// <summary>
+        /// Computes the hyperbolic cosecant.
+        /// </summary>
+        /// <param name="x">The nonzero real hyperbolic argument.</param>
+        /// <returns>The reciprocal of hyperbolic sine.</returns>
         public static double HCosec(double x)
         {
             return 2 / (Math.Exp(x) - Math.Exp(-x));
         } 
 
         // Hyperbolic Cotangent 
+        /// <summary>
+        /// Computes the hyperbolic cotangent.
+        /// </summary>
+        /// <param name="x">The nonzero real hyperbolic argument.</param>
+        /// <returns>The ratio of hyperbolic cosine to hyperbolic sine.</returns>
         public static double HCotan(double x)
         {
             return (Math.Exp(x) + Math.Exp(-x)) / (Math.Exp(x) - Math.Exp(-x));
         } 
 
         // Inverse Hyperbolic Sine 
+        /// <summary>
+        /// Computes the inverse hyperbolic sine.
+        /// </summary>
+        /// <param name="x">The hyperbolic-sine value to invert.</param>
+        /// <returns>The real-valued inverse where defined.</returns>
         public static double HArcsin(double x)
         {
             return Math.Log(x + Math.Sqrt(x * x + 1)) ;
         }
 
         // Inverse Hyperbolic Cosine 
+        /// <summary>
+        /// Computes the inverse hyperbolic cosine.
+        /// </summary>
+        /// <param name="x">The hyperbolic-cosine value to invert; must be at least one for a real result.</param>
+        /// <returns>The real-valued inverse for inputs at least one.</returns>
         public static double HArccos(double x)
         {
             return Math.Log(x + Math.Sqrt(x * x - 1));
         }
 
         // Inverse Hyperbolic Tangent 
+        /// <summary>
+        /// Computes the inverse hyperbolic tangent.
+        /// </summary>
+        /// <param name="x">The hyperbolic-tangent value to invert; real inputs lie between -1 and 1.</param>
+        /// <returns>The real-valued inverse for inputs between -1 and 1.</returns>
         public static double HArctan(double x)
         {
             return Math.Log((1 + x) / (1 - x)) / 2 ;
         }
 
         // Inverse Hyperbolic Secant 
+        /// <summary>
+        /// Computes the inverse hyperbolic secant.
+        /// </summary>
+        /// <param name="x">The hyperbolic-secant value to invert.</param>
+        /// <returns>The logarithmic inverse where defined.</returns>
         public static double HArcsec(double x)
         {
             return Math.Log((Math.Sqrt(-x * x + 1) + 1) / x);
         } 
 
         // Inverse Hyperbolic Cosecant 
+        /// <summary>
+        /// Computes the inverse hyperbolic cosecant.
+        /// </summary>
+        /// <param name="x">The nonzero hyperbolic-cosecant value to invert.</param>
+        /// <returns>The logarithmic inverse where defined.</returns>
         public static double HArccosec(double x)
         {
             return Math.Log((Math.Sign(x) * Math.Sqrt(x * x + 1) + 1) / x) ;
         }
 
         // Inverse Hyperbolic Cotangent 
+        /// <summary>
+        /// Computes the inverse hyperbolic cotangent.
+        /// </summary>
+        /// <param name="x">The hyperbolic-cotangent value to invert.</param>
+        /// <returns>The logarithmic inverse where defined.</returns>
         public static double HArccotan(double x)
         {
             return Math.Log((x + 1) / (x - 1)) / 2;
         } 
 
         // Logarithm to base N 
+        /// <summary>
+        /// Computes a logarithm in an arbitrary base by change of base.
+        /// </summary>
+        /// <param name="x">The positive value whose logarithm is requested.</param>
+        /// <param name="n">The positive base other than one.</param>
+        /// <returns><c>ln(x) / ln(n)</c>.</returns>
         public static double LogN(double x, double n)
         {
             return Math.Log(x) / Math.Log(n);

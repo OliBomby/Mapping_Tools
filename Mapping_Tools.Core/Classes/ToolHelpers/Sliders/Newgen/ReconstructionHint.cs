@@ -4,6 +4,9 @@ using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
+    /// <summary>
+    /// Preserves an original slider segment so an edited sampled path can reuse its anchors where possible.
+    /// </summary>
     public struct ReconstructionHint {
         /// <summary>
         /// The start node in the point path.
@@ -50,6 +53,17 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
         /// </summary>
         public readonly Func<double, double> DistFunc;
 
+        /// <summary>
+        /// Associates a path interval with source anchors, precedence, and completion mapping.
+        /// </summary>
+        /// <param name="start">The first sampled-path node covered by the hint.</param>
+        /// <param name="end">The final sampled-path node covered by the hint.</param>
+        /// <param name="layer">The layer.</param>
+        /// <param name="anchors">Original control points to reuse, or null for a void interval.</param>
+        /// <param name="pathType">The path type.</param>
+        /// <param name="startP">The start p.</param>
+        /// <param name="endP">The end p.</param>
+        /// <param name="distFunc">The dist func.</param>
         public ReconstructionHint(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int layer, List<Vector2> anchors,
             PathType pathType = PathType.Bezier, double startP = 0, double endP = 1, Func<double, double> distFunc = null) {
             Start = start;
@@ -62,10 +76,23 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             DistFunc = distFunc;
         }
 
+        /// <summary>
+        /// Returns a copy restricted to a smaller point and source-completion interval.
+        /// </summary>
+        /// <param name="start">The new first covered node.</param>
+        /// <param name="end">The new final covered node.</param>
+        /// <param name="startP">The start p.</param>
+        /// <param name="endP">The end p.</param>
+        /// <returns>The restricted hint with the same anchors, type, layer, and distance mapping.</returns>
         public ReconstructionHint Cut(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, double startP = 0, double endP = 1) {
             return new ReconstructionHint(start, end, Layer, Anchors, PathType, startP, endP, DistFunc);
         }
 
+        /// <summary>
+        /// Returns a copy with a new curve-to-hint distance mapping.
+        /// </summary>
+        /// <param name="distFunc">The dist func.</param>
+        /// <returns>The updated immutable hint value.</returns>
         public ReconstructionHint SetDistFunc(Func<double, double> distFunc) {
             return new ReconstructionHint(Start, End, Layer, Anchors, PathType, StartP, EndP, distFunc);
         }

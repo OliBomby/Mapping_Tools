@@ -12,9 +12,20 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
     /// </summary>
     public static class BezierConverter {
         private struct CircleBezierPreset {
+            /// <summary>
+            /// The largest circle-arc sweep for which this preset meets the approximation tolerance.
+            /// </summary>
             public readonly double MaxAngle;
+            /// <summary>
+            /// Unit-circle Bézier control points transformed onto the requested arc.
+            /// </summary>
             public readonly List<Vector2> Points;
 
+            /// <summary>
+            /// Associates an angular threshold with a unit-circle control polygon.
+            /// </summary>
+            /// <param name="maxAngle">The max angle.</param>
+            /// <param name="points">Unit-circle Bézier control points for the preset arc.</param>
             public CircleBezierPreset(double maxAngle, List<Vector2> points)
             {
                 MaxAngle = maxAngle;
@@ -79,7 +90,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         }
 
         /// <summary>
-        /// 
+        /// Converts a perfect-curve path to Bézier segments; non-perfect paths are returned unchanged.
         /// </summary>
         /// <param name="perfectPath"></param>
         /// <returns></returns>
@@ -95,7 +106,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         }
 
         /// <summary>
-        /// 
+        /// Approximates a stable circular arc with one or more preset Bézier segments.
         /// </summary>
         /// <param name="ca"></param>
         /// <returns></returns>
@@ -107,7 +118,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         }
 
         /// <summary>
-        /// 
+        /// Creates a Bézier path from three perfect-curve anchors.
         /// </summary>
         /// <param name="perfectAnchors"></param>
         /// <returns></returns>
@@ -119,7 +130,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         }
 
         /// <summary>
-        /// 
+        /// Converts three perfect-curve anchors into Bézier control points, preserving unstable input unchanged.
         /// </summary>
         /// <param name="perfectAnchors"></param>
         /// <returns></returns>
@@ -131,7 +142,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         }
 
         /// <summary>
-        /// 
+        /// Maps a stable circle arc onto the smallest preset whose angular tolerance covers its sweep.
         /// </summary>
         /// <param name="cs"></param>
         /// <returns></returns>
@@ -175,7 +186,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         }
 
         /// <summary>
-        /// 
+        /// Converts a Catmull path to joined cubic Bézier segments; other path types are returned unchanged.
         /// </summary>
         /// <param name="catmullPath"></param>
         /// <returns></returns>
@@ -191,7 +202,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         }
 
         /// <summary>
-        /// 
+        /// Creates a Bézier path from Catmull control points.
         /// </summary>
         /// <param name="catmullAnchors"></param>
         /// <returns></returns>
@@ -203,7 +214,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         }
 
         /// <summary>
-        /// 
+        /// Converts each Catmull span into its equivalent cubic Bézier control polygon.
         /// </summary>
         /// <param name="pts"></param>
         /// <returns></returns>
@@ -229,7 +240,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         }
 
         /// <summary>
-        /// 
+        /// Converts a linear path to first-order Bézier segments; other path types are returned unchanged.
         /// </summary>
         /// <param name="linearPath"></param>
         /// <returns></returns>
@@ -245,7 +256,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         }
 
         /// <summary>
-        /// 
+        /// Creates a Bézier path from polyline anchors.
         /// </summary>
         /// <param name="linearAnchors"></param>
         /// <returns></returns>
@@ -257,7 +268,7 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders {
         }
 
         /// <summary>
-        /// 
+        /// Separates consecutive line segments with duplicated red anchors in Bézier serialization form.
         /// </summary>
         /// <param name="pts"></param>
         /// <returns></returns>

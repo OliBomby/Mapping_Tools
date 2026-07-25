@@ -11,7 +11,12 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 #nullable disable
 
     public class OtherCommand : Command, IHasEndTime {
+        /// <summary>
+        /// Gets or sets the interpolation curve applied between parameter values.
+        /// </summary>
         public EasingType Easing { get; set; }
+        /// <summary>
+        /// <inheritdoc/>
         public double EndTime { get; set; }
 
         /// <summary>
@@ -24,6 +29,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// </summary>
         public string FallbackEventType { get; set; }
 
+        /// <summary>
+        /// <inheritdoc/>
         public override string GetLine() {
             var builder = new StringBuilder(8 + Params.Length * 2);
 
@@ -45,6 +52,8 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
             return builder.ToString();
         }
 
+        /// <summary>
+        /// <inheritdoc/>
         public override void SetLine(string line) {
             var subLine = RemoveIndents(line);
             var values = subLine.Split(',');

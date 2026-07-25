@@ -1,7 +1,19 @@
 namespace Mapping_Tools.ApplicationServices.Platform;
 
+/// <summary>
+/// Describes one portable native-file-dialog filter using the metadata formats
+/// required by Windows/Linux patterns, MIME-aware platforms, and macOS.
+/// </summary>
 public sealed class FilePickerFilter
 {
+    /// <summary>
+    /// Creates a normalized, case-insensitive file filter.
+    /// </summary>
+    /// <param name="name">The label shown by the native picker.</param>
+    /// <param name="patterns">Filename patterns such as <c>*.osu</c>.</param>
+    /// <param name="mimeTypes">Optional MIME types for platforms that support them.</param>
+    /// <param name="appleUniformTypeIdentifiers">Optional Apple uniform type identifiers.</param>
+    /// <exception cref="ArgumentException">The name is blank or no non-blank pattern is supplied.</exception>
     public FilePickerFilter(
         string name,
         IEnumerable<string> patterns,
@@ -23,12 +35,24 @@ public sealed class FilePickerFilter
         AppleUniformTypeIdentifiers = CleanValues(appleUniformTypeIdentifiers ?? []);
     }
 
+    /// <summary>
+    /// Gets the trimmed display label.
+    /// </summary>
     public string Name { get; }
 
+    /// <summary>
+    /// Gets distinct, trimmed filename patterns.
+    /// </summary>
     public IReadOnlyList<string> Patterns { get; }
 
+    /// <summary>
+    /// Gets distinct, trimmed MIME types.
+    /// </summary>
     public IReadOnlyList<string> MimeTypes { get; }
 
+    /// <summary>
+    /// Gets distinct, trimmed Apple uniform type identifiers.
+    /// </summary>
     public IReadOnlyList<string> AppleUniformTypeIdentifiers { get; }
 
     private static string[] CleanValues(IEnumerable<string> values)

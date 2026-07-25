@@ -8,14 +8,26 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 #nullable disable
 
     public class TriggerLoop : Command, IHasEndTime {
+        /// <summary>
+        /// Gets the storyboard-trigger command token.
+        /// </summary>
         public override EventType EventType => EventType.T;
+        /// <summary>
+        /// <inheritdoc/>
         public double EndTime { get; set; }
+        /// <summary>
+        /// Gets or sets the gameplay trigger expression controlling the nested commands.
+        /// </summary>
         public string TriggerName { get; set; }
 
+        /// <summary>
+        /// <inheritdoc/>
         public override string GetLine() {
             return $"{EventType},{TriggerName},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{(SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant())}";
         }
 
+        /// <summary>
+        /// <inheritdoc/>
         public override void SetLine(string line) {
             var subLine = RemoveIndents(line);
             var values = subLine.Split(',');

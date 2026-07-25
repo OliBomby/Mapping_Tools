@@ -25,7 +25,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Enums {
         Linear,
 
         /// <summary>
-        /// 
+        /// A degree-annotated B-spline encoded with the lazer <c>B4</c> path token.
         /// </summary>
         PerfectCurve,
 

@@ -5,6 +5,9 @@
 #nullable disable
 
     public interface IHasEndTime {
+        /// <summary>
+        /// Gets or sets the absolute end time in milliseconds.
+        /// </summary>
         double EndTime { get; set; }
     }
 }

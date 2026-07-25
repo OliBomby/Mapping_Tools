@@ -6,7 +6,15 @@ using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
+    /// <summary>
+    /// Maintains sampled slider paths and their reconstruction metadata during geometric edits.
+    /// </summary>
     public static class PathHelper {
+        /// <summary>
+        /// Samples a slider path and records each original red-anchor segment as a reusable hint.
+        /// </summary>
+        /// <param name="sliderPath">The parsed slider geometry, including its requested pixel length.</param>
+        /// <returns>A linked sample path whose hints preserve the source anchors and truncation.</returns>
         public static PathWithHints CreatePathWithHints(SliderPath sliderPath) {
             var pathWithHints = new PathWithHints();
             var path = pathWithHints.Path;
@@ -129,6 +137,11 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             }
         }
 
+        /// <summary>
+        /// Inserts one Catmull-Rom-interpolated point after a path node.
+        /// </summary>
+        /// <param name="p1">The p1.</param>
+        /// <param name="t">The local interpolation parameter between the node and its successor.</param>
         public static void Interpolate(LinkedListNode<PathPoint> p1, double t) {
             Interpolate(p1, new[] { t });
         }
@@ -140,6 +153,11 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             Interpolate(p1, Enumerable.Range(1, count).Select(o => (double) o / (count + 1)));
         }
 
+        /// <summary>
+        /// Inserts Catmull-Rom-interpolated points at the supplied local parameters after a path node.
+        /// </summary>
+        /// <param name="p1">The p1.</param>
+        /// <param name="ts">The ts.</param>
         public static void Interpolate(LinkedListNode<PathPoint> p1, IEnumerable<double> ts) {
             if (p1.List is null) {
                 throw new ArgumentException(@"Point 1 must be part of a linked list.", nameof(p1));
@@ -530,6 +548,11 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             return node.Previous;
         }
 
+        /// <summary>
+        /// Finds the next curvature boundary, treating the path end as a boundary.
+        /// </summary>
+        /// <param name="start">The node before the forward search begins.</param>
+        /// <returns>The next red or terminal node, or null when no successor exists.</returns>
         public static LinkedListNode<PathPoint> FindNextRed(LinkedListNode<PathPoint> start) {
             var current = start?.Next;
             while (current is not null) {
@@ -542,6 +565,11 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
             return null;
         }
 
+        /// <summary>
+        /// Finds the previous curvature boundary, treating the path start as a boundary.
+        /// </summary>
+        /// <param name="start">The node after which the backward search begins.</param>
+        /// <returns>The previous red or initial node, or null when no predecessor exists.</returns>
         public static LinkedListNode<PathPoint> FindPreviousRed(LinkedListNode<PathPoint> start) {
             var current = start?.Previous;
             while (current is not null) {

@@ -32,6 +32,11 @@ namespace Mapping_Tools.Classes.MathUtil {
             DirectionVector = directionVector;
         }
 
+        /// <summary>
+        /// Constructs a line from an origin and an angle measured counter-clockwise in radians.
+        /// </summary>
+        /// <param name="positionVector">A point on the line.</param>
+        /// <param name="angle">The direction angle in radians.</param>
         public Line2(Vector2 positionVector, double angle)
         {
             PositionVector = positionVector;
@@ -95,6 +100,12 @@ namespace Mapping_Tools.Classes.MathUtil {
                    left.DirectionVector.Length;
         }
 
+        /// <summary>
+        /// Projects a point onto an infinite line.
+        /// </summary>
+        /// <param name="left">The line onto which to project.</param>
+        /// <param name="right">The point to project.</param>
+        /// <returns>The intersection between the line and the perpendicular line through the point.</returns>
         public static Vector2 NearestPoint(Line2 left, Vector2 right) {
             var perp = left.PerpendicularLeft();
             perp.PositionVector = right;

@@ -129,6 +129,13 @@ internal static class Program
 
 internal sealed class StaticJsonHandler : HttpMessageHandler
 {
+    /// <summary>
+    /// Returns an empty JSON array so isolated legacy views cannot perform live
+    /// update or network discovery during deterministic rendering.
+    /// </summary>
+    /// <param name="request">The intercepted request; its destination is intentionally ignored.</param>
+    /// <param name="cancellationToken">The renderer cancellation token.</param>
+    /// <returns>A successful response containing <c>[]</c>.</returns>
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
         Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
         {
@@ -138,6 +145,11 @@ internal sealed class StaticJsonHandler : HttpMessageHandler
 
 internal sealed record RenderOptions(string View, string Output, double Width, double Height, bool List)
 {
+    /// <summary>
+    /// Parses renderer command-line options and supplies deterministic WPF defaults.
+    /// </summary>
+    /// <param name="args">The renderer command-line arguments.</param>
+    /// <returns>The requested view, output path, dimensions, and list mode.</returns>
     public static RenderOptions Parse(string[] args)
     {
         string? Value(string key) => args.SkipWhile(value => value != key).Skip(1).FirstOrDefault();

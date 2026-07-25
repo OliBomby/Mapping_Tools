@@ -5,24 +5,46 @@ using Mapping_Tools.Classes.BeatmapHelper.Enums;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
-    /// 
+    /// Groups every generated sample layer that plays at one timestamp.
     /// </summary>
     public class SamplePackage {
+        /// <summary>
+        /// The common playback time in milliseconds.
+        /// </summary>
         public double Time;
+        /// <summary>
+        /// The distinct sample layers that play at <see cref="Time"/>.
+        /// </summary>
         public HashSet<Sample> Samples;
 
+        /// <summary>
+        /// Gets the loudest event-level volume among the package layers.
+        /// </summary>
         public double MaxOutsideVolume => Samples.Max(s => s.OutsideVolume);
 
+        /// <summary>
+        /// Creates a package around an existing sample set.
+        /// </summary>
+        /// <param name="time">The playback time in milliseconds.</param>
+        /// <param name="samples">The layers playing at that time.</param>
         public SamplePackage(double time, HashSet<Sample> samples) {
             Time = time;
             Samples = samples;
         }
 
+        /// <summary>
+        /// Creates an empty package at a playback time.
+        /// </summary>
+        /// <param name="time">The playback time in milliseconds.</param>
         public SamplePackage(double time) {
             Time = time;
             Samples = new HashSet<Sample>();
         }
 
+        /// <summary>
+        /// Applies one event-level volume multiplier to every layer in the package.
+        /// </summary>
+        /// <param name="outsideVolume">The multiplier assigned to each sample.</param>
         public void SetAllOutsideVolume(double outsideVolume) {
             foreach (var sample in Samples) {
                 sample.OutsideVolume = outsideVolume;
@@ -57,6 +79,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return sampleSet;
         }
 
+        /// <summary>
+        /// Resolves the addition sample family by lowest priority, falling back to normal layers.
+        /// </summary>
+        /// <returns>The family for whistle, finish, and clap, or auto when none is available.</returns>
         public SampleSet GetAdditions() {
             SampleSet additions = SampleSet.None;
             int bestPriority = int.MaxValue;
@@ -81,6 +107,11 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             return additions;
         }
 
+        /// <summary>
+        /// Converts package layers into the twelve standard sample slots of an unassigned custom index.
+        /// </summary>
+        /// <param name="comparer">The identity policy used to deduplicate generation arguments.</param>
+        /// <returns>A custom-index requirement whose sample family follows the resolved normal and addition sets.</returns>
         public CustomIndex GetCustomIndex(SampleGeneratingArgsComparer comparer = null) {
             if (comparer == null)
                 comparer = new SampleGeneratingArgsComparer();

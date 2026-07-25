@@ -24,8 +24,17 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         private List<TimingPoint> redlines;
         private List<TimingPoint> greenlines;
 
+        /// <summary>
+        /// Gets the timing points.
+        /// </summary>
         public IReadOnlyList<TimingPoint> TimingPoints => timingPoints;
+        /// <summary>
+        /// Gets the redlines.
+        /// </summary>
         public IReadOnlyList<TimingPoint> Redlines => redlines;
+        /// <summary>
+        /// Gets the greenlines.
+        /// </summary>
         public IReadOnlyList<TimingPoint> Greenlines => greenlines;
 
         /// <summary>
@@ -33,16 +42,30 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </summary>
         public double SliderMultiplier { get; set; }
 
+        /// <summary>
+        /// Creates empty timing data with a global slider multiplier.
+        /// </summary>
+        /// <param name="sliderMultiplier">The slider multiplier.</param>
         public Timing(double sliderMultiplier) {
             SetTimingPoints(null);
             SliderMultiplier = sliderMultiplier;
         }
 
+        /// <summary>
+        /// Creates timing data from points, sorting and partitioning redlines and greenlines.
+        /// </summary>
+        /// <param name="timingPoints">The timing points.</param>
+        /// <param name="sliderMultiplier">The slider multiplier.</param>
         public Timing(List<TimingPoint> timingPoints, double sliderMultiplier) {
             SetTimingPoints(timingPoints);
             SliderMultiplier = sliderMultiplier;
         }
 
+        /// <summary>
+        /// Parses timing-point lines and builds sorted timing indexes.
+        /// </summary>
+        /// <param name="timingLines">The timing lines.</param>
+        /// <param name="sliderMultiplier">The slider multiplier.</param>
         public Timing(IEnumerable<string> timingLines, double sliderMultiplier) {
             SetTimingPoints(GetTimingPoints(timingLines).ToList());
             SliderMultiplier = sliderMultiplier;
@@ -70,6 +93,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
 
         #region BasicOperations
 
+        /// <summary>
+        /// Inserts a timing point into the complete list and the matching redline/greenline index while preserving order.
+        /// </summary>
+        /// <param name="tp">The tp.</param>
         public void Add(TimingPoint tp) {
             if (tp == null) return;
 
@@ -94,6 +121,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// Removes the equal sorted entry from both the complete and type-specific indexes.
+        /// </summary>
+        /// <param name="tp">The tp.</param>
+        /// <returns><see langword="true"/> when the point was present in its type-specific index.</returns>
         public bool Remove(TimingPoint tp) {
             var index = timingPoints.BinarySearch(tp);
             if (index >= 0) {
@@ -117,12 +149,21 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return false;
         }
 
+        /// <summary>
+        /// Inserts each point through <see cref="Add(TimingPoint)"/> so all indexes remain sorted.
+        /// </summary>
+        /// <param name="timingPoints">The timing points.</param>
         public void AddRange(IEnumerable<TimingPoint> timingPoints) {
             foreach (var timingPoint in timingPoints) {
                 Add(timingPoint);
             }
         }
 
+        /// <summary>
+        /// Copies the chronologically sorted complete timing list into an array.
+        /// </summary>
+        /// <param name="array">The array.</param>
+        /// <param name="arrayIndex">The array index.</param>
         public void CopyTo(TimingPoint[] array, int arrayIndex) {
             timingPoints.CopyTo(array, arrayIndex);
         }
@@ -131,23 +172,46 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return tp != null && Remove(tp);
         }
 
+        /// <summary>
+        /// Gets the count.
+        /// </summary>
         public int Count => timingPoints.Count;
+        /// <summary>
+        /// Gets the is read only.
+        /// </summary>
         public bool IsReadOnly => false;
 
+        /// <summary>
+        /// Removes every point from the complete, redline, and greenline indexes.
+        /// </summary>
         public void Clear() {
             timingPoints.Clear();
             redlines.Clear();
             greenlines.Clear();
         }
 
+        /// <summary>
+        /// Checks the complete timing list using <see cref="TimingPoint.Equals(TimingPoint)"/>.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns><see langword="true"/> when an equal point exists.</returns>
         public bool Contains(TimingPoint item) {
             return timingPoints.Contains(item);
         }
 
+        /// <summary>
+        /// Shifts every timing-point offset by a number of milliseconds without changing order.
+        /// </summary>
+        /// <param name="offset">The offset.</param>
         public void Offset(double offset) {
             timingPoints.ForEach(tp => tp.Offset += offset);
         }
 
+        /// <summary>
+        /// Removes every point matching a predicate while keeping all indexes synchronized.
+        /// </summary>
+        /// <param name="match">The match.</param>
+        /// <returns>The number of removed points.</returns>
         public int RemoveAll(Func<TimingPoint, bool> match) {
             var itemsToRemove = timingPoints.Where(match).ToList();
 
@@ -158,6 +222,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return itemsToRemove.Count;
         }
 
+        /// <summary>
+        /// Enumerates all timing points in chronological order.
+        /// </summary>
+        /// <returns>An enumerator over the complete timing list.</returns>
         public IEnumerator<TimingPoint> GetEnumerator() {
             return timingPoints.GetEnumerator();
         }
@@ -166,6 +234,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return GetEnumerator();
         }
 
+        /// <summary>
+        /// Finds a point's index in the complete chronological list.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>The zero-based index, or -1 when absent.</returns>
         public int IndexOf(TimingPoint item) {
             return timingPoints.IndexOf(item);
         }
@@ -177,16 +250,29 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Add(item);
         }
 
+        /// <summary>
+        /// Removes the point at a chronological index from every relevant index.
+        /// </summary>
+        /// <param name="index">The chronological index to remove.</param>
         public void RemoveAt(int index) {
             var itemToRemove = timingPoints[index];
             Remove(itemToRemove);
         }
 
+        /// <summary>
+        /// Gets or sets the value at the specified index.
+        /// </summary>
+        /// <param name="index">The chronological index.</param>
+        /// <returns>The point at the chronological index.</returns>
         public TimingPoint this[int index] {
             get => timingPoints[index];
             set => timingPoints[index] = value;
         }
 
+        /// <summary>
+        /// Deep-copies timing points while preserving the global slider multiplier.
+        /// </summary>
+        /// <returns>Independently mutable timing data.</returns>
         public Timing Copy() {
             return new Timing(timingPoints.Select(o => o.Copy()).ToList(), SliderMultiplier);
         }
@@ -650,6 +736,14 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return index + 1 < timingPoints.Count ? index + 1 : -1;
         }
 
+        /// <summary>
+        /// Selects a contiguous chronological slice between two millisecond offsets.
+        /// </summary>
+        /// <param name="startTime">The start time.</param>
+        /// <param name="endTime">The end time.</param>
+        /// <param name="timingPoints">The timing points.</param>
+        /// <param name="inclusive">The inclusive.</param>
+        /// <returns>A new list containing the points inside the inclusive or exclusive bounds.</returns>
         public static List<TimingPoint> GetTimingPointsInRange(double startTime, double endTime,
             List<TimingPoint> timingPoints, bool inclusive = true) {
             if (!inclusive) {
@@ -798,11 +892,24 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return CalculateSliderTemporalLength(time, length, sv);
         }
 
+        /// <summary>
+        /// Converts pixel length to milliseconds using an explicit inherited SV value.
+        /// </summary>
+        /// <param name="time">The slider start time in milliseconds, used to resolve BPM.</param>
+        /// <param name="length">The slider length in osu! pixels.</param>
+        /// <param name="sv">The sv.</param>
+        /// <returns>The duration of one slider span in milliseconds.</returns>
         public double CalculateSliderTemporalLength(double time, double length, double sv) {
             return (length * GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : MathHelper.Clamp(sv, -1000, -10))) / 
                    (-10000 * SliderMultiplier);
         }
 
+        /// <summary>
+        /// Converts pixel length to beats using an explicit inherited SV value.
+        /// </summary>
+        /// <param name="length">The slider length in osu! pixels.</param>
+        /// <param name="sv">The sv.</param>
+        /// <returns>The duration as a number of beats.</returns>
         public double CalculateSliderBeatLength(double length, double sv) {
             return (length * (double.IsNaN(sv) ? -100 : MathHelper.Clamp(sv, -1000, -10))) / 
                    (-10000 * SliderMultiplier);
@@ -819,6 +926,13 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) );
         }
 
+        /// <summary>
+        /// Converts a millisecond duration to slider pixels using an explicit inherited SV value.
+        /// </summary>
+        /// <param name="time">The slider start time in milliseconds, used to resolve BPM.</param>
+        /// <param name="temporalLength">The temporal length.</param>
+        /// <param name="sv">The sv.</param>
+        /// <returns>The slider pixel length.</returns>
         public double CalculateSliderLengthCustomSv(double time, double temporalLength, double sv) {
             return ( -10000 * temporalLength * SliderMultiplier ) / ( GetMpBAtTime(time) * (double.IsNaN(sv) ? -100 : sv) );
         }
@@ -827,6 +941,11 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return timingLines.Select(line => new TimingPoint(line));
         }
 
+        /// <summary>
+        /// Synthesizes timing before the first real point so early objects can resolve beat and sample settings.
+        /// </summary>
+        /// <param name="needRedline">The need redline.</param>
+        /// <returns>An earlier copy of the first redline, a 1000-ms fallback based on the first greenline, or a zeroed default.</returns>
         public TimingPoint GetFirstTimingPointExtended(bool needRedline = false) {
             // Add an extra timingpoint that is the same as the first redline but like 10 x meter beats earlier so any objects before the first redline can use that thing
 

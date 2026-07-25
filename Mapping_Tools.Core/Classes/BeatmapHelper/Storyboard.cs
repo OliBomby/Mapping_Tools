@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
-    /// 
+    /// Parses and serializes the event collections shared by <c>.osu</c> and <c>.osb</c> files.
     /// </summary>
 #nullable disable
 
@@ -64,6 +64,10 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             Initialize();
         }
 
+        /// <summary>
+        /// Creates an empty storyboard with separate collections for every osu! event layer and category.
+        /// </summary>
+        /// <param name="lines">The lines.</param>
         public StoryBoard(List<string> lines) {
             Initialize();
             SetLines(lines);

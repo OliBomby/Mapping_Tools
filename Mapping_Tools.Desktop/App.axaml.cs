@@ -8,15 +8,25 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop;
 
+/// <summary>
+/// Owns Avalonia resource initialization and the desktop dependency-injection scope.
+/// </summary>
 public partial class App : Application
 {
     private ServiceProvider? _serviceProvider;
 
+    /// <summary>
+    /// <inheritdoc/>
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
     }
 
+    /// <summary>
+    /// <summary>
+    /// Builds and validates the desktop service provider, resolves the main
+    /// window, and disposes services when the desktop lifetime exits.
+    /// </summary>
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

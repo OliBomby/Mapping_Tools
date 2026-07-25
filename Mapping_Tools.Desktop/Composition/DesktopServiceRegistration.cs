@@ -12,6 +12,12 @@ namespace Mapping_Tools.Desktop.Composition;
 
 internal static class DesktopServiceRegistration
 {
+    /// <summary>
+    /// Registers the Avalonia shell, platform adapters, application paths, and
+    /// settings pipeline as desktop-lifetime singletons.
+    /// </summary>
+    /// <param name="services">The collection that owns the desktop composition root.</param>
+    /// <returns>The same collection for registration chaining.</returns>
     public static IServiceCollection AddMappingToolsDesktop(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);

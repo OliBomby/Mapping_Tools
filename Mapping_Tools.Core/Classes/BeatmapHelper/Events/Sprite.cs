@@ -5,8 +5,17 @@ using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 #nullable disable
 
+    /// <summary>
+    /// Represents a static storyboard texture and its initial placement.
+    /// </summary>
     public class Sprite : Event {
+        /// <summary>
+        /// Gets or sets the storyboard layer on which the texture is drawn.
+        /// </summary>
         public StoryboardLayer Layer { get; set; }
+        /// <summary>
+        /// Gets or sets the texture point anchored to <see cref="Pos"/>.
+        /// </summary>
         public Origin Origin { get; set; }
 
         /// <summary>
@@ -14,20 +23,19 @@ namespace Mapping_Tools.Classes.BeatmapHelper.Events {
         /// </summary>
         public string FilePath { get; set; }
 
+        /// <summary>
+        /// Gets or sets the sprite's storyboard-space anchor position.
+        /// </summary>
         public Vector2 Pos { get; set; }
 
         /// <summary>
-        /// Serializes this object to .osu code.
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public override string GetLine() {
             return $"Sprite,{Layer},{Origin},\"{FilePath}\",{Pos.X.ToInvariant()},{Pos.Y.ToInvariant()}";
         }
 
         /// <summary>
-        /// Deserializes a string of .osu code and populates the properties of this object.
-        /// </summary>
-        /// <param name="line"></param>
+        /// <inheritdoc/>
         public override void SetLine(string line) {
             string[] values = line.Split(',');
 

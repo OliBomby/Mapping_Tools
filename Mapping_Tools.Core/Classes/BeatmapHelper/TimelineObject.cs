@@ -9,137 +9,161 @@ using Mapping_Tools.Classes.BeatmapHelper.Enums;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
-    /// 
+    /// Represents one playable edge expanded from a hit object, with both explicit and timing-inherited sample state.
     /// </summary>
     public class TimelineObject {
         /// <summary>
-        /// 
+        /// Gets or sets the hit object whose edge this event represents.
         /// </summary>
         public HitObject Origin { get; set; }
         /// <summary>
-        /// 
+        /// Gets or sets the edge time in milliseconds.
         /// </summary>
         public double Time { get; set; }
         /// <summary>
-        /// 
+        /// Gets or sets the edge index: zero for a head, intermediate slider repeats, and the final index for a tail.
         /// </summary>
         public int Repeat { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets or sets the packed osu! gameplay object type inherited from <see cref="Origin"/>.
         /// </summary>
         public int ObjectType { get; set; }
         private BitArray TypeArray => new BitArray(new[] { ObjectType });
 
         /// <summary>
-        /// 
+        /// Indicates that the origin is a circle.
         /// </summary>
         public bool IsCircle => TypeArray[0];
 
         /// <summary>
-        /// 
+        /// Indicates that the origin is a slider.
         /// </summary>
         public bool IsSlider => TypeArray[1];
         /// <summary>
-        /// 
+        /// Indicates that the origin is a spinner.
         /// </summary>
         public bool IsSpinner => TypeArray[3];
+        /// <summary>
+        /// Indicates that the origin is an osu!mania hold note.
+        /// </summary>
         public bool IsHoldNote => TypeArray[7];
+        /// <summary>
+        /// Indicates that this event is a slider head.
+        /// </summary>
         public bool IsSliderHead => IsSlider && Repeat == 0;
+        /// <summary>
+        /// Indicates that this event is an intermediate slider repeat edge.
+        /// </summary>
         public bool IsSliderRepeat => IsSlider && Repeat != 0 && Repeat != Origin.Repeat;
+        /// <summary>
+        /// Indicates that this event is the final slider edge.
+        /// </summary>
         public bool IsSliderEnd => IsSlider && Repeat == Origin.Repeat;
+        /// <summary>
+        /// Indicates that this event is the silent beginning of a spinner.
+        /// </summary>
         public bool IsSpinnerHead => IsSpinner && Repeat == 0;
+        /// <summary>
+        /// Indicates that this event is the playable spinner end.
+        /// </summary>
         public bool IsSpinnerEnd => IsSpinner && Repeat == 1;
+        /// <summary>
+        /// Indicates that this event is the playable beginning of a mania hold note.
+        /// </summary>
         public bool IsHoldnoteHead => IsHoldNote && Repeat == 0;
+        /// <summary>
+        /// Indicates that this event is the mania hold-note release.
+        /// </summary>
         public bool IsHoldnoteEnd => IsHoldNote && Repeat == 1;
 
         /// <summary>
-        /// 
+        /// Gets or sets the event's explicit normal-layer sample family.
         /// </summary>
         public SampleSet SampleSet { get; set; }
         /// <summary>
-        /// 
+        /// Gets or sets the event's explicit addition-layer sample family.
         /// </summary>
         public SampleSet AdditionSet { get; set; }
         /// <summary>
-        /// 
+        /// Indicates that the normal sample bit is set.
         /// </summary>
         public bool Normal { get; set; }
         /// <summary>
-        /// 
+        /// Indicates that the whistle sample bit is set.
         /// </summary>
         public bool Whistle { get; set; }
         /// <summary>
-        /// 
+        /// Indicates that the finish sample bit is set.
         /// </summary>
         public bool Finish { get; set; }
         /// <summary>
-        /// 
+        /// Indicates that the clap sample bit is set.
         /// </summary>
         public bool Clap { get; set; }
 
         /// <summary>
-        /// 
+        /// Indicates that this edge type produces a gameplay hitsound.
         /// </summary>
         public bool HasHitsound =>
             IsCircle || IsSliderHead || IsHoldnoteHead || IsSliderEnd || IsSpinnerEnd || IsSliderRepeat;
 
         /// <summary>
-        /// 
+        /// Indicates that this circle or hold-note head uses an explicit custom filename.
         /// </summary>
         public bool UsesFilename => !string.IsNullOrEmpty(Filename) && (IsCircle || IsHoldnoteHead);
 
         /// <summary>
-        /// 
+        /// Indicates that this edge type supports object-level custom index, volume, and filename fields.
         /// </summary>
         public bool CanCustoms => IsCircle || IsHoldnoteHead;
 
         /// <summary>
-        /// 
+        /// Gets or sets the event's explicit custom sample index.
         /// </summary>
         public int CustomIndex { get; set; }
         /// <summary>
-        /// 
+        /// Gets or sets the event's explicit sample volume percentage.
         /// </summary>
         public double SampleVolume { get; set; }
         /// <summary>
-        /// 
+        /// Gets or sets the explicit beatmap-relative custom filename.
         /// </summary>
         public string Filename { get; set; }
 
         // Special combined with greenline
         /// <summary>
-        /// 
+        /// Gets or sets the timing point active at the exact edge time.
         /// </summary>
         public TimingPoint TimingPoint { get; set; }
         /// <summary>
-        /// 
+        /// Gets or sets the timing point used for hitsound inheritance, including osu!'s five-millisecond lookup offset.
         /// </summary>
         public TimingPoint HitsoundTimingPoint { get; set; }
         /// <summary>
-        /// 
+        /// Gets or sets the uninherited timing point supplying BPM at this edge.
         /// </summary>
         public TimingPoint UninheritedTimingPoint { get; set; }
         /// <summary>
-        /// 
+        /// Gets or sets the fully resolved normal-layer sample family.
         /// </summary>
         public SampleSet FenoSampleSet { get; set; }
         /// <summary>
-        /// 
+        /// Gets or sets the fully resolved addition-layer sample family.
         /// </summary>
         public SampleSet FenoAdditionSet { get; set; }
         /// <summary>
-        /// 
+        /// Gets or sets the fully resolved custom sample index.
         /// </summary>
         public int FenoCustomIndex { get; set; }
         /// <summary>
-        /// 
+        /// Gets or sets the fully resolved sample volume percentage.
         /// </summary>
         public double FenoSampleVolume { get; set; }
 
         // 
         /// <summary>
-        /// 
+        /// Controls whether hitsound-copy operations may use this edge.
         /// </summary>
         /// <remarks>Special for hitsound copier</remarks>
         public bool CanCopy = true;
@@ -200,9 +224,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// 
+        /// Packs the normal, whistle, finish, and clap flags into the osu! hitsound integer.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The packed hitsound bit field.</returns>
         public int GetHitsounds() {
             return MathHelper.GetIntFromBitArray(new BitArray(new[] { Normal, Whistle, Finish, Clap }));
         }
@@ -234,6 +258,9 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// Clears resolved sample overrides on this expanded timeline event.
+        /// </summary>
         public void ResetHitsounds() {
             Normal = false;
             Whistle = false;
@@ -254,7 +281,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// 
+        /// Lists the resolved sample family, layer, and custom index combinations that play at this edge.
         /// </summary>
         /// <param name="mode"></param>
         /// <returns></returns>
@@ -302,7 +329,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// 
+        /// Resolves filenames through a first-identical-sample map so duplicate audio refers to its canonical file.
         /// </summary>
         /// <param name="mode"></param>
         /// <param name="mapDir"></param>
@@ -359,7 +386,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// 
+        /// Writes this expanded edge's sample edits back into the appropriate origin object or slider-edge fields.
         /// </summary>
         public void HitsoundsToOrigin() {
             if (Origin.IsCircle || (Origin.IsSpinner && Repeat == 1) || (Origin.IsHoldNote && Repeat == 0)) {
@@ -377,7 +404,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// 
+        /// Resolves auto sample families, custom index, and volume against the active hitsound timing point.
         /// </summary>
         /// <param name="hstp"></param>
         public void GiveHitsoundTimingPoint(TimingPoint hstp) {
@@ -409,10 +436,18 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             }
         }
 
+        /// <summary>
+        /// Copies the expanded event while retaining its reference to the originating hit object.
+        /// </summary>
+        /// <returns>An independently mutable timeline event.</returns>
         public TimelineObject Copy() {
             return (TimelineObject) MemberwiseClone();
         }
 
+        /// <summary>
+        /// Formats the event's time, edge role, and resolved sample state for diagnostics.
+        /// </summary>
+        /// <returns>A diagnostic description rather than osu! file text.</returns>
         public override string ToString() {
             return $"{Time}, {ObjectType}, {Repeat}, {FenoSampleVolume}";
         }

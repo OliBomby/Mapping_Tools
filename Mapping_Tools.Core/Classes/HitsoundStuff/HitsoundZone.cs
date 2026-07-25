@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>
-    /// 
+    /// Defines a positional hitsound-mapping rule in which -1 coordinates act as wildcards.
     /// </summary>
     public class HitsoundZone : INotifyPropertyChanged
     {
@@ -21,6 +21,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         private SampleSet additionsSet;
         private int customIndex;
 
+        /// <summary>
+        /// Creates an unselected wildcard zone using inherited sample settings.
+        /// </summary>
         public HitsoundZone() {
             isSelected = false;
             name = "";
@@ -33,6 +36,18 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             customIndex = 0;
         }
 
+        /// <summary>
+        /// Creates a complete zone for persistence or editing.
+        /// </summary>
+        /// <param name="isSelected">Transient editor selection state.</param>
+        /// <param name="name">The user-facing rule name.</param>
+        /// <param name="filename">An optional explicit sample filename.</param>
+        /// <param name="xPos">The target playfield X coordinate, or -1 to ignore X.</param>
+        /// <param name="yPos">The target playfield Y coordinate, or -1 to ignore Y.</param>
+        /// <param name="hitsound">The target hitsound layer.</param>
+        /// <param name="sampleSet">The normal-layer sample family.</param>
+        /// <param name="additionsSet">The addition-layer sample family.</param>
+        /// <param name="customIndex">The custom sample index.</param>
         public HitsoundZone(bool isSelected, string name, string filename, double xPos, double yPos, Hitsound hitsound, SampleSet sampleSet, SampleSet additionsSet, int customIndex) {
             this.isSelected = isSelected;
             this.name = name;
@@ -46,10 +61,10 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Calculates Euclidean distance from a playfield point while ignoring wildcard axes.
         /// </summary>
-        /// <param name="pos"></param>
-        /// <returns></returns>
+        /// <param name="pos">The point to test.</param>
+        /// <returns>Distance in playfield pixels over the constrained axes.</returns>
         public double Distance(Vector2 pos) {
             double dx = XPos == -1 ? 0 : XPos - pos.X;
             double dy = YPos == -1 ? 0 : YPos - pos.Y;
@@ -57,13 +72,16 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Copies persisted and editor state into a new zone.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An independently mutable zone.</returns>
         public HitsoundZone Copy() {
             return new HitsoundZone(IsSelected, Name, Filename, XPos, YPos, Hitsound, SampleSet, AdditionsSet, CustomIndex);
         }
 
+        /// <summary>
+        /// Gets or sets transient editor selection state; this value is excluded from JSON.
+        /// </summary>
         [JsonIgnore]
         public bool IsSelected {
             get => isSelected;
@@ -74,6 +92,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        /// <summary>
+        /// Gets or sets the explicit custom sample filename.
+        /// </summary>
         public string Filename {
             get => filename;
             set {
@@ -83,6 +104,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        /// <summary>
+        /// Gets or sets the user-facing rule name.
+        /// </summary>
         public string Name {
             get => name;
             set {
@@ -92,6 +116,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        /// <summary>
+        /// Gets or sets the target X coordinate, or -1 to match any X.
+        /// </summary>
         public double XPos {
             get => xPos;
             set {
@@ -101,6 +128,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        /// <summary>
+        /// Gets or sets the target Y coordinate, or -1 to match any Y.
+        /// </summary>
         public double YPos {
             get => yPos;
             set {
@@ -110,6 +140,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        /// <summary>
+        /// Gets or sets the normal, whistle, finish, or clap layer matched by the zone.
+        /// </summary>
         public Hitsound Hitsound {
             get => hitsound;
             set {
@@ -119,6 +152,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        /// <summary>
+        /// Gets or sets the normal-layer sample family.
+        /// </summary>
         public SampleSet SampleSet {
             get => sampleSet;
             set {
@@ -128,6 +164,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        /// <summary>
+        /// Gets or sets the whistle/finish/clap sample family.
+        /// </summary>
         public SampleSet AdditionsSet {
             get => additionsSet;
             set {
@@ -137,6 +176,9 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
             }
         }
 
+        /// <summary>
+        /// Gets or sets the custom sample index assigned by the zone.
+        /// </summary>
         public int CustomIndex {
             get => customIndex;
             set {
@@ -147,14 +189,14 @@ namespace Mapping_Tools.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// 
+        /// Notifies binding clients after a zone property changes.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
-        /// 
+        /// Raises <see cref="PropertyChanged"/> for a mutated property.
         /// </summary>
-        /// <param name="propertyName"></param>
+        /// <param name="propertyName">The property name; supplied automatically by the caller.</param>
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

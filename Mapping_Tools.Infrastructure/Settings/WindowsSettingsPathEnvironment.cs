@@ -4,10 +4,22 @@ using System.Runtime.Versioning;
 
 namespace Mapping_Tools.Infrastructure.Settings;
 
+/// <summary>
+/// Reads Windows registry and filesystem state needed to reproduce the legacy
+/// osu! path-discovery behavior.
+/// </summary>
 public sealed class WindowsSettingsPathEnvironment : ISettingsPathEnvironment
 {
+    /// <summary>
+    /// <inheritdoc/>
     public string UserName => Environment.UserName;
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Searches both 64-bit and WOW6432 uninstall registry locations by display name.
+    /// Non-Windows platforms return <see langword="null"/>.
+    /// </remarks>
     public string? FindOsuInstallation()
     {
         if (!OperatingSystem.IsWindows())
@@ -25,6 +37,8 @@ public sealed class WindowsSettingsPathEnvironment : ISettingsPathEnvironment
                    "osu!");
     }
 
+    /// <summary>
+    /// <inheritdoc/>
     public string GetBeatmapDirectory(string configPath)
     {
         try
@@ -51,6 +65,8 @@ public sealed class WindowsSettingsPathEnvironment : ISettingsPathEnvironment
         return "Songs";
     }
 
+    /// <summary>
+    /// <inheritdoc/>
     public void EnsureDirectoryExists(string path)
     {
         Directory.CreateDirectory(path);

@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>
-    /// 
+    /// Expands hit objects into individually editable head, repeat, tail, and duration-edge events.
     /// </summary>
     public class Timeline {
         /// <summary>
-        /// 
+        /// Gets or sets expanded events in chronological order.
         /// </summary>
         public List<TimelineObject> TimelineObjects { get; set; }
 
@@ -64,7 +64,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// 
+        /// Finds expanded events inside an inclusive millisecond range.
         /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
@@ -74,7 +74,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// 
+        /// Resolves active timing and inherited sample settings for every expanded event.
         /// </summary>
         /// <param name="timing"></param>
         public void GiveTimingPoints(Timing timing) {
@@ -89,7 +89,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         }
 
         /// <summary>
-        /// 
+        /// Finds the chronologically nearest expanded event, optionally requiring a copyable edge.
         /// </summary>
         /// <param name="time"></param>
         /// <param name="needCopyable"></param>

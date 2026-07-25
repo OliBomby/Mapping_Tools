@@ -3,21 +3,42 @@
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 #nullable disable
 
+    /// <summary>
+    /// Represents a gameplay break interval from the beatmap events section.
+    /// </summary>
     public class Break : Event, IHasStartTime, IHasEndTime {
+        /// <summary>
+        /// Gets or sets the original break token, preserving <c>2</c> or <c>Break</c>.
+        /// </summary>
         public string EventType { get; set; }
+        /// <summary>
+        /// <inheritdoc/>
         public double StartTime { get; set; }
+        /// <summary>
+        /// <inheritdoc/>
         public double EndTime { get; set; }
 
+        /// <summary>
+        /// Creates an uninitialized break event for property-based construction.
+        /// </summary>
         public Break() { }
 
+        /// <summary>
+        /// Parses a break event from a serialized line.
+        /// </summary>
+        /// <param name="line">A <c>2</c> or <c>Break</c> event line.</param>
         public Break(string line) {
             SetLine(line);
         }
 
+        /// <summary>
+        /// <inheritdoc/>
         public override string GetLine() {
             return $"{EventType},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{(SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant())}";
         }
 
+        /// <summary>
+        /// <inheritdoc/>
         public override sealed void SetLine(string line) {
             string[] values = line.Split(',');
 

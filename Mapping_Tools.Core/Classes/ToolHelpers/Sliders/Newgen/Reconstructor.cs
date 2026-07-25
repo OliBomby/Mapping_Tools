@@ -10,10 +10,21 @@ namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
     /// Reconstructs the anchors of a complete slider out of a <see cref="PathWithHints"/>.
     /// </summary>
     public class Reconstructor {
+        /// <summary>
+        /// Gets the strategy used to synthesize Bézier anchors for intervals without reusable hints.
+        /// </summary>
         public PathGenerator2 PathGenerator { get; init; } = new();
 
+        /// <summary>
+        /// Controls whether reconstruction returns the sampled points as a linear path for inspection.
+        /// </summary>
         public bool DebugConstruction { get; set; } = false;
 
+        /// <summary>
+        /// Reuses valid hinted segments and generates the gaps to produce one serializable slider path.
+        /// </summary>
+        /// <param name="pathWithHints">The edited sampled path and its original-segment hints.</param>
+        /// <returns>Reconstructed anchors and the single path type that can serialize them.</returns>
         public (List<Vector2>, PathType) Reconstruct(PathWithHints pathWithHints) {
             if (DebugConstruction) {
                 return (pathWithHints.Path.Select(o => o.Pos).ToList(), PathType.Linear);

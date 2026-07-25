@@ -25,6 +25,32 @@ Never add references to `System.Windows`, `System.Windows.Forms`, `MaterialDesig
 
 Copy code from the WPF project exactly whenever possible, this will make manual review easier.
 
+## XML documentation standard
+
+Every public or protected API added to non-legacy production or tool projects
+must have meaningful XML documentation. This includes types, constructors,
+methods, properties, fields, events, delegates, operators, enum types and enum
+members. Document parameters, type parameters, return values, exceptions, and
+important platform or cancellation behavior where applicable. Prefer a
+specific summary of the contract or behavior over restating the identifier.
+Never generate documentation mechanically from a symbol name or signature.
+Read the implementation and relevant call sites before writing each comment,
+and make the documentation add information that the identifier does not:
+units, ranges, invariants, ordering, ownership, mutation, side effects,
+fallbacks, format compatibility, cancellation, or failure behavior. Reject
+placeholder prose such as "Represents X", "Gets or sets X", "Performs X",
+"The operation result", empty summaries, and parameter descriptions that only
+repeat the parameter name. Every word of new documentation must be
+context-specific prose written after understanding the API.
+Use `<inheritdoc/>` only when an inherited or implemented contract already
+describes the member accurately.
+
+The legacy `Mapping_Tools` and `Mapping_Tools_Tests` projects and all test
+projects are exempt. `Directory.Build.targets` generates documentation files
+and treats CS1591 as an error for every other project. Do not suppress CS1591;
+build every affected non-test project and resolve the diagnostic before
+completing a migration.
+
 ## Workflow
 
 1. Inspect the selected WPF XAML, code-behind, view model, converters, custom controls, and services. Trace every static dependency such as `MainWindow.AppWindow`, dialogs, dispatcher calls, clipboard, cursor, keyboard hooks, and settings singletons.
@@ -36,7 +62,11 @@ Copy code from the WPF project exactly whenever possible, this will make manual 
 7. Implement the Avalonia view in `Mapping_Tools.Desktop/Views` with compiled bindings and an explicit `x:DataType`. Use Material.Avalonia resources already registered in `App.axaml`. Do not translate WPF triggers, dependency properties, event names, or dialog APIs mechanically.
 8. Register the feature in the Avalonia shell using the smallest navigation change required. Do not remove or redirect the WPF feature yet.
 9. Build the new frontend and run focused tests. Use `$render-desktop-view` to capture the WPF view and Avalonia port with identical deterministic state and dimensions, inspect both PNGs, and resolve or record visible differences. Use a real desktop run for native dialogs, overlays, global input, audio, or other platform behavior.
-10. Report migrated behavior, intentionally deferred behavior, platform limitations, tests run, and the exact Avalonia 12.1 documentation pages consulted.
+10. Run the XML-documentation build gate for every affected non-legacy,
+    non-test project and resolve all CS1591 diagnostics. Also search the
+    affected files for empty or identifier-paraphrasing documentation; CS1591
+    alone does not detect low-quality comments.
+11. Report migrated behavior, intentionally deferred behavior, platform limitations, tests run, and the exact Avalonia 12.1 documentation pages consulted.
 
 ## Completion criteria
 
@@ -47,5 +77,7 @@ Complete a feature migration only when:
 - Core and Application contain no WPF, WinForms, Avalonia, or ReactiveUI references.
 - The Avalonia view uses APIs verified for 12.1.0 and compiled bindings where applicable.
 - Cancellation and error paths do not depend on view code-behind.
+- Every public and protected API in affected non-legacy, non-test projects has
+  meaningful XML documentation, and the CS1591 build gate passes without
+  suppressions.
 - The legacy feature remains available until the user explicitly authorizes removal.
-

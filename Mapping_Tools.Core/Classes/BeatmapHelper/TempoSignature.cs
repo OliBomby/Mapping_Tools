@@ -4,6 +4,9 @@ using System.Collections.Generic;
 namespace Mapping_Tools.Classes.BeatmapHelper {
 #nullable disable
 
+    /// <summary>
+    /// Describes the metrical numerator and denominator active at a timing point.
+    /// </summary>
     public class TempoSignature : IEquatable<TempoSignature>
     {
         /// <summary>
@@ -45,18 +48,32 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         /// </remarks>
         public bool PartialMeasure { get; set; }
 
+        /// <summary>
+        /// Compares the numerator and denominator of two signatures.
+        /// </summary>
+        /// <param name="other">The signature to compare.</param>
+        /// <returns><see langword="true"/> when both metrical components match.</returns>
         public bool Equals(TempoSignature other)
         {
             return other != null && 
                    TempoDenominator == other.TempoDenominator && 
                    TempoNumerator == other.TempoNumerator;
         }
+        /// <summary>
+        /// Determines whether an object is a signature with matching metrical components.
+        /// </summary>
+        /// <param name="obj">The object to compare.</param>
+        /// <returns><see langword="true"/> for an equal <see cref="TempoSignature"/>.</returns>
         public override bool Equals(object obj) {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             return obj.GetType() == GetType() && Equals((TempoSignature) obj);
         }
 
+        /// <summary>
+        /// Combines the metrical components and partial-measure flag into a hash code.
+        /// </summary>
+        /// <returns>A hash code for this signature state.</returns>
         public override int GetHashCode()
         {
             var hashCode = -175245820;
@@ -66,11 +83,23 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
             return hashCode;
         }
 
+        /// <summary>
+        /// Applies the == operator.
+        /// </summary>
+        /// <param name="signature1">The left signature.</param>
+        /// <param name="signature2">The right signature.</param>
+        /// <returns><see langword="true"/> when both references are null or their metrical components match.</returns>
         public static bool operator ==(TempoSignature signature1, TempoSignature signature2)
         {
             return EqualityComparer<TempoSignature>.Default.Equals(signature1, signature2);
         }
 
+        /// <summary>
+        /// Applies the != operator.
+        /// </summary>
+        /// <param name="signature1">The left signature.</param>
+        /// <param name="signature2">The right signature.</param>
+        /// <returns><see langword="true"/> when the signatures are not equal.</returns>
         public static bool operator !=(TempoSignature signature1, TempoSignature signature2)
         {
             return !(signature1 == signature2);

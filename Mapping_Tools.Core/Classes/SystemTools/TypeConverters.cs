@@ -4,7 +4,15 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Mapping_Tools.Classes.SystemTools {
+    /// <summary>
+    /// Parses user-entered numeric expressions and osu!-style timestamps.
+    /// </summary>
     public class TypeConverters {
+        /// <summary>
+        /// Evaluates a simple arithmetic expression and converts its result to a floating-point value.
+        /// </summary>
+        /// <param name="str">An expression accepted by <see cref="DataTable.Compute(string, string)"/>; commas are treated as decimal points.</param>
+        /// <returns>The evaluated numeric result.</returns>
         public static double ParseDouble(string str) {
             using (DataTable dt = new DataTable()) {
                 string text = str.Replace(",", ".");
@@ -13,6 +21,11 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        /// <summary>
+        /// Evaluates a simple arithmetic expression and rounds its result using <see cref="Convert.ToInt32(object)"/>.
+        /// </summary>
+        /// <param name="str">An expression accepted by <see cref="DataTable.Compute(string, string)"/>; commas are treated as decimal points.</param>
+        /// <returns>The evaluated result converted to a 32-bit integer.</returns>
         public static int ParseInt(string str) {
             using (DataTable dt = new DataTable()) {
                 string text = str.Replace(",", ".");
@@ -21,6 +34,13 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        /// <summary>
+        /// Attempts to evaluate a floating-point expression without propagating parser or conversion failures.
+        /// </summary>
+        /// <param name="str">The expression to evaluate.</param>
+        /// <param name="result">The evaluated value, or <paramref name="defaultValue"/> on failure.</param>
+        /// <param name="defaultValue">The sentinel assigned when evaluation fails.</param>
+        /// <returns><see langword="true"/> when the expression was evaluated and converted successfully.</returns>
         public static bool TryParseDouble(string str, out double result, double defaultValue = -1) {
             try {
                 result = ParseDouble(str);
@@ -31,6 +51,12 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        /// <summary>
+        /// Attempts to evaluate a floating-point expression, using <c>-1</c> as the failure sentinel.
+        /// </summary>
+        /// <param name="str">The expression to evaluate.</param>
+        /// <param name="result">The evaluated value, or <c>-1</c> on failure.</param>
+        /// <returns><see langword="true"/> when the expression was evaluated and converted successfully.</returns>
         public static bool TryParseDouble(string str, out double result) {
             try {
                 result = ParseDouble(str);
@@ -41,6 +67,13 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        /// <summary>
+        /// Attempts to evaluate an integer expression without propagating parser or conversion failures.
+        /// </summary>
+        /// <param name="str">The expression to evaluate.</param>
+        /// <param name="result">The converted value, or <paramref name="defaultValue"/> on failure.</param>
+        /// <param name="defaultValue">The sentinel assigned when evaluation fails.</param>
+        /// <returns><see langword="true"/> when the expression was evaluated and converted successfully.</returns>
         public static bool TryParseInt(string str, out int result, int defaultValue = -1) {
             try {
                 result = ParseInt(str);
@@ -51,6 +84,12 @@ namespace Mapping_Tools.Classes.SystemTools {
             }
         }
 
+        /// <summary>
+        /// Attempts to evaluate an integer expression, using <c>-1</c> as the failure sentinel.
+        /// </summary>
+        /// <param name="str">The expression to evaluate.</param>
+        /// <param name="result">The converted value, or <c>-1</c> on failure.</param>
+        /// <returns><see langword="true"/> when the expression was evaluated and converted successfully.</returns>
         public static bool TryParseInt(string str, out int result) {
             try {
                 result = ParseInt(str);
@@ -68,8 +107,9 @@ namespace Mapping_Tools.Classes.SystemTools {
         /// <example>60:00:074 - </example>
         /// <example>00:-01:-230 (1) - </example>
         /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
+        /// <param name="str">A colon-separated timestamp; annotations after each numeric component are ignored.</param>
+        /// <returns>The accumulated duration, including negative components when present.</returns>
+        /// <exception cref="ArgumentException">The timestamp contains more than day, hour, minute, second, and millisecond components.</exception>
         public static TimeSpan ParseOsuTimestamp(string str) {
             var split = str.Split(':');
             var time = TimeSpan.Zero;

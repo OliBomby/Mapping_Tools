@@ -6,11 +6,19 @@ using Mapping_Tools.ApplicationServices.Settings;
 
 namespace Mapping_Tools.Infrastructure.Settings;
 
+/// <summary>
+/// Reads and atomically replaces the legacy-compatible Mapping Tools JSON
+/// configuration using a frontend-neutral settings model.
+/// </summary>
 public sealed class JsonSettingsStore : ISettingsStore
 {
     private readonly IApplicationDirectories _directories;
     private readonly JsonSerializerOptions _options;
 
+    /// <summary>
+    /// Creates a store for the configuration path supplied by the application layout.
+    /// </summary>
+    /// <param name="directories">Provides the configuration path and required parent directories.</param>
     public JsonSettingsStore(IApplicationDirectories directories)
     {
         _directories = directories ?? throw new ArgumentNullException(nameof(directories));
@@ -24,8 +32,13 @@ public sealed class JsonSettingsStore : ISettingsStore
         _options.Converters.Add(new WindowBoundsJsonConverter());
     }
 
+    /// <summary>
+    /// <inheritdoc/>
     public bool Exists => File.Exists(_directories.ConfigurationFile);
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// <exception cref="JsonException">The file is empty, malformed, or contains invalid legacy bounds.</exception>
     public ApplicationSettings Load()
     {
         string json = File.ReadAllText(_directories.ConfigurationFile);
@@ -33,6 +46,12 @@ public sealed class JsonSettingsStore : ISettingsStore
             ?? throw new JsonException("The settings document contained no JSON value.");
     }
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Serialization first targets a sibling <c>.tmp</c> file, which is moved
+    /// over the configuration only after the complete JSON has been written.
+    /// </remarks>
     public void Save(ApplicationSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
@@ -59,6 +78,12 @@ public sealed class JsonSettingsStore : ISettingsStore
 
     private sealed class WindowBoundsJsonConverter : JsonConverter<WindowBounds>
     {
+        /// <summary>
+        /// <summary>
+        /// Parses the comma-separated <c>x,y,width,height</c> representation
+        /// emitted for the legacy WPF <c>Rect</c> property.
+        /// </summary>
+        /// <inheritdoc/>
         public override WindowBounds Read(
             ref Utf8JsonReader reader,
             Type typeToConvert,
@@ -89,6 +114,12 @@ public sealed class JsonSettingsStore : ISettingsStore
             }
         }
 
+        /// <summary>
+        /// <summary>
+        /// Writes bounds in the invariant comma-separated form understood by
+        /// both the old Newtonsoft/WPF model and the new settings model.
+        /// </summary>
+        /// <inheritdoc/>
         public override void Write(
             Utf8JsonWriter writer,
             WindowBounds value,

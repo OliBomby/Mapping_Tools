@@ -5,11 +5,11 @@ using System.Runtime.CompilerServices;
 namespace Mapping_Tools.Classes.SystemTools {
     
     /// <summary>
-    /// 
+    /// Provides equality-checked property mutation and change notification for editable domain models.
     /// </summary>
     public abstract class BindableBase : INotifyPropertyChanged {
         /// <summary>
-        /// 
+        /// Notifies subscribers after a bindable property changes.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -32,9 +32,9 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         /// <summary>
-        /// 
+        /// Raises <see cref="PropertyChanged"/> for a property changed outside <see cref="Set{T}"/>.
         /// </summary>
-        /// <param name="propertyName"></param>
+        /// <param name="propertyName">The changed property name, inferred from the caller by default.</param>
         protected void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

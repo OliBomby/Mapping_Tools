@@ -3,8 +3,15 @@ using Mapping_Tools.ApplicationServices.Platform;
 
 namespace Mapping_Tools.Infrastructure.Platform;
 
+/// <summary>
+/// Reveals directories or selects files by launching Windows Explorer with
+/// the appropriate command-line arguments.
+/// </summary>
 public sealed class WindowsFileRevealService : IFileRevealService
 {
+    /// <summary>
+    /// <inheritdoc/>
+    /// <exception cref="PlatformNotSupportedException">The current platform is not Windows.</exception>
     public Task<bool> RevealAsync(string path, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);

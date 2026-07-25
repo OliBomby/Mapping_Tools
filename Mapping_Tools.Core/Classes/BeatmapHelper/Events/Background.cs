@@ -4,18 +4,36 @@ using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
 namespace Mapping_Tools.Classes.BeatmapHelper.Events {
 #nullable disable
 
+    /// <summary>
+    /// Represents the playfield background declaration in an osu! events section.
+    /// </summary>
     public class Background : Event, IHasStartTime {
+        /// <summary>
+        /// Gets or sets the original background token, normally <c>0</c>.
+        /// </summary>
         public string EventType { get; set; }
+        /// <summary>
+        /// <inheritdoc/>
         public double StartTime { get; set; }
+        /// <summary>
+        /// Gets or sets the background image path relative to the beatmap folder.
+        /// </summary>
         public string Filename { get; set; }
 
+        /// <summary>
+        /// Gets or sets the optional image offset in osu! playfield coordinates.
+        /// </summary>
         public Vector2 Pos { get; set; }
 
+        /// <summary>
+        /// <inheritdoc/>
         public override string GetLine() {
             // Writing the offset is optional if its 0,0 but we add it anyways because that is what osu! does.
             return $"{EventType},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},\"{Filename}\",{Pos.X.ToInvariant()},{Pos.Y.ToInvariant()}";
         }
 
+        /// <summary>
+        /// <inheritdoc/>
         public override void SetLine(string line) {
             string[] values = line.Split(',');
 
