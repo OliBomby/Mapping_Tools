@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -121,7 +121,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             var editor = EditorReaderStuff.GetNewestVersionOrNot(mapPath, out _, out exception);
 
             // Save temp version
-            var tempPath = Path.Combine(MainWindow.AppDataPath, "temp.osu");
+            var tempPath = Path.Combine(SettingsManager.ApplicationDataPath, "temp.osu");
 
             Editor.SaveFile(tempPath, editor.Beatmap.GetLines());
 

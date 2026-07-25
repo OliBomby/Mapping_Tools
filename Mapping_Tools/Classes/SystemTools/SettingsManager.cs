@@ -1,92 +1,93 @@
-﻿using Microsoft.Win32;
-using Newtonsoft.Json;
+using Mapping_Tools.ApplicationServices.Platform;
+using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.Infrastructure.Files;
+using Mapping_Tools.Infrastructure.Settings;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Windows;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public static class SettingsManager {
-        private static string JsonPath { get; set; }
-        private static readonly JsonSerializer serializer = new() {
-            NullValueHandling = NullValueHandling.Ignore,
-            Formatting = Formatting.Indented
-        };
+        private static IApplicationDirectories directories;
+        private static ISettingsService settingsService;
+        private static ISettingsPathService settingsPaths;
 
         public static readonly Settings Settings = new();
         public static bool InstanceComplete;
 
+        public static string ApplicationDataPath => Directories.ApplicationData;
+        public static string ExportPath => Directories.Exports;
+        public static string ConfigurationFile => Directories.ConfigurationFile;
+
+        private static IApplicationDirectories Directories {
+            get {
+                EnsureConfigured();
+                return directories;
+            }
+        }
+
+        public static void Configure(IApplicationDirectories applicationDirectories) {
+            directories = applicationDirectories ??
+                throw new ArgumentNullException(nameof(applicationDirectories));
+            directories.EnsureCreated();
+
+            ISettingsPathEnvironment environment = new WindowsSettingsPathEnvironment();
+            settingsPaths = new SettingsPathService(directories, environment);
+            settingsService = new SettingsService(
+                new JsonSettingsStore(directories),
+                settingsPaths);
+        }
+
         public static void LoadConfig() {
-            JsonPath = Path.Combine(MainWindow.AppDataPath, "config.json");
-            InstanceComplete = File.Exists(JsonPath) ? LoadFromJson() : CreateJson();
-
+            EnsureConfigured();
+            bool usedFallbackOsuPath = false;
             try {
-                DefaultPaths();
-            } catch (Exception e) {
-                e.Show();
+                SettingsLoadResult result = settingsService.LoadOrCreate();
+                LegacySettingsMapper.Apply(result.Settings, Settings);
+                usedFallbackOsuPath = result.UsedFallbackOsuPath;
+                InstanceComplete = true;
             }
-        }
-
-        private static bool LoadFromJson() {
-            try {
-                using( StreamReader sr = new StreamReader(JsonPath)) {
-                    using (JsonReader reader = new JsonTextReader(sr)) {
-                        Settings newSettings = serializer.Deserialize<Settings>(reader);
-                        newSettings.CopyTo(Settings);
-                    }
-                }
-            }
-            catch( Exception ex ) {
+            catch (Exception ex) {
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine(ex.Message);
 
                 MessageBox.Show("User-specific configuration could not be loaded!");
                 ex.Show();
-                return false;
-            }
-            return true;
-        }
+                InstanceComplete = false;
 
-        private static bool CreateJson() {
-            try {
-                using( StreamWriter sw = new StreamWriter(JsonPath)) {
-                    using (JsonWriter writer = new JsonTextWriter(sw)) {
-                        serializer.Serialize(writer, Settings);
-                    }
+                try {
+                    usedFallbackOsuPath = ApplyDefaultPaths();
+                }
+                catch (Exception pathException) {
+                    pathException.Show();
                 }
             }
-            catch( Exception ex ) {
-                Console.WriteLine(ex.StackTrace);
-                Console.WriteLine(ex.Message);
 
-                MessageBox.Show("User-specific configuration could not be loaded!");
-                ex.Show();
-                return false;
+            if (usedFallbackOsuPath) {
+                MessageBox.Show(
+                    "Could not automatically find osu! install directory. " +
+                    "Please set the correct paths in the Preferences.");
             }
-            return true;
         }
 
         public static bool WriteToJson(bool doLoading=false) {
+            EnsureConfigured();
             try {
-                using( StreamWriter sw = new StreamWriter(JsonPath)) {
-                    using (JsonWriter writer = new JsonTextWriter(sw)) {
-                        serializer.Serialize(writer, Settings);
-                    }
+                settingsService.Save(LegacySettingsMapper.ToApplication(Settings));
+                if (doLoading) {
+                    SettingsLoadResult result = settingsService.LoadOrCreate();
+                    LegacySettingsMapper.Apply(result.Settings, Settings);
                 }
             }
-            catch( Exception ex ) {
+            catch (Exception ex) {
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine(ex.Message);
 
                 MessageBox.Show("User-specific configuration could not be saved!");
                 ex.Show();
                 return false;
-            }
-
-            if( doLoading ) {
-                LoadFromJson();
             }
 
             return true;
@@ -107,65 +108,12 @@ namespace Mapping_Tools.Classes.SystemTools {
         }
 
         public static void DefaultPaths() {
-            if (string.IsNullOrWhiteSpace(Settings.OsuPath)) {
-                try {
-                    var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall");
-                    Settings.OsuPath = FindByDisplayName(regKey, "osu!");
-                } catch (KeyNotFoundException) {
-                    try {
-                        var regKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall");
-                        Settings.OsuPath = FindByDisplayName(regKey, "osu!");
-                    } catch (KeyNotFoundException) {
-                        Settings.OsuPath = Path.Combine(MainWindow.AppCommon, "osu!");
-                        MessageBox.Show("Could not automatically find osu! install directory. Please set the correct paths in the Preferences.");
-                    }
-                }
+            EnsureConfigured();
+            if (ApplyDefaultPaths()) {
+                MessageBox.Show(
+                    "Could not automatically find osu! install directory. " +
+                    "Please set the correct paths in the Preferences.");
             }
-
-            if (string.IsNullOrWhiteSpace(Settings.OsuConfigPath)) {
-                Settings.OsuConfigPath = Path.Combine(Settings.OsuPath, $"osu!.{Environment.UserName}.cfg");
-            }
-
-            if (string.IsNullOrWhiteSpace(Settings.SongsPath)) {
-                var beatmapDirectory = GetBeatmapDirectory(Settings.OsuConfigPath);
-                Settings.SongsPath = Path.Combine(Settings.OsuPath, beatmapDirectory);
-            }
-
-            if (string.IsNullOrWhiteSpace(Settings.BackupsPath)) {
-                Settings.BackupsPath = Path.Combine(MainWindow.AppDataPath, "Backups");
-            }
-            Directory.CreateDirectory(Settings.BackupsPath);
-        }
-
-        private static string GetBeatmapDirectory(string configPath) {
-            try {
-                foreach (var line in File.ReadLines(configPath)) {
-                    var split = line.Split('=');
-                    if (split[0].Trim() == "BeatmapDirectory") {
-                        return split[1].Trim();
-                    }
-                }
-            }
-            catch (Exception exception) {
-                Console.WriteLine(exception);
-            }
-
-            return "Songs";
-        }
-
-        private static string FindByDisplayName(RegistryKey parentKey, string name) {
-            var nameList = parentKey.GetSubKeyNames();
-            foreach (var t in nameList)
-            {
-                RegistryKey regKey = parentKey.OpenSubKey(t);
-                try {
-                    if (regKey != null && regKey.GetValue("DisplayName")?.ToString() == name) {
-                        return Path.GetDirectoryName(regKey.GetValue("UninstallString")?.ToString());
-                    }
-                } catch (NullReferenceException) { }
-            }
-
-            throw new KeyNotFoundException($"Could not find registry key with display name \"{name}\".");
         }
 
         public static List<string[]> GetRecentMaps() {
@@ -207,6 +155,20 @@ namespace Mapping_Tools.Classes.SystemTools {
                     ), new Vector(
                     MainWindow.AppWindow.Width,
                     MainWindow.AppWindow.Height));
+            }
+        }
+
+        private static bool ApplyDefaultPaths() {
+            ApplicationSettings applicationSettings =
+                LegacySettingsMapper.ToApplication(Settings);
+            SettingsPathResult result = settingsPaths.ApplyDefaults(applicationSettings);
+            LegacySettingsMapper.Apply(applicationSettings, Settings);
+            return result.UsedFallbackOsuPath;
+        }
+
+        private static void EnsureConfigured() {
+            if (directories is null) {
+                Configure(new ApplicationDirectories());
             }
         }
     }

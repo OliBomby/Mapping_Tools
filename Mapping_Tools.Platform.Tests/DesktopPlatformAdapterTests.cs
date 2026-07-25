@@ -16,9 +16,13 @@ public sealed class DesktopPlatformAdapterTests
         Assert.AreEqual(
             Path.Combine(Path.GetFullPath(root), "Mapping Tools"),
             directories.ApplicationData);
+        Assert.AreEqual(Path.GetFullPath(root), directories.LocalApplicationData);
         Assert.AreEqual(
             Path.Combine(Path.GetFullPath(root), "Mapping Tools", "Exports"),
             directories.Exports);
+        Assert.AreEqual(
+            Path.Combine(Path.GetFullPath(root), "Mapping Tools", "config.json"),
+            directories.ConfigurationFile);
     }
 
     [TestMethod]

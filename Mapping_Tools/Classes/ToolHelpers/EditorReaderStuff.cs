@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -160,7 +160,7 @@ namespace Mapping_Tools.Classes.ToolHelpers {
         }
 
         private static void LogEditorReader(EditorReader reader) {
-            var path = Path.Combine(MainWindow.AppDataPath, "editor_reader_error.txt");
+            var path = Path.Combine(SettingsManager.ApplicationDataPath, "editor_reader_error.txt");
 
             if (!File.Exists(path))
             {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -212,8 +212,8 @@ namespace Mapping_Tools.Views.MapCleaner {
             DataContext = saveData;
         }
 
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "mapcleanerproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "mapcleanerproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Map Cleaner Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Map Cleaner Projects");
     }
 }

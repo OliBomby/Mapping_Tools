@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Annotations;
+using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
@@ -321,7 +321,7 @@ namespace Mapping_Tools.Views.HitsoundCopier {
 
             // Export the sample schema if there are samples
             if (sampleSchema.Count > 0) {
-                string exportFolder = MainWindow.ExportPath;
+                string exportFolder = SettingsManager.ExportPath;
 
                 DirectoryInfo di = new DirectoryInfo(exportFolder);
                 foreach (FileInfo file in di.GetFiles()) {
@@ -648,8 +648,8 @@ namespace Mapping_Tools.Views.HitsoundCopier {
             DataContext = saveData;
         }
 
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "hitsoundcopierproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "hitsoundcopierproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Hitsound Copier Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Hitsound Copier Projects");
     }
 }

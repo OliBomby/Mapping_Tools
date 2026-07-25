@@ -1,9 +1,11 @@
 using Mapping_Tools.ApplicationServices.Platform;
+using Mapping_Tools.ApplicationServices.Settings;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Platform;
+using Mapping_Tools.Infrastructure.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop.Composition;
@@ -34,6 +36,10 @@ internal static class DesktopServiceRegistration
         });
         services.AddSingleton<IFileRevealService, WindowsFileRevealService>();
         services.AddSingleton<IApplicationDirectories, ApplicationDirectories>();
+        services.AddSingleton<ISettingsStore, JsonSettingsStore>();
+        services.AddSingleton<ISettingsPathEnvironment, WindowsSettingsPathEnvironment>();
+        services.AddSingleton<ISettingsPathService, SettingsPathService>();
+        services.AddSingleton<ISettingsService, SettingsService>();
 
         return services;
     }

@@ -20,4 +20,11 @@
     <ProjectReference Include="..\Mapping_Tools.Infrastructure\Mapping_Tools.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\tests\fixtures\wave0\settings\*.json">
+      <Link>Fixtures\Settings\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

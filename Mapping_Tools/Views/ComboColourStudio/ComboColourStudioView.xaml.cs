@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -20,9 +20,9 @@ namespace Mapping_Tools.Views.ComboColourStudio {
     /// Interactielogica voor ComboColourStudioView.xaml
     /// </summary>
     public partial class ComboColourStudioView : ISavable<ComboColourProject> {
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "combocolourproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "combocolourproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Combo Colour Studio Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Combo Colour Studio Projects");
 
         public static readonly string ToolName = "Combo Colour Studio";
 

@@ -1,4 +1,4 @@
-﻿using Editor_Reader;
+using Editor_Reader;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
@@ -26,9 +26,9 @@ namespace Mapping_Tools.Views.PatternGallery {
     [SmartQuickRunUsage(SmartQuickRunTargets.Always)]
     //[HiddenTool]
     public partial class PatternGalleryView : ISavable<PatternGalleryVm>, IHasExtraAutoSaveTarget, IQuickRun, IHaveExtraProjectMenuItems {
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "patterngalleryproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "patterngalleryproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Pattern Gallery Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Pattern Gallery Projects");
 
         public string ExtraAutoSavePath => Path.Combine(ViewModel.FileHandler.GetCollectionFolderPath(), "project.json");
 
@@ -324,7 +324,7 @@ namespace Mapping_Tools.Views.PatternGallery {
 
         private async void DoExportCollection(object sender, RoutedEventArgs e) {
             try {
-                string exportFolder = MainWindow.ExportPath;
+                string exportFolder = SettingsManager.ExportPath;
                 string saveName = ViewModel.CollectionName;
                 string savePath = Path.Combine(exportFolder, saveName + ".zip");
 

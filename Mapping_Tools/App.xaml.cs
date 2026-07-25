@@ -2,7 +2,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
-using static Mapping_Tools.MainWindow;
+using Mapping_Tools.Classes.SystemTools;
 
 namespace Mapping_Tools {
     /// <summary>
@@ -24,12 +24,12 @@ namespace Mapping_Tools {
             }
 
             const string filename = "crash-log.txt";
-            var path = AppDataPath != null ? Path.Combine(AppDataPath, filename) : filename;
+            var path = Path.Combine(SettingsManager.ApplicationDataPath, filename);
             File.WriteAllLines(path, lines);
             MessageBox.Show($"The program encountered an unhandled exception. Look in {filename} for more info:\n{path}", "Error");
 
             // Prevent default unhandled exception processing
-            e.Handled = AppDataPath != null;
+            e.Handled = true;
         }
     }
 }

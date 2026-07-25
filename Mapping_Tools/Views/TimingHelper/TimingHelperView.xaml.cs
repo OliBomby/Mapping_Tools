@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -399,8 +399,8 @@ namespace Mapping_Tools.Views.TimingHelper {
             DataContext = saveData;
         }
 
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timinghelperproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "timinghelperproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Timing Helper Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Timing Helper Projects");
     }
 }

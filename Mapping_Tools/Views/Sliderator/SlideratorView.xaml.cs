@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -822,9 +822,9 @@ namespace Mapping_Tools.Views.Sliderator {
             ViewModel.PropertyChanged += ViewModelOnPropertyChanged;
         }
         
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "slideratorproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "slideratorproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Sliderator Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Sliderator Projects");
 
         public void RunFast() {
             var currentMap = MainWindow.AppWindow.GetCurrentMaps()[0];

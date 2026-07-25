@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -17,9 +17,9 @@ namespace Mapping_Tools.Views.MapsetMerger {
     /// Interactielogica voor MapsetMergerView.xaml
     /// </summary>
     public partial class MapsetMergerView : ISavable<MapsetMergerVm> {
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "mapsetmergerproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "mapsetmergerproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Mapset Merger Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Mapset Merger Projects");
 
         public static readonly string ToolName = "Mapset Merger";
 

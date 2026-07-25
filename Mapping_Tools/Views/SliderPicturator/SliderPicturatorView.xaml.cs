@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -234,9 +234,9 @@ namespace Mapping_Tools.Views.SliderPicturator {
             DataContext = saveData;
         }
 
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "sliderpicturatorproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "sliderpicturatorproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Slider Picturator Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Slider Picturator Projects");
 
         private static double OsuStableDistance(List<Vector2> controlPoints)
         {

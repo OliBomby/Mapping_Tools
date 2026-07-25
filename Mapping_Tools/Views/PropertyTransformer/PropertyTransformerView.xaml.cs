@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
@@ -323,8 +323,8 @@ namespace Mapping_Tools.Views.PropertyTransformer {
             DataContext = saveData;
         }
 
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "propertytransformerproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "propertytransformerproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Property Transformer Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Property Transformer Projects");
     }
 }

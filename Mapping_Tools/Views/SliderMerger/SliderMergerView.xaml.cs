@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -334,8 +334,8 @@ namespace Mapping_Tools.Views.SliderMerger {
             DataContext = saveData;
         }
 
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "slidermergerproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "slidermergerproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Slider Merger Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Slider Merger Projects");
     }
 }

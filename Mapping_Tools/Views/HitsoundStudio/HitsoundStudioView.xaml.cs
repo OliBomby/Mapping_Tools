@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -37,9 +37,9 @@ namespace Mapping_Tools.Views.HitsoundStudio
 
         private static IWavePlayer outputDevice;
 
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "hsstudioproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "hsstudioproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Hitsound Studio Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Hitsound Studio Projects");
 
         public static readonly string ToolName = "Hitsound Studio";
 

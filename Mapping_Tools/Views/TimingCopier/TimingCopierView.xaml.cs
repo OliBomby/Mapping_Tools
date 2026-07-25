@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -18,9 +18,9 @@ namespace Mapping_Tools.Views.TimingCopier {
     /// </summary>
     [VerticalContentScroll]
     public partial class TimingCopierView : ISavable<TimingCopierVm> {
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "timingcopierproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "timingcopierproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Timing Copier Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Timing Copier Projects");
 
         public static readonly string ToolName = "Timing Copier";
 

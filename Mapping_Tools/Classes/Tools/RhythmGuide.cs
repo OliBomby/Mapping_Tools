@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,7 +34,7 @@ namespace Mapping_Tools.Classes.Tools {
             private IBeatDivisor[] beatDivisors = new RationalBeatDivisor[] {16, 12};
 
             private ExportMode exportMode = ExportMode.NewMap;
-            private string exportPath = Path.Combine(MainWindow.ExportPath, @"rhythm_guide.osu");
+            private string exportPath = Path.Combine(SettingsManager.ExportPath, @"rhythm_guide.osu");
 
             #endregion
 

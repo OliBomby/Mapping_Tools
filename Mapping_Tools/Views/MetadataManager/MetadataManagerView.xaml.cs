@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -14,9 +14,9 @@ namespace Mapping_Tools.Views.MetadataManager {
     /// Interactielogica voor MetadataManagerView.xaml
     /// </summary>
     public partial class MetadataManagerView : ISavable<MetadataManagerVm> {
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "metadataproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "metadataproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Metadata Manager Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Metadata Manager Projects");
 
         public static readonly string ToolName = "Metadata Manager";
 

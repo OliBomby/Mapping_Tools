@@ -224,9 +224,10 @@ Exit: Core can load, modify, and round-trip representative maps without referenc
 
 Exit: a headless Application use case can select/load/edit/backup/save a map and report a result without a Window or UserControl.
 
-Implementation status: step 8 is complete. Its contracts, adapters, behavior,
-limitations, tests, and consulted Avalonia 12.1 sources are recorded in
-[wave-2-step-8-platform-ports.md](wave-2-step-8-platform-ports.md).
+Implementation status: steps 8 and 9 are complete. Their contracts, adapters,
+behavior, limitations, tests, and compatibility decisions are recorded in
+[wave-2-step-8-platform-ports.md](wave-2-step-8-platform-ports.md) and
+[wave-2-step-9-settings.md](wave-2-step-9-settings.md).
 The Avalonia composition root now uses `Microsoft.Extensions.DependencyInjection`;
 adopting the full .NET Generic Host is explicitly deferred to step 14 (A6),
 when logging, configuration, hosted execution, and coordinated shutdown are

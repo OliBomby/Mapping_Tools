@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Classes;
+using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 using Newtonsoft.Json;
@@ -27,7 +27,7 @@ namespace Mapping_Tools.Viewmodels {
 
         public MapsetMergerVm() {
             Mapsets = new ObservableCollection<MapsetItem>();
-            ExportPath = MainWindow.ExportPath;
+            ExportPath = SettingsManager.ExportPath;
 
             AddMapsetCommand = new CommandImplementation(_ => {
                 string path = MainWindow.AppWindow.GetCurrentMaps().FirstOrDefault() ?? string.Empty;

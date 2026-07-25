@@ -1,6 +1,7 @@
 using Mapping_Tools.ApplicationServices.Abstractions;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools;
+using Mapping_Tools.Classes.SystemTools;
 using System.Collections.Generic;
 using System.IO;
 
@@ -18,7 +19,7 @@ namespace Mapping_Tools.Classes.BeatmapHelper {
         public BeatmapEditor(string path, ITextFileStore fileStore) : base(path, fileStore) { }
 
         protected override void BeforeSave(List<string> lines) {
-            var tempPath = System.IO.Path.Combine(MainWindow.AppDataPath, "temp.osu");
+            var tempPath = System.IO.Path.Combine(SettingsManager.ApplicationDataPath, "temp.osu");
 
             if (!File.Exists(tempPath)) {
                 File.Create(tempPath).Dispose();

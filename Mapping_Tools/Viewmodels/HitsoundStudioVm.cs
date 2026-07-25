@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
 using System;
 using System.Collections.Generic;
@@ -214,7 +214,7 @@ namespace Mapping_Tools.Viewmodels {
             BaseBeatmap = baseBeatmap;
             DefaultSample = defaultSample;
             HitsoundLayers = hitsoundLayers;
-            ExportFolder = MainWindow.ExportPath;
+            ExportFolder = SettingsManager.ExportPath;
             HitsoundDiffName = "Hitsounds";
             ShowResults = false;
             ExportMap = true;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -74,8 +74,8 @@ namespace Mapping_Tools.Views.SnappingTools {
             ViewModel.SetProject(saveData);
         }
 
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "geometrydashboardproject.json");
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Geometry Dashboard Projects");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "geometrydashboardproject.json");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Geometry Dashboard Projects");
 
         private void UIElement_OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {

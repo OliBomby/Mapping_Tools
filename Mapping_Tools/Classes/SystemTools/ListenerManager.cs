@@ -1,4 +1,4 @@
-﻿using Editor_Reader;
+using Editor_Reader;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.Tools;
 using NonInvasiveKeyboardHookLibrary;
@@ -70,7 +70,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 var editor = EditorReaderStuff.GetNewestVersionOrNot(path, reader);
 
                 // Save temp version
-                var tempPath = Path.Combine(MainWindow.AppDataPath, "temp.osu");
+                var tempPath = Path.Combine(SettingsManager.ApplicationDataPath, "temp.osu");
 
                 Editor.SaveFile(tempPath, editor.Beatmap.GetLines());
 

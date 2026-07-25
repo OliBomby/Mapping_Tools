@@ -2,6 +2,7 @@
 using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
+using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Updater;
 using Mapping_Tools.Viewmodels;
 using Mapping_Tools.Views;
@@ -35,9 +36,6 @@ namespace Mapping_Tools {
         public ViewCollection Views => ViewModel.Views;
 
         public static MainWindow AppWindow { get; set; }
-        public static string AppCommon { get; set; }
-        public static string AppDataPath { get; set; }
-        public static string ExportPath { get; set; }
         public static HttpClient HttpClient { get; set; }
         public static SnackbarMessageQueue MessageQueue { get; set; }
 
@@ -59,13 +57,12 @@ namespace Mapping_Tools {
         internal MainWindow(bool initializeRuntimeServices) {
             try {
                 AppWindow = this;
-                AppCommon = initializeRuntimeServices
-                    ? Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
-                    : Path.GetTempPath();
-                AppDataPath = initializeRuntimeServices
-                    ? Path.Combine(AppCommon, "Mapping Tools")
-                    : Path.Combine(AppCommon, "MappingToolsViewRenderer");
-                ExportPath = Path.Combine(AppDataPath, "Exports");
+                SettingsManager.Configure(
+                    initializeRuntimeServices
+                        ? new ApplicationDirectories()
+                        : new ApplicationDirectories(
+                            Path.GetTempPath(),
+                            "MappingToolsViewRenderer"));
                 if (initializeRuntimeServices || HttpClient == null) {
                     HttpClient = new HttpClient();
                     HttpClient.DefaultRequestHeaders.Add("user-agent", "Mapping Tools");
@@ -106,15 +103,6 @@ namespace Mapping_Tools {
 
         private void Setup() {
             SessionhasAdminRights = IsUserAdministrator();
-            
-            try {
-                Directory.CreateDirectory(AppDataPath);
-                Directory.CreateDirectory(ExportPath);
-            }
-
-            catch( Exception ex ) {
-                ex.Show();
-            }
         }
 
         private async Task Update(bool allowSkip = true, bool notifyUser = false) {
@@ -371,7 +359,9 @@ namespace Mapping_Tools {
 
         private void OpenConfig(object sender, RoutedEventArgs e) {
             try {
-                System.Diagnostics.Process.Start("explorer.exe", AppDataPath);
+                System.Diagnostics.Process.Start(
+                    "explorer.exe",
+                    SettingsManager.ApplicationDataPath);
             }
             catch( Exception ex ) {
                 ex.Show();

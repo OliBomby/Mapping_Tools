@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Viewmodels;
 using System;
 using System.ComponentModel;
@@ -68,8 +68,8 @@ namespace Mapping_Tools.Views.RhythmGuide {
             DataContext = saveData;
         }
 
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "rhythmguideproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "rhythmguideproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Rhythm Guide Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Rhythm Guide Projects");
     }
 }

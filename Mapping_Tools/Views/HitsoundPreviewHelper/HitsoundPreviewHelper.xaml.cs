@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -24,9 +24,9 @@ namespace Mapping_Tools.Views.HitsoundPreviewHelper
     {
         public event EventHandler RunFinished;
 
-        public string AutoSavePath => Path.Combine(MainWindow.AppDataPath, "hspreviewproject.json");
+        public string AutoSavePath => Path.Combine(SettingsManager.ApplicationDataPath, "hspreviewproject.json");
 
-        public string DefaultSaveFolder => Path.Combine(MainWindow.AppDataPath, "Hitsound Preview Projects");
+        public string DefaultSaveFolder => Path.Combine(SettingsManager.ApplicationDataPath, "Hitsound Preview Projects");
 
         public static readonly string ToolName = "Hitsound Preview Helper";
         public static readonly string ToolDescription =
