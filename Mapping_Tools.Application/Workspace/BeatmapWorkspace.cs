@@ -32,7 +32,8 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
     /// <param name="filePicker">Presents the shared beatmap file dialog.</param>
     /// <param name="fileSystem">Checks selections and derives picker start folders.</param>
     /// <param name="currentBeatmapLocator">
-    /// Supplies live osu! state; step 12 replaces the unavailable adapter with Editor Reader.
+        /// Supplies the current path through the same live-reader boundary used
+        /// by editing sessions, without leaking process-memory types here.
     /// </param>
     /// <param name="timeProvider">Supplies deterministic timestamps for recent history.</param>
     public BeatmapWorkspace(

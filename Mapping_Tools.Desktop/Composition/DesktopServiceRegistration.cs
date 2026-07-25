@@ -1,3 +1,5 @@
+using Mapping_Tools.ApplicationServices.Abstractions;
+using Mapping_Tools.ApplicationServices.BeatmapEditing;
 using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Projects;
 using Mapping_Tools.ApplicationServices.Settings;
@@ -6,6 +8,7 @@ using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 using Mapping_Tools.Infrastructure.Files;
+using Mapping_Tools.Infrastructure.Editor;
 using Mapping_Tools.Infrastructure.Platform;
 using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Settings;
@@ -54,8 +57,15 @@ internal static class DesktopServiceRegistration
         services.AddSingleton(provider =>
             provider.GetRequiredService<ISettingsService>().LoadOrCreate().Settings);
         services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<ITextFileStore, FileSystemFileStore>();
+        services.AddSingleton<WindowsEditorReaderAdapter>();
+        services.AddSingleton<ILiveBeatmapReader>(provider =>
+            provider.GetRequiredService<WindowsEditorReaderAdapter>());
+        services.AddSingleton<ICurrentBeatmapLocator>(provider =>
+            provider.GetRequiredService<WindowsEditorReaderAdapter>());
+        services.AddSingleton<IEditorReloadService, WindowsOsuEditorReloadService>();
+        services.AddSingleton<IBeatmapEditingGateway, BeatmapEditingGateway>();
         services.AddSingleton<IBeatmapFileSystem, PhysicalBeatmapFileSystem>();
-        services.AddSingleton<ICurrentBeatmapLocator, UnavailableCurrentBeatmapLocator>();
         services.AddSingleton<IBeatmapWorkspace, BeatmapWorkspace>();
         services.AddSingleton<IProjectSerializer, LegacyProjectJsonSerializer>();
         services.AddSingleton<IProjectStore, FileSystemProjectStore>();

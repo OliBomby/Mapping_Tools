@@ -12,12 +12,15 @@ public class Editor2 {
     protected ITextFileStore FileStore { get; }
 
     /// <summary>
-    /// Gets or sets the path associated with <see cref="TextFile"/>.
+    /// Identifies the source file and the destination used by parameterless
+    /// saves; assigning it retargets future writes without reloading the document.
     /// </summary>
     public string Path { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the parsed osu! text document being edited.
+    /// Owns the mutable parsed document that will be serialized on save. Its
+    /// runtime type is <see cref="Beatmap"/> or <see cref="StoryBoard"/>
+    /// according to the editor that loaded it.
     /// </summary>
     public ITextFile TextFile { get; set; } = null!;
 

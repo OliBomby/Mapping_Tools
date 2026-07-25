@@ -21,12 +21,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="EditorReader">
+      <HintPath>..\lib\EditorReader.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="..\tests\fixtures\wave0\settings\*.json">
       <Link>Fixtures\Settings\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\tests\fixtures\wave0\projects\*.json">
       <Link>Fixtures\Projects\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\tests\fixtures\wave0\beatmaps\*.osu">
+      <Link>Fixtures\Beatmaps\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

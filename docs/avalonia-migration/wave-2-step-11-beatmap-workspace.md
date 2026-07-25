@@ -62,9 +62,10 @@ The Avalonia composition root registers the shared settings instance,
 workspace as singletons. The temporary Avalonia shell does not yet expose the
 current-map UI; that presentation work remains Wave 3 step 19.
 
-The cross-platform locator currently returns unavailable explicitly. Wave 2
-step 12 will supply the Windows Editor Reader/process-memory implementation
-alongside the editing gateway.
+Wave 2 step 12 replaced the temporary unavailable locator with the Windows
+Editor Reader adapter. The workspace and editing gateway now share that one
+singleton reader, so selecting osu!'s current map and opening its unsaved
+version cannot disagree because of separate memory reads or path logic.
 
 The WPF `MainWindow` now delegates selected paths, recent promotion, missing
 path checks, startup restoration, and change notification to
