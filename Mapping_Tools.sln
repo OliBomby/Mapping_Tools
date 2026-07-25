@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Core.Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Architecture.Tests", "Mapping_Tools.Architecture.Tests\Mapping_Tools.Architecture.Tests.csproj", "{116AAB91-A4AC-463B-B0FB-F1A5557FB131}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Platform.Tests", "Mapping_Tools.Platform.Tests\Mapping_Tools.Platform.Tests.csproj", "{F8D27966-2EC3-4231-BAF3-41E05D786E38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -160,6 +162,18 @@ Global
 		{116AAB91-A4AC-463B-B0FB-F1A5557FB131}.Release|x64.Build.0 = Release|Any CPU
 		{116AAB91-A4AC-463B-B0FB-F1A5557FB131}.Release|x86.ActiveCfg = Release|Any CPU
 		{116AAB91-A4AC-463B-B0FB-F1A5557FB131}.Release|x86.Build.0 = Release|Any CPU
+		{F8D27966-2EC3-4231-BAF3-41E05D786E38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8D27966-2EC3-4231-BAF3-41E05D786E38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8D27966-2EC3-4231-BAF3-41E05D786E38}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F8D27966-2EC3-4231-BAF3-41E05D786E38}.Debug|x64.Build.0 = Debug|Any CPU
+		{F8D27966-2EC3-4231-BAF3-41E05D786E38}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F8D27966-2EC3-4231-BAF3-41E05D786E38}.Debug|x86.Build.0 = Debug|Any CPU
+		{F8D27966-2EC3-4231-BAF3-41E05D786E38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8D27966-2EC3-4231-BAF3-41E05D786E38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8D27966-2EC3-4231-BAF3-41E05D786E38}.Release|x64.ActiveCfg = Release|Any CPU
+		{F8D27966-2EC3-4231-BAF3-41E05D786E38}.Release|x64.Build.0 = Release|Any CPU
+		{F8D27966-2EC3-4231-BAF3-41E05D786E38}.Release|x86.ActiveCfg = Release|Any CPU
+		{F8D27966-2EC3-4231-BAF3-41E05D786E38}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -224,6 +224,10 @@ Exit: Core can load, modify, and round-trip representative maps without referenc
 
 Exit: a headless Application use case can select/load/edit/backup/save a map and report a result without a Window or UserControl.
 
+Implementation status: step 8 is complete. Its contracts, adapters, behavior,
+limitations, tests, and consulted Avalonia 12.1 sources are recorded in
+[wave-2-step-8-platform-ports.md](wave-2-step-8-platform-ports.md).
+
 ### Wave 3 — Avalonia shell and common UI
 
 16. **D2 common forms/validation and D3 typed dialogs.** Implement only reusable primitives needed by the next features.

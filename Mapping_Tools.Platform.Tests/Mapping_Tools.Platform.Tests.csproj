@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.5.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.5.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mapping_Tools.Application\Mapping_Tools.Application.csproj" />
+    <ProjectReference Include="..\Mapping_Tools.Desktop\Mapping_Tools.Desktop.csproj" />
+    <ProjectReference Include="..\Mapping_Tools.Infrastructure\Mapping_Tools.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
