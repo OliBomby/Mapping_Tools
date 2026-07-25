@@ -68,6 +68,39 @@ completing a migration.
     alone does not detect low-quality comments.
 11. Report migrated behavior, intentionally deferred behavior, platform limitations, tests run, and the exact Avalonia 12.1 documentation pages consulted.
 
+## Visual parity gate
+
+Treat the legacy WPF rendering as the specification unless the user explicitly
+requests a redesign. "Similar", "modernized", "cleaner", and "structurally
+equivalent" are not visual parity.
+
+Before editing the Avalonia view:
+
+1. Render the complete legacy view in its real shell, not only the isolated
+   child control.
+2. Record the exact viewport, semantic state, theme, visible text, hierarchy,
+   column and row sizes, margins, padding, typography, colors, borders,
+   control density, scrollbars, chrome, menus, and empty states.
+3. Reuse the legacy text and layout measurements exactly where the frameworks
+   permit. Do not add badges, cards, buttons, labels, release notes, empty-state
+   prose, wider navigation, different chrome, or other design changes that the
+   WPF reference does not contain.
+
+After editing:
+
+1. Render WPF and Avalonia at identical dimensions and with identical data.
+2. Open both images and compare them side by side. Inspect the complete shell
+   and each migrated child view.
+3. Iterate on every visible mismatch that is under application control.
+   Framework rasterization differences may be documented only after font,
+   size, weight, line height, spacing, and colors have been matched.
+4. Do not claim parity or completion while obvious differences remain.
+   Successful compilation, matching feature structure, shared colors, or a
+   subjective impression are not substitutes for this gate.
+5. In the handoff, list any remaining visible difference precisely. If none
+   was explicitly authorized by the user, treat it as unfinished work rather
+   than an intentional design change.
+
 ## Completion criteria
 
 Complete a feature migration only when:
@@ -76,6 +109,8 @@ Complete a feature migration only when:
 - Extracted logic has focused automated coverage or a documented reason coverage is impractical.
 - Core and Application contain no WPF, WinForms, Avalonia, or ReactiveUI references.
 - The Avalonia view uses APIs verified for 12.1.0 and compiled bindings where applicable.
+- Equal-state, equal-viewport WPF and Avalonia renders have been opened and
+  inspected, and no unrequested visible design differences remain.
 - Cancellation and error paths do not depend on view code-behind.
 - Every public and protected API in affected non-legacy, non-test projects has
   meaningful XML documentation, and the CS1591 build gate passes without

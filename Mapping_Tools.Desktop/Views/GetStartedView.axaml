@@ -1,0 +1,208 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="1040"
+             d:DesignHeight="725"
+             x:Class="Mapping_Tools.Desktop.Views.GetStartedView"
+             x:DataType="vm:GetStartedViewModel"
+             Foreground="#DEFFFFFF"
+             FontSize="13.2"
+             FontWeight="Normal">
+    <UserControl.Resources>
+        <ControlTheme x:Key="LegacyScrollArrowTheme"
+                      TargetType="Button">
+            <Setter Property="Background" Value="#555555" />
+            <Setter Property="Foreground" Value="#9E9E9E" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+    </UserControl.Resources>
+
+    <Grid RowDefinitions="5*,21,3*"
+          ColumnDefinitions="*,21,*">
+        <Grid Grid.Row="0"
+              Grid.Column="0"
+              RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0"
+                       Text="Get started"
+                       FontSize="32"
+                       FontWeight="Medium"
+                       Foreground="#2196F3" />
+
+            <ScrollViewer x:Name="OnboardingScroller"
+                          Grid.Row="1"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto">
+                <StackPanel HorizontalAlignment="Left">
+                    <TextBlock Margin="8,0"
+                               Height="31.7"
+                               LineHeight="31.7"
+                               Text="0. Set the correct path to your Songs folder in the [Preferences]."
+                               TextWrapping="NoWrap" />
+                    <TextBlock Margin="8,0"
+                               Height="31.7"
+                               LineHeight="31.7"
+                               Text="1. Select a beatmap [File] -> [Open beatmap/Open current beatmap] to select a file from your system OR the current in-game selected beatmap."
+                               TextWrapping="NoWrap" />
+                    <TextBlock Margin="8,0"
+                               Height="31.7"
+                               LineHeight="31.7"
+                               Text="2. Select a tool that you want to use from the navigation menu. (Ctrl+K)"
+                               TextWrapping="NoWrap" />
+                    <TextBlock Margin="8,0"
+                               Height="31.7"
+                               LineHeight="31.7"
+                               Text="3. Read a basic summary of the tool by clicking the (?) button."
+                               TextWrapping="NoWrap" />
+                    <TextBlock Margin="8,0"
+                               Height="31.7"
+                               LineHeight="31.7"
+                               Text="4. Configure your tool. To find out what specific things do, read the tooltips by hovering over them."
+                               TextWrapping="NoWrap" />
+                    <TextBlock Margin="8,0"
+                               Height="31.7"
+                               LineHeight="31.7"
+                               Text="5. Click the run button in the bottom right to run the program."
+                               TextWrapping="NoWrap" />
+                    <TextBlock Margin="8,0"
+                               Height="31.7"
+                               LineHeight="31.7"
+                               Text="6. Reload your beatmap WITHOUT SAVING by either leaving and re-entering the editor or pressing Ctrl+L, Enter."
+                               TextWrapping="NoWrap" />
+                    <TextBlock Margin="8,0"
+                               Height="31.7"
+                               LineHeight="31.7"
+                               Text="7. If you run into issues, consult the FAQ over on the [About] -> [Website]."
+                               TextWrapping="NoWrap" />
+                </StackPanel>
+            </ScrollViewer>
+            <Button Grid.Row="1"
+                    ZIndex="2"
+                    Theme="{StaticResource LegacyScrollArrowTheme}"
+                    Width="17"
+                    Height="17"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    Content="‹"
+                    FontSize="12"
+                    Click="ScrollOnboardingLeft" />
+            <Button Grid.Row="1"
+                    ZIndex="2"
+                    Theme="{StaticResource LegacyScrollArrowTheme}"
+                    Width="17"
+                    Height="17"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Content="›"
+                    FontSize="12"
+                    Click="ScrollOnboardingRight" />
+        </Grid>
+
+        <Border Grid.Row="0"
+                Grid.Column="1"
+                Width="1"
+                Margin="10"
+                Background="#454545" />
+
+        <Grid Grid.Row="0"
+              Grid.Column="2"
+              RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0"
+                       Text="Changelog"
+                       FontSize="32"
+                       FontWeight="Medium"
+                       Foreground="#2196F3" />
+            <ScrollViewer Grid.Row="1"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Changelog}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ChangelogEntryViewModel">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Title}"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Margin="10,0,0,0"
+                                           Text="{Binding Text}"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+
+        <Border Grid.Row="1"
+                Grid.ColumnSpan="3"
+                Height="1"
+                Margin="10"
+                Background="#454545" />
+
+        <Grid Grid.Row="2"
+              Grid.ColumnSpan="3"
+              RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0"
+                       Text="Recent"
+                       FontSize="32"
+                       FontWeight="Medium"
+                       Foreground="#2196F3" />
+
+            <Grid Grid.Row="1"
+                  RowDefinitions="56,*">
+                <Grid Grid.Row="0"
+                      Margin="32,0"
+                      ColumnDefinitions="90,*">
+                    <TextBlock Grid.Column="0"
+                               Text="Path"
+                               Margin="0,19,0,0"
+                               VerticalAlignment="Top" />
+                    <TextBlock Grid.Column="1"
+                               Text="Date"
+                               Margin="0,19,0,0"
+                               VerticalAlignment="Top" />
+                </Grid>
+
+                <Border Grid.Row="0"
+                        VerticalAlignment="Bottom"
+                        Height="1"
+                        Background="#454545" />
+
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding RecentMaps}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:RecentMapViewModel">
+                                <Grid MinHeight="36"
+                                      Margin="32,0"
+                                      ColumnDefinitions="90,*">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding FileName}"
+                                               TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding DisplayDate}"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

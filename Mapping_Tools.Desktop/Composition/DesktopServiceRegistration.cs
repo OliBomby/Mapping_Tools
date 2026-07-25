@@ -9,6 +9,7 @@ using Mapping_Tools.ApplicationServices.QuickRun;
 using Mapping_Tools.ApplicationServices.Settings;
 using Mapping_Tools.ApplicationServices.Workspace;
 using Mapping_Tools.Desktop.Platform;
+using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 using Mapping_Tools.Infrastructure.Files;
@@ -36,6 +37,19 @@ internal static class DesktopServiceRegistration
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddSingleton<MainWindow>();
+        services.AddSingleton<IUiDispatcher, AvaloniaUiDispatcher>();
+        services.AddSingleton<GetStartedViewModel>();
+        services.AddSingleton<IShellFeatureRegistry>(provider =>
+            new ShellFeatureRegistry(
+            [
+                new ShellFeatureRegistration(
+                    "get-started",
+                    "Get started",
+                    "Home",
+                    "Onboarding, bundled changelog, support links, and recent beatmaps.",
+                    ["home", "help", "changelog", "recent", "faq"],
+                    provider.GetRequiredService<GetStartedViewModel>)
+            ]));
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<IDialogService>(provider =>
         {

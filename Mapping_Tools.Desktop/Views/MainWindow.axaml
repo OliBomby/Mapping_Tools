@@ -1,23 +1,283 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+        xmlns:views="using:Mapping_Tools.Desktop.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d"
+        d:DesignWidth="1280"
+        d:DesignHeight="800"
         x:Class="Mapping_Tools.Desktop.Views.MainWindow"
         x:DataType="vm:MainViewModel"
+        Width="1500"
+        Height="800"
+        MinWidth="500"
+        MinHeight="200"
+        WindowStartupLocation="Manual"
+        WindowDecorations="BorderOnly"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="35"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Mapping Tools">
+        Background="#303030"
+        Foreground="#DEFFFFFF"
+        FontSize="14"
+        FontWeight="Medium"
+        Title="{Binding Header}">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel />
-    </Design.DataContext>
+    <Window.Resources>
+        <ControlTheme x:Key="ChromeButtonTheme"
+                      TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover">
+                <Setter Property="Background" Value="#26000000" />
+            </Style>
+        </ControlTheme>
 
-    <TextBlock Text="{Binding Greeting}"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center"
-               FontSize="24" />
+        <ControlTheme x:Key="NavigationButtonTheme"
+                      TargetType="Button">
+            <Setter Property="Foreground" Value="#DEFFFFFF" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="18,0" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalContentAlignment="Left"
+                                          VerticalContentAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover">
+                <Setter Property="Background" Value="#494949" />
+            </Style>
+        </ControlTheme>
+    </Window.Resources>
 
+    <Window.DataTemplates>
+        <DataTemplate DataType="vm:GetStartedViewModel"
+                      x:DataType="vm:GetStartedViewModel">
+            <views:GetStartedView />
+        </DataTemplate>
+    </Window.DataTemplates>
+
+    <Window.Styles>
+        <Style Selector="Menu.top-menu">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Height" Value="35" />
+        </Style>
+        <Style Selector="Menu.top-menu MenuItem">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Height" Value="35" />
+            <Setter Property="Padding" Value="12,0" />
+        </Style>
+        <Style Selector="ScrollBar:vertical">
+            <Setter Property="Width" Value="13" />
+            <Setter Property="MinWidth" Value="13" />
+            <Setter Property="MaxWidth" Value="13" />
+        </Style>
+    </Window.Styles>
+
+    <Grid>
+        <Grid RowDefinitions="35,*">
+            <Border Grid.Row="0"
+                    Background="#2196F3"
+                    WindowDecorationProperties.ElementRole="TitleBar">
+                <DockPanel LastChildFill="True">
+                    <StackPanel DockPanel.Dock="Left"
+                                Orientation="Horizontal">
+                        <Button Theme="{StaticResource ChromeButtonTheme}"
+                                Width="45"
+                                Height="35"
+                                Command="{Binding ToggleNavigationCommand}"
+                                ToolTip.Tip="Use Ctrl+K to toggle navigation.">
+                            <StackPanel Spacing="4"
+                                        Width="22"
+                                        VerticalAlignment="Center">
+                                <Border Height="2" Background="White" />
+                                <Border Height="2" Background="White" />
+                                <Border Height="2" Background="White" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Theme="{StaticResource ChromeButtonTheme}"
+                                Width="50"
+                                Height="35"
+                                Content="File">
+                            <Button.Flyout>
+                                <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                                    <MenuItem Header="Open beatmap"
+                                              IsEnabled="False" />
+                                    <MenuItem Header="Open current beatmap"
+                                              IsEnabled="False" />
+                                    <MenuItem Header="Generate backup"
+                                              IsEnabled="False" />
+                                    <MenuItem Header="Load backup"
+                                              IsEnabled="False" />
+                                    <MenuItem Header="BetterSave™ current beatmap"
+                                              IsEnabled="False" />
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                        <Border Width="12" />
+                        <Button Theme="{StaticResource ChromeButtonTheme}"
+                                Width="63"
+                                Height="35"
+                                Content="About">
+                            <Button.Flyout>
+                                <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                                    <MenuItem Header="Website"
+                                              Click="OpenWebsite" />
+                                    <MenuItem Header="Github"
+                                              Click="OpenGitHub" />
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                    </StackPanel>
+
+                    <StackPanel DockPanel.Dock="Right"
+                                Orientation="Horizontal">
+                        <Button Theme="{StaticResource ChromeButtonTheme}"
+                                Width="51"
+                                Height="35"
+                                Content="―"
+                                Click="MinimizeWindow"
+                                ToolTip.Tip="Minimize" />
+                        <Button Theme="{StaticResource ChromeButtonTheme}"
+                                Width="51"
+                                Height="35"
+                                Content="□"
+                                FontSize="17"
+                                Click="ToggleMaximizeWindow"
+                                ToolTip.Tip="Maximize or restore" />
+                        <Button Theme="{StaticResource ChromeButtonTheme}"
+                                Width="51"
+                                Height="35"
+                                Content="×"
+                                FontSize="20"
+                                Click="CloseWindow"
+                                ToolTip.Tip="Close" />
+                    </StackPanel>
+
+                    <Border Margin="10,0"
+                            Padding="5"
+                            CornerRadius="2"
+                            Background="#1976D2">
+                        <TextBlock HorizontalAlignment="Right"
+                                   VerticalAlignment="Center"
+                                   Text="(0) maps total"
+                                   FontStyle="Italic"
+                                   FontWeight="ExtraBold" />
+                    </Border>
+                </DockPanel>
+            </Border>
+
+            <SplitView Grid.Row="1"
+                       IsPaneOpen="{Binding IsNavigationOpen}"
+                       DisplayMode="Inline"
+                       OpenPaneLength="200"
+                       CompactPaneLength="0">
+                <SplitView.Pane>
+                    <DockPanel Width="200"
+                               Background="#303030">
+                        <TextBox DockPanel.Dock="Top"
+                                 Margin="16,16,16,0"
+                                 Padding="8"
+                                 Height="35"
+                                 BorderBrush="#9E9E9E"
+                                 BorderThickness="1"
+                                 CornerRadius="4"
+                                 PlaceholderText="Search"
+                                 Text="{Binding SearchText, Mode=TwoWay}"
+                                 ToolTip.Tip="Search registered features" />
+                        <ScrollViewer Margin="0,16">
+                            <ItemsControl Width="183"
+                                          HorizontalAlignment="Left"
+                                          ItemsSource="{Binding VisibleFeatures}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:ShellFeatureItemViewModel">
+                                        <StackPanel>
+                                            <Border IsVisible="{Binding StartsSection}"
+                                                    Height="1"
+                                                    Margin="8,10"
+                                                    Background="#1FFFFFFF" />
+                                            <Button Theme="{StaticResource NavigationButtonTheme}"
+                                                    Height="{Binding NavigationHeight}"
+                                                    Background="{Binding NavigationBackground}"
+                                                    Command="{Binding ActivateCommand}"
+                                                    Content="{Binding DisplayName}"
+                                                    ToolTip.Tip="{Binding Description}">
+                                                <Button.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="{Binding FavoriteActionLabel}"
+                                                                  Command="{Binding ToggleFavoriteCommand}" />
+                                                    </ContextMenu>
+                                                </Button.ContextMenu>
+                                            </Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </DockPanel>
+                </SplitView.Pane>
+
+                <Grid Background="#303030">
+                    <ContentControl Margin="20"
+                                    Content="{Binding CurrentFeature}"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch" />
+
+                    <ItemsControl ItemsSource="{Binding NotificationQueue}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Bottom"
+                                  Margin="16"
+                                  MaxWidth="620">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ShellNotificationViewModel">
+                                <Border Margin="0,4"
+                                        Padding="16,10"
+                                        MinWidth="360"
+                                        Background="#FF323232"
+                                        BoxShadow="0 3 8 0 #66000000">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Text="{Binding DisplayText}"
+                                                   VerticalAlignment="Center"
+                                                   TextWrapping="Wrap" />
+                                        <Button Grid.Column="1"
+                                                Margin="18,0,0,0"
+                                                Command="{Binding DismissCommand}"
+                                                Content="DISMISS"
+                                                Foreground="#2196F3"
+                                                Background="Transparent" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </SplitView>
+        </Grid>
+        <Border BorderBrush="#1976D2"
+                BorderThickness="1"
+                IsHitTestVisible="False" />
+    </Grid>
 </Window>
