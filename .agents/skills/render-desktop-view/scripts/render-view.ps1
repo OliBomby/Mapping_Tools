@@ -5,6 +5,7 @@ param(
     [Parameter(ParameterSetName = 'Render')] [string] $Output,
     [Parameter(ParameterSetName = 'Render')] [ValidateRange(1, 10000)] [int] $Width = 1280,
     [Parameter(ParameterSetName = 'Render')] [ValidateRange(1, 10000)] [int] $Height = 800,
+    [Parameter(ParameterSetName = 'Render')] [string] $Scenario,
     [Parameter(Mandatory, ParameterSetName = 'List')] [switch] $List
 )
 
@@ -23,6 +24,9 @@ if ($List) {
     }
     $Output = [System.IO.Path]::GetFullPath($Output)
     $rendererArgs += @('--view', $View, '--output', $Output, '--width', $Width, '--height', $Height)
+    if (-not [string]::IsNullOrWhiteSpace($Scenario)) {
+        $rendererArgs += @('--scenario', $Scenario)
+    }
 }
 
 $isolatedOutput = "artifacts\view-renderer\$Framework\"

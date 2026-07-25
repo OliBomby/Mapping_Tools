@@ -33,6 +33,19 @@ internal static class Program
         app.InitializeComponent();
         MainWindow.HttpClient = new HttpClient(new StaticJsonHandler());
         SettingsManager.Settings.RecentMaps.Clear();
+        if (options.Scenario.Equals("recent-maps", StringComparison.OrdinalIgnoreCase))
+        {
+            SettingsManager.Settings.RecentMaps.Add(
+            [
+                @"C:\Songs\Artist - A Very Long Beatmap Name (Mapper) [Difficulty].osu",
+                "26-07-2026 12:34:56"
+            ]);
+            SettingsManager.Settings.RecentMaps.Add(
+            [
+                @"C:\Songs\Short Map.osu",
+                "25-07-2026 09:10:11"
+            ]);
+        }
         var type = viewTypes.SingleOrDefault(candidate =>
             candidate.Name.Equals(options.View, StringComparison.OrdinalIgnoreCase) ||
             candidate.FullName?.Equals(options.View, StringComparison.OrdinalIgnoreCase) == true)
@@ -178,7 +191,13 @@ internal sealed class StaticJsonHandler : HttpMessageHandler
         });
 }
 
-internal sealed record RenderOptions(string View, string Output, double Width, double Height, bool List)
+internal sealed record RenderOptions(
+    string View,
+    string Output,
+    double Width,
+    double Height,
+    bool List,
+    string Scenario)
 {
     /// <summary>
     /// Parses renderer command-line options and supplies deterministic WPF defaults.
@@ -193,6 +212,7 @@ internal sealed record RenderOptions(string View, string Output, double Width, d
             Path.GetFullPath(Value("--output") ?? Path.Combine("artifacts", "view-renders", $"wpf-{view}.png")),
             double.TryParse(Value("--width"), out var width) ? width : 1280,
             double.TryParse(Value("--height"), out var height) ? height : 800,
-            args.Contains("--list"));
+            args.Contains("--list"),
+            Value("--scenario") ?? string.Empty);
     }
 }

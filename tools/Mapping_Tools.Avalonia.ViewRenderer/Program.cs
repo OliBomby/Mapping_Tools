@@ -5,6 +5,7 @@ using Avalonia.Media.Imaging;
 using Mapping_Tools.ApplicationServices.Execution;
 using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.ApplicationServices.Workspace;
 using Mapping_Tools.Desktop;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
@@ -27,13 +28,13 @@ AppBuilder.Configure<App>()
 
 Control view = options.View switch
 {
-    "MainWindow" => new MainWindow { DataContext = CreateMainViewModel() },
+    "MainWindow" => new MainWindow { DataContext = CreateMainViewModel(options.Scenario) },
     "GetStartedView" => new Border
     {
         Padding = new Thickness(20),
         Background = new Avalonia.Media.SolidColorBrush(
             Avalonia.Media.Color.Parse("#303030")),
-        Child = new GetStartedView { DataContext = CreateGetStartedViewModel() }
+        Child = new GetStartedView { DataContext = CreateGetStartedViewModel(options.Scenario) }
     },
     "MessageDialogWindow" => CreateMessageDialog(),
     "ValueDialogWindow" => CreateValueDialog(),
@@ -89,9 +90,9 @@ static ValueDialogWindow CreateValueDialog()
     };
 }
 
-static MainViewModel CreateMainViewModel()
+static MainViewModel CreateMainViewModel(string scenario)
 {
-    ApplicationSettings settings = new();
+    ApplicationSettings settings = CreateSettings(scenario);
     IUserNotificationService notifications = new UserNotificationService();
     GetStartedViewModel getStarted = new(
         settings,
@@ -154,13 +155,32 @@ static MainViewModel CreateMainViewModel()
         new ImmediateDispatcher());
 }
 
-static GetStartedViewModel CreateGetStartedViewModel()
+static GetStartedViewModel CreateGetStartedViewModel(string scenario)
 {
-    ApplicationSettings settings = new();
+    ApplicationSettings settings = CreateSettings(scenario);
     return new GetStartedViewModel(
         settings,
         new AcceptedLauncher(),
         new UserNotificationService());
+}
+
+static ApplicationSettings CreateSettings(string scenario)
+{
+    ApplicationSettings settings = new();
+    if (scenario.Equals("recent-maps", StringComparison.OrdinalIgnoreCase))
+    {
+        settings.RecentMaps =
+        [
+            new RecentBeatmap(
+                @"C:\Songs\Artist - A Very Long Beatmap Name (Mapper) [Difficulty].osu",
+                "26-07-2026 12:34:56"),
+            new RecentBeatmap(
+                @"C:\Songs\Short Map.osu",
+                "25-07-2026 09:10:11")
+        ];
+    }
+
+    return settings;
 }
 
 static Control CreateParameterlessView(string name)
@@ -175,7 +195,13 @@ static Control CreateParameterlessView(string name)
             ?? throw new InvalidOperationException($"Could not construct '{type.FullName}'. Add a deterministic factory to Program.cs."));
 }
 
-internal sealed record RenderOptions(string View, string Output, double Width, double Height, bool List)
+internal sealed record RenderOptions(
+    string View,
+    string Output,
+    double Width,
+    double Height,
+    bool List,
+    string Scenario)
 {
     /// <summary>
     /// Parses renderer command-line options and supplies deterministic defaults.
@@ -190,7 +216,8 @@ internal sealed record RenderOptions(string View, string Output, double Width, d
             Path.GetFullPath(Value("--output") ?? Path.Combine("artifacts", "view-renders", $"avalonia-{view}.png")),
             double.TryParse(Value("--width"), out var width) ? width : 1280,
             double.TryParse(Value("--height"), out var height) ? height : 800,
-            args.Contains("--list"));
+            args.Contains("--list"),
+            Value("--scenario") ?? string.Empty);
     }
 }
 

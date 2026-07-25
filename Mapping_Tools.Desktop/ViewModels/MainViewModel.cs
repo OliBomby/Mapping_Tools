@@ -20,6 +20,7 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
     private readonly Dictionary<string, ViewModelBase> _featureViewModels =
         new(StringComparer.OrdinalIgnoreCase);
     private string _searchText = string.Empty;
+    private ShellFeatureItemViewModel? _selectedFeature;
     private ViewModelBase? _currentFeature;
     private string _header = "Mapping Tools";
     private bool _isNavigationOpen = true;
@@ -46,7 +47,7 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
                 registration,
                 order,
                 settings.FavoriteTools.Contains(registration.Id, StringComparer.OrdinalIgnoreCase),
-                Activate,
+                item => SelectedFeature = item,
                 ToggleFavorite))
             .ToArray();
         VisibleFeatures = [];
@@ -58,7 +59,7 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
 
         _notifications.Published += OnNotificationPublished;
         RefreshVisibleFeatures();
-        Activate(FeatureItems[0]);
+        SelectedFeature = FeatureItems[0];
     }
 
     /// <summary>Gets every registered navigation item in declaration order.</summary>
@@ -66,6 +67,27 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
 
     /// <summary>Gets the feature items matching the current query.</summary>
     public ObservableCollection<ShellFeatureItemViewModel> VisibleFeatures { get; }
+
+    /// <summary>
+    /// Gets or sets the selected navigation item and activates its registered feature.
+    /// </summary>
+    public ShellFeatureItemViewModel? SelectedFeature
+    {
+        get => _selectedFeature;
+        set
+        {
+            if (ReferenceEquals(_selectedFeature, value))
+            {
+                return;
+            }
+
+            this.RaiseAndSetIfChanged(ref _selectedFeature, value);
+            if (value is not null)
+            {
+                Activate(value);
+            }
+        }
+    }
 
     /// <summary>Gets queued notifications in publication order.</summary>
     public ObservableCollection<ShellNotificationViewModel> NotificationQueue { get; }

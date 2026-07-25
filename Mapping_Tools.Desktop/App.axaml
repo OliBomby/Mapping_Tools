@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:material="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="Mapping_Tools.Desktop.App"
              xmlns:local="using:Mapping_Tools.Desktop"
              RequestedThemeVariant="Default">
@@ -14,5 +15,21 @@
         <material:MaterialTheme BaseTheme="Dark"
                                 PrimaryColor="Blue"
                                 SecondaryColor="Lime" />
+        <materialIcons:MaterialIconStyles />
+        <Style Selector="MenuItem:not(.Menu):not(:separator)">
+            <Setter Property="Height" Value="32" />
+            <Setter Property="MinHeight" Value="32" />
+        </Style>
+        <Style Selector="MenuItem:not(.Menu) /template/ AccessText#PART_MenuItemText">
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style Selector="MenuItem:not(.Menu) /template/ ContentPresenter#PART_Icon">
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="Margin" Value="0,0,12,0" />
+        </Style>
+        <Style Selector="MenuItem /template/ ItemsPresenter#PART_ItemsPresenter">
+            <Setter Property="Margin" Value="0,4" />
+        </Style>
     </Application.Styles>
 </Application>

@@ -8,29 +8,177 @@
              d:DesignHeight="725"
              x:Class="Mapping_Tools.Desktop.Views.GetStartedView"
              x:DataType="vm:GetStartedViewModel"
-             Foreground="#DEFFFFFF"
-             FontSize="13.2"
+             Foreground="#E5E5E5"
+             FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
+             FontSize="13"
              FontWeight="Normal">
     <UserControl.Resources>
-        <ControlTheme x:Key="LegacyScrollArrowTheme"
-                      TargetType="Button">
-            <Setter Property="Background" Value="#555555" />
-            <Setter Property="Foreground" Value="#9E9E9E" />
-            <Setter Property="BorderThickness" Value="0" />
+        <ControlTemplate x:Key="RecentColumnResizerTemplate"
+                         TargetType="Thumb">
+            <Border Background="Transparent">
+                <Rectangle Width="1"
+                           Fill="Transparent"
+                           HorizontalAlignment="Center" />
+            </Border>
+        </ControlTemplate>
+
+        <ControlTheme x:Key="{x:Type TableViewColumnHeader}"
+                      TargetType="TableViewColumnHeader">
+            <Setter Property="FontWeight" Value="Normal" />
             <Setter Property="Padding" Value="0" />
-            <Setter Property="MinWidth" Value="0" />
-            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="ClipToBounds" Value="False" />
             <Setter Property="Template">
                 <ControlTemplate>
-                    <Border Background="{TemplateBinding Background}">
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          HorizontalContentAlignment="Center"
-                                          VerticalContentAlignment="Center" />
+                    <Panel>
+                        <ContentPresenter Background="{TemplateBinding Background}"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Padding="{TemplateBinding Padding}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <Thumb x:Name="PART_Resizer"
+                               Width="12"
+                               Margin="0,-9,-6,-12"
+                               HorizontalAlignment="Right"
+                               Cursor="SizeWestEast"
+                               Template="{StaticResource RecentColumnResizerTemplate}"
+                               IsEnabled="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Column.CanUserEffectivelyResize, FallbackValue=False}" />
+                    </Panel>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+
+        <ControlTheme x:Key="{x:Type TableViewCell}"
+                      TargetType="TableViewCell">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </ControlTheme>
+
+        <ControlTheme x:Key="{x:Type TableViewRow}"
+                      TargetType="TableViewRow">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#E5E5E5" />
+            <Setter Property="MinHeight" Value="36" />
+            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border x:Name="PART_RowBorder"
+                            MinHeight="{TemplateBinding MinHeight}"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}">
+                        <TableViewCellsPresenter x:Name="PART_CellsPresenter"
+                                                 VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover /template/ Border#PART_RowBorder">
+                <Setter Property="Background" Value="#0DFFFFFF" />
+            </Style>
+            <Style Selector="^:selected /template/ Border#PART_RowBorder">
+                <Setter Property="Background" Value="#1FFFFFFF" />
+            </Style>
+            <Style Selector="^:selected:pointerover /template/ Border#PART_RowBorder">
+                <Setter Property="Background" Value="#29FFFFFF" />
+            </Style>
+        </ControlTheme>
+
+        <ControlTheme x:Key="RecentTableScrollViewerTheme"
+                      TargetType="ScrollViewer">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Grid ColumnDefinitions="*,Auto"
+                          RowDefinitions="*,Auto">
+                        <DockPanel x:Name="PART_ContentPanel">
+                            <Border DockPanel.Dock="Top"
+                                    Height="56"
+                                    Padding="14,0"
+                                    BorderBrush="#494949"
+                                    BorderThickness="0,0,0,1">
+                                <TableViewColumnHeadersPresenter VerticalAlignment="Center" />
+                            </Border>
+                            <ScrollContentPresenter x:Name="PART_ContentPresenter"
+                                                    Background="{TemplateBinding Background}"
+                                                    HorizontalSnapPointsType="{TemplateBinding HorizontalSnapPointsType}"
+                                                    VerticalSnapPointsType="{TemplateBinding VerticalSnapPointsType}"
+                                                    HorizontalSnapPointsAlignment="{TemplateBinding HorizontalSnapPointsAlignment}"
+                                                    VerticalSnapPointsAlignment="{TemplateBinding VerticalSnapPointsAlignment}"
+                                                    Padding="{TemplateBinding Padding}"
+                                                    ScrollViewer.IsScrollInertiaEnabled="{TemplateBinding IsScrollInertiaEnabled}">
+                                <ScrollContentPresenter.GestureRecognizers>
+                                    <ScrollGestureRecognizer CanHorizontallyScroll="{Binding CanHorizontallyScroll, ElementName=PART_ContentPresenter}"
+                                                             CanVerticallyScroll="{Binding CanVerticallyScroll, ElementName=PART_ContentPresenter}"
+                                                             IsScrollInertiaEnabled="{Binding (ScrollViewer.IsScrollInertiaEnabled), ElementName=PART_ContentPresenter}" />
+                                </ScrollContentPresenter.GestureRecognizers>
+                            </ScrollContentPresenter>
+                        </DockPanel>
+                        <ScrollBar x:Name="PART_HorizontalScrollBar"
+                                   Grid.Row="1"
+                                   Orientation="Horizontal" />
+                        <ScrollBar x:Name="PART_VerticalScrollBar"
+                                   Grid.Column="1"
+                                   Orientation="Vertical" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+
+        <ControlTheme x:Key="{x:Type TableView}"
+                      TargetType="TableView">
+            <Setter Property="Foreground" Value="#E5E5E5" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            ClipToBounds="{TemplateBinding ClipToBounds}">
+                        <ScrollViewer x:Name="PART_ScrollViewer"
+                                      Theme="{StaticResource RecentTableScrollViewerTheme}"
+                                      HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                                      VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                                      IsScrollChainingEnabled="{TemplateBinding (ScrollViewer.IsScrollChainingEnabled)}"
+                                      IsScrollInertiaEnabled="{TemplateBinding (ScrollViewer.IsScrollInertiaEnabled)}"
+                                      AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}">
+                            <ItemsPresenter x:Name="PART_ItemsPresenter"
+                                            ItemsPanel="{TemplateBinding ItemsPanel}"
+                                            Margin="{TemplateBinding Padding}" />
+                        </ScrollViewer>
                     </Border>
                 </ControlTemplate>
             </Setter>
         </ControlTheme>
     </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="ListBox.content-list">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+        <Style Selector="ListBox.content-list ListBoxItem">
+            <Setter Property="Padding" Value="8,0" />
+            <Setter Property="MinHeight" Value="31.7" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="ListBox.content-list ListBoxItem:pointerover /template/ Border#PART_HoverEffect">
+            <Setter Property="Opacity" Value="0.05" />
+        </Style>
+        <Style Selector="ScrollViewer /template/ :is(ScrollBar):horizontal /template/ Thumb">
+            <Setter Property="Background" Value="#C1C1C1" />
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="RenderTransform" Value="none" />
+        </Style>
+        <Style Selector="ListBox.content-list /template/ ScrollViewer /template/ ScrollBar:horizontal">
+            <Setter Property="AllowAutoHide" Value="False" />
+        </Style>
+    </UserControl.Styles>
 
     <Grid RowDefinitions="5*,21,3*"
           ColumnDefinitions="*,21,*">
@@ -43,80 +191,32 @@
                        FontWeight="Medium"
                        Foreground="#2196F3" />
 
-            <ScrollViewer x:Name="OnboardingScroller"
-                          Grid.Row="1"
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto">
-                <StackPanel HorizontalAlignment="Left">
-                    <TextBlock Margin="8,0"
-                               Height="31.7"
-                               LineHeight="31.7"
-                               Text="0. Set the correct path to your Songs folder in the [Preferences]."
-                               TextWrapping="NoWrap" />
-                    <TextBlock Margin="8,0"
-                               Height="31.7"
-                               LineHeight="31.7"
-                               Text="1. Select a beatmap [File] -> [Open beatmap/Open current beatmap] to select a file from your system OR the current in-game selected beatmap."
-                               TextWrapping="NoWrap" />
-                    <TextBlock Margin="8,0"
-                               Height="31.7"
-                               LineHeight="31.7"
-                               Text="2. Select a tool that you want to use from the navigation menu. (Ctrl+K)"
-                               TextWrapping="NoWrap" />
-                    <TextBlock Margin="8,0"
-                               Height="31.7"
-                               LineHeight="31.7"
-                               Text="3. Read a basic summary of the tool by clicking the (?) button."
-                               TextWrapping="NoWrap" />
-                    <TextBlock Margin="8,0"
-                               Height="31.7"
-                               LineHeight="31.7"
-                               Text="4. Configure your tool. To find out what specific things do, read the tooltips by hovering over them."
-                               TextWrapping="NoWrap" />
-                    <TextBlock Margin="8,0"
-                               Height="31.7"
-                               LineHeight="31.7"
-                               Text="5. Click the run button in the bottom right to run the program."
-                               TextWrapping="NoWrap" />
-                    <TextBlock Margin="8,0"
-                               Height="31.7"
-                               LineHeight="31.7"
-                               Text="6. Reload your beatmap WITHOUT SAVING by either leaving and re-entering the editor or pressing Ctrl+L, Enter."
-                               TextWrapping="NoWrap" />
-                    <TextBlock Margin="8,0"
-                               Height="31.7"
-                               LineHeight="31.7"
-                               Text="7. If you run into issues, consult the FAQ over on the [About] -> [Website]."
-                               TextWrapping="NoWrap" />
-                </StackPanel>
-            </ScrollViewer>
-            <Button Grid.Row="1"
-                    ZIndex="2"
-                    Theme="{StaticResource LegacyScrollArrowTheme}"
-                    Width="17"
-                    Height="17"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Bottom"
-                    Content="‹"
-                    FontSize="12"
-                    Click="ScrollOnboardingLeft" />
-            <Button Grid.Row="1"
-                    ZIndex="2"
-                    Theme="{StaticResource LegacyScrollArrowTheme}"
-                    Width="17"
-                    Height="17"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Bottom"
-                    Content="›"
-                    FontSize="12"
-                    Click="ScrollOnboardingRight" />
+            <ListBox Grid.Row="1"
+                     Classes="content-list"
+                     HorizontalAlignment="Left"
+                     ItemsSource="{Binding Instructions}"
+                     ScrollViewer.AllowAutoHide="False"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:CompileBindings="False">
+                        <TextBlock Width="831"
+                                   FontSize="13.18"
+                                   Text="{Binding}"
+                                   TextWrapping="NoWrap" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Grid>
 
-        <Border Grid.Row="0"
-                Grid.Column="1"
-                Width="1"
-                Margin="10"
-                Background="#454545" />
+        <GridSplitter Grid.Row="0"
+                      Grid.Column="1"
+                      Width="2"
+                      Margin="10"
+                      HorizontalAlignment="Stretch"
+                      ResizeBehavior="PreviousAndNext"
+                      ResizeDirection="Columns"
+                      Background="#373737" />
 
         <Grid Grid.Row="0"
               Grid.Column="2"
@@ -126,32 +226,35 @@
                        FontSize="32"
                        FontWeight="Medium"
                        Foreground="#2196F3" />
-            <ScrollViewer Grid.Row="1"
-                          HorizontalScrollBarVisibility="Disabled"
-                          VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Changelog}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:ChangelogEntryViewModel">
-                            <StackPanel>
-                                <TextBlock Text="{Binding Title}"
-                                           FontSize="18"
-                                           FontWeight="Bold"
-                                           TextWrapping="Wrap" />
-                                <TextBlock Margin="10,0,0,0"
-                                           Text="{Binding Text}"
-                                           TextWrapping="Wrap" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+            <ListBox Grid.Row="1"
+                     Classes="content-list"
+                     ItemsSource="{Binding Changelog}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ChangelogEntryViewModel">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Title}"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       TextWrapping="Wrap" />
+                            <TextBlock Margin="10,0,0,0"
+                                       Text="{Binding Text}"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Grid>
 
-        <Border Grid.Row="1"
-                Grid.ColumnSpan="3"
-                Height="1"
-                Margin="10"
-                Background="#454545" />
+        <GridSplitter Grid.Row="1"
+                      Grid.ColumnSpan="3"
+                      Height="1"
+                      Margin="10"
+                      HorizontalAlignment="Stretch"
+                      ResizeBehavior="PreviousAndNext"
+                      ResizeDirection="Rows"
+                      Background="#3E3E3E" />
 
         <Grid Grid.Row="2"
               Grid.ColumnSpan="3"
@@ -162,47 +265,31 @@
                        FontWeight="Medium"
                        Foreground="#2196F3" />
 
-            <Grid Grid.Row="1"
-                  RowDefinitions="56,*">
-                <Grid Grid.Row="0"
-                      Margin="32,0"
-                      ColumnDefinitions="90,*">
-                    <TextBlock Grid.Column="0"
-                               Text="Path"
-                               Margin="0,19,0,0"
-                               VerticalAlignment="Top" />
-                    <TextBlock Grid.Column="1"
-                               Text="Date"
-                               Margin="0,19,0,0"
-                               VerticalAlignment="Top" />
-                </Grid>
-
-                <Border Grid.Row="0"
-                        VerticalAlignment="Bottom"
-                        Height="1"
-                        Background="#454545" />
-
-                <ScrollViewer Grid.Row="1"
-                              VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding RecentMaps}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:RecentMapViewModel">
-                                <Grid MinHeight="36"
-                                      Margin="32,0"
-                                      ColumnDefinitions="90,*">
-                                    <TextBlock Grid.Column="0"
-                                               Text="{Binding FileName}"
-                                               TextTrimming="CharacterEllipsis"
-                                               VerticalAlignment="Center" />
-                                    <TextBlock Grid.Column="1"
-                                               Text="{Binding DisplayDate}"
-                                               VerticalAlignment="Center" />
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-            </Grid>
+            <TableView x:Name="RecentMapsTable"
+                       Grid.Row="1"
+                       ItemsSource="{Binding RecentMaps}"
+                       CanUserResizeColumns="True"
+                       SelectionMode="Multiple"
+                       ToolTip.Tip="Double-click any selection of items to set them as the current beatmap.">
+                <TableView.Columns>
+                    <TableViewColumn x:Name="RecentPathColumn"
+                                     Width="90"
+                                     Binding="{Binding FileName}">
+                        <TableViewColumn.Header>
+                            <TextBlock MinWidth="78"
+                                       Margin="18,0,0,0"
+                                       Text="Path" />
+                        </TableViewColumn.Header>
+                    </TableViewColumn>
+                    <TableViewColumn Width="*"
+                                     Binding="{Binding DisplayDate}">
+                        <TableViewColumn.Header>
+                            <TextBlock Margin="18,0,0,0"
+                                       Text="Date" />
+                        </TableViewColumn.Header>
+                    </TableViewColumn>
+                </TableView.Columns>
+            </TableView>
         </Grid>
     </Grid>
 </UserControl>

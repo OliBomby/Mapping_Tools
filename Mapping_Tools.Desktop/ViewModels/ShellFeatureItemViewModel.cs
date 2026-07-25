@@ -1,4 +1,3 @@
-using Avalonia.Media;
 using Mapping_Tools.Desktop.Shell;
 using ReactiveUI;
 
@@ -76,19 +75,16 @@ public sealed class ShellFeatureItemViewModel : ViewModelBase
         internal set
         {
             this.RaiseAndSetIfChanged(ref _isActive, value);
-            this.RaisePropertyChanged(nameof(NavigationBackground));
         }
     }
-
-    /// <summary>Gets the legacy-compatible navigation selection background.</summary>
-    public IBrush NavigationBackground => IsActive
-        ? new SolidColorBrush(Color.Parse("#494949"))
-        : Brushes.Transparent;
 
     /// <summary>Gets the legacy row height for default pages and tool pages.</summary>
     public double NavigationHeight => Category.Equals("Tools", StringComparison.Ordinal)
         ? 37
         : 41;
+
+    /// <summary>Gets the complete row height, including a legacy section divider when present.</summary>
+    public double NavigationRowHeight => NavigationHeight + (StartsSection ? 21 : 0);
 
     /// <summary>Gets the command that activates this feature.</summary>
     public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> ActivateCommand { get; }

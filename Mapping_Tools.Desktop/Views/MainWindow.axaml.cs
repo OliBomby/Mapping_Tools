@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform;
 using Mapping_Tools.ApplicationServices.Settings;
@@ -141,6 +142,14 @@ public partial class MainWindow : Window
             : WindowState.Maximized;
 
     private void CloseWindow(object? sender, RoutedEventArgs eventArgs) => Close();
+
+    private void DragCurrentMaps(object? sender, PointerPressedEventArgs eventArgs)
+    {
+        if (eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            BeginMoveDrag(eventArgs);
+        }
+    }
 
     private void OpenWebsite(object? sender, RoutedEventArgs eventArgs) =>
         ExecuteCurrentGetStartedCommand(openSource: false);

@@ -11,6 +11,11 @@ Migrate one bounded feature while keeping both frontends buildable. Do not perfo
 
 Before writing or changing any Avalonia C# API, AXAML, binding, style, control, routed event, property, or platform service, read [references/avalonia-12.1.md](references/avalonia-12.1.md) completely and consult the linked official documentation online. Treat this as a mandatory pre-edit gate, even for familiar APIs.
 
+For any UI-bearing migration, also read
+[references/control-parity.md](references/control-parity.md) completely before
+choosing controls or styles. Treat semantic control parity, interaction parity,
+and visual parity as one acceptance gate.
+
 Use only official Avalonia documentation, the Avalonia 12.1.0 tagged source/release, exact-version NuGet metadata, ReactiveUI documentation, and the Material.Avalonia repository as authorities. Do not use WPF knowledge or Avalonia 11 examples as evidence that an API exists. When current documentation covers a later release, verify the API against the 12.1.0 tag or package before using it.
 
 ## Project boundaries
@@ -54,7 +59,7 @@ completing a migration.
 ## Workflow
 
 1. Inspect the selected WPF XAML, code-behind, view model, converters, custom controls, and services. Trace every static dependency such as `MainWindow.AppWindow`, dialogs, dispatcher calls, clipboard, cursor, keyboard hooks, and settings singletons.
-2. Record observable behavior and establish focused tests before moving logic. Include success, validation failure, cancellation, and error behavior relevant to the feature.
+2. Record observable behavior and establish focused tests before moving logic. Include success, validation failure, cancellation, error behavior, hover, focus, checked/selected states, resizing, dragging, keyboard access, open menus, populated data, and empty data whenever relevant.
 3. Classify code into domain rules, application orchestration, infrastructure, and presentation. Keep only rendering, focus, pointer gestures, animation, and other genuinely visual behavior in a view.
 4. Extract the smallest reusable slice. Introduce interfaces for file/folder pickers, notifications, clipboard, dispatching, window ownership, or other UI/OS effects. Preserve the WPF behavior through WPF-side adapters where necessary.
 5. Confirm the extracted Core/Application code contains no frontend types with searches such as `rg "System\\.Windows|System\\.Windows\\.Forms|Avalonia|ReactiveUI" Mapping_Tools.Core Mapping_Tools.Application`.
@@ -85,19 +90,29 @@ Before editing the Avalonia view:
    permit. Do not add badges, cards, buttons, labels, release notes, empty-state
    prose, wider navigation, different chrome, or other design changes that the
    WPF reference does not contain.
+4. Map each interactive WPF control to the corresponding interactive Avalonia
+   control. A collection of borders, text blocks, grids, or pointer handlers
+   that only resembles a menu, table, list, splitter, outlined text box,
+   icon, or Material color surface fails this gate.
 
 After editing:
 
 1. Render WPF and Avalonia at identical dimensions and with identical data.
 2. Open both images and compare them side by side. Inspect the complete shell
    and each migrated child view.
-3. Iterate on every visible mismatch that is under application control.
+3. Compare non-default states too: opened menus and context menus, hover,
+   focus, checked and unchecked toggles, selected rows, populated tables,
+   resized columns or splitters, overflow, and empty states.
+4. Iterate on every visible mismatch that is under application control.
    Framework rasterization differences may be documented only after font,
    size, weight, line height, spacing, and colors have been matched.
-4. Do not claim parity or completion while obvious differences remain.
+5. Do not claim parity or completion while obvious differences remain.
    Successful compilation, matching feature structure, shared colors, or a
    subjective impression are not substitutes for this gate.
-5. In the handoff, list any remaining visible difference precisely. If none
+6. Prove native behaviors such as title-bar dragging, window controls, popup
+   placement, and platform dialogs in a real desktop run; a headless render
+   cannot prove them.
+7. In the handoff, list any remaining visible difference precisely. If none
    was explicitly authorized by the user, treat it as unfinished work rather
    than an intentional design change.
 
@@ -109,6 +124,9 @@ Complete a feature migration only when:
 - Extracted logic has focused automated coverage or a documented reason coverage is impractical.
 - Core and Application contain no WPF, WinForms, Avalonia, or ReactiveUI references.
 - The Avalonia view uses APIs verified for 12.1.0 and compiled bindings where applicable.
+- Each legacy interactive element is represented by the correct Avalonia
+  control and preserves its selection, resizing, dragging, menu, hover,
+  focus, checked, and keyboard behavior where applicable.
 - Equal-state, equal-viewport WPF and Avalonia renders have been opened and
   inspected, and no unrequested visible design differences remain.
 - Cancellation and error paths do not depend on view code-behind.
