@@ -1,11 +1,9 @@
-using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using Mapping_Tools.Classes.JsonConverters;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Newtonsoft.Json.Serialization;
+using Mapping_Tools.ApplicationServices.Projects;
+using Mapping_Tools.Infrastructure.Projects;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public enum ErrorType
@@ -16,66 +14,26 @@ namespace Mapping_Tools.Classes.SystemTools {
     }
 
     public static class ProjectManager {
-        private static readonly JsonSerializer serializer = new() {
-            NullValueHandling = NullValueHandling.Ignore,
-            TypeNameHandling = TypeNameHandling.Objects,
-            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-            Formatting = Formatting.Indented,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore, 
-            SerializationBinder = new LegacyProjectTypeBinder(),
-            Converters = { new Vector2Converter()}
-        };
-
-        private sealed class LegacyProjectTypeBinder : ISerializationBinder {
-            private readonly DefaultSerializationBinder fallback = new();
-            private static readonly System.Reflection.Assembly MigratedCoreAssembly = typeof(Beatmap).Assembly;
-
-            public Type BindToType(string assemblyName, string typeName) {
-                if (assemblyName == "Mapping Tools") {
-                    // Wave 1 moved domain types from the WPF executable into Core.
-                    // Existing project files still identify those types as belonging to "Mapping Tools".
-                    Type migratedType = MigratedCoreAssembly.GetType(typeName);
-                    if (migratedType != null) return migratedType;
-                }
-                return fallback.BindToType(assemblyName, typeName);
-            }
-
-            public void BindToName(Type serializedType, out string assemblyName, out string typeName) {
-                if (serializedType.Assembly == MigratedCoreAssembly) {
-                    assemblyName = "Mapping Tools";
-                    typeName = serializedType.FullName;
-                    return;
-                }
-                fallback.BindToName(serializedType, out assemblyName, out typeName);
-            }
-        }
+        private static readonly IProjectSerializer Serializer =
+            new LegacyProjectJsonSerializer();
+        private static readonly IProjectStore Store =
+            new FileSystemProjectStore(Serializer);
 
         public static void WriteJson(StreamWriter streamWriter, object obj) {
-            using (JsonTextWriter reader = new JsonTextWriter(streamWriter)) {
-                serializer.Serialize(reader, obj);
-            }
+            streamWriter.Write(Serializer.Serialize(obj));
         }
 
         public static void SaveJson(string path, object obj) {
-            using (StreamWriter fs = new StreamWriter(path)) {
-                WriteJson(fs, obj);
-            }
+            Store.SaveAsync(path, obj).GetAwaiter().GetResult();
         }
         
         public static T LoadJson<T>(string path) {
-            using (StreamReader fs = new StreamReader(path)) {
-                using (JsonReader reader = new JsonTextReader(fs)) {
-                    return serializer.Deserialize<T>(reader);
-                }
-            }
+            return Store.LoadAsync<T>(path).GetAwaiter().GetResult();
         }
 
         public static T LoadJson<T>(Stream stream) {
-            using (StreamReader fs = new StreamReader(stream)) {
-                using (JsonReader reader = new JsonTextReader(fs)) {
-                    return serializer.Deserialize<T>(reader);
-                }
-            }
+            using StreamReader reader = new(stream);
+            return Serializer.Deserialize<T>(reader.ReadToEnd());
         }
 
         public static void AutoSaveProject<T>(ISavable<T> view) {

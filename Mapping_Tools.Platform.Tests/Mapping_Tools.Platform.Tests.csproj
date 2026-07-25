@@ -25,6 +25,10 @@
       <Link>Fixtures\Settings\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\tests\fixtures\wave0\projects\*.json">
+      <Link>Fixtures\Projects\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

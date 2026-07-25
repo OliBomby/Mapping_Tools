@@ -1,4 +1,5 @@
 using Mapping_Tools.ApplicationServices.Platform;
+using Mapping_Tools.ApplicationServices.Projects;
 using Mapping_Tools.ApplicationServices.Settings;
 using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.ViewModels;
@@ -30,7 +31,10 @@ public sealed class DependencyInjectionTests
             typeof(ISettingsStore),
             typeof(ISettingsPathEnvironment),
             typeof(ISettingsPathService),
-            typeof(ISettingsService)
+            typeof(ISettingsService),
+            typeof(IProjectSerializer),
+            typeof(IProjectStore),
+            typeof(IProjectService)
         ];
 
         foreach (Type serviceType in expectedSingletons)

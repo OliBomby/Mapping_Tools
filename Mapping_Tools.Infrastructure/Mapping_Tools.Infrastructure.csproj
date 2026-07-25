@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Mapping_Tools.Application\Mapping_Tools.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+  </ItemGroup>
+
 </Project>
