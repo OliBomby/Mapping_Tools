@@ -2,6 +2,7 @@ using Mapping_Tools.ApplicationServices.Abstractions;
 using Mapping_Tools.ApplicationServices.Backups;
 using Mapping_Tools.ApplicationServices.BeatmapEditing;
 using Mapping_Tools.ApplicationServices.Execution;
+using Mapping_Tools.ApplicationServices.Interactions;
 using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Projects;
 using Mapping_Tools.ApplicationServices.QuickRun;
@@ -30,6 +31,7 @@ public sealed class DependencyInjectionTests
         [
             typeof(MainWindow),
             typeof(MainViewModel),
+            typeof(IDialogService),
             typeof(IFilePicker),
             typeof(IClipboardService),
             typeof(IPlatformLauncher),
@@ -92,6 +94,30 @@ public sealed class DependencyInjectionTests
 
         // Assert
         provider.Should().NotBeNull();
+    }
+
+    [TestMethod]
+    public void BuildServiceProvider_WithDesktopAndHostedRegistrations_PassesValidation()
+    {
+        // Arrange
+        ServiceCollection services = new();
+        services.AddLogging();
+        services.AddMappingToolsDesktop();
+        services.AddMappingToolsHostedServices();
+
+        // Act
+        Action act = () =>
+        {
+            using ServiceProvider provider = services.BuildServiceProvider(
+                new ServiceProviderOptions
+                {
+                    ValidateOnBuild = true,
+                    ValidateScopes = true
+                });
+        };
+
+        // Assert
+        act.Should().NotThrow();
     }
 
     [TestMethod]

@@ -2,6 +2,7 @@ using Mapping_Tools.ApplicationServices.Abstractions;
 using Mapping_Tools.ApplicationServices.Backups;
 using Mapping_Tools.ApplicationServices.BeatmapEditing;
 using Mapping_Tools.ApplicationServices.Execution;
+using Mapping_Tools.ApplicationServices.Interactions;
 using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Projects;
 using Mapping_Tools.ApplicationServices.QuickRun;
@@ -36,6 +37,11 @@ internal static class DesktopServiceRegistration
 
         services.AddSingleton<MainWindow>();
         services.AddSingleton<MainViewModel>();
+        services.AddSingleton<IDialogService>(provider =>
+        {
+            MainWindow window = provider.GetRequiredService<MainWindow>();
+            return new AvaloniaDialogService(() => window);
+        });
 
         services.AddSingleton<IFilePicker>(provider =>
         {

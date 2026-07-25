@@ -1,0 +1,139 @@
+using Avalonia.Controls;
+using Avalonia.Threading;
+using Mapping_Tools.ApplicationServices.Interactions;
+using Mapping_Tools.Desktop.ViewModels.Dialogs;
+using Mapping_Tools.Desktop.Views.Dialogs;
+
+namespace Mapping_Tools.Desktop.Platform;
+
+/// <summary>
+/// Presents application dialog contracts as Avalonia 12.1 owner-modal windows.
+/// </summary>
+public sealed class AvaloniaDialogService : IDialogService
+{
+    private readonly Func<Window> _owner;
+
+    /// <summary>
+    /// Creates a service whose dialogs are always owned by the current shell window.
+    /// </summary>
+    /// <param name="owner">Returns the initialized window disabled during each modal interaction.</param>
+    public AvaloniaDialogService(Func<Window> owner)
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+        _owner = owner;
+    }
+
+    /// <inheritdoc/>
+    public Task<TResult> ShowMessageAsync<TResult>(
+        MessageDialogRequest<TResult> request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        cancellationToken.ThrowIfCancellationRequested();
+        return InvokeOnUiThreadAsync(
+            () => ShowMessageOnUiThreadAsync(request, cancellationToken));
+    }
+
+    /// <inheritdoc/>
+    public Task<ValueDialogResult<TValue>> ShowValueAsync<TValue>(
+        ValueDialogRequest<TValue> request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        cancellationToken.ThrowIfCancellationRequested();
+        return InvokeOnUiThreadAsync(
+            () => ShowValueOnUiThreadAsync(request, cancellationToken));
+    }
+
+    private async Task<TResult> ShowMessageOnUiThreadAsync<TResult>(
+        MessageDialogRequest<TResult> request,
+        CancellationToken cancellationToken)
+    {
+        MessageDialogWindow window = new();
+        List<DialogChoiceViewModel> choices = request.Choices
+            .Select(choice => new DialogChoiceViewModel(
+                choice.Label,
+                choice.IsDefault,
+                choice.IsCancel,
+                () => window.Close(new ResultBox<TResult>(choice.Result))))
+            .ToList();
+        window.DataContext = new MessageDialogViewModel(
+            request.Title,
+            request.Message,
+            request.Details,
+            choices);
+
+        Task<object?> lifetime = window.ShowDialog<object?>(_owner());
+        using CancellationTokenRegistration registration =
+            RegisterCancellation(window, cancellationToken);
+        object? result = await lifetime;
+        cancellationToken.ThrowIfCancellationRequested();
+        return result is ResultBox<TResult> box
+            ? box.Value
+            : request.DismissResult;
+    }
+
+    private async Task<ValueDialogResult<TValue>> ShowValueOnUiThreadAsync<TValue>(
+        ValueDialogRequest<TValue> request,
+        CancellationToken cancellationToken)
+    {
+        ValueDialogWindow window = new();
+        ValueDialogViewModel viewModel = new(
+            request.Title,
+            request.Prompt,
+            request.Converter.Format(request.InitialValue),
+            request.AcceptLabel,
+            request.CancelLabel,
+            text => Evaluate(text, request),
+            value => window.Close(new ResultBox<TValue>((TValue)value!)),
+            () => window.Close());
+        window.DataContext = viewModel;
+
+        Task<object?> lifetime = window.ShowDialog<object?>(_owner());
+        using CancellationTokenRegistration registration =
+            RegisterCancellation(window, cancellationToken);
+        object? result = await lifetime;
+        cancellationToken.ThrowIfCancellationRequested();
+        return result is ResultBox<TValue> box
+            ? new ValueDialogResult<TValue>(true, box.Value)
+            : new ValueDialogResult<TValue>(false, default);
+    }
+
+    private static ValueInputEvaluation Evaluate<TValue>(
+        string? text,
+        ValueDialogRequest<TValue> request)
+    {
+        ValueEvaluation<TValue> evaluation = request.Evaluate(text);
+        return new ValueInputEvaluation(
+            evaluation.IsValid,
+            evaluation.Value,
+            evaluation.ErrorMessage);
+    }
+
+    private static CancellationTokenRegistration RegisterCancellation(
+        Window window,
+        CancellationToken cancellationToken)
+    {
+        return cancellationToken.Register(() =>
+            window.Dispatcher.Post(() =>
+            {
+                if (window.IsVisible)
+                {
+                    window.Close();
+                }
+            }));
+    }
+
+    private static async Task<TResult> InvokeOnUiThreadAsync<TResult>(
+        Func<Task<TResult>> action)
+    {
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            return await action();
+        }
+
+        return await Dispatcher.UIThread.InvokeAsync(action);
+    }
+
+    private sealed record ResultBox<T>(T Value);
+}

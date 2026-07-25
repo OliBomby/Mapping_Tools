@@ -234,8 +234,8 @@ behavior, limitations, tests, and compatibility decisions are recorded in
 [wave-2-step-12-editing-gateway.md](wave-2-step-12-editing-gateway.md),
 [wave-2-step-13-backup-restore-undo.md](wave-2-step-13-backup-restore-undo.md),
 [wave-2-step-14-tool-execution-host.md](wave-2-step-14-tool-execution-host.md),
-[wave-2-step-15-quickrun-hotkeys.md](wave-2-step-15-quickrun-hotkeys.md),
-and [wave-2-completion-validation.md](wave-2-completion-validation.md).
+[wave-2-step-15-quickrun-hotkeys.md](wave-2-step-15-quickrun-hotkeys.md), and
+[wave-2-completion-validation.md](wave-2-completion-validation.md).
 The Avalonia composition root now uses the .NET Generic Host for DI,
 configuration, logging, periodic backups, and coordinated tool cancellation
 during shutdown.
@@ -250,6 +250,11 @@ during shutdown.
     configuration, live hotkey rebinding, BetterSave, and QuickUndo controls.
 
 Exit: the Avalonia shell can host independently registered features and exercise all cross-cutting workflows without static WPF state.
+
+Implementation status: step 16 is complete. Its reusable validation
+contracts, typed dialog service, Avalonia presentation, compatibility
+decisions, tests, and render evidence are recorded in
+[wave-3-step-16-forms-dialogs.md](wave-3-step-16-forms-dialogs.md).
 
 ### Wave 4 — First vertical slices and shared timeline
 

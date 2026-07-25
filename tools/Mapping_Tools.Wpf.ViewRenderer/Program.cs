@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Mapping_Tools;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Components.Dialogs;
 
 internal static class Program
 {
@@ -85,14 +86,34 @@ internal static class Program
         }
         else
         {
+            bool isEmbeddedDialog =
+                view is MessageDialog or TypeValueDialog;
+            if (isEmbeddedDialog)
+            {
+                view.Width = 363;
+                view.HorizontalAlignment = HorizontalAlignment.Left;
+                view.VerticalAlignment = VerticalAlignment.Top;
+            }
+
             renderTarget = new Border
             {
                 Width = options.Width,
                 Height = options.Height,
                 Background = (Brush?)app.TryFindResource("MaterialDesignPaper") ?? Brushes.White,
-                Padding = new Thickness(20),
+                Padding = isEmbeddedDialog
+                    ? new Thickness(0)
+                    : new Thickness(20),
                 Child = view,
             };
+            TextElement.SetForeground(
+                renderTarget,
+                (Brush?)app.TryFindResource("MaterialDesignBody") ?? Brushes.White);
+            TextElement.SetFontFamily(
+                renderTarget,
+                new FontFamily(
+                    "pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"));
+            TextElement.SetFontWeight(renderTarget, FontWeights.Medium);
+            TextElement.SetFontSize(renderTarget, 14);
         }
 
         renderTarget.Measure(new Size(options.Width, options.Height));
@@ -121,6 +142,20 @@ internal static class Program
                 binder: null,
                 args: [false],
                 culture: null);
+        }
+
+        if (type == typeof(MessageDialog))
+        {
+            return new MessageDialog(
+                "A project already exists at the selected location. Continuing will replace that file.");
+        }
+
+        if (type == typeof(TypeValueDialog))
+        {
+            var dialog = new TypeValueDialog(0);
+            var valueBox = (TextBox)dialog.FindName("ValueBox");
+            valueBox.Text = string.Empty;
+            return dialog;
         }
 
         return Activator.CreateInstance(type);

@@ -14,7 +14,7 @@ internal sealed class GlobalHotkeyHostedService : IHostedService
     private readonly IQuickUndoCommandService _quickUndo;
     private readonly ApplicationSettings _settings;
 
-    internal GlobalHotkeyHostedService(
+    public GlobalHotkeyHostedService(
         IGlobalHotkeyService hotkeys,
         IQuickRunService quickRun,
         IQuickUndoCommandService quickUndo,

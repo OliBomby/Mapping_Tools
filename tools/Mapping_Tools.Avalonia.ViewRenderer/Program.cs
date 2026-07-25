@@ -3,7 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Mapping_Tools.Desktop;
 using Mapping_Tools.Desktop.ViewModels;
+using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Mapping_Tools.Desktop.Views;
+using Mapping_Tools.Desktop.Views.Dialogs;
 
 var options = RenderOptions.Parse(args);
 if (options.List)
@@ -21,11 +23,14 @@ AppBuilder.Configure<App>()
 Control view = options.View switch
 {
     "MainWindow" => new MainWindow { DataContext = new MainViewModel() },
+    "MessageDialogWindow" => CreateMessageDialog(),
+    "ValueDialogWindow" => CreateValueDialog(),
     _ => CreateParameterlessView(options.View),
 };
 var host = view as Window ?? new Window { Content = view };
 host.Width = options.Width;
 host.Height = options.Height;
+host.SizeToContent = SizeToContent.Manual;
 host.Show();
 var frame = host.CaptureRenderedFrame()
     ?? throw new InvalidOperationException("Avalonia did not produce a rendered frame.");
@@ -33,6 +38,39 @@ Directory.CreateDirectory(Path.GetDirectoryName(options.Output)!);
 frame.Save(options.Output);
 host.Close();
 Console.WriteLine(options.Output);
+
+static MessageDialogWindow CreateMessageDialog()
+{
+    DialogChoiceViewModel[] choices =
+    [
+        new("OK", isDefault: true, isCancel: false, () => { }),
+        new("I WANNA SPEAK TO YOUR MANAGER", isDefault: false, isCancel: true, () => { })
+    ];
+    return new MessageDialogWindow
+    {
+        DataContext = new MessageDialogViewModel(
+            "Confirm",
+            "A project already exists at the selected location. Continuing will replace that file.",
+            null,
+            choices)
+    };
+}
+
+static ValueDialogWindow CreateValueDialog()
+{
+    return new ValueDialogWindow
+    {
+        DataContext = new ValueDialogViewModel(
+            "Type value",
+            "Value",
+            string.Empty,
+            "ACCEPT",
+            "CANCEL",
+            text => new ValueInputEvaluation(true, text, null),
+            _ => { },
+            () => { })
+    };
+}
 
 static Control CreateParameterlessView(string name)
 {

@@ -1,0 +1,88 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Mapping_Tools.Desktop.ViewModels.Dialogs"
+        x:Class="Mapping_Tools.Desktop.Views.Dialogs.MessageDialogWindow"
+        x:DataType="vm:MessageDialogViewModel"
+        Title="{Binding Title}"
+        Width="460"
+        MinWidth="360"
+        MaxWidth="720"
+        SizeToContent="Height"
+        CanResize="False"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner">
+    <Window.Styles>
+        <Style Selector="Button.dialog-action">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#FF0277BD" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border x:Name="PART_DialogActionBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="Transparent"
+                            BorderThickness="1"
+                            CornerRadius="2">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover /template/ Border#PART_DialogActionBorder">
+                <Setter Property="Background" Value="#1F0277BD" />
+            </Style>
+            <Style Selector="^:focus /template/ Border#PART_DialogActionBorder">
+                <Setter Property="BorderBrush" Value="#FF0277BD" />
+            </Style>
+        </Style>
+        <Style Selector="TextBlock">
+            <Setter Property="FontWeight" Value="Medium" />
+        </Style>
+    </Window.Styles>
+    <Grid Width="363"
+          MaxWidth="363"
+          Margin="0"
+          HorizontalAlignment="Left"
+          VerticalAlignment="Top"
+          RowDefinitions="Auto,Auto">
+        <ScrollViewer MaxHeight="520"
+                      Padding="0"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,20,0,12" Spacing="12">
+                <TextBlock Text="{Binding Message}"
+                           MaxWidth="315"
+                           FontSize="18"
+                           TextWrapping="Wrap" />
+                <TextBlock Text="{Binding Details}"
+                           IsVisible="{Binding HasDetails}"
+                           Opacity="0.75"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+        </ScrollViewer>
+        <ItemsControl Grid.Row="1"
+                      Margin="24,0,16,16"
+                      HorizontalAlignment="Left"
+                      ItemsSource="{Binding Choices}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:DialogChoiceViewModel">
+                    <Button Classes="dialog-action"
+                            Margin="0,0,8,0"
+                            Content="{Binding Label}"
+                            Command="{Binding Command}"
+                            IsDefault="{Binding IsDefault}"
+                            IsCancel="{Binding IsCancel}" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</Window>
