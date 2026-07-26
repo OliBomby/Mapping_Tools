@@ -1,6 +1,6 @@
-using Mapping_Tools.ApplicationServices.Platform;
+using Mapping_Tools.Application.Platform;
 
-namespace Mapping_Tools.ApplicationServices.Settings;
+namespace Mapping_Tools.Application.Settings;
 
 /// <summary>
 /// Derives missing osu!, Songs, config, and backup paths while preserving every

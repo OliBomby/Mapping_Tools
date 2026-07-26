@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Settings;
+namespace Mapping_Tools.Application.Settings;
 
 /// <summary>
 /// Persists the portable settings document without applying machine defaults.

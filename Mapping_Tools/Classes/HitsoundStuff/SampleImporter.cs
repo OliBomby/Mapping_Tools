@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Mapping_Tools.Core.Classes.HitsoundStuff;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     class SampleImporter {

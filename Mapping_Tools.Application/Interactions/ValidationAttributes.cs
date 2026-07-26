@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 
-namespace Mapping_Tools.ApplicationServices.Interactions;
+namespace Mapping_Tools.Application.Interactions;
 
 /// <summary>
 /// Rejects missing, empty, or whitespace-only text while preserving the

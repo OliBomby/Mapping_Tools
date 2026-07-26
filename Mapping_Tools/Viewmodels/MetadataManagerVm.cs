@@ -8,10 +8,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.MathUtil;
 using System.Text.Json.Serialization;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Properties;
 
 namespace Mapping_Tools.Viewmodels {
 

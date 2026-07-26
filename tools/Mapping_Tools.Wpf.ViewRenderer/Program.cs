@@ -10,10 +10,11 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using Mapping_Tools;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Dialogs;
 using Mapping_Tools.Views.Preferences;
+
+namespace Mapping_Tools.Wpf.ViewRenderer;
 
 internal static class Program
 {
@@ -58,14 +59,14 @@ internal static class Program
             ]);
         }
         var type = viewTypes.SingleOrDefault(candidate =>
-            candidate.Name.Equals(options.View, StringComparison.OrdinalIgnoreCase) ||
-            candidate.FullName?.Equals(options.View, StringComparison.OrdinalIgnoreCase) == true)
-            ?? throw new ArgumentException($"Unknown WPF view '{options.View}'. Use --list.");
+                       candidate.Name.Equals(options.View, StringComparison.OrdinalIgnoreCase) ||
+                       candidate.FullName?.Equals(options.View, StringComparison.OrdinalIgnoreCase) == true)
+                   ?? throw new ArgumentException($"Unknown WPF view '{options.View}'. Use --list.");
         FrameworkElement view;
         try
         {
             view = (FrameworkElement)(CreateView(type)
-                ?? throw new InvalidOperationException($"Could not construct '{type.FullName}'."));
+                                      ?? throw new InvalidOperationException($"Could not construct '{type.FullName}'."));
         }
         catch (Exception exception)
         {
@@ -78,7 +79,7 @@ internal static class Program
         if (view is Window window)
         {
             var content = window.Content as FrameworkElement
-                ?? throw new InvalidOperationException($"Window '{type.FullName}' does not have renderable content.");
+                          ?? throw new InvalidOperationException($"Window '{type.FullName}' does not have renderable content.");
             window.Content = null;
 
             var designerHost = new Border

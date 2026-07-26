@@ -1,6 +1,6 @@
-﻿using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
+﻿using static Mapping_Tools.Core.Classes.BeatmapHelper.FileFormatHelper;
 
-namespace Mapping_Tools.Classes.BeatmapHelper.Events {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper.Events {
 #nullable disable
 
     /// <summary>

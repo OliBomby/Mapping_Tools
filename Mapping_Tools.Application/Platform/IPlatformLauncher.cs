@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Platform;
+namespace Mapping_Tools.Application.Platform;
 
 /// <summary>
 /// Opens URIs and local filesystem items with their operating-system handlers.

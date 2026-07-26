@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourTemplates;
 using Mapping_Tools.Components.Domain;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.Tools.TumourGenerating.Options {
     public class TumourLayer : BindableBase, ITumourLayer {

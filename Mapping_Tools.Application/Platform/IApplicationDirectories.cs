@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Platform;
+namespace Mapping_Tools.Application.Platform;
 
 /// <summary>
 /// Defines the stable filesystem locations owned by Mapping Tools.

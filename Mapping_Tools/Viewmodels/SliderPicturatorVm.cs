@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -16,8 +16,10 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools.SlideratorStuff;
 using Mapping_Tools.Components.Domain;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.SystemTools;
 using Newtonsoft.Json;
-using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
+using HitObject = Mapping_Tools.Core.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Viewmodels
 {

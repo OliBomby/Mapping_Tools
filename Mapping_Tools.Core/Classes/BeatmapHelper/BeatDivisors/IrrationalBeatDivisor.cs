@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Classes.BeatmapHelper.BeatDivisors {
+﻿namespace Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors {
 #nullable disable
 
     /// <summary>

@@ -1,14 +1,8 @@
-using Mapping_Tools.Classes.MathUtil;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.HitsoundStuff {
+namespace Mapping_Tools.Core.Classes.HitsoundStuff {
     /// <summary>
     /// Represents a hitsound by a single circle in the editor
     /// </summary>

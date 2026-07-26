@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
+namespace Mapping_Tools.Core.Classes.ToolHelpers.Sliders.Newgen {
     /// <summary>
     /// Its a path with reconstruction hints.
     /// </summary>

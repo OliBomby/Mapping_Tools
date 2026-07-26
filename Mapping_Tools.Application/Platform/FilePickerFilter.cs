@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Platform;
+namespace Mapping_Tools.Application.Platform;
 
 /// <summary>
 /// Describes one portable native-file-dialog filter using the metadata formats

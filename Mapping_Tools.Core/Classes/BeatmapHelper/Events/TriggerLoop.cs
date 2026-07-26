@@ -1,7 +1,6 @@
-﻿using System.Text;
-using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
+﻿using static Mapping_Tools.Core.Classes.BeatmapHelper.FileFormatHelper;
 
-namespace Mapping_Tools.Classes.BeatmapHelper.Events {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper.Events {
     /// <summary>
     /// Represents trigger loop events. Although called loops, these only ever activate once.
     /// </summary>

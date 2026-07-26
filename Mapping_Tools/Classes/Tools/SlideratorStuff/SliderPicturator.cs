@@ -4,7 +4,8 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
     public static class SliderPicturator {

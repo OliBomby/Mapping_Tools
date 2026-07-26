@@ -1,4 +1,4 @@
-namespace Mapping_Tools.Classes.HitsoundStuff {
+namespace Mapping_Tools.Core.Classes.HitsoundStuff {
     /// <summary>
     /// Enumerator of import types of hitsounds.
     /// </summary>

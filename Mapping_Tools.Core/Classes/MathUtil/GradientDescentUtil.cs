@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Mapping_Tools.Classes.MathUtil {
+﻿namespace Mapping_Tools.Core.Classes.MathUtil {
     /// <summary>
     /// Performs simple finite-difference optimization over a bounded scalar interval.
     /// </summary>

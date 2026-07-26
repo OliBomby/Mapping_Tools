@@ -1,6 +1,5 @@
 ﻿using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Components.Domain;
@@ -29,10 +28,12 @@ using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectColl
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
-using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
+using HitObject = Mapping_Tools.Core.Classes.BeatmapHelper.HitObject;
 using MessageBox = System.Windows.MessageBox;
 using System.Diagnostics;
-using Mapping_Tools.Annotations;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Properties;
 
 namespace Mapping_Tools.Viewmodels {
     public class SnappingToolsVm : IDisposable

@@ -3,7 +3,7 @@ using OggVorbisEncoder;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     public class VorbisFileWriter : IDisposable {

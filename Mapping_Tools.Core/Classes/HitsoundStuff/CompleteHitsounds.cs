@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Mapping_Tools.Classes.HitsoundStuff {
+namespace Mapping_Tools.Core.Classes.HitsoundStuff {
 
     /// <summary>
     /// Bundles resolved playback events with the custom-index sample requirements needed to render them.

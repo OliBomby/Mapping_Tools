@@ -1,7 +1,7 @@
-using Mapping_Tools.ApplicationServices.Backups;
-using Mapping_Tools.ApplicationServices.BeatmapEditing;
-using Mapping_Tools.ApplicationServices.Settings;
-using Mapping_Tools.ApplicationServices.Workspace;
+using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.SafetyCopies;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Workspace;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 

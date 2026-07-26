@@ -8,6 +8,7 @@
              xmlns:domain="clr-namespace:Mapping_Tools.Components.Domain"
              xmlns:beatmapHelper="clr-namespace:Mapping_Tools.Classes.BeatmapHelper;assembly=Mapping_Tools.Core"
              xmlns:comboColourStudio="clr-namespace:Mapping_Tools.Classes.Tools.ComboColourStudio"
+             xmlns:beatmapHelper1="clr-namespace:Mapping_Tools.Core.Classes.BeatmapHelper;assembly=Mapping_Tools.Core"
              mc:Ignorable="d" 
              x:Name="This"
              d:DesignHeight="650" Width="759.5" d:DataContext="{d:DesignData ComboColourStudioVm}">
@@ -108,7 +109,7 @@
                                                 </ItemsPanelTemplate>
                                             </ListBox.ItemsPanel>
                                             <ListBox.ItemTemplate>
-                                                <DataTemplate DataType="beatmapHelper:SpecialColour">
+                                                <DataTemplate DataType="beatmapHelper1:SpecialColour">
                                                     <StackPanel Orientation="Horizontal">
                                                         <materialDesign:Chip ToolTip="{Binding Name}" IconBackground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Icon=""
                                                                              IsDeletable="True" DeleteCommand="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}, Path=DataContext.RemoveCommand}" DeleteCommandParameter="{Binding}"/>
@@ -173,7 +174,7 @@
                                         </ItemsPanelTemplate>
                                     </ListBox.ItemsPanel>
                                     <ListBox.ItemTemplate>
-                                        <DataTemplate DataType="beatmapHelper:SpecialColour">
+                                        <DataTemplate DataType="beatmapHelper1:SpecialColour">
                                             <materialDesign:PopupBox StaysOpen="True" ToolTip="{Binding Name}">
                                                 <materialDesign:PopupBox.ToggleContent>
                                                     <materialDesign:PackIcon Kind="Circle" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" Width="35" Height="35"/>

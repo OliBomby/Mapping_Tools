@@ -1,7 +1,6 @@
-﻿using System.Text;
-using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
+﻿using static Mapping_Tools.Core.Classes.BeatmapHelper.FileFormatHelper;
 
-namespace Mapping_Tools.Classes.BeatmapHelper.Events {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper.Events {
     /// <summary>
     /// Represents the standard loop event. This event has a different syntax so it can't be a <see cref="OtherCommand"/>.
     /// </summary>

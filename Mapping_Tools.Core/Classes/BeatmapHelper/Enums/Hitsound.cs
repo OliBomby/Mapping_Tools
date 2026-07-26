@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Classes.BeatmapHelper.Enums {
+﻿namespace Mapping_Tools.Core.Classes.BeatmapHelper.Enums {
     /// <summary>
     /// The hitsound placed into the hitobject.
     /// </summary>

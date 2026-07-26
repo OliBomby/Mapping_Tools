@@ -1,9 +1,6 @@
-using System.Collections.Generic;
-using System.Linq;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 
-namespace Mapping_Tools.Classes.HitsoundStuff {
+namespace Mapping_Tools.Core.Classes.HitsoundStuff {
     /// <summary>
     /// Groups every generated sample layer that plays at one timestamp.
     /// </summary>

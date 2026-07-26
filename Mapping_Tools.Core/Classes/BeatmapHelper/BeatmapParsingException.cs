@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Mapping_Tools.Classes.BeatmapHelper
+﻿namespace Mapping_Tools.Core.Classes.BeatmapHelper
 {
     /// <summary>
     /// Reports malformed osu! beatmap text while retaining the offending source line in the message.

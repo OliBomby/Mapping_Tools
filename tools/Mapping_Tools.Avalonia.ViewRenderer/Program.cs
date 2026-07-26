@@ -2,11 +2,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Media.Imaging;
-using Mapping_Tools.ApplicationServices.Execution;
-using Mapping_Tools.ApplicationServices.Interactions;
-using Mapping_Tools.ApplicationServices.Platform;
-using Mapping_Tools.ApplicationServices.Settings;
-using Mapping_Tools.ApplicationServices.Workspace;
+using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Interactions;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Avalonia.ViewRenderer;
 using Mapping_Tools.Desktop;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Platform;
@@ -56,7 +57,7 @@ host.Show();
 host.Width = options.Width;
 host.Height = options.Height;
 var frame = host.CaptureRenderedFrame()
-    ?? throw new InvalidOperationException("Avalonia did not produce a rendered frame.");
+            ?? throw new InvalidOperationException("Avalonia did not produce a rendered frame.");
 Directory.CreateDirectory(Path.GetDirectoryName(options.Output)!);
 using (FileStream output = File.Create(options.Output))
 {
@@ -283,92 +284,94 @@ static Control CreateParameterlessView(string name)
     return type is null
         ? throw new ArgumentException($"Unknown Avalonia view '{name}'. Use --list or add a deterministic factory to Program.cs.")
         : (Control)(Activator.CreateInstance(type)
-            ?? throw new InvalidOperationException($"Could not construct '{type.FullName}'. Add a deterministic factory to Program.cs."));
+                    ?? throw new InvalidOperationException($"Could not construct '{type.FullName}'. Add a deterministic factory to Program.cs."));
 }
 
-internal sealed record RenderOptions(
-    string View,
-    string Output,
-    double Width,
-    double Height,
-    bool List,
-    string Scenario)
-{
-    /// <summary>
-    /// Parses renderer command-line options and supplies deterministic defaults.
-    /// </summary>
-    /// <param name="args">The renderer command-line arguments.</param>
-    /// <returns>The requested view, output path, dimensions, and list mode.</returns>
-    public static RenderOptions Parse(string[] args)
+namespace Mapping_Tools.Avalonia.ViewRenderer {
+    internal sealed record RenderOptions(
+        string View,
+        string Output,
+        double Width,
+        double Height,
+        bool List,
+        string Scenario)
     {
-        string? Value(string key) => args.SkipWhile(value => value != key).Skip(1).FirstOrDefault();
-        var view = Value("--view") ?? "MainWindow";
-        return new RenderOptions(view,
-            Path.GetFullPath(Value("--output") ?? Path.Combine("artifacts", "view-renders", $"avalonia-{view}.png")),
-            double.TryParse(Value("--width"), out var width) ? width : 1280,
-            double.TryParse(Value("--height"), out var height) ? height : 800,
-            args.Contains("--list"),
-            Value("--scenario") ?? string.Empty);
+        /// <summary>
+        /// Parses renderer command-line options and supplies deterministic defaults.
+        /// </summary>
+        /// <param name="args">The renderer command-line arguments.</param>
+        /// <returns>The requested view, output path, dimensions, and list mode.</returns>
+        public static RenderOptions Parse(string[] args)
+        {
+            string? Value(string key) => args.SkipWhile(value => value != key).Skip(1).FirstOrDefault();
+            var view = Value("--view") ?? "MainWindow";
+            return new RenderOptions(view,
+                Path.GetFullPath(Value("--output") ?? Path.Combine("artifacts", "view-renders", $"avalonia-{view}.png")),
+                double.TryParse(Value("--width"), out var width) ? width : 1280,
+                double.TryParse(Value("--height"), out var height) ? height : 800,
+                args.Contains("--list"),
+                Value("--scenario") ?? string.Empty);
+        }
     }
-}
 
-internal sealed class AcceptedLauncher : IPlatformLauncher
-{
-    public Task<bool> OpenUriAsync(Uri uri, CancellationToken cancellationToken = default) =>
-        Task.FromResult(true);
+    internal sealed class AcceptedLauncher : IPlatformLauncher
+    {
+        public Task<bool> OpenUriAsync(Uri uri, CancellationToken cancellationToken = default) =>
+            Task.FromResult(true);
 
-    public Task<bool> OpenFileAsync(string path, CancellationToken cancellationToken = default) =>
-        Task.FromResult(true);
+        public Task<bool> OpenFileAsync(string path, CancellationToken cancellationToken = default) =>
+            Task.FromResult(true);
 
-    public Task<bool> OpenFolderAsync(string path, CancellationToken cancellationToken = default) =>
-        Task.FromResult(true);
-}
+        public Task<bool> OpenFolderAsync(string path, CancellationToken cancellationToken = default) =>
+            Task.FromResult(true);
+    }
 
-internal sealed class NoOpSettingsService(ApplicationSettings settings) : ISettingsService
-{
-    public SettingsLoadResult LoadOrCreate() => new(settings, false, false);
+    internal sealed class NoOpSettingsService(ApplicationSettings settings) : ISettingsService
+    {
+        public SettingsLoadResult LoadOrCreate() => new(settings, false, false);
 
-    public void Save(ApplicationSettings applicationSettings)
+        public void Save(ApplicationSettings applicationSettings)
+        {
+        }
+    }
+
+    internal sealed class ImmediateDispatcher : IUiDispatcher
+    {
+        public void Post(Action action) => action();
+    }
+
+    internal sealed class RendererThemeService : IApplicationThemeService
+    {
+        public void Apply(ApplicationTheme theme)
+        {
+        }
+    }
+
+    internal sealed class RendererFilePicker : IFilePicker
+    {
+        public bool CanOpenFiles => false;
+
+        public bool CanSaveFiles => false;
+
+        public bool CanPickFolders => false;
+
+        public Task<IReadOnlyList<string>> PickOpenFilesAsync(
+            OpenFilePickerRequest request,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<string>>([]);
+
+        public Task<string?> PickSaveFileAsync(
+            SaveFilePickerRequest request,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<string?>(null);
+
+        public Task<IReadOnlyList<string>> PickFoldersAsync(
+            OpenFolderPickerRequest request,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<string>>([]);
+    }
+
+    internal sealed class RendererPlaceholderViewModel : ViewModelBase
     {
     }
-}
-
-internal sealed class ImmediateDispatcher : IUiDispatcher
-{
-    public void Post(Action action) => action();
-}
-
-internal sealed class RendererThemeService : IApplicationThemeService
-{
-    public void Apply(ApplicationTheme theme)
-    {
-    }
-}
-
-internal sealed class RendererFilePicker : IFilePicker
-{
-    public bool CanOpenFiles => false;
-
-    public bool CanSaveFiles => false;
-
-    public bool CanPickFolders => false;
-
-    public Task<IReadOnlyList<string>> PickOpenFilesAsync(
-        OpenFilePickerRequest request,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult<IReadOnlyList<string>>([]);
-
-    public Task<string?> PickSaveFileAsync(
-        SaveFilePickerRequest request,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult<string?>(null);
-
-    public Task<IReadOnlyList<string>> PickFoldersAsync(
-        OpenFolderPickerRequest request,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult<IReadOnlyList<string>>([]);
-}
-
-internal sealed class RendererPlaceholderViewModel : ViewModelBase
-{
 }

@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
+namespace Mapping_Tools.Core.Classes.ToolHelpers.Sliders.Newgen {
     /// <summary>
     /// Preserves an original slider segment so an edited sampled path can reuse its anchors where possible.
     /// </summary>

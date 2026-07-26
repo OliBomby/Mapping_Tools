@@ -5,6 +5,8 @@ using System.Globalization;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.SystemTools;
 
 namespace Mapping_Tools.Components.Domain {
     internal class DoubleArrayToStringConverter : IValueConverter {

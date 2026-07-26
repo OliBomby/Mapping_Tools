@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Mapping_Tools.Classes.BeatmapHelper {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper {
     /// <summary>
     /// Helper class for a single string that can represent multiple data types.
     /// Provides methods for converting data to and from string.

@@ -2,8 +2,8 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Forms;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Core.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools {
 

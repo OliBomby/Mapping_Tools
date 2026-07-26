@@ -1,6 +1,6 @@
 using Microsoft.Win32;
-using Mapping_Tools.ApplicationServices.Settings;
 using System.Runtime.Versioning;
+using Mapping_Tools.Application.Settings;
 
 namespace Mapping_Tools.Infrastructure.Settings;
 

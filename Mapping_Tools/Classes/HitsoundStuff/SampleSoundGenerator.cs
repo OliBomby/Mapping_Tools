@@ -2,9 +2,9 @@
 using NAudio.Wave.SampleProviders;
 using System;
 using System.Linq;
-using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.HitsoundStuff.Effects;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Properties;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {
     /// <summary>

@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Interactions;
+namespace Mapping_Tools.Application.Interactions;
 
 /// <summary>
 /// Describes one strongly typed action in a message or confirmation dialog.

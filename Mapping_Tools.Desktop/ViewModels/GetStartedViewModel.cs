@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
-using Mapping_Tools.ApplicationServices.Execution;
-using Mapping_Tools.ApplicationServices.Platform;
-using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Settings;
 using ReactiveUI;
 
 namespace Mapping_Tools.Desktop.ViewModels;

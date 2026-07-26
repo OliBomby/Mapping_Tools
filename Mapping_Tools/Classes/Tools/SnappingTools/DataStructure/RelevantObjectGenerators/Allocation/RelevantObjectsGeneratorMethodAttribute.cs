@@ -1,5 +1,5 @@
 ﻿using System;
-using Mapping_Tools.Annotations;
+using Mapping_Tools.Properties;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation {
     /// <summary>

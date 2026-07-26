@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using Mapping_Tools.Annotations;
-using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Core.Classes.SystemTools;
+using Mapping_Tools.Properties;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class Settings : BindableBase {

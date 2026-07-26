@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools.Core.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
+namespace Mapping_Tools.Core.Classes.ToolHelpers.Sliders.Newgen {
     /// <summary>
     /// Maintains sampled slider paths and their reconstruction metadata during geometric edits.
     /// </summary>

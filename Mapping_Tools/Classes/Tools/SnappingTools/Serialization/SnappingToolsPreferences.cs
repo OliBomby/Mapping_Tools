@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Windows.Input;
 using System.Windows.Media;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {
     public class SnappingToolsPreferences : BindableBase, ICloneable {

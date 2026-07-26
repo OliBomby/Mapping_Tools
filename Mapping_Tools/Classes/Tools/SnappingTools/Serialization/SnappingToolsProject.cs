@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
-using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
+using Mapping_Tools.Core.Classes.SystemTools;
+using Mapping_Tools.Properties;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {

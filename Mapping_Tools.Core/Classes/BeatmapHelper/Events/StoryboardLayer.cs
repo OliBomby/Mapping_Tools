@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Classes.BeatmapHelper
+﻿namespace Mapping_Tools.Core.Classes.BeatmapHelper.Events
 {
     /// <summary>
     /// The layers according to the osu! Storyboard.

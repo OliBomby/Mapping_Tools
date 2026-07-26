@@ -1,10 +1,10 @@
-using Mapping_Tools.ApplicationServices.Settings;
-using Mapping_Tools.ApplicationServices.Workspace;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Workspace;
 
 namespace Mapping_Tools.Classes.SystemTools {
     internal static class LegacySettingsMapper {

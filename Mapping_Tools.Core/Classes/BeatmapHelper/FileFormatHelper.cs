@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
+﻿using System.Globalization;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Events;
 
-namespace Mapping_Tools.Classes.BeatmapHelper {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper {
     /// <summary>
     /// Helper class for File Formats
     /// </summary>

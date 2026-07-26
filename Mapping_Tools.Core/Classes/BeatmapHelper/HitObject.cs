@@ -1,17 +1,14 @@
 #nullable disable
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools.Core.Classes.MathUtil;
 using Newtonsoft.Json;
-using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
+using static Mapping_Tools.Core.Classes.BeatmapHelper.FileFormatHelper;
 
-namespace Mapping_Tools.Classes.BeatmapHelper {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper {
     /// <summary>
     /// Represents an osu! hit object and its parsed gameplay, timing, geometry,
     /// hitsound, and slider data.

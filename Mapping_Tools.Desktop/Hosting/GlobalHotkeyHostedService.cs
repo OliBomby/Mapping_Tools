@@ -1,6 +1,6 @@
-using Mapping_Tools.ApplicationServices.Backups;
-using Mapping_Tools.ApplicationServices.QuickRun;
-using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.Application.QuickRun;
+using Mapping_Tools.Application.SafetyCopies;
+using Mapping_Tools.Application.Settings;
 using Microsoft.Extensions.Hosting;
 
 namespace Mapping_Tools.Desktop.Hosting;

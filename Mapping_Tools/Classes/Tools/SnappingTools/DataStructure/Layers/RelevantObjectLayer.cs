@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
+using Mapping_Tools.Properties;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.Layers {
     /// <summary>

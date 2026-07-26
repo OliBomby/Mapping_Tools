@@ -1,13 +1,9 @@
 #nullable disable
-using Mapping_Tools.Classes.MathUtil;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.BeatmapHelper {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper {
     /// <summary>
     /// Represents one playable edge expanded from a hit object, with both explicit and timing-inherited sample state.
     /// </summary>

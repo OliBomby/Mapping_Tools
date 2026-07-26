@@ -1,5 +1,4 @@
-﻿using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Components.Graph.Interpolation;
+﻿using Mapping_Tools.Components.Graph.Interpolation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,6 +6,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using Mapping_Tools.Core.Classes.MathUtil;
 
 namespace Mapping_Tools.Components.Graph {
     public sealed class AnchorCollection : ObservableCollection<Anchor> {

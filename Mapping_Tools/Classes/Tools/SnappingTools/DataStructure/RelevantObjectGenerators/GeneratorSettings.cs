@@ -2,9 +2,10 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
+using Mapping_Tools.Core.Classes.SystemTools;
+using Mapping_Tools.Properties;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators {

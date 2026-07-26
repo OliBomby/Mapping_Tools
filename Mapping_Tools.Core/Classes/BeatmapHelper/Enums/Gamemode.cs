@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Classes.BeatmapHelper.Enums
+﻿namespace Mapping_Tools.Core.Classes.BeatmapHelper.Enums
 {
     /// <summary>
     /// Identifies the osu! ruleset encoded by the beatmap's <c>Mode</c> field.

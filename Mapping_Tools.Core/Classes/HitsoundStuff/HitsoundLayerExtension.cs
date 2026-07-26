@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 
-namespace Mapping_Tools.Classes.HitsoundStuff {
+namespace Mapping_Tools.Core.Classes.HitsoundStuff {
     /// <summary>
     /// Provides formatting helpers for multi-selection hitsound editors.
     /// </summary>

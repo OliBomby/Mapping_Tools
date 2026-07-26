@@ -5,11 +5,12 @@ using System.IO;
 using System.Text.Json.Serialization;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
+using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.SystemTools;
 
 namespace Mapping_Tools.Viewmodels {
     public class HitsoundCopierVm : BindableBase {

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Input;
-using Mapping_Tools.Annotations;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.SystemTools;
+using Mapping_Tools.Properties;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.Serialization {

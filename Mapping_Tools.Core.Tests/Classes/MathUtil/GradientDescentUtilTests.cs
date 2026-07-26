@@ -1,5 +1,5 @@
 ﻿using System;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.MathUtil;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Classes.MathUtil {

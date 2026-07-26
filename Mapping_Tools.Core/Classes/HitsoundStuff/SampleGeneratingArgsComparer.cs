@@ -1,7 +1,6 @@
-using System.Collections.Generic;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.HitsoundStuff {
+namespace Mapping_Tools.Core.Classes.HitsoundStuff {
     /// <summary>
     /// Compares sample specifications according to whether generated-file identity or complete source identity matters.
     /// </summary>

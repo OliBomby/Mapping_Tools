@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
+﻿using System.Globalization;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.ToolHelpers.Sliders.Newgen;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
+namespace Mapping_Tools.Core.Tests.Classes.ToolHelpers.Sliders.NewGen {
     [TestClass]
     public class PathHelperTests {
         [TestMethod]

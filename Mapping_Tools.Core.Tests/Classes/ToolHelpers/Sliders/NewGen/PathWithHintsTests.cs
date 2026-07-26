@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
+﻿using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.ToolHelpers.Sliders.Newgen;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools_Tests.Classes.ToolHelpers.Sliders.NewGen {
+namespace Mapping_Tools.Core.Tests.Classes.ToolHelpers.Sliders.NewGen {
     [TestClass]
     public class PathWithHintsTests {
         private PathWithHints path;

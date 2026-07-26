@@ -6,11 +6,10 @@
  * Contributions by Andy Gill, James Talton and Georg Wächter.
  */
 
-using System;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Mapping_Tools.Classes.MathUtil {
+namespace Mapping_Tools.Core.Classes.MathUtil {
     /// <summary>
     /// Contains common mathematical functions and constants.
     /// </summary>

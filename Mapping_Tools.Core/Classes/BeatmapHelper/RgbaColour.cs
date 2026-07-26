@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Mapping_Tools.Classes.BeatmapHelper;
+namespace Mapping_Tools.Core.Classes.BeatmapHelper;
 
 /// <summary>
 /// Stores an eight-bit alpha, red, green, and blue colour value in ARGB order.

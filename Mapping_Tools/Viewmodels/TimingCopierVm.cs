@@ -6,8 +6,8 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 using System.Text.Json.Serialization;
+using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
 
 namespace Mapping_Tools.Viewmodels {
 

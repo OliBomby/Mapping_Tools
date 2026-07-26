@@ -6,9 +6,7 @@
  * Contributions by Georg W�chter.
  */
 
-using System;
-
-namespace Mapping_Tools.Classes.MathUtil {
+namespace Mapping_Tools.Core.Classes.MathUtil {
     /// <summary>
     /// Represents a cubic bezier curve with two anchor and two control points.
     /// </summary>

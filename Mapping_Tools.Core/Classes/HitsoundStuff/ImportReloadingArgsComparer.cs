@@ -1,7 +1,8 @@
-using System.Collections.Generic;
+
+
 // ReSharper disable CompareOfFloatsByEqualityOperator
 
-namespace Mapping_Tools.Classes.HitsoundStuff {
+namespace Mapping_Tools.Core.Classes.HitsoundStuff {
     /// <summary>
     /// Supplies dictionary equality for cached import-reload descriptors.
     /// </summary>

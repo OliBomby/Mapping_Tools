@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Workspace;
+namespace Mapping_Tools.Application.Workspace;
 
 /// <summary>
 /// Identifies a previously selected beatmap and the culture-formatted timestamp

@@ -1,6 +1,7 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
 using System.Globalization;
 using System.Windows.Controls;
+using Mapping_Tools.Core.Classes.SystemTools;
 
 namespace Mapping_Tools.Components.Domain {
     internal class IsGreaterValidationRule : ValidationRule

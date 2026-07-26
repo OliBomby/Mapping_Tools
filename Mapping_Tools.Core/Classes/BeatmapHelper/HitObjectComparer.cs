@@ -1,8 +1,5 @@
 #nullable disable
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Mapping_Tools.Classes.BeatmapHelper {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper {
     /// <summary>
     /// Compares serialized hit-object behavior with optional editor-selection, position, and time checks.
     /// </summary>

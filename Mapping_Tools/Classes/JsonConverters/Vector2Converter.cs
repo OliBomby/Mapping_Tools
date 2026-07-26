@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.MathUtil;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.JsonConverters {

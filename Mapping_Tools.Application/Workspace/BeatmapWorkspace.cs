@@ -1,8 +1,8 @@
 using System.Globalization;
-using Mapping_Tools.ApplicationServices.Platform;
-using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Settings;
 
-namespace Mapping_Tools.ApplicationServices.Workspace;
+namespace Mapping_Tools.Application.Workspace;
 
 /// <summary>
 /// Coordinates selected paths, persisted recent history, native file picking,

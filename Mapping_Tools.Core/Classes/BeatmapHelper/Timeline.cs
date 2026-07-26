@@ -1,13 +1,5 @@
 #nullable disable
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Mapping_Tools.Classes.BeatmapHelper {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper {
     /// <summary>
     /// Expands hit objects into individually editable head, repeat, tail, and duration-edge events.
     /// </summary>

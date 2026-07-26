@@ -1,10 +1,7 @@
-﻿using Mapping_Tools.Classes.BeatmapHelper.Events;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Events;
 
-namespace Mapping_Tools.Classes.BeatmapHelper {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper {
     /// <summary>
     /// Parses and serializes the event collections shared by <c>.osu</c> and <c>.osb</c> files.
     /// </summary>

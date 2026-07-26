@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.Classes.MathUtil;
 using NAudio.Midi;
 
 namespace Mapping_Tools.Classes.HitsoundStuff {

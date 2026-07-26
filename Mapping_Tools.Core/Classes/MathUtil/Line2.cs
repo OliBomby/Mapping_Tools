@@ -1,9 +1,6 @@
-using System;
 using System.Runtime.InteropServices;
-using System.Linq;
-using System.Collections.Generic;
 
-namespace Mapping_Tools.Classes.MathUtil {
+namespace Mapping_Tools.Core.Classes.MathUtil {
     /// <summary>Represents a 2D line with infinite length using a position vector and a direction vector.</summary>
     /// <remarks>
     /// The Line structure is suitable for interoperation with unmanaged code requiring three consecutive doubles.

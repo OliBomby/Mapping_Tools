@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
+using Mapping_Tools.Properties;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject {

@@ -1,6 +1,6 @@
-using Mapping_Tools.ApplicationServices.Workspace;
+using Mapping_Tools.Application.Workspace;
 
-namespace Mapping_Tools.ApplicationServices.Settings;
+namespace Mapping_Tools.Application.Settings;
 
 /// <summary>
 /// Contains the user preferences persisted in the legacy-compatible

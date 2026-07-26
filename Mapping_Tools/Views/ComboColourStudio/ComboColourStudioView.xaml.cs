@@ -6,12 +6,13 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Classes.Tools.ComboColourStudio;
 using Mapping_Tools.Components.Dialogs;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;
 

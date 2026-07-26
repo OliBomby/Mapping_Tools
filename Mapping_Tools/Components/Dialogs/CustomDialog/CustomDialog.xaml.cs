@@ -151,7 +151,7 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                         MinWidth = 100,
                         ToolTip = description,
                         Margin = new Thickness(0, 0, 0, 5),
-                        Style = Application.Current.FindResource("MaterialDesignFloatingHintTextBox") as Style
+                        Style = System.Windows.Application.Current.FindResource("MaterialDesignFloatingHintTextBox") as Style
                     };
                     HintAssist.SetHint(doubleTextBox, name);
 
@@ -175,7 +175,7 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
                         MinWidth = 100,
                         ToolTip = description,
                         Margin = new Thickness(0, 0, 0, 5),
-                        Style = Application.Current.FindResource("MaterialDesignFloatingHintTextBox") as Style };
+                        Style = System.Windows.Application.Current.FindResource("MaterialDesignFloatingHintTextBox") as Style };
                     HintAssist.SetHint(stringTextBox, name);
 
                     if (prop.GetCustomAttribute(typeof(TextWrappingAttribute)) is TextWrappingAttribute stringTextWrappingAttribute) {
@@ -230,12 +230,12 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
 
             var browseButton = new Button {
                 Cursor = Cursors.Hand,
-                Style = Application.Current.FindResource("IconButton") as Style,
+                Style = System.Windows.Application.Current.FindResource("IconButton") as Style,
                 VerticalAlignment = VerticalAlignment.Bottom,
                 ToolTip = @"Select files with File Explorer.",
                 Content = new PackIcon {
                     Kind = PackIconKind.Folder, Width = 30, Height = 30, Cursor = Cursors.Hand,
-                    Foreground = Application.Current.FindResource("PrimaryHueMidBrush") as Brush
+                    Foreground = System.Windows.Application.Current.FindResource("PrimaryHueMidBrush") as Brush
                 },
                 Command = new CommandImplementation(_ => {
                     try {
@@ -269,12 +269,12 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
 
             var getButton = new Button {
                 Cursor = Cursors.Hand,
-                Style = Application.Current.FindResource("IconButton") as Style,
+                Style = System.Windows.Application.Current.FindResource("IconButton") as Style,
                 VerticalAlignment = VerticalAlignment.Bottom,
                 ToolTip = @"Fetch the selected beatmap from your osu! client.",
                 Content = new PackIcon {
                     Kind = PackIconKind.RestoreFromTrash, Width = 30, Height = 30, Cursor = Cursors.Hand,
-                    Foreground = Application.Current.FindResource("PrimaryHueMidBrush") as Brush
+                    Foreground = System.Windows.Application.Current.FindResource("PrimaryHueMidBrush") as Brush
                 },
                 Command = new CommandImplementation(_ => {
                     try {
@@ -292,12 +292,12 @@ namespace Mapping_Tools.Components.Dialogs.CustomDialog {
 
             var browseButton = new Button {
                 Cursor = Cursors.Hand,
-                Style = Application.Current.FindResource("IconButton") as Style,
+                Style = System.Windows.Application.Current.FindResource("IconButton") as Style,
                 VerticalAlignment = VerticalAlignment.Bottom,
                 ToolTip = @"Select beatmaps with File Explorer.",
                 Content = new PackIcon {
                     Kind = PackIconKind.Folder, Width = 30, Height = 30, Cursor = Cursors.Hand,
-                    Foreground = Application.Current.FindResource("PrimaryHueMidBrush") as Brush
+                    Foreground = System.Windows.Application.Current.FindResource("PrimaryHueMidBrush") as Brush
                 },
                 Command = new CommandImplementation(_ => {
                     try {

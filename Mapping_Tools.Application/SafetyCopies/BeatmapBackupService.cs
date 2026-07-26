@@ -1,11 +1,10 @@
 using System.Security.Cryptography;
 using System.Text;
-using Mapping_Tools.ApplicationServices.Abstractions;
-using Mapping_Tools.ApplicationServices.BeatmapEditing;
-using Mapping_Tools.ApplicationServices.Settings;
-using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.Settings;
 
-namespace Mapping_Tools.ApplicationServices.Backups;
+namespace Mapping_Tools.Application.SafetyCopies;
 
 /// <summary>
 /// Enforces backup-before-overwrite ordering and preserves legacy-compatible

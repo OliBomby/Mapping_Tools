@@ -1,6 +1,6 @@
-﻿using Mapping_Tools.Annotations;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows.Controls;
+using Mapping_Tools.Properties;
 
 namespace Mapping_Tools.Components.Graph.Markers {
     public class CompositeMarkerGenerator : IMarkerGenerator {

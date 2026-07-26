@@ -1,9 +1,10 @@
-using Mapping_Tools.ApplicationServices.Abstractions;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Classes.SystemTools;
 using System.Collections.Generic;
 using System.IO;
+using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.BeatmapEditing;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>

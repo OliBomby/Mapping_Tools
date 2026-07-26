@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Core.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject {
     public interface IRelevantDrawable : IRelevantObject {

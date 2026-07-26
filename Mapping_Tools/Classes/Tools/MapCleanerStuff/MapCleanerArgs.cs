@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.Tools.MapCleanerStuff {
     public class MapCleanerArgs : BindableBase {

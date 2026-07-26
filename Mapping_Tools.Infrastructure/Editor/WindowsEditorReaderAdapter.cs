@@ -1,13 +1,13 @@
 using System.Diagnostics;
 using Editor_Reader;
-using Mapping_Tools.ApplicationServices.BeatmapEditing;
-using Mapping_Tools.ApplicationServices.Platform;
-using Mapping_Tools.ApplicationServices.Settings;
-using Mapping_Tools.ApplicationServices.Workspace;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.MathUtil;
-using DomainHitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
+using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.MathUtil;
+using DomainHitObject = Mapping_Tools.Core.Classes.BeatmapHelper.HitObject;
 using ReaderHitObject = Editor_Reader.HitObject;
 
 namespace Mapping_Tools.Infrastructure.Editor;

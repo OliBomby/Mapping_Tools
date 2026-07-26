@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Components.Domain {
     public class CircleSizeToThicknessConverter : IValueConverter {

@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Workspace;
+namespace Mapping_Tools.Application.Workspace;
 
 /// <summary>
 /// Supplies the path checks needed by current-map state without tying the

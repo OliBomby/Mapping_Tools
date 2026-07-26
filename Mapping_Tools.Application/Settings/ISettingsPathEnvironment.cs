@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Settings;
+namespace Mapping_Tools.Application.Settings;
 
 /// <summary>
 /// Supplies machine-specific information needed to derive settings paths.

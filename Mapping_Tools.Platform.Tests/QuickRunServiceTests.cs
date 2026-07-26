@@ -1,8 +1,8 @@
-using Mapping_Tools.ApplicationServices.BeatmapEditing;
-using Mapping_Tools.ApplicationServices.Execution;
-using Mapping_Tools.ApplicationServices.QuickRun;
-using Mapping_Tools.ApplicationServices.Settings;
-using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.QuickRun;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Infrastructure.Platform;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

@@ -1,17 +1,19 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Windows.Input;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
 using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.Classes.HitsoundStuff;
 using Mapping_Tools.Views;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -23,12 +25,12 @@ namespace Mapping_Tools_Tests {
         public void ComboColourSerializationPreservesLegacyProjectFormat() {
             string path = System.IO.Path.GetTempFileName();
             try {
-                var expected = new Mapping_Tools.Classes.BeatmapHelper.ComboColour(
-                    Mapping_Tools.Classes.BeatmapHelper.RgbaColour.FromArgb(0x7F, 0x12, 0x34, 0x56));
+                var expected = new ComboColour(
+                    RgbaColour.FromArgb(0x7F, 0x12, 0x34, 0x56));
 
                 ProjectManager.SaveJson(path, expected);
                 string json = System.IO.File.ReadAllText(path);
-                var actual = ProjectManager.LoadJson<Mapping_Tools.Classes.BeatmapHelper.ComboColour>(path);
+                var actual = ProjectManager.LoadJson<ComboColour>(path);
 
                 StringAssert.Contains(json, "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools");
                 StringAssert.Contains(json, "\"Color\": \"#7F123456\"");
@@ -43,11 +45,11 @@ namespace Mapping_Tools_Tests {
             string path = System.IO.Path.GetTempFileName();
             try {
                 const string line = "256,192,1000,1,2,0:0:0:0:";
-                var expected = new Mapping_Tools.Classes.BeatmapHelper.HitObject(line);
+                var expected = new HitObject(line);
 
                 ProjectManager.SaveJson(path, expected);
                 string json = System.IO.File.ReadAllText(path);
-                var actual = ProjectManager.LoadJson<Mapping_Tools.Classes.BeatmapHelper.HitObject>(path);
+                var actual = ProjectManager.LoadJson<HitObject>(path);
 
                 StringAssert.Contains(json, "Mapping_Tools.Classes.BeatmapHelper.HitObject, Mapping Tools");
                 Assert.AreEqual(line, actual.GetLine());

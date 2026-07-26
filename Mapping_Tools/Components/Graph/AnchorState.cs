@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Components.Graph.Interpolation;
 using System.Windows;
 using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
+using Mapping_Tools.Core.Classes.MathUtil;
 
 namespace Mapping_Tools.Components.Graph {
     public class AnchorState : Freezable, IGraphAnchor {

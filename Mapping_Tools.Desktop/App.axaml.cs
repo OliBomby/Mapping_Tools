@@ -1,12 +1,12 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
-using Mapping_Tools.ApplicationServices.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -16,7 +16,7 @@ namespace Mapping_Tools.Desktop;
 /// Owns Avalonia resource initialization and bridges its classic desktop
 /// lifetime to the .NET Generic Host.
 /// </summary>
-public partial class App : Application
+public partial class App : Avalonia.Application
 {
     private IHost? _host;
 

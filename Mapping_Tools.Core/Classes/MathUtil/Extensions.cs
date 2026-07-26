@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Mapping_Tools.Classes.MathUtil {
+﻿namespace Mapping_Tools.Core.Classes.MathUtil {
     /// <summary>
     /// Supplies small collection and text helpers used by legacy geometry code.
     /// </summary>

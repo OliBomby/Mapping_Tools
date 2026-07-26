@@ -1,6 +1,6 @@
-using Mapping_Tools.ApplicationServices.Platform;
+using Mapping_Tools.Application.Platform;
 
-namespace Mapping_Tools.ApplicationServices.Projects;
+namespace Mapping_Tools.Application.Projects;
 
 /// <summary>
 /// Implements project lifecycle orchestration while leaving serialization,

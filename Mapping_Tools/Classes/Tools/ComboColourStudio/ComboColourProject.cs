@@ -5,10 +5,12 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows.Input;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Components.Domain;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.Tools.ComboColourStudio {
     public class ComboColourProject : BindableBase {

@@ -1,8 +1,6 @@
-using System;
 using System.Runtime.InteropServices;
-using System.Xml.Serialization;
 
-namespace Mapping_Tools.Classes.MathUtil {
+namespace Mapping_Tools.Core.Classes.MathUtil {
     /// <summary>Represents a line with infinite length using three double-precision floating-point numbers in the equation AX + BY = C.</summary>
     /// <remarks>
     /// The LineSegment structure is suitable for interoperation with unmanaged code requiring three consecutive doubles.

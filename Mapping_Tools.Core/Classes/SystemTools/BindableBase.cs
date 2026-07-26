@@ -1,8 +1,7 @@
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Mapping_Tools.Classes.SystemTools {
+namespace Mapping_Tools.Core.Classes.SystemTools {
     
     /// <summary>
     /// Provides equality-checked property mutation and change notification for editable domain models.

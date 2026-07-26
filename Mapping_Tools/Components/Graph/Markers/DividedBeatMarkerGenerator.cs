@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Mapping_Tools.Annotations;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.MathUtil;
 
 namespace Mapping_Tools.Components.Graph.Markers {
     public class DividedBeatMarkerGenerator : IMarkerGenerator {

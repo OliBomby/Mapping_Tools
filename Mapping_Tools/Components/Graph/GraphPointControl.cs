@@ -1,9 +1,9 @@
-﻿using Mapping_Tools.Classes.MathUtil;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Mapping_Tools.Core.Classes.MathUtil;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Components.Graph {

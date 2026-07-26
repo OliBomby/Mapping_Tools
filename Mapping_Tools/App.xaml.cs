@@ -8,8 +8,7 @@ namespace Mapping_Tools {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
-    {
+    public partial class App {
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
          // Log the exception, display it, etc
             var exception = e.Exception;

@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Execution;
+namespace Mapping_Tools.Application.Execution;
 
 /// <summary>
 /// Classifies user-facing messages without prescribing a snackbar, dialog,

@@ -1,4 +1,4 @@
-namespace Mapping_Tools.Classes.BeatmapHelper {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper {
     /// <summary>
     /// Associates a named osu! special-colour key, such as slider border, with an RGBA value.
     /// </summary>

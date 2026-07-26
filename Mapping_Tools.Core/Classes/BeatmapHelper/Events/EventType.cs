@@ -1,5 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
-namespace Mapping_Tools.Classes.BeatmapHelper.Events {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper.Events {
 #nullable disable
 
     /// <summary>

@@ -1,6 +1,6 @@
-using Mapping_Tools.ApplicationServices.Projects;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.MathUtil;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 

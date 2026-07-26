@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace Mapping_Tools.Classes.BeatmapHelper.Events {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper.Events {
     /// <summary>
     /// Abstract event type. Represents everything that can be put in the [Events] section.
     /// TODO: When actually doing storyboard stuff some of the types should have child and parent events instead of indents, so we get a tree structure. BTW this would break ITextLine

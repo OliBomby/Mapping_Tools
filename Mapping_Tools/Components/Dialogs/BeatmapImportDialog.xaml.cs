@@ -3,9 +3,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using Mapping_Tools.Annotations;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Properties;
 
 namespace Mapping_Tools.Components.Dialogs {
     /// <summary>

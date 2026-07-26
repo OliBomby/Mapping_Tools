@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Settings;
+namespace Mapping_Tools.Application.Settings;
 
 /// <summary>
 /// Implements startup settings orchestration without coupling callers to JSON,

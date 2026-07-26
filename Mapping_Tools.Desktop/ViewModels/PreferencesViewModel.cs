@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using Mapping_Tools.ApplicationServices.Execution;
-using Mapping_Tools.ApplicationServices.Interactions;
-using Mapping_Tools.ApplicationServices.Platform;
-using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Interactions;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Platform;
 using ReactiveUI;
 

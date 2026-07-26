@@ -1,11 +1,10 @@
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.MathUtil;
-using Newtonsoft.Json;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Newtonsoft.Json;
 
-namespace Mapping_Tools.Classes.HitsoundStuff {
+namespace Mapping_Tools.Core.Classes.HitsoundStuff {
     /// <summary>
     /// Defines a positional hitsound-mapping rule in which -1 coordinates act as wildcards.
     /// </summary>

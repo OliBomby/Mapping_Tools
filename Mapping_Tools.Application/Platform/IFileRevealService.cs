@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Platform;
+namespace Mapping_Tools.Application.Platform;
 
 /// <summary>
 /// Locates a file or directory in the platform's graphical file manager.

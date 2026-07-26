@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using Mapping_Tools.ApplicationServices.Abstractions;
+using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.BeatmapEditing;
 
 namespace Mapping_Tools.Classes.BeatmapHelper {
     /// <summary>

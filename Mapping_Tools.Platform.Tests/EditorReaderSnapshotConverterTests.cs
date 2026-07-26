@@ -1,5 +1,5 @@
 using Editor_Reader;
-using Mapping_Tools.ApplicationServices.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Infrastructure.Editor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -39,7 +39,7 @@ public sealed class EditorReaderSnapshotConverterTests
         LiveBeatmapSnapshot snapshot = EditorReaderSnapshotConverter.Convert(
             reader,
             @"C:\osu!\Songs");
-        Mapping_Tools.Classes.BeatmapHelper.HitObject converted =
+        Core.Classes.BeatmapHelper.HitObject converted =
             snapshot.HitObjects[0];
 
         // Assert

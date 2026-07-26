@@ -1,11 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper.SliderPathStuff {
 #nullable disable
 
     /// <summary>

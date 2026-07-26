@@ -1,6 +1,7 @@
-using Mapping_Tools.ApplicationServices.Abstractions;
+using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 
-namespace Mapping_Tools.Classes.BeatmapHelper;
+namespace Mapping_Tools.Application.BeatmapEditing;
 
 /// <summary>
 /// Edits an osu! text file using caller-provided persistence.

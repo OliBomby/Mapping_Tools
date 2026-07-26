@@ -1,9 +1,8 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Mapping_Tools.Classes.SystemTools {
+namespace Mapping_Tools.Core.Classes.SystemTools {
     /// <summary>
     /// Parses user-entered numeric expressions and osu!-style timestamps.
     /// </summary>

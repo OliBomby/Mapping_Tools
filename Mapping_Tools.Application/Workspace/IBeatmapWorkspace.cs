@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Workspace;
+namespace Mapping_Tools.Application.Workspace;
 
 /// <summary>
 /// Owns the ordered beatmap selection and recent-map history shared by tools,

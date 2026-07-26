@@ -1,6 +1,6 @@
 using Avalonia;
 using Avalonia.Styling;
-using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.Application.Settings;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
 
@@ -17,7 +17,7 @@ public sealed class AvaloniaApplicationThemeService : IApplicationThemeService
     /// </exception>
     public void Apply(ApplicationTheme theme)
     {
-        Application application = Application.Current
+        Avalonia.Application application = Avalonia.Application.Current
             ?? throw new InvalidOperationException(
                 "The application theme cannot be changed before Avalonia initializes.");
         application.RequestedThemeVariant = theme == ApplicationTheme.Light

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -7,13 +7,14 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Editor_Reader;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.Exceptions;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.MathUtil;
 using Process.NET;
 using Process.NET.Memory;
-using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
+using HitObject = Mapping_Tools.Core.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Classes.ToolHelpers {
 

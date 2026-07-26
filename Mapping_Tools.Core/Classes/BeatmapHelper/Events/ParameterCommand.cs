@@ -1,9 +1,8 @@
-﻿using System;
-using System.Text;
-using Mapping_Tools.Classes.MathUtil;
-using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
+﻿using System.Text;
+using Mapping_Tools.Core.Classes.MathUtil;
+using static Mapping_Tools.Core.Classes.BeatmapHelper.FileFormatHelper;
 
-namespace Mapping_Tools.Classes.BeatmapHelper.Events {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper.Events {
     /// <summary>
     /// Represents the parameter command. This event has a different syntax so it can't be a <see cref="OtherCommand"/>.
     /// </summary>

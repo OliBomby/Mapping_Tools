@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Xml.Serialization;
-
-namespace Mapping_Tools.Classes.MathUtil {
+namespace Mapping_Tools.Core.Classes.MathUtil {
     /// <summary>Represents a CircleArc as could be defined by 3 points.</summary>
     public struct CircleArc :IEquatable<CircleArc> {
         /// <summary>

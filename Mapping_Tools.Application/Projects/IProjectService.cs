@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Projects;
+namespace Mapping_Tools.Application.Projects;
 
 /// <summary>
 /// Coordinates typed project lifecycle operations, autosave targets, and

@@ -1,8 +1,9 @@
 ﻿using System;
 using Mapping_Tools.Classes.SystemTools;
 using System.ComponentModel;
-using Mapping_Tools.Annotations;
 using Mapping_Tools.Components.Dialogs.CustomDialog;
+using Mapping_Tools.Core.Classes.SystemTools;
+using Mapping_Tools.Properties;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class OsuPatternDetailsVm : BindableBase {

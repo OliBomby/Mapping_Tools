@@ -1,6 +1,6 @@
-using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 
-namespace Mapping_Tools.ApplicationServices.BeatmapEditing;
+namespace Mapping_Tools.Application.BeatmapEditing;
 
 /// <summary>
 /// Controls whether opening a beatmap may incorporate the unsaved state of

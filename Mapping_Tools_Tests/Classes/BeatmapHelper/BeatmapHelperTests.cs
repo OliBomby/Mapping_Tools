@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -75,7 +77,7 @@ namespace Mapping_Tools_Tests.Classes.BeatmapHelper {
             Assert.AreEqual(path, store.WrittenPath);
         }
 
-        private sealed class FakeTextFileStore : Mapping_Tools.ApplicationServices.Abstractions.ITextFileStore {
+        private sealed class FakeTextFileStore : ITextFileStore {
             private readonly string sourcePath;
             private readonly IReadOnlyList<string> sourceLines;
 

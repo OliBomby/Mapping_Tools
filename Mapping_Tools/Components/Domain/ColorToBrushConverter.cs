@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Components.Domain
 {

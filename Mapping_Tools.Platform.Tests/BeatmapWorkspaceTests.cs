@@ -1,6 +1,6 @@
-using Mapping_Tools.ApplicationServices.Platform;
-using Mapping_Tools.ApplicationServices.Settings;
-using Mapping_Tools.ApplicationServices.Workspace;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Workspace;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Platform.Tests;

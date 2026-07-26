@@ -11,11 +11,13 @@ using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Classes.Tools.TumourGenerating;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Enums;
 using Mapping_Tools.Classes.Tools.TumourGenerating.Options;
 using Mapping_Tools.Components.Domain;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.SystemTools;
+using Mapping_Tools.Core.Classes.ToolHelpers.Sliders.Newgen;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {
@@ -384,7 +386,7 @@ namespace Mapping_Tools.Viewmodels {
                 tumourGenerator.TumourGenerate(args, ct);
 
                 // Send the tumoured slider to the main thread
-                Application.Current.Dispatcher.Invoke(() => {
+                System.Windows.Application.Current.Dispatcher.Invoke(() => {
                     TumouredPreviewHitObject = args;
                     layerRangeSliderMaxes.Clear();
                     layerRangeSliderMaxes.AddRange(tumourGenerator.LayerLengths);
@@ -404,7 +406,7 @@ namespace Mapping_Tools.Viewmodels {
                     task.Exception.Show();
                 }
                 // Stop the processing indicator
-                Application.Current.Dispatcher.Invoke(() => {
+                System.Windows.Application.Current.Dispatcher.Invoke(() => {
                     IsProcessingPreview = false;
                 });
             }, ct);

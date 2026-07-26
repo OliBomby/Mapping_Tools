@@ -8,9 +8,10 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.Tools.PatternGallery;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools.Core.Classes.MathUtil;
 
 namespace Mapping_Tools.Components.ObjectVisualiser {
     public class OsuPatternToThumbnailConverter : IMultiValueConverter {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Classes.ToolHelpers {
     public struct TimingPointsChange {

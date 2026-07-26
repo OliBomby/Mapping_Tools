@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using Mapping_Tools.Core.Classes.HitsoundStuff;
 
 namespace Mapping_Tools.Components.Domain {
     class ImportTypeToStringConverter : IValueConverter {

@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.QuickRun;
+namespace Mapping_Tools.Application.QuickRun;
 
 /// <summary>
 /// Maintains a deterministic process-lifetime QuickRun catalog without

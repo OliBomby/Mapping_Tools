@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Mapping_Tools.ApplicationServices.Platform;
-using Mapping_Tools.ApplicationServices.Settings;
-using Mapping_Tools.ApplicationServices.Workspace;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Workspace;
 
 namespace Mapping_Tools.Infrastructure.Settings;
 

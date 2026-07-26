@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Globalization;
 using Avalonia.Data;
-using Mapping_Tools.ApplicationServices.Interactions;
+using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

@@ -1,4 +1,4 @@
-using Mapping_Tools.ApplicationServices.Workspace;
+using Mapping_Tools.Application.Workspace;
 
 namespace Mapping_Tools.Infrastructure.Workspace;
 

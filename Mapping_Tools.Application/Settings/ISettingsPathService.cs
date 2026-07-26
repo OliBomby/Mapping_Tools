@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Settings;
+namespace Mapping_Tools.Application.Settings;
 
 /// <summary>
 /// Completes missing filesystem settings from the current machine environment.

@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Workspace;
+namespace Mapping_Tools.Application.Workspace;
 
 /// <summary>
 /// Locates the beatmap currently open in osu! without exposing process-memory

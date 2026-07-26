@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
-using Mapping_Tools.ApplicationServices.Execution;
-using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Shell;
 using ReactiveUI;
 

@@ -1,4 +1,4 @@
-﻿namespace Mapping_Tools.Classes.BeatmapHelper.Enums {
+﻿namespace Mapping_Tools.Core.Classes.BeatmapHelper.Enums {
 #nullable disable
 
     /// <summary>

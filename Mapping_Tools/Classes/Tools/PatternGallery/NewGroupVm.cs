@@ -1,5 +1,6 @@
 ﻿using Mapping_Tools.Classes.SystemTools;
 using System.ComponentModel;
+using Mapping_Tools.Core.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.Tools.PatternGallery {
     public class NewGroupVm : BindableBase {

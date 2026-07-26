@@ -2,7 +2,6 @@
 using Mapping_Tools.Classes.Exceptions;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.ApplicationServices.Workspace;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Workspace;
 using Mapping_Tools.Updater;
@@ -20,7 +19,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Core.Classes.MathUtil;
 
 namespace Mapping_Tools {
 

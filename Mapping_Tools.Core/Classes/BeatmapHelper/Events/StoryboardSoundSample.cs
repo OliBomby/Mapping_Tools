@@ -1,7 +1,6 @@
-﻿using System;
-using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
+﻿using static Mapping_Tools.Core.Classes.BeatmapHelper.FileFormatHelper;
 
-namespace Mapping_Tools.Classes.BeatmapHelper.Events {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper.Events {
     /// <summary>
     /// This represents a storyboarded sound sample for osu! storyboards. These can always be found under the [Events] -> (Storyboard Sound Samples) section.
     /// </summary>

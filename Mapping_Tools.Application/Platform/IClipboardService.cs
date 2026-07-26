@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Platform;
+namespace Mapping_Tools.Application.Platform;
 
 /// <summary>
 /// Provides asynchronous text-only access to the platform clipboard.

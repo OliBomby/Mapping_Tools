@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -12,13 +12,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools.Classes.MathUtil;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.ToolHelpers;
-using Mapping_Tools.Classes.ToolHelpers.Sliders;
 using Mapping_Tools.Classes.Tools;
 using Mapping_Tools.Classes.Tools.SlideratorStuff;
 using Mapping_Tools.Components.Dialogs;
@@ -26,9 +22,15 @@ using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Interpolation;
 using Mapping_Tools.Components.Graph.Markers;
 using Mapping_Tools.Components.ObjectVisualiser;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.SystemTools;
+using Mapping_Tools.Core.Classes.ToolHelpers.Sliders;
 using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;
-using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
+using HitObject = Mapping_Tools.Core.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Views.Sliderator {
     //[HiddenTool]

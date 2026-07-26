@@ -1,6 +1,7 @@
 ﻿using System;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Core.Classes.SystemTools;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection {
     public class SelectionPredicate : BindableBase, IEquatable<SelectionPredicate>, ICloneable {

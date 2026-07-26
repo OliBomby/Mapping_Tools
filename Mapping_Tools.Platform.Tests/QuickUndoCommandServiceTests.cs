@@ -1,8 +1,8 @@
-using Mapping_Tools.ApplicationServices.Backups;
-using Mapping_Tools.ApplicationServices.BeatmapEditing;
-using Mapping_Tools.ApplicationServices.Execution;
-using Mapping_Tools.ApplicationServices.Settings;
-using Mapping_Tools.ApplicationServices.Workspace;
+using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.SafetyCopies;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Workspace;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Platform.Tests;

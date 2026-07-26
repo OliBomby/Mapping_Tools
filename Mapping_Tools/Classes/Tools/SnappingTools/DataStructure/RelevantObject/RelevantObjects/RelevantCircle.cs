@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Media;
-using Mapping_Tools.Annotations;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Properties;
 
 namespace Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects {
     public class RelevantCircle : RelevantDrawable {

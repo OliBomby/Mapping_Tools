@@ -1,8 +1,8 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.MathUtil;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Mapping_Tools.Core.Classes.MathUtil;
 
 namespace Mapping_Tools.Classes.Tools.SlideratorStuff {
     public static class SliderInvisiblator

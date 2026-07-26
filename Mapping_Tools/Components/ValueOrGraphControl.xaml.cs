@@ -1,10 +1,10 @@
-﻿using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Components.Graph;
+﻿using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Markers;
 using MaterialDesignThemes.Wpf;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
+using Mapping_Tools.Core.Classes.MathUtil;
 
 namespace Mapping_Tools.Components {
     public partial class ValueOrGraphControl {

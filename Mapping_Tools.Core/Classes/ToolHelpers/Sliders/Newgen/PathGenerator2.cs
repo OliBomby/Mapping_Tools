@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Mapping_Tools.Classes.MathUtil;
+﻿using Mapping_Tools.Core.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
+namespace Mapping_Tools.Core.Classes.ToolHelpers.Sliders.Newgen {
     /// <summary>
     /// Version of <see cref="PathGenerator"/> but working with <see cref="PathPoint"/> instead.
     /// </summary>

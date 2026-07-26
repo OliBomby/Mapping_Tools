@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Settings;
+namespace Mapping_Tools.Application.Settings;
 
 /// <summary>
 /// Coordinates settings persistence with machine-specific path initialization.

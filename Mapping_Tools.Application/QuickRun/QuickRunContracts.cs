@@ -1,6 +1,6 @@
-using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.Application.Settings;
 
-namespace Mapping_Tools.ApplicationServices.QuickRun;
+namespace Mapping_Tools.Application.QuickRun;
 
 /// <summary>
 /// Identifies the live osu! selection sizes for which a command may be offered

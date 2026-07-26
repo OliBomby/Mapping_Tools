@@ -14,7 +14,8 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using HitObject = Mapping_Tools.Classes.BeatmapHelper.HitObject;
+using Mapping_Tools.Core.Classes.SystemTools;
+using HitObject = Mapping_Tools.Core.Classes.BeatmapHelper.HitObject;
 
 namespace Mapping_Tools.Viewmodels {
     public class SlideratorVm : BindableBase {
@@ -339,14 +340,14 @@ namespace Mapping_Tools.Viewmodels {
         }
 
         private void SlideratorViewOnRunFinishedMoveLeftOnce(object sender, EventArgs e) {
-            Application.Current.Dispatcher?.Invoke(() => {
+            System.Windows.Application.Current.Dispatcher?.Invoke(() => {
                 SlideratorView.RunFinished -= SlideratorViewOnRunFinishedMoveLeftOnce;
                 MoveLeftOnce();
             });
         }
 
         private void SlideratorViewOnRunFinishedMoveRightOnce(object sender, EventArgs e) {
-            Application.Current.Dispatcher?.Invoke(() => {
+            System.Windows.Application.Current.Dispatcher?.Invoke(() => {
                 SlideratorView.RunFinished -= SlideratorViewOnRunFinishedMoveRightOnce;
                 MoveRightOnce();
             });

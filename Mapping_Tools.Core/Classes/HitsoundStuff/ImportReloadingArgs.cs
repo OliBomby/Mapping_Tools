@@ -1,8 +1,8 @@
-using System;
-using System.Collections.Generic;
+
+
 // ReSharper disable CompareOfFloatsByEqualityOperator
 
-namespace Mapping_Tools.Classes.HitsoundStuff {
+namespace Mapping_Tools.Core.Classes.HitsoundStuff {
     /// <summary>
     /// Captures the subset of import settings that determines whether cached source data must be reloaded.
     /// </summary>

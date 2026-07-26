@@ -1,6 +1,6 @@
-using Mapping_Tools.ApplicationServices.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing;
 
-namespace Mapping_Tools.ApplicationServices.Backups;
+namespace Mapping_Tools.Application.SafetyCopies;
 
 /// <summary>
 /// Identifies why a snapshot exists so filenames and future retention policies

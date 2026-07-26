@@ -1,4 +1,4 @@
-using Mapping_Tools.Classes.HitsoundStuff;
+﻿using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.SystemTools;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.Classes.SystemTools;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {

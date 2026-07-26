@@ -1,4 +1,4 @@
-using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 

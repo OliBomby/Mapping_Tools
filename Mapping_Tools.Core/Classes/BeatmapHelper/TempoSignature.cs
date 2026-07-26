@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Mapping_Tools.Classes.BeatmapHelper {
+﻿namespace Mapping_Tools.Core.Classes.BeatmapHelper {
 #nullable disable
 
     /// <summary>

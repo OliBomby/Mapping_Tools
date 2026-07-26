@@ -1,4 +1,4 @@
-using Mapping_Tools.ApplicationServices.Platform;
+using Mapping_Tools.Application.Platform;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Platform.Tests;

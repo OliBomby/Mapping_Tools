@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using Mapping_Tools.ApplicationServices.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing;
 
 namespace Mapping_Tools.Infrastructure.Editor;
 

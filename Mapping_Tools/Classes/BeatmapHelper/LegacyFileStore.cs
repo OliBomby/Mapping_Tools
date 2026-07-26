@@ -1,4 +1,4 @@
-using Mapping_Tools.ApplicationServices.Abstractions;
+using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Infrastructure.Files;
 
 namespace Mapping_Tools.Classes.BeatmapHelper;

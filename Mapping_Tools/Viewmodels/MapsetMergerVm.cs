@@ -1,4 +1,4 @@
-using Mapping_Tools.Classes;
+﻿using Mapping_Tools.Classes;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Domain;
 using Newtonsoft.Json;
@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using Mapping_Tools.Core.Classes.SystemTools;
 
 namespace Mapping_Tools.Viewmodels {
 

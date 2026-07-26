@@ -1,8 +1,8 @@
-using Mapping_Tools.ApplicationServices.Execution;
-using Mapping_Tools.ApplicationServices.Settings;
-using Mapping_Tools.ApplicationServices.Workspace;
+using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Workspace;
 
-namespace Mapping_Tools.ApplicationServices.Backups;
+namespace Mapping_Tools.Application.SafetyCopies;
 
 /// <summary>
 /// Distinguishes a completed one-key restore from missing editor state,

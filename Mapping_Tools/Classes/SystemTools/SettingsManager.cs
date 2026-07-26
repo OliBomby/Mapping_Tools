@@ -1,6 +1,3 @@
-using Mapping_Tools.ApplicationServices.Platform;
-using Mapping_Tools.ApplicationServices.Settings;
-using Mapping_Tools.ApplicationServices.Workspace;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Settings;
 using System;
@@ -8,6 +5,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Workspace;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public static class SettingsManager {

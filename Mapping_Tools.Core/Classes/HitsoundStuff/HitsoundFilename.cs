@@ -1,8 +1,8 @@
 using System.Text.RegularExpressions;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 
-namespace Mapping_Tools.Classes.HitsoundStuff;
+namespace Mapping_Tools.Core.Classes.HitsoundStuff;
 
 /// <summary>
 /// Parses the standard osu! sample filename convention without accessing the filesystem.

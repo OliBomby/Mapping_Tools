@@ -1,12 +1,8 @@
-using Mapping_Tools.Classes.MathUtil;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.SystemTools;
 
-namespace Mapping_Tools.Classes.HitsoundStuff {
+namespace Mapping_Tools.Core.Classes.HitsoundStuff {
     /// <summary>
     /// Represents a single hitsound and every time that hitsound has to be played.
     /// It is also directly connected to the source of the data.

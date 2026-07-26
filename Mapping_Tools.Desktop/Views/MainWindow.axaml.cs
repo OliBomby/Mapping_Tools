@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform;
-using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.Views;

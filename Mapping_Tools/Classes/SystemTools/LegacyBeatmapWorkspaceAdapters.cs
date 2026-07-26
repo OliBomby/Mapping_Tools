@@ -1,11 +1,11 @@
-using Mapping_Tools.ApplicationServices.Platform;
-using Mapping_Tools.ApplicationServices.Workspace;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Workspace;
 
 namespace Mapping_Tools.Classes.SystemTools {
     internal sealed class LegacyBeatmapFilePicker : IFilePicker {

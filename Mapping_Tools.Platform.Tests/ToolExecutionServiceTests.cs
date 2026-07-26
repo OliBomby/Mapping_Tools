@@ -1,6 +1,6 @@
-using Mapping_Tools.ApplicationServices.BeatmapEditing;
-using Mapping_Tools.ApplicationServices.Execution;
-using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Platform.Tests;

@@ -1,8 +1,7 @@
-﻿using System;
-using Mapping_Tools.Classes.MathUtil;
-using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
+﻿using Mapping_Tools.Core.Classes.MathUtil;
+using static Mapping_Tools.Core.Classes.BeatmapHelper.FileFormatHelper;
 
-namespace Mapping_Tools.Classes.BeatmapHelper.Events {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper.Events {
 #nullable disable
 
     /// <summary>

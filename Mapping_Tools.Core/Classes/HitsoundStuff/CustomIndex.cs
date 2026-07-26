@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Text;
-using Mapping_Tools.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 
-namespace Mapping_Tools.Classes.HitsoundStuff {
+namespace Mapping_Tools.Core.Classes.HitsoundStuff {
 
     /// <summary>
     /// Describes the source mixes assigned to all twelve standard hitsound slots for one custom sample index.

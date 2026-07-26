@@ -1,6 +1,7 @@
 ﻿using Mapping_Tools.Classes.BeatmapHelper;
-using Mapping_Tools.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Classes.SystemTools;
+using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.Classes.SystemTools;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Viewmodels {

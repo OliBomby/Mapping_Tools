@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Projects;
+namespace Mapping_Tools.Application.Projects;
 
 /// <summary>
 /// Binds a feature's project model to its legacy autosave filename, user-facing

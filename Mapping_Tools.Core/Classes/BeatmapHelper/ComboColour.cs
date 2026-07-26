@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using static Mapping_Tools.Classes.BeatmapHelper.FileFormatHelper;
+using static Mapping_Tools.Core.Classes.BeatmapHelper.FileFormatHelper;
 
-namespace Mapping_Tools.Classes.BeatmapHelper {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper {
     /// <summary>
     /// The british alternative because main developer wants to keep the spelling.
     /// Its spelled "Colours" in the game.

@@ -1,6 +1,4 @@
-﻿using Mapping_Tools.Annotations;
-using Mapping_Tools.Classes.MathUtil;
-using Mapping_Tools.Components.Graph.Interpolation;
+﻿using Mapping_Tools.Components.Graph.Interpolation;
 using Mapping_Tools.Components.Graph.Interpolation.Interpolators;
 using Mapping_Tools.Components.Graph.Markers;
 using System;
@@ -13,6 +11,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Properties;
 
 namespace Mapping_Tools.Components.Graph {
     /// <summary>

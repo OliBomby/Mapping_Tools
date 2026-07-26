@@ -1,5 +1,4 @@
 ﻿using Mapping_Tools.Classes;
-using Mapping_Tools.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Classes.HitsoundStuff;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Components.Domain;
@@ -13,7 +12,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.Classes.MathUtil;
 
 namespace Mapping_Tools.Viewmodels {
     public class HitsoundPreviewHelperVm : INotifyPropertyChanged

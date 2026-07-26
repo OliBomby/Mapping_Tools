@@ -1,7 +1,6 @@
-using System;
-using Mapping_Tools.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.MathUtil;
 
-namespace Mapping_Tools.Classes.ToolHelpers.Sliders.Newgen {
+namespace Mapping_Tools.Core.Classes.ToolHelpers.Sliders.Newgen {
     /// <summary>
     /// Carries a sampled path position together with reconstruction geometry and stable path ordering.
     /// </summary>

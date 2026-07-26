@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Projects;
+namespace Mapping_Tools.Application.Projects;
 
 /// <summary>
 /// Converts typed feature projects to and from their persisted JSON document.

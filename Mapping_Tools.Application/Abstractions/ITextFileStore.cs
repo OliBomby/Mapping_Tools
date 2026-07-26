@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Abstractions;
+namespace Mapping_Tools.Application.Abstractions;
 
 /// <summary>
 /// Abstracts the text-file and path operations used by beatmap editors so

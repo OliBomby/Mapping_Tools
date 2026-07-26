@@ -1,4 +1,4 @@
-namespace Mapping_Tools.ApplicationServices.Projects;
+namespace Mapping_Tools.Application.Projects;
 
 /// <summary>
 /// Persists typed project documents without exposing a JSON library or

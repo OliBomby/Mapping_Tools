@@ -1,4 +1,4 @@
-using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.Application.Settings;
 
 namespace Mapping_Tools.Desktop.Shell;
 

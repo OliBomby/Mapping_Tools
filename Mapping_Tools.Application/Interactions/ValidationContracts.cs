@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Mapping_Tools.ApplicationServices.Interactions;
+namespace Mapping_Tools.Application.Interactions;
 
 /// <summary>
 /// Reports whether a form value is acceptable and, when it is not, supplies

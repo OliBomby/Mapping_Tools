@@ -1,8 +1,8 @@
-using Mapping_Tools.ApplicationServices.BeatmapEditing;
-using Mapping_Tools.ApplicationServices.Execution;
-using Mapping_Tools.ApplicationServices.Settings;
+using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Settings;
 
-namespace Mapping_Tools.ApplicationServices.QuickRun;
+namespace Mapping_Tools.Application.QuickRun;
 
 /// <summary>
 /// Reproduces legacy Smart QuickRun routing while returning explicit outcomes
