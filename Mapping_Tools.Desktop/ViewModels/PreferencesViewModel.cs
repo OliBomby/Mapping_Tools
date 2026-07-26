@@ -1,25 +1,26 @@
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Platform;
-using ReactiveUI;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Edits the first Preferences migration slice and persists each valid change
-/// without exposing Avalonia controls or storage-provider objects.
+/// Edits the process-lifetime settings document and applies live-only side
+/// effects without exposing Avalonia controls or storage-provider objects.
 /// </summary>
-public sealed class PreferencesViewModel : ViewModelBase
+public sealed class PreferencesViewModel : ObservableValidator
 {
     private static readonly FilePickerFilter OsuConfigurationFilter = new(
         "osu! user configuration",
         ["osu!.*.cfg"]);
 
     private readonly ApplicationSettings _settings;
-    private readonly ISettingsService _settingsService;
     private readonly IFilePicker _filePicker;
     private readonly IApplicationThemeService _themeService;
     private readonly IUserNotificationService _notifications;
@@ -34,19 +35,16 @@ public sealed class PreferencesViewModel : ViewModelBase
     /// Creates an editor over the process-lifetime settings document.
     /// </summary>
     /// <param name="settings">The mutable document shared by desktop services.</param>
-    /// <param name="settingsService">Persists valid changes.</param>
     /// <param name="filePicker">Presents native folder and configuration-file pickers.</param>
     /// <param name="themeService">Applies palette changes to the live application.</param>
-    /// <param name="notifications">Reports picker and persistence failures through the shell.</param>
+    /// <param name="notifications">Reports picker failures through the shell.</param>
     public PreferencesViewModel(
         ApplicationSettings settings,
-        ISettingsService settingsService,
         IFilePicker filePicker,
         IApplicationThemeService themeService,
         IUserNotificationService notifications)
     {
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         _themeService = themeService ?? throw new ArgumentNullException(nameof(themeService));
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
@@ -58,70 +56,66 @@ public sealed class PreferencesViewModel : ViewModelBase
         _maxBackupFiles = settings.MaxBackupFiles;
         _periodicBackupInterval = settings.PeriodicBackupInterval;
 
-        BrowseOsuPathCommand = ReactiveCommand.CreateFromTask(
+        BrowseOsuPathCommand = new AsyncRelayCommand(
             () => PickFolderAsync(
                 "Select the osu! folder",
                 OsuPath,
                 path => OsuPath = path));
-        BrowseSongsPathCommand = ReactiveCommand.CreateFromTask(
+        BrowseSongsPathCommand = new AsyncRelayCommand(
             () => PickFolderAsync(
                 "Select the osu! Songs folder",
                 SongsPath,
                 path => SongsPath = path));
-        BrowseBackupsPathCommand = ReactiveCommand.CreateFromTask(
+        BrowseBackupsPathCommand = new AsyncRelayCommand(
             () => PickFolderAsync(
                 "Select the Mapping Tools backups folder",
                 BackupsPath,
                 path => BackupsPath = path));
-        BrowseOsuConfigPathCommand = ReactiveCommand.CreateFromTask(PickOsuConfigAsync);
+        BrowseOsuConfigPathCommand = new AsyncRelayCommand(PickOsuConfigAsync);
     }
 
     /// <summary>Gets or edits the directory containing the osu! executable.</summary>
-    [RequiredText(ErrorMessage = "Select a path.")]
+    [Required(ErrorMessage = "Select a path.")]
     public string OsuPath
     {
         get => _osuPath;
-        set => SetPath(
+        set => SetValidatedProperty(
             ref _osuPath,
-            value,
-            path => _settings.OsuPath = path,
-            nameof(OsuPath));
+            value ?? string.Empty,
+            static (settings, path) => settings.OsuPath = path);
     }
 
     /// <summary>Gets or edits osu!'s beatmap-library directory.</summary>
-    [RequiredText(ErrorMessage = "Select a path.")]
+    [Required(ErrorMessage = "Select a path.")]
     public string SongsPath
     {
         get => _songsPath;
-        set => SetPath(
+        set => SetValidatedProperty(
             ref _songsPath,
-            value,
-            path => _settings.SongsPath = path,
-            nameof(SongsPath));
+            value ?? string.Empty,
+            static (settings, path) => settings.SongsPath = path);
     }
 
     /// <summary>Gets or edits the current user's osu! configuration file.</summary>
-    [RequiredText(ErrorMessage = "Select a path.")]
+    [Required(ErrorMessage = "Select a path.")]
     public string OsuConfigPath
     {
         get => _osuConfigPath;
-        set => SetPath(
+        set => SetValidatedProperty(
             ref _osuConfigPath,
-            value,
-            path => _settings.OsuConfigPath = path,
-            nameof(OsuConfigPath));
+            value ?? string.Empty,
+            static (settings, path) => settings.OsuConfigPath = path);
     }
 
     /// <summary>Gets or edits the directory that receives beatmap backups.</summary>
-    [RequiredText(ErrorMessage = "Select a path.")]
+    [Required(ErrorMessage = "Select a path.")]
     public string BackupsPath
     {
         get => _backupsPath;
-        set => SetPath(
+        set => SetValidatedProperty(
             ref _backupsPath,
-            value,
-            path => _settings.BackupsPath = path,
-            nameof(BackupsPath));
+            value ?? string.Empty,
+            static (settings, path) => settings.BackupsPath = path);
     }
 
     /// <summary>Gets or edits the retained-backup limit as a typed count.</summary>
@@ -132,20 +126,10 @@ public sealed class PreferencesViewModel : ViewModelBase
     public int MaxBackupFiles
     {
         get => _maxBackupFiles;
-        set
-        {
-            if (_maxBackupFiles == value)
-            {
-                return;
-            }
-
-            this.RaiseAndSetIfChanged(ref _maxBackupFiles, value);
-            if (ValidateProperty(value))
-            {
-                _settings.MaxBackupFiles = value;
-                Persist();
-            }
-        }
+        set => SetValidatedProperty(
+            ref _maxBackupFiles,
+            value,
+            static (settings, count) => settings.MaxBackupFiles = count);
     }
 
     /// <summary>Gets or edits the periodic-backup interval as a typed duration.</summary>
@@ -155,42 +139,36 @@ public sealed class PreferencesViewModel : ViewModelBase
     public TimeSpan PeriodicBackupInterval
     {
         get => _periodicBackupInterval;
-        set
-        {
-            if (_periodicBackupInterval == value)
-            {
-                return;
-            }
-
-            this.RaiseAndSetIfChanged(ref _periodicBackupInterval, value);
-            if (ValidateProperty(value))
-            {
-                _settings.PeriodicBackupInterval = value;
-                Persist();
-            }
-        }
+        set => SetValidatedProperty(
+            ref _periodicBackupInterval,
+            value,
+            static (settings, interval) =>
+                settings.PeriodicBackupInterval = interval);
     }
 
     /// <summary>Gets or sets whether destructive tools create safety backups.</summary>
     public bool MakeBackups
     {
         get => _settings.MakeBackups;
-        set => SetBoolean(
+        set => SetProperty(
             _settings.MakeBackups,
             value,
-            updated => _settings.MakeBackups = updated,
-            nameof(MakeBackups));
+            _settings,
+            static (settings, enabled) => settings.MakeBackups = enabled,
+            validate: false);
     }
 
     /// <summary>Gets or sets whether the background backup timer is enabled.</summary>
     public bool MakePeriodicBackups
     {
         get => _settings.MakePeriodicBackups;
-        set => SetBoolean(
+        set => SetProperty(
             _settings.MakePeriodicBackups,
             value,
-            updated => _settings.MakePeriodicBackups = updated,
-            nameof(MakePeriodicBackups));
+            _settings,
+            static (settings, enabled) =>
+                settings.MakePeriodicBackups = enabled,
+            validate: false);
     }
 
     /// <summary>
@@ -199,91 +177,73 @@ public sealed class PreferencesViewModel : ViewModelBase
     public bool CurrentBeatmapDefaultFolder
     {
         get => _settings.CurrentBeatmapDefaultFolder;
-        set => SetBoolean(
+        set => SetProperty(
             _settings.CurrentBeatmapDefaultFolder,
             value,
-            updated => _settings.CurrentBeatmapDefaultFolder = updated,
-            nameof(CurrentBeatmapDefaultFolder));
+            _settings,
+            static (settings, enabled) =>
+                settings.CurrentBeatmapDefaultFolder = enabled,
+            validate: false);
     }
 
     /// <summary>Gets or sets whether live editor memory may be read.</summary>
     public bool UseEditorReader
     {
         get => _settings.UseEditorReader;
-        set => SetBoolean(
+        set => SetProperty(
             _settings.UseEditorReader,
             value,
-            updated => _settings.UseEditorReader = updated,
-            nameof(UseEditorReader));
+            _settings,
+            static (settings, enabled) =>
+                settings.UseEditorReader = enabled,
+            validate: false);
     }
 
-    /// <summary>Gets or sets whether the dark application palette is active.</summary>
-    public bool IsDarkTheme
+    /// <summary>Gets or sets the palette applied immediately to the live application.</summary>
+    public ApplicationTheme Theme
     {
-        get => _settings.Theme == ApplicationTheme.Dark;
+        get => _settings.Theme;
         set
         {
-            ApplicationTheme theme = value
-                ? ApplicationTheme.Dark
-                : ApplicationTheme.Light;
-            if (_settings.Theme == theme)
+            if (SetProperty(
+                    _settings.Theme,
+                    value,
+                    _settings,
+                    static (settings, theme) => settings.Theme = theme,
+                    validate: false))
             {
-                return;
+                _themeService.Apply(value);
             }
-
-            _settings.Theme = theme;
-            this.RaisePropertyChanged();
-            _themeService.Apply(theme);
-            Persist();
         }
     }
 
     /// <summary>Gets the native folder-picker command for the osu! directory.</summary>
-    public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> BrowseOsuPathCommand { get; }
+    public IAsyncRelayCommand BrowseOsuPathCommand { get; }
 
     /// <summary>Gets the native folder-picker command for the Songs directory.</summary>
-    public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> BrowseSongsPathCommand { get; }
+    public IAsyncRelayCommand BrowseSongsPathCommand { get; }
 
     /// <summary>Gets the native file-picker command for the osu! configuration.</summary>
-    public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> BrowseOsuConfigPathCommand { get; }
+    public IAsyncRelayCommand BrowseOsuConfigPathCommand { get; }
 
     /// <summary>Gets the native folder-picker command for the backups directory.</summary>
-    public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> BrowseBackupsPathCommand { get; }
+    public IAsyncRelayCommand BrowseBackupsPathCommand { get; }
 
-    private void SetPath(
-        ref string field,
-        string? value,
-        Action<string> apply,
-        string propertyName)
+    private void SetValidatedProperty<T>(
+        ref T field,
+        T value,
+        Action<ApplicationSettings, T> apply,
+        [CallerMemberName] string propertyName = "")
     {
-        string normalized = value ?? string.Empty;
-        if (field == normalized)
+        if (SetProperty(
+                ref field,
+                value,
+                validate: true,
+                propertyName: propertyName)
+            && PropertyIsValid(propertyName))
         {
-            return;
+            apply(_settings, value);
         }
-
-        this.RaiseAndSetIfChanged(ref field, normalized, propertyName);
-        if (ValidateProperty(normalized, propertyName))
-        {
-            apply(normalized);
-            Persist();
-        }
-    }
-
-    private void SetBoolean(
-        bool current,
-        bool value,
-        Action<bool> apply,
-        string propertyName)
-    {
-        if (current == value)
-        {
-            return;
-        }
-
-        apply(value);
-        this.RaisePropertyChanged(propertyName);
-        Persist();
     }
 
     private async Task PickFolderAsync(
@@ -346,20 +306,8 @@ public sealed class PreferencesViewModel : ViewModelBase
         }
     }
 
-    private void Persist()
-    {
-        try
-        {
-            _settingsService.Save(_settings);
-        }
-        catch (Exception exception)
-        {
-            _ = PublishFailureAsync(
-                "Could not save preferences",
-                "The change remains active for this session but could not be written to config.json.",
-                exception);
-        }
-    }
+    private bool PropertyIsValid(string propertyName) =>
+        !GetErrors(propertyName).Cast<object>().Any();
 
     private Task PublishFailureAsync(
         string title,

@@ -1,12 +1,13 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
-using ReactiveUI;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
 /// Presents one independently dismissible shell notification.
 /// </summary>
-public sealed class ShellNotificationViewModel : ViewModelBase
+public sealed class ShellNotificationViewModel : ObservableObject
 {
     internal ShellNotificationViewModel(
         UserNotification notification,
@@ -16,7 +17,7 @@ public sealed class ShellNotificationViewModel : ViewModelBase
         Severity = notification.Severity;
         Title = notification.Title;
         Message = notification.Message;
-        DismissCommand = ReactiveCommand.Create(() => dismiss(this));
+        DismissCommand = new RelayCommand(() => dismiss(this));
     }
 
     /// <summary>Gets the notification severity.</summary>
@@ -32,5 +33,5 @@ public sealed class ShellNotificationViewModel : ViewModelBase
     public string DisplayText => $"{Title}: {Message}";
 
     /// <summary>Gets the command that removes this notification from the queue.</summary>
-    public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> DismissCommand { get; }
+    public IRelayCommand DismissCommand { get; }
 }

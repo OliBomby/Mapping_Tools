@@ -1,12 +1,13 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Desktop.Shell;
-using ReactiveUI;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
 /// Presents one explicit feature registration in shell navigation.
 /// </summary>
-public sealed class ShellFeatureItemViewModel : ViewModelBase
+public sealed class ShellFeatureItemViewModel : ObservableObject
 {
     private bool _isFavorite;
     private bool _isActive;
@@ -29,8 +30,8 @@ public sealed class ShellFeatureItemViewModel : ViewModelBase
             new[] { registration.DisplayName, registration.Category, registration.Description }
                 .Concat(registration.SearchTerms));
         _isFavorite = isFavorite;
-        ActivateCommand = ReactiveCommand.Create(() => activate(this));
-        ToggleFavoriteCommand = ReactiveCommand.Create(() => toggleFavorite(this));
+        ActivateCommand = new RelayCommand(() => activate(this));
+        ToggleFavoriteCommand = new RelayCommand(() => toggleFavorite(this));
     }
 
     /// <summary>Gets the stable persistence identifier.</summary>
@@ -54,9 +55,11 @@ public sealed class ShellFeatureItemViewModel : ViewModelBase
         get => _isFavorite;
         internal set
         {
-            this.RaiseAndSetIfChanged(ref _isFavorite, value);
-            this.RaisePropertyChanged(nameof(FavoriteGlyph));
-            this.RaisePropertyChanged(nameof(FavoriteActionLabel));
+            if (SetProperty(ref _isFavorite, value))
+            {
+                OnPropertyChanged(nameof(FavoriteGlyph));
+                OnPropertyChanged(nameof(FavoriteActionLabel));
+            }
         }
     }
 
@@ -74,7 +77,7 @@ public sealed class ShellFeatureItemViewModel : ViewModelBase
         get => _isActive;
         internal set
         {
-            this.RaiseAndSetIfChanged(ref _isActive, value);
+            SetProperty(ref _isActive, value);
         }
     }
 
@@ -87,10 +90,10 @@ public sealed class ShellFeatureItemViewModel : ViewModelBase
     public double NavigationRowHeight => NavigationHeight + (StartsSection ? 21 : 0);
 
     /// <summary>Gets the command that activates this feature.</summary>
-    public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> ActivateCommand { get; }
+    public IRelayCommand ActivateCommand { get; }
 
     /// <summary>Gets the command that toggles persisted favorite state.</summary>
-    public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> ToggleFavoriteCommand { get; }
+    public IRelayCommand ToggleFavoriteCommand { get; }
 
     internal string SearchableText { get; }
 

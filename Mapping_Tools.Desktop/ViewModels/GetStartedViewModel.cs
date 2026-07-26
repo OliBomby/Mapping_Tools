@@ -1,15 +1,16 @@
 using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
-using ReactiveUI;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
 /// Supplies offline onboarding, changelog, recent-map, and support-link content.
 /// </summary>
-public sealed class GetStartedViewModel : ViewModelBase
+public sealed class GetStartedViewModel : ObservableObject
 {
     private static readonly string[] OnboardingInstructions =
     [
@@ -44,9 +45,9 @@ public sealed class GetStartedViewModel : ViewModelBase
                 recent.DisplayDate)));
         Changelog = [];
         Instructions = OnboardingInstructions;
-        OpenWebsiteCommand = ReactiveCommand.CreateFromTask(
+        OpenWebsiteCommand = new AsyncRelayCommand(
             () => OpenUriAsync(WebsiteUri, "website"));
-        OpenSourceCommand = ReactiveCommand.CreateFromTask(
+        OpenSourceCommand = new AsyncRelayCommand(
             () => OpenUriAsync(SourceUri, "source repository"));
     }
 
@@ -63,10 +64,10 @@ public sealed class GetStartedViewModel : ViewModelBase
     public bool HasNoRecentMaps => RecentMaps.Count == 0;
 
     /// <summary>Gets the command that opens the Mapping Tools website.</summary>
-    public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> OpenWebsiteCommand { get; }
+    public IAsyncRelayCommand OpenWebsiteCommand { get; }
 
     /// <summary>Gets the command that opens the source repository.</summary>
-    public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> OpenSourceCommand { get; }
+    public IAsyncRelayCommand OpenSourceCommand { get; }
 
     private async Task OpenUriAsync(Uri uri, string destination)
     {

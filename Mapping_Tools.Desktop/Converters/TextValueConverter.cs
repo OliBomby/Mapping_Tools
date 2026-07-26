@@ -2,6 +2,7 @@ using System.Globalization;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Mapping_Tools.Application.Interactions;
+using Mapping_Tools.Application.Settings;
 
 namespace Mapping_Tools.Desktop.Converters;
 
@@ -126,11 +127,24 @@ public sealed class TextConversionState
     }
 }
 
+// TODO: Move each converter to separate file, like the in the WPF project.
+// TODO: Nuke this generic 'text' converter which doesn't even use the same converter as the WPF project
 /// <summary>
 /// Exposes the application's standard typed text formats as shared Avalonia converters.
 /// </summary>
 public static class DesktopValueConverters
 {
+    /// <summary>
+    /// Gets the two-way converter used by the dark-theme toggle while keeping
+    /// the view model's setting strongly typed.
+    /// </summary>
+    public static IValueConverter DarkTheme { get; } =
+        new FuncValueConverter<ApplicationTheme, bool>(
+            theme => theme == ApplicationTheme.Dark,
+            isDark => isDark
+                ? ApplicationTheme.Dark
+                : ApplicationTheme.Light);
+
     /// <summary>
     /// Gets the invariant signed 32-bit integer converter.
     /// </summary>

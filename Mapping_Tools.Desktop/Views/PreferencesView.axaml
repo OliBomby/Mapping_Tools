@@ -160,7 +160,9 @@
                            VerticalAlignment="Center" />
                 <ToggleSwitch Margin="10,0"
                               AutomationProperties.Name="Dark theme"
-                              IsChecked="{Binding IsDarkTheme, Mode=TwoWay}"
+                              IsChecked="{Binding Theme,
+                                                  Mode=TwoWay,
+                                                  Converter={x:Static converters:DesktopValueConverters.DarkTheme}}"
                               OffContent=""
                               OnContent=""
                               ToolTip.Tip="Change the Mapping Tools theme." />

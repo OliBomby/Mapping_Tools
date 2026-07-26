@@ -1,7 +1,10 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Avalonia.Data;
+using Avalonia.Data.Converters;
 using Mapping_Tools.Application.Interactions;
+using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,6 +14,40 @@ namespace Mapping_Tools.Platform.Tests;
 [TestClass]
 public sealed class DialogAndValidationTests
 {
+    [TestMethod]
+    public void Convert_DarkTheme_ReturnsCheckedState()
+    {
+        // Arrange
+        IValueConverter converter = DesktopValueConverters.DarkTheme;
+
+        // Act
+        object? result = converter.Convert(
+            ApplicationTheme.Dark,
+            typeof(bool),
+            null,
+            CultureInfo.InvariantCulture);
+
+        // Assert
+        result.Should().Be(true);
+    }
+
+    [TestMethod]
+    public void ConvertBack_UncheckedThemeToggle_ReturnsLightTheme()
+    {
+        // Arrange
+        IValueConverter converter = DesktopValueConverters.DarkTheme;
+
+        // Act
+        object? result = converter.ConvertBack(
+            false,
+            typeof(ApplicationTheme),
+            null,
+            CultureInfo.InvariantCulture);
+
+        // Assert
+        result.Should().Be(ApplicationTheme.Light);
+    }
+
     [TestMethod]
     public void TryConvert_InvariantDoubleText_ReturnsExpectedValue()
     {
@@ -117,33 +154,37 @@ public sealed class DialogAndValidationTests
     }
 
     [TestMethod]
-    public void Validate_RequiredWhitespace_ReturnsFieldRequiredError()
+    public void GetValidationResult_RequiredWhitespace_ReturnsFieldRequiredError()
     {
         // Arrange
-        IValueValidator<string> validator = ValueValidators.RequiredText();
+        ValidationAttribute validator = ValueValidators.RequiredText();
 
         // Act
-        ValidationOutcome outcome = validator.Validate("   ");
+        ValidationResult? result = validator.GetValidationResult(
+            "   ",
+            new ValidationContext(new object()));
 
         // Assert
-        outcome.IsValid.Should().BeFalse();
-        outcome.ErrorMessage.Should().Be("Field is required.");
+        result.Should().NotBe(ValidationResult.Success);
+        result!.ErrorMessage.Should().Be("Field is required.");
     }
 
     [TestMethod]
-    public void Validate_InclusiveRangeBoundary_ReturnsSuccess()
+    public void GetValidationResult_InclusiveRangeBoundary_ReturnsSuccess()
     {
         // Arrange
-        IValueValidator<int> validator = ValueValidators.InclusiveRange(
+        ValidationAttribute validator = ValueValidators.InclusiveRange(
             1,
             60,
             "Use 1 through 60.");
 
         // Act
-        ValidationOutcome outcome = validator.Validate(60);
+        ValidationResult? result = validator.GetValidationResult(
+            60,
+            new ValidationContext(new object()));
 
         // Assert
-        outcome.Should().Be(ValidationOutcome.Success);
+        result.Should().Be(ValidationResult.Success);
     }
 
     [TestMethod]
@@ -218,7 +259,7 @@ public sealed class DialogAndValidationTests
             TextValueConverters.InvariantInt32,
             conversionState);
         ValueDialogViewModel viewModel = CreateValueViewModel(
-            _ => ValidationOutcome.Success,
+            _ => ValidationResult.Success,
             conversionState,
             _ => acceptCount++);
 
@@ -246,7 +287,7 @@ public sealed class DialogAndValidationTests
         object? accepted = null;
         TextConversionState conversionState = new();
         ValueDialogViewModel viewModel = CreateValueViewModel(
-            _ => ValidationOutcome.Success,
+            _ => ValidationResult.Success,
             conversionState,
             value => accepted = value);
 
@@ -268,8 +309,8 @@ public sealed class DialogAndValidationTests
         TextConversionState conversionState = new();
         ValueDialogViewModel viewModel = CreateValueViewModel(
             value => (int)value! <= 60
-                ? ValidationOutcome.Success
-                : ValidationOutcome.Failure("Use 1 through 60."),
+                ? ValidationResult.Success
+                : new ValidationResult("Use 1 through 60."),
             conversionState,
             _ => acceptCount++);
 
@@ -281,7 +322,8 @@ public sealed class DialogAndValidationTests
         viewModel.IsValid.Should().BeFalse();
         INotifyDataErrorInfo validation = viewModel;
         validation.GetErrors(nameof(ValueDialogViewModel.Value))
-            .Cast<string>()
+            .Cast<ValidationResult>()
+            .Select(result => result.ErrorMessage)
             .Should()
             .Equal("Use 1 through 60.");
         acceptCount.Should().Be(0);
@@ -300,7 +342,7 @@ public sealed class DialogAndValidationTests
             1,
             "OK",
             "Cancel",
-            _ => ValidationOutcome.Success,
+            _ => ValidationResult.Success,
             conversionState,
             _ => acceptCount++,
             () => cancelCount++);
@@ -334,7 +376,7 @@ public sealed class DialogAndValidationTests
     }
 
     private static ValueDialogViewModel CreateValueViewModel(
-        Func<object?, ValidationOutcome> validate,
+        Func<object?, ValidationResult?> validate,
         TextConversionState conversionState,
         Action<object?> accept)
     {

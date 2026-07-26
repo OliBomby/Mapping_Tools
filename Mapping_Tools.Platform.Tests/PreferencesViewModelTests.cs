@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using CommunityToolkit.Mvvm.Input;
 using FluentAssertions;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Platform;
@@ -6,7 +8,6 @@ using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ReactiveUI;
 
 namespace Mapping_Tools.Platform.Tests;
 
@@ -18,17 +19,15 @@ public sealed class PreferencesViewModelTests
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
-        RecordingSettingsService persistence = new();
 
         // Act
-        PreferencesViewModel viewModel = CreateViewModel(settings, persistence);
+        PreferencesViewModel viewModel = CreateViewModel(settings);
 
         // Assert
         viewModel.OsuPath.Should().Be(@"C:\osu!");
         viewModel.MaxBackupFiles.Should().Be(25);
         viewModel.PeriodicBackupInterval.Should().Be(TimeSpan.FromMinutes(5));
-        viewModel.IsDarkTheme.Should().BeTrue();
-        persistence.SaveCount.Should().Be(0);
+        viewModel.Theme.Should().Be(ApplicationTheme.Dark);
     }
 
     [TestMethod]
@@ -36,8 +35,7 @@ public sealed class PreferencesViewModelTests
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
-        RecordingSettingsService persistence = new();
-        PreferencesViewModel viewModel = CreateViewModel(settings, persistence);
+        PreferencesViewModel viewModel = CreateViewModel(settings);
 
         // Act
         viewModel.OsuPath = "   ";
@@ -45,11 +43,11 @@ public sealed class PreferencesViewModelTests
         // Assert
         INotifyDataErrorInfo validation = viewModel;
         validation.GetErrors(nameof(PreferencesViewModel.OsuPath))
-            .Cast<string>()
+            .Cast<ValidationResult>()
+            .Select(result => result.ErrorMessage)
             .Should()
             .Equal("Select a path.");
         settings.OsuPath.Should().Be(@"C:\osu!");
-        persistence.SaveCount.Should().Be(0);
     }
 
     [TestMethod]
@@ -57,8 +55,7 @@ public sealed class PreferencesViewModelTests
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
-        RecordingSettingsService persistence = new();
-        PreferencesViewModel viewModel = CreateViewModel(settings, persistence);
+        PreferencesViewModel viewModel = CreateViewModel(settings);
         INotifyDataErrorInfo validation = viewModel;
         List<string?> changedProperties = [];
         validation.ErrorsChanged += (_, eventArgs) =>
@@ -70,7 +67,8 @@ public sealed class PreferencesViewModelTests
         // Assert
         validation.HasErrors.Should().BeTrue();
         validation.GetErrors(nameof(PreferencesViewModel.OsuPath))
-            .Cast<string>()
+            .Cast<ValidationResult>()
+            .Select(result => result.ErrorMessage)
             .Should()
             .Equal("Select a path.");
         changedProperties.Should().Equal(nameof(PreferencesViewModel.OsuPath));
@@ -81,7 +79,8 @@ public sealed class PreferencesViewModelTests
         // Assert
         validation.HasErrors.Should().BeFalse();
         validation.GetErrors(nameof(PreferencesViewModel.OsuPath))
-            .Cast<string>()
+            .Cast<ValidationResult>()
+            .Select(result => result.ErrorMessage)
             .Should()
             .BeEmpty();
         changedProperties.Should().Equal(
@@ -90,30 +89,26 @@ public sealed class PreferencesViewModelTests
     }
 
     [TestMethod]
-    public void OsuPath_WithNonBlankText_UpdatesSharedSettingsAndPersists()
+    public void OsuPath_WithNonBlankText_UpdatesSharedSettingsInMemory()
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
-        RecordingSettingsService persistence = new();
-        PreferencesViewModel viewModel = CreateViewModel(settings, persistence);
+        PreferencesViewModel viewModel = CreateViewModel(settings);
 
         // Act
         viewModel.OsuPath = @"D:\Games\osu!";
 
         // Assert
         settings.OsuPath.Should().Be(@"D:\Games\osu!");
-        persistence.LastSaved.Should().BeSameAs(settings);
-        persistence.SaveCount.Should().Be(1);
         ((INotifyDataErrorInfo)viewModel).HasErrors.Should().BeFalse();
     }
 
     [TestMethod]
-    public void MaxBackupFiles_WithOutOfRangeThenValidValue_OnlyPersistsValidValue()
+    public void MaxBackupFiles_WithOutOfRangeThenValidValue_OnlyAppliesValidValue()
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
-        RecordingSettingsService persistence = new();
-        PreferencesViewModel viewModel = CreateViewModel(settings, persistence);
+        PreferencesViewModel viewModel = CreateViewModel(settings);
 
         // Act
         viewModel.MaxBackupFiles = 0;
@@ -121,31 +116,30 @@ public sealed class PreferencesViewModelTests
         // Assert
         INotifyDataErrorInfo validation = viewModel;
         validation.GetErrors(nameof(PreferencesViewModel.MaxBackupFiles))
-            .Cast<string>()
+            .Cast<ValidationResult>()
+            .Select(result => result.ErrorMessage)
             .Should()
             .Equal("Use a whole number from 1 through 100000.");
         settings.MaxBackupFiles.Should().Be(25);
-        persistence.SaveCount.Should().Be(0);
 
         // Act
         viewModel.MaxBackupFiles = 500;
 
         // Assert
         validation.GetErrors(nameof(PreferencesViewModel.MaxBackupFiles))
-            .Cast<string>()
+            .Cast<ValidationResult>()
+            .Select(result => result.ErrorMessage)
             .Should()
             .BeEmpty();
         settings.MaxBackupFiles.Should().Be(500);
-        persistence.SaveCount.Should().Be(1);
     }
 
     [TestMethod]
-    public void PeriodicBackupInterval_WithTooShortThenValidValue_OnlyPersistsValidInterval()
+    public void PeriodicBackupInterval_WithTooShortThenValidValue_OnlyAppliesValidInterval()
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
-        RecordingSettingsService persistence = new();
-        PreferencesViewModel viewModel = CreateViewModel(settings, persistence);
+        PreferencesViewModel viewModel = CreateViewModel(settings);
 
         // Act
         viewModel.PeriodicBackupInterval = TimeSpan.Zero;
@@ -153,74 +147,84 @@ public sealed class PreferencesViewModelTests
         // Assert
         INotifyDataErrorInfo validation = viewModel;
         validation.GetErrors(nameof(PreferencesViewModel.PeriodicBackupInterval))
-            .Cast<string>()
+            .Cast<ValidationResult>()
+            .Select(result => result.ErrorMessage)
             .Should()
             .Equal("Use an interval of at least one second.");
         settings.PeriodicBackupInterval.Should().Be(TimeSpan.FromMinutes(5));
-        persistence.SaveCount.Should().Be(0);
 
         // Act
         viewModel.PeriodicBackupInterval = TimeSpan.FromMinutes(15);
 
         // Assert
         validation.GetErrors(nameof(PreferencesViewModel.PeriodicBackupInterval))
-            .Cast<string>()
+            .Cast<ValidationResult>()
+            .Select(result => result.ErrorMessage)
             .Should()
             .BeEmpty();
         settings.PeriodicBackupInterval.Should().Be(TimeSpan.FromMinutes(15));
-        persistence.SaveCount.Should().Be(1);
     }
 
     [TestMethod]
-    public void IsDarkTheme_WhenUnchecked_AppliesLightThemeAndPersists()
+    public void Theme_WhenChanged_AppliesLightThemeInMemory()
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
-        RecordingSettingsService persistence = new();
         RecordingThemeService themes = new();
         PreferencesViewModel viewModel = CreateViewModel(
             settings,
-            persistence,
             themeService: themes);
 
         // Act
-        viewModel.IsDarkTheme = false;
+        viewModel.Theme = ApplicationTheme.Light;
 
         // Assert
         settings.Theme.Should().Be(ApplicationTheme.Light);
         themes.AppliedThemes.Should().Equal(ApplicationTheme.Light);
-        persistence.SaveCount.Should().Be(1);
     }
 
     [TestMethod]
-    public void MakePeriodicBackups_WhenChanged_UpdatesLivePolicyAndPersists()
+    public void Theme_WhenUnchanged_DoesNotReapplyTheme()
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
-        RecordingSettingsService persistence = new();
-        PreferencesViewModel viewModel = CreateViewModel(settings, persistence);
+        RecordingThemeService themes = new();
+        PreferencesViewModel viewModel = CreateViewModel(
+            settings,
+            themeService: themes);
+
+        // Act
+        viewModel.Theme = ApplicationTheme.Dark;
+
+        // Assert
+        themes.AppliedThemes.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void MakePeriodicBackups_WhenChanged_UpdatesLivePolicyInMemory()
+    {
+        // Arrange
+        ApplicationSettings settings = CreateSettings();
+        PreferencesViewModel viewModel = CreateViewModel(settings);
 
         // Act
         viewModel.MakePeriodicBackups = false;
 
         // Assert
         settings.MakePeriodicBackups.Should().BeFalse();
-        persistence.SaveCount.Should().Be(1);
     }
 
     [TestMethod]
-    public async Task BrowseBackupsPathCommand_WithSelectedFolder_UpdatesAndPersistsPath()
+    public async Task BrowseBackupsPathCommand_WithSelectedFolder_UpdatesPathInMemory()
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
-        RecordingSettingsService persistence = new();
         StubFilePicker picker = new()
         {
             FolderResults = [@"D:\Mapping Tools Backups"]
         };
         PreferencesViewModel viewModel = CreateViewModel(
             settings,
-            persistence,
             filePicker: picker);
 
         // Act
@@ -230,7 +234,6 @@ public sealed class PreferencesViewModelTests
         picker.LastFolderRequest.Should().NotBeNull();
         picker.LastFolderRequest!.AllowMultiple.Should().BeFalse();
         settings.BackupsPath.Should().Be(@"D:\Mapping Tools Backups");
-        persistence.SaveCount.Should().Be(1);
     }
 
     [TestMethod]
@@ -238,11 +241,9 @@ public sealed class PreferencesViewModelTests
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
-        RecordingSettingsService persistence = new();
         StubFilePicker picker = new();
         PreferencesViewModel viewModel = CreateViewModel(
             settings,
-            persistence,
             filePicker: picker);
 
         // Act
@@ -252,7 +253,6 @@ public sealed class PreferencesViewModelTests
         picker.LastOpenFileRequest.Should().NotBeNull();
         picker.LastOpenFileRequest!.Filters.Single().Patterns.Should().Equal("osu!.*.cfg");
         settings.OsuConfigPath.Should().Be(@"C:\osu!\osu!.Fixture.cfg");
-        persistence.SaveCount.Should().Be(0);
     }
 
     [TestMethod]
@@ -260,7 +260,6 @@ public sealed class PreferencesViewModelTests
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
-        RecordingSettingsService persistence = new();
         StubFilePicker picker = new()
         {
             ExceptionToThrow = new IOException("Picker unavailable.")
@@ -271,7 +270,6 @@ public sealed class PreferencesViewModelTests
             published.Add(eventArgs.Notification);
         PreferencesViewModel viewModel = CreateViewModel(
             settings,
-            persistence,
             filePicker: picker,
             notifications: notifications);
 
@@ -280,7 +278,6 @@ public sealed class PreferencesViewModelTests
 
         // Assert
         settings.BackupsPath.Should().Be(@"C:\Mapping Tools\Backups");
-        persistence.SaveCount.Should().Be(0);
         published.Should().ContainSingle();
         published[0].Severity.Should().Be(UserNotificationSeverity.Error);
         published[0].Title.Should().Be("Could not select folder");
@@ -301,44 +298,17 @@ public sealed class PreferencesViewModelTests
 
     private static PreferencesViewModel CreateViewModel(
         ApplicationSettings settings,
-        RecordingSettingsService persistence,
         StubFilePicker? filePicker = null,
         RecordingThemeService? themeService = null,
         IUserNotificationService? notifications = null) =>
         new(
             settings,
-            persistence,
             filePicker ?? new StubFilePicker(),
             themeService ?? new RecordingThemeService(),
             notifications ?? new UserNotificationService());
 
-    private static Task ExecuteAsync(
-        ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> command)
-    {
-        TaskCompletionSource completion =
-            new(TaskCreationOptions.RunContinuationsAsynchronously);
-        command.Execute().Subscribe(
-            _ => { },
-            completion.SetException,
-            completion.SetResult);
-        return completion.Task;
-    }
-
-    private sealed class RecordingSettingsService : ISettingsService
-    {
-        public int SaveCount { get; private set; }
-
-        public ApplicationSettings? LastSaved { get; private set; }
-
-        public SettingsLoadResult LoadOrCreate() =>
-            new(new ApplicationSettings(), false, false);
-
-        public void Save(ApplicationSettings settings)
-        {
-            SaveCount++;
-            LastSaved = settings;
-        }
-    }
+    private static Task ExecuteAsync(IAsyncRelayCommand command) =>
+        command.ExecuteAsync(null);
 
     private sealed class RecordingThemeService : IApplicationThemeService
     {

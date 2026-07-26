@@ -1,9 +1,11 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 
 /// <summary>
 /// Supplies immutable, wrapping content and typed action adapters to a message dialog.
 /// </summary>
-public sealed class MessageDialogViewModel : ViewModelBase
+public sealed class MessageDialogViewModel : ObservableObject
 {
     /// <summary>
     /// Creates presentation state for a message or confirmation dialog.

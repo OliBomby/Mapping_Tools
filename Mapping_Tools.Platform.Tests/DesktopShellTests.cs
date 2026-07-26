@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using FluentAssertions;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Settings;
@@ -52,23 +53,20 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
-    public void MainViewModel_ToggleFavorite_PersistsAndSortsFavoriteFirst()
+    public void MainViewModel_ToggleFavorite_UpdatesSettingsAndSortsFavoriteFirst()
     {
         // Arrange
         ApplicationSettings settings = new();
-        RecordingSettingsService settingsService = new();
         using MainViewModel viewModel = CreateMainViewModel(
             [Registration("alpha", "Alpha"), Registration("zulu", "Zulu")],
-            settings,
-            settingsService);
+            settings);
         ShellFeatureItemViewModel zulu = viewModel.FeatureItems.Single(item => item.Id == "zulu");
 
         // Act
-        zulu.ToggleFavoriteCommand.Execute().Subscribe();
+        zulu.ToggleFavoriteCommand.Execute(null);
 
         // Assert
         settings.FavoriteTools.Should().Equal("zulu");
-        settingsService.SaveCount.Should().Be(1);
         viewModel.VisibleFeatures.Select(item => item.Id).Should().Equal("zulu", "alpha");
         zulu.IsFavorite.Should().BeTrue();
     }
@@ -88,8 +86,8 @@ public sealed class DesktopShellTests
         ShellFeatureItemViewModel firstItem = viewModel.FeatureItems.Single(item => item.Id == "first");
 
         // Act
-        secondItem.ActivateCommand.Execute().Subscribe();
-        firstItem.ActivateCommand.Execute().Subscribe();
+        secondItem.ActivateCommand.Execute(null);
+        firstItem.ActivateCommand.Execute(null);
 
         // Assert
         first.ActivationCount.Should().Be(2);
@@ -119,7 +117,7 @@ public sealed class DesktopShellTests
         viewModel.NotificationQueue.Select(item => item.Title).Should().Equal("Check map", "Check map");
 
         // Act
-        viewModel.NotificationQueue[0].DismissCommand.Execute().Subscribe();
+        viewModel.NotificationQueue[0].DismissCommand.Execute(null);
 
         // Assert
         viewModel.NotificationQueue.Should().ContainSingle();
@@ -163,14 +161,12 @@ public sealed class DesktopShellTests
     private static MainViewModel CreateMainViewModel(
         IReadOnlyList<ShellFeatureRegistration>? registrations = null,
         ApplicationSettings? settings = null,
-        RecordingSettingsService? settingsService = null,
         IUserNotificationService? notifications = null)
     {
         return new MainViewModel(
             new ShellFeatureRegistry(registrations ??
                 [Registration("get-started", "Get started")]),
             settings ?? new ApplicationSettings(),
-            settingsService ?? new RecordingSettingsService(),
             notifications ?? new UserNotificationService(),
             new ImmediateDispatcher());
     }
@@ -178,7 +174,7 @@ public sealed class DesktopShellTests
     private static ShellFeatureRegistration Registration(
         string id,
         string displayName,
-        Func<ViewModelBase>? factory = null) =>
+        Func<ObservableObject>? factory = null) =>
         new(
             id,
             displayName,
@@ -187,7 +183,7 @@ public sealed class DesktopShellTests
             [displayName, id],
             factory ?? (() => new StubFeatureViewModel()));
 
-    private sealed class StubFeatureViewModel : ViewModelBase, IShellFeatureActivation
+    private sealed class StubFeatureViewModel : ObservableObject, IShellFeatureActivation
     {
         public int ActivationCount { get; private set; }
 
@@ -203,13 +199,4 @@ public sealed class DesktopShellTests
         public void Post(Action action) => action();
     }
 
-    private sealed class RecordingSettingsService : ISettingsService
-    {
-        public int SaveCount { get; private set; }
-
-        public SettingsLoadResult LoadOrCreate() =>
-            new(new ApplicationSettings(), false, false);
-
-        public void Save(ApplicationSettings settings) => SaveCount++;
-    }
 }

@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using ReactiveUI.Avalonia;
 using System;
 
 namespace Mapping_Tools.Desktop;
@@ -21,7 +20,7 @@ sealed class Program
     /// <summary>
     /// Creates the shared Avalonia configuration used by the executable and designer.
     /// </summary>
-    /// <returns>An application builder configured for platform detection, Inter, tracing, and ReactiveUI.</returns>
+    /// <returns>An application builder configured for platform detection, Inter, and tracing.</returns>
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
@@ -29,6 +28,5 @@ sealed class Program
             .WithDeveloperTools()
 #endif
             .WithInterFont()
-            .LogToTrace()
-            .UseReactiveUI(_ => { });
+            .LogToTrace();
 }

@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Mapping_Tools.Desktop.ViewModels;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Mapping_Tools.Desktop;
 
@@ -46,6 +46,6 @@ public class ViewLocator : IDataTemplate
     /// <returns><see langword="true"/> for Mapping Tools view models.</returns>
     public bool Match(object? data)
     {
-        return data is ViewModelBase;
+        return data is ObservableObject;
     }
 }

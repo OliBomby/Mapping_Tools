@@ -1,17 +1,18 @@
 using System.ComponentModel.DataAnnotations;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Desktop.Converters;
-using ReactiveUI;
 
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 
 /// <summary>
 /// Holds a type-erased value whose text conversion remains in the Avalonia binding.
 /// </summary>
-public sealed class ValueDialogViewModel : ViewModelBase
+public sealed class ValueDialogViewModel : ObservableValidator
 {
-    private readonly Func<object?, ValidationOutcome> _validate;
+    private readonly Func<object?, ValidationResult?> _validate;
     private readonly Action<object?> _accept;
     private readonly TextConversionState _conversionState;
     private object? _value;
@@ -34,7 +35,7 @@ public sealed class ValueDialogViewModel : ViewModelBase
         object? initialValue,
         string acceptLabel,
         string cancelLabel,
-        Func<object?, ValidationOutcome> validate,
+        Func<object?, ValidationResult?> validate,
         TextConversionState conversionState,
         Action<object?> accept,
         Action cancel)
@@ -54,12 +55,12 @@ public sealed class ValueDialogViewModel : ViewModelBase
         _validate = validate;
         _conversionState = conversionState;
         _accept = accept;
-        AcceptCommand = ReactiveCommand.Create(Accept);
-        CancelCommand = ReactiveCommand.Create(cancel);
+        AcceptCommand = new RelayCommand(Accept);
+        CancelCommand = new RelayCommand(cancel);
 
-        ErrorsChanged += (_, _) => this.RaisePropertyChanged(nameof(IsValid));
+        ErrorsChanged += (_, _) => OnPropertyChanged(nameof(IsValid));
         _conversionState.ErrorChanged += (_, _) =>
-            this.RaisePropertyChanged(nameof(IsValid));
+            OnPropertyChanged(nameof(IsValid));
         ValidateProperty(_value, nameof(Value));
     }
 
@@ -87,9 +88,7 @@ public sealed class ValueDialogViewModel : ViewModelBase
                 return;
             }
 
-            this.RaiseAndSetIfChanged(ref _value, value);
-            ValidateProperty(value);
-            this.RaisePropertyChanged(nameof(IsValid));
+            SetProperty(ref _value, value, validate: true);
         }
     }
 
@@ -118,14 +117,14 @@ public sealed class ValueDialogViewModel : ViewModelBase
     /// </summary>
     public ICommand CancelCommand { get; }
 
-    internal ValidationOutcome ValidateDialogValue(object? value) =>
+    internal ValidationResult? ValidateDialogValue(object? value) =>
         _validate(value);
 
     private void Accept()
     {
-        bool annotationsAreValid = ValidateAllProperties();
-        this.RaisePropertyChanged(nameof(IsValid));
-        if (annotationsAreValid && !_conversionState.HasError)
+        ValidateAllProperties();
+        OnPropertyChanged(nameof(IsValid));
+        if (!HasErrors && !_conversionState.HasError)
         {
             _accept(Value);
         }
@@ -148,16 +147,13 @@ internal sealed class DialogValueAttribute : ValidationAttribute
                     : [validationContext.MemberName]);
         }
 
-        ValidationOutcome outcome = viewModel.ValidateDialogValue(value);
-        if (outcome.IsValid)
-        {
-            return ValidationResult.Success;
-        }
-
-        return new ValidationResult(
-            outcome.ErrorMessage ?? "The value is invalid.",
-            validationContext.MemberName is null
-                ? null
-                : [validationContext.MemberName]);
+        ValidationResult? result = viewModel.ValidateDialogValue(value);
+        return result == ValidationResult.Success
+            ? ValidationResult.Success
+            : new ValidationResult(
+                result?.ErrorMessage ?? "The value is invalid.",
+                validationContext.MemberName is null
+                    ? null
+                    : [validationContext.MemberName]);
     }
 }

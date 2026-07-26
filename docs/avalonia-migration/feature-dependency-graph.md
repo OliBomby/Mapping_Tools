@@ -18,7 +18,7 @@ This document inventories the user-visible features in the WPF application, defi
 
 ```mermaid
 flowchart LR
-    Desktop["Mapping_Tools.Desktop<br/>Avalonia views + ReactiveUI presentation"]
+    Desktop["Mapping_Tools.Desktop<br/>Avalonia views + MVVM Toolkit presentation"]
     Application["Mapping_Tools.Application<br/>use cases + ports"]
     Core["Mapping_Tools.Core<br/>beatmap/domain rules + algorithms"]
     Infrastructure["Mapping_Tools.Infrastructure<br/>filesystem, osu!, audio, network, platform adapters"]
@@ -34,7 +34,7 @@ Rules:
 1. Core has no UI, filesystem dialog, dispatcher, process, or operating-system dependencies.
 2. Application owns use cases and interfaces for side effects.
 3. Infrastructure implements those interfaces. Windows-only integrations are explicit adapters rather than hidden static calls.
-4. Desktop owns Avalonia controls, navigation, view activation, and ReactiveUI presentation state.
+4. Desktop owns Avalonia controls, navigation, view activation, and MVVM Toolkit presentation state.
 5. The WPF application consumes the same Application/Core behavior until the final cutover.
 
 ## Shared subsystem catalog
@@ -339,7 +339,7 @@ Apply this checklist to each tool in the order above:
 2. Extract the smallest Core algorithm and Application use case required by that feature.
 3. Add side-effect ports and WPF adapters so the legacy feature still works.
 4. Add focused unit/fixture tests before changing presentation behavior.
-5. Implement a ReactiveUI view model containing state and commands but no controls, windows, or static shell references.
+5. Implement an MVVM Toolkit view model containing state and commands but no controls, windows, or static shell references.
 6. Consult official Avalonia 12.1 documentation and verify APIs against 12.1.0 before writing AXAML or Avalonia code.
 7. Implement the Avalonia view with compiled bindings and explicit `x:DataType`.
 8. Register it explicitly in the shell; do not remove the WPF version.

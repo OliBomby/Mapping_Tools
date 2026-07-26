@@ -9,6 +9,7 @@ using Mapping_Tools.Application.SafetyCopies;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Desktop.Platform;
+using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
@@ -89,6 +90,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton(provider =>
             provider.GetRequiredService<ISettingsService>().LoadOrCreate().Settings);
+        services.AddHostedService<SettingsPersistenceHostedService>();
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ITextFileStore, FileSystemFileStore>();
         services.AddSingleton<IUserNotificationService, UserNotificationService>();

@@ -1,12 +1,13 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System.Windows.Input;
-using ReactiveUI;
 
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 
 /// <summary>
 /// Exposes one message-dialog action with its keyboard role and close command.
 /// </summary>
-public sealed class DialogChoiceViewModel
+public sealed class DialogChoiceViewModel : ObservableObject
 {
     /// <summary>
     /// Creates an action that invokes the supplied close callback once per execution.
@@ -26,7 +27,7 @@ public sealed class DialogChoiceViewModel
         Label = label;
         IsDefault = isDefault;
         IsCancel = isCancel;
-        Command = ReactiveCommand.Create(close);
+        Command = new RelayCommand(close);
     }
 
     /// <summary>

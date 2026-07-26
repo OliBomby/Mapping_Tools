@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
+using System.ComponentModel.DataAnnotations;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
@@ -106,7 +107,7 @@ public sealed class AvaloniaDialogService : IDialogService
             : new ValueDialogResult<TValue>(false, default);
     }
 
-    private static ValidationOutcome Validate<TValue>(
+    private static ValidationResult? Validate<TValue>(
         object? value,
         ValueDialogRequest<TValue> request)
     {
@@ -117,20 +118,26 @@ public sealed class AvaloniaDialogService : IDialogService
         }
         catch (InvalidCastException)
         {
-            return ValidationOutcome.Failure(
+            return new ValidationResult(
                 "The converted value has an unexpected type.");
         }
 
-        foreach (IValueValidator<TValue> validator in request.Validators)
+        ValidationContext context = new(request)
         {
-            ValidationOutcome outcome = validator.Validate(typedValue);
-            if (!outcome.IsValid)
+            MemberName = nameof(request.InitialValue),
+            DisplayName = request.Prompt
+        };
+        foreach (ValidationAttribute validator in request.Validators)
+        {
+            ValidationResult? result =
+                validator.GetValidationResult(typedValue, context);
+            if (result != ValidationResult.Success)
             {
-                return outcome;
+                return result;
             }
         }
 
-        return ValidationOutcome.Success;
+        return ValidationResult.Success;
     }
 
     private static CancellationTokenRegistration RegisterCancellation(

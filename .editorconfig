@@ -142,3 +142,66 @@ dotnet_diagnostic.ide0011.severity = none
 
 # CA2201: Do not raise reserved exception types
 dotnet_diagnostic.ca2201.severity = none
+
+[*]
+
+# Microsoft .NET properties
+csharp_new_line_before_catch = false
+csharp_new_line_before_else = false
+csharp_new_line_before_members_in_object_initializers = false
+csharp_preferred_modifier_order = public, internal, protected, private, file, new, sealed, static, unsafe, closed, extern, abstract, override, virtual, readonly, volatile, async, required:suggestion
+csharp_preserve_single_line_blocks = true
+csharp_space_after_cast = true
+csharp_style_namespace_declarations = block_scoped:suggestion
+csharp_style_var_for_built_in_types = false:suggestion
+
+# ReSharper properties
+resharper_accessor_owner_body = accessors_with_expression_body
+resharper_arguments_skip_single = true
+resharper_blank_lines_after_block_statements = 0
+resharper_blank_lines_after_start_comment = 0
+resharper_blank_lines_around_auto_property = 0
+resharper_blank_lines_around_property = 0
+resharper_blank_lines_around_single_line_type = 0
+resharper_braces_for_ifelse = not_required
+resharper_braces_for_using = not_required
+resharper_braces_for_while = required_for_multiline
+resharper_braces_redundant = false
+resharper_csharp_allow_comment_after_lbrace = true
+resharper_csharp_blank_lines_around_field = 0
+resharper_csharp_blank_lines_around_invocable = 0
+resharper_csharp_blank_lines_around_namespace = 0
+resharper_csharp_blank_lines_around_region = 0
+resharper_csharp_empty_block_style = together
+resharper_csharp_insert_final_newline = true
+resharper_csharp_keep_blank_lines_in_declarations = 100
+resharper_csharp_keep_existing_enum_arrangement = false
+resharper_csharp_max_line_length = 858
+resharper_csharp_remove_blank_lines_near_braces_in_code = false
+resharper_csharp_remove_blank_lines_near_braces_in_declarations = false
+resharper_csharp_wrap_extends_list_style = chop_if_long
+resharper_csharp_wrap_multiple_declaration_style = wrap_if_long
+resharper_csharp_wrap_ternary_expr_style = wrap_if_long
+resharper_for_simple_types = use_var_when_evident
+resharper_indent_nested_for_stmt = true
+resharper_instance_members_qualify_declared_in =
+resharper_keep_existing_attribute_arrangement = true
+resharper_method_or_operator_body = block_body
+resharper_nested_ternary_style = simple_wrap
+resharper_parentheses_non_obvious_operations = none, bitwise_and, bitwise_exclusive_or, bitwise_inclusive_or, bitwise
+resharper_place_accessorholder_attribute_on_same_line = false
+resharper_place_expr_accessor_on_single_line = true
+resharper_place_field_attribute_on_same_line = false
+resharper_place_simple_blocks_on_single_line = false
+resharper_place_simple_initializer_on_single_line = false
+resharper_place_simple_list_pattern_on_single_line = false
+resharper_place_simple_property_pattern_on_single_line = false
+resharper_place_single_method_argument_lambda_on_same_line = false
+resharper_trailing_comma_in_multiline_lists = false
+resharper_use_roslyn_logic_for_evident_types = true
+resharper_wrap_before_binary_opsign = false
+resharper_wrap_before_binary_pattern_op = false
+resharper_wrap_chained_binary_expressions = wrap_if_long
+resharper_wrap_chained_binary_patterns = chop_if_long
+resharper_wrap_list_pattern = chop_always
+resharper_wrap_object_and_collection_initializer_style = chop_always

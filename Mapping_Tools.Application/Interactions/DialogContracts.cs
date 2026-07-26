@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Mapping_Tools.Application.Interactions;
 
 /// <summary>
@@ -105,7 +107,7 @@ public sealed class ValueDialogRequest<TValue>
     /// <param name="prompt">The label or instruction placed above the field.</param>
     /// <param name="initialValue">The value formatted into the field when it opens.</param>
     /// <param name="converter">The bidirectional text representation.</param>
-    /// <param name="validators">Rules evaluated in order after successful parsing.</param>
+    /// <param name="validators">DataAnnotations rules evaluated in order after successful parsing.</param>
     /// <param name="acceptLabel">The default-action button text.</param>
     /// <param name="cancelLabel">The Escape-action button text.</param>
     public ValueDialogRequest(
@@ -113,7 +115,7 @@ public sealed class ValueDialogRequest<TValue>
         string prompt,
         TValue initialValue,
         ITextValueConverter<TValue> converter,
-        IReadOnlyList<IValueValidator<TValue>>? validators = null,
+        IReadOnlyList<ValidationAttribute>? validators = null,
         string acceptLabel = "OK",
         string cancelLabel = "Cancel")
     {
@@ -155,7 +157,7 @@ public sealed class ValueDialogRequest<TValue>
     /// <summary>
     /// Gets an immutable snapshot of rules evaluated in order after parsing.
     /// </summary>
-    public IReadOnlyList<IValueValidator<TValue>> Validators { get; }
+    public IReadOnlyList<ValidationAttribute> Validators { get; }
 
     /// <summary>
     /// Gets the label for the Enter/default action.
@@ -185,15 +187,20 @@ public sealed class ValueDialogRequest<TValue>
                 conversionError ?? "The value could not be parsed.");
         }
 
-        foreach (IValueValidator<TValue> validator in Validators)
+        ValidationContext context = new(this)
         {
-            ValidationOutcome outcome = validator.Validate(value);
-            if (!outcome.IsValid)
+            MemberName = nameof(InitialValue),
+            DisplayName = Prompt
+        };
+        foreach (ValidationAttribute validator in Validators)
+        {
+            ValidationResult? result = validator.GetValidationResult(value, context);
+            if (result != ValidationResult.Success)
             {
                 return new ValueEvaluation<TValue>(
                     false,
                     default,
-                    outcome.ErrorMessage);
+                    result?.ErrorMessage);
             }
         }
 

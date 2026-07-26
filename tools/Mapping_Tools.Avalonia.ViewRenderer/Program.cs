@@ -2,6 +2,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Media.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
@@ -99,8 +101,8 @@ static ValueDialogWindow CreateValueDialog(string scenario)
             "ACCEPT",
             "CANCEL",
             value => invalid
-                ? ValidationOutcome.Failure("Enter a whole number.")
-                : ValidationOutcome.Success,
+                ? new ValidationResult("Enter a whole number.")
+                : ValidationResult.Success,
             conversionState,
             _ => { },
             () => { })
@@ -170,7 +172,6 @@ static MainViewModel CreateMainViewModel(string scenario)
     MainViewModel shell = new(
         new ShellFeatureRegistry(registrations),
         settings,
-        new NoOpSettingsService(settings),
         notifications,
         new ImmediateDispatcher());
     if (scenario.StartsWith("preferences", StringComparison.OrdinalIgnoreCase))
@@ -219,7 +220,6 @@ static PreferencesViewModel CreatePreferencesViewModel(
 {
     PreferencesViewModel viewModel = new(
         settings,
-        new NoOpSettingsService(settings),
         new RendererFilePicker(),
         new RendererThemeService(),
         new UserNotificationService());
@@ -326,15 +326,6 @@ namespace Mapping_Tools.Avalonia.ViewRenderer {
             Task.FromResult(true);
     }
 
-    internal sealed class NoOpSettingsService(ApplicationSettings settings) : ISettingsService
-    {
-        public SettingsLoadResult LoadOrCreate() => new(settings, false, false);
-
-        public void Save(ApplicationSettings applicationSettings)
-        {
-        }
-    }
-
     internal sealed class ImmediateDispatcher : IUiDispatcher
     {
         public void Post(Action action) => action();
@@ -371,7 +362,7 @@ namespace Mapping_Tools.Avalonia.ViewRenderer {
             Task.FromResult<IReadOnlyList<string>>([]);
     }
 
-    internal sealed class RendererPlaceholderViewModel : ViewModelBase
+    internal sealed class RendererPlaceholderViewModel : ObservableObject
     {
     }
 }

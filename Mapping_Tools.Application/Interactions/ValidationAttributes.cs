@@ -4,20 +4,6 @@ using System.Globalization;
 namespace Mapping_Tools.Application.Interactions;
 
 /// <summary>
-/// Rejects missing, empty, or whitespace-only text while preserving the
-/// standard DataAnnotations validation pipeline.
-/// </summary>
-[AttributeUsage(
-    AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter,
-    AllowMultiple = false)]
-public sealed class RequiredTextAttribute : ValidationAttribute
-{
-    /// <inheritdoc/>
-    public override bool IsValid(object? value) =>
-        value is string text && !string.IsNullOrWhiteSpace(text);
-}
-
-/// <summary>
 /// Requires a duration to meet a constant-format inclusive lower bound.
 /// </summary>
 [AttributeUsage(

@@ -5,7 +5,7 @@ Status: implemented, 2026-07-26.
 ## Scope delivered
 
 Preferences is now an explicit, lazy shell feature with its own compiled
-`PreferencesView` and ReactiveUI `PreferencesViewModel`. This first pass
+`PreferencesView` and MVVM Toolkit `PreferencesViewModel`. This first pass
 preserves the legacy controls and behavior for:
 
 - the osu!, Songs, osu! user configuration, and backups paths;
@@ -45,9 +45,10 @@ not displayed as disabled or non-functional placeholders in this pass.
 ## Validation and persistence
 
 Every valid edit updates the process-lifetime `ApplicationSettings` instance
-used by backup, workspace, and Editor Reader services, then immediately saves
-the complete legacy-compatible JSON document through `ISettingsService`.
-There is no view code-behind persistence or static WPF settings dependency.
+used by backup, workspace, and Editor Reader services. The shell writes the
+complete legacy-compatible JSON document through `ISettingsService` when the
+main window closes, together with its final placement. There is no
+field-by-field persistence or static WPF settings dependency.
 
 Path fields reject blank values without replacing the last usable setting.
 The retained-backup limit accepts 1 through 100000. The periodic interval uses
@@ -59,10 +60,9 @@ Material.Avalonia's own `DataValidationErrors` element inside each text-field
 template to render the red caption, underline, and explanation. There are no
 separate validation text blocks in Preferences or the reusable value dialog.
 
-Picker cancellation leaves both the field and persisted document unchanged.
-Picker and save failures are caught by the view model and published through
-the shared notification surface. A failed save leaves the valid change active
-for the current process and tells the user that `config.json` was not updated.
+Picker cancellation leaves both the field and settings document unchanged.
+Picker failures are caught by the view model and published through the shared
+notification surface.
 
 ## Theme compatibility
 
@@ -88,16 +88,16 @@ hexadecimal colors.
 
 Avalonia does not implement WPF's XAML `Binding.ValidationRules` collection.
 Preferences therefore reports property-level errors through the standard
-`INotifyDataErrorInfo` binding-validation plugin. A single internal
-property/error dictionary replaces the earlier per-field error properties;
-the setters still own the small amount of parsing and persistence gating
-needed to prevent invalid edits from reaching `ApplicationSettings`.
+`INotifyDataErrorInfo` binding-validation plugin. MVVM Toolkit's
+`ObservableValidator` replaces both the earlier per-field error properties
+and the custom desktop validation base; typed setters only gate invalid
+values from reaching `ApplicationSettings`.
 
 ## Automated and visual coverage
 
 `Mapping_Tools.Platform.Tests` verifies initial presentation without a write;
 valid and blank paths; valid and invalid backup limits and intervals; live
-periodic-policy changes; light-theme application and persistence; selected
+periodic-policy changes; live light-theme application; selected
 folders; cancelled config selection; legacy/default settings loading; theme
 JSON round trips; DI registration; and the existing shell behavior. All 132
 platform tests pass. All 3 architecture tests pass.

@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Shell;
@@ -7,7 +8,7 @@ namespace Mapping_Tools.Desktop.Shell;
 /// </summary>
 public sealed class ShellFeatureRegistration
 {
-    private readonly Func<ViewModelBase> _createViewModel;
+    private readonly Func<ObservableObject> _createViewModel;
 
     /// <summary>
     /// Creates an explicit shell feature registration.
@@ -25,7 +26,7 @@ public sealed class ShellFeatureRegistration
         string category,
         string description,
         IEnumerable<string> searchTerms,
-        Func<ViewModelBase> createViewModel,
+        Func<ObservableObject> createViewModel,
         bool startsSection = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(id);
@@ -64,5 +65,5 @@ public sealed class ShellFeatureRegistration
 
     /// <summary>Creates the presentation model when the feature is first opened.</summary>
     /// <returns>A new feature presentation model.</returns>
-    public ViewModelBase CreateViewModel() => _createViewModel();
+    public ObservableObject CreateViewModel() => _createViewModel();
 }

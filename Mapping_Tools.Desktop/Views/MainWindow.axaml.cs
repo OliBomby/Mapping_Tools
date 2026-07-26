@@ -9,13 +9,12 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.Views;
 
 /// <summary>
-/// Hosts the registered Avalonia features and persists safe normal-state window geometry.
+/// Hosts registered Avalonia features and captures safe normal-state window geometry.
 /// </summary>
 public partial class MainWindow : Window
 {
     private static readonly WindowBounds DefaultBounds = new(80, 60, 1500, 800);
     private readonly ApplicationSettings _settings;
-    private readonly ISettingsService _settingsService;
     private WindowBounds _normalBounds = DefaultBounds;
     private bool _restored;
 
@@ -24,19 +23,17 @@ public partial class MainWindow : Window
     /// Runtime composition uses the settings-aware constructor.
     /// </summary>
     public MainWindow()
-        : this(new ApplicationSettings(), new NoOpSettingsService())
+        : this(new ApplicationSettings())
     {
     }
 
     /// <summary>
-    /// Loads the compiled shell and attaches settings-backed window persistence.
+    /// Loads the compiled shell and attaches the shared window-placement state.
     /// </summary>
     public MainWindow(
-        ApplicationSettings settings,
-        ISettingsService settingsService)
+        ApplicationSettings settings)
     {
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         InitializeComponent();
         PositionChanged += (_, _) => CaptureNormalBounds();
         Resized += (_, _) => CaptureNormalBounds();
@@ -59,7 +56,6 @@ public partial class MainWindow : Window
 
         _settings.MainWindowRestoreBounds = _normalBounds;
         _settings.MainWindowMaximized = WindowState == WindowState.Maximized;
-        _settingsService.Save(_settings);
         base.OnClosing(eventArgs);
     }
 
@@ -167,20 +163,10 @@ public partial class MainWindow : Window
             return;
         }
 
-        _ = (openSource
+        (openSource
                 ? getStarted.OpenSourceCommand
                 : getStarted.OpenWebsiteCommand)
-            .Execute()
-            .Subscribe();
+            .Execute(null);
     }
 
-    private sealed class NoOpSettingsService : ISettingsService
-    {
-        public SettingsLoadResult LoadOrCreate() =>
-            new(new ApplicationSettings(), false, false);
-
-        public void Save(ApplicationSettings settings)
-        {
-        }
-    }
 }
