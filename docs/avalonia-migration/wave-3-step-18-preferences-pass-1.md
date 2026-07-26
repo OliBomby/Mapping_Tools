@@ -27,7 +27,16 @@ than the legacy minimum.
 Like the WPF `HintAssist.Hint` fields, every caption belongs to the Material
 text-field template. The Avalonia view supplies it through
 `TextFieldAssist.Label`; it does not place a separate `TextBlock` above a
-text box.
+text box. A shared application-level default for every non-outlined text box
+reduces the internal panel to 40 pixels, keeps floating captions gray except
+during validation, moves captions away from entered text, and moves entered
+text closer to the underline. Preferences uses eight-pixel gaps between
+these fields, producing the same 48-pixel line rhythm as the legacy view.
+
+The same shared field style is also used by the reusable value-entry dialog
+and automatically applies to ordinary text boxes in future views. The shell
+search field remains intentionally separate because it uses an outlined
+search treatment.
 
 QuickRun hotkeys and smart targets, QuickUndo, BetterSave, AutoReload,
 Always QuickRun, and the BetterSave override remain Wave 3 step 20. They are
@@ -44,8 +53,11 @@ Path fields reject blank values without replacing the last usable setting.
 The retained-backup limit accepts 1 through 100000. The periodic interval uses
 the invariant constant format, displays `hh:mm:ss` for ordinary intervals,
 and rejects malformed values and intervals below one second. Invalid edits
-remain visible for correction, show an inline explanation, and do not reach
-the shared settings document.
+remain visible for correction and do not reach the shared settings document.
+The view models expose corrections through `INotifyDataErrorInfo`, allowing
+Material.Avalonia's own `DataValidationErrors` element inside each text-field
+template to render the red caption, underline, and explanation. There are no
+separate validation text blocks in Preferences or the reusable value dialog.
 
 Picker cancellation leaves both the field and persisted document unchanged.
 Picker and save failures are caught by the view model and published through
@@ -72,7 +84,7 @@ table rules with matching light and dark resources.
 valid and blank paths; valid and invalid backup limits and intervals; live
 periodic-policy changes; light-theme application and persistence; selected
 folders; cancelled config selection; legacy/default settings loading; theme
-JSON round trips; DI registration; and the existing shell behavior. All 131
+JSON round trips; DI registration; and the existing shell behavior. All 132
 platform tests pass. All 3 architecture tests pass.
 
 Both frontends build. The Avalonia Release project builds with zero warnings
@@ -88,25 +100,38 @@ The following captures were opened and inspected:
 - `artifacts/view-renders/wave3-step18-shell-preferences-light.png`
 - `artifacts/view-renders/wave3-step18-preferences-invalid.png`
 - `artifacts/view-renders/wave3-step18-preferences-periodic-off.png`
+- `artifacts/view-renders/wave3-step18-preferences-avalonia-native.png`
+- `artifacts/view-renders/wave3-step18-value-dialog.png`
+- `artifacts/view-renders/wave3-step18-value-dialog-invalid.png`
 
-The dark isolated render aligns the shared pass-1 field widths, underlines,
-labels, path icons, checkbox order, interval placement, type scale, and
-palette with the legacy view. The light isolated and full-shell renders prove
-that text, fields, navigation, migrated content, dividers, and selection
-feedback all switch together. The legacy reference also contains the
-step-20-only controls between Editor Reader and the theme switch; their
-absence and the resulting earlier theme-switch position are the planned
-pass boundary, not a redesign of migrated controls.
+The WPF designer-host capture is useful for the page hierarchy but renders
+floating hints over their values, unlike the running WPF control. Text-field
+internals were therefore compared against the legacy XAML's
+`MaterialDesignFloatingHintTextBox` plus a native WPF reference crop, rather
+than treating that renderer artifact as the target. The Avalonia isolated and
+native-window captures agree on the corrected caption/value/underline
+spacing, field widths, path icons, checkbox order, interval placement, type
+scale, and palette. The light isolated and full-shell renders prove that text,
+fields, navigation, migrated content, dividers, and selection feedback all
+switch together. The legacy reference also contains the step-20-only controls
+between Editor Reader and the theme switch; their absence and the resulting
+earlier theme-switch position are the planned pass boundary, not a redesign
+of migrated controls.
 
 The invalid-state capture verifies visible corrections without replacing the
 last valid shared settings. The periodic-off capture verifies unchecked
 feedback and removal of the dependent interval field without leaving a layout
 hole.
 
-Native dialogs are outside deterministic image rendering. Preferences uses
-the already tested Avalonia storage-provider adapter; focused view-model tests
-cover selected and cancelled results without opening a user-profile-dependent
-dialog.
+The native-window capture was taken from the Release application after
+selecting Preferences through UI Automation. Its field density, underlines,
+widths, and placement match the Avalonia headless capture; the renderer is
+therefore representative for this static layout. Native dialogs remain
+outside deterministic image rendering.
+
+Preferences uses the already tested Avalonia storage-provider adapter;
+focused view-model tests cover selected and cancelled results without opening
+a user-profile-dependent dialog.
 
 ## Documentation consulted
 

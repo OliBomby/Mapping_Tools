@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.ViewModels.Dialogs"
+        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         x:Class="Mapping_Tools.Desktop.Views.Dialogs.ValueDialogWindow"
         x:DataType="vm:ValueDialogViewModel"
         Title="{Binding Title}"
@@ -47,20 +48,14 @@
           Margin="0"
           HorizontalAlignment="Left"
           VerticalAlignment="Top"
-          RowDefinitions="Auto,Auto,Auto">
+          RowDefinitions="Auto,Auto">
         <TextBox x:Name="ValueTextBox"
                  Margin="16,16,16,0"
                  FontSize="18"
                  FontWeight="Medium"
-                 PlaceholderText="{Binding Prompt}"
+                 materialAssists:TextFieldAssist.Label="{Binding Prompt}"
                  Text="{Binding Text, Mode=TwoWay}" />
-        <TextBlock Grid.Row="1"
-                   Margin="16,6,16,0"
-                   Foreground="#FFF44336"
-                   IsVisible="{Binding HasError}"
-                   Text="{Binding ErrorMessage}"
-                   TextWrapping="Wrap" />
-        <StackPanel Grid.Row="2"
+        <StackPanel Grid.Row="1"
                     Margin="16,16,16,16"
                     HorizontalAlignment="Left"
                     Orientation="Horizontal"

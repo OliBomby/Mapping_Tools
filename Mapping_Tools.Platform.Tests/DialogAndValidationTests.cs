@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Mapping_Tools.ApplicationServices.Interactions;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -166,6 +167,12 @@ public sealed class DialogAndValidationTests
         // Assert
         viewModel.IsValid.Should().BeFalse();
         viewModel.ErrorMessage.Should().Be("Enter a whole number.");
+        INotifyDataErrorInfo validation = viewModel;
+        validation.HasErrors.Should().BeTrue();
+        validation.GetErrors(nameof(ValueDialogViewModel.Text))
+            .Cast<string>()
+            .Should()
+            .Equal("Enter a whole number.");
         acceptCount.Should().Be(0);
     }
 

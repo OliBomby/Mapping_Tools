@@ -23,6 +23,7 @@
                     <SolidColorBrush x:Key="MappingToolsSelectionHover" Color="#29FFFFFF" />
                     <SolidColorBrush x:Key="MappingToolsDivider" Color="#3E3E3E" />
                     <SolidColorBrush x:Key="MappingToolsTableRule" Color="#494949" />
+                    <SolidColorBrush x:Key="MappingToolsTextFieldLabel" Color="#B0B0B0" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="MappingToolsBackground" Color="#FAFAFA" />
@@ -33,6 +34,7 @@
                     <SolidColorBrush x:Key="MappingToolsSelectionHover" Color="#29000000" />
                     <SolidColorBrush x:Key="MappingToolsDivider" Color="#D5D5D5" />
                     <SolidColorBrush x:Key="MappingToolsTableRule" Color="#CCCCCC" />
+                    <SolidColorBrush x:Key="MappingToolsTextFieldLabel" Color="#757575" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
@@ -43,6 +45,31 @@
                                 PrimaryColor="Blue"
                                 SecondaryColor="Lime" />
         <materialIcons:MaterialIconStyles />
+        <Style Selector="TextBox:not(.outline) /template/ Panel#PART_TextFieldPanel">
+            <Setter Property="MinHeight" Value="40" />
+        </Style>
+        <Style Selector="TextBox:not(.outline):empty:not(:focus-within) /template/ Border#PART_LabelRootBorder">
+            <Setter Property="Margin" Value="0,16,1,1" />
+            <Setter Property="RenderTransform" Value="scale(1)" />
+        </Style>
+        <Style Selector="TextBox:not(.outline):focus-within:not(:empty) /template/ Border#PART_LabelRootBorder,
+                         TextBox:not(.outline):focus-within /template/ Border#PART_LabelRootBorder,
+                         TextBox:not(.outline):not(:empty) /template/ Border#PART_LabelRootBorder">
+            <Setter Property="Margin" Value="0,4,1,1" />
+            <Setter Property="RenderTransform" Value="scale(0.75)" />
+        </Style>
+        <Style Selector="TextBox:not(.outline) /template/ TextBlock#PART_LabelText">
+            <Setter Property="Foreground" Value="{DynamicResource MappingToolsTextFieldLabel}" />
+        </Style>
+        <Style Selector="TextBox:not(.outline):focus-within /template/ TextBlock#PART_LabelText">
+            <Setter Property="Foreground" Value="#2196F3" />
+        </Style>
+        <Style Selector="TextBox:not(.outline):error /template/ TextBlock#PART_LabelText">
+            <Setter Property="Foreground" Value="{DynamicResource MaterialValidationErrorBrush}" />
+        </Style>
+        <Style Selector="TextBox:not(.outline) /template/ DataValidationErrors#PART_DataValidation /template/ ContentControl#PART_ErrorPresenter">
+            <Setter Property="Margin" Value="0,2,0,0" />
+        </Style>
         <Style Selector="MenuItem:not(.Menu):not(:separator)">
             <Setter Property="Height" Value="32" />
             <Setter Property="MinHeight" Value="32" />

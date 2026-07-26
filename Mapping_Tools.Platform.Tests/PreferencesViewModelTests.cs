@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using FluentAssertions;
 using Mapping_Tools.ApplicationServices.Execution;
 using Mapping_Tools.ApplicationServices.Platform;
@@ -46,6 +47,43 @@ public sealed class PreferencesViewModelTests
         viewModel.OsuPathError.Should().Be("Select a path.");
         settings.OsuPath.Should().Be(@"C:\osu!");
         persistence.SaveCount.Should().Be(0);
+    }
+
+    [TestMethod]
+    public void OsuPath_WithInvalidThenValidText_UpdatesBindingValidationErrors()
+    {
+        // Arrange
+        ApplicationSettings settings = CreateSettings();
+        RecordingSettingsService persistence = new();
+        PreferencesViewModel viewModel = CreateViewModel(settings, persistence);
+        INotifyDataErrorInfo validation = viewModel;
+        List<string?> changedProperties = [];
+        validation.ErrorsChanged += (_, eventArgs) =>
+            changedProperties.Add(eventArgs.PropertyName);
+
+        // Act
+        viewModel.OsuPath = string.Empty;
+
+        // Assert
+        validation.HasErrors.Should().BeTrue();
+        validation.GetErrors(nameof(PreferencesViewModel.OsuPath))
+            .Cast<string>()
+            .Should()
+            .Equal("Select a path.");
+        changedProperties.Should().Equal(nameof(PreferencesViewModel.OsuPath));
+
+        // Act
+        viewModel.OsuPath = @"D:\Games\osu!";
+
+        // Assert
+        validation.HasErrors.Should().BeFalse();
+        validation.GetErrors(nameof(PreferencesViewModel.OsuPath))
+            .Cast<string>()
+            .Should()
+            .BeEmpty();
+        changedProperties.Should().Equal(
+            nameof(PreferencesViewModel.OsuPath),
+            nameof(PreferencesViewModel.OsuPath));
     }
 
     [TestMethod]

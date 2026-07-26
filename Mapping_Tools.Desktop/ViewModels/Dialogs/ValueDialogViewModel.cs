@@ -1,3 +1,5 @@
+using System.Collections;
+using System.ComponentModel;
 using System.Windows.Input;
 using ReactiveUI;
 
@@ -6,7 +8,7 @@ namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 /// <summary>
 /// Holds an erased typed value and its validation status for the reusable field dialog.
 /// </summary>
-public sealed class ValueDialogViewModel : ViewModelBase
+public sealed class ValueDialogViewModel : ViewModelBase, INotifyDataErrorInfo
 {
     private readonly Func<string?, ValueInputEvaluation> _evaluate;
     private readonly Action<object?> _accept;
@@ -14,6 +16,12 @@ public sealed class ValueDialogViewModel : ViewModelBase
     private string? _errorMessage;
     private bool _isValid;
     private object? _parsedValue;
+
+    /// <summary>
+    /// Notifies the bound field when parsing or validation changes so its
+    /// Material template can present the current correction.
+    /// </summary>
+    public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
     /// <summary>
     /// Creates editable dialog state and immediately validates the formatted initial text.
@@ -85,7 +93,19 @@ public sealed class ValueDialogViewModel : ViewModelBase
     public string? ErrorMessage
     {
         get => _errorMessage;
-        private set => this.RaiseAndSetIfChanged(ref _errorMessage, value);
+        private set
+        {
+            if (_errorMessage == value)
+            {
+                return;
+            }
+
+            this.RaiseAndSetIfChanged(ref _errorMessage, value);
+            this.RaisePropertyChanged(nameof(HasErrors));
+            ErrorsChanged?.Invoke(
+                this,
+                new DataErrorsChangedEventArgs(nameof(Text)));
+        }
     }
 
     /// <summary>
@@ -105,6 +125,35 @@ public sealed class ValueDialogViewModel : ViewModelBase
     /// Gets whether correction text should occupy space below the field.
     /// </summary>
     public bool HasError => !IsValid;
+
+    /// <summary>
+    /// Gets whether the editable representation currently fails parsing or
+    /// one of the dialog request's validation rules.
+    /// </summary>
+    public bool HasErrors => ErrorMessage is not null;
+
+    /// <summary>
+    /// Returns the correction associated with <see cref="Text"/> for
+    /// Avalonia's binding-validation pipeline.
+    /// </summary>
+    /// <param name="propertyName">
+    /// The requested property, or an empty value for all dialog errors.
+    /// </param>
+    /// <returns>
+    /// An empty snapshot when valid; otherwise the single current correction.
+    /// </returns>
+    public IEnumerable GetErrors(string? propertyName)
+    {
+        if (!string.IsNullOrEmpty(propertyName)
+            && propertyName != nameof(Text))
+        {
+            return Array.Empty<string>();
+        }
+
+        return ErrorMessage is null
+            ? Array.Empty<string>()
+            : new[] { ErrorMessage };
+    }
 
     /// <summary>
     /// Gets the label for the Enter/default action.

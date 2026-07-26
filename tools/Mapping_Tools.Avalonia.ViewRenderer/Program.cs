@@ -43,7 +43,7 @@ Control view = options.View switch
     },
     "PreferencesView" => CreatePreferencesView(options.Scenario),
     "MessageDialogWindow" => CreateMessageDialog(),
-    "ValueDialogWindow" => CreateValueDialog(),
+    "ValueDialogWindow" => CreateValueDialog(options.Scenario),
     _ => CreateParameterlessView(options.View),
 };
 var host = view as Window ?? new Window { Content = view };
@@ -80,17 +80,23 @@ static MessageDialogWindow CreateMessageDialog()
     };
 }
 
-static ValueDialogWindow CreateValueDialog()
+static ValueDialogWindow CreateValueDialog(string scenario)
 {
+    bool invalid = scenario.Equals("invalid", StringComparison.OrdinalIgnoreCase);
     return new ValueDialogWindow
     {
         DataContext = new ValueDialogViewModel(
             "Type value",
             "Value",
-            string.Empty,
+            invalid ? "not-a-number" : "1000",
             "ACCEPT",
             "CANCEL",
-            text => new ValueInputEvaluation(true, text, null),
+            text => invalid
+                ? new ValueInputEvaluation(
+                    false,
+                    null,
+                    "Enter a whole number.")
+                : new ValueInputEvaluation(true, text, null),
             _ => { },
             () => { })
     };

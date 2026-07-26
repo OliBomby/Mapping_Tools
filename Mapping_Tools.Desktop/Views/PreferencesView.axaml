@@ -15,23 +15,15 @@
              FontSize="14"
              FontWeight="Normal">
     <UserControl.Styles>
-        <Style Selector="TextBox.preference-field">
-            <Setter Property="MinHeight" Value="48" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-        </Style>
         <Style Selector="Button.path-picker">
-            <Setter Property="Width" Value="48" />
-            <Setter Property="Height" Value="48" />
-            <Setter Property="MinWidth" Value="48" />
-            <Setter Property="MinHeight" Value="48" />
-            <Setter Property="Padding" Value="9" />
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="MinWidth" Value="40" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="#2196F3" />
-        </Style>
-        <Style Selector="TextBlock.validation-error">
-            <Setter Property="Margin" Value="0,2,53,0" />
-            <Setter Property="Foreground" Value="#EF5350" />
-            <Setter Property="FontSize" Value="12" />
         </Style>
         <Style Selector="CheckBox.preference-check">
             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -52,8 +44,7 @@
 
             <Grid Margin="0,20,0,0"
                   ColumnDefinitions="*,Auto">
-                <TextBox Classes="preference-field"
-                         MinWidth="220"
+                <TextBox MinWidth="220"
                          Margin="0,0,5,0"
                          materialAssists:TextFieldAssist.Label="osu! folder"
                          Text="{Binding OsuPath, Mode=TwoWay}"
@@ -68,14 +59,10 @@
                                                 Height="30" />
                 </Button>
             </Grid>
-            <TextBlock Classes="validation-error"
-                       Text="{Binding OsuPathError}"
-                       IsVisible="{Binding HasOsuPathError}" />
 
-            <Grid Margin="0,10,0,0"
+            <Grid Margin="0,8,0,0"
                   ColumnDefinitions="*,Auto">
-                <TextBox Classes="preference-field"
-                         MinWidth="220"
+                <TextBox MinWidth="220"
                          Margin="0,0,5,0"
                          materialAssists:TextFieldAssist.Label="Songs folder"
                          Text="{Binding SongsPath, Mode=TwoWay}"
@@ -90,14 +77,10 @@
                                                 Height="30" />
                 </Button>
             </Grid>
-            <TextBlock Classes="validation-error"
-                       Text="{Binding SongsPathError}"
-                       IsVisible="{Binding HasSongsPathError}" />
 
-            <Grid Margin="0,10,0,0"
+            <Grid Margin="0,8,0,0"
                   ColumnDefinitions="*,Auto">
-                <TextBox Classes="preference-field"
-                         MinWidth="220"
+                <TextBox MinWidth="220"
                          Margin="0,0,5,0"
                          materialAssists:TextFieldAssist.Label="osu! user config file"
                          Text="{Binding OsuConfigPath, Mode=TwoWay}"
@@ -112,14 +95,10 @@
                                                 Height="30" />
                 </Button>
             </Grid>
-            <TextBlock Classes="validation-error"
-                       Text="{Binding OsuConfigPathError}"
-                       IsVisible="{Binding HasOsuConfigPathError}" />
 
-            <Grid Margin="0,10,0,0"
+            <Grid Margin="0,8,0,0"
                   ColumnDefinitions="*,Auto">
-                <TextBox Classes="preference-field"
-                         MinWidth="220"
+                <TextBox MinWidth="220"
                          Margin="0,0,5,0"
                          materialAssists:TextFieldAssist.Label="Backups folder"
                          Text="{Binding BackupsPath, Mode=TwoWay}"
@@ -134,23 +113,15 @@
                                                 Height="30" />
                 </Button>
             </Grid>
-            <TextBlock Classes="validation-error"
-                       Text="{Binding BackupsPathError}"
-                       IsVisible="{Binding HasBackupsPathError}" />
 
-            <Grid Width="150"
-                  Margin="0,10,0,0"
-                  HorizontalAlignment="Left">
-                <TextBox Classes="preference-field"
-                         materialAssists:TextFieldAssist.Label="Max backup files"
-                         Text="{Binding MaxBackupFilesText, Mode=TwoWay}"
-                         ToolTip.Tip="Select the maximum number of backup files. The oldest beatmap backups are removed when the folder exceeds this limit." />
-            </Grid>
-            <TextBlock Classes="validation-error"
-                       Text="{Binding MaxBackupFilesError}"
-                       IsVisible="{Binding HasMaxBackupFilesError}" />
+            <TextBox Width="150"
+                     Margin="0,8,0,0"
+                     HorizontalAlignment="Left"
+                     materialAssists:TextFieldAssist.Label="Max backup files"
+                     Text="{Binding MaxBackupFilesText, Mode=TwoWay}"
+                     ToolTip.Tip="Select the maximum number of backup files. The oldest beatmap backups are removed when the folder exceeds this limit." />
 
-            <StackPanel Margin="5,10,0,0">
+            <StackPanel Margin="5,8,0,0">
                 <CheckBox Classes="preference-check"
                           Content="Make automatic backups"
                           IsChecked="{Binding MakeBackups, Mode=TwoWay}"
@@ -160,19 +131,14 @@
                               Content="Make periodic backups"
                               IsChecked="{Binding MakePeriodicBackups, Mode=TwoWay}"
                               ToolTip.Tip="Periodically back up changed beatmaps while the editor is open." />
-                    <Grid Width="150"
-                          Margin="20,0,0,0"
-                          IsVisible="{Binding MakePeriodicBackups}">
-                        <TextBox Classes="preference-field"
-                                 materialAssists:TextFieldAssist.Label="Backup interval"
-                                 Text="{Binding PeriodicBackupIntervalText, Mode=TwoWay}"
-                                 ToolTip.Tip="The time between automatic periodic backups, in hh:mm:ss format." />
-                    </Grid>
+                    <TextBox Width="150"
+                             Margin="20,0,0,0"
+                             HorizontalAlignment="Left"
+                             IsVisible="{Binding MakePeriodicBackups}"
+                             materialAssists:TextFieldAssist.Label="Backup interval"
+                             Text="{Binding PeriodicBackupIntervalText, Mode=TwoWay}"
+                             ToolTip.Tip="The time between automatic periodic backups, in hh:mm:ss format." />
                 </StackPanel>
-                <TextBlock Classes="validation-error"
-                           Margin="208,2,0,0"
-                           Text="{Binding PeriodicBackupIntervalError}"
-                           IsVisible="{Binding HasPeriodicBackupIntervalError}" />
                 <CheckBox Classes="preference-check"
                           Content="Current beatmap default folder in all tools"
                           IsChecked="{Binding CurrentBeatmapDefaultFolder, Mode=TwoWay}"

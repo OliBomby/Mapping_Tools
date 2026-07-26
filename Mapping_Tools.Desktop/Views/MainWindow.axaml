@@ -366,10 +366,6 @@
                                  PlaceholderText="Search"
                                  Text="{Binding SearchText, Mode=TwoWay}"
                                  ToolTip.Tip="Search registered features">
-                            <TextBox.Resources>
-                                <SolidColorBrush x:Key="MaterialTextBoxBorderBrush"
-                                                 Color="#C9C9C9" />
-                            </TextBox.Resources>
                         </TextBox>
 
                         <ListBox Classes="navigation-list"
