@@ -25,8 +25,8 @@ public sealed class PreferencesViewModelTests
 
         // Assert
         viewModel.OsuPath.Should().Be(@"C:\osu!");
-        viewModel.MaxBackupFilesText.Should().Be("25");
-        viewModel.PeriodicBackupIntervalText.Should().Be("00:05:00");
+        viewModel.MaxBackupFiles.Should().Be(25);
+        viewModel.PeriodicBackupInterval.Should().Be(TimeSpan.FromMinutes(5));
         viewModel.IsDarkTheme.Should().BeTrue();
         persistence.SaveCount.Should().Be(0);
     }
@@ -108,7 +108,7 @@ public sealed class PreferencesViewModelTests
     }
 
     [TestMethod]
-    public void MaxBackupFilesText_WithInvalidThenValidText_OnlyPersistsValidValue()
+    public void MaxBackupFiles_WithOutOfRangeThenValidValue_OnlyPersistsValidValue()
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
@@ -116,11 +116,11 @@ public sealed class PreferencesViewModelTests
         PreferencesViewModel viewModel = CreateViewModel(settings, persistence);
 
         // Act
-        viewModel.MaxBackupFilesText = "0";
+        viewModel.MaxBackupFiles = 0;
 
         // Assert
         INotifyDataErrorInfo validation = viewModel;
-        validation.GetErrors(nameof(PreferencesViewModel.MaxBackupFilesText))
+        validation.GetErrors(nameof(PreferencesViewModel.MaxBackupFiles))
             .Cast<string>()
             .Should()
             .Equal("Use a whole number from 1 through 100000.");
@@ -128,10 +128,10 @@ public sealed class PreferencesViewModelTests
         persistence.SaveCount.Should().Be(0);
 
         // Act
-        viewModel.MaxBackupFilesText = "500";
+        viewModel.MaxBackupFiles = 500;
 
         // Assert
-        validation.GetErrors(nameof(PreferencesViewModel.MaxBackupFilesText))
+        validation.GetErrors(nameof(PreferencesViewModel.MaxBackupFiles))
             .Cast<string>()
             .Should()
             .BeEmpty();
@@ -140,7 +140,7 @@ public sealed class PreferencesViewModelTests
     }
 
     [TestMethod]
-    public void PeriodicBackupIntervalText_WithInvalidThenValidText_OnlyPersistsValidInterval()
+    public void PeriodicBackupInterval_WithTooShortThenValidValue_OnlyPersistsValidInterval()
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
@@ -148,22 +148,22 @@ public sealed class PreferencesViewModelTests
         PreferencesViewModel viewModel = CreateViewModel(settings, persistence);
 
         // Act
-        viewModel.PeriodicBackupIntervalText = "soon";
+        viewModel.PeriodicBackupInterval = TimeSpan.Zero;
 
         // Assert
         INotifyDataErrorInfo validation = viewModel;
-        validation.GetErrors(nameof(PreferencesViewModel.PeriodicBackupIntervalText))
+        validation.GetErrors(nameof(PreferencesViewModel.PeriodicBackupInterval))
             .Cast<string>()
             .Should()
-            .Equal("Use the format hh:mm:ss, for example 00:10:00.");
+            .Equal("Use an interval of at least one second.");
         settings.PeriodicBackupInterval.Should().Be(TimeSpan.FromMinutes(5));
         persistence.SaveCount.Should().Be(0);
 
         // Act
-        viewModel.PeriodicBackupIntervalText = "00:15:00";
+        viewModel.PeriodicBackupInterval = TimeSpan.FromMinutes(15);
 
         // Assert
-        validation.GetErrors(nameof(PreferencesViewModel.PeriodicBackupIntervalText))
+        validation.GetErrors(nameof(PreferencesViewModel.PeriodicBackupInterval))
             .Cast<string>()
             .Should()
             .BeEmpty();

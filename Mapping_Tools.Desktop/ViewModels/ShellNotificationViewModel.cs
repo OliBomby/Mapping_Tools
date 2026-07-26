@@ -1,4 +1,3 @@
-using Avalonia.Media;
 using Mapping_Tools.ApplicationServices.Execution;
 using ReactiveUI;
 
@@ -29,20 +28,8 @@ public sealed class ShellNotificationViewModel : ViewModelBase
     /// <summary>Gets the notification body.</summary>
     public string Message { get; }
 
-    /// <summary>Gets the uppercase severity label shown to every visual theme.</summary>
-    public string SeverityLabel => Severity.ToString().ToUpperInvariant();
-
     /// <summary>Gets the compact legacy-snackbar text.</summary>
     public string DisplayText => $"{Title}: {Message}";
-
-    /// <summary>Gets the severity-specific accent used by the notification surface.</summary>
-    public IBrush AccentBrush => Severity switch
-    {
-        UserNotificationSeverity.Success => Brushes.LimeGreen,
-        UserNotificationSeverity.Warning => Brushes.Orange,
-        UserNotificationSeverity.Error => Brushes.IndianRed,
-        _ => Brushes.CornflowerBlue
-    };
 
     /// <summary>Gets the command that removes this notification from the queue.</summary>
     public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> DismissCommand { get; }

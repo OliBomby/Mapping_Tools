@@ -1,6 +1,4 @@
-using System.Collections;
-using System.ComponentModel;
-using System.Globalization;
+using System.ComponentModel.DataAnnotations;
 using Mapping_Tools.ApplicationServices.Execution;
 using Mapping_Tools.ApplicationServices.Interactions;
 using Mapping_Tools.ApplicationServices.Platform;
@@ -14,15 +12,8 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// Edits the first Preferences migration slice and persists each valid change
 /// without exposing Avalonia controls or storage-provider objects.
 /// </summary>
-public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
+public sealed class PreferencesViewModel : ViewModelBase
 {
-    private static readonly IValueValidator<string> RequiredPath =
-        ValueValidators.RequiredText("Select a path.");
-    private static readonly IValueValidator<int> BackupCount =
-        ValueValidators.InclusiveRange(
-            1,
-            100_000,
-            "Use a whole number from 1 through 100000.");
     private static readonly FilePickerFilter OsuConfigurationFilter = new(
         "osu! user configuration",
         ["osu!.*.cfg"]);
@@ -32,19 +23,12 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
     private readonly IFilePicker _filePicker;
     private readonly IApplicationThemeService _themeService;
     private readonly IUserNotificationService _notifications;
-    private readonly Dictionary<string, string> _validationErrors =
-        new(StringComparer.Ordinal);
     private string _osuPath;
     private string _songsPath;
     private string _osuConfigPath;
     private string _backupsPath;
-    private string _maxBackupFilesText;
-    private string _periodicBackupIntervalText;
-    /// <summary>
-    /// Notifies Avalonia when a property-level correction is added, replaced,
-    /// or cleared so the owning input control can update its validation state.
-    /// </summary>
-    public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+    private int _maxBackupFiles;
+    private TimeSpan _periodicBackupInterval;
 
     /// <summary>
     /// Creates an editor over the process-lifetime settings document.
@@ -71,8 +55,8 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
         _songsPath = settings.SongsPath;
         _osuConfigPath = settings.OsuConfigPath;
         _backupsPath = settings.BackupsPath;
-        _maxBackupFilesText = settings.MaxBackupFiles.ToString(CultureInfo.InvariantCulture);
-        _periodicBackupIntervalText = settings.PeriodicBackupInterval.ToString("c", CultureInfo.InvariantCulture);
+        _maxBackupFiles = settings.MaxBackupFiles;
+        _periodicBackupInterval = settings.PeriodicBackupInterval;
 
         BrowseOsuPathCommand = ReactiveCommand.CreateFromTask(
             () => PickFolderAsync(
@@ -93,6 +77,7 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
     }
 
     /// <summary>Gets or edits the directory containing the osu! executable.</summary>
+    [RequiredText(ErrorMessage = "Select a path.")]
     public string OsuPath
     {
         get => _osuPath;
@@ -104,6 +89,7 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
     }
 
     /// <summary>Gets or edits osu!'s beatmap-library directory.</summary>
+    [RequiredText(ErrorMessage = "Select a path.")]
     public string SongsPath
     {
         get => _songsPath;
@@ -115,6 +101,7 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
     }
 
     /// <summary>Gets or edits the current user's osu! configuration file.</summary>
+    [RequiredText(ErrorMessage = "Select a path.")]
     public string OsuConfigPath
     {
         get => _osuConfigPath;
@@ -126,6 +113,7 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
     }
 
     /// <summary>Gets or edits the directory that receives beatmap backups.</summary>
+    [RequiredText(ErrorMessage = "Select a path.")]
     public string BackupsPath
     {
         get => _backupsPath;
@@ -136,79 +124,50 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
             nameof(BackupsPath));
     }
 
-    /// <summary>Gets editable invariant text for the retained-backup limit.</summary>
-    public string MaxBackupFilesText
+    /// <summary>Gets or edits the retained-backup limit as a typed count.</summary>
+    [Range(
+        1,
+        100_000,
+        ErrorMessage = "Use a whole number from 1 through 100000.")]
+    public int MaxBackupFiles
     {
-        get => _maxBackupFilesText;
+        get => _maxBackupFiles;
         set
         {
-            string normalized = value ?? string.Empty;
-            if (_maxBackupFilesText == normalized)
+            if (_maxBackupFiles == value)
             {
                 return;
             }
 
-            this.RaiseAndSetIfChanged(ref _maxBackupFilesText, normalized);
-            if (!TextValueConverters.InvariantInt32.TryConvert(
-                    normalized,
-                    out int count,
-                    out string? conversionError))
+            this.RaiseAndSetIfChanged(ref _maxBackupFiles, value);
+            if (ValidateProperty(value))
             {
-                SetValidationError(
-                    nameof(MaxBackupFilesText),
-                    conversionError);
-                return;
-            }
-
-            ValidationOutcome outcome = BackupCount.Validate(count);
-            SetValidationError(
-                nameof(MaxBackupFilesText),
-                outcome.ErrorMessage);
-            if (outcome.IsValid)
-            {
-                _settings.MaxBackupFiles = count;
+                _settings.MaxBackupFiles = value;
                 Persist();
             }
         }
     }
 
-    /// <summary>Gets editable constant-format text for the periodic-backup interval.</summary>
-    public string PeriodicBackupIntervalText
+    /// <summary>Gets or edits the periodic-backup interval as a typed duration.</summary>
+    [MinimumTimeSpan(
+        "00:00:01",
+        ErrorMessage = "Use an interval of at least one second.")]
+    public TimeSpan PeriodicBackupInterval
     {
-        get => _periodicBackupIntervalText;
+        get => _periodicBackupInterval;
         set
         {
-            string normalized = value ?? string.Empty;
-            if (_periodicBackupIntervalText == normalized)
+            if (_periodicBackupInterval == value)
             {
                 return;
             }
 
-            this.RaiseAndSetIfChanged(ref _periodicBackupIntervalText, normalized);
-            bool parsed = TimeSpan.TryParseExact(
-                normalized,
-                "c",
-                CultureInfo.InvariantCulture,
-                out TimeSpan interval);
-            if (!parsed)
+            this.RaiseAndSetIfChanged(ref _periodicBackupInterval, value);
+            if (ValidateProperty(value))
             {
-                SetValidationError(
-                    nameof(PeriodicBackupIntervalText),
-                    "Use the format hh:mm:ss, for example 00:10:00.");
-                return;
+                _settings.PeriodicBackupInterval = value;
+                Persist();
             }
-
-            if (interval < TimeSpan.FromSeconds(1))
-            {
-                SetValidationError(
-                    nameof(PeriodicBackupIntervalText),
-                    "Use an interval of at least one second.");
-                return;
-            }
-
-            SetValidationError(nameof(PeriodicBackupIntervalText), null);
-            _settings.PeriodicBackupInterval = interval;
-            Persist();
         }
     }
 
@@ -279,35 +238,6 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
         }
     }
 
-    /// <summary>
-    /// Gets whether any editable preference currently contains an invalid
-    /// value that has not been written to the shared settings document.
-    /// </summary>
-    public bool HasErrors => _validationErrors.Count > 0;
-
-    /// <summary>
-    /// Returns the current corrections for one bindable property, or all
-    /// corrections when <paramref name="propertyName"/> is empty.
-    /// </summary>
-    /// <param name="propertyName">
-    /// The view-model property whose bound control is requesting errors.
-    /// </param>
-    /// <returns>
-    /// A stable snapshot containing zero or one correction per editable
-    /// preference.
-    /// </returns>
-    public IEnumerable GetErrors(string? propertyName)
-    {
-        if (string.IsNullOrEmpty(propertyName))
-        {
-            return _validationErrors.Values.ToArray();
-        }
-
-        return _validationErrors.TryGetValue(propertyName, out string? error)
-            ? new[] { error }
-            : Array.Empty<string>();
-    }
-
     /// <summary>Gets the native folder-picker command for the osu! directory.</summary>
     public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> BrowseOsuPathCommand { get; }
 
@@ -333,46 +263,11 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
         }
 
         this.RaiseAndSetIfChanged(ref field, normalized, propertyName);
-        ValidationOutcome outcome = RequiredPath.Validate(normalized);
-        SetValidationError(propertyName, outcome.ErrorMessage);
-        if (outcome.IsValid)
+        if (ValidateProperty(normalized, propertyName))
         {
             apply(normalized);
             Persist();
         }
-    }
-
-    private void SetValidationError(
-        string propertyName,
-        string? error)
-    {
-        bool changed;
-        if (error is null)
-        {
-            changed = _validationErrors.Remove(propertyName);
-        }
-        else if (_validationErrors.TryGetValue(
-                     propertyName,
-                     out string? current)
-                 && current == error)
-        {
-            changed = false;
-        }
-        else
-        {
-            _validationErrors[propertyName] = error;
-            changed = true;
-        }
-
-        if (!changed)
-        {
-            return;
-        }
-
-        this.RaisePropertyChanged(nameof(HasErrors));
-        ErrorsChanged?.Invoke(
-            this,
-            new DataErrorsChangedEventArgs(propertyName));
     }
 
     private void SetBoolean(

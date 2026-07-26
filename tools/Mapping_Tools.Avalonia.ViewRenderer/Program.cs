@@ -3,10 +3,12 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Media.Imaging;
 using Mapping_Tools.ApplicationServices.Execution;
+using Mapping_Tools.ApplicationServices.Interactions;
 using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Settings;
 using Mapping_Tools.ApplicationServices.Workspace;
 using Mapping_Tools.Desktop;
+using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
@@ -83,23 +85,27 @@ static MessageDialogWindow CreateMessageDialog()
 static ValueDialogWindow CreateValueDialog(string scenario)
 {
     bool invalid = scenario.Equals("invalid", StringComparison.OrdinalIgnoreCase);
-    return new ValueDialogWindow
+    TextConversionState conversionState = new();
+    TextValueConverter<int> converter = new(
+        TextValueConverters.InvariantInt32,
+        conversionState);
+    ValueDialogWindow window = new()
     {
         DataContext = new ValueDialogViewModel(
             "Type value",
             "Value",
-            invalid ? "not-a-number" : "1000",
+            invalid ? 0 : 1000,
             "ACCEPT",
             "CANCEL",
-            text => invalid
-                ? new ValueInputEvaluation(
-                    false,
-                    null,
-                    "Enter a whole number.")
-                : new ValueInputEvaluation(true, text, null),
+            value => invalid
+                ? ValidationOutcome.Failure("Enter a whole number.")
+                : ValidationOutcome.Success,
+            conversionState,
             _ => { },
             () => { })
     };
+    window.BindValue(converter);
+    return window;
 }
 
 static MainViewModel CreateMainViewModel(string scenario)
@@ -219,8 +225,8 @@ static PreferencesViewModel CreatePreferencesViewModel(
     if (scenario.Equals("preferences-invalid", StringComparison.OrdinalIgnoreCase))
     {
         viewModel.OsuPath = string.Empty;
-        viewModel.MaxBackupFilesText = "0";
-        viewModel.PeriodicBackupIntervalText = "soon";
+        viewModel.MaxBackupFiles = 0;
+        viewModel.PeriodicBackupInterval = TimeSpan.Zero;
     }
     else if (scenario.Equals(
                  "preferences-periodic-off",

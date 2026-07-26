@@ -157,6 +157,11 @@ public static class TextValueConverters
     /// </summary>
     public static ITextValueConverter<int> InvariantInt32 { get; } = new InvariantInt32TextValueConverter();
 
+    /// <summary>
+    /// Gets a converter for durations in the invariant constant TimeSpan format.
+    /// </summary>
+    public static ITextValueConverter<TimeSpan> ConstantTimeSpan { get; } = new ConstantTimeSpanTextValueConverter();
+
     private sealed class StringTextValueConverter : ITextValueConverter<string>
     {
         public string Format(string value) => value ?? string.Empty;
@@ -197,6 +202,28 @@ public static class TextValueConverters
                 CultureInfo.InvariantCulture,
                 out value);
             errorMessage = converted ? null : "Enter a whole number.";
+            return converted;
+        }
+    }
+
+    private sealed class ConstantTimeSpanTextValueConverter : ITextValueConverter<TimeSpan>
+    {
+        public string Format(TimeSpan value) =>
+            value.ToString("c", CultureInfo.InvariantCulture);
+
+        public bool TryConvert(
+            string? text,
+            out TimeSpan value,
+            out string? errorMessage)
+        {
+            bool converted = TimeSpan.TryParseExact(
+                text,
+                "c",
+                CultureInfo.InvariantCulture,
+                out value);
+            errorMessage = converted
+                ? null
+                : "Use the format hh:mm:ss, for example 00:10:00.";
             return converted;
         }
     }

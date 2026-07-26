@@ -1,52 +1,48 @@
-using System.Collections;
-using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Windows.Input;
+using Mapping_Tools.ApplicationServices.Interactions;
+using Mapping_Tools.Desktop.Converters;
 using ReactiveUI;
 
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 
 /// <summary>
-/// Holds an erased typed value and its validation status for the reusable field dialog.
+/// Holds a type-erased value whose text conversion remains in the Avalonia binding.
 /// </summary>
-public sealed class ValueDialogViewModel : ViewModelBase, INotifyDataErrorInfo
+public sealed class ValueDialogViewModel : ViewModelBase
 {
-    private readonly Func<string?, ValueInputEvaluation> _evaluate;
+    private readonly Func<object?, ValidationOutcome> _validate;
     private readonly Action<object?> _accept;
-    private string _text;
-    private string? _errorMessage;
-    private bool _isValid;
-    private object? _parsedValue;
+    private readonly TextConversionState _conversionState;
+    private object? _value;
 
     /// <summary>
-    /// Notifies the bound field when parsing or validation changes so its
-    /// Material template can present the current correction.
-    /// </summary>
-    public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
-
-    /// <summary>
-    /// Creates editable dialog state and immediately validates the formatted initial text.
+    /// Creates typed dialog state and validates the initial value through DataAnnotations.
     /// </summary>
     /// <param name="title">The native window title.</param>
     /// <param name="prompt">The field instruction.</param>
-    /// <param name="initialText">The converter-formatted initial value.</param>
+    /// <param name="initialValue">The initial typed value before binding conversion.</param>
     /// <param name="acceptLabel">The Enter/default action label.</param>
     /// <param name="cancelLabel">The Escape/cancel action label.</param>
-    /// <param name="evaluate">The parser and ordered validation pipeline.</param>
+    /// <param name="validate">The typed application rules adapted to the erased value.</param>
+    /// <param name="conversionState">Tracks malformed text rejected by the binding converter.</param>
     /// <param name="accept">The callback receiving the validated, type-erased value.</param>
     /// <param name="cancel">The callback that closes the dialog without a value.</param>
     public ValueDialogViewModel(
         string title,
         string prompt,
-        string initialText,
+        object? initialValue,
         string acceptLabel,
         string cancelLabel,
-        Func<string?, ValueInputEvaluation> evaluate,
+        Func<object?, ValidationOutcome> validate,
+        TextConversionState conversionState,
         Action<object?> accept,
         Action cancel)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentException.ThrowIfNullOrWhiteSpace(prompt);
-        ArgumentNullException.ThrowIfNull(evaluate);
+        ArgumentNullException.ThrowIfNull(validate);
+        ArgumentNullException.ThrowIfNull(conversionState);
         ArgumentNullException.ThrowIfNull(accept);
         ArgumentNullException.ThrowIfNull(cancel);
 
@@ -54,12 +50,17 @@ public sealed class ValueDialogViewModel : ViewModelBase, INotifyDataErrorInfo
         Prompt = prompt;
         AcceptLabel = acceptLabel;
         CancelLabel = cancelLabel;
-        _text = initialText;
-        _evaluate = evaluate;
+        _value = initialValue;
+        _validate = validate;
+        _conversionState = conversionState;
         _accept = accept;
         AcceptCommand = ReactiveCommand.Create(Accept);
         CancelCommand = ReactiveCommand.Create(cancel);
-        Evaluate();
+
+        ErrorsChanged += (_, _) => this.RaisePropertyChanged(nameof(IsValid));
+        _conversionState.ErrorChanged += (_, _) =>
+            this.RaisePropertyChanged(nameof(IsValid));
+        ValidateProperty(_value, nameof(Value));
     }
 
     /// <summary>
@@ -73,60 +74,29 @@ public sealed class ValueDialogViewModel : ViewModelBase, INotifyDataErrorInfo
     public string Prompt { get; }
 
     /// <summary>
-    /// Gets or sets the editable representation and revalidates it immediately.
+    /// Gets or sets the typed value produced by the field's binding converter.
     /// </summary>
-    public string Text
+    [DialogValue]
+    public object? Value
     {
-        get => _text;
+        get => _value;
         set
         {
-            if (this.RaiseAndSetIfChanged(ref _text, value) is not null)
+            if (Equals(_value, value))
             {
-                Evaluate();
+                return;
             }
+
+            this.RaiseAndSetIfChanged(ref _value, value);
+            ValidateProperty(value);
+            this.RaisePropertyChanged(nameof(IsValid));
         }
     }
 
     /// <summary>
-    /// Gets whether the current text parsed and passed every validation rule.
+    /// Gets whether conversion and every DataAnnotations rule currently succeed.
     /// </summary>
-    public bool IsValid
-    {
-        get => _isValid;
-        private set
-        {
-            this.RaiseAndSetIfChanged(ref _isValid, value);
-        }
-    }
-
-    /// <summary>
-    /// Gets whether the editable representation currently fails parsing or
-    /// one of the dialog request's validation rules.
-    /// </summary>
-    public bool HasErrors => _errorMessage is not null;
-
-    /// <summary>
-    /// Returns the correction associated with <see cref="Text"/> for
-    /// Avalonia's binding-validation pipeline.
-    /// </summary>
-    /// <param name="propertyName">
-    /// The requested property, or an empty value for all dialog errors.
-    /// </param>
-    /// <returns>
-    /// An empty snapshot when valid; otherwise the single current correction.
-    /// </returns>
-    public IEnumerable GetErrors(string? propertyName)
-    {
-        if (!string.IsNullOrEmpty(propertyName)
-            && propertyName != nameof(Text))
-        {
-            return Array.Empty<string>();
-        }
-
-        return _errorMessage is null
-            ? Array.Empty<string>()
-            : new[] { _errorMessage };
-    }
+    public bool IsValid => !_conversionState.HasError && !HasErrors;
 
     /// <summary>
     /// Gets the label for the Enter/default action.
@@ -148,44 +118,46 @@ public sealed class ValueDialogViewModel : ViewModelBase, INotifyDataErrorInfo
     /// </summary>
     public ICommand CancelCommand { get; }
 
-    private void Evaluate()
-    {
-        ValueInputEvaluation result = _evaluate(Text);
-        _parsedValue = result.Value;
-        SetValidationError(result.ErrorMessage);
-        IsValid = result.IsValid;
-    }
-
-    private void SetValidationError(string? error)
-    {
-        if (_errorMessage == error)
-        {
-            return;
-        }
-
-        _errorMessage = error;
-        this.RaisePropertyChanged(nameof(HasErrors));
-        ErrorsChanged?.Invoke(
-            this,
-            new DataErrorsChangedEventArgs(nameof(Text)));
-    }
+    internal ValidationOutcome ValidateDialogValue(object? value) =>
+        _validate(value);
 
     private void Accept()
     {
-        if (IsValid)
+        bool annotationsAreValid = ValidateAllProperties();
+        this.RaisePropertyChanged(nameof(IsValid));
+        if (annotationsAreValid && !_conversionState.HasError)
         {
-            _accept(_parsedValue);
+            _accept(Value);
         }
     }
 }
 
-/// <summary>
-/// Transfers a type-erased parse result from a generic dialog request into presentation state.
-/// </summary>
-/// <param name="IsValid">Whether the value may be submitted.</param>
-/// <param name="Value">The parsed value when valid.</param>
-/// <param name="ErrorMessage">The first user-facing parsing or validation problem.</param>
-public readonly record struct ValueInputEvaluation(
-    bool IsValid,
-    object? Value,
-    string? ErrorMessage);
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+internal sealed class DialogValueAttribute : ValidationAttribute
+{
+    protected override ValidationResult? IsValid(
+        object? value,
+        ValidationContext validationContext)
+    {
+        if (validationContext.ObjectInstance is not ValueDialogViewModel viewModel)
+        {
+            return new ValidationResult(
+                "The dialog value validator is unavailable.",
+                validationContext.MemberName is null
+                    ? null
+                    : [validationContext.MemberName]);
+        }
+
+        ValidationOutcome outcome = viewModel.ValidateDialogValue(value);
+        if (outcome.IsValid)
+        {
+            return ValidationResult.Success;
+        }
+
+        return new ValidationResult(
+            outcome.ErrorMessage ?? "The value is invalid.",
+            validationContext.MemberName is null
+                ? null
+                : [validationContext.MemberName]);
+    }
+}

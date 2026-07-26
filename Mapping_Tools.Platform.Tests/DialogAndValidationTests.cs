@@ -1,5 +1,8 @@
 using System.ComponentModel;
+using System.Globalization;
+using Avalonia.Data;
 using Mapping_Tools.ApplicationServices.Interactions;
+using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -35,6 +38,60 @@ public sealed class DialogAndValidationTests
         // Assert
         converted.Should().BeFalse();
         error.Should().Contain("period");
+    }
+
+    [TestMethod]
+    public void Convert_InvariantInt32_ReturnsEditableText()
+    {
+        // Arrange
+        TextValueConverter<int> converter = new(
+            TextValueConverters.InvariantInt32);
+
+        // Act
+        object result = converter.Convert(
+            42,
+            typeof(string),
+            null,
+            CultureInfo.GetCultureInfo("nl-NL"));
+
+        // Assert
+        result.Should().Be("42");
+    }
+
+    [TestMethod]
+    public void ConvertBack_InvariantDouble_ReturnsTypedValue()
+    {
+        // Arrange
+        TextValueConverter<double> converter = new(
+            TextValueConverters.InvariantDouble);
+
+        // Act
+        object result = converter.ConvertBack(
+            "12.5",
+            typeof(double),
+            null,
+            CultureInfo.GetCultureInfo("nl-NL"));
+
+        // Assert
+        result.Should().Be(12.5);
+    }
+
+    [TestMethod]
+    public void ConvertBack_ConstantTimeSpan_ReturnsTypedDuration()
+    {
+        // Arrange
+        TextValueConverter<TimeSpan> converter = new(
+            TextValueConverters.ConstantTimeSpan);
+
+        // Act
+        object result = converter.ConvertBack(
+            "00:15:00",
+            typeof(TimeSpan),
+            null,
+            CultureInfo.InvariantCulture);
+
+        // Assert
+        result.Should().Be(TimeSpan.FromMinutes(15));
     }
 
     [TestMethod]
@@ -152,26 +209,33 @@ public sealed class DialogAndValidationTests
     }
 
     [TestMethod]
-    public void Text_ParsingFailure_DisablesAcceptanceAndShowsFormatError()
+    public void ConvertBack_ParsingFailure_DisablesDialogAcceptance()
     {
         // Arrange
         int acceptCount = 0;
+        TextConversionState conversionState = new();
+        TextValueConverter<int> converter = new(
+            TextValueConverters.InvariantInt32,
+            conversionState);
         ValueDialogViewModel viewModel = CreateValueViewModel(
-            _ => new ValueInputEvaluation(false, null, "Enter a whole number."),
+            _ => ValidationOutcome.Success,
+            conversionState,
             _ => acceptCount++);
 
         // Act
-        viewModel.Text = "not-a-number";
+        object result = converter.ConvertBack(
+            "not-a-number",
+            typeof(object),
+            null,
+            CultureInfo.InvariantCulture);
         viewModel.AcceptCommand.Execute(null);
 
         // Assert
-        viewModel.IsValid.Should().BeFalse();
-        INotifyDataErrorInfo validation = viewModel;
-        validation.HasErrors.Should().BeTrue();
-        validation.GetErrors(nameof(ValueDialogViewModel.Text))
-            .Cast<string>()
+        result.Should().BeOfType<BindingNotification>();
+        ((BindingNotification)result).ErrorType
             .Should()
-            .Equal("Enter a whole number.");
+            .Be(BindingErrorType.DataValidationError);
+        viewModel.IsValid.Should().BeFalse();
         acceptCount.Should().Be(0);
     }
 
@@ -180,12 +244,14 @@ public sealed class DialogAndValidationTests
     {
         // Arrange
         object? accepted = null;
+        TextConversionState conversionState = new();
         ValueDialogViewModel viewModel = CreateValueViewModel(
-            text => new ValueInputEvaluation(true, int.Parse(text!), null),
+            _ => ValidationOutcome.Success,
+            conversionState,
             value => accepted = value);
 
         // Act
-        viewModel.Text = "42";
+        viewModel.Value = 42;
         viewModel.AcceptCommand.Execute(null);
 
         // Assert
@@ -195,18 +261,47 @@ public sealed class DialogAndValidationTests
     }
 
     [TestMethod]
+    public void Value_RejectedByCustomAttribute_DisablesAcceptanceAndExposesError()
+    {
+        // Arrange
+        int acceptCount = 0;
+        TextConversionState conversionState = new();
+        ValueDialogViewModel viewModel = CreateValueViewModel(
+            value => (int)value! <= 60
+                ? ValidationOutcome.Success
+                : ValidationOutcome.Failure("Use 1 through 60."),
+            conversionState,
+            _ => acceptCount++);
+
+        // Act
+        viewModel.Value = 90;
+        viewModel.AcceptCommand.Execute(null);
+
+        // Assert
+        viewModel.IsValid.Should().BeFalse();
+        INotifyDataErrorInfo validation = viewModel;
+        validation.GetErrors(nameof(ValueDialogViewModel.Value))
+            .Cast<string>()
+            .Should()
+            .Equal("Use 1 through 60.");
+        acceptCount.Should().Be(0);
+    }
+
+    [TestMethod]
     public void CancelCommand_ValidValue_DismissesWithoutAcceptance()
     {
         // Arrange
         int acceptCount = 0;
         int cancelCount = 0;
+        TextConversionState conversionState = new();
         ValueDialogViewModel viewModel = new(
             "Type value",
             "Value",
-            "1",
+            1,
             "OK",
             "Cancel",
-            text => new ValueInputEvaluation(true, int.Parse(text!), null),
+            _ => ValidationOutcome.Success,
+            conversionState,
             _ => acceptCount++,
             () => cancelCount++);
 
@@ -239,16 +334,18 @@ public sealed class DialogAndValidationTests
     }
 
     private static ValueDialogViewModel CreateValueViewModel(
-        Func<string?, ValueInputEvaluation> evaluate,
+        Func<object?, ValidationOutcome> validate,
+        TextConversionState conversionState,
         Action<object?> accept)
     {
         return new ValueDialogViewModel(
             "Type value",
             "Value",
-            "0",
+            0,
             "OK",
             "Cancel",
-            evaluate,
+            validate,
+            conversionState,
             accept,
             () => { });
     }

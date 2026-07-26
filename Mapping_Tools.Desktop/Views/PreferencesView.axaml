@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+             xmlns:converters="using:Mapping_Tools.Desktop.Converters"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -118,7 +119,9 @@
                      Margin="0,8,0,0"
                      HorizontalAlignment="Left"
                      materialAssists:TextFieldAssist.Label="Max backup files"
-                     Text="{Binding MaxBackupFilesText, Mode=TwoWay}"
+                     Text="{Binding MaxBackupFiles,
+                                    Mode=TwoWay,
+                                    Converter={x:Static converters:DesktopValueConverters.InvariantInt32}}"
                      ToolTip.Tip="Select the maximum number of backup files. The oldest beatmap backups are removed when the folder exceeds this limit." />
 
             <StackPanel Margin="5,8,0,0">
@@ -136,7 +139,9 @@
                              HorizontalAlignment="Left"
                              IsVisible="{Binding MakePeriodicBackups}"
                              materialAssists:TextFieldAssist.Label="Backup interval"
-                             Text="{Binding PeriodicBackupIntervalText, Mode=TwoWay}"
+                             Text="{Binding PeriodicBackupInterval,
+                                            Mode=TwoWay,
+                                            Converter={x:Static converters:DesktopValueConverters.ConstantTimeSpan}}"
                              ToolTip.Tip="The time between automatic periodic backups, in hh:mm:ss format." />
                 </StackPanel>
                 <CheckBox Classes="preference-check"

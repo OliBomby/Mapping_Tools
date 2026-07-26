@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
 using Mapping_Tools.ApplicationServices.Interactions;
+using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Mapping_Tools.Desktop.Views.Dialogs;
 
@@ -78,16 +79,22 @@ public sealed class AvaloniaDialogService : IDialogService
         CancellationToken cancellationToken)
     {
         ValueDialogWindow window = new();
+        TextConversionState conversionState = new();
+        TextValueConverter<TValue> converter = new(
+            request.Converter,
+            conversionState);
         ValueDialogViewModel viewModel = new(
             request.Title,
             request.Prompt,
-            request.Converter.Format(request.InitialValue),
+            request.InitialValue,
             request.AcceptLabel,
             request.CancelLabel,
-            text => Evaluate(text, request),
+            value => Validate(value, request),
+            conversionState,
             value => window.Close(new ResultBox<TValue>((TValue)value!)),
             () => window.Close());
         window.DataContext = viewModel;
+        window.BindValue(converter);
 
         Task<object?> lifetime = window.ShowDialog<object?>(_owner());
         using CancellationTokenRegistration registration =
@@ -99,15 +106,31 @@ public sealed class AvaloniaDialogService : IDialogService
             : new ValueDialogResult<TValue>(false, default);
     }
 
-    private static ValueInputEvaluation Evaluate<TValue>(
-        string? text,
+    private static ValidationOutcome Validate<TValue>(
+        object? value,
         ValueDialogRequest<TValue> request)
     {
-        ValueEvaluation<TValue> evaluation = request.Evaluate(text);
-        return new ValueInputEvaluation(
-            evaluation.IsValid,
-            evaluation.Value,
-            evaluation.ErrorMessage);
+        TValue typedValue;
+        try
+        {
+            typedValue = (TValue)value!;
+        }
+        catch (InvalidCastException)
+        {
+            return ValidationOutcome.Failure(
+                "The converted value has an unexpected type.");
+        }
+
+        foreach (IValueValidator<TValue> validator in request.Validators)
+        {
+            ValidationOutcome outcome = validator.Validate(typedValue);
+            if (!outcome.IsValid)
+            {
+                return outcome;
+            }
+        }
+
+        return ValidationOutcome.Success;
     }
 
     private static CancellationTokenRegistration RegisterCancellation(
