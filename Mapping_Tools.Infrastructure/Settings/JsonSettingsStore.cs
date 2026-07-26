@@ -32,6 +32,7 @@ public sealed class JsonSettingsStore : ISettingsStore
         };
         _options.Converters.Add(new WindowBoundsJsonConverter());
         _options.Converters.Add(new RecentBeatmapJsonConverter());
+        _options.Converters.Add(new JsonStringEnumConverter<ApplicationTheme>());
     }
 
     /// <inheritdoc/>

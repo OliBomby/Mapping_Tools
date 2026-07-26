@@ -1,0 +1,201 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="1040"
+             d:DesignHeight="725"
+             x:Class="Mapping_Tools.Desktop.Views.PreferencesView"
+             x:DataType="vm:PreferencesViewModel"
+             Foreground="{DynamicResource MappingToolsForeground}"
+             FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
+             FontSize="14"
+             FontWeight="Normal">
+    <UserControl.Styles>
+        <Style Selector="TextBox.preference-field">
+            <Setter Property="MinHeight" Value="48" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.path-picker">
+            <Setter Property="Width" Value="48" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="MinWidth" Value="48" />
+            <Setter Property="MinHeight" Value="48" />
+            <Setter Property="Padding" Value="9" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#2196F3" />
+        </Style>
+        <Style Selector="TextBlock.validation-error">
+            <Setter Property="Margin" Value="0,2,53,0" />
+            <Setter Property="Foreground" Value="#EF5350" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+        <Style Selector="CheckBox.preference-check">
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="MinHeight" Value="30" />
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto">
+        <StackPanel Width="900"
+                    MinWidth="400"
+                    Margin="0,0,100,20"
+                    HorizontalAlignment="Left">
+            <TextBlock Text="Preferences"
+                       FontSize="32"
+                       FontWeight="Medium"
+                       Foreground="#2196F3" />
+
+            <Grid Margin="0,20,0,0"
+                  ColumnDefinitions="*,Auto">
+                <TextBox Classes="preference-field"
+                         MinWidth="220"
+                         Margin="0,0,5,0"
+                         materialAssists:TextFieldAssist.Label="osu! folder"
+                         Text="{Binding OsuPath, Mode=TwoWay}"
+                         ToolTip.Tip="Select the path to your osu! folder." />
+                <Button Grid.Column="1"
+                        Classes="flat path-picker"
+                        AutomationProperties.Name="Browse osu! folder"
+                        Command="{Binding BrowseOsuPathCommand}"
+                        ToolTip.Tip="Browse for the osu! folder.">
+                    <materialIcons:MaterialIcon Kind="Folder"
+                                                Width="30"
+                                                Height="30" />
+                </Button>
+            </Grid>
+            <TextBlock Classes="validation-error"
+                       Text="{Binding OsuPathError}"
+                       IsVisible="{Binding HasOsuPathError}" />
+
+            <Grid Margin="0,10,0,0"
+                  ColumnDefinitions="*,Auto">
+                <TextBox Classes="preference-field"
+                         MinWidth="220"
+                         Margin="0,0,5,0"
+                         materialAssists:TextFieldAssist.Label="Songs folder"
+                         Text="{Binding SongsPath, Mode=TwoWay}"
+                         ToolTip.Tip="Select the path to your osu! songs folder." />
+                <Button Grid.Column="1"
+                        Classes="flat path-picker"
+                        AutomationProperties.Name="Browse Songs folder"
+                        Command="{Binding BrowseSongsPathCommand}"
+                        ToolTip.Tip="Browse for the Songs folder.">
+                    <materialIcons:MaterialIcon Kind="Folder"
+                                                Width="30"
+                                                Height="30" />
+                </Button>
+            </Grid>
+            <TextBlock Classes="validation-error"
+                       Text="{Binding SongsPathError}"
+                       IsVisible="{Binding HasSongsPathError}" />
+
+            <Grid Margin="0,10,0,0"
+                  ColumnDefinitions="*,Auto">
+                <TextBox Classes="preference-field"
+                         MinWidth="220"
+                         Margin="0,0,5,0"
+                         materialAssists:TextFieldAssist.Label="osu! user config file"
+                         Text="{Binding OsuConfigPath, Mode=TwoWay}"
+                         ToolTip.Tip="Select the path to your osu! user config file. This file usually contains the name of your PC account." />
+                <Button Grid.Column="1"
+                        Classes="flat path-picker"
+                        AutomationProperties.Name="Browse osu! configuration"
+                        Command="{Binding BrowseOsuConfigPathCommand}"
+                        ToolTip.Tip="Browse for the osu! user configuration file.">
+                    <materialIcons:MaterialIcon Kind="Folder"
+                                                Width="30"
+                                                Height="30" />
+                </Button>
+            </Grid>
+            <TextBlock Classes="validation-error"
+                       Text="{Binding OsuConfigPathError}"
+                       IsVisible="{Binding HasOsuConfigPathError}" />
+
+            <Grid Margin="0,10,0,0"
+                  ColumnDefinitions="*,Auto">
+                <TextBox Classes="preference-field"
+                         MinWidth="220"
+                         Margin="0,0,5,0"
+                         materialAssists:TextFieldAssist.Label="Backups folder"
+                         Text="{Binding BackupsPath, Mode=TwoWay}"
+                         ToolTip.Tip="Select the path to your backups folder. This is where Mapping Tools will save backups." />
+                <Button Grid.Column="1"
+                        Classes="flat path-picker"
+                        AutomationProperties.Name="Browse backups folder"
+                        Command="{Binding BrowseBackupsPathCommand}"
+                        ToolTip.Tip="Browse for the backups folder.">
+                    <materialIcons:MaterialIcon Kind="Folder"
+                                                Width="30"
+                                                Height="30" />
+                </Button>
+            </Grid>
+            <TextBlock Classes="validation-error"
+                       Text="{Binding BackupsPathError}"
+                       IsVisible="{Binding HasBackupsPathError}" />
+
+            <Grid Width="150"
+                  Margin="0,10,0,0"
+                  HorizontalAlignment="Left">
+                <TextBox Classes="preference-field"
+                         materialAssists:TextFieldAssist.Label="Max backup files"
+                         Text="{Binding MaxBackupFilesText, Mode=TwoWay}"
+                         ToolTip.Tip="Select the maximum number of backup files. The oldest beatmap backups are removed when the folder exceeds this limit." />
+            </Grid>
+            <TextBlock Classes="validation-error"
+                       Text="{Binding MaxBackupFilesError}"
+                       IsVisible="{Binding HasMaxBackupFilesError}" />
+
+            <StackPanel Margin="5,10,0,0">
+                <CheckBox Classes="preference-check"
+                          Content="Make automatic backups"
+                          IsChecked="{Binding MakeBackups, Mode=TwoWay}"
+                          ToolTip.Tip="Automatically make a backup whenever you run a mapping tool." />
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Classes="preference-check"
+                              Content="Make periodic backups"
+                              IsChecked="{Binding MakePeriodicBackups, Mode=TwoWay}"
+                              ToolTip.Tip="Periodically back up changed beatmaps while the editor is open." />
+                    <Grid Width="150"
+                          Margin="20,0,0,0"
+                          IsVisible="{Binding MakePeriodicBackups}">
+                        <TextBox Classes="preference-field"
+                                 materialAssists:TextFieldAssist.Label="Backup interval"
+                                 Text="{Binding PeriodicBackupIntervalText, Mode=TwoWay}"
+                                 ToolTip.Tip="The time between automatic periodic backups, in hh:mm:ss format." />
+                    </Grid>
+                </StackPanel>
+                <TextBlock Classes="validation-error"
+                           Margin="208,2,0,0"
+                           Text="{Binding PeriodicBackupIntervalError}"
+                           IsVisible="{Binding HasPeriodicBackupIntervalError}" />
+                <CheckBox Classes="preference-check"
+                          Content="Current beatmap default folder in all tools"
+                          IsChecked="{Binding CurrentBeatmapDefaultFolder, Mode=TwoWay}"
+                          ToolTip.Tip="Start general file pickers beside the current beatmap instead of the last-used folder." />
+                <CheckBox Classes="preference-check"
+                          Content="Enable Editor Reader"
+                          IsChecked="{Binding UseEditorReader, Mode=TwoWay}"
+                          ToolTip.Tip="Allow Mapping Tools to read live editor state from the osu! client." />
+            </StackPanel>
+
+            <StackPanel Margin="0,15,0,0"
+                        Orientation="Horizontal">
+                <TextBlock Text="Light"
+                           VerticalAlignment="Center" />
+                <ToggleSwitch Margin="10,0"
+                              AutomationProperties.Name="Dark theme"
+                              IsChecked="{Binding IsDarkTheme, Mode=TwoWay}"
+                              OffContent=""
+                              OnContent=""
+                              ToolTip.Tip="Change the Mapping Tools theme." />
+                <TextBlock Text="Dark"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

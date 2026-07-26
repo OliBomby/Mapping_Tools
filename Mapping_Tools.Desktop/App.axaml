@@ -11,6 +11,33 @@
         <local:ViewLocator />
     </Application.DataTemplates>
 
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="MappingToolsBackground" Color="#303030" />
+                    <SolidColorBrush x:Key="MappingToolsForeground" Color="#E5E5E5" />
+                    <SolidColorBrush x:Key="MappingToolsSelection" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="MappingToolsHoverLow" Color="#0DFFFFFF" />
+                    <SolidColorBrush x:Key="MappingToolsSelectionMedium" Color="#1FFFFFFF" />
+                    <SolidColorBrush x:Key="MappingToolsSelectionHover" Color="#29FFFFFF" />
+                    <SolidColorBrush x:Key="MappingToolsDivider" Color="#3E3E3E" />
+                    <SolidColorBrush x:Key="MappingToolsTableRule" Color="#494949" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="MappingToolsBackground" Color="#FAFAFA" />
+                    <SolidColorBrush x:Key="MappingToolsForeground" Color="#212121" />
+                    <SolidColorBrush x:Key="MappingToolsSelection" Color="#000000" />
+                    <SolidColorBrush x:Key="MappingToolsHoverLow" Color="#0D000000" />
+                    <SolidColorBrush x:Key="MappingToolsSelectionMedium" Color="#1F000000" />
+                    <SolidColorBrush x:Key="MappingToolsSelectionHover" Color="#29000000" />
+                    <SolidColorBrush x:Key="MappingToolsDivider" Color="#D5D5D5" />
+                    <SolidColorBrush x:Key="MappingToolsTableRule" Color="#CCCCCC" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
     <Application.Styles>
         <material:MaterialTheme BaseTheme="Dark"
                                 PrimaryColor="Blue"

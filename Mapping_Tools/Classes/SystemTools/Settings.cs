@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using Mapping_Tools.Annotations;
+using Mapping_Tools.ApplicationServices.Settings;
 
 namespace Mapping_Tools.Classes.SystemTools {
     public class Settings : BindableBase {
@@ -124,6 +125,12 @@ namespace Mapping_Tools.Classes.SystemTools {
             set => Set(ref currentBeatmapDefaultFolder, value);
         }
 
+        private ApplicationTheme theme;
+        public ApplicationTheme Theme {
+            get => theme;
+            set => Set(ref theme, value);
+        }
+
         private Hotkey quickUndoHotkey;
         public Hotkey QuickUndoHotkey {
             get => quickUndoHotkey;
@@ -161,6 +168,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             MakePeriodicBackups = true;
             PeriodicBackupInterval = TimeSpan.FromMinutes(10);
             CurrentBeatmapDefaultFolder = true;
+            Theme = ApplicationTheme.Dark;
             SkipVersion = null;
         }
 

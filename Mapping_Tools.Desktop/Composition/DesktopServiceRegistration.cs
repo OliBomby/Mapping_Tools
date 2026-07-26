@@ -39,6 +39,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<MainWindow>();
         services.AddSingleton<IUiDispatcher, AvaloniaUiDispatcher>();
         services.AddSingleton<GetStartedViewModel>();
+        services.AddSingleton<PreferencesViewModel>();
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(
             [
@@ -48,7 +49,14 @@ internal static class DesktopServiceRegistration
                     "Home",
                     "Onboarding, bundled changelog, support links, and recent beatmaps.",
                     ["home", "help", "changelog", "recent", "faq"],
-                    provider.GetRequiredService<GetStartedViewModel>)
+                    provider.GetRequiredService<GetStartedViewModel>),
+                new ShellFeatureRegistration(
+                    "preferences",
+                    "Preferences",
+                    "Application",
+                    "Paths, backup policy, Editor Reader, and application theme.",
+                    ["settings", "paths", "backups", "editor reader", "theme"],
+                    provider.GetRequiredService<PreferencesViewModel>)
             ]));
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<IDialogService>(provider =>
@@ -73,6 +81,7 @@ internal static class DesktopServiceRegistration
             return new AvaloniaPlatformLauncher(() => window.Launcher);
         });
         services.AddSingleton<IFileRevealService, WindowsFileRevealService>();
+        services.AddSingleton<IApplicationThemeService, AvaloniaApplicationThemeService>();
         services.AddSingleton<IApplicationDirectories, ApplicationDirectories>();
         services.AddSingleton<ISettingsStore, JsonSettingsStore>();
         services.AddSingleton<ISettingsPathEnvironment, WindowsSettingsPathEnvironment>();

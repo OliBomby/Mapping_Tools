@@ -3,8 +3,10 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.Hosting;
+using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
+using Mapping_Tools.ApplicationServices.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -36,6 +38,11 @@ public partial class App : Application
             try
             {
                 _host.Start();
+                ApplicationSettings settings =
+                    _host.Services.GetRequiredService<ApplicationSettings>();
+                _host.Services
+                    .GetRequiredService<IApplicationThemeService>()
+                    .Apply(settings.Theme);
                 MainWindow mainWindow =
                     _host.Services.GetRequiredService<MainWindow>();
                 mainWindow.DataContext =

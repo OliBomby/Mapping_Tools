@@ -8,7 +8,7 @@
              d:DesignHeight="725"
              x:Class="Mapping_Tools.Desktop.Views.GetStartedView"
              x:DataType="vm:GetStartedViewModel"
-             Foreground="#E5E5E5"
+             Foreground="{DynamicResource MappingToolsForeground}"
              FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
              FontSize="13"
              FontWeight="Normal">
@@ -74,13 +74,13 @@
                 </ControlTemplate>
             </Setter>
             <Style Selector="^:pointerover /template/ Border#PART_RowBorder">
-                <Setter Property="Background" Value="#0DFFFFFF" />
+                <Setter Property="Background" Value="{DynamicResource MappingToolsHoverLow}" />
             </Style>
             <Style Selector="^:selected /template/ Border#PART_RowBorder">
-                <Setter Property="Background" Value="#1FFFFFFF" />
+                <Setter Property="Background" Value="{DynamicResource MappingToolsSelectionMedium}" />
             </Style>
             <Style Selector="^:selected:pointerover /template/ Border#PART_RowBorder">
-                <Setter Property="Background" Value="#29FFFFFF" />
+                <Setter Property="Background" Value="{DynamicResource MappingToolsSelectionHover}" />
             </Style>
         </ControlTheme>
 
@@ -95,7 +95,7 @@
                             <Border DockPanel.Dock="Top"
                                     Height="56"
                                     Padding="14,0"
-                                    BorderBrush="#494949"
+                            BorderBrush="{DynamicResource MappingToolsTableRule}"
                                     BorderThickness="0,0,0,1">
                                 <TableViewColumnHeadersPresenter VerticalAlignment="Center" />
                             </Border>
@@ -127,7 +127,7 @@
 
         <ControlTheme x:Key="{x:Type TableView}"
                       TargetType="TableView">
-            <Setter Property="Foreground" Value="#E5E5E5" />
+            <Setter Property="Foreground" Value="{DynamicResource MappingToolsForeground}" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
@@ -216,7 +216,7 @@
                       HorizontalAlignment="Stretch"
                       ResizeBehavior="PreviousAndNext"
                       ResizeDirection="Columns"
-                      Background="#373737" />
+                      Background="{DynamicResource MappingToolsDivider}" />
 
         <Grid Grid.Row="0"
               Grid.Column="2"
@@ -254,7 +254,7 @@
                       HorizontalAlignment="Stretch"
                       ResizeBehavior="PreviousAndNext"
                       ResizeDirection="Rows"
-                      Background="#3E3E3E" />
+                      Background="{DynamicResource MappingToolsDivider}" />
 
         <Grid Grid.Row="2"
               Grid.ColumnSpan="3"

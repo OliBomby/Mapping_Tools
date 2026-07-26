@@ -7,6 +7,7 @@ using Mapping_Tools.ApplicationServices.Platform;
 using Mapping_Tools.ApplicationServices.Settings;
 using Mapping_Tools.ApplicationServices.Workspace;
 using Mapping_Tools.Desktop;
+using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
@@ -25,6 +26,10 @@ AppBuilder.Configure<App>()
     .UseSkia()
     .UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false })
     .SetupWithoutStarting();
+new AvaloniaApplicationThemeService().Apply(
+    options.Scenario.EndsWith("light", StringComparison.OrdinalIgnoreCase)
+        ? ApplicationTheme.Light
+        : ApplicationTheme.Dark);
 
 Control view = options.View switch
 {
@@ -36,6 +41,7 @@ Control view = options.View switch
             Avalonia.Media.Color.Parse("#303030")),
         Child = new GetStartedView { DataContext = CreateGetStartedViewModel(options.Scenario) }
     },
+    "PreferencesView" => CreatePreferencesView(options.Scenario),
     "MessageDialogWindow" => CreateMessageDialog(),
     "ValueDialogWindow" => CreateValueDialog(),
     _ => CreateParameterlessView(options.View),
@@ -120,6 +126,7 @@ static MainViewModel CreateMainViewModel(string scenario)
         "Timing Helper",
         "Tumour Generator 2"
     ];
+    PreferencesViewModel preferences = CreatePreferencesViewModel(settings, scenario);
     List<ShellFeatureRegistration> registrations =
     [
         new(
@@ -135,7 +142,7 @@ static MainViewModel CreateMainViewModel(string scenario)
             "Application",
             "Application preferences.",
             ["settings"],
-            () => new RendererPlaceholderViewModel())
+            () => preferences)
     ];
     registrations.AddRange(toolNames.Select((name, index) =>
         new ShellFeatureRegistration(
@@ -147,12 +154,18 @@ static MainViewModel CreateMainViewModel(string scenario)
             () => new RendererPlaceholderViewModel(),
             startsSection: index == 0)));
 
-    return new MainViewModel(
+    MainViewModel shell = new(
         new ShellFeatureRegistry(registrations),
         settings,
         new NoOpSettingsService(settings),
         notifications,
         new ImmediateDispatcher());
+    if (scenario.StartsWith("preferences", StringComparison.OrdinalIgnoreCase))
+    {
+        shell.SelectedFeature = shell.FeatureItems.Single(item => item.Id == "preferences");
+    }
+
+    return shell;
 }
 
 static GetStartedViewModel CreateGetStartedViewModel(string scenario)
@@ -164,9 +177,75 @@ static GetStartedViewModel CreateGetStartedViewModel(string scenario)
         new UserNotificationService());
 }
 
+static Control CreatePreferencesView(string scenario)
+{
+    ApplicationSettings settings = CreateSettings(scenario);
+    if (scenario.EndsWith("light", StringComparison.OrdinalIgnoreCase))
+    {
+        settings.Theme = ApplicationTheme.Light;
+        new AvaloniaApplicationThemeService().Apply(ApplicationTheme.Light);
+    }
+
+    return new Border
+    {
+        Padding = new Thickness(20),
+        Background = new Avalonia.Media.SolidColorBrush(
+            settings.Theme == ApplicationTheme.Light
+                ? Avalonia.Media.Color.Parse("#FAFAFA")
+                : Avalonia.Media.Color.Parse("#303030")),
+        Child = new PreferencesView
+        {
+            DataContext = CreatePreferencesViewModel(settings, scenario)
+        }
+    };
+}
+
+static PreferencesViewModel CreatePreferencesViewModel(
+    ApplicationSettings settings,
+    string scenario)
+{
+    PreferencesViewModel viewModel = new(
+        settings,
+        new NoOpSettingsService(settings),
+        new RendererFilePicker(),
+        new RendererThemeService(),
+        new UserNotificationService());
+    if (scenario.Equals("preferences-invalid", StringComparison.OrdinalIgnoreCase))
+    {
+        viewModel.OsuPath = string.Empty;
+        viewModel.MaxBackupFilesText = "0";
+        viewModel.PeriodicBackupIntervalText = "soon";
+    }
+    else if (scenario.Equals(
+                 "preferences-periodic-off",
+                 StringComparison.OrdinalIgnoreCase))
+    {
+        viewModel.MakePeriodicBackups = false;
+    }
+
+    return viewModel;
+}
+
 static ApplicationSettings CreateSettings(string scenario)
 {
-    ApplicationSettings settings = new();
+    ApplicationSettings settings = new()
+    {
+        OsuPath = @"C:\Games\osu!",
+        SongsPath = @"C:\Games\osu!\Songs",
+        OsuConfigPath = @"C:\Games\osu!\osu!.Fixture.cfg",
+        BackupsPath = @"C:\Mapping Tools\Backups",
+        MaxBackupFiles = 1000,
+        MakeBackups = true,
+        MakePeriodicBackups = true,
+        PeriodicBackupInterval = TimeSpan.FromMinutes(10),
+        CurrentBeatmapDefaultFolder = true,
+        UseEditorReader = true,
+        Theme = ApplicationTheme.Dark
+    };
+    if (scenario.EndsWith("light", StringComparison.OrdinalIgnoreCase))
+    {
+        settings.Theme = ApplicationTheme.Light;
+    }
     if (scenario.Equals("recent-maps", StringComparison.OrdinalIgnoreCase))
     {
         settings.RecentMaps =
@@ -245,6 +324,37 @@ internal sealed class NoOpSettingsService(ApplicationSettings settings) : ISetti
 internal sealed class ImmediateDispatcher : IUiDispatcher
 {
     public void Post(Action action) => action();
+}
+
+internal sealed class RendererThemeService : IApplicationThemeService
+{
+    public void Apply(ApplicationTheme theme)
+    {
+    }
+}
+
+internal sealed class RendererFilePicker : IFilePicker
+{
+    public bool CanOpenFiles => false;
+
+    public bool CanSaveFiles => false;
+
+    public bool CanPickFolders => false;
+
+    public Task<IReadOnlyList<string>> PickOpenFilesAsync(
+        OpenFilePickerRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<string>>([]);
+
+    public Task<string?> PickSaveFileAsync(
+        SaveFilePickerRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult<string?>(null);
+
+    public Task<IReadOnlyList<string>> PickFoldersAsync(
+        OpenFolderPickerRequest request,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult<IReadOnlyList<string>>([]);
 }
 
 internal sealed class RendererPlaceholderViewModel : ViewModelBase

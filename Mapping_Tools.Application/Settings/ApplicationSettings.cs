@@ -127,6 +127,12 @@ public sealed class ApplicationSettings
     public bool CurrentBeatmapDefaultFolder { get; set; } = true;
 
     /// <summary>
+    /// Selects the light or dark application palette independently of the
+    /// operating-system theme.
+    /// </summary>
+    public ApplicationTheme Theme { get; set; } = ApplicationTheme.Dark;
+
+    /// <summary>
     /// Defines the global key combination assigned to QuickUndo.
     /// </summary>
     public HotkeySettings? QuickUndoHotkey { get; set; }
@@ -154,3 +160,19 @@ public sealed record HotkeySettings(int Key, int Modifiers);
 /// <param name="Width">The window width.</param>
 /// <param name="Height">The window height.</param>
 public sealed record WindowBounds(double X, double Y, double Width, double Height);
+
+/// <summary>
+/// Identifies the persisted application palette selected in Preferences.
+/// </summary>
+public enum ApplicationTheme
+{
+    /// <summary>
+    /// Uses dark surfaces with light foreground content.
+    /// </summary>
+    Dark,
+
+    /// <summary>
+    /// Uses light surfaces with dark foreground content.
+    /// </summary>
+    Light
+}

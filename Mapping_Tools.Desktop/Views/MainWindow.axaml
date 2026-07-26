@@ -21,8 +21,8 @@
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaTitleBarHeightHint="35"
         Icon="/Assets/avalonia-logo.ico"
-        Background="#303030"
-        Foreground="#E1E1E1"
+        Background="{DynamicResource MappingToolsBackground}"
+        Foreground="{DynamicResource MappingToolsForeground}"
         FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
         FontSize="14"
         FontWeight="Medium"
@@ -89,6 +89,10 @@
                       x:DataType="vm:GetStartedViewModel">
             <views:GetStartedView />
         </DataTemplate>
+        <DataTemplate DataType="vm:PreferencesViewModel"
+                      x:DataType="vm:PreferencesViewModel">
+            <views:PreferencesView />
+        </DataTemplate>
     </Window.DataTemplates>
 
     <Window.Styles>
@@ -121,14 +125,14 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="FontSize" Value="14" />
             <Setter Property="FontWeight" Value="Normal" />
-            <Setter Property="Foreground" Value="#E5E5E5" />
+            <Setter Property="Foreground" Value="{DynamicResource MappingToolsForeground}" />
         </Style>
         <Style Selector="ListBox.navigation-list ListBoxItem:selected /template/ Border#PART_HoverEffect">
-            <Setter Property="Background" Value="White" />
+            <Setter Property="Background" Value="{DynamicResource MappingToolsSelection}" />
             <Setter Property="Opacity" Value="0.08" />
         </Style>
         <Style Selector="ListBox.navigation-list ListBoxItem:pointerover /template/ Border#PART_HoverEffect">
-            <Setter Property="Background" Value="White" />
+            <Setter Property="Background" Value="{DynamicResource MappingToolsSelection}" />
             <Setter Property="Opacity" Value="0.05" />
         </Style>
         <Style Selector="ScrollViewer /template/ :is(ScrollBar):vertical">
@@ -351,7 +355,7 @@
                        CompactPaneLength="0">
                 <SplitView.Pane>
                     <DockPanel Width="200"
-                               Background="#303030">
+                               Background="{DynamicResource MappingToolsBackground}">
                         <TextBox DockPanel.Dock="Top"
                                  Classes="outline shell-search clearButton"
                                  Margin="16,16,16,0"
@@ -382,7 +386,7 @@
                                           RowDefinitions="Auto,*">
                                         <Separator IsVisible="{Binding StartsSection}"
                                                    Margin="-10,9,-10,11"
-                                                   Foreground="#6F6F6F" />
+                                                   Foreground="{DynamicResource MappingToolsDivider}" />
                                         <TextBlock Grid.Row="1"
                                                    Text="{Binding DisplayName}"
                                                    VerticalAlignment="Center"
@@ -401,7 +405,7 @@
                     </DockPanel>
                 </SplitView.Pane>
 
-                <Grid Background="#303030">
+                <Grid Background="{DynamicResource MappingToolsBackground}">
                     <ContentControl Margin="20"
                                     Content="{Binding CurrentFeature}"
                                     HorizontalContentAlignment="Stretch"
@@ -421,6 +425,7 @@
                                         BoxShadow="0 3 8 0 #66000000">
                                     <Grid ColumnDefinitions="*,Auto">
                                         <TextBlock Text="{Binding DisplayText}"
+                                                   Foreground="White"
                                                    VerticalAlignment="Center"
                                                    TextWrapping="Wrap" />
                                         <Button Grid.Column="1"

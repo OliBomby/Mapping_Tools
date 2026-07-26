@@ -10,6 +10,7 @@ using Mapping_Tools.ApplicationServices.Settings;
 using Mapping_Tools.ApplicationServices.Workspace;
 using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.Hosting;
+using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,11 +32,13 @@ public sealed class DependencyInjectionTests
         [
             typeof(MainWindow),
             typeof(MainViewModel),
+            typeof(PreferencesViewModel),
             typeof(IDialogService),
             typeof(IFilePicker),
             typeof(IClipboardService),
             typeof(IPlatformLauncher),
             typeof(IFileRevealService),
+            typeof(IApplicationThemeService),
             typeof(IApplicationDirectories),
             typeof(ISettingsStore),
             typeof(ISettingsPathEnvironment),

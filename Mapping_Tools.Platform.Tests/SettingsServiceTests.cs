@@ -40,6 +40,7 @@ public sealed class SettingsServiceTests
         using TestDirectory test = TestDirectory.FromFixture("legacy-config.json");
         JsonSettingsStore store = new(test.Directories);
         ApplicationSettings settings = store.Load();
+        settings.Theme = ApplicationTheme.Light;
 
         // Act
         store.Save(settings);
@@ -48,6 +49,7 @@ public sealed class SettingsServiceTests
         // Assert
         reloaded.MainWindowRestoreBounds.Should().Be(settings.MainWindowRestoreBounds);
         reloaded.QuickUndoHotkey.Should().Be(settings.QuickUndoHotkey);
+        reloaded.Theme.Should().Be(ApplicationTheme.Light);
 
         using JsonDocument document = JsonDocument.Parse(
             File.ReadAllText(test.Directories.ConfigurationFile));
@@ -55,6 +57,7 @@ public sealed class SettingsServiceTests
         root.GetProperty("MainWindowRestoreBounds").GetString().Should().Be("440,256,1407,855");
         root.GetProperty("QuickRunHotkey").GetProperty("Key").ValueKind.Should().Be(JsonValueKind.Number);
         root.GetProperty("PeriodicBackupInterval").GetString().Should().Be("00:10:00");
+        root.GetProperty("Theme").GetString().Should().Be("Light");
         JsonElement firstRecent = root.GetProperty("RecentMaps")[0];
         firstRecent.ValueKind.Should().Be(JsonValueKind.Array);
         firstRecent.GetArrayLength().Should().Be(2);

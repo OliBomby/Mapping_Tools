@@ -13,6 +13,7 @@ using System.Windows.Threading;
 using Mapping_Tools;
 using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Components.Dialogs;
+using Mapping_Tools.Views.Preferences;
 
 internal static class Program
 {
@@ -33,6 +34,16 @@ internal static class Program
         app.InitializeComponent();
         MainWindow.HttpClient = new HttpClient(new StaticJsonHandler());
         SettingsManager.Settings.RecentMaps.Clear();
+        SettingsManager.Settings.OsuPath = @"C:\Games\osu!";
+        SettingsManager.Settings.SongsPath = @"C:\Games\osu!\Songs";
+        SettingsManager.Settings.OsuConfigPath = @"C:\Games\osu!\osu!.Fixture.cfg";
+        SettingsManager.Settings.BackupsPath = @"C:\Mapping Tools\Backups";
+        SettingsManager.Settings.MaxBackupFiles = 1000;
+        SettingsManager.Settings.MakeBackups = true;
+        SettingsManager.Settings.MakePeriodicBackups = true;
+        SettingsManager.Settings.PeriodicBackupInterval = TimeSpan.FromMinutes(10);
+        SettingsManager.Settings.CurrentBeatmapDefaultFolder = true;
+        SettingsManager.Settings.UseEditorReader = true;
         if (options.Scenario.Equals("recent-maps", StringComparison.OrdinalIgnoreCase))
         {
             SettingsManager.Settings.RecentMaps.Add(
@@ -169,6 +180,17 @@ internal static class Program
             var valueBox = (TextBox)dialog.FindName("ValueBox");
             valueBox.Text = string.Empty;
             return dialog;
+        }
+
+        if (type == typeof(PreferencesView))
+        {
+            _ = Activator.CreateInstance(
+                typeof(MainWindow),
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                binder: null,
+                args: [false],
+                culture: null);
+            return new PreferencesView();
         }
 
         return Activator.CreateInstance(type);

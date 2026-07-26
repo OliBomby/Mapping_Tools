@@ -37,6 +37,7 @@ namespace Mapping_Tools.Classes.SystemTools {
                 MakePeriodicBackups = source.MakePeriodicBackups,
                 PeriodicBackupInterval = source.PeriodicBackupInterval,
                 CurrentBeatmapDefaultFolder = source.CurrentBeatmapDefaultFolder,
+                Theme = source.Theme,
                 QuickUndoHotkey = ToApplication(source.QuickUndoHotkey),
                 SkipVersion = source.SkipVersion?.ToString()
             };
@@ -70,6 +71,7 @@ namespace Mapping_Tools.Classes.SystemTools {
             destination.MakePeriodicBackups = source.MakePeriodicBackups;
             destination.PeriodicBackupInterval = source.PeriodicBackupInterval;
             destination.CurrentBeatmapDefaultFolder = source.CurrentBeatmapDefaultFolder;
+            destination.Theme = source.Theme;
             destination.QuickUndoHotkey = ToLegacy(source.QuickUndoHotkey);
             destination.SkipVersion = Version.TryParse(source.SkipVersion, out Version version)
                 ? version
