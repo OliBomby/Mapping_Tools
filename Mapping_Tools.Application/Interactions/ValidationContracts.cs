@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace Mapping_Tools.Application.Interactions;
 
 /// <summary>
@@ -40,29 +38,6 @@ public interface IValueValidator<in T>
     /// <param name="value">The parsed value to inspect.</param>
     /// <returns>A successful outcome or a failed outcome explaining how to correct the value.</returns>
     ValidationOutcome Validate(T value);
-}
-
-/// <summary>
-/// Converts between editable text and a typed form value.
-/// </summary>
-/// <typeparam name="T">The value type represented by the text.</typeparam>
-public interface ITextValueConverter<T>
-{
-    /// <summary>
-    /// Formats an existing value for editing without losing required precision.
-    /// </summary>
-    /// <param name="value">The value to place in a form field.</param>
-    /// <returns>The editable text representation.</returns>
-    string Format(T value);
-
-    /// <summary>
-    /// Attempts to parse text and supplies a correction message on failure.
-    /// </summary>
-    /// <param name="text">The current field text, which may be <see langword="null"/>.</param>
-    /// <param name="value">The parsed value when conversion succeeds.</param>
-    /// <param name="errorMessage">A user-facing format error when conversion fails.</param>
-    /// <returns><see langword="true"/> only when <paramref name="value"/> is usable.</returns>
-    bool TryConvert(string? text, out T value, out string? errorMessage);
 }
 
 /// <summary>
@@ -134,97 +109,5 @@ public static class ValueValidators
             value.CompareTo(minimum) >= 0 && value.CompareTo(maximum) <= 0
                 ? ValidationOutcome.Success
                 : ValidationOutcome.Failure(errorMessage));
-    }
-}
-
-/// <summary>
-/// Provides culture-stable converters used by shared numeric and text forms.
-/// </summary>
-public static class TextValueConverters
-{
-    /// <summary>
-    /// Gets a converter that preserves text exactly, treating <see langword="null"/> as an empty field.
-    /// </summary>
-    public static ITextValueConverter<string> String { get; } = new StringTextValueConverter();
-
-    /// <summary>
-    /// Gets a converter for invariant-culture floating-point values, including exponent notation.
-    /// </summary>
-    public static ITextValueConverter<double> InvariantDouble { get; } = new InvariantDoubleTextValueConverter();
-
-    /// <summary>
-    /// Gets a converter for invariant-culture signed 32-bit integers.
-    /// </summary>
-    public static ITextValueConverter<int> InvariantInt32 { get; } = new InvariantInt32TextValueConverter();
-
-    /// <summary>
-    /// Gets a converter for durations in the invariant constant TimeSpan format.
-    /// </summary>
-    public static ITextValueConverter<TimeSpan> ConstantTimeSpan { get; } = new ConstantTimeSpanTextValueConverter();
-
-    private sealed class StringTextValueConverter : ITextValueConverter<string>
-    {
-        public string Format(string value) => value ?? string.Empty;
-
-        public bool TryConvert(string? text, out string value, out string? errorMessage)
-        {
-            value = text ?? string.Empty;
-            errorMessage = null;
-            return true;
-        }
-    }
-
-    private sealed class InvariantDoubleTextValueConverter : ITextValueConverter<double>
-    {
-        public string Format(double value) => value.ToString("R", CultureInfo.InvariantCulture);
-
-        public bool TryConvert(string? text, out double value, out string? errorMessage)
-        {
-            bool converted = double.TryParse(
-                text,
-                NumberStyles.Float,
-                CultureInfo.InvariantCulture,
-                out value);
-            errorMessage = converted ? null : "Enter a valid number using a period as the decimal separator.";
-            return converted;
-        }
-    }
-
-    private sealed class InvariantInt32TextValueConverter : ITextValueConverter<int>
-    {
-        public string Format(int value) => value.ToString(CultureInfo.InvariantCulture);
-
-        public bool TryConvert(string? text, out int value, out string? errorMessage)
-        {
-            bool converted = int.TryParse(
-                text,
-                NumberStyles.Integer,
-                CultureInfo.InvariantCulture,
-                out value);
-            errorMessage = converted ? null : "Enter a whole number.";
-            return converted;
-        }
-    }
-
-    private sealed class ConstantTimeSpanTextValueConverter : ITextValueConverter<TimeSpan>
-    {
-        public string Format(TimeSpan value) =>
-            value.ToString("c", CultureInfo.InvariantCulture);
-
-        public bool TryConvert(
-            string? text,
-            out TimeSpan value,
-            out string? errorMessage)
-        {
-            bool converted = TimeSpan.TryParseExact(
-                text,
-                "c",
-                CultureInfo.InvariantCulture,
-                out value);
-            errorMessage = converted
-                ? null
-                : "Use the format hh:mm:ss, for example 00:10:00.";
-            return converted;
-        }
     }
 }
