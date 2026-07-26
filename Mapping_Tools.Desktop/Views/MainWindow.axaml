@@ -21,8 +21,8 @@
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaTitleBarHeightHint="35"
         Icon="/Assets/avalonia-logo.ico"
-        Background="{DynamicResource MappingToolsBackground}"
-        Foreground="{DynamicResource MappingToolsForeground}"
+        Background="{DynamicResource MaterialPaperBrush}"
+        Foreground="{DynamicResource MaterialBodyBrush}"
         FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
         FontSize="14"
         FontWeight="Medium"
@@ -37,7 +37,7 @@
         <ControlTheme x:Key="ChromeButtonTheme"
                       TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="MinWidth" Value="0" />
@@ -52,16 +52,16 @@
                 </ControlTemplate>
             </Setter>
             <Style Selector="^:pointerover">
-                <Setter Property="Background" Value="#26000000" />
+                <Setter Property="Background" Value="{DynamicResource MappingToolsChromeHoverBrush}" />
             </Style>
             <Style Selector="^:pressed">
-                <Setter Property="Background" Value="#40000000" />
+                <Setter Property="Background" Value="{DynamicResource MappingToolsChromePressedBrush}" />
             </Style>
         </ControlTheme>
         <ControlTheme x:Key="ChromeToggleButtonTheme"
                       TargetType="ToggleButton">
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="MinWidth" Value="0" />
@@ -76,10 +76,10 @@
                 </ControlTemplate>
             </Setter>
             <Style Selector="^:pointerover">
-                <Setter Property="Background" Value="#26000000" />
+                <Setter Property="Background" Value="{DynamicResource MappingToolsChromeHoverBrush}" />
             </Style>
             <Style Selector="^:pressed">
-                <Setter Property="Background" Value="#40000000" />
+                <Setter Property="Background" Value="{DynamicResource MappingToolsChromePressedBrush}" />
             </Style>
         </ControlTheme>
     </Window.Resources>
@@ -98,7 +98,7 @@
     <Window.Styles>
         <Style Selector="Menu.top-menu">
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
             <Setter Property="Height" Value="35" />
         </Style>
         <Style Selector="ToggleButton.navigation-toggle materialIcons|MaterialIcon">
@@ -108,7 +108,7 @@
             <Setter Property="Opacity" Value="1" />
         </Style>
         <Style Selector="Menu.top-menu > MenuItem">
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
             <Setter Property="Height" Value="35" />
             <Setter Property="Padding" Value="12,0" />
         </Style>
@@ -125,14 +125,14 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="FontSize" Value="14" />
             <Setter Property="FontWeight" Value="Normal" />
-            <Setter Property="Foreground" Value="{DynamicResource MappingToolsForeground}" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
         </Style>
         <Style Selector="ListBox.navigation-list ListBoxItem:selected /template/ Border#PART_HoverEffect">
-            <Setter Property="Background" Value="{DynamicResource MappingToolsSelection}" />
+            <Setter Property="Background" Value="{DynamicResource MaterialBodyBrush}" />
             <Setter Property="Opacity" Value="0.08" />
         </Style>
         <Style Selector="ListBox.navigation-list ListBoxItem:pointerover /template/ Border#PART_HoverEffect">
-            <Setter Property="Background" Value="{DynamicResource MappingToolsSelection}" />
+            <Setter Property="Background" Value="{DynamicResource MaterialBodyBrush}" />
             <Setter Property="Opacity" Value="0.05" />
         </Style>
         <Style Selector="ScrollViewer /template/ :is(ScrollBar):vertical">
@@ -355,7 +355,7 @@
                        CompactPaneLength="0">
                 <SplitView.Pane>
                     <DockPanel Width="200"
-                               Background="{DynamicResource MappingToolsBackground}">
+                               Background="{DynamicResource MaterialPaperBrush}">
                         <TextBox DockPanel.Dock="Top"
                                  Classes="outline shell-search clearButton"
                                  Margin="16,16,16,0"
@@ -382,7 +382,7 @@
                                           RowDefinitions="Auto,*">
                                         <Separator IsVisible="{Binding StartsSection}"
                                                    Margin="-10,9,-10,11"
-                                                   Foreground="{DynamicResource MappingToolsDivider}" />
+                                                   Foreground="{DynamicResource MaterialDividerBrush}" />
                                         <TextBlock Grid.Row="1"
                                                    Text="{Binding DisplayName}"
                                                    VerticalAlignment="Center"
@@ -401,7 +401,7 @@
                     </DockPanel>
                 </SplitView.Pane>
 
-                <Grid Background="{DynamicResource MappingToolsBackground}">
+                <Grid Background="{DynamicResource MaterialPaperBrush}">
                     <ContentControl Margin="20"
                                     Content="{Binding CurrentFeature}"
                                     HorizontalContentAlignment="Stretch"
@@ -417,18 +417,18 @@
                                 <Border Margin="0,4"
                                         Padding="16,10"
                                         MinWidth="360"
-                                        Background="#FF323232"
-                                        BoxShadow="0 3 8 0 #66000000">
+                                        Background="{DynamicResource MaterialSnackbarBackgroundBrush}"
+                                        materialAssists:ShadowAssist.ShadowDepth="Depth2">
                                     <Grid ColumnDefinitions="*,Auto">
                                         <TextBlock Text="{Binding DisplayText}"
-                                                   Foreground="White"
+                                                   Foreground="{DynamicResource MaterialBackgroundBrush}"
                                                    VerticalAlignment="Center"
                                                    TextWrapping="Wrap" />
                                         <Button Grid.Column="1"
                                                 Margin="18,0,0,0"
                                                 Command="{Binding DismissCommand}"
                                                 Content="DISMISS"
-                                                Foreground="#2196F3"
+                                                Foreground="{DynamicResource MaterialPrimaryMidBrush}"
                                                 Background="Transparent" />
                                     </Grid>
                                 </Border>
@@ -438,7 +438,7 @@
                 </Grid>
             </SplitView>
         </Grid>
-        <Border BorderBrush="#1976D2"
+        <Border BorderBrush="{DynamicResource MaterialPrimaryDarkBrush}"
                 BorderThickness="1"
                 IsHitTestVisible="False" />
     </Grid>

@@ -8,7 +8,7 @@
              d:DesignHeight="725"
              x:Class="Mapping_Tools.Desktop.Views.GetStartedView"
              x:DataType="vm:GetStartedViewModel"
-             Foreground="{DynamicResource MappingToolsForeground}"
+             Foreground="{DynamicResource MaterialBodyBrush}"
              FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
              FontSize="13"
              FontWeight="Normal">
@@ -59,7 +59,7 @@
         <ControlTheme x:Key="{x:Type TableViewRow}"
                       TargetType="TableViewRow">
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="#E5E5E5" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
             <Setter Property="MinHeight" Value="36" />
             <Setter Property="Padding" Value="14,0" />
             <Setter Property="Template">
@@ -74,13 +74,13 @@
                 </ControlTemplate>
             </Setter>
             <Style Selector="^:pointerover /template/ Border#PART_RowBorder">
-                <Setter Property="Background" Value="{DynamicResource MappingToolsHoverLow}" />
+                <Setter Property="Background" Value="{DynamicResource MaterialDataGridRowHoverBackgroundBrush}" />
             </Style>
             <Style Selector="^:selected /template/ Border#PART_RowBorder">
-                <Setter Property="Background" Value="{DynamicResource MappingToolsSelectionMedium}" />
+                <Setter Property="Background" Value="{DynamicResource MaterialTextFieldBoxBackgroundBrush}" />
             </Style>
             <Style Selector="^:selected:pointerover /template/ Border#PART_RowBorder">
-                <Setter Property="Background" Value="{DynamicResource MappingToolsSelectionHover}" />
+                <Setter Property="Background" Value="{DynamicResource MaterialTextFieldBoxHoverBackgroundBrush}" />
             </Style>
         </ControlTheme>
 
@@ -95,7 +95,7 @@
                             <Border DockPanel.Dock="Top"
                                     Height="56"
                                     Padding="14,0"
-                            BorderBrush="{DynamicResource MappingToolsTableRule}"
+                            BorderBrush="{DynamicResource MaterialDividerBrush}"
                                     BorderThickness="0,0,0,1">
                                 <TableViewColumnHeadersPresenter VerticalAlignment="Center" />
                             </Border>
@@ -127,7 +127,7 @@
 
         <ControlTheme x:Key="{x:Type TableView}"
                       TargetType="TableView">
-            <Setter Property="Foreground" Value="{DynamicResource MappingToolsForeground}" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
@@ -171,7 +171,7 @@
             <Setter Property="Opacity" Value="0.05" />
         </Style>
         <Style Selector="ScrollViewer /template/ :is(ScrollBar):horizontal /template/ Thumb">
-            <Setter Property="Background" Value="#C1C1C1" />
+            <Setter Property="Background" Value="{DynamicResource MappingToolsScrollbarThumbBrush}" />
             <Setter Property="Opacity" Value="1" />
             <Setter Property="RenderTransform" Value="none" />
         </Style>
@@ -189,7 +189,7 @@
                        Text="Get started"
                        FontSize="32"
                        FontWeight="Medium"
-                       Foreground="#2196F3" />
+                       Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
 
             <ListBox Grid.Row="1"
                      Classes="content-list"
@@ -216,7 +216,7 @@
                       HorizontalAlignment="Stretch"
                       ResizeBehavior="PreviousAndNext"
                       ResizeDirection="Columns"
-                      Background="{DynamicResource MappingToolsDivider}" />
+                      Background="{DynamicResource MaterialDividerBrush}" />
 
         <Grid Grid.Row="0"
               Grid.Column="2"
@@ -225,7 +225,7 @@
                        Text="Changelog"
                        FontSize="32"
                        FontWeight="Medium"
-                       Foreground="#2196F3" />
+                       Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
             <ListBox Grid.Row="1"
                      Classes="content-list"
                      ItemsSource="{Binding Changelog}"
@@ -254,7 +254,7 @@
                       HorizontalAlignment="Stretch"
                       ResizeBehavior="PreviousAndNext"
                       ResizeDirection="Rows"
-                      Background="{DynamicResource MappingToolsDivider}" />
+                      Background="{DynamicResource MaterialDividerBrush}" />
 
         <Grid Grid.Row="2"
               Grid.ColumnSpan="3"
@@ -263,7 +263,7 @@
                        Text="Recent"
                        FontSize="32"
                        FontWeight="Medium"
-                       Foreground="#2196F3" />
+                       Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
 
             <TableView x:Name="RecentMapsTable"
                        Grid.Row="1"

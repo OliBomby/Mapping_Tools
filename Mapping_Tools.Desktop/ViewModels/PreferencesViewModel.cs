@@ -32,19 +32,14 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
     private readonly IFilePicker _filePicker;
     private readonly IApplicationThemeService _themeService;
     private readonly IUserNotificationService _notifications;
+    private readonly Dictionary<string, string> _validationErrors =
+        new(StringComparer.Ordinal);
     private string _osuPath;
     private string _songsPath;
     private string _osuConfigPath;
     private string _backupsPath;
     private string _maxBackupFilesText;
     private string _periodicBackupIntervalText;
-    private string? _osuPathError;
-    private string? _songsPathError;
-    private string? _osuConfigPathError;
-    private string? _backupsPathError;
-    private string? _maxBackupFilesError;
-    private string? _periodicBackupIntervalError;
-
     /// <summary>
     /// Notifies Avalonia when a property-level correction is added, replaced,
     /// or cleared so the owning input control can update its validation state.
@@ -104,7 +99,6 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
         set => SetPath(
             ref _osuPath,
             value,
-            error => OsuPathError = error,
             path => _settings.OsuPath = path,
             nameof(OsuPath));
     }
@@ -116,7 +110,6 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
         set => SetPath(
             ref _songsPath,
             value,
-            error => SongsPathError = error,
             path => _settings.SongsPath = path,
             nameof(SongsPath));
     }
@@ -128,7 +121,6 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
         set => SetPath(
             ref _osuConfigPath,
             value,
-            error => OsuConfigPathError = error,
             path => _settings.OsuConfigPath = path,
             nameof(OsuConfigPath));
     }
@@ -140,7 +132,6 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
         set => SetPath(
             ref _backupsPath,
             value,
-            error => BackupsPathError = error,
             path => _settings.BackupsPath = path,
             nameof(BackupsPath));
     }
@@ -163,12 +154,16 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
                     out int count,
                     out string? conversionError))
             {
-                MaxBackupFilesError = conversionError;
+                SetValidationError(
+                    nameof(MaxBackupFilesText),
+                    conversionError);
                 return;
             }
 
             ValidationOutcome outcome = BackupCount.Validate(count);
-            MaxBackupFilesError = outcome.ErrorMessage;
+            SetValidationError(
+                nameof(MaxBackupFilesText),
+                outcome.ErrorMessage);
             if (outcome.IsValid)
             {
                 _settings.MaxBackupFiles = count;
@@ -197,19 +192,21 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
                 out TimeSpan interval);
             if (!parsed)
             {
-                PeriodicBackupIntervalError =
-                    "Use the format hh:mm:ss, for example 00:10:00.";
+                SetValidationError(
+                    nameof(PeriodicBackupIntervalText),
+                    "Use the format hh:mm:ss, for example 00:10:00.");
                 return;
             }
 
             if (interval < TimeSpan.FromSeconds(1))
             {
-                PeriodicBackupIntervalError =
-                    "Use an interval of at least one second.";
+                SetValidationError(
+                    nameof(PeriodicBackupIntervalText),
+                    "Use an interval of at least one second.");
                 return;
             }
 
-            PeriodicBackupIntervalError = null;
+            SetValidationError(nameof(PeriodicBackupIntervalText), null);
             _settings.PeriodicBackupInterval = interval;
             Persist();
         }
@@ -282,107 +279,11 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
         }
     }
 
-    /// <summary>Gets the validation correction for the osu! directory.</summary>
-    public string? OsuPathError
-    {
-        get => _osuPathError;
-        private set => SetValidationError(
-            ref _osuPathError,
-            value,
-            nameof(OsuPathError),
-            nameof(HasOsuPathError),
-            nameof(OsuPath));
-    }
-
-    /// <summary>Gets whether the osu! directory needs correction.</summary>
-    public bool HasOsuPathError => OsuPathError is not null;
-
-    /// <summary>Gets the validation correction for the Songs directory.</summary>
-    public string? SongsPathError
-    {
-        get => _songsPathError;
-        private set => SetValidationError(
-            ref _songsPathError,
-            value,
-            nameof(SongsPathError),
-            nameof(HasSongsPathError),
-            nameof(SongsPath));
-    }
-
-    /// <summary>Gets whether the Songs directory needs correction.</summary>
-    public bool HasSongsPathError => SongsPathError is not null;
-
-    /// <summary>Gets the validation correction for the osu! configuration path.</summary>
-    public string? OsuConfigPathError
-    {
-        get => _osuConfigPathError;
-        private set => SetValidationError(
-            ref _osuConfigPathError,
-            value,
-            nameof(OsuConfigPathError),
-            nameof(HasOsuConfigPathError),
-            nameof(OsuConfigPath));
-    }
-
-    /// <summary>Gets whether the osu! configuration path needs correction.</summary>
-    public bool HasOsuConfigPathError => OsuConfigPathError is not null;
-
-    /// <summary>Gets the validation correction for the backups directory.</summary>
-    public string? BackupsPathError
-    {
-        get => _backupsPathError;
-        private set => SetValidationError(
-            ref _backupsPathError,
-            value,
-            nameof(BackupsPathError),
-            nameof(HasBackupsPathError),
-            nameof(BackupsPath));
-    }
-
-    /// <summary>Gets whether the backups directory needs correction.</summary>
-    public bool HasBackupsPathError => BackupsPathError is not null;
-
-    /// <summary>Gets the validation correction for the retained-backup limit.</summary>
-    public string? MaxBackupFilesError
-    {
-        get => _maxBackupFilesError;
-        private set => SetValidationError(
-            ref _maxBackupFilesError,
-            value,
-            nameof(MaxBackupFilesError),
-            nameof(HasMaxBackupFilesError),
-            nameof(MaxBackupFilesText));
-    }
-
-    /// <summary>Gets whether the retained-backup limit needs correction.</summary>
-    public bool HasMaxBackupFilesError => MaxBackupFilesError is not null;
-
-    /// <summary>Gets the validation correction for the periodic-backup interval.</summary>
-    public string? PeriodicBackupIntervalError
-    {
-        get => _periodicBackupIntervalError;
-        private set => SetValidationError(
-            ref _periodicBackupIntervalError,
-            value,
-            nameof(PeriodicBackupIntervalError),
-            nameof(HasPeriodicBackupIntervalError),
-            nameof(PeriodicBackupIntervalText));
-    }
-
-    /// <summary>Gets whether the periodic-backup interval needs correction.</summary>
-    public bool HasPeriodicBackupIntervalError => PeriodicBackupIntervalError is not null;
-
     /// <summary>
     /// Gets whether any editable preference currently contains an invalid
     /// value that has not been written to the shared settings document.
     /// </summary>
-    public bool HasErrors =>
-        OsuPathError is not null
-        || SongsPathError is not null
-        || OsuConfigPathError is not null
-        || BackupsPathError is not null
-        || MaxBackupFilesError is not null
-        || PeriodicBackupIntervalError is not null;
+    public bool HasErrors => _validationErrors.Count > 0;
 
     /// <summary>
     /// Returns the current corrections for one bindable property, or all
@@ -399,28 +300,12 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
     {
         if (string.IsNullOrEmpty(propertyName))
         {
-            return new[]
-            {
-                OsuPathError,
-                SongsPathError,
-                OsuConfigPathError,
-                BackupsPathError,
-                MaxBackupFilesError,
-                PeriodicBackupIntervalError
-            }.Where(error => error is not null).Cast<string>().ToArray();
+            return _validationErrors.Values.ToArray();
         }
 
-        string? error = propertyName switch
-        {
-            nameof(OsuPath) => OsuPathError,
-            nameof(SongsPath) => SongsPathError,
-            nameof(OsuConfigPath) => OsuConfigPathError,
-            nameof(BackupsPath) => BackupsPathError,
-            nameof(MaxBackupFilesText) => MaxBackupFilesError,
-            nameof(PeriodicBackupIntervalText) => PeriodicBackupIntervalError,
-            _ => null
-        };
-        return error is null ? Array.Empty<string>() : new[] { error };
+        return _validationErrors.TryGetValue(propertyName, out string? error)
+            ? new[] { error }
+            : Array.Empty<string>();
     }
 
     /// <summary>Gets the native folder-picker command for the osu! directory.</summary>
@@ -438,7 +323,6 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
     private void SetPath(
         ref string field,
         string? value,
-        Action<string?> setError,
         Action<string> apply,
         string propertyName)
     {
@@ -450,7 +334,7 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
 
         this.RaiseAndSetIfChanged(ref field, normalized, propertyName);
         ValidationOutcome outcome = RequiredPath.Validate(normalized);
-        setError(outcome.ErrorMessage);
+        SetValidationError(propertyName, outcome.ErrorMessage);
         if (outcome.IsValid)
         {
             apply(normalized);
@@ -459,23 +343,36 @@ public sealed class PreferencesViewModel : ViewModelBase, INotifyDataErrorInfo
     }
 
     private void SetValidationError(
-        ref string? field,
-        string? value,
-        string errorPropertyName,
-        string hasErrorPropertyName,
-        string validatedPropertyName)
+        string propertyName,
+        string? error)
     {
-        if (field == value)
+        bool changed;
+        if (error is null)
+        {
+            changed = _validationErrors.Remove(propertyName);
+        }
+        else if (_validationErrors.TryGetValue(
+                     propertyName,
+                     out string? current)
+                 && current == error)
+        {
+            changed = false;
+        }
+        else
+        {
+            _validationErrors[propertyName] = error;
+            changed = true;
+        }
+
+        if (!changed)
         {
             return;
         }
 
-        this.RaiseAndSetIfChanged(ref field, value, errorPropertyName);
-        this.RaisePropertyChanged(hasErrorPropertyName);
         this.RaisePropertyChanged(nameof(HasErrors));
         ErrorsChanged?.Invoke(
             this,
-            new DataErrorsChangedEventArgs(validatedPropertyName));
+            new DataErrorsChangedEventArgs(propertyName));
     }
 
     private void SetBoolean(

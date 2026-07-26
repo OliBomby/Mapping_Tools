@@ -166,7 +166,6 @@ public sealed class DialogAndValidationTests
 
         // Assert
         viewModel.IsValid.Should().BeFalse();
-        viewModel.ErrorMessage.Should().Be("Enter a whole number.");
         INotifyDataErrorInfo validation = viewModel;
         validation.HasErrors.Should().BeTrue();
         validation.GetErrors(nameof(ValueDialogViewModel.Text))
@@ -191,7 +190,7 @@ public sealed class DialogAndValidationTests
 
         // Assert
         viewModel.IsValid.Should().BeTrue();
-        viewModel.ErrorMessage.Should().BeNull();
+        ((INotifyDataErrorInfo)viewModel).HasErrors.Should().BeFalse();
         accepted.Should().Be(42);
     }
 

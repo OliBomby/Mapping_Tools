@@ -43,8 +43,11 @@ public sealed class PreferencesViewModelTests
         viewModel.OsuPath = "   ";
 
         // Assert
-        viewModel.HasOsuPathError.Should().BeTrue();
-        viewModel.OsuPathError.Should().Be("Select a path.");
+        INotifyDataErrorInfo validation = viewModel;
+        validation.GetErrors(nameof(PreferencesViewModel.OsuPath))
+            .Cast<string>()
+            .Should()
+            .Equal("Select a path.");
         settings.OsuPath.Should().Be(@"C:\osu!");
         persistence.SaveCount.Should().Be(0);
     }
@@ -101,7 +104,7 @@ public sealed class PreferencesViewModelTests
         settings.OsuPath.Should().Be(@"D:\Games\osu!");
         persistence.LastSaved.Should().BeSameAs(settings);
         persistence.SaveCount.Should().Be(1);
-        viewModel.HasOsuPathError.Should().BeFalse();
+        ((INotifyDataErrorInfo)viewModel).HasErrors.Should().BeFalse();
     }
 
     [TestMethod]
@@ -116,7 +119,11 @@ public sealed class PreferencesViewModelTests
         viewModel.MaxBackupFilesText = "0";
 
         // Assert
-        viewModel.HasMaxBackupFilesError.Should().BeTrue();
+        INotifyDataErrorInfo validation = viewModel;
+        validation.GetErrors(nameof(PreferencesViewModel.MaxBackupFilesText))
+            .Cast<string>()
+            .Should()
+            .Equal("Use a whole number from 1 through 100000.");
         settings.MaxBackupFiles.Should().Be(25);
         persistence.SaveCount.Should().Be(0);
 
@@ -124,7 +131,10 @@ public sealed class PreferencesViewModelTests
         viewModel.MaxBackupFilesText = "500";
 
         // Assert
-        viewModel.HasMaxBackupFilesError.Should().BeFalse();
+        validation.GetErrors(nameof(PreferencesViewModel.MaxBackupFilesText))
+            .Cast<string>()
+            .Should()
+            .BeEmpty();
         settings.MaxBackupFiles.Should().Be(500);
         persistence.SaveCount.Should().Be(1);
     }
@@ -141,7 +151,11 @@ public sealed class PreferencesViewModelTests
         viewModel.PeriodicBackupIntervalText = "soon";
 
         // Assert
-        viewModel.HasPeriodicBackupIntervalError.Should().BeTrue();
+        INotifyDataErrorInfo validation = viewModel;
+        validation.GetErrors(nameof(PreferencesViewModel.PeriodicBackupIntervalText))
+            .Cast<string>()
+            .Should()
+            .Equal("Use the format hh:mm:ss, for example 00:10:00.");
         settings.PeriodicBackupInterval.Should().Be(TimeSpan.FromMinutes(5));
         persistence.SaveCount.Should().Be(0);
 
@@ -149,7 +163,10 @@ public sealed class PreferencesViewModelTests
         viewModel.PeriodicBackupIntervalText = "00:15:00";
 
         // Assert
-        viewModel.HasPeriodicBackupIntervalError.Should().BeFalse();
+        validation.GetErrors(nameof(PreferencesViewModel.PeriodicBackupIntervalText))
+            .Cast<string>()
+            .Should()
+            .BeEmpty();
         settings.PeriodicBackupInterval.Should().Be(TimeSpan.FromMinutes(15));
         persistence.SaveCount.Should().Be(1);
     }

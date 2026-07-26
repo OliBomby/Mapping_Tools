@@ -88,27 +88,6 @@ public sealed class ValueDialogViewModel : ViewModelBase, INotifyDataErrorInfo
     }
 
     /// <summary>
-    /// Gets the first parsing or validation error, or <see langword="null"/> when submission is allowed.
-    /// </summary>
-    public string? ErrorMessage
-    {
-        get => _errorMessage;
-        private set
-        {
-            if (_errorMessage == value)
-            {
-                return;
-            }
-
-            this.RaiseAndSetIfChanged(ref _errorMessage, value);
-            this.RaisePropertyChanged(nameof(HasErrors));
-            ErrorsChanged?.Invoke(
-                this,
-                new DataErrorsChangedEventArgs(nameof(Text)));
-        }
-    }
-
-    /// <summary>
     /// Gets whether the current text parsed and passed every validation rule.
     /// </summary>
     public bool IsValid
@@ -117,20 +96,14 @@ public sealed class ValueDialogViewModel : ViewModelBase, INotifyDataErrorInfo
         private set
         {
             this.RaiseAndSetIfChanged(ref _isValid, value);
-            this.RaisePropertyChanged(nameof(HasError));
         }
     }
-
-    /// <summary>
-    /// Gets whether correction text should occupy space below the field.
-    /// </summary>
-    public bool HasError => !IsValid;
 
     /// <summary>
     /// Gets whether the editable representation currently fails parsing or
     /// one of the dialog request's validation rules.
     /// </summary>
-    public bool HasErrors => ErrorMessage is not null;
+    public bool HasErrors => _errorMessage is not null;
 
     /// <summary>
     /// Returns the correction associated with <see cref="Text"/> for
@@ -150,9 +123,9 @@ public sealed class ValueDialogViewModel : ViewModelBase, INotifyDataErrorInfo
             return Array.Empty<string>();
         }
 
-        return ErrorMessage is null
+        return _errorMessage is null
             ? Array.Empty<string>()
-            : new[] { ErrorMessage };
+            : new[] { _errorMessage };
     }
 
     /// <summary>
@@ -179,8 +152,22 @@ public sealed class ValueDialogViewModel : ViewModelBase, INotifyDataErrorInfo
     {
         ValueInputEvaluation result = _evaluate(Text);
         _parsedValue = result.Value;
-        ErrorMessage = result.ErrorMessage;
+        SetValidationError(result.ErrorMessage);
         IsValid = result.IsValid;
+    }
+
+    private void SetValidationError(string? error)
+    {
+        if (_errorMessage == error)
+        {
+            return;
+        }
+
+        _errorMessage = error;
+        this.RaisePropertyChanged(nameof(HasErrors));
+        ErrorsChanged?.Invoke(
+            this,
+            new DataErrorsChangedEventArgs(nameof(Text)));
     }
 
     private void Accept()

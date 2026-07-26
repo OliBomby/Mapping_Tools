@@ -78,6 +78,21 @@ Material.Avalonia's exact-version `BaseThemeMode`. Theme dictionaries supply
 the shell, navigation, migrated content, dividers, selection feedback, and
 table rules with matching light and dark resources.
 
+Material.Avalonia is the canonical application palette. Views reference its
+semantic dynamic resources, including `MaterialPrimaryMidBrush`,
+`MaterialPaperBrush`, `MaterialBodyBrush`, `MaterialBodyLightBrush`,
+`MaterialDividerBrush`, and `MaterialValidationErrorBrush`. The only literal
+colors in the Avalonia frontend are three invariant custom-chrome values,
+centralized in `Resources/MappingToolsColors.axaml`; view files contain no
+hexadecimal colors.
+
+Avalonia does not implement WPF's XAML `Binding.ValidationRules` collection.
+Preferences therefore reports property-level errors through the standard
+`INotifyDataErrorInfo` binding-validation plugin. A single internal
+property/error dictionary replaces the earlier per-field error properties;
+the setters still own the small amount of parsing and persistence gating
+needed to prevent invalid edits from reaching `ApplicationSettings`.
+
 ## Automated and visual coverage
 
 `Mapping_Tools.Platform.Tests` verifies initial presentation without a write;

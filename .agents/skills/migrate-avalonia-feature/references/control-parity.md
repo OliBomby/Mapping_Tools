@@ -48,6 +48,39 @@ until it resembles the reference is not parity.
 If Avalonia lacks an exact counterpart, document the mismatch before creating
 a custom control and reproduce the full behavior, not just its resting pixels.
 
+## Material palette discipline
+
+Treat Material.Avalonia as the canonical palette. Use `DynamicResource` so
+runtime light/dark changes propagate. Prefer these exact 3.17.0 keys:
+
+- `MaterialPrimaryMidBrush`, `MaterialPrimaryLightBrush`, and
+  `MaterialPrimaryDarkBrush` for the configured primary swatch;
+- `MaterialPrimaryMidForegroundBrush` for content on the mid-primary surface;
+- `MaterialPaperBrush`, `MaterialCardBackgroundBrush`, `MaterialBodyBrush`,
+  and `MaterialBodyLightBrush` for surfaces and text;
+- `MaterialDividerBrush`, `MaterialSelectionBrush`, and
+  `MaterialDataGridRowHoverBackgroundBrush` for standard state feedback;
+- `MaterialValidationErrorBrush` for invalid state; and
+- `MaterialFlatButtonClickBrush`, `MaterialSnackbarBackgroundBrush`, and
+  `ShadowAssist.ShadowDepth` instead of custom button, notification, or
+  shadow colors.
+
+Do not assume a primary foreground is white: Material computes it for
+contrast, and Blue 500's mid-foreground may be black. When legacy chrome
+requires white content on blue, use an existing Material light-on-dark brush
+such as `MaterialDarkForegroundBrush` after verifying contrast.
+
+Do not put hexadecimal colors in views. If a visual role genuinely has no
+Material equivalent, add one semantic resource to the small centralized
+`Mapping_Tools.Desktop/Resources/MappingToolsColors.axaml` dictionary and use
+it everywhere. Before handoff, search:
+
+```powershell
+rg -n --glob "*.axaml" "#[0-9A-Fa-f]{3,8}" Mapping_Tools.Desktop
+```
+
+Only the centralized custom-color dictionary should match.
+
 ## Inspect exact control templates
 
 Read the templates from the exact Material.Avalonia and Avalonia 12.1 package
@@ -70,6 +103,28 @@ or tagged source before overriding them.
   boundaries are shared. Compare both boundaries and text origins with
   populated data.
 
+### Floating-label text fields
+
+- Map WPF `HintAssist.Hint` plus `MaterialDesignFloatingHintTextBox` to a real
+  Material.Avalonia `TextBox` with `TextFieldAssist.Label`. The label is part
+  of the control template; never add a sibling `TextBlock` above it.
+- Reuse the application-level non-outlined `TextBox` styles in `App.axaml`.
+  Do not add per-view `Height`, `MinHeight`, dense classes, label margins, or
+  underline offsets unless the exact template and a native reference prove a
+  distinct control variant is required.
+- In Material.Avalonia 3.17.0, the useful template parts include
+  `PART_TextFieldPanel`, `PART_LabelRootBorder`, `PART_LabelText`,
+  `PART_DataValidation`, and `PART_ErrorPresenter`. Adjust the responsible
+  internal part, not a compensating outer margin.
+- The default text-field panel is 56 pixels high and the dense variant is 48.
+  Neither automatically matches the legacy layout. Judge label-to-value,
+  value-to-underline, and row-to-row spacing separately before changing
+  geometry.
+- Material's `TextBox` template already wraps the field in
+  `DataValidationErrors` and presents correction text through
+  `PART_ErrorPresenter`. Never add a separate validation `TextBlock`; it
+  creates a second layout row and breaks field ownership.
+
 Keep selector placement valid:
 
 - Put descendant selectors that target controls outside a template in normal
@@ -78,6 +133,58 @@ Keep selector placement valid:
   as `^` and `/template/`.
 - Do not place an arbitrary descendant selector directly inside a
   `ControlTheme`; compiled AXAML can still fail only when the view is rendered.
+
+## Typed text conversion
+
+Keep bindable values typed. An `int`, `double`, enum, date, duration, or other
+non-string value must not acquire a parallel `FooText` property merely because
+a `TextBox` edits it.
+
+- Put reusable two-way `IValueConverter` implementations in the frontend's
+  shared converter location. Convert typed values to presentation text in
+  `Convert` and parse edits in `ConvertBack`; never move this work into a view
+  model setter.
+- Reuse converters by type and formatting semantics rather than creating one
+  converter per field. Expose a shared instance through application resources
+  or a static property.
+- Choose culture and number styles deliberately. Use the legacy/persistence
+  format when parity requires it; otherwise use the intended UI culture.
+- Report empty or malformed input as a binding validation failure. Never
+  silently coerce invalid text to `0`, another default, or the previous value.
+  The invalid edit must remain visible for correction.
+- Test forward conversion, valid conversion back, empty/null input, malformed
+  input, boundary values, and culture-sensitive input.
+
+## Validation presentation and ownership
+
+Avalonia does not provide WPF's XAML
+`Binding.ValidationRules`/`ValidationRule` collection. Define validation rules
+with `System.ComponentModel.DataAnnotations` on the typed bindable property and
+let Avalonia consume the resulting `INotifyDataErrorInfo` errors.
+
+- Use built-in attributes such as `Required`, `Range`, and `StringLength`
+  whenever they express the rule.
+- For domain-specific or cross-property rules, create a reusable custom
+  `ValidationAttribute`, override `IsValid(object?, ValidationContext)`, and
+  return a meaningful `ValidationResult`. Put UI-independent attributes in
+  Core or Application according to the project boundaries.
+- Use one shared annotation-driven validation base/adapter that invokes the
+  DataAnnotations validator and raises `INotifyDataErrorInfo` notifications.
+  If the feature already uses CommunityToolkit.Mvvm, its `ObservableValidator`
+  and `NotifyDataErrorInfo` generation are suitable. Do not add a second MVVM
+  framework solely for validation, and do not hand-write parsing, error
+  dictionaries, or duplicated validation branches in each ReactiveUI view
+  model.
+- Run property validation when the value changes. Validate all properties
+  before submit/save and block persistence while any error remains.
+- Keep persistence gating outside the view. Invalid edits must not reach
+  shared settings or trigger a save.
+- Do not expose parallel `FooError` and `HasFooError` properties unless a
+  non-validation consumer actually needs them.
+- Bind editable values `TwoWay`. Route converter failures and annotation
+  errors through Avalonia's binding-validation pipeline, and let the Material
+  text-field template own the error label, underline, spacing, and correction
+  presentation instead of adding a separate error control.
 
 ## Custom chrome and state feedback
 
@@ -114,9 +221,17 @@ For each migrated view:
 4. Capture or inspect opened menu/context-menu states when present.
 5. Exercise hover, focus, selection, checked state, column resizing, splitter
    movement, scrolling, and keyboard access as applicable.
-6. Use a native desktop run for title dragging, window controls, platform
+6. Render both light and dark themes when a palette or semantic resource
+   changes. For fields, inspect populated, focused, empty, and invalid states.
+7. Treat the WPF designer-host render as hierarchy evidence, not unquestioned
+   template evidence. It can draw Material floating hints over their values;
+   when it conflicts with the WPF XAML/template or a native reference, verify
+   the running WPF control and do not copy the renderer artifact.
+8. Use a native desktop run for title dragging, window controls, platform
    dialogs, popup behavior, and anything a headless renderer cannot prove.
-7. Treat compilation as an implementation check, never as visual or
+9. Compare an Avalonia native-window capture with the headless render when
+   template spacing or DPI accuracy is disputed.
+10. Treat compilation as an implementation check, never as visual or
    interaction evidence.
 
 Do not report completion while a semantic substitute, inactive chrome,

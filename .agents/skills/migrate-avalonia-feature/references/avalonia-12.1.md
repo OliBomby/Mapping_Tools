@@ -7,6 +7,8 @@ The desktop frontend pins Avalonia to `12.1.0`. Verify Avalonia work online befo
 - Avalonia 12.1.0 release and source: https://github.com/AvaloniaUI/Avalonia/releases/tag/12.1.0 and https://github.com/AvaloniaUI/Avalonia/tree/12.1.0
 - Avalonia documentation: https://docs.avaloniaui.net/docs/
 - Avalonia API reference: https://docs.avaloniaui.net/api/
+- Binding validation and DataAnnotations: https://docs.avaloniaui.net/docs/data-binding/binding-validation
+- Custom data-binding converters: https://docs.avaloniaui.net/docs/data-binding/how-to-create-a-custom-data-binding-converter
 - WPF migration guide: https://docs.avaloniaui.net/docs/migration/wpf
 - Avalonia 12 breaking changes: https://docs.avaloniaui.net/docs/avalonia12-breaking-changes
 - Avalonia 12.1.0 package metadata: https://www.nuget.org/packages/Avalonia/12.1.0

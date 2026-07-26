@@ -1,0 +1,11 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Material.Avalonia owns the main palette. These are the few colors
+         specific to Mapping Tools' custom desktop chrome. -->
+    <SolidColorBrush x:Key="MappingToolsChromeHoverBrush"
+                     Color="#26000000" />
+    <SolidColorBrush x:Key="MappingToolsChromePressedBrush"
+                     Color="#40000000" />
+    <SolidColorBrush x:Key="MappingToolsScrollbarThumbBrush"
+                     Color="#C1C1C1" />
+</ResourceDictionary>
