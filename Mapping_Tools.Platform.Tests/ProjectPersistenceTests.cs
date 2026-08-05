@@ -53,6 +53,22 @@ public sealed class ProjectPersistenceTests
     }
 
     [TestMethod]
+    public void Deserialize_WithTransitionalCoreTypeMetadata_ResolvesMigratedAssembly()
+    {
+        // Arrange
+        LegacyProjectJsonSerializer serializer = new();
+        const string json =
+            """{"$type":"Mapping_Tools.Core.Classes.BeatmapHelper.TimingPoint, Mapping Tools","Offset":1250.0,"MpB":500.0}""";
+
+        // Act
+        TimingPoint timingPoint = serializer.Deserialize<TimingPoint>(json);
+
+        // Assert
+        timingPoint.Offset.Should().Be(1250);
+        timingPoint.MpB.Should().Be(500);
+    }
+
+    [TestMethod]
     public void SerializeAndDeserialize_VectorDocument_MatchesLegacyRepresentation()
     {
         // Arrange

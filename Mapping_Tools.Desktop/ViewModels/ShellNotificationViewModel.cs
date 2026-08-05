@@ -7,8 +7,10 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// <summary>
 /// Presents one independently dismissible shell notification.
 /// </summary>
-public sealed class ShellNotificationViewModel : ObservableObject
+public sealed partial class ShellNotificationViewModel : ObservableObject
 {
+    private readonly Action<ShellNotificationViewModel> _dismiss;
+
     internal ShellNotificationViewModel(
         UserNotification notification,
         Action<ShellNotificationViewModel> dismiss)
@@ -17,7 +19,7 @@ public sealed class ShellNotificationViewModel : ObservableObject
         Severity = notification.Severity;
         Title = notification.Title;
         Message = notification.Message;
-        DismissCommand = new RelayCommand(() => dismiss(this));
+        _dismiss = dismiss;
     }
 
     /// <summary>Gets the notification severity.</summary>
@@ -32,6 +34,7 @@ public sealed class ShellNotificationViewModel : ObservableObject
     /// <summary>Gets the compact legacy-snackbar text.</summary>
     public string DisplayText => $"{Title}: {Message}";
 
-    /// <summary>Gets the command that removes this notification from the queue.</summary>
-    public IRelayCommand DismissCommand { get; }
+    [RelayCommand]
+    private void Dismiss() =>
+        _dismiss(this);
 }

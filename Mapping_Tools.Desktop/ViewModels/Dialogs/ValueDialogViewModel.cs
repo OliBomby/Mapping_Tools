@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Interactions;
+using Mapping_Tools.Desktop.ViewModels.Dialogs.Validation;
 
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 
@@ -13,6 +13,7 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
 {
     private readonly Func<object?, ValidationResult?> _validate;
     private readonly Action<object?> _accept;
+    private readonly Action _cancel;
     private bool _hasConversionError;
     /// <summary>
     /// Gets or sets the typed value produced by the field's binding converter.
@@ -55,8 +56,7 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
         CancelLabel = cancelLabel;
         _validate = validate;
         _accept = accept;
-        AcceptCommand = new RelayCommand(Accept);
-        CancelCommand = new RelayCommand(cancel);
+        _cancel = cancel;
 
         ErrorsChanged += (_, _) => OnPropertyChanged(nameof(IsValid));
         if (Equals(Value, initialValue))
@@ -94,16 +94,6 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
     /// </summary>
     public string CancelLabel { get; }
 
-    /// <summary>
-    /// Gets the guarded command that submits only the currently validated value.
-    /// </summary>
-    public ICommand AcceptCommand { get; }
-
-    /// <summary>
-    /// Gets the command that dismisses the field without submitting a value.
-    /// </summary>
-    public ICommand CancelCommand { get; }
-
     internal ValidationResult? ValidateDialogValue(object? value) =>
         _validate(value);
 
@@ -119,6 +109,7 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
         OnPropertyChanged(nameof(IsValid));
     }
 
+    [RelayCommand]
     private void Accept()
     {
         ValidateAllProperties();
@@ -128,4 +119,8 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
             _accept(Value);
         }
     }
+
+    [RelayCommand]
+    private void Cancel() =>
+        _cancel();
 }

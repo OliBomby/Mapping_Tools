@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
+namespace Mapping_Tools.Desktop.ViewModels.Dialogs.Validation;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 internal sealed class DialogValueAttribute : ValidationAttribute

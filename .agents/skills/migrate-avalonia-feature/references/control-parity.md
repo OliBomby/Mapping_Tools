@@ -168,13 +168,8 @@ let Avalonia consume the resulting `INotifyDataErrorInfo` errors.
   `ValidationAttribute`, override `IsValid(object?, ValidationContext)`, and
   return a meaningful `ValidationResult`. Put UI-independent attributes in
   Core or Application according to the project boundaries.
-- Use one shared annotation-driven validation base/adapter that invokes the
-  DataAnnotations validator and raises `INotifyDataErrorInfo` notifications.
-  If the feature already uses CommunityToolkit.Mvvm, its `ObservableValidator`
-  and `NotifyDataErrorInfo` generation are suitable. Do not add a second MVVM
-  framework solely for validation, and do not hand-write parsing, error
-  dictionaries, or duplicated validation branches in each ReactiveUI view
-  model.
+- Derive each validating view model directly from CommunityToolkit.Mvvm's
+  `ObservableValidator` and use `[NotifyDataErrorInfo]` on generated properties.
 - Run property validation when the value changes. Validate all properties
   before submit/save and block persistence while any error remains.
 - Keep persistence gating outside the view. Invalid edits must not reach

@@ -1,6 +1,6 @@
 ---
 name: migrate-avalonia-feature
-description: Migrate one small Mapping Tools feature from the legacy WPF/WinForms frontend to Avalonia 12.1.0. Use when porting a view, dialog, control, or simple feature slice; extracting its business logic from WPF code-behind; introducing UI-independent services and tests; creating ReactiveUI view models and Material.Avalonia views; or reviewing a feature migration for framework leakage and behavior parity.
+description: Migrate one small Mapping Tools feature from the legacy WPF/WinForms frontend to Avalonia 12.1.0. Use when porting a view, dialog, control, or simple feature slice; extracting its business logic from WPF code-behind; introducing UI-independent services and tests; creating CommunityToolkit.Mvvm view models and Material.Avalonia views; or reviewing a feature migration for framework leakage and behavior parity.
 ---
 
 # Migrate Avalonia Feature
@@ -16,17 +16,17 @@ For any UI-bearing migration, also read
 choosing controls or styles. Treat semantic control parity, interaction parity,
 and visual parity as one acceptance gate.
 
-Use only official Avalonia documentation, the Avalonia 12.1.0 tagged source/release, exact-version NuGet metadata, ReactiveUI documentation, and the Material.Avalonia repository as authorities. Do not use WPF knowledge or Avalonia 11 examples as evidence that an API exists. When current documentation covers a later release, verify the API against the 12.1.0 tag or package before using it.
+Use only official Avalonia documentation, the Avalonia 12.1.0 tagged source/release, exact-version NuGet metadata, official CommunityToolkit.Mvvm documentation, and the Material.Avalonia repository as authorities. Do not use WPF knowledge or Avalonia 11 examples as evidence that an API exists. When current documentation covers a later release, verify the API against the 12.1.0 tag or package before using it.
 
 ## Project boundaries
 
 - Put pure models, value objects, calculations, and domain rules in `Mapping_Tools.Core`.
 - Put feature use cases and UI/OS abstraction interfaces in `Mapping_Tools.Application`.
 - Put filesystem, osu!, audio, network, and platform adapter implementations in `Mapping_Tools.Infrastructure`.
-- Put Avalonia views, ReactiveUI presentation state, navigation, and UI-only adapters in `Mapping_Tools.Desktop`.
+- Put Avalonia views, CommunityToolkit.Mvvm presentation state, navigation, and UI-only adapters in `Mapping_Tools.Desktop`.
 - Keep the existing `Mapping_Tools` WPF project runnable until the migrated feature is accepted.
 
-Never add references to `System.Windows`, `System.Windows.Forms`, `MaterialDesignThemes.Wpf`, or Avalonia/ReactiveUI packages to Core, Application, or Infrastructure. Infrastructure may contain an explicitly Windows-specific adapter only when the feature inherently requires Windows; keep its interface platform-neutral and call out the limitation.
+Never add references to `System.Windows`, `System.Windows.Forms`, `MaterialDesignThemes.Wpf`, Avalonia, ReactiveUI, or CommunityToolkit.Mvvm packages to Core, Application, or Infrastructure. Infrastructure may contain an explicitly Windows-specific adapter only when the feature inherently requires Windows; keep its interface platform-neutral and call out the limitation.
 
 Copy code from the WPF project exactly whenever possible, this will make manual review easier.
 
@@ -62,8 +62,8 @@ completing a migration.
 2. Record observable behavior and establish focused tests before moving logic. Include success, validation failure, cancellation, error behavior, hover, focus, checked/selected states, resizing, dragging, keyboard access, open menus, populated data, and empty data whenever relevant.
 3. Classify code into domain rules, application orchestration, infrastructure, and presentation. Keep only rendering, focus, pointer gestures, animation, and other genuinely visual behavior in a view.
 4. Extract the smallest reusable slice. Introduce interfaces for file/folder pickers, notifications, clipboard, dispatching, window ownership, or other UI/OS effects. Preserve the WPF behavior through WPF-side adapters where necessary.
-5. Confirm the extracted Core/Application code contains no frontend types with searches such as `rg "System\\.Windows|System\\.Windows\\.Forms|Avalonia|ReactiveUI" Mapping_Tools.Core Mapping_Tools.Application`.
-6. Implement a ReactiveUI view model in `Mapping_Tools.Desktop/ViewModels`. Use `ReactiveObject`, `RaiseAndSetIfChanged`, and `ReactiveCommand` only when the verified 12.1-compatible documentation supports the pattern. Keep services constructor-injected and expose bindable typed state rather than controls or string mirrors of numeric, enum, date, duration, or other non-string values. Use the shared DataAnnotations-driven validation base/adapter described in `control-parity.md`; do not hand-write field-specific error dictionaries or recreate WPF `Binding.ValidationRules` syntax.
+5. Confirm the extracted Core/Application code contains no frontend types with searches such as `rg "System\\.Windows|System\\.Windows\\.Forms|Avalonia|ReactiveUI|CommunityToolkit\\.Mvvm" Mapping_Tools.Core Mapping_Tools.Application`.
+6. Implement a CommunityToolkit.Mvvm view model in `Mapping_Tools.Desktop/ViewModels` using the view-model implementation standard below. Keep services constructor-injected and expose bindable typed state rather than controls or string mirrors of numeric, enum, date, duration, or other non-string values. Use DataAnnotations with `ObservableValidator` and `[NotifyDataErrorInfo]`; do not hand-write field-specific error dictionaries or recreate WPF `Binding.ValidationRules` syntax.
 7. Implement the Avalonia view in `Mapping_Tools.Desktop/Views` with compiled bindings and an explicit `x:DataType`. Use reusable two-way `IValueConverter` implementations for text presentation and parsing of typed values; do not parse or format those values in the view model. Use Material.Avalonia's semantic dynamic resources and the application-level styles already registered in `App.axaml`. Do not translate WPF triggers, dependency properties, event names, dialog APIs, floating-hint labels, or literal colors mechanically.
 8. Register the feature in the Avalonia shell using the smallest navigation change required. Do not remove or redirect the WPF feature yet.
 9. Build the new frontend and run focused tests. Use `$render-desktop-view` to capture the WPF view and Avalonia port with identical deterministic state and dimensions, inspect both PNGs, and resolve or record visible differences. Use a real desktop run for native dialogs, overlays, global input, audio, or other platform behavior.
@@ -72,6 +72,16 @@ completing a migration.
     affected files for empty or identifier-paraphrasing documentation; CS1591
     alone does not detect low-quality comments.
 11. Report migrated behavior, intentionally deferred behavior, platform limitations, tests run, and the exact Avalonia 12.1 documentation pages consulted.
+
+## View-model implementation standard
+
+- Prefer small, feature-specific `partial` view models based on CommunityToolkit.Mvvm's `ObservableObject` or `ObservableValidator`.
+- Use `[ObservableProperty]` for bindable mutable state whenever its generated equality, accessibility, and change-hook behavior preserve the feature contract. Use generated partial-property declarations when a non-public setter or XML documentation must remain explicit.
+- Put DataAnnotations validation attributes and `[NotifyDataErrorInfo]` on generated properties in `ObservableValidator` types. Keep validation state in the toolkit rather than maintaining error dictionaries or duplicating validation events.
+- Use `[NotifyPropertyChangedFor]` and `[NotifyCanExecuteChangedFor]` for static dependent notifications instead of manual `OnPropertyChanged` calls.
+- Use `[RelayCommand]` for synchronous and asynchronous view-model actions when the generated command has the required execution and cancellation semantics.
+- Keep a manual property when it normalizes input, directly adapts a non-observable model without duplicate state, or requires setter ordering that generator hooks cannot preserve clearly.
+- Do not introduce broad observable adapter or base classes merely to consolidate generated properties. Keep state beside the feature that owns its behavior unless multiple real consumers justify a separate abstraction.
 
 ## Visual parity gate
 
@@ -122,7 +132,7 @@ Complete a feature migration only when:
 
 - Both the WPF application and Avalonia desktop project build.
 - Extracted logic has focused automated coverage or a documented reason coverage is impractical.
-- Core and Application contain no WPF, WinForms, Avalonia, or ReactiveUI references.
+- Core and Application contain no WPF, WinForms, Avalonia, ReactiveUI, or CommunityToolkit.Mvvm references.
 - The Avalonia view uses APIs verified for 12.1.0 and compiled bindings where applicable.
 - Each legacy interactive element is represented by the correct Avalonia
   control and preserves its selection, resizing, dragging, menu, hover,

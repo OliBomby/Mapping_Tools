@@ -10,7 +10,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// <summary>
 /// Supplies offline onboarding, changelog, recent-map, and support-link content.
 /// </summary>
-public sealed class GetStartedViewModel : ObservableObject
+public sealed partial class GetStartedViewModel : ObservableObject
 {
     private static readonly string[] OnboardingInstructions =
     [
@@ -45,10 +45,9 @@ public sealed class GetStartedViewModel : ObservableObject
                 recent.DisplayDate)));
         Changelog = [];
         Instructions = OnboardingInstructions;
-        OpenWebsiteCommand = new AsyncRelayCommand(
-            () => OpenUriAsync(WebsiteUri, "website"));
-        OpenSourceCommand = new AsyncRelayCommand(
-            () => OpenUriAsync(SourceUri, "source repository"));
+        HasNoRecentMaps = RecentMaps.Count == 0;
+        RecentMaps.CollectionChanged += (_, _) =>
+            HasNoRecentMaps = RecentMaps.Count == 0;
     }
 
     /// <summary>Gets recent maps in persisted order.</summary>
@@ -61,13 +60,16 @@ public sealed class GetStartedViewModel : ObservableObject
     public IReadOnlyList<ChangelogEntryViewModel> Changelog { get; }
 
     /// <summary>Gets whether an empty-state explanation should be shown.</summary>
-    public bool HasNoRecentMaps => RecentMaps.Count == 0;
+    [ObservableProperty]
+    public partial bool HasNoRecentMaps { get; private set; }
 
-    /// <summary>Gets the command that opens the Mapping Tools website.</summary>
-    public IAsyncRelayCommand OpenWebsiteCommand { get; }
+    [RelayCommand]
+    private Task OpenWebsiteAsync() =>
+        OpenUriAsync(WebsiteUri, "website");
 
-    /// <summary>Gets the command that opens the source repository.</summary>
-    public IAsyncRelayCommand OpenSourceCommand { get; }
+    [RelayCommand]
+    private Task OpenSourceAsync() =>
+        OpenUriAsync(SourceUri, "source repository");
 
     private async Task OpenUriAsync(Uri uri, string destination)
     {

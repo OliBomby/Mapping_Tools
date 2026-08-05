@@ -24,6 +24,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator
     private readonly IFilePicker _filePicker;
     private readonly IApplicationThemeService _themeService;
     private readonly IUserNotificationService _notifications;
+
     /// <summary>Gets or edits the directory containing the osu! executable.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
@@ -89,23 +90,6 @@ public sealed partial class PreferencesViewModel : ObservableValidator
         _backupsPath = settings.BackupsPath;
         _maxBackupFiles = settings.MaxBackupFiles;
         _periodicBackupInterval = settings.PeriodicBackupInterval;
-
-        BrowseOsuPathCommand = new AsyncRelayCommand(
-            () => PickFolderAsync(
-                "Select the osu! folder",
-                OsuPath,
-                path => OsuPath = path));
-        BrowseSongsPathCommand = new AsyncRelayCommand(
-            () => PickFolderAsync(
-                "Select the osu! Songs folder",
-                SongsPath,
-                path => SongsPath = path));
-        BrowseBackupsPathCommand = new AsyncRelayCommand(
-            () => PickFolderAsync(
-                "Select the Mapping Tools backups folder",
-                BackupsPath,
-                path => BackupsPath = path));
-        BrowseOsuConfigPathCommand = new AsyncRelayCommand(PickOsuConfigAsync);
     }
 
     /// <summary>Gets or sets whether destructive tools create safety backups.</summary>
@@ -128,8 +112,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator
             _settings.MakePeriodicBackups,
             value,
             _settings,
-            static (settings, enabled) =>
-                settings.MakePeriodicBackups = enabled,
+            static (settings, enabled) => settings.MakePeriodicBackups = enabled,
             validate: false);
     }
 
@@ -143,8 +126,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator
             _settings.CurrentBeatmapDefaultFolder,
             value,
             _settings,
-            static (settings, enabled) =>
-                settings.CurrentBeatmapDefaultFolder = enabled,
+            static (settings, enabled) => settings.CurrentBeatmapDefaultFolder = enabled,
             validate: false);
     }
 
@@ -156,8 +138,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator
             _settings.UseEditorReader,
             value,
             _settings,
-            static (settings, enabled) =>
-                settings.UseEditorReader = enabled,
+            static (settings, enabled) => settings.UseEditorReader = enabled,
             validate: false);
     }
 
@@ -179,64 +160,42 @@ public sealed partial class PreferencesViewModel : ObservableValidator
         }
     }
 
-    /// <summary>Gets the native folder-picker command for the osu! directory.</summary>
-    public IAsyncRelayCommand BrowseOsuPathCommand { get; }
-
-    /// <summary>Gets the native folder-picker command for the Songs directory.</summary>
-    public IAsyncRelayCommand BrowseSongsPathCommand { get; }
-
-    /// <summary>Gets the native file-picker command for the osu! configuration.</summary>
-    public IAsyncRelayCommand BrowseOsuConfigPathCommand { get; }
-
-    /// <summary>Gets the native folder-picker command for the backups directory.</summary>
-    public IAsyncRelayCommand BrowseBackupsPathCommand { get; }
-
     partial void OnOsuPathChanged(string value) =>
-        ApplyValidatedValue(
-            value,
-            static (settings, path) => settings.OsuPath = path,
-            nameof(OsuPath));
+        ApplyValidatedValue(value, static (settings, path) => settings.OsuPath = path, nameof(OsuPath));
 
     partial void OnSongsPathChanged(string value) =>
-        ApplyValidatedValue(
-            value,
-            static (settings, path) => settings.SongsPath = path,
-            nameof(SongsPath));
+        ApplyValidatedValue(value, static (settings, path) => settings.SongsPath = path, nameof(SongsPath));
 
     partial void OnOsuConfigPathChanged(string value) =>
-        ApplyValidatedValue(
-            value,
-            static (settings, path) => settings.OsuConfigPath = path,
-            nameof(OsuConfigPath));
+        ApplyValidatedValue(value, static (settings, path) => settings.OsuConfigPath = path, nameof(OsuConfigPath));
 
     partial void OnBackupsPathChanged(string value) =>
-        ApplyValidatedValue(
-            value,
-            static (settings, path) => settings.BackupsPath = path,
-            nameof(BackupsPath));
+        ApplyValidatedValue(value, static (settings, path) => settings.BackupsPath = path, nameof(BackupsPath));
 
     partial void OnMaxBackupFilesChanged(int value) =>
-        ApplyValidatedValue(
-            value,
-            static (settings, count) => settings.MaxBackupFiles = count,
-            nameof(MaxBackupFiles));
+        ApplyValidatedValue(value, static (settings, count) => settings.MaxBackupFiles = count, nameof(MaxBackupFiles));
 
     partial void OnPeriodicBackupIntervalChanged(TimeSpan value) =>
-        ApplyValidatedValue(
-            value,
-            static (settings, interval) =>
-                settings.PeriodicBackupInterval = interval,
-            nameof(PeriodicBackupInterval));
+        ApplyValidatedValue(value, static (settings, interval) => settings.PeriodicBackupInterval = interval, nameof(PeriodicBackupInterval));
+
+    [RelayCommand]
+    private Task BrowseOsuPathAsync() =>
+        PickFolderAsync("Select the osu! folder", OsuPath, path => OsuPath = path);
+
+    [RelayCommand]
+    private Task BrowseSongsPathAsync() =>
+        PickFolderAsync("Select the osu! Songs folder", SongsPath, path => SongsPath = path);
+
+    [RelayCommand]
+    private Task BrowseBackupsPathAsync() =>
+        PickFolderAsync("Select the Mapping Tools backups folder", BackupsPath, path => BackupsPath = path);
 
     private void ApplyValidatedValue<T>(
         T value,
         Action<ApplicationSettings, T> apply,
         string propertyName)
     {
-        ValidationContext context = new(this)
-        {
-            MemberName = propertyName
-        };
+        ValidationContext context = new(this) { MemberName = propertyName };
         if (Validator.TryValidateProperty(value, context, null))
         {
             apply(_settings, value);
@@ -274,7 +233,8 @@ public sealed partial class PreferencesViewModel : ObservableValidator
         }
     }
 
-    private async Task PickOsuConfigAsync()
+    [RelayCommand]
+    private async Task BrowseOsuConfigPathAsync()
     {
         try
         {

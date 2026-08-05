@@ -13,7 +13,8 @@ The desktop frontend pins Avalonia to `12.1.0`. Verify Avalonia work online befo
 - Avalonia 12 breaking changes: https://docs.avaloniaui.net/docs/avalonia12-breaking-changes
 - Avalonia 12.1.0 package metadata: https://www.nuget.org/packages/Avalonia/12.1.0
 - Official Avalonia templates: https://github.com/AvaloniaUI/avalonia-dotnet-templates
-- ReactiveUI Avalonia integration: https://www.reactiveui.net/docs/getting-started/installation/avalonia and https://www.nuget.org/packages/ReactiveUI.Avalonia/12.0.3
+- CommunityToolkit.Mvvm generators: https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/generators/observableproperty and https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/generators/relaycommand
+- CommunityToolkit.Mvvm 8.4.2 package metadata: https://www.nuget.org/packages/CommunityToolkit.Mvvm/8.4.2
 - Material.Avalonia setup: https://github.com/AvaloniaCommunity/Material.Avalonia and https://www.nuget.org/packages/Material.Avalonia/3.17.0
 
 ## Verification rules

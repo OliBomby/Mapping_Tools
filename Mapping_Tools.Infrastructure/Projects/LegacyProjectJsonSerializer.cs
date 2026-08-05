@@ -66,13 +66,16 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
     private sealed class LegacyProjectTypeBinder : ISerializationBinder
     {
         private const string LegacyAssemblyName = "Mapping Tools";
+        private const string LegacyNamespacePrefix = "Mapping_Tools.";
+        private const string CurrentNamespacePrefix = "Mapping_Tools.Core.";
         private readonly DefaultSerializationBinder _fallback = new();
 
         public Type BindToType(string? assemblyName, string typeName)
         {
             if (assemblyName == LegacyAssemblyName)
             {
-                Type? migratedType = MigratedCoreMarker.Assembly.GetType(typeName);
+                Type? migratedType = MigratedCoreMarker.Assembly.GetType(typeName)
+                    ?? MigratedCoreMarker.Assembly.GetType(ToCurrentTypeName(typeName));
                 if (migratedType is not null)
                 {
                     return migratedType;
@@ -90,12 +93,22 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             if (serializedType.Assembly == MigratedCoreMarker.Assembly)
             {
                 assemblyName = LegacyAssemblyName;
-                typeName = serializedType.FullName;
+                typeName = ToLegacyTypeName(serializedType.FullName);
                 return;
             }
 
             _fallback.BindToName(serializedType, out assemblyName, out typeName);
         }
+
+        private static string ToCurrentTypeName(string typeName) =>
+            typeName.StartsWith(LegacyNamespacePrefix, StringComparison.Ordinal)
+                ? CurrentNamespacePrefix + typeName[LegacyNamespacePrefix.Length..]
+                : typeName;
+
+        private static string? ToLegacyTypeName(string? typeName) =>
+            typeName?.StartsWith(CurrentNamespacePrefix, StringComparison.Ordinal) == true
+                ? LegacyNamespacePrefix + typeName[CurrentNamespacePrefix.Length..]
+                : typeName;
     }
 
     private sealed class Vector2Converter : JsonConverter

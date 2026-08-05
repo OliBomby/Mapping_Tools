@@ -9,6 +9,9 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public sealed partial class ShellFeatureItemViewModel : ObservableObject
 {
+    private readonly Action<ShellFeatureItemViewModel> _activate;
+    private readonly Action<ShellFeatureItemViewModel> _toggleFavorite;
+
     internal ShellFeatureItemViewModel(
         ShellFeatureRegistration registration,
         int order,
@@ -22,13 +25,13 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
         Description = registration.Description;
         Order = order;
         StartsSection = registration.StartsSection;
+        _activate = activate;
+        _toggleFavorite = toggleFavorite;
         SearchableText = string.Join(
             ' ',
             new[] { registration.DisplayName, registration.Category, registration.Description }
                 .Concat(registration.SearchTerms));
         IsFavorite = isFavorite;
-        ActivateCommand = new RelayCommand(() => activate(this));
-        ToggleFavoriteCommand = new RelayCommand(() => toggleFavorite(this));
     }
 
     /// <summary>Gets the stable persistence identifier.</summary>
@@ -72,13 +75,15 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
     /// <summary>Gets the complete row height, including a legacy section divider when present.</summary>
     public double NavigationRowHeight => NavigationHeight + (StartsSection ? 21 : 0);
 
-    /// <summary>Gets the command that activates this feature.</summary>
-    public IRelayCommand ActivateCommand { get; }
-
-    /// <summary>Gets the command that toggles persisted favorite state.</summary>
-    public IRelayCommand ToggleFavoriteCommand { get; }
-
     internal string SearchableText { get; }
 
     internal int Order { get; }
+
+    [RelayCommand]
+    private void Activate() =>
+        _activate(this);
+
+    [RelayCommand]
+    private void ToggleFavorite() =>
+        _toggleFavorite(this);
 }

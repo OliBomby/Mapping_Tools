@@ -46,11 +46,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             .ToArray();
         VisibleFeatures = [];
         NotificationQueue = [];
-        ToggleNavigationCommand = new RelayCommand(() =>
-        {
-            IsNavigationOpen = !IsNavigationOpen;
-        });
-
         _notifications.Published += OnNotificationPublished;
         RefreshVisibleFeatures();
         SelectedFeature = FeatureItems[0];
@@ -70,9 +65,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     /// <summary>Gets queued notifications in publication order.</summary>
     public ObservableCollection<ShellNotificationViewModel> NotificationQueue { get; }
-
-    /// <summary>Gets the command that expands or collapses the navigation pane.</summary>
-    public IRelayCommand ToggleNavigationCommand { get; }
 
     /// <summary>Gets or sets the case-insensitive feature search query.</summary>
     public string SearchText
@@ -158,6 +150,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             Activate(value);
         }
     }
+
+    [RelayCommand]
+    private void ToggleNavigation() =>
+        IsNavigationOpen = !IsNavigationOpen;
 
     private void ToggleFavorite(ShellFeatureItemViewModel item)
     {
