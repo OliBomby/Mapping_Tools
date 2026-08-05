@@ -89,24 +89,23 @@ static MessageDialogWindow CreateMessageDialog()
 static ValueDialogWindow CreateValueDialog(string scenario)
 {
     bool invalid = scenario.Equals("invalid", StringComparison.OrdinalIgnoreCase);
-    TextConversionState conversionState = new();
+    ValueDialogViewModel viewModel = new(
+        "Type value",
+        "Value",
+        invalid ? 0 : 1000,
+        "ACCEPT",
+        "CANCEL",
+        value => invalid
+            ? new ValidationResult("Enter a whole number.")
+            : ValidationResult.Success,
+        _ => { },
+        () => { });
     ValueDialogConverter converter = new(
         new ApplicationInvariantInt32Converter(),
-        conversionState);
+        viewModel.SetConversionError);
     ValueDialogWindow window = new()
     {
-        DataContext = new ValueDialogViewModel(
-            "Type value",
-            "Value",
-            invalid ? 0 : 1000,
-            "ACCEPT",
-            "CANCEL",
-            value => invalid
-                ? new ValidationResult("Enter a whole number.")
-                : ValidationResult.Success,
-            conversionState,
-            _ => { },
-            () => { })
+        DataContext = viewModel
     };
     window.BindValue(converter);
     return window;

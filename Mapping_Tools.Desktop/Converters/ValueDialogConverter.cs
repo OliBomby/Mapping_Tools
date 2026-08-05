@@ -7,16 +7,16 @@ namespace Mapping_Tools.Desktop.Converters;
 internal sealed class ValueDialogConverter : IValueConverter
 {
     private readonly ApplicationValueConverter _converter;
-    private readonly TextConversionState _state;
+    private readonly Action<string?> _reportConversionError;
 
     public ValueDialogConverter(
         ApplicationValueConverter converter,
-        TextConversionState state)
+        Action<string?> reportConversionError)
     {
         ArgumentNullException.ThrowIfNull(converter);
-        ArgumentNullException.ThrowIfNull(state);
+        ArgumentNullException.ThrowIfNull(reportConversionError);
         _converter = converter;
-        _state = state;
+        _reportConversionError = reportConversionError;
     }
 
     public object Convert(
@@ -42,5 +42,5 @@ internal sealed class ValueDialogConverter : IValueConverter
             parameter,
             culture,
             _converter,
-            _state);
+            _reportConversionError);
 }

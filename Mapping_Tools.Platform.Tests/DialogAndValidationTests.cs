@@ -302,14 +302,12 @@ public sealed class DialogAndValidationTests
     {
         // Arrange
         int acceptCount = 0;
-        TextConversionState conversionState = new();
-        ValueDialogConverter converter = new(
-            new ApplicationConverters.InvariantInt32Converter(),
-            conversionState);
         ValueDialogViewModel viewModel = CreateValueViewModel(
             _ => ValidationResult.Success,
-            conversionState,
             _ => acceptCount++);
+        ValueDialogConverter converter = new(
+            new ApplicationConverters.InvariantInt32Converter(),
+            viewModel.SetConversionError);
 
         // Act
         object? result = converter.ConvertBack(
@@ -349,14 +347,43 @@ public sealed class DialogAndValidationTests
     }
 
     [TestMethod]
+    public void ConvertBack_ValidTextAfterParsingFailure_ReenablesDialogAcceptance()
+    {
+        // Arrange
+        object? accepted = null;
+        ValueDialogViewModel viewModel = CreateValueViewModel(
+            _ => ValidationResult.Success,
+            value => accepted = value);
+        ValueDialogConverter converter = new(
+            new ApplicationConverters.InvariantInt32Converter(),
+            viewModel.SetConversionError);
+        _ = converter.ConvertBack(
+            "not-a-number",
+            typeof(object),
+            null,
+            CultureInfo.InvariantCulture);
+
+        // Act
+        object? converted = converter.ConvertBack(
+            "42",
+            typeof(object),
+            null,
+            CultureInfo.InvariantCulture);
+        viewModel.Value = converted;
+        viewModel.AcceptCommand.Execute(null);
+
+        // Assert
+        viewModel.IsValid.Should().BeTrue();
+        accepted.Should().Be(42);
+    }
+
+    [TestMethod]
     public void AcceptCommand_ValidValue_SubmitsParsedValue()
     {
         // Arrange
         object? accepted = null;
-        TextConversionState conversionState = new();
         ValueDialogViewModel viewModel = CreateValueViewModel(
             _ => ValidationResult.Success,
-            conversionState,
             value => accepted = value);
 
         // Act
@@ -374,12 +401,10 @@ public sealed class DialogAndValidationTests
     {
         // Arrange
         int acceptCount = 0;
-        TextConversionState conversionState = new();
         ValueDialogViewModel viewModel = CreateValueViewModel(
             value => (int)value! <= 60
                 ? ValidationResult.Success
                 : new ValidationResult("Use 1 through 60."),
-            conversionState,
             _ => acceptCount++);
 
         // Act
@@ -403,7 +428,6 @@ public sealed class DialogAndValidationTests
         // Arrange
         int acceptCount = 0;
         int cancelCount = 0;
-        TextConversionState conversionState = new();
         ValueDialogViewModel viewModel = new(
             "Type value",
             "Value",
@@ -411,7 +435,6 @@ public sealed class DialogAndValidationTests
             "OK",
             "Cancel",
             _ => ValidationResult.Success,
-            conversionState,
             _ => acceptCount++,
             () => cancelCount++);
 
@@ -445,7 +468,6 @@ public sealed class DialogAndValidationTests
 
     private static ValueDialogViewModel CreateValueViewModel(
         Func<object?, ValidationResult?> validate,
-        TextConversionState conversionState,
         Action<object?> accept)
     {
         return new ValueDialogViewModel(
@@ -455,7 +477,6 @@ public sealed class DialogAndValidationTests
             "OK",
             "Cancel",
             validate,
-            conversionState,
             accept,
             () => { });
     }

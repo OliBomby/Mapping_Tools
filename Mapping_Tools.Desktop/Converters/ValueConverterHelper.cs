@@ -29,7 +29,7 @@ internal static class ValueConverterHelper
         object? parameter,
         CultureInfo culture,
         ApplicationValueConverter converter,
-        TextConversionState? state = null)
+        Action<string?>? reportConversionError = null)
     {
         try
         {
@@ -38,12 +38,12 @@ internal static class ValueConverterHelper
                 targetType,
                 parameter,
                 culture);
-            state?.SetError(null);
+            reportConversionError?.Invoke(null);
             return converted!;
         }
         catch (FormatException exception)
         {
-            state?.SetError(exception.Message);
+            reportConversionError?.Invoke(exception.Message);
             return new BindingNotification(
                 exception,
                 BindingErrorType.DataValidationError);

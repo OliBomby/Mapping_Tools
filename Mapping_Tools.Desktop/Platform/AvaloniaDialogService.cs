@@ -80,10 +80,6 @@ public sealed class AvaloniaDialogService : IDialogService
         CancellationToken cancellationToken)
     {
         ValueDialogWindow window = new();
-        TextConversionState conversionState = new();
-        ValueDialogConverter converter = new(
-            request.Converter,
-            conversionState);
         ValueDialogViewModel viewModel = new(
             request.Title,
             request.Prompt,
@@ -91,9 +87,11 @@ public sealed class AvaloniaDialogService : IDialogService
             request.AcceptLabel,
             request.CancelLabel,
             value => Validate(value, request),
-            conversionState,
             value => window.Close(new ResultBox<TValue>((TValue)value!)),
             () => window.Close());
+        ValueDialogConverter converter = new(
+            request.Converter,
+            viewModel.SetConversionError);
         window.DataContext = viewModel;
         window.BindValue(converter);
 
