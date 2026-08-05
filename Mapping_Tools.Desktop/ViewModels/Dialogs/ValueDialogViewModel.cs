@@ -9,12 +9,18 @@ namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 /// <summary>
 /// Holds a type-erased value whose text conversion remains in the Avalonia binding.
 /// </summary>
-public sealed class ValueDialogViewModel : ObservableValidator
+public sealed partial class ValueDialogViewModel : ObservableValidator
 {
     private readonly Func<object?, ValidationResult?> _validate;
     private readonly Action<object?> _accept;
     private bool _hasConversionError;
-    private object? _value;
+    /// <summary>
+    /// Gets or sets the typed value produced by the field's binding converter.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [DialogValue]
+    public partial object? Value { get; set; }
 
     /// <summary>
     /// Creates typed dialog state and validates the initial value through DataAnnotations.
@@ -47,14 +53,20 @@ public sealed class ValueDialogViewModel : ObservableValidator
         Prompt = prompt;
         AcceptLabel = acceptLabel;
         CancelLabel = cancelLabel;
-        _value = initialValue;
         _validate = validate;
         _accept = accept;
         AcceptCommand = new RelayCommand(Accept);
         CancelCommand = new RelayCommand(cancel);
 
         ErrorsChanged += (_, _) => OnPropertyChanged(nameof(IsValid));
-        ValidateProperty(_value, nameof(Value));
+        if (Equals(Value, initialValue))
+        {
+            ValidateProperty(Value, nameof(Value));
+        }
+        else
+        {
+            Value = initialValue;
+        }
     }
 
     /// <summary>
@@ -66,24 +78,6 @@ public sealed class ValueDialogViewModel : ObservableValidator
     /// Gets the label or editing instruction above the field.
     /// </summary>
     public string Prompt { get; }
-
-    /// <summary>
-    /// Gets or sets the typed value produced by the field's binding converter.
-    /// </summary>
-    [DialogValue]
-    public object? Value
-    {
-        get => _value;
-        set
-        {
-            if (Equals(_value, value))
-            {
-                return;
-            }
-
-            SetProperty(ref _value, value, validate: true);
-        }
-    }
 
     /// <summary>
     /// Gets whether conversion and every DataAnnotations rule currently succeed.

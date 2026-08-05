@@ -7,11 +7,8 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// <summary>
 /// Presents one explicit feature registration in shell navigation.
 /// </summary>
-public sealed class ShellFeatureItemViewModel : ObservableObject
+public sealed partial class ShellFeatureItemViewModel : ObservableObject
 {
-    private bool _isFavorite;
-    private bool _isActive;
-
     internal ShellFeatureItemViewModel(
         ShellFeatureRegistration registration,
         int order,
@@ -29,7 +26,7 @@ public sealed class ShellFeatureItemViewModel : ObservableObject
             ' ',
             new[] { registration.DisplayName, registration.Category, registration.Description }
                 .Concat(registration.SearchTerms));
-        _isFavorite = isFavorite;
+        IsFavorite = isFavorite;
         ActivateCommand = new RelayCommand(() => activate(this));
         ToggleFavoriteCommand = new RelayCommand(() => toggleFavorite(this));
     }
@@ -50,18 +47,10 @@ public sealed class ShellFeatureItemViewModel : ObservableObject
     public bool StartsSection { get; }
 
     /// <summary>Gets whether this feature is pinned ahead of ordinary items.</summary>
-    public bool IsFavorite
-    {
-        get => _isFavorite;
-        internal set
-        {
-            if (SetProperty(ref _isFavorite, value))
-            {
-                OnPropertyChanged(nameof(FavoriteGlyph));
-                OnPropertyChanged(nameof(FavoriteActionLabel));
-            }
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FavoriteGlyph))]
+    [NotifyPropertyChangedFor(nameof(FavoriteActionLabel))]
+    public partial bool IsFavorite { get; internal set; }
 
     /// <summary>Gets the star glyph corresponding to favorite state.</summary>
     public string FavoriteGlyph => IsFavorite ? "★" : "☆";
@@ -72,14 +61,8 @@ public sealed class ShellFeatureItemViewModel : ObservableObject
         : $"Add {DisplayName} to favorites";
 
     /// <summary>Gets whether this feature currently occupies the shell content area.</summary>
-    public bool IsActive
-    {
-        get => _isActive;
-        internal set
-        {
-            SetProperty(ref _isActive, value);
-        }
-    }
+    [ObservableProperty]
+    public partial bool IsActive { get; internal set; }
 
     /// <summary>Gets the legacy row height for default pages and tool pages.</summary>
     public double NavigationHeight => Category.Equals("Tools", StringComparison.Ordinal)

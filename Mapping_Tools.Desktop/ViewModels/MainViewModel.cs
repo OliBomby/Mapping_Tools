@@ -11,7 +11,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// Coordinates explicit feature discovery, navigation, favorites, activation,
 /// and the shell notification queue.
 /// </summary>
-public sealed class MainViewModel : ObservableObject, IDisposable
+public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
     private readonly IShellFeatureRegistry _registry;
     private readonly ApplicationSettings _settings;
@@ -20,10 +20,6 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private readonly Dictionary<string, ObservableObject> _featureViewModels =
         new(StringComparer.OrdinalIgnoreCase);
     private string _searchText = string.Empty;
-    private ShellFeatureItemViewModel? _selectedFeature;
-    private ObservableObject? _currentFeature;
-    private string _header = "Mapping Tools";
-    private bool _isNavigationOpen = true;
     private bool _disposed;
 
     /// <summary>
@@ -69,22 +65,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     /// <summary>
     /// Gets or sets the selected navigation item and activates its registered feature.
     /// </summary>
-    public ShellFeatureItemViewModel? SelectedFeature
-    {
-        get => _selectedFeature;
-        set
-        {
-            if (ReferenceEquals(_selectedFeature, value))
-            {
-                return;
-            }
-
-            if (SetProperty(ref _selectedFeature, value) && value is not null)
-            {
-                Activate(value);
-            }
-        }
-    }
+    [ObservableProperty]
+    public partial ShellFeatureItemViewModel? SelectedFeature { get; set; }
 
     /// <summary>Gets queued notifications in publication order.</summary>
     public ObservableCollection<ShellNotificationViewModel> NotificationQueue { get; }
@@ -111,27 +93,17 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    // TODO: use [ObservableProperty] everywhere we can and [NotifyDataErrorInfo]
     /// <summary>Gets the currently activated feature presentation model.</summary>
-    public ObservableObject? CurrentFeature
-    {
-        get => _currentFeature;
-        private set => SetProperty(ref _currentFeature, value);
-    }
+    [ObservableProperty]
+    public partial ObservableObject? CurrentFeature { get; private set; }
 
     /// <summary>Gets the title of the currently activated feature.</summary>
-    public string Header
-    {
-        get => _header;
-        private set => SetProperty(ref _header, value);
-    }
+    [ObservableProperty]
+    public partial string Header { get; private set; } = "Mapping Tools";
 
     /// <summary>Gets or sets whether the full navigation pane is visible.</summary>
-    public bool IsNavigationOpen
-    {
-        get => _isNavigationOpen;
-        set => SetProperty(ref _isNavigationOpen, value);
-    }
+    [ObservableProperty]
+    public partial bool IsNavigationOpen { get; set; } = true;
 
     /// <summary>Unsubscribes the process-lifetime notification stream.</summary>
     public void Dispose()
@@ -176,6 +148,14 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         if (viewModel is IShellFeatureActivation current)
         {
             current.Activate();
+        }
+    }
+
+    partial void OnSelectedFeatureChanged(ShellFeatureItemViewModel? value)
+    {
+        if (value is not null)
+        {
+            Activate(value);
         }
     }
 

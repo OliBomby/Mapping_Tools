@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
@@ -15,7 +14,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// Edits the process-lifetime settings document and applies live-only side
 /// effects without exposing Avalonia controls or storage-provider objects.
 /// </summary>
-public sealed class PreferencesViewModel : ObservableValidator
+public sealed partial class PreferencesViewModel : ObservableValidator
 {
     private static readonly FilePickerFilter OsuConfigurationFilter = new(
         "osu! user configuration",
@@ -25,11 +24,45 @@ public sealed class PreferencesViewModel : ObservableValidator
     private readonly IFilePicker _filePicker;
     private readonly IApplicationThemeService _themeService;
     private readonly IUserNotificationService _notifications;
+    /// <summary>Gets or edits the directory containing the osu! executable.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "Select a path.")]
     private string _osuPath;
+
+    /// <summary>Gets or edits osu!'s beatmap-library directory.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "Select a path.")]
     private string _songsPath;
+
+    /// <summary>Gets or edits the current user's osu! configuration file.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "Select a path.")]
     private string _osuConfigPath;
+
+    /// <summary>Gets or edits the directory that receives beatmap backups.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "Select a path.")]
     private string _backupsPath;
+
+    /// <summary>Gets or edits the retained-backup limit as a typed count.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Range(
+        1,
+        100_000,
+        ErrorMessage = "Use a whole number from 1 through 100000.")]
     private int _maxBackupFiles;
+
+    /// <summary>Gets or edits the periodic-backup interval as a typed duration.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [MinimumTimeSpan(
+        "00:00:01",
+        ErrorMessage = "Use an interval of at least one second.")]
     private TimeSpan _periodicBackupInterval;
 
     /// <summary>
@@ -73,78 +106,6 @@ public sealed class PreferencesViewModel : ObservableValidator
                 BackupsPath,
                 path => BackupsPath = path));
         BrowseOsuConfigPathCommand = new AsyncRelayCommand(PickOsuConfigAsync);
-    }
-
-    /// <summary>Gets or edits the directory containing the osu! executable.</summary>
-    [Required(ErrorMessage = "Select a path.")]
-    public string OsuPath
-    {
-        get => _osuPath;
-        set => SetValidatedProperty(
-            ref _osuPath,
-            value ?? string.Empty,
-            static (settings, path) => settings.OsuPath = path);
-    }
-
-    /// <summary>Gets or edits osu!'s beatmap-library directory.</summary>
-    [Required(ErrorMessage = "Select a path.")]
-    public string SongsPath
-    {
-        get => _songsPath;
-        set => SetValidatedProperty(
-            ref _songsPath,
-            value ?? string.Empty,
-            static (settings, path) => settings.SongsPath = path);
-    }
-
-    /// <summary>Gets or edits the current user's osu! configuration file.</summary>
-    [Required(ErrorMessage = "Select a path.")]
-    public string OsuConfigPath
-    {
-        get => _osuConfigPath;
-        set => SetValidatedProperty(
-            ref _osuConfigPath,
-            value ?? string.Empty,
-            static (settings, path) => settings.OsuConfigPath = path);
-    }
-
-    /// <summary>Gets or edits the directory that receives beatmap backups.</summary>
-    [Required(ErrorMessage = "Select a path.")]
-    public string BackupsPath
-    {
-        get => _backupsPath;
-        set => SetValidatedProperty(
-            ref _backupsPath,
-            value ?? string.Empty,
-            static (settings, path) => settings.BackupsPath = path);
-    }
-
-    /// <summary>Gets or edits the retained-backup limit as a typed count.</summary>
-    [Range(
-        1,
-        100_000,
-        ErrorMessage = "Use a whole number from 1 through 100000.")]
-    public int MaxBackupFiles
-    {
-        get => _maxBackupFiles;
-        set => SetValidatedProperty(
-            ref _maxBackupFiles,
-            value,
-            static (settings, count) => settings.MaxBackupFiles = count);
-    }
-
-    /// <summary>Gets or edits the periodic-backup interval as a typed duration.</summary>
-    [MinimumTimeSpan(
-        "00:00:01",
-        ErrorMessage = "Use an interval of at least one second.")]
-    public TimeSpan PeriodicBackupInterval
-    {
-        get => _periodicBackupInterval;
-        set => SetValidatedProperty(
-            ref _periodicBackupInterval,
-            value,
-            static (settings, interval) =>
-                settings.PeriodicBackupInterval = interval);
     }
 
     /// <summary>Gets or sets whether destructive tools create safety backups.</summary>
@@ -230,18 +191,53 @@ public sealed class PreferencesViewModel : ObservableValidator
     /// <summary>Gets the native folder-picker command for the backups directory.</summary>
     public IAsyncRelayCommand BrowseBackupsPathCommand { get; }
 
-    private void SetValidatedProperty<T>(
-        ref T field,
+    partial void OnOsuPathChanged(string value) =>
+        ApplyValidatedValue(
+            value,
+            static (settings, path) => settings.OsuPath = path,
+            nameof(OsuPath));
+
+    partial void OnSongsPathChanged(string value) =>
+        ApplyValidatedValue(
+            value,
+            static (settings, path) => settings.SongsPath = path,
+            nameof(SongsPath));
+
+    partial void OnOsuConfigPathChanged(string value) =>
+        ApplyValidatedValue(
+            value,
+            static (settings, path) => settings.OsuConfigPath = path,
+            nameof(OsuConfigPath));
+
+    partial void OnBackupsPathChanged(string value) =>
+        ApplyValidatedValue(
+            value,
+            static (settings, path) => settings.BackupsPath = path,
+            nameof(BackupsPath));
+
+    partial void OnMaxBackupFilesChanged(int value) =>
+        ApplyValidatedValue(
+            value,
+            static (settings, count) => settings.MaxBackupFiles = count,
+            nameof(MaxBackupFiles));
+
+    partial void OnPeriodicBackupIntervalChanged(TimeSpan value) =>
+        ApplyValidatedValue(
+            value,
+            static (settings, interval) =>
+                settings.PeriodicBackupInterval = interval,
+            nameof(PeriodicBackupInterval));
+
+    private void ApplyValidatedValue<T>(
         T value,
         Action<ApplicationSettings, T> apply,
-        [CallerMemberName] string propertyName = "")
+        string propertyName)
     {
-        if (SetProperty(
-                ref field,
-                value,
-                validate: true,
-                propertyName: propertyName)
-            && PropertyIsValid(propertyName))
+        ValidationContext context = new(this)
+        {
+            MemberName = propertyName
+        };
+        if (Validator.TryValidateProperty(value, context, null))
         {
             apply(_settings, value);
         }
@@ -306,9 +302,6 @@ public sealed class PreferencesViewModel : ObservableValidator
                 exception).ConfigureAwait(false);
         }
     }
-
-    private bool PropertyIsValid(string propertyName) =>
-        !GetErrors(propertyName).Cast<object>().Any();
 
     private Task PublishFailureAsync(
         string title,
