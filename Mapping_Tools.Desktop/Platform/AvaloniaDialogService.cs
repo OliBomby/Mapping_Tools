@@ -81,7 +81,7 @@ public sealed class AvaloniaDialogService : IDialogService
     {
         ValueDialogWindow window = new();
         TextConversionState conversionState = new();
-        ValueDialogConverter converter = ValueDialogConverter.Create(
+        ValueDialogConverter converter = new(
             request.Converter,
             conversionState);
         ValueDialogViewModel viewModel = new(

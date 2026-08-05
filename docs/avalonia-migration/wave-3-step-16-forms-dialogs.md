@@ -10,10 +10,12 @@ dialog workflows used by the rest of Wave 3:
 - `ValidationOutcome`, `IValueValidator<T>`, and
   `DelegateValueValidator<T>` express validation without WPF or Avalonia
   types;
-- `ValueValidators` supplies required-text and inclusive-range rules while
-  feature-specific rules remain explicit delegates;
-- `ITextValueConverter<T>` and `TextValueConverters` provide exact string,
-  invariant `double`, and invariant `int` editing formats;
+- `RequiredTextAttribute`, `InclusiveRangeAttribute<T>`, and
+  `MinimumTimeSpanAttribute` provide reusable validation rules in individual
+  files under `Interactions/Validation`;
+- the UI-independent `Interactions.Converters.IValueConverter` contract and
+  its one-class-per-file implementations provide string, equation-aware
+  `double` and `int`, and duration editing formats;
 - `MessageDialogRequest<TResult>` returns caller-owned result types instead
   of framework button enums and requires exactly one Enter/default action and
   one Escape/cancel action;

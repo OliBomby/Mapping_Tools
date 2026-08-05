@@ -1,6 +1,6 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
-using Mapping_Tools.Application.Interactions;
+using ApplicationInvariantInt32Converter = Mapping_Tools.Application.Interactions.Converters.InvariantInt32Converter;
 
 namespace Mapping_Tools.Desktop.Converters;
 
@@ -9,16 +9,20 @@ namespace Mapping_Tools.Desktop.Converters;
 /// </summary>
 public sealed class InvariantInt32Converter : IValueConverter
 {
+    private static readonly ApplicationInvariantInt32Converter Converter = new();
+
     /// <inheritdoc/>
     public object Convert(
         object? value,
         Type targetType,
         object? parameter,
         CultureInfo culture) =>
-        TextValueConverterHelper.Convert(
+        ValueConverterHelper.Convert(
             value,
             targetType,
-            TextValueConverters.InvariantInt32);
+            parameter,
+            culture,
+            Converter);
 
     /// <inheritdoc/>
     public object ConvertBack(
@@ -26,8 +30,10 @@ public sealed class InvariantInt32Converter : IValueConverter
         Type targetType,
         object? parameter,
         CultureInfo culture) =>
-        TextValueConverterHelper.ConvertBack(
+        ValueConverterHelper.ConvertBack(
             value,
             targetType,
-            TextValueConverters.InvariantInt32);
+            parameter,
+            culture,
+            Converter);
 }

@@ -4,10 +4,12 @@ using System.Globalization;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Mapping_Tools.Application.Interactions;
+using Mapping_Tools.Application.Interactions.Validation;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ApplicationConverters = Mapping_Tools.Application.Interactions.Converters;
 
 namespace Mapping_Tools.Platform.Tests;
 
@@ -49,32 +51,39 @@ public sealed class DialogAndValidationTests
     }
 
     [TestMethod]
-    public void TryConvert_InvariantDoubleText_ReturnsExpectedValue()
+    public void ConvertBack_DoubleExpression_ReturnsEvaluatedValue()
     {
         // Arrange
-        ITextValueConverter<double> converter = TextValueConverters.InvariantDouble;
+        ApplicationConverters.IValueConverter converter =
+            new ApplicationConverters.InvariantDoubleConverter();
 
         // Act
-        bool converted = converter.TryConvert("12.5", out double value, out string? error);
+        object? result = converter.ConvertBack(
+            "5 * 2.5",
+            typeof(double),
+            null,
+            CultureInfo.InvariantCulture);
 
         // Assert
-        converted.Should().BeTrue();
-        value.Should().Be(12.5);
-        error.Should().BeNull();
+        result.Should().Be(12.5);
     }
 
     [TestMethod]
-    public void TryConvert_CommaDecimal_ReturnsActionableError()
+    public void ConvertBack_CommaDecimal_ReturnsExpectedValue()
     {
         // Arrange
-        ITextValueConverter<double> converter = TextValueConverters.InvariantDouble;
+        ApplicationConverters.IValueConverter converter =
+            new ApplicationConverters.InvariantDoubleConverter();
 
         // Act
-        bool converted = converter.TryConvert("12,5", out _, out string? error);
+        object? result = converter.ConvertBack(
+            "12,5",
+            typeof(double),
+            null,
+            CultureInfo.GetCultureInfo("nl-NL"));
 
         // Assert
-        converted.Should().BeFalse();
-        error.Should().Contain("period");
+        result.Should().Be(12.5);
     }
 
     [TestMethod]
@@ -129,6 +138,42 @@ public sealed class DialogAndValidationTests
     }
 
     [TestMethod]
+    public void ConvertBack_MillisecondExpression_ReturnsTypedDuration()
+    {
+        // Arrange
+        ApplicationConverters.IValueConverter converter =
+            new ApplicationConverters.ConstantTimeSpanConverter();
+
+        // Act
+        object? result = converter.ConvertBack(
+            "60 * 1000 * 15",
+            typeof(TimeSpan),
+            null,
+            CultureInfo.InvariantCulture);
+
+        // Assert
+        result.Should().Be(TimeSpan.FromMinutes(15));
+    }
+
+    [TestMethod]
+    public void ConvertBack_Int32Expression_ReturnsEvaluatedValue()
+    {
+        // Arrange
+        ApplicationConverters.IValueConverter converter =
+            new ApplicationConverters.InvariantInt32Converter();
+
+        // Act
+        object? result = converter.ConvertBack(
+            "6 * 7",
+            typeof(int),
+            null,
+            CultureInfo.InvariantCulture);
+
+        // Assert
+        result.Should().Be(42);
+    }
+
+    [TestMethod]
     public void MessageDialogRequest_MultipleDefaultChoices_ThrowsArgumentException()
     {
         // Arrange
@@ -154,7 +199,7 @@ public sealed class DialogAndValidationTests
     public void GetValidationResult_RequiredWhitespace_ReturnsFieldRequiredError()
     {
         // Arrange
-        ValidationAttribute validator = ValueValidators.RequiredText();
+        ValidationAttribute validator = new RequiredTextAttribute();
 
         // Act
         ValidationResult? result = validator.GetValidationResult(
@@ -170,10 +215,10 @@ public sealed class DialogAndValidationTests
     public void GetValidationResult_InclusiveRangeBoundary_ReturnsSuccess()
     {
         // Arrange
-        ValidationAttribute validator = ValueValidators.InclusiveRange(
-            1,
-            60,
-            "Use 1 through 60.");
+        ValidationAttribute validator = new InclusiveRangeAttribute<int>(1, 60)
+        {
+            ErrorMessage = "Use 1 through 60."
+        };
 
         // Act
         ValidationResult? result = validator.GetValidationResult(
@@ -192,8 +237,11 @@ public sealed class DialogAndValidationTests
             "Backup interval",
             "Minutes",
             5,
-            TextValueConverters.InvariantInt32,
-            [ValueValidators.InclusiveRange(1, 60, "Use 1 through 60.")]);
+            new ApplicationConverters.InvariantInt32Converter(),
+            [new InclusiveRangeAttribute<int>(1, 60)
+            {
+                ErrorMessage = "Use 1 through 60."
+            }]);
 
         // Act
         ValueEvaluation<int> evaluation = request.Evaluate("90");
@@ -212,8 +260,11 @@ public sealed class DialogAndValidationTests
             "Backup interval",
             "Minutes",
             5,
-            TextValueConverters.InvariantInt32,
-            [ValueValidators.InclusiveRange(1, 60, "Use 1 through 60.")]);
+            new ApplicationConverters.InvariantInt32Converter(),
+            [new InclusiveRangeAttribute<int>(1, 60)
+            {
+                ErrorMessage = "Use 1 through 60."
+            }]);
 
         // Act
         ValueEvaluation<int> evaluation = request.Evaluate("15");
@@ -252,8 +303,8 @@ public sealed class DialogAndValidationTests
         // Arrange
         int acceptCount = 0;
         TextConversionState conversionState = new();
-        ValueDialogConverter converter = ValueDialogConverter.Create(
-            TextValueConverters.InvariantInt32,
+        ValueDialogConverter converter = new(
+            new ApplicationConverters.InvariantInt32Converter(),
             conversionState);
         ValueDialogViewModel viewModel = CreateValueViewModel(
             _ => ValidationResult.Success,
@@ -261,7 +312,7 @@ public sealed class DialogAndValidationTests
             _ => acceptCount++);
 
         // Act
-        object result = converter.ConvertBack(
+        object? result = converter.ConvertBack(
             "not-a-number",
             typeof(object),
             null,
@@ -275,6 +326,26 @@ public sealed class DialogAndValidationTests
             .Be(BindingErrorType.DataValidationError);
         viewModel.IsValid.Should().BeFalse();
         acceptCount.Should().Be(0);
+    }
+
+    [TestMethod]
+    public void ConvertBack_NullInt32_ReturnsDataValidationError()
+    {
+        // Arrange
+        IValueConverter converter = new InvariantInt32Converter();
+
+        // Act
+        object? result = converter.ConvertBack(
+            null,
+            typeof(int),
+            null,
+            CultureInfo.InvariantCulture);
+
+        // Assert
+        result.Should().BeOfType<BindingNotification>();
+        ((BindingNotification)result!).ErrorType
+            .Should()
+            .Be(BindingErrorType.DataValidationError);
     }
 
     [TestMethod]

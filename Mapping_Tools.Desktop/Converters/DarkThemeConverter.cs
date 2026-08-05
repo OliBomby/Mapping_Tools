@@ -19,7 +19,7 @@ public sealed class DarkThemeConverter : IValueConverter
         if (value is not ApplicationTheme theme
             || (targetType != typeof(bool) && targetType != typeof(bool?)))
         {
-            return TextValueConverterHelper.TypeError(
+            return ValueConverterHelper.TypeError(
                 typeof(ApplicationTheme),
                 targetType);
         }
@@ -38,7 +38,7 @@ public sealed class DarkThemeConverter : IValueConverter
             || (targetType != typeof(ApplicationTheme)
                 && targetType != typeof(object)))
         {
-            return TextValueConverterHelper.TypeError(
+            return ValueConverterHelper.TypeError(
                 typeof(bool),
                 targetType);
         }

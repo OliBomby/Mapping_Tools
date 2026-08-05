@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
+using Mapping_Tools.Core.Classes.SystemTools;
 
-namespace Mapping_Tools.Application.Interactions;
+namespace Mapping_Tools.Application.Interactions.Validation;
 
 /// <summary>
-/// Requires a duration to meet a constant-format inclusive lower bound.
+/// Requires a duration to meet an inclusive lower bound.
 /// </summary>
 [AttributeUsage(
     AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter,
@@ -12,24 +12,20 @@ namespace Mapping_Tools.Application.Interactions;
 public sealed class MinimumTimeSpanAttribute : ValidationAttribute
 {
     /// <summary>
-    /// Creates a lower-bound rule from the invariant constant TimeSpan format.
+    /// Creates a lower-bound rule from a constant-format duration or millisecond expression.
     /// </summary>
     /// <param name="minimum">
-    /// The inclusive minimum in the <c>[-][d.]hh:mm:ss[.fffffff]</c> format.
+    /// The inclusive minimum as <c>[-][d.]hh:mm:ss[.fffffff]</c> text or an arithmetic expression in milliseconds.
     /// </param>
     /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="minimum"/> is not a constant-format duration.
+    /// <paramref name="minimum"/> is not a supported duration or millisecond expression.
     /// </exception>
     public MinimumTimeSpanAttribute(string minimum)
     {
-        if (!TimeSpan.TryParseExact(
-                minimum,
-                "c",
-                CultureInfo.InvariantCulture,
-                out TimeSpan parsedMinimum))
+        if (!TypeConverters.TryParseTimeSpan(minimum, out TimeSpan parsedMinimum))
         {
             throw new ArgumentException(
-                "The minimum must use the invariant constant TimeSpan format.",
+                "The minimum must be a constant-format duration or millisecond expression.",
                 nameof(minimum));
         }
 

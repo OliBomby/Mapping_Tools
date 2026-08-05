@@ -18,6 +18,7 @@ using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Mapping_Tools.Desktop.Views;
 using Mapping_Tools.Desktop.Views.Dialogs;
+using ApplicationInvariantInt32Converter = Mapping_Tools.Application.Interactions.Converters.InvariantInt32Converter;
 
 var options = RenderOptions.Parse(args);
 if (options.List)
@@ -89,8 +90,8 @@ static ValueDialogWindow CreateValueDialog(string scenario)
 {
     bool invalid = scenario.Equals("invalid", StringComparison.OrdinalIgnoreCase);
     TextConversionState conversionState = new();
-    ValueDialogConverter converter = ValueDialogConverter.Create(
-        TextValueConverters.InvariantInt32,
+    ValueDialogConverter converter = new(
+        new ApplicationInvariantInt32Converter(),
         conversionState);
     ValueDialogWindow window = new()
     {

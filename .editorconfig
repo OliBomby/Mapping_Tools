@@ -21,8 +21,6 @@ csharp_new_line_before_catch = false
 csharp_new_line_before_else = false
 #require members of object initializers to be on the same line
 csharp_new_line_before_members_in_object_initializers = false
-#require members of object initializers to be on the same line
-csharp_new_line_before_members_in_object_initializers = false
 #require elements of query expression clauses to be on the same line
 csharp_new_line_between_query_expression_clauses = false
 
@@ -131,29 +129,10 @@ dotnet_style_qualification_for_method = false:suggestion
 #prefer properties not to be prefaced with this. or Me. in Visual Basic
 dotnet_style_qualification_for_property = false:suggestion
 
-# IDE0008: Use explicit type
-dotnet_diagnostic.ide0008.severity = none
-
-# IDE0058: Expression value is never used
-dotnet_diagnostic.ide0058.severity = none
-
-# IDE0011: Add braces
-dotnet_diagnostic.ide0011.severity = none
-
-# CA2201: Do not raise reserved exception types
-dotnet_diagnostic.ca2201.severity = none
+# Microsoft .NET properties
+csharp_style_namespace_declarations = file_scoped:suggestion
 
 [*]
-
-# Microsoft .NET properties
-csharp_new_line_before_catch = false
-csharp_new_line_before_else = false
-csharp_new_line_before_members_in_object_initializers = false
-csharp_preferred_modifier_order = public, internal, protected, private, file, new, sealed, static, unsafe, closed, extern, abstract, override, virtual, readonly, volatile, async, required:suggestion
-csharp_preserve_single_line_blocks = true
-csharp_space_after_cast = true
-csharp_style_namespace_declarations = block_scoped:suggestion
-csharp_style_var_for_built_in_types = false:suggestion
 
 # ReSharper properties
 resharper_accessor_owner_body = accessors_with_expression_body

@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using Mapping_Tools.Application.Interactions.Converters;
 
 namespace Mapping_Tools.Application.Interactions;
 
@@ -114,7 +116,7 @@ public sealed class ValueDialogRequest<TValue>
         string title,
         string prompt,
         TValue initialValue,
-        ITextValueConverter<TValue> converter,
+        IValueConverter converter,
         IReadOnlyList<ValidationAttribute>? validators = null,
         string acceptLabel = "OK",
         string cancelLabel = "Cancel")
@@ -152,7 +154,7 @@ public sealed class ValueDialogRequest<TValue>
     /// <summary>
     /// Gets the converter responsible for culture and format compatibility.
     /// </summary>
-    public ITextValueConverter<TValue> Converter { get; }
+    public IValueConverter Converter { get; }
 
     /// <summary>
     /// Gets an immutable snapshot of rules evaluated in order after parsing.
@@ -176,15 +178,45 @@ public sealed class ValueDialogRequest<TValue>
     /// <returns>A typed value only when parsing and every ordered validator succeed.</returns>
     public ValueEvaluation<TValue> Evaluate(string? text)
     {
-        if (!Converter.TryConvert(
+        object? converted;
+        try
+        {
+            converted = Converter.ConvertBack(
                 text,
-                out TValue? value,
-                out string? conversionError))
+                typeof(TValue),
+                null,
+                CultureInfo.InvariantCulture);
+        }
+        catch (FormatException exception)
         {
             return new ValueEvaluation<TValue>(
                 false,
                 default,
-                conversionError ?? "The value could not be parsed.");
+                exception.Message);
+        }
+        catch (InvalidCastException exception)
+        {
+            return new ValueEvaluation<TValue>(
+                false,
+                default,
+                exception.Message);
+        }
+
+        TValue? value;
+        if (converted is TValue typedValue)
+        {
+            value = typedValue;
+        }
+        else if (converted is null && default(TValue) is null)
+        {
+            value = default;
+        }
+        else
+        {
+            return new ValueEvaluation<TValue>(
+                false,
+                default,
+                $"The converter returned {converted?.GetType().Name ?? "null"} instead of {typeof(TValue).Name}.");
         }
 
         ValidationContext context = new(this)

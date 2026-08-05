@@ -100,6 +100,43 @@ namespace Mapping_Tools.Core.Classes.SystemTools {
         }
 
         /// <summary>
+        /// Parses an invariant constant-format duration or evaluates a millisecond expression.
+        /// </summary>
+        /// <param name="str">
+        /// A <c>[-][d.]hh:mm:ss[.fffffff]</c> duration, or an arithmetic expression whose result is milliseconds.
+        /// </param>
+        /// <returns>The parsed or evaluated duration.</returns>
+        /// <exception cref="FormatException">The input is neither a constant-format duration nor a valid numeric expression.</exception>
+        /// <exception cref="OverflowException">The evaluated milliseconds exceed the <see cref="TimeSpan"/> range.</exception>
+        public static TimeSpan ParseTimeSpan(string str) {
+            if (TimeSpan.TryParseExact(
+                    str,
+                    "c",
+                    CultureInfo.InvariantCulture,
+                    out TimeSpan duration)) {
+                return duration;
+            }
+
+            return TimeSpan.FromMilliseconds(ParseDouble(str));
+        }
+
+        /// <summary>
+        /// Attempts to parse a constant-format duration or evaluate a millisecond expression.
+        /// </summary>
+        /// <param name="str">The duration text or millisecond expression to evaluate.</param>
+        /// <param name="result">The converted duration, or <see cref="TimeSpan.Zero"/> on failure.</param>
+        /// <returns><see langword="true"/> when the input produces a duration within the supported range.</returns>
+        public static bool TryParseTimeSpan(string str, out TimeSpan result) {
+            try {
+                result = ParseTimeSpan(str);
+                return true;
+            } catch (Exception) {
+                result = TimeSpan.Zero;
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Valid timestamps:
         /// <example>00:00:891 (1) - </example>
         /// <example>60:00:074 (2,4) - </example>

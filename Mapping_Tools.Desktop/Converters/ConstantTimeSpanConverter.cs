@@ -1,6 +1,6 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
-using Mapping_Tools.Application.Interactions;
+using ApplicationConstantTimeSpanConverter = Mapping_Tools.Application.Interactions.Converters.ConstantTimeSpanConverter;
 
 namespace Mapping_Tools.Desktop.Converters;
 
@@ -9,16 +9,20 @@ namespace Mapping_Tools.Desktop.Converters;
 /// </summary>
 public sealed class ConstantTimeSpanConverter : IValueConverter
 {
+    private static readonly ApplicationConstantTimeSpanConverter Converter = new();
+
     /// <inheritdoc/>
     public object Convert(
         object? value,
         Type targetType,
         object? parameter,
         CultureInfo culture) =>
-        TextValueConverterHelper.Convert(
+        ValueConverterHelper.Convert(
             value,
             targetType,
-            TextValueConverters.ConstantTimeSpan);
+            parameter,
+            culture,
+            Converter);
 
     /// <inheritdoc/>
     public object ConvertBack(
@@ -26,8 +30,10 @@ public sealed class ConstantTimeSpanConverter : IValueConverter
         Type targetType,
         object? parameter,
         CultureInfo culture) =>
-        TextValueConverterHelper.ConvertBack(
+        ValueConverterHelper.ConvertBack(
             value,
             targetType,
-            TextValueConverters.ConstantTimeSpan);
+            parameter,
+            culture,
+            Converter);
 }

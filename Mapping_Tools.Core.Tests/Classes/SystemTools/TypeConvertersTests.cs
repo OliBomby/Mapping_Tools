@@ -21,5 +21,29 @@ namespace Mapping_Tools.Core.Tests.Classes.SystemTools {
             var test4 = TypeConverters.ParseOsuTimestamp("00:-01:-230 (1) - ");
             test4.TotalMilliseconds.Should().Be(-1230);
         }
+
+        [TestMethod]
+        public void ParseTimeSpan_ConstantFormat_ReturnsExpectedDuration() {
+            // Arrange
+            const string text = "00:15:00";
+
+            // Act
+            TimeSpan result = TypeConverters.ParseTimeSpan(text);
+
+            // Assert
+            result.Should().Be(TimeSpan.FromMinutes(15));
+        }
+
+        [TestMethod]
+        public void ParseTimeSpan_MillisecondExpression_ReturnsEvaluatedDuration() {
+            // Arrange
+            const string text = "60 * 1000 * 15";
+
+            // Act
+            TimeSpan result = TypeConverters.ParseTimeSpan(text);
+
+            // Assert
+            result.Should().Be(TimeSpan.FromMinutes(15));
+        }
     }
 }
