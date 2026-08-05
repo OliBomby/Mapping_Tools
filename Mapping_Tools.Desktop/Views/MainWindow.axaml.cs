@@ -147,26 +147,4 @@ public partial class MainWindow : Window
         }
     }
 
-    private void OpenWebsite(object? sender, RoutedEventArgs eventArgs) =>
-        ExecuteCurrentGetStartedCommand(openSource: false);
-
-    private void OpenGitHub(object? sender, RoutedEventArgs eventArgs) =>
-        ExecuteCurrentGetStartedCommand(openSource: true);
-
-    private void ExecuteCurrentGetStartedCommand(bool openSource)
-    {
-        if (DataContext is not ViewModels.MainViewModel
-            {
-                CurrentFeature: ViewModels.GetStartedViewModel getStarted
-            })
-        {
-            return;
-        }
-
-        (openSource
-                ? getStarted.OpenSourceCommand
-                : getStarted.OpenWebsiteCommand)
-            .Execute(null);
-    }
-
 }

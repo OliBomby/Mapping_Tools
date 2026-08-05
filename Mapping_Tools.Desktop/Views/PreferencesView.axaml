@@ -1,7 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
-             xmlns:converters="using:Mapping_Tools.Desktop.Converters"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -15,11 +14,6 @@
              FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
              FontSize="14"
              FontWeight="Normal">
-    <UserControl.Resources>
-        <converters:InvariantInt32Converter x:Key="InvariantInt32Converter" />
-        <converters:ConstantTimeSpanConverter x:Key="ConstantTimeSpanConverter" />
-        <converters:DarkThemeConverter x:Key="DarkThemeConverter" />
-    </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="Button.path-picker">
             <Setter Property="Width" Value="40" />

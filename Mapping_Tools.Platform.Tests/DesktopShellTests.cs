@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using FluentAssertions;
 using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
@@ -124,6 +126,45 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    public async Task MainViewModel_OpenWebsiteCommand_WhenExecuted_OpensWebsite()
+    {
+        // Arrange
+        RecordingLauncher launcher = new();
+        using MainViewModel viewModel = CreateMainViewModel(launcher: launcher);
+
+        // Act
+        await ExecuteAsync(viewModel.OpenWebsiteCommand);
+
+        // Assert
+        launcher.OpenedUris.Should().ContainSingle()
+            .Which.Should().Be(new Uri("https://mappingtools.github.io"));
+    }
+
+    [TestMethod]
+    public async Task MainViewModel_OpenGitHubCommand_WhenPlatformRejects_PublishesWarning()
+    {
+        // Arrange
+        RecordingLauncher launcher = new() { AcceptUris = false };
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) =>
+            published.Add(eventArgs.Notification);
+        using MainViewModel viewModel = CreateMainViewModel(
+            notifications: notifications,
+            launcher: launcher);
+
+        // Act
+        await ExecuteAsync(viewModel.OpenGitHubCommand);
+
+        // Assert
+        launcher.OpenedUris.Should().ContainSingle()
+            .Which.Should().Be(new Uri("https://github.com/OliBomby/Mapping_Tools"));
+        published.Should().ContainSingle();
+        published[0].Severity.Should().Be(UserNotificationSeverity.Warning);
+        published[0].Title.Should().Be("Could not open link");
+    }
+
+    [TestMethod]
     public void WindowPlacementCalculator_DisconnectedMonitor_UsesPrimaryWorkingArea()
     {
         // Arrange
@@ -161,13 +202,15 @@ public sealed class DesktopShellTests
     private static MainViewModel CreateMainViewModel(
         IReadOnlyList<ShellFeatureRegistration>? registrations = null,
         ApplicationSettings? settings = null,
-        IUserNotificationService? notifications = null)
+        IUserNotificationService? notifications = null,
+        IPlatformLauncher? launcher = null)
     {
         return new MainViewModel(
             new ShellFeatureRegistry(registrations ??
                 [Registration("get-started", "Get started")]),
             settings ?? new ApplicationSettings(),
             notifications ?? new UserNotificationService(),
+            launcher ?? new RecordingLauncher(),
             new ImmediateDispatcher());
     }
 
@@ -197,6 +240,34 @@ public sealed class DesktopShellTests
     private sealed class ImmediateDispatcher : IUiDispatcher
     {
         public void Post(Action action) => action();
+    }
+
+    private static Task ExecuteAsync(IAsyncRelayCommand command) =>
+        command.ExecuteAsync(null);
+
+    private sealed class RecordingLauncher : IPlatformLauncher
+    {
+        public bool AcceptUris { get; init; } = true;
+
+        public List<Uri> OpenedUris { get; } = [];
+
+        public Task<bool> OpenUriAsync(
+            Uri uri,
+            CancellationToken cancellationToken = default)
+        {
+            OpenedUris.Add(uri);
+            return Task.FromResult(AcceptUris);
+        }
+
+        public Task<bool> OpenFileAsync(
+            string path,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(false);
+
+        public Task<bool> OpenFolderAsync(
+            string path,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(false);
     }
 
 }

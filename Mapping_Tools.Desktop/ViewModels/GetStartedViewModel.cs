@@ -1,8 +1,5 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.Execution;
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 
 namespace Mapping_Tools.Desktop.ViewModels;
@@ -23,20 +20,11 @@ public sealed partial class GetStartedViewModel : ObservableObject
         "6. Reload your beatmap WITHOUT SAVING by either leaving and re-entering the editor or pressing Ctrl+L, Enter.",
         "7. If you run into issues, consult the FAQ over on the [About] -> [Website]."
     ];
-    private static readonly Uri WebsiteUri = new("https://mappingtools.github.io");
-    private static readonly Uri SourceUri = new("https://github.com/OliBomby/Mapping_Tools");
-    private readonly IPlatformLauncher _launcher;
-    private readonly IUserNotificationService _notifications;
-
     /// <summary>Creates the landing-page presentation model.</summary>
     public GetStartedViewModel(
-        ApplicationSettings settings,
-        IPlatformLauncher launcher,
-        IUserNotificationService notifications)
+        ApplicationSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
 
         RecentMaps = new ObservableCollection<RecentMapViewModel>(
             settings.RecentMaps.Select(recent => new RecentMapViewModel(
@@ -63,25 +51,6 @@ public sealed partial class GetStartedViewModel : ObservableObject
     [ObservableProperty]
     public partial bool HasNoRecentMaps { get; private set; }
 
-    [RelayCommand]
-    private Task OpenWebsiteAsync() =>
-        OpenUriAsync(WebsiteUri, "website");
-
-    [RelayCommand]
-    private Task OpenSourceAsync() =>
-        OpenUriAsync(SourceUri, "source repository");
-
-    private async Task OpenUriAsync(Uri uri, string destination)
-    {
-        bool accepted = await _launcher.OpenUriAsync(uri).ConfigureAwait(false);
-        if (!accepted)
-        {
-            await _notifications.PublishAsync(new UserNotification(
-                UserNotificationSeverity.Warning,
-                "Could not open link",
-                $"The {destination} could not be opened by the operating system.")).ConfigureAwait(false);
-        }
-    }
 }
 
 /// <summary>Displays one persisted recent-map entry without loading it.</summary>

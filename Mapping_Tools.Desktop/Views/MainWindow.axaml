@@ -251,13 +251,13 @@
                                     </MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="_Website"
-                                          Click="OpenWebsite">
+                                          Command="{Binding OpenWebsiteCommand}">
                                     <MenuItem.Icon>
                                         <materialIcons:MaterialIcon Kind="OpenInBrowser" />
                                     </MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="_Github"
-                                          Click="OpenGitHub">
+                                          Command="{Binding OpenGitHubCommand}">
                                     <MenuItem.Icon>
                                         <materialIcons:MaterialIcon Kind="Github" />
                                     </MenuItem.Icon>

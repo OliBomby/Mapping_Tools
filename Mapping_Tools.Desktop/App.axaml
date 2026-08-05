@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:material="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:converters="using:Mapping_Tools.Desktop.Converters"
              x:Class="Mapping_Tools.Desktop.App"
              xmlns:local="using:Mapping_Tools.Desktop"
              RequestedThemeVariant="Default">
@@ -16,6 +17,10 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="avares://Mapping_Tools.Desktop/Resources/MappingToolsColors.axaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:InvariantInt32Converter x:Key="InvariantInt32Converter" />
+            <converters:InvariantDoubleConverter x:Key="InvariantDoubleConverter" />
+            <converters:ConstantTimeSpanConverter x:Key="ConstantTimeSpanConverter" />
+            <converters:DarkThemeConverter x:Key="DarkThemeConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

@@ -115,10 +115,7 @@ static MainViewModel CreateMainViewModel(string scenario)
 {
     ApplicationSettings settings = CreateSettings(scenario);
     IUserNotificationService notifications = new UserNotificationService();
-    GetStartedViewModel getStarted = new(
-        settings,
-        new AcceptedLauncher(),
-        notifications);
+    GetStartedViewModel getStarted = new(settings);
     string[] toolNames =
     [
         "Auto-fail Detector",
@@ -173,6 +170,7 @@ static MainViewModel CreateMainViewModel(string scenario)
         new ShellFeatureRegistry(registrations),
         settings,
         notifications,
+        new AcceptedLauncher(),
         new ImmediateDispatcher());
     if (scenario.StartsWith("preferences", StringComparison.OrdinalIgnoreCase))
     {
@@ -185,10 +183,7 @@ static MainViewModel CreateMainViewModel(string scenario)
 static GetStartedViewModel CreateGetStartedViewModel(string scenario)
 {
     ApplicationSettings settings = CreateSettings(scenario);
-    return new GetStartedViewModel(
-        settings,
-        new AcceptedLauncher(),
-        new UserNotificationService());
+    return new GetStartedViewModel(settings);
 }
 
 static Control CreatePreferencesView(string scenario)

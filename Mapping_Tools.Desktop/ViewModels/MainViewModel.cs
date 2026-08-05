@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Shell;
 
@@ -13,9 +14,12 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
+    private static readonly Uri WebsiteUri = new("https://mappingtools.github.io");
+    private static readonly Uri GitHubUri = new("https://github.com/OliBomby/Mapping_Tools");
     private readonly IShellFeatureRegistry _registry;
     private readonly ApplicationSettings _settings;
     private readonly IUserNotificationService _notifications;
+    private readonly IPlatformLauncher _launcher;
     private readonly IUiDispatcher _dispatcher;
     private readonly Dictionary<string, ObservableObject> _featureViewModels =
         new(StringComparer.OrdinalIgnoreCase);
@@ -29,11 +33,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         IShellFeatureRegistry registry,
         ApplicationSettings settings,
         IUserNotificationService notifications,
+        IPlatformLauncher launcher,
         IUiDispatcher dispatcher)
     {
         _registry = registry ?? throw new ArgumentNullException(nameof(registry));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
         FeatureItems = registry.Features
@@ -155,6 +161,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private void ToggleNavigation() =>
         IsNavigationOpen = !IsNavigationOpen;
 
+    [RelayCommand]
+    private Task OpenWebsiteAsync() =>
+        OpenUriAsync(WebsiteUri, "website");
+
+    [RelayCommand]
+    private Task OpenGitHubAsync() =>
+        OpenUriAsync(GitHubUri, "source repository");
+
     private void ToggleFavorite(ShellFeatureItemViewModel item)
     {
         item.IsFavorite = !item.IsFavorite;
@@ -202,4 +216,16 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     private void RemoveNotification(ShellNotificationViewModel notification) =>
         NotificationQueue.Remove(notification);
+
+    private async Task OpenUriAsync(Uri uri, string destination)
+    {
+        bool accepted = await _launcher.OpenUriAsync(uri).ConfigureAwait(false);
+        if (!accepted)
+        {
+            await _notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Warning,
+                "Could not open link",
+                $"The {destination} could not be opened by the operating system.")).ConfigureAwait(false);
+        }
+    }
 }
