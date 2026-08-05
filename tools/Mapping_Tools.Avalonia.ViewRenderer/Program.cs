@@ -89,7 +89,7 @@ static ValueDialogWindow CreateValueDialog(string scenario)
 {
     bool invalid = scenario.Equals("invalid", StringComparison.OrdinalIgnoreCase);
     TextConversionState conversionState = new();
-    TextValueConverter<int> converter = new(
+    ValueDialogConverter converter = ValueDialogConverter.Create(
         TextValueConverters.InvariantInt32,
         conversionState);
     ValueDialogWindow window = new()

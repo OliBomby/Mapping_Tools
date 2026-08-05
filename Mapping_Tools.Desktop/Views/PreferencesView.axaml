@@ -15,6 +15,11 @@
              FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
              FontSize="14"
              FontWeight="Normal">
+    <UserControl.Resources>
+        <converters:InvariantInt32Converter x:Key="InvariantInt32Converter" />
+        <converters:ConstantTimeSpanConverter x:Key="ConstantTimeSpanConverter" />
+        <converters:DarkThemeConverter x:Key="DarkThemeConverter" />
+    </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="Button.path-picker">
             <Setter Property="Width" Value="40" />
@@ -121,7 +126,7 @@
                      materialAssists:TextFieldAssist.Label="Max backup files"
                      Text="{Binding MaxBackupFiles,
                                     Mode=TwoWay,
-                                    Converter={x:Static converters:DesktopValueConverters.InvariantInt32}}"
+                                    Converter={StaticResource InvariantInt32Converter}}"
                      ToolTip.Tip="Select the maximum number of backup files. The oldest beatmap backups are removed when the folder exceeds this limit." />
 
             <StackPanel Margin="5,8,0,0">
@@ -141,7 +146,7 @@
                              materialAssists:TextFieldAssist.Label="Backup interval"
                              Text="{Binding PeriodicBackupInterval,
                                             Mode=TwoWay,
-                                            Converter={x:Static converters:DesktopValueConverters.ConstantTimeSpan}}"
+                                            Converter={StaticResource ConstantTimeSpanConverter}}"
                              ToolTip.Tip="The time between automatic periodic backups, in hh:mm:ss format." />
                 </StackPanel>
                 <CheckBox Classes="preference-check"
@@ -162,7 +167,7 @@
                               AutomationProperties.Name="Dark theme"
                               IsChecked="{Binding Theme,
                                                   Mode=TwoWay,
-                                                  Converter={x:Static converters:DesktopValueConverters.DarkTheme}}"
+                                                  Converter={StaticResource DarkThemeConverter}}"
                               OffContent=""
                               OnContent=""
                               ToolTip.Tip="Change the Mapping Tools theme." />

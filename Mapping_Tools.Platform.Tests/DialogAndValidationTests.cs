@@ -15,15 +15,15 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class DialogAndValidationTests
 {
     [TestMethod]
-    public void Convert_DarkTheme_ReturnsCheckedState()
+    public void Convert_DarkThemeForNullableToggle_ReturnsCheckedState()
     {
         // Arrange
-        IValueConverter converter = DesktopValueConverters.DarkTheme;
+        IValueConverter converter = new DarkThemeConverter();
 
         // Act
         object? result = converter.Convert(
             ApplicationTheme.Dark,
-            typeof(bool),
+            typeof(bool?),
             null,
             CultureInfo.InvariantCulture);
 
@@ -35,7 +35,7 @@ public sealed class DialogAndValidationTests
     public void ConvertBack_UncheckedThemeToggle_ReturnsLightTheme()
     {
         // Arrange
-        IValueConverter converter = DesktopValueConverters.DarkTheme;
+        IValueConverter converter = new DarkThemeConverter();
 
         // Act
         object? result = converter.ConvertBack(
@@ -81,11 +81,10 @@ public sealed class DialogAndValidationTests
     public void Convert_InvariantInt32_ReturnsEditableText()
     {
         // Arrange
-        TextValueConverter<int> converter = new(
-            TextValueConverters.InvariantInt32);
+        IValueConverter converter = new InvariantInt32Converter();
 
         // Act
-        object result = converter.Convert(
+        object? result = converter.Convert(
             42,
             typeof(string),
             null,
@@ -99,11 +98,10 @@ public sealed class DialogAndValidationTests
     public void ConvertBack_InvariantDouble_ReturnsTypedValue()
     {
         // Arrange
-        TextValueConverter<double> converter = new(
-            TextValueConverters.InvariantDouble);
+        IValueConverter converter = new InvariantDoubleConverter();
 
         // Act
-        object result = converter.ConvertBack(
+        object? result = converter.ConvertBack(
             "12.5",
             typeof(double),
             null,
@@ -117,11 +115,10 @@ public sealed class DialogAndValidationTests
     public void ConvertBack_ConstantTimeSpan_ReturnsTypedDuration()
     {
         // Arrange
-        TextValueConverter<TimeSpan> converter = new(
-            TextValueConverters.ConstantTimeSpan);
+        IValueConverter converter = new ConstantTimeSpanConverter();
 
         // Act
-        object result = converter.ConvertBack(
+        object? result = converter.ConvertBack(
             "00:15:00",
             typeof(TimeSpan),
             null,
@@ -255,7 +252,7 @@ public sealed class DialogAndValidationTests
         // Arrange
         int acceptCount = 0;
         TextConversionState conversionState = new();
-        TextValueConverter<int> converter = new(
+        ValueDialogConverter converter = ValueDialogConverter.Create(
             TextValueConverters.InvariantInt32,
             conversionState);
         ValueDialogViewModel viewModel = CreateValueViewModel(
