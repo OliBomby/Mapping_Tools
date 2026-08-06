@@ -13,6 +13,7 @@ using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
+/// <summary>Coordinates Auto-fail Detector options, execution, fixes, and timeline output.</summary>
 public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShellFeatureActivation
 {
     internal const string OperationId = "auto-fail-detector";
@@ -25,20 +26,68 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
     private readonly IQuickRunCommandRegistry _quickRunRegistry;
     private readonly IPlatformLauncher _launcher;
 
-    [ObservableProperty] private bool _showUnloadingObjects = true;
-    [ObservableProperty] private bool _showPotentialUnloadingObjects;
-    [ObservableProperty] private bool _showPotentialDisruptors;
-    [ObservableProperty] private double _approachRateOverride = -1;
-    [ObservableProperty] private double _overallDifficultyOverride = -1;
-    [ObservableProperty] private int _physicsUpdateLeniency = 9;
-    [ObservableProperty] private bool _getAutoFailFix;
-    [ObservableProperty] private bool _autoPlaceFix;
-    [ObservableProperty] private bool _isRunning;
-    [ObservableProperty] private double _progress;
-    [ObservableProperty] private double _endTime = 20;
-    [ObservableProperty] private IReadOnlyList<TimelineMarker> _markers = [];
-    [ObservableProperty] private string _resultSummary = "Run the detector to inspect this beatmap.";
+    /// <summary>Gets or sets whether confirmed unloading objects appear on the timeline.</summary>
+    [ObservableProperty]
+    public partial bool ShowUnloadingObjects { get; set; } = true;
 
+    /// <summary>Gets or sets whether possible unloading objects appear on the timeline.</summary>
+    [ObservableProperty]
+    public partial bool ShowPotentialUnloadingObjects { get; set; }
+
+    /// <summary>Gets or sets whether disrupting objects appear on the timeline.</summary>
+    [ObservableProperty]
+    public partial bool ShowPotentialDisruptors { get; set; }
+
+    /// <summary>Gets or sets the simulated approach rate, or -1 to use the map value.</summary>
+    [ObservableProperty]
+    public partial double ApproachRateOverride { get; set; } = -1;
+
+    /// <summary>Gets or sets the simulated overall difficulty, or -1 to use the map value.</summary>
+    [ObservableProperty]
+    public partial double OverallDifficultyOverride { get; set; } = -1;
+
+    /// <summary>Gets or sets the tolerated physics-update delay in milliseconds.</summary>
+    [ObservableProperty]
+    public partial int PhysicsUpdateLeniency { get; set; } = 9;
+
+    /// <summary>Gets or sets whether analysis offers repair guidance.</summary>
+    [ObservableProperty]
+    public partial bool GetAutoFailFix { get; set; }
+
+    /// <summary>Gets or sets whether an accepted repair may insert spinners automatically.</summary>
+    [ObservableProperty]
+    public partial bool AutoPlaceFix { get; set; }
+
+    /// <summary>Gets whether analysis or repair work is running.</summary>
+    [ObservableProperty]
+    public partial bool IsRunning { get; private set; }
+
+    /// <summary>Gets the current operation completion percentage.</summary>
+    [ObservableProperty]
+    public partial double Progress { get; private set; }
+
+    /// <summary>Gets the final timestamp displayed by the result timeline.</summary>
+    [ObservableProperty]
+    public partial double EndTime { get; private set; } = 20;
+
+    /// <summary>Gets the filtered result markers displayed on the timeline.</summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<TimelineMarker> Markers { get; private set; } = [];
+
+    /// <summary>Gets a textual summary of the latest analysis.</summary>
+    [ObservableProperty]
+    public partial string ResultSummary { get; private set; } =
+        "Run the detector to inspect this beatmap.";
+
+    /// <summary>Creates an Auto-fail Detector presentation model.</summary>
+    /// <param name="autoFail">Analyzes beatmaps and applies repairs.</param>
+    /// <param name="execution">Coordinates cancellation, backup, and notifications.</param>
+    /// <param name="workspace">Supplies the shell's selected beatmap.</param>
+    /// <param name="currentBeatmap">Finds the beatmap open in osu! for QuickRun.</param>
+    /// <param name="settings">Supplies QuickRun behavior preferences.</param>
+    /// <param name="dialogs">Presents repair choices.</param>
+    /// <param name="quickRunRegistry">Tracks the active QuickRun-capable tool.</param>
+    /// <param name="launcher">Navigates osu! to selected timeline markers.</param>
     public AutoFailDetectorViewModel(
         IAutoFailService autoFail,
         IToolExecutionService execution,
@@ -59,8 +108,10 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
         _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
     }
 
+    /// <summary>Selects this feature as the current QuickRun target.</summary>
     public void Activate() => _quickRunRegistry.SelectCurrent(OperationId);
 
+    /// <summary>Clears this feature as the current QuickRun target when it is active.</summary>
     public void Deactivate()
     {
         if (_quickRunRegistry.CurrentCommandId == OperationId)
@@ -80,6 +131,9 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
         await RunPathAsync(path, CancellationToken.None);
     }
 
+    /// <summary>Analyzes the beatmap currently open in osu! through the QuickRun path.</summary>
+    /// <param name="cancellationToken">Cancels beatmap discovery or analysis.</param>
+    /// <returns>A task that completes after QuickRun finishes.</returns>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
         string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);

@@ -46,7 +46,12 @@ public sealed class AutoFailDetectorViewModelTests
             service,
             registry: registry,
             currentPath: "current.osu");
-        AutoFailQuickRunHostedService hosted = new(registry, viewModel);
+        MappingToolQuickRunRegistration registration = new(
+            "auto-fail-detector",
+            "Auto-fail Detector",
+            QuickRunTargets.Always,
+            viewModel.RunQuickAsync);
+        MappingToolQuickRunHostedService hosted = new(registry, [registration]);
 
         // Act
         await hosted.StartAsync(CancellationToken.None);

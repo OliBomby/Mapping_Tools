@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Mapping_Tools.Desktop.Controls.ToolViewHeader"
+             x:Name="Root"
+             x:DataType="controls:ToolViewHeader">
+    <StackPanel Orientation="Horizontal">
+        <TextBlock VerticalAlignment="Center"
+                   FontSize="32"
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource MaterialPrimaryMidBrush}"
+                   Text="{Binding Title, ElementName=Root}" />
+
+        <Button Classes="flat tool-info-badge"
+                AutomationProperties.Name="Tool information"
+                ToolTip.Tip="About this tool">
+            <materialIcons:MaterialIcon Width="24"
+                                        Height="24"
+                                        Foreground="{DynamicResource MappingToolsHelpBadgeBrush}"
+                                        Kind="HelpCircle" />
+            <Button.Flyout>
+                <Flyout Placement="BottomEdgeAlignedLeft">
+                    <TextBlock MaxWidth="600"
+                               Padding="5"
+                               Text="{Binding HelpText, ElementName=Root}"
+                               TextWrapping="Wrap" />
+                </Flyout>
+            </Button.Flyout>
+        </Button>
+
+        <Button Classes="flat tool-info-badge"
+                IsVisible="{Binding IsQuickRunSupported, ElementName=Root}"
+                AutomationProperties.Name="QuickRun information"
+                ToolTip.Tip="QuickRun support">
+            <materialIcons:MaterialIcon Width="24"
+                                        Height="24"
+                                        Foreground="{DynamicResource MappingToolsQuickRunBadgeBrush}"
+                                        Kind="LightningBoltCircle" />
+            <Button.Flyout>
+                <Flyout Placement="BottomEdgeAlignedLeft">
+                    <TextBlock MaxWidth="600"
+                               Padding="5"
+                               Text="This tool is compatible with QuickRun!"
+                               TextWrapping="Wrap" />
+                </Flyout>
+            </Button.Flyout>
+        </Button>
+    </StackPanel>
+</UserControl>

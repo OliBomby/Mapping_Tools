@@ -5,6 +5,10 @@ using Mapping_Tools.Core.Classes.MathUtil;
 namespace Mapping_Tools.Core.Tools.AutoFail;
 
 /// <summary>Contains one immutable auto-fail analysis result.</summary>
+/// <param name="HasAutoFail">Whether at least one object unloads incorrectly.</param>
+/// <param name="UnloadingObjects">The timestamps of confirmed unloading objects.</param>
+/// <param name="PotentialUnloadingObjects">The timestamps of objects that may unload.</param>
+/// <param name="Disruptors">The timestamps of objects that disrupt loading.</param>
 public sealed record AutoFailAnalysis(
     bool HasAutoFail,
     IReadOnlyList<double> UnloadingObjects,
@@ -12,6 +16,8 @@ public sealed record AutoFailAnalysis(
     IReadOnlyList<double> Disruptors);
 
 /// <summary>Describes one candidate distribution of padding objects and its human-readable guide.</summary>
+/// <param name="Padding">The number of objects inserted around each problem area.</param>
+/// <param name="Guide">The mapper-facing instructions for reproducing the repair.</param>
 public sealed record AutoFailFixPlan(IReadOnlyList<int> Padding, string Guide);
 
 /// <summary>Reproduces osu!'s object-loading search and plans optional padding without UI dependencies.</summary>
@@ -29,6 +35,14 @@ public sealed class AutoFailDetectorEngine
     private SortedSet<int>? _timesToCheckStartIndex;
     private int?[]? _placementTimes;
 
+    /// <summary>Creates an analyzer for one beatmap and one set of difficulty windows.</summary>
+    /// <param name="hitObjects">The mutable hit-object collection to inspect and optionally repair.</param>
+    /// <param name="mapStartTime">The first relevant map timestamp.</param>
+    /// <param name="mapEndTime">The final map timestamp.</param>
+    /// <param name="autoFailCheckTime">The latest timestamp at which unloading causes auto-fail.</param>
+    /// <param name="approachTime">The simulated object preempt duration.</param>
+    /// <param name="window50">The simulated 50 judgement window.</param>
+    /// <param name="physicsTime">The tolerated physics-update delay.</param>
     public AutoFailDetectorEngine(
         List<HitObject> hitObjects,
         int mapStartTime,
@@ -53,6 +67,8 @@ public sealed class AutoFailDetectorEngine
         SortHitObjects();
     }
 
+    /// <summary>Replaces the mutable object collection and invalidates prior analysis state.</summary>
+    /// <param name="hitObjects">The new hit-object collection.</param>
     public void SetHitObjects(List<HitObject> hitObjects)
     {
         _hitObjects = hitObjects ?? throw new ArgumentNullException(nameof(hitObjects));
@@ -60,6 +76,9 @@ public sealed class AutoFailDetectorEngine
         SortHitObjects();
     }
 
+    /// <summary>Detects confirmed and potential unloading conditions.</summary>
+    /// <param name="cancellationToken">Cancels the object-loading simulation.</param>
+    /// <returns>The detected unloading objects and disruptors.</returns>
     public AutoFailAnalysis Analyze(CancellationToken cancellationToken = default)
     {
         List<double> unloading = [];
@@ -157,6 +176,9 @@ public sealed class AutoFailDetectorEngine
             disruptorTimes.ToArray());
     }
 
+    /// <summary>Lazily enumerates valid padding distributions after analysis.</summary>
+    /// <param name="cancellationToken">Cancels solution enumeration.</param>
+    /// <returns>Repair plans ordered from fewer to more padding objects.</returns>
     public IEnumerable<AutoFailFixPlan> GetFixPlans(
         CancellationToken cancellationToken = default)
     {
@@ -176,6 +198,8 @@ public sealed class AutoFailDetectorEngine
         }
     }
 
+    /// <summary>Applies one repair plan to the mutable hit-object collection.</summary>
+    /// <param name="plan">The plan produced by <see cref="GetFixPlans"/>.</param>
     public void ApplyFix(AutoFailFixPlan plan)
     {
         ArgumentNullException.ThrowIfNull(plan);

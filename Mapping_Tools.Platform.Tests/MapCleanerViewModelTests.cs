@@ -43,7 +43,12 @@ public sealed class MapCleanerViewModelTests
         RecordingCleaner cleaner = new();
         QuickRunCommandRegistry registry = new();
         MapCleanerViewModel viewModel = Create(cleaner, registry: registry, currentPath: "current.osu");
-        MapCleanerQuickRunHostedService hosted = new(registry, viewModel);
+        MappingToolQuickRunRegistration registration = new(
+            "map-cleaner",
+            "Map Cleaner",
+            QuickRunTargets.Always,
+            viewModel.RunQuickAsync);
+        MappingToolQuickRunHostedService hosted = new(registry, [registration]);
 
         // Act
         await hosted.StartAsync(CancellationToken.None);

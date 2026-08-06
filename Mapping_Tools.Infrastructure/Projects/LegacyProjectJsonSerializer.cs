@@ -92,8 +92,14 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 {
                     return typeof(RhythmGuideOptions);
                 }
-                if (typeName == LegacyMapCleanerProject) return typeof(MapCleanerProject);
-                if (typeName == LegacyMapCleanerOptions) return typeof(MapCleanerOptions);
+                if (typeName == LegacyMapCleanerProject)
+                {
+                    return typeof(MapCleanerProject);
+                }
+                if (typeName == LegacyMapCleanerOptions)
+                {
+                    return typeof(MapCleanerOptions);
+                }
 
                 Type? migratedType = MigratedCoreMarker.Assembly.GetType(typeName)
                     ?? MigratedCoreMarker.Assembly.GetType(ToCurrentTypeName(typeName));

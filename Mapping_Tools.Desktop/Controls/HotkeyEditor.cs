@@ -26,6 +26,7 @@ public sealed class HotkeyEditor : TextBox
     /// <summary>Creates a read-only field whose keyboard input edits only the hotkey value.</summary>
     public HotkeyEditor()
     {
+        Classes.Add("outline");
         IsReadOnly = true;
         IsUndoEnabled = false;
         HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center;

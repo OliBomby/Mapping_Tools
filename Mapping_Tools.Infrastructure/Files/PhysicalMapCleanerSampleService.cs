@@ -10,6 +10,7 @@ public sealed class PhysicalMapCleanerSampleService : IMapCleanerSampleService
 {
     private static readonly string[] AudioExtensions = [".wav", ".ogg", ".mp3"];
 
+    /// <inheritdoc/>
     public Task<IReadOnlyDictionary<string, string>> AnalyzeAsync(
         string directory,
         bool detectDuplicates,
@@ -28,13 +29,16 @@ public sealed class PhysicalMapCleanerSampleService : IMapCleanerSampleService
                 using FileStream stream = File.OpenRead(path);
                 string hash = Convert.ToHexString(SHA256.HashData(stream));
                 if (!firstByHash.TryGetValue(hash, out first!))
+                {
                     firstByHash[hash] = first = path;
+                }
             }
             result[Path.Combine(directory, Path.GetFileNameWithoutExtension(path))] = first;
         }
         return result;
     }, cancellationToken);
 
+    /// <inheritdoc/>
     public Task<int> MoveUnusedToRecoveryAsync(
         string directory,
         string currentBeatmapPath,
@@ -46,7 +50,10 @@ public sealed class PhysicalMapCleanerSampleService : IMapCleanerSampleService
         foreach (string path in Directory.EnumerateFiles(directory, "*.osu"))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            Beatmap beatmap = string.Equals(Path.GetFullPath(path), Path.GetFullPath(currentBeatmapPath), StringComparison.OrdinalIgnoreCase)
+            Beatmap beatmap = string.Equals(
+                    Path.GetFullPath(path),
+                    Path.GetFullPath(currentBeatmapPath),
+                    StringComparison.OrdinalIgnoreCase)
                 ? currentBeatmap
                 : new Beatmap(File.ReadAllLines(path).ToList());
             CollectUsed(beatmap, used, ref anyStandardSpinner);
@@ -57,7 +64,10 @@ public sealed class PhysicalMapCleanerSampleService : IMapCleanerSampleService
             used.UnionWith(storyboard.StoryboardSoundSamples.Select(sample =>
                 Path.GetFileNameWithoutExtension(sample.FilePath)));
         }
-        if (anyStandardSpinner) used.UnionWith(["spinnerspin", "spinnerbonus"]);
+        if (anyStandardSpinner)
+        {
+            used.UnionWith(["spinnerspin", "spinnerbonus"]);
+        }
 
         string recovery = Path.Combine(
             directory,
@@ -68,7 +78,11 @@ public sealed class PhysicalMapCleanerSampleService : IMapCleanerSampleService
         {
             cancellationToken.ThrowIfCancellationRequested();
             string stem = Path.GetFileNameWithoutExtension(path);
-            if (used.Contains(stem) || IsSkinnable(stem)) continue;
+            if (used.Contains(stem) || IsSkinnable(stem))
+            {
+                continue;
+            }
+
             Directory.CreateDirectory(recovery);
             File.Move(path, Path.Combine(recovery, Path.GetFileName(path)));
             moved++;
@@ -83,9 +97,14 @@ public sealed class PhysicalMapCleanerSampleService : IMapCleanerSampleService
         anyStandardSpinner |= mode == GameMode.Standard && beatmap.HitObjects.Any(item => item.IsSpinner);
         used.Add(Path.GetFileNameWithoutExtension(beatmap.General["AudioFilename"].Value.Trim()));
         foreach (HitObject item in beatmap.HitObjects)
+        {
             used.UnionWith(item.GetPlayingBodyFilenames(tickRate, false).Select(Path.GetFileNameWithoutExtension));
+        }
+
         foreach (TimelineObject item in beatmap.GetTimeline().TimelineObjects)
+        {
             used.UnionWith(item.GetPlayingFilenames(mode, false).Select(Path.GetFileNameWithoutExtension));
+        }
         used.UnionWith(beatmap.StoryboardSoundSamples.Select(sample =>
             Path.GetFileNameWithoutExtension(sample.FilePath)));
     }

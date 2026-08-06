@@ -15,38 +15,54 @@ public sealed class TimelineControl : Control
     private const double HitTolerance = 4;
     private Cursor? _handCursor;
 
+    /// <summary>Identifies the semantic marker collection drawn on the timeline.</summary>
     public static readonly StyledProperty<IReadOnlyList<TimelineMarker>> MarkersProperty =
         AvaloniaProperty.Register<TimelineControl, IReadOnlyList<TimelineMarker>>(
             nameof(Markers),
             []);
+    /// <summary>Identifies the first visible timestamp in milliseconds.</summary>
     public static readonly StyledProperty<double> StartTimeProperty =
         AvaloniaProperty.Register<TimelineControl, double>(nameof(StartTime));
+    /// <summary>Identifies the final visible timestamp in milliseconds.</summary>
     public static readonly StyledProperty<double> EndTimeProperty =
         AvaloniaProperty.Register<TimelineControl, double>(nameof(EndTime), 20);
+    /// <summary>Identifies the command invoked when a marker is double-clicked.</summary>
     public static readonly StyledProperty<ICommand?> NavigateCommandProperty =
         AvaloniaProperty.Register<TimelineControl, ICommand?>(nameof(NavigateCommand));
+    /// <summary>Identifies the horizontal timeline brush.</summary>
     public static readonly StyledProperty<IBrush?> LineBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(LineBrush));
+    /// <summary>Identifies the timeline-label brush.</summary>
     public static readonly StyledProperty<IBrush?> TickBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(TickBrush));
+    /// <summary>Identifies the translucent outer brush for neutral markers.</summary>
     public static readonly StyledProperty<IBrush?> NeutralOuterBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(NeutralOuterBrush));
+    /// <summary>Identifies the solid inner brush for neutral markers.</summary>
     public static readonly StyledProperty<IBrush?> NeutralInnerBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(NeutralInnerBrush));
+    /// <summary>Identifies the translucent outer brush for added markers.</summary>
     public static readonly StyledProperty<IBrush?> AddedOuterBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(AddedOuterBrush));
+    /// <summary>Identifies the solid inner brush for added markers.</summary>
     public static readonly StyledProperty<IBrush?> AddedInnerBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(AddedInnerBrush));
+    /// <summary>Identifies the translucent outer brush for changed markers.</summary>
     public static readonly StyledProperty<IBrush?> ChangedOuterBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(ChangedOuterBrush));
+    /// <summary>Identifies the solid inner brush for changed markers.</summary>
     public static readonly StyledProperty<IBrush?> ChangedInnerBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(ChangedInnerBrush));
+    /// <summary>Identifies the translucent outer brush for removed markers.</summary>
     public static readonly StyledProperty<IBrush?> RemovedOuterBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(RemovedOuterBrush));
+    /// <summary>Identifies the solid inner brush for removed markers.</summary>
     public static readonly StyledProperty<IBrush?> RemovedInnerBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(RemovedInnerBrush));
+    /// <summary>Identifies the translucent outer brush for highlighted markers.</summary>
     public static readonly StyledProperty<IBrush?> AccentOuterBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(AccentOuterBrush));
+    /// <summary>Identifies the solid inner brush for highlighted markers.</summary>
     public static readonly StyledProperty<IBrush?> AccentInnerBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(AccentInnerBrush));
 
@@ -70,28 +86,71 @@ public sealed class TimelineControl : Control
             AccentInnerBrushProperty);
     }
 
+    /// <summary>Gets or sets the semantic markers drawn on the timeline.</summary>
     public IReadOnlyList<TimelineMarker> Markers
     {
         get => GetValue(MarkersProperty);
         set => SetValue(MarkersProperty, value);
     }
 
-    public double StartTime { get => GetValue(StartTimeProperty); set => SetValue(StartTimeProperty, value); }
-    public double EndTime { get => GetValue(EndTimeProperty); set => SetValue(EndTimeProperty, value); }
-    public ICommand? NavigateCommand { get => GetValue(NavigateCommandProperty); set => SetValue(NavigateCommandProperty, value); }
+    /// <summary>Gets or sets the first visible timestamp in milliseconds.</summary>
+    public double StartTime
+    {
+        get => GetValue(StartTimeProperty);
+        set => SetValue(StartTimeProperty, value);
+    }
+
+    /// <summary>Gets or sets the final visible timestamp in milliseconds.</summary>
+    public double EndTime
+    {
+        get => GetValue(EndTimeProperty);
+        set => SetValue(EndTimeProperty, value);
+    }
+
+    /// <summary>Gets or sets the command invoked with a marker timestamp after a double-click.</summary>
+    public ICommand? NavigateCommand
+    {
+        get => GetValue(NavigateCommandProperty);
+        set => SetValue(NavigateCommandProperty, value);
+    }
+
+    /// <summary>Gets or sets the horizontal timeline brush.</summary>
     public IBrush? LineBrush { get => GetValue(LineBrushProperty); set => SetValue(LineBrushProperty, value); }
+
+    /// <summary>Gets or sets the timeline-label brush.</summary>
     public IBrush? TickBrush { get => GetValue(TickBrushProperty); set => SetValue(TickBrushProperty, value); }
+
+    /// <summary>Gets or sets the translucent outer brush for neutral markers.</summary>
     public IBrush? NeutralOuterBrush { get => GetValue(NeutralOuterBrushProperty); set => SetValue(NeutralOuterBrushProperty, value); }
+
+    /// <summary>Gets or sets the solid inner brush for neutral markers.</summary>
     public IBrush? NeutralInnerBrush { get => GetValue(NeutralInnerBrushProperty); set => SetValue(NeutralInnerBrushProperty, value); }
+
+    /// <summary>Gets or sets the translucent outer brush for added markers.</summary>
     public IBrush? AddedOuterBrush { get => GetValue(AddedOuterBrushProperty); set => SetValue(AddedOuterBrushProperty, value); }
+
+    /// <summary>Gets or sets the solid inner brush for added markers.</summary>
     public IBrush? AddedInnerBrush { get => GetValue(AddedInnerBrushProperty); set => SetValue(AddedInnerBrushProperty, value); }
+
+    /// <summary>Gets or sets the translucent outer brush for changed markers.</summary>
     public IBrush? ChangedOuterBrush { get => GetValue(ChangedOuterBrushProperty); set => SetValue(ChangedOuterBrushProperty, value); }
+
+    /// <summary>Gets or sets the solid inner brush for changed markers.</summary>
     public IBrush? ChangedInnerBrush { get => GetValue(ChangedInnerBrushProperty); set => SetValue(ChangedInnerBrushProperty, value); }
+
+    /// <summary>Gets or sets the translucent outer brush for removed markers.</summary>
     public IBrush? RemovedOuterBrush { get => GetValue(RemovedOuterBrushProperty); set => SetValue(RemovedOuterBrushProperty, value); }
+
+    /// <summary>Gets or sets the solid inner brush for removed markers.</summary>
     public IBrush? RemovedInnerBrush { get => GetValue(RemovedInnerBrushProperty); set => SetValue(RemovedInnerBrushProperty, value); }
+
+    /// <summary>Gets or sets the translucent outer brush for highlighted markers.</summary>
     public IBrush? AccentOuterBrush { get => GetValue(AccentOuterBrushProperty); set => SetValue(AccentOuterBrushProperty, value); }
+
+    /// <summary>Gets or sets the solid inner brush for highlighted markers.</summary>
     public IBrush? AccentInnerBrush { get => GetValue(AccentInnerBrushProperty); set => SetValue(AccentInnerBrushProperty, value); }
 
+    /// <inheritdoc/>
     public override void Render(DrawingContext context)
     {
         base.Render(context);
@@ -141,10 +200,12 @@ public sealed class TimelineControl : Control
         }
     }
 
+    /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize) => new(
         double.IsInfinity(availableSize.Width) ? 300 : availableSize.Width,
         double.IsInfinity(availableSize.Height) ? 80 : Math.Max(50, availableSize.Height));
 
+    /// <inheritdoc/>
     protected override void OnPointerMoved(PointerEventArgs eventArgs)
     {
         base.OnPointerMoved(eventArgs);
@@ -157,6 +218,7 @@ public sealed class TimelineControl : Control
             : marker.Label ?? TimelineScale.FormatMarker(marker.Time));
     }
 
+    /// <inheritdoc/>
     protected override void OnPointerPressed(PointerPressedEventArgs eventArgs)
     {
         base.OnPointerPressed(eventArgs);

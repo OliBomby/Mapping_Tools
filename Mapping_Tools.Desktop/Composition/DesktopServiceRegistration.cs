@@ -44,51 +44,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<MainWindow>();
         services.AddSingleton<IUiDispatcher, AvaloniaUiDispatcher>();
         services.AddSingleton<BeatmapWorkspaceViewModel>();
-        services.AddSingleton<GetStartedViewModel>();
-        services.AddSingleton<PreferencesViewModel>();
-        services.AddSingleton<RhythmGuideViewModel>();
-        services.AddSingleton<AutoFailDetectorViewModel>();
-        services.AddSingleton<MapCleanerViewModel>();
-        services.AddSingleton<IShellFeatureRegistry>(provider =>
-            new ShellFeatureRegistry(
-            [
-                new ShellFeatureRegistration(
-                    "get-started",
-                    "Get started",
-                    "Home",
-                    "Onboarding, bundled changelog, support links, and recent beatmaps.",
-                    ["home", "help", "changelog", "recent", "faq"],
-                    provider.GetRequiredService<GetStartedViewModel>),
-                new ShellFeatureRegistration(
-                    "preferences",
-                    "Preferences",
-                    "Application",
-                    "Paths, backup policy, Editor Reader, and application theme.",
-                    ["settings", "paths", "backups", "editor reader", "theme"],
-                    provider.GetRequiredService<PreferencesViewModel>),
-                new ShellFeatureRegistration(
-                    "rhythm-guide",
-                    "Rhythm Guide",
-                    "Tools",
-                    "Make a beatmap with circles from the rhythm of multiple maps.",
-                    ["rhythm", "hitsound", "guide", "reference"],
-                    provider.GetRequiredService<RhythmGuideViewModel>,
-                    startsSection: true),
-                new ShellFeatureRegistration(
-                    "auto-fail-detector",
-                    "Auto-fail Detector",
-                    "Tools",
-                    "Detect incorrect object loading in overlapping patterns.",
-                    ["auto fail", "2b", "unloading", "objects"],
-                    provider.GetRequiredService<AutoFailDetectorViewModel>),
-                new ShellFeatureRegistration(
-                    "map-cleaner",
-                    "Map Cleaner",
-                    "Tools",
-                    "Rebuild useful greenlines and optionally resnap map content.",
-                    ["clean", "greenline", "resnap", "samples"],
-                    provider.GetRequiredService<MapCleanerViewModel>)
-            ]));
+        services.AddDesktopFeatures();
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<IDialogService>(provider =>
         {
@@ -124,8 +80,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton(provider =>
             provider.GetRequiredService<ISettingsService>().LoadOrCreate().Settings);
         services.AddHostedService<SettingsPersistenceHostedService>();
-        services.AddHostedService<AutoFailQuickRunHostedService>();
-        services.AddHostedService<MapCleanerQuickRunHostedService>();
+        services.AddHostedService<MappingToolQuickRunHostedService>();
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ITextFileStore, FileSystemFileStore>();
         services.AddSingleton<IUserNotificationService, UserNotificationService>();

@@ -8,6 +8,10 @@ namespace Mapping_Tools.Core.Tools.RhythmGuide;
 public static class RhythmGuideGenerator
 {
     /// <summary>Creates a new guide map by retaining the first source's base metadata and redlines.</summary>
+    /// <param name="sources">The beatmaps whose expanded rhythm events are copied.</param>
+    /// <param name="options">The output mode, name, selection, and snapping choices.</param>
+    /// <param name="cancellationToken">Cancels timeline expansion or guide generation.</param>
+    /// <returns>A new beatmap containing generated guide objects.</returns>
     public static Beatmap CreateNewMap(
         IReadOnlyList<Beatmap> sources,
         RhythmGuideOptions options,
@@ -32,6 +36,10 @@ public static class RhythmGuideGenerator
     }
 
     /// <summary>Appends guide objects to an existing target without changing its existing content.</summary>
+    /// <param name="target">The beatmap that receives guide objects.</param>
+    /// <param name="sources">The beatmaps whose expanded rhythm events are copied.</param>
+    /// <param name="options">The selection, snapping, and new-combo choices.</param>
+    /// <param name="cancellationToken">Cancels timeline expansion or guide generation.</param>
     public static void Append(
         Beatmap target,
         IEnumerable<Beatmap> sources,

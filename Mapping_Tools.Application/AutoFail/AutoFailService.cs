@@ -9,9 +9,12 @@ public sealed class AutoFailService : IAutoFailService
 {
     private readonly IBeatmapEditingGateway _editingGateway;
 
+    /// <summary>Creates a service that opens and saves beatmaps through the shared editing gateway.</summary>
+    /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
     public AutoFailService(IBeatmapEditingGateway editingGateway) =>
         _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
 
+    /// <inheritdoc/>
     public async Task<AutoFailRun> AnalyzeAsync(
         AutoFailOptions options,
         CancellationToken cancellationToken = default)
@@ -40,6 +43,7 @@ public sealed class AutoFailService : IAutoFailService
         return new AutoFailRun(analysis, beatmap.GetMapEndTime(), session, detector);
     }
 
+    /// <inheritdoc/>
     public IEnumerable<AutoFailFixPlan> GetFixPlans(
         AutoFailRun run,
         CancellationToken cancellationToken = default)
@@ -49,6 +53,7 @@ public sealed class AutoFailService : IAutoFailService
             .GetFixPlans(cancellationToken);
     }
 
+    /// <inheritdoc/>
     public async Task ApplyFixAsync(
         AutoFailRun run,
         AutoFailFixPlan plan,

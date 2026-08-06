@@ -13,6 +13,10 @@ public sealed class RhythmGuideService : IRhythmGuideService
     private readonly IBeatmapFileSystem _fileSystem;
     private readonly ITextFileStore _textFileStore;
 
+    /// <summary>Creates a service that loads source maps and safely persists guide output.</summary>
+    /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
+    /// <param name="fileSystem">Checks whether a destination already exists.</param>
+    /// <param name="textFileStore">Writes newly created beatmap documents.</param>
     public RhythmGuideService(
         IBeatmapEditingGateway editingGateway,
         IBeatmapFileSystem fileSystem,
@@ -23,6 +27,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
         _textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
     }
 
+    /// <inheritdoc/>
     public async Task<RhythmGuideResult> GenerateAsync(
         RhythmGuideOptions options,
         CancellationToken cancellationToken = default)

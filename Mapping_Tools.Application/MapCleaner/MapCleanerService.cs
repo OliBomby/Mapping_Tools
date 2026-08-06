@@ -11,6 +11,10 @@ public sealed class MapCleanerService : IMapCleanerService
     private readonly IBeatmapFileSystem _fileSystem;
     private readonly IMapCleanerSampleService _samples;
 
+    /// <summary>Creates a service that cleans beatmaps and their mapset samples.</summary>
+    /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
+    /// <param name="fileSystem">Resolves beatmap parent directories.</param>
+    /// <param name="samples">Analyzes and recoverably removes mapset samples.</param>
     public MapCleanerService(
         IBeatmapEditingGateway editingGateway,
         IBeatmapFileSystem fileSystem,
@@ -21,6 +25,7 @@ public sealed class MapCleanerService : IMapCleanerService
         _samples = samples ?? throw new ArgumentNullException(nameof(samples));
     }
 
+    /// <inheritdoc/>
     public async Task<MapCleanerResult> CleanAsync(
         IReadOnlyList<string> paths,
         MapCleanerOptions options,
@@ -30,7 +35,9 @@ public sealed class MapCleanerService : IMapCleanerService
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(options);
         if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace))
+        {
             throw new ArgumentException("Select at least one beatmap.", nameof(paths));
+        }
 
         MapCleanerResult total = new(0, 0, 0, [], [], [], 20);
         for (int index = 0; index < paths.Count; index++)

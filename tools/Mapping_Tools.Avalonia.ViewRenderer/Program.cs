@@ -4,17 +4,24 @@ using Avalonia.Headless;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.AutoFail;
 using Mapping_Tools.Application.Interactions;
+using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.QuickRun;
+using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.SafetyCopies;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Avalonia.ViewRenderer;
 using Mapping_Tools.Desktop;
 using Mapping_Tools.Desktop.Converters;
+using Mapping_Tools.Desktop.Interactions;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
@@ -51,6 +58,9 @@ Control view = options.View switch
         Child = new GetStartedView { DataContext = CreateGetStartedViewModel(options.Scenario) }
     },
     "PreferencesView" => CreatePreferencesView(options.Scenario),
+    "RhythmGuideView" => CreateRhythmGuideView(),
+    "AutoFailDetectorView" => CreateAutoFailDetectorView(),
+    "MapCleanerView" => CreateMapCleanerView(),
     "MessageDialogWindow" => CreateMessageDialog(),
     "ValueDialogWindow" => CreateValueDialog(options.Scenario),
     _ => CreateParameterlessView(options.View),
@@ -231,6 +241,57 @@ static Control CreatePreferencesView(string scenario)
     };
 }
 
+static Control CreateRhythmGuideView()
+{
+    RhythmGuideViewModel viewModel = new(
+        RendererStub<IRhythmGuideService>.Create(),
+        RendererStub<IToolExecutionService>.Create(),
+        new RendererFilePicker(),
+        RendererStub<ICurrentBeatmapLocator>.Create(),
+        RendererStub<IProjectService>.Create(),
+        new RendererDialogService(),
+        new RendererFileRevealService(),
+        RendererStub<IRhythmGuideWindowService>.Create(),
+        new UserNotificationService(),
+        new RendererApplicationDirectories());
+
+    return new RhythmGuideView { DataContext = viewModel };
+}
+
+static Control CreateAutoFailDetectorView()
+{
+    ApplicationSettings settings = CreateSettings(string.Empty);
+    AutoFailDetectorViewModel viewModel = new(
+        RendererStub<IAutoFailService>.Create(),
+        RendererStub<IToolExecutionService>.Create(),
+        new RendererBeatmapWorkspace(settings),
+        RendererStub<ICurrentBeatmapLocator>.Create(),
+        settings,
+        new RendererDialogService(),
+        new QuickRunCommandRegistry(),
+        new AcceptedLauncher());
+
+    return new AutoFailDetectorView { DataContext = viewModel };
+}
+
+static Control CreateMapCleanerView()
+{
+    ApplicationSettings settings = CreateSettings(string.Empty);
+    MapCleanerViewModel viewModel = new(
+        RendererStub<IMapCleanerService>.Create(),
+        RendererStub<IToolExecutionService>.Create(),
+        new RendererBeatmapWorkspace(settings),
+        RendererStub<ICurrentBeatmapLocator>.Create(),
+        settings,
+        new QuickRunCommandRegistry(),
+        RendererStub<IProjectService>.Create(),
+        new RendererDialogService(),
+        new UserNotificationService(),
+        new AcceptedLauncher());
+
+    return new MapCleanerView { DataContext = viewModel };
+}
+
 static PreferencesViewModel CreatePreferencesViewModel(
     ApplicationSettings settings,
     string scenario)
@@ -308,6 +369,33 @@ static Control CreateParameterlessView(string name)
 }
 
 namespace Mapping_Tools.Avalonia.ViewRenderer {
+    internal class RendererStub<TService> : DispatchProxy
+        where TService : class
+    {
+        public static TService Create() => DispatchProxy.Create<TService, RendererStub<TService>>();
+
+        protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
+        {
+            Type returnType = targetMethod?.ReturnType ?? typeof(void);
+            if (returnType == typeof(Task))
+            {
+                return Task.CompletedTask;
+            }
+
+            if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+            {
+                Type resultType = returnType.GetGenericArguments()[0];
+                object? result = resultType.IsValueType ? Activator.CreateInstance(resultType) : null;
+                return typeof(Task)
+                    .GetMethod(nameof(Task.FromResult))!
+                    .MakeGenericMethod(resultType)
+                    .Invoke(null, [result]);
+            }
+
+            return returnType.IsValueType ? Activator.CreateInstance(returnType) : null;
+        }
+    }
+
     internal sealed record RenderOptions(
         string View,
         string Output,

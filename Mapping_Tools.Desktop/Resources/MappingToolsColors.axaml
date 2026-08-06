@@ -8,6 +8,8 @@
                      Color="#40000000" />
     <SolidColorBrush x:Key="MappingToolsScrollbarThumbBrush"
                      Color="#C1C1C1" />
+    <SolidColorBrush x:Key="MappingToolsHelpBadgeBrush" Color="#B2FF00" />
+    <SolidColorBrush x:Key="MappingToolsQuickRunBadgeBrush" Color="#81D4FA" />
     <SolidColorBrush x:Key="MappingToolsTimelineLineBrush" Color="#FFD6D6D6" />
     <SolidColorBrush x:Key="MappingToolsTimelineNeutralOuterBrush" Color="#FF787878" />
     <SolidColorBrush x:Key="MappingToolsTimelineNeutralInnerBrush" Color="#FFC8C8C8" />

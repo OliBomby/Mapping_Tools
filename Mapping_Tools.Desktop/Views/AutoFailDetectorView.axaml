@@ -3,68 +3,92 @@
              xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="Mapping_Tools.Desktop.Views.AutoFailDetectorView"
              x:DataType="vm:AutoFailDetectorViewModel">
-    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                  VerticalScrollBarVisibility="Auto">
-        <Grid Margin="0,0,20,20" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*">
-            <TextBlock Text="Auto-fail Detector"
-                       FontSize="32"
+    <Grid RowDefinitions="*,Auto,Auto">
+        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
+            <Grid Margin="0,0,20,10">
+                <StackPanel>
+                    <controls:ToolViewHeader
+                        Title="Auto-fail Detector"
+                        IsQuickRunSupported="True"
+                        HelpText="Detects cases of incorrect object loading in a beatmap which makes osu! unable to calculate scores correctly.&#x0a;&#x0a;Auto-fail is most often caused by placing other hit objects during sliders, so multiple hit objects are active at the same time (also known as 2B patterns).&#x0a;&#x0a;Use the AR and OD overrides to see what would happen with difficulty-changing mods." />
+
+                    <CheckBox Content="Show unloading hit objects"
+                              IsChecked="{Binding ShowUnloadingObjects, Mode=TwoWay}"
+                              ToolTip.Tip="Show unloading objects in red on the timeline." />
+                    <CheckBox Content="Show potential unloading hit objects"
+                              IsChecked="{Binding ShowPotentialUnloadingObjects, Mode=TwoWay}"
+                              ToolTip.Tip="Show potentially unloading objects in green on the timeline." />
+                    <CheckBox Content="Show disrupting hit objects"
+                              IsChecked="{Binding ShowPotentialDisruptors, Mode=TwoWay}"
+                              ToolTip.Tip="Show disrupting objects in purple on the timeline." />
+                    <CheckBox Content="Get auto-fail fix guide"
+                              IsChecked="{Binding GetAutoFailFix, Mode=TwoWay}" />
+                    <CheckBox Content="Auto-insert spinners"
+                              IsEnabled="{Binding GetAutoFailFix}"
+                              IsChecked="{Binding AutoPlaceFix, Mode=TwoWay}" />
+
+                    <TextBox Width="258"
+                             Margin="0,10,0,0"
+                             HorizontalAlignment="Left"
+                             materialAssists:TextFieldAssist.Label="AR override"
+                             Text="{Binding ApproachRateOverride, Converter={StaticResource InvariantDoubleConverter}, Mode=TwoWay}"
+                             ToolTip.Tip="Use -1 to read the map's approach rate." />
+                    <TextBox Width="258"
+                             Margin="0,10,0,0"
+                             HorizontalAlignment="Left"
+                             materialAssists:TextFieldAssist.Label="OD override"
+                             Text="{Binding OverallDifficultyOverride, Converter={StaticResource InvariantDoubleConverter}, Mode=TwoWay}"
+                             ToolTip.Tip="Use -1 to read the map's overall difficulty." />
+                    <TextBox Width="258"
+                             Margin="0,20,0,0"
+                             HorizontalAlignment="Left"
+                             materialAssists:TextFieldAssist.Label="Physics update leniency"
+                             Text="{Binding PhysicsUpdateLeniency, Converter={StaticResource InvariantInt32Converter}, Mode=TwoWay}"
+                             ToolTip.Tip="Required unload delay in milliseconds; 9 ms or more is recommended." />
+                </StackPanel>
+
+                <StackPanel Margin="10"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Orientation="Horizontal">
+                    <Button Margin="0,0,8,0"
+                            VerticalAlignment="Center"
+                            IsVisible="{Binding IsRunning}"
+                            Command="{Binding CancelCommand}"
+                            Content="Cancel" />
+                    <Button Classes="tool-run-action"
+                            Command="{Binding RunCommand}"
+                            ToolTip.Tip="Run this tool.">
+                        <materialIcons:MaterialIcon Width="36" Height="36" Kind="Play" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <TextBlock VerticalAlignment="Bottom"
                        FontWeight="Bold"
-                       Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
-            <TextBlock Grid.Row="1"
-                       Margin="0,8,0,0"
-                       MaxWidth="760"
-                       HorizontalAlignment="Left"
-                       TextWrapping="Wrap"
-                       Text="Detect incorrect object loading in overlapping (2B) patterns. AR and OD overrides can model difficulty-changing mods; use -1 to read the map value." />
-
-            <Grid Grid.Row="2" Margin="0,20,0,0" ColumnDefinitions="240,240,240">
-                <TextBox Margin="0,0,12,0"
-                         materialAssists:TextFieldAssist.Label="Approach rate override"
-                         Text="{Binding ApproachRateOverride, Converter={StaticResource InvariantDoubleConverter}, Mode=TwoWay}" />
-                <TextBox Grid.Column="1" Margin="0,0,12,0"
-                         materialAssists:TextFieldAssist.Label="Overall difficulty override"
-                         Text="{Binding OverallDifficultyOverride, Converter={StaticResource InvariantDoubleConverter}, Mode=TwoWay}" />
-                <TextBox Grid.Column="2"
-                         materialAssists:TextFieldAssist.Label="Physics update leniency (ms)"
-                         Text="{Binding PhysicsUpdateLeniency, Converter={StaticResource InvariantInt32Converter}, Mode=TwoWay}" />
-            </Grid>
-
-            <WrapPanel Grid.Row="3" Margin="0,16,0,0">
-                <CheckBox Margin="0,0,20,0" Content="Show unloading objects"
-                          IsChecked="{Binding ShowUnloadingObjects, Mode=TwoWay}" />
-                <CheckBox Margin="0,0,20,0" Content="Show potential unloading objects"
-                          IsChecked="{Binding ShowPotentialUnloadingObjects, Mode=TwoWay}" />
-                <CheckBox Content="Show potential disruptors"
-                          IsChecked="{Binding ShowPotentialDisruptors, Mode=TwoWay}" />
-            </WrapPanel>
-
-            <WrapPanel Grid.Row="4" Margin="0,10,0,0">
-                <CheckBox Margin="0,0,20,0" Content="Show auto-fail fix guide"
-                          IsChecked="{Binding GetAutoFailFix, Mode=TwoWay}" />
-                <CheckBox Content="Allow applying the fix"
-                          IsEnabled="{Binding GetAutoFailFix}"
-                          IsChecked="{Binding AutoPlaceFix, Mode=TwoWay}" />
-            </WrapPanel>
-
-            <Grid Grid.Row="5" Margin="0,22,0,0" ColumnDefinitions="*,Auto,Auto">
-                <ProgressBar Height="18" Margin="0,0,20,0" VerticalAlignment="Center"
-                             Maximum="100" Value="{Binding Progress}" />
-                <Button Grid.Column="1" Margin="0,0,8,0" IsVisible="{Binding IsRunning}"
-                        Command="{Binding CancelCommand}" Content="Cancel" />
-                <Button Grid.Column="2" Command="{Binding RunCommand}" Content="Run" />
-            </Grid>
-
-            <StackPanel Grid.Row="6" Margin="0,18,0,0">
-                <TextBlock Text="{Binding ResultSummary}" FontWeight="SemiBold" />
-                <controls:TimelineControl Height="100"
-                                          Margin="0,10,0,0"
-                                          StartTime="0"
-                                          EndTime="{Binding EndTime}"
-                                          Markers="{Binding Markers}"
-                                          NavigateCommand="{Binding NavigateCommand}" />
-            </StackPanel>
+                       Opacity="0.58"
+                       Text="Made by OliBomby &amp; Karoo" />
+            <ProgressBar Grid.Column="1"
+                         Classes="tool-progress"
+                         Height="20"
+                         Margin="20,0"
+                         Maximum="100"
+                         Value="{Binding Progress}" />
         </Grid>
-    </ScrollViewer>
+
+        <StackPanel Grid.Row="2"
+                    ToolTip.Tip="Red lines unload and cause auto-fail; green lines may unload; purple lines disrupt other objects. Double-click a line to navigate.">
+            <controls:TimelineControl Height="100"
+                                      StartTime="0"
+                                      EndTime="{Binding EndTime}"
+                                      Markers="{Binding Markers}"
+                                      NavigateCommand="{Binding NavigateCommand}" />
+        </StackPanel>
+    </Grid>
 </UserControl>

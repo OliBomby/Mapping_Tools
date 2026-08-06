@@ -185,16 +185,29 @@ internal static class Program
 
         if (type == typeof(PreferencesView))
         {
-            _ = Activator.CreateInstance(
-                typeof(MainWindow),
-                BindingFlags.Instance | BindingFlags.NonPublic,
-                binder: null,
-                args: [false],
-                culture: null);
+            CreateDesignerMainWindow();
             return new PreferencesView();
         }
 
+        if (type == typeof(Mapping_Tools.Views.RhythmGuide.RhythmGuideView) ||
+            type == typeof(Mapping_Tools.Views.AutoFailDetector.AutoFailDetectorView) ||
+            type == typeof(Mapping_Tools.Views.MapCleaner.CleanerView))
+        {
+            CreateDesignerMainWindow();
+            return Activator.CreateInstance(type);
+        }
+
         return Activator.CreateInstance(type);
+    }
+
+    private static void CreateDesignerMainWindow()
+    {
+        _ = Activator.CreateInstance(
+            typeof(MainWindow),
+            BindingFlags.Instance | BindingFlags.NonPublic,
+            binder: null,
+            args: [false],
+            culture: null);
     }
 }
 

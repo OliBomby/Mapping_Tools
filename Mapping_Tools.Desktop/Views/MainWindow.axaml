@@ -119,39 +119,45 @@
             <Setter Property="Height" Value="35" />
             <Setter Property="Padding" Value="12,0" />
         </Style>
-        <Style Selector="ListBox.navigation-list">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="0" />
-        </Style>
-        <Style Selector="ListBox.navigation-list ListBoxItem">
+        <Style Selector="Button.navigation-item">
             <Setter Property="Width" Value="183" />
+            <Setter Property="MinWidth" Value="183" />
             <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="Padding" Value="18,0,0,0" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Padding" Value="18,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="FontSize" Value="14" />
             <Setter Property="FontWeight" Value="Normal" />
             <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}">
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          Content="{TemplateBinding Content}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
         </Style>
-        <Style Selector="ListBox.navigation-list ListBoxItem:selected /template/ Border#PART_HoverEffect">
-            <Setter Property="Background" Value="{DynamicResource MaterialBodyBrush}" />
-            <Setter Property="Opacity" Value="0.08" />
+        <Style Selector="Button.navigation-item.active">
+            <Setter Property="Background" Value="{DynamicResource MaterialFlatButtonClickBrush}" />
         </Style>
-        <Style Selector="ListBox.navigation-list ListBoxItem:pointerover /template/ Border#PART_HoverEffect">
-            <Setter Property="Background" Value="{DynamicResource MaterialBodyBrush}" />
-            <Setter Property="Opacity" Value="0.05" />
+        <Style Selector="Button.navigation-item:pointerover">
+            <Setter Property="Background" Value="{DynamicResource MaterialFlatButtonClickBrush}" />
         </Style>
         <Style Selector="ScrollViewer /template/ :is(ScrollBar):vertical">
             <Setter Property="Width" Value="13" />
             <Setter Property="MinWidth" Value="13" />
             <Setter Property="MaxWidth" Value="13" />
         </Style>
-        <Style Selector="ListBox.navigation-list /template/ ScrollViewer /template/ ScrollBar:vertical /template/ Track#PART_Track">
+        <Style Selector="ScrollViewer.navigation-scroll /template/ ScrollBar:vertical /template/ Track#PART_Track">
             <Setter Property="Width" Value="10" />
             <Setter Property="RenderTransform" Value="translateX(-3px)" />
         </Style>
-        <Style Selector="ListBox.navigation-list /template/ ScrollViewer /template/ ScrollBar:vertical /template/ Thumb#PART_Thumb">
+        <Style Selector="ScrollViewer.navigation-scroll /template/ ScrollBar:vertical /template/ Thumb#PART_Thumb">
             <Setter Property="Width" Value="10" />
         </Style>
         <Style Selector="TextBox.shell-search /template/ Panel#PART_TextFieldPanel">
@@ -417,36 +423,42 @@
                                  ToolTip.Tip="Search registered features">
                         </TextBox>
 
-                        <ListBox Classes="navigation-list"
-                                 Width="200"
-                                 Margin="0,16"
-                                 HorizontalAlignment="Left"
-                                 AutomationProperties.Name="Tools menu"
-                                 ItemsSource="{Binding VisibleFeatures}"
-                                 SelectedItem="{Binding SelectedFeature, Mode=TwoWay}"
-                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
-                            <ListBox.ItemTemplate>
+                        <ScrollViewer Classes="navigation-scroll"
+                                      Width="200"
+                                      Margin="0,16"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto">
+                            <ItemsControl Width="183"
+                                          HorizontalAlignment="Left"
+                                          AutomationProperties.Name="Tools menu"
+                                          ItemsSource="{Binding VisibleFeatures}">
+                            <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="vm:ShellFeatureItemViewModel">
-                                    <Grid Height="{Binding NavigationRowHeight}"
-                                          RowDefinitions="Auto,*">
+                                    <StackPanel>
                                         <Separator IsVisible="{Binding StartsSection}"
-                                                   Margin="-10,9,-10,11"
-                                                   Foreground="{DynamicResource MaterialDividerBrush}" />
-                                        <TextBlock Grid.Row="1"
-                                                   Text="{Binding DisplayName}"
-                                                   VerticalAlignment="Center"
-                                                   TextWrapping="NoWrap"
-                                                   ToolTip.Tip="{Binding Description}" />
-                                        <Grid.ContextMenu>
+                                                   Height="1"
+                                                   Margin="8,10,8,10"
+                                                   Background="{DynamicResource MaterialDividerBrush}"
+                                                   IsHitTestVisible="False"
+                                                   Focusable="False" />
+                                        <Button Classes="navigation-item"
+                                                Classes.active="{Binding IsActive}"
+                                                Height="{Binding NavigationHeight}"
+                                                Command="{Binding ActivateCommand}"
+                                                Content="{Binding DisplayName}"
+                                                ToolTip.Tip="{Binding Description}">
+                                            <Button.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="{Binding FavoriteActionLabel}"
                                                           Command="{Binding ToggleFavoriteCommand}" />
                                             </ContextMenu>
-                                        </Grid.ContextMenu>
-                                    </Grid>
+                                            </Button.ContextMenu>
+                                        </Button>
+                                    </StackPanel>
                                 </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                            </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
                     </DockPanel>
                 </SplitView.Pane>
 
