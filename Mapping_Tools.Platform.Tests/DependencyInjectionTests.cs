@@ -51,6 +51,7 @@ public sealed class DependencyInjectionTests
             typeof(IToolExecutionService),
             typeof(IQuickRunCommandRegistry),
             typeof(IQuickRunService),
+            typeof(IHotkeyBindingCoordinator),
             typeof(IGlobalHotkeyService),
             typeof(IBeatmapBackupStore),
             typeof(IBeatmapBackupService),
@@ -60,6 +61,8 @@ public sealed class DependencyInjectionTests
             typeof(IBeatmapEditingGateway),
             typeof(IBeatmapFileSystem),
             typeof(ICurrentBeatmapLocator),
+            typeof(IBetterSaveService),
+            typeof(IBetterSaveOverrideService),
             typeof(IBeatmapWorkspace),
             typeof(IProjectSerializer),
             typeof(IProjectStore),
@@ -136,7 +139,7 @@ public sealed class DependencyInjectionTests
             .Where(descriptor => descriptor.ServiceType == typeof(IHostedService))
             .ToArray();
         // Assert
-        hosted.Length.Should().Be(3);
+        hosted.Length.Should().Be(4);
         hosted.All(
             descriptor => descriptor.Lifetime == ServiceLifetime.Singleton).Should().BeTrue();
     }
@@ -160,7 +163,28 @@ public sealed class DependencyInjectionTests
     }
 
     [TestMethod]
-    public async Task QuickRunHostedService_StartAndStop_ConnectsBindingAndStopsListener()
+    public async Task BetterSaveOverrideHostedService_StartAndStop_AppliesSettingsAndStopsWatcher()
+    {
+        // Arrange
+        TestBetterSaveOverrideService betterSaveOverride = new();
+        ApplicationSettings settings = new()
+        {
+            SongsPath = @"C:\osu!\Songs",
+            OverrideOsuSave = true
+        };
+        BetterSaveOverrideHostedService service = new(betterSaveOverride, settings);
+
+        // Act
+        await service.StartAsync(CancellationToken.None);
+        await service.StopAsync(CancellationToken.None);
+
+        // Assert
+        betterSaveOverride.Configurations.Should().Equal((settings.SongsPath, true));
+        betterSaveOverride.Stopped.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task GlobalHotkeyHostedService_StartAndStop_ConnectsBindingsAndStopsListener()
     {
         // Arrange
         RecordingGlobalHotkeyService hotkeys = new();
@@ -168,13 +192,16 @@ public sealed class DependencyInjectionTests
         ApplicationSettings settings = new()
         {
             QuickRunHotkey = new HotkeySettings(56, 2),
-            QuickUndoHotkey = new HotkeySettings(69, 6)
+            QuickUndoHotkey = new HotkeySettings(69, 6),
+            BetterSaveHotkey = new HotkeySettings(31, 2)
         };
         RecordingQuickUndoCommandService quickUndo = new();
+        TestBetterSaveService betterSave = new();
         GlobalHotkeyHostedService service = new(
             hotkeys,
             quickRun,
             quickUndo,
+            betterSave,
             settings);
 
         // Act
@@ -183,13 +210,16 @@ public sealed class DependencyInjectionTests
         hotkeys.Started.Should().BeTrue();
         hotkeys.Hotkeys["quick-run"].Should().Be(settings.QuickRunHotkey);
         hotkeys.Hotkeys["quick-undo"].Should().Be(settings.QuickUndoHotkey);
+        hotkeys.Hotkeys["better-save"].Should().Be(settings.BetterSaveHotkey);
 
         await hotkeys.Callbacks["quick-run"](CancellationToken.None);
         await hotkeys.Callbacks["quick-undo"](CancellationToken.None);
+        await hotkeys.Callbacks["better-save"](CancellationToken.None);
         await service.StopAsync(CancellationToken.None);
 
         quickRun.RunCount.Should().Be(1);
         quickUndo.RunCount.Should().Be(1);
+        betterSave.ExecutionCount.Should().Be(1);
         hotkeys.Stopped.Should().BeTrue();
     }
 

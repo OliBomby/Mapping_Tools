@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -151,6 +152,80 @@
                           Content="Enable Editor Reader"
                           IsChecked="{Binding UseEditorReader, Mode=TwoWay}"
                           ToolTip.Tip="Allow Mapping Tools to read live editor state from the osu! client." />
+                <CheckBox Classes="preference-check"
+                          Content="Override osu! save with BetterSave™"
+                          IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}"
+                          ToolTip.Tip="Automatically BetterSave after every osu! save. This can overwrite manual file changes while the editor is open." />
+                <CheckBox Classes="preference-check"
+                          Content="Auto reload after QuickRun"
+                          IsChecked="{Binding AutoReload, Mode=TwoWay}"
+                          ToolTip.Tip="Automatically reload the editor after every QuickRun." />
+                <CheckBox Classes="preference-check"
+                          Content="Always use QuickRun"
+                          IsChecked="{Binding AlwaysQuickRun, Mode=TwoWay}"
+                          ToolTip.Tip="Use each feature's QuickRun path even when its ordinary Run button is pressed." />
+            </StackPanel>
+
+            <StackPanel Margin="5,8,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="150"
+                               VerticalAlignment="Center"
+                               Text="QuickRun hotkey:"
+                               ToolTip.Tip="QuickRun quickly runs a tool on the beatmap open in osu!." />
+                    <controls:HotkeyEditor Width="150"
+                                           Hotkey="{Binding QuickRunHotkey, Mode=TwoWay}" />
+
+                    <CheckBox Margin="15,0,0,0"
+                              VerticalAlignment="Center"
+                              IsChecked="{Binding SmartQuickRunEnabled, Mode=TwoWay}"
+                              ToolTip.Tip="Route QuickRun by the number of hit objects selected in the editor." />
+
+                    <StackPanel Orientation="Horizontal"
+                                IsEnabled="{Binding SmartQuickRunEnabled}">
+                        <TextBlock Margin="15,0"
+                                   VerticalAlignment="Center"
+                                   Text="None:"
+                                   ToolTip.Tip="This tool receives QuickRun when no hit objects are selected." />
+                        <ComboBox Width="120"
+                                  ItemsSource="{Binding NoneQuickRunTools}"
+                                  SelectedItem="{Binding NoneQuickRunTool, Mode=TwoWay}"
+                                  ToolTip.Tip="QuickRun target for no selected hit objects." />
+                        <TextBlock Margin="15,0"
+                                   VerticalAlignment="Center"
+                                   Text="Single:"
+                                   ToolTip.Tip="This tool receives QuickRun when one hit object is selected." />
+                        <ComboBox Width="120"
+                                  ItemsSource="{Binding SingleQuickRunTools}"
+                                  SelectedItem="{Binding SingleQuickRunTool, Mode=TwoWay}"
+                                  ToolTip.Tip="QuickRun target for one selected hit object." />
+                        <TextBlock Margin="15,0"
+                                   VerticalAlignment="Center"
+                                   Text="Multiple:"
+                                   ToolTip.Tip="This tool receives QuickRun when multiple hit objects are selected." />
+                        <ComboBox Width="120"
+                                  ItemsSource="{Binding MultipleQuickRunTools}"
+                                  SelectedItem="{Binding MultipleQuickRunTool, Mode=TwoWay}"
+                                  ToolTip.Tip="QuickRun target for multiple selected hit objects." />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="150"
+                               VerticalAlignment="Center"
+                               Text="QuickUndo hotkey:"
+                               ToolTip.Tip="Load the newest backup into the beatmap currently open in osu!." />
+                    <controls:HotkeyEditor Width="150"
+                                           Hotkey="{Binding QuickUndoHotkey, Mode=TwoWay}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Width="150"
+                               VerticalAlignment="Center"
+                               Text="BetterSave™ hotkey:"
+                               ToolTip.Tip="Save the current live editor state with rounded values." />
+                    <controls:HotkeyEditor Width="150"
+                                           Hotkey="{Binding BetterSaveHotkey, Mode=TwoWay}" />
+                </StackPanel>
             </StackPanel>
 
             <StackPanel Margin="0,15,0,0"

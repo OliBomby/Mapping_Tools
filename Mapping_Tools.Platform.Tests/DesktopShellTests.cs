@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentAssertions;
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
@@ -165,6 +166,20 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    public async Task MainViewModel_BetterSaveCommand_WhenExecuted_UsesSharedService()
+    {
+        // Arrange
+        TestBetterSaveService betterSave = new();
+        using MainViewModel viewModel = CreateMainViewModel(betterSave: betterSave);
+
+        // Act
+        await ExecuteAsync(viewModel.BetterSaveCommand);
+
+        // Assert
+        betterSave.ExecutionCount.Should().Be(1);
+    }
+
+    [TestMethod]
     public async Task ProjectCommands_WithProjectFeature_ShowMenuAndDelegateToFeature()
     {
         // Arrange
@@ -229,7 +244,8 @@ public sealed class DesktopShellTests
         IReadOnlyList<ShellFeatureRegistration>? registrations = null,
         ApplicationSettings? settings = null,
         IUserNotificationService? notifications = null,
-        IPlatformLauncher? launcher = null)
+        IPlatformLauncher? launcher = null,
+        IBetterSaveService? betterSave = null)
     {
         ApplicationSettings resolvedSettings = settings ?? new ApplicationSettings();
         IUserNotificationService resolvedNotifications = notifications ?? new UserNotificationService();
@@ -252,7 +268,8 @@ public sealed class DesktopShellTests
             resolvedNotifications,
             launcher ?? new RecordingLauncher(),
             dispatcher,
-            workspace);
+            workspace,
+            betterSave ?? new TestBetterSaveService());
     }
 
     private static ShellFeatureRegistration Registration(

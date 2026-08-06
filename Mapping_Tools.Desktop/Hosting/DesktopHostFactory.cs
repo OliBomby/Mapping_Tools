@@ -19,7 +19,9 @@ internal static class DesktopHostFactory
     {
         services.AddHostedService<ToolExecutionHostedService>();
         services.AddHostedService<PeriodicBackupHostedService>();
-        services.AddHostedService<GlobalHotkeyHostedService>();
+        services.AddHostedService<BetterSaveOverrideHostedService>();
+        services.AddSingleton<IHostedService>(provider =>
+            provider.GetRequiredService<GlobalHotkeyHostedService>());
         return services;
     }
 }

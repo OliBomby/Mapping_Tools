@@ -8,6 +8,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.SafetyCopies;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
@@ -175,7 +176,8 @@ static MainViewModel CreateMainViewModel(string scenario)
         notifications,
         new AcceptedLauncher(),
         new ImmediateDispatcher(),
-        CreateWorkspaceViewModel(settings, notifications, workspace));
+        CreateWorkspaceViewModel(settings, notifications, workspace),
+        new RendererBetterSaveService());
     if (scenario.StartsWith("preferences", StringComparison.OrdinalIgnoreCase))
     {
         shell.SelectedFeature = shell.FeatureItems.Single(item => item.Id == "preferences");
@@ -237,7 +239,10 @@ static PreferencesViewModel CreatePreferencesViewModel(
         settings,
         new RendererFilePicker(),
         new RendererThemeService(),
-        new UserNotificationService());
+        new UserNotificationService(),
+        new QuickRunCommandRegistry(),
+        new RendererHotkeyBindingCoordinator(),
+        new RendererBetterSaveOverrideService());
     if (scenario.Equals("preferences-invalid", StringComparison.OrdinalIgnoreCase))
     {
         viewModel.OsuPath = string.Empty;
@@ -482,6 +487,39 @@ namespace Mapping_Tools.Avalonia.ViewRenderer {
         public Task<QuickUndoCommandResult> ExecuteAsync(
             CancellationToken cancellationToken = default) =>
             Task.FromResult(new QuickUndoCommandResult(QuickUndoCommandStatus.NoBackup));
+    }
+
+    internal sealed class RendererBetterSaveService : IBetterSaveService
+    {
+        public Task<BetterSaveResult> ExecuteAsync(
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(new BetterSaveResult(BetterSaveStatus.NoCurrentBeatmap));
+    }
+
+    internal sealed class RendererHotkeyBindingCoordinator : IHotkeyBindingCoordinator
+    {
+        public void ApplyQuickRun(HotkeySettings? hotkey)
+        {
+        }
+
+        public void ApplyQuickUndo(HotkeySettings? hotkey)
+        {
+        }
+
+        public void ApplyBetterSave(HotkeySettings? hotkey)
+        {
+        }
+    }
+
+    internal sealed class RendererBetterSaveOverrideService : IBetterSaveOverrideService
+    {
+        public void Configure(string songsPath, bool enabled)
+        {
+        }
+
+        public void Stop()
+        {
+        }
     }
 
     internal sealed class RendererFileRevealService : IFileRevealService

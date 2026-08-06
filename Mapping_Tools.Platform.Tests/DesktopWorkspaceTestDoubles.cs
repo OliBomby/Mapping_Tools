@@ -1,11 +1,52 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.SafetyCopies;
+using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Platform.Tests;
+
+internal sealed class TestBetterSaveService : IBetterSaveService
+{
+    public int ExecutionCount { get; private set; }
+
+    public Task<BetterSaveResult> ExecuteAsync(
+        CancellationToken cancellationToken = default)
+    {
+        ExecutionCount++;
+        return Task.FromResult(new BetterSaveResult(BetterSaveStatus.NoCurrentBeatmap));
+    }
+}
+
+internal sealed class TestHotkeyBindingCoordinator : IHotkeyBindingCoordinator
+{
+    public HotkeySettings? QuickRun { get; private set; }
+
+    public HotkeySettings? QuickUndo { get; private set; }
+
+    public HotkeySettings? BetterSave { get; private set; }
+
+    public void ApplyQuickRun(HotkeySettings? hotkey) => QuickRun = hotkey;
+
+    public void ApplyQuickUndo(HotkeySettings? hotkey) => QuickUndo = hotkey;
+
+    public void ApplyBetterSave(HotkeySettings? hotkey) => BetterSave = hotkey;
+}
+
+internal sealed class TestBetterSaveOverrideService : IBetterSaveOverrideService
+{
+    public List<(string SongsPath, bool Enabled)> Configurations { get; } = [];
+
+    public bool Stopped { get; private set; }
+
+    public void Configure(string songsPath, bool enabled) =>
+        Configurations.Add((songsPath, enabled));
+
+    public void Stop() => Stopped = true;
+}
 
 internal sealed class TestBeatmapWorkspace : IBeatmapWorkspace
 {

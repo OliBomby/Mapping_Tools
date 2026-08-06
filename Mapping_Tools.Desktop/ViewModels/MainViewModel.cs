@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
@@ -21,6 +22,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly IUserNotificationService _notifications;
     private readonly IPlatformLauncher _launcher;
     private readonly IUiDispatcher _dispatcher;
+    private readonly IBetterSaveService _betterSave;
     private readonly Dictionary<string, ObservableObject> _featureViewModels =
         new(StringComparer.OrdinalIgnoreCase);
     private string _searchText = string.Empty;
@@ -35,13 +37,15 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <param name="launcher">Opens support links through the operating system.</param>
     /// <param name="dispatcher">Marshals notification changes to the UI thread.</param>
     /// <param name="workspace">Presents current-map and safety-copy actions in shell chrome.</param>
+    /// <param name="betterSave">Saves the current live editor state through the shared safety gateway.</param>
     public MainViewModel(
         IShellFeatureRegistry registry,
         ApplicationSettings settings,
         IUserNotificationService notifications,
         IPlatformLauncher launcher,
         IUiDispatcher dispatcher,
-        BeatmapWorkspaceViewModel workspace)
+        BeatmapWorkspaceViewModel workspace,
+        IBetterSaveService betterSave)
     {
         _registry = registry ?? throw new ArgumentNullException(nameof(registry));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -49,6 +53,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         Workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        _betterSave = betterSave ?? throw new ArgumentNullException(nameof(betterSave));
 
         FeatureItems = registry.Features
             .Select((registration, order) => new ShellFeatureItemViewModel(
@@ -187,6 +192,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private Task OpenGitHubAsync() =>
         OpenUriAsync(GitHubUri, "source repository");
+
+    [RelayCommand]
+    private Task BetterSaveAsync() => _betterSave.ExecuteAsync();
 
     private bool CanUseProjectActions() =>
         CurrentFeature is IShellProjectFeature;

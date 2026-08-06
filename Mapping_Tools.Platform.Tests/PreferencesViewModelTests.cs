@@ -2,8 +2,10 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.Input;
 using FluentAssertions;
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels;
@@ -215,6 +217,123 @@ public sealed class PreferencesViewModelTests
     }
 
     [TestMethod]
+    public void Constructor_WithQuickRunSettings_ExposesPersistedValues()
+    {
+        // Arrange
+        ApplicationSettings settings = CreateSettings();
+        settings.OverrideOsuSave = true;
+        settings.AutoReload = true;
+        settings.AlwaysQuickRun = true;
+        settings.SmartQuickRunEnabled = true;
+        settings.NoneQuickRunTool = "Cleaner";
+        settings.SingleQuickRunTool = "Slider";
+        settings.MultipleQuickRunTool = "Transformer";
+        settings.QuickRunHotkey = new HotkeySettings(56, 2);
+        settings.QuickUndoHotkey = new HotkeySettings(69, 6);
+        settings.BetterSaveHotkey = new HotkeySettings(31, 2);
+
+        // Act
+        PreferencesViewModel viewModel = CreateViewModel(settings);
+
+        // Assert
+        viewModel.OverrideOsuSave.Should().BeTrue();
+        viewModel.AutoReload.Should().BeTrue();
+        viewModel.AlwaysQuickRun.Should().BeTrue();
+        viewModel.SmartQuickRunEnabled.Should().BeTrue();
+        viewModel.NoneQuickRunTool.Should().Be("Cleaner");
+        viewModel.SingleQuickRunTool.Should().Be("Slider");
+        viewModel.MultipleQuickRunTool.Should().Be("Transformer");
+        viewModel.QuickRunHotkey.Should().Be(settings.QuickRunHotkey);
+        viewModel.QuickUndoHotkey.Should().Be(settings.QuickUndoHotkey);
+        viewModel.BetterSaveHotkey.Should().Be(settings.BetterSaveHotkey);
+    }
+
+    [TestMethod]
+    public void Activate_WithRegisteredCommands_RefreshesTargetsBySelectionSize()
+    {
+        // Arrange
+        ApplicationSettings settings = CreateSettings();
+        QuickRunCommandRegistry registry = new();
+        PreferencesViewModel viewModel = CreateViewModel(
+            settings,
+            quickRunRegistry: registry);
+        registry.Register(new QuickRunCommand(
+            "always",
+            "Always",
+            QuickRunTargets.Always,
+            _ => Task.CompletedTask));
+        registry.Register(new QuickRunCommand(
+            "selected",
+            "Selected",
+            QuickRunTargets.AnySelection,
+            _ => Task.CompletedTask));
+
+        // Act
+        viewModel.Activate();
+
+        // Assert
+        viewModel.NoneQuickRunTools.Should().Equal("<Current Tool>", "Always");
+        viewModel.SingleQuickRunTools.Should().Equal("<Current Tool>", "Always", "Selected");
+        viewModel.MultipleQuickRunTools.Should().Equal("<Current Tool>", "Always", "Selected");
+    }
+
+    [TestMethod]
+    public void QuickRunHotkey_WhenChanged_UpdatesSettingsAndLiveBinding()
+    {
+        // Arrange
+        ApplicationSettings settings = CreateSettings();
+        TestHotkeyBindingCoordinator bindings = new();
+        PreferencesViewModel viewModel = CreateViewModel(
+            settings,
+            hotkeyBindings: bindings);
+        HotkeySettings hotkey = new(90, 6);
+
+        // Act
+        viewModel.QuickRunHotkey = hotkey;
+
+        // Assert
+        settings.QuickRunHotkey.Should().Be(hotkey);
+        bindings.QuickRun.Should().Be(hotkey);
+    }
+
+    [TestMethod]
+    public void OverrideOsuSave_WhenChanged_ReconfiguresWatcherImmediately()
+    {
+        // Arrange
+        ApplicationSettings settings = CreateSettings();
+        TestBetterSaveOverrideService betterSaveOverride = new();
+        PreferencesViewModel viewModel = CreateViewModel(
+            settings,
+            betterSaveOverride: betterSaveOverride);
+
+        // Act
+        viewModel.OverrideOsuSave = true;
+
+        // Assert
+        settings.OverrideOsuSave.Should().BeTrue();
+        betterSaveOverride.Configurations.Should().Equal((settings.SongsPath, true));
+    }
+
+    [TestMethod]
+    public void SongsPath_WithValidValue_ReconfiguresEnabledWatcher()
+    {
+        // Arrange
+        ApplicationSettings settings = CreateSettings();
+        settings.OverrideOsuSave = true;
+        TestBetterSaveOverrideService betterSaveOverride = new();
+        PreferencesViewModel viewModel = CreateViewModel(
+            settings,
+            betterSaveOverride: betterSaveOverride);
+
+        // Act
+        viewModel.SongsPath = @"D:\osu!\Songs";
+
+        // Assert
+        settings.SongsPath.Should().Be(@"D:\osu!\Songs");
+        betterSaveOverride.Configurations.Should().Equal((@"D:\osu!\Songs", true));
+    }
+
+    [TestMethod]
     public async Task BrowseBackupsPathCommand_WithSelectedFolder_UpdatesPathInMemory()
     {
         // Arrange
@@ -300,12 +419,18 @@ public sealed class PreferencesViewModelTests
         ApplicationSettings settings,
         StubFilePicker? filePicker = null,
         RecordingThemeService? themeService = null,
-        IUserNotificationService? notifications = null) =>
+        IUserNotificationService? notifications = null,
+        IQuickRunCommandRegistry? quickRunRegistry = null,
+        IHotkeyBindingCoordinator? hotkeyBindings = null,
+        IBetterSaveOverrideService? betterSaveOverride = null) =>
         new(
             settings,
             filePicker ?? new StubFilePicker(),
             themeService ?? new RecordingThemeService(),
-            notifications ?? new UserNotificationService());
+            notifications ?? new UserNotificationService(),
+            quickRunRegistry ?? new QuickRunCommandRegistry(),
+            hotkeyBindings ?? new TestHotkeyBindingCoordinator(),
+            betterSaveOverride ?? new TestBetterSaveOverrideService());
 
     private static Task ExecuteAsync(IAsyncRelayCommand command) =>
         command.ExecuteAsync(null);

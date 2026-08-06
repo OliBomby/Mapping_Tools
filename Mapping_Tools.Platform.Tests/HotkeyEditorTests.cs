@@ -1,0 +1,53 @@
+using FluentAssertions;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Desktop.Controls;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Platform.Tests;
+
+[TestClass]
+public sealed class HotkeyEditorTests
+{
+    [TestMethod]
+    public void TryGetLegacyKey_WithSupportedAvaloniaNames_ReturnsWpfKeyValues()
+    {
+        // Arrange
+        string[] names = ["A", "D7", "NumPad3", "F12", "Delete"];
+
+        // Act
+        int[] values = names.Select(name =>
+        {
+            HotkeyEditor.TryGetLegacyKey(name, out int value).Should().BeTrue();
+            return value;
+        }).ToArray();
+
+        // Assert
+        values.Should().Equal(44, 41, 77, 101, 32);
+    }
+
+    [TestMethod]
+    public void Format_WithLegacyModifiers_UsesStableReadableOrder()
+    {
+        // Arrange
+        HotkeySettings hotkey = new(56, 15);
+
+        // Act
+        string display = HotkeyEditor.Format(hotkey);
+
+        // Assert
+        display.Should().Be("Ctrl + Shift + Alt + Win + M");
+    }
+
+    [TestMethod]
+    public void Format_WithoutBinding_ShowsNotSetPlaceholder()
+    {
+        // Arrange
+        HotkeySettings? hotkey = null;
+
+        // Act
+        string display = HotkeyEditor.Format(hotkey);
+
+        // Assert
+        display.Should().Be("< not set >");
+    }
+}

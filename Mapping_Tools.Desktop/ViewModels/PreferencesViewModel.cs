@@ -1,12 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Interactions.Validation;
 using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Platform;
+using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -14,8 +17,9 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// Edits the process-lifetime settings document and applies live-only side
 /// effects without exposing Avalonia controls or storage-provider objects.
 /// </summary>
-public sealed partial class PreferencesViewModel : ObservableValidator
+public sealed partial class PreferencesViewModel : ObservableValidator, IShellFeatureActivation
 {
+    private const string CurrentTool = "<Current Tool>";
     private static readonly FilePickerFilter OsuConfigurationFilter = new(
         "osu! user configuration",
         ["osu!.*.cfg"]);
@@ -24,6 +28,12 @@ public sealed partial class PreferencesViewModel : ObservableValidator
     private readonly IFilePicker _filePicker;
     private readonly IApplicationThemeService _themeService;
     private readonly IUserNotificationService _notifications;
+    private readonly IQuickRunCommandRegistry _quickRunRegistry;
+    private readonly IHotkeyBindingCoordinator _hotkeyBindings;
+    private readonly IBetterSaveOverrideService _betterSaveOverride;
+    private IReadOnlyList<string> _noneQuickRunTools = [CurrentTool];
+    private IReadOnlyList<string> _singleQuickRunTools = [CurrentTool];
+    private IReadOnlyList<string> _multipleQuickRunTools = [CurrentTool];
 
     /// <summary>Gets or edits the directory containing the osu! executable.</summary>
     [ObservableProperty]
@@ -73,16 +83,25 @@ public sealed partial class PreferencesViewModel : ObservableValidator
     /// <param name="filePicker">Presents native folder and configuration-file pickers.</param>
     /// <param name="themeService">Applies palette changes to the live application.</param>
     /// <param name="notifications">Reports picker failures through the shell.</param>
+    /// <param name="quickRunRegistry">Supplies explicit Smart QuickRun target choices.</param>
+    /// <param name="hotkeyBindings">Applies shortcut changes to the running global listener.</param>
+    /// <param name="betterSaveOverride">Reconfigures automatic save observation immediately.</param>
     public PreferencesViewModel(
         ApplicationSettings settings,
         IFilePicker filePicker,
         IApplicationThemeService themeService,
-        IUserNotificationService notifications)
+        IUserNotificationService notifications,
+        IQuickRunCommandRegistry quickRunRegistry,
+        IHotkeyBindingCoordinator hotkeyBindings,
+        IBetterSaveOverrideService betterSaveOverride)
     {
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         _themeService = themeService ?? throw new ArgumentNullException(nameof(themeService));
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        _quickRunRegistry = quickRunRegistry ?? throw new ArgumentNullException(nameof(quickRunRegistry));
+        _hotkeyBindings = hotkeyBindings ?? throw new ArgumentNullException(nameof(hotkeyBindings));
+        _betterSaveOverride = betterSaveOverride ?? throw new ArgumentNullException(nameof(betterSaveOverride));
 
         _osuPath = settings.OsuPath;
         _songsPath = settings.SongsPath;
@@ -90,6 +109,28 @@ public sealed partial class PreferencesViewModel : ObservableValidator
         _backupsPath = settings.BackupsPath;
         _maxBackupFiles = settings.MaxBackupFiles;
         _periodicBackupInterval = settings.PeriodicBackupInterval;
+        RefreshQuickRunTools();
+    }
+
+    /// <summary>Gets QuickRun targets that accept no selected hit objects.</summary>
+    public IReadOnlyList<string> NoneQuickRunTools
+    {
+        get => _noneQuickRunTools;
+        private set => SetProperty(ref _noneQuickRunTools, value);
+    }
+
+    /// <summary>Gets QuickRun targets that accept exactly one selected hit object.</summary>
+    public IReadOnlyList<string> SingleQuickRunTools
+    {
+        get => _singleQuickRunTools;
+        private set => SetProperty(ref _singleQuickRunTools, value);
+    }
+
+    /// <summary>Gets QuickRun targets that accept multiple selected hit objects.</summary>
+    public IReadOnlyList<string> MultipleQuickRunTools
+    {
+        get => _multipleQuickRunTools;
+        private set => SetProperty(ref _multipleQuickRunTools, value);
     }
 
     /// <summary>Gets or sets whether destructive tools create safety backups.</summary>
@@ -142,6 +183,123 @@ public sealed partial class PreferencesViewModel : ObservableValidator
             validate: false);
     }
 
+    /// <summary>Gets or sets whether Mapping Tools overwrites osu!'s own save with BetterSave.</summary>
+    public bool OverrideOsuSave
+    {
+        get => _settings.OverrideOsuSave;
+        set
+        {
+            if (SetProperty(
+                    _settings.OverrideOsuSave,
+                    value,
+                    _settings,
+                    static (settings, enabled) => settings.OverrideOsuSave = enabled,
+                    validate: false))
+            {
+                _betterSaveOverride.Configure(_settings.SongsPath, value);
+            }
+        }
+    }
+
+    /// <summary>Gets or sets whether tool execution reloads osu! after saving.</summary>
+    public bool AutoReload
+    {
+        get => _settings.AutoReload;
+        set => SetProperty(
+            _settings.AutoReload,
+            value,
+            _settings,
+            static (settings, enabled) => settings.AutoReload = enabled,
+            validate: false);
+    }
+
+    /// <summary>Gets or sets whether ordinary Run actions use each feature's QuickRun path.</summary>
+    public bool AlwaysQuickRun
+    {
+        get => _settings.AlwaysQuickRun;
+        set => SetProperty(
+            _settings.AlwaysQuickRun,
+            value,
+            _settings,
+            static (settings, enabled) => settings.AlwaysQuickRun = enabled,
+            validate: false);
+    }
+
+    /// <summary>Gets or sets whether QuickRun routes by the live selected-object count.</summary>
+    public bool SmartQuickRunEnabled
+    {
+        get => _settings.SmartQuickRunEnabled;
+        set => SetProperty(
+            _settings.SmartQuickRunEnabled,
+            value,
+            _settings,
+            static (settings, enabled) => settings.SmartQuickRunEnabled = enabled,
+            validate: false);
+    }
+
+    /// <summary>Gets or sets the target used when no hit objects are selected.</summary>
+    public string NoneQuickRunTool
+    {
+        get => _settings.NoneQuickRunTool;
+        set => SetQuickRunTarget(
+            _settings.NoneQuickRunTool,
+            value,
+            static (settings, target) => settings.NoneQuickRunTool = target);
+    }
+
+    /// <summary>Gets or sets the target used when exactly one hit object is selected.</summary>
+    public string SingleQuickRunTool
+    {
+        get => _settings.SingleQuickRunTool;
+        set => SetQuickRunTarget(
+            _settings.SingleQuickRunTool,
+            value,
+            static (settings, target) => settings.SingleQuickRunTool = target);
+    }
+
+    /// <summary>Gets or sets the target used when multiple hit objects are selected.</summary>
+    public string MultipleQuickRunTool
+    {
+        get => _settings.MultipleQuickRunTool;
+        set => SetQuickRunTarget(
+            _settings.MultipleQuickRunTool,
+            value,
+            static (settings, target) => settings.MultipleQuickRunTool = target);
+    }
+
+    /// <summary>Gets or sets the live global QuickRun shortcut.</summary>
+    public HotkeySettings? QuickRunHotkey
+    {
+        get => _settings.QuickRunHotkey;
+        set => SetHotkey(
+            _settings.QuickRunHotkey,
+            value,
+            static (settings, hotkey) => settings.QuickRunHotkey = hotkey,
+            _hotkeyBindings.ApplyQuickRun);
+    }
+
+    /// <summary>Gets or sets the live global QuickUndo shortcut.</summary>
+    public HotkeySettings? QuickUndoHotkey
+    {
+        get => _settings.QuickUndoHotkey;
+        set => SetHotkey(
+            _settings.QuickUndoHotkey,
+            value,
+            static (settings, hotkey) => settings.QuickUndoHotkey = hotkey,
+            _hotkeyBindings.ApplyQuickUndo);
+    }
+
+    /// <summary>Gets or sets the live global BetterSave shortcut.</summary>
+    public HotkeySettings? BetterSaveHotkey
+    {
+        get => _settings.BetterSaveHotkey;
+        set => SetHotkey(
+            _settings.BetterSaveHotkey,
+            value,
+            static (settings, hotkey) => settings.BetterSaveHotkey = hotkey,
+            _hotkeyBindings.ApplyBetterSave);
+    }
+
     /// <summary>Gets or sets the palette applied immediately to the live application.</summary>
     public ApplicationTheme Theme
     {
@@ -163,8 +321,14 @@ public sealed partial class PreferencesViewModel : ObservableValidator
     partial void OnOsuPathChanged(string value) =>
         ApplyValidatedValue(value, static (settings, path) => settings.OsuPath = path, nameof(OsuPath));
 
-    partial void OnSongsPathChanged(string value) =>
+    partial void OnSongsPathChanged(string value)
+    {
         ApplyValidatedValue(value, static (settings, path) => settings.SongsPath = path, nameof(SongsPath));
+        if (!GetErrors(nameof(SongsPath)).Cast<object>().Any())
+        {
+            _betterSaveOverride.Configure(value, _settings.OverrideOsuSave);
+        }
+    }
 
     partial void OnOsuConfigPathChanged(string value) =>
         ApplyValidatedValue(value, static (settings, path) => settings.OsuConfigPath = path, nameof(OsuConfigPath));
@@ -177,6 +341,14 @@ public sealed partial class PreferencesViewModel : ObservableValidator
 
     partial void OnPeriodicBackupIntervalChanged(TimeSpan value) =>
         ApplyValidatedValue(value, static (settings, interval) => settings.PeriodicBackupInterval = interval, nameof(PeriodicBackupInterval));
+
+    /// <inheritdoc/>
+    public void Activate() => RefreshQuickRunTools();
+
+    /// <inheritdoc/>
+    public void Deactivate()
+    {
+    }
 
     [RelayCommand]
     private Task BrowseOsuPathAsync() =>
@@ -272,4 +444,43 @@ public sealed partial class PreferencesViewModel : ObservableValidator
             title,
             message,
             exception));
+
+    private void RefreshQuickRunTools()
+    {
+        NoneQuickRunTools = GetQuickRunTools(QuickRunTargets.NoSelection);
+        SingleQuickRunTools = GetQuickRunTools(QuickRunTargets.SingleSelection);
+        MultipleQuickRunTools = GetQuickRunTools(QuickRunTargets.MultipleSelection);
+    }
+
+    private IReadOnlyList<string> GetQuickRunTools(QuickRunTargets target) =>
+        [
+            CurrentTool,
+            .. _quickRunRegistry.GetCommandsFor(target)
+                .Select(command => command.DisplayName)
+        ];
+
+    private void SetQuickRunTarget(
+        string current,
+        string value,
+        Action<ApplicationSettings, string> apply)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        SetProperty(current, value, _settings, apply, validate: false);
+    }
+
+    private void SetHotkey(
+        HotkeySettings? current,
+        HotkeySettings? value,
+        Action<ApplicationSettings, HotkeySettings?> apply,
+        Action<HotkeySettings?> applyBinding)
+    {
+        if (SetProperty(current, value, _settings, apply, validate: false))
+        {
+            applyBinding(value);
+        }
+    }
 }

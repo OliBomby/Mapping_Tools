@@ -105,6 +105,9 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IQuickRunService>(provider =>
             provider.GetRequiredService<QuickRunService>());
         services.AddSingleton<IGlobalHotkeyService, WindowsGlobalHotkeyService>();
+        services.AddSingleton<GlobalHotkeyHostedService>();
+        services.AddSingleton<IHotkeyBindingCoordinator>(provider =>
+            provider.GetRequiredService<GlobalHotkeyHostedService>());
         services.AddSingleton<IBeatmapBackupStore, FileSystemBeatmapBackupStore>();
         services.AddSingleton<IBeatmapBackupService, BeatmapBackupService>();
         services.AddSingleton<IQuickUndoCommandService, QuickUndoCommandService>();
@@ -115,6 +118,8 @@ internal static class DesktopServiceRegistration
             provider.GetRequiredService<WindowsEditorReaderAdapter>());
         services.AddSingleton<IEditorReloadService, WindowsOsuEditorReloadService>();
         services.AddSingleton<IBeatmapEditingGateway, BeatmapEditingGateway>();
+        services.AddSingleton<IBetterSaveService, BetterSaveService>();
+        services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();
         services.AddSingleton<IBeatmapFileSystem, PhysicalBeatmapFileSystem>();
         services.AddSingleton<IBeatmapWorkspace, BeatmapWorkspace>();
         services.AddSingleton<IProjectSerializer, LegacyProjectJsonSerializer>();

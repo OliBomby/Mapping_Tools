@@ -228,7 +228,7 @@
                                     </MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="_BetterSave™ current beatmap"
-                                          IsEnabled="False"
+                                          Command="{Binding BetterSaveCommand}"
                                           ToolTip.Tip="Save the current editor beatmap while preserving decimal values.">
                                     <MenuItem.Icon>
                                         <materialIcons:MaterialIcon Kind="ContentSave" />
@@ -371,7 +371,8 @@
                                           Command="{Binding Workspace.RestoreBackupCommand}" />
                                 <MenuItem Header="_QuickUndo"
                                           Command="{Binding Workspace.QuickUndoCommand}" />
-                                <MenuItem Header="_BetterSave™ current beatmap" IsEnabled="False" />
+                                <MenuItem Header="_BetterSave™ current beatmap"
+                                          Command="{Binding BetterSaveCommand}" />
                             </ContextMenu>
                         </materialControls:ColorZone.ContextMenu>
                         <Grid ColumnDefinitions="*,Auto">
