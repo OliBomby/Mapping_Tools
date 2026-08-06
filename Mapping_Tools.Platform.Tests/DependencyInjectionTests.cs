@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.AutoFail;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
@@ -36,6 +37,7 @@ public sealed class DependencyInjectionTests
             typeof(MainViewModel),
             typeof(PreferencesViewModel),
             typeof(RhythmGuideViewModel),
+            typeof(AutoFailDetectorViewModel),
             typeof(IDialogService),
             typeof(IFilePicker),
             typeof(IClipboardService),
@@ -67,6 +69,7 @@ public sealed class DependencyInjectionTests
             typeof(ICurrentBeatmapLocator),
             typeof(IBetterSaveService),
             typeof(IRhythmGuideService),
+            typeof(IAutoFailService),
             typeof(IBetterSaveOverrideService),
             typeof(IBeatmapWorkspace),
             typeof(IProjectSerializer),

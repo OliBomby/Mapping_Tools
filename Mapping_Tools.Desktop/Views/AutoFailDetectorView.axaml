@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="Mapping_Tools.Desktop.Views.AutoFailDetectorView"
+             x:DataType="vm:AutoFailDetectorViewModel">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto">
+        <Grid Margin="0,0,20,20" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*">
+            <TextBlock Text="Auto-fail Detector"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
+            <TextBlock Grid.Row="1"
+                       Margin="0,8,0,0"
+                       MaxWidth="760"
+                       HorizontalAlignment="Left"
+                       TextWrapping="Wrap"
+                       Text="Detect incorrect object loading in overlapping (2B) patterns. AR and OD overrides can model difficulty-changing mods; use -1 to read the map value." />
+
+            <Grid Grid.Row="2" Margin="0,20,0,0" ColumnDefinitions="240,240,240">
+                <TextBox Margin="0,0,12,0"
+                         materialAssists:TextFieldAssist.Label="Approach rate override"
+                         Text="{Binding ApproachRateOverride, Converter={StaticResource InvariantDoubleConverter}, Mode=TwoWay}" />
+                <TextBox Grid.Column="1" Margin="0,0,12,0"
+                         materialAssists:TextFieldAssist.Label="Overall difficulty override"
+                         Text="{Binding OverallDifficultyOverride, Converter={StaticResource InvariantDoubleConverter}, Mode=TwoWay}" />
+                <TextBox Grid.Column="2"
+                         materialAssists:TextFieldAssist.Label="Physics update leniency (ms)"
+                         Text="{Binding PhysicsUpdateLeniency, Converter={StaticResource InvariantInt32Converter}, Mode=TwoWay}" />
+            </Grid>
+
+            <WrapPanel Grid.Row="3" Margin="0,16,0,0">
+                <CheckBox Margin="0,0,20,0" Content="Show unloading objects"
+                          IsChecked="{Binding ShowUnloadingObjects, Mode=TwoWay}" />
+                <CheckBox Margin="0,0,20,0" Content="Show potential unloading objects"
+                          IsChecked="{Binding ShowPotentialUnloadingObjects, Mode=TwoWay}" />
+                <CheckBox Content="Show potential disruptors"
+                          IsChecked="{Binding ShowPotentialDisruptors, Mode=TwoWay}" />
+            </WrapPanel>
+
+            <WrapPanel Grid.Row="4" Margin="0,10,0,0">
+                <CheckBox Margin="0,0,20,0" Content="Show auto-fail fix guide"
+                          IsChecked="{Binding GetAutoFailFix, Mode=TwoWay}" />
+                <CheckBox Content="Allow applying the fix"
+                          IsEnabled="{Binding GetAutoFailFix}"
+                          IsChecked="{Binding AutoPlaceFix, Mode=TwoWay}" />
+            </WrapPanel>
+
+            <Grid Grid.Row="5" Margin="0,22,0,0" ColumnDefinitions="*,Auto,Auto">
+                <ProgressBar Height="18" Margin="0,0,20,0" VerticalAlignment="Center"
+                             Maximum="100" Value="{Binding Progress}" />
+                <Button Grid.Column="1" Margin="0,0,8,0" IsVisible="{Binding IsRunning}"
+                        Command="{Binding CancelCommand}" Content="Cancel" />
+                <Button Grid.Column="2" Command="{Binding RunCommand}" Content="Run" />
+            </Grid>
+
+            <StackPanel Grid.Row="6" Margin="0,18,0,0">
+                <TextBlock Text="{Binding ResultSummary}" FontWeight="SemiBold" />
+                <controls:TimelineControl Height="100"
+                                          Margin="0,10,0,0"
+                                          StartTime="0"
+                                          EndTime="{Binding EndTime}"
+                                          Markers="{Binding Markers}"
+                                          NavigateCommand="{Binding NavigateCommand}" />
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

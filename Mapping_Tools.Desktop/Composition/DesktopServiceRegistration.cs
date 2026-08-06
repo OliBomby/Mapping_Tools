@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.AutoFail;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
@@ -45,6 +46,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<GetStartedViewModel>();
         services.AddSingleton<PreferencesViewModel>();
         services.AddSingleton<RhythmGuideViewModel>();
+        services.AddSingleton<AutoFailDetectorViewModel>();
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(
             [
@@ -69,7 +71,14 @@ internal static class DesktopServiceRegistration
                     "Make a beatmap with circles from the rhythm of multiple maps.",
                     ["rhythm", "hitsound", "guide", "reference"],
                     provider.GetRequiredService<RhythmGuideViewModel>,
-                    startsSection: true)
+                    startsSection: true),
+                new ShellFeatureRegistration(
+                    "auto-fail-detector",
+                    "Auto-fail Detector",
+                    "Tools",
+                    "Detect incorrect object loading in overlapping patterns.",
+                    ["auto fail", "2b", "unloading", "objects"],
+                    provider.GetRequiredService<AutoFailDetectorViewModel>)
             ]));
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<IDialogService>(provider =>
@@ -106,6 +115,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton(provider =>
             provider.GetRequiredService<ISettingsService>().LoadOrCreate().Settings);
         services.AddHostedService<SettingsPersistenceHostedService>();
+        services.AddHostedService<AutoFailQuickRunHostedService>();
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ITextFileStore, FileSystemFileStore>();
         services.AddSingleton<IUserNotificationService, UserNotificationService>();
@@ -134,6 +144,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IBeatmapEditingGateway, BeatmapEditingGateway>();
         services.AddSingleton<IBetterSaveService, BetterSaveService>();
         services.AddSingleton<IRhythmGuideService, RhythmGuideService>();
+        services.AddSingleton<IAutoFailService, AutoFailService>();
         services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();
         services.AddSingleton<IBeatmapFileSystem, PhysicalBeatmapFileSystem>();
         services.AddSingleton<IBeatmapWorkspace, BeatmapWorkspace>();

@@ -32,6 +32,9 @@
     <None Include="..\tests\fixtures\wave0\beatmaps\standard-feature-rich.osu" Link="Resources\standard-feature-rich.osu">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\tests\fixtures\wave0\beatmaps\standard-autofail-2b.osu" Link="Resources\standard-autofail-2b.osu">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
