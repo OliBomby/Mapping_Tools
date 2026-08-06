@@ -169,81 +169,30 @@ namespace Mapping_Tools.Classes.Tools {
         }
 
         private static Beatmap MergeBeatmaps(Beatmap[] beatmaps, RhythmGuideGeneratorArgs args) {
-            if (beatmaps.Length == 0) {
-                throw new ArgumentException("There must be at least one beatmap.");
-            }
-
-            // Scuffed beatmap copy
-            var newBeatmap = new Beatmap(beatmaps[0].GetLines());
-
-            // Remove all greenlines
-            newBeatmap.BeatmapTiming.RemoveAll(o => !o.Uninherited);
-
-            // Remove all hitobjects
-            newBeatmap.HitObjects.Clear();
-
-            // Change some parameters;
-            newBeatmap.General["StackLeniency"] = new TValue("0.0");
-            newBeatmap.General["Mode"] = new TValue(((int)args.OutputGameMode).ToString());
-            newBeatmap.Metadata["Version"] = new TValue(args.OutputName);
-            newBeatmap.Difficulty["CircleSize"] = new TValue("4");
-
-            // Add hitobjects
-            PopulateBeatmap(newBeatmap, beatmaps, args);
-
-            return newBeatmap;
+            return Core.Tools.RhythmGuide.RhythmGuideGenerator.CreateNewMap(
+                beatmaps,
+                ToCoreOptions(args));
         }
 
         private static void PopulateBeatmap(Beatmap beatmap, IEnumerable<Beatmap> beatmaps, RhythmGuideGeneratorArgs args) {
-            foreach (var b in beatmaps) {
-                var timeline = b.GetTimeline();
-                foreach (var timelineObject in timeline.TimelineObjects) {
-                    // Handle different selection modes
-                    switch (args.SelectionMode) {
-                        case SelectionMode.AllEvents:
-                            addHitObject(timelineObject.Time);
-                            break;
-                        case SelectionMode.HitsoundEvents:
-                            if (timelineObject.HasHitsound) {
-                                addHitObject(timelineObject.Time);
-                            }
+            Core.Tools.RhythmGuide.RhythmGuideGenerator.Append(
+                beatmap,
+                beatmaps,
+                ToCoreOptions(args));
+        }
 
-                            break;
-                        case SelectionMode.AllEventSeparated:
-                            var active = timelineObject.IsHoldnoteHead || timelineObject.IsCircle || timelineObject.IsSliderHead;
-                            var pos = active ? new Vector2(0, 192) : new Vector2(512, 192);
-
-                            addHitObject(timelineObject.Time, pos);
-                            break;
-                        case SelectionMode.LongNotes:
-                            var isStart = timelineObject.IsHoldnoteHead || timelineObject.IsCircle ||
-                                          timelineObject.IsSliderHead || timelineObject.IsSpinnerHead;
-
-                            if (isStart) {
-                                addHitObject(timelineObject.Time);
-                            } else if (beatmap.HitObjects.Count > 0) {
-                                // Extend last object
-                                var last = beatmap.HitObjects[^1];
-                                last.IsCircle = false;
-                                last.IsHoldNote = true;
-                                last.EndTime = timelineObject.Time;
-                            }
-
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
-            }
-
-            void addHitObject(double time, Vector2? pos = null) {
-                var t = beatmap.BeatmapTiming.Resnap(time, args.BeatDivisors);
-                var ho = new HitObject(time, 0, SampleSet.None, SampleSet.None) { NewCombo = args.NcEverything };
-                if (pos.HasValue)
-                    ho.Pos = pos.Value;
-
-                beatmap.HitObjects.Add(ho);
-            }
+        private static Core.Tools.RhythmGuide.RhythmGuideOptions ToCoreOptions(
+            RhythmGuideGeneratorArgs args) {
+            return new Core.Tools.RhythmGuide.RhythmGuideOptions {
+                Paths = args.Paths,
+                OutputGameMode = args.OutputGameMode,
+                OutputName = args.OutputName,
+                NcEverything = args.NcEverything,
+                SelectionMode = (Core.Tools.RhythmGuide.RhythmGuideSelectionMode) args.SelectionMode,
+                ExportMode = (Core.Tools.RhythmGuide.RhythmGuideExportMode) args.ExportMode,
+                ExportPath = args.ExportPath,
+                BeatDivisors = args.BeatDivisors
+            };
         }
     }
 }

@@ -1,0 +1,132 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Mapping_Tools.Desktop.Views.RhythmGuideView"
+             x:DataType="vm:RhythmGuideViewModel">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto">
+        <Grid Margin="0,0,20,20"
+              RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*"
+              ColumnDefinitions="*,Auto,Auto">
+            <StackPanel Grid.ColumnSpan="3"
+                        Orientation="Horizontal">
+                <TextBlock Text="Rhythm Guide"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
+                <Button Margin="12,0,0,0"
+                        Classes="flat"
+                        Command="{Binding OpenAuxiliaryWindowCommand}"
+                        Content="Open in window"
+                        ToolTip.Tip="Open this same Rhythm Guide project in a resizable auxiliary window." />
+            </StackPanel>
+
+            <TextBox Grid.Row="1"
+                     Margin="0,20,8,0"
+                     materialAssists:TextFieldAssist.Label="Copy rhythm from"
+                     Text="{Binding SourcePathsText, Mode=TwoWay}"
+                     ToolTip.Tip="One or more beatmap paths separated by |." />
+            <Button Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="0,20,4,0"
+                    Classes="flat"
+                    Command="{Binding UseCurrentSourceCommand}"
+                    ToolTip.Tip="Use the beatmap currently open in osu!.">
+                <materialIcons:MaterialIcon Kind="RestoreFromTrash" />
+            </Button>
+            <Button Grid.Row="1"
+                    Grid.Column="2"
+                    Margin="0,20,0,0"
+                    Classes="flat"
+                    Command="{Binding BrowseSourcesCommand}"
+                    ToolTip.Tip="Select one or more source beatmaps.">
+                <materialIcons:MaterialIcon Kind="Folder" />
+            </Button>
+
+            <TextBlock Grid.Row="2"
+                       Grid.ColumnSpan="3"
+                       Margin="4,2,0,0"
+                       FontStyle="Italic"
+                       Text="{Binding SourceCount, StringFormat='{}{0} source map(s)'}" />
+
+            <TextBox Grid.Row="3"
+                     Margin="0,10,8,0"
+                     materialAssists:TextFieldAssist.Label="Copy rhythm to"
+                     Text="{Binding ExportPath, Mode=TwoWay}" />
+            <Button Grid.Row="3"
+                    Grid.Column="1"
+                    Margin="0,10,4,0"
+                    Classes="flat"
+                    Command="{Binding UseCurrentExportCommand}"
+                    ToolTip.Tip="Use the beatmap currently open in osu!.">
+                <materialIcons:MaterialIcon Kind="RestoreFromTrash" />
+            </Button>
+            <Button Grid.Row="3"
+                    Grid.Column="2"
+                    Margin="0,10,0,0"
+                    Classes="flat"
+                    Command="{Binding BrowseExportCommand}"
+                    ToolTip.Tip="Choose the output beatmap.">
+                <materialIcons:MaterialIcon Kind="Folder" />
+            </Button>
+
+            <ComboBox Grid.Row="4"
+                      Grid.ColumnSpan="3"
+                      Width="320"
+                      Margin="0,10,0,0"
+                      HorizontalAlignment="Left"
+                      ItemsSource="{Binding ExportModes}"
+                      SelectedItem="{Binding ExportMode, Mode=TwoWay}"
+                      materialAssists:ComboBoxAssist.Label="Export mode" />
+            <ComboBox Grid.Row="5"
+                      Grid.ColumnSpan="3"
+                      Width="320"
+                      Margin="0,10,0,0"
+                      HorizontalAlignment="Left"
+                      ItemsSource="{Binding OutputGameModes}"
+                      SelectedItem="{Binding OutputGameMode, Mode=TwoWay}"
+                      materialAssists:ComboBoxAssist.Label="Export map game mode" />
+            <TextBox Grid.Row="6"
+                     Grid.ColumnSpan="3"
+                     Width="320"
+                     Margin="0,10,0,0"
+                     HorizontalAlignment="Left"
+                     materialAssists:TextFieldAssist.Label="Export map difficulty name"
+                     Text="{Binding OutputName, Mode=TwoWay}" />
+
+            <StackPanel Grid.Row="7"
+                        Grid.ColumnSpan="3"
+                        Margin="0,16,0,0">
+                <CheckBox Content="NC everything"
+                          IsChecked="{Binding NcEverything, Mode=TwoWay}" />
+                <ComboBox Width="320"
+                          Margin="0,10,0,0"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding SelectionModes}"
+                          SelectedItem="{Binding SelectionMode, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="Selection mode" />
+            </StackPanel>
+
+            <Grid Grid.Row="8"
+                  Grid.ColumnSpan="3"
+                  Margin="0,24,0,0"
+                  ColumnDefinitions="*,Auto,Auto">
+                <ProgressBar Height="18"
+                             Margin="0,0,20,0"
+                             VerticalAlignment="Center"
+                             Maximum="100"
+                             Value="{Binding Progress}" />
+                <Button Grid.Column="1"
+                        Margin="0,0,8,0"
+                        IsVisible="{Binding IsRunning}"
+                        Command="{Binding CancelCommand}"
+                        Content="Cancel" />
+                <Button Grid.Column="2"
+                        Command="{Binding RunCommand}"
+                        Content="Run" />
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

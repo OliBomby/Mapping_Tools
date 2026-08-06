@@ -1,6 +1,8 @@
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Tools.RhythmGuide;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -68,12 +70,24 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string LegacyAssemblyName = "Mapping Tools";
         private const string LegacyNamespacePrefix = "Mapping_Tools.";
         private const string CurrentNamespacePrefix = "Mapping_Tools.Core.";
+        private const string LegacyRhythmGuideProject = "Mapping_Tools.Viewmodels.RhythmGuideVm";
+        private const string LegacyRhythmGuideOptions =
+            "Mapping_Tools.Classes.Tools.RhythmGuide+RhythmGuideGeneratorArgs";
         private readonly DefaultSerializationBinder _fallback = new();
 
         public Type BindToType(string? assemblyName, string typeName)
         {
             if (assemblyName == LegacyAssemblyName)
             {
+                if (typeName == LegacyRhythmGuideProject)
+                {
+                    return typeof(RhythmGuideProject);
+                }
+                if (typeName == LegacyRhythmGuideOptions)
+                {
+                    return typeof(RhythmGuideOptions);
+                }
+
                 Type? migratedType = MigratedCoreMarker.Assembly.GetType(typeName)
                     ?? MigratedCoreMarker.Assembly.GetType(ToCurrentTypeName(typeName));
                 if (migratedType is not null)
@@ -90,6 +104,19 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             out string? assemblyName,
             out string? typeName)
         {
+            if (serializedType == typeof(RhythmGuideProject))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyRhythmGuideProject;
+                return;
+            }
+            if (serializedType == typeof(RhythmGuideOptions))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyRhythmGuideOptions;
+                return;
+            }
+
             if (serializedType.Assembly == MigratedCoreMarker.Assembly)
             {
                 assemblyName = LegacyAssemblyName;

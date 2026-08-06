@@ -5,11 +5,13 @@ using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.QuickRun;
+using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.SafetyCopies;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Hosting;
+using Mapping_Tools.Desktop.Interactions;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
@@ -42,6 +44,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<BeatmapWorkspaceViewModel>();
         services.AddSingleton<GetStartedViewModel>();
         services.AddSingleton<PreferencesViewModel>();
+        services.AddSingleton<RhythmGuideViewModel>();
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(
             [
@@ -58,7 +61,15 @@ internal static class DesktopServiceRegistration
                     "Application",
                     "Paths, backup policy, Editor Reader, and application theme.",
                     ["settings", "paths", "backups", "editor reader", "theme"],
-                    provider.GetRequiredService<PreferencesViewModel>)
+                    provider.GetRequiredService<PreferencesViewModel>),
+                new ShellFeatureRegistration(
+                    "rhythm-guide",
+                    "Rhythm Guide",
+                    "Tools",
+                    "Make a beatmap with circles from the rhythm of multiple maps.",
+                    ["rhythm", "hitsound", "guide", "reference"],
+                    provider.GetRequiredService<RhythmGuideViewModel>,
+                    startsSection: true)
             ]));
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<IDialogService>(provider =>
@@ -84,6 +95,9 @@ internal static class DesktopServiceRegistration
         });
         services.AddSingleton<IFileRevealService, WindowsFileRevealService>();
         services.AddSingleton<IApplicationThemeService, AvaloniaApplicationThemeService>();
+        services.AddSingleton<IRhythmGuideWindowService>(provider =>
+            new AvaloniaRhythmGuideWindowService(
+                provider.GetRequiredService<MainWindow>));
         services.AddSingleton<IApplicationDirectories, ApplicationDirectories>();
         services.AddSingleton<ISettingsStore, JsonSettingsStore>();
         services.AddSingleton<ISettingsPathEnvironment, WindowsSettingsPathEnvironment>();
@@ -119,6 +133,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IEditorReloadService, WindowsOsuEditorReloadService>();
         services.AddSingleton<IBeatmapEditingGateway, BeatmapEditingGateway>();
         services.AddSingleton<IBetterSaveService, BetterSaveService>();
+        services.AddSingleton<IRhythmGuideService, RhythmGuideService>();
         services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();
         services.AddSingleton<IBeatmapFileSystem, PhysicalBeatmapFileSystem>();
         services.AddSingleton<IBeatmapWorkspace, BeatmapWorkspace>();

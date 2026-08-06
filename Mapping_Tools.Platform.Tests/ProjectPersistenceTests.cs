@@ -1,7 +1,9 @@
 using System.Text.Json;
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Tools.RhythmGuide;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -50,6 +52,35 @@ public sealed class ProjectPersistenceTests
 
         // Assert
         json.Should().Contain("\"$type\": \"Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools\"");
+    }
+
+    [TestMethod]
+    public void DeserializeAndSerialize_LegacyRhythmGuideProject_PreservesTypeAliasesAndValues()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Projects",
+            "rhythmguideproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        RhythmGuideProject project = serializer.Deserialize<RhythmGuideProject>(
+            File.ReadAllText(fixture));
+        string json = serializer.Serialize(project);
+
+        // Assert
+        project.GuideGeneratorArgs.OutputGameMode.Should().Be(
+            Mapping_Tools.Core.Classes.BeatmapHelper.Enums.GameMode.Mania);
+        project.GuideGeneratorArgs.OutputName.Should().Be("Hitsound Layers");
+        project.GuideGeneratorArgs.SelectionMode.Should().Be(
+            RhythmGuideSelectionMode.HitsoundEvents);
+        project.GuideGeneratorArgs.BeatDivisors.Should().HaveCount(2);
+        json.Should().Contain(
+            "\"$type\": \"Mapping_Tools.Viewmodels.RhythmGuideVm, Mapping Tools\"");
+        json.Should().Contain(
+            "\"$type\": \"Mapping_Tools.Classes.Tools.RhythmGuide+RhythmGuideGeneratorArgs, Mapping Tools\"");
     }
 
     [TestMethod]

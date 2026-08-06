@@ -5,11 +5,13 @@ using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.QuickRun;
+using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.SafetyCopies;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.Hosting;
+using Mapping_Tools.Desktop.Interactions;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
@@ -33,12 +35,14 @@ public sealed class DependencyInjectionTests
             typeof(MainWindow),
             typeof(MainViewModel),
             typeof(PreferencesViewModel),
+            typeof(RhythmGuideViewModel),
             typeof(IDialogService),
             typeof(IFilePicker),
             typeof(IClipboardService),
             typeof(IPlatformLauncher),
             typeof(IFileRevealService),
             typeof(IApplicationThemeService),
+            typeof(IRhythmGuideWindowService),
             typeof(IApplicationDirectories),
             typeof(ISettingsStore),
             typeof(ISettingsPathEnvironment),
@@ -62,6 +66,7 @@ public sealed class DependencyInjectionTests
             typeof(IBeatmapFileSystem),
             typeof(ICurrentBeatmapLocator),
             typeof(IBetterSaveService),
+            typeof(IRhythmGuideService),
             typeof(IBetterSaveOverrideService),
             typeof(IBeatmapWorkspace),
             typeof(IProjectSerializer),

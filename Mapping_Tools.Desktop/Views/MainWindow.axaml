@@ -96,6 +96,10 @@
                       x:DataType="vm:PreferencesViewModel">
             <views:PreferencesView />
         </DataTemplate>
+        <DataTemplate DataType="vm:RhythmGuideViewModel"
+                      x:DataType="vm:RhythmGuideViewModel">
+            <views:RhythmGuideView />
+        </DataTemplate>
     </Window.DataTemplates>
 
     <Window.Styles>
