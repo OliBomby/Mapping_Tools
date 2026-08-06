@@ -38,7 +38,7 @@
                 <TextBox MinWidth="220"
                          Margin="0,0,5,0"
                          materialAssists:TextFieldAssist.Label="osu! folder"
-                         Text="{Binding OsuPath, Mode=TwoWay}"
+                         Text="{Binding OsuPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ToolTip.Tip="Select the path to your osu! folder." />
                 <Button Grid.Column="1"
                         Classes="flat path-picker"
@@ -56,7 +56,7 @@
                 <TextBox MinWidth="220"
                          Margin="0,0,5,0"
                          materialAssists:TextFieldAssist.Label="Songs folder"
-                         Text="{Binding SongsPath, Mode=TwoWay}"
+                         Text="{Binding SongsPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ToolTip.Tip="Select the path to your osu! songs folder." />
                 <Button Grid.Column="1"
                         Classes="flat path-picker"
@@ -74,7 +74,7 @@
                 <TextBox MinWidth="220"
                          Margin="0,0,5,0"
                          materialAssists:TextFieldAssist.Label="osu! user config file"
-                         Text="{Binding OsuConfigPath, Mode=TwoWay}"
+                         Text="{Binding OsuConfigPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ToolTip.Tip="Select the path to your osu! user config file. This file usually contains the name of your PC account." />
                 <Button Grid.Column="1"
                         Classes="flat path-picker"
@@ -92,7 +92,7 @@
                 <TextBox MinWidth="220"
                          Margin="0,0,5,0"
                          materialAssists:TextFieldAssist.Label="Backups folder"
-                         Text="{Binding BackupsPath, Mode=TwoWay}"
+                         Text="{Binding BackupsPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ToolTip.Tip="Select the path to your backups folder. This is where Mapping Tools will save backups." />
                 <Button Grid.Column="1"
                         Classes="flat path-picker"
@@ -109,9 +109,10 @@
                      Margin="0,8,0,0"
                      HorizontalAlignment="Left"
                      materialAssists:TextFieldAssist.Label="Max backup files"
-                     Text="{Binding MaxBackupFiles,
-                                    Mode=TwoWay,
-                                    Converter={StaticResource InvariantInt32Converter}}"
+                     Text="{ReflectionBinding MaxBackupFiles,
+                                              Mode=TwoWay,
+                                              UpdateSourceTrigger=LostFocus,
+                                              Converter={StaticResource InvariantInt32Converter}}"
                      ToolTip.Tip="Select the maximum number of backup files. The oldest beatmap backups are removed when the folder exceeds this limit." />
 
             <StackPanel Margin="5,8,0,0">
@@ -129,9 +130,10 @@
                              HorizontalAlignment="Left"
                              IsVisible="{Binding MakePeriodicBackups}"
                              materialAssists:TextFieldAssist.Label="Backup interval"
-                             Text="{Binding PeriodicBackupInterval,
-                                            Mode=TwoWay,
-                                            Converter={StaticResource ConstantTimeSpanConverter}}"
+                             Text="{ReflectionBinding PeriodicBackupInterval,
+                                                      Mode=TwoWay,
+                                                      UpdateSourceTrigger=LostFocus,
+                                                      Converter={StaticResource ConstantTimeSpanConverter}}"
                              ToolTip.Tip="The time between automatic periodic backups, in hh:mm:ss format." />
                 </StackPanel>
                 <CheckBox Classes="preference-check"

@@ -8,7 +8,7 @@ using Mapping_Tools.Application.Timeline;
 
 namespace Mapping_Tools.Desktop.Controls;
 
-/// <summary>Draws a compact, themeable timeline and invokes navigation for double-clicked markers.</summary>
+/// <summary>Draws a compact, themeable timeline and invokes navigation for clicked markers.</summary>
 public sealed class TimelineControl : Control
 {
     private const double LabelHeight = 16;
@@ -26,7 +26,7 @@ public sealed class TimelineControl : Control
     /// <summary>Identifies the final visible timestamp in milliseconds.</summary>
     public static readonly StyledProperty<double> EndTimeProperty =
         AvaloniaProperty.Register<TimelineControl, double>(nameof(EndTime), 20);
-    /// <summary>Identifies the command invoked when a marker is double-clicked.</summary>
+    /// <summary>Identifies the command invoked when a marker is clicked.</summary>
     public static readonly StyledProperty<ICommand?> NavigateCommandProperty =
         AvaloniaProperty.Register<TimelineControl, ICommand?>(nameof(NavigateCommand));
     /// <summary>Identifies the horizontal timeline brush.</summary>
@@ -107,7 +107,7 @@ public sealed class TimelineControl : Control
         set => SetValue(EndTimeProperty, value);
     }
 
-    /// <summary>Gets or sets the command invoked with a marker timestamp after a double-click.</summary>
+    /// <summary>Gets or sets the command invoked with a marker timestamp after a click.</summary>
     public ICommand? NavigateCommand
     {
         get => GetValue(NavigateCommandProperty);
@@ -221,17 +221,14 @@ public sealed class TimelineControl : Control
         Cursor = marker is null
             ? null
             : _handCursor ??= new Cursor(StandardCursorType.Hand);
-        ToolTip.SetTip(this, marker is null
-            ? null
-            : marker.Label ?? TimelineScale.FormatMarker(marker.Time));
+        ToolTip.SetTip(this, marker is null ? null : FormatToolTip(marker));
     }
 
     /// <inheritdoc/>
     protected override void OnPointerPressed(PointerPressedEventArgs eventArgs)
     {
         base.OnPointerPressed(eventArgs);
-        if (eventArgs.ClickCount < 2 ||
-            !eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed ||
+        if (!eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed ||
             MarkerAt(eventArgs.GetPosition(this).X) is not { } marker)
         {
             return;
@@ -246,6 +243,14 @@ public sealed class TimelineControl : Control
 
     internal TimelineMarker? MarkerAt(double x) => CreateScale()
         .FindNearest(Markers ?? [], x, Bounds.Width, HitTolerance);
+
+    internal static string FormatToolTip(TimelineMarker marker)
+    {
+        string timestamp = TimelineScale.FormatMarker(marker.Time);
+        return string.IsNullOrWhiteSpace(marker.Label)
+            ? timestamp
+            : $"{marker.Label} — {timestamp}";
+    }
 
     private TimelineScale CreateScale() =>
         double.IsFinite(StartTime) && double.IsFinite(EndTime)

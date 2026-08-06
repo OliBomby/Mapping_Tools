@@ -3,7 +3,6 @@
              xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="Mapping_Tools.Desktop.Views.RhythmGuideView"
              x:DataType="vm:RhythmGuideViewModel">
     <Grid RowDefinitions="*,Auto">
@@ -20,10 +19,11 @@
 
                     <Grid Margin="0,20,0,0" ColumnDefinitions="*,Auto,Auto,5,Auto">
                         <TextBox materialAssists:TextFieldAssist.Label="Copy rhythm from"
-                                 Text="{Binding SourcePathsText, Mode=TwoWay}"
+                                 Text="{Binding SourcePathsText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  ToolTip.Tip="One or more beatmap paths separated by |." />
                         <TextBlock Grid.Column="1"
                                    Margin="3,15,5,0"
+                                   Padding="0,0,2,0"
                                    FontStyle="Italic"
                                    Text="{Binding SourceCount, StringFormat='{}{0} maps total'}" />
                         <Button Grid.Column="2"
@@ -45,7 +45,7 @@
                     <Grid Margin="0,10,0,0" ColumnDefinitions="*,Auto,5,Auto">
                         <TextBox Margin="0,0,5,0"
                                  materialAssists:TextFieldAssist.Label="Copy rhythm to"
-                                 Text="{Binding ExportPath, Mode=TwoWay}" />
+                                 Text="{Binding ExportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                         <Button Grid.Column="1"
                                 Classes="flat path-picker"
                                 VerticalAlignment="Bottom"
@@ -78,7 +78,7 @@
                              Margin="0,10,0,0"
                              HorizontalAlignment="Left"
                              materialAssists:TextFieldAssist.Label="Export map diff name"
-                             Text="{Binding OutputName, Mode=TwoWay}" />
+                             Text="{Binding OutputName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                     <CheckBox Margin="0,30,0,0"
                               Content="NC everything"
                               IsChecked="{Binding NcEverything, Mode=TwoWay}" />
@@ -90,21 +90,12 @@
                               materialAssists:ComboBoxAssist.Label="Selection mode" />
                 </StackPanel>
 
-                <StackPanel Margin="10"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Bottom"
-                            Orientation="Horizontal">
-                    <Button Margin="0,0,8,0"
-                            VerticalAlignment="Center"
-                            IsVisible="{Binding IsRunning}"
-                            Command="{Binding CancelCommand}"
-                            Content="Cancel" />
-                    <Button Classes="tool-run-action"
-                            Command="{Binding RunCommand}"
-                            ToolTip.Tip="Run this tool.">
-                        <materialIcons:MaterialIcon Kind="Play" />
-                    </Button>
-                </StackPanel>
+                <controls:ToolRunButton Margin="10"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        RunCommand="{Binding RunCommand}"
+                                        CancelCommand="{Binding CancelCommand}"
+                                        IsRunning="{Binding IsRunning}" />
             </Grid>
         </ScrollViewer>
 

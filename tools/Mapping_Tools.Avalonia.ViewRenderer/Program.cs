@@ -18,9 +18,11 @@ using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.SafetyCopies;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Avalonia.ViewRenderer;
 using Mapping_Tools.Desktop;
+using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Interactions;
 using Mapping_Tools.Desktop.Platform;
@@ -59,9 +61,9 @@ Control view = options.View switch
         Child = new GetStartedView { DataContext = CreateGetStartedViewModel(options.Scenario) }
     },
     "PreferencesView" => CreatePreferencesView(options.Scenario),
-    "RhythmGuideView" => CreateRhythmGuideView(),
-    "AutoFailDetectorView" => CreateAutoFailDetectorView(),
-    "MapCleanerView" => CreateMapCleanerView(),
+    "RhythmGuideView" => CreateRhythmGuideView(options.Scenario),
+    "AutoFailDetectorView" => CreateAutoFailDetectorView(options.Scenario),
+    "MapCleanerView" => CreateMapCleanerView(options.Scenario),
     "MessageDialogWindow" => CreateMessageDialog(),
     "ValueDialogWindow" => CreateValueDialog(options.Scenario),
     _ => CreateParameterlessView(options.View),
@@ -79,6 +81,23 @@ if (options.Scenario.Equals("help", StringComparison.OrdinalIgnoreCase))
         .OfType<Button>()
         .First(button => button.Flyout is not null);
     helpButton.Flyout!.ShowAt(helpButton);
+}
+if (options.Scenario.Equals("invalid", StringComparison.OrdinalIgnoreCase) &&
+    view is MapCleanerView)
+{
+    TextBox field = host.GetVisualDescendants().OfType<TextBox>().Single();
+    field.Focus();
+    field.Text = "1/16, nope";
+    host.GetVisualDescendants().OfType<ToolRunButton>().Single().Focus();
+}
+if (options.Scenario.Equals("running", StringComparison.OrdinalIgnoreCase))
+{
+    foreach (ToolProgressBar progressBar in host.GetVisualDescendants()
+                 .OfType<ToolProgressBar>())
+    {
+        progressBar.Value = 0;
+        progressBar.Value = 45;
+    }
 }
 var frame = host.CaptureRenderedFrame()
             ?? throw new InvalidOperationException("Avalonia did not produce a rendered frame.");
@@ -249,7 +268,7 @@ static Control CreatePreferencesView(string scenario)
     };
 }
 
-static Control CreateRhythmGuideView()
+static Control CreateRhythmGuideView(string scenario)
 {
     RhythmGuideViewModel viewModel = new(
         RendererStub<IRhythmGuideService>.Create(),
@@ -262,11 +281,18 @@ static Control CreateRhythmGuideView()
         RendererStub<IRhythmGuideWindowService>.Create(),
         new UserNotificationService(),
         new RendererApplicationDirectories());
+    viewModel.SourcePathsText = string.Join('|', Enumerable.Range(1, 12)
+        .Select(index => $@"C:\Songs\Fixture Map {index}.osu"));
+    if (scenario.Equals("running", StringComparison.OrdinalIgnoreCase))
+    {
+        SetProperty(viewModel, nameof(RhythmGuideViewModel.IsRunning), true);
+        SetProperty(viewModel, nameof(RhythmGuideViewModel.Progress), 45d);
+    }
 
     return new RhythmGuideView { DataContext = viewModel };
 }
 
-static Control CreateAutoFailDetectorView()
+static Control CreateAutoFailDetectorView(string scenario)
 {
     ApplicationSettings settings = CreateSettings(string.Empty);
     AutoFailDetectorViewModel viewModel = new(
@@ -278,11 +304,12 @@ static Control CreateAutoFailDetectorView()
         new RendererDialogService(),
         new QuickRunCommandRegistry(),
         new AcceptedLauncher());
+    PrepareToolState(viewModel, scenario);
 
     return new AutoFailDetectorView { DataContext = viewModel };
 }
 
-static Control CreateMapCleanerView()
+static Control CreateMapCleanerView(string scenario)
 {
     ApplicationSettings settings = CreateSettings(string.Empty);
     MapCleanerViewModel viewModel = new(
@@ -296,8 +323,41 @@ static Control CreateMapCleanerView()
         new RendererDialogService(),
         new UserNotificationService(),
         new AcceptedLauncher());
+    PrepareToolState(viewModel, scenario);
 
     return new MapCleanerView { DataContext = viewModel };
+}
+
+static void PrepareToolState(object viewModel, string scenario)
+{
+    if (scenario.Equals("running", StringComparison.OrdinalIgnoreCase))
+    {
+        SetProperty(viewModel, "IsRunning", true);
+        SetProperty(viewModel, "Progress", 45d);
+    }
+
+    if (scenario.Equals("timeline", StringComparison.OrdinalIgnoreCase))
+    {
+        SetProperty(viewModel, "HasRun", true);
+        SetProperty(viewModel, "EndTime", 60_000d);
+        SetProperty(
+            viewModel,
+            "Markers",
+            new TimelineMarker[]
+            {
+                new(6_000, TimelineMarkerKind.Added, "Greenline added"),
+                new(24_000, TimelineMarkerKind.Changed, "Greenline changed"),
+                new(48_000, TimelineMarkerKind.Removed, "Greenline removed")
+            });
+    }
+}
+
+static void SetProperty(object target, string propertyName, object value)
+{
+    PropertyInfo property = target.GetType().GetProperty(propertyName)
+        ?? throw new InvalidOperationException(
+            $"Renderer state property '{propertyName}' was not found on {target.GetType().Name}.");
+    property.SetValue(target, value);
 }
 
 static PreferencesViewModel CreatePreferencesViewModel(

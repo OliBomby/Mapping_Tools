@@ -24,6 +24,18 @@
             <converters:ConstantTimeSpanConverter x:Key="ConstantTimeSpanConverter" />
             <converters:DarkThemeConverter x:Key="DarkThemeConverter" />
             <converters:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter" />
+            <converters:ValidationErrorMessageConverter x:Key="ValidationErrorMessageConverter" />
+            <DataTemplate x:Key="ConciseValidationErrorTemplate">
+                <ItemsControl ItemsSource="{Binding}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock FontSize="12"
+                                       Text="{Binding Converter={StaticResource ValidationErrorMessageConverter}}"
+                                       TextWrapping="Wrap" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </DataTemplate>
             <ControlTheme x:Key="ToolHelpFlyoutPresenterTheme"
                           TargetType="FlyoutPresenter"
                           BasedOn="{StaticResource MaterialFlyoutPresenter}">
@@ -38,6 +50,9 @@
                                 PrimaryColor="Blue"
                                 SecondaryColor="Lime" />
         <materialIcons:MaterialIconStyles />
+        <Style Selector="DataValidationErrors">
+            <Setter Property="ErrorTemplate" Value="{StaticResource ConciseValidationErrorTemplate}" />
+        </Style>
         <Style Selector="TextBox:not(.outline) /template/ Panel#PART_TextFieldPanel">
             <Setter Property="MinHeight" Value="40" />
         </Style>
@@ -99,8 +114,10 @@
             <Setter Property="Height" Value="40" />
         </Style>
         <Style Selector="ComboBox /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Margin" Value="0,18,20,4" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="Margin" Value="0,0,20,3" />
             <Setter Property="Padding" Value="0" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <Style Selector="ComboBox /template/ Border#PART_LabelRootBorder">
@@ -141,6 +158,22 @@
         </Style>
         <Style Selector="controls|HotkeyEditor">
             <Setter Property="Theme" Value="{StaticResource {x:Type TextBox}}" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="UseFloatingPlaceholder" Value="False" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="BorderBrush" Value="{DynamicResource MaterialTextBoxBorderBrush}" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+        </Style>
+        <Style Selector="controls|HotkeyEditor /template/ ContentControl#PART_RightContentControl">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="controls|HotkeyEditor /template/ Panel#PART_TextContainer">
+            <Setter Property="Margin" Value="0,0,0,1" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="controls|HotkeyEditor /template/ materialControls|MaterialUnderline#PART_Underline">
+            <Setter Property="IdleBrush" Value="{DynamicResource MaterialTextBoxBorderBrush}" />
         </Style>
         <Style Selector="Button.tool-info-badge">
             <Setter Property="Width" Value="40" />

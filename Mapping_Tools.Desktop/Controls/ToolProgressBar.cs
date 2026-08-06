@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 
 namespace Mapping_Tools.Desktop.Controls;
@@ -19,6 +20,13 @@ public sealed class ToolProgressBar : ProgressBar
 
     /// <summary>Creates an initially hidden progress indicator.</summary>
     public ToolProgressBar() => IsVisible = false;
+
+    /// <inheritdoc/>
+    protected override void OnLoaded(RoutedEventArgs eventArgs)
+    {
+        base.OnLoaded(eventArgs);
+        UpdateVisibility();
+    }
 
     private void UpdateVisibility()
     {
@@ -42,7 +50,6 @@ public sealed class ToolProgressBar : ProgressBar
                 return;
             }
 
-            SetCurrentValue(ValueProperty, Minimum);
             IsVisible = false;
         });
     }

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Avalonia.Input;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Controls;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -49,5 +50,22 @@ public sealed class HotkeyEditorTests
 
         // Assert
         display.Should().Be("< not set >");
+    }
+
+    [TestMethod]
+    public void ApplyKey_WithUnmodifiedEscape_ClearsHotkeyAndUpdatesDisplay()
+    {
+        // Arrange
+        HotkeyEditor editor = new()
+        {
+            Hotkey = new HotkeySettings(56, 2)
+        };
+
+        // Act
+        editor.ApplyKey("Escape", KeyModifiers.None);
+
+        // Assert
+        editor.Hotkey.Should().BeNull();
+        editor.Text.Should().Be("< not set >");
     }
 }

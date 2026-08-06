@@ -118,8 +118,13 @@ public sealed class MapCleanerViewModelTests
             System.Globalization.CultureInfo.InvariantCulture);
 
         // Assert
-        converted.Should().BeOfType<BindingNotification>()
-            .Which.ErrorType.Should().Be(BindingErrorType.DataValidationError);
+        BindingNotification notification = converted.Should()
+            .BeOfType<BindingNotification>()
+            .Which;
+        notification.ErrorType.Should().Be(BindingErrorType.DataValidationError);
+        notification.Error.Should().NotBeNull();
+        notification.Error!.Message.Should().Be(
+            "Beat divisor 'nope' is not a valid fraction or number.");
     }
 
     [TestMethod]

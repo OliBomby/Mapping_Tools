@@ -3,7 +3,6 @@
              xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="Mapping_Tools.Desktop.Views.MapCleanerView"
              x:DataType="vm:MapCleanerViewModel">
     <Grid RowDefinitions="*,Auto,Auto">
@@ -37,27 +36,19 @@
                              Margin="0,4,0,0"
                              HorizontalAlignment="Left"
                              materialAssists:TextFieldAssist.Label="Beat divisors"
-                             Text="{Binding BeatDivisors,
-                                            Mode=TwoWay,
-                                            Converter={StaticResource BeatDivisorArrayToStringConverter}}"
+                             Text="{ReflectionBinding BeatDivisors,
+                                                      Mode=TwoWay,
+                                                      UpdateSourceTrigger=LostFocus,
+                                                      Converter={StaticResource BeatDivisorArrayToStringConverter}}"
                              ToolTip.Tip="Comma-separated fractions, for example 1/16, 1/12." />
                 </StackPanel>
 
-                <StackPanel Margin="10"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Bottom"
-                            Orientation="Horizontal">
-                    <Button Margin="0,0,8,0"
-                            VerticalAlignment="Center"
-                            IsVisible="{Binding IsRunning}"
-                            Command="{Binding CancelCommand}"
-                            Content="Cancel" />
-                    <Button Classes="tool-run-action"
-                            Command="{Binding RunCommand}"
-                            ToolTip.Tip="Run this tool.">
-                        <materialIcons:MaterialIcon Kind="Play" />
-                    </Button>
-                </StackPanel>
+                <controls:ToolRunButton Margin="10"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        RunCommand="{Binding RunCommand}"
+                                        CancelCommand="{Binding CancelCommand}"
+                                        IsRunning="{Binding IsRunning}" />
             </Grid>
         </ScrollViewer>
 
@@ -76,7 +67,7 @@
 
         <StackPanel Grid.Row="2"
                     IsVisible="{Binding HasRun}"
-                    ToolTip.Tip="The timeline shows control-point changes. Double-click a line to navigate.">
+                    ToolTip.Tip="The timeline shows control-point changes. Click a line to navigate.">
             <controls:TimelineControl Height="100"
                                       StartTime="0"
                                       EndTime="{Binding EndTime}"

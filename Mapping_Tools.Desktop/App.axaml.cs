@@ -1,6 +1,9 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.Hosting;
@@ -19,6 +22,11 @@ namespace Mapping_Tools.Desktop;
 public partial class App : Avalonia.Application
 {
     private IHost? _host;
+
+    static App()
+    {
+        InputElement.PointerPressedEvent.AddClassHandler<Window>(ClearFocusFromBackground);
+    }
 
     /// <inheritdoc/>
     public override void Initialize()
@@ -79,5 +87,27 @@ public partial class App : Avalonia.Application
             _host.Dispose();
             _host = null;
         }
+    }
+
+    private static void ClearFocusFromBackground(
+        Window window,
+        PointerPressedEventArgs eventArgs)
+    {
+        if (!eventArgs.GetCurrentPoint(window).Properties.IsLeftButtonPressed)
+        {
+            return;
+        }
+
+        for (Visual? current = eventArgs.Source as Visual;
+             current is not null && current != window;
+             current = current.GetVisualParent())
+        {
+            if (current is InputElement { Focusable: true })
+            {
+                return;
+            }
+        }
+
+        TopLevel.GetTopLevel(window)?.FocusManager?.Focus(null);
     }
 }

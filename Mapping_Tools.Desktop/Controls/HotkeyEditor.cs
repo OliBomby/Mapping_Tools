@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
+using Avalonia.Media;
 using Mapping_Tools.Application.Settings;
 
 namespace Mapping_Tools.Desktop.Controls;
@@ -28,6 +29,8 @@ public sealed class HotkeyEditor : TextBox
     {
         IsReadOnly = true;
         IsUndoEnabled = false;
+        InnerRightContent = null;
+        TextAlignment = TextAlignment.Center;
         UpdateText();
     }
 
@@ -48,11 +51,16 @@ public sealed class HotkeyEditor : TextBox
     protected override void OnKeyDown(KeyEventArgs eventArgs)
     {
         eventArgs.Handled = true;
-        string keyName = eventArgs.Key.ToString();
-        int modifiers = ToLegacyModifiers(eventArgs.KeyModifiers);
+        ApplyKey(eventArgs.Key.ToString(), eventArgs.KeyModifiers);
+    }
+
+    internal void ApplyKey(string keyName, KeyModifiers keyModifiers)
+    {
+        int modifiers = ToLegacyModifiers(keyModifiers);
         if (modifiers == 0 && keyName is "Delete" or "Back" or "Escape")
         {
             SetCurrentValue(HotkeyProperty, null);
+            UpdateText();
             return;
         }
 

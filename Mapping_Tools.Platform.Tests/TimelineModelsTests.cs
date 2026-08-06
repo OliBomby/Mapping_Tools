@@ -86,4 +86,17 @@ public sealed class TimelineModelsTests
         // Assert
         marker.Should().BeSameAs(expected);
     }
+
+    [TestMethod]
+    public void FormatToolTip_WithLabel_IncludesLabelAndTimestamp()
+    {
+        // Arrange
+        TimelineMarker marker = new(61_005, TimelineMarkerKind.Removed, "Greenline removed");
+
+        // Act
+        string tooltip = TimelineControl.FormatToolTip(marker);
+
+        // Assert
+        tooltip.Should().Be("Greenline removed — 01:01:005");
+    }
 }
