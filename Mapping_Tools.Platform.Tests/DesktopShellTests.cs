@@ -75,6 +75,34 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    public void MainViewModel_WithFoundationalFavoritesAndTools_GroupsItemsWithInertDividers()
+    {
+        // Arrange
+        ApplicationSettings settings = new()
+        {
+            FavoriteTools = ["favorite"]
+        };
+        using MainViewModel viewModel = CreateMainViewModel(
+        [
+            Registration("get-started", "Get started", category: "General"),
+            Registration("preferences", "Preferences", category: "General"),
+            Registration("ordinary", "Ordinary"),
+            Registration("favorite", "Favorite tool")
+        ], settings);
+
+        // Act
+        ShellFeatureItemViewModel[] items = viewModel.VisibleFeatures.ToArray();
+
+        // Assert
+        items.Select(item => item.Id).Should().Equal(
+            "get-started",
+            "preferences",
+            "favorite",
+            "ordinary");
+        items.Select(item => item.StartsSection).Should().Equal(false, false, true, true);
+    }
+
+    [TestMethod]
     public void MainViewModel_ActivateDifferentFeature_DeactivatesPreviousAndCachesInstances()
     {
         // Arrange
@@ -275,11 +303,12 @@ public sealed class DesktopShellTests
     private static ShellFeatureRegistration Registration(
         string id,
         string displayName,
-        Func<ObservableObject>? factory = null) =>
+        Func<ObservableObject>? factory = null,
+        string category = "Tools") =>
         new(
             id,
             displayName,
-            "Tools",
+            category,
             $"Open {displayName}.",
             [displayName, id],
             factory ?? (() => new StubFeatureViewModel()));

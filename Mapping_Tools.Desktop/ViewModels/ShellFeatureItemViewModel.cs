@@ -46,8 +46,10 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
     /// <summary>Gets the feature summary.</summary>
     public string Description { get; }
 
-    /// <summary>Gets whether a divider precedes this navigation item.</summary>
-    public bool StartsSection { get; }
+    /// <summary>Gets whether a non-selectable divider precedes this navigation item.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(NavigationRowHeight))]
+    public partial bool StartsSection { get; internal set; }
 
     /// <summary>Gets whether this feature is pinned ahead of ordinary items.</summary>
     [ObservableProperty]
@@ -58,10 +60,8 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
     /// <summary>Gets the star glyph corresponding to favorite state.</summary>
     public string FavoriteGlyph => IsFavorite ? "★" : "☆";
 
-    /// <summary>Gets an accessible description of the favorite action.</summary>
-    public string FavoriteActionLabel => IsFavorite
-        ? $"Remove {DisplayName} from favorites"
-        : $"Add {DisplayName} to favorites";
+    /// <summary>Gets the context-menu action for the current favorite state.</summary>
+    public string FavoriteActionLabel => IsFavorite ? "Unfavorite" : "Favorite";
 
     /// <summary>Gets whether this feature currently occupies the shell content area.</summary>
     [ObservableProperty]

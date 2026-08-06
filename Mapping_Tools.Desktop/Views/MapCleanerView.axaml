@@ -7,9 +7,12 @@
              x:Class="Mapping_Tools.Desktop.Views.MapCleanerView"
              x:DataType="vm:MapCleanerViewModel">
     <Grid RowDefinitions="*,Auto,Auto">
-        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+        <ScrollViewer x:Name="ToolScroller"
+                      HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Auto">
-            <Grid Margin="0,0,20,10">
+            <Grid Width="{Binding Viewport.Width, ElementName=ToolScroller}"
+                  MinWidth="300"
+                  Margin="0,0,0,10">
                 <StackPanel>
                     <controls:ToolViewHeader
                         Title="Map Cleaner"
@@ -34,7 +37,9 @@
                              Margin="0,4,0,0"
                              HorizontalAlignment="Left"
                              materialAssists:TextFieldAssist.Label="Beat divisors"
-                             Text="{Binding BeatDivisorsText, Mode=TwoWay}"
+                             Text="{Binding BeatDivisors,
+                                            Mode=TwoWay,
+                                            Converter={StaticResource BeatDivisorArrayToStringConverter}}"
                              ToolTip.Tip="Comma-separated fractions, for example 1/16, 1/12." />
                 </StackPanel>
 
@@ -50,7 +55,7 @@
                     <Button Classes="tool-run-action"
                             Command="{Binding RunCommand}"
                             ToolTip.Tip="Run this tool.">
-                        <materialIcons:MaterialIcon Width="36" Height="36" Kind="Play" />
+                        <materialIcons:MaterialIcon Kind="Play" />
                     </Button>
                 </StackPanel>
             </Grid>
@@ -61,15 +66,16 @@
                        FontWeight="Bold"
                        Opacity="0.58"
                        Text="Made by OliBomby" />
-            <ProgressBar Grid.Column="1"
-                         Classes="tool-progress"
-                         Height="20"
-                         Margin="20,0"
-                         Maximum="100"
-                         Value="{Binding Progress}" />
+            <controls:ToolProgressBar Grid.Column="1"
+                                      Classes="tool-progress"
+                                      Height="20"
+                                      Margin="20,0"
+                                      Maximum="100"
+                                      Value="{Binding Progress}" />
         </Grid>
 
         <StackPanel Grid.Row="2"
+                    IsVisible="{Binding HasRun}"
                     ToolTip.Tip="The timeline shows control-point changes. Double-click a line to navigate.">
             <controls:TimelineControl Height="100"
                                       StartTime="0"

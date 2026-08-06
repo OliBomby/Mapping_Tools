@@ -7,21 +7,16 @@
              x:Class="Mapping_Tools.Desktop.Views.RhythmGuideView"
              x:DataType="vm:RhythmGuideViewModel">
     <Grid RowDefinitions="*,Auto">
-        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+        <ScrollViewer x:Name="ToolScroller"
+                      HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Auto">
-            <Grid Margin="0,0,20,10">
+            <Grid Width="{Binding Viewport.Width, ElementName=ToolScroller}"
+                  MinWidth="300"
+                  Margin="0,0,0,10">
                 <StackPanel Margin="0,0,120,0">
-                    <StackPanel Orientation="Horizontal">
-                        <controls:ToolViewHeader
-                            Title="Rhythm Guide"
-                            HelpText="Make a beatmap with circles from the rhythm of multiple maps, so you have a reference for hitsounding.&#x0a;&#x0a;You can add the circles to an existing map or make a new map with the circles.&#x0a;&#x0a;Use the browse button to choose multiple maps at the same time." />
-                        <Button Margin="8,4,0,0"
-                                VerticalAlignment="Center"
-                                Classes="flat"
-                                Command="{Binding OpenAuxiliaryWindowCommand}"
-                                Content="Open in window"
-                                ToolTip.Tip="Open this Rhythm Guide project in a resizable auxiliary window." />
-                    </StackPanel>
+                    <controls:ToolViewHeader
+                        Title="Rhythm Guide"
+                        HelpText="Make a beatmap with circles from the rhythm of multiple maps, so you have a reference for hitsounding.&#x0a;&#x0a;You can add the circles to an existing map or make a new map with the circles.&#x0a;&#x0a;Use the browse button to choose multiple maps at the same time." />
 
                     <Grid Margin="0,20,0,0" ColumnDefinitions="*,Auto,Auto,5,Auto">
                         <TextBox materialAssists:TextFieldAssist.Label="Copy rhythm from"
@@ -32,14 +27,14 @@
                                    FontStyle="Italic"
                                    Text="{Binding SourceCount, StringFormat='{}{0} maps total'}" />
                         <Button Grid.Column="2"
-                                Classes="flat"
+                                Classes="flat path-picker"
                                 VerticalAlignment="Bottom"
                                 Command="{Binding UseCurrentSourceCommand}"
                                 ToolTip.Tip="Use the beatmap currently open in osu!.">
                             <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
                         </Button>
                         <Button Grid.Column="4"
-                                Classes="flat"
+                                Classes="flat path-picker"
                                 VerticalAlignment="Bottom"
                                 Command="{Binding BrowseSourcesCommand}"
                                 ToolTip.Tip="Select source beatmaps.">
@@ -52,14 +47,14 @@
                                  materialAssists:TextFieldAssist.Label="Copy rhythm to"
                                  Text="{Binding ExportPath, Mode=TwoWay}" />
                         <Button Grid.Column="1"
-                                Classes="flat"
+                                Classes="flat path-picker"
                                 VerticalAlignment="Bottom"
                                 Command="{Binding UseCurrentExportCommand}"
                                 ToolTip.Tip="Use the beatmap currently open in osu!.">
                             <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
                         </Button>
                         <Button Grid.Column="3"
-                                Classes="flat"
+                                Classes="flat path-picker"
                                 VerticalAlignment="Bottom"
                                 Command="{Binding BrowseExportCommand}"
                                 ToolTip.Tip="Choose the output beatmap.">
@@ -107,7 +102,7 @@
                     <Button Classes="tool-run-action"
                             Command="{Binding RunCommand}"
                             ToolTip.Tip="Run this tool.">
-                        <materialIcons:MaterialIcon Width="36" Height="36" Kind="Play" />
+                        <materialIcons:MaterialIcon Kind="Play" />
                     </Button>
                 </StackPanel>
             </Grid>
@@ -118,12 +113,12 @@
                        FontWeight="Bold"
                        Opacity="0.58"
                        Text="Made by OliBomby" />
-            <ProgressBar Grid.Column="1"
-                         Classes="tool-progress"
-                         Height="20"
-                         Margin="20,0"
-                         Maximum="100"
-                         Value="{Binding Progress}" />
+            <controls:ToolProgressBar Grid.Column="1"
+                                      Classes="tool-progress"
+                                      Height="20"
+                                      Margin="20,0"
+                                      Maximum="100"
+                                      Value="{Binding Progress}" />
         </Grid>
     </Grid>
 </UserControl>

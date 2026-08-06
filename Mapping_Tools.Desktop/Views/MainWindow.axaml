@@ -245,32 +245,6 @@
                                     </MenuItem.Icon>
                                 </MenuItem>
                             </MenuItem>
-                            <MenuItem Header="_Project"
-                                      MinWidth="67"
-                                      Height="35"
-                                      IsVisible="{Binding HasProjectMenu}">
-                                <MenuItem Header="_Save project"
-                                          Command="{Binding SaveProjectCommand}"
-                                          ToolTip.Tip="Save tool settings to file.">
-                                    <MenuItem.Icon>
-                                        <materialIcons:MaterialIcon Kind="ContentSave" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                                <MenuItem Header="_Open project"
-                                          Command="{Binding OpenProjectCommand}"
-                                          ToolTip.Tip="Load tool settings from file.">
-                                    <MenuItem.Icon>
-                                        <materialIcons:MaterialIcon Kind="Folder" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                                <MenuItem Header="_New project"
-                                          Command="{Binding NewProjectCommand}"
-                                          ToolTip.Tip="Load the default tool settings.">
-                                    <MenuItem.Icon>
-                                        <materialIcons:MaterialIcon Kind="RocketLaunch" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                            </MenuItem>
                             <Separator Width="9"
                                        Height="35"
                                        Margin="0"
@@ -318,6 +292,32 @@
                                           IsEnabled="False">
                                     <MenuItem.Icon>
                                         <materialIcons:MaterialIcon Kind="Information" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </MenuItem>
+                            <MenuItem Header="_Project"
+                                      MinWidth="67"
+                                      Height="35"
+                                      IsVisible="{Binding HasProjectMenu}">
+                                <MenuItem Header="_Save project"
+                                          Command="{Binding SaveProjectCommand}"
+                                          ToolTip.Tip="Save tool settings to file.">
+                                    <MenuItem.Icon>
+                                        <materialIcons:MaterialIcon Kind="ContentSave" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="_Open project"
+                                          Command="{Binding OpenProjectCommand}"
+                                          ToolTip.Tip="Load tool settings from file.">
+                                    <MenuItem.Icon>
+                                        <materialIcons:MaterialIcon Kind="Folder" />
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                                <MenuItem Header="_New project"
+                                          Command="{Binding NewProjectCommand}"
+                                          ToolTip.Tip="Load the default tool settings.">
+                                    <MenuItem.Icon>
+                                        <materialIcons:MaterialIcon Kind="RocketLaunch" />
                                     </MenuItem.Icon>
                                 </MenuItem>
                             </MenuItem>
@@ -448,10 +448,22 @@
                                                 Content="{Binding DisplayName}"
                                                 ToolTip.Tip="{Binding Description}">
                                             <Button.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="{Binding FavoriteActionLabel}"
-                                                          Command="{Binding ToggleFavoriteCommand}" />
-                                            </ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Favorite"
+                                                              IsVisible="{Binding !IsFavorite}"
+                                                              Command="{Binding ToggleFavoriteCommand}">
+                                                        <MenuItem.Icon>
+                                                            <materialIcons:MaterialIcon Kind="StarOutline" />
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem Header="Unfavorite"
+                                                              IsVisible="{Binding IsFavorite}"
+                                                              Command="{Binding ToggleFavoriteCommand}">
+                                                        <MenuItem.Icon>
+                                                            <materialIcons:MaterialIcon Kind="Star" />
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                </ContextMenu>
                                             </Button.ContextMenu>
                                         </Button>
                                     </StackPanel>

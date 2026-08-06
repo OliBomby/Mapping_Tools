@@ -70,6 +70,10 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
     [ObservableProperty]
     public partial double EndTime { get; private set; } = 20;
 
+    /// <summary>Gets whether a successful analysis has produced timeline state.</summary>
+    [ObservableProperty]
+    public partial bool HasRun { get; private set; }
+
     /// <summary>Gets the filtered result markers displayed on the timeline.</summary>
     [ObservableProperty]
     public partial IReadOnlyList<TimelineMarker> Markers { get; private set; } = [];
@@ -197,6 +201,7 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
 
     private void InstallResult(AutoFailRun run)
     {
+        HasRun = true;
         ResultSummary = Summarize(run.Analysis);
         EndTime = run.MapEndTime;
         List<TimelineMarker> markers = [];

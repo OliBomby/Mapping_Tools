@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:material="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
+             xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:converters="using:Mapping_Tools.Desktop.Converters"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
@@ -22,6 +23,13 @@
             <converters:InvariantDoubleConverter x:Key="InvariantDoubleConverter" />
             <converters:ConstantTimeSpanConverter x:Key="ConstantTimeSpanConverter" />
             <converters:DarkThemeConverter x:Key="DarkThemeConverter" />
+            <converters:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter" />
+            <ControlTheme x:Key="ToolHelpFlyoutPresenterTheme"
+                          TargetType="FlyoutPresenter"
+                          BasedOn="{StaticResource MaterialFlyoutPresenter}">
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+            </ControlTheme>
         </ResourceDictionary>
     </Application.Resources>
 
@@ -48,6 +56,9 @@
         </Style>
         <Style Selector="TextBox:not(.outline):focus-within /template/ TextBlock#PART_LabelText">
             <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        </Style>
+        <Style Selector="TextBox:not(.outline):pointerover /template/ materialControls|MaterialUnderline#PART_Underline">
+            <Setter Property="IdleBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
         </Style>
         <Style Selector="TextBox:not(.outline):error /template/ TextBlock#PART_LabelText">
             <Setter Property="Foreground" Value="{DynamicResource MaterialValidationErrorBrush}" />
@@ -84,31 +95,52 @@
             <Setter Property="AccentOuterBrush" Value="{DynamicResource MappingToolsTimelineAccentOuterBrush}" />
             <Setter Property="AccentInnerBrush" Value="{DynamicResource MappingToolsTimelineAccentInnerBrush}" />
         </Style>
-        <Style Selector="controls|HotkeyEditor">
-            <Setter Property="MinHeight" Value="38" />
-            <Setter Property="Padding" Value="8,5" />
-            <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
-            <Setter Property="Background" Value="{DynamicResource MaterialTextFieldBoxBackgroundBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDividerBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Border Padding="{TemplateBinding Padding}"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="2">
-                        <TextPresenter x:Name="PART_TextPresenter"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       Text="{TemplateBinding Text}" />
-                    </Border>
-                </ControlTemplate>
-            </Setter>
+        <Style Selector="ComboBox /template/ Panel#PART_RootPanel">
+            <Setter Property="Height" Value="40" />
         </Style>
-        <Style Selector="controls|HotkeyEditor:focus">
-            <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
-            <Setter Property="BorderThickness" Value="2" />
+        <Style Selector="ComboBox /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Margin" Value="0,18,20,4" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="ComboBox /template/ Border#PART_LabelRootBorder">
+            <Setter Property="Margin" Value="0,4,1,1" />
+            <Setter Property="RenderTransform" Value="scale(0.75)" />
+            <Setter Property="RenderTransformOrigin" Value="0,0" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+        </Style>
+        <Style Selector="ComboBox[SelectedIndex=-1]:not(:focus-within) /template/ Border#PART_LabelRootBorder">
+            <Setter Property="Margin" Value="0,16,1,1" />
+            <Setter Property="RenderTransform" Value="scale(1)" />
+        </Style>
+        <Style Selector="ComboBox /template/ TextBlock#PART_LabelText">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialBodyLightBrush}" />
+        </Style>
+        <Style Selector="ComboBox:focus-within /template/ TextBlock#PART_LabelText">
+            <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        </Style>
+        <Style Selector="ComboBox:pointerover /template/ materialControls|MaterialUnderline#PART_Underline">
+            <Setter Property="IdleBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        </Style>
+        <Style Selector="ComboBox:pointerover /template/ Path#arrow,
+                         ComboBox:focus-within /template/ Path#arrow,
+                         ComboBox[IsDropDownOpen=True] /template/ Path#arrow">
+            <Setter Property="Fill" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        </Style>
+        <Style Selector="Button.path-picker">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="MinWidth" Value="40" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        </Style>
+        <Style Selector="controls|HotkeyEditor">
+            <Setter Property="Theme" Value="{StaticResource {x:Type TextBox}}" />
         </Style>
         <Style Selector="Button.tool-info-badge">
             <Setter Property="Width" Value="40" />
@@ -128,6 +160,10 @@
             <Setter Property="CornerRadius" Value="35" />
             <Setter Property="Background" Value="{DynamicResource MaterialPrimaryMidBrush}" />
             <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.tool-run-action materialIcons|MaterialIcon">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="42" />
         </Style>
         <Style Selector="ProgressBar.tool-progress">
             <Setter Property="Background" Value="Transparent" />

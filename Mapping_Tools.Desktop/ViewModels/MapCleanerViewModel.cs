@@ -79,9 +79,10 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
     [ObservableProperty]
     public partial bool RemoveUnclickableHitsounds { get; set; }
 
-    /// <summary>Gets or sets the comma-separated beat divisors used for resnapping.</summary>
+    /// <summary>Gets or sets the typed beat divisors used for resnapping.</summary>
     [ObservableProperty]
-    public partial string BeatDivisorsText { get; set; } = "1/16, 1/12";
+    public partial IBeatDivisor[] BeatDivisors { get; set; } =
+        RationalBeatDivisor.GetDefaultBeatDivisors();
 
     /// <summary>Gets whether cleanup is currently running.</summary>
     [ObservableProperty]
@@ -107,6 +108,10 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
     /// <summary>Gets the final timestamp displayed by the cleanup timeline.</summary>
     [ObservableProperty]
     public partial double EndTime { get; private set; } = 20;
+
+    /// <summary>Gets whether a successful cleanup has produced timeline state.</summary>
+    [ObservableProperty]
+    public partial bool HasRun { get; private set; }
 
     /// <summary>Creates a Map Cleaner presentation model.</summary>
     /// <param name="cleaner">Runs framework-independent cleanup operations.</param>
@@ -252,16 +257,7 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
             return;
         }
 
-        MapCleanerOptions options;
-        try
-        {
-            options = Snapshot().MapCleanerArgs;
-        }
-        catch (FormatException exception)
-        {
-            ResultSummary = exception.Message;
-            return;
-        }
+        MapCleanerOptions options = Snapshot().MapCleanerArgs;
 
         IsRunning = true;
         Progress = 0;
@@ -283,7 +279,7 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
                         return new ToolExecutionOutput<MapCleanerResult>(
                             result,
                             quick ? null : Summarize(result, options),
-                            reloadEditor: true);
+                            reloadEditor: quick);
                     }),
                 new Progress<ToolExecutionProgress>(value => Progress = value.Percent),
                 cancellationToken);
@@ -292,6 +288,7 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
                 ResultSummary = Summarize(result, options);
                 EndTime = result.TimelineEndTime;
                 Markers = paths.Count == 1 ? CreateMarkers(result) : [];
+                HasRun = true;
             }
         }
         finally
@@ -314,7 +311,7 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
             RemoveHitsounds = RemoveHitsounds,
             RemoveMuting = RemoveMuting,
             RemoveUnclickableHitsounds = RemoveUnclickableHitsounds,
-            BeatDivisors = ParseDivisors(BeatDivisorsText)
+            BeatDivisors = BeatDivisors.ToArray()
         }
     };
 
@@ -333,7 +330,7 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
         RemoveHitsounds = options.RemoveHitsounds;
         RemoveMuting = options.RemoveMuting;
         RemoveUnclickableHitsounds = options.RemoveUnclickableHitsounds;
-        BeatDivisorsText = string.Join(", ", options.BeatDivisors.Select(value => value.ToString()));
+        BeatDivisors = options.BeatDivisors.ToArray();
         _installing = false;
         IsDirty = false;
     }
@@ -395,27 +392,6 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
     private Task PublishFailureAsync(string message, Exception exception) =>
         _notifications.PublishAsync(new UserNotification(UserNotificationSeverity.Error, "Map Cleaner", message, exception));
 
-    private static IBeatDivisor[] ParseDivisors(string text)
-    {
-        string[] parts = text.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length == 0)
-        {
-            throw new FormatException("Enter at least one beat divisor.");
-        }
-
-        return parts.Select(part =>
-        {
-            string[] fraction = part.Split('/', StringSplitOptions.TrimEntries);
-            if (fraction.Length != 2 || !int.TryParse(fraction[0], out int numerator) ||
-                !int.TryParse(fraction[1], out int denominator) || numerator <= 0 || denominator <= 0)
-            {
-                throw new FormatException($"Beat divisor '{part}' must use positive numerator/denominator notation.");
-            }
-
-            return (IBeatDivisor)new RationalBeatDivisor(numerator, denominator);
-        }).ToArray();
-    }
-
     private static IReadOnlyList<TimelineMarker> CreateMarkers(MapCleanerResult result) =>
         result.TimingPointsAdded
             .Select(time => new TimelineMarker(
@@ -457,7 +433,7 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
     partial void OnRemoveHitsoundsChanged(bool value) => MarkDirty();
     partial void OnRemoveMutingChanged(bool value) => MarkDirty();
     partial void OnRemoveUnclickableHitsoundsChanged(bool value) => MarkDirty();
-    partial void OnBeatDivisorsTextChanged(string value) => MarkDirty();
+    partial void OnBeatDivisorsChanged(IBeatDivisor[] value) => MarkDirty();
     private void MarkDirty()
     {
         if (!_installing)

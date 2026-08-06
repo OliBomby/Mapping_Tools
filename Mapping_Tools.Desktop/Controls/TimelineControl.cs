@@ -168,6 +168,14 @@ public sealed class TimelineControl : Control
             foreach (double tick in scale.GetTicks())
             {
                 double x = scale.ToUnit(tick) * width;
+                if (LineBrush is not null)
+                {
+                    context.DrawLine(
+                        new Pen(LineBrush, 1),
+                        new Point(x, LabelHeight),
+                        new Point(x, height));
+                }
+
                 FormattedText text = new(
                     TimelineScale.FormatTick(tick),
                     CultureInfo.InvariantCulture,

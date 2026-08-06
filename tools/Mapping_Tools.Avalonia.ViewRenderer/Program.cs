@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Media.Imaging;
+using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
@@ -72,6 +73,13 @@ host.SizeToContent = SizeToContent.Manual;
 host.Show();
 host.Width = options.Width;
 host.Height = options.Height;
+if (options.Scenario.Equals("help", StringComparison.OrdinalIgnoreCase))
+{
+    Button helpButton = host.GetVisualDescendants()
+        .OfType<Button>()
+        .First(button => button.Flyout is not null);
+    helpButton.Flyout!.ShowAt(helpButton);
+}
 var frame = host.CaptureRenderedFrame()
             ?? throw new InvalidOperationException("Avalonia did not produce a rendered frame.");
 Directory.CreateDirectory(Path.GetDirectoryName(options.Output)!);
@@ -351,6 +359,10 @@ static ApplicationSettings CreateSettings(string scenario)
                 @"C:\Songs\Short Map.osu",
                 "25-07-2026 09:10:11")
         ];
+    }
+    if (scenario.Equals("favorites", StringComparison.OrdinalIgnoreCase))
+    {
+        settings.FavoriteTools = ["render-tool-2", "render-tool-5"];
     }
 
     return settings;

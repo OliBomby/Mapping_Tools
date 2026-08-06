@@ -232,13 +232,43 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     private void RefreshVisibleFeatures()
     {
-        IEnumerable<ShellFeatureItemViewModel> matches = FeatureItems.Where(MatchesSearch);
-        matches = matches
-            .OrderByDescending(item => item.IsFavorite)
-            .ThenBy(item => item.Order);
+        ShellFeatureItemViewModel[] matches = FeatureItems
+            .Where(MatchesSearch)
+            .ToArray();
+        ShellFeatureItemViewModel[] foundational = matches
+            .Where(item => !item.Category.Equals("Tools", StringComparison.OrdinalIgnoreCase))
+            .OrderBy(item => item.Order)
+            .ToArray();
+        ShellFeatureItemViewModel[] favorites = matches
+            .Where(item =>
+                item.Category.Equals("Tools", StringComparison.OrdinalIgnoreCase) &&
+                item.IsFavorite)
+            .OrderBy(item => item.Order)
+            .ToArray();
+        ShellFeatureItemViewModel[] tools = matches
+            .Where(item =>
+                item.Category.Equals("Tools", StringComparison.OrdinalIgnoreCase) &&
+                !item.IsFavorite)
+            .OrderBy(item => item.Order)
+            .ToArray();
+
+        foreach (ShellFeatureItemViewModel item in matches)
+        {
+            item.StartsSection = false;
+        }
+
+        if (favorites.Length > 0 && foundational.Length > 0)
+        {
+            favorites[0].StartsSection = true;
+        }
+
+        if (tools.Length > 0 && foundational.Length + favorites.Length > 0)
+        {
+            tools[0].StartsSection = true;
+        }
 
         VisibleFeatures.Clear();
-        foreach (ShellFeatureItemViewModel item in matches)
+        foreach (ShellFeatureItemViewModel item in foundational.Concat(favorites).Concat(tools))
         {
             VisibleFeatures.Add(item);
         }

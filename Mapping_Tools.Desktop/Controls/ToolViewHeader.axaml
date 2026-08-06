@@ -20,8 +20,9 @@
                                         Foreground="{DynamicResource MappingToolsHelpBadgeBrush}"
                                         Kind="HelpCircle" />
             <Button.Flyout>
-                <Flyout Placement="BottomEdgeAlignedLeft">
-                    <TextBlock MaxWidth="600"
+                <Flyout Placement="BottomEdgeAlignedLeft"
+                        FlyoutPresenterTheme="{StaticResource ToolHelpFlyoutPresenterTheme}">
+                    <TextBlock Width="420"
                                Padding="5"
                                Text="{Binding HelpText, ElementName=Root}"
                                TextWrapping="Wrap" />
@@ -38,8 +39,9 @@
                                         Foreground="{DynamicResource MappingToolsQuickRunBadgeBrush}"
                                         Kind="LightningBoltCircle" />
             <Button.Flyout>
-                <Flyout Placement="BottomEdgeAlignedLeft">
-                    <TextBlock MaxWidth="600"
+                <Flyout Placement="BottomEdgeAlignedLeft"
+                        FlyoutPresenterTheme="{StaticResource ToolHelpFlyoutPresenterTheme}">
+                    <TextBlock Width="300"
                                Padding="5"
                                Text="This tool is compatible with QuickRun!"
                                TextWrapping="Wrap" />
