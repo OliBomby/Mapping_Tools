@@ -3,6 +3,7 @@
              xmlns:material="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:converters="using:Mapping_Tools.Desktop.Converters"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              x:Class="Mapping_Tools.Desktop.App"
              xmlns:local="using:Mapping_Tools.Desktop"
              RequestedThemeVariant="Default">
@@ -68,6 +69,20 @@
         </Style>
         <Style Selector="MenuItem /template/ ItemsPresenter#PART_ItemsPresenter">
             <Setter Property="Margin" Value="0,4" />
+        </Style>
+        <Style Selector="controls|TimelineControl">
+            <Setter Property="LineBrush" Value="{DynamicResource MappingToolsTimelineLineBrush}" />
+            <Setter Property="TickBrush" Value="{DynamicResource MaterialBodyBrush}" />
+            <Setter Property="NeutralOuterBrush" Value="{DynamicResource MappingToolsTimelineNeutralOuterBrush}" />
+            <Setter Property="NeutralInnerBrush" Value="{DynamicResource MappingToolsTimelineNeutralInnerBrush}" />
+            <Setter Property="AddedOuterBrush" Value="{DynamicResource MappingToolsTimelineAddedOuterBrush}" />
+            <Setter Property="AddedInnerBrush" Value="{DynamicResource MappingToolsTimelineAddedInnerBrush}" />
+            <Setter Property="ChangedOuterBrush" Value="{DynamicResource MappingToolsTimelineChangedOuterBrush}" />
+            <Setter Property="ChangedInnerBrush" Value="{DynamicResource MappingToolsTimelineChangedInnerBrush}" />
+            <Setter Property="RemovedOuterBrush" Value="{DynamicResource MappingToolsTimelineRemovedOuterBrush}" />
+            <Setter Property="RemovedInnerBrush" Value="{DynamicResource MappingToolsTimelineRemovedInnerBrush}" />
+            <Setter Property="AccentOuterBrush" Value="{DynamicResource MappingToolsTimelineAccentOuterBrush}" />
+            <Setter Property="AccentInnerBrush" Value="{DynamicResource MappingToolsTimelineAccentInnerBrush}" />
         </Style>
     </Application.Styles>
 </Application>
