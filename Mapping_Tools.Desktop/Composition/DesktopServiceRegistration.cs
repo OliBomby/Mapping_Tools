@@ -3,6 +3,7 @@ using Mapping_Tools.Application.AutoFail;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
+using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.QuickRun;
@@ -47,6 +48,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<PreferencesViewModel>();
         services.AddSingleton<RhythmGuideViewModel>();
         services.AddSingleton<AutoFailDetectorViewModel>();
+        services.AddSingleton<MapCleanerViewModel>();
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(
             [
@@ -78,7 +80,14 @@ internal static class DesktopServiceRegistration
                     "Tools",
                     "Detect incorrect object loading in overlapping patterns.",
                     ["auto fail", "2b", "unloading", "objects"],
-                    provider.GetRequiredService<AutoFailDetectorViewModel>)
+                    provider.GetRequiredService<AutoFailDetectorViewModel>),
+                new ShellFeatureRegistration(
+                    "map-cleaner",
+                    "Map Cleaner",
+                    "Tools",
+                    "Rebuild useful greenlines and optionally resnap map content.",
+                    ["clean", "greenline", "resnap", "samples"],
+                    provider.GetRequiredService<MapCleanerViewModel>)
             ]));
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<IDialogService>(provider =>
@@ -116,6 +125,7 @@ internal static class DesktopServiceRegistration
             provider.GetRequiredService<ISettingsService>().LoadOrCreate().Settings);
         services.AddHostedService<SettingsPersistenceHostedService>();
         services.AddHostedService<AutoFailQuickRunHostedService>();
+        services.AddHostedService<MapCleanerQuickRunHostedService>();
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ITextFileStore, FileSystemFileStore>();
         services.AddSingleton<IUserNotificationService, UserNotificationService>();
@@ -145,6 +155,8 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IBetterSaveService, BetterSaveService>();
         services.AddSingleton<IRhythmGuideService, RhythmGuideService>();
         services.AddSingleton<IAutoFailService, AutoFailService>();
+        services.AddSingleton<IMapCleanerService, MapCleanerService>();
+        services.AddSingleton<IMapCleanerSampleService, PhysicalMapCleanerSampleService>();
         services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();
         services.AddSingleton<IBeatmapFileSystem, PhysicalBeatmapFileSystem>();
         services.AddSingleton<IBeatmapWorkspace, BeatmapWorkspace>();

@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="Mapping_Tools.Desktop.Views.MapCleanerView"
+             x:DataType="vm:MapCleanerViewModel">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <Grid Margin="0,0,20,20" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*">
+            <TextBlock Text="Map Cleaner" FontSize="32" FontWeight="Bold"
+                       Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
+            <TextBlock Grid.Row="1" Margin="0,8,0,0" MaxWidth="760" HorizontalAlignment="Left"
+                       TextWrapping="Wrap"
+                       Text="Rebuild useful greenlines, optionally resnap map content, and clean hitsound state." />
+            <Grid Grid.Row="2" Margin="0,16,0,0" ColumnDefinitions="*,*">
+                <StackPanel Margin="0,0,24,0">
+                    <CheckBox Content="Analyze samples" IsChecked="{Binding AnalyzeSamples}" />
+                    <CheckBox Content="Resnap objects" IsChecked="{Binding ResnapObjects}" />
+                    <CheckBox Content="Resnap bookmarks" IsChecked="{Binding ResnapBookmarks}" />
+                    <CheckBox Content="Remove hitsounds" IsChecked="{Binding RemoveHitsounds}" />
+                    <CheckBox Content="Recoverably remove unused samples" IsChecked="{Binding RemoveUnusedSamples}" />
+                    <CheckBox Content="Remove muting" IsChecked="{Binding RemoveMuting}" />
+                    <CheckBox Content="Mute unclickable hitsounds" IsChecked="{Binding RemoveUnclickableHitsounds}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Map info" FontWeight="Bold" />
+                    <CheckBox Content="Map uses volume changes in sliders" IsChecked="{Binding VolumeSliders}" />
+                    <CheckBox Content="Map uses sampleset changes in sliders" IsChecked="{Binding SampleSetSliders}" />
+                    <CheckBox Content="Map uses volume changes in spinners" IsChecked="{Binding VolumeSpinners}" />
+                    <TextBox Margin="0,14,0,0" materialAssists:TextFieldAssist.Label="Beat divisors"
+                             Text="{Binding BeatDivisorsText, Mode=TwoWay}"
+                             ToolTip.Tip="Comma-separated fractions, for example 1/16, 1/12." />
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="3" Margin="0,22,0,0" ColumnDefinitions="*,Auto,Auto">
+                <ProgressBar Height="18" Margin="0,0,20,0" VerticalAlignment="Center" Maximum="100" Value="{Binding Progress}" />
+                <Button Grid.Column="1" Margin="0,0,8,0" IsVisible="{Binding IsRunning}" Command="{Binding CancelCommand}" Content="Cancel" />
+                <Button Grid.Column="2" Command="{Binding RunCommand}" Content="Run" />
+            </Grid>
+            <TextBlock Grid.Row="4" Margin="0,16,0,0" Text="{Binding ResultSummary}" FontWeight="SemiBold" />
+            <controls:TimelineControl Grid.Row="5" Height="100" Margin="0,10,0,0"
+                                      StartTime="0" EndTime="{Binding EndTime}" Markers="{Binding Markers}"
+                                      NavigateCommand="{Binding NavigateCommand}" />
+        </Grid>
+    </ScrollViewer>
+</UserControl>

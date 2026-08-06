@@ -1,8 +1,10 @@
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.RhythmGuide;
+using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.RhythmGuide;
+using Mapping_Tools.Core.Tools.MapCleaner;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -73,6 +75,9 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string LegacyRhythmGuideProject = "Mapping_Tools.Viewmodels.RhythmGuideVm";
         private const string LegacyRhythmGuideOptions =
             "Mapping_Tools.Classes.Tools.RhythmGuide+RhythmGuideGeneratorArgs";
+        private const string LegacyMapCleanerProject = "Mapping_Tools.Viewmodels.MapCleanerVm";
+        private const string LegacyMapCleanerOptions =
+            "Mapping_Tools.Classes.Tools.MapCleanerStuff.MapCleanerArgs";
         private readonly DefaultSerializationBinder _fallback = new();
 
         public Type BindToType(string? assemblyName, string typeName)
@@ -87,6 +92,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 {
                     return typeof(RhythmGuideOptions);
                 }
+                if (typeName == LegacyMapCleanerProject) return typeof(MapCleanerProject);
+                if (typeName == LegacyMapCleanerOptions) return typeof(MapCleanerOptions);
 
                 Type? migratedType = MigratedCoreMarker.Assembly.GetType(typeName)
                     ?? MigratedCoreMarker.Assembly.GetType(ToCurrentTypeName(typeName));
@@ -114,6 +121,18 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             {
                 assemblyName = LegacyAssemblyName;
                 typeName = LegacyRhythmGuideOptions;
+                return;
+            }
+            if (serializedType == typeof(MapCleanerProject))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyMapCleanerProject;
+                return;
+            }
+            if (serializedType == typeof(MapCleanerOptions))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyMapCleanerOptions;
                 return;
             }
 

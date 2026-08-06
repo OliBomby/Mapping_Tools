@@ -1,9 +1,11 @@
 using System.Text.Json;
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.RhythmGuide;
+using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -81,6 +83,24 @@ public sealed class ProjectPersistenceTests
             "\"$type\": \"Mapping_Tools.Viewmodels.RhythmGuideVm, Mapping Tools\"");
         json.Should().Contain(
             "\"$type\": \"Mapping_Tools.Classes.Tools.RhythmGuide+RhythmGuideGeneratorArgs, Mapping Tools\"");
+    }
+
+    [TestMethod]
+    public void DeserializeAndSerialize_LegacyMapCleanerProject_PreservesTypeAliasesAndValues()
+    {
+        // Arrange
+        string fixture = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Projects", "mapcleanerproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        MapCleanerProject project = serializer.Deserialize<MapCleanerProject>(File.ReadAllText(fixture));
+        string json = serializer.Serialize(project);
+
+        // Assert
+        project.MapCleanerArgs.ResnapObjects.Should().BeTrue();
+        project.MapCleanerArgs.BeatDivisors.Should().HaveCount(2);
+        json.Should().Contain("\"$type\": \"Mapping_Tools.Viewmodels.MapCleanerVm, Mapping Tools\"");
+        json.Should().Contain("\"$type\": \"Mapping_Tools.Classes.Tools.MapCleanerStuff.MapCleanerArgs, Mapping Tools\"");
     }
 
     [TestMethod]

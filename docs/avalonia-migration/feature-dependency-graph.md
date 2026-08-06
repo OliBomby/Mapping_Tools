@@ -279,7 +279,7 @@ in
 
 Exit: manual run, QuickRun, project persistence, backups, errors, and timeline rendering are proven end-to-end.
 
-Implementation status: steps 21 through 23 are complete. Rhythm Guide's shared Core
+Implementation status: steps 21 through 24 are complete. Rhythm Guide's shared Core
 generator, live-aware and backup-safe Application use case, legacy-compatible
 project model, Avalonia view model/view, and reusable auxiliary-window boundary
 are recorded in
@@ -291,6 +291,10 @@ Step 23's shared Auto-fail engine, live-aware Application use case, backup-safe
 optional fix path, startup QuickRun registration, and Avalonia timeline consumer
 are recorded in
 [wave-4-step-23-auto-fail-detector.md](wave-4-step-23-auto-fail-detector.md).
+Step 24's shared Map Cleaner transformation, legacy project aliases, backup-safe
+multi-map Application workflow, recoverable unused-sample handling, QuickRun
+registration, and Avalonia timeline consumer are recorded in
+[wave-4-step-24-map-cleaner.md](wave-4-step-24-map-cleaner.md).
 
 ### Wave 5 — Conventional beatmap tools
 

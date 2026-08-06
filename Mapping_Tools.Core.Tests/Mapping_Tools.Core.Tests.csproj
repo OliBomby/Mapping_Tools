@@ -35,6 +35,9 @@
     <None Include="..\tests\fixtures\wave0\beatmaps\standard-autofail-2b.osu" Link="Resources\standard-autofail-2b.osu">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\tests\fixtures\wave0\transformations\expected\map-cleaner.osu" Link="Resources\expected-map-cleaner.osu">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
