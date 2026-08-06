@@ -5,8 +5,10 @@ using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.SafetyCopies;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Avalonia.ViewRenderer;
@@ -115,7 +117,8 @@ static MainViewModel CreateMainViewModel(string scenario)
 {
     ApplicationSettings settings = CreateSettings(scenario);
     IUserNotificationService notifications = new UserNotificationService();
-    GetStartedViewModel getStarted = new(settings);
+    RendererBeatmapWorkspace workspace = new(settings);
+    GetStartedViewModel getStarted = new(workspace);
     string[] toolNames =
     [
         "Auto-fail Detector",
@@ -171,7 +174,8 @@ static MainViewModel CreateMainViewModel(string scenario)
         settings,
         notifications,
         new AcceptedLauncher(),
-        new ImmediateDispatcher());
+        new ImmediateDispatcher(),
+        CreateWorkspaceViewModel(settings, notifications, workspace));
     if (scenario.StartsWith("preferences", StringComparison.OrdinalIgnoreCase))
     {
         shell.SelectedFeature = shell.FeatureItems.Single(item => item.Id == "preferences");
@@ -183,8 +187,24 @@ static MainViewModel CreateMainViewModel(string scenario)
 static GetStartedViewModel CreateGetStartedViewModel(string scenario)
 {
     ApplicationSettings settings = CreateSettings(scenario);
-    return new GetStartedViewModel(settings);
+    return new GetStartedViewModel(new RendererBeatmapWorkspace(settings));
 }
+
+static BeatmapWorkspaceViewModel CreateWorkspaceViewModel(
+    ApplicationSettings settings,
+    IUserNotificationService notifications,
+    IBeatmapWorkspace workspace) =>
+    new(
+        workspace,
+        new RendererBackupService(),
+        new RendererQuickUndoService(),
+        new RendererFilePicker(),
+        new RendererFileRevealService(),
+        new RendererApplicationDirectories(),
+        settings,
+        new RendererDialogService(),
+        notifications,
+        new ImmediateDispatcher());
 
 static Control CreatePreferencesView(string scenario)
 {
@@ -359,5 +379,144 @@ namespace Mapping_Tools.Avalonia.ViewRenderer {
 
     internal sealed class RendererPlaceholderViewModel : ObservableObject
     {
+    }
+
+    internal sealed class RendererBeatmapWorkspace : IBeatmapWorkspace
+    {
+        private readonly ApplicationSettings _settings;
+        private string[] _selectedPaths = [];
+
+        public RendererBeatmapWorkspace(ApplicationSettings settings)
+        {
+            _settings = settings;
+        }
+
+        public event EventHandler<BeatmapSelectionChangedEventArgs>? SelectionChanged;
+
+        public IReadOnlyList<string> SelectedPaths => _selectedPaths;
+
+        public IReadOnlyList<RecentBeatmap> RecentMaps => _settings.RecentMaps;
+
+        public bool RestoreMostRecent()
+        {
+            if (_settings.RecentMaps.FirstOrDefault() is not { } recent)
+            {
+                return false;
+            }
+
+            SetSelection(
+                recent.Path.Split('|', StringSplitOptions.RemoveEmptyEntries),
+                BeatmapSelectionSource.Startup);
+            return true;
+        }
+
+        public void SetSelection(
+            IEnumerable<string> paths,
+            BeatmapSelectionSource source = BeatmapSelectionSource.Programmatic)
+        {
+            _selectedPaths = paths.ToArray();
+            SelectionChanged?.Invoke(
+                this,
+                new BeatmapSelectionChangedEventArgs(_selectedPaths, source));
+        }
+
+        public void ClearSelection(
+            BeatmapSelectionSource source = BeatmapSelectionSource.Programmatic) =>
+            SetSelection([], source);
+
+        public bool RemoveRecent(string path) => false;
+
+        public IReadOnlyList<string> GetMissingSelectedPaths() => [];
+
+        public Task<bool> PickBeatmapsAsync(
+            bool allowMultiple,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(false);
+
+        public Task<CurrentBeatmapSelectionResult> SelectCurrentBeatmapAsync(
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(new CurrentBeatmapSelectionResult(
+                CurrentBeatmapSelectionStatus.Unavailable,
+                null));
+    }
+
+    internal sealed class RendererBackupService : IBeatmapBackupService
+    {
+        public Task<BeatmapBackupResult> CreateAsync(
+            IEnumerable<string> sourcePaths,
+            BeatmapBackupReason reason,
+            bool force = false,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(new BeatmapBackupResult([], false));
+
+        public Task<BeatmapBackupResult> CreateAsync(
+            BeatmapEditingSession session,
+            BeatmapBackupReason reason,
+            bool force = false,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(new BeatmapBackupResult([], false));
+
+        public Task<BeatmapBackupArtifact?> CreatePeriodicIfChangedAsync(
+            BeatmapEditingSession session,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<BeatmapBackupArtifact?>(null);
+
+        public Task<BeatmapRestoreResult> RestoreAsync(
+            string backupPath,
+            string destinationPath,
+            bool allowDifferentFilename = false,
+            bool reloadEditor = false,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+
+        public Task<BeatmapRestoreResult?> QuickUndoAsync(
+            string destinationPath,
+            bool allowDifferentFilename = false,
+            bool reloadEditor = false,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<BeatmapRestoreResult?>(null);
+    }
+
+    internal sealed class RendererQuickUndoService : IQuickUndoCommandService
+    {
+        public Task<QuickUndoCommandResult> ExecuteAsync(
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(new QuickUndoCommandResult(QuickUndoCommandStatus.NoBackup));
+    }
+
+    internal sealed class RendererFileRevealService : IFileRevealService
+    {
+        public Task<bool> RevealAsync(
+            string path,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(true);
+    }
+
+    internal sealed class RendererApplicationDirectories : IApplicationDirectories
+    {
+        public string LocalApplicationData => @"C:\Local";
+
+        public string ApplicationData => @"C:\Local\Mapping Tools";
+
+        public string Exports => @"C:\Local\Mapping Tools\Exports";
+
+        public string ConfigurationFile => @"C:\Local\Mapping Tools\config.json";
+
+        public void EnsureCreated()
+        {
+        }
+    }
+
+    internal sealed class RendererDialogService : IDialogService
+    {
+        public Task<TResult> ShowMessageAsync<TResult>(
+            MessageDialogRequest<TResult> request,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(request.DismissResult);
+
+        public Task<ValueDialogResult<TValue>> ShowValueAsync<TValue>(
+            ValueDialogRequest<TValue> request,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(new ValueDialogResult<TValue>(false, default));
     }
 }

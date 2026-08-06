@@ -251,7 +251,7 @@ during shutdown.
 
 Exit: the Avalonia shell can host independently registered features and exercise all cross-cutting workflows without static WPF state.
 
-Implementation status: steps 16 through 18 are complete. Step 16's reusable
+Implementation status: steps 16 through 19 are complete. Step 16's reusable
 validation contracts and typed dialog presentation are recorded in
 [wave-3-step-16-forms-dialogs.md](wave-3-step-16-forms-dialogs.md). Step 17's
 explicit feature registry, shell navigation, Get started page, notification
@@ -261,6 +261,10 @@ are recorded in
 Step 18's path, backup-policy, Editor Reader, theme, validation, and settings
 persistence slice is recorded in
 [wave-3-step-18-preferences-pass-1.md](wave-3-step-18-preferences-pass-1.md).
+Step 19's current-map selection, recent-map activation, explicit backup and
+restore actions, QuickUndo command, folder actions, and conditional project
+menu contract are recorded in
+[wave-3-step-19-current-map-backup-project.md](wave-3-step-19-current-map-backup-project.md).
 
 ### Wave 4 — First vertical slices and shared timeline
 

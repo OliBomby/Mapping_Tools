@@ -1,14 +1,16 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Workspace;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
 /// Supplies offline onboarding, changelog, recent-map, and support-link content.
 /// </summary>
-public sealed partial class GetStartedViewModel : ObservableObject
+public sealed partial class GetStartedViewModel : ObservableObject, IDisposable
 {
+    private readonly IBeatmapWorkspace _workspace;
+    private bool _disposed;
     private static readonly string[] OnboardingInstructions =
     [
         "0. Set the correct path to your Songs folder in the [Preferences].",
@@ -21,21 +23,19 @@ public sealed partial class GetStartedViewModel : ObservableObject
         "7. If you run into issues, consult the FAQ over on the [About] -> [Website]."
     ];
     /// <summary>Creates the landing-page presentation model.</summary>
+    /// <param name="workspace">Supplies live recent history and accepts activated rows.</param>
     public GetStartedViewModel(
-        ApplicationSettings settings)
+        IBeatmapWorkspace workspace)
     {
-        ArgumentNullException.ThrowIfNull(settings);
+        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
 
-        RecentMaps = new ObservableCollection<RecentMapViewModel>(
-            settings.RecentMaps.Select(recent => new RecentMapViewModel(
-                Path.GetFileName(recent.Path),
-                recent.Path,
-                recent.DisplayDate)));
+        RecentMaps = [];
         Changelog = [];
         Instructions = OnboardingInstructions;
-        HasNoRecentMaps = RecentMaps.Count == 0;
         RecentMaps.CollectionChanged += (_, _) =>
             HasNoRecentMaps = RecentMaps.Count == 0;
+        _workspace.SelectionChanged += OnWorkspaceSelectionChanged;
+        RefreshRecentMaps();
     }
 
     /// <summary>Gets recent maps in persisted order.</summary>
@@ -50,6 +50,51 @@ public sealed partial class GetStartedViewModel : ObservableObject
     /// <summary>Gets whether an empty-state explanation should be shown.</summary>
     [ObservableProperty]
     public partial bool HasNoRecentMaps { get; private set; }
+
+    /// <summary>
+    /// Makes the selected recent rows the current beatmap selection in table order.
+    /// </summary>
+    /// <param name="recentMaps">Rows selected by the landing-page table.</param>
+    public void SelectRecentMaps(IEnumerable<RecentMapViewModel> recentMaps)
+    {
+        ArgumentNullException.ThrowIfNull(recentMaps);
+        string[] paths = recentMaps.Select(recent => recent.FullPath).ToArray();
+        if (paths.Length > 0)
+        {
+            _workspace.SetSelection(paths, BeatmapSelectionSource.RecentHistory);
+        }
+    }
+
+    /// <summary>Stops observing recent-history changes owned by the workspace.</summary>
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        _workspace.SelectionChanged -= OnWorkspaceSelectionChanged;
+    }
+
+    private void OnWorkspaceSelectionChanged(
+        object? sender,
+        BeatmapSelectionChangedEventArgs eventArgs) =>
+        RefreshRecentMaps();
+
+    private void RefreshRecentMaps()
+    {
+        RecentMaps.Clear();
+        foreach (RecentBeatmap recent in _workspace.RecentMaps)
+        {
+            RecentMaps.Add(new RecentMapViewModel(
+                Path.GetFileName(recent.Path),
+                recent.Path,
+                recent.DisplayDate));
+        }
+
+        HasNoRecentMaps = RecentMaps.Count == 0;
+    }
 
 }
 

@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mapping_Tools.Desktop.ViewModels;
@@ -48,5 +49,17 @@ public partial class GetStartedView : UserControl
         {
             descendant.InvalidateMeasure();
         }
+    }
+
+    private void SelectRecentMaps(object? sender, TappedEventArgs eventArgs)
+    {
+        if (DataContext is not GetStartedViewModel viewModel)
+        {
+            return;
+        }
+
+        viewModel.SelectRecentMaps(
+            RecentMapsTable.SelectedItems?.OfType<RecentMapViewModel>() ?? []);
+        eventArgs.Handled = true;
     }
 }

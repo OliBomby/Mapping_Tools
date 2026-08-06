@@ -165,6 +165,32 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    public async Task ProjectCommands_WithProjectFeature_ShowMenuAndDelegateToFeature()
+    {
+        // Arrange
+        StubProjectFeatureViewModel project = new();
+        using MainViewModel viewModel = CreateMainViewModel(
+        [
+            Registration("home", "Home"),
+            Registration("project", "Project", () => project)
+        ]);
+        ShellFeatureItemViewModel projectItem = viewModel.FeatureItems
+            .Single(item => item.Id == "project");
+
+        // Act
+        projectItem.ActivateCommand.Execute(null);
+        await ExecuteAsync(viewModel.SaveProjectCommand);
+        await ExecuteAsync(viewModel.OpenProjectCommand);
+        await ExecuteAsync(viewModel.NewProjectCommand);
+
+        // Assert
+        viewModel.HasProjectMenu.Should().BeTrue();
+        project.SaveCount.Should().Be(1);
+        project.OpenCount.Should().Be(1);
+        project.NewCount.Should().Be(1);
+    }
+
+    [TestMethod]
     public void WindowPlacementCalculator_DisconnectedMonitor_UsesPrimaryWorkingArea()
     {
         // Arrange
@@ -205,13 +231,28 @@ public sealed class DesktopShellTests
         IUserNotificationService? notifications = null,
         IPlatformLauncher? launcher = null)
     {
+        ApplicationSettings resolvedSettings = settings ?? new ApplicationSettings();
+        IUserNotificationService resolvedNotifications = notifications ?? new UserNotificationService();
+        ImmediateDispatcher dispatcher = new();
+        BeatmapWorkspaceViewModel workspace = new(
+            new TestBeatmapWorkspace(),
+            new TestBeatmapBackupService(),
+            new TestQuickUndoCommandService(),
+            new TestFilePicker(),
+            new TestFileRevealService(),
+            new TestApplicationDirectories(),
+            resolvedSettings,
+            new TestDialogService(),
+            resolvedNotifications,
+            dispatcher);
         return new MainViewModel(
             new ShellFeatureRegistry(registrations ??
                 [Registration("get-started", "Get started")]),
-            settings ?? new ApplicationSettings(),
-            notifications ?? new UserNotificationService(),
+            resolvedSettings,
+            resolvedNotifications,
             launcher ?? new RecordingLauncher(),
-            new ImmediateDispatcher());
+            dispatcher,
+            workspace);
     }
 
     private static ShellFeatureRegistration Registration(
@@ -235,6 +276,33 @@ public sealed class DesktopShellTests
         public void Activate() => ActivationCount++;
 
         public void Deactivate() => DeactivationCount++;
+    }
+
+    private sealed class StubProjectFeatureViewModel : ObservableObject, IShellProjectFeature
+    {
+        public int SaveCount { get; private set; }
+
+        public int OpenCount { get; private set; }
+
+        public int NewCount { get; private set; }
+
+        public Task SaveProjectAsync(CancellationToken cancellationToken = default)
+        {
+            SaveCount++;
+            return Task.CompletedTask;
+        }
+
+        public Task OpenProjectAsync(CancellationToken cancellationToken = default)
+        {
+            OpenCount++;
+            return Task.CompletedTask;
+        }
+
+        public Task NewProjectAsync(CancellationToken cancellationToken = default)
+        {
+            NewCount++;
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class ImmediateDispatcher : IUiDispatcher

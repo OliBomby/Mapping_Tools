@@ -3,8 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform;
+using Avalonia.Platform.Storage;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Views;
 
@@ -145,6 +147,34 @@ public partial class MainWindow : Window
         {
             BeginMoveDrag(eventArgs);
         }
+    }
+
+    private void AcceptFileDrop(object? sender, DragEventArgs eventArgs)
+    {
+        eventArgs.DragEffects = eventArgs.DataTransfer.Formats.Contains(DataFormat.File)
+            ? DragDropEffects.Copy
+            : DragDropEffects.None;
+        eventArgs.Handled = true;
+    }
+
+    private void OpenDroppedBeatmaps(object? sender, DragEventArgs eventArgs)
+    {
+        IReadOnlyList<string> paths = eventArgs.DataTransfer.TryGetFiles()?
+            .Select(item => item.TryGetLocalPath())
+            .Where(path => !string.IsNullOrWhiteSpace(path))
+            .Cast<string>()
+            .ToArray() ?? [];
+        if (paths.Count > 0 && DataContext is MainViewModel viewModel)
+        {
+            viewModel.Workspace.SetDroppedPaths(paths);
+            eventArgs.DragEffects = DragDropEffects.Copy;
+        }
+        else
+        {
+            eventArgs.DragEffects = DragDropEffects.None;
+        }
+
+        eventArgs.Handled = true;
     }
 
 }

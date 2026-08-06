@@ -1,4 +1,4 @@
-using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -28,6 +28,23 @@ public sealed class GetStartedViewModelTests
             .Which.Should().Be(nameof(GetStartedViewModel.HasNoRecentMaps));
     }
 
+    [TestMethod]
+    public void SelectRecentMaps_WithMultipleRows_SetsWorkspaceSelectionInRowOrder()
+    {
+        // Arrange
+        TestBeatmapWorkspace workspace = new();
+        using GetStartedViewModel viewModel = new(workspace);
+        RecentMapViewModel first = new("one.osu", @"C:\one.osu", "today");
+        RecentMapViewModel second = new("two.osu", @"C:\two.osu", "yesterday");
+
+        // Act
+        viewModel.SelectRecentMaps([first, second]);
+
+        // Assert
+        workspace.SelectedPaths.Should().Equal(@"C:\one.osu", @"C:\two.osu");
+        workspace.LastSelectionSource.Should().Be(BeatmapSelectionSource.RecentHistory);
+    }
+
     private static GetStartedViewModel CreateViewModel() =>
-        new(new ApplicationSettings());
+        new(new TestBeatmapWorkspace());
 }

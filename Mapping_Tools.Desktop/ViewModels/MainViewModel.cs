@@ -29,18 +29,26 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <summary>
     /// Creates the desktop shell and activates the first explicit registration.
     /// </summary>
+    /// <param name="registry">Supplies explicitly registered features in navigation order.</param>
+    /// <param name="settings">Owns persisted favorites and other shared preferences.</param>
+    /// <param name="notifications">Supplies the process-lifetime user notification stream.</param>
+    /// <param name="launcher">Opens support links through the operating system.</param>
+    /// <param name="dispatcher">Marshals notification changes to the UI thread.</param>
+    /// <param name="workspace">Presents current-map and safety-copy actions in shell chrome.</param>
     public MainViewModel(
         IShellFeatureRegistry registry,
         ApplicationSettings settings,
         IUserNotificationService notifications,
         IPlatformLauncher launcher,
-        IUiDispatcher dispatcher)
+        IUiDispatcher dispatcher,
+        BeatmapWorkspaceViewModel workspace)
     {
         _registry = registry ?? throw new ArgumentNullException(nameof(registry));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        Workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
 
         FeatureItems = registry.Features
             .Select((registration, order) => new ShellFeatureItemViewModel(
@@ -72,6 +80,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <summary>Gets queued notifications in publication order.</summary>
     public ObservableCollection<ShellNotificationViewModel> NotificationQueue { get; }
 
+    /// <summary>Gets current-map and backup actions shared by every shell feature.</summary>
+    public BeatmapWorkspaceViewModel Workspace { get; }
+
     /// <summary>Gets or sets the case-insensitive feature search query.</summary>
     public string SearchText
     {
@@ -98,6 +109,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <summary>Gets the title of the currently activated feature.</summary>
     [ObservableProperty]
     public partial string Header { get; private set; } = "Mapping Tools";
+
+    /// <summary>Gets whether the active feature exposes typed project operations.</summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SaveProjectCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenProjectCommand))]
+    [NotifyCanExecuteChangedFor(nameof(NewProjectCommand))]
+    public partial bool HasProjectMenu { get; private set; }
 
     /// <summary>Gets or sets whether the full navigation pane is visible.</summary>
     [ObservableProperty]
@@ -140,6 +158,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
 
         CurrentFeature = viewModel;
+        HasProjectMenu = viewModel is IShellProjectFeature;
         Header = item.DisplayName == "Get started"
             ? "Mapping Tools"
             : $"Mapping Tools - {item.DisplayName}";
@@ -168,6 +187,27 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private Task OpenGitHubAsync() =>
         OpenUriAsync(GitHubUri, "source repository");
+
+    private bool CanUseProjectActions() =>
+        CurrentFeature is IShellProjectFeature;
+
+    [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
+    private Task SaveProjectAsync() =>
+        RunProjectOperationAsync(
+            feature => feature.SaveProjectAsync(),
+            "Save project");
+
+    [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
+    private Task OpenProjectAsync() =>
+        RunProjectOperationAsync(
+            feature => feature.OpenProjectAsync(),
+            "Open project");
+
+    [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
+    private Task NewProjectAsync() =>
+        RunProjectOperationAsync(
+            feature => feature.NewProjectAsync(),
+            "New project");
 
     private void ToggleFavorite(ShellFeatureItemViewModel item)
     {
@@ -226,6 +266,33 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 UserNotificationSeverity.Warning,
                 "Could not open link",
                 $"The {destination} could not be opened by the operating system.")).ConfigureAwait(false);
+        }
+    }
+
+    private async Task RunProjectOperationAsync(
+        Func<IShellProjectFeature, Task> operation,
+        string title)
+    {
+        if (CurrentFeature is not IShellProjectFeature feature)
+        {
+            return;
+        }
+
+        try
+        {
+            await operation(feature);
+        }
+        catch (OperationCanceledException)
+        {
+            // Feature-owned confirmation and native picker cancellation are no-ops.
+        }
+        catch (Exception exception)
+        {
+            await _notifications.PublishAsync(new UserNotification(
+                UserNotificationSeverity.Error,
+                title,
+                exception.Message,
+                exception));
         }
     }
 }

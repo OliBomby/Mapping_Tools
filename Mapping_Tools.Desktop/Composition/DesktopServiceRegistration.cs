@@ -39,6 +39,7 @@ internal static class DesktopServiceRegistration
 
         services.AddSingleton<MainWindow>();
         services.AddSingleton<IUiDispatcher, AvaloniaUiDispatcher>();
+        services.AddSingleton<BeatmapWorkspaceViewModel>();
         services.AddSingleton<GetStartedViewModel>();
         services.AddSingleton<PreferencesViewModel>();
         services.AddSingleton<IShellFeatureRegistry>(provider =>

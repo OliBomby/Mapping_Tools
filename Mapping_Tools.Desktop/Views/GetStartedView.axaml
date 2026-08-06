@@ -270,6 +270,7 @@
                        ItemsSource="{Binding RecentMaps}"
                        CanUserResizeColumns="True"
                        SelectionMode="Multiple"
+                       DoubleTapped="SelectRecentMaps"
                        ToolTip.Tip="Double-click any selection of items to set them as the current beatmap.">
                 <TableView.Columns>
                     <TableViewColumn x:Name="RecentPathColumn"
