@@ -3,6 +3,7 @@
              xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="Mapping_Tools.Desktop.Views.RhythmGuideView"
              x:DataType="vm:RhythmGuideViewModel">
     <Grid RowDefinitions="*,Auto">
