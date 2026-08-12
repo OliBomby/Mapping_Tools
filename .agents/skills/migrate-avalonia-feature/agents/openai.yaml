@@ -1,4 +1,0 @@
-interface:
-  display_name: "Avalonia Feature Migration"
-  short_description: "Port one WPF feature safely to Avalonia"
-  default_prompt: "Use $migrate-avalonia-feature to migrate one simple WPF feature to the Avalonia frontend."

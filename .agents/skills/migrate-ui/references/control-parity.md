@@ -205,30 +205,3 @@ dimmer than WPF, first match the foreground color. Increasing `FontWeight` can
 make the result visibly too thick because weight mapping and rasterization
 differ between renderers. Ignore only unavoidable subpixel rasterization after
 face, size, foreground, weight, line height, spacing, and clipping match.
-
-## Required evidence
-
-For each migrated view:
-
-1. Render WPF and Avalonia at the same viewport and deterministic state.
-2. Render at least empty and representative populated/overflow states.
-3. Open both images and compare layout, content boundaries, and typography.
-4. Capture or inspect opened menu/context-menu states when present.
-5. Exercise hover, focus, selection, checked state, column resizing, splitter
-   movement, scrolling, and keyboard access as applicable.
-6. Render both light and dark themes when a palette or semantic resource
-   changes. For fields, inspect populated, focused, empty, and invalid states.
-7. Treat the WPF designer-host render as hierarchy evidence, not unquestioned
-   template evidence. It can draw Material floating hints over their values;
-   when it conflicts with the WPF XAML/template or a native reference, verify
-   the running WPF control and do not copy the renderer artifact.
-8. Use a native desktop run for title dragging, window controls, platform
-   dialogs, popup behavior, and anything a headless renderer cannot prove.
-9. Compare an Avalonia native-window capture with the headless render when
-   template spacing or DPI accuracy is disputed.
-10. Treat compilation as an implementation check, never as visual or
-   interaction evidence.
-
-Do not report completion while a semantic substitute, inactive chrome,
-missing state feedback, clipped themed control, or obvious application-owned
-visual mismatch remains.

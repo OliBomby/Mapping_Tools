@@ -1,0 +1,4 @@
+interface:
+  display_name: "Avalonia UI Migration"
+  short_description: "Port one WPF UI component safely to Avalonia"
+  default_prompt: "Use $migrate-ui to migrate a WPF UI view to the Avalonia frontend."

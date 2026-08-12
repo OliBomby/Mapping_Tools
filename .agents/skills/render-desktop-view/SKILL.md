@@ -1,11 +1,14 @@
 ---
 name: render-desktop-view
-description: Render Mapping Tools WPF or Avalonia views to deterministic PNG files and inspect them for migration visual parity. Use when an agent needs to see a desktop view, compare a legacy WPF view with its Avalonia port, establish a visual baseline, diagnose layout or styling differences, or add a render scenario for a view that cannot be constructed safely in isolation.
+description: Use when you need to render Mapping Tools WPF or Avalonia views to deterministic PNG files.
 ---
 
 # Render Desktop View
 
 Render a view at a fixed size without launching the full application. Avalonia uses its headless platform. WPF uses an isolated, never-visible designer host because WPF has no equivalent supported headless platform. Treat the PNG as evidence for static visual parity, not as proof of native-window, input, overlay, animation, or dialog behavior.
+
+Rendering views with the renderer project could sometimes have styles differing from the real application, because of mismatches in resources inherited from the main window or `App.axaml`.
+In those cases you should update the renderer shell to be an identical environment to the real application.
 
 ## Required workflow
 
@@ -17,16 +20,14 @@ Render a view at a fixed size without launching the full application. Avalonia u
    .\.agents\skills\render-desktop-view\scripts\render-view.ps1 -Framework wpf -List
    ```
 
-3. Render both implementations with the same width and height:
+3. Render both implementations with the same width and height. Number the output files chronologically to avoid overwriting. For example:
 
    ```powershell
-   .\.agents\skills\render-desktop-view\scripts\render-view.ps1 -Framework wpf -View MainWindow -Output artifacts\view-renders\legacy.png -Width 1280 -Height 800
-   .\.agents\skills\render-desktop-view\scripts\render-view.ps1 -Framework avalonia -View MainWindow -Output artifacts\view-renders\avalonia.png -Width 1280 -Height 800
+   .\.agents\skills\render-desktop-view\scripts\render-view.ps1 -Framework wpf -View MainWindow -Output artifacts\view-renders\legacy-scenario-name-1.png -Width 1280 -Height 800
+   .\.agents\skills\render-desktop-view\scripts\render-view.ps1 -Framework avalonia -View MainWindow -Output artifacts\view-renders\avalonia-scenario-name-1.png -Width 1280 -Height 800
    ```
 
-4. Open every PNG with the local image-viewing tool. Do not claim parity from a successful render alone.
-5. Compare hierarchy, alignment, spacing, typography, colors, wrapping, clipping, scrolling, enabled state, empty state, and focus cues.
-6. Correct visible differences or explicitly record intentional design changes.
+4. Open every PNG with the local image-viewing tool.
 
 ## Deterministic render scenarios
 
