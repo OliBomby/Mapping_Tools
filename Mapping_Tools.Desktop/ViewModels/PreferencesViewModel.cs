@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
-using Mapping_Tools.Application.Interactions.Validation;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
@@ -61,19 +60,10 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
 
     /// <summary>Gets or edits the retained-backup limit as a typed count.</summary>
     [ObservableProperty]
-    [NotifyDataErrorInfo]
-    [Range(
-        1,
-        100_000,
-        ErrorMessage = "Use a whole number from 1 through 100000.")]
     private int _maxBackupFiles;
 
     /// <summary>Gets or edits the periodic-backup interval as a typed duration.</summary>
     [ObservableProperty]
-    [NotifyDataErrorInfo]
-    [MinimumTimeSpan(
-        "00:00:01",
-        ErrorMessage = "Use an interval of at least one second.")]
     private TimeSpan _periodicBackupInterval;
 
     /// <summary>

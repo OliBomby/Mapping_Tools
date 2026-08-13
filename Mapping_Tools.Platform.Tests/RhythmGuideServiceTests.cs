@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.RhythmGuide;
+using Mapping_Tools.Application.SafetyCopies;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.RhythmGuide;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,9 +17,10 @@ public sealed class RhythmGuideServiceTests
         // Arrange
         MemoryTextFileStore files = new();
         RecordingEditingGateway gateway = new(files);
+        TestBeatmapBackupService backups = new();
         gateway.Add("source.osu", CreateEditor("source.osu", files, includeObject: true));
         gateway.Add("target.osu", CreateEditor("target.osu", files, includeObject: false));
-        RhythmGuideService service = new(gateway, new StubBeatmapFileSystem(), files);
+        RhythmGuideService service = new(gateway, backups, new StubBeatmapFileSystem(), files);
         RhythmGuideOptions options = new()
         {
             Paths = ["source.osu"],
@@ -36,6 +38,10 @@ public sealed class RhythmGuideServiceTests
             ("source.osu", LiveBeatmapPreference.PreferLive),
             ("target.osu", LiveBeatmapPreference.PreferLive));
         gateway.SavedEditor.Should().BeSameAs(gateway.Sessions["target.osu"].Editor);
+        backups.CreateRequests.Should().ContainSingle();
+        backups.CreateRequests[0].Paths.Should().Equal("source.osu");
+        backups.CreateRequests[0].Reason.Should().Be(BeatmapBackupReason.Automatic);
+        backups.CreateRequests[0].Force.Should().BeFalse();
     }
 
     [TestMethod]
@@ -45,7 +51,11 @@ public sealed class RhythmGuideServiceTests
         MemoryTextFileStore files = new();
         RecordingEditingGateway gateway = new(files);
         gateway.Add("source.osu", CreateEditor("source.osu", files, includeObject: true));
-        RhythmGuideService service = new(gateway, new StubBeatmapFileSystem(), files);
+        RhythmGuideService service = new(
+            gateway,
+            new TestBeatmapBackupService(),
+            new StubBeatmapFileSystem(),
+            files);
         RhythmGuideOptions options = new()
         {
             Paths = ["source.osu"],
@@ -72,6 +82,7 @@ public sealed class RhythmGuideServiceTests
         gateway.Add("source.osu", CreateEditor("source.osu", files, includeObject: true));
         RhythmGuideService service = new(
             gateway,
+            new TestBeatmapBackupService(),
             new StubBeatmapFileSystem { Existing = ["existing.osu"] },
             files);
         RhythmGuideOptions options = new()

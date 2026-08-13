@@ -7,111 +7,73 @@
              x:Class="Mapping_Tools.Desktop.Views.RhythmGuideView"
              x:DataType="vm:RhythmGuideViewModel">
     <Grid RowDefinitions="*,Auto">
-        <ScrollViewer x:Name="ToolScroller"
-                      HorizontalScrollBarVisibility="Auto"
-                      VerticalScrollBarVisibility="Auto">
-            <Grid Width="{Binding Viewport.Width, ElementName=ToolScroller}"
-                  MinWidth="300"
-                  Margin="0,0,0,10">
-                <StackPanel Margin="0,0,120,0">
-                    <controls:ToolViewHeader
-                        Title="Rhythm Guide"
-                        HelpText="Make a beatmap with circles from the rhythm of multiple maps, so you have a reference for hitsounding.&#x0a;&#x0a;You can add the circles to an existing map or make a new map with the circles.&#x0a;&#x0a;Use the browse button to choose multiple maps at the same time." />
+        <Grid Margin="0,0,0,10">
+            <StackPanel Margin="0,0,120,0">
+                <controls:ToolViewHeader
+                    Title="Rhythm Guide"
+                    HelpText="Make a beatmap with circles from the rhythm of multiple maps, so you have a reference for hitsounding.&#x0a;&#x0a;You can add the circles to an existing map or make a new map with the circles.&#x0a;&#x0a;Use the browse button to choose mutliple maps at the same time." />
 
-                    <Grid Margin="0,20,0,0" ColumnDefinitions="*,Auto,Auto,5,Auto">
-                        <TextBox materialAssists:TextFieldAssist.Label="Copy rhythm from"
-                                 Text="{Binding SourcePathsText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                 ToolTip.Tip="One or more beatmap paths separated by |." />
-                        <TextBlock Grid.Column="1"
-                                   Margin="3,0,5,5"
-                                   Padding="0,0,2,0"
-                                   VerticalAlignment="Bottom"
-                                   FontStyle="Italic"
-                                   Text="{Binding SourceCount, StringFormat='{}{0} maps total'}" />
-                        <Button Grid.Column="2"
-                                Classes="flat path-picker"
-                                VerticalAlignment="Bottom"
-                                Command="{Binding UseCurrentSourceCommand}"
-                                ToolTip.Tip="Use the beatmap currently open in osu!.">
-                            <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
-                        </Button>
-                        <Button Grid.Column="4"
-                                Classes="flat path-picker"
-                                VerticalAlignment="Bottom"
-                                Command="{Binding BrowseSourcesCommand}"
-                                ToolTip.Tip="Select source beatmaps.">
-                            <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
-                        </Button>
-                    </Grid>
+                <Grid Margin="0,20,0,0" ColumnDefinitions="*,Auto,Auto,5,Auto">
+                    <TextBox materialAssists:TextFieldAssist.Label="Copy rhythm from"
+                             Text="{ReflectionBinding SourcePaths, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource StringArrayToStringConverter}}"
+                             ToolTip.Tip="Beatmap(s) to import rhythm from. You can input multiple beatmap paths seperated by '|'." />
+                    <TextBlock Grid.Column="1" Margin="3,15,5,0" FontStyle="Italic"
+                               ToolTip.Tip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
+                               Text="{Binding SourceCount, StringFormat='{}({0}) maps total'}" />
+                    <Button Grid.Column="2" Classes="flat path-picker" Cursor="Hand" VerticalAlignment="Bottom"
+                            Command="{Binding UseCurrentSourceCommand}"
+                            ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                        <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
+                    </Button>
+                    <Button Grid.Column="4" Classes="flat path-picker" Cursor="Hand" VerticalAlignment="Bottom"
+                            Command="{Binding BrowseSourcesCommand}"
+                            ToolTip.Tip="Select beatmaps with File Explorer.">
+                        <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+                    </Button>
+                </Grid>
 
-                    <Grid Margin="0,10,0,0" ColumnDefinitions="*,Auto,5,Auto">
-                        <TextBox Margin="0,0,5,0"
-                                 materialAssists:TextFieldAssist.Label="Copy rhythm to"
-                                 Text="{Binding ExportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                        <Button Grid.Column="1"
-                                Classes="flat path-picker"
-                                VerticalAlignment="Bottom"
-                                Command="{Binding UseCurrentExportCommand}"
-                                ToolTip.Tip="Use the beatmap currently open in osu!.">
-                            <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
-                        </Button>
-                        <Button Grid.Column="3"
-                                Classes="flat path-picker"
-                                VerticalAlignment="Bottom"
-                                Command="{Binding BrowseExportCommand}"
-                                ToolTip.Tip="Choose the output beatmap.">
-                            <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
-                        </Button>
-                    </Grid>
+                <Grid Margin="0,10,0,0" ColumnDefinitions="*,Auto,5,Auto">
+                    <TextBox Margin="0,0,5,0" materialAssists:TextFieldAssist.Label="Copy rhythm to"
+                             Text="{Binding ExportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             ToolTip.Tip="Where to save the rhythm guide map. Can also be an existing beatmap." />
+                    <Button Grid.Column="1" Classes="flat path-picker" Cursor="Hand" VerticalAlignment="Bottom"
+                            Command="{Binding UseCurrentExportCommand}"
+                            ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                        <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
+                    </Button>
+                    <Button Grid.Column="3" Classes="flat path-picker" Cursor="Hand" VerticalAlignment="Bottom"
+                            Command="{Binding BrowseExportCommand}"
+                            ToolTip.Tip="Select beatmaps with File Explorer.">
+                        <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+                    </Button>
+                </Grid>
 
-                    <ComboBox Width="300"
-                              Margin="0,10,0,0"
-                              HorizontalAlignment="Left"
-                              ItemsSource="{Binding ExportModes}"
-                              SelectedItem="{Binding ExportMode, Mode=TwoWay}"
-                              materialAssists:ComboBoxAssist.Label="Export mode" />
-                    <ComboBox Width="300"
-                              Margin="0,10,0,0"
-                              HorizontalAlignment="Left"
-                              ItemsSource="{Binding OutputGameModes}"
-                              SelectedItem="{Binding OutputGameMode, Mode=TwoWay}"
-                              materialAssists:ComboBoxAssist.Label="Export map game mode" />
-                    <TextBox Width="300"
-                             Margin="0,10,0,0"
-                             HorizontalAlignment="Left"
-                             materialAssists:TextFieldAssist.Label="Export map diff name"
-                             Text="{Binding OutputName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                    <CheckBox Margin="0,30,0,0"
-                              Content="NC everything"
-                              IsChecked="{Binding NcEverything, Mode=TwoWay}" />
-                    <ComboBox Width="300"
-                              Margin="0,10,0,0"
-                              HorizontalAlignment="Left"
-                              ItemsSource="{Binding SelectionModes}"
-                              SelectedItem="{Binding SelectionMode, Mode=TwoWay}"
-                              materialAssists:ComboBoxAssist.Label="Selection mode" />
-                </StackPanel>
+                <ComboBox Width="300" Margin="0,10,0,0" HorizontalAlignment="Left"
+                          ItemsSource="{Binding ExportModes}" SelectedItem="{Binding ExportMode}"
+                          materialAssists:ComboBoxAssist.Label="Export mode"
+                          ToolTip.Tip="Choose to either generate a completely new map or add the rhythm guide onto what's already in the map in the export field." />
+                <ComboBox Width="300" Margin="0,10,0,0" HorizontalAlignment="Left"
+                          ItemsSource="{Binding OutputGameModes}" SelectedItem="{Binding OutputGameMode}"
+                          materialAssists:ComboBoxAssist.Label="Export map game mode"
+                          ToolTip.Tip="The game mode of the rhythm guide. Only works in NewMap mode." />
+                <TextBox Width="300" Margin="0,10,0,0" HorizontalAlignment="Left"
+                         materialAssists:TextFieldAssist.Label="Export map diff name"
+                         Text="{Binding OutputName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="The difficulty name of the rhythm guide. Only works in NewMap mode." />
+                <CheckBox Margin="0,30,0,0" Content="NC everything" IsChecked="{Binding NcEverything}" />
+                <ComboBox Width="300" Margin="0,10,0,0" HorizontalAlignment="Left"
+                          ItemsSource="{Binding SelectionModes}" SelectedItem="{Binding SelectionMode}"
+                          materialAssists:ComboBoxAssist.Label="Selection mode"
+                          ToolTip.Tip="Select which events should be included in the rhythm guide map." />
+            </StackPanel>
 
-                <controls:ToolRunButton Margin="10"
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Bottom"
-                                        RunCommand="{Binding RunCommand}"
-                                        CancelCommand="{Binding CancelCommand}"
-                                        IsRunning="{Binding IsRunning}" />
-            </Grid>
-        </ScrollViewer>
+            <controls:ToolRunButton Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                    RunCommand="{Binding RunCommand}" />
+        </Grid>
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
-            <TextBlock VerticalAlignment="Bottom"
-                       FontWeight="Bold"
-                       Opacity="0.58"
-                       Text="Made by OliBomby" />
-            <controls:ToolProgressBar Grid.Column="1"
-                                      Classes="tool-progress"
-                                      Height="20"
-                                      Margin="20,0"
-                                      Maximum="100"
-                                      Value="{Binding Progress}" />
+            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
+            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100" Value="{Binding Progress}" />
         </Grid>
     </Grid>
 </UserControl>

@@ -305,23 +305,11 @@ public sealed class DialogAndValidationTests
         ValueDialogViewModel viewModel = CreateValueViewModel(
             _ => ValidationResult.Success,
             _ => acceptCount++);
-        ValueDialogConverter converter = new(
-            new ApplicationConverters.InvariantInt32Converter(),
-            viewModel.SetConversionError);
-
         // Act
-        object? result = converter.ConvertBack(
-            "not-a-number",
-            typeof(object),
-            null,
-            CultureInfo.InvariantCulture);
+        viewModel.ValueText = "not-a-number";
         viewModel.AcceptCommand.Execute(null);
 
         // Assert
-        result.Should().BeOfType<BindingNotification>();
-        ((BindingNotification)result).ErrorType
-            .Should()
-            .Be(BindingErrorType.DataValidationError);
         viewModel.IsValid.Should().BeFalse();
         acceptCount.Should().Be(0);
     }
@@ -354,22 +342,10 @@ public sealed class DialogAndValidationTests
         ValueDialogViewModel viewModel = CreateValueViewModel(
             _ => ValidationResult.Success,
             value => accepted = value);
-        ValueDialogConverter converter = new(
-            new ApplicationConverters.InvariantInt32Converter(),
-            viewModel.SetConversionError);
-        _ = converter.ConvertBack(
-            "not-a-number",
-            typeof(object),
-            null,
-            CultureInfo.InvariantCulture);
+        viewModel.ValueText = "not-a-number";
 
         // Act
-        object? converted = converter.ConvertBack(
-            "42",
-            typeof(object),
-            null,
-            CultureInfo.InvariantCulture);
-        viewModel.Value = converted;
+        viewModel.ValueText = "42";
         viewModel.AcceptCommand.Execute(null);
 
         // Assert
@@ -387,7 +363,7 @@ public sealed class DialogAndValidationTests
             value => accepted = value);
 
         // Act
-        viewModel.Value = 42;
+        viewModel.ValueText = "42";
         viewModel.AcceptCommand.Execute(null);
 
         // Assert
@@ -397,7 +373,7 @@ public sealed class DialogAndValidationTests
     }
 
     [TestMethod]
-    public void Value_RejectedByCustomAttribute_DisablesAcceptanceAndExposesError()
+    public void ValueText_RejectedByCustomAttribute_DisablesAcceptanceAndExposesError()
     {
         // Arrange
         int acceptCount = 0;
@@ -408,13 +384,13 @@ public sealed class DialogAndValidationTests
             _ => acceptCount++);
 
         // Act
-        viewModel.Value = 90;
+        viewModel.ValueText = "90";
         viewModel.AcceptCommand.Execute(null);
 
         // Assert
         viewModel.IsValid.Should().BeFalse();
         INotifyDataErrorInfo validation = viewModel;
-        validation.GetErrors(nameof(ValueDialogViewModel.Value))
+        validation.GetErrors(nameof(ValueDialogViewModel.ValueText))
             .Cast<ValidationResult>()
             .Select(result => result.ErrorMessage)
             .Should()
@@ -432,6 +408,8 @@ public sealed class DialogAndValidationTests
             "Type value",
             "Value",
             1,
+            new ApplicationConverters.InvariantInt32Converter(),
+            typeof(int),
             "OK",
             "Cancel",
             _ => ValidationResult.Success,
@@ -474,6 +452,8 @@ public sealed class DialogAndValidationTests
             "Type value",
             "Value",
             0,
+            new ApplicationConverters.InvariantInt32Converter(),
+            typeof(int),
             "OK",
             "Cancel",
             validate,

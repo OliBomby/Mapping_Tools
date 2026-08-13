@@ -1,43 +1,45 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.Interactions;
+using Mapping_Tools.Application.Interactions.Converters;
 using Mapping_Tools.Desktop.ViewModels.Dialogs.Validation;
 
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 
-/// <summary>
-/// Holds a type-erased value whose text conversion remains in the Avalonia binding.
-/// </summary>
+/// <summary>Owns editable dialog text and validates its converted value through DataAnnotations.</summary>
 public sealed partial class ValueDialogViewModel : ObservableValidator
 {
+    private readonly IValueConverter _converter;
+    private readonly Type _targetType;
     private readonly Func<object?, ValidationResult?> _validate;
     private readonly Action<object?> _accept;
     private readonly Action _cancel;
-    private bool _hasConversionError;
-    /// <summary>
-    /// Gets or sets the typed value produced by the field's binding converter.
-    /// </summary>
+    private object? _parsedValue;
+
+    /// <summary>Gets or sets the editable invariant text displayed in the value field.</summary>
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [DialogValue]
-    public partial object? Value { get; set; }
+    public partial string ValueText { get; set; }
 
-    /// <summary>
-    /// Creates typed dialog state and validates the initial value through DataAnnotations.
-    /// </summary>
+    /// <summary>Creates typed dialog state and validates the formatted initial value.</summary>
     /// <param name="title">The native window title.</param>
     /// <param name="prompt">The field instruction.</param>
-    /// <param name="initialValue">The initial typed value before binding conversion.</param>
+    /// <param name="initialValue">The initial typed value to format.</param>
+    /// <param name="converter">The application-layer text converter.</param>
+    /// <param name="targetType">The typed value expected after parsing.</param>
     /// <param name="acceptLabel">The Enter/default action label.</param>
     /// <param name="cancelLabel">The Escape/cancel action label.</param>
     /// <param name="validate">The typed application rules adapted to the erased value.</param>
-    /// <param name="accept">The callback receiving the validated, type-erased value.</param>
+    /// <param name="accept">The callback receiving the validated value.</param>
     /// <param name="cancel">The callback that closes the dialog without a value.</param>
     public ValueDialogViewModel(
         string title,
         string prompt,
         object? initialValue,
+        IValueConverter converter,
+        Type targetType,
         string acceptLabel,
         string cancelLabel,
         Func<object?, ValidationResult?> validate,
@@ -46,6 +48,8 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentException.ThrowIfNullOrWhiteSpace(prompt);
+        ArgumentNullException.ThrowIfNull(converter);
+        ArgumentNullException.ThrowIfNull(targetType);
         ArgumentNullException.ThrowIfNull(validate);
         ArgumentNullException.ThrowIfNull(accept);
         ArgumentNullException.ThrowIfNull(cancel);
@@ -54,59 +58,59 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
         Prompt = prompt;
         AcceptLabel = acceptLabel;
         CancelLabel = cancelLabel;
+        _converter = converter;
+        _targetType = targetType;
         _validate = validate;
         _accept = accept;
         _cancel = cancel;
-
+        ValueText = converter.Convert(initialValue, typeof(string), null, CultureInfo.InvariantCulture)?.ToString()
+            ?? string.Empty;
         ErrorsChanged += (_, _) => OnPropertyChanged(nameof(IsValid));
-        if (Equals(Value, initialValue))
-        {
-            ValidateProperty(Value, nameof(Value));
-        }
-        else
-        {
-            Value = initialValue;
-        }
+        ValidateProperty(ValueText, nameof(ValueText));
     }
 
-    /// <summary>
-    /// Gets the native window title.
-    /// </summary>
+    /// <summary>Gets the native window title.</summary>
     public string Title { get; }
 
-    /// <summary>
-    /// Gets the label or editing instruction above the field.
-    /// </summary>
+    /// <summary>Gets the label or editing instruction above the field.</summary>
     public string Prompt { get; }
 
-    /// <summary>
-    /// Gets whether conversion and every DataAnnotations rule currently succeed.
-    /// </summary>
-    public bool IsValid => !_hasConversionError && !HasErrors;
+    /// <summary>Gets whether conversion and every DataAnnotations rule currently succeed.</summary>
+    public bool IsValid => !HasErrors;
 
-    /// <summary>
-    /// Gets the label for the Enter/default action.
-    /// </summary>
+    /// <summary>Gets the label for the Enter/default action.</summary>
     public string AcceptLabel { get; }
 
-    /// <summary>
-    /// Gets the label for the Escape/cancel action.
-    /// </summary>
+    /// <summary>Gets the label for the Escape/cancel action.</summary>
     public string CancelLabel { get; }
 
-    internal ValidationResult? ValidateDialogValue(object? value) =>
-        _validate(value);
-
-    internal void SetConversionError(string? errorMessage)
+    internal ValidationResult? ValidateDialogText(object? value)
     {
-        bool hasError = errorMessage is not null;
-        if (_hasConversionError == hasError)
+        object? converted;
+        try
         {
-            return;
+            converted = _converter.ConvertBack(
+                value?.ToString(),
+                _targetType,
+                null,
+                CultureInfo.InvariantCulture);
+        }
+        catch (FormatException exception)
+        {
+            return new ValidationResult(exception.Message);
+        }
+        catch (InvalidCastException exception)
+        {
+            return new ValidationResult(exception.Message);
         }
 
-        _hasConversionError = hasError;
-        OnPropertyChanged(nameof(IsValid));
+        ValidationResult? result = _validate(converted);
+        if (result == ValidationResult.Success)
+        {
+            _parsedValue = converted;
+        }
+
+        return result;
     }
 
     [RelayCommand]
@@ -114,13 +118,12 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
     {
         ValidateAllProperties();
         OnPropertyChanged(nameof(IsValid));
-        if (!HasErrors && !_hasConversionError)
+        if (!HasErrors)
         {
-            _accept(Value);
+            _accept(_parsedValue);
         }
     }
 
     [RelayCommand]
-    private void Cancel() =>
-        _cancel();
+    private void Cancel() => _cancel();
 }

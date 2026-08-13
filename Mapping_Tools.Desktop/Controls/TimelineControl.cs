@@ -11,7 +11,11 @@ namespace Mapping_Tools.Desktop.Controls;
 /// <summary>Draws a compact, themeable timeline and invokes navigation for clicked markers.</summary>
 public sealed class TimelineControl : Control
 {
-    private const double LabelHeight = 16;
+    private const double ReservedRight = 110;
+    private const double LabelTop = 1;
+    private const double ElementTop = 14;
+    private const double ElementHeight = 52;
+    private const double LineY = 50;
     private const double HitTolerance = 4;
     private Cursor? _handCursor;
 
@@ -155,12 +159,10 @@ public sealed class TimelineControl : Control
     {
         base.Render(context);
         TimelineScale scale = CreateScale();
-        double width = Bounds.Width;
-        double height = Bounds.Height;
-        double lineY = LabelHeight + Math.Max(0, height - LabelHeight) / 2;
+        double width = TimelineWidth;
         if (LineBrush is not null)
         {
-            context.DrawLine(new Pen(LineBrush, 2), new Point(0, lineY), new Point(width, lineY));
+            context.DrawLine(new Pen(LineBrush, 2), new Point(0, LineY), new Point(width, LineY));
         }
 
         if (TickBrush is not null)
@@ -168,42 +170,25 @@ public sealed class TimelineControl : Control
             foreach (double tick in scale.GetTicks())
             {
                 double x = scale.ToUnit(tick) * width;
-                if (LineBrush is not null)
-                {
-                    context.DrawLine(
-                        new Pen(LineBrush, 1),
-                        new Point(x, LabelHeight),
-                        new Point(x, height));
-                }
-
                 FormattedText text = new(
                     TimelineScale.FormatTick(tick),
                     CultureInfo.InvariantCulture,
                     FlowDirection.LeftToRight,
-                    Typeface.Default,
+                    new Typeface("Consolas"),
                     10,
                     TickBrush);
-                context.DrawText(text, new Point(Math.Clamp(x - text.Width / 2, 0, Math.Max(0, width - text.Width)), 0));
+                context.DrawText(text, new Point(x, LabelTop));
+                DrawMarker(context, x, NeutralOuterBrush, NeutralInnerBrush, isScaleMark: true);
             }
         }
 
-        using (context.PushClip(new Rect(0, LabelHeight, width, Math.Max(0, height - LabelHeight))))
+        using (context.PushClip(new Rect(0, 0, width, Bounds.Height)))
         {
             foreach (TimelineMarker marker in Markers ?? [])
             {
                 double x = scale.ToUnit(marker.Time) * width;
                 (IBrush? outer, IBrush? inner) = GetBrushes(marker.Kind);
-                if (outer is not null)
-                {
-                    using (context.PushOpacity(0.3))
-                    {
-                        context.FillRectangle(outer, new Rect(x - 2.5, LabelHeight, 5, height - LabelHeight));
-                    }
-                }
-                if (inner is not null)
-                {
-                    context.FillRectangle(inner, new Rect(x - 0.5, LabelHeight, 1, height - LabelHeight));
-                }
+                DrawMarker(context, x, outer, inner, isScaleMark: false);
             }
         }
     }
@@ -211,7 +196,7 @@ public sealed class TimelineControl : Control
     /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize) => new(
         double.IsInfinity(availableSize.Width) ? 300 : availableSize.Width,
-        double.IsInfinity(availableSize.Height) ? 80 : Math.Max(50, availableSize.Height));
+        double.IsInfinity(availableSize.Height) ? 100 : Math.Max(100, availableSize.Height));
 
     /// <inheritdoc/>
     protected override void OnPointerMoved(PointerEventArgs eventArgs)
@@ -241,21 +226,41 @@ public sealed class TimelineControl : Control
         }
     }
 
-    internal TimelineMarker? MarkerAt(double x) => CreateScale()
-        .FindNearest(Markers ?? [], x, Bounds.Width, HitTolerance);
+    internal TimelineMarker? MarkerAt(double x) => x < 0 || x > TimelineWidth
+        ? null
+        : CreateScale().FindNearest(Markers ?? [], x, TimelineWidth, HitTolerance);
 
     internal static string FormatToolTip(TimelineMarker marker)
-    {
-        string timestamp = TimelineScale.FormatMarker(marker.Time);
-        return string.IsNullOrWhiteSpace(marker.Label)
-            ? timestamp
-            : $"{marker.Label} — {timestamp}";
-    }
+        => TimelineScale.FormatMarker(marker.Time);
 
     private TimelineScale CreateScale() =>
         double.IsFinite(StartTime) && double.IsFinite(EndTime)
             ? new TimelineScale(StartTime, EndTime)
             : new TimelineScale(0, 20);
+
+    private double TimelineWidth => Math.Max(0, Bounds.Width - ReservedRight);
+
+    private static void DrawMarker(
+        DrawingContext context,
+        double x,
+        IBrush? outer,
+        IBrush? inner,
+        bool isScaleMark)
+    {
+        double outerLeft = isScaleMark ? x : x - 1;
+        if (outer is not null)
+        {
+            using (context.PushOpacity(0.3))
+            {
+                context.FillRectangle(outer, new Rect(outerLeft, ElementTop, 5, ElementHeight));
+            }
+        }
+
+        if (inner is not null)
+        {
+            context.FillRectangle(inner, new Rect(outerLeft + 2, ElementTop, 1, ElementHeight));
+        }
+    }
 
     private (IBrush? Outer, IBrush? Inner) GetBrushes(TimelineMarkerKind kind) => kind switch
     {

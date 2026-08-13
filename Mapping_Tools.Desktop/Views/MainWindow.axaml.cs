@@ -5,7 +5,9 @@ using Avalonia.Interactivity;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Material.Icons;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
 
@@ -18,6 +20,7 @@ public partial class MainWindow : Window
 {
     private static readonly WindowBounds DefaultBounds = new(80, 60, 1500, 800);
     private readonly ApplicationSettings _settings;
+    private readonly SettingsPersistenceHostedService? _settingsPersistence;
     private WindowBounds _normalBounds = DefaultBounds;
     private bool _restored;
 
@@ -26,7 +29,7 @@ public partial class MainWindow : Window
     /// Runtime composition uses the settings-aware constructor.
     /// </summary>
     public MainWindow()
-        : this(new ApplicationSettings())
+        : this(new ApplicationSettings(), null)
     {
     }
 
@@ -35,12 +38,33 @@ public partial class MainWindow : Window
     /// </summary>
     public MainWindow(
         ApplicationSettings settings)
+        : this(settings, null)
+    {
+    }
+
+    /// <summary>
+    /// Loads the compiled shell and attaches window placement and shutdown-persistence state.
+    /// </summary>
+    /// <param name="settings">The process-lifetime settings document.</param>
+    /// <param name="settingsPersistence">The orderly-shutdown boundary used by Exit without saving.</param>
+    public MainWindow(
+        ApplicationSettings settings,
+        SettingsPersistenceHostedService? settingsPersistence)
     {
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _settingsPersistence = settingsPersistence;
         InitializeComponent();
         AddHandler(KeyDownEvent, HandleWindowKeyDown, RoutingStrategies.Tunnel);
         PositionChanged += (_, _) => CaptureNormalBounds();
         Resized += (_, _) => CaptureNormalBounds();
+        PropertyChanged += (_, eventArgs) =>
+        {
+            if (eventArgs.Property == WindowStateProperty)
+            {
+                UpdateWindowChrome();
+            }
+        };
+        UpdateWindowChrome();
     }
 
     /// <inheritdoc/>
@@ -142,6 +166,20 @@ public partial class MainWindow : Window
             : WindowState.Maximized;
 
     private void CloseWindow(object? sender, RoutedEventArgs eventArgs) => Close();
+
+    private void CloseWithoutSaving(object? sender, RoutedEventArgs eventArgs)
+    {
+        _settingsPersistence?.SuppressSave();
+        Close();
+    }
+
+    private void UpdateWindowChrome()
+    {
+        bool maximized = WindowState == WindowState.Maximized;
+        RootGrid.Margin = maximized ? new Thickness(7) : new Thickness(0);
+        WindowBorder.BorderThickness = maximized ? new Thickness(0) : new Thickness(1);
+        MaximizeIcon.Kind = maximized ? MaterialIconKind.WindowRestore : MaterialIconKind.WindowMaximize;
+    }
 
     private void HandleWindowKeyDown(object? sender, KeyEventArgs eventArgs)
     {

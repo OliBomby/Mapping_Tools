@@ -1,8 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Avalonia.Controls.Primitives;
 using FluentAssertions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Shell;
@@ -175,6 +177,29 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    public void MainViewModel_ActivateFeature_AppliesShellOwnedScrollContract()
+    {
+        // Arrange
+        using MainViewModel viewModel = CreateMainViewModel(
+        [
+            Registration("first", "First"),
+            Registration(
+                "second",
+                "Second",
+                horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
+                verticalScrollBarVisibility: ScrollBarVisibility.Visible)
+        ]);
+        ShellFeatureItemViewModel second = viewModel.FeatureItems.Single(item => item.Id == "second");
+
+        // Act
+        second.ActivateCommand.Execute(null);
+
+        // Assert
+        viewModel.ContentHorizontalScrollBarVisibility.Should().Be(ScrollBarVisibility.Auto);
+        viewModel.ContentVerticalScrollBarVisibility.Should().Be(ScrollBarVisibility.Visible);
+    }
+
+    [TestMethod]
     public async Task MainViewModel_RepeatedNotifications_QueuesInOrderAndDismissesIndependently()
     {
         // Arrange
@@ -237,6 +262,37 @@ public sealed class DesktopShellTests
         published.Should().ContainSingle();
         published[0].Severity.Should().Be(UserNotificationSeverity.Warning);
         published[0].Title.Should().Be("Could not open link");
+    }
+
+    [TestMethod]
+    public async Task MainViewModel_OpenDonateCommand_WhenExecuted_OpensLegacyDonationPage()
+    {
+        // Arrange
+        RecordingLauncher launcher = new();
+        using MainViewModel viewModel = CreateMainViewModel(launcher: launcher);
+
+        // Act
+        await ExecuteAsync(viewModel.OpenDonateCommand);
+
+        // Assert
+        launcher.OpenedUris.Should().ContainSingle()
+            .Which.Should().Be(new Uri("https://ko-fi.com/olibomby"));
+    }
+
+    [TestMethod]
+    public async Task MainViewModel_OpenAboutCommand_WhenExecuted_PresentsLegacyCredits()
+    {
+        // Arrange
+        TestDialogService dialogs = new();
+        using MainViewModel viewModel = CreateMainViewModel(dialogs: dialogs);
+
+        // Act
+        await ExecuteAsync(viewModel.OpenAboutCommand);
+
+        // Assert
+        dialogs.MessageCount.Should().Be(1);
+        dialogs.LastMessageRequest.Should().BeOfType<MessageDialogRequest<bool>>()
+            .Which.Message.Should().Contain("Supporters:").And.Contain("Contributors:");
     }
 
     [TestMethod]
@@ -319,7 +375,8 @@ public sealed class DesktopShellTests
         ApplicationSettings? settings = null,
         IUserNotificationService? notifications = null,
         IPlatformLauncher? launcher = null,
-        IBetterSaveService? betterSave = null)
+        IBetterSaveService? betterSave = null,
+        TestDialogService? dialogs = null)
     {
         ApplicationSettings resolvedSettings = settings ?? new ApplicationSettings();
         IUserNotificationService resolvedNotifications = notifications ?? new UserNotificationService();
@@ -343,21 +400,26 @@ public sealed class DesktopShellTests
             launcher ?? new RecordingLauncher(),
             dispatcher,
             workspace,
-            betterSave ?? new TestBetterSaveService());
+            betterSave ?? new TestBetterSaveService(),
+            dialogs ?? new TestDialogService());
     }
 
     private static ShellFeatureRegistration Registration(
         string id,
         string displayName,
         Func<ObservableObject>? factory = null,
-        string category = "Tools") =>
+        string category = "Tools",
+        ScrollBarVisibility horizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+        ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled) =>
         new(
             id,
             displayName,
             category,
             $"Open {displayName}.",
             [displayName, id],
-            factory ?? (() => new StubFeatureViewModel()));
+            factory ?? (() => new StubFeatureViewModel()),
+            horizontalScrollBarVisibility: horizontalScrollBarVisibility,
+            verticalScrollBarVisibility: verticalScrollBarVisibility);
 
     private sealed class StubFeatureViewModel : ObservableObject, IShellFeatureActivation
     {

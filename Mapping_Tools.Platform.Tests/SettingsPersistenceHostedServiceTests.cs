@@ -26,6 +26,21 @@ public sealed class SettingsPersistenceHostedServiceTests
         settingsService.LastSaved.Should().BeSameAs(settings);
     }
 
+    [TestMethod]
+    public async Task StopAsync_AfterSuppressSave_DoesNotPersistSettings()
+    {
+        // Arrange
+        RecordingSettingsService settingsService = new();
+        SettingsPersistenceHostedService service = new(new ApplicationSettings(), settingsService);
+        service.SuppressSave();
+
+        // Act
+        await service.StopAsync(CancellationToken.None);
+
+        // Assert
+        settingsService.SaveCount.Should().Be(0);
+    }
+
     private sealed class RecordingSettingsService : ISettingsService
     {
         public int SaveCount { get; private set; }

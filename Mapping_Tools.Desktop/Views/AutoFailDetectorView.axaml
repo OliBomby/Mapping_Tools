@@ -6,83 +6,60 @@
              x:Class="Mapping_Tools.Desktop.Views.AutoFailDetectorView"
              x:DataType="vm:AutoFailDetectorViewModel">
     <Grid RowDefinitions="*,Auto,Auto">
-        <ScrollViewer x:Name="ToolScroller"
-                      HorizontalScrollBarVisibility="Auto"
-                      VerticalScrollBarVisibility="Auto">
-            <Grid Width="{Binding Viewport.Width, ElementName=ToolScroller}"
-                  MinWidth="300"
-                  Margin="0,0,0,10">
-                <StackPanel>
-                    <controls:ToolViewHeader
-                        Title="Auto-fail Detector"
-                        IsQuickRunSupported="True"
-                        HelpText="Detects cases of incorrect object loading in a beatmap which makes osu! unable to calculate scores correctly.&#x0a;&#x0a;Auto-fail is most often caused by placing other hit objects during sliders, so multiple hit objects are active at the same time (also known as 2B patterns).&#x0a;&#x0a;Use the AR and OD overrides to see what would happen with difficulty-changing mods." />
+        <Grid Margin="0,0,0,10">
+            <StackPanel>
+                <controls:ToolViewHeader
+                    Title="Auto-fail Detector"
+                    IsQuickRunSupported="True"
+                    HelpText="Detects cases of incorrect object loading in a beatmap which makes osu! unable to calculate scores correctly.&#x0a;&#x0a;Auto-fail is most often caused by placing other hit objects during sliders, so there are multiple hit objects going on at the same time also known as &quot;2B&quot; patterns.&#x0a;&#x0a;Use the AR and OD override options to see what would happen when you use hardrock mod on the map." />
 
-                    <CheckBox Content="Show unloading hit objects"
-                              IsChecked="{Binding ShowUnloadingObjects, Mode=TwoWay}"
-                              ToolTip.Tip="Show unloading objects in red on the timeline." />
-                    <CheckBox Content="Show potential unloading hit objects"
-                              IsChecked="{Binding ShowPotentialUnloadingObjects, Mode=TwoWay}"
-                              ToolTip.Tip="Show potentially unloading objects in green on the timeline." />
-                    <CheckBox Content="Show disrupting hit objects"
-                              IsChecked="{Binding ShowPotentialDisruptors, Mode=TwoWay}"
-                              ToolTip.Tip="Show disrupting objects in purple on the timeline." />
-                    <CheckBox Content="Get auto-fail fix guide"
-                              IsChecked="{Binding GetAutoFailFix, Mode=TwoWay}" />
-                    <CheckBox Content="Auto-insert spinners"
-                              IsEnabled="{Binding GetAutoFailFix}"
-                              IsChecked="{Binding AutoPlaceFix, Mode=TwoWay}" />
+                <CheckBox FontSize="14" Cursor="Hand" Content="Show unloading hit objects"
+                          IsChecked="{Binding ShowUnloadingObjects}"
+                          ToolTip.Tip="Show the start times of unloading hit objects which cause auto-fail. Red in the timeline." />
+                <CheckBox FontSize="14" Cursor="Hand" Content="Show potential unloading hit objects"
+                          IsChecked="{Binding ShowPotentialUnloadingObjects}"
+                          ToolTip.Tip="Show the start times of hit objects which could unload to cause auto-fail depending on the object counts. Green in the timeline." />
+                <CheckBox FontSize="14" Cursor="Hand" Content="Show disrupting hit objects"
+                          IsChecked="{Binding ShowPotentialDisruptors}"
+                          ToolTip.Tip="Show the start times of hit objects which cause the potential unloading of other hit objects. Purple in the timeline." />
+                <CheckBox FontSize="14" Cursor="Hand" Content="Get auto-fail fix guide"
+                          IsChecked="{Binding GetAutoFailFix}"
+                          ToolTip.Tip="Get a guide on where to place extra objects such that there will be no auto-fail anymore." />
+                <CheckBox FontSize="14" Cursor="Hand" Content="Auto-insert spinners"
+                          IsChecked="{Binding AutoPlaceFix}"
+                          ToolTip.Tip="Automatically place spinners according to the guide on where to place extra objects such that there will be no auto-fail anymore. This adds negative length spinners at probably unwanted moments. It's recommended to place your objects yourself." />
 
-                    <TextBox Width="258"
-                             Margin="0,10,0,0"
-                             HorizontalAlignment="Left"
-                             materialAssists:TextFieldAssist.Label="AR override"
-                             Text="{ReflectionBinding ApproachRateOverride, Converter={StaticResource InvariantDoubleConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                             ToolTip.Tip="Use -1 to read the map's approach rate." />
-                    <TextBox Width="258"
-                             Margin="0,10,0,0"
-                             HorizontalAlignment="Left"
-                             materialAssists:TextFieldAssist.Label="OD override"
-                             Text="{ReflectionBinding OverallDifficultyOverride, Converter={StaticResource InvariantDoubleConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                             ToolTip.Tip="Use -1 to read the map's overall difficulty." />
-                    <TextBox Width="258"
-                             Margin="0,20,0,0"
-                             HorizontalAlignment="Left"
-                             materialAssists:TextFieldAssist.Label="Physics update leniency"
-                             Text="{ReflectionBinding PhysicsUpdateLeniency, Converter={StaticResource InvariantInt32Converter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                             ToolTip.Tip="Required unload delay in milliseconds; 9 ms or more is recommended." />
-                </StackPanel>
+                <TextBox Width="258" Margin="0,10,0,0" HorizontalAlignment="Left"
+                         materialAssists:TextFieldAssist.Label="AR override"
+                         Text="{ReflectionBinding ApproachRateOverride, Converter={StaticResource InvariantDoubleConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="Override the approach rate used for finding the loaded hit objects. Use -1 for no override." />
+                <TextBox Width="258" Margin="0,10,0,0" HorizontalAlignment="Left"
+                         materialAssists:TextFieldAssist.Label="OD override"
+                         Text="{ReflectionBinding OverallDifficultyOverride, Converter={StaticResource InvariantDoubleConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="Override the overall difficulty used for finding which hit objects unload incorrectly. Use -1 for no override." />
+                <TextBox Width="258" Margin="0,20,0,0" HorizontalAlignment="Left"
+                         materialAssists:TextFieldAssist.Label="Physics update leniency"
+                         Text="{ReflectionBinding PhysicsUpdateLeniency, Converter={StaticResource InvariantInt32Converter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="Time in milliseconds to require objects to unload later to account for the update frequency of the physics engine. A value of 9ms or higher is recommended, so players with 120fps (8.33ms frame time) can pass the map. Increase it further if your map is really laggy." />
+            </StackPanel>
 
-                <controls:ToolRunButton Margin="10"
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Bottom"
-                                        RunCommand="{Binding RunCommand}"
-                                        CancelCommand="{Binding CancelCommand}"
-                                        IsRunning="{Binding IsRunning}" />
-            </Grid>
-        </ScrollViewer>
-
-        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
-            <TextBlock VerticalAlignment="Bottom"
-                       FontWeight="Bold"
-                       Opacity="0.58"
-                       Text="Made by OliBomby &amp; Karoo" />
-            <controls:ToolProgressBar Grid.Column="1"
-                                      Classes="tool-progress"
-                                      Height="20"
-                                      Margin="20,0"
-                                      Maximum="100"
-                                      Value="{Binding Progress}" />
+            <controls:ToolRunButton Margin="10"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    RunCommand="{Binding RunCommand}" />
         </Grid>
 
-        <StackPanel Grid.Row="2"
-                    IsVisible="{Binding HasRun}"
-                    ToolTip.Tip="Red lines unload and cause auto-fail; green lines may unload; purple lines disrupt other objects. Click a line to navigate.">
-            <controls:TimelineControl Height="100"
-                                      StartTime="0"
-                                      EndTime="{Binding EndTime}"
-                                      Markers="{Binding Markers}"
-                                      NavigateCommand="{Binding NavigateCommand}" />
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58"
+                       Text="Made by OliBomby &amp; Karoo" />
+            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0"
+                                      Maximum="100" Value="{Binding Progress}" />
+        </Grid>
+
+        <StackPanel Grid.Row="2" IsVisible="{Binding HasRun}"
+                    ToolTip.Tip="This timeline shows where the auto-fail occurs. Red lines show the objects which unload and cause auto-fail. Green lines show the objects which could potentially unload with different object counts. Purple lines show objects which make other objects potentially unload. You can double-click the lines to go to that time.">
+            <controls:TimelineControl Height="100" StartTime="0" EndTime="{Binding EndTime}"
+                                      Markers="{Binding Markers}" NavigateCommand="{Binding NavigateCommand}" />
         </StackPanel>
     </Grid>
 </UserControl>

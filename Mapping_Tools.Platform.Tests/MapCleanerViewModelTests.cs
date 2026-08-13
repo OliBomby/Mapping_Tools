@@ -36,7 +36,7 @@ public sealed class MapCleanerViewModelTests
         cleaner.Paths.Should().Equal("map.osu");
         viewModel.ResultSummary.Should().Be("Successfully removed 16 greenlines and resnapped 20 objects!");
         viewModel.Markers.Should().HaveCount(3);
-        viewModel.Progress.Should().Be(100);
+        viewModel.Progress.Should().Be(0);
         viewModel.HasRun.Should().BeTrue();
     }
 
@@ -60,6 +60,22 @@ public sealed class MapCleanerViewModelTests
         // Assert
         reload.ReloadCount.Should().Be(0);
         viewModel.ResultSummary.Should().StartWith("Successfully removed");
+    }
+
+    [TestMethod]
+    public async Task RunCommand_WithMultipleMaps_DoesNotExposeEmptyTimeline()
+    {
+        // Arrange
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["first.osu", "second.osu"]);
+        MapCleanerViewModel viewModel = Create(new RecordingCleaner(), workspace: workspace);
+
+        // Act
+        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+
+        // Assert
+        viewModel.HasRun.Should().BeFalse();
+        viewModel.Markers.Should().BeEmpty();
     }
 
     [TestMethod]

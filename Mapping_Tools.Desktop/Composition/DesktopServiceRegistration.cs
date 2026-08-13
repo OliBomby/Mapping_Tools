@@ -79,7 +79,9 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton(provider =>
             provider.GetRequiredService<ISettingsService>().LoadOrCreate().Settings);
-        services.AddHostedService<SettingsPersistenceHostedService>();
+        services.AddSingleton<SettingsPersistenceHostedService>();
+        services.AddHostedService(provider =>
+            provider.GetRequiredService<SettingsPersistenceHostedService>());
         services.AddHostedService<MappingToolQuickRunHostedService>();
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ITextFileStore, FileSystemFileStore>();

@@ -106,7 +106,7 @@ public sealed class PreferencesViewModelTests
     }
 
     [TestMethod]
-    public void MaxBackupFiles_WithOutOfRangeThenValidValue_OnlyAppliesValidValue()
+    public void MaxBackupFiles_WithZeroAndLargeValue_AppliesWithoutInventedRange()
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
@@ -114,30 +114,15 @@ public sealed class PreferencesViewModelTests
 
         // Act
         viewModel.MaxBackupFiles = 0;
+        viewModel.MaxBackupFiles = int.MaxValue;
 
         // Assert
-        INotifyDataErrorInfo validation = viewModel;
-        validation.GetErrors(nameof(PreferencesViewModel.MaxBackupFiles))
-            .Cast<ValidationResult>()
-            .Select(result => result.ErrorMessage)
-            .Should()
-            .Equal("Use a whole number from 1 through 100000.");
-        settings.MaxBackupFiles.Should().Be(25);
-
-        // Act
-        viewModel.MaxBackupFiles = 500;
-
-        // Assert
-        validation.GetErrors(nameof(PreferencesViewModel.MaxBackupFiles))
-            .Cast<ValidationResult>()
-            .Select(result => result.ErrorMessage)
-            .Should()
-            .BeEmpty();
-        settings.MaxBackupFiles.Should().Be(500);
+        settings.MaxBackupFiles.Should().Be(int.MaxValue);
+        ((INotifyDataErrorInfo)viewModel).HasErrors.Should().BeFalse();
     }
 
     [TestMethod]
-    public void PeriodicBackupInterval_WithTooShortThenValidValue_OnlyAppliesValidInterval()
+    public void PeriodicBackupInterval_WithZero_AppliesWithoutInventedMinimum()
     {
         // Arrange
         ApplicationSettings settings = CreateSettings();
@@ -147,24 +132,8 @@ public sealed class PreferencesViewModelTests
         viewModel.PeriodicBackupInterval = TimeSpan.Zero;
 
         // Assert
-        INotifyDataErrorInfo validation = viewModel;
-        validation.GetErrors(nameof(PreferencesViewModel.PeriodicBackupInterval))
-            .Cast<ValidationResult>()
-            .Select(result => result.ErrorMessage)
-            .Should()
-            .Equal("Use an interval of at least one second.");
-        settings.PeriodicBackupInterval.Should().Be(TimeSpan.FromMinutes(5));
-
-        // Act
-        viewModel.PeriodicBackupInterval = TimeSpan.FromMinutes(15);
-
-        // Assert
-        validation.GetErrors(nameof(PreferencesViewModel.PeriodicBackupInterval))
-            .Cast<ValidationResult>()
-            .Select(result => result.ErrorMessage)
-            .Should()
-            .BeEmpty();
-        settings.PeriodicBackupInterval.Should().Be(TimeSpan.FromMinutes(15));
+        settings.PeriodicBackupInterval.Should().Be(TimeSpan.Zero);
+        ((INotifyDataErrorInfo)viewModel).HasErrors.Should().BeFalse();
     }
 
     [TestMethod]

@@ -40,10 +40,19 @@ separately, transforms it, and saves it through `IBeatmapEditingGateway`.
 Overwriting an existing new-map destination also uses the gateway. A genuinely
 new destination is written directly because no prior file exists to protect.
 
-This intentionally corrects the accepted legacy safety discrepancy: WPF backed
-up source maps even though Add-to-map mutated the export target. Avalonia creates
-the mandatory backup for the file actually overwritten. Read-only sources are
-not copied merely because they were inputs.
+Before opening any source, Avalonia now submits every ordered source path to the
+preference-respecting backup service, matching WPF's generation contract. The
+editing gateway still makes its mandatory safety copy when an existing export
+target is overwritten, so source compatibility and destination safety are both
+preserved.
+
+The form keeps the typed source-path array and uses a two-way `|` text converter
+only at the binding edge. Export Browse always opens an osu! beatmap picker in
+both modes. New-map completion remains silent and does not reveal the output;
+Add-to-map reports `Done!`. The shell and auxiliary window share the same form,
+and the auxiliary window restores the WPF borderless 35-pixel chrome, one-pixel
+border, ten-pixel content inset, drag, double-click maximize/restore, and
+five-pixel resize affordances.
 
 Existing project files remain compatible. The serializer maps legacy
 `RhythmGuideVm` and nested `RhythmGuideGeneratorArgs` type metadata to the new

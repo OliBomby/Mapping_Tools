@@ -29,6 +29,7 @@
                  Margin="16,16,16,0"
                  FontSize="18"
                  FontWeight="Medium"
+                 Text="{Binding ValueText, Mode=TwoWay}"
                  materialAssists:TextFieldAssist.Label="{Binding Prompt}" />
         <StackPanel Grid.Row="1"
                     Margin="16,16,16,16"

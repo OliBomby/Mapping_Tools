@@ -30,16 +30,16 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
     private readonly IFilePicker _filePicker;
     private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
     private readonly IProjectService _projects;
-    private readonly IFileRevealService _fileReveal;
     private readonly IRhythmGuideWindowService _windowService;
     private readonly IUserNotificationService _notifications;
     private readonly ProjectDefinition<RhythmGuideProject> _definition;
     private IBeatDivisor[] _beatDivisors = DefaultBeatDivisors();
     private bool _loadedAutosave;
 
-    /// <summary>Gets or sets source beatmap paths separated by vertical bars.</summary>
+    /// <summary>Gets or sets the source beatmap paths in selection order.</summary>
     [ObservableProperty]
-    public partial string SourcePathsText { get; set; } = string.Empty;
+    [NotifyPropertyChangedFor(nameof(SourceCount))]
+    public partial string[] SourcePaths { get; set; } = [];
 
     /// <summary>Gets or sets the destination beatmap path.</summary>
     [ObservableProperty]
@@ -81,7 +81,6 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
     /// <param name="filePicker">Selects source and destination beatmap files.</param>
     /// <param name="currentBeatmapLocator">Finds the beatmap open in osu!.</param>
     /// <param name="projects">Loads, saves, and autosaves typed projects.</param>
-    /// <param name="fileReveal">Reveals newly generated beatmaps.</param>
     /// <param name="windowService">Opens the auxiliary Rhythm Guide window.</param>
     /// <param name="notifications">Publishes project persistence failures.</param>
     /// <param name="directories">Supplies the default export directory.</param>
@@ -91,7 +90,6 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         IFilePicker filePicker,
         ICurrentBeatmapLocator currentBeatmapLocator,
         IProjectService projects,
-        IFileRevealService fileReveal,
         IRhythmGuideWindowService windowService,
         IUserNotificationService notifications,
         IApplicationDirectories directories)
@@ -101,7 +99,6 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         _currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         _projects = projects ?? throw new ArgumentNullException(nameof(projects));
-        _fileReveal = fileReveal ?? throw new ArgumentNullException(nameof(fileReveal));
         _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         ArgumentNullException.ThrowIfNull(directories);
@@ -125,7 +122,7 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         Enum.GetValues<RhythmGuideSelectionMode>();
 
     /// <summary>Gets the number of non-empty source beatmap paths.</summary>
-    public int SourceCount => ParsePaths(SourcePathsText).Length;
+    public int SourceCount => SourcePaths.Length;
 
     /// <summary>Restores the autosaved project the first time this feature is activated.</summary>
     public void Activate()
@@ -189,7 +186,7 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
             });
         if (paths.Count > 0)
         {
-            SourcePathsText = string.Join('|', paths);
+            SourcePaths = paths.ToArray();
         }
     }
 
@@ -199,43 +196,24 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         string? path = await _currentBeatmapLocator.FindCurrentBeatmapAsync();
         if (!string.IsNullOrWhiteSpace(path))
         {
-            SourcePathsText = path;
+            SourcePaths = [path];
         }
     }
 
     [RelayCommand]
     private async Task BrowseExportAsync()
     {
-        if (ExportMode == RhythmGuideExportMode.AddToMap)
-        {
-            IReadOnlyList<string> paths = await _filePicker.PickOpenFilesAsync(
-                new OpenFilePickerRequest
-                {
-                    Title = "Copy rhythm to",
-                    SuggestedStartLocation = ExportPath,
-                    AllowMultiple = false,
-                    Filters = [BeatmapFilter]
-                });
-            if (paths.Count > 0)
+        IReadOnlyList<string> paths = await _filePicker.PickOpenFilesAsync(
+            new OpenFilePickerRequest
             {
-                ExportPath = paths[0];
-            }
-            return;
-        }
-
-        string? path = await _filePicker.PickSaveFileAsync(
-            new SaveFilePickerRequest
-            {
-                Title = "Save rhythm guide",
+                Title = "Copy rhythm to",
                 SuggestedStartLocation = ExportPath,
-                SuggestedFileName = Path.GetFileName(ExportPath),
-                DefaultExtension = "osu",
-                ShowOverwritePrompt = true,
+                AllowMultiple = false,
                 Filters = [BeatmapFilter]
             });
-        if (path is not null)
+        if (paths.Count > 0)
         {
-            ExportPath = path;
+            ExportPath = paths[0];
         }
     }
 
@@ -273,18 +251,14 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
                         context.ReportProgress(100, "Complete");
                         return new ToolExecutionOutput<RhythmGuideResult>(
                             generated,
-                            $"Added {generated.AddedObjectCount} rhythm-guide objects.",
+                            generated.ExportMode == RhythmGuideExportMode.AddToMap ? "Done!" : null,
                             reloadEditor: generated.ExportMode == RhythmGuideExportMode.AddToMap);
                     }),
                 progress);
-            if (result.Status == ToolExecutionStatus.Succeeded &&
-                result.Value?.ExportMode == RhythmGuideExportMode.NewMap)
-            {
-                await _fileReveal.RevealAsync(result.Value.ExportPath);
-            }
         }
         finally
         {
+            Progress = 0;
             IsRunning = false;
         }
     }
@@ -302,7 +276,7 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
 
     private RhythmGuideOptions CreateOptions() => new()
     {
-        Paths = ParsePaths(SourcePathsText),
+        Paths = SourcePaths.ToArray(),
         ExportPath = ExportPath,
         ExportMode = ExportMode,
         OutputGameMode = OutputGameMode,
@@ -316,7 +290,7 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
     {
         ValidateProject(project);
         RhythmGuideOptions options = project.GuideGeneratorArgs;
-        SourcePathsText = string.Join('|', options.Paths);
+        SourcePaths = options.Paths.ToArray();
         ExportPath = options.ExportPath;
         ExportMode = options.ExportMode;
         OutputGameMode = options.OutputGameMode;
@@ -365,11 +339,7 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
             message,
             exception));
 
-    private string? FirstPathOrNull() => ParsePaths(SourcePathsText).FirstOrDefault();
-
-    private static string[] ParsePaths(string value) => value.Split(
-        '|',
-        StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+    private string? FirstPathOrNull() => SourcePaths.FirstOrDefault();
 
     private static RhythmGuideProject CreateDefaultProject(string exportPath) => new()
     {
@@ -395,8 +365,4 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         }
     }
 
-    partial void OnSourcePathsTextChanged(string value)
-    {
-        OnPropertyChanged(nameof(SourceCount));
-    }
 }

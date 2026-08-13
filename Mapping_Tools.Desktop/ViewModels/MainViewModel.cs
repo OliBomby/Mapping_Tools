@@ -1,8 +1,12 @@
 using System.Collections.ObjectModel;
+using System.Reflection;
+using System.Text;
+using Avalonia.Controls.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Shell;
@@ -17,12 +21,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
     private static readonly Uri WebsiteUri = new("https://mappingtools.github.io");
     private static readonly Uri GitHubUri = new("https://github.com/OliBomby/Mapping_Tools");
+    private static readonly Uri DonateUri = new("https://ko-fi.com/olibomby");
     private readonly IShellFeatureRegistry _registry;
     private readonly ApplicationSettings _settings;
     private readonly IUserNotificationService _notifications;
     private readonly IPlatformLauncher _launcher;
     private readonly IUiDispatcher _dispatcher;
     private readonly IBetterSaveService _betterSave;
+    private readonly IDialogService _dialogs;
     private readonly Dictionary<string, ObservableObject> _featureViewModels =
         new(StringComparer.OrdinalIgnoreCase);
     private string _searchText = string.Empty;
@@ -38,6 +44,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <param name="dispatcher">Marshals notification changes to the UI thread.</param>
     /// <param name="workspace">Presents current-map and safety-copy actions in shell chrome.</param>
     /// <param name="betterSave">Saves the current live editor state through the shared safety gateway.</param>
+    /// <param name="dialogs">Presents shell-owned information dialogs.</param>
     public MainViewModel(
         IShellFeatureRegistry registry,
         ApplicationSettings settings,
@@ -45,7 +52,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         IPlatformLauncher launcher,
         IUiDispatcher dispatcher,
         BeatmapWorkspaceViewModel workspace,
-        IBetterSaveService betterSave)
+        IBetterSaveService betterSave,
+        IDialogService dialogs)
     {
         _registry = registry ?? throw new ArgumentNullException(nameof(registry));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -54,6 +62,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         Workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         _betterSave = betterSave ?? throw new ArgumentNullException(nameof(betterSave));
+        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
 
         FeatureItems = registry.Features
             .Select((registration, order) => new ShellFeatureItemViewModel(
@@ -119,6 +128,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial string Header { get; private set; } = "Mapping Tools";
 
+    /// <summary>Gets the active feature's shell-owned horizontal scrolling behavior.</summary>
+    [ObservableProperty]
+    public partial ScrollBarVisibility ContentHorizontalScrollBarVisibility { get; private set; }
+
+    /// <summary>Gets the active feature's shell-owned vertical scrolling behavior.</summary>
+    [ObservableProperty]
+    public partial ScrollBarVisibility ContentVerticalScrollBarVisibility { get; private set; }
+
     /// <summary>Gets whether the active feature exposes typed project operations.</summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SaveProjectCommand))]
@@ -160,15 +177,17 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             previous.Deactivate();
         }
 
+        ShellFeatureRegistration registration = _registry.Find(item.Id)
+            ?? throw new InvalidOperationException($"Feature '{item.Id}' is not registered.");
         if (!_featureViewModels.TryGetValue(item.Id, out ObservableObject? viewModel))
         {
-            ShellFeatureRegistration registration = _registry.Find(item.Id)
-                ?? throw new InvalidOperationException($"Feature '{item.Id}' is not registered.");
             viewModel = registration.CreateViewModel();
             _featureViewModels.Add(item.Id, viewModel);
         }
 
         CurrentFeature = viewModel;
+        ContentHorizontalScrollBarVisibility = registration.HorizontalScrollBarVisibility;
+        ContentVerticalScrollBarVisibility = registration.VerticalScrollBarVisibility;
         HasProjectMenu = viewModel is IShellProjectFeature;
         Header = item.DisplayName == "Get started"
             ? "Mapping Tools"
@@ -194,6 +213,46 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private Task OpenGitHubAsync() =>
         OpenUriAsync(GitHubUri, "source repository");
+
+    [RelayCommand]
+    private Task OpenDonateAsync() =>
+        OpenUriAsync(DonateUri, "donation page");
+
+    [RelayCommand]
+    private async Task OpenAboutAsync()
+    {
+        Version? version = Assembly.GetEntryAssembly()?.GetName().Version;
+        StringBuilder message = new();
+        message.AppendLine($"Mapping Tools {version}");
+        message.AppendLine();
+        message.AppendLine("Made by:");
+        message.AppendLine("OliBomby");
+        message.AppendLine();
+        message.AppendLine("Supporters:");
+        message.AppendLine("Mercury");
+        message.AppendLine("Ryuusei Aika");
+        message.AppendLine("Pon -");
+        message.AppendLine("Spoppyboi");
+        message.AppendLine("fanzhen0019");
+        message.AppendLine("spon");
+        message.AppendLine("Joshua Saku");
+        message.AppendLine("Julaaaan");
+        message.AppendLine("pizzafanboy");
+        message.AppendLine("ZEduards");
+        message.AppendLine("Dcs");
+        message.AppendLine();
+        message.AppendLine("Contributors:");
+        message.AppendLine("Potoofu");
+        message.AppendLine("Karoo13");
+        message.AppendLine("Coppertine");
+        message.Append("JPK314");
+
+        await _dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
+            "Info",
+            message.ToString(),
+            [new DialogChoice<bool>("OK", true, IsDefault: true, IsCancel: true)],
+            true));
+    }
 
     [RelayCommand]
     private Task BetterSaveAsync() => _betterSave.ExecuteAsync();

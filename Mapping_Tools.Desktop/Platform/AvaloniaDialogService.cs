@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using System.ComponentModel.DataAnnotations;
 using Mapping_Tools.Application.Interactions;
-using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Mapping_Tools.Desktop.Views.Dialogs;
 
@@ -84,16 +83,14 @@ public sealed class AvaloniaDialogService : IDialogService
             request.Title,
             request.Prompt,
             request.InitialValue,
+            request.Converter,
+            typeof(TValue),
             request.AcceptLabel,
             request.CancelLabel,
             value => Validate(value, request),
             value => window.Close(new ResultBox<TValue>((TValue)value!)),
             () => window.Close());
-        ValueDialogConverter converter = new(
-            request.Converter,
-            viewModel.SetConversionError);
         window.DataContext = viewModel;
-        window.BindValue(converter);
 
         Task<object?> lifetime = window.ShowDialog<object?>(_owner());
         using CancellationTokenRegistration registration =

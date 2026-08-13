@@ -26,21 +26,18 @@ public sealed class RhythmGuideViewModelTests
         await ExecuteAsync(viewModel.BrowseSourcesCommand);
 
         // Assert
-        viewModel.SourcePathsText.Should().Be("first.osu|second.osu");
+        viewModel.SourcePaths.Should().Equal("first.osu", "second.osu");
         viewModel.SourceCount.Should().Be(2);
         picker.LastOpenRequest!.AllowMultiple.Should().BeTrue();
     }
 
     [TestMethod]
-    public async Task RunCommand_WithNewMap_ExecutesUseCaseAndRevealsOutput()
+    public async Task RunCommand_WithNewMap_ExecutesUseCaseWithoutCompletionMessageOrReveal()
     {
         // Arrange
         RecordingRhythmGuideService rhythmGuide = new();
-        TestFileRevealService reveal = new();
-        RhythmGuideViewModel viewModel = CreateViewModel(
-            rhythmGuide: rhythmGuide,
-            fileReveal: reveal);
-        viewModel.SourcePathsText = "source.osu";
+        RhythmGuideViewModel viewModel = CreateViewModel(rhythmGuide: rhythmGuide);
+        viewModel.SourcePaths = ["source.osu"];
         viewModel.ExportPath = "guide.osu";
 
         // Act
@@ -49,9 +46,44 @@ public sealed class RhythmGuideViewModelTests
         // Assert
         rhythmGuide.Options.Should().NotBeNull();
         rhythmGuide.Options!.Paths.Should().Equal("source.osu");
-        reveal.RevealedPaths.Should().Equal("guide.osu");
-        viewModel.Progress.Should().Be(100);
+        viewModel.Progress.Should().Be(0);
         viewModel.IsRunning.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task BrowseExportCommand_WithNewMap_UsesBeatmapOpenPicker()
+    {
+        // Arrange
+        TestFilePicker picker = new() { OpenFiles = ["target.osu"] };
+        RhythmGuideViewModel viewModel = CreateViewModel(filePicker: picker);
+        viewModel.ExportMode = RhythmGuideExportMode.NewMap;
+
+        // Act
+        await ExecuteAsync(viewModel.BrowseExportCommand);
+
+        // Assert
+        picker.LastOpenRequest.Should().NotBeNull();
+        picker.LastOpenRequest!.AllowMultiple.Should().BeFalse();
+        viewModel.ExportPath.Should().Be("target.osu");
+    }
+
+    [TestMethod]
+    public async Task RunCommand_WithAddToMap_PublishesLegacyDoneMessage()
+    {
+        // Arrange
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        RhythmGuideViewModel viewModel = CreateViewModel(notifications: notifications);
+        viewModel.SourcePaths = ["source.osu"];
+        viewModel.ExportPath = "target.osu";
+        viewModel.ExportMode = RhythmGuideExportMode.AddToMap;
+
+        // Act
+        await ExecuteAsync(viewModel.RunCommand);
+
+        // Assert
+        published.Should().ContainSingle(notification => notification.Message == "Done!");
     }
 
     [TestMethod]
@@ -71,9 +103,9 @@ public sealed class RhythmGuideViewModelTests
     private static RhythmGuideViewModel CreateViewModel(
         RecordingRhythmGuideService? rhythmGuide = null,
         TestFilePicker? filePicker = null,
-        TestFileRevealService? fileReveal = null)
+        UserNotificationService? notifications = null)
     {
-        UserNotificationService notifications = new();
+        notifications ??= new UserNotificationService();
         ToolExecutionService execution = new(
             notifications,
             new StubReloadService(),
@@ -85,7 +117,6 @@ public sealed class RhythmGuideViewModelTests
             filePicker ?? new TestFilePicker(),
             new StubCurrentBeatmapLocator(),
             new StubProjectService(),
-            fileReveal ?? new TestFileRevealService(),
             new StubRhythmGuideWindowService(),
             notifications,
             new TestApplicationDirectories());

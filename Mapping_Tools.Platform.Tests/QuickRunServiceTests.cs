@@ -266,6 +266,9 @@ public sealed class QuickRunServiceTests
         WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(56).Should().Be(0x4D);
         WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(62).Should().Be(0x53);
         WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(69).Should().Be(0x5A);
+        WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(122).Should().Be(0xA6);
+        WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(132).Should().Be(0xB0);
+        WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(141).Should().Be(0xBB);
         Action act4 = () => WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(-1);
 
         act4.Should().Throw<ArgumentOutOfRangeException>();

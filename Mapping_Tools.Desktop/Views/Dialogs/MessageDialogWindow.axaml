@@ -29,19 +29,21 @@
                       Padding="0"
                       HorizontalScrollBarVisibility="Disabled"
                       VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="0,20,0,12" Spacing="12">
+            <StackPanel Margin="16" Spacing="12">
                 <TextBlock Text="{Binding Message}"
                            MaxWidth="315"
                            FontSize="18"
                            TextWrapping="Wrap" />
-                <TextBlock Text="{Binding Details}"
-                           IsVisible="{Binding HasDetails}"
-                           Opacity="0.75"
-                           TextWrapping="Wrap" />
+                <Expander Header="Show Error Details"
+                          IsVisible="{Binding HasDetails}">
+                    <TextBlock Text="{Binding Details}"
+                               Opacity="0.75"
+                               TextWrapping="Wrap" />
+                </Expander>
             </StackPanel>
         </ScrollViewer>
         <ItemsControl Grid.Row="1"
-                      Margin="24,0,16,16"
+                      Margin="16,0,16,16"
                       HorizontalAlignment="Left"
                       ItemsSource="{Binding Choices}">
             <ItemsControl.ItemsPanel>

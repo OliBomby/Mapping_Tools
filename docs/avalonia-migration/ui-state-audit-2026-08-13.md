@@ -1,5 +1,19 @@
 # Avalonia UI migration state audit
 
+Remediation status: closed on 2026-08-13.
+
+The findings below are retained as the source inventory. The remediation
+restored shell-owned per-feature scrolling, WPF copy/tooltips/density, ordinary
+run and persistent-progress contracts, legacy timeline geometry, unrestricted
+legacy-compatible hotkeys, typed Rhythm Guide paths, source backups and
+completion behavior, Map Cleaner initialization/multi-map state, Preferences
+value domains, Get Started presentation ownership/empty state, Rhythm Guide
+custom chrome, and the missing MainWindow actions and maximize state. Dialog
+and TableView platform substitutions are now explicitly recorded in their wave
+notes. Parity tests cover those behavioral contracts. Both frontends build and
+the focused platform and architecture suites pass. Per the user's instruction,
+no render or image-comparison tooling was used during remediation.
+
 Date: 2026-08-13
 
 Status update: the style-ownership and migration-guidance recommendations in
@@ -229,9 +243,9 @@ requires behavior inventory and focused tests. It also tells agents to consult
 the dependency graph so explicitly later-wave work is scope rather than a
 current defect, and it rejects renderer screenshots as acceptance evidence.
 
-The implementation still contradicts the existing “no arbitrary hard limits”
-rule through the Preferences ranges and HotkeyEditor whitelist; those product
-findings remain open.
+The Preferences ranges and HotkeyEditor whitelist that contradicted the
+existing “no arbitrary hard limits” rule have been removed. Focused tests now
+cover zero-valued preference domains and legacy browser, media, and OEM keys.
 
 ## Skills audit
 
@@ -263,23 +277,18 @@ fixture symmetry solely to support visual acceptance.
 
 The test naming, Arrange/Act/Assert, and Fluent Assertions rules are sound and do not conflict with the migration vision. Consider adding a pointer from `migrate-ui` to a parity-testing checklist rather than expanding this general unit-test style skill.
 
-## Recommended remediation order
+## Remediation performed
 
-Completed immediately after this audit: migration guidance, style ownership,
-focused Material dictionaries, and renderer phase-out.
-
-Remaining order:
-
-1. Define and test the exact legacy behavior/layout contracts of `ToolViewHeader`, `ToolRunButton`, `ToolProgressBar`, `TimelineControl`, and `HotkeyEditor`.
-2. Restore the shell scroller and re-port each feature AXAML as a minimal WPF translation, preserving copy, tooltips, bindings, order, and measurements.
-3. Restore missing behavior assigned to completed waves before adding more views.
-4. Remove the new Preferences limits and fix HotkeyEditor input parity.
-5. Decide and document the two legitimate architectural exceptions: native dialog/windows versus WPF `DialogHost`/custom chrome, and the Avalonia replacement for WPF `ListView`/`GridView`.
-6. Add behavior-parity coverage for the remaining violations.
+1. Restored and tested the legacy behavior/layout contracts of `ToolViewHeader`, `ToolRunButton`, `ToolProgressBar`, `TimelineControl`, and `HotkeyEditor`.
+2. Restored the shell scroller and re-ported each feature AXAML from the WPF source, preserving copy, tooltips, bindings, order, and measurements.
+3. Restored missing behavior assigned to completed waves, including shell commands, Map Cleaner state, and Rhythm Guide backup and completion branches.
+4. Removed the new Preferences limits and fixed HotkeyEditor input parity.
+5. Documented the two required architectural substitutions: native owner-modal dialogs and the Avalonia `TableView` presentation.
+6. Added focused behavior-parity coverage for the remediated findings.
 
 ## Verification performed
 
-The reorganized Avalonia desktop project builds successfully in an isolated
-artifacts directory. All 204 platform tests pass from a fresh isolated build.
-The three updated skill packages pass the skill validator. Renderer output is
-not used as verification evidence.
+Both the legacy WPF and Avalonia desktop projects build successfully in
+isolated artifacts directories. All 214 platform tests and all three
+architecture tests pass. The three updated skill packages pass the skill
+validator. Renderer output was not used as verification evidence.

@@ -64,6 +64,27 @@ public sealed class AutoFailDetectorViewModelTests
         service.Options!.Path.Should().Be("current.osu");
     }
 
+    [TestMethod]
+    public async Task RunCommand_WithFixModeAndNoPotentialObjects_StillRequestsFixPlans()
+    {
+        // Arrange
+        RecordingAutoFailService service = new()
+        {
+            Analysis = new AutoFailAnalysis(false, [], [], [])
+        };
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        AutoFailDetectorViewModel viewModel = CreateViewModel(service, workspace: workspace);
+        viewModel.GetAutoFailFix = true;
+
+        // Act
+        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+
+        // Assert
+        service.FixPlanRequestCount.Should().Be(1);
+        viewModel.Progress.Should().Be(0);
+    }
+
     private static AutoFailDetectorViewModel CreateViewModel(
         RecordingAutoFailService service,
         TestBeatmapWorkspace? workspace = null,
@@ -91,19 +112,28 @@ public sealed class AutoFailDetectorViewModelTests
     {
         public AutoFailOptions? Options { get; private set; }
 
+        public AutoFailAnalysis Analysis { get; init; } =
+            new(true, [1000], [1000, 2000], [1500]);
+
+        public int FixPlanRequestCount { get; private set; }
+
         public Task<AutoFailRun> AnalyzeAsync(
             AutoFailOptions options,
             CancellationToken cancellationToken = default)
         {
             Options = options;
             return Task.FromResult(new AutoFailRun(
-                new AutoFailAnalysis(true, [1000], [1000, 2000], [1500]),
+                Analysis,
                 5000));
         }
 
         public IEnumerable<AutoFailFixPlan> GetFixPlans(
             AutoFailRun run,
-            CancellationToken cancellationToken = default) => [];
+            CancellationToken cancellationToken = default)
+        {
+            FixPlanRequestCount++;
+            return [];
+        }
 
         public Task ApplyFixAsync(
             AutoFailRun run,

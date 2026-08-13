@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.SafetyCopies;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.RhythmGuide;
@@ -10,19 +11,23 @@ namespace Mapping_Tools.Application.RhythmGuide;
 public sealed class RhythmGuideService : IRhythmGuideService
 {
     private readonly IBeatmapEditingGateway _editingGateway;
+    private readonly IBeatmapBackupService _backupService;
     private readonly IBeatmapFileSystem _fileSystem;
     private readonly ITextFileStore _textFileStore;
 
     /// <summary>Creates a service that loads source maps and safely persists guide output.</summary>
     /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
+    /// <param name="backupService">Creates preference-respecting copies of every source before it is read.</param>
     /// <param name="fileSystem">Checks whether a destination already exists.</param>
     /// <param name="textFileStore">Writes newly created beatmap documents.</param>
     public RhythmGuideService(
         IBeatmapEditingGateway editingGateway,
+        IBeatmapBackupService backupService,
         IBeatmapFileSystem fileSystem,
         ITextFileStore textFileStore)
     {
         _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        _backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
         _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         _textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
     }
@@ -33,6 +38,12 @@ public sealed class RhythmGuideService : IRhythmGuideService
         CancellationToken cancellationToken = default)
     {
         Validate(options);
+        await _backupService.CreateAsync(
+            options.Paths,
+            BeatmapBackupReason.Automatic,
+            force: false,
+            cancellationToken).ConfigureAwait(false);
+
         List<Beatmap> sources = [];
         foreach (string path in options.Paths)
         {

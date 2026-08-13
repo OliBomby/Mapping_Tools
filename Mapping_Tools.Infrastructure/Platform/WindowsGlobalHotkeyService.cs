@@ -96,14 +96,14 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
 
     internal static int ConvertLegacyKeyToVirtualKey(int key)
     {
-        if (key is >= 34 and <= 43)
+        if (key is >= 18 and <= 43)
         {
-            return key + 14; // WPF D0-D9 to Win32 0-9.
+            return key + 14; // WPF Space through D9 follow the Win32 sequence.
         }
 
-        if (key is >= 44 and <= 69)
+        if (key is >= 44 and <= 72)
         {
-            return key + 21; // WPF A-Z to Win32 A-Z.
+            return key + 21; // WPF A through Apps follow the Win32 sequence.
         }
 
         if (key is >= 74 and <= 83)
@@ -116,31 +116,55 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
             return key + 22; // WPF F1-F24 to Win32 function keys.
         }
 
+        if (key is >= 122 and <= 139)
+        {
+            return key + 44; // Browser, media, and launch keys.
+        }
+
+        if (key is >= 140 and <= 148)
+        {
+            return key + 46; // OEM1 through ABNT C2.
+        }
+
+        if (key is >= 149 and <= 153)
+        {
+            return key + 70; // OEM4 through OEM8.
+        }
+
+        if (key is >= 157 and <= 171)
+        {
+            return key + 83; // IME DBE keys through OEM Clear.
+        }
+
         return key switch
         {
-            2 => 0x08,  // Backspace
-            3 => 0x09,  // Tab
-            6 => 0x0D,  // Enter
-            13 => 0x1B, // Escape
-            18 => 0x20, // Space
-            19 => 0x21, // Page Up
-            20 => 0x22, // Page Down
-            21 => 0x23, // End
-            22 => 0x24, // Home
-            23 => 0x25, // Left
-            24 => 0x26, // Up
-            25 => 0x27, // Right
-            26 => 0x28, // Down
-            31 => 0x2D, // Insert
-            32 => 0x2E, // Delete
-            84 => 0x6A, // Multiply
-            85 => 0x6B, // Add
-            86 => 0x6C, // Separator
-            87 => 0x6D, // Subtract
-            88 => 0x6E, // Decimal
-            89 => 0x6F, // Divide
+            1 => 0x03,   // Cancel
+            2 => 0x08,   // Backspace
+            3 => 0x09,   // Tab
+            4 => 0x0A,   // Line feed
+            5 => 0x0C,   // Clear
+            6 => 0x0D,   // Enter
+            7 => 0x13,   // Pause
+            8 => 0x14,   // Caps lock
+            9 => 0x15,   // Kana mode
+            10 => 0x17,  // Junja mode
+            11 => 0x18,  // Final mode
+            12 => 0x19,  // Hanja mode
+            13 => 0x1B,  // Escape
+            14 => 0x1C,  // IME convert
+            15 => 0x1D,  // IME non-convert
+            16 => 0x1E,  // IME accept
+            17 => 0x1F,  // IME mode change
+            73 => 0x5F,  // Sleep
+            84 => 0x6A,  // Multiply
+            85 => 0x6B,  // Add
+            86 => 0x6C,  // Separator
+            87 => 0x6D,  // Subtract
+            88 => 0x6E,  // Decimal
+            89 => 0x6F,  // Divide
             114 => 0x90, // Num Lock
             115 => 0x91, // Scroll Lock
+            154 => 0xE2, // OEM 102
             _ => throw new ArgumentOutOfRangeException(
                 nameof(key),
                 key,

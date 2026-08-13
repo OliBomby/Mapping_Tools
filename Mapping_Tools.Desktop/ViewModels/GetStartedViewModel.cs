@@ -11,17 +11,6 @@ public sealed partial class GetStartedViewModel : ObservableObject, IDisposable
 {
     private readonly IBeatmapWorkspace _workspace;
     private bool _disposed;
-    private static readonly string[] OnboardingInstructions =
-    [
-        "0. Set the correct path to your Songs folder in the [Preferences].",
-        "1. Select a beatmap [File] -> [Open beatmap/Open current beatmap] to select a file from your system OR the current in-game selected beatmap.",
-        "2. Select a tool that you want to use from the navigation menu. (Ctrl+K)",
-        "3. Read a basic summary of the tool by clicking the (?) button.",
-        "4. Configure your tool. To find out what specific things do, read the tooltips by hovering over them.",
-        "5. Click the run button in the bottom right to run the program.",
-        "6. Reload your beatmap WITHOUT SAVING by either leaving and re-entering the editor or pressing Ctrl+L, Enter.",
-        "7. If you run into issues, consult the FAQ over on the [About] -> [Website]."
-    ];
     /// <summary>Creates the landing-page presentation model.</summary>
     /// <param name="workspace">Supplies live recent history and accepts activated rows.</param>
     public GetStartedViewModel(
@@ -31,7 +20,6 @@ public sealed partial class GetStartedViewModel : ObservableObject, IDisposable
 
         RecentMaps = [];
         Changelog = [];
-        Instructions = OnboardingInstructions;
         RecentMaps.CollectionChanged += (_, _) =>
             HasNoRecentMaps = RecentMaps.Count == 0;
         _workspace.SelectionChanged += OnWorkspaceSelectionChanged;
@@ -40,9 +28,6 @@ public sealed partial class GetStartedViewModel : ObservableObject, IDisposable
 
     /// <summary>Gets recent maps in persisted order.</summary>
     public ObservableCollection<RecentMapViewModel> RecentMaps { get; }
-
-    /// <summary>Gets the ordered legacy onboarding instructions.</summary>
-    public IReadOnlyList<string> Instructions { get; }
 
     /// <summary>Gets bundled notes that are available offline.</summary>
     public IReadOnlyList<ChangelogEntryViewModel> Changelog { get; }

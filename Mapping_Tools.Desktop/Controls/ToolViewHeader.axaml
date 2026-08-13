@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:converters="using:Avalonia.Data.Converters"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="Mapping_Tools.Desktop.Controls.ToolViewHeader"
              x:Name="Root"
@@ -15,12 +16,12 @@
     </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="Button.tool-info-badge">
-            <Setter Property="Width" Value="40" />
-            <Setter Property="Height" Value="40" />
-            <Setter Property="MinWidth" Value="40" />
-            <Setter Property="MinHeight" Value="40" />
-            <Setter Property="Margin" Value="4,4,0,0" />
-            <Setter Property="Padding" Value="8" />
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="MinWidth" Value="32" />
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="Margin" Value="5,5,0,0" />
+            <Setter Property="Padding" Value="4" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
     </UserControl.Styles>
@@ -32,8 +33,9 @@
                    Text="{Binding Title, ElementName=Root}" />
 
         <Button Classes="flat tool-info-badge"
+                IsVisible="{Binding HelpText, ElementName=Root, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}"
                 AutomationProperties.Name="Tool information"
-                ToolTip.Tip="About this tool">
+                ToolTip.Tip="Click me!">
             <materialIcons:MaterialIcon Width="24"
                                         Height="24"
                                         Foreground="{DynamicResource MappingToolsHelpBadgeBrush}"
@@ -41,7 +43,7 @@
             <Button.Flyout>
                 <Flyout Placement="BottomEdgeAlignedLeft"
                         FlyoutPresenterTheme="{StaticResource ToolHelpFlyoutPresenterTheme}">
-                    <TextBlock Width="420"
+                    <TextBlock MaxWidth="600"
                                Padding="5"
                                Text="{Binding HelpText, ElementName=Root}"
                                TextWrapping="Wrap" />
@@ -52,7 +54,7 @@
         <Button Classes="flat tool-info-badge"
                 IsVisible="{Binding IsQuickRunSupported, ElementName=Root}"
                 AutomationProperties.Name="QuickRun information"
-                ToolTip.Tip="QuickRun support">
+                ToolTip.Tip="Click me!">
             <materialIcons:MaterialIcon Width="24"
                                         Height="24"
                                         Foreground="{DynamicResource MappingToolsQuickRunBadgeBrush}"
@@ -60,7 +62,7 @@
             <Button.Flyout>
                 <Flyout Placement="BottomEdgeAlignedLeft"
                         FlyoutPresenterTheme="{StaticResource ToolHelpFlyoutPresenterTheme}">
-                    <TextBlock Width="300"
+                    <TextBlock MaxWidth="600"
                                Padding="5"
                                Text="This tool is compatible with QuickRun!"
                                TextWrapping="Wrap" />

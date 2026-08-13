@@ -83,7 +83,12 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
 
     /// <summary>Gets whether cleanup is currently running.</summary>
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RunCommand))]
     public partial bool IsRunning { get; private set; }
+
+    /// <summary>Gets whether the autosaved project has finished restoring into the visible form.</summary>
+    [ObservableProperty]
+    public partial bool IsInitialized { get; private set; }
 
     /// <summary>Gets the current cleanup completion percentage.</summary>
     [ObservableProperty]
@@ -267,11 +272,12 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
                 ResultSummary = Summarize(result, options);
                 EndTime = result.TimelineEndTime;
                 Markers = paths.Count == 1 ? CreateMarkers(result) : [];
-                HasRun = true;
+                HasRun = paths.Count == 1;
             }
         }
         finally
         {
+            Progress = 0;
             IsRunning = false;
         }
     }
@@ -328,6 +334,10 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
         catch (Exception exception)
         {
             await PublishFailureAsync("Project could not be loaded", exception);
+        }
+        finally
+        {
+            IsInitialized = true;
         }
     }
 

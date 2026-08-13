@@ -9,21 +9,22 @@ namespace Mapping_Tools.Platform.Tests;
 public sealed class ToolControlTests
 {
     [TestMethod]
-    public void Value_AfterCompletedRun_ShowsNextRunAgain()
+    public void Value_AcrossRunLifecycle_AlwaysReservesProgressSlot()
     {
         // Arrange
         ToolProgressBar progressBar = new()
         {
             Maximum = 100,
-            Value = 100,
-            IsVisible = false
+            Value = 100
         };
 
         // Act
         progressBar.Value = 0;
+        bool afterReset = progressBar.IsVisible;
         progressBar.Value = 25;
 
         // Assert
+        afterReset.Should().BeTrue();
         progressBar.IsVisible.Should().BeTrue();
     }
 

@@ -68,7 +68,7 @@ public sealed class TimelineModelsTests
     }
 
     [TestMethod]
-    public void TimelineControl_MarkerAt_UsesArrangedWidthAndSharedHitTesting()
+    public void TimelineControl_MarkerAt_UsesLegacyWidthWithReservedRightSpace()
     {
         // Arrange
         TimelineMarker expected = new(500, TimelineMarkerKind.Accent);
@@ -78,17 +78,19 @@ public sealed class TimelineModelsTests
             EndTime = 1000,
             Markers = [expected]
         };
-        control.Arrange(new Rect(0, 0, 200, 80));
+        control.Arrange(new Rect(0, 0, 200, 100));
 
         // Act
-        TimelineMarker? marker = control.MarkerAt(101);
+        TimelineMarker? marker = control.MarkerAt(46);
+        TimelineMarker? reservedAreaMarker = control.MarkerAt(145);
 
         // Assert
         marker.Should().BeSameAs(expected);
+        reservedAreaMarker.Should().BeNull();
     }
 
     [TestMethod]
-    public void FormatToolTip_WithLabel_IncludesLabelAndTimestamp()
+    public void FormatToolTip_WithLabel_UsesLegacyTimestampOnly()
     {
         // Arrange
         TimelineMarker marker = new(61_005, TimelineMarkerKind.Removed, "Greenline removed");
@@ -97,6 +99,6 @@ public sealed class TimelineModelsTests
         string tooltip = TimelineControl.FormatToolTip(marker);
 
         // Assert
-        tooltip.Should().Be("Greenline removed — 01:01:005");
+        tooltip.Should().Be("01:01:005");
     }
 }

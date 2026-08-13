@@ -2,6 +2,28 @@
 
 Status: implemented, 2026-07-25.
 
+## 2026-08-13 compatibility clarification
+
+`TableView` is the explicit platform substitution for WPF's read-only
+`ListView`/`GridView`: it is Avalonia 12.1's integrated selectable table with
+column headers and user resizing. Material.Avalonia 3.17 does not supply an
+Avalonia 12.1 `TableView` theme, so the co-located compact compatibility themes
+are unavoidable view-owned presentation code. The Path column is measured from
+the actual filename content and remains user-resizable; the Date column fills
+the remaining space. This preserves the legacy auto-content/fill contract
+without introducing a second table model.
+
+The onboarding instructions are again literal presentation content in AXAML,
+and the recent section binds its empty state. The shell once again owns feature
+scrolling; each registration declares the horizontal and vertical behavior of
+its corresponding WPF content presenter.
+
+The shell's owner-modal dialogs and queued notification surface remain an
+explicit Avalonia architecture exception to WPF `DialogHost` and Snackbar.
+They retain typed choices, owner modality, ordering, dismissal, and the legacy
+bottom notification placement without leaking framework controls into the
+application layer.
+
 ## Scope delivered
 
 The temporary greeting window has been replaced by the first production

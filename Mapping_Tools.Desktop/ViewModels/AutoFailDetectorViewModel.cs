@@ -60,6 +60,7 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
 
     /// <summary>Gets whether analysis or repair work is running.</summary>
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RunCommand))]
     public partial bool IsRunning { get; private set; }
 
     /// <summary>Gets the current operation completion percentage.</summary>
@@ -169,7 +170,7 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
                     "Auto-fail Detector",
                     async context =>
                     {
-                        context.ReportProgress(10, "Loading beatmap");
+                        context.ReportProgress(33, "Loading beatmap");
                         AutoFailRun run = await _autoFail.AnalyzeAsync(
                             new AutoFailOptions(
                                 path,
@@ -177,6 +178,7 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
                                 OverallDifficultyOverride,
                                 PhysicsUpdateLeniency),
                             context.CancellationToken);
+                        context.ReportProgress(67, "Planning fixes");
                         context.ReportProgress(100, "Analysis complete");
                         return new ToolExecutionOutput<AutoFailRun>(run, Summarize(run.Analysis));
                     }),
@@ -188,13 +190,14 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
             }
 
             InstallResult(result.Value);
-            if (GetAutoFailFix && result.Value.Analysis.PotentialUnloadingObjects.Count > 0)
+            if (GetAutoFailFix)
             {
                 await OfferFixesAsync(result.Value, cancellationToken);
             }
         }
         finally
         {
+            Progress = 0;
             IsRunning = false;
         }
     }

@@ -53,84 +53,50 @@ public sealed class HotkeyEditor : TextBox
     protected override void OnKeyDown(KeyEventArgs eventArgs)
     {
         eventArgs.Handled = true;
-        ApplyKey(eventArgs.Key.ToString(), eventArgs.KeyModifiers);
+        ApplyKey(eventArgs.Key, eventArgs.KeyModifiers);
     }
 
     internal void ApplyKey(string keyName, KeyModifiers keyModifiers)
     {
+        if (Enum.TryParse(keyName, out Key key))
+        {
+            ApplyKey(key, keyModifiers);
+        }
+    }
+
+    internal void ApplyKey(Key key, KeyModifiers keyModifiers)
+    {
         int modifiers = ToLegacyModifiers(keyModifiers);
-        if (modifiers == 0 && keyName is "Delete" or "Back" or "Escape")
+        if (modifiers == 0 && key is Key.Delete or Key.Back or Key.Escape)
         {
             SetCurrentValue(HotkeyProperty, null);
             UpdateText();
             return;
         }
 
-        if (IsModifierOnly(keyName) || !TryGetLegacyKey(keyName, out int key))
+        if (IsUnsupportedKey(key) || !TryGetLegacyKey(key, out int legacyKey))
         {
             return;
         }
 
-        SetCurrentValue(HotkeyProperty, new HotkeySettings(key, modifiers));
+        SetCurrentValue(HotkeyProperty, new HotkeySettings(legacyKey, modifiers));
     }
 
     internal static bool TryGetLegacyKey(string keyName, out int key)
     {
-        if (keyName.Length == 1 && keyName[0] is >= 'A' and <= 'Z')
+        if (Enum.TryParse(keyName, out Key avaloniaKey))
         {
-            key = 44 + keyName[0] - 'A';
-            return true;
+            return TryGetLegacyKey(avaloniaKey, out key);
         }
 
-        if (keyName.Length == 2 && keyName[0] == 'D' && char.IsAsciiDigit(keyName[1]))
-        {
-            key = 34 + keyName[1] - '0';
-            return true;
-        }
+        key = 0;
+        return false;
+    }
 
-        if (keyName.StartsWith("NumPad", StringComparison.Ordinal) &&
-            keyName.Length == 7 && char.IsAsciiDigit(keyName[6]))
-        {
-            key = 74 + keyName[6] - '0';
-            return true;
-        }
-
-        if (keyName.Length is 2 or 3 && keyName[0] == 'F' &&
-            int.TryParse(keyName.AsSpan(1), out int function) &&
-            function is >= 1 and <= 24)
-        {
-            key = 89 + function;
-            return true;
-        }
-
-        key = keyName switch
-        {
-            "Back" => 2,
-            "Tab" => 3,
-            "Enter" or "Return" => 6,
-            "Escape" => 13,
-            "Space" => 18,
-            "PageUp" => 19,
-            "PageDown" => 20,
-            "End" => 21,
-            "Home" => 22,
-            "Left" => 23,
-            "Up" => 24,
-            "Right" => 25,
-            "Down" => 26,
-            "Insert" => 31,
-            "Delete" => 32,
-            "Multiply" => 84,
-            "Add" => 85,
-            "Separator" => 86,
-            "Subtract" => 87,
-            "Decimal" => 88,
-            "Divide" => 89,
-            "NumLock" => 114,
-            "Scroll" or "ScrollLock" => 115,
-            _ => 0
-        };
-        return key != 0;
+    internal static bool TryGetLegacyKey(Key avaloniaKey, out int key)
+    {
+        key = (int)avaloniaKey;
+        return key is >= 1 and <= 171 && !IsUnsupportedKey(avaloniaKey);
     }
 
     internal static string Format(HotkeySettings? hotkey)
@@ -184,59 +150,19 @@ public sealed class HotkeyEditor : TextBox
         return result;
     }
 
-    private static bool IsModifierOnly(string keyName) =>
-        keyName is "LeftCtrl" or "RightCtrl" or
-            "LeftAlt" or "RightAlt" or
-            "LeftShift" or "RightShift" or
-            "LWin" or "RWin" or "LeftMeta" or "RightMeta" or
-            "Clear" or "OemClear" or "Apps";
+    private static bool IsUnsupportedKey(Key key) => key is
+        Key.None or Key.LeftCtrl or Key.RightCtrl or
+        Key.LeftAlt or Key.RightAlt or
+        Key.LeftShift or Key.RightShift or
+        Key.LWin or Key.RWin or
+        Key.Clear or Key.OemClear or Key.Apps or
+        Key.ImeProcessed or Key.System or Key.DeadCharProcessed;
 
     private static string FormatKey(int key)
     {
-        if (key is >= 34 and <= 43)
-        {
-            return $"D{key - 34}";
-        }
-        if (key is >= 44 and <= 69)
-        {
-            return ((char)('A' + key - 44)).ToString();
-        }
-        if (key is >= 74 and <= 83)
-        {
-            return $"NumPad{key - 74}";
-        }
-        if (key is >= 90 and <= 113)
-        {
-            return $"F{key - 89}";
-        }
-
-        return key switch
-        {
-            2 => "Back",
-            3 => "Tab",
-            6 => "Enter",
-            13 => "Escape",
-            18 => "Space",
-            19 => "PageUp",
-            20 => "PageDown",
-            21 => "End",
-            22 => "Home",
-            23 => "Left",
-            24 => "Up",
-            25 => "Right",
-            26 => "Down",
-            31 => "Insert",
-            32 => "Delete",
-            84 => "Multiply",
-            85 => "Add",
-            86 => "Separator",
-            87 => "Subtract",
-            88 => "Decimal",
-            89 => "Divide",
-            114 => "NumLock",
-            115 => "ScrollLock",
-            _ => $"Key {key}"
-        };
+        return key is >= 1 and <= 171 && Enum.IsDefined((Key)key)
+            ? ((Key)key).ToString()
+            : $"Key {key}";
     }
 
     private void UpdateText() => Text = Format(Hotkey);

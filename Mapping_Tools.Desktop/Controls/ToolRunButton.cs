@@ -1,77 +1,50 @@
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
-using Material.Styles.Controls;
 using Material.Icons;
 using Material.Icons.Avalonia;
+using Material.Styles.Controls;
 
 namespace Mapping_Tools.Desktop.Controls;
 
 /// <summary>
-/// Presents one stable tool action button that runs while idle and cancels while running.
+/// Presents the ordinary play action used to start a mapping tool inside a 70-pixel view box.
 /// </summary>
-public sealed class ToolRunButton : FloatingButton
+public sealed class ToolRunButton : Viewbox
 {
-    private readonly MaterialIcon _icon = new();
+    private readonly FloatingButton _button;
 
-    /// <summary>Identifies the command invoked while the tool is idle.</summary>
+    /// <summary>Identifies the command invoked when the play action is selected.</summary>
     public static readonly StyledProperty<ICommand?> RunCommandProperty =
         AvaloniaProperty.Register<ToolRunButton, ICommand?>(nameof(RunCommand));
-
-    /// <summary>Identifies the command invoked while the tool is running.</summary>
-    public static readonly StyledProperty<ICommand?> CancelCommandProperty =
-        AvaloniaProperty.Register<ToolRunButton, ICommand?>(nameof(CancelCommand));
-
-    /// <summary>Identifies whether the button currently represents cancellation.</summary>
-    public static readonly StyledProperty<bool> IsRunningProperty =
-        AvaloniaProperty.Register<ToolRunButton, bool>(nameof(IsRunning));
 
     static ToolRunButton()
     {
         RunCommandProperty.Changed.AddClassHandler<ToolRunButton>(
-            static (button, _) => button.UpdatePresentation());
-        CancelCommandProperty.Changed.AddClassHandler<ToolRunButton>(
-            static (button, _) => button.UpdatePresentation());
-        IsRunningProperty.Changed.AddClassHandler<ToolRunButton>(
-            static (button, _) => button.UpdatePresentation());
+            static (control, eventArgs) => control._button.Command = eventArgs.NewValue as ICommand);
     }
 
-    /// <summary>Creates a circular primary action button with a play icon.</summary>
+    /// <summary>Creates the WPF-compatible floating play action.</summary>
     public ToolRunButton()
     {
-        Classes.Add("tool-run-action");
-        Classes.Add("no-transitions");
-        _icon.Width = 42;
-        _icon.Height = 42;
-        Content = _icon;
-        UpdatePresentation();
+        Width = 70;
+        _button = new FloatingButton
+        {
+            Content = new MaterialIcon
+            {
+                Width = 36,
+                Height = 36,
+                Kind = MaterialIconKind.Play
+            }
+        };
+        ToolTip.SetTip(_button, "Run this tool.");
+        Child = _button;
     }
 
-    /// <summary>Gets or sets the command invoked while the tool is idle.</summary>
+    /// <summary>Gets or sets the command invoked when the play action is selected.</summary>
     public ICommand? RunCommand
     {
         get => GetValue(RunCommandProperty);
         set => SetValue(RunCommandProperty, value);
-    }
-
-    /// <summary>Gets or sets the command invoked while the tool is running.</summary>
-    public ICommand? CancelCommand
-    {
-        get => GetValue(CancelCommandProperty);
-        set => SetValue(CancelCommandProperty, value);
-    }
-
-    /// <summary>Gets or sets whether the button currently cancels an active run.</summary>
-    public bool IsRunning
-    {
-        get => GetValue(IsRunningProperty);
-        set => SetValue(IsRunningProperty, value);
-    }
-
-    private void UpdatePresentation()
-    {
-        SetCurrentValue(CommandProperty, IsRunning ? CancelCommand : RunCommand);
-        _icon.Kind = IsRunning ? MaterialIconKind.Stop : MaterialIconKind.Play;
-        ToolTip.SetTip(this, IsRunning ? "Stop this tool." : "Run this tool.");
     }
 }

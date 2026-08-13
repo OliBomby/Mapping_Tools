@@ -10,6 +10,7 @@ public sealed class SettingsPersistenceHostedService : IHostedService
 {
     private readonly ApplicationSettings _settings;
     private readonly ISettingsService _settingsService;
+    private bool _saveOnShutdown = true;
 
     /// <summary>
     /// Creates the process-lifetime persistence boundary for the shared settings instance.
@@ -31,7 +32,13 @@ public sealed class SettingsPersistenceHostedService : IHostedService
     /// <inheritdoc/>
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _settingsService.Save(_settings);
+        if (_saveOnShutdown)
+        {
+            _settingsService.Save(_settings);
+        }
         return Task.CompletedTask;
     }
+
+    /// <summary>Prevents the current process from persisting settings during orderly shutdown.</summary>
+    public void SuppressSave() => _saveOnShutdown = false;
 }

@@ -22,6 +22,7 @@
             <converters:ConstantTimeSpanConverter x:Key="ConstantTimeSpanConverter" />
             <converters:DarkThemeConverter x:Key="DarkThemeConverter" />
             <converters:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter" />
+            <converters:StringArrayToStringConverter x:Key="StringArrayToStringConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

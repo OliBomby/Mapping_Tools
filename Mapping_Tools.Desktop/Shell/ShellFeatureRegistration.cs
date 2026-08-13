@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Avalonia.Controls.Primitives;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Shell;
@@ -20,6 +21,8 @@ public sealed class ShellFeatureRegistration
     /// <param name="searchTerms">Additional case-insensitive search terms.</param>
     /// <param name="createViewModel">Factory invoked when the feature is first activated.</param>
     /// <param name="startsSection">Whether navigation draws a divider before this item.</param>
+    /// <param name="horizontalScrollBarVisibility">How the shell scrolls this feature horizontally.</param>
+    /// <param name="verticalScrollBarVisibility">How the shell scrolls this feature vertically.</param>
     public ShellFeatureRegistration(
         string id,
         string displayName,
@@ -27,7 +30,9 @@ public sealed class ShellFeatureRegistration
         string description,
         IEnumerable<string> searchTerms,
         Func<ObservableObject> createViewModel,
-        bool startsSection = false)
+        bool startsSection = false,
+        ScrollBarVisibility horizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+        ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(id);
         ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
@@ -42,6 +47,8 @@ public sealed class ShellFeatureRegistration
         Description = description;
         SearchTerms = searchTerms.Where(term => !string.IsNullOrWhiteSpace(term)).ToArray();
         StartsSection = startsSection;
+        HorizontalScrollBarVisibility = horizontalScrollBarVisibility;
+        VerticalScrollBarVisibility = verticalScrollBarVisibility;
         _createViewModel = createViewModel;
     }
 
@@ -62,6 +69,12 @@ public sealed class ShellFeatureRegistration
 
     /// <summary>Gets whether this item begins a visually separated navigation group.</summary>
     public bool StartsSection { get; }
+
+    /// <summary>Gets the horizontal scrolling behavior owned by the feature shell.</summary>
+    public ScrollBarVisibility HorizontalScrollBarVisibility { get; }
+
+    /// <summary>Gets the vertical scrolling behavior owned by the feature shell.</summary>
+    public ScrollBarVisibility VerticalScrollBarVisibility { get; }
 
     /// <summary>Creates the presentation model when the feature is first opened.</summary>
     /// <returns>A new feature presentation model.</returns>

@@ -1,7 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Data;
-using Avalonia.Data.Converters;
-using Mapping_Tools.Desktop.ViewModels.Dialogs;
 
 namespace Mapping_Tools.Desktop.Views.Dialogs;
 
@@ -21,23 +18,5 @@ public partial class ValueDialogWindow : Window
             ValueTextBox.Focus();
             ValueTextBox.SelectAll();
         };
-    }
-
-    /// <summary>
-    /// Connects the field to its typed value through the request-specific converter.
-    /// </summary>
-    /// <param name="converter">
-    /// The converter that formats the initial typed value and parses subsequent edits.
-    /// </param>
-    public void BindValue(IValueConverter converter)
-    {
-        ArgumentNullException.ThrowIfNull(converter);
-        ValueTextBox.Bind(
-            TextBox.TextProperty,
-            new Binding(nameof(ValueDialogViewModel.Value))
-            {
-                Mode = BindingMode.TwoWay,
-                Converter = converter
-            });
     }
 }

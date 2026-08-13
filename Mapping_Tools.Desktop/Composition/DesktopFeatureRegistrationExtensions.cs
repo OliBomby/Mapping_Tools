@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Avalonia.Controls.Primitives;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Shell;
@@ -22,18 +23,16 @@ internal static class DesktopFeatureRegistrationExtensions
             "Preferences",
             "Application",
             "Paths, backup policy, Editor Reader, and application theme.",
-            ["settings", "paths", "backups", "editor reader", "theme"]);
-        services.AddMappingTool<RhythmGuideViewModel>(
-            "rhythm-guide",
-            "Rhythm Guide",
-            "Make a beatmap with circles from the rhythm of multiple maps.",
-            ["rhythm", "hitsound", "guide", "reference"],
-            startsSection: true);
+            ["settings", "paths", "backups", "editor reader", "theme"],
+            horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<AutoFailDetectorViewModel>(
             "auto-fail-detector",
             "Auto-fail Detector",
             "Detect incorrect object loading in overlapping patterns.",
             ["auto fail", "2b", "unloading", "objects"],
+            startsSection: true,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
             quickRunTargets: QuickRunTargets.Always,
             quickRun: static (viewModel, cancellationToken) =>
                 viewModel.RunQuickAsync(cancellationToken));
@@ -42,9 +41,17 @@ internal static class DesktopFeatureRegistrationExtensions
             "Map Cleaner",
             "Rebuild useful greenlines and optionally resnap map content.",
             ["clean", "greenline", "resnap", "samples"],
+            horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
             quickRunTargets: QuickRunTargets.Always,
             quickRun: static (viewModel, cancellationToken) =>
                 viewModel.RunQuickAsync(cancellationToken));
+        services.AddMappingTool<RhythmGuideViewModel>(
+            "rhythm-guide",
+            "Rhythm Guide",
+            "Make a beatmap with circles from the rhythm of multiple maps.",
+            ["rhythm", "hitsound", "guide", "reference"],
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(
@@ -60,7 +67,9 @@ internal static class DesktopFeatureRegistrationExtensions
         string category,
         string description,
         IEnumerable<string> searchTerms,
-        bool startsSection = false)
+        bool startsSection = false,
+        ScrollBarVisibility horizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+        ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled)
         where TViewModel : ObservableObject
     {
         services.AddSingleton<TViewModel>();
@@ -71,7 +80,9 @@ internal static class DesktopFeatureRegistrationExtensions
             description,
             searchTerms,
             provider.GetRequiredService<TViewModel>,
-            startsSection));
+            startsSection,
+            horizontalScrollBarVisibility,
+            verticalScrollBarVisibility));
 
         return services;
     }
@@ -83,6 +94,8 @@ internal static class DesktopFeatureRegistrationExtensions
         string description,
         IEnumerable<string> searchTerms,
         bool startsSection = false,
+        ScrollBarVisibility horizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+        ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled,
         QuickRunTargets? quickRunTargets = null,
         Func<TViewModel, CancellationToken, Task>? quickRun = null)
         where TViewModel : ObservableObject
@@ -93,7 +106,9 @@ internal static class DesktopFeatureRegistrationExtensions
             "Tools",
             description,
             searchTerms,
-            startsSection);
+            startsSection,
+            horizontalScrollBarVisibility,
+            verticalScrollBarVisibility);
 
         if (quickRunTargets is not null && quickRun is not null)
         {

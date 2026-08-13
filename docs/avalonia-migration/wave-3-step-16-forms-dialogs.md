@@ -2,6 +2,22 @@
 
 Status: implemented, 2026-07-25.
 
+## 2026-08-13 compatibility clarification
+
+The native owner-modal window is an explicit Avalonia compatibility exception.
+Material.Avalonia does not provide the WPF `DialogHost` presentation model used
+by the legacy embedded controls, and the desktop architecture has one typed
+`IDialogService` boundary. Native chrome, native focus/stacking, and owner
+disablement therefore replace the embedded WPF host; message width, wrapping,
+action order, default/cancel roles, and value-field behavior remain legacy
+contracts. Message details are collapsed behind `Show Error Details`, matching
+the separate legacy `MessageWindow` behavior.
+
+Value-dialog text is now declared in AXAML and owned by
+`ValueDialogViewModel.ValueText`. The VM converts it to the request's typed
+value and exposes conversion and validator failures through its
+DataAnnotations error surface. Code-behind retains only focus/select-all.
+
 ## Scope delivered
 
 The Application layer now defines UI-independent primitives for the form and

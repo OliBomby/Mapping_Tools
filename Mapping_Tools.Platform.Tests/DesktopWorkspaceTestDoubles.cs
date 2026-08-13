@@ -262,11 +262,14 @@ internal sealed class TestDialogService : IDialogService
 
     public int MessageCount { get; private set; }
 
+    public object? LastMessageRequest { get; private set; }
+
     public Task<TResult> ShowMessageAsync<TResult>(
         MessageDialogRequest<TResult> request,
         CancellationToken cancellationToken = default)
     {
         MessageCount++;
+        LastMessageRequest = request;
         return Task.FromResult((TResult)(object)BooleanResult);
     }
 

@@ -9,9 +9,7 @@
              x:Class="Mapping_Tools.Desktop.Views.GetStartedView"
              x:DataType="vm:GetStartedViewModel"
              Foreground="{DynamicResource MaterialBodyBrush}"
-             FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
-             FontSize="13"
-             FontWeight="Normal">
+             FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto">
     <UserControl.Resources>
         <ControlTemplate x:Key="RecentColumnResizerTemplate"
                          TargetType="Thumb">
@@ -190,24 +188,23 @@
             <TextBlock Grid.Row="0"
                        Text="Get started"
                        FontSize="32"
-                       FontWeight="Medium"
+                       FontWeight="Bold"
                        Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
 
             <ListBox Grid.Row="1"
                      Classes="content-list"
                      HorizontalAlignment="Left"
-                     ItemsSource="{Binding Instructions}"
                      ScrollViewer.AllowAutoHide="False"
                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
                      ScrollViewer.VerticalScrollBarVisibility="Auto">
-                <ListBox.ItemTemplate>
-                    <DataTemplate x:CompileBindings="False">
-                        <TextBlock Width="831"
-                                   FontSize="13.18"
-                                   Text="{Binding}"
-                                   TextWrapping="NoWrap" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
+                <ListBoxItem>0. Set the correct path to your Songs folder in the [Preferences].</ListBoxItem>
+                <ListBoxItem>1. Select a beatmap [File] -&gt; [Open beatmap/Open current beatmap] to select a file from your system OR the current in-game selected beatmap.</ListBoxItem>
+                <ListBoxItem>2. Select a tool that you want to use from the navigation menu. (Ctrl+K)</ListBoxItem>
+                <ListBoxItem>3. Read a basic summary of the tool by clicking the (?) button.</ListBoxItem>
+                <ListBoxItem>4. Configure your tool. To find out what specific things do, read the tooltips by hovering over them.</ListBoxItem>
+                <ListBoxItem>5. Click the run button in the bottom right to run the program.</ListBoxItem>
+                <ListBoxItem>6. Reload your beatmap WITHOUT SAVING by either leaving and re-entering the editor or pressing Ctrl+L, Enter.</ListBoxItem>
+                <ListBoxItem>7. If you run into issues, consult the FAQ over on the [About] -&gt; [Website].</ListBoxItem>
             </ListBox>
         </Grid>
 
@@ -226,7 +223,7 @@
             <TextBlock Grid.Row="0"
                        Text="Changelog"
                        FontSize="32"
-                       FontWeight="Medium"
+                       FontWeight="Bold"
                        Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
             <ListBox Grid.Row="1"
                      Classes="content-list"
@@ -264,7 +261,7 @@
             <TextBlock Grid.Row="0"
                        Text="Recent"
                        FontSize="32"
-                       FontWeight="Medium"
+                       FontWeight="Bold"
                        Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
 
             <TableView x:Name="RecentMapsTable"
@@ -293,6 +290,11 @@
                     </TableViewColumn>
                 </TableView.Columns>
             </TableView>
+            <TextBlock Grid.Row="1"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       IsVisible="{Binding HasNoRecentMaps}"
+                       Text="No recent beatmaps." />
         </Grid>
     </Grid>
 </UserControl>

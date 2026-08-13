@@ -18,7 +18,7 @@ internal sealed class DialogValueAttribute : ValidationAttribute
                     : [validationContext.MemberName]);
         }
 
-        ValidationResult? result = viewModel.ValidateDialogValue(value);
+        ValidationResult? result = viewModel.ValidateDialogText(value);
         return result == ValidationResult.Success
             ? ValidationResult.Success
             : new ValidationResult(

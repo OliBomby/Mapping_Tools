@@ -13,7 +13,8 @@ public sealed class HotkeyEditorTests
     public void TryGetLegacyKey_WithSupportedAvaloniaNames_ReturnsWpfKeyValues()
     {
         // Arrange
-        string[] names = ["A", "D7", "NumPad3", "F12", "Delete"];
+        string[] names =
+            ["A", "D7", "NumPad3", "F12", "Delete", "BrowserBack", "MediaNextTrack", "OemPlus"];
 
         // Act
         int[] values = names.Select(name =>
@@ -23,7 +24,7 @@ public sealed class HotkeyEditorTests
         }).ToArray();
 
         // Assert
-        values.Should().Equal(44, 41, 77, 101, 32);
+        values.Should().Equal(44, 41, 77, 101, 32, 122, 132, 141);
     }
 
     [TestMethod]
