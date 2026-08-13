@@ -67,4 +67,19 @@ public sealed class ToolControlTests
         // Assert
         message.Should().Be("Beat divisor 'nope' is not a valid fraction or number.");
     }
+
+    [TestMethod]
+    public void ConvertError_WithBindingFailure_ReturnsOnlyErrorReason()
+    {
+        // Arrange
+        BindingNotification notification = new(
+            new FormatException("Enter a whole number."),
+            BindingErrorType.DataValidationError);
+
+        // Act
+        object message = ValidationErrorMessageConverter.ConvertError(notification);
+
+        // Assert
+        message.Should().Be("Enter a whole number.");
+    }
 }

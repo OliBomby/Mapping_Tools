@@ -55,27 +55,23 @@ public sealed class RhythmGuideViewModelTests
     }
 
     [TestMethod]
-    public async Task NewProjectAsync_WithDirtyStateAndRejectedConfirmation_PreservesInputs()
+    public async Task NewProjectAsync_WithModifiedInputs_InstallsDefaultWithoutConfirmation()
     {
         // Arrange
-        TestDialogService dialogs = new() { BooleanResult = false };
-        RhythmGuideViewModel viewModel = CreateViewModel(dialogs: dialogs);
+        RhythmGuideViewModel viewModel = CreateViewModel();
         viewModel.OutputName = "Unsaved";
 
         // Act
         await viewModel.NewProjectAsync();
 
         // Assert
-        viewModel.OutputName.Should().Be("Unsaved");
-        viewModel.IsDirty.Should().BeTrue();
-        dialogs.MessageCount.Should().Be(1);
+        viewModel.OutputName.Should().Be("Hitsounds");
     }
 
     private static RhythmGuideViewModel CreateViewModel(
         RecordingRhythmGuideService? rhythmGuide = null,
         TestFilePicker? filePicker = null,
-        TestFileRevealService? fileReveal = null,
-        TestDialogService? dialogs = null)
+        TestFileRevealService? fileReveal = null)
     {
         UserNotificationService notifications = new();
         ToolExecutionService execution = new(
@@ -89,7 +85,6 @@ public sealed class RhythmGuideViewModelTests
             filePicker ?? new TestFilePicker(),
             new StubCurrentBeatmapLocator(),
             new StubProjectService(),
-            dialogs ?? new TestDialogService(),
             fileReveal ?? new TestFileRevealService(),
             new StubRhythmGuideWindowService(),
             notifications,

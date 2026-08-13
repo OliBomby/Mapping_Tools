@@ -206,7 +206,6 @@ public sealed class MapCleanerViewModelTests
             settings,
             registry ?? new QuickRunCommandRegistry(),
             new StubProjects(),
-            new TestDialogService(),
             notifications,
             new StubLauncher());
     }

@@ -67,6 +67,8 @@
                     <Border x:Name="PART_RowBorder"
                             MinHeight="{TemplateBinding MinHeight}"
                             Background="{TemplateBinding Background}"
+                            BorderBrush="{DynamicResource MaterialDividerBrush}"
+                            BorderThickness="0,0,0,1"
                             Padding="{TemplateBinding Padding}">
                         <TableViewCellsPresenter x:Name="PART_CellsPresenter"
                                                  VerticalAlignment="Center" />

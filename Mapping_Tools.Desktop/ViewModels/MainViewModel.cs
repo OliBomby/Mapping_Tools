@@ -82,6 +82,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial ShellFeatureItemViewModel? SelectedFeature { get; set; }
 
+    /// <summary>Gets or sets the navigation item currently targeted by keyboard input.</summary>
+    [ObservableProperty]
+    public partial ShellFeatureItemViewModel? HighlightedFeature { get; set; }
+
     /// <summary>Gets queued notifications in publication order.</summary>
     public ObservableCollection<ShellNotificationViewModel> NotificationQueue { get; }
 
@@ -144,6 +148,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     private void Activate(ShellFeatureItemViewModel item)
     {
+        HighlightedFeature = item;
+
         foreach (ShellFeatureItemViewModel featureItem in FeatureItems)
         {
             featureItem.IsActive = ReferenceEquals(featureItem, item);
@@ -180,10 +186,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             Activate(value);
         }
     }
-
-    [RelayCommand]
-    private void ToggleNavigation() =>
-        IsNavigationOpen = !IsNavigationOpen;
 
     [RelayCommand]
     private Task OpenWebsiteAsync() =>
@@ -272,6 +274,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         {
             VisibleFeatures.Add(item);
         }
+
+        if (HighlightedFeature is null || !VisibleFeatures.Contains(HighlightedFeature))
+        {
+            HighlightedFeature = VisibleFeatures.FirstOrDefault();
+        }
     }
 
     private bool MatchesSearch(ShellFeatureItemViewModel item)
@@ -282,6 +289,25 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
 
         return item.SearchableText.Contains(SearchText.Trim(), StringComparison.CurrentCultureIgnoreCase);
+    }
+
+    internal void MoveHighlightedFeature(int offset)
+    {
+        if (VisibleFeatures.Count == 0)
+        {
+            return;
+        }
+
+        int currentIndex = HighlightedFeature is null
+            ? -1
+            : VisibleFeatures.IndexOf(HighlightedFeature);
+        int nextIndex = Math.Clamp(currentIndex + offset, 0, VisibleFeatures.Count - 1);
+        HighlightedFeature = VisibleFeatures[nextIndex];
+    }
+
+    internal void ActivateHighlightedFeature()
+    {
+        HighlightedFeature?.ActivateCommand.Execute(null);
     }
 
     private void OnNotificationPublished(

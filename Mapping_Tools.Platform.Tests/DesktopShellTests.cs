@@ -56,6 +56,52 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    public void MainViewModel_SearchExcludesHighlightedItem_HighlightsFirstVisibleFeature()
+    {
+        // Arrange
+        using MainViewModel viewModel = CreateMainViewModel(
+            [Registration("get-started", "Get started"), Registration("timing", "Timing copier")]);
+
+        // Act
+        viewModel.SearchText = "timing";
+
+        // Assert
+        viewModel.HighlightedFeature.Should().BeSameAs(viewModel.VisibleFeatures.Single());
+    }
+
+    [TestMethod]
+    public void MoveHighlightedFeature_WithKeyboardOffsets_ChangesOnlyHighlightedItem()
+    {
+        // Arrange
+        using MainViewModel viewModel = CreateMainViewModel(
+            [Registration("first", "First"), Registration("second", "Second")]);
+        ShellFeatureItemViewModel initiallyActive = viewModel.SelectedFeature!;
+
+        // Act
+        viewModel.MoveHighlightedFeature(1);
+
+        // Assert
+        viewModel.HighlightedFeature.Should().BeSameAs(viewModel.VisibleFeatures[1]);
+        viewModel.SelectedFeature.Should().BeSameAs(initiallyActive);
+    }
+
+    [TestMethod]
+    public void ActivateHighlightedFeature_WithKeyboardSelection_OpensHighlightedPage()
+    {
+        // Arrange
+        using MainViewModel viewModel = CreateMainViewModel(
+            [Registration("first", "First"), Registration("second", "Second")]);
+        viewModel.MoveHighlightedFeature(1);
+
+        // Act
+        viewModel.ActivateHighlightedFeature();
+
+        // Assert
+        viewModel.SelectedFeature.Should().BeSameAs(viewModel.VisibleFeatures[1]);
+        viewModel.HighlightedFeature.Should().BeSameAs(viewModel.SelectedFeature);
+    }
+
+    [TestMethod]
     public void MainViewModel_ToggleFavorite_UpdatesSettingsAndSortsFavoriteFirst()
     {
         // Arrange

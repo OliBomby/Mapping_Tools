@@ -30,6 +30,8 @@ public sealed class HotkeyEditor : TextBox
         IsReadOnly = true;
         IsUndoEnabled = false;
         InnerRightContent = null;
+        CaretBrush = Brushes.Transparent;
+        ContextFlyout = null;
         TextAlignment = TextAlignment.Center;
         UpdateText();
     }

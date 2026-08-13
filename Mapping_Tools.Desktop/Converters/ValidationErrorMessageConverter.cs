@@ -7,6 +7,11 @@ namespace Mapping_Tools.Desktop.Converters;
 /// <summary>Reduces binding validation failures to a concise user-facing reason.</summary>
 public sealed class ValidationErrorMessageConverter : IValueConverter
 {
+    /// <summary>
+    /// Gets the Avalonia validation-pipeline adapter that replaces raw exceptions with their concise reason.
+    /// </summary>
+    public static Func<object, object> ConvertError { get; } = value => Message(value);
+
     /// <summary>Returns only the useful message from a validation error.</summary>
     /// <param name="value">An exception, binding notification, or validation message.</param>
     /// <param name="targetType">The requested target type.</param>
@@ -17,7 +22,9 @@ public sealed class ValidationErrorMessageConverter : IValueConverter
         object? value,
         Type targetType,
         object? parameter,
-        CultureInfo culture) => value switch
+        CultureInfo culture) => Message(value);
+
+    private static object Message(object? value) => value switch
         {
             BindingNotification { Error: { } error } => Reason(error),
             Exception exception => Reason(exception),

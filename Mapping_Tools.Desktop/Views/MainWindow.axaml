@@ -31,11 +31,6 @@
         DragDrop.DragOver="AcceptFileDrop"
         DragDrop.Drop="OpenDroppedBeatmaps">
 
-    <Window.KeyBindings>
-        <KeyBinding Gesture="Ctrl+K"
-                    Command="{Binding ToggleNavigationCommand}" />
-    </Window.KeyBindings>
-
     <Window.Resources>
         <ControlTheme x:Key="ChromeButtonTheme"
                       TargetType="Button">
@@ -119,34 +114,16 @@
             <Setter Property="Height" Value="35" />
             <Setter Property="Padding" Value="12,0" />
         </Style>
-        <Style Selector="Button.navigation-item">
-            <Setter Property="Width" Value="183" />
-            <Setter Property="MinWidth" Value="183" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="Padding" Value="18,0" />
-            <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontWeight" Value="Normal" />
-            <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
+        <Style Selector="ListBox.navigation-list">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Border Background="{TemplateBinding Background}">
-                        <ContentPresenter Margin="{TemplateBinding Padding}"
-                                          Content="{TemplateBinding Content}"
-                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-                    </Border>
-                </ControlTemplate>
-            </Setter>
+            <Setter Property="Padding" Value="0" />
         </Style>
-        <Style Selector="Button.navigation-item.active">
-            <Setter Property="Background" Value="{DynamicResource MaterialFlatButtonClickBrush}" />
-        </Style>
-        <Style Selector="Button.navigation-item:pointerover">
-            <Setter Property="Background" Value="{DynamicResource MaterialFlatButtonClickBrush}" />
+        <Style Selector="ListBox.navigation-list ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="Transparent" />
         </Style>
         <Style Selector="ScrollViewer /template/ :is(ScrollBar):vertical">
             <Setter Property="Width" Value="13" />
@@ -160,17 +137,17 @@
         <Style Selector="ScrollViewer.navigation-scroll /template/ ScrollBar:vertical /template/ Thumb#PART_Thumb">
             <Setter Property="Width" Value="10" />
         </Style>
-        <Style Selector="TextBox.shell-search /template/ Panel#PART_TextFieldPanel">
+        <Style Selector="TextBox#ToolSearchBox /template/ Panel#PART_TextFieldPanel">
             <Setter Property="MinHeight" Value="35" />
         </Style>
-        <Style Selector="TextBox.shell-search /template/ Border#PART_BackgroundTextField">
+        <Style Selector="TextBox#ToolSearchBox /template/ Border#PART_BackgroundTextField">
             <Setter Property="Margin" Value="0" />
         </Style>
-        <Style Selector="TextBox.shell-search /template/ Panel#PART_TextContainer">
+        <Style Selector="TextBox#ToolSearchBox /template/ Panel#PART_TextContainer">
             <Setter Property="Margin" Value="10,0,4,0" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
-        <Style Selector="TextBox.shell-search /template/ DockPanel#PART_InnerPanel > ContentControl#PART_RightContentControl">
+        <Style Selector="TextBox#ToolSearchBox /template/ DockPanel#PART_InnerPanel > ContentControl#PART_RightContentControl">
             <Setter Property="Margin" Value="0" />
         </Style>
     </Window.Styles>
@@ -192,7 +169,7 @@
                                       Height="35"
                                       AutomationProperties.Name="Navigation menu"
                                       IsChecked="{Binding IsNavigationOpen, Mode=TwoWay}"
-                                      ToolTip.Tip="Use Ctrl+K to toggle navigation.">
+                                      ToolTip.Tip="Use Ctrl+K to open navigation.">
                             <materialIcons:MaterialIcon Kind="Menu"
                                                         Width="28"
                                                         Height="28" />
@@ -411,8 +388,9 @@
                 <SplitView.Pane>
                     <DockPanel Width="200"
                                Background="{DynamicResource MaterialPaperBrush}">
-                        <TextBox DockPanel.Dock="Top"
-                                 Classes="outline shell-search clearButton"
+                        <TextBox x:Name="ToolSearchBox"
+                                 DockPanel.Dock="Top"
+                                 Classes="clearButton outline"
                                  Margin="16,16,16,0"
                                  Padding="8"
                                  Height="35"
@@ -420,34 +398,36 @@
                                  UseFloatingPlaceholder="False"
                                  PlaceholderText="Search"
                                  Text="{Binding SearchText, Mode=TwoWay}"
+                                 KeyDown="HandleSearchKeyDown"
                                  ToolTip.Tip="Search registered features">
                         </TextBox>
 
-                        <ScrollViewer Classes="navigation-scroll"
-                                      Width="200"
-                                      Margin="0,16"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      VerticalScrollBarVisibility="Auto">
-                            <ItemsControl Width="183"
-                                          HorizontalAlignment="Left"
-                                          AutomationProperties.Name="Tools menu"
-                                          ItemsSource="{Binding VisibleFeatures}">
-                            <ItemsControl.ItemTemplate>
+                        <ListBox x:Name="ToolList"
+                                 Classes="navigation-list"
+                                 Width="200"
+                                 Margin="0,16"
+                                 HorizontalAlignment="Left"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 AutomationProperties.Name="Tools menu"
+                                 ItemsSource="{Binding VisibleFeatures}"
+                                 SelectedItem="{Binding HighlightedFeature, Mode=TwoWay}"
+                                 KeyDown="HandleToolListKeyDown">
+                            <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="vm:ShellFeatureItemViewModel">
                                     <StackPanel>
                                         <Separator IsVisible="{Binding StartsSection}"
                                                    Height="1"
                                                    Margin="8,10,8,10"
                                                    Background="{DynamicResource MaterialDividerBrush}"
-                                                   IsHitTestVisible="False"
-                                                   Focusable="False" />
-                                        <Button Classes="navigation-item"
-                                                Classes.active="{Binding IsActive}"
+                                                   Focusable="False"
+                                                   PointerPressed="IgnoreNavigationDivider" />
+                                        <Border Classes="navigation-item"
                                                 Height="{Binding NavigationHeight}"
-                                                Command="{Binding ActivateCommand}"
-                                                Content="{Binding DisplayName}"
+                                                Padding="18,0"
+                                                PointerPressed="ActivateNavigationItem"
                                                 ToolTip.Tip="{Binding Description}">
-                                            <Button.ContextMenu>
+                                            <Border.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Header="Favorite"
                                                               IsVisible="{Binding !IsFavorite}"
@@ -464,13 +444,17 @@
                                                         </MenuItem.Icon>
                                                     </MenuItem>
                                                 </ContextMenu>
-                                            </Button.ContextMenu>
-                                        </Button>
+                                            </Border.ContextMenu>
+                                            <TextBlock VerticalAlignment="Center"
+                                                       FontSize="14"
+                                                       FontWeight="Normal"
+                                                       Foreground="{DynamicResource MaterialBodyBrush}"
+                                                       Text="{Binding DisplayName}" />
+                                        </Border>
                                     </StackPanel>
                                 </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
                     </DockPanel>
                 </SplitView.Pane>
 

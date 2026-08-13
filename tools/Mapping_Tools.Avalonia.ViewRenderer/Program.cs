@@ -99,6 +99,13 @@ if (options.Scenario.Equals("running", StringComparison.OrdinalIgnoreCase))
         progressBar.Value = 45;
     }
 }
+if (options.Scenario.Equals("preferences-hotkey-states", StringComparison.OrdinalIgnoreCase))
+{
+    HotkeyEditor[] editors = host.GetVisualDescendants().OfType<HotkeyEditor>().ToArray();
+    editors[0].Focus();
+    Point pointer = editors[1].TranslatePoint(new Point(2, 2), host) ?? new Point(2, 2);
+    host.MouseMove(pointer);
+}
 var frame = host.CaptureRenderedFrame()
             ?? throw new InvalidOperationException("Avalonia did not produce a rendered frame.");
 Directory.CreateDirectory(Path.GetDirectoryName(options.Output)!);
@@ -276,7 +283,6 @@ static Control CreateRhythmGuideView(string scenario)
         new RendererFilePicker(),
         RendererStub<ICurrentBeatmapLocator>.Create(),
         RendererStub<IProjectService>.Create(),
-        new RendererDialogService(),
         new RendererFileRevealService(),
         RendererStub<IRhythmGuideWindowService>.Create(),
         new UserNotificationService(),
@@ -320,7 +326,6 @@ static Control CreateMapCleanerView(string scenario)
         settings,
         new QuickRunCommandRegistry(),
         RendererStub<IProjectService>.Create(),
-        new RendererDialogService(),
         new UserNotificationService(),
         new AcceptedLauncher());
     PrepareToolState(viewModel, scenario);

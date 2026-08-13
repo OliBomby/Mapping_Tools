@@ -1,6 +1,7 @@
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
+using Material.Styles.Controls;
 using Material.Icons;
 using Material.Icons.Avalonia;
 
@@ -9,7 +10,7 @@ namespace Mapping_Tools.Desktop.Controls;
 /// <summary>
 /// Presents one stable tool action button that runs while idle and cancels while running.
 /// </summary>
-public sealed class ToolRunButton : Button
+public sealed class ToolRunButton : FloatingButton
 {
     private readonly MaterialIcon _icon = new();
 
@@ -39,6 +40,7 @@ public sealed class ToolRunButton : Button
     public ToolRunButton()
     {
         Classes.Add("tool-run-action");
+        Classes.Add("no-transitions");
         _icon.Width = 42;
         _icon.Height = 42;
         Content = _icon;

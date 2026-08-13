@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
-using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
@@ -29,14 +28,12 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
     private readonly ApplicationSettings _settings;
     private readonly IQuickRunCommandRegistry _quickRunRegistry;
     private readonly IProjectService _projects;
-    private readonly IDialogService _dialogs;
     private readonly IUserNotificationService _notifications;
     private readonly IPlatformLauncher _launcher;
     private readonly ProjectDefinition<MapCleanerProject> _definition = new(
         "mapcleanerproject.json",
         "Map Cleaner Projects",
         () => new MapCleanerProject());
-    private bool _installing;
     private bool _loadedAutosave;
 
     /// <summary>Gets or sets whether slider volume changes are preserved.</summary>
@@ -92,10 +89,6 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
     [ObservableProperty]
     public partial double Progress { get; private set; }
 
-    /// <summary>Gets whether the current project contains unsaved option changes.</summary>
-    [ObservableProperty]
-    public partial bool IsDirty { get; private set; }
-
     /// <summary>Gets a textual summary of the latest cleanup.</summary>
     [ObservableProperty]
     public partial string ResultSummary { get; private set; } =
@@ -121,7 +114,6 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
     /// <param name="settings">Supplies shared execution preferences.</param>
     /// <param name="quickRunRegistry">Tracks the active QuickRun-capable tool.</param>
     /// <param name="projects">Loads, saves, and autosaves typed projects.</param>
-    /// <param name="dialogs">Confirms destructive project changes.</param>
     /// <param name="notifications">Publishes project persistence failures.</param>
     /// <param name="launcher">Navigates osu! to selected timeline markers.</param>
     public MapCleanerViewModel(
@@ -132,7 +124,6 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
         ApplicationSettings settings,
         IQuickRunCommandRegistry quickRunRegistry,
         IProjectService projects,
-        IDialogService dialogs,
         IUserNotificationService notifications,
         IPlatformLauncher launcher)
     {
@@ -144,7 +135,6 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
         _quickRunRegistry = quickRunRegistry ??
             throw new ArgumentNullException(nameof(quickRunRegistry));
         _projects = projects ?? throw new ArgumentNullException(nameof(projects));
-        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
     }
@@ -208,27 +198,18 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
     /// <returns>A task that completes after the save attempt.</returns>
     public async Task SaveProjectAsync(CancellationToken cancellationToken = default)
     {
-        string? path = await _projects.SaveAsAsync(
+        await _projects.SaveAsAsync(
             _definition,
             Snapshot(),
             "map-cleaner-project.json",
             cancellationToken);
-        if (path is not null)
-        {
-            IsDirty = false;
-        }
     }
 
-    /// <summary>Confirms unsaved changes and opens a Map Cleaner project.</summary>
-    /// <param name="cancellationToken">Cancels confirmation, picking, or loading.</param>
+    /// <summary>Opens a Map Cleaner project selected by the user.</summary>
+    /// <param name="cancellationToken">Cancels picking or loading.</param>
     /// <returns>A task that completes after the open attempt.</returns>
     public async Task OpenProjectAsync(CancellationToken cancellationToken = default)
     {
-        if (!await ConfirmDiscardAsync(cancellationToken))
-        {
-            return;
-        }
-
         ProjectOpenResult<MapCleanerProject>? opened = await _projects.OpenAsync(
             _definition,
             cancellationToken);
@@ -238,15 +219,13 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
         }
     }
 
-    /// <summary>Confirms unsaved changes and installs a new default project.</summary>
-    /// <param name="cancellationToken">Cancels confirmation.</param>
+    /// <summary>Installs a new default Map Cleaner project.</summary>
+    /// <param name="cancellationToken">Unused cancellation token retained by the project-feature contract.</param>
     /// <returns>A task that completes after the new-project attempt.</returns>
-    public async Task NewProjectAsync(CancellationToken cancellationToken = default)
+    public Task NewProjectAsync(CancellationToken cancellationToken = default)
     {
-        if (await ConfirmDiscardAsync(cancellationToken))
-        {
-            Install(_projects.CreateNew(_definition));
-        }
+        Install(_projects.CreateNew(_definition));
+        return Task.CompletedTask;
     }
 
     private async Task RunPathsAsync(IReadOnlyList<string> paths, bool quick, CancellationToken cancellationToken)
@@ -319,7 +298,6 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
     {
         MapCleanerOptions options = project?.MapCleanerArgs ??
             throw new InvalidDataException("Map Cleaner project is incomplete.");
-        _installing = true;
         VolumeSliders = options.VolumeSliders;
         SampleSetSliders = options.SampleSetSliders;
         VolumeSpinners = options.VolumeSpinners;
@@ -331,27 +309,6 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
         RemoveMuting = options.RemoveMuting;
         RemoveUnclickableHitsounds = options.RemoveUnclickableHitsounds;
         BeatDivisors = options.BeatDivisors.ToArray();
-        _installing = false;
-        IsDirty = false;
-    }
-
-    private async Task<bool> ConfirmDiscardAsync(CancellationToken cancellationToken)
-    {
-        if (!IsDirty)
-        {
-            return true;
-        }
-
-        return await _dialogs.ShowMessageAsync(
-            new MessageDialogRequest<bool>(
-                "Confirm new project",
-                "All unsaved Map Cleaner changes will be lost. Continue?",
-                [
-                    new DialogChoice<bool>("Continue", true, IsDefault: true),
-                    new DialogChoice<bool>("Cancel", false, IsCancel: true)
-                ],
-                false),
-            cancellationToken);
     }
 
     private async Task LoadAutosaveAsync()
@@ -360,10 +317,7 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
         {
             MapCleanerProject project = await _projects.LoadAsync<MapCleanerProject>(
                 _projects.GetAutoSavePath(_definition));
-            if (!IsDirty)
-            {
-                Install(project);
-            }
+            Install(project);
         }
         catch (FileNotFoundException)
         {
@@ -423,22 +377,4 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
             : string.Empty) +
         "!";
 
-    partial void OnVolumeSlidersChanged(bool value) => MarkDirty();
-    partial void OnSampleSetSlidersChanged(bool value) => MarkDirty();
-    partial void OnVolumeSpinnersChanged(bool value) => MarkDirty();
-    partial void OnResnapObjectsChanged(bool value) => MarkDirty();
-    partial void OnResnapBookmarksChanged(bool value) => MarkDirty();
-    partial void OnAnalyzeSamplesChanged(bool value) => MarkDirty();
-    partial void OnRemoveUnusedSamplesChanged(bool value) => MarkDirty();
-    partial void OnRemoveHitsoundsChanged(bool value) => MarkDirty();
-    partial void OnRemoveMutingChanged(bool value) => MarkDirty();
-    partial void OnRemoveUnclickableHitsoundsChanged(bool value) => MarkDirty();
-    partial void OnBeatDivisorsChanged(IBeatDivisor[] value) => MarkDirty();
-    private void MarkDirty()
-    {
-        if (!_installing)
-        {
-            IsDirty = true;
-        }
-    }
 }

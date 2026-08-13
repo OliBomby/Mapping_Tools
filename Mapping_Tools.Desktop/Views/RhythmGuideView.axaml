@@ -23,8 +23,9 @@
                                  Text="{Binding SourcePathsText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  ToolTip.Tip="One or more beatmap paths separated by |." />
                         <TextBlock Grid.Column="1"
-                                   Margin="3,15,5,0"
+                                   Margin="3,0,5,5"
                                    Padding="0,0,2,0"
+                                   VerticalAlignment="Bottom"
                                    FontStyle="Italic"
                                    Text="{Binding SourceCount, StringFormat='{}{0} maps total'}" />
                         <Button Grid.Column="2"

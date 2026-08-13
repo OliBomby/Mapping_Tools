@@ -65,7 +65,7 @@ internal static class Program
         FrameworkElement view;
         try
         {
-            view = (FrameworkElement)(CreateView(type)
+            view = (FrameworkElement)(CreateView(type, options.Scenario)
                                       ?? throw new InvalidOperationException($"Could not construct '{type.FullName}'."));
         }
         catch (Exception exception)
@@ -157,7 +157,7 @@ internal static class Program
         app.Shutdown();
     }
 
-    private static object? CreateView(Type type)
+    private static object? CreateView(Type type, string scenario)
     {
         if (type == typeof(MainWindow))
         {
@@ -194,7 +194,14 @@ internal static class Program
             type == typeof(Mapping_Tools.Views.MapCleaner.CleanerView))
         {
             CreateDesignerMainWindow();
-            return Activator.CreateInstance(type);
+            var tool = (Mapping_Tools.Views.SingleRunMappingTool?)Activator.CreateInstance(type);
+            if (tool is not null && scenario.Equals("running", StringComparison.OrdinalIgnoreCase))
+            {
+                tool.CanRun = false;
+                tool.Progress = 45;
+            }
+
+            return tool;
         }
 
         return Activator.CreateInstance(type);

@@ -4,6 +4,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
@@ -37,6 +38,7 @@ public partial class MainWindow : Window
     {
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         InitializeComponent();
+        AddHandler(KeyDownEvent, HandleWindowKeyDown, RoutingStrategies.Tunnel);
         PositionChanged += (_, _) => CaptureNormalBounds();
         Resized += (_, _) => CaptureNormalBounds();
     }
@@ -140,6 +142,88 @@ public partial class MainWindow : Window
             : WindowState.Maximized;
 
     private void CloseWindow(object? sender, RoutedEventArgs eventArgs) => Close();
+
+    private void HandleWindowKeyDown(object? sender, KeyEventArgs eventArgs)
+    {
+        if (eventArgs.Key != Key.K || eventArgs.KeyModifiers != KeyModifiers.Control)
+        {
+            return;
+        }
+
+        if (DataContext is MainViewModel viewModel)
+        {
+            viewModel.IsNavigationOpen = true;
+            Dispatcher.UIThread.Post(
+                () => ToolSearchBox.Focus(),
+                DispatcherPriority.Input);
+        }
+
+        eventArgs.Handled = true;
+    }
+
+    private void HandleSearchKeyDown(object? sender, KeyEventArgs eventArgs)
+    {
+        if (DataContext is not MainViewModel viewModel)
+        {
+            return;
+        }
+
+        switch (eventArgs.Key)
+        {
+            case Key.Enter:
+                viewModel.ActivateHighlightedFeature();
+                break;
+            case Key.Up:
+                MoveHighlightedFeature(viewModel, -1);
+                break;
+            case Key.Down:
+                MoveHighlightedFeature(viewModel, 1);
+                break;
+            case Key.Escape:
+                viewModel.SearchText = string.Empty;
+                break;
+            default:
+                return;
+        }
+
+        eventArgs.Handled = true;
+    }
+
+    private void HandleToolListKeyDown(object? sender, KeyEventArgs eventArgs)
+    {
+        if (eventArgs.Key == Key.Enter && DataContext is MainViewModel viewModel)
+        {
+            viewModel.ActivateHighlightedFeature();
+            eventArgs.Handled = true;
+        }
+    }
+
+    private void ActivateNavigationItem(object? sender, PointerPressedEventArgs eventArgs)
+    {
+        if (!eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed ||
+            sender is not Control { DataContext: ShellFeatureItemViewModel item } ||
+            DataContext is not MainViewModel viewModel)
+        {
+            return;
+        }
+
+        viewModel.HighlightedFeature = item;
+        viewModel.ActivateHighlightedFeature();
+        eventArgs.Handled = true;
+    }
+
+    private static void IgnoreNavigationDivider(
+        object? sender,
+        PointerPressedEventArgs eventArgs) => eventArgs.Handled = true;
+
+    private void MoveHighlightedFeature(MainViewModel viewModel, int offset)
+    {
+        viewModel.MoveHighlightedFeature(offset);
+        if (viewModel.HighlightedFeature is { } highlightedFeature)
+        {
+            ToolList.ScrollIntoView(highlightedFeature);
+        }
+    }
 
     private void DragCurrentMaps(object? sender, PointerPressedEventArgs eventArgs)
     {

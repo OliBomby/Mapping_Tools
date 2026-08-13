@@ -179,6 +179,7 @@
                                    Text="None:"
                                    ToolTip.Tip="This tool receives QuickRun when no hit objects are selected." />
                         <ComboBox Width="120"
+                                  Classes="compact"
                                   ItemsSource="{Binding NoneQuickRunTools}"
                                   SelectedItem="{Binding NoneQuickRunTool, Mode=TwoWay}"
                                   ToolTip.Tip="QuickRun target for no selected hit objects." />
@@ -187,6 +188,7 @@
                                    Text="Single:"
                                    ToolTip.Tip="This tool receives QuickRun when one hit object is selected." />
                         <ComboBox Width="120"
+                                  Classes="compact"
                                   ItemsSource="{Binding SingleQuickRunTools}"
                                   SelectedItem="{Binding SingleQuickRunTool, Mode=TwoWay}"
                                   ToolTip.Tip="QuickRun target for one selected hit object." />
@@ -195,6 +197,7 @@
                                    Text="Multiple:"
                                    ToolTip.Tip="This tool receives QuickRun when multiple hit objects are selected." />
                         <ComboBox Width="120"
+                                  Classes="compact"
                                   ItemsSource="{Binding MultipleQuickRunTools}"
                                   SelectedItem="{Binding MultipleQuickRunTool, Mode=TwoWay}"
                                   ToolTip.Tip="QuickRun target for multiple selected hit objects." />

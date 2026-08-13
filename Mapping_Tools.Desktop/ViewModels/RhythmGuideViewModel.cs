@@ -30,13 +30,11 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
     private readonly IFilePicker _filePicker;
     private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
     private readonly IProjectService _projects;
-    private readonly IDialogService _dialogs;
     private readonly IFileRevealService _fileReveal;
     private readonly IRhythmGuideWindowService _windowService;
     private readonly IUserNotificationService _notifications;
     private readonly ProjectDefinition<RhythmGuideProject> _definition;
     private IBeatDivisor[] _beatDivisors = DefaultBeatDivisors();
-    private bool _installing;
     private bool _loadedAutosave;
 
     /// <summary>Gets or sets source beatmap paths separated by vertical bars.</summary>
@@ -77,17 +75,12 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
     [ObservableProperty]
     public partial double Progress { get; private set; }
 
-    /// <summary>Gets whether the current project has unsaved input changes.</summary>
-    [ObservableProperty]
-    public partial bool IsDirty { get; private set; }
-
     /// <summary>Creates a Rhythm Guide presentation model.</summary>
     /// <param name="rhythmGuide">Generates framework-independent guide beatmaps.</param>
     /// <param name="execution">Coordinates cancellation, backup, and notifications.</param>
     /// <param name="filePicker">Selects source and destination beatmap files.</param>
     /// <param name="currentBeatmapLocator">Finds the beatmap open in osu!.</param>
     /// <param name="projects">Loads, saves, and autosaves typed projects.</param>
-    /// <param name="dialogs">Confirms replacement of unsaved project changes.</param>
     /// <param name="fileReveal">Reveals newly generated beatmaps.</param>
     /// <param name="windowService">Opens the auxiliary Rhythm Guide window.</param>
     /// <param name="notifications">Publishes project persistence failures.</param>
@@ -98,7 +91,6 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         IFilePicker filePicker,
         ICurrentBeatmapLocator currentBeatmapLocator,
         IProjectService projects,
-        IDialogService dialogs,
         IFileRevealService fileReveal,
         IRhythmGuideWindowService windowService,
         IUserNotificationService notifications,
@@ -109,7 +101,6 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         _currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         _projects = projects ?? throw new ArgumentNullException(nameof(projects));
-        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         _fileReveal = fileReveal ?? throw new ArgumentNullException(nameof(fileReveal));
         _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
@@ -120,7 +111,6 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
             "rhythmguideproject.json",
             "Rhythm Guide Projects",
             () => CreateDefaultProject(defaultExportPath));
-        IsDirty = false;
     }
 
     /// <summary>Gets every supported export mode for selection controls.</summary>
@@ -155,27 +145,18 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
     /// <returns>A task that completes after the save attempt.</returns>
     public async Task SaveProjectAsync(CancellationToken cancellationToken = default)
     {
-        string? path = await _projects.SaveAsAsync(
+        await _projects.SaveAsAsync(
             _definition,
             Snapshot(),
             "rhythm-guide-project.json",
             cancellationToken);
-        if (path is not null)
-        {
-            IsDirty = false;
-        }
     }
 
-    /// <summary>Confirms unsaved changes and opens a Rhythm Guide project.</summary>
-    /// <param name="cancellationToken">Cancels confirmation, picking, or loading.</param>
+    /// <summary>Opens a Rhythm Guide project selected by the user.</summary>
+    /// <param name="cancellationToken">Cancels picking or loading.</param>
     /// <returns>A task that completes after the open attempt.</returns>
     public async Task OpenProjectAsync(CancellationToken cancellationToken = default)
     {
-        if (!await ConfirmDiscardAsync(cancellationToken))
-        {
-            return;
-        }
-
         ProjectOpenResult<RhythmGuideProject>? opened = await _projects.OpenAsync(
             _definition,
             cancellationToken);
@@ -186,15 +167,13 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         }
     }
 
-    /// <summary>Confirms unsaved changes and installs a new default project.</summary>
-    /// <param name="cancellationToken">Cancels confirmation.</param>
+    /// <summary>Installs a new default Rhythm Guide project.</summary>
+    /// <param name="cancellationToken">Unused cancellation token retained by the project-feature contract.</param>
     /// <returns>A task that completes after the new-project attempt.</returns>
-    public async Task NewProjectAsync(CancellationToken cancellationToken = default)
+    public Task NewProjectAsync(CancellationToken cancellationToken = default)
     {
-        if (await ConfirmDiscardAsync(cancellationToken))
-        {
-            Install(_projects.CreateNew(_definition));
-        }
+        Install(_projects.CreateNew(_definition));
+        return Task.CompletedTask;
     }
 
     [RelayCommand]
@@ -337,7 +316,6 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
     {
         ValidateProject(project);
         RhythmGuideOptions options = project.GuideGeneratorArgs;
-        _installing = true;
         SourcePathsText = string.Join('|', options.Paths);
         ExportPath = options.ExportPath;
         ExportMode = options.ExportMode;
@@ -346,26 +324,6 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         NcEverything = options.NcEverything;
         SelectionMode = options.SelectionMode;
         _beatDivisors = options.BeatDivisors.ToArray();
-        _installing = false;
-        IsDirty = false;
-    }
-
-    private async Task<bool> ConfirmDiscardAsync(CancellationToken cancellationToken)
-    {
-        if (!IsDirty)
-        {
-            return true;
-        }
-        return await _dialogs.ShowMessageAsync(
-            new MessageDialogRequest<bool>(
-                "Confirm new project",
-                "All unsaved Rhythm Guide changes will be lost. Continue?",
-                [
-                    new DialogChoice<bool>("Continue", true, IsDefault: true),
-                    new DialogChoice<bool>("Cancel", false, IsCancel: true)
-                ],
-                dismissResult: false),
-            cancellationToken);
     }
 
     private async Task LoadAutosaveAsync()
@@ -374,10 +332,7 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         {
             RhythmGuideProject project = await _projects.LoadAsync<RhythmGuideProject>(
                 _projects.GetAutoSavePath(_definition));
-            if (!IsDirty)
-            {
-                Install(project);
-            }
+            Install(project);
         }
         catch (FileNotFoundException)
         {
@@ -443,21 +398,5 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
     partial void OnSourcePathsTextChanged(string value)
     {
         OnPropertyChanged(nameof(SourceCount));
-        MarkDirty();
-    }
-
-    partial void OnExportPathChanged(string value) => MarkDirty();
-    partial void OnExportModeChanged(RhythmGuideExportMode value) => MarkDirty();
-    partial void OnOutputGameModeChanged(GameMode value) => MarkDirty();
-    partial void OnOutputNameChanged(string value) => MarkDirty();
-    partial void OnNcEverythingChanged(bool value) => MarkDirty();
-    partial void OnSelectionModeChanged(RhythmGuideSelectionMode value) => MarkDirty();
-
-    private void MarkDirty()
-    {
-        if (!_installing)
-        {
-            IsDirty = true;
-        }
     }
 }
