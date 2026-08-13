@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\mt_icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

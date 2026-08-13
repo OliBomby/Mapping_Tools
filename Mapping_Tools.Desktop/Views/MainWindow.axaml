@@ -21,7 +21,7 @@
         WindowDecorations="BorderOnly"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaTitleBarHeightHint="35"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/mt_icon.ico"
         Background="{DynamicResource MaterialPaperBrush}"
         Foreground="{DynamicResource MaterialBodyBrush}"
         FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
