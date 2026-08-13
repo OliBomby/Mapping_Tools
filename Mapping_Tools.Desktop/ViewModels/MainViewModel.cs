@@ -279,10 +279,26 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             "Open project");
 
     [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
-    private Task NewProjectAsync() =>
-        RunProjectOperationAsync(
+    private async Task NewProjectAsync()
+    {
+        bool confirmed = await _dialogs.ShowMessageAsync(
+            new MessageDialogRequest<bool>(
+                "Confirm new project",
+                "Are you sure you want to start a new project? All unsaved progress will be lost.",
+                [
+                    new DialogChoice<bool>("Yes", true, IsDefault: true),
+                    new DialogChoice<bool>("No", false, IsCancel: true)
+                ],
+                dismissResult: false));
+        if (!confirmed)
+        {
+            return;
+        }
+
+        await RunProjectOperationAsync(
             feature => feature.NewProjectAsync(),
             "New project");
+    }
 
     private void ToggleFavorite(ShellFeatureItemViewModel item)
     {

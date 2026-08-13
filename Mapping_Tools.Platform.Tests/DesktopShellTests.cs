@@ -346,11 +346,13 @@ public sealed class DesktopShellTests
     {
         // Arrange
         StubProjectFeatureViewModel project = new();
+        TestDialogService dialogs = new() { BooleanResult = true };
         using MainViewModel viewModel = CreateMainViewModel(
-        [
-            Registration("home", "Home"),
-            Registration("project", "Project", () => project)
-        ]);
+            [
+                Registration("home", "Home"),
+                Registration("project", "Project", () => project)
+            ],
+            dialogs: dialogs);
         ShellFeatureItemViewModel projectItem = viewModel.FeatureItems
             .Single(item => item.Id == "project");
 
@@ -365,6 +367,31 @@ public sealed class DesktopShellTests
         project.SaveCount.Should().Be(1);
         project.OpenCount.Should().Be(1);
         project.NewCount.Should().Be(1);
+    }
+
+    [TestMethod]
+    public async Task NewProjectCommand_WhenConfirmationIsDeclined_DoesNotReplaceProject()
+    {
+        // Arrange
+        StubProjectFeatureViewModel project = new();
+        TestDialogService dialogs = new() { BooleanResult = false };
+        using MainViewModel viewModel = CreateMainViewModel(
+            [Registration("project", "Project", () => project)],
+            dialogs: dialogs);
+
+        // Act
+        await ExecuteAsync(viewModel.NewProjectCommand);
+
+        // Assert
+        project.NewCount.Should().Be(0);
+        dialogs.MessageCount.Should().Be(1);
+        MessageDialogRequest<bool> request = dialogs.LastMessageRequest.Should()
+            .BeOfType<MessageDialogRequest<bool>>().Subject;
+        request.Title.Should().Be("Confirm new project");
+        request.Message.Should().Be(
+            "Are you sure you want to start a new project? All unsaved progress will be lost.");
+        request.Choices.Select(choice => choice.Label).Should().Equal("Yes", "No");
+        request.DismissResult.Should().BeFalse();
     }
 
     [TestMethod]
