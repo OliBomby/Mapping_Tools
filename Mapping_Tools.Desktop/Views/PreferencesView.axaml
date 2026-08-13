@@ -213,7 +213,7 @@
                         Orientation="Horizontal">
                 <TextBlock Text="Light"
                            VerticalAlignment="Center" />
-                <ToggleButton Margin="10,0"
+                <ToggleSwitch Margin="10,0"
                               AutomationProperties.Name="Dark theme"
                               IsChecked="{Binding Theme,
                                                   Mode=TwoWay,
