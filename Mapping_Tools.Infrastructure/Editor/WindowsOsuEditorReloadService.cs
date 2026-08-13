@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Mapping_Tools.Application.BeatmapEditing;
 
@@ -13,23 +14,36 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
     private const byte VirtualKeyL = 0x4C;
     private const byte VirtualKeyEnter = 0x0D;
     private const uint KeyUp = 0x0002;
+    private readonly Func<Process?> _findProcess;
+
+    /// <summary>
+    /// Creates a reload adapter that discovers the active osu!stable process
+    /// when a reload is requested.
+    /// </summary>
+    public WindowsOsuEditorReloadService()
+        : this(OsuProcessDiscovery.FindStableProcess)
+    {
+    }
+
+    internal WindowsOsuEditorReloadService(Func<Process?> findProcess)
+    {
+        _findProcess = findProcess ?? throw new ArgumentNullException(nameof(findProcess));
+    }
 
     /// <inheritdoc/>
     public async Task ReloadAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        using Process? process = _findProcess();
+        if (process is null || process.MainWindowHandle == IntPtr.Zero)
+        {
+            return;
+        }
+
         if (!OperatingSystem.IsWindows())
         {
             throw new PlatformNotSupportedException(
                 "Reloading osu!'s editor is only supported on Windows.");
-        }
-
-        cancellationToken.ThrowIfCancellationRequested();
-        using System.Diagnostics.Process? process =
-            OsuProcessDiscovery.FindStableProcess();
-        if (process is null || process.MainWindowHandle == IntPtr.Zero)
-        {
-            throw new InvalidOperationException(
-                "No running osu!stable window is available to reload.");
         }
 
         if (GetForegroundWindow() != process.MainWindowHandle)

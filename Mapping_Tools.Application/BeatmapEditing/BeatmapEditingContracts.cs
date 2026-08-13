@@ -144,10 +144,11 @@ public interface ILiveBeatmapReader
 public interface IEditorReloadService
 {
     /// <summary>
-    /// Sends the reload gesture to an active osu! editor.
+    /// Sends the reload gesture to an active osu! editor, or does nothing when
+    /// osu! is closed or has no usable window.
     /// </summary>
     /// <param name="cancellationToken">Cancels before or between input operations.</param>
-    /// <returns>A task that completes after the reload gesture has been delivered.</returns>
+    /// <returns>A task that completes after the reload gesture is delivered or skipped.</returns>
     Task ReloadAsync(CancellationToken cancellationToken = default);
 }
 
