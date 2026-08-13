@@ -49,35 +49,6 @@ Use only official Avalonia documentation, the Avalonia 12.1.0 tagged source/rele
 - Use Material.Avalonia's semantic dynamic resources and the application-level styles already registered in `App.axaml`. 
 - Prefer using re-usable styles and components rather than re-defining the same styles in every view.
 
-## Visual parity gate
-
-Use `$render-desktop-view` to capture the WPF view and Avalonia port with identical deterministic state and dimensions.
-
-Treat the legacy WPF rendering as the specification unless the user explicitly
-requests a redesign. "Similar", "modernized", "cleaner", and "structurally
-equivalent" are not visual parity.
-
-After editing:
-
-1. Render WPF and Avalonia at identical dimensions and with identical data.
-2. Open both images and compare them. Write down **all** visible differences.
-   Also focus on details such as clipped text, slight color differences, missing dividers, or uneven margins.
-3. Compare all applicable non-default states too: light mode, opened menus and context menus, hover,
-   focus, checked and unchecked toggles, selected rows, populated tables,
-   resized windows or columns, overflow, filled and empty states, and validation errors.
-4. Try to make your test states maximally useful, testing multiple state changes in a single image.
-   Test at most 3 different states per view. Fewer is better.
-5. Iterate on every visible mismatch that is under application control.
-   Framework rasterization differences may be documented only after font,
-   size, weight, line height, spacing, and colors have been matched.
-6. Do not claim parity or completion while differences remain.
-7. Prove native behaviors such as title-bar dragging, window controls, popup
-   placement, and platform dialogs in a real desktop run; a headless render
-   cannot prove them.
-8. In the handoff, list any remaining visible difference precisely. If none
-   was explicitly authorized by the user, treat it as unfinished work rather
-   than an intentional design change.
-
 ## Completion criteria
 
 Complete a feature migration only when:
@@ -89,5 +60,3 @@ Complete a feature migration only when:
 - Each legacy interactive element is represented by the correct Avalonia
   control and preserves its selection, resizing, dragging, menu, hover,
   focus, checked, and keyboard behavior where applicable.
-- Equal-state, equal-viewport WPF and Avalonia renders have been opened and
-  inspected, and no unrequested visible design differences remain.
