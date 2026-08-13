@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
         xmlns:views="using:Mapping_Tools.Desktop.Views"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -124,6 +125,12 @@
             <Setter Property="Margin" Value="0" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="Separator.navigation-divider">
+            <Setter Property="Height" Value="1" />
+            <Setter Property="Margin" Value="8,10" />
+            <Setter Property="Background" Value="{DynamicResource MaterialDividerBrush}" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
         <Style Selector="ScrollViewer /template/ :is(ScrollBar):vertical">
             <Setter Property="Width" Value="13" />
@@ -430,63 +437,46 @@
                                  UseFloatingPlaceholder="False"
                                  PlaceholderText="Search"
                                  Text="{Binding SearchText, Mode=TwoWay}"
-                                 KeyDown="HandleSearchKeyDown"
                                  ToolTip.Tip="Search registered features">
+                            <TextBox.KeyBindings>
+                                <KeyBinding Gesture="Enter"
+                                            Command="{Binding ActivateHighlightedFeatureCommand}" />
+                                <KeyBinding Gesture="Up"
+                                            Command="{Binding SelectPreviousFeatureCommand}" />
+                                <KeyBinding Gesture="Down"
+                                            Command="{Binding SelectNextFeatureCommand}" />
+                            </TextBox.KeyBindings>
                         </TextBox>
 
-                        <ListBox x:Name="ToolList"
-                                 Classes="navigation-list"
-                                 Width="200"
-                                 Margin="0,16"
-                                 HorizontalAlignment="Left"
-                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                 AutomationProperties.Name="Tools menu"
-                                 ItemsSource="{Binding VisibleFeatures}"
-                                 SelectedItem="{Binding HighlightedFeature, Mode=TwoWay}"
-                                 KeyDown="HandleToolListKeyDown">
-                            <ListBox.ItemTemplate>
+                        <controls:NavigationListBox x:Name="ToolList"
+                                                    Classes="navigation-list"
+                                                    Width="200"
+                                                    Margin="0,16"
+                                                    HorizontalAlignment="Left"
+                                                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                    AutoScrollToSelectedItem="True"
+                                                    AutomationProperties.Name="Tools menu"
+                                                    ItemsSource="{Binding NavigationEntries}"
+                                                    SelectedItem="{Binding HighlightedFeature, Mode=TwoWay}">
+                            <controls:NavigationListBox.KeyBindings>
+                                <KeyBinding Gesture="Enter"
+                                            Command="{Binding ActivateHighlightedFeatureCommand}" />
+                            </controls:NavigationListBox.KeyBindings>
+                            <controls:NavigationListBox.ItemTemplate>
                                 <DataTemplate x:DataType="vm:ShellFeatureItemViewModel">
-                                    <StackPanel>
-                                        <Separator IsVisible="{Binding StartsSection}"
-                                                   Height="1"
-                                                   Margin="8,10,8,10"
-                                                   Background="{DynamicResource MaterialDividerBrush}"
-                                                   Focusable="False"
-                                                   PointerPressed="IgnoreNavigationDivider" />
-                                        <Border Classes="navigation-item"
-                                                Height="{Binding NavigationHeight}"
-                                                Padding="18,0"
-                                                PointerPressed="ActivateNavigationItem"
-                                                ToolTip.Tip="{Binding Description}">
-                                            <Border.ContextMenu>
-                                                <ContextMenu>
-                                                    <MenuItem Header="Favorite"
-                                                              IsVisible="{Binding !IsFavorite}"
-                                                              Command="{Binding ToggleFavoriteCommand}">
-                                                        <MenuItem.Icon>
-                                                            <materialIcons:MaterialIcon Kind="StarOutline" />
-                                                        </MenuItem.Icon>
-                                                    </MenuItem>
-                                                    <MenuItem Header="Unfavorite"
-                                                              IsVisible="{Binding IsFavorite}"
-                                                              Command="{Binding ToggleFavoriteCommand}">
-                                                        <MenuItem.Icon>
-                                                            <materialIcons:MaterialIcon Kind="Star" />
-                                                        </MenuItem.Icon>
-                                                    </MenuItem>
-                                                </ContextMenu>
-                                            </Border.ContextMenu>
-                                            <TextBlock VerticalAlignment="Center"
-                                                       FontSize="14"
-                                                       FontWeight="Normal"
-                                                       Foreground="{DynamicResource MaterialBodyBrush}"
-                                                       Text="{Binding DisplayName}" />
-                                        </Border>
-                                    </StackPanel>
+                                    <Border Classes="navigation-item"
+                                            Height="{Binding NavigationHeight}"
+                                            Padding="18,0">
+                                        <TextBlock VerticalAlignment="Center"
+                                                   FontSize="14"
+                                                   FontWeight="Normal"
+                                                   Foreground="{DynamicResource MaterialBodyBrush}"
+                                                   Text="{Binding DisplayName}" />
+                                    </Border>
                                 </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                            </controls:NavigationListBox.ItemTemplate>
+                        </controls:NavigationListBox>
                     </DockPanel>
                 </SplitView.Pane>
 

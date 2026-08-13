@@ -73,6 +73,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 ToggleFavorite))
             .ToArray();
         VisibleFeatures = [];
+        NavigationEntries = [];
         NotificationQueue = [];
         _notifications.Published += OnNotificationPublished;
         RefreshVisibleFeatures();
@@ -84,6 +85,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     /// <summary>Gets the feature items matching the current query.</summary>
     public ObservableCollection<ShellFeatureItemViewModel> VisibleFeatures { get; }
+
+    /// <summary>
+    /// Gets the visible feature rows interleaved with inert section-divider markers.
+    /// </summary>
+    public ObservableCollection<object> NavigationEntries { get; }
 
     /// <summary>
     /// Gets or sets the selected navigation item and activates its registered feature.
@@ -313,26 +319,16 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             .OrderBy(item => item.Order)
             .ToArray();
 
-        foreach (ShellFeatureItemViewModel item in matches)
-        {
-            item.StartsSection = false;
-        }
-
-        if (favorites.Length > 0 && foundational.Length > 0)
-        {
-            favorites[0].StartsSection = true;
-        }
-
-        if (tools.Length > 0 && foundational.Length + favorites.Length > 0)
-        {
-            tools[0].StartsSection = true;
-        }
-
         VisibleFeatures.Clear();
         foreach (ShellFeatureItemViewModel item in foundational.Concat(favorites).Concat(tools))
         {
             VisibleFeatures.Add(item);
         }
+
+        NavigationEntries.Clear();
+        AddNavigationSection(foundational, includeDivider: false);
+        AddNavigationSection(favorites, foundational.Length > 0);
+        AddNavigationSection(tools, foundational.Length + favorites.Length > 0);
 
         if (HighlightedFeature is null || !VisibleFeatures.Contains(HighlightedFeature))
         {
@@ -364,9 +360,37 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         HighlightedFeature = VisibleFeatures[nextIndex];
     }
 
+    [RelayCommand]
     internal void ActivateHighlightedFeature()
     {
         HighlightedFeature?.ActivateCommand.Execute(null);
+    }
+
+    [RelayCommand]
+    private void SelectPreviousFeature() => MoveHighlightedFeature(-1);
+
+    [RelayCommand]
+    private void SelectNextFeature() => MoveHighlightedFeature(1);
+
+    private void AddNavigationSection(
+        IEnumerable<ShellFeatureItemViewModel> section,
+        bool includeDivider)
+    {
+        ShellFeatureItemViewModel[] items = section.ToArray();
+        if (items.Length == 0)
+        {
+            return;
+        }
+
+        if (includeDivider)
+        {
+            NavigationEntries.Add(new NavigationDividerViewModel());
+        }
+
+        foreach (ShellFeatureItemViewModel item in items)
+        {
+            NavigationEntries.Add(item);
+        }
     }
 
     private void OnNotificationPublished(

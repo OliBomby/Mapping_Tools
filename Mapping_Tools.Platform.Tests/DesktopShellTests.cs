@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using FluentAssertions;
 using Mapping_Tools.Application.BeatmapEditing;
@@ -7,6 +8,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -139,15 +141,45 @@ public sealed class DesktopShellTests
         ], settings);
 
         // Act
-        ShellFeatureItemViewModel[] items = viewModel.VisibleFeatures.ToArray();
+        object[] entries = viewModel.NavigationEntries.ToArray();
 
         // Assert
-        items.Select(item => item.Id).Should().Equal(
+        entries.OfType<ShellFeatureItemViewModel>().Select(item => item.Id).Should().Equal(
             "get-started",
             "preferences",
             "favorite",
             "ordinary");
-        items.Select(item => item.StartsSection).Should().Equal(false, false, true, true);
+        entries.Select(entry => entry.GetType()).Should().Equal(
+            typeof(ShellFeatureItemViewModel),
+            typeof(ShellFeatureItemViewModel),
+            typeof(NavigationDividerViewModel),
+            typeof(ShellFeatureItemViewModel),
+            typeof(NavigationDividerViewModel),
+            typeof(ShellFeatureItemViewModel));
+    }
+
+    [TestMethod]
+    public void Prepare_WithFeature_AssignsTooltipAndContextMenuToListBoxItem()
+    {
+        // Arrange
+        ShellFeatureRegistration registration = Registration("feature", "Feature");
+        ShellFeatureItemViewModel feature = new(
+            registration,
+            0,
+            false,
+            _ => { },
+            _ => { });
+        NavigationListBoxItem container = new();
+
+        // Act
+        container.Prepare(feature, icon: null);
+
+        // Assert
+        ToolTip.GetTip(container).Should().Be(feature.Description);
+        container.ContextMenu.Should().NotBeNull();
+        MenuItem menuItem = container.ContextMenu!.Items.Single().Should().BeOfType<MenuItem>().Subject;
+        menuItem.Header.Should().Be("Favorite");
+        menuItem.Command.Should().BeSameAs(feature.ToggleFavoriteCommand);
     }
 
     [TestMethod]

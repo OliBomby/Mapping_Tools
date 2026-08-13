@@ -24,7 +24,6 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
         Category = registration.Category;
         Description = registration.Description;
         Order = order;
-        StartsSection = registration.StartsSection;
         _activate = activate;
         _toggleFavorite = toggleFavorite;
         SearchableText = string.Join(
@@ -46,11 +45,6 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
     /// <summary>Gets the feature summary.</summary>
     public string Description { get; }
 
-    /// <summary>Gets whether a non-selectable divider precedes this navigation item.</summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(NavigationRowHeight))]
-    public partial bool StartsSection { get; internal set; }
-
     /// <summary>Gets whether this feature is pinned ahead of ordinary items.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(FavoriteGlyph))]
@@ -71,9 +65,6 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
     public double NavigationHeight => Category.Equals("Tools", StringComparison.Ordinal)
         ? 37
         : 41;
-
-    /// <summary>Gets the complete row height, including a legacy section divider when present.</summary>
-    public double NavigationRowHeight => NavigationHeight + (StartsSection ? 21 : 0);
 
     internal string SearchableText { get; }
 
