@@ -1,14 +1,22 @@
 ---
 name: render-desktop-view
-description: Use when you need to render Mapping Tools WPF or Avalonia views to deterministic PNG files.
+description: Use only when the user explicitly requests a Mapping Tools WPF or Avalonia PNG render, or when diagnosing an isolated XAML-loading or drawing problem. Do not use for migration parity verification or acceptance.
 ---
 
 # Render Desktop View
 
-Render a view at a fixed size without launching the full application. Avalonia uses its headless platform. WPF uses an isolated, never-visible designer host because WPF has no equivalent supported headless platform. Treat the PNG as evidence for static visual parity, not as proof of native-window, input, overlay, animation, or dialog behavior.
+Render a view at a fixed size without launching the full application. Avalonia uses its headless platform. WPF uses an isolated, never-visible designer host because WPF has no equivalent supported headless platform.
 
-Rendering views with the renderer project could sometimes have styles differing from the real application, because of mismatches in resources inherited from the main window or `App.axaml`.
-In those cases you should update the renderer shell to be an identical environment to the real application.
+This tool is diagnostic only. Its hosts, resource inheritance, fixtures, fonts,
+and platform behavior can differ from the real applications. Never use its PNGs
+as migration parity evidence, a completion gate, or a substitute for source
+review and behavioral tests.
+
+Renderer output can differ from the real application because its host does not
+necessarily inherit the same shell or application resources. Do not tune
+production UI or expand renderer fixtures to make a diagnostic PNG look like
+the application. Fix the renderer host only when that mismatch blocks the
+explicitly requested diagnosis.
 
 ## Required workflow
 
@@ -20,7 +28,7 @@ In those cases you should update the renderer shell to be an identical environme
    .\.agents\skills\render-desktop-view\scripts\render-view.ps1 -Framework wpf -List
    ```
 
-3. Render both implementations with the same width and height. Number the output files chronologically to avoid overwriting. For example:
+3. Render only the implementation requested or needed for the isolated diagnosis. If the user explicitly asks for both, use the same width and height. Number output files chronologically to avoid overwriting. For example:
 
    ```powershell
    .\.agents\skills\render-desktop-view\scripts\render-view.ps1 -Framework wpf -View MainWindow -Output artifacts\view-renders\legacy-scenario-name-1.png -Width 1280 -Height 800
@@ -51,4 +59,4 @@ Do not describe WPF rendering as truly headless. The WPF renderer is a separate 
 
 ## Limits
 
-Use a real desktop run or automation test for native file dialogs, global hotkeys, WinForms hosts, editor-memory integration, audio devices, overlays, native window chrome, OS font fallback, DPI/multi-monitor behavior, drag-and-drop, and timing-sensitive animation. Image rendering remains the default parity check for ordinary control trees.
+Use source review and focused behavior tests for migration acceptance. Use a real desktop run or automation test for native file dialogs, global hotkeys, WinForms hosts, editor-memory integration, audio devices, overlays, native window chrome, OS font fallback, DPI/multi-monitor behavior, drag-and-drop, and timing-sensitive animation.

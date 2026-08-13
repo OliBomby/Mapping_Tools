@@ -5,6 +5,25 @@
              x:Class="Mapping_Tools.Desktop.Controls.ToolViewHeader"
              x:Name="Root"
              x:DataType="controls:ToolViewHeader">
+    <UserControl.Resources>
+        <ControlTheme x:Key="ToolHelpFlyoutPresenterTheme"
+                      TargetType="FlyoutPresenter"
+                      BasedOn="{StaticResource MaterialFlyoutPresenter}">
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+        </ControlTheme>
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="Button.tool-info-badge">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="MinWidth" Value="40" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="Margin" Value="4,4,0,0" />
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Styles>
     <StackPanel Orientation="Horizontal">
         <TextBlock VerticalAlignment="Center"
                    FontSize="32"

@@ -1,0 +1,57 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles">
+    <Style Selector="ComboBox /template/ Panel#PART_RootPanel">
+        <Setter Property="Height" Value="40" />
+    </Style>
+    <Style Selector="ComboBox /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Margin" Value="0,0,20,1" />
+        <Setter Property="Padding" Value="0,0,0,5" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Setter Property="VerticalContentAlignment" Value="Bottom" />
+    </Style>
+    <Style Selector="ComboBox /template/ Border#PART_LabelRootBorder">
+        <Setter Property="Margin" Value="0,4,1,1" />
+        <Setter Property="RenderTransform" Value="scale(0.75)" />
+        <Setter Property="RenderTransformOrigin" Value="0,0" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+    <Style Selector="ComboBox[SelectedIndex=-1]:not(:focus-within) /template/ Border#PART_LabelRootBorder">
+        <Setter Property="Margin" Value="0,16,1,1" />
+        <Setter Property="RenderTransform" Value="scale(1)" />
+    </Style>
+    <Style Selector="ComboBox /template/ TextBlock#PART_LabelText">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialBodyLightBrush}" />
+    </Style>
+    <Style Selector="ComboBox:focus-within /template/ TextBlock#PART_LabelText,
+                     ComboBox[IsDropDownOpen=True] /template/ TextBlock#PART_LabelText">
+        <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+    </Style>
+    <Style Selector="ComboBox:pointerover /template/ materialControls|MaterialUnderline#PART_Underline">
+        <Setter Property="IdleBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+    </Style>
+    <Style Selector="ComboBox:pointerover /template/ Path#arrow,
+                     ComboBox:focus-within /template/ Path#arrow,
+                     ComboBox[IsDropDownOpen=True] /template/ Path#arrow">
+        <Setter Property="Fill" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+    </Style>
+    <Style Selector="ComboBox.compact">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="ComboBox.compact /template/ Panel#PART_RootPanel">
+        <Setter Property="Height" Value="26" />
+    </Style>
+    <Style Selector="ComboBox.compact /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Margin" Value="8,0,20,1" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ComboBox.compact /template/ Border#PART_LabelRootBorder">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+</Styles>

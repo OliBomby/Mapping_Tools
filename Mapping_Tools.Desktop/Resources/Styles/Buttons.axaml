@@ -1,0 +1,40 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style Selector="Button.path-picker">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="MinWidth" Value="40" />
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="Padding" Value="5" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        <Setter Property="RenderTransform" Value="translateY(4px)" />
+    </Style>
+    <Style Selector="Button.dialog-action">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="PART_DialogActionBorder"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="Transparent"
+                        BorderThickness="1"
+                        CornerRadius="2">
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#PART_DialogActionBorder">
+            <Setter Property="Background" Value="{DynamicResource MaterialFlatButtonClickBrush}" />
+        </Style>
+        <Style Selector="^:focus /template/ Border#PART_DialogActionBorder">
+            <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        </Style>
+    </Style>
+</Styles>

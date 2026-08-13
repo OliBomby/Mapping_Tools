@@ -2,6 +2,11 @@
 
 Date: 2026-08-13
 
+Status update: the style-ownership and migration-guidance recommendations in
+this report were implemented on 2026-08-13. Renderer screenshots were retired
+as migration acceptance evidence. Findings for updater/release-lifecycle work
+assigned to Wave 11 were removed from this audit.
+
 ## Intended migration contract
 
 The legacy WPF implementation is the normative UI and behavior specification. A migrated view should keep the same XAML structure, copy, bindings, spacing, tooltips, and interaction flow, except for these deliberate transformations:
@@ -19,13 +24,13 @@ An Avalonia view that merely looks similar in one screenshot is not sufficient i
 
 The current migration is visually promising but does not yet follow this contract consistently.
 
-- `MainWindow` and `GetStartedView` have very good static visual parity in the audited desktop render.
+- `MainWindow` and `GetStartedView` preserve much of the legacy static structure.
 - The three migrated tools and Preferences are recognizable and generally use source-generated MVVM properties and commands.
 - The feature XAML was nevertheless rewritten rather than translated minimally. Scroll ownership, copy, tooltips, spacing, bindings, and some control choices differ throughout.
-- Important WPF behavior is missing: changelog loading, check-for-updates, Donate, About, exit-without-saving, and maximize/restore icon behavior.
+- Important current-wave WPF behavior is missing: Donate, About, exit-without-saving, and maximize/restore icon behavior.
 - The shared run and progress controls change the tool execution contract instead of only deduplicating the legacy layout.
-- `App.axaml` currently owns both global Material overrides and styles for custom controls. This directly conflicts with the requested ownership model.
-- The renderer can produce reassuring screenshots from semantically different states and, for tool views, different hosts. It is not currently a reliable parity gate.
+- Style ownership has now been corrected: `App.axaml` composes focused application dictionaries and co-located custom-control styles.
+- Renderer screenshots are diagnostic only and are no longer a migration parity gate.
 
 The migration should be treated as a good prototype, not a source-and-behavior-faithful port.
 
@@ -51,7 +56,7 @@ The same views also paraphrase labels and help text, remove tooltips, and change
 
 `Mapping_Tools.Desktop/Controls/ToolRunButton.cs:13-76` implements a Run/Cancel toggle with play/stop icons. The WPF tools use an ordinary run button bound to `CanRun`; they do not expose cancellation through that button. The control therefore introduces a feature and changes the execution contract.
 
-Its global style at `Mapping_Tools.Desktop/App.axaml:208-222` also does not reproduce the legacy structure. The WPF views use a 70-wide `Viewbox` with margin 10 around a button and a 36-by-36 icon. The Avalonia style makes the button itself 70-by-70 with padding 17 and a 42 icon.
+Its co-located style at `Mapping_Tools.Desktop/Controls/ToolRunButton.axaml` also does not reproduce the legacy structure. The WPF views use a 70-wide `Viewbox` with margin 10 around a button and a 36-by-36 icon. The Avalonia style makes the button itself 70-by-70 with padding 17 and a 42 icon.
 
 #### `ToolProgressBar`
 
@@ -69,28 +74,19 @@ The Avalonia control is a new drawing implementation rather than a direct transl
 
 `Mapping_Tools.Desktop/Controls/HotkeyEditor.cs:77-133` accepts a hard-coded subset of keys. The WPF `HotkeyEditorControl` accepts all WPF keys except modifiers and a few explicitly excluded keys (`Mapping_Tools/Components/HotkeyEditorControl.xaml.cs:24-54`). OEM punctuation, browser/media keys, and other valid inputs can now be silently ignored. This violates both behavior parity and the repository's rule against arbitrary limits.
 
-### 3. Styles are owned by the wrong layer (High)
+### 3. Style ownership (Resolved)
 
-`Mapping_Tools.Desktop/App.axaml` contains custom-control styles for:
+`App.axaml` is now a composition root. Application-wide Material compatibility
+styles live in focused files under `Mapping_Tools.Desktop/Resources/Styles`.
+`TimelineControl`, `HotkeyEditor`, `ToolRunButton`, and `ToolProgressBar` own
+co-located style files; `ToolViewHeader` owns its resources and badge styles.
+The shared portion of the formerly duplicated dialog-action style is in
+`Resources/Styles/Buttons.axaml`, while each dialog retains only its distinct
+padding override.
 
-- `ToolHelpFlyout` presenter behavior (`:28-33`)
-- `TimelineControl` brushes (`:93-106`)
-- `HotkeyEditor` (`:154-181`)
-- tool information badges (`:199-207`)
-- `ToolRunButton` (`:208-222`)
-- `ToolProgressBar` (`:223-226`)
-
-These belong with the components. `App.axaml` also contains broad overrides for TextBox, Menu, ComboBox, path-picker buttons, and compact combo boxes. Meanwhile additional styles exist in `MainWindow.axaml`, `GetStartedView.axaml`, `PreferencesView.axaml`, and both dialog windows. `Resources/MappingToolsColors.axaml` is the only separate global dictionary.
-
-Recommended ownership model:
-
-- `App.axaml`: theme declarations and merged dictionary references only.
-- `Resources/Styles/TextBoxes.axaml`, `ComboBoxes.axaml`, `Menus.axaml`, and `CommonButtons.axaml`: application-wide Material compatibility overrides, merged by `App.axaml`.
-- `Controls/<Control>.axaml` or a control-owned `Themes/Generic.axaml`: templates and styles for code-only custom controls, merged once for Avalonia discovery but maintained beside the component.
-- A view's resources: genuinely view-specific styles, such as the `GetStartedView` replacement for WPF `ListView`/`GridView`.
-- `MainWindow.axaml`: shell-only styling.
-
-Prefer explicit classes for legacy-parity adaptations when the style is not truly universal. Broad default selectors such as the current TextBox and ComboBox overrides silently change every future view.
+Future parity-specific adaptations should use explicit classes when they are
+not truly universal. Type-wide TextBox and ComboBox selectors otherwise affect
+every future view.
 
 ### 4. View-model modernization is mostly good, with two notable violations (Medium)
 
@@ -185,12 +181,11 @@ Legacy source: `Mapping_Tools/Views/Standard/StandardView.xaml` and `.xaml.cs`.
 
 Avalonia source: `Mapping_Tools.Desktop/Views/GetStartedView.axaml` and `Mapping_Tools.Desktop/ViewModels/GetStartedViewModel.cs`.
 
-- **High:** The WPF view fetches GitHub releases and populates its changelog (`StandardView.xaml.cs:31-53`). Avalonia initializes `Changelog` as an empty collection and never fills it (`GetStartedViewModel.cs:32-48`).
 - **Medium:** `HasNoRecentMaps` exists but is not bound, so the promised empty-state behavior is absent.
 - **Medium:** Static onboarding copy was moved from XAML into the VM. It is presentation content, not behavior, and this increases source divergence.
 - **Medium:** `TableView` is a reasonable replacement for WPF `ListView`/`GridView`, but the 143-line local template and hard-coded measurements are a brittle visual reimplementation. The first/second column sizing no longer follows the legacy auto-content behavior.
 - **Low:** The view introduces local font size/weight defaults that differ from the legacy inherited shell typography.
-- **Pass:** In the full-shell 1280-by-800 render, the static layout is very close to WPF.
+- **Pass:** The main static structure remains close to WPF despite the source-level differences above.
 
 ### `MainWindow`
 
@@ -198,14 +193,14 @@ Legacy source: `Mapping_Tools/MainWindow.xaml` and `.xaml.cs`.
 
 Avalonia source: `Mapping_Tools.Desktop/Views/MainWindow.axaml`, `.axaml.cs`, and `Mapping_Tools.Desktop/ViewModels/MainViewModel.cs`.
 
-- **High:** Check for updates, Donate, and About are present but disabled (`MainWindow.axaml:244-269`); all work in WPF.
+- **High:** Donate and About are present but disabled (`MainWindow.axaml:262-269`); both work in WPF.
 - **Medium:** The close-button context menu action `Exit without saving` was omitted.
 - **Medium:** About-menu tooltips and current-map menu details/icons were removed or changed.
 - **Medium:** The maximize button never switches to a restore icon or adjusts chrome layout when maximized. WPF handles those state changes in `MainWindow.xaml.cs:455-495`.
 - **High:** The shell-owned content scroller was removed, causing every ported feature to reinvent it.
 - **Medium:** WPF `DialogHost`/Snackbar behavior was replaced with external windows and a custom notification surface. Material.Avalonia differences may justify this, but it is a major behavior/layout exception and is not documented as such.
-- **Medium:** Production feature registration order is Rhythm Guide, Auto-Fail Detector, Map Cleaner (`Mapping_Tools.Desktop/Composition/DesktopFeatureRegistrationExtensions.cs:26-47`), while WPF sorts tools alphabetically. The renderer hides this by injecting a synthetic alphabetic registry.
-- **Pass:** The static 1280-by-800 full-shell render is exceptionally close to WPF.
+- **Medium:** Production feature registration order is Rhythm Guide, Auto-Fail Detector, Map Cleaner (`Mapping_Tools.Desktop/Composition/DesktopFeatureRegistrationExtensions.cs:26-47`), while WPF sorts tools alphabetically.
+- **Pass:** The main static shell structure remains close to WPF.
 - **Pass:** Remaining code-behind is mostly visual window and pointer behavior, which is appropriate to keep in the view.
 
 ### `MessageDialogWindow`
@@ -214,7 +209,7 @@ Closest legacy source: `Mapping_Tools/Components/Dialogs/MessageDialog.xaml`. Th
 
 - **High:** The embedded WPF `DialogHost` user control became a native owner-modal window. That changes chrome, focus, stacking, and layout and must be an explicit compatibility exception.
 - **Medium:** The new dialog generalizes the fixed legacy choice layout and details presentation instead of preserving the legacy source.
-- **Medium:** Its action-button style duplicates `ValueDialogWindow`'s local style.
+- **Resolved:** The shared action-button style now lives in `Resources/Styles/Buttons.axaml`; this view retains only its distinct padding.
 - **Medium:** If this window is also intended to replace legacy `MessageWindow`, it lacks that window's collapsible error details and custom borderless chrome.
 
 ### `ValueDialogWindow`
@@ -222,67 +217,47 @@ Closest legacy source: `Mapping_Tools/Components/Dialogs/MessageDialog.xaml`. Th
 Legacy source: `Mapping_Tools/Components/Dialogs/TypeValueDialog.xaml`.
 
 - **High:** Like MessageDialog, the embedded `DialogHost` component became a native owner-modal window without a recorded exception.
-- **Medium:** The dialog action style is duplicated rather than shared.
+- **Resolved:** The shared dialog action style now lives in `Resources/Styles/Buttons.axaml`; this view retains only its distinct padding.
 - **Medium:** `ValueDialogWindow.axaml.cs:26-42` constructs the validation binding programmatically. Focus/select-all behavior belongs in the view, but value/validation behavior should be exposed by the VM or a reusable control so the XAML remains declarative.
 
-## `AGENTS.md` audit
+## `AGENTS.md` audit (Remediated)
 
-The root `AGENTS.md` clearly communicates product values, XML-documentation requirements, and the preference for simple systems. It does not state the migration contract, so an agent can plausibly produce a visually similar redesign while believing the task is complete.
+The root guidance now defines WPF as the normative source and behavior
+specification, requires a minimal structural diff, prohibits opportunistic
+product changes, preserves shell scrolling, defines style ownership, and
+requires behavior inventory and focused tests. It also tells agents to consult
+the dependency graph so explicitly later-wave work is scope rather than a
+current defect, and it rejects renderer screenshots as acceptance evidence.
 
-Add a dedicated Avalonia migration section with these enforceable rules:
-
-1. WPF XAML, code-behind, and VM behavior are the normative specification.
-2. Keep the AXAML structurally identical; only enumerated platform translations and approved shared-control substitutions are allowed.
-3. Do not paraphrase copy, remove tooltips, alter spacing, change validation ranges, add commands, or redesign interactions during migration.
-4. Inventory every WPF event handler, command, binding, validation rule, converter, tooltip, context-menu item, dialog, and completion branch before coding.
-5. Preserve shell-owned scrolling; only migrate inner scrolling that exists in the legacy view.
-6. Use `ToolViewHeader`, `ToolRunButton`, and `ToolProgressBar`, but require those controls to reproduce the WPF layout and contract.
-7. Keep custom-control styles with their controls. Keep application-wide Material compatibility styles in focused dictionaries composed by `App.axaml`.
-8. A deliberately different platform behavior must be listed in a per-view exception record and approved; it cannot be silently treated as parity.
-9. Missing or deferred legacy behavior means a view is not complete.
-10. Require same-state WPF/Avalonia render evidence plus focused behavioral tests before declaring a view migrated.
-
-The current code also contradicts the existing “no arbitrary hard limits” rule through the Preferences ranges and HotkeyEditor whitelist.
+The implementation still contradicts the existing “no arbitrary hard limits”
+rule through the Preferences ranges and HotkeyEditor whitelist; those product
+findings remain open.
 
 ## Skills audit
 
-### `migrate-ui`
+### `migrate-ui` (Remediated)
 
-Strong points:
+The skill now requires a minimal WPF-to-Avalonia structural diff, a complete
+source/behavior inventory, shared tool controls with unchanged contracts,
+shell-owned scrolling, explicit style ownership, dependency-graph scope, and
+focused behavior tests. It prohibits unapproved cancellation, validation,
+picker, and completion-message changes. `control-parity.md` now points to the
+focused TextBox dictionary and warns that validation attributes must translate
+an existing rule rather than invent one.
 
-- Requires a behavior inventory before migration.
-- Correctly favors source-generated MVVM state and commands.
-- Calls for exact layout and compiled bindings.
-- Its control-parity reference correctly warns against string shadow properties such as `FooText`.
+### `migrate-feature` (Remediated)
 
-Violations/gaps in the skill itself:
+The skill now states that migration is not a product-improvement pass, requires
+a method-by-method behavior checklist and dependency-graph scope, builds both
+affected frontends, and blocks completion on unapproved WPF differences.
 
-- “Copy the exact layout” is weaker than a minimal structural source-diff rule. It allowed visually similar rewrites.
-- It does not mandate the shared header/run/progress controls or define their legacy contracts.
-- It does not state shell-owned scrolling as an invariant.
-- It says to use application-level styles registered in `App.axaml` and only “prefer” reusable styles. This encouraged the present `App.axaml` concentration and conflicts with component-owned styles.
-- It lacks a style-ownership taxonomy distinguishing component, view, shell, and application-wide Material compatibility styles.
-- It permits “intentionally deferred behavior” in a final report without making that status incomplete. This lets disabled menu actions and the missing changelog pass a migration handoff.
-- Its completion criteria do not require a method-by-method comparison against legacy code-behind.
-- It does not forbid opportunistic improvements such as cancellation, new picker semantics, or new validation limits during a port.
+### `render-desktop-view` (Phased out for verification)
 
-`references/control-parity.md` is otherwise valuable, but its advice to put non-outlined TextBox styles directly in `App.axaml` should instead point to a focused resource dictionary merged by the app.
-
-### `migrate-feature`
-
-The instruction to copy code exactly where possible and the requirement to use `migrate-ui` are directionally correct. It should additionally say that migration is not a product-improvement pass, require an explicit WPF behavior checklist, and state that unapproved UI or behavior differences block completion.
-
-### `render-desktop-view`
-
-The written skill correctly requires the same size, theme, font, and semantic state. The renderer implementation currently violates that requirement:
-
-- The WPF ordinary-view host adds 20 pixels of padding (`tools/Mapping_Tools.Wpf.ViewRenderer/Program.cs:123-131`), while the Avalonia AutoFail, MapCleaner, and RhythmGuide factories return raw views (`tools/Mapping_Tools.Avalonia.ViewRenderer/Program.cs:278-333`). The image pairs are not using the same host.
-- RhythmGuide uses 12 synthetic source paths only on Avalonia. Preferences fixtures also differ in path/hotkey values. These are not same-state comparisons.
-- The Avalonia MainWindow renderer injects a synthetic full, alphabetically arranged tool registry (`Program.cs:167-215`) and therefore conceals the production tool-order difference.
-- The WPF StandardView's asynchronous changelog load is not awaited, allowing both screenshots to appear empty and hiding the missing Avalonia feature.
-- Rendering MapCleaner can attempt to load real temporary autosave state, making the scenario less deterministic than the skill promises.
-
-Until these fixtures are symmetric, renders are useful visual clues but not acceptance evidence.
+The skill now triggers only for an explicitly requested PNG or an isolated
+XAML-loading/drawing diagnosis. It explicitly forbids using renderer output as
+migration parity evidence or a completion gate. The renderer projects remain
+available as diagnostic utilities, but migration work should not invest in
+fixture symmetry solely to support visual acceptance.
 
 ### `write-unit-tests`
 
@@ -290,17 +265,21 @@ The test naming, Arrange/Act/Assert, and Fluent Assertions rules are sound and d
 
 ## Recommended remediation order
 
-1. Amend `AGENTS.md` and `migrate-ui` first. Otherwise future agents will continue creating the same class of drift.
-2. Define and test the exact legacy contracts of `ToolViewHeader`, `ToolRunButton`, `ToolProgressBar`, `TimelineControl`, and `HotkeyEditor`; then move their styles to component-owned resources.
-3. Split Material compatibility styles into focused dictionaries and reduce `App.axaml` to composition.
-4. Restore the shell scroller and re-port each feature AXAML as a minimal WPF translation, preserving copy, tooltips, bindings, order, and measurements.
-5. Restore missing MainWindow and GetStarted behaviors before adding more views.
-6. Remove the new Preferences limits and fix HotkeyEditor input parity.
-7. Decide and document the two legitimate architectural exceptions: native dialog/windows versus WPF `DialogHost`/custom chrome, and the Avalonia replacement for WPF `ListView`/`GridView`.
-8. Make render fixtures symmetric and add behavior-parity coverage.
+Completed immediately after this audit: migration guidance, style ownership,
+focused Material dictionaries, and renderer phase-out.
+
+Remaining order:
+
+1. Define and test the exact legacy behavior/layout contracts of `ToolViewHeader`, `ToolRunButton`, `ToolProgressBar`, `TimelineControl`, and `HotkeyEditor`.
+2. Restore the shell scroller and re-port each feature AXAML as a minimal WPF translation, preserving copy, tooltips, bindings, order, and measurements.
+3. Restore missing behavior assigned to completed waves before adding more views.
+4. Remove the new Preferences limits and fix HotkeyEditor input parity.
+5. Decide and document the two legitimate architectural exceptions: native dialog/windows versus WPF `DialogHost`/custom chrome, and the Avalonia replacement for WPF `ListView`/`GridView`.
+6. Add behavior-parity coverage for the remaining violations.
 
 ## Verification performed
 
-The following paired 1280-by-800 renders were generated and visually inspected for Avalonia and WPF: MainWindow, Get Started, Preferences, Rhythm Guide, Auto-Fail Detector, and Map Cleaner. MainWindow and Get Started show strong static parity; the other pairs expose fixture/host asymmetry and cannot serve as exact comparison evidence.
-
-The already-built platform test assembly passes all 188 tests. A clean recompilation could not be verified because a renderer-owned `.NET Host` process held the desktop output DLLs open. That lock is an infrastructure verification limitation, not a product test failure. No production source was changed during this audit.
+The reorganized Avalonia desktop project builds successfully in an isolated
+artifacts directory. All 204 platform tests pass from a fresh isolated build.
+The three updated skill packages pass the skill validator. Renderer output is
+not used as verification evidence.

@@ -1,0 +1,32 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles">
+    <Style Selector="TextBox:not(.outline) /template/ Panel#PART_TextFieldPanel">
+        <Setter Property="MinHeight" Value="40" />
+    </Style>
+    <Style Selector="TextBox:not(.outline):empty:not(:focus-within) /template/ Border#PART_LabelRootBorder">
+        <Setter Property="Margin" Value="0,16,1,1" />
+        <Setter Property="RenderTransform" Value="scale(1)" />
+    </Style>
+    <Style Selector="TextBox:not(.outline):focus-within:not(:empty) /template/ Border#PART_LabelRootBorder,
+                     TextBox:not(.outline):focus-within /template/ Border#PART_LabelRootBorder,
+                     TextBox:not(.outline):not(:empty) /template/ Border#PART_LabelRootBorder">
+        <Setter Property="Margin" Value="0,4,1,1" />
+        <Setter Property="RenderTransform" Value="scale(0.75)" />
+    </Style>
+    <Style Selector="TextBox:not(.outline) /template/ TextBlock#PART_LabelText">
+        <Setter Property="Foreground" Value="{DynamicResource MaterialBodyLightBrush}" />
+    </Style>
+    <Style Selector="TextBox:not(.outline):focus-within /template/ TextBlock#PART_LabelText">
+        <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+    </Style>
+    <Style Selector="TextBox:not(.outline):pointerover /template/ materialControls|MaterialUnderline#PART_Underline">
+        <Setter Property="IdleBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+    </Style>
+    <Style Selector="TextBox:not(.outline):error /template/ TextBlock#PART_LabelText">
+        <Setter Property="Foreground" Value="{DynamicResource MaterialValidationErrorBrush}" />
+    </Style>
+    <Style Selector="TextBox:not(.outline) /template/ DataValidationErrors#PART_DataValidation /template/ ContentControl#PART_ErrorPresenter">
+        <Setter Property="Margin" Value="0,2,0,0" />
+    </Style>
+</Styles>

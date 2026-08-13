@@ -1,14 +1,12 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:material="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
-             xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:converters="using:Mapping_Tools.Desktop.Converters"
-             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
-             x:Class="Mapping_Tools.Desktop.App"
              xmlns:local="using:Mapping_Tools.Desktop"
+             x:Class="Mapping_Tools.Desktop.App"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+    <!-- "Default" follows the system theme. "Dark" and "Light" force a variant. -->
 
     <Application.DataTemplates>
         <local:ViewLocator />
@@ -24,13 +22,6 @@
             <converters:ConstantTimeSpanConverter x:Key="ConstantTimeSpanConverter" />
             <converters:DarkThemeConverter x:Key="DarkThemeConverter" />
             <converters:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter" />
-            <converters:ValidationErrorMessageConverter x:Key="ValidationErrorMessageConverter" />
-            <ControlTheme x:Key="ToolHelpFlyoutPresenterTheme"
-                          TargetType="FlyoutPresenter"
-                          BasedOn="{StaticResource MaterialFlyoutPresenter}">
-                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
-                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
-            </ControlTheme>
         </ResourceDictionary>
     </Application.Resources>
 
@@ -39,190 +30,18 @@
                                 PrimaryColor="Blue"
                                 SecondaryColor="Lime" />
         <materialIcons:MaterialIconStyles />
-        <Style Selector="TextBox">
-            <Setter Property="DataValidationErrors.ErrorConverter"
-                    Value="{x:Static converters:ValidationErrorMessageConverter.ConvertError}" />
-        </Style>
-        <Style Selector="ComboBox">
-            <Setter Property="DataValidationErrors.ErrorConverter"
-                    Value="{x:Static converters:ValidationErrorMessageConverter.ConvertError}" />
-        </Style>
-        <Style Selector="TextBox:not(.outline) /template/ Panel#PART_TextFieldPanel">
-            <Setter Property="MinHeight" Value="40" />
-        </Style>
-        <Style Selector="TextBox:not(.outline):empty:not(:focus-within) /template/ Border#PART_LabelRootBorder">
-            <Setter Property="Margin" Value="0,16,1,1" />
-            <Setter Property="RenderTransform" Value="scale(1)" />
-        </Style>
-        <Style Selector="TextBox:not(.outline):focus-within:not(:empty) /template/ Border#PART_LabelRootBorder,
-                         TextBox:not(.outline):focus-within /template/ Border#PART_LabelRootBorder,
-                         TextBox:not(.outline):not(:empty) /template/ Border#PART_LabelRootBorder">
-            <Setter Property="Margin" Value="0,4,1,1" />
-            <Setter Property="RenderTransform" Value="scale(0.75)" />
-        </Style>
-        <Style Selector="TextBox:not(.outline) /template/ TextBlock#PART_LabelText">
-            <Setter Property="Foreground" Value="{DynamicResource MaterialBodyLightBrush}" />
-        </Style>
-        <Style Selector="TextBox:not(.outline):focus-within /template/ TextBlock#PART_LabelText">
-            <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
-        </Style>
-        <Style Selector="TextBox:not(.outline):pointerover /template/ materialControls|MaterialUnderline#PART_Underline">
-            <Setter Property="IdleBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
-        </Style>
-        <Style Selector="TextBox:not(.outline):error /template/ TextBlock#PART_LabelText">
-            <Setter Property="Foreground" Value="{DynamicResource MaterialValidationErrorBrush}" />
-        </Style>
-        <Style Selector="TextBox:not(.outline) /template/ DataValidationErrors#PART_DataValidation /template/ ContentControl#PART_ErrorPresenter">
-            <Setter Property="Margin" Value="0,2,0,0" />
-        </Style>
-        <Style Selector="MenuItem:not(.Menu):not(:separator)">
-            <Setter Property="Height" Value="32" />
-            <Setter Property="MinHeight" Value="32" />
-        </Style>
-        <Style Selector="MenuItem:not(.Menu) /template/ AccessText#PART_MenuItemText">
-            <Setter Property="FontSize" Value="14" />
-        </Style>
-        <Style Selector="MenuItem:not(.Menu) /template/ ContentPresenter#PART_Icon">
-            <Setter Property="Width" Value="20" />
-            <Setter Property="Height" Value="20" />
-            <Setter Property="Margin" Value="0,0,12,0" />
-        </Style>
-        <Style Selector="MenuItem /template/ ItemsPresenter#PART_ItemsPresenter">
-            <Setter Property="Margin" Value="0,4" />
-        </Style>
-        <Style Selector="controls|TimelineControl">
-            <Setter Property="LineBrush" Value="{DynamicResource MappingToolsTimelineLineBrush}" />
-            <Setter Property="TickBrush" Value="{DynamicResource MaterialBodyBrush}" />
-            <Setter Property="NeutralOuterBrush" Value="{DynamicResource MappingToolsTimelineNeutralOuterBrush}" />
-            <Setter Property="NeutralInnerBrush" Value="{DynamicResource MappingToolsTimelineNeutralInnerBrush}" />
-            <Setter Property="AddedOuterBrush" Value="{DynamicResource MappingToolsTimelineAddedOuterBrush}" />
-            <Setter Property="AddedInnerBrush" Value="{DynamicResource MappingToolsTimelineAddedInnerBrush}" />
-            <Setter Property="ChangedOuterBrush" Value="{DynamicResource MappingToolsTimelineChangedOuterBrush}" />
-            <Setter Property="ChangedInnerBrush" Value="{DynamicResource MappingToolsTimelineChangedInnerBrush}" />
-            <Setter Property="RemovedOuterBrush" Value="{DynamicResource MappingToolsTimelineRemovedOuterBrush}" />
-            <Setter Property="RemovedInnerBrush" Value="{DynamicResource MappingToolsTimelineRemovedInnerBrush}" />
-            <Setter Property="AccentOuterBrush" Value="{DynamicResource MappingToolsTimelineAccentOuterBrush}" />
-            <Setter Property="AccentInnerBrush" Value="{DynamicResource MappingToolsTimelineAccentInnerBrush}" />
-        </Style>
-        <Style Selector="ComboBox /template/ Panel#PART_RootPanel">
-            <Setter Property="Height" Value="40" />
-        </Style>
-        <Style Selector="ComboBox /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Margin" Value="0,0,20,1" />
-            <Setter Property="Padding" Value="0,0,0,5" />
-            <Setter Property="VerticalAlignment" Value="Bottom" />
-            <Setter Property="VerticalContentAlignment" Value="Bottom" />
-        </Style>
-        <Style Selector="ComboBox /template/ Border#PART_LabelRootBorder">
-            <Setter Property="Margin" Value="0,4,1,1" />
-            <Setter Property="RenderTransform" Value="scale(0.75)" />
-            <Setter Property="RenderTransformOrigin" Value="0,0" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Top" />
-        </Style>
-        <Style Selector="ComboBox[SelectedIndex=-1]:not(:focus-within) /template/ Border#PART_LabelRootBorder">
-            <Setter Property="Margin" Value="0,16,1,1" />
-            <Setter Property="RenderTransform" Value="scale(1)" />
-        </Style>
-        <Style Selector="ComboBox /template/ TextBlock#PART_LabelText">
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="Foreground" Value="{DynamicResource MaterialBodyLightBrush}" />
-        </Style>
-        <Style Selector="ComboBox:focus-within /template/ TextBlock#PART_LabelText,
-                         ComboBox[IsDropDownOpen=True] /template/ TextBlock#PART_LabelText">
-            <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
-        </Style>
-        <Style Selector="ComboBox:pointerover /template/ materialControls|MaterialUnderline#PART_Underline">
-            <Setter Property="IdleBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
-        </Style>
-        <Style Selector="ComboBox:pointerover /template/ Path#arrow,
-                         ComboBox:focus-within /template/ Path#arrow,
-                         ComboBox[IsDropDownOpen=True] /template/ Path#arrow">
-            <Setter Property="Fill" Value="{DynamicResource MaterialPrimaryMidBrush}" />
-        </Style>
-        <Style Selector="Button.path-picker">
-            <Setter Property="Width" Value="40" />
-            <Setter Property="Height" Value="40" />
-            <Setter Property="MinWidth" Value="40" />
-            <Setter Property="MinHeight" Value="40" />
-            <Setter Property="Padding" Value="5" />
-            <Setter Property="VerticalAlignment" Value="Bottom" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
-            <Setter Property="RenderTransform" Value="translateY(4px)" />
-        </Style>
-        <Style Selector="controls|HotkeyEditor">
-            <Setter Property="Theme" Value="{StaticResource {x:Type TextBox}}" />
-            <Setter Property="Height" Value="26" />
-            <Setter Property="MinHeight" Value="26" />
-            <Setter Property="UseFloatingPlaceholder" Value="False" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="BorderBrush" Value="{DynamicResource MaterialTextBoxBorderBrush}" />
-            <Setter Property="BorderThickness" Value="0,0,0,1" />
-        </Style>
-        <Style Selector="controls|HotkeyEditor /template/ Panel#PART_TextFieldPanel">
-            <Setter Property="Height" Value="26" />
-            <Setter Property="MinHeight" Value="26" />
-        </Style>
-        <Style Selector="controls|HotkeyEditor /template/ ContentControl#PART_RightContentControl">
-            <Setter Property="IsVisible" Value="False" />
-        </Style>
-        <Style Selector="controls|HotkeyEditor /template/ Panel#PART_TextContainer">
-            <Setter Property="Margin" Value="0,0,0,1" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style Selector="controls|HotkeyEditor /template/ materialControls|MaterialUnderline#PART_Underline">
-            <Setter Property="IdleBrush" Value="{DynamicResource MaterialTextBoxBorderBrush}" />
-        </Style>
-        <Style Selector="controls|HotkeyEditor:pointerover /template/ materialControls|MaterialUnderline#PART_Underline,
-                         controls|HotkeyEditor:focus-within /template/ materialControls|MaterialUnderline#PART_Underline">
-            <Setter Property="IdleBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
-            <Setter Property="IsActive" Value="True" />
-        </Style>
-        <Style Selector="ComboBox.compact">
-            <Setter Property="Height" Value="26" />
-            <Setter Property="MinHeight" Value="26" />
-            <Setter Property="Padding" Value="0" />
-        </Style>
-        <Style Selector="ComboBox.compact /template/ Panel#PART_RootPanel">
-            <Setter Property="Height" Value="26" />
-        </Style>
-        <Style Selector="ComboBox.compact /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Margin" Value="8,0,20,1" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-        </Style>
-        <Style Selector="ComboBox.compact /template/ Border#PART_LabelRootBorder">
-            <Setter Property="IsVisible" Value="False" />
-        </Style>
-        <Style Selector="Button.tool-info-badge">
-            <Setter Property="Width" Value="40" />
-            <Setter Property="Height" Value="40" />
-            <Setter Property="MinWidth" Value="40" />
-            <Setter Property="MinHeight" Value="40" />
-            <Setter Property="Margin" Value="4,4,0,0" />
-            <Setter Property="Padding" Value="8" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style Selector="controls|ToolRunButton">
-            <Setter Property="Theme" Value="{StaticResource {x:Type materialControls:FloatingButton}}" />
-            <Setter Property="Width" Value="70" />
-            <Setter Property="Height" Value="70" />
-            <Setter Property="MinWidth" Value="70" />
-            <Setter Property="MinHeight" Value="70" />
-            <Setter Property="Padding" Value="17" />
-            <Setter Property="CornerRadius" Value="35" />
-            <Setter Property="Background" Value="{DynamicResource MaterialPrimaryMidBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
-        </Style>
-        <Style Selector="controls|ToolRunButton materialIcons|MaterialIcon">
-            <Setter Property="Width" Value="42" />
-            <Setter Property="Height" Value="42" />
-        </Style>
-        <Style Selector="controls|ToolProgressBar">
-            <Setter Property="Theme" Value="{StaticResource {x:Type ProgressBar}}" />
-            <Setter Property="Background" Value="Transparent" />
-        </Style>
+
+        <!-- Application-wide Material compatibility overrides. -->
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Validation.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/TextBoxes.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Menus.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/ComboBoxes.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Buttons.axaml" />
+
+        <!-- Styles owned by code-only custom controls. -->
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/TimelineControl.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/HotkeyEditor.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/ToolRunButton.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/ToolProgressBar.axaml" />
     </Application.Styles>
 </Application>

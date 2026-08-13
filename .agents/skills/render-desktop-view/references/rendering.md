@@ -13,9 +13,12 @@ The Avalonia renderer follows the documented 12.1 recipe: configure the applicat
 
 WPF has no corresponding public headless platform. Rider documents that it launches a separate process, renders XAML there, captures a bitmap, and displays that bitmap in the IDE. This repository follows the same isolation model. Its `WinExe` renderer never shows or activates a window. `Window` content is connected to a non-visible `HwndSource` so WPF performs presentation-source-dependent layout and rendering before `RenderTargetBitmap` captures it.
 
-## What a PNG proves
+## What a PNG can diagnose
 
-A frame exercises XAML loading, application resources, styles, templates, bindings, measure/arrange, and drawing. It supports static layout and theme comparison, but does not prove native integration or interaction behavior.
+A frame exercises the renderer host's XAML loading, resources, styles,
+templates, bindings, measure/arrange, and drawing. It can diagnose isolated
+loading or drawing failures, but it is not migration parity or acceptance
+evidence and does not prove native integration or interaction behavior.
 
 Compare equal logical dimensions. Keep the environment, fonts, DPI, theme, culture, and data stable before pixel comparisons. Prefer structured visual inspection when WPF and Avalonia rasterize text differently.
 

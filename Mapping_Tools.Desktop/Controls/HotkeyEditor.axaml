@@ -1,0 +1,33 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+        xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles">
+    <Style Selector="controls|HotkeyEditor">
+        <Setter Property="Theme" Value="{StaticResource {x:Type TextBox}}" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="UseFloatingPlaceholder" Value="False" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaterialTextBoxBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+    <Style Selector="controls|HotkeyEditor /template/ Panel#PART_TextFieldPanel">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinHeight" Value="26" />
+    </Style>
+    <Style Selector="controls|HotkeyEditor /template/ ContentControl#PART_RightContentControl">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="controls|HotkeyEditor /template/ Panel#PART_TextContainer">
+        <Setter Property="Margin" Value="0,0,0,1" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="controls|HotkeyEditor /template/ materialControls|MaterialUnderline#PART_Underline">
+        <Setter Property="IdleBrush" Value="{DynamicResource MaterialTextBoxBorderBrush}" />
+    </Style>
+    <Style Selector="controls|HotkeyEditor:pointerover /template/ materialControls|MaterialUnderline#PART_Underline,
+                     controls|HotkeyEditor:focus-within /template/ materialControls|MaterialUnderline#PART_Underline">
+        <Setter Property="IdleBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+        <Setter Property="IsActive" Value="True" />
+    </Style>
+</Styles>

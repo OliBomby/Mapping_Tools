@@ -1,8 +1,10 @@
 # Control and interaction parity
 
 Read this reference before choosing controls or styles for any migrated UI.
-The legacy WPF view is both a visual and behavioral specification unless the
-user explicitly requests a redesign.
+The legacy WPF view is the source, visual, and behavioral specification unless
+the user explicitly requests a redesign. Start from that XAML and keep a
+minimal structural diff; matching a resting screenshot after rewriting the
+control tree is not parity.
 
 ## Inventory before implementation
 
@@ -81,6 +83,19 @@ rg -n --glob "*.axaml" "#[0-9A-Fa-f]{3,8}" Mapping_Tools.Desktop
 
 Only the centralized custom-color dictionary should match.
 
+## Style ownership
+
+- Keep a custom control's styles in its AXAML or a co-located control-owned
+  style file.
+- Keep view-only and shell-only styles in the owning view or shell.
+- Put application-wide Material compatibility overrides in focused files under
+  `Mapping_Tools.Desktop/Resources/Styles` and include them from `App.axaml`.
+- Keep `App.axaml` as the composition root for themes, global resources, and
+  style includes. Do not define unrelated component styles inline there.
+- Prefer an explicit style class when an override applies only to a legacy
+  control variant. Use a type-wide selector only for genuinely universal
+  application behavior.
+
 ## Inspect exact control templates
 
 Read the templates from the exact Material.Avalonia and Avalonia 12.1 package
@@ -108,7 +123,8 @@ or tagged source before overriding them.
 - Map WPF `HintAssist.Hint` plus `MaterialDesignFloatingHintTextBox` to a real
   Material.Avalonia `TextBox` with `TextFieldAssist.Label`. The label is part
   of the control template; never add a sibling `TextBlock` above it.
-- Reuse the application-level non-outlined `TextBox` styles in `App.axaml`.
+- Reuse the application-level non-outlined `TextBox` styles composed by
+  `App.axaml` from `Resources/Styles/TextBoxes.axaml`.
   Do not add per-view `Height`, `MinHeight`, dense classes, label margins, or
   underline offsets unless the exact template and a native reference prove a
   distinct control variant is required.
@@ -163,7 +179,8 @@ with `System.ComponentModel.DataAnnotations` on the typed bindable property and
 let Avalonia consume the resulting `INotifyDataErrorInfo` errors.
 
 - Use built-in attributes such as `Required`, `Range`, and `StringLength`
-  whenever they express the rule.
+  whenever they express a rule already present in the legacy or domain
+  contract. Never invent a new range or required constraint during migration.
 - For domain-specific or cross-property rules, create a reusable custom
   `ValidationAttribute`, override `IsValid(object?, ValidationContext)`, and
   return a meaningful `ValidationResult`. Put UI-independent attributes in

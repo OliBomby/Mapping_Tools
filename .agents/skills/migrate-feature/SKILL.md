@@ -20,15 +20,17 @@ If the feature includes UI, use the `$migrate-ui` skill.
 Never add references to `System.Windows`, `System.Windows.Forms`, `MaterialDesignThemes.Wpf`, Avalonia, ReactiveUI, or CommunityToolkit.Mvvm packages to Core, Application, or Infrastructure. Infrastructure may contain an explicitly Windows-specific adapter only when the feature inherently requires Windows; keep its interface platform-neutral and call out the limitation.
 
 Copy code from the WPF project exactly whenever possible, this will make manual review easier.
+Migration is not a product-improvement pass. Do not add commands, validation limits, picker semantics, completion behavior, or other interaction changes unless the user explicitly requests them.
 
 ## Workflow
 
-1. Inspect the original code carefully.
-2. Record observable behavior and establish focused tests before moving logic.
-3. Classify code into domain rules, application orchestration, infrastructure, and presentation. Keep only rendering, focus, pointer gestures, animation, and other genuinely visual behavior in a view.
-4. Migrate the feature.
-5. Build the project and run focused tests.
-6. Report migrated behavior, intentionally deferred behavior, platform limitations, tests run.
+1. Read `docs/avalonia-migration/feature-dependency-graph.md` and identify the current wave's scope.
+2. Inspect the original code carefully and record a method-by-method behavior checklist.
+3. Record observable behavior and establish focused tests before moving logic.
+4. Classify code into domain rules, application orchestration, infrastructure, and presentation. Keep only rendering, focus, pointer gestures, animation, and other genuinely visual behavior in a view.
+5. Migrate the feature with the smallest reviewable source diff.
+6. Build both affected frontends and run focused tests.
+7. Report migrated behavior, later-wave scope, platform limitations, tests run, and approved differences. Current-wave behavior may not be deferred while declaring the migration complete.
 
 ## Completion criteria
 
@@ -37,3 +39,4 @@ Complete a feature migration only when:
 - All tests pass.
 - Extracted logic has focused automated coverage or a documented reason coverage is impractical.
 - The legacy feature remains available until the user explicitly authorizes removal.
+- Every behavior assigned to the current dependency-graph wave is implemented, and every difference from WPF is required by the platform or explicitly approved.
