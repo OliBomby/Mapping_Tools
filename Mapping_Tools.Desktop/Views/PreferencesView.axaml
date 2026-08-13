@@ -151,6 +151,7 @@
                                Text="QuickRun hotkey:"
                                ToolTip.Tip="QuickRun lets you quickly run a tool on the beatmap you have open in the editor." />
                     <controls:HotkeyEditor Width="150"
+                                           Classes="compact"
                                            Hotkey="{Binding QuickRunHotkey, Mode=TwoWay}" />
 
                     <CheckBox Margin="15,0,0,0"
@@ -196,6 +197,7 @@
                                Text="QuickUndo hotkey:"
                                ToolTip.Tip="Quickly loads the latest backup into the beatmap currently open in the editor." />
                     <controls:HotkeyEditor Width="150"
+                                           Classes="compact"
                                            Hotkey="{Binding QuickUndoHotkey, Mode=TwoWay}" />
                 </StackPanel>
 
@@ -205,6 +207,7 @@
                                Text="BetterSave™ hotkey:"
                                ToolTip.Tip="BetterSave saves the current map with proper rounding instead of truncating values." />
                     <controls:HotkeyEditor Width="150"
+                                           Classes="compact"
                                            Hotkey="{Binding BetterSaveHotkey, Mode=TwoWay}" />
                 </StackPanel>
             </StackPanel>
