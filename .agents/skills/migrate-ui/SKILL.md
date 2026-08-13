@@ -45,6 +45,7 @@ Use only official Avalonia documentation, the Avalonia 12.1.0 tagged source/rele
 
 - Start from the original WPF XAML and keep the smallest possible structural diff. Preserve element order, nesting, grid definitions, measurements, margins, copy, tooltips, bindings, and visibility rules unless an Avalonia substitution requires a documented change.
 - Map components in the WPF source to Avalonia components using the `control-parity` document.
+- Reuse every applicable project mapping in the concrete WPF-to-Avalonia catalog in `control-parity`; when a migration establishes a new reusable substitution, add it to that catalog instead of leaving the knowledge only in a feature view or migration note.
 - Use bindings with converters and parameters matching the original WPF source.
 - Prefer compiled bindings and an explicit `x:DataType`.
 - Use `ToolViewHeader`, `ToolRunButton`, and `ToolProgressBar` for the corresponding legacy tool elements. Reuse must not change their WPF layout or behavior.

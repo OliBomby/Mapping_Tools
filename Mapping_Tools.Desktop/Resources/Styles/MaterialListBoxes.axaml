@@ -1,0 +1,25 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style Selector="ListBox.material-list-view">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="ListBox.material-list-view ListBoxItem">
+        <Setter Property="Padding" Value="8,0" />
+        <Setter Property="MinHeight" Value="31.7" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ListBox.material-list-view ListBoxItem:pointerover /template/ Border#PART_HoverEffect">
+        <Setter Property="Opacity" Value="0.05" />
+    </Style>
+    <Style Selector="ListBox.material-list-view /template/ ScrollViewer /template/ :is(ScrollBar):horizontal /template/ Thumb">
+        <Setter Property="Background" Value="{DynamicResource MappingToolsScrollbarThumbBrush}" />
+        <Setter Property="Opacity" Value="1" />
+        <Setter Property="RenderTransform" Value="none" />
+    </Style>
+    <Style Selector="ListBox.material-list-view /template/ ScrollViewer /template/ ScrollBar:horizontal">
+        <Setter Property="AllowAutoHide" Value="False" />
+    </Style>
+</Styles>

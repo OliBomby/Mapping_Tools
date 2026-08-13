@@ -38,11 +38,13 @@
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Menus.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/ComboBoxes.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Buttons.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/MaterialListBoxes.axaml" />
 
         <!-- Styles owned by code-only custom controls. -->
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/TimelineControl.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/HotkeyEditor.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/ToolRunButton.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/ToolProgressBar.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/MaterialGridListView.axaml" />
     </Application.Styles>
 </Application>

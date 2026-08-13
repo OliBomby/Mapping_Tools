@@ -77,7 +77,6 @@ The legacy WPF implementation is the normative specification for every migrated 
 - Inventory every legacy binding, converter, event handler, command, validation rule, tooltip, context-menu item, dialog, and completion/error branch. Preserve all behavior that belongs to the current migration wave.
 - Consult `docs/avalonia-migration/feature-dependency-graph.md` before treating absent behavior as a violation. Behavior explicitly assigned to a later wave is deferred scope, not part of the current view migration.
 - Preserve shell-owned behavior such as feature scrolling. Add view-owned scrolling only when the WPF view itself owns a specialized inner scroller.
-- Use `ToolViewHeader`, `ToolRunButton`, and `ToolProgressBar` where applicable. Their purpose is reuse; their layout and behavior must remain identical to their WPF counterparts.
 - Keep a custom control's styles in its control AXAML or a co-located control-owned style file. Keep view-only styles in the view and shell-only styles in the shell.
 - Put application-wide Material compatibility overrides in focused dictionaries under `Mapping_Tools.Desktop/Resources/Styles`. `App.axaml` composes those dictionaries and global resources; it must not become the owner of unrelated component styles.
 - Record any unavoidable platform substitution in the migration notes. An unapproved difference blocks completion.

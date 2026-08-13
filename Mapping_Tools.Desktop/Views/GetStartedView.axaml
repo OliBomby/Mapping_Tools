@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
@@ -10,176 +11,6 @@
              x:DataType="vm:GetStartedViewModel"
              Foreground="{DynamicResource MaterialBodyBrush}"
              FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto">
-    <UserControl.Resources>
-        <ControlTemplate x:Key="RecentColumnResizerTemplate"
-                         TargetType="Thumb">
-            <Border Background="Transparent">
-                <Rectangle Width="1"
-                           Fill="Transparent"
-                           HorizontalAlignment="Center" />
-            </Border>
-        </ControlTemplate>
-
-        <ControlTheme x:Key="{x:Type TableViewColumnHeader}"
-                      TargetType="TableViewColumnHeader">
-            <Setter Property="FontWeight" Value="Normal" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="ClipToBounds" Value="False" />
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Panel>
-                        <ContentPresenter Background="{TemplateBinding Background}"
-                                          Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}"
-                                          Padding="{TemplateBinding Padding}"
-                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-                        <Thumb x:Name="PART_Resizer"
-                               Width="12"
-                               Margin="0,-9,-6,-12"
-                               HorizontalAlignment="Right"
-                               Cursor="SizeWestEast"
-                               Template="{StaticResource RecentColumnResizerTemplate}"
-                               IsEnabled="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Column.CanUserEffectivelyResize, FallbackValue=False}" />
-                    </Panel>
-                </ControlTemplate>
-            </Setter>
-        </ControlTheme>
-
-        <ControlTheme x:Key="{x:Type TableViewCell}"
-                      TargetType="TableViewCell">
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-        </ControlTheme>
-
-        <ControlTheme x:Key="{x:Type TableViewRow}"
-                      TargetType="TableViewRow">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
-            <Setter Property="MinHeight" Value="36" />
-            <Setter Property="Padding" Value="14,0" />
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Border x:Name="PART_RowBorder"
-                            MinHeight="{TemplateBinding MinHeight}"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{DynamicResource MaterialDividerBrush}"
-                            BorderThickness="0,0,0,1"
-                            Padding="{TemplateBinding Padding}">
-                        <TableViewCellsPresenter x:Name="PART_CellsPresenter"
-                                                 VerticalAlignment="Center" />
-                    </Border>
-                </ControlTemplate>
-            </Setter>
-            <Style Selector="^:pointerover /template/ Border#PART_RowBorder">
-                <Setter Property="Background" Value="{DynamicResource MaterialDataGridRowHoverBackgroundBrush}" />
-            </Style>
-            <Style Selector="^:selected /template/ Border#PART_RowBorder">
-                <Setter Property="Background" Value="{DynamicResource MaterialTextFieldBoxBackgroundBrush}" />
-            </Style>
-            <Style Selector="^:selected:pointerover /template/ Border#PART_RowBorder">
-                <Setter Property="Background" Value="{DynamicResource MaterialTextFieldBoxHoverBackgroundBrush}" />
-            </Style>
-        </ControlTheme>
-
-        <ControlTheme x:Key="RecentTableScrollViewerTheme"
-                      TargetType="ScrollViewer">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Grid ColumnDefinitions="*,Auto"
-                          RowDefinitions="*,Auto">
-                        <DockPanel x:Name="PART_ContentPanel">
-                            <Border DockPanel.Dock="Top"
-                                    Height="56"
-                                    Padding="14,0"
-                            BorderBrush="{DynamicResource MaterialDividerBrush}"
-                                    BorderThickness="0,0,0,1">
-                                <TableViewColumnHeadersPresenter VerticalAlignment="Center" />
-                            </Border>
-                            <ScrollContentPresenter x:Name="PART_ContentPresenter"
-                                                    Background="{TemplateBinding Background}"
-                                                    HorizontalSnapPointsType="{TemplateBinding HorizontalSnapPointsType}"
-                                                    VerticalSnapPointsType="{TemplateBinding VerticalSnapPointsType}"
-                                                    HorizontalSnapPointsAlignment="{TemplateBinding HorizontalSnapPointsAlignment}"
-                                                    VerticalSnapPointsAlignment="{TemplateBinding VerticalSnapPointsAlignment}"
-                                                    Padding="{TemplateBinding Padding}"
-                                                    ScrollViewer.IsScrollInertiaEnabled="{TemplateBinding IsScrollInertiaEnabled}">
-                                <ScrollContentPresenter.GestureRecognizers>
-                                    <ScrollGestureRecognizer CanHorizontallyScroll="{Binding CanHorizontallyScroll, ElementName=PART_ContentPresenter}"
-                                                             CanVerticallyScroll="{Binding CanVerticallyScroll, ElementName=PART_ContentPresenter}"
-                                                             IsScrollInertiaEnabled="{Binding (ScrollViewer.IsScrollInertiaEnabled), ElementName=PART_ContentPresenter}" />
-                                </ScrollContentPresenter.GestureRecognizers>
-                            </ScrollContentPresenter>
-                        </DockPanel>
-                        <ScrollBar x:Name="PART_HorizontalScrollBar"
-                                   Grid.Row="1"
-                                   Orientation="Horizontal" />
-                        <ScrollBar x:Name="PART_VerticalScrollBar"
-                                   Grid.Column="1"
-                                   Orientation="Vertical" />
-                    </Grid>
-                </ControlTemplate>
-            </Setter>
-        </ControlTheme>
-
-        <ControlTheme x:Key="{x:Type TableView}"
-                      TargetType="TableView">
-            <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            ClipToBounds="{TemplateBinding ClipToBounds}">
-                        <ScrollViewer x:Name="PART_ScrollViewer"
-                                      Theme="{StaticResource RecentTableScrollViewerTheme}"
-                                      HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
-                                      VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
-                                      IsScrollChainingEnabled="{TemplateBinding (ScrollViewer.IsScrollChainingEnabled)}"
-                                      IsScrollInertiaEnabled="{TemplateBinding (ScrollViewer.IsScrollInertiaEnabled)}"
-                                      AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}">
-                            <ItemsPresenter x:Name="PART_ItemsPresenter"
-                                            ItemsPanel="{TemplateBinding ItemsPanel}"
-                                            Margin="{TemplateBinding Padding}" />
-                        </ScrollViewer>
-                    </Border>
-                </ControlTemplate>
-            </Setter>
-        </ControlTheme>
-    </UserControl.Resources>
-
-    <UserControl.Styles>
-        <Style Selector="ListBox.content-list">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="0" />
-        </Style>
-        <Style Selector="ListBox.content-list ListBoxItem">
-            <Setter Property="Padding" Value="8,0" />
-            <Setter Property="MinHeight" Value="31.7" />
-            <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-        </Style>
-        <Style Selector="ListBox.content-list ListBoxItem:pointerover /template/ Border#PART_HoverEffect">
-            <Setter Property="Opacity" Value="0.05" />
-        </Style>
-        <Style Selector="ScrollViewer /template/ :is(ScrollBar):horizontal /template/ Thumb">
-            <Setter Property="Background" Value="{DynamicResource MappingToolsScrollbarThumbBrush}" />
-            <Setter Property="Opacity" Value="1" />
-            <Setter Property="RenderTransform" Value="none" />
-        </Style>
-        <Style Selector="ListBox.content-list /template/ ScrollViewer /template/ ScrollBar:horizontal">
-            <Setter Property="AllowAutoHide" Value="False" />
-        </Style>
-    </UserControl.Styles>
-
     <Grid RowDefinitions="5*,21,3*"
           ColumnDefinitions="*,21,*">
         <Grid Grid.Row="0"
@@ -192,7 +23,7 @@
                        Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
 
             <ListBox Grid.Row="1"
-                     Classes="content-list"
+                     Classes="material-list-view"
                      HorizontalAlignment="Left"
                      ScrollViewer.AllowAutoHide="False"
                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
@@ -210,7 +41,7 @@
 
         <GridSplitter Grid.Row="0"
                       Grid.Column="1"
-                      Width="2"
+                      Width="1"
                       Margin="10"
                       HorizontalAlignment="Stretch"
                       ResizeBehavior="PreviousAndNext"
@@ -226,7 +57,7 @@
                        FontWeight="Bold"
                        Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
             <ListBox Grid.Row="1"
-                     Classes="content-list"
+                     Classes="material-list-view"
                      ItemsSource="{Binding Changelog}"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ScrollViewer.VerticalScrollBarVisibility="Auto">
@@ -264,14 +95,14 @@
                        FontWeight="Bold"
                        Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
 
-            <TableView x:Name="RecentMapsTable"
-                       Grid.Row="1"
-                       ItemsSource="{Binding RecentMaps}"
-                       CanUserResizeColumns="True"
-                       SelectionMode="Multiple"
-                       DoubleTapped="SelectRecentMaps"
-                       ToolTip.Tip="Double-click any selection of items to set them as the current beatmap.">
-                <TableView.Columns>
+            <controls:MaterialGridListView x:Name="RecentMapsTable"
+                                           Grid.Row="1"
+                                           ItemsSource="{Binding RecentMaps}"
+                                           CanUserResizeColumns="True"
+                                           SelectionMode="Multiple"
+                                           DoubleTapped="SelectRecentMaps"
+                                           ToolTip.Tip="Double-click any selection of items to set them as the current beatmap.">
+                <controls:MaterialGridListView.Columns>
                     <TableViewColumn x:Name="RecentPathColumn"
                                      Width="90"
                                      Binding="{Binding FileName}">
@@ -288,8 +119,8 @@
                                        Text="Date" />
                         </TableViewColumn.Header>
                     </TableViewColumn>
-                </TableView.Columns>
-            </TableView>
+                </controls:MaterialGridListView.Columns>
+            </controls:MaterialGridListView>
             <TextBlock Grid.Row="1"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
