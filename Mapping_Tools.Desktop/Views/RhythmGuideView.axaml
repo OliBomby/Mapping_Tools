@@ -17,7 +17,7 @@
                     <TextBox materialAssists:TextFieldAssist.Label="Copy rhythm from"
                              Text="{ReflectionBinding SourcePaths, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource StringArrayToStringConverter}}"
                              ToolTip.Tip="Beatmap(s) to import rhythm from. You can input multiple beatmap paths seperated by '|'." />
-                    <TextBlock Grid.Column="1" Margin="3,15,5,0" FontStyle="Italic"
+                    <TextBlock Grid.Column="1" Margin="3,15,5,0" Padding="0 0 3 0" FontStyle="Italic"
                                ToolTip.Tip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
                                Text="{Binding SourceCount, StringFormat='{}({0}) maps total'}" />
                     <Button Grid.Column="2" Classes="flat path-picker" Cursor="Hand" VerticalAlignment="Bottom"
