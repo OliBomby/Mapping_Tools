@@ -31,6 +31,8 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
         _findProcess = findProcess ?? throw new ArgumentNullException(nameof(findProcess));
     }
 
+    internal static int NativeInputSize => Marshal.SizeOf<INPUT>();
+
     /// <inheritdoc/>
     public async Task ReloadAsync(CancellationToken cancellationToken = default)
     {
@@ -58,24 +60,17 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
             await Task.Delay(300, cancellationToken).ConfigureAwait(false);
         }
 
-        List<INPUT> inputs =
-        [
-            KeyboardInput(VirtualKeyControl, keyUp: false)
-        ];
+        SendKeyboardInput(VirtualKeyControl, keyUp: false);
         for (int index = 0; index < 10; index++)
         {
-            inputs.Add(KeyboardInput(VirtualKeyL, keyUp: false));
-            inputs.Add(KeyboardInput(VirtualKeyL, keyUp: true));
+            SendKeyboardInput(VirtualKeyL, keyUp: false);
+            SendKeyboardInput(VirtualKeyL, keyUp: true);
         }
 
-        inputs.Add(KeyboardInput(VirtualKeyControl, keyUp: true));
-        SendKeyboardInput(inputs);
+        SendKeyboardInput(VirtualKeyControl, keyUp: true);
         await Task.Delay(100, cancellationToken).ConfigureAwait(false);
-        SendKeyboardInput(
-        [
-            KeyboardInput(VirtualKeyEnter, keyUp: false),
-            KeyboardInput(VirtualKeyEnter, keyUp: true)
-        ]);
+        SendKeyboardInput(VirtualKeyEnter, keyUp: false);
+        SendKeyboardInput(VirtualKeyEnter, keyUp: true);
     }
 
     private static INPUT KeyboardInput(byte virtualKey, bool keyUp)
@@ -94,18 +89,25 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
         };
     }
 
-    private static void SendKeyboardInput(IReadOnlyList<INPUT> inputs)
+    private static void SendKeyboardInput(byte virtualKey, bool keyUp)
     {
-        INPUT[] nativeInputs = inputs.ToArray();
+        INPUT[] nativeInputs = [KeyboardInput(virtualKey, keyUp)];
         uint sent = SendInput(
-            (uint)nativeInputs.Length,
+            1,
             nativeInputs,
-            Marshal.SizeOf<INPUT>());
-        if (sent != nativeInputs.Length)
+            NativeInputSize);
+        if (sent != 1)
         {
+            int error = Marshal.GetLastWin32Error();
             throw new InvalidOperationException(
-                $"Windows delivered {sent} of {nativeInputs.Length} reload key events.");
+                $"Windows delivered {sent} of 1 reload key events " +
+                $"(Win32 error {error}).");
         }
+
+        // SendKeys' SendInput path yields between individual events. osu!'s editor
+        // reliably observes the legacy sequence when it is delivered this way,
+        // rather than as one large batch.
+        Thread.Sleep(1);
     }
 
     [DllImport("user32.dll")]
@@ -132,7 +134,24 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
     private struct INPUT_UNION
     {
         [FieldOffset(0)]
+        public MOUSEINPUT Mouse;
+
+        [FieldOffset(0)]
         public KEYBDINPUT Keyboard;
+
+        [FieldOffset(0)]
+        public HARDWAREINPUT Hardware;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MOUSEINPUT
+    {
+        public int Dx;
+        public int Dy;
+        public uint MouseData;
+        public uint Flags;
+        public uint Time;
+        public UIntPtr ExtraInfo;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -143,5 +162,13 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
         public uint Flags;
         public uint Time;
         public UIntPtr ExtraInfo;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct HARDWAREINPUT
+    {
+        public uint Message;
+        public ushort ParameterLow;
+        public ushort ParameterHigh;
     }
 }

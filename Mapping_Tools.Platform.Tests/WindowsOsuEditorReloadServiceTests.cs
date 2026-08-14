@@ -18,4 +18,17 @@ public sealed class WindowsOsuEditorReloadServiceTests
         // Assert
         await act.Should().NotThrowAsync();
     }
+
+    [TestMethod]
+    public void NativeInputSize_MatchesWin32InputStructure()
+    {
+        // Arrange
+        int expected = IntPtr.Size == 8 ? 40 : 28;
+
+        // Act
+        int actual = WindowsOsuEditorReloadService.NativeInputSize;
+
+        // Assert
+        actual.Should().Be(expected);
+    }
 }
