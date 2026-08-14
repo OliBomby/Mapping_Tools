@@ -10,7 +10,7 @@ public sealed class ValidationErrorMessageConverter : IValueConverter
     /// <summary>
     /// Gets the Avalonia validation-pipeline adapter that replaces raw exceptions with their concise reason.
     /// </summary>
-    public static Func<object, object> ConvertError { get; } = value => Message(value);
+    public static Func<object, object> ConvertError { get; } = Message;
 
     /// <summary>Returns only the useful message from a validation error.</summary>
     /// <param name="value">An exception, binding notification, or validation message.</param>
@@ -60,7 +60,8 @@ public sealed class ValidationErrorMessageConverter : IValueConverter
         start += formatMarker.Length;
         int fallback = message.IndexOf(", Fallback:", start, StringComparison.Ordinal);
         int closing = message.IndexOf("}'", start, StringComparison.Ordinal);
-        int end = new[] { fallback, closing }
+        int lineEnd = message.IndexOfAny(['\r', '\n'], start);
+        int end = new[] { fallback, closing, lineEnd }
             .Where(index => index >= 0)
             .DefaultIfEmpty(message.Length)
             .Min();

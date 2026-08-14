@@ -70,6 +70,29 @@ public sealed class ToolControlTests
     }
 
     [TestMethod]
+    public void Convert_WithWrappedConverterErrorStackTrace_ReturnsOnlyNestedFormatReason()
+    {
+        // Arrange
+        ValidationErrorMessageConverter converter = new();
+        InvalidCastException error = new(
+            "Could not convert '{DataValidationError: System.FormatException: " +
+            "Enter a whole number or arithmetic expression.\r\n" +
+            "   at Mapping_Tools.Application.Interactions.Converters.InvariantInt32Converter.ConvertBack()\r\n" +
+            "   at Mapping_Tools.Desktop.Converters.ValueConverterHelper.ConvertBack()\r\n" +
+            "}' (Avalonia.Data.BindingNotification) to System.Int32.");
+
+        // Act
+        object message = converter.Convert(
+            error,
+            typeof(string),
+            null,
+            System.Globalization.CultureInfo.InvariantCulture);
+
+        // Assert
+        message.Should().Be("Enter a whole number or arithmetic expression.");
+    }
+
+    [TestMethod]
     public void ConvertError_WithBindingFailure_ReturnsOnlyErrorReason()
     {
         // Arrange
