@@ -45,8 +45,7 @@
                       Margin="10"
                       HorizontalAlignment="Stretch"
                       ResizeBehavior="PreviousAndNext"
-                      ResizeDirection="Columns"
-                      Background="{DynamicResource MaterialDividerBrush}" />
+                      ResizeDirection="Columns" />
 
         <Grid Grid.Row="0"
               Grid.Column="2"
@@ -77,16 +76,15 @@
             </ListBox>
         </Grid>
 
-        <GridSplitter Grid.Row="1"
+        <GridSplitter Grid.Row="1" Grid.Column="0"
                       Grid.ColumnSpan="3"
                       Height="1"
                       Margin="10"
                       HorizontalAlignment="Stretch"
                       ResizeBehavior="PreviousAndNext"
-                      ResizeDirection="Rows"
-                      Background="{DynamicResource MaterialDividerBrush}" />
+                      ResizeDirection="Rows" />
 
-        <Grid Grid.Row="2"
+        <Grid Grid.Row="2" Grid.Column="0"
               Grid.ColumnSpan="3"
               RowDefinitions="Auto,*">
             <TextBlock Grid.Row="0"
