@@ -90,6 +90,19 @@ public sealed class TimelineModelsTests
     }
 
     [TestMethod]
+    public void TimelineControl_WithoutExplicitHeight_RequestsOnlyItsDrawnHeight()
+    {
+        // Arrange
+        TimelineControl control = new();
+
+        // Act
+        control.Measure(new Size(300, double.PositiveInfinity));
+
+        // Assert
+        control.DesiredSize.Height.Should().Be(66);
+    }
+
+    [TestMethod]
     public void FormatToolTip_WithLabel_UsesLegacyTimestampOnly()
     {
         // Arrange

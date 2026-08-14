@@ -7,6 +7,7 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
@@ -37,6 +38,11 @@ public sealed class MapCleanerViewModelTests
         cleaner.Paths.Should().Equal("map.osu");
         viewModel.ResultSummary.Should().Be("Successfully removed 16 greenlines and resnapped 20 objects!");
         viewModel.Markers.Should().HaveCount(3);
+        viewModel.Markers.Select(marker => marker.Kind)
+            .Should().Equal(
+                TimelineMarkerKind.Added,
+                TimelineMarkerKind.Changed,
+                TimelineMarkerKind.Removed);
         viewModel.Progress.Should().Be(0);
         viewModel.HasRun.Should().BeTrue();
     }

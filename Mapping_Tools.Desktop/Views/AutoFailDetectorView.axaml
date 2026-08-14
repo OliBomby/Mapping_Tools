@@ -57,8 +57,8 @@
         </Grid>
 
         <StackPanel Grid.Row="2" IsVisible="{Binding HasRun}"
-                    ToolTip.Tip="This timeline shows where the auto-fail occurs. Red lines show the objects which unload and cause auto-fail. Green lines show the objects which could potentially unload with different object counts. Purple lines show objects which make other objects potentially unload. You can double-click the lines to go to that time.">
-            <controls:TimelineControl Height="100" StartTime="0" EndTime="{Binding EndTime}"
+                    ToolTip.Tip="This timeline shows where the auto-fail occurs. Red lines show the objects which unload and cause auto-fail. Green lines show the objects which could potentially unload with different object counts. Purple lines show objects which make other objects potentially unload. You can click the lines to go to that time.">
+            <controls:TimelineControl Height="66" StartTime="0" EndTime="{Binding EndTime}"
                                       Markers="{Binding Markers}" NavigateCommand="{Binding NavigateCommand}" />
         </StackPanel>
     </Grid>

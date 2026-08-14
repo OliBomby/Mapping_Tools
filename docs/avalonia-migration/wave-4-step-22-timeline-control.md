@@ -13,8 +13,8 @@ Consumers supply an immutable snapshot of framework-neutral `TimelineMarker`
 records, a start/end viewport, and an optional navigation command. Marker kinds
 preserve the legacy neutral, added/green, changed/yellow, removed/red, and
 accent/purple semantics without placing colors or brushes in Application.
-Double-clicking the nearest marker invokes the command with its millisecond
-timestamp. Hover uses the same deterministic hit testing and displays either a
+Clicking the nearest marker invokes the command with its millisecond timestamp.
+Hover uses the same deterministic hit testing and displays either a
 consumer label or a normalized timestamp tooltip.
 
 `TimelineScale` owns the non-visual behavior: the legacy 20-millisecond minimum

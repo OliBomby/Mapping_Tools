@@ -15,6 +15,7 @@ public sealed class TimelineControl : Control
     private const double LabelTop = 1;
     private const double ElementTop = 14;
     private const double ElementHeight = 52;
+    private const double DefaultHeight = ElementTop + ElementHeight;
     private const double LineY = 50;
     private const double HitTolerance = 4;
     private Cursor? _handCursor;
@@ -160,6 +161,7 @@ public sealed class TimelineControl : Control
         base.Render(context);
         TimelineScale scale = CreateScale();
         double width = TimelineWidth;
+        double elementHeight = Math.Max(0, Bounds.Height - ElementTop);
         if (LineBrush is not null)
         {
             context.DrawLine(new Pen(LineBrush, 2), new Point(0, LineY), new Point(width, LineY));
@@ -178,7 +180,7 @@ public sealed class TimelineControl : Control
                     10,
                     TickBrush);
                 context.DrawText(text, new Point(x, LabelTop));
-                DrawMarker(context, x, NeutralOuterBrush, NeutralInnerBrush, isScaleMark: true);
+                DrawMarker(context, x, NeutralOuterBrush, NeutralInnerBrush, elementHeight);
             }
         }
 
@@ -188,7 +190,7 @@ public sealed class TimelineControl : Control
             {
                 double x = scale.ToUnit(marker.Time) * width;
                 (IBrush? outer, IBrush? inner) = GetBrushes(marker.Kind);
-                DrawMarker(context, x, outer, inner, isScaleMark: false);
+                DrawMarker(context, x, outer, inner, elementHeight);
             }
         }
     }
@@ -196,7 +198,7 @@ public sealed class TimelineControl : Control
     /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize) => new(
         double.IsInfinity(availableSize.Width) ? 300 : availableSize.Width,
-        double.IsInfinity(availableSize.Height) ? 100 : Math.Max(100, availableSize.Height));
+        double.IsInfinity(availableSize.Height) ? DefaultHeight : Math.Max(DefaultHeight, availableSize.Height));
 
     /// <inheritdoc/>
     protected override void OnPointerMoved(PointerEventArgs eventArgs)
@@ -245,20 +247,19 @@ public sealed class TimelineControl : Control
         double x,
         IBrush? outer,
         IBrush? inner,
-        bool isScaleMark)
+        double height)
     {
-        double outerLeft = isScaleMark ? x : x - 1;
         if (outer is not null)
         {
             using (context.PushOpacity(0.3))
             {
-                context.FillRectangle(outer, new Rect(outerLeft, ElementTop, 5, ElementHeight));
+                context.FillRectangle(outer, new Rect(x - 2.5, ElementTop, 5, height));
             }
         }
 
         if (inner is not null)
         {
-            context.FillRectangle(inner, new Rect(outerLeft + 2, ElementTop, 1, ElementHeight));
+            context.FillRectangle(inner, new Rect(x - 0.5, ElementTop, 1, height));
         }
     }
 

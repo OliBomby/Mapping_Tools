@@ -45,8 +45,8 @@
         </Grid>
 
         <StackPanel Grid.Row="2" IsVisible="{Binding HasRun}"
-                    ToolTip.Tip="This timeline shows the changes in the control points of the map. You can double-click the lines to go to that time.">
-            <controls:TimelineControl Height="100" StartTime="0" EndTime="{Binding EndTime}"
+                    ToolTip.Tip="This timeline shows the changes in the control points of the map. You can click the lines to go to that time.">
+            <controls:TimelineControl Height="66" StartTime="0" EndTime="{Binding EndTime}"
                                       Markers="{Binding Markers}" NavigateCommand="{Binding NavigateCommand}" />
         </StackPanel>
     </Grid>

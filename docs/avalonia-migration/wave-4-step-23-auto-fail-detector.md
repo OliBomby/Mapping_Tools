@@ -14,7 +14,7 @@ The view preserves the legacy defaults for confirmed objects, potential
 objects, disruptors, AR/OD overrides, physics-update leniency, fix guidance,
 and automatic fix placement. Results retain the legacy summary wording and are
 projected into the shared Timeline using removed/red, added/green, and
-accent/purple semantic markers. Double-click navigation is routed through the
+accent/purple semantic markers. Click navigation is routed through the
 platform launcher rather than starting a process from the control.
 
 ## Shared algorithm and safety boundaries

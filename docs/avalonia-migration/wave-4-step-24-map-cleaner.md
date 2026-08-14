@@ -17,7 +17,7 @@ beat-divisor types to their migrated models and emits the legacy aliases again
 when saving.
 
 For a single map, added, changed, and removed greenlines appear in the shared
-Timeline with the Step 22 semantic colors. Double-click navigation is routed
+Timeline with the Step 22 semantic colors. Click navigation is routed
 through the injected platform launcher. Multi-map runs intentionally omit one
 ambiguous combined timeline while retaining aggregate result counts.
 
