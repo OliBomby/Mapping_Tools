@@ -26,6 +26,9 @@
     <Style Selector=":is(TextBox):not(.outline):error /template/ TextBlock#PART_LabelText">
         <Setter Property="Foreground" Value="{DynamicResource MaterialValidationErrorBrush}" />
     </Style>
+    <Style Selector=":is(TextBox):disabled">
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
     <Style Selector=":is(TextBox):not(.outline) /template/ DataValidationErrors#PART_DataValidation /template/ ContentControl#PART_ErrorPresenter">
         <Setter Property="Margin" Value="0,2,0,0" />
     </Style>

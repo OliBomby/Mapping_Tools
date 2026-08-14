@@ -34,6 +34,7 @@
 
         <!-- Application-wide Material compatibility overrides. -->
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Validation.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/TextBlocks.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/TextBoxes.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Menus.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/ComboBoxes.axaml" />

@@ -13,6 +13,7 @@
              x:DataType="vm:PreferencesViewModel"
              Foreground="{DynamicResource MaterialBodyBrush}"
              FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto">
+
     <StackPanel Margin="0,0,100,0">
             <TextBlock Text="Preferences"
                        FontSize="32"
@@ -162,6 +163,7 @@
                     <StackPanel Orientation="Horizontal"
                                 IsEnabled="{Binding SmartQuickRunEnabled}">
                         <TextBlock Margin="15,0"
+                                   Classes="togglable"
                                    VerticalAlignment="Center"
                                    Text="None:"
                                    ToolTip.Tip="This tool gets QuickRun if you have no objects selected in the editor." />
@@ -171,6 +173,7 @@
                                   SelectedItem="{Binding NoneQuickRunTool, Mode=TwoWay}"
                                   ToolTip.Tip="This tool gets QuickRun if you have no objects selected in the editor." />
                         <TextBlock Margin="15,0"
+                                   Classes="togglable"
                                    VerticalAlignment="Center"
                                    Text="Single:"
                                    ToolTip.Tip="This tool gets QuickRun if you have one object selected in the editor." />
@@ -180,6 +183,7 @@
                                   SelectedItem="{Binding SingleQuickRunTool, Mode=TwoWay}"
                                   ToolTip.Tip="This tool gets QuickRun if you have one object selected in the editor." />
                         <TextBlock Margin="15,0"
+                                   Classes="togglable"
                                    VerticalAlignment="Center"
                                    Text="Multiple:"
                                    ToolTip.Tip="This tool gets QuickRun if you have multiple objects selected in the editor." />

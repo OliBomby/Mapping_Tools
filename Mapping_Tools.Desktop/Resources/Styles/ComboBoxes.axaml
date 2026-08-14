@@ -37,6 +37,9 @@
                      :is(ComboBox)[IsDropDownOpen=True] /template/ Path#arrow">
         <Setter Property="Fill" Value="{DynamicResource MaterialPrimaryMidBrush}" />
     </Style>
+    <Style Selector=":is(ComboBox):disabled">
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
     <Style Selector=":is(ComboBox).compact">
         <Setter Property="Height" Value="26" />
         <Setter Property="MinHeight" Value="26" />
