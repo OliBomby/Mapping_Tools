@@ -51,7 +51,10 @@ public sealed class AutoFailDetectorViewModelTests
             "Auto-fail Detector",
             QuickRunTargets.Always,
             viewModel.RunQuickAsync);
-        MappingToolQuickRunHostedService hosted = new(registry, [registration]);
+        MappingToolQuickRunHostedService hosted = new(
+            registry,
+            [registration],
+            new ImmediateTestDispatcher());
 
         // Act
         await hosted.StartAsync(CancellationToken.None);

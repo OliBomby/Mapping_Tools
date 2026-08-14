@@ -12,6 +12,7 @@ using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Hosting;
+using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -191,7 +192,11 @@ public sealed class MapCleanerViewModelTests
             "Map Cleaner",
             QuickRunTargets.Always,
             viewModel.RunQuickAsync);
-        MappingToolQuickRunHostedService hosted = new(registry, [registration]);
+        RecordingDispatcher dispatcher = new();
+        MappingToolQuickRunHostedService hosted = new(
+            registry,
+            [registration],
+            dispatcher);
 
         // Act
         await hosted.StartAsync(CancellationToken.None);
@@ -202,6 +207,7 @@ public sealed class MapCleanerViewModelTests
         command.DisplayName.Should().Be("Map Cleaner");
         command.Targets.Should().Be(QuickRunTargets.Always);
         cleaner.Paths.Should().Equal("current.osu");
+        dispatcher.PostCount.Should().Be(1);
     }
 
     private static MapCleanerViewModel Create(
@@ -250,6 +256,17 @@ public sealed class MapCleanerViewModelTests
         {
             ReloadCount++;
             return Task.CompletedTask;
+        }
+    }
+
+    private sealed class RecordingDispatcher : IUiDispatcher
+    {
+        public int PostCount { get; private set; }
+
+        public void Post(Action action)
+        {
+            PostCount++;
+            action();
         }
     }
 

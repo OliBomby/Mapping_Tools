@@ -251,8 +251,7 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
                         context.ReportProgress(100, "Complete");
                         return new ToolExecutionOutput<RhythmGuideResult>(
                             generated,
-                            generated.ExportMode == RhythmGuideExportMode.AddToMap ? "Done!" : null,
-                            reloadEditor: generated.ExportMode == RhythmGuideExportMode.AddToMap);
+                            generated.ExportMode == RhythmGuideExportMode.AddToMap ? "Done!" : null);
                     }),
                 progress);
         }

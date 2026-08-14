@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun;
+using Mapping_Tools.Desktop.Shell;
 using Microsoft.Extensions.Hosting;
 
 namespace Mapping_Tools.Desktop.Hosting;
@@ -13,13 +14,16 @@ internal sealed class MappingToolQuickRunHostedService : IHostedService
 {
     private readonly IQuickRunCommandRegistry _registry;
     private readonly IReadOnlyList<MappingToolQuickRunRegistration> _tools;
+    private readonly IUiDispatcher _dispatcher;
 
     public MappingToolQuickRunHostedService(
         IQuickRunCommandRegistry registry,
-        IEnumerable<MappingToolQuickRunRegistration> tools)
+        IEnumerable<MappingToolQuickRunRegistration> tools,
+        IUiDispatcher dispatcher)
     {
         _registry = registry;
         _tools = tools.ToArray();
+        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -32,7 +36,9 @@ internal sealed class MappingToolQuickRunHostedService : IHostedService
                     tool.Id,
                     tool.DisplayName,
                     tool.Targets,
-                    tool.Execute));
+                    cancellationToken => ExecuteOnUiThreadAsync(
+                        tool.Execute,
+                        cancellationToken)));
             }
         }
 
@@ -47,5 +53,33 @@ internal sealed class MappingToolQuickRunHostedService : IHostedService
         }
 
         return Task.CompletedTask;
+    }
+
+    private Task ExecuteOnUiThreadAsync(
+        Func<CancellationToken, Task> execute,
+        CancellationToken cancellationToken)
+    {
+        TaskCompletionSource completion = new(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        _dispatcher.Post(() => _ = CompleteAsync());
+        return completion.Task;
+
+        async Task CompleteAsync()
+        {
+            try
+            {
+                await execute(cancellationToken);
+                completion.TrySetResult();
+            }
+            catch (OperationCanceledException exception) when (
+                cancellationToken.IsCancellationRequested)
+            {
+                completion.TrySetCanceled(exception.CancellationToken);
+            }
+            catch (Exception exception)
+            {
+                completion.TrySetException(exception);
+            }
+        }
     }
 }

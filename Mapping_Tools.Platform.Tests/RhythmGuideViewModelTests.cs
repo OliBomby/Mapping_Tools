@@ -73,8 +73,11 @@ public sealed class RhythmGuideViewModelTests
         // Arrange
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
+        RecordingReload reload = new();
         notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
-        RhythmGuideViewModel viewModel = CreateViewModel(notifications: notifications);
+        RhythmGuideViewModel viewModel = CreateViewModel(
+            notifications: notifications,
+            reload: reload);
         viewModel.SourcePaths = ["source.osu"];
         viewModel.ExportPath = "target.osu";
         viewModel.ExportMode = RhythmGuideExportMode.AddToMap;
@@ -84,6 +87,7 @@ public sealed class RhythmGuideViewModelTests
 
         // Assert
         published.Should().ContainSingle(notification => notification.Message == "Done!");
+        reload.ReloadCount.Should().Be(0);
     }
 
     [TestMethod]
@@ -103,12 +107,13 @@ public sealed class RhythmGuideViewModelTests
     private static RhythmGuideViewModel CreateViewModel(
         RecordingRhythmGuideService? rhythmGuide = null,
         TestFilePicker? filePicker = null,
-        UserNotificationService? notifications = null)
+        UserNotificationService? notifications = null,
+        IEditorReloadService? reload = null)
     {
         notifications ??= new UserNotificationService();
         ToolExecutionService execution = new(
             notifications,
-            new StubReloadService(),
+            reload ?? new StubReloadService(),
             new ApplicationSettings(),
             TimeProvider.System);
         return new RhythmGuideViewModel(
@@ -151,6 +156,17 @@ public sealed class RhythmGuideViewModelTests
     {
         public Task ReloadAsync(CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
+    }
+
+    private sealed class RecordingReload : IEditorReloadService
+    {
+        public int ReloadCount { get; private set; }
+
+        public Task ReloadAsync(CancellationToken cancellationToken = default)
+        {
+            ReloadCount++;
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class StubRhythmGuideWindowService : IRhythmGuideWindowService
