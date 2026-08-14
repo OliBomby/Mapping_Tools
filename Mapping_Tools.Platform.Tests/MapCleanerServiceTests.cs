@@ -56,6 +56,9 @@ public sealed class MapCleanerServiceTests
             Saved = value;
             return Task.CompletedTask;
         }
+
+        public Task SaveAsync(BeatmapEditingSession session, bool reloadEditor = false, CancellationToken cancellationToken = default) =>
+            SaveAsync(session.Editor, reloadEditor, cancellationToken);
     }
 
     private sealed class RecordingSamples : IMapCleanerSampleService

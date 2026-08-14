@@ -130,6 +130,7 @@ public sealed class BeatmapBackupServiceTests
             editor,
             BeatmapEditingSource.LiveEditor,
             []);
+        editor.Beatmap.Metadata["Version"] = new TValue("AfterToolRun");
         BeatmapBackupService service = CreateService(store, CreateSettings());
 
         // Act
@@ -148,6 +149,33 @@ public sealed class BeatmapBackupServiceTests
             .Any(line => line == "Version:Unsaved").Should().BeFalse();
         store.Files[result.Artifacts[1].Path]
             .Any(line => line == "Version:Unsaved").Should().BeTrue();
+        store.Files[result.Artifacts[1].Path]
+            .Any(line => line == "Version:AfterToolRun").Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task CreateAsync_WithLiveSessionMatchingDisk_CreatesOnlyDirectCopy()
+    {
+        // Arrange
+        MemoryBackupStore store = CreateStore();
+        BeatmapEditor2 editor = new(MapPath, store);
+        store.Files[MapPath] = editor.Beatmap.GetLines();
+        BeatmapEditingSession session = new(
+            editor,
+            BeatmapEditingSource.LiveEditor,
+            []);
+        BeatmapBackupService service = CreateService(store, CreateSettings());
+
+        // Act
+        BeatmapBackupResult result = await service.CreateAsync(
+            session,
+            BeatmapBackupReason.Automatic,
+            force: true);
+
+        // Assert
+        result.Artifacts.Should().ContainSingle();
+        result.Artifacts[0].ContainsUnsavedState.Should().BeFalse();
+        store.WriteOperations.Should().BeEmpty();
     }
 
     [TestMethod]

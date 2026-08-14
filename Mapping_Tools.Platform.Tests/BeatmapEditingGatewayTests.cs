@@ -169,7 +169,7 @@ public sealed class BeatmapEditingGatewayTests
         session.Editor.Beatmap.Metadata["Version"] = new TValue("Edited");
 
         // Act
-        await gateway.SaveAsync(session.Editor, reloadEditor: true);
+        await gateway.SaveAsync(session, reloadEditor: true);
 
         // Assert
         store.WriteCount.Should().Be(1);
@@ -290,8 +290,25 @@ public sealed class BeatmapEditingGatewayTests
             BeatmapEditingSession session,
             BeatmapBackupReason reason,
             bool force = false,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException();
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            CreateCount++;
+            BackupPrecededWrite = _store.WriteCount == 0;
+            if (_failure is not null)
+            {
+                return Task.FromException<BeatmapBackupResult>(_failure);
+            }
+
+            BeatmapBackupArtifact artifact = new(
+                "backup.osu",
+                session.Editor.Path,
+                reason,
+                session.Source == BeatmapEditingSource.LiveEditor,
+                DateTimeOffset.UnixEpoch);
+            return Task.FromResult(
+                new BeatmapBackupResult([artifact], false));
+        }
 
         public Task<BeatmapBackupArtifact?> CreatePeriodicIfChangedAsync(
             BeatmapEditingSession session,

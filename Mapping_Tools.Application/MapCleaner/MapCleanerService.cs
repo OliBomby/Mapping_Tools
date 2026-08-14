@@ -64,7 +64,7 @@ public sealed class MapCleanerService : IMapCleanerService
                 mapProgress,
                 cancellationToken);
             await _editingGateway.SaveAsync(
-                session.Editor,
+                session,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
             int removedSamples = options.RemoveUnusedSamples
                 ? await _samples.MoveUnusedToRecoveryAsync(

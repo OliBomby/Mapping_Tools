@@ -173,6 +173,12 @@ public sealed class RhythmGuideServiceTests
             SavedEditor = editor;
             return Task.CompletedTask;
         }
+
+        public Task SaveAsync(
+            BeatmapEditingSession session,
+            bool reloadEditor = false,
+            CancellationToken cancellationToken = default) =>
+            SaveAsync(session.Editor, reloadEditor, cancellationToken);
     }
 
     private sealed class StubBeatmapFileSystem : IBeatmapFileSystem

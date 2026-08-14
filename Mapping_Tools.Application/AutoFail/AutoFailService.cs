@@ -68,7 +68,7 @@ public sealed class AutoFailService : IAutoFailService
             throw new InvalidOperationException("This analysis has no editing session.");
         detector.ApplyFix(plan);
         await _editingGateway.SaveAsync(
-            session.Editor,
+            session,
             cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 

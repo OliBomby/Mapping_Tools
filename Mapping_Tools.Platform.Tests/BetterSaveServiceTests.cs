@@ -151,6 +151,12 @@ public sealed class BetterSaveServiceTests
             SavedEditor = editor;
             return Task.CompletedTask;
         }
+
+        public Task SaveAsync(
+            BeatmapEditingSession session,
+            bool reloadEditor = false,
+            CancellationToken cancellationToken = default) =>
+            SaveAsync(session.Editor, reloadEditor, cancellationToken);
     }
 
     private sealed class MemoryTextFileStore : ITextFileStore

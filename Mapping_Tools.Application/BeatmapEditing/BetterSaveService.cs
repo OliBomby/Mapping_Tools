@@ -112,7 +112,7 @@ public sealed class BetterSaveService : IBetterSaveService
                     cancellationToken)
                 .ConfigureAwait(false);
             await _editingGateway
-                .SaveAsync(session.Editor, cancellationToken: cancellationToken)
+                .SaveAsync(session, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
             await PublishAsync(
                 UserNotificationSeverity.Success,

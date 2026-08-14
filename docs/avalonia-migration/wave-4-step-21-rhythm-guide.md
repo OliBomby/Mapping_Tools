@@ -40,10 +40,11 @@ separately, transforms it, and saves it through `IBeatmapEditingGateway`.
 Overwriting an existing new-map destination also uses the gateway. A genuinely
 new destination is written directly because no prior file exists to protect.
 
-Before opening any source, Avalonia now submits every ordered source path to the
-preference-respecting backup service, matching WPF's generation contract. The
-editing gateway still makes its mandatory safety copy when an existing export
-target is overwritten, so source compatibility and destination safety are both
+Each source is opened and then submitted to the preference-respecting backup
+service as a session, so a matching unsaved Editor Reader state is retained as
+the historical `_2_` companion when it differs from disk. The editing gateway
+still makes its mandatory safety copy when an existing export target is
+overwritten, so source compatibility and destination safety are both
 preserved.
 
 The form keeps the typed source-path array and uses a two-way `|` text converter

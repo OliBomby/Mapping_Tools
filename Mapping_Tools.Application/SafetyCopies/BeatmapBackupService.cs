@@ -140,12 +140,13 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
                 .ConfigureAwait(false);
             List<BeatmapBackupArtifact> artifacts = [disk];
 
-            if (session.Source == BeatmapEditingSource.LiveEditor)
+            if (session.Source == BeatmapEditingSource.LiveEditor &&
+                !HasSameContentsAsDisk(session.Editor.Path, session.InitialBeatmapLines))
             {
                 artifacts.Add(
                     await WriteSnapshotAsync(
                             session.Editor.Path,
-                            session.Editor.Beatmap.GetLines(),
+                            session.InitialBeatmapLines,
                             reason,
                             createdAt,
                             liveCompanion: true,
@@ -163,6 +164,14 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         {
             _operationLock.Release();
         }
+    }
+
+    private bool HasSameContentsAsDisk(
+        string path,
+        IReadOnlyList<string> serializedLines)
+    {
+        IReadOnlyList<string> diskLines = _textFileStore.ReadAllLines(path);
+        return diskLines.SequenceEqual(serializedLines, StringComparer.Ordinal);
     }
 
     /// <inheritdoc/>

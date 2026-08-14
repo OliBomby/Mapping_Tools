@@ -86,6 +86,12 @@ public sealed class AutoFailServiceTests
             SavedEditor = editor;
             return Task.CompletedTask;
         }
+
+        public Task SaveAsync(
+            BeatmapEditingSession session,
+            bool reloadEditor = false,
+            CancellationToken cancellationToken = default) =>
+            SaveAsync(session.Editor, reloadEditor, cancellationToken);
     }
 
     private sealed class MemoryStore : ITextFileStore

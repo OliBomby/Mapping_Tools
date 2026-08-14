@@ -38,12 +38,6 @@ public sealed class RhythmGuideService : IRhythmGuideService
         CancellationToken cancellationToken = default)
     {
         Validate(options);
-        await _backupService.CreateAsync(
-            options.Paths,
-            BeatmapBackupReason.Automatic,
-            force: false,
-            cancellationToken).ConfigureAwait(false);
-
         List<Beatmap> sources = [];
         foreach (string path in options.Paths)
         {
@@ -51,6 +45,11 @@ public sealed class RhythmGuideService : IRhythmGuideService
             BeatmapEditingSession source = await _editingGateway.OpenBeatmapAsync(
                 path,
                 LiveBeatmapPreference.PreferLive,
+                cancellationToken).ConfigureAwait(false);
+            await _backupService.CreateAsync(
+                source,
+                BeatmapBackupReason.Automatic,
+                force: false,
                 cancellationToken).ConfigureAwait(false);
             sources.Add(source.Editor.Beatmap);
         }
@@ -68,7 +67,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
                 options,
                 cancellationToken);
             await _editingGateway.SaveAsync(
-                target.Editor,
+                target,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
             return new RhythmGuideResult(
                 options.ExportPath,

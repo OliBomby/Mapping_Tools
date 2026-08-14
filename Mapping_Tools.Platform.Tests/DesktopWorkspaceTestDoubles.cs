@@ -145,8 +145,20 @@ internal sealed class TestBeatmapBackupService : IBeatmapBackupService
         BeatmapEditingSession session,
         BeatmapBackupReason reason,
         bool force = false,
-        CancellationToken cancellationToken = default) =>
-        throw new NotSupportedException();
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        CreateRequests.Add(([session.Editor.Path], reason, force));
+        return Task.FromResult(
+            new BeatmapBackupResult(
+                [new BeatmapBackupArtifact(
+                    session.Editor.Path + ".backup",
+                    session.Editor.Path,
+                    reason,
+                    session.Source == BeatmapEditingSource.LiveEditor,
+                    DateTimeOffset.UnixEpoch)],
+                false));
+    }
 
     public Task<BeatmapBackupArtifact?> CreatePeriodicIfChangedAsync(
         BeatmapEditingSession session,

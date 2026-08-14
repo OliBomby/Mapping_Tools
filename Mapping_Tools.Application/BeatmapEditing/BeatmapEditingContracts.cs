@@ -160,7 +160,8 @@ public interface IEditorReloadService
 public sealed class BeatmapEditingSession
 {
     /// <summary>
-    /// Creates a session around a parsed beatmap.
+    /// Creates a session around a parsed beatmap and retains its initial
+    /// serialized state for a later safety copy.
     /// </summary>
     /// <param name="editor">The mutable document editor.</param>
     /// <param name="source">Whether the document came only from disk or was overlaid with live state.</param>
@@ -182,6 +183,7 @@ public sealed class BeatmapEditingSession
         Source = source;
         SelectedHitObjects = selectedHitObjects.ToArray();
         LiveReadFailure = liveReadFailure;
+        InitialBeatmapLines = editor.Beatmap.GetLines().ToArray();
     }
 
     /// <summary>
@@ -204,6 +206,11 @@ public sealed class BeatmapEditingSession
     /// Gets the failure that caused a best-effort live open to use disk, if any.
     /// </summary>
     public Exception? LiveReadFailure { get; }
+
+    /// <summary>
+    /// Gets the serialized document captured when this session was opened.
+    /// </summary>
+    internal IReadOnlyList<string> InitialBeatmapLines { get; }
 }
 
 /// <summary>
@@ -251,6 +258,25 @@ public interface IBeatmapEditingGateway
     /// </exception>
     Task SaveAsync(
         Editor2 editor,
+        bool reloadEditor = false,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Persists a beatmap session using the session's original live state for
+    /// the optional companion safety copy, then optionally reloads osu!.
+    /// </summary>
+    /// <param name="session">The opened beatmap session to save.</param>
+    /// <param name="reloadEditor">Whether an active osu! editor should be refreshed after the write.</param>
+    /// <param name="cancellationToken">Cancels before saving or before requesting the reload.</param>
+    /// <returns>A task that completes after backup, persistence, and any requested reload.</returns>
+    /// <exception cref="IOException">
+    /// The safety copy or document write fails; a backup failure leaves the source untouched.
+    /// </exception>
+    /// <exception cref="OperationCanceledException">
+    /// Cancellation occurs before backup, save, or a requested reload completes.
+    /// </exception>
+    Task SaveAsync(
+        BeatmapEditingSession session,
         bool reloadEditor = false,
         CancellationToken cancellationToken = default);
 }

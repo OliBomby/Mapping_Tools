@@ -13,7 +13,8 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
     private const byte VirtualKeyControl = 0x11;
     private const byte VirtualKeyL = 0x4C;
     private const byte VirtualKeyEnter = 0x0D;
-    private const uint KeyUp = 0x0002;
+    private const uint InputKeyboard = 1;
+    private const uint KeyboardKeyUp = 0x0002;
     private readonly Func<Process?> _findProcess;
 
     /// <summary>
@@ -57,22 +58,54 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
             await Task.Delay(300, cancellationToken).ConfigureAwait(false);
         }
 
-        KeyEvent(VirtualKeyControl, keyUp: false);
+        List<INPUT> inputs =
+        [
+            KeyboardInput(VirtualKeyControl, keyUp: false)
+        ];
         for (int index = 0; index < 10; index++)
         {
-            KeyEvent(VirtualKeyL, keyUp: false);
-            KeyEvent(VirtualKeyL, keyUp: true);
+            inputs.Add(KeyboardInput(VirtualKeyL, keyUp: false));
+            inputs.Add(KeyboardInput(VirtualKeyL, keyUp: true));
         }
 
-        KeyEvent(VirtualKeyControl, keyUp: true);
+        inputs.Add(KeyboardInput(VirtualKeyControl, keyUp: true));
+        SendKeyboardInput(inputs);
         await Task.Delay(100, cancellationToken).ConfigureAwait(false);
-        KeyEvent(VirtualKeyEnter, keyUp: false);
-        KeyEvent(VirtualKeyEnter, keyUp: true);
+        SendKeyboardInput(
+        [
+            KeyboardInput(VirtualKeyEnter, keyUp: false),
+            KeyboardInput(VirtualKeyEnter, keyUp: true)
+        ]);
     }
 
-    private static void KeyEvent(byte virtualKey, bool keyUp)
+    private static INPUT KeyboardInput(byte virtualKey, bool keyUp)
     {
-        keybd_event(virtualKey, 0, keyUp ? KeyUp : 0, UIntPtr.Zero);
+        return new INPUT
+        {
+            Type = InputKeyboard,
+            Data = new INPUT_UNION
+            {
+                Keyboard = new KEYBDINPUT
+                {
+                    VirtualKey = virtualKey,
+                    Flags = keyUp ? KeyboardKeyUp : 0
+                }
+            }
+        };
+    }
+
+    private static void SendKeyboardInput(IReadOnlyList<INPUT> inputs)
+    {
+        INPUT[] nativeInputs = inputs.ToArray();
+        uint sent = SendInput(
+            (uint)nativeInputs.Length,
+            nativeInputs,
+            Marshal.SizeOf<INPUT>());
+        if (sent != nativeInputs.Length)
+        {
+            throw new InvalidOperationException(
+                $"Windows delivered {sent} of {nativeInputs.Length} reload key events.");
+        }
     }
 
     [DllImport("user32.dll")]
@@ -82,10 +115,33 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SetForegroundWindow(IntPtr window);
 
-    [DllImport("user32.dll")]
-    private static extern void keybd_event(
-        byte virtualKey,
-        byte scanCode,
-        uint flags,
-        UIntPtr extraInfo);
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern uint SendInput(
+        uint numberOfInputs,
+        INPUT[] inputs,
+        int inputSize);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct INPUT
+    {
+        public uint Type;
+        public INPUT_UNION Data;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    private struct INPUT_UNION
+    {
+        [FieldOffset(0)]
+        public KEYBDINPUT Keyboard;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct KEYBDINPUT
+    {
+        public ushort VirtualKey;
+        public ushort ScanCode;
+        public uint Flags;
+        public uint Time;
+        public UIntPtr ExtraInfo;
+    }
 }

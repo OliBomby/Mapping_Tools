@@ -131,13 +131,47 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(editor);
-        cancellationToken.ThrowIfCancellationRequested();
-        await _backupService.CreateAsync(
-                [editor.Path],
-                BeatmapBackupReason.Automatic,
-                force: true,
-                cancellationToken)
+        await SaveCoreAsync(editor, null, reloadEditor, cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task SaveAsync(
+        BeatmapEditingSession session,
+        bool reloadEditor = false,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+        await SaveCoreAsync(session.Editor, session, reloadEditor, cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private async Task SaveCoreAsync(
+        Editor2 editor,
+        BeatmapEditingSession? session,
+        bool reloadEditor,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (session is null)
+        {
+            await _backupService.CreateAsync(
+                    [editor.Path],
+                    BeatmapBackupReason.Automatic,
+                    force: true,
+                    cancellationToken)
+                .ConfigureAwait(false);
+        }
+        else
+        {
+            await _backupService.CreateAsync(
+                    session,
+                    BeatmapBackupReason.Automatic,
+                    force: true,
+                    cancellationToken)
+                .ConfigureAwait(false);
+        }
+
         cancellationToken.ThrowIfCancellationRequested();
         editor.SaveFile();
 
