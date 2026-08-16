@@ -115,16 +115,16 @@
                                             </ListBox.ItemTemplate>
                                         </ListBox>
                                     </materialDesign:Card>
-                                    <Button Classes="light" Margin="5" VerticalAlignment="Bottom"
-                                            Command="{Binding AddComboColourCommand}"
-                                            ToolTip.Tip="Add a new combo colour.">
+                                    <materialDesign:FloatingButton Classes="mini light" Margin="5" VerticalAlignment="Bottom"
+                                                    Command="{Binding AddComboColourCommand}"
+                                                    ToolTip.Tip="Add a new combo colour.">
                                         <materialIcons:MaterialIcon Width="24" Height="24" Kind="Plus" />
-                                    </Button>
-                                    <Button Classes="light" Margin="5" VerticalAlignment="Bottom"
+                                    </materialDesign:FloatingButton>
+                                    <materialDesign:FloatingButton Classes="mini light" Margin="5" VerticalAlignment="Bottom"
                                             Command="{Binding RemoveComboColourCommand}"
                                             ToolTip.Tip="Remove last combo colour.">
                                         <materialIcons:MaterialIcon Width="24" Height="24" Kind="Minus" />
-                                    </Button>
+                                    </materialDesign:FloatingButton>
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
@@ -142,16 +142,16 @@
                                             </ListBox.ItemTemplate>
                                         </ListBox>
                                     </materialDesign:Card>
-                                    <Button Classes="flat" Margin="5" VerticalAlignment="Bottom"
+                                    <materialDesign:FloatingButton Classes="mini light" Margin="5" VerticalAlignment="Bottom"
                                             Command="{Binding AddSpecialColourCommand}"
                                             ToolTip.Tip="Add a new special colour.">
                                         <materialIcons:MaterialIcon Width="24" Height="24" Kind="Plus" />
-                                    </Button>
-                                    <Button Classes="flat" Margin="5" VerticalAlignment="Bottom"
+                                    </materialDesign:FloatingButton>
+                                    <materialDesign:FloatingButton Classes="mini light" Margin="5" VerticalAlignment="Bottom"
                                             Command="{Binding RemoveSpecialColourCommand}"
                                             ToolTip.Tip="Remove last special colour.">
                                         <materialIcons:MaterialIcon Width="24" Height="24" Kind="Minus" />
-                                    </Button>
+                                    </materialDesign:FloatingButton>
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>

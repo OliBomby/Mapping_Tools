@@ -1,5 +1,32 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles">
+    <!--
+        MaterialDesignInXaml's floating-action-button styles combine the
+        control shape, size, and palette role. Material.Avalonia exposes the
+        FloatingButton control, so keep those roles composable as classes.
+    -->
+    <Style Selector="materialControls|FloatingButton.mini">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="MinWidth" Value="40" />
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="CornerRadius" Value="20" />
+    </Style>
+    <Style Selector="materialControls|FloatingButton.light">
+        <Setter Property="Background" Value="{DynamicResource MaterialPrimaryLightBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialLightForegroundBrush}" />
+    </Style>
+    <Style Selector="materialControls|FloatingButton.dark">
+        <Setter Property="Background" Value="{DynamicResource MaterialPrimaryDarkBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
+    </Style>
+
+    <Style Selector=":is(Button)">
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
+    </Style>
+
     <Style Selector="Button.path-picker">
         <Setter Property="Width" Value="40" />
         <Setter Property="Height" Value="40" />
