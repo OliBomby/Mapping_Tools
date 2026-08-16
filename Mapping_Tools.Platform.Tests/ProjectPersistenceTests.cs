@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.MapCleaner;
+using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
@@ -101,6 +102,30 @@ public sealed class ProjectPersistenceTests
         project.MapCleanerArgs.BeatDivisors.Should().HaveCount(2);
         json.Should().Contain("\"$type\": \"Mapping_Tools.Viewmodels.MapCleanerVm, Mapping Tools\"");
         json.Should().Contain("\"$type\": \"Mapping_Tools.Classes.Tools.MapCleanerStuff.MapCleanerArgs, Mapping Tools\"");
+    }
+
+    [TestMethod]
+    public void DeserializeAndSerialize_LegacyMetadataManagerProject_PreservesTypeAliasAndValues()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Projects",
+            "metadataproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        MetadataManagerProject project = serializer.Deserialize<MetadataManagerProject>(
+            File.ReadAllText(fixture));
+        string json = serializer.Serialize(project);
+
+        // Assert
+        project.RomanisedArtist.Should().Be("Kou! & KASOKUKI:Collective");
+        project.PreviewTime.Should().Be(315111);
+        project.ComboColours.Should().HaveCount(4);
+        json.Should().Contain(
+            "\"$type\": \"Mapping_Tools.Viewmodels.MetadataManagerVm, Mapping Tools\"");
     }
 
     [TestMethod]

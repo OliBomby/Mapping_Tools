@@ -96,6 +96,10 @@
                       x:DataType="vm:RhythmGuideViewModel">
             <views:RhythmGuideView />
         </DataTemplate>
+        <DataTemplate DataType="vm:MetadataManagerViewModel"
+                      x:DataType="vm:MetadataManagerViewModel">
+            <views:MetadataManagerView />
+        </DataTemplate>
     </Window.DataTemplates>
 
     <Window.Styles>

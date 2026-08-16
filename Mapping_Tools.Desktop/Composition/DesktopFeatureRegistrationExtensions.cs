@@ -52,6 +52,12 @@ internal static class DesktopFeatureRegistrationExtensions
             "Make a beatmap with circles from the rhythm of multiple maps.",
             ["rhythm", "hitsound", "guide", "reference"],
             verticalScrollBarVisibility: ScrollBarVisibility.Auto);
+        services.AddMappingTool<MetadataManagerViewModel>(
+            "metadata-manager",
+            "Metadata Manager",
+            "Edit metadata once and apply it to multiple beatmaps.",
+            ["metadata", "artist", "title", "tags", "colours"],
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(

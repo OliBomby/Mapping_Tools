@@ -19,10 +19,12 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:InvariantInt32Converter x:Key="InvariantInt32Converter" />
             <converters:InvariantDoubleConverter x:Key="InvariantDoubleConverter" />
+            <converters:TimeToStringConverter x:Key="TimeToStringConverter" />
             <converters:ConstantTimeSpanConverter x:Key="ConstantTimeSpanConverter" />
             <converters:DarkThemeConverter x:Key="DarkThemeConverter" />
             <converters:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter" />
             <converters:StringArrayToStringConverter x:Key="StringArrayToStringConverter" />
+            <converters:RgbaColourToAvaloniaColorConverter x:Key="RgbaColourToAvaloniaColorConverter" />
         </ResourceDictionary>
     </Application.Resources>
 
@@ -31,6 +33,7 @@
                                 PrimaryColor="Blue"
                                 SecondaryColor="Lime" />
         <materialIcons:MaterialIconStyles />
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
 
         <!-- Application-wide Material compatibility overrides. -->
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Validation.axaml" />
