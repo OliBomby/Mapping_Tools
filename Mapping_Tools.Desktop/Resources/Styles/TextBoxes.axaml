@@ -34,13 +34,11 @@
             <Setter Property="Margin" Value="0,2,0,0" />
         </Style>
         <Style Selector="^.compact">
-            <Setter Property="Height" Value="26" />
             <Setter Property="MinHeight" Value="26" />
             <Setter Property="UseFloatingPlaceholder" Value="False" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <Style Selector="^.compact /template/ Panel#PART_TextFieldPanel">
-            <Setter Property="Height" Value="26" />
             <Setter Property="MinHeight" Value="26" />
         </Style>
         <Style Selector="^.compact /template/ Border#PART_LabelRootBorder">
@@ -48,6 +46,9 @@
         </Style>
         <Style Selector="^.compact /template/ Panel#PART_TextContainer">
             <Setter Property="Margin" Value="0,5,0,0" />
+        </Style>
+        <Style Selector="^.multiline">
+            <Setter Property="VerticalContentAlignment" Value="Top" />
         </Style>
     </Style>
 </Styles>

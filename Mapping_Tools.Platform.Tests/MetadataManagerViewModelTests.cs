@@ -32,6 +32,22 @@ public sealed class MetadataManagerViewModelTests
     }
 
     [TestMethod]
+    public async Task ImportCommand_WithExistingExportPath_PreservesExportPath()
+    {
+        // Arrange
+        MetadataManagerViewModel viewModel = CreateViewModel();
+        viewModel.ImportPath = "source.osu";
+        viewModel.ExportPath = "existing-target.osu";
+
+        // Act
+        await ExecuteAsync(viewModel.ImportCommand);
+
+        // Assert
+        viewModel.ImportPath.Should().Be("source.osu");
+        viewModel.ExportPath.Should().Be("existing-target.osu");
+    }
+
+    [TestMethod]
     public async Task RunCommand_WithConfiguredMetadata_ExecutesServiceAndResetsProgress()
     {
         // Arrange

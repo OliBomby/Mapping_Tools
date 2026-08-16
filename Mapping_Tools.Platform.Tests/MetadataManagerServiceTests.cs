@@ -27,8 +27,7 @@ public sealed class MetadataManagerServiceTests
         TestBeatmapBackupService backup = new();
         MetadataManagerService service = new(
             new TestEditingGateway(fileStore),
-            backup,
-            fileStore);
+            backup);
         MetadataManagerOptions options = new()
         {
             ExportPath = target,

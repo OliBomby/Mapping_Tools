@@ -8,12 +8,6 @@ namespace Mapping_Tools.Application.Projects;
 /// </summary>
 public sealed class ProjectService : IProjectService
 {
-    private static readonly FilePickerFilter ProjectFilter = new(
-        "Mapping Tools project",
-        ["*.json"],
-        ["application/json"],
-        ["public.json"]);
-
     private readonly IApplicationDirectories _directories;
     private readonly IFilePicker _filePicker;
     private readonly IProjectStore _store;
@@ -132,7 +126,7 @@ public sealed class ProjectService : IProjectService
                 SuggestedFileName = suggestedFileName,
                 DefaultExtension = "json",
                 ShowOverwritePrompt = true,
-                Filters = [ProjectFilter]
+                Filters = [CommonFilePickerFilters.MappingToolsProjects]
             },
             cancellationToken);
 
@@ -161,7 +155,7 @@ public sealed class ProjectService : IProjectService
                 Title = "Open project",
                 SuggestedStartLocation = projectFolder,
                 AllowMultiple = false,
-                Filters = [ProjectFilter]
+                Filters = [CommonFilePickerFilters.MappingToolsProjects]
             },
             cancellationToken);
 

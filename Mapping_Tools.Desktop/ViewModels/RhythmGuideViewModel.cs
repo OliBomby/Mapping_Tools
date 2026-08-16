@@ -20,10 +20,6 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
     IShellProjectFeature
 {
     private const string OperationId = "rhythm-guide";
-    private static readonly FilePickerFilter BeatmapFilter = new(
-        "osu! beatmap",
-        ["*.osu"],
-        ["application/x-osu-beatmap"]);
 
     private readonly IRhythmGuideService _rhythmGuide;
     private readonly IToolExecutionService _execution;
@@ -182,7 +178,7 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
                 Title = "Copy rhythm from",
                 SuggestedStartLocation = FirstPathOrNull(),
                 AllowMultiple = true,
-                Filters = [BeatmapFilter]
+                Filters = [CommonFilePickerFilters.Beatmaps]
             });
         if (paths.Count > 0)
         {
@@ -209,7 +205,7 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
                 Title = "Copy rhythm to",
                 SuggestedStartLocation = ExportPath,
                 AllowMultiple = false,
-                Filters = [BeatmapFilter]
+                Filters = [CommonFilePickerFilters.Beatmaps]
             });
         if (paths.Count > 0)
         {

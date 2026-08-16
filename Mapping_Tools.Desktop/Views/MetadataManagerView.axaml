@@ -81,7 +81,7 @@
                         <TextBox Grid.Column="2" Grid.Row="3" Classes="compact" Text="{Binding RomanisedTitle, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                         <TextBox Grid.Column="2" Grid.Row="4" Classes="compact" Text="{Binding BeatmapCreator, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                         <TextBox Grid.Column="2" Grid.Row="5" Classes="compact" Text="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                        <TextBox Grid.Column="2" Grid.Row="6" Classes="compact" TextWrapping="Wrap"
+                        <TextBox Grid.Column="2" Grid.Row="6" Classes="compact multiline" TextWrapping="Wrap"
                                  Text="{Binding Tags, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
 
                         <CheckBox Grid.Column="2" Grid.Row="7" VerticalAlignment="Top"

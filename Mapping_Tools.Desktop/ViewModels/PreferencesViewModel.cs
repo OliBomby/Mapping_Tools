@@ -19,9 +19,6 @@ namespace Mapping_Tools.Desktop.ViewModels;
 public sealed partial class PreferencesViewModel : ObservableValidator, IShellFeatureActivation
 {
     private const string CurrentTool = "<Current Tool>";
-    private static readonly FilePickerFilter OsuConfigurationFilter = new(
-        "osu! user configuration",
-        ["osu!.*.cfg"]);
 
     private readonly ApplicationSettings _settings;
     private readonly IFilePicker _filePicker;
@@ -406,7 +403,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
                     Title = "Select the osu! user configuration file",
                     SuggestedStartLocation = OsuPath,
                     AllowMultiple = false,
-                    Filters = [OsuConfigurationFilter]
+                    Filters = [CommonFilePickerFilters.OsuConfiguration]
                 });
             if (paths.Count > 0)
             {

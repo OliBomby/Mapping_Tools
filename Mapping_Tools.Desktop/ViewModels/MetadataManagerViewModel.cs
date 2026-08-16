@@ -23,10 +23,6 @@ public sealed partial class MetadataManagerViewModel : ObservableValidator,
     IShellProjectFeature
 {
     private const string OperationId = "metadata-manager";
-    private static readonly FilePickerFilter BeatmapFilter = new(
-        "osu! beatmap",
-        ["*.osu"],
-        ["application/x-osu-beatmap"]);
 
     private readonly IMetadataManagerService _metadataManager;
     private readonly IToolExecutionService _execution;
@@ -251,8 +247,10 @@ public sealed partial class MetadataManagerViewModel : ObservableValidator,
     {
         try
         {
+            string exportPath = ExportPath;
             MetadataManagerOptions options = await _metadataManager.ImportAsync(ImportPath);
             options.ImportPath = ImportPath;
+            options.ExportPath = exportPath;
             Install(options);
         }
         catch (OperationCanceledException)
@@ -480,7 +478,7 @@ public sealed partial class MetadataManagerViewModel : ObservableValidator,
                     Title = title,
                     SuggestedStartLocation = suggestedStartLocation,
                     AllowMultiple = allowMultiple,
-                    Filters = [BeatmapFilter]
+                    Filters = [CommonFilePickerFilters.Beatmaps]
                 });
             if (paths.Count > 0)
             {

@@ -13,7 +13,17 @@ The migrated feature preserves the legacy Metadata Manager workflow:
 
 The WPF Material popup colour editor is represented by the Avalonia 12
 ColorPicker package in the migrated view; the underlying `RgbaColour` values
-and two-way editing contract are unchanged.
+and two-way editing contract are unchanged. The application currently includes
+the package's Fluent style. The package also provides a Simple style and
+Material colour palettes, but Material.Avalonia does not provide a native
+ColorPicker style, so no unapproved Material-specific substitution was added.
+
+Metadata export delegates filename-aware saving to the reusable
+`BeatmapEditor2.SaveFileWithNameUpdate` method. Importing metadata preserves the
+existing export path. Shared native picker filters now live in
+`CommonFilePickerFilters`, and the shared default and compact TextBox styles no
+longer impose a fixed height, allowing the wrapped Tags field to grow with its
+content.
 
 The metadata transformation lives in `Mapping_Tools.Core`, the file and backup
 orchestration lives in `Mapping_Tools.Application`, and the Avalonia view only

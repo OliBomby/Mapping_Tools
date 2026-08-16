@@ -11,11 +11,6 @@ namespace Mapping_Tools.Application.Workspace;
 public sealed class BeatmapWorkspace : IBeatmapWorkspace
 {
     private const int RecentMapLimit = 20;
-    private static readonly FilePickerFilter BeatmapFilter = new(
-        "osu! beatmaps and storyboards",
-        ["*.osu", "*.osb"],
-        ["application/x-osu-beatmap", "text/plain"],
-        ["public.data", "public.text"]);
 
     private readonly ApplicationSettings _settings;
     private readonly IFilePicker _filePicker;
@@ -144,7 +139,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
                 Title = "Open beatmap",
                 SuggestedStartLocation = GetPickerStartLocation(),
                 AllowMultiple = allowMultiple,
-                Filters = [BeatmapFilter]
+                Filters = [CommonFilePickerFilters.BeatmapsAndStoryboards]
             },
             cancellationToken);
 

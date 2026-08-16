@@ -15,12 +15,6 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDisposable
 {
-    private static readonly FilePickerFilter BackupFilter = new(
-        "osu! beatmap backups",
-        ["*.osu", "*.osb"],
-        ["application/x-osu-beatmap", "text/plain"],
-        ["public.data", "public.text"]);
-
     private readonly IBeatmapWorkspace _workspace;
     private readonly IBeatmapBackupService _backupService;
     private readonly IQuickUndoCommandService _quickUndoService;
@@ -179,7 +173,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
                     Title = "Load backup",
                     SuggestedStartLocation = _settings.BackupsPath,
                     AllowMultiple = false,
-                    Filters = [BackupFilter]
+                    Filters = [CommonFilePickerFilters.BeatmapBackups]
                 });
             if (selected.Count == 0)
             {

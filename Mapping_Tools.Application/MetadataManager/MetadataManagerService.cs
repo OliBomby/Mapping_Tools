@@ -13,22 +13,18 @@ public sealed class MetadataManagerService : IMetadataManagerService
 {
     private readonly IBeatmapEditingGateway _editingGateway;
     private readonly IBeatmapBackupService _backupService;
-    private readonly ITextFileStore _fileStore;
 
     /// <summary>
     /// Creates a Metadata Manager application service.
     /// </summary>
     /// <param name="editingGateway">Loads beatmaps with the configured live-editor preference.</param>
     /// <param name="backupService">Creates the pre-write safety copy for each target.</param>
-    /// <param name="fileStore">Persists renamed output files and resolves their parent paths.</param>
     public MetadataManagerService(
         IBeatmapEditingGateway editingGateway,
-        IBeatmapBackupService backupService,
-        ITextFileStore fileStore)
+        IBeatmapBackupService backupService)
     {
         _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         _backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
-        _fileStore = fileStore ?? throw new ArgumentNullException(nameof(fileStore));
     }
 
     /// <inheritdoc/>
@@ -78,31 +74,11 @@ public sealed class MetadataManagerService : IMetadataManagerService
 
             MetadataManagerEngine.Apply(session.Editor.Beatmap, options);
             cancellationToken.ThrowIfCancellationRequested();
-            string outputPath = SaveWithNameUpdate(session.Editor);
-            processedPaths.Add(outputPath);
+            session.Editor.SaveFileWithNameUpdate();
+            processedPaths.Add(session.Editor.Path);
             progress?.Report((index + 1) * 100d / paths.Length);
         }
 
         return new MetadataManagerResult(processedPaths);
-    }
-
-    private string SaveWithNameUpdate(BeatmapEditor2 editor)
-    {
-        string originalPath = editor.Path;
-        string outputName = editor.Beatmap.GetFileName();
-        string outputPath = _fileStore.CombinePath(
-            _fileStore.GetParentFolder(originalPath),
-            outputName);
-
-        if (string.Equals(originalPath, outputPath, StringComparison.OrdinalIgnoreCase))
-        {
-            editor.SaveFile();
-            return originalPath;
-        }
-
-        editor.SaveFile(outputPath);
-        _fileStore.Delete(originalPath);
-        editor.Path = outputPath;
-        return outputPath;
     }
 }
