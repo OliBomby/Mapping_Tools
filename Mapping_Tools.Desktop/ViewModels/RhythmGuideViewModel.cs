@@ -15,14 +15,13 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>Owns Rhythm Guide inputs, execution, projects, and auxiliary-window interaction.</summary>
-public sealed partial class RhythmGuideViewModel : ObservableObject,
+public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     IShellFeatureActivation,
     IShellProjectFeature
 {
     private const string OperationId = "rhythm-guide";
 
     private readonly IRhythmGuideService _rhythmGuide;
-    private readonly IToolExecutionService _execution;
     private readonly IFilePicker _filePicker;
     private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
     private readonly IProjectService _projects;
@@ -62,15 +61,6 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
     public partial RhythmGuideSelectionMode SelectionMode { get; set; } =
         RhythmGuideSelectionMode.HitsoundEvents;
 
-    /// <summary>Gets whether generation is currently running.</summary>
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(RunCommand))]
-    public partial bool IsRunning { get; private set; }
-
-    /// <summary>Gets the current generation completion percentage.</summary>
-    [ObservableProperty]
-    public partial double Progress { get; private set; }
-
     /// <summary>Creates a Rhythm Guide presentation model.</summary>
     /// <param name="rhythmGuide">Generates framework-independent guide beatmaps.</param>
     /// <param name="execution">Coordinates cancellation, backup, and notifications.</param>
@@ -89,9 +79,9 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         IRhythmGuideWindowService windowService,
         IUserNotificationService notifications,
         IApplicationDirectories directories)
+        : base(execution, OperationId)
     {
         _rhythmGuide = rhythmGuide ?? throw new ArgumentNullException(nameof(rhythmGuide));
-        _execution = execution ?? throw new ArgumentNullException(nameof(execution));
         _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         _currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         _projects = projects ?? throw new ArgumentNullException(nameof(projects));
@@ -126,12 +116,20 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         if (!_loadedAutosave)
         {
             _loadedAutosave = true;
-            _ = LoadAutosaveAsync();
+            _ = ProjectAutosaveCoordinator.LoadAsync(
+                _projects,
+                _definition,
+                Install,
+                exception => PublishProjectFailureAsync("Project could not be loaded", exception));
         }
     }
 
     /// <summary>Schedules autosave when the feature leaves the shell content area.</summary>
-    public void Deactivate() => _ = AutoSaveSafelyAsync();
+    public void Deactivate() => _ = ProjectAutosaveCoordinator.SaveAsync(
+        _projects,
+        _definition,
+        Snapshot,
+        exception => PublishProjectFailureAsync("Project could not be saved", exception));
 
     /// <summary>Prompts for a destination and saves the current Rhythm Guide project.</summary>
     /// <param name="cancellationToken">Cancels the picker or save.</param>
@@ -223,43 +221,27 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         }
     }
 
-    private bool CanRun() => !IsRunning;
-
-    [RelayCommand(CanExecute = nameof(CanRun))]
-    private async Task RunAsync()
+    /// <inheritdoc/>
+    protected override async Task RunCoreAsync()
     {
         RhythmGuideOptions options = CreateOptions();
-        IsRunning = true;
-        Progress = 0;
-        Progress<ToolExecutionProgress> progress = new(value => Progress = value.Percent);
-        try
-        {
-            ToolExecutionResult<RhythmGuideResult> result = await _execution.ExecuteAsync(
-                new ToolExecutionRequest<RhythmGuideResult>(
-                    OperationId,
-                    "Rhythm Guide",
-                    async context =>
-                    {
-                        context.ReportProgress(10, "Loading beatmaps");
-                        RhythmGuideResult generated = await _rhythmGuide.GenerateAsync(
-                            options,
-                            context.CancellationToken);
-                        context.ReportProgress(100, "Complete");
-                        return new ToolExecutionOutput<RhythmGuideResult>(
-                            generated,
-                            generated.ExportMode == RhythmGuideExportMode.AddToMap ? "Done!" : null);
-                    }),
-                progress);
-        }
-        finally
-        {
-            Progress = 0;
-            IsRunning = false;
-        }
+        await Execution.ExecuteAsync(
+            new ToolExecutionRequest<RhythmGuideResult>(
+                OperationId,
+                "Rhythm Guide",
+                async context =>
+                {
+                    context.ReportProgress(10, "Loading beatmaps");
+                    RhythmGuideResult generated = await _rhythmGuide.GenerateAsync(
+                        options,
+                        context.CancellationToken);
+                    context.ReportProgress(100, "Complete");
+                    return new ToolExecutionOutput<RhythmGuideResult>(
+                        generated,
+                        generated.ExportMode == RhythmGuideExportMode.AddToMap ? "Done!" : null);
+                }),
+            CreateProgress());
     }
-
-    [RelayCommand]
-    private void Cancel() => _execution.Cancel(OperationId);
 
     [RelayCommand]
     private void OpenAuxiliaryWindow() => _windowService.Show(this);
@@ -293,38 +275,6 @@ public sealed partial class RhythmGuideViewModel : ObservableObject,
         NcEverything = options.NcEverything;
         SelectionMode = options.SelectionMode;
         _beatDivisors = options.BeatDivisors.ToArray();
-    }
-
-    private async Task LoadAutosaveAsync()
-    {
-        try
-        {
-            RhythmGuideProject project = await _projects.LoadAsync<RhythmGuideProject>(
-                _projects.GetAutoSavePath(_definition));
-            Install(project);
-        }
-        catch (FileNotFoundException)
-        {
-        }
-        catch (DirectoryNotFoundException)
-        {
-        }
-        catch (Exception exception)
-        {
-            await PublishProjectFailureAsync("Project could not be loaded", exception);
-        }
-    }
-
-    private async Task AutoSaveSafelyAsync()
-    {
-        try
-        {
-            await _projects.AutoSaveAsync(_definition, Snapshot());
-        }
-        catch (Exception exception)
-        {
-            await PublishProjectFailureAsync("Project could not be saved", exception);
-        }
     }
 
     private Task PublishProjectFailureAsync(string message, Exception exception) =>

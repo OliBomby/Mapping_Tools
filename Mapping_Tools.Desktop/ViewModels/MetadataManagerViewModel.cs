@@ -18,14 +18,13 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// <summary>
 /// Owns Metadata Manager form state, project persistence, file selection, and execution.
 /// </summary>
-public sealed partial class MetadataManagerViewModel : ObservableValidator,
+public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     IShellFeatureActivation,
     IShellProjectFeature
 {
     private const string OperationId = "metadata-manager";
 
     private readonly IMetadataManagerService _metadataManager;
-    private readonly IToolExecutionService _execution;
     private readonly IFilePicker _filePicker;
     private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
     private readonly IProjectService _projects;
@@ -114,15 +113,6 @@ public sealed partial class MetadataManagerViewModel : ObservableValidator,
     /// <summary>Gets the named special colours edited by the form.</summary>
     public ObservableCollection<SpecialColour> SpecialColours { get; } = [];
 
-    /// <summary>Gets whether a metadata export is currently running.</summary>
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(RunCommand))]
-    public partial bool IsRunning { get; private set; }
-
-    /// <summary>Gets the current export completion percentage.</summary>
-    [ObservableProperty]
-    public partial double Progress { get; private set; }
-
     /// <summary>Gets the number of non-empty target beatmap paths.</summary>
     public string ExportMapCountText
     {
@@ -159,9 +149,9 @@ public sealed partial class MetadataManagerViewModel : ObservableValidator,
         IProjectService projects,
         IUserNotificationService notifications,
         IApplicationDirectories directories)
+        : base(execution, OperationId)
     {
         _metadataManager = metadataManager ?? throw new ArgumentNullException(nameof(metadataManager));
-        _execution = execution ?? throw new ArgumentNullException(nameof(execution));
         _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         _currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         _projects = projects ?? throw new ArgumentNullException(nameof(projects));
@@ -182,12 +172,26 @@ public sealed partial class MetadataManagerViewModel : ObservableValidator,
         if (!_loadedAutosave)
         {
             _loadedAutosave = true;
-            _ = LoadAutosaveAsync();
+            _ = ProjectAutosaveCoordinator.LoadAsync(
+                _projects,
+                _definition,
+                Install,
+                exception => PublishFailureAsync(
+                    "Project could not be loaded",
+                    "The Metadata Manager autosave is invalid.",
+                    exception));
         }
     }
 
     /// <inheritdoc/>
-    public void Deactivate() => _ = AutoSaveSafelyAsync();
+    public void Deactivate() => _ = ProjectAutosaveCoordinator.SaveAsync(
+        _projects,
+        _definition,
+        Snapshot,
+        exception => PublishFailureAsync(
+            "Project could not be saved",
+            "The Metadata Manager autosave could not be written.",
+            exception));
 
     /// <summary>Saves the current Metadata Manager project through the native picker.</summary>
     /// <param name="cancellationToken">Cancels the picker or save.</param>
@@ -326,49 +330,34 @@ public sealed partial class MetadataManagerViewModel : ObservableValidator,
         }
     }
 
-    private bool CanRun() => !IsRunning;
-
-    [RelayCommand(CanExecute = nameof(CanRun))]
-    private async Task RunAsync()
+    /// <inheritdoc/>
+    protected override bool PrepareRun()
     {
         ValidateAllProperties();
-        if (HasErrors)
-        {
-            return;
-        }
-
-        MetadataManagerOptions options = CreateOptions();
-        IsRunning = true;
-        Progress = 0;
-        Progress<ToolExecutionProgress> progress = new(value => Progress = value.Percent);
-        try
-        {
-            await _execution.ExecuteAsync(
-                new ToolExecutionRequest<MetadataManagerResult>(
-                    OperationId,
-                    "Metadata Manager",
-                    async context =>
-                    {
-                        context.ReportProgress(0, "Preparing metadata export");
-                        MetadataManagerResult result = await _metadataManager.ExportAsync(
-                            options,
-                            new Progress<double>(value => context.ReportProgress(value, "Exporting metadata")),
-                            context.CancellationToken);
-                        return new ToolExecutionOutput<MetadataManagerResult>(
-                            result,
-                            $"Successfully exported metadata to {result.ProcessedCount} beatmap(s)!");
-                    }),
-                progress);
-        }
-        finally
-        {
-            Progress = 0;
-            IsRunning = false;
-        }
+        return !HasErrors;
     }
 
-    [RelayCommand]
-    private void Cancel() => _execution.Cancel(OperationId);
+    /// <inheritdoc/>
+    protected override async Task RunCoreAsync()
+    {
+        MetadataManagerOptions options = Snapshot();
+        await Execution.ExecuteAsync(
+            new ToolExecutionRequest<MetadataManagerResult>(
+                OperationId,
+                "Metadata Manager",
+                async context =>
+                {
+                    context.ReportProgress(0, "Preparing metadata export");
+                    MetadataManagerResult result = await _metadataManager.ExportAsync(
+                        options,
+                        new Progress<double>(value => context.ReportProgress(value, "Exporting metadata")),
+                        context.CancellationToken);
+                    return new ToolExecutionOutput<MetadataManagerResult>(
+                        result,
+                        $"Successfully exported metadata to {result.ProcessedCount} beatmap(s)!");
+                }),
+            CreateProgress());
+    }
 
     partial void OnDoRemoveDuplicateTagsChanged(bool value)
     {
@@ -390,30 +379,7 @@ public sealed partial class MetadataManagerViewModel : ObservableValidator,
         }
     }
 
-    private MetadataManagerProject Snapshot()
-    {
-        MetadataManagerOptions options = CreateOptions();
-        return new MetadataManagerProject
-        {
-            ImportPath = options.ImportPath,
-            ExportPath = options.ExportPath,
-            Artist = options.Artist,
-            RomanisedArtist = options.RomanisedArtist,
-            Title = options.Title,
-            RomanisedTitle = options.RomanisedTitle,
-            BeatmapCreator = options.BeatmapCreator,
-            Source = options.Source,
-            Tags = options.Tags,
-            DoRemoveDuplicateTags = options.DoRemoveDuplicateTags,
-            ResetIds = options.ResetIds,
-            PreviewTime = options.PreviewTime,
-            UseComboColours = options.UseComboColours,
-            ComboColours = options.ComboColours,
-            SpecialColours = options.SpecialColours
-        };
-    }
-
-    private MetadataManagerOptions CreateOptions() => new()
+    private MetadataManagerProject Snapshot() => new()
     {
         ImportPath = ImportPath,
         ExportPath = ExportPath,
@@ -493,44 +459,6 @@ public sealed partial class MetadataManagerViewModel : ObservableValidator,
             await PublishFailureAsync(
                 "Could not select beatmaps",
                 "The file picker could not return local beatmap paths.",
-                exception);
-        }
-    }
-
-    private async Task LoadAutosaveAsync()
-    {
-        try
-        {
-            MetadataManagerProject project = await _projects.LoadAsync<MetadataManagerProject>(
-                _projects.GetAutoSavePath(_definition));
-            Install(project);
-        }
-        catch (FileNotFoundException)
-        {
-        }
-        catch (DirectoryNotFoundException)
-        {
-        }
-        catch (Exception exception)
-        {
-            await PublishFailureAsync(
-                "Project could not be loaded",
-                "The Metadata Manager autosave is invalid.",
-                exception);
-        }
-    }
-
-    private async Task AutoSaveSafelyAsync()
-    {
-        try
-        {
-            await _projects.AutoSaveAsync(_definition, Snapshot());
-        }
-        catch (Exception exception)
-        {
-            await PublishFailureAsync(
-                "Project could not be saved",
-                "The Metadata Manager autosave could not be written.",
                 exception);
         }
     }

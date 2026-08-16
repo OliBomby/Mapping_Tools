@@ -14,11 +14,10 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>Coordinates Auto-fail Detector options, execution, fixes, and timeline output.</summary>
-public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShellFeatureActivation
+public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, IShellFeatureActivation
 {
     internal const string OperationId = "auto-fail-detector";
     private readonly IAutoFailService _autoFail;
-    private readonly IToolExecutionService _execution;
     private readonly IBeatmapWorkspace _workspace;
     private readonly ICurrentBeatmapLocator _currentBeatmap;
     private readonly ApplicationSettings _settings;
@@ -58,15 +57,6 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
     [ObservableProperty]
     public partial bool AutoPlaceFix { get; set; }
 
-    /// <summary>Gets whether analysis or repair work is running.</summary>
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(RunCommand))]
-    public partial bool IsRunning { get; private set; }
-
-    /// <summary>Gets the current operation completion percentage.</summary>
-    [ObservableProperty]
-    public partial double Progress { get; private set; }
-
     /// <summary>Gets the final timestamp displayed by the result timeline.</summary>
     [ObservableProperty]
     public partial double EndTime { get; private set; } = 20;
@@ -102,9 +92,9 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
         IDialogService dialogs,
         IQuickRunCommandRegistry quickRunRegistry,
         IPlatformLauncher launcher)
+        : base(execution, OperationId)
     {
         _autoFail = autoFail ?? throw new ArgumentNullException(nameof(autoFail));
-        _execution = execution ?? throw new ArgumentNullException(nameof(execution));
         _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -125,10 +115,8 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
         }
     }
 
-    private bool CanRun() => !IsRunning;
-
-    [RelayCommand(CanExecute = nameof(CanRun))]
-    private async Task RunAsync()
+    /// <inheritdoc/>
+    protected override async Task RunCoreAsync()
     {
         string? path = _settings.AlwaysQuickRun
             ? await _currentBeatmap.FindCurrentBeatmapAsync()
@@ -142,11 +130,8 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
         string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
-        await RunPathAsync(path, cancellationToken);
+        await RunWithStateAsync(() => RunPathAsync(path, cancellationToken));
     }
-
-    [RelayCommand]
-    private void Cancel() => _execution.Cancel(OperationId);
 
     [RelayCommand]
     private Task NavigateAsync(double time) => _launcher.OpenUriAsync(
@@ -160,45 +145,35 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
             return;
         }
 
-        IsRunning = true;
-        Progress = 0;
-        try
+        ToolExecutionResult<AutoFailRun> result = await Execution.ExecuteAsync(
+            new ToolExecutionRequest<AutoFailRun>(
+                OperationId,
+                "Auto-fail Detector",
+                async context =>
+                {
+                    context.ReportProgress(33, "Loading beatmap");
+                    AutoFailRun run = await _autoFail.AnalyzeAsync(
+                        new AutoFailOptions(
+                            path,
+                            ApproachRateOverride,
+                            OverallDifficultyOverride,
+                            PhysicsUpdateLeniency),
+                        context.CancellationToken);
+                    context.ReportProgress(67, "Planning fixes");
+                    context.ReportProgress(100, "Analysis complete");
+                    return new ToolExecutionOutput<AutoFailRun>(run, Summarize(run.Analysis));
+                }),
+            CreateProgress(),
+            cancellationToken);
+        if (result.Status != ToolExecutionStatus.Succeeded || result.Value is null)
         {
-            ToolExecutionResult<AutoFailRun> result = await _execution.ExecuteAsync(
-                new ToolExecutionRequest<AutoFailRun>(
-                    OperationId,
-                    "Auto-fail Detector",
-                    async context =>
-                    {
-                        context.ReportProgress(33, "Loading beatmap");
-                        AutoFailRun run = await _autoFail.AnalyzeAsync(
-                            new AutoFailOptions(
-                                path,
-                                ApproachRateOverride,
-                                OverallDifficultyOverride,
-                                PhysicsUpdateLeniency),
-                            context.CancellationToken);
-                        context.ReportProgress(67, "Planning fixes");
-                        context.ReportProgress(100, "Analysis complete");
-                        return new ToolExecutionOutput<AutoFailRun>(run, Summarize(run.Analysis));
-                    }),
-                new Progress<ToolExecutionProgress>(value => Progress = value.Percent),
-                cancellationToken);
-            if (result.Status != ToolExecutionStatus.Succeeded || result.Value is null)
-            {
-                return;
-            }
-
-            InstallResult(result.Value);
-            if (GetAutoFailFix)
-            {
-                await OfferFixesAsync(result.Value, cancellationToken);
-            }
+            return;
         }
-        finally
+
+        InstallResult(result.Value);
+        if (GetAutoFailFix)
         {
-            Progress = 0;
-            IsRunning = false;
+            await OfferFixesAsync(result.Value, cancellationToken);
         }
     }
 
@@ -251,7 +226,7 @@ public sealed partial class AutoFailDetectorViewModel : ObservableObject, IShell
             }
             if (choice == FixChoice.Apply)
             {
-                ToolExecutionResult<bool> applied = await _execution.ExecuteAsync(
+                ToolExecutionResult<bool> applied = await Execution.ExecuteAsync(
                     new ToolExecutionRequest<bool>(
                         OperationId + "-fix",
                         "Auto-fail Fix",

@@ -16,13 +16,12 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>Coordinates Map Cleaner options, projects, QuickRun, and timeline results.</summary>
-public sealed partial class MapCleanerViewModel : ObservableObject,
+public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     IShellFeatureActivation,
     IShellProjectFeature
 {
     internal const string OperationId = "map-cleaner";
     private readonly IMapCleanerService _cleaner;
-    private readonly IToolExecutionService _execution;
     private readonly IBeatmapWorkspace _workspace;
     private readonly ICurrentBeatmapLocator _currentBeatmap;
     private readonly ApplicationSettings _settings;
@@ -81,18 +80,9 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
     public partial IBeatDivisor[] BeatDivisors { get; set; } =
         RationalBeatDivisor.GetDefaultBeatDivisors();
 
-    /// <summary>Gets whether cleanup is currently running.</summary>
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(RunCommand))]
-    public partial bool IsRunning { get; private set; }
-
     /// <summary>Gets whether the autosaved project has finished restoring into the visible form.</summary>
     [ObservableProperty]
     public partial bool IsInitialized { get; private set; }
-
-    /// <summary>Gets the current cleanup completion percentage.</summary>
-    [ObservableProperty]
-    public partial double Progress { get; private set; }
 
     /// <summary>Gets a textual summary of the latest cleanup.</summary>
     [ObservableProperty]
@@ -131,9 +121,9 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
         IProjectService projects,
         IUserNotificationService notifications,
         IPlatformLauncher launcher)
+        : base(execution, OperationId)
     {
         _cleaner = cleaner ?? throw new ArgumentNullException(nameof(cleaner));
-        _execution = execution ?? throw new ArgumentNullException(nameof(execution));
         _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -151,7 +141,12 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
         if (!_loadedAutosave)
         {
             _loadedAutosave = true;
-            _ = LoadAutosaveAsync();
+            _ = ProjectAutosaveCoordinator.LoadAsync(
+                _projects,
+                _definition,
+                Install,
+                exception => PublishFailureAsync("Project could not be loaded", exception),
+                () => IsInitialized = true);
         }
     }
 
@@ -163,15 +158,23 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
             _quickRunRegistry.SelectCurrent(null);
         }
 
-        _ = AutoSaveSafelyAsync();
+        _ = ProjectAutosaveCoordinator.SaveAsync(
+            _projects,
+            _definition,
+            Snapshot,
+            exception => PublishFailureAsync("Project could not be saved", exception));
     }
 
-    [RelayCommand(CanExecute = nameof(CanRun))]
-    private async Task RunAsync()
+    /// <inheritdoc/>
+    protected override async Task RunCoreAsync()
     {
         if (_settings.AlwaysQuickRun)
         {
-            await RunQuickAsync(CancellationToken.None);
+            string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
+            await RunPathsAsync(
+                string.IsNullOrWhiteSpace(path) ? [] : [path],
+                quick: true,
+                CancellationToken.None);
             return;
         }
         await RunPathsAsync(
@@ -186,17 +189,15 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
         string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
-        await RunPathsAsync(string.IsNullOrWhiteSpace(path) ? [] : [path], true, cancellationToken);
+        await RunWithStateAsync(() => RunPathsAsync(
+            string.IsNullOrWhiteSpace(path) ? [] : [path],
+            true,
+            cancellationToken));
     }
-
-    [RelayCommand]
-    private void Cancel() => _execution.Cancel(OperationId);
 
     [RelayCommand]
     private Task NavigateAsync(double time) =>
         _launcher.OpenUriAsync(new Uri($"osu://edit/{Math.Round(time)}"));
-
-    private bool CanRun() => !IsRunning;
 
     /// <summary>Prompts for a destination and saves the current Map Cleaner project.</summary>
     /// <param name="cancellationToken">Cancels the picker or save.</param>
@@ -243,42 +244,32 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
 
         MapCleanerOptions options = Snapshot().MapCleanerArgs;
 
-        IsRunning = true;
-        Progress = 0;
-        try
+        ToolExecutionResult<MapCleanerResult> execution = await Execution.ExecuteAsync(
+            new ToolExecutionRequest<MapCleanerResult>(
+                OperationId,
+                "Map Cleaner",
+                async context =>
+                {
+                    Progress<double> progress = new(value =>
+                        context.ReportProgress(value, "Cleaning beatmaps"));
+                    MapCleanerResult result = await _cleaner.CleanAsync(
+                        paths,
+                        options,
+                        progress,
+                        context.CancellationToken);
+                    return new ToolExecutionOutput<MapCleanerResult>(
+                        result,
+                        quick ? null : Summarize(result, options),
+                        reloadEditor: quick);
+                }),
+            CreateProgress(),
+            cancellationToken);
+        if (execution.Status == ToolExecutionStatus.Succeeded && execution.Value is { } result)
         {
-            ToolExecutionResult<MapCleanerResult> execution = await _execution.ExecuteAsync(
-                new ToolExecutionRequest<MapCleanerResult>(
-                    OperationId,
-                    "Map Cleaner",
-                    async context =>
-                    {
-                        Progress<double> progress = new(value =>
-                            context.ReportProgress(value, "Cleaning beatmaps"));
-                        MapCleanerResult result = await _cleaner.CleanAsync(
-                            paths,
-                            options,
-                            progress,
-                            context.CancellationToken);
-                        return new ToolExecutionOutput<MapCleanerResult>(
-                            result,
-                            quick ? null : Summarize(result, options),
-                            reloadEditor: quick);
-                    }),
-                new Progress<ToolExecutionProgress>(value => Progress = value.Percent),
-                cancellationToken);
-            if (execution.Status == ToolExecutionStatus.Succeeded && execution.Value is { } result)
-            {
-                ResultSummary = Summarize(result, options);
-                EndTime = result.TimelineEndTime;
-                Markers = paths.Count == 1 ? CreateMarkers(result) : [];
-                HasRun = paths.Count == 1;
-            }
-        }
-        finally
-        {
-            Progress = 0;
-            IsRunning = false;
+            ResultSummary = Summarize(result, options);
+            EndTime = result.TimelineEndTime;
+            Markers = paths.Count == 1 ? CreateMarkers(result) : [];
+            HasRun = paths.Count == 1;
         }
     }
 
@@ -315,42 +306,6 @@ public sealed partial class MapCleanerViewModel : ObservableObject,
         RemoveMuting = options.RemoveMuting;
         RemoveUnclickableHitsounds = options.RemoveUnclickableHitsounds;
         BeatDivisors = options.BeatDivisors.ToArray();
-    }
-
-    private async Task LoadAutosaveAsync()
-    {
-        try
-        {
-            MapCleanerProject project = await _projects.LoadAsync<MapCleanerProject>(
-                _projects.GetAutoSavePath(_definition));
-            Install(project);
-        }
-        catch (FileNotFoundException)
-        {
-        }
-        catch (DirectoryNotFoundException)
-        {
-        }
-        catch (Exception exception)
-        {
-            await PublishFailureAsync("Project could not be loaded", exception);
-        }
-        finally
-        {
-            IsInitialized = true;
-        }
-    }
-
-    private async Task AutoSaveSafelyAsync()
-    {
-        try
-        {
-            await _projects.AutoSaveAsync(_definition, Snapshot());
-        }
-        catch (Exception exception)
-        {
-            await PublishFailureAsync("Project could not be saved", exception);
-        }
     }
 
     private Task PublishFailureAsync(string message, Exception exception) =>
