@@ -185,42 +185,39 @@
     </Style>
 
     <!-- The labels and their editors form one compact outlined control. -->
-    <Style Selector=":is(ColorPicker) /template/ TextBox#PART_HexTextBox,
-                     :is(ColorView) /template/ TextBox#PART_HexTextBox">
+    <!--
+        Match flyout parts by their ColorView contract names. On the first opening the flyout
+        is styled before it has a stable template ancestry back to the owning ColorPicker.
+    -->
+    <Style Selector="TextBox#PART_HexTextBox">
         <Setter Property="Theme" Value="{StaticResource ColorViewTextBoxTheme}" />
     </Style>
-    <Style Selector=":is(ColorPicker) /template/ NumericUpDown,
-                     :is(ColorView) /template/ NumericUpDown">
+    <Style Selector="NumericUpDown#Component1NumericUpDown,
+                     NumericUpDown#Component2NumericUpDown,
+                     NumericUpDown#Component3NumericUpDown,
+                     NumericUpDown#AlphaComponentNumericUpDown">
         <Setter Property="Theme" Value="{StaticResource ColorViewNumericUpDownTheme}" />
     </Style>
 
     <!-- A transparent presenter supplies a full rectangular hit target for RGB and HSV. -->
-    <Style Selector=":is(ColorPicker) /template/ RadioButton#RgbRadioButton,
-                     :is(ColorPicker) /template/ RadioButton#HsvRadioButton,
-                     :is(ColorView) /template/ RadioButton#RgbRadioButton,
-                     :is(ColorView) /template/ RadioButton#HsvRadioButton">
+    <Style Selector="RadioButton#RgbRadioButton,
+                     RadioButton#HsvRadioButton">
         <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialTextBoxBorderBrush}" />
     </Style>
-    <Style Selector=":is(ColorPicker) /template/ RadioButton#RgbRadioButton /template/ ContentPresenter#PART_ContentPresenter,
-                     :is(ColorPicker) /template/ RadioButton#HsvRadioButton /template/ ContentPresenter#PART_ContentPresenter,
-                     :is(ColorView) /template/ RadioButton#RgbRadioButton /template/ ContentPresenter#PART_ContentPresenter,
-                     :is(ColorView) /template/ RadioButton#HsvRadioButton /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="RadioButton#RgbRadioButton /template/ ContentPresenter#PART_ContentPresenter,
+                     RadioButton#HsvRadioButton /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="TextBlock.Foreground" Value="{DynamicResource MaterialBodyBrush}" />
     </Style>
-    <Style Selector=":is(ColorPicker) /template/ RadioButton#RgbRadioButton:checked /template/ ContentPresenter#PART_ContentPresenter,
-                     :is(ColorPicker) /template/ RadioButton#HsvRadioButton:checked /template/ ContentPresenter#PART_ContentPresenter,
-                     :is(ColorView) /template/ RadioButton#RgbRadioButton:checked /template/ ContentPresenter#PART_ContentPresenter,
-                     :is(ColorView) /template/ RadioButton#HsvRadioButton:checked /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="RadioButton#RgbRadioButton:checked /template/ ContentPresenter#PART_ContentPresenter,
+                     RadioButton#HsvRadioButton:checked /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource MaterialSelectionBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
     </Style>
-    <Style Selector=":is(ColorPicker) /template/ RadioButton#RgbRadioButton:pointerover /template/ ContentPresenter#PART_ContentPresenter,
-                     :is(ColorPicker) /template/ RadioButton#HsvRadioButton:pointerover /template/ ContentPresenter#PART_ContentPresenter,
-                     :is(ColorView) /template/ RadioButton#RgbRadioButton:pointerover /template/ ContentPresenter#PART_ContentPresenter,
-                     :is(ColorView) /template/ RadioButton#HsvRadioButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="RadioButton#RgbRadioButton:pointerover /template/ ContentPresenter#PART_ContentPresenter,
+                     RadioButton#HsvRadioButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource MaterialFlatButtonClickBrush}" />
     </Style>
 </Styles>

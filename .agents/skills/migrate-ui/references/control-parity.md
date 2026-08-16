@@ -194,6 +194,12 @@ or tagged source before overriding them.
   `ColorPickers.axaml`. The component label and adjacent editor must read as a
   single outline, editable text must be vertically centered, and the whole
   RGB/HSV segment—not just its letters—must remain hit-testable.
+- Match controls created inside the flyout by the stable names defined by the
+  Avalonia 12.1 `ColorView` template (`PART_HexTextBox`, the four named
+  component `NumericUpDown` controls, and `RgbRadioButton`/`HsvRadioButton`).
+  Do not depend on a `ColorPicker /template/` ancestor selector: on the first
+  opening, the flyout is styled before that popup ancestry is stable, so the
+  intended control themes otherwise appear only after closing and reopening.
 
 Keep selector placement valid:
 
