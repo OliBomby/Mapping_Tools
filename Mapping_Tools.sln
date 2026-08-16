@@ -20,12 +20,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Desktop", "Mapping_Tools.Desktop\Mapping_Tools.Desktop.csproj", "{976B6ED8-2B2F-461C-B85B-16B49DE56281}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{07C2787E-EAC7-C090-1BA3-A61EC2A24D84}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Wpf.ViewRenderer", "tools\Mapping_Tools.Wpf.ViewRenderer\Mapping_Tools.Wpf.ViewRenderer.csproj", "{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Avalonia.ViewRenderer", "tools\Mapping_Tools.Avalonia.ViewRenderer\Mapping_Tools.Avalonia.ViewRenderer.csproj", "{786E42F1-05D7-4329-91ED-DA4304B48E5A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Core.Tests", "Mapping_Tools.Core.Tests\Mapping_Tools.Core.Tests.csproj", "{96E63447-ECF5-4F1E-AA63-DD525B4FEA86}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Architecture.Tests", "Mapping_Tools.Architecture.Tests\Mapping_Tools.Architecture.Tests.csproj", "{116AAB91-A4AC-463B-B0FB-F1A5557FB131}"
@@ -114,30 +108,6 @@ Global
 		{976B6ED8-2B2F-461C-B85B-16B49DE56281}.Release|x64.Build.0 = Release|Any CPU
 		{976B6ED8-2B2F-461C-B85B-16B49DE56281}.Release|x86.ActiveCfg = Release|Any CPU
 		{976B6ED8-2B2F-461C-B85B-16B49DE56281}.Release|x86.Build.0 = Release|Any CPU
-		{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0}.Debug|x64.Build.0 = Debug|Any CPU
-		{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0}.Debug|x86.Build.0 = Debug|Any CPU
-		{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0}.Release|x64.ActiveCfg = Release|Any CPU
-		{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0}.Release|x64.Build.0 = Release|Any CPU
-		{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0}.Release|x86.ActiveCfg = Release|Any CPU
-		{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0}.Release|x86.Build.0 = Release|Any CPU
-		{786E42F1-05D7-4329-91ED-DA4304B48E5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{786E42F1-05D7-4329-91ED-DA4304B48E5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{786E42F1-05D7-4329-91ED-DA4304B48E5A}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{786E42F1-05D7-4329-91ED-DA4304B48E5A}.Debug|x64.Build.0 = Debug|Any CPU
-		{786E42F1-05D7-4329-91ED-DA4304B48E5A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{786E42F1-05D7-4329-91ED-DA4304B48E5A}.Debug|x86.Build.0 = Debug|Any CPU
-		{786E42F1-05D7-4329-91ED-DA4304B48E5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{786E42F1-05D7-4329-91ED-DA4304B48E5A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{786E42F1-05D7-4329-91ED-DA4304B48E5A}.Release|x64.ActiveCfg = Release|Any CPU
-		{786E42F1-05D7-4329-91ED-DA4304B48E5A}.Release|x64.Build.0 = Release|Any CPU
-		{786E42F1-05D7-4329-91ED-DA4304B48E5A}.Release|x86.ActiveCfg = Release|Any CPU
-		{786E42F1-05D7-4329-91ED-DA4304B48E5A}.Release|x86.Build.0 = Release|Any CPU
 		{96E63447-ECF5-4F1E-AA63-DD525B4FEA86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{96E63447-ECF5-4F1E-AA63-DD525B4FEA86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96E63447-ECF5-4F1E-AA63-DD525B4FEA86}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -179,8 +149,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{A0E5FB05-00EE-4EEE-B083-19D63BA1F5F0} = {07C2787E-EAC7-C090-1BA3-A61EC2A24D84}
-		{786E42F1-05D7-4329-91ED-DA4304B48E5A} = {07C2787E-EAC7-C090-1BA3-A61EC2A24D84}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C38FB453-FDE5-4B82-9B74-2485B979F0C9}

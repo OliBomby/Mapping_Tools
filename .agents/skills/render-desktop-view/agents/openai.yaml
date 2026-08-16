@@ -1,4 +1,0 @@
-interface:
-  display_name: "Render Desktop View"
-  short_description: "Create a diagnostic PNG of a desktop view"
-  default_prompt: "Use $render-desktop-view to create the explicitly requested diagnostic PNG without treating it as migration verification."
