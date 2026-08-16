@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
@@ -52,7 +53,7 @@ public sealed class MetadataManagerServiceTests
         File.Exists(target).Should().BeFalse();
         backup.CreateRequests.Should().ContainSingle(request =>
             request.Paths.SequenceEqual(new[] { target }) &&
-            request.Reason == Mapping_Tools.Application.SafetyCopies.BeatmapBackupReason.Automatic &&
+            request.Reason == BeatmapBackupReason.Automatic &&
             !request.Force);
         Beatmap output = new(File.ReadAllLines(result.ProcessedPaths[0]).ToList());
         output.Metadata["Artist"].Value.Should().Be("Wave Zero Artist");

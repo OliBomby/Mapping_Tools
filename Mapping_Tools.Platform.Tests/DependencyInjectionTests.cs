@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.AutoFail;
+using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
@@ -8,7 +9,6 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.RhythmGuide;
-using Mapping_Tools.Application.SafetyCopies;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Desktop.Composition;

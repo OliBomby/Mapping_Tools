@@ -1,7 +1,7 @@
 using System.Text;
-using Mapping_Tools.Application.SafetyCopies;
+using Mapping_Tools.Application.Backups;
 
-namespace Mapping_Tools.Infrastructure.SafetyCopies;
+namespace Mapping_Tools.Infrastructure.Backups;
 
 /// <summary>
 /// Persists backup copies with sibling temporary files so cancellation or an

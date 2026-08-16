@@ -4,7 +4,7 @@ using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Settings;
 
-namespace Mapping_Tools.Application.SafetyCopies;
+namespace Mapping_Tools.Application.Backups;
 
 /// <summary>
 /// Enforces backup-before-overwrite ordering and preserves legacy-compatible
