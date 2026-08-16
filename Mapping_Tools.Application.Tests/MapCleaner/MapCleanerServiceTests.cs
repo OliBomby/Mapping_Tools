@@ -7,7 +7,7 @@ using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.MapCleaner;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Application.Tests;
+namespace Mapping_Tools.Application.Tests.MapCleaner;
 
 [TestClass]
 public sealed class MapCleanerServiceTests

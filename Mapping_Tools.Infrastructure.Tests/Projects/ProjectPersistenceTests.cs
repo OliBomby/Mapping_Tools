@@ -1,17 +1,16 @@
 using System.Text.Json;
-using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.MetadataManager;
+using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.RhythmGuide;
-using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
-namespace Mapping_Tools.Infrastructure.Tests;
+namespace Mapping_Tools.Infrastructure.Tests.Projects;
 
 [TestClass]
 public sealed class ProjectPersistenceTests

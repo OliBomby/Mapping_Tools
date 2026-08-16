@@ -3,7 +3,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Application.Tests;
+namespace Mapping_Tools.Application.Tests.Execution;
 
 [TestClass]
 public sealed class ToolExecutionServiceTests

@@ -7,7 +7,7 @@ using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Application.Tests;
+namespace Mapping_Tools.Application.Tests.BeatmapEditing;
 
 [TestClass]
 public sealed class BeatmapEditingGatewayTests

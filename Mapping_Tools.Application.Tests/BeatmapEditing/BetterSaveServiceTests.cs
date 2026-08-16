@@ -1,11 +1,10 @@
-using FluentAssertions;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Workspace;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Application.Tests;
+namespace Mapping_Tools.Application.Tests.BeatmapEditing;
 
 [TestClass]
 public sealed class BetterSaveServiceTests

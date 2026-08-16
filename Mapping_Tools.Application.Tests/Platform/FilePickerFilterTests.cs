@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.Platform;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Application.Tests;
+namespace Mapping_Tools.Application.Tests.Platform;
 
 [TestClass]
 public sealed class FilePickerFilterTests

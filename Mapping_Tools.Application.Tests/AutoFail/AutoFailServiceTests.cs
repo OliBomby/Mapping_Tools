@@ -1,11 +1,10 @@
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.AutoFail;
 using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.AutoFail;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Application.Tests;
+namespace Mapping_Tools.Application.Tests.AutoFail;
 
 [TestClass]
 public sealed class AutoFailServiceTests

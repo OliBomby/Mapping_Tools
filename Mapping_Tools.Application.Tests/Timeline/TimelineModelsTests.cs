@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.Timeline;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Application.Tests;
+namespace Mapping_Tools.Application.Tests.Timeline;
 
 [TestClass]
 public sealed class TimelineModelsTests

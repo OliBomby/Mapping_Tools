@@ -2,12 +2,13 @@ using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.MetadataManager;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.MetadataManager;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Application.Tests;
+namespace Mapping_Tools.Application.Tests.MetadataManager;
 
 [TestClass]
 public sealed class MetadataManagerServiceTests

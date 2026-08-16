@@ -1,8 +1,7 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using FluentAssertions;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
@@ -11,12 +10,13 @@ using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Controls;
-using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services;
+using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests;
+namespace Mapping_Tools.Desktop.Tests.Shell;
 
 [TestClass]
 public sealed class DesktopShellTests

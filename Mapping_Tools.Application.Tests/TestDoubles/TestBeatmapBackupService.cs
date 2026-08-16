@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
 
-namespace Mapping_Tools.Application.Tests;
+namespace Mapping_Tools.Application.Tests.TestDoubles;
 
 internal sealed class TestBeatmapBackupService : IBeatmapBackupService
 {

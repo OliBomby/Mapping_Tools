@@ -1,11 +1,11 @@
-using FluentAssertions;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests;
+namespace Mapping_Tools.Desktop.Tests.Services;
 
 [TestClass]
 public sealed class ProjectAutosaveCoordinatorTests

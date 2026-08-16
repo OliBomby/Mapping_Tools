@@ -3,7 +3,7 @@ using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Converters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests;
+namespace Mapping_Tools.Desktop.Tests.Controls;
 
 [TestClass]
 public sealed class ToolControlTests

@@ -2,7 +2,7 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Desktop.Platform;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests;
+namespace Mapping_Tools.Desktop.Tests.Platform;
 
 [TestClass]
 public sealed class AvaloniaFilePickerTests

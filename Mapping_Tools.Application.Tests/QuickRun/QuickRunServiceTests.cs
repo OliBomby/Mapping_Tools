@@ -6,7 +6,7 @@ using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Infrastructure.Platform;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Application.Tests;
+namespace Mapping_Tools.Application.Tests.QuickRun;
 
 [TestClass]
 public sealed class QuickRunServiceTests

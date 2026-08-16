@@ -5,7 +5,7 @@ using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Application.Tests;
+namespace Mapping_Tools.Application.Tests.Backups;
 
 [TestClass]
 public sealed class BeatmapBackupServiceTests

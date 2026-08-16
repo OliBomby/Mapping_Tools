@@ -1,10 +1,9 @@
-using FluentAssertions;
 using Avalonia.Input;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Controls;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests;
+namespace Mapping_Tools.Desktop.Tests.Controls;
 
 [TestClass]
 public sealed class HotkeyEditorTests

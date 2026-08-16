@@ -2,7 +2,7 @@ using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Platform;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Infrastructure.Tests;
+namespace Mapping_Tools.Infrastructure.Tests.Platform;
 
 [TestClass]
 public sealed class DesktopPlatformAdapterTests

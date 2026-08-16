@@ -3,7 +3,7 @@ using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Application.Tests;
+namespace Mapping_Tools.Application.Tests.Workspace;
 
 [TestClass]
 public sealed class BeatmapWorkspaceTests

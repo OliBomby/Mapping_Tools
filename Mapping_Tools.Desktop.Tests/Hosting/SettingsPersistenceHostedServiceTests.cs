@@ -2,7 +2,7 @@ using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests;
+namespace Mapping_Tools.Desktop.Tests.Hosting;
 
 [TestClass]
 public sealed class SettingsPersistenceHostedServiceTests

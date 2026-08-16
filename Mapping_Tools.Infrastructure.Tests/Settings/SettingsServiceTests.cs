@@ -4,7 +4,7 @@ using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Infrastructure.Tests;
+namespace Mapping_Tools.Infrastructure.Tests.Settings;
 
 [TestClass]
 public sealed class SettingsServiceTests

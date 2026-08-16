@@ -11,7 +11,7 @@ using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ApplicationConverters = Mapping_Tools.Application.Interactions.Converters;
 
-namespace Mapping_Tools.Desktop.Tests;
+namespace Mapping_Tools.Desktop.Tests.ViewModels.Dialogs;
 
 [TestClass]
 public sealed class DialogAndValidationTests

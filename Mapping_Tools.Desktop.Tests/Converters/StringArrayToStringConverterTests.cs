@@ -2,7 +2,7 @@ using System.Globalization;
 using Mapping_Tools.Desktop.Converters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests;
+namespace Mapping_Tools.Desktop.Tests.Converters;
 
 [TestClass]
 public sealed class StringArrayToStringConverterTests

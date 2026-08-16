@@ -1,8 +1,9 @@
 using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests;
+namespace Mapping_Tools.Desktop.Tests.ViewModels;
 
 [TestClass]
 public sealed class GetStartedViewModelTests

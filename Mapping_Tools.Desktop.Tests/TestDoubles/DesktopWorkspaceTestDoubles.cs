@@ -7,7 +7,7 @@ using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Desktop.Shell;
 
-namespace Mapping_Tools.Desktop.Tests;
+namespace Mapping_Tools.Desktop.Tests.TestDoubles;
 
 internal sealed class TestBetterSaveService : IBetterSaveService
 {

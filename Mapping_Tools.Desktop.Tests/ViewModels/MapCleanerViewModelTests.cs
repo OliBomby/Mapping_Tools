@@ -1,23 +1,23 @@
-using CommunityToolkit.Mvvm.Input;
 using Avalonia.Data;
+using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.Platform;
-using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Workspace;
-using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests;
+namespace Mapping_Tools.Desktop.Tests.ViewModels;
 
 [TestClass]
 public sealed class MapCleanerViewModelTests

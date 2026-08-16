@@ -15,13 +15,14 @@ using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Interactions;
 using Mapping_Tools.Desktop.Platform;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Desktop.Tests;
+namespace Mapping_Tools.Desktop.Tests.Composition;
 
 [TestClass]
 public sealed class DependencyInjectionTests

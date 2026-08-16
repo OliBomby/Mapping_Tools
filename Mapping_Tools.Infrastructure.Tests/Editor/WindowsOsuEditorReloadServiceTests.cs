@@ -1,7 +1,7 @@
 using Mapping_Tools.Infrastructure.Editor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Infrastructure.Tests;
+namespace Mapping_Tools.Infrastructure.Tests.Editor;
 
 [TestClass]
 public sealed class WindowsOsuEditorReloadServiceTests

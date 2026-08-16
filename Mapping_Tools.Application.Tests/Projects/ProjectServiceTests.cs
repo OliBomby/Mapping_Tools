@@ -2,7 +2,7 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Application.Tests;
+namespace Mapping_Tools.Application.Tests.Projects;
 
 [TestClass]
 public sealed class ProjectServiceTests
