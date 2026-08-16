@@ -1,7 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
-        xmlns:views="using:Mapping_Tools.Desktop.Views"
         xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
@@ -82,25 +81,6 @@
             </Style>
         </ControlTheme>
     </Window.Resources>
-
-    <Window.DataTemplates>
-        <DataTemplate DataType="vm:GetStartedViewModel"
-                      x:DataType="vm:GetStartedViewModel">
-            <views:GetStartedView />
-        </DataTemplate>
-        <DataTemplate DataType="vm:PreferencesViewModel"
-                      x:DataType="vm:PreferencesViewModel">
-            <views:PreferencesView />
-        </DataTemplate>
-        <DataTemplate DataType="vm:RhythmGuideViewModel"
-                      x:DataType="vm:RhythmGuideViewModel">
-            <views:RhythmGuideView />
-        </DataTemplate>
-        <DataTemplate DataType="vm:MetadataManagerViewModel"
-                      x:DataType="vm:MetadataManagerViewModel">
-            <views:MetadataManagerView />
-        </DataTemplate>
-    </Window.DataTemplates>
 
     <Window.Styles>
         <Style Selector="Menu.top-menu">
