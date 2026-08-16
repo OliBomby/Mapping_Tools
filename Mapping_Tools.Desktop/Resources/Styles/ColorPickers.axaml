@@ -1,0 +1,226 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia">
+    <Styles.Resources>
+        <ResourceDictionary>
+            <!--
+                Avalonia's Simple ColorView expects palette roles which Material.Avalonia does not define.
+                Resource aliases must resolve to brush instances here; a DynamicResource markup-extension
+                object is not an IBrush and crashes when the popup acquires its logical parent.
+            -->
+            <StaticResource x:Key="SystemControlBackgroundBaseLowBrush" ResourceKey="MaterialCardBackgroundBrush" />
+            <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="MaterialSelectionBrush" />
+            <StaticResource x:Key="TextControlForeground" ResourceKey="MaterialBodyBrush" />
+            <StaticResource x:Key="ThemeControlMidBrush" ResourceKey="MaterialPaperBrush" />
+            <StaticResource x:Key="ThemeControlHighBrush" ResourceKey="MaterialSelectionBrush" />
+            <StaticResource x:Key="ThemeControlHighlightMidBrush" ResourceKey="MaterialFlatButtonClickBrush" />
+            <StaticResource x:Key="ThemeBorderLowBrush" ResourceKey="MaterialDividerBrush" />
+            <StaticResource x:Key="ThemeBorderMidBrush" ResourceKey="MaterialTextBoxBorderBrush" />
+            <StaticResource x:Key="ThemeForegroundBrush" ResourceKey="MaterialBodyBrush" />
+            <StaticResource x:Key="ThemeForegroundLowBrush" ResourceKey="MaterialBodyLightBrush" />
+            <StaticResource x:Key="ThemeAccentColor" ResourceKey="MaterialPrimaryMidBrush" />
+            <StaticResource x:Key="ThemeAccentBrush3" ResourceKey="MaterialSelectionBrush" />
+            <StaticResource x:Key="ThemeAccentBrush4" ResourceKey="MaterialSelectionBrush" />
+            <StaticResource x:Key="ColorControlDefaultSelectorBrush" ResourceKey="MaterialBodyBrush" />
+            <Thickness x:Key="ThemeBorderThickness">1</Thickness>
+            <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
+
+            <ControlTheme x:Key="ColorViewTextBoxTheme"
+                          TargetType="TextBox"
+                          BasedOn="{StaticResource MaterialTextBox}">
+                <Setter Property="MinHeight" Value="32" />
+                <Setter Property="Padding" Value="8,0" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MaterialTextBoxBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="0" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Border x:Name="PART_ColorViewTextBoxBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}">
+                            <ScrollViewer x:Name="PART_ScrollViewer"
+                                          Margin="{TemplateBinding Padding}"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Hidden"
+                                          VerticalAlignment="Stretch">
+                                <TextPresenter x:Name="PART_TextPresenter"
+                                               CaretBrush="{TemplateBinding CaretBrush}"
+                                               CaretIndex="{TemplateBinding CaretIndex}"
+                                               PasswordChar="{TemplateBinding PasswordChar}"
+                                               RevealPassword="{TemplateBinding RevealPassword}"
+                                               SelectionBrush="{TemplateBinding SelectionBrush}"
+                                               SelectionEnd="{TemplateBinding SelectionEnd}"
+                                               SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                               SelectionStart="{TemplateBinding SelectionStart}"
+                                               Text="{TemplateBinding Text, Mode=TwoWay}"
+                                               TextAlignment="{TemplateBinding TextAlignment}"
+                                               TextBlock.Foreground="{TemplateBinding Foreground}"
+                                               VerticalAlignment="Center" />
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </Setter>
+                <Style Selector="^:pointerover /template/ Border#PART_ColorViewTextBoxBorder">
+                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialBodyLightBrush}" />
+                </Style>
+                <Style Selector="^:focus /template/ Border#PART_ColorViewTextBoxBorder">
+                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+                </Style>
+            </ControlTheme>
+
+            <ControlTheme x:Key="ColorViewNumericTextBoxTheme"
+                          TargetType="TextBox"
+                          BasedOn="{StaticResource ColorViewTextBoxTheme}">
+                <Setter Property="BorderThickness" Value="0" />
+            </ControlTheme>
+
+            <ControlTheme x:Key="ColorViewNumericUpDownTheme" TargetType="NumericUpDown">
+                <Setter Property="MinHeight" Value="32" />
+                <Setter Property="Padding" Value="8,0" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MaterialTextBoxBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="0" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <DataValidationErrors>
+                            <ButtonSpinner x:Name="PART_Spinner"
+                                           AllowSpin="{TemplateBinding AllowSpin}"
+                                           Background="{TemplateBinding Background}"
+                                           BorderBrush="{TemplateBinding BorderBrush}"
+                                           BorderThickness="{TemplateBinding BorderThickness}"
+                                           ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
+                                           CornerRadius="{TemplateBinding CornerRadius}"
+                                           HorizontalContentAlignment="Stretch"
+                                           IsTabStop="False"
+                                           MinWidth="0"
+                                           Padding="0"
+                                           ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
+                                           VerticalContentAlignment="Stretch">
+                                <TextBox x:Name="PART_TextBox"
+                                         AcceptsReturn="False"
+                                         Background="{TemplateBinding Background}"
+                                         BorderThickness="0"
+                                         HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                         IsReadOnly="{TemplateBinding IsReadOnly}"
+                                         Margin="0"
+                                         MinWidth="20"
+                                         Padding="{TemplateBinding Padding}"
+                                         Text="{TemplateBinding Text}"
+                                         TextAlignment="{TemplateBinding TextAlignment}"
+                                         TextWrapping="NoWrap"
+                                         Theme="{StaticResource ColorViewNumericTextBoxTheme}"
+                                         VerticalContentAlignment="Center" />
+                            </ButtonSpinner>
+                        </DataValidationErrors>
+                    </ControlTemplate>
+                </Setter>
+                <Style Selector="^:pointerover /template/ ButtonSpinner#PART_Spinner">
+                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialBodyLightBrush}" />
+                </Style>
+                <Style Selector="^:focus-within /template/ ButtonSpinner#PART_Spinner">
+                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+                </Style>
+            </ControlTheme>
+
+            <!-- Avalonia's ColorPicker template reserves ten pixels for an arrow we do not display. -->
+            <ControlTheme x:Key="ColorPickerDropDownButtonTheme" TargetType="DropDownButton">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <ContentPresenter x:Name="PART_ContentPresenter"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </ControlTemplate>
+                </Setter>
+            </ControlTheme>
+        </ResourceDictionary>
+    </Styles.Resources>
+
+    <!-- Match the legacy PopupBox toggle while retaining Avalonia's full ColorView flyout. -->
+    <Style Selector="ColorPicker">
+        <Setter Property="Width" Value="35" />
+        <Setter Property="Height" Value="35" />
+        <Setter Property="MinWidth" Value="35" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="Content">
+            <Template>
+                <materialIcons:MaterialIcon Width="35"
+                                            Height="35"
+                                            Foreground="{TemplateBinding HsvColor, Converter={StaticResource ToBrushConverter}}"
+                                            Kind="Circle" />
+            </Template>
+        </Setter>
+    </Style>
+
+    <Style Selector="ColorPicker /template/ DropDownButton">
+        <Setter Property="Theme" Value="{StaticResource ColorPickerDropDownButtonTheme}" />
+        <Setter Property="Width" Value="35" />
+        <Setter Property="Height" Value="35" />
+        <Setter Property="MinWidth" Value="35" />
+        <Setter Property="MinHeight" Value="35" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="materialAssists:ShadowAssist.ShadowDepth" Value="Depth0" />
+    </Style>
+
+    <!-- The labels and their editors form one compact outlined control. -->
+    <Style Selector=":is(ColorPicker) /template/ TextBox#PART_HexTextBox,
+                     :is(ColorView) /template/ TextBox#PART_HexTextBox">
+        <Setter Property="Theme" Value="{StaticResource ColorViewTextBoxTheme}" />
+    </Style>
+    <Style Selector=":is(ColorPicker) /template/ NumericUpDown,
+                     :is(ColorView) /template/ NumericUpDown">
+        <Setter Property="Theme" Value="{StaticResource ColorViewNumericUpDownTheme}" />
+    </Style>
+
+    <!-- A transparent presenter supplies a full rectangular hit target for RGB and HSV. -->
+    <Style Selector=":is(ColorPicker) /template/ RadioButton#RgbRadioButton,
+                     :is(ColorPicker) /template/ RadioButton#HsvRadioButton,
+                     :is(ColorView) /template/ RadioButton#RgbRadioButton,
+                     :is(ColorView) /template/ RadioButton#HsvRadioButton">
+        <Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaterialTextBoxBorderBrush}" />
+    </Style>
+    <Style Selector=":is(ColorPicker) /template/ RadioButton#RgbRadioButton /template/ ContentPresenter#PART_ContentPresenter,
+                     :is(ColorPicker) /template/ RadioButton#HsvRadioButton /template/ ContentPresenter#PART_ContentPresenter,
+                     :is(ColorView) /template/ RadioButton#RgbRadioButton /template/ ContentPresenter#PART_ContentPresenter,
+                     :is(ColorView) /template/ RadioButton#HsvRadioButton /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource MaterialBodyBrush}" />
+    </Style>
+    <Style Selector=":is(ColorPicker) /template/ RadioButton#RgbRadioButton:checked /template/ ContentPresenter#PART_ContentPresenter,
+                     :is(ColorPicker) /template/ RadioButton#HsvRadioButton:checked /template/ ContentPresenter#PART_ContentPresenter,
+                     :is(ColorView) /template/ RadioButton#RgbRadioButton:checked /template/ ContentPresenter#PART_ContentPresenter,
+                     :is(ColorView) /template/ RadioButton#HsvRadioButton:checked /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource MaterialSelectionBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+    </Style>
+    <Style Selector=":is(ColorPicker) /template/ RadioButton#RgbRadioButton:pointerover /template/ ContentPresenter#PART_ContentPresenter,
+                     :is(ColorPicker) /template/ RadioButton#HsvRadioButton:pointerover /template/ ContentPresenter#PART_ContentPresenter,
+                     :is(ColorView) /template/ RadioButton#RgbRadioButton:pointerover /template/ ContentPresenter#PART_ContentPresenter,
+                     :is(ColorView) /template/ RadioButton#HsvRadioButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource MaterialFlatButtonClickBrush}" />
+    </Style>
+</Styles>

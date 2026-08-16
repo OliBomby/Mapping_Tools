@@ -33,7 +33,8 @@
                                 PrimaryColor="Blue"
                                 SecondaryColor="Lime" />
         <materialIcons:MaterialIconStyles />
-        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
+        <!-- <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" /> -->
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Simple/Simple.xaml" />
 
         <!-- Application-wide Material compatibility overrides. -->
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Validation.axaml" />
@@ -43,6 +44,8 @@
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/ComboBoxes.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Buttons.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/MaterialListBoxes.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/ColorPickers.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Cards.axaml" />
 
         <!-- Styles owned by code-only custom controls. -->
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/TimelineControl.axaml" />

@@ -13,10 +13,16 @@ The migrated feature preserves the legacy Metadata Manager workflow:
 
 The WPF Material popup colour editor is represented by the Avalonia 12
 ColorPicker package in the migrated view; the underlying `RgbaColour` values
-and two-way editing contract are unchanged. The application currently includes
-the package's Fluent style. The package also provides a Simple style and
-Material colour palettes, but Material.Avalonia does not provide a native
-ColorPicker style, so no unapproved Material-specific substitution was added.
+and two-way editing contract are unchanged. Material.Avalonia 3.17.0 does not
+provide a ColorPicker theme, and no Avalonia 12-compatible package supplying
+one was found. The application therefore composes Avalonia's Simple ColorView
+layout with a shared Material compatibility style. Its collapsed picker is the
+legacy 35-pixel circular colour swatch, while the expanded editor retains the
+additional Avalonia spectrum, palette, component, and preview controls. The
+compatibility style aliases the Simple theme roles to Material brush
+resources, uses the legacy circle icon for the collapsed swatch, gives the
+32-pixel hex and component fields a continuous compact outline with vertically
+centred text, and restores the full RGB/HSV segmented-button hit targets.
 
 Metadata export delegates filename-aware saving to the reusable
 `BeatmapEditor2.SaveFileWithNameUpdate` method. Importing metadata preserves the
