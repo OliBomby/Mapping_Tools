@@ -10,6 +10,7 @@ using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -29,6 +30,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly IUiDispatcher _dispatcher;
     private readonly IBetterSaveService _betterSave;
     private readonly IDialogService _dialogs;
+    private readonly ProjectAutosaveCoordinator _projectCoordinator;
     private readonly Dictionary<string, ObservableObject> _featureViewModels =
         new(StringComparer.OrdinalIgnoreCase);
     private string _searchText = string.Empty;
@@ -45,6 +47,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <param name="workspace">Presents current-map and safety-copy actions in shell chrome.</param>
     /// <param name="betterSave">Saves the current live editor state through the shared safety gateway.</param>
     /// <param name="dialogs">Presents shell-owned information dialogs.</param>
+    /// <param name="projectCoordinator">Owns project menus and feature autosave lifecycle.</param>
     public MainViewModel(
         IShellFeatureRegistry registry,
         ApplicationSettings settings,
@@ -53,7 +56,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         IUiDispatcher dispatcher,
         BeatmapWorkspaceViewModel workspace,
         IBetterSaveService betterSave,
-        IDialogService dialogs)
+        IDialogService dialogs,
+        ProjectAutosaveCoordinator projectCoordinator)
     {
         _registry = registry ?? throw new ArgumentNullException(nameof(registry));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -63,6 +67,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         Workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         _betterSave = betterSave ?? throw new ArgumentNullException(nameof(betterSave));
         _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        _projectCoordinator = projectCoordinator ??
+            throw new ArgumentNullException(nameof(projectCoordinator));
 
         FeatureItems = registry.Features
             .Select((registration, order) => new ShellFeatureItemViewModel(
@@ -163,6 +169,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
         _disposed = true;
         _notifications.Published -= OnNotificationPublished;
+        if (CurrentFeature is IShellProjectFeature projectFeature)
+        {
+            _projectCoordinator.Deactivate(projectFeature);
+        }
         if (CurrentFeature is IShellFeatureActivation activation)
         {
             activation.Deactivate();
@@ -181,6 +191,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         if (CurrentFeature is IShellFeatureActivation previous)
         {
             previous.Deactivate();
+        }
+        if (CurrentFeature is IShellProjectFeature previousProject)
+        {
+            _projectCoordinator.Deactivate(previousProject);
         }
 
         ShellFeatureRegistration registration = _registry.Find(item.Id)
@@ -201,6 +215,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         if (viewModel is IShellFeatureActivation current)
         {
             current.Activate();
+        }
+        if (viewModel is IShellProjectFeature projectFeature)
+        {
+            _projectCoordinator.Activate(projectFeature);
         }
     }
 
@@ -268,37 +286,21 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
     private Task SaveProjectAsync() =>
-        RunProjectOperationAsync(
-            feature => feature.SaveProjectAsync(),
-            "Save project");
+        CurrentFeature is IShellProjectFeature feature
+            ? _projectCoordinator.SaveAsync(feature)
+            : Task.CompletedTask;
 
     [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
     private Task OpenProjectAsync() =>
-        RunProjectOperationAsync(
-            feature => feature.OpenProjectAsync(),
-            "Open project");
+        CurrentFeature is IShellProjectFeature feature
+            ? _projectCoordinator.OpenAsync(feature)
+            : Task.CompletedTask;
 
     [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
-    private async Task NewProjectAsync()
-    {
-        bool confirmed = await _dialogs.ShowMessageAsync(
-            new MessageDialogRequest<bool>(
-                "Confirm new project",
-                "Are you sure you want to start a new project? All unsaved progress will be lost.",
-                [
-                    new DialogChoice<bool>("Yes", true, IsDefault: true),
-                    new DialogChoice<bool>("No", false, IsCancel: true)
-                ],
-                dismissResult: false));
-        if (!confirmed)
-        {
-            return;
-        }
-
-        await RunProjectOperationAsync(
-            feature => feature.NewProjectAsync(),
-            "New project");
-    }
+    private Task NewProjectAsync() =>
+        CurrentFeature is IShellProjectFeature feature
+            ? _projectCoordinator.NewAsync(feature)
+            : Task.CompletedTask;
 
     private void ToggleFavorite(ShellFeatureItemViewModel item)
     {
@@ -432,30 +434,4 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private async Task RunProjectOperationAsync(
-        Func<IShellProjectFeature, Task> operation,
-        string title)
-    {
-        if (CurrentFeature is not IShellProjectFeature feature)
-        {
-            return;
-        }
-
-        try
-        {
-            await operation(feature);
-        }
-        catch (OperationCanceledException)
-        {
-            // Feature-owned confirmation and native picker cancellation are no-ops.
-        }
-        catch (Exception exception)
-        {
-            await _notifications.PublishAsync(new UserNotification(
-                UserNotificationSeverity.Error,
-                title,
-                exception.Message,
-                exception));
-        }
-    }
 }

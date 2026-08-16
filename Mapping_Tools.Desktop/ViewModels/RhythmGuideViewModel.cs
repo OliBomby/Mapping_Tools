@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
-using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.RhythmGuide;
@@ -16,7 +15,6 @@ namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>Owns Rhythm Guide inputs, execution, projects, and auxiliary-window interaction.</summary>
 public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
-    IShellFeatureActivation,
     IShellProjectFeature
 {
     private const string OperationId = "rhythm-guide";
@@ -24,12 +22,9 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     private readonly IRhythmGuideService _rhythmGuide;
     private readonly IFilePicker _filePicker;
     private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
-    private readonly IProjectService _projects;
     private readonly IRhythmGuideWindowService _windowService;
-    private readonly IUserNotificationService _notifications;
     private readonly ProjectDefinition<RhythmGuideProject> _definition;
     private IBeatDivisor[] _beatDivisors = DefaultBeatDivisors();
-    private bool _loadedAutosave;
 
     /// <summary>Gets or sets the source beatmap paths in selection order.</summary>
     [ObservableProperty]
@@ -66,34 +61,29 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     /// <param name="execution">Coordinates cancellation, backup, and notifications.</param>
     /// <param name="filePicker">Selects source and destination beatmap files.</param>
     /// <param name="currentBeatmapLocator">Finds the beatmap open in osu!.</param>
-    /// <param name="projects">Loads, saves, and autosaves typed projects.</param>
     /// <param name="windowService">Opens the auxiliary Rhythm Guide window.</param>
-    /// <param name="notifications">Publishes project persistence failures.</param>
     /// <param name="directories">Supplies the default export directory.</param>
     public RhythmGuideViewModel(
         IRhythmGuideService rhythmGuide,
         IToolExecutionService execution,
         IFilePicker filePicker,
         ICurrentBeatmapLocator currentBeatmapLocator,
-        IProjectService projects,
         IRhythmGuideWindowService windowService,
-        IUserNotificationService notifications,
         IApplicationDirectories directories)
         : base(execution, OperationId)
     {
         _rhythmGuide = rhythmGuide ?? throw new ArgumentNullException(nameof(rhythmGuide));
         _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         _currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
-        _projects = projects ?? throw new ArgumentNullException(nameof(projects));
         _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         ArgumentNullException.ThrowIfNull(directories);
         ExportPath = Path.Combine(directories.Exports, "rhythm_guide.osu");
         string defaultExportPath = ExportPath;
         _definition = new ProjectDefinition<RhythmGuideProject>(
             "rhythmguideproject.json",
             "Rhythm Guide Projects",
-            () => CreateDefaultProject(defaultExportPath));
+            () => CreateDefaultProject(defaultExportPath),
+            "rhythm-guide-project.json");
     }
 
     /// <summary>Gets every supported export mode for selection controls.</summary>
@@ -109,63 +99,6 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets the number of non-empty source beatmap paths.</summary>
     public int SourceCount => SourcePaths.Length;
-
-    /// <summary>Restores the autosaved project the first time this feature is activated.</summary>
-    public void Activate()
-    {
-        if (!_loadedAutosave)
-        {
-            _loadedAutosave = true;
-            _ = ProjectAutosaveCoordinator.LoadAsync(
-                _projects,
-                _definition,
-                Install,
-                exception => PublishProjectFailureAsync("Project could not be loaded", exception));
-        }
-    }
-
-    /// <summary>Schedules autosave when the feature leaves the shell content area.</summary>
-    public void Deactivate() => _ = ProjectAutosaveCoordinator.SaveAsync(
-        _projects,
-        _definition,
-        Snapshot,
-        exception => PublishProjectFailureAsync("Project could not be saved", exception));
-
-    /// <summary>Prompts for a destination and saves the current Rhythm Guide project.</summary>
-    /// <param name="cancellationToken">Cancels the picker or save.</param>
-    /// <returns>A task that completes after the save attempt.</returns>
-    public async Task SaveProjectAsync(CancellationToken cancellationToken = default)
-    {
-        await _projects.SaveAsAsync(
-            _definition,
-            Snapshot(),
-            "rhythm-guide-project.json",
-            cancellationToken);
-    }
-
-    /// <summary>Opens a Rhythm Guide project selected by the user.</summary>
-    /// <param name="cancellationToken">Cancels picking or loading.</param>
-    /// <returns>A task that completes after the open attempt.</returns>
-    public async Task OpenProjectAsync(CancellationToken cancellationToken = default)
-    {
-        ProjectOpenResult<RhythmGuideProject>? opened = await _projects.OpenAsync(
-            _definition,
-            cancellationToken);
-        if (opened is not null)
-        {
-            ValidateProject(opened.Project);
-            Install(opened.Project);
-        }
-    }
-
-    /// <summary>Installs a new default Rhythm Guide project.</summary>
-    /// <param name="cancellationToken">Unused cancellation token retained by the project-feature contract.</param>
-    /// <returns>A task that completes after the new-project attempt.</returns>
-    public Task NewProjectAsync(CancellationToken cancellationToken = default)
-    {
-        Install(_projects.CreateNew(_definition));
-        return Task.CompletedTask;
-    }
 
     [RelayCommand]
     private async Task BrowseSourcesAsync()
@@ -246,6 +179,13 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void OpenAuxiliaryWindow() => _windowService.Show(this);
 
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+
+    object IShellProjectFeature.Snapshot() => Snapshot();
+
+    void IShellProjectFeature.Install(object project) =>
+        Install((RhythmGuideProject)project);
+
     private RhythmGuideProject Snapshot() => new()
     {
         GuideGeneratorArgs = CreateOptions()
@@ -276,13 +216,6 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         SelectionMode = options.SelectionMode;
         _beatDivisors = options.BeatDivisors.ToArray();
     }
-
-    private Task PublishProjectFailureAsync(string message, Exception exception) =>
-        _notifications.PublishAsync(new UserNotification(
-            UserNotificationSeverity.Error,
-            "Rhythm Guide",
-            message,
-            exception));
 
     private string? FirstPathOrNull() => SourcePaths.FirstOrDefault();
 

@@ -233,8 +233,6 @@ public sealed class MapCleanerViewModelTests
             new StubLocator(currentPath),
             settings,
             registry ?? new QuickRunCommandRegistry(),
-            new StubProjects(),
-            notifications,
             new StubLauncher());
     }
 
@@ -283,15 +281,4 @@ public sealed class MapCleanerViewModelTests
         public Task<bool> OpenFolderAsync(string path, CancellationToken cancellationToken = default) => Task.FromResult(true);
     }
 
-    private sealed class StubProjects : IProjectService
-    {
-        public string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition) => Path.Combine(Path.GetTempPath(), definition.AutoSaveFileName);
-        public string GetProjectFolder<TProject>(ProjectDefinition<TProject> definition) => Path.GetTempPath();
-        public TProject CreateNew<TProject>(ProjectDefinition<TProject> definition) => definition.CreateProject();
-        public Task SaveAsync<TProject>(string path, TProject project, CancellationToken cancellationToken = default) => Task.CompletedTask;
-        public Task<TProject> LoadAsync<TProject>(string path, CancellationToken cancellationToken = default) => Task.FromException<TProject>(new FileNotFoundException());
-        public Task AutoSaveAsync<TProject>(ProjectDefinition<TProject> definition, TProject project, IEnumerable<string>? additionalPaths = null, CancellationToken cancellationToken = default) => Task.CompletedTask;
-        public Task<string?> SaveAsAsync<TProject>(ProjectDefinition<TProject> definition, TProject project, string? suggestedFileName = null, CancellationToken cancellationToken = default) => Task.FromResult<string?>(null);
-        public Task<ProjectOpenResult<TProject>?> OpenAsync<TProject>(ProjectDefinition<TProject> definition, CancellationToken cancellationToken = default) => Task.FromResult<ProjectOpenResult<TProject>?>(null);
-    }
 }

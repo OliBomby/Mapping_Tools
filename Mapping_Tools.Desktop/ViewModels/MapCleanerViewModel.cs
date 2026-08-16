@@ -26,14 +26,12 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     private readonly ICurrentBeatmapLocator _currentBeatmap;
     private readonly ApplicationSettings _settings;
     private readonly IQuickRunCommandRegistry _quickRunRegistry;
-    private readonly IProjectService _projects;
-    private readonly IUserNotificationService _notifications;
     private readonly IPlatformLauncher _launcher;
     private readonly ProjectDefinition<MapCleanerProject> _definition = new(
         "mapcleanerproject.json",
         "Map Cleaner Projects",
-        () => new MapCleanerProject());
-    private bool _loadedAutosave;
+        () => new MapCleanerProject(),
+        "map-cleaner-project.json");
 
     /// <summary>Gets or sets whether slider volume changes are preserved.</summary>
     [ObservableProperty]
@@ -80,10 +78,6 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     public partial IBeatDivisor[] BeatDivisors { get; set; } =
         RationalBeatDivisor.GetDefaultBeatDivisors();
 
-    /// <summary>Gets whether the autosaved project has finished restoring into the visible form.</summary>
-    [ObservableProperty]
-    public partial bool IsInitialized { get; private set; }
-
     /// <summary>Gets a textual summary of the latest cleanup.</summary>
     [ObservableProperty]
     public partial string ResultSummary { get; private set; } =
@@ -108,8 +102,6 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     /// <param name="currentBeatmap">Finds the beatmap open in osu! for QuickRun.</param>
     /// <param name="settings">Supplies shared execution preferences.</param>
     /// <param name="quickRunRegistry">Tracks the active QuickRun-capable tool.</param>
-    /// <param name="projects">Loads, saves, and autosaves typed projects.</param>
-    /// <param name="notifications">Publishes project persistence failures.</param>
     /// <param name="launcher">Navigates osu! to selected timeline markers.</param>
     public MapCleanerViewModel(
         IMapCleanerService cleaner,
@@ -118,8 +110,6 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmap,
         ApplicationSettings settings,
         IQuickRunCommandRegistry quickRunRegistry,
-        IProjectService projects,
-        IUserNotificationService notifications,
         IPlatformLauncher launcher)
         : base(execution, OperationId)
     {
@@ -129,40 +119,22 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _quickRunRegistry = quickRunRegistry ??
             throw new ArgumentNullException(nameof(quickRunRegistry));
-        _projects = projects ?? throw new ArgumentNullException(nameof(projects));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
     }
 
-    /// <summary>Selects this feature for QuickRun and restores its autosaved project once.</summary>
+    /// <summary>Selects this feature as the current QuickRun target.</summary>
     public void Activate()
     {
         _quickRunRegistry.SelectCurrent(OperationId);
-        if (!_loadedAutosave)
-        {
-            _loadedAutosave = true;
-            _ = ProjectAutosaveCoordinator.LoadAsync(
-                _projects,
-                _definition,
-                Install,
-                exception => PublishFailureAsync("Project could not be loaded", exception),
-                () => IsInitialized = true);
-        }
     }
 
-    /// <summary>Clears QuickRun selection and schedules project autosave.</summary>
+    /// <summary>Clears this feature as the current QuickRun target.</summary>
     public void Deactivate()
     {
         if (_quickRunRegistry.CurrentCommandId == OperationId)
         {
             _quickRunRegistry.SelectCurrent(null);
         }
-
-        _ = ProjectAutosaveCoordinator.SaveAsync(
-            _projects,
-            _definition,
-            Snapshot,
-            exception => PublishFailureAsync("Project could not be saved", exception));
     }
 
     /// <inheritdoc/>
@@ -198,41 +170,6 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private Task NavigateAsync(double time) =>
         _launcher.OpenUriAsync(new Uri($"osu://edit/{Math.Round(time)}"));
-
-    /// <summary>Prompts for a destination and saves the current Map Cleaner project.</summary>
-    /// <param name="cancellationToken">Cancels the picker or save.</param>
-    /// <returns>A task that completes after the save attempt.</returns>
-    public async Task SaveProjectAsync(CancellationToken cancellationToken = default)
-    {
-        await _projects.SaveAsAsync(
-            _definition,
-            Snapshot(),
-            "map-cleaner-project.json",
-            cancellationToken);
-    }
-
-    /// <summary>Opens a Map Cleaner project selected by the user.</summary>
-    /// <param name="cancellationToken">Cancels picking or loading.</param>
-    /// <returns>A task that completes after the open attempt.</returns>
-    public async Task OpenProjectAsync(CancellationToken cancellationToken = default)
-    {
-        ProjectOpenResult<MapCleanerProject>? opened = await _projects.OpenAsync(
-            _definition,
-            cancellationToken);
-        if (opened is not null)
-        {
-            Install(opened.Project);
-        }
-    }
-
-    /// <summary>Installs a new default Map Cleaner project.</summary>
-    /// <param name="cancellationToken">Unused cancellation token retained by the project-feature contract.</param>
-    /// <returns>A task that completes after the new-project attempt.</returns>
-    public Task NewProjectAsync(CancellationToken cancellationToken = default)
-    {
-        Install(_projects.CreateNew(_definition));
-        return Task.CompletedTask;
-    }
 
     private async Task RunPathsAsync(IReadOnlyList<string> paths, bool quick, CancellationToken cancellationToken)
     {
@@ -273,6 +210,13 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
         }
     }
 
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+
+    object IShellProjectFeature.Snapshot() => Snapshot();
+
+    void IShellProjectFeature.Install(object project) =>
+        Install((MapCleanerProject)project);
+
     private MapCleanerProject Snapshot() => new()
     {
         MapCleanerArgs = new MapCleanerOptions
@@ -307,9 +251,6 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
         RemoveUnclickableHitsounds = options.RemoveUnclickableHitsounds;
         BeatDivisors = options.BeatDivisors.ToArray();
     }
-
-    private Task PublishFailureAsync(string message, Exception exception) =>
-        _notifications.PublishAsync(new UserNotification(UserNotificationSeverity.Error, "Map Cleaner", message, exception));
 
     private static IReadOnlyList<TimelineMarker> CreateMarkers(MapCleanerResult result) =>
         result.TimingPointsAdded

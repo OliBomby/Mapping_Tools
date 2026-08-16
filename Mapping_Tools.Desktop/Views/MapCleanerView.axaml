@@ -4,8 +4,7 @@
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              x:Class="Mapping_Tools.Desktop.Views.MapCleanerView"
-             x:DataType="vm:MapCleanerViewModel"
-             IsVisible="{Binding IsInitialized}">
+             x:DataType="vm:MapCleanerViewModel">
     <Grid RowDefinitions="*,Auto,Auto">
         <Grid Margin="0,0,0,10">
             <StackPanel>

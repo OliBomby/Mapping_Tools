@@ -16,6 +16,7 @@ using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Interactions;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 using Mapping_Tools.Infrastructure.Files;
@@ -122,6 +123,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IProjectSerializer, LegacyProjectJsonSerializer>();
         services.AddSingleton<IProjectStore, FileSystemProjectStore>();
         services.AddSingleton<IProjectService, ProjectService>();
+        services.AddSingleton<ProjectAutosaveCoordinator>();
 
         return services;
     }

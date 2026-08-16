@@ -19,7 +19,6 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// Owns Metadata Manager form state, project persistence, file selection, and execution.
 /// </summary>
 public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
-    IShellFeatureActivation,
     IShellProjectFeature
 {
     private const string OperationId = "metadata-manager";
@@ -27,10 +26,8 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     private readonly IMetadataManagerService _metadataManager;
     private readonly IFilePicker _filePicker;
     private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
-    private readonly IProjectService _projects;
     private readonly IUserNotificationService _notifications;
     private readonly ProjectDefinition<MetadataManagerProject> _definition;
-    private bool _loadedAutosave;
 
     /// <summary>Gets or sets the beatmap whose metadata should be imported.</summary>
     [ObservableProperty]
@@ -138,7 +135,6 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     /// <param name="execution">Coordinates background execution, cancellation, and notifications.</param>
     /// <param name="filePicker">Presents native beatmap file dialogs.</param>
     /// <param name="currentBeatmapLocator">Finds the beatmap currently open in osu!.</param>
-    /// <param name="projects">Loads, saves, and autosaves typed projects.</param>
     /// <param name="notifications">Publishes project and picker failures.</param>
     /// <param name="directories">Supplies the default export directory.</param>
     public MetadataManagerViewModel(
@@ -146,7 +142,6 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         IToolExecutionService execution,
         IFilePicker filePicker,
         ICurrentBeatmapLocator currentBeatmapLocator,
-        IProjectService projects,
         IUserNotificationService notifications,
         IApplicationDirectories directories)
         : base(execution, OperationId)
@@ -154,7 +149,6 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         _metadataManager = metadataManager ?? throw new ArgumentNullException(nameof(metadataManager));
         _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         _currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
-        _projects = projects ?? throw new ArgumentNullException(nameof(projects));
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         ArgumentNullException.ThrowIfNull(directories);
 
@@ -163,67 +157,8 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         _definition = new ProjectDefinition<MetadataManagerProject>(
             "metadataproject.json",
             "Metadata Manager Projects",
-            () => CreateDefaultProject(defaultExportPath));
-    }
-
-    /// <inheritdoc/>
-    public void Activate()
-    {
-        if (!_loadedAutosave)
-        {
-            _loadedAutosave = true;
-            _ = ProjectAutosaveCoordinator.LoadAsync(
-                _projects,
-                _definition,
-                Install,
-                exception => PublishFailureAsync(
-                    "Project could not be loaded",
-                    "The Metadata Manager autosave is invalid.",
-                    exception));
-        }
-    }
-
-    /// <inheritdoc/>
-    public void Deactivate() => _ = ProjectAutosaveCoordinator.SaveAsync(
-        _projects,
-        _definition,
-        Snapshot,
-        exception => PublishFailureAsync(
-            "Project could not be saved",
-            "The Metadata Manager autosave could not be written.",
-            exception));
-
-    /// <summary>Saves the current Metadata Manager project through the native picker.</summary>
-    /// <param name="cancellationToken">Cancels the picker or save.</param>
-    /// <returns>A task that completes after the save attempt.</returns>
-    public Task SaveProjectAsync(CancellationToken cancellationToken = default) =>
-        _projects.SaveAsAsync(
-            _definition,
-            Snapshot(),
-            "metadata-manager-project.json",
-            cancellationToken);
-
-    /// <summary>Opens a Metadata Manager project selected by the user.</summary>
-    /// <param name="cancellationToken">Cancels picking or loading.</param>
-    /// <returns>A task that completes after the open attempt.</returns>
-    public async Task OpenProjectAsync(CancellationToken cancellationToken = default)
-    {
-        ProjectOpenResult<MetadataManagerProject>? opened = await _projects.OpenAsync(
-            _definition,
-            cancellationToken);
-        if (opened is not null)
-        {
-            Install(opened.Project);
-        }
-    }
-
-    /// <summary>Installs a new default Metadata Manager project.</summary>
-    /// <param name="cancellationToken">Unused cancellation token retained by the project-feature contract.</param>
-    /// <returns>A completed task after the defaults are installed.</returns>
-    public Task NewProjectAsync(CancellationToken cancellationToken = default)
-    {
-        Install(_projects.CreateNew(_definition));
-        return Task.CompletedTask;
+            () => CreateDefaultProject(defaultExportPath),
+            "metadata-manager-project.json");
     }
 
     [RelayCommand]
@@ -358,6 +293,13 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
                 }),
             CreateProgress());
     }
+
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+
+    object IShellProjectFeature.Snapshot() => Snapshot();
+
+    void IShellProjectFeature.Install(object project) =>
+        Install((MetadataManagerProject)project);
 
     partial void OnDoRemoveDuplicateTagsChanged(bool value)
     {

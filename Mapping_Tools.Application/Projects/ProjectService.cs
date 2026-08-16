@@ -29,6 +29,13 @@ public sealed class ProjectService : IProjectService
     }
 
     /// <inheritdoc/>
+    public string GetAutoSavePath(IProjectDefinition definition)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        return Path.Combine(_directories.ApplicationData, definition.AutoSaveFileName);
+    }
+
+    /// <inheritdoc/>
     public string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition)
     {
         ArgumentNullException.ThrowIfNull(definition);
@@ -40,6 +47,21 @@ public sealed class ProjectService : IProjectService
     {
         ArgumentNullException.ThrowIfNull(definition);
         return Path.Combine(_directories.ApplicationData, definition.ProjectFolderName);
+    }
+
+    /// <inheritdoc/>
+    public string GetProjectFolder(IProjectDefinition definition)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        return Path.Combine(_directories.ApplicationData, definition.ProjectFolderName);
+    }
+
+    /// <inheritdoc/>
+    public object CreateNew(IProjectDefinition definition)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        return definition.CreateProject()
+            ?? throw new InvalidOperationException("The project factory returned null.");
     }
 
     /// <inheritdoc/>
@@ -66,6 +88,18 @@ public sealed class ProjectService : IProjectService
         CancellationToken cancellationToken = default)
     {
         return _store.LoadAsync<TProject>(path, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public async Task<object> LoadAsync(
+        IProjectDefinition definition,
+        string path,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        cancellationToken.ThrowIfCancellationRequested();
+        return await definition.LoadAsync(_store, path, cancellationToken);
     }
 
     /// <inheritdoc/>
@@ -106,6 +140,24 @@ public sealed class ProjectService : IProjectService
     }
 
     /// <inheritdoc/>
+    public async Task AutoSaveAsync(
+        IProjectDefinition definition,
+        object project,
+        IEnumerable<string>? additionalPaths = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        ArgumentNullException.ThrowIfNull(project);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        foreach (string path in ResolveAutoSavePaths(definition, additionalPaths))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await definition.SaveAsync(_store, path, project, cancellationToken);
+        }
+    }
+
+    /// <inheritdoc/>
     public async Task<string?> SaveAsAsync<TProject>(
         ProjectDefinition<TProject> definition,
         TProject project,
@@ -140,6 +192,39 @@ public sealed class ProjectService : IProjectService
     }
 
     /// <inheritdoc/>
+    public async Task<string?> SaveAsAsync(
+        IProjectDefinition definition,
+        object project,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        ArgumentNullException.ThrowIfNull(project);
+        cancellationToken.ThrowIfCancellationRequested();
+        string projectFolder = GetProjectFolder(definition);
+        _store.EnsureDirectoryExists(projectFolder);
+
+        string? path = await _filePicker.PickSaveFileAsync(
+            new SaveFilePickerRequest
+            {
+                Title = "Save project",
+                SuggestedStartLocation = projectFolder,
+                SuggestedFileName = definition.SuggestedFileName,
+                DefaultExtension = "json",
+                ShowOverwritePrompt = true,
+                Filters = [CommonFilePickerFilters.MappingToolsProjects]
+            },
+            cancellationToken);
+
+        if (path is null)
+        {
+            return null;
+        }
+
+        await definition.SaveAsync(_store, path, project, cancellationToken);
+        return path;
+    }
+
+    /// <inheritdoc/>
     public async Task<ProjectOpenResult<TProject>?> OpenAsync<TProject>(
         ProjectDefinition<TProject> definition,
         CancellationToken cancellationToken = default)
@@ -167,5 +252,58 @@ public sealed class ProjectService : IProjectService
         string path = paths[0];
         TProject project = await _store.LoadAsync<TProject>(path, cancellationToken);
         return new ProjectOpenResult<TProject>(path, project);
+    }
+
+    /// <inheritdoc/>
+    public async Task<ProjectOpenResult?> OpenAsync(
+        IProjectDefinition definition,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        cancellationToken.ThrowIfCancellationRequested();
+        string projectFolder = GetProjectFolder(definition);
+        _store.EnsureDirectoryExists(projectFolder);
+
+        IReadOnlyList<string> paths = await _filePicker.PickOpenFilesAsync(
+            new OpenFilePickerRequest
+            {
+                Title = "Open project",
+                SuggestedStartLocation = projectFolder,
+                AllowMultiple = false,
+                Filters = [CommonFilePickerFilters.MappingToolsProjects]
+            },
+            cancellationToken);
+
+        string? path = paths.FirstOrDefault();
+        if (path is null)
+        {
+            return null;
+        }
+
+        object project = await definition.LoadAsync(_store, path, cancellationToken);
+        return new ProjectOpenResult(path, project);
+    }
+
+    private IEnumerable<string> ResolveAutoSavePaths(
+        IProjectDefinition definition,
+        IEnumerable<string>? additionalPaths)
+    {
+        StringComparer pathComparer = OperatingSystem.IsWindows()
+            ? StringComparer.OrdinalIgnoreCase
+            : StringComparer.Ordinal;
+        HashSet<string> writtenPaths = new(pathComparer);
+        IEnumerable<string> candidatePaths = additionalPaths is null
+            ? [GetAutoSavePath(definition)]
+            : [GetAutoSavePath(definition), .. additionalPaths];
+
+        foreach (string path in candidatePaths)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(path);
+            string fullPath = Path.GetFullPath(path);
+            if (writtenPaths.Add(fullPath))
+            {
+                yield return fullPath;
+            }
+        }
     }
 }

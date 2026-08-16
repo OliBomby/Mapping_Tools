@@ -7,9 +7,11 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -346,13 +348,15 @@ public sealed class DesktopShellTests
     {
         // Arrange
         StubProjectFeatureViewModel project = new();
+        RecordingProjectService projectService = new();
         TestDialogService dialogs = new() { BooleanResult = true };
         using MainViewModel viewModel = CreateMainViewModel(
             [
                 Registration("home", "Home"),
                 Registration("project", "Project", () => project)
             ],
-            dialogs: dialogs);
+            dialogs: dialogs,
+            projectService: projectService);
         ShellFeatureItemViewModel projectItem = viewModel.FeatureItems
             .Single(item => item.Id == "project");
 
@@ -364,9 +368,9 @@ public sealed class DesktopShellTests
 
         // Assert
         viewModel.HasProjectMenu.Should().BeTrue();
-        project.SaveCount.Should().Be(1);
-        project.OpenCount.Should().Be(1);
-        project.NewCount.Should().Be(1);
+        projectService.SaveAsCount.Should().Be(1);
+        projectService.OpenCount.Should().Be(1);
+        projectService.CreateNewCount.Should().Be(1);
     }
 
     [TestMethod]
@@ -383,7 +387,7 @@ public sealed class DesktopShellTests
         await ExecuteAsync(viewModel.NewProjectCommand);
 
         // Assert
-        project.NewCount.Should().Be(0);
+        project.InstallCount.Should().Be(0);
         dialogs.MessageCount.Should().Be(1);
         MessageDialogRequest<bool> request = dialogs.LastMessageRequest.Should()
             .BeOfType<MessageDialogRequest<bool>>().Subject;
@@ -435,10 +439,13 @@ public sealed class DesktopShellTests
         IUserNotificationService? notifications = null,
         IPlatformLauncher? launcher = null,
         IBetterSaveService? betterSave = null,
-        TestDialogService? dialogs = null)
+        TestDialogService? dialogs = null,
+        RecordingProjectService? projectService = null)
     {
         ApplicationSettings resolvedSettings = settings ?? new ApplicationSettings();
         IUserNotificationService resolvedNotifications = notifications ?? new UserNotificationService();
+        TestDialogService resolvedDialogs = dialogs ?? new TestDialogService();
+        projectService ??= new RecordingProjectService();
         ImmediateDispatcher dispatcher = new();
         BeatmapWorkspaceViewModel workspace = new(
             new TestBeatmapWorkspace(),
@@ -460,7 +467,11 @@ public sealed class DesktopShellTests
             dispatcher,
             workspace,
             betterSave ?? new TestBetterSaveService(),
-            dialogs ?? new TestDialogService());
+            resolvedDialogs,
+            new ProjectAutosaveCoordinator(
+                projectService,
+                resolvedDialogs,
+                resolvedNotifications));
     }
 
     private static ShellFeatureRegistration Registration(
@@ -493,28 +504,112 @@ public sealed class DesktopShellTests
 
     private sealed class StubProjectFeatureViewModel : ObservableObject, IShellProjectFeature
     {
-        public int SaveCount { get; private set; }
+        private static readonly ProjectDefinition<StubProject> Definition = new(
+            "stubproject.json",
+            "Stub Projects",
+            static () => new StubProject());
+
+        public IProjectDefinition ProjectDefinition => Definition;
+
+        public int InstallCount { get; private set; }
+
+        public object Snapshot() => new StubProject();
+
+        public void Install(object project)
+        {
+            InstallCount++;
+        }
+    }
+
+    private sealed record StubProject;
+
+    private sealed class RecordingProjectService : IProjectService
+    {
+        public int SaveAsCount { get; private set; }
 
         public int OpenCount { get; private set; }
 
-        public int NewCount { get; private set; }
+        public int CreateNewCount { get; private set; }
 
-        public Task SaveProjectAsync(CancellationToken cancellationToken = default)
+        public string GetAutoSavePath(IProjectDefinition definition) =>
+            Path.Combine(Path.GetTempPath(), definition.AutoSaveFileName);
+
+        public string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition) =>
+            Path.Combine(Path.GetTempPath(), definition.AutoSaveFileName);
+
+        public string GetProjectFolder(IProjectDefinition definition) => Path.GetTempPath();
+
+        public string GetProjectFolder<TProject>(ProjectDefinition<TProject> definition) =>
+            Path.GetTempPath();
+
+        public object CreateNew(IProjectDefinition definition)
         {
-            SaveCount++;
-            return Task.CompletedTask;
+            CreateNewCount++;
+            return definition.CreateProject();
         }
 
-        public Task OpenProjectAsync(CancellationToken cancellationToken = default)
+        public TProject CreateNew<TProject>(ProjectDefinition<TProject> definition) =>
+            definition.CreateProject();
+
+        public Task SaveAsync<TProject>(
+            string path,
+            TProject project,
+            CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task<TProject> LoadAsync<TProject>(
+            string path,
+            CancellationToken cancellationToken = default) =>
+            Task.FromException<TProject>(new FileNotFoundException());
+
+        public Task<object> LoadAsync(
+            IProjectDefinition definition,
+            string path,
+            CancellationToken cancellationToken = default) =>
+            Task.FromException<object>(new FileNotFoundException());
+
+        public Task AutoSaveAsync<TProject>(
+            ProjectDefinition<TProject> definition,
+            TProject project,
+            IEnumerable<string>? additionalPaths = null,
+            CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task AutoSaveAsync(
+            IProjectDefinition definition,
+            object project,
+            IEnumerable<string>? additionalPaths = null,
+            CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task<string?> SaveAsAsync<TProject>(
+            ProjectDefinition<TProject> definition,
+            TProject project,
+            string? suggestedFileName = null,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<string?>(null);
+
+        public Task<string?> SaveAsAsync(
+            IProjectDefinition definition,
+            object project,
+            CancellationToken cancellationToken = default)
+        {
+            SaveAsCount++;
+            return Task.FromResult<string?>("saved.json");
+        }
+
+        public Task<ProjectOpenResult<TProject>?> OpenAsync<TProject>(
+            ProjectDefinition<TProject> definition,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<ProjectOpenResult<TProject>?>(null);
+
+        public Task<ProjectOpenResult?> OpenAsync(
+            IProjectDefinition definition,
+            CancellationToken cancellationToken = default)
         {
             OpenCount++;
-            return Task.CompletedTask;
-        }
-
-        public Task NewProjectAsync(CancellationToken cancellationToken = default)
-        {
-            NewCount++;
-            return Task.CompletedTask;
+            return Task.FromResult<ProjectOpenResult?>(
+                new ProjectOpenResult("opened.json", new StubProject()));
         }
     }
 

@@ -6,6 +6,11 @@ namespace Mapping_Tools.Application.Projects;
 /// </summary>
 public interface IProjectService
 {
+    /// <summary>Resolves the automatic recovery file for a shell project definition.</summary>
+    /// <param name="definition">The feature's type-erased persistence metadata.</param>
+    /// <returns>The absolute autosave path.</returns>
+    string GetAutoSavePath(IProjectDefinition definition);
+
     /// <summary>
     /// Resolves the feature's automatic recovery file beneath application data.
     /// </summary>
@@ -14,6 +19,11 @@ public interface IProjectService
     /// <returns>The absolute autosave path.</returns>
     string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition);
 
+    /// <summary>Resolves the project-picker directory for a shell project definition.</summary>
+    /// <param name="definition">The feature's type-erased persistence metadata.</param>
+    /// <returns>The absolute project directory.</returns>
+    string GetProjectFolder(IProjectDefinition definition);
+
     /// <summary>
     /// Resolves the directory offered by the feature's Open and Save As dialogs.
     /// </summary>
@@ -21,6 +31,11 @@ public interface IProjectService
     /// <param name="definition">The feature's persistence metadata.</param>
     /// <returns>The absolute project directory.</returns>
     string GetProjectFolder<TProject>(ProjectDefinition<TProject> definition);
+
+    /// <summary>Creates clean state through a type-erased shell project definition.</summary>
+    /// <param name="definition">Supplies the feature's default-state factory.</param>
+    /// <returns>A new, fully initialized project.</returns>
+    object CreateNew(IProjectDefinition definition);
 
     /// <summary>
     /// Creates clean feature state after the caller has handled any discard confirmation.
@@ -54,6 +69,16 @@ public interface IProjectService
         string path,
         CancellationToken cancellationToken = default);
 
+    /// <summary>Loads a project through a type-erased shell definition.</summary>
+    /// <param name="definition">Supplies the concrete project deserializer.</param>
+    /// <param name="path">The existing JSON file.</param>
+    /// <param name="cancellationToken">Cancels reading before deserialization begins.</param>
+    /// <returns>The reconstructed project.</returns>
+    Task<object> LoadAsync(
+        IProjectDefinition definition,
+        string path,
+        CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Writes the primary recovery file followed by any feature-specific
     /// recovery targets, preserving target order.
@@ -69,6 +94,17 @@ public interface IProjectService
     Task AutoSaveAsync<TProject>(
         ProjectDefinition<TProject> definition,
         TProject project,
+        IEnumerable<string>? additionalPaths = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Writes a type-erased shell project to its recovery targets.</summary>
+    /// <param name="definition">Identifies the project and typed serializer.</param>
+    /// <param name="project">The complete project snapshot.</param>
+    /// <param name="additionalPaths">Optional additional recovery targets.</param>
+    /// <param name="cancellationToken">Stops before the next target is written.</param>
+    Task AutoSaveAsync(
+        IProjectDefinition definition,
+        object project,
         IEnumerable<string>? additionalPaths = null,
         CancellationToken cancellationToken = default);
 
@@ -89,6 +125,16 @@ public interface IProjectService
         string? suggestedFileName = null,
         CancellationToken cancellationToken = default);
 
+    /// <summary>Presents Save As for a type-erased shell project.</summary>
+    /// <param name="definition">Supplies the project folder and typed serializer.</param>
+    /// <param name="project">The complete project snapshot.</param>
+    /// <param name="cancellationToken">Cancels picker result processing or persistence.</param>
+    /// <returns>The selected path, or <see langword="null"/> when cancelled.</returns>
+    Task<string?> SaveAsAsync(
+        IProjectDefinition definition,
+        object project,
+        CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Presents a project Open picker and returns loaded data without installing it in a view model.
     /// </summary>
@@ -101,6 +147,14 @@ public interface IProjectService
     Task<ProjectOpenResult<TProject>?> OpenAsync<TProject>(
         ProjectDefinition<TProject> definition,
         CancellationToken cancellationToken = default);
+
+    /// <summary>Presents Open for a type-erased shell project.</summary>
+    /// <param name="definition">Supplies the project folder and typed deserializer.</param>
+    /// <param name="cancellationToken">Cancels picker result processing or persistence.</param>
+    /// <returns>The selected path and project, or <see langword="null"/> when cancelled.</returns>
+    Task<ProjectOpenResult?> OpenAsync(
+        IProjectDefinition definition,
+        CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -111,3 +165,10 @@ public interface IProjectService
 /// <param name="Path">The local file selected by the user.</param>
 /// <param name="Project">The deserialized project, not yet installed into presentation state.</param>
 public sealed record ProjectOpenResult<TProject>(string Path, TProject Project);
+
+/// <summary>
+/// Carries a successfully opened project across the heterogeneous shell boundary.
+/// </summary>
+/// <param name="Path">The local file selected by the user.</param>
+/// <param name="Project">The deserialized project, not yet installed into presentation state.</param>
+public sealed record ProjectOpenResult(string Path, object Project);

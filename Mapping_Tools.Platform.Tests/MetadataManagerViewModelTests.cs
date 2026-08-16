@@ -71,20 +71,6 @@ public sealed class MetadataManagerViewModelTests
         viewModel.IsRunning.Should().BeFalse();
     }
 
-    [TestMethod]
-    public async Task NewProjectAsync_WithModifiedInputs_InstallsDefaultExportPath()
-    {
-        // Arrange
-        MetadataManagerViewModel viewModel = CreateViewModel();
-        viewModel.ExportPath = "modified.osu";
-
-        // Act
-        await viewModel.NewProjectAsync();
-
-        // Assert
-        viewModel.ExportPath.Should().EndWith("metadata_manager.osu");
-    }
-
     private static MetadataManagerViewModel CreateViewModel(
         RecordingMetadataManagerService? metadataManager = null,
         TestFilePicker? filePicker = null)
@@ -100,7 +86,6 @@ public sealed class MetadataManagerViewModelTests
             execution,
             filePicker ?? new TestFilePicker(),
             new StubCurrentBeatmapLocator(),
-            new StubProjectService(),
             notifications,
             new TestApplicationDirectories());
     }
@@ -141,45 +126,4 @@ public sealed class MetadataManagerViewModelTests
             Task.CompletedTask;
     }
 
-    private sealed class StubProjectService : IProjectService
-    {
-        public string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition) =>
-            Path.Combine(Path.GetTempPath(), definition.AutoSaveFileName);
-
-        public string GetProjectFolder<TProject>(ProjectDefinition<TProject> definition) =>
-            Path.GetTempPath();
-
-        public TProject CreateNew<TProject>(ProjectDefinition<TProject> definition) =>
-            definition.CreateProject();
-
-        public Task SaveAsync<TProject>(
-            string path,
-            TProject project,
-            CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
-
-        public Task<TProject> LoadAsync<TProject>(
-            string path,
-            CancellationToken cancellationToken = default) =>
-            Task.FromException<TProject>(new FileNotFoundException());
-
-        public Task AutoSaveAsync<TProject>(
-            ProjectDefinition<TProject> definition,
-            TProject project,
-            IEnumerable<string>? additionalPaths = null,
-            CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
-
-        public Task<string?> SaveAsAsync<TProject>(
-            ProjectDefinition<TProject> definition,
-            TProject project,
-            string? suggestedFileName = null,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult<string?>(null);
-
-        public Task<ProjectOpenResult<TProject>?> OpenAsync<TProject>(
-            ProjectDefinition<TProject> definition,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult<ProjectOpenResult<TProject>?>(null);
-    }
 }

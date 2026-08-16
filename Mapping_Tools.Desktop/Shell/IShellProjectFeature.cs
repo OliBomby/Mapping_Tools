@@ -1,26 +1,27 @@
+using Mapping_Tools.Application.Projects;
+
 namespace Mapping_Tools.Desktop.Shell;
 
 /// <summary>
-/// Exposes the project operations owned by an active feature without placing
-/// feature models or persistence details in the shell.
+/// Exposes the typed project state owned by an active feature to the shared
+/// shell project coordinator.
 /// </summary>
 public interface IShellProjectFeature
 {
     /// <summary>
-    /// Saves the feature's current typed project through its configured project service.
+    /// Gets the persistence metadata used for autosave and project pickers.
     /// </summary>
-    /// <param name="cancellationToken">Cancels picker result processing or persistence.</param>
-    Task SaveProjectAsync(CancellationToken cancellationToken = default);
+    IProjectDefinition ProjectDefinition { get; }
 
     /// <summary>
-    /// Opens a typed project and installs it only after the feature validates the loaded state.
+    /// Captures the complete current project state for persistence.
     /// </summary>
-    /// <param name="cancellationToken">Cancels picker result processing or persistence.</param>
-    Task OpenProjectAsync(CancellationToken cancellationToken = default);
+    /// <returns>A project instance matching <see cref="ProjectDefinition"/>.</returns>
+    object Snapshot();
 
     /// <summary>
-    /// Handles discard confirmation and replaces current state with feature defaults when accepted.
+    /// Installs a project after the shared coordinator has loaded or created it.
     /// </summary>
-    /// <param name="cancellationToken">Cancels confirmation or project initialization.</param>
-    Task NewProjectAsync(CancellationToken cancellationToken = default);
+    /// <param name="project">A project instance matching <see cref="ProjectDefinition"/>.</param>
+    void Install(object project);
 }
