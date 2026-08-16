@@ -9,6 +9,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services;
 
@@ -24,6 +25,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private static readonly Uri GitHubUri = new("https://github.com/OliBomby/Mapping_Tools");
     private static readonly Uri DonateUri = new("https://ko-fi.com/olibomby");
     private readonly IShellFeatureRegistry _registry;
+    private readonly IQuickRunCommandRegistry _quickRunRegistry;
     private readonly ApplicationSettings _settings;
     private readonly IUserNotificationService _notifications;
     private readonly IPlatformLauncher _launcher;
@@ -40,6 +42,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// Creates the desktop shell and activates the first explicit registration.
     /// </summary>
     /// <param name="registry">Supplies explicitly registered features in navigation order.</param>
+    /// <param name="quickRunRegistry">Tracks the command for the active QuickRun-capable feature.</param>
     /// <param name="settings">Owns persisted favorites and other shared preferences.</param>
     /// <param name="notifications">Supplies the process-lifetime user notification stream.</param>
     /// <param name="launcher">Opens support links through the operating system.</param>
@@ -50,6 +53,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <param name="projectCoordinator">Owns project menus and feature autosave lifecycle.</param>
     public MainViewModel(
         IShellFeatureRegistry registry,
+        IQuickRunCommandRegistry quickRunRegistry,
         ApplicationSettings settings,
         IUserNotificationService notifications,
         IPlatformLauncher launcher,
@@ -60,6 +64,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         ProjectAutosaveCoordinator projectCoordinator)
     {
         _registry = registry ?? throw new ArgumentNullException(nameof(registry));
+        _quickRunRegistry = quickRunRegistry ??
+            throw new ArgumentNullException(nameof(quickRunRegistry));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
@@ -173,6 +179,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         {
             _projectCoordinator.Deactivate(projectFeature);
         }
+        if (CurrentFeature is IQuickRun quickRun)
+        {
+            DeactivateQuickRun(quickRun);
+        }
         if (CurrentFeature is IShellFeatureActivation activation)
         {
             activation.Deactivate();
@@ -195,6 +205,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         if (CurrentFeature is IShellProjectFeature previousProject)
         {
             _projectCoordinator.Deactivate(previousProject);
+        }
+        if (CurrentFeature is IQuickRun previousQuickRun)
+        {
+            DeactivateQuickRun(previousQuickRun);
         }
 
         ShellFeatureRegistration registration = _registry.Find(item.Id)
@@ -219,6 +233,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         if (viewModel is IShellProjectFeature projectFeature)
         {
             _projectCoordinator.Activate(projectFeature);
+        }
+        if (viewModel is IQuickRun quickRun)
+        {
+            _quickRunRegistry.SelectCurrent(quickRun.OperationId);
         }
     }
 
@@ -283,6 +301,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     private bool CanUseProjectActions() =>
         CurrentFeature is IShellProjectFeature;
+
+    private void DeactivateQuickRun(IQuickRun quickRun)
+    {
+        if (_quickRunRegistry.CurrentCommandId == quickRun.OperationId)
+        {
+            _quickRunRegistry.SelectCurrent(null);
+        }
+    }
 
     [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
     private Task SaveProjectAsync() =>

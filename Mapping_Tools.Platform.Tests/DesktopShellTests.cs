@@ -8,6 +8,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Shell;
@@ -208,6 +209,39 @@ public sealed class DesktopShellTests
         second.ActivationCount.Should().Be(1);
         second.DeactivationCount.Should().Be(1);
         viewModel.CurrentFeature.Should().BeSameAs(first);
+    }
+
+    [TestMethod]
+    public void MainViewModel_ActivatesQuickRunFeature_UpdatesCurrentRegistryTool()
+    {
+        // Arrange
+        QuickRunCommandRegistry quickRunRegistry = new();
+        quickRunRegistry.Register(new QuickRunCommand(
+            "quick-tool",
+            "Quick tool",
+            QuickRunTargets.Always,
+            _ => Task.CompletedTask));
+        StubQuickRunFeatureViewModel quickTool = new();
+        using MainViewModel viewModel = CreateMainViewModel(
+            [
+                Registration("ordinary", "Ordinary"),
+                Registration("quick", "Quick", () => quickTool)
+            ],
+            quickRunRegistry: quickRunRegistry);
+        ShellFeatureItemViewModel quickItem = viewModel.FeatureItems.Single(item => item.Id == "quick");
+        ShellFeatureItemViewModel ordinaryItem = viewModel.FeatureItems.Single(item => item.Id == "ordinary");
+
+        // Act
+        quickItem.ActivateCommand.Execute(null);
+
+        // Assert
+        quickRunRegistry.CurrentCommandId.Should().Be("quick-tool");
+
+        // Act
+        ordinaryItem.ActivateCommand.Execute(null);
+
+        // Assert
+        quickRunRegistry.CurrentCommandId.Should().BeNull();
     }
 
     [TestMethod]
@@ -440,11 +474,14 @@ public sealed class DesktopShellTests
         IPlatformLauncher? launcher = null,
         IBetterSaveService? betterSave = null,
         TestDialogService? dialogs = null,
+        IQuickRunCommandRegistry? quickRunRegistry = null,
         RecordingProjectService? projectService = null)
     {
         ApplicationSettings resolvedSettings = settings ?? new ApplicationSettings();
         IUserNotificationService resolvedNotifications = notifications ?? new UserNotificationService();
         TestDialogService resolvedDialogs = dialogs ?? new TestDialogService();
+        IQuickRunCommandRegistry resolvedQuickRunRegistry = quickRunRegistry ??
+            new QuickRunCommandRegistry();
         projectService ??= new RecordingProjectService();
         ImmediateDispatcher dispatcher = new();
         BeatmapWorkspaceViewModel workspace = new(
@@ -461,6 +498,7 @@ public sealed class DesktopShellTests
         return new MainViewModel(
             new ShellFeatureRegistry(registrations ??
                 [Registration("get-started", "Get started")]),
+            resolvedQuickRunRegistry,
             resolvedSettings,
             resolvedNotifications,
             launcher ?? new RecordingLauncher(),
@@ -500,6 +538,13 @@ public sealed class DesktopShellTests
         public void Activate() => ActivationCount++;
 
         public void Deactivate() => DeactivationCount++;
+    }
+
+    private sealed class StubQuickRunFeatureViewModel : ObservableObject, IQuickRun
+    {
+        public string OperationId => "quick-tool";
+
+        public Task RunQuickAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 
     private sealed class StubProjectFeatureViewModel : ObservableObject, IShellProjectFeature

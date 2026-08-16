@@ -4,7 +4,6 @@ using Mapping_Tools.Application.AutoFail;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
-using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Workspace;
@@ -14,7 +13,7 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>Coordinates Auto-fail Detector options, execution, fixes, and timeline output.</summary>
-public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, IShellFeatureActivation
+public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, IQuickRun
 {
     internal const string OperationId = "auto-fail-detector";
     private readonly IAutoFailService _autoFail;
@@ -22,7 +21,6 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     private readonly ICurrentBeatmapLocator _currentBeatmap;
     private readonly ApplicationSettings _settings;
     private readonly IDialogService _dialogs;
-    private readonly IQuickRunCommandRegistry _quickRunRegistry;
     private readonly IPlatformLauncher _launcher;
 
     /// <summary>Gets or sets whether confirmed unloading objects appear on the timeline.</summary>
@@ -81,7 +79,6 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     /// <param name="currentBeatmap">Finds the beatmap open in osu! for QuickRun.</param>
     /// <param name="settings">Supplies QuickRun behavior preferences.</param>
     /// <param name="dialogs">Presents repair choices.</param>
-    /// <param name="quickRunRegistry">Tracks the active QuickRun-capable tool.</param>
     /// <param name="launcher">Navigates osu! to selected timeline markers.</param>
     public AutoFailDetectorViewModel(
         IAutoFailService autoFail,
@@ -90,7 +87,6 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         ICurrentBeatmapLocator currentBeatmap,
         ApplicationSettings settings,
         IDialogService dialogs,
-        IQuickRunCommandRegistry quickRunRegistry,
         IPlatformLauncher launcher)
         : base(execution, OperationId)
     {
@@ -99,20 +95,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
-        _quickRunRegistry = quickRunRegistry ?? throw new ArgumentNullException(nameof(quickRunRegistry));
         _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
-    }
-
-    /// <summary>Selects this feature as the current QuickRun target.</summary>
-    public void Activate() => _quickRunRegistry.SelectCurrent(OperationId);
-
-    /// <summary>Clears this feature as the current QuickRun target when it is active.</summary>
-    public void Deactivate()
-    {
-        if (_quickRunRegistry.CurrentCommandId == OperationId)
-        {
-            _quickRunRegistry.SelectCurrent(null);
-        }
     }
 
     /// <inheritdoc/>
@@ -132,6 +115,8 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
         await RunWithStateAsync(() => RunPathAsync(path, cancellationToken));
     }
+
+    string IQuickRun.OperationId => OperationId;
 
     [RelayCommand]
     private Task NavigateAsync(double time) => _launcher.OpenUriAsync(

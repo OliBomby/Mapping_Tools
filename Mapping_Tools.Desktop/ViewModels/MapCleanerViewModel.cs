@@ -5,7 +5,6 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
-using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Workspace;
@@ -17,7 +16,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>Coordinates Map Cleaner options, projects, QuickRun, and timeline results.</summary>
 public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
-    IShellFeatureActivation,
+    IQuickRun,
     IShellProjectFeature
 {
     internal const string OperationId = "map-cleaner";
@@ -25,7 +24,6 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     private readonly IBeatmapWorkspace _workspace;
     private readonly ICurrentBeatmapLocator _currentBeatmap;
     private readonly ApplicationSettings _settings;
-    private readonly IQuickRunCommandRegistry _quickRunRegistry;
     private readonly IPlatformLauncher _launcher;
     private readonly ProjectDefinition<MapCleanerProject> _definition = new(
         "mapcleanerproject.json",
@@ -101,7 +99,6 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     /// <param name="workspace">Supplies selected beatmaps for ordinary runs.</param>
     /// <param name="currentBeatmap">Finds the beatmap open in osu! for QuickRun.</param>
     /// <param name="settings">Supplies shared execution preferences.</param>
-    /// <param name="quickRunRegistry">Tracks the active QuickRun-capable tool.</param>
     /// <param name="launcher">Navigates osu! to selected timeline markers.</param>
     public MapCleanerViewModel(
         IMapCleanerService cleaner,
@@ -109,7 +106,6 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
         IBeatmapWorkspace workspace,
         ICurrentBeatmapLocator currentBeatmap,
         ApplicationSettings settings,
-        IQuickRunCommandRegistry quickRunRegistry,
         IPlatformLauncher launcher)
         : base(execution, OperationId)
     {
@@ -117,24 +113,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
         _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _quickRunRegistry = quickRunRegistry ??
-            throw new ArgumentNullException(nameof(quickRunRegistry));
         _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
-    }
-
-    /// <summary>Selects this feature as the current QuickRun target.</summary>
-    public void Activate()
-    {
-        _quickRunRegistry.SelectCurrent(OperationId);
-    }
-
-    /// <summary>Clears this feature as the current QuickRun target.</summary>
-    public void Deactivate()
-    {
-        if (_quickRunRegistry.CurrentCommandId == OperationId)
-        {
-            _quickRunRegistry.SelectCurrent(null);
-        }
     }
 
     /// <inheritdoc/>
@@ -166,6 +145,8 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
             true,
             cancellationToken));
     }
+
+    string IQuickRun.OperationId => OperationId;
 
     [RelayCommand]
     private Task NavigateAsync(double time) =>

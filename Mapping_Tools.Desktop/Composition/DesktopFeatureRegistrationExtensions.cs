@@ -8,10 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop.Composition;
 
-internal static class DesktopFeatureRegistrationExtensions
-{
-    public static IServiceCollection AddDesktopFeatures(this IServiceCollection services)
-    {
+static internal class DesktopFeatureRegistrationExtensions {
+    public static IServiceCollection AddDesktopFeatures(this IServiceCollection services) {
         services.AddShellFeature<GetStartedViewModel>(
             "get-started",
             "Get started",
@@ -33,9 +31,7 @@ internal static class DesktopFeatureRegistrationExtensions
             ["auto fail", "2b", "unloading", "objects"],
             startsSection: true,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.Always,
-            quickRun: static (viewModel, cancellationToken) =>
-                viewModel.RunQuickAsync(cancellationToken));
+            quickRunTargets: QuickRunTargets.Always);
         services.AddMappingTool<MapCleanerViewModel>(
             "map-cleaner",
             "Map Cleaner",
@@ -43,9 +39,7 @@ internal static class DesktopFeatureRegistrationExtensions
             ["clean", "greenline", "resnap", "samples"],
             horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.Always,
-            quickRun: static (viewModel, cancellationToken) =>
-                viewModel.RunQuickAsync(cancellationToken));
+            quickRunTargets: QuickRunTargets.Always);
         services.AddMappingTool<RhythmGuideViewModel>(
             "rhythm-guide",
             "Rhythm Guide",
@@ -76,8 +70,7 @@ internal static class DesktopFeatureRegistrationExtensions
         bool startsSection = false,
         ScrollBarVisibility horizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
         ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled)
-        where TViewModel : ObservableObject
-    {
+        where TViewModel : ObservableObject {
         services.AddSingleton<TViewModel>();
         services.AddSingleton(provider => new ShellFeatureRegistration(
             id,
@@ -102,10 +95,8 @@ internal static class DesktopFeatureRegistrationExtensions
         bool startsSection = false,
         ScrollBarVisibility horizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
         ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled,
-        QuickRunTargets? quickRunTargets = null,
-        Func<TViewModel, CancellationToken, Task>? quickRun = null)
-        where TViewModel : ObservableObject
-    {
+        QuickRunTargets? quickRunTargets = null)
+        where TViewModel : ObservableObject {
         services.AddShellFeature<TViewModel>(
             id,
             displayName,
@@ -116,15 +107,15 @@ internal static class DesktopFeatureRegistrationExtensions
             horizontalScrollBarVisibility,
             verticalScrollBarVisibility);
 
-        if (quickRunTargets is not null && quickRun is not null)
-        {
+        if (quickRunTargets is not null) {
             services.AddSingleton(provider => new MappingToolQuickRunRegistration(
                 id,
                 displayName,
                 quickRunTargets.Value,
-                cancellationToken => quickRun(
-                    provider.GetRequiredService<TViewModel>(),
-                    cancellationToken)));
+                cancellationToken => (provider.GetRequiredService<TViewModel>() as IQuickRun ??
+                                      throw new InvalidOperationException(
+                                          $"Feature '{id}' declares QuickRun but {typeof(TViewModel).Name} does not implement IQuickRun.")).RunQuickAsync(cancellationToken)
+            ));
         }
 
         return services;

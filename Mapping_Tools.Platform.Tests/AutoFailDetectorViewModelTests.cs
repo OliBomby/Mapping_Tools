@@ -44,7 +44,6 @@ public sealed class AutoFailDetectorViewModelTests
         QuickRunCommandRegistry registry = new();
         AutoFailDetectorViewModel viewModel = CreateViewModel(
             service,
-            registry: registry,
             currentPath: "current.osu");
         MappingToolQuickRunRegistration registration = new(
             "auto-fail-detector",
@@ -91,7 +90,6 @@ public sealed class AutoFailDetectorViewModelTests
     private static AutoFailDetectorViewModel CreateViewModel(
         RecordingAutoFailService service,
         TestBeatmapWorkspace? workspace = null,
-        QuickRunCommandRegistry? registry = null,
         string? currentPath = null)
     {
         UserNotificationService notifications = new();
@@ -107,7 +105,6 @@ public sealed class AutoFailDetectorViewModelTests
             new StubCurrentBeatmapLocator(currentPath),
             new ApplicationSettings(),
             new TestDialogService(),
-            registry ?? new QuickRunCommandRegistry(),
             new StubLauncher());
     }
 

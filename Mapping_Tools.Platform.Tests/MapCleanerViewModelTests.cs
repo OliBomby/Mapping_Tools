@@ -192,7 +192,7 @@ public sealed class MapCleanerViewModelTests
         // Arrange
         RecordingCleaner cleaner = new();
         QuickRunCommandRegistry registry = new();
-        MapCleanerViewModel viewModel = Create(cleaner, registry: registry, currentPath: "current.osu");
+        MapCleanerViewModel viewModel = Create(cleaner, currentPath: "current.osu");
         MappingToolQuickRunRegistration registration = new(
             "map-cleaner",
             "Map Cleaner",
@@ -219,7 +219,6 @@ public sealed class MapCleanerViewModelTests
     private static MapCleanerViewModel Create(
         RecordingCleaner cleaner,
         TestBeatmapWorkspace? workspace = null,
-        QuickRunCommandRegistry? registry = null,
         string? currentPath = null,
         RecordingReload? reload = null,
         bool autoReload = false)
@@ -232,7 +231,6 @@ public sealed class MapCleanerViewModelTests
             workspace ?? new TestBeatmapWorkspace(),
             new StubLocator(currentPath),
             settings,
-            registry ?? new QuickRunCommandRegistry(),
             new StubLauncher());
     }
 
