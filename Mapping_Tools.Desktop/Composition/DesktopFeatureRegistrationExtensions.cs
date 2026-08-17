@@ -65,6 +65,13 @@ static internal class DesktopFeatureRegistrationExtensions {
             "Copy timing between beatmaps with optional object resnapping.",
             ["timing", "copy", "resnap", "beat divisors", "multi-map"],
             verticalScrollBarVisibility: ScrollBarVisibility.Auto);
+        services.AddMappingTool<TimingHelperViewModel>(
+            "timing-helper",
+            "Timing Helper",
+            "Adjust BPM and add redlines so selected markers become snapped.",
+            ["timing", "redlines", "BPM", "markers", "beat divisors"],
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
+            quickRunTargets: QuickRunTargets.Always);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(
