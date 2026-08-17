@@ -1,0 +1,206 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:core="using:Mapping_Tools.Core.Classes.BeatmapHelper"
+             xmlns:combo="using:Mapping_Tools.Core.Tools.ComboColourStudio"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:materialIcons="using:Material.Icons.Avalonia"
+             x:Class="Mapping_Tools.Desktop.Views.ComboColourStudioView"
+             x:Name="Root"
+             x:DataType="vm:ComboColourStudioViewModel">
+    <Grid RowDefinitions="*,Auto">
+        <Grid Margin="0,0,0,10" RowDefinitions="Auto,*,Auto">
+            <controls:ToolViewHeader
+                Title="Combo Colour Studio"
+                IsQuickRunSupported="True"
+                HelpText="With Combo Colour Studio you can easily customize the combo colours of your beatmap. AKA colour haxing.&#x0a;&#x0a;You define colored sections much like how you use timing points in the osu! editor. Just add a new colour point and define the sequence of combo colours.&#x0a;&#x0a;You can also define 'burst' colour points which only work for one combo, so you can emphasize specific patterns using colour.&#x0a;&#x0a;You can get started by adding a combo colour using the plus on the bottom left or by importing combo colours from an existing map. The combo colours can be edited by clicking on the coloured circles.&#x0a;&#x0a;Add a colour point by clicking on the plus on the bottom right. You can edit the colour sequence by double clicking the colour sequence cell." />
+
+            <Grid Grid.Row="1" Margin="0,10,0,0" ColumnDefinitions="2*,3*">
+                <DataGrid Grid.Column="0" ItemsSource="{Binding Project.ColourPoints}"
+                          SelectedItem="{Binding SelectedColourPoint, Mode=TwoWay}"
+                          AutoGenerateColumns="False"
+                          CanUserSortColumns="True"
+                          SelectionMode="Extended" IsReadOnly="False"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <DataGrid.Styles>
+                        <Style Selector="DataGridRow">
+                            <Setter Property="IsSelected"
+                                    Value="{ReflectionBinding IsSelected, Mode=TwoWay}" />
+                        </Style>
+                    </DataGrid.Styles>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Offset"
+                                            Binding="{Binding Time, Mode=TwoWay, Converter={StaticResource TimeToStringConverter}}" />
+                        <DataGridTemplateColumn Header="Mode">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="combo:ColourPoint">
+                                    <TextBlock Text="{Binding Mode}" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate x:DataType="combo:ColourPoint">
+                                    <ComboBox ItemsSource="{Binding ColourPointModes}"
+                                              SelectedItem="{Binding Mode, Mode=TwoWay}" Classes="compact" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Colour Sequence">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="combo:ColourPoint">
+                                    <ItemsControl ItemsSource="{Binding ColourSequence}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="core:SpecialColour">
+                                                <Border Width="24" Height="24" CornerRadius="12" Margin="2"
+                                                        Background="{Binding Color, Converter={StaticResource RgbaColourToAvaloniaBrushConverter}}"
+                                                        ToolTip.Tip="{Binding Name}" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <Grid Grid.Column="1" Margin="10,0,0,0" RowDefinitions="Auto,*,Auto">
+                    <TextBlock FontSize="16" FontWeight="Bold" Text="Sequence editor" />
+                    <Grid Grid.Row="1" RowDefinitions="Auto,*,Auto">
+                        <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,10,0,10">
+                            <ComboBox ItemsSource="{Binding Project.ComboColours}"
+                                      SelectedItem="{Binding SelectedSequenceColour, Mode=TwoWay}"
+                                      Classes="compact" />
+                            <materialDesign:FloatingButton Grid.Column="1" Classes="mini light" Margin="5,0"
+                                                            Command="{Binding AddSequenceColourCommand}"
+                                                            CommandParameter="{Binding SelectedColourPoint}"
+                                                            ToolTip.Tip="Add the selected colour to this sequence.">
+                                <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
+                            </materialDesign:FloatingButton>
+                            <materialDesign:FloatingButton Grid.Column="2" Classes="mini light"
+                                                            Command="{Binding RemoveSequenceColourCommand}"
+                                                            ToolTip.Tip="Remove the last colour from this sequence.">
+                                <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
+                            </materialDesign:FloatingButton>
+                        </Grid>
+                        <controls:ReorderableListBox Grid.Row="1"
+                                                     ItemsSource="{Binding SelectedColourPoint.ColourSequence}">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="core:SpecialColour">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,2">
+                                        <Border Width="28" Height="28" CornerRadius="14"
+                                                Background="{Binding Color, Converter={StaticResource RgbaColourToAvaloniaBrushConverter}}"
+                                                VerticalAlignment="Center" ToolTip.Tip="{Binding Name}" />
+                                        <TextBlock Grid.Column="1" Margin="8,0" VerticalAlignment="Center"
+                                                   Text="{Binding Name}" />
+                                        <Button Grid.Column="2" Classes="flat" Tag="{Binding}"
+                                                Click="RemoveSequenceColour_OnClick" ToolTip.Tip="Remove this colour.">
+                                            <materialIcons:MaterialIcon Kind="Close" Width="18" Height="18" />
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </controls:ReorderableListBox>
+                        <Border Grid.Row="2" Margin="0,10,0,0" Padding="8"
+                                Background="{DynamicResource MaterialCardBackgroundBrush}"
+                                IsVisible="{Binding HasPreviewItems}">
+                            <StackPanel>
+                                <TextBlock FontWeight="Bold" Text="Preview" />
+                                <ItemsControl ItemsSource="{Binding PreviewItems}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="combo:ComboColourPreviewEntry">
+                                            <Border Width="24" Height="24" CornerRadius="12" Margin="2"
+                                                    Background="{Binding Colour, Converter={StaticResource RgbaColourToAvaloniaBrushConverter}}"
+                                                    ToolTip.Tip="{Binding ColourName}" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                    <TextBlock Grid.Row="2" Text="Select a colour point to edit its ordered sequence. Drag sequence entries to reorder them."
+                               TextWrapping="Wrap" Opacity="0.7" Margin="0,10,0,0" />
+                </Grid>
+            </Grid>
+
+            <Grid Grid.Row="2" Margin="0,10,0,0" ColumnDefinitions="*,Auto">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:Card Padding="4">
+                            <ListBox ItemsSource="{Binding Project.ComboColours}">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="core:SpecialColour">
+                                        <ColorPicker Color="{Binding Color, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}"
+                                                     ToolTip.Tip="{Binding Name}" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </materialDesign:Card>
+                        <materialDesign:FloatingButton Classes="mini light" Margin="8,0,4,0" Command="{Binding AddComboColourCommand}"
+                                                        ToolTip.Tip="Add a new combo colour.">
+                            <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
+                        </materialDesign:FloatingButton>
+                        <materialDesign:FloatingButton Classes="mini light" Command="{Binding RemoveComboColourCommand}"
+                                                        ToolTip.Tip="Remove the last combo colour.">
+                            <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
+                        </materialDesign:FloatingButton>
+                    </StackPanel>
+                    <Grid ColumnDefinitions="Auto,Auto,*" Margin="0,8,0,0">
+                        <Button Content="Import colours" Command="{Binding ImportColoursCommand}" ToolTip.Tip="Import combo colours from a beatmap." />
+                        <Button Grid.Column="1" Content="Import colourhax" Margin="8,0,0,0" Command="{Binding ImportColourHaxCommand}"
+                                ToolTip.Tip="Import colour haxing from a beatmap and populate colour points." />
+                        <TextBox Grid.Column="2" Margin="8,0,0,0"
+                                 materialAssists:TextFieldAssist.Label="Max burst length"
+                                 Text="{Binding Project.MaxBurstLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantInt32Converter}}"
+                                 ToolTip.Tip="Determines the maximum combo size for burst combos. Combos longer than this value can't get a colour from burst colour points." />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+                        <TextBox materialAssists:TextFieldAssist.Label="Import from beatmap"
+                                 Text="{Binding ImportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                        <Button Grid.Column="1" Classes="flat" Margin="8,0,0,0" Command="{Binding UseCurrentImportCommand}"
+                                ToolTip.Tip="Use the beatmap currently open in osu!.">
+                            <materialIcons:MaterialIcon Kind="RestoreFromTrash" Width="24" Height="24" />
+                        </Button>
+                    </Grid>
+                </StackPanel>
+                <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal" VerticalAlignment="Bottom">
+                        <materialDesign:FloatingButton Classes="mini light" Margin="5" Command="{Binding AddColourPointCommand}"
+                                                        PointerPressed="AddColourPointButtonPointerPressed"
+                                                        ToolTip.Tip="Add a new colour point.">
+                        <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
+                    </materialDesign:FloatingButton>
+                    <materialDesign:FloatingButton Classes="mini light" Margin="5" Command="{Binding RemoveColourPointCommand}"
+                                                    ToolTip.Tip="Remove selected colour points or the last point.">
+                        <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
+                    </materialDesign:FloatingButton>
+                    <controls:ToolRunButton Margin="10,0,0,0" RunCommand="{Binding RunCommand}" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
+            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100" Value="{Binding Progress}" />
+        </Grid>
+    </Grid>
+</UserControl>

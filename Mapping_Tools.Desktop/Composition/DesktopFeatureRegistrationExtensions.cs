@@ -109,6 +109,13 @@ static internal class DesktopFeatureRegistrationExtensions {
             horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto,
             quickRunTargets: QuickRunTargets.AnySelection);
+        services.AddMappingTool<ComboColourStudioViewModel>(
+            "combo-colour-studio",
+            "Combo Colour Studio",
+            "Customize combo-colour sequences, bursts, and colour haxing.",
+            ["combo", "colour", "color", "hax", "palette", "burst"],
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
+            quickRunTargets: QuickRunTargets.Always);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(

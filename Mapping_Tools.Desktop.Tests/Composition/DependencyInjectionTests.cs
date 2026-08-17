@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.AutoFail;
 using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.ComboColourStudio;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Interactions;
@@ -46,6 +47,7 @@ public sealed class DependencyInjectionTests
             typeof(HitsoundPreviewHelperViewModel),
             typeof(AutoFailDetectorViewModel),
             typeof(MapCleanerViewModel),
+            typeof(ComboColourStudioViewModel),
             typeof(IDialogService),
             typeof(IFilePicker),
             typeof(IClipboardService),
@@ -80,6 +82,7 @@ public sealed class DependencyInjectionTests
             typeof(IHitsoundPreviewHelperService),
             typeof(IAutoFailService),
             typeof(IMapCleanerService),
+            typeof(IComboColourStudioService),
             typeof(ITimingHelperService),
             typeof(ISliderCompletionatorService),
             typeof(ISliderMergerService),

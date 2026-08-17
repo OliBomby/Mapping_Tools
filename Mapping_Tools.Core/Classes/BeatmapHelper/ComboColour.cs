@@ -16,7 +16,10 @@ namespace Mapping_Tools.Core.Classes.BeatmapHelper {
         /// </summary>
         public RgbaColour Color {
             get => color;
-            set => Set(ref color, value);
+            set {
+                if (Set(ref color, value) && value.A != byte.MaxValue)
+                    hasAlpha = true;
+            }
         }
 
         /// <summary>
@@ -37,6 +40,7 @@ namespace Mapping_Tools.Core.Classes.BeatmapHelper {
         /// <param name="color">The value exposed by <see cref="Color"/>.</param>
         public ComboColour(RgbaColour color) {
             Color = color;
+            hasAlpha = color.A != byte.MaxValue;
         }
 
         /// <summary>

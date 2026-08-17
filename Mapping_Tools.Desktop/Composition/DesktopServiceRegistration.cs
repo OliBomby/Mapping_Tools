@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.AutoFail;
 using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.ComboColourStudio;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.HitsoundPreviewHelper;
 using Mapping_Tools.Application.HitsoundCopier;
@@ -134,6 +135,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<ISliderCompletionatorService, SliderCompletionatorService>();
         services.AddSingleton<ISliderMergerService, SliderMergerService>();
         services.AddSingleton<ISliderPicturatorService, SliderPicturatorService>();
+        services.AddSingleton<IComboColourStudioService, ComboColourStudioService>();
         services.AddSingleton<IImageFileService, SystemDrawingImageFileService>();
         services.AddSingleton<IMapCleanerSampleService, PhysicalMapCleanerSampleService>();
         services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();

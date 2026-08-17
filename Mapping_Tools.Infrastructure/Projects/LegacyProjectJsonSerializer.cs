@@ -12,6 +12,7 @@ using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.MapCleaner;
 using Newtonsoft.Json;
@@ -105,6 +106,10 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             "Mapping_Tools.Viewmodels.SliderMergerVm";
         private const string LegacySliderPicturatorProject =
             "Mapping_Tools.Viewmodels.SliderPicturatorVm";
+        private const string LegacyComboColourProject =
+            "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourProject";
+        private const string LegacyComboColourPoint =
+            "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint";
         private readonly DefaultSerializationBinder _fallback = new();
 
         public Type BindToType(string? assemblyName, string typeName)
@@ -163,7 +168,17 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 {
                     return typeof(SliderPicturatorProject);
                 }
+                if (typeName == LegacyComboColourProject)
+                {
+                    return typeof(ComboColourProject);
+                }
+                if (typeName == LegacyComboColourPoint)
+                {
+                    return typeof(ColourPoint);
+                }
 
+                // Accept both the former namespace and documents emitted by
+                // an intermediate migration build that already used Core names.
                 Type? migratedType = MigratedCoreMarker.Assembly.GetType(typeName)
                     ?? MigratedCoreMarker.Assembly.GetType(ToCurrentTypeName(typeName));
                 if (migratedType is not null)
@@ -256,6 +271,18 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             {
                 assemblyName = LegacyAssemblyName;
                 typeName = LegacySliderPicturatorProject;
+                return;
+            }
+            if (serializedType == typeof(ComboColourProject))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyComboColourProject;
+                return;
+            }
+            if (serializedType == typeof(ColourPoint))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyComboColourPoint;
                 return;
             }
 
