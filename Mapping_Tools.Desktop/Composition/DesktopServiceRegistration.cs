@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.HitsoundPreviewHelper;
+using Mapping_Tools.Application.HitsoundCopier;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.MetadataManager;
@@ -122,6 +123,8 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IBetterSaveService, BetterSaveService>();
         services.AddSingleton<IRhythmGuideService, RhythmGuideService>();
         services.AddSingleton<IHitsoundPreviewHelperService, HitsoundPreviewHelperService>();
+        services.AddSingleton<IHitsoundCopierService, HitsoundCopierService>();
+        services.AddSingleton<IHitsoundSampleService, PhysicalHitsoundSampleService>();
         services.AddSingleton<IAutoFailService, AutoFailService>();
         services.AddSingleton<IMapCleanerService, MapCleanerService>();
         services.AddSingleton<IMetadataManagerService, MetadataManagerService>();

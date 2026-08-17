@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Mapping_Tools.Application.HitsoundCopier;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.Projects;
@@ -134,6 +135,28 @@ public sealed class ProjectPersistenceTests
         project.Items[0].CustomIndex.Should().Be(3);
         roundTrip.Should().Contain(
             "\"$type\": \"Mapping_Tools.Viewmodels.HitsoundPreviewHelperVm, Mapping Tools\"");
+    }
+
+    [TestMethod]
+    public void DeserializeAndSerialize_LegacyHitsoundCopierProject_PreservesOptionsAndTypeAlias()
+    {
+        // Arrange
+        LegacyProjectJsonSerializer serializer = new();
+        const string json =
+            "{\"$type\":\"Mapping_Tools.Viewmodels.HitsoundCopierVm, Mapping Tools\",\"PathFrom\":\"source.osu\",\"PathTo\":\"target.osu\",\"CopyMode\":1,\"TemporalLeniency\":12,\"CopyStoryboardedSamples\":true}";
+
+        // Act
+        HitsoundCopierProject project = serializer.Deserialize<HitsoundCopierProject>(json);
+        string roundTrip = serializer.Serialize(project);
+
+        // Assert
+        project.PathFrom.Should().Be("source.osu");
+        project.PathTo.Should().Be("target.osu");
+        project.CopyMode.Should().Be(1);
+        project.TemporalLeniency.Should().Be(12);
+        project.CopyStoryboardedSamples.Should().BeTrue();
+        roundTrip.Should().Contain(
+            "\"$type\": \"Mapping_Tools.Viewmodels.HitsoundCopierVm, Mapping Tools\"");
     }
 
     [TestMethod]

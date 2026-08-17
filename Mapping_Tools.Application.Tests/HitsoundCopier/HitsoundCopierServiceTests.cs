@@ -1,0 +1,127 @@
+using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.HitsoundCopier;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.Tools.HitsoundCopier;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Application.Tests.HitsoundCopier;
+
+[TestClass]
+public sealed class HitsoundCopierServiceTests
+{
+    [TestMethod]
+    public async Task CopyAsync_WithMultipleTargets_UsesSourceSelectionAndSavesEveryTarget()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu");
+        RecordingGateway gateway = new(fixture);
+        HitsoundCopierService service = new(gateway, new StubSampleService(), new ApplicationSettings());
+        HitsoundCopierOptions options = new()
+        {
+            PathFrom = "source.osu",
+            PathTo = "first.osu|second.osu",
+            SourceSelectionMode = HitsoundCopierSelectionMode.Everything
+        };
+
+        // Act
+        HitsoundCopierResult result = await service.CopyAsync(options);
+
+        // Assert
+        result.ProcessedPaths.Should().Equal("first.osu", "second.osu");
+        gateway.OpenedPaths.Should().Equal("source.osu", "first.osu", "second.osu");
+        gateway.SavedPaths.Should().Equal("first.osu", "second.osu");
+    }
+
+    [TestMethod]
+    public async Task CopyAsync_TimeSelectionWithoutCode_RejectsBeforeOpeningMaps()
+    {
+        // Arrange
+        RecordingGateway gateway = new(Path.Combine(
+            AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu"));
+        HitsoundCopierService service = new(gateway, new StubSampleService(), new ApplicationSettings());
+        HitsoundCopierOptions options = new()
+        {
+            PathTo = "target.osu",
+            SourceSelectionMode = HitsoundCopierSelectionMode.Time
+        };
+
+        // Act
+        Func<Task> act = () => service.CopyAsync(options);
+
+        // Assert
+        await act.Should().ThrowAsync<ArgumentException>();
+        gateway.OpenedPaths.Should().BeEmpty();
+    }
+
+    private sealed class StubSampleService : IHitsoundSampleService
+    {
+        public Task<IReadOnlyDictionary<string, string>> AnalyzeAsync(
+            string directory,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyDictionary<string, string>>(
+                new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+
+        public HitsoundSampleAssignment? TryCreateAssignment(
+            string directory,
+            IReadOnlyList<string> sourceFilenames,
+            IReadOnlyDictionary<string, string> firstSamples,
+            string role,
+            Mapping_Tools.Core.Classes.BeatmapHelper.Enums.SampleSet sampleSet,
+            int startIndex,
+            SampleSchema existingSchema) => null;
+
+        public Task ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+    }
+
+    private sealed class RecordingGateway : IBeatmapEditingGateway
+    {
+        private readonly string _fixture;
+
+        public RecordingGateway(string fixture) => _fixture = fixture;
+        public List<string> OpenedPaths { get; } = [];
+        public List<string> SavedPaths { get; } = [];
+
+        public Task<BeatmapEditingSession> OpenBeatmapAsync(
+            string path,
+            LiveBeatmapPreference livePreference = LiveBeatmapPreference.PreferLive,
+            CancellationToken cancellationToken = default)
+        {
+            OpenedPaths.Add(path);
+            BeatmapEditor2 editor = new(File.ReadAllLines(_fixture).ToList(), new MemoryStore()) { Path = path };
+            return Task.FromResult(new BeatmapEditingSession(editor, BeatmapEditingSource.Disk, []));
+        }
+
+        public Task<StoryboardEditor2> OpenStoryboardAsync(
+            string path,
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
+        public Task SaveAsync(
+            Editor2 editor,
+            bool reloadEditor = false,
+            CancellationToken cancellationToken = default)
+        {
+            SavedPaths.Add(editor.Path);
+            return Task.CompletedTask;
+        }
+
+        public Task SaveAsync(
+            BeatmapEditingSession session,
+            bool reloadEditor = false,
+            CancellationToken cancellationToken = default) =>
+            SaveAsync(session.Editor, reloadEditor, cancellationToken);
+    }
+
+    private sealed class MemoryStore : ITextFileStore
+    {
+        public IReadOnlyList<string> ReadAllLines(string path) => [];
+        public void WriteAllLines(string path, IEnumerable<string> lines) { }
+        public void Delete(string path) { }
+        public string GetParentFolder(string path) => string.Empty;
+        public string CombinePath(string parent, string child) => child;
+    }
+}

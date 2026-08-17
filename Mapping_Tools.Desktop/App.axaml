@@ -20,6 +20,7 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:InvariantInt32Converter x:Key="InvariantInt32Converter" />
             <converters:InvariantDoubleConverter x:Key="InvariantDoubleConverter" />
+            <converters:EnumEqualsConverter x:Key="EnumEqualsConverter" />
             <converters:TimeToStringConverter x:Key="TimeToStringConverter" />
             <converters:DoubleArrayToStringConverter x:Key="DoubleArrayToStringConverter" />
             <converters:ConstantTimeSpanConverter x:Key="ConstantTimeSpanConverter" />

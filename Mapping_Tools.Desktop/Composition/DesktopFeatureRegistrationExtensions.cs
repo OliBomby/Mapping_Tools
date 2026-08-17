@@ -53,6 +53,13 @@ static internal class DesktopFeatureRegistrationExtensions {
             ["hitsound", "preview", "zone", "sample", "position"],
             verticalScrollBarVisibility: ScrollBarVisibility.Auto,
             quickRunTargets: QuickRunTargets.Always);
+        services.AddMappingTool<HitsoundCopierViewModel>(
+            "hitsound-copier",
+            "Hitsound Copier",
+            "Copy hitsounds, samples, and storyboard sounds between beatmaps.",
+            ["hitsound", "copy", "sample", "storyboard", "mute", "multi-map"],
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
+            quickRunTargets: QuickRunTargets.Always);
         services.AddMappingTool<MetadataManagerViewModel>(
             "metadata-manager",
             "Metadata Manager",
