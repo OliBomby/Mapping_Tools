@@ -79,6 +79,14 @@ static internal class DesktopFeatureRegistrationExtensions {
             ["slider", "completion", "duration", "length", "velocity"],
             verticalScrollBarVisibility: ScrollBarVisibility.Auto,
             quickRunTargets: QuickRunTargets.AnySelection);
+        services.AddMappingTool<SliderMergerViewModel>(
+            "slider-merger",
+            "Slider Merger",
+            "Merge selected sliders and circles into one connected slider.",
+            ["slider", "merge", "bezier", "connection", "circles"],
+            horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
+            quickRunTargets: QuickRunTargets.MultipleSelection);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(

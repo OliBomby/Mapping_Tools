@@ -11,6 +11,7 @@ using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.SliderCompletionator;
+using Mapping_Tools.Application.SliderMerger;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Desktop.Composition;
@@ -78,6 +79,7 @@ public sealed class DependencyInjectionTests
             typeof(IMapCleanerService),
             typeof(ITimingHelperService),
             typeof(ISliderCompletionatorService),
+            typeof(ISliderMergerService),
             typeof(IMapCleanerSampleService),
             typeof(IBetterSaveOverrideService),
             typeof(IBeatmapWorkspace),

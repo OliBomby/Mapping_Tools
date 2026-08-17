@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="Mapping_Tools.Desktop.Views.SliderMergerView"
+             x:DataType="vm:SliderMergerViewModel">
+    <Grid RowDefinitions="*,Auto">
+        <Grid Margin="0,0,120,10">
+            <StackPanel>
+                <controls:ToolViewHeader
+                    Title="Slider Merger"
+                    IsQuickRunSupported="True"
+                    HelpText="Merge 2 or more sliders and circles into one big slider.&#x0a;This program will automatically convert any type of slider into a Beziér slider for the purpose of merging.&#x0a;Circles can be merged too and will always use the linear connection mode.&#x0a;&#x0a;The maximum distance in osu! pixels between two merging hit objects is controlled by the connection leniency." />
+
+                <TextBox Width="258" HorizontalAlignment="Left" Margin="0,20,0,0"
+                         Classes="compact"
+                         materialAssists:TextFieldAssist.Label="Merge connection leniency"
+                         Text="{Binding Leniency, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
+                         ToolTip.Tip="The maximum distance in osu! pixels between two merging hit objects." />
+
+                <StackPanel Orientation="Horizontal" Margin="0,26,0,0" HorizontalAlignment="Left">
+                    <ComboBox Width="258" Classes="compact"
+                              ItemsSource="{Binding ImportModes}"
+                              SelectedItem="{Binding ImportModeSetting}"
+                              materialAssists:ComboBoxAssist.Label="Object selection mode"
+                              ToolTip.Tip="Choose how to select hit objects to merge. Slider Merger will not always merge all the specified objects, because the distance between every pair of objects must still be within the connection distance leniency." />
+                    <TextBox Margin="15,0,0,0" Width="258"
+                             IsVisible="{Binding TimeCodeVisible}"
+                             materialAssists:TextFieldAssist.Label="Time code"
+                             Text="{Binding TimeCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             ToolTip.Tip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - " />
+                </StackPanel>
+
+                <ComboBox Margin="0,26,0,0" Width="258" HorizontalAlignment="Left"
+                          Classes="compact"
+                          ItemsSource="{Binding ConnectionModes}"
+                          SelectedItem="{Binding ConnectionModeSetting}"
+                          materialAssists:ComboBoxAssist.Label="Object connection mode"
+                          ToolTip.Tip="Choose what to do with space gaps between hit objects that want to merge." />
+
+                <CheckBox Margin="0,26,0,0" Content="Merge on slider end"
+                          IsChecked="{Binding MergeOnSliderEnd}"
+                          ToolTip.Tip="Merge on the slider end instead of the last anchor of the slider." />
+                <CheckBox Margin="0,5,0,0" Content="Use linear curve type on fully linear merge"
+                          IsChecked="{Binding LinearOnLinear}"
+                          ToolTip.Tip="This option will make Slider Merger, if possible, use linear curve type and no red anchors for the resulting slider." />
+            </StackPanel>
+
+            <controls:ToolRunButton Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                    RunCommand="{Binding RunCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
+            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0"
+                                      Maximum="100" Value="{Binding Progress}" />
+        </Grid>
+    </Grid>
+</UserControl>

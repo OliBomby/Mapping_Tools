@@ -5,11 +5,13 @@ using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.SliderCompletionator;
+using Mapping_Tools.Application.SliderMerger;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.RhythmGuide;
+using Mapping_Tools.Core.Tools.SliderMerger;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -225,6 +227,30 @@ public sealed class ProjectPersistenceTests
         project.Length.Should().Be(1);
         json.Should().Contain(
             "\"$type\": \"Mapping_Tools.Viewmodels.SliderCompletionatorVm, Mapping Tools\"");
+    }
+
+    [TestMethod]
+    public void DeserializeAndSerialize_LegacySliderMergerProject_PreservesTypeAliasAndValues()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Projects",
+            "slidermergerproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        SliderMergerProject project = serializer.Deserialize<SliderMergerProject>(
+            File.ReadAllText(fixture));
+        string json = serializer.Serialize(project);
+
+        // Assert
+        project.ImportModeSetting.Should().Be(SliderMergerImportMode.Selected);
+        project.Leniency.Should().Be(999999);
+        project.MergeOnSliderEnd.Should().BeTrue();
+        json.Should().Contain(
+            "\"$type\": \"Mapping_Tools.Viewmodels.SliderMergerVm, Mapping Tools\"");
     }
 
     [TestMethod]

@@ -77,7 +77,14 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
             (string path, BeatmapEditingSession session) = sessions[index];
 
             IReadOnlyList<Mapping_Tools.Core.Classes.BeatmapHelper.HitObject> markedObjects =
-                SelectObjects(session, options);
+                BeatmapObjectSelection.Select(
+                    session,
+                    options.ImportModeSetting,
+                    SliderCompletionatorImportMode.Selected,
+                    SliderCompletionatorImportMode.Bookmarked,
+                    SliderCompletionatorImportMode.Time,
+                    SliderCompletionatorImportMode.Everything,
+                    options.TimeCode);
 
             int completed = SliderCompletionatorEngine.Apply(
                 session.Editor.Beatmap,
@@ -99,16 +106,4 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
         progress?.Report(100);
         return new SliderCompletionatorResult(processedPaths, slidersCompleted);
     }
-
-    private static IReadOnlyList<Mapping_Tools.Core.Classes.BeatmapHelper.HitObject> SelectObjects(
-        BeatmapEditingSession session,
-        SliderCompletionatorOptions options) =>
-        options.ImportModeSetting switch
-        {
-            SliderCompletionatorImportMode.Selected => session.SelectedHitObjects,
-            SliderCompletionatorImportMode.Bookmarked => session.Editor.Beatmap.GetBookmarkedObjects(),
-            SliderCompletionatorImportMode.Time => session.Editor.Beatmap.QueryTimeCode(options.TimeCode).ToList(),
-            SliderCompletionatorImportMode.Everything => session.Editor.Beatmap.HitObjects,
-            _ => throw new ArgumentException("Unexpected import mode.", nameof(options))
-        };
 }
