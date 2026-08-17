@@ -9,6 +9,7 @@ using Mapping_Tools.Application.HitsoundCopier;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.MetadataManager;
+using Mapping_Tools.Application.MapsetMerger;
 using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
@@ -36,6 +37,7 @@ using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Settings;
 using Mapping_Tools.Infrastructure.Images;
 using Mapping_Tools.Infrastructure.Workspace;
+using Mapping_Tools.Infrastructure.MapsetMerger;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop.Composition;
@@ -136,6 +138,8 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<ISliderMergerService, SliderMergerService>();
         services.AddSingleton<ISliderPicturatorService, SliderPicturatorService>();
         services.AddSingleton<IComboColourStudioService, ComboColourStudioService>();
+        services.AddSingleton<IMapsetMergerService, MapsetMergerService>();
+        services.AddSingleton<IMapsetFileSystem, PhysicalMapsetFileSystem>();
         services.AddSingleton<IImageFileService, SystemDrawingImageFileService>();
         services.AddSingleton<IMapCleanerSampleService, PhysicalMapCleanerSampleService>();
         services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();

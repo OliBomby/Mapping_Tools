@@ -7,6 +7,7 @@ using Mapping_Tools.Application.SliderMerger;
 using Mapping_Tools.Application.SliderPicturator;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.MetadataManager;
+using Mapping_Tools.Application.MapsetMerger;
 using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
@@ -106,6 +107,10 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             "Mapping_Tools.Viewmodels.SliderMergerVm";
         private const string LegacySliderPicturatorProject =
             "Mapping_Tools.Viewmodels.SliderPicturatorVm";
+        private const string LegacyMapsetMergerProject =
+            "Mapping_Tools.Viewmodels.MapsetMergerVm";
+        private const string LegacyMapsetMergerItem =
+            "Mapping_Tools.Viewmodels.MapsetMergerVm+MapsetItem";
         private const string LegacyComboColourProject =
             "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourProject";
         private const string LegacyComboColourPoint =
@@ -167,6 +172,14 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 if (typeName == LegacySliderPicturatorProject)
                 {
                     return typeof(SliderPicturatorProject);
+                }
+                if (typeName == LegacyMapsetMergerProject)
+                {
+                    return typeof(MapsetMergerProject);
+                }
+                if (typeName == LegacyMapsetMergerItem)
+                {
+                    return typeof(MapsetMergerProject.MapsetItem);
                 }
                 if (typeName == LegacyComboColourProject)
                 {
@@ -271,6 +284,18 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             {
                 assemblyName = LegacyAssemblyName;
                 typeName = LegacySliderPicturatorProject;
+                return;
+            }
+            if (serializedType == typeof(MapsetMergerProject))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyMapsetMergerProject;
+                return;
+            }
+            if (serializedType == typeof(MapsetMergerProject.MapsetItem))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyMapsetMergerItem;
                 return;
             }
             if (serializedType == typeof(ComboColourProject))

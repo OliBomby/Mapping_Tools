@@ -116,6 +116,12 @@ static internal class DesktopFeatureRegistrationExtensions {
             ["combo", "colour", "color", "hax", "palette", "burst"],
             verticalScrollBarVisibility: ScrollBarVisibility.Auto,
             quickRunTargets: QuickRunTargets.Always);
+        services.AddMappingTool<MapsetMergerViewModel>(
+            "mapset-merger",
+            "Mapset Merger",
+            "Combine multiple mapsets and resolve beatmap, audio, image, storyboard, and sample conflicts.",
+            ["mapset", "merge", "audio", "image", "storyboard", "samples", "conflicts"],
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(
