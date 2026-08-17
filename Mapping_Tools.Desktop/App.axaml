@@ -26,6 +26,7 @@
             <converters:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter" />
             <converters:StringArrayToStringConverter x:Key="StringArrayToStringConverter" />
             <converters:RgbaColourToAvaloniaColorConverter x:Key="RgbaColourToAvaloniaColorConverter" />
+            <converters:RgbaColourToAvaloniaBrushConverter x:Key="RgbaColourToAvaloniaBrushConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

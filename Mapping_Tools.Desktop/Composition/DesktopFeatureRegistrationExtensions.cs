@@ -87,6 +87,14 @@ static internal class DesktopFeatureRegistrationExtensions {
             horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto,
             quickRunTargets: QuickRunTargets.MultipleSelection);
+        services.AddMappingTool<SliderPicturatorViewModel>(
+            "slider-picturator",
+            "Slider Picturator",
+            "Generate a slider path that reproduces an imported image.",
+            ["slider", "picture", "image", "picturator", "render"],
+            horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
+            quickRunTargets: QuickRunTargets.AnySelection);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(

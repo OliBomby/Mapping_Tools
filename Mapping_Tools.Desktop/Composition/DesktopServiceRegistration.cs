@@ -14,6 +14,7 @@ using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.SliderMerger;
+using Mapping_Tools.Application.SliderPicturator;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Application.Workspace;
@@ -30,6 +31,7 @@ using Mapping_Tools.Infrastructure.Editor;
 using Mapping_Tools.Infrastructure.Platform;
 using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Settings;
+using Mapping_Tools.Infrastructure.Images;
 using Mapping_Tools.Infrastructure.Workspace;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -126,6 +128,8 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<ITimingHelperService, TimingHelperService>();
         services.AddSingleton<ISliderCompletionatorService, SliderCompletionatorService>();
         services.AddSingleton<ISliderMergerService, SliderMergerService>();
+        services.AddSingleton<ISliderPicturatorService, SliderPicturatorService>();
+        services.AddSingleton<IImageFileService, SystemDrawingImageFileService>();
         services.AddSingleton<IMapCleanerSampleService, PhysicalMapCleanerSampleService>();
         services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();
         services.AddSingleton<IBeatmapFileSystem, PhysicalBeatmapFileSystem>();

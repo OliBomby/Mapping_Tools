@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.SliderMerger;
+using Mapping_Tools.Application.SliderPicturator;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.PropertyTransformer;
@@ -96,6 +97,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             "Mapping_Tools.Viewmodels.SliderCompletionatorVm";
         private const string LegacySliderMergerProject =
             "Mapping_Tools.Viewmodels.SliderMergerVm";
+        private const string LegacySliderPicturatorProject =
+            "Mapping_Tools.Viewmodels.SliderPicturatorVm";
         private readonly DefaultSerializationBinder _fallback = new();
 
         public Type BindToType(string? assemblyName, string typeName)
@@ -141,6 +144,10 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 if (typeName == LegacySliderMergerProject)
                 {
                     return typeof(SliderMergerProject);
+                }
+                if (typeName == LegacySliderPicturatorProject)
+                {
+                    return typeof(SliderPicturatorProject);
                 }
 
                 Type? migratedType = MigratedCoreMarker.Assembly.GetType(typeName)
@@ -217,6 +224,12 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             {
                 assemblyName = LegacyAssemblyName;
                 typeName = LegacySliderMergerProject;
+                return;
+            }
+            if (serializedType == typeof(SliderPicturatorProject))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacySliderPicturatorProject;
                 return;
             }
 

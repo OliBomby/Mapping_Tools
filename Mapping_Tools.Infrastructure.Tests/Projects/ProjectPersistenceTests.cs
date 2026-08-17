@@ -6,6 +6,7 @@ using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.SliderMerger;
+using Mapping_Tools.Application.SliderPicturator;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
@@ -21,6 +22,24 @@ namespace Mapping_Tools.Infrastructure.Tests.Projects;
 [TestClass]
 public sealed class ProjectPersistenceTests
 {
+    [TestMethod]
+    public void DeserializeAndSerialize_LegacySliderPicturatorProject_PreservesColorsAndTypeAlias()
+    {
+        // Arrange
+        string fixture = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Projects", "sliderpicturatorproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        SliderPicturatorProject project = serializer.Deserialize<SliderPicturatorProject>(File.ReadAllText(fixture));
+        string json = serializer.Serialize(project);
+
+        // Assert
+        project.ViewportSize.Should().Be(32768);
+        project.ComboColor.Should().Be(RgbaColour.FromRgb(0, 128, 255));
+        project.CurrentTrackColor.Should().Be(RgbaColour.FromRgb(0, 128, 255));
+        json.Should().Contain("\"$type\": \"Mapping_Tools.Viewmodels.SliderPicturatorVm, Mapping Tools\"");
+    }
+
     [TestMethod]
     public void Deserialize_WithLegacyCoreTypeMetadata_ResolvesMigratedAssembly()
     {

@@ -66,10 +66,23 @@ internal sealed class RgbaColourJsonConverter : JsonConverter<RgbaColour> {
 
         string hex = value.StartsWith('#') ? value[1..] : value;
         if (hex.Length == 6) hex = "FF" + hex;
-        if (hex.Length != 8 || !uint.TryParse(hex, System.Globalization.NumberStyles.HexNumber,
+        if (hex.Length == 8 && uint.TryParse(hex, System.Globalization.NumberStyles.HexNumber,
                 System.Globalization.CultureInfo.InvariantCulture, out uint argb))
-            throw new JsonSerializationException($"Invalid colour value '{value}'.");
+            return RgbaColour.FromArgb((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)argb);
 
-        return RgbaColour.FromArgb((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)argb);
+        string[] channels = value.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        if (channels.Length == 3 && channels.All(channel => byte.TryParse(
+                channel,
+                System.Globalization.NumberStyles.Integer,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out _)))
+        {
+            return RgbaColour.FromRgb(
+                byte.Parse(channels[0], System.Globalization.CultureInfo.InvariantCulture),
+                byte.Parse(channels[1], System.Globalization.CultureInfo.InvariantCulture),
+                byte.Parse(channels[2], System.Globalization.CultureInfo.InvariantCulture));
+        }
+
+        throw new JsonSerializationException($"Invalid colour value '{value}'.");
     }
 }
