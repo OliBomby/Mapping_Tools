@@ -4,6 +4,7 @@ using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.RhythmGuide;
+using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.RhythmGuide;
@@ -151,6 +152,29 @@ public sealed class ProjectPersistenceTests
         project.SyncTimeFields.Should().BeTrue();
         json.Should().Contain(
             "\"$type\": \"Mapping_Tools.Viewmodels.PropertyTransformerVm, Mapping Tools\"");
+    }
+
+    [TestMethod]
+    public void DeserializeAndSerialize_LegacyTimingCopierProject_PreservesTypeAliasAndValues()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Projects",
+            "timingcopierproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        TimingCopierProject project = serializer.Deserialize<TimingCopierProject>(
+            File.ReadAllText(fixture));
+        string json = serializer.Serialize(project);
+
+        // Assert
+        project.ResnapMode.Should().Be("Just resnap");
+        project.BeatDivisors.Should().HaveCount(2);
+        json.Should().Contain(
+            "\"$type\": \"Mapping_Tools.Viewmodels.TimingCopierVm, Mapping Tools\"");
     }
 
     [TestMethod]

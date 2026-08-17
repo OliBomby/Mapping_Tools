@@ -59,6 +59,12 @@ static internal class DesktopFeatureRegistrationExtensions {
             ["properties", "transform", "timing", "offset", "multiplier"],
             horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto);
+        services.AddMappingTool<TimingCopierViewModel>(
+            "timing-copier",
+            "Timing Copier",
+            "Copy timing between beatmaps with optional object resnapping.",
+            ["timing", "copy", "resnap", "beat divisors", "multi-map"],
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(

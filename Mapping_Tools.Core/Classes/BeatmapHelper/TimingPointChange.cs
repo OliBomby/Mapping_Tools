@@ -1,8 +1,6 @@
-using Mapping_Tools.Core.Classes.BeatmapHelper;
+namespace Mapping_Tools.Core.Classes.BeatmapHelper;
 
-namespace Mapping_Tools.Core.Tools.MapCleaner;
-
-internal struct TimingPointChange
+internal readonly struct TimingPointChange
 {
     public TimingPointChange(
         TimingPoint timingPoint,
@@ -28,16 +26,16 @@ internal struct TimingPointChange
         Fuzziness = fuzziness;
     }
 
-    public TimingPoint TimingPoint;
-    public bool Mpb;
-    public bool Meter;
-    public bool SampleSet;
-    public bool Index;
-    public bool Volume;
-    public bool Uninherited;
-    public bool Kiai;
-    public bool OmitFirstBarLine;
-    public double Fuzziness;
+    public TimingPoint TimingPoint { get; }
+    public bool Mpb { get; }
+    public bool Meter { get; }
+    public bool SampleSet { get; }
+    public bool Index { get; }
+    public bool Volume { get; }
+    public bool Uninherited { get; }
+    public bool Kiai { get; }
+    public bool OmitFirstBarLine { get; }
+    public double Fuzziness { get; }
 
     public static void Apply(Timing timing, IEnumerable<TimingPointChange> changes)
     {
@@ -54,6 +52,7 @@ internal struct TimingPointChange
         List<TimingPoint> atOffset = [];
         bool hasRed = false;
         bool hasGreen = false;
+
         foreach (TimingPoint? point in timing)
         {
             if (point is null)
@@ -61,7 +60,8 @@ internal struct TimingPointChange
                 continue;
             }
 
-            if (point.Offset < TimingPoint.Offset && (previous is null || point.Offset >= previous.Offset))
+            if (point.Offset < TimingPoint.Offset &&
+                (previous is null || point.Offset >= previous.Offset))
             {
                 previous = point;
             }
@@ -73,6 +73,7 @@ internal struct TimingPointChange
                 hasGreen |= !point.Uninherited;
             }
         }
+
         if (atOffset.Count > 0)
         {
             previous = atOffset[^1];
@@ -85,6 +86,7 @@ internal struct TimingPointChange
             adding.Uninherited = true;
             atOffset.Add(adding);
         }
+
         if (!Uninherited && (atOffset.Count == 0 || Mpb && !hasGreen))
         {
             adding = previous?.Copy() ?? TimingPoint.Copy();
@@ -97,41 +99,50 @@ internal struct TimingPointChange
 
             atOffset.Add(adding);
         }
+
         foreach (TimingPoint point in atOffset)
         {
             if (Mpb && (Uninherited ? point.Uninherited : !point.Uninherited))
             {
                 point.MpB = TimingPoint.MpB;
             }
+
             if (Meter && Uninherited && point.Uninherited)
             {
                 point.Meter = TimingPoint.Meter;
             }
+
             if (SampleSet)
             {
                 point.SampleSet = TimingPoint.SampleSet;
             }
+
             if (Index)
             {
                 point.SampleIndex = TimingPoint.SampleIndex;
             }
+
             if (Volume)
             {
                 point.Volume = TimingPoint.Volume;
             }
+
             if (Kiai)
             {
                 point.Kiai = TimingPoint.Kiai;
             }
+
             if (OmitFirstBarLine && Uninherited && point.Uninherited)
             {
                 point.OmitFirstBarLine = TimingPoint.OmitFirstBarLine;
             }
         }
 
-        if (adding is not null && (previous is null || !adding.SameEffect(previous) || Uninherited))
+        if (adding is not null &&
+            (previous is null || !adding.SameEffect(previous) || Uninherited))
         {
             timing.Add(adding);
         }
+
     }
 }

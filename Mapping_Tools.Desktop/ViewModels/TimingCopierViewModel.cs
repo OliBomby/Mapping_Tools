@@ -1,0 +1,288 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Interactions;
+using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.TimingCopier;
+using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.Tools.TimingCopier;
+using Mapping_Tools.Desktop.Shell;
+
+namespace Mapping_Tools.Desktop.ViewModels;
+
+/// <summary>
+/// Owns Timing Copier form state, native file selection, project persistence, and execution.
+/// </summary>
+public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
+    IShellProjectFeature
+{
+    internal const string OperationId = "timing-copier";
+
+    private readonly ITimingCopierService _timingCopier;
+    private readonly IFilePicker _filePicker;
+    private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
+    private readonly IUserNotificationService _notifications;
+    private readonly IBeatmapWorkspace _workspace;
+    private readonly ApplicationSettings _settings;
+    private readonly ProjectDefinition<TimingCopierProject> _definition = new(
+        "timingcopierproject.json",
+        "Timing Copier Projects",
+        () => new TimingCopierProject(),
+        "timing-copier-project.json");
+
+    /// <summary>Gets the three legacy object-placement choices in display order.</summary>
+    public IReadOnlyList<string> ResnapModes { get; } =
+    [
+        TimingCopierResnapModes.PreserveBeatSpacing,
+        TimingCopierResnapModes.Resnap,
+        TimingCopierResnapModes.KeepObjectsFixed
+    ];
+
+    /// <summary>Gets or sets the source beatmap path.</summary>
+    [ObservableProperty]
+    public partial string ImportPath { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets vertical-bar-separated target beatmap paths.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ExportMapCountText))]
+    public partial string ExportPath { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the legacy object-placement mode label.</summary>
+    [ObservableProperty]
+    public partial string ResnapMode { get; set; } = TimingCopierResnapModes.PreserveBeatSpacing;
+
+    /// <summary>Gets or sets the positive beat snap divisors used during resnapping.</summary>
+    [ObservableProperty]
+    public partial IBeatDivisor[] BeatDivisors { get; set; } =
+        RationalBeatDivisor.GetDefaultBeatDivisors();
+
+    /// <summary>Gets the legacy singular or plural target-map count label.</summary>
+    public string ExportMapCountText
+    {
+        get
+        {
+            int count = string.IsNullOrEmpty(ExportPath)
+                ? 0
+                : ExportPath.Split('|').Length;
+            return count == 1 ? "(1) map total" : $"({count}) maps total";
+        }
+    }
+
+    /// <summary>
+    /// Creates a Timing Copier presentation model.
+    /// </summary>
+    /// <param name="timingCopier">Runs the framework-independent timing transformation.</param>
+    /// <param name="execution">Coordinates background execution, cancellation, and notifications.</param>
+    /// <param name="filePicker">Presents native beatmap file dialogs.</param>
+    /// <param name="currentBeatmapLocator">Finds the beatmap currently open in osu!.</param>
+    /// <param name="notifications">Publishes picker and current-map failures.</param>
+    /// <param name="workspace">Supplies the current shell map selection for picker locations.</param>
+    /// <param name="settings">Supplies the legacy picker-folder preference and Songs fallback.</param>
+    public TimingCopierViewModel(
+        ITimingCopierService timingCopier,
+        IToolExecutionService execution,
+        IFilePicker filePicker,
+        ICurrentBeatmapLocator currentBeatmapLocator,
+        IUserNotificationService notifications,
+        IBeatmapWorkspace workspace,
+        ApplicationSettings settings)
+        : base(execution, OperationId)
+    {
+        _timingCopier = timingCopier ?? throw new ArgumentNullException(nameof(timingCopier));
+        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        _currentBeatmapLocator = currentBeatmapLocator
+            ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+    }
+
+    /// <summary>Fetches the current osu! beatmap into the source field.</summary>
+    [RelayCommand]
+    private async Task ImportLoadAsync()
+    {
+        try
+        {
+            string? path = await _currentBeatmapLocator.FindCurrentBeatmapAsync();
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                ImportPath = path;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception exception)
+        {
+            await PublishFailureAsync(
+                "Could not fetch the source beatmap",
+                "The selected beatmap could not be obtained from osu!.",
+                exception);
+        }
+    }
+
+    /// <summary>Opens a native picker for the source beatmap.</summary>
+    [RelayCommand]
+    private async Task ImportBrowseAsync()
+    {
+        await PickBeatmapsAsync(
+            "Copy timing from",
+            GetCurrentPickerStartLocation(),
+            allowMultiple: false,
+            paths => ImportPath = paths[0]);
+    }
+
+    /// <summary>Fetches the current osu! beatmap into the target field.</summary>
+    [RelayCommand]
+    private async Task ExportLoadAsync()
+    {
+        try
+        {
+            string? path = await _currentBeatmapLocator.FindCurrentBeatmapAsync();
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                ExportPath = path;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception exception)
+        {
+            await PublishFailureAsync(
+                "Could not fetch the target beatmap",
+                "The selected beatmap could not be obtained from osu!.",
+                exception);
+        }
+    }
+
+    /// <summary>Opens a native multi-select picker for target beatmaps.</summary>
+    [RelayCommand]
+    private async Task ExportBrowseAsync()
+    {
+        string? suggestedStartLocation = Path.GetDirectoryName(ImportPath);
+        if (string.IsNullOrWhiteSpace(suggestedStartLocation))
+        {
+            suggestedStartLocation = _settings.SongsPath;
+        }
+
+        await PickBeatmapsAsync(
+            "Copy timing to",
+            suggestedStartLocation,
+            allowMultiple: true,
+            paths => ExportPath = string.Join('|', paths));
+    }
+
+    /// <inheritdoc/>
+    protected override async Task RunCoreAsync()
+    {
+        TimingCopierOptions options = Snapshot();
+        await Execution.ExecuteAsync(
+                new ToolExecutionRequest<TimingCopierResult>(
+                    OperationId,
+                    "Timing Copier",
+                    async context =>
+                    {
+                        TimingCopierResult result = await _timingCopier.CopyAsync(
+                            options,
+                            new Progress<double>(value =>
+                                context.ReportProgress(value, "Copying timing")),
+                            context.CancellationToken);
+                        return new ToolExecutionOutput<TimingCopierResult>(
+                            result,
+                            $"Successfully copied timing to {result.ProcessedCount} " +
+                            $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!");
+                    }),
+                CreateProgress())
+            .ConfigureAwait(false);
+    }
+
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+
+    object IShellProjectFeature.Snapshot() => Snapshot();
+
+    void IShellProjectFeature.Install(object project) =>
+        Install((TimingCopierProject)project);
+
+    private TimingCopierProject Snapshot() => new()
+    {
+        ImportPath = ImportPath,
+        ExportPath = ExportPath,
+        ResnapMode = ResnapMode,
+        BeatDivisors = BeatDivisors.ToArray()
+    };
+
+    private void Install(TimingCopierProject project)
+    {
+        ArgumentNullException.ThrowIfNull(project);
+        if (project.BeatDivisors is null ||
+            project.BeatDivisors.Length == 0 ||
+            project.BeatDivisors.Any(divisor => divisor is null) ||
+            project.ResnapMode is not TimingCopierResnapModes.PreserveBeatSpacing and
+            not TimingCopierResnapModes.Resnap and
+            not TimingCopierResnapModes.KeepObjectsFixed)
+        {
+            throw new InvalidDataException("Timing Copier project is incomplete.");
+        }
+
+        ImportPath = project.ImportPath;
+        ExportPath = project.ExportPath;
+        ResnapMode = project.ResnapMode;
+        BeatDivisors = project.BeatDivisors.ToArray();
+    }
+
+    private async Task PickBeatmapsAsync(
+        string title,
+        string? suggestedStartLocation,
+        bool allowMultiple,
+        Action<IReadOnlyList<string>> apply)
+    {
+        try
+        {
+            IReadOnlyList<string> paths = await _filePicker.PickOpenFilesAsync(
+                new OpenFilePickerRequest
+                {
+                    Title = title,
+                    SuggestedStartLocation = suggestedStartLocation,
+                    AllowMultiple = allowMultiple,
+                    Filters = [CommonFilePickerFilters.BeatmapsAndStoryboards]
+                });
+            if (paths.Count > 0)
+            {
+                apply(paths);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception exception)
+        {
+            await PublishFailureAsync(
+                "Could not select beatmaps",
+                "The file picker could not return local beatmap paths.",
+                exception);
+        }
+    }
+
+    private string? GetCurrentPickerStartLocation()
+    {
+        if (!_settings.CurrentBeatmapDefaultFolder)
+        {
+            return null;
+        }
+
+        string? currentPath = _workspace.SelectedPaths.FirstOrDefault();
+        string? directory = Path.GetDirectoryName(currentPath);
+        return string.IsNullOrWhiteSpace(directory) ? _settings.SongsPath : directory;
+    }
+
+    private Task PublishFailureAsync(string title, string message, Exception exception) =>
+        _notifications.PublishAsync(new UserNotification(
+            UserNotificationSeverity.Error,
+            title,
+            message,
+            exception));
+}
