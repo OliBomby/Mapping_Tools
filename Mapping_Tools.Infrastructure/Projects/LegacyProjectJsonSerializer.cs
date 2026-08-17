@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.RhythmGuide;
+using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.PropertyTransformer;
@@ -90,6 +91,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             "Mapping_Tools.Viewmodels.TimingCopierVm";
         private const string LegacyTimingHelperProject =
             "Mapping_Tools.Viewmodels.TimingHelperVm";
+        private const string LegacySliderCompletionatorProject =
+            "Mapping_Tools.Viewmodels.SliderCompletionatorVm";
         private readonly DefaultSerializationBinder _fallback = new();
 
         public Type BindToType(string? assemblyName, string typeName)
@@ -127,6 +130,10 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 if (typeName == LegacyTimingHelperProject)
                 {
                     return typeof(TimingHelperProject);
+                }
+                if (typeName == LegacySliderCompletionatorProject)
+                {
+                    return typeof(SliderCompletionatorProject);
                 }
 
                 Type? migratedType = MigratedCoreMarker.Assembly.GetType(typeName)
@@ -191,6 +198,12 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             {
                 assemblyName = LegacyAssemblyName;
                 typeName = LegacyTimingHelperProject;
+                return;
+            }
+            if (serializedType == typeof(SliderCompletionatorProject))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacySliderCompletionatorProject;
                 return;
             }
 

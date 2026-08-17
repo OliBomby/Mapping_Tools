@@ -12,6 +12,7 @@ using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Application.Workspace;
@@ -122,6 +123,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IPropertyTransformerService, PropertyTransformerService>();
         services.AddSingleton<ITimingCopierService, TimingCopierService>();
         services.AddSingleton<ITimingHelperService, TimingHelperService>();
+        services.AddSingleton<ISliderCompletionatorService, SliderCompletionatorService>();
         services.AddSingleton<IMapCleanerSampleService, PhysicalMapCleanerSampleService>();
         services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();
         services.AddSingleton<IBeatmapFileSystem, PhysicalBeatmapFileSystem>();

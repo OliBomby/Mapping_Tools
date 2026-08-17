@@ -4,6 +4,7 @@ using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.RhythmGuide;
+using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
@@ -200,6 +201,30 @@ public sealed class ProjectPersistenceTests
         project.BeatDivisors.Should().ContainSingle();
         json.Should().Contain(
             "\"$type\": \"Mapping_Tools.Viewmodels.TimingHelperVm, Mapping Tools\"");
+    }
+
+    [TestMethod]
+    public void DeserializeAndSerialize_LegacySliderCompletionatorProject_PreservesTypeAliasAndValues()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Projects",
+            "slidercompletionatorproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        SliderCompletionatorProject project = serializer.Deserialize<SliderCompletionatorProject>(
+            File.ReadAllText(fixture));
+        string json = serializer.Serialize(project);
+
+        // Assert
+        project.UseEndTime.Should().BeTrue();
+        project.UseCurrentEditorTime.Should().BeTrue();
+        project.Length.Should().Be(1);
+        json.Should().Contain(
+            "\"$type\": \"Mapping_Tools.Viewmodels.SliderCompletionatorVm, Mapping Tools\"");
     }
 
     [TestMethod]

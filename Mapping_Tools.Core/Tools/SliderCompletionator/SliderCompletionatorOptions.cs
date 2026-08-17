@@ -1,0 +1,79 @@
+namespace Mapping_Tools.Core.Tools.SliderCompletionator;
+
+/// <summary>
+/// Identifies the beatmap objects supplied to Slider Completionator.
+/// </summary>
+public enum SliderCompletionatorImportMode
+{
+    /// <summary>Uses hit objects selected in the live editor.</summary>
+    Selected,
+
+    /// <summary>Uses objects covered by editor bookmarks.</summary>
+    Bookmarked,
+
+    /// <summary>Uses objects matched by <see cref="SliderCompletionatorOptions.TimeCode"/>.</summary>
+    Time,
+
+    /// <summary>Uses every hit object in each input beatmap.</summary>
+    Everything
+}
+
+/// <summary>
+/// Identifies the slider value calculated from the other requested values.
+/// </summary>
+public enum SliderCompletionatorFreeVariable
+{
+    /// <summary>Calculates inherited slider velocity.</summary>
+    Velocity,
+
+    /// <summary>Calculates slider pixel length.</summary>
+    Length,
+
+    /// <summary>Calculates slider duration.</summary>
+    Duration
+}
+
+/// <summary>
+/// Stores Slider Completionator's persisted settings and transformation inputs.
+/// A numeric value of <c>-1</c> means that the corresponding value is preserved.
+/// </summary>
+public class SliderCompletionatorOptions
+{
+    /// <summary>Gets or sets how hit objects are selected for completion.</summary>
+    public SliderCompletionatorImportMode ImportModeSetting { get; set; } =
+        SliderCompletionatorImportMode.Selected;
+
+    /// <summary>Gets or sets the value calculated by the transformation.</summary>
+    public SliderCompletionatorFreeVariable FreeVariableSetting { get; set; } =
+        SliderCompletionatorFreeVariable.Velocity;
+
+    /// <summary>Gets or sets the legacy time-code query used by Time mode.</summary>
+    public string TimeCode { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the requested slider duration in beats, or <c>-1</c> to preserve it.</summary>
+    public double Duration { get; set; } = -1;
+
+    /// <summary>Gets or sets the requested slider end time in milliseconds, or <c>-1</c> to preserve it.</summary>
+    public double EndTime { get; set; } = -1;
+
+    /// <summary>Gets or sets the requested fraction of the complete slider path, or <c>-1</c> to preserve it.</summary>
+    public double Length { get; set; } = 1;
+
+    /// <summary>Gets or sets the requested inherited slider velocity multiplier, or <c>-1</c> to preserve it.</summary>
+    public double SliderVelocity { get; set; } = -1;
+
+    /// <summary>Gets or sets whether all slider anchors are moved to the new path length.</summary>
+    public bool MoveAnchors { get; set; }
+
+    /// <summary>Gets or sets whether <see cref="EndTime"/> replaces duration input.</summary>
+    public bool UseEndTime { get; set; }
+
+    /// <summary>Gets or sets whether the live editor time supplies the end time.</summary>
+    public bool UseCurrentEditorTime { get; set; }
+
+    /// <summary>Gets or sets whether slider velocity is delegated to BPM timing points.</summary>
+    public bool DelegateToBpm { get; set; }
+
+    /// <summary>Gets or sets whether delegated sliders suppress slider ticks with NaN velocity.</summary>
+    public bool RemoveSliderTicks { get; set; }
+}

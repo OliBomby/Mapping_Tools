@@ -92,7 +92,8 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
             return new BeatmapEditingSession(
                 diskEditor,
                 BeatmapEditingSource.LiveEditor,
-                selected);
+                selected,
+                liveEditorTime: snapshot.EditorTime);
         }
         catch (OperationCanceledException)
         {

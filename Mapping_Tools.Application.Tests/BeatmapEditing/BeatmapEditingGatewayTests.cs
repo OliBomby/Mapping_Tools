@@ -41,7 +41,8 @@ public sealed class BeatmapEditingGatewayTests
             [selected, earlier],
             1234,
             1.8,
-            2);
+            2,
+            2222);
         FakeLiveBeatmapReader reader = new(snapshot);
         BeatmapEditingGateway gateway = CreateGateway(store, reader);
 
@@ -57,6 +58,7 @@ public sealed class BeatmapEditingGatewayTests
         session.Editor.Beatmap.General["PreviewTime"].IntValue.Should().Be(1234);
         session.Editor.Beatmap.BeatmapTiming.SliderMultiplier.Should().Be(1.8);
         session.Editor.Beatmap.Bookmarks.ToArray().Should().Equal(new[] { 750d });
+        session.LiveEditorTime.Should().Be(2222);
     }
 
     [TestMethod]

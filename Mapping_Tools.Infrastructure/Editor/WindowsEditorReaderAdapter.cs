@@ -115,7 +115,10 @@ public sealed class WindowsEditorReaderAdapter :
 
         try
         {
-            return EditorReaderSnapshotConverter.Convert(_reader, _settings.SongsPath);
+            return EditorReaderSnapshotConverter.Convert(
+                _reader,
+                _settings.SongsPath,
+                _reader.EditorTime());
         }
         catch (InvalidDataException)
         {
@@ -167,7 +170,8 @@ internal static class EditorReaderSnapshotConverter
 {
     internal static LiveBeatmapSnapshot Convert(
         EditorReader reader,
-        string songsPath)
+        string songsPath,
+        double? editorTime = null)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentException.ThrowIfNullOrWhiteSpace(songsPath);
@@ -196,7 +200,8 @@ internal static class EditorReaderSnapshotConverter
             reader.hitObjects.Select(ConvertHitObject).ToList(),
             reader.PreviewTime,
             reader.SliderMultiplier,
-            reader.SliderTickRate);
+            reader.SliderTickRate,
+            editorTime);
     }
 
     private static bool IsInvalid(ReaderHitObject hitObject)

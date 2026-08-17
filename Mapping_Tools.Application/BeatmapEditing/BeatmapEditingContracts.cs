@@ -59,6 +59,7 @@ public sealed record LiveBeatmapSnapshot
     /// <param name="previewTime">The preview timestamp currently configured in the editor.</param>
     /// <param name="sliderMultiplier">The base slider velocity currently configured in the editor.</param>
     /// <param name="sliderTickRate">The slider tick rate currently configured in the editor.</param>
+    /// <param name="editorTime">The current editor playhead in milliseconds, when available.</param>
     public LiveBeatmapSnapshot(
         string path,
         IReadOnlyList<double> bookmarks,
@@ -66,7 +67,8 @@ public sealed record LiveBeatmapSnapshot
         IReadOnlyList<HitObject> hitObjects,
         int previewTime,
         double sliderMultiplier,
-        double sliderTickRate)
+        double sliderTickRate,
+        double? editorTime = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentNullException.ThrowIfNull(bookmarks);
@@ -80,6 +82,7 @@ public sealed record LiveBeatmapSnapshot
         PreviewTime = previewTime;
         SliderMultiplier = sliderMultiplier;
         SliderTickRate = sliderTickRate;
+        EditorTime = editorTime;
     }
 
     /// <summary>
@@ -118,6 +121,12 @@ public sealed record LiveBeatmapSnapshot
     /// Gets the live number of slider ticks per beat.
     /// </summary>
     public double SliderTickRate { get; }
+
+    /// <summary>
+    /// Gets the live editor playhead in milliseconds, when the platform reader
+    /// can supply it.
+    /// </summary>
+    public double? EditorTime { get; }
 }
 
 /// <summary>
@@ -170,11 +179,13 @@ public sealed class BeatmapEditingSession
     /// A diagnostic from a best-effort live read that fell back to disk, or
     /// <see langword="null"/> when no read failed.
     /// </param>
+    /// <param name="liveEditorTime">The editor playhead captured with live state, when available.</param>
     public BeatmapEditingSession(
         BeatmapEditor2 editor,
         BeatmapEditingSource source,
         IReadOnlyList<HitObject> selectedHitObjects,
-        Exception? liveReadFailure = null)
+        Exception? liveReadFailure = null,
+        double? liveEditorTime = null)
     {
         ArgumentNullException.ThrowIfNull(editor);
         ArgumentNullException.ThrowIfNull(selectedHitObjects);
@@ -183,6 +194,7 @@ public sealed class BeatmapEditingSession
         Source = source;
         SelectedHitObjects = selectedHitObjects.ToArray();
         LiveReadFailure = liveReadFailure;
+        LiveEditorTime = liveEditorTime;
         InitialBeatmapLines = editor.Beatmap.GetLines().ToArray();
     }
 
@@ -206,6 +218,12 @@ public sealed class BeatmapEditingSession
     /// Gets the failure that caused a best-effort live open to use disk, if any.
     /// </summary>
     public Exception? LiveReadFailure { get; }
+
+    /// <summary>
+    /// Gets the editor playhead captured with live state, or <see langword="null"/>
+    /// when the session came from disk or the reader did not expose a playhead.
+    /// </summary>
+    public double? LiveEditorTime { get; }
 
     /// <summary>
     /// Gets the serialized document captured when this session was opened.

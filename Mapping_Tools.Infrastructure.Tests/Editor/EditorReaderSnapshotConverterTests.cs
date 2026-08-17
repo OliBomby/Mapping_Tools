@@ -38,7 +38,8 @@ public sealed class EditorReaderSnapshotConverterTests
         // Act
         LiveBeatmapSnapshot snapshot = EditorReaderSnapshotConverter.Convert(
             reader,
-            @"C:\osu!\Songs");
+            @"C:\osu!\Songs",
+            editorTime: 2222);
         Core.Classes.BeatmapHelper.HitObject converted =
             snapshot.HitObjects[0];
 
@@ -47,6 +48,7 @@ public sealed class EditorReaderSnapshotConverterTests
                 @"C:\osu!\Songs",
                 "123 Artist - Title",
                 "map.osu"));
+        snapshot.EditorTime.Should().Be(2222);
         converted.IsSelected.Should().BeTrue();
         converted.Repeat.Should().Be(2);
         converted.CurvePoints.Count.Should().Be(2);

@@ -72,6 +72,13 @@ static internal class DesktopFeatureRegistrationExtensions {
             ["timing", "redlines", "BPM", "markers", "beat divisors"],
             verticalScrollBarVisibility: ScrollBarVisibility.Auto,
             quickRunTargets: QuickRunTargets.Always);
+        services.AddMappingTool<SliderCompletionatorViewModel>(
+            "slider-completionator",
+            "Slider Completionator",
+            "Change slider length and duration while calculating slider velocity.",
+            ["slider", "completion", "duration", "length", "velocity"],
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
+            quickRunTargets: QuickRunTargets.AnySelection);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(
