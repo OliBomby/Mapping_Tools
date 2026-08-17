@@ -298,12 +298,12 @@ registration, and Avalonia timeline consumer are recorded in
 
 ### Wave 5 — Conventional beatmap tools
 
-Step 25 is implemented in the Avalonia frontend. The remaining Wave 5 steps
-stay ordered because they depend on the same multi-file editing and timing
-infrastructure.
+Steps 25 and 26 are implemented in the Avalonia frontend. The remaining Wave
+5 steps stay ordered because they depend on the same multi-file editing and
+timing infrastructure.
 
 25. **Metadata Manager.** Exercises reusable forms and multi-difficulty writes.
-26. **Property Transformer.** Exercises broad document transformations and numeric validation.
+26. **Property Transformer.** Exercises broad document transformations and numeric validation. Implemented; see [wave-5-step-26-property-transformer.md](wave-5-step-26-property-transformer.md).
 27. **Timing Copier.** Exercises source/target maps, beat divisors, resnapping, and multi-file workflows.
 28. **Timing Helper.** Builds on timing infrastructure and QuickRun.
 

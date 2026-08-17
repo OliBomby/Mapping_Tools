@@ -6,6 +6,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.MetadataManager;
+using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.QuickRun;
@@ -116,6 +117,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IAutoFailService, AutoFailService>();
         services.AddSingleton<IMapCleanerService, MapCleanerService>();
         services.AddSingleton<IMetadataManagerService, MetadataManagerService>();
+        services.AddSingleton<IPropertyTransformerService, PropertyTransformerService>();
         services.AddSingleton<IMapCleanerSampleService, PhysicalMapCleanerSampleService>();
         services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();
         services.AddSingleton<IBeatmapFileSystem, PhysicalBeatmapFileSystem>();

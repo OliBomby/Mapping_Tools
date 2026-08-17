@@ -2,6 +2,7 @@ using System.Text.Json;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
@@ -125,6 +126,31 @@ public sealed class ProjectPersistenceTests
         project.ComboColours.Should().HaveCount(4);
         json.Should().Contain(
             "\"$type\": \"Mapping_Tools.Viewmodels.MetadataManagerVm, Mapping Tools\"");
+    }
+
+    [TestMethod]
+    public void DeserializeAndSerialize_LegacyPropertyTransformerProject_PreservesTypeAliasAndValues()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Projects",
+            "propertytransformerproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        PropertyTransformerProject project = serializer.Deserialize<PropertyTransformerProject>(
+            File.ReadAllText(fixture));
+        string json = serializer.Serialize(project);
+
+        // Assert
+        project.TimingpointBpmMultiplier.Should().Be(0.5);
+        project.MatchFilter.Length.Should().Be(1);
+        project.MatchFilter[0].Should().Be(0);
+        project.SyncTimeFields.Should().BeTrue();
+        json.Should().Contain(
+            "\"$type\": \"Mapping_Tools.Viewmodels.PropertyTransformerVm, Mapping Tools\"");
     }
 
     [TestMethod]

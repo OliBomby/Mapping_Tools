@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.MetadataManager;
+using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.RhythmGuide;
@@ -81,6 +82,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             "Mapping_Tools.Classes.Tools.MapCleanerStuff.MapCleanerArgs";
         private const string LegacyMetadataManagerProject =
             "Mapping_Tools.Viewmodels.MetadataManagerVm";
+        private const string LegacyPropertyTransformerProject =
+            "Mapping_Tools.Viewmodels.PropertyTransformerVm";
         private readonly DefaultSerializationBinder _fallback = new();
 
         public Type BindToType(string? assemblyName, string typeName)
@@ -106,6 +109,10 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 if (typeName == LegacyMetadataManagerProject)
                 {
                     return typeof(MetadataManagerProject);
+                }
+                if (typeName == LegacyPropertyTransformerProject)
+                {
+                    return typeof(PropertyTransformerProject);
                 }
 
                 Type? migratedType = MigratedCoreMarker.Assembly.GetType(typeName)
@@ -152,6 +159,12 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             {
                 assemblyName = LegacyAssemblyName;
                 typeName = LegacyMetadataManagerProject;
+                return;
+            }
+            if (serializedType == typeof(PropertyTransformerProject))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyPropertyTransformerProject;
                 return;
             }
 

@@ -52,6 +52,13 @@ static internal class DesktopFeatureRegistrationExtensions {
             "Edit metadata once and apply it to multiple beatmaps.",
             ["metadata", "artist", "title", "tags", "colours"],
             verticalScrollBarVisibility: ScrollBarVisibility.Auto);
+        services.AddMappingTool<PropertyTransformerViewModel>(
+            "property-transformer",
+            "Property Transformer",
+            "Multiply and add to timing, object, bookmark, and storyboard properties.",
+            ["properties", "transform", "timing", "offset", "multiplier"],
+            horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(

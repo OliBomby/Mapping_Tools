@@ -38,5 +38,6 @@ the shared tool header, run button, progress bar, and Avalonia 12 ColorPicker.
 
 Focused verification covers the core transformation, independent colour reads,
 the multi-file view-model workflow, and legacy project deserialization and
-serialization. Property Transformer, Timing Copier, and Timing Helper remain
-deferred to the next migration slices.
+serialization. Property Transformer is covered by
+[wave-5-step-26-property-transformer.md](wave-5-step-26-property-transformer.md);
+Timing Copier and Timing Helper remain deferred to the next migration slices.
