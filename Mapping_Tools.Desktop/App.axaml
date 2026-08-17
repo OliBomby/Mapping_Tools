@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:material="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
+             xmlns:materialDataGrid="clr-namespace:Material.Avalonia.DataGrid;assembly=Material.Avalonia.DataGrid"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:converters="using:Mapping_Tools.Desktop.Converters"
              xmlns:local="using:Mapping_Tools.Desktop"
@@ -34,6 +35,7 @@
         <material:MaterialTheme BaseTheme="Dark"
                                 PrimaryColor="Blue"
                                 SecondaryColor="Lime" />
+        <materialDataGrid:MaterialDataGridStyles />
         <materialIcons:MaterialIconStyles />
         <!-- <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" /> -->
         <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Simple/Simple.xaml" />

@@ -4,6 +4,7 @@ using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.RhythmGuide;
+using Mapping_Tools.Application.HitsoundPreviewHelper;
 using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.SliderMerger;
 using Mapping_Tools.Application.SliderPicturator;
@@ -11,6 +12,8 @@ using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.SliderMerger;
 using Mapping_Tools.Infrastructure.Projects;
@@ -108,6 +111,29 @@ public sealed class ProjectPersistenceTests
             "\"$type\": \"Mapping_Tools.Viewmodels.RhythmGuideVm, Mapping Tools\"");
         json.Should().Contain(
             "\"$type\": \"Mapping_Tools.Classes.Tools.RhythmGuide+RhythmGuideGeneratorArgs, Mapping Tools\"");
+    }
+
+    [TestMethod]
+    public void DeserializeAndSerialize_LegacyHitsoundPreviewProject_PreservesZonesAndTypeAlias()
+    {
+        // Arrange
+        LegacyProjectJsonSerializer serializer = new();
+        const string json =
+            "{\"$type\":\"Mapping_Tools.Viewmodels.HitsoundPreviewHelperVm, Mapping Tools\",\"Items\":[{\"$type\":\"Mapping_Tools.Core.Classes.HitsoundStuff.HitsoundZone, Mapping Tools\",\"Name\":\"kick\",\"Filename\":\"kick.wav\",\"XPos\":64.0,\"YPos\":96.0,\"Hitsound\":3,\"SampleSet\":3,\"AdditionsSet\":0,\"CustomIndex\":3}]}";
+
+        // Act
+        HitsoundPreviewHelperProject project = serializer
+            .Deserialize<HitsoundPreviewHelperProject>(json);
+        string roundTrip = serializer.Serialize(project);
+
+        // Assert
+        project.Items.Should().ContainSingle();
+        project.Items[0].Name.Should().Be("kick");
+        project.Items[0].Filename.Should().Be("kick.wav");
+        project.Items[0].Hitsound.Should().Be(Hitsound.Clap);
+        project.Items[0].CustomIndex.Should().Be(3);
+        roundTrip.Should().Contain(
+            "\"$type\": \"Mapping_Tools.Viewmodels.HitsoundPreviewHelperVm, Mapping Tools\"");
     }
 
     [TestMethod]

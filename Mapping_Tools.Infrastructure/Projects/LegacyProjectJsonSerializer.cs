@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.RhythmGuide;
+using Mapping_Tools.Application.HitsoundPreviewHelper;
 using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.SliderMerger;
 using Mapping_Tools.Application.SliderPicturator;
@@ -80,6 +81,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string LegacyNamespacePrefix = "Mapping_Tools.";
         private const string CurrentNamespacePrefix = "Mapping_Tools.Core.";
         private const string LegacyRhythmGuideProject = "Mapping_Tools.Viewmodels.RhythmGuideVm";
+        private const string LegacyHitsoundPreviewHelperProject =
+            "Mapping_Tools.Viewmodels.HitsoundPreviewHelperVm";
         private const string LegacyRhythmGuideOptions =
             "Mapping_Tools.Classes.Tools.RhythmGuide+RhythmGuideGeneratorArgs";
         private const string LegacyMapCleanerProject = "Mapping_Tools.Viewmodels.MapCleanerVm";
@@ -108,6 +111,10 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 if (typeName == LegacyRhythmGuideProject)
                 {
                     return typeof(RhythmGuideProject);
+                }
+                if (typeName == LegacyHitsoundPreviewHelperProject)
+                {
+                    return typeof(HitsoundPreviewHelperProject);
                 }
                 if (typeName == LegacyRhythmGuideOptions)
                 {
@@ -170,6 +177,12 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             {
                 assemblyName = LegacyAssemblyName;
                 typeName = LegacyRhythmGuideProject;
+                return;
+            }
+            if (serializedType == typeof(HitsoundPreviewHelperProject))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyHitsoundPreviewHelperProject;
                 return;
             }
             if (serializedType == typeof(RhythmGuideOptions))

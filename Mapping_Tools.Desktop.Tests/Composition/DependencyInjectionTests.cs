@@ -3,6 +3,7 @@ using Mapping_Tools.Application.AutoFail;
 using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.Platform;
@@ -42,6 +43,7 @@ public sealed class DependencyInjectionTests
             typeof(MainViewModel),
             typeof(PreferencesViewModel),
             typeof(RhythmGuideViewModel),
+            typeof(HitsoundPreviewHelperViewModel),
             typeof(AutoFailDetectorViewModel),
             typeof(MapCleanerViewModel),
             typeof(IDialogService),
@@ -75,6 +77,7 @@ public sealed class DependencyInjectionTests
             typeof(ICurrentBeatmapLocator),
             typeof(IBetterSaveService),
             typeof(IRhythmGuideService),
+            typeof(IHitsoundPreviewHelperService),
             typeof(IAutoFailService),
             typeof(IMapCleanerService),
             typeof(ITimingHelperService),

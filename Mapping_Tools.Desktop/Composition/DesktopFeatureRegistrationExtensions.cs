@@ -46,6 +46,13 @@ static internal class DesktopFeatureRegistrationExtensions {
             "Make a beatmap with circles from the rhythm of multiple maps.",
             ["rhythm", "hitsound", "guide", "reference"],
             verticalScrollBarVisibility: ScrollBarVisibility.Auto);
+        services.AddMappingTool<HitsoundPreviewHelperViewModel>(
+            "hitsound-preview-helper",
+            "Hitsound Preview Helper",
+            "Place provisional hitsounds from positional zones.",
+            ["hitsound", "preview", "zone", "sample", "position"],
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
+            quickRunTargets: QuickRunTargets.Always);
         services.AddMappingTool<MetadataManagerViewModel>(
             "metadata-manager",
             "Metadata Manager",
