@@ -14,6 +14,12 @@ public interface IShellProjectFeature
     IProjectDefinition ProjectDefinition { get; }
 
     /// <summary>
+    /// Gets optional feature-owned recovery files that should receive the same
+    /// snapshot as the shell autosave, such as a collection-local project file.
+    /// </summary>
+    IReadOnlyList<string> AdditionalAutoSavePaths => [];
+
+    /// <summary>
     /// Captures the complete current project state for persistence.
     /// </summary>
     /// <returns>A project instance matching <see cref="ProjectDefinition"/>.</returns>

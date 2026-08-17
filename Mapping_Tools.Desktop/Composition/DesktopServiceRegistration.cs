@@ -11,6 +11,7 @@ using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.MapsetMerger;
 using Mapping_Tools.Application.PropertyTransformer;
+using Mapping_Tools.Application.PatternGallery;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.QuickRun;
@@ -38,6 +39,7 @@ using Mapping_Tools.Infrastructure.Settings;
 using Mapping_Tools.Infrastructure.Images;
 using Mapping_Tools.Infrastructure.Workspace;
 using Mapping_Tools.Infrastructure.MapsetMerger;
+using Mapping_Tools.Infrastructure.PatternGallery;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop.Composition;
@@ -65,6 +67,8 @@ internal static class DesktopServiceRegistration
             MainWindow window = provider.GetRequiredService<MainWindow>();
             return new AvaloniaDialogService(() => window);
         });
+        services.AddSingleton<IPatternGalleryInputDialog>(provider =>
+            new PatternGalleryInputDialog(() => provider.GetRequiredService<MainWindow>()));
 
         services.AddSingleton<IFilePicker>(provider =>
         {
@@ -139,6 +143,9 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<ISliderPicturatorService, SliderPicturatorService>();
         services.AddSingleton<IComboColourStudioService, ComboColourStudioService>();
         services.AddSingleton<IMapsetMergerService, MapsetMergerService>();
+        services.AddSingleton<IPatternGalleryService, PatternGalleryService>();
+        services.AddSingleton<IPatternGalleryFileService, PatternGalleryFileService>();
+        services.AddSingleton<IPatternGalleryArchiveService, PatternGalleryArchiveService>();
         services.AddSingleton<IMapsetFileSystem, PhysicalMapsetFileSystem>();
         services.AddSingleton<IImageFileService, SystemDrawingImageFileService>();
         services.AddSingleton<IMapCleanerSampleService, PhysicalMapCleanerSampleService>();

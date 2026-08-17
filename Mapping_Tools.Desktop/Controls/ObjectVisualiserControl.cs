@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using System.Globalization;
 using System.Collections.Specialized;
 using Mapping_Tools.Application.ObjectVisualiser;
 using Mapping_Tools.Core.Classes.MathUtil;
@@ -93,6 +94,26 @@ public sealed class ObjectVisualiserControl : Control
         AvaloniaProperty.Register<ObjectVisualiserControl, IReadOnlyList<ObjectVisualiserMarker>>(
             nameof(Markers), []);
 
+    /// <summary>Identifies whether combo numbers are drawn at object starts.</summary>
+    public static readonly StyledProperty<bool> ShowComboNumbersProperty =
+        AvaloniaProperty.Register<ObjectVisualiserControl, bool>(nameof(ShowComboNumbers));
+
+    /// <summary>Identifies whether follow lines are drawn between nearby objects.</summary>
+    public static readonly StyledProperty<bool> ShowFollowLinesProperty =
+        AvaloniaProperty.Register<ObjectVisualiserControl, bool>(nameof(ShowFollowLines));
+
+    /// <summary>Identifies the brush used for combo labels.</summary>
+    public static readonly StyledProperty<IBrush?> ComboNumberBrushProperty =
+        AvaloniaProperty.Register<ObjectVisualiserControl, IBrush?>(nameof(ComboNumberBrush), Brushes.White);
+
+    /// <summary>Identifies the brush used for follow lines.</summary>
+    public static readonly StyledProperty<IBrush?> FollowLineBrushProperty =
+        AvaloniaProperty.Register<ObjectVisualiserControl, IBrush?>(nameof(FollowLineBrush), Brushes.White);
+
+    /// <summary>Identifies the world-space combo-number font size.</summary>
+    public static readonly StyledProperty<double> ComboNumberSizeProperty =
+        AvaloniaProperty.Register<ObjectVisualiserControl, double>(nameof(ComboNumberSize), 24);
+
     /// <summary>Identifies the selected object identifier.</summary>
     public static readonly StyledProperty<int?> SelectedObjectIdProperty =
         AvaloniaProperty.Register<ObjectVisualiserControl, int?>(nameof(SelectedObjectId));
@@ -120,6 +141,11 @@ public sealed class ObjectVisualiserControl : Control
             DuplicateAnchorBrushProperty,
             AnchorOutlineBrushProperty,
             MarkersProperty,
+            ShowComboNumbersProperty,
+            ShowFollowLinesProperty,
+            ComboNumberBrushProperty,
+            FollowLineBrushProperty,
+            ComboNumberSizeProperty,
             SelectedObjectIdProperty,
             HoveredObjectIdProperty);
 
@@ -217,6 +243,21 @@ public sealed class ObjectVisualiserControl : Control
     /// <summary>Gets or sets extra square markers drawn on slider paths.</summary>
     public IReadOnlyList<ObjectVisualiserMarker> Markers { get => GetValue(MarkersProperty); set => SetValue(MarkersProperty, value); }
 
+    /// <summary>Gets or sets whether combo numbers are rendered at object starts.</summary>
+    public bool ShowComboNumbers { get => GetValue(ShowComboNumbersProperty); set => SetValue(ShowComboNumbersProperty, value); }
+
+    /// <summary>Gets or sets whether follow lines are rendered between nearby objects.</summary>
+    public bool ShowFollowLines { get => GetValue(ShowFollowLinesProperty); set => SetValue(ShowFollowLinesProperty, value); }
+
+    /// <summary>Gets or sets the combo-number text brush.</summary>
+    public IBrush? ComboNumberBrush { get => GetValue(ComboNumberBrushProperty); set => SetValue(ComboNumberBrushProperty, value); }
+
+    /// <summary>Gets or sets the follow-line brush.</summary>
+    public IBrush? FollowLineBrush { get => GetValue(FollowLineBrushProperty); set => SetValue(FollowLineBrushProperty, value); }
+
+    /// <summary>Gets or sets the combo-number font size in world units.</summary>
+    public double ComboNumberSize { get => GetValue(ComboNumberSizeProperty); set => SetValue(ComboNumberSizeProperty, value); }
+
     /// <summary>Gets or sets the selected object's stable identifier.</summary>
     public int? SelectedObjectId { get => GetValue(SelectedObjectIdProperty); set => SetValue(SelectedObjectIdProperty, value); }
 
@@ -294,6 +335,31 @@ public sealed class ObjectVisualiserControl : Control
         }
 
         using IDisposable clip = context.PushClip(new Rect(Bounds.Size));
+        if (ShowFollowLines && FollowLineBrush is not null)
+        {
+            IReadOnlyList<ObjectVisualiserObject> objects = Scene.Objects.Take(100).ToArray();
+            for (int index = 1; index < objects.Count; index++)
+            {
+                ObjectVisualiserObject previous = objects[index - 1];
+                ObjectVisualiserObject current = objects[index];
+                if (current.StartsCombo)
+                {
+                    continue;
+                }
+
+                double distance = Vector2.Distance(previous.EndPosition, current.Position);
+                if (distance <= previous.Radius * 2.5)
+                {
+                    continue;
+                }
+
+                Vector2 start = Vector2.Lerp(previous.EndPosition, current.Position, previous.Radius / distance * 1.2);
+                Vector2 end = Vector2.Lerp(previous.EndPosition, current.Position, 1 - previous.Radius / distance * 1.2);
+                context.DrawLine(new Pen(FollowLineBrush, Math.Max(1, previous.Radius * 0.1 * transform.Scale)),
+                    ToPoint(start), ToPoint(end));
+            }
+        }
+
         foreach (ObjectVisualiserObject visualObject in Scene.Objects)
         {
             DrawObject(context, visualObject);
@@ -526,6 +592,27 @@ public sealed class ObjectVisualiserControl : Control
         {
             DrawCircle(context, Fill, outlinePen, visualObject.Position, radius);
         }
+
+        if (ShowComboNumbers && ComboNumberBrush is not null && visualObject.Kind != ObjectVisualiserObjectKind.Spinner)
+        {
+            DrawComboNumber(context, visualObject);
+        }
+    }
+
+    private void DrawComboNumber(DrawingContext context, ObjectVisualiserObject visualObject)
+    {
+        double size = Math.Max(1, ComboNumberSize * transform.Scale);
+        FormattedText text = new(
+            visualObject.ComboIndex.ToString(CultureInfo.InvariantCulture),
+            CultureInfo.InvariantCulture,
+            FlowDirection.LeftToRight,
+            new Typeface("Arial"),
+            size,
+            ComboNumberBrush);
+        Vector2 center = transform.WorldToViewport(visualObject.Position);
+        context.DrawText(text, new Point(
+            center.X - text.Width / 2,
+            center.Y - text.Height / 2));
     }
 
     private IBrush? GetOutlineBrush(ObjectVisualiserObject visualObject) =>

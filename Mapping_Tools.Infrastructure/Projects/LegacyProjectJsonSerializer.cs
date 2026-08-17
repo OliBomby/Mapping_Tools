@@ -16,6 +16,7 @@ using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.MapCleaner;
+using Mapping_Tools.Core.Tools.PatternGallery;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -115,6 +116,12 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourProject";
         private const string LegacyComboColourPoint =
             "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint";
+        private const string LegacyPatternGalleryProject =
+            "Mapping_Tools.Viewmodels.PatternGalleryVm";
+        private const string LegacyPatternGalleryPattern =
+            "Mapping_Tools.Classes.Tools.PatternGallery.OsuPattern";
+        private const string LegacyPatternGalleryHandler =
+            "Mapping_Tools.Classes.Tools.PatternGallery.OsuPatternFileHandler";
         private readonly DefaultSerializationBinder _fallback = new();
 
         public Type BindToType(string? assemblyName, string typeName)
@@ -188,6 +195,18 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 if (typeName == LegacyComboColourPoint)
                 {
                     return typeof(ColourPoint);
+                }
+                if (typeName == LegacyPatternGalleryProject)
+                {
+                    return typeof(PatternGalleryProject);
+                }
+                if (typeName == LegacyPatternGalleryPattern)
+                {
+                    return typeof(PatternGalleryPattern);
+                }
+                if (typeName == LegacyPatternGalleryHandler)
+                {
+                    return typeof(PatternGalleryCollectionMetadata);
                 }
 
                 // Accept both the former namespace and documents emitted by
@@ -308,6 +327,24 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             {
                 assemblyName = LegacyAssemblyName;
                 typeName = LegacyComboColourPoint;
+                return;
+            }
+            if (serializedType == typeof(PatternGalleryProject))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyPatternGalleryProject;
+                return;
+            }
+            if (serializedType == typeof(PatternGalleryPattern))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyPatternGalleryPattern;
+                return;
+            }
+            if (serializedType == typeof(PatternGalleryCollectionMetadata))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyPatternGalleryHandler;
                 return;
             }
 

@@ -49,6 +49,26 @@ public sealed class ProjectAutosaveCoordinatorTests
     }
 
     [TestMethod]
+    public async Task Deactivate_PassesFeatureAdditionalAutosavePaths()
+    {
+        // Arrange
+        RecordingProjectService projects = new();
+        TestProjectFeature feature = new()
+        {
+            Value = 7,
+            AdditionalAutoSavePaths = ["gallery\\project.json"]
+        };
+        ProjectAutosaveCoordinator coordinator = CreateCoordinator(projects);
+
+        // Act
+        coordinator.Deactivate(feature);
+        await projects.LastAutoSave.Task;
+
+        // Assert
+        projects.LastAdditionalAutoSavePaths.Should().Equal("gallery\\project.json");
+    }
+
+    [TestMethod]
     public async Task SaveAsync_WithActiveFeature_UsesFeatureSnapshot()
     {
         // Arrange
@@ -126,6 +146,8 @@ public sealed class ProjectAutosaveCoordinatorTests
 
         public int InstallCount { get; private set; }
 
+        public IReadOnlyList<string> AdditionalAutoSavePaths { get; init; } = [];
+
         public IProjectDefinition ProjectDefinition => Definition;
 
         public object Snapshot() => new TestProject(Value);
@@ -155,6 +177,8 @@ public sealed class ProjectAutosaveCoordinatorTests
         public int SaveAsCount { get; private set; }
 
         public TestProject? LastSaveAsProject { get; private set; }
+
+        public IReadOnlyList<string> LastAdditionalAutoSavePaths { get; private set; } = [];
 
         public IProjectDefinition? LastSaveAsDefinition { get; private set; }
 
@@ -214,6 +238,7 @@ public sealed class ProjectAutosaveCoordinatorTests
             CancellationToken cancellationToken = default)
         {
             AutoSavedProjects.Add((TestProject)project);
+            LastAdditionalAutoSavePaths = additionalPaths?.ToArray() ?? [];
             LastAutoSave.TrySetResult(project);
             return Task.CompletedTask;
         }

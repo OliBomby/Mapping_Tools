@@ -30,6 +30,29 @@ public sealed class ObjectVisualiserHitTesterTests
     }
 
     [TestMethod]
+    public void FromHitObjects_WithComboMetadata_PreservesLabelsAndComboBoundaries()
+    {
+        // Arrange
+        HitObject first = new("100,200,0,1,0,0:0:0:0:")
+        {
+            ComboIndex = 3,
+            ActualNewCombo = true
+        };
+        HitObject second = new("100,300,100,1,0,0:0:0:0:")
+        {
+            ComboIndex = 4,
+            ActualNewCombo = false
+        };
+
+        // Act
+        ObjectVisualiserScene scene = ObjectVisualiserSceneBuilder.FromHitObjects([first, second], 4);
+
+        // Assert
+        scene.Objects.Select(item => item.ComboIndex).Should().Equal(3, 4);
+        scene.Objects.Select(item => item.StartsCombo).Should().Equal(true, false);
+    }
+
+    [TestMethod]
     public void HitTest_WithOverlappingObjects_ReturnsFrontMostObject()
     {
         // Arrange

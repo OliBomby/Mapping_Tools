@@ -122,6 +122,13 @@ static internal class DesktopFeatureRegistrationExtensions {
             "Combine multiple mapsets and resolve beatmap, audio, image, storyboard, and sample conflicts.",
             ["mapset", "merge", "audio", "image", "storyboard", "samples", "conflicts"],
             verticalScrollBarVisibility: ScrollBarVisibility.Auto);
+        services.AddMappingTool<PatternGalleryViewModel>(
+            "pattern-gallery",
+            "Pattern Gallery",
+            "Collect, preview, organize, and place reusable hit-object patterns.",
+            ["pattern", "gallery", "collection", "osu", "snippet"],
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
+            quickRunTargets: QuickRunTargets.Always);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(

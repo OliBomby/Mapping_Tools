@@ -126,7 +126,8 @@ public sealed class ProjectAutosaveCoordinator
         {
             await _projects.AutoSaveAsync(
                 feature.ProjectDefinition,
-                feature.Snapshot());
+                feature.Snapshot(),
+                feature.AdditionalAutoSavePaths);
         }
         catch (Exception exception)
         {
