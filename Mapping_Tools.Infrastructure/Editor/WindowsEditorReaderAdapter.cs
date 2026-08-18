@@ -1,12 +1,14 @@
 using System.Diagnostics;
 using Editor_Reader;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.GeometryDashboard;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Infrastructure.Platform;
 using DomainHitObject = Mapping_Tools.Core.Classes.BeatmapHelper.HitObject;
 using ReaderHitObject = Editor_Reader.HitObject;
 
@@ -19,12 +21,16 @@ namespace Mapping_Tools.Infrastructure.Editor;
 public sealed class WindowsEditorReaderAdapter :
     ILiveBeatmapReader,
     ICurrentBeatmapLocator,
+    IGeometryDashboardEditorReader,
     IDisposable
 {
     private readonly ApplicationSettings _settings;
     private readonly IApplicationDirectories _directories;
+    private readonly Func<bool> _isWindows;
     private readonly EditorReader _reader = new();
     private readonly SemaphoreSlim _readerLock = new(1, 1);
+    private readonly object _lifecycleGate = new();
+    private int _activeReads;
     private bool _disposed;
 
     /// <summary>
@@ -36,9 +42,18 @@ public sealed class WindowsEditorReaderAdapter :
     public WindowsEditorReaderAdapter(
         ApplicationSettings settings,
         IApplicationDirectories directories)
+        : this(settings, directories, OperatingSystem.IsWindows)
+    {
+    }
+
+    internal WindowsEditorReaderAdapter(
+        ApplicationSettings settings,
+        IApplicationDirectories directories,
+        Func<bool> isWindows)
     {
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _directories = directories ?? throw new ArgumentNullException(nameof(directories));
+        _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
     /// <inheritdoc/>
@@ -46,17 +61,19 @@ public sealed class WindowsEditorReaderAdapter :
         CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        if (!OperatingSystem.IsWindows())
+        if (!_isWindows())
         {
             return null;
         }
 
-        await _readerLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        EnterRead();
+        bool lockTaken = false;
         try
         {
+            await _readerLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+            lockTaken = true;
             using Process? process = OsuProcessDiscovery.FindStableProcess();
-            if (process is null ||
-                !process.MainWindowTitle.EndsWith(".osu", StringComparison.Ordinal))
+            if (process is null || !IsActiveEditor(process))
             {
                 return null;
             }
@@ -71,7 +88,56 @@ public sealed class WindowsEditorReaderAdapter :
         }
         finally
         {
-            _readerLock.Release();
+            if (lockTaken)
+            {
+                _readerLock.Release();
+            }
+
+            ExitRead();
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task<GeometryDashboardEditorSnapshot?> ReadGeometryDashboardAsync(
+        GeometryDashboardProcess process,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(process);
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (!_isWindows())
+        {
+            return null;
+        }
+
+        EnterRead();
+        bool lockTaken = false;
+        try
+        {
+            await _readerLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+            lockTaken = true;
+            using Process? nativeProcess = OsuProcessDiscovery.FindStableProcess(process.ProcessId);
+            if (nativeProcess is null ||
+                !IsActiveEditor(nativeProcess, process.MainWindow))
+            {
+                return null;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            GeometryDashboardEditorSnapshot snapshot = await Task.Run(
+                    () => ReadGeometrySnapshot(nativeProcess),
+                    cancellationToken)
+                .ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            return snapshot;
+        }
+        finally
+        {
+            if (lockTaken)
+            {
+                _readerLock.Release();
+            }
+
+            ExitRead();
         }
     }
 
@@ -98,13 +164,46 @@ public sealed class WindowsEditorReaderAdapter :
     /// </summary>
     public void Dispose()
     {
-        if (_disposed)
+        bool disposeReaderLock;
+        lock (_lifecycleGate)
         {
-            return;
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            disposeReaderLock = _activeReads == 0;
         }
 
-        _readerLock.Dispose();
-        _disposed = true;
+        if (disposeReaderLock)
+        {
+            _readerLock.Dispose();
+        }
+    }
+
+    private void EnterRead()
+    {
+        lock (_lifecycleGate)
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            _activeReads++;
+        }
+    }
+
+    private void ExitRead()
+    {
+        bool disposeReaderLock;
+        lock (_lifecycleGate)
+        {
+            _activeReads--;
+            disposeReaderLock = _disposed && _activeReads == 0;
+        }
+
+        if (disposeReaderLock)
+        {
+            _readerLock.Dispose();
+        }
     }
 
     private LiveBeatmapSnapshot ReadSnapshot(Process process)
@@ -124,6 +223,40 @@ public sealed class WindowsEditorReaderAdapter :
         {
             WriteDiagnosticLog(_reader);
             throw;
+        }
+    }
+
+    private GeometryDashboardEditorSnapshot ReadGeometrySnapshot(Process process)
+    {
+        LiveBeatmapSnapshot snapshot = ReadSnapshot(process);
+        int editorTime = snapshot.EditorTime is null
+            ? 0
+            : checked((int)snapshot.EditorTime.Value);
+        return new GeometryDashboardEditorSnapshot(
+            snapshot.Path,
+            _reader.ApproachRate,
+            _reader.CircleSize,
+            editorTime,
+            snapshot.HitObjects);
+    }
+
+    private static bool IsActiveEditor(
+        Process process,
+        PlatformWindowId? expectedWindow = null)
+    {
+        try
+        {
+            return (expectedWindow is null ||
+                    process.MainWindowHandle.ToInt64() == expectedWindow.Value.Value) &&
+                   process.MainWindowTitle.EndsWith(".osu", StringComparison.Ordinal);
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            return false;
         }
     }
 
@@ -176,11 +309,19 @@ internal static class EditorReaderSnapshotConverter
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentException.ThrowIfNullOrWhiteSpace(songsPath);
 
+        if (reader.bookmarks is null ||
+            reader.controlPoints is null ||
+            reader.hitObjects is null ||
+            string.IsNullOrWhiteSpace(reader.ContainingFolder) ||
+            string.IsNullOrWhiteSpace(reader.Filename))
+        {
+            throw new InvalidDataException(
+                "Editor Reader returned incomplete editor metadata or collections.");
+        }
+
         int removed = reader.hitObjects.RemoveAll(IsInvalid);
         if (removed > 1 ||
             reader.numControlPoints <= 0 ||
-            reader.controlPoints is null ||
-            reader.hitObjects is null ||
             reader.numControlPoints != reader.controlPoints.Count ||
             reader.numObjects != reader.hitObjects.Count ||
             reader.hitObjects.Any(IsInvalid))
@@ -300,41 +441,5 @@ internal static class EditorReaderSnapshotConverter
         {
             values.Add(defaultValue);
         }
-    }
-}
-
-internal static class OsuProcessDiscovery
-{
-    internal static Process? FindStableProcess()
-    {
-        foreach (Process process in Process.GetProcessesByName("osu!"))
-        {
-            try
-            {
-                ProcessModule? mainModule = process.MainModule;
-                if (mainModule is not null &&
-                    string.Equals(
-                        mainModule.ModuleName,
-                        "osu!.exe",
-                        StringComparison.Ordinal) &&
-                    string.Equals(
-                        mainModule.FileVersionInfo.ProductName,
-                        "osu!",
-                        StringComparison.Ordinal))
-                {
-                    return process;
-                }
-            }
-            catch (InvalidOperationException)
-            {
-            }
-            catch (System.ComponentModel.Win32Exception)
-            {
-            }
-
-            process.Dispose();
-        }
-
-        return null;
     }
 }

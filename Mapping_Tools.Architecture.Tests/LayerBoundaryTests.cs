@@ -110,6 +110,42 @@ public sealed class LayerBoundaryTests
         violations.Count.Should().Be(0, string.Join(Environment.NewLine, violations));
     }
 
+    [TestMethod]
+    public void GeometryDashboardApplicationPorts_ContainNoPlatformImplementationTypes()
+    {
+        // Arrange
+        string geometryDirectory = Path.Combine(
+            RepositoryRoot,
+            "Mapping_Tools.Application",
+            "GeometryDashboard");
+        string[] forbiddenTokens =
+        [
+            "System.Diagnostics.Process",
+            "System.Windows",
+            "System.Windows.Forms",
+            "Process.NET",
+            "Overlay.NET",
+            "DllImport",
+            "LibraryImport",
+            "IntPtr",
+            "nint"
+        ];
+
+        // Act
+        string[] violations = Directory.EnumerateFiles(
+                geometryDirectory,
+                "*.cs",
+                SearchOption.AllDirectories)
+            .SelectMany(path => forbiddenTokens
+                .Where(token => File.ReadAllText(path).Contains(token))
+                .Select(token =>
+                    $"{Path.GetRelativePath(RepositoryRoot, path)} contains forbidden token '{token}'."))
+            .ToArray();
+
+        // Assert
+        violations.Should().BeEmpty(string.Join(Environment.NewLine, violations));
+    }
+
     private static IEnumerable<string> FindTokenViolations(string path, string source)
     {
         foreach (var token in ForbiddenSourceTokens.Where(source.Contains))

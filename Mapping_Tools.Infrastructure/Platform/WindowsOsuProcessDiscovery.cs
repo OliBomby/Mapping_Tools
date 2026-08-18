@@ -1,0 +1,114 @@
+using System.Diagnostics;
+using Mapping_Tools.Application.GeometryDashboard;
+
+namespace Mapping_Tools.Infrastructure.Platform;
+
+/// <summary>
+/// Discovers the first osu! stable process whose executable and product name
+/// match the legacy adapter's exact checks.
+/// </summary>
+public sealed class WindowsOsuProcessDiscovery : IGeometryDashboardProcessDiscovery
+{
+    private readonly Func<bool> _isWindows;
+
+    /// <summary>Creates a process discovery adapter using the current platform guard.</summary>
+    public WindowsOsuProcessDiscovery()
+        : this(OperatingSystem.IsWindows)
+    {
+    }
+
+    internal WindowsOsuProcessDiscovery(Func<bool> isWindows)
+    {
+        _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
+    }
+
+    /// <inheritdoc/>
+    public bool IsSupported => _isWindows();
+
+    /// <inheritdoc/>
+    public Task<GeometryDashboardProcess?> FindAsync(
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!_isWindows())
+        {
+            return Task.FromResult<GeometryDashboardProcess?>(null);
+        }
+
+        using Process? process = OsuProcessDiscovery.FindStableProcess();
+        if (process is null)
+        {
+            return Task.FromResult<GeometryDashboardProcess?>(null);
+        }
+
+        try
+        {
+            return Task.FromResult<GeometryDashboardProcess?>(new GeometryDashboardProcess(
+                process.Id,
+                new PlatformWindowId(process.MainWindowHandle.ToInt64()),
+                process.MainWindowTitle));
+        }
+        catch (InvalidOperationException)
+        {
+            return Task.FromResult<GeometryDashboardProcess?>(null);
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            return Task.FromResult<GeometryDashboardProcess?>(null);
+        }
+    }
+}
+
+internal static class OsuProcessDiscovery
+{
+    internal static Process? FindStableProcess() => FindStableProcess(null);
+
+    internal static Process? FindStableProcess(long? expectedProcessId)
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            return null;
+        }
+
+        if (expectedProcessId is <= 0)
+        {
+            return null;
+        }
+
+        foreach (Process process in Process.GetProcessesByName("osu!"))
+        {
+            bool matches = false;
+            try
+            {
+                if (expectedProcessId is null || process.Id == expectedProcessId.Value)
+                {
+                    ProcessModule? mainModule = process.MainModule;
+                    matches = mainModule is not null &&
+                        string.Equals(
+                            mainModule.ModuleName,
+                            "osu!.exe",
+                            StringComparison.Ordinal) &&
+                        string.Equals(
+                            mainModule.FileVersionInfo.ProductName,
+                            "osu!",
+                            StringComparison.Ordinal);
+                }
+            }
+            catch (InvalidOperationException)
+            {
+            }
+            catch (System.ComponentModel.Win32Exception)
+            {
+            }
+
+            if (matches)
+            {
+                return process;
+            }
+
+            process.Dispose();
+        }
+
+        return null;
+    }
+}

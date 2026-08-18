@@ -75,6 +75,22 @@ public sealed class EditorReaderSnapshotConverterTests
     }
 
     [TestMethod]
+    public void Convert_WithMissingReaderCollections_ThrowsInvalidDataException()
+    {
+        // Arrange
+        EditorReader reader = CreateValidReader();
+        reader.hitObjects = null!;
+
+        // Act
+        Action act = () => EditorReaderSnapshotConverter.Convert(
+            reader,
+            @"C:\osu!\Songs");
+
+        // Assert
+        act.Should().Throw<InvalidDataException>();
+    }
+
+    [TestMethod]
     public void Convert_WithTimingEffectsAndBookmarks_MapsValues()
     {
         // Arrange

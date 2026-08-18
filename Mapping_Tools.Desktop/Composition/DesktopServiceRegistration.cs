@@ -5,6 +5,7 @@ using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.ComboColourStudio;
 using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.GeometryDashboard;
 using Mapping_Tools.Application.HitsoundPreviewHelper;
 using Mapping_Tools.Application.HitsoundStudio;
 using Mapping_Tools.Application.HitsoundCopier;
@@ -123,6 +124,14 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IQuickRunService>(provider =>
             provider.GetRequiredService<QuickRunService>());
         services.AddSingleton<IGlobalHotkeyService, WindowsGlobalHotkeyService>();
+        services.AddSingleton<IGeometryDashboardProcessDiscovery, WindowsOsuProcessDiscovery>();
+        services.AddSingleton<IGeometryDashboardInputService, WindowsGeometryDashboardInputService>();
+        services.AddSingleton<IGeometryDashboardScreenService, WindowsGeometryDashboardScreenService>();
+        services.AddSingleton<IGeometryDashboardWindowService, WindowsGeometryDashboardWindowService>();
+        services.AddSingleton<IGeometryDashboardRuntime, GeometryDashboardRuntimeService>();
+        services.AddSingleton<IGeometryDashboardOverlayHostFactory>(provider =>
+            new WindowsGeometryDashboardOverlayHostFactory(
+                provider.GetRequiredService<IGeometryDashboardWindowService>()));
         services.AddSingleton<GlobalHotkeyHostedService>();
         services.AddSingleton<IHotkeyBindingCoordinator>(provider =>
             provider.GetRequiredService<GlobalHotkeyHostedService>());
@@ -131,6 +140,8 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IQuickUndoCommandService, QuickUndoCommandService>();
         services.AddSingleton<WindowsEditorReaderAdapter>();
         services.AddSingleton<ILiveBeatmapReader>(provider =>
+            provider.GetRequiredService<WindowsEditorReaderAdapter>());
+        services.AddSingleton<IGeometryDashboardEditorReader>(provider =>
             provider.GetRequiredService<WindowsEditorReaderAdapter>());
         services.AddSingleton<ICurrentBeatmapLocator>(provider =>
             provider.GetRequiredService<WindowsEditorReaderAdapter>());

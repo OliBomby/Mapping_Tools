@@ -20,8 +20,20 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
     private readonly Dictionary<string, Binding> _bindings =
         new(StringComparer.Ordinal);
     private readonly object _gate = new();
+    private readonly Func<bool> _isWindows;
     private CancellationTokenSource _stopping = new();
     private bool _started;
+
+    /// <summary>Creates the global hotkey adapter using the current platform guard.</summary>
+    public WindowsGlobalHotkeyService()
+        : this(OperatingSystem.IsWindows)
+    {
+    }
+
+    internal WindowsGlobalHotkeyService(Func<bool> isWindows)
+    {
+        _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
+    }
 
     /// <inheritdoc/>
     public void SetBinding(
@@ -71,6 +83,12 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
                 _stopping = new CancellationTokenSource();
             }
 
+            if (!_isWindows())
+            {
+                _started = true;
+                return;
+            }
+
             ReloadBindings();
             _manager.Start();
             _started = true;
@@ -88,8 +106,12 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
             }
 
             _stopping.Cancel();
-            _manager.UnregisterAll();
-            _manager.Stop();
+            if (_isWindows())
+            {
+                _manager.UnregisterAll();
+                _manager.Stop();
+            }
+
             _started = false;
         }
     }
@@ -114,6 +136,11 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
         if (key is >= 90 and <= 113)
         {
             return key + 22; // WPF F1-F24 to Win32 function keys.
+        }
+
+        if (key is >= 116 and <= 121)
+        {
+            return key + 44; // WPF left/right modifier keys.
         }
 
         if (key is >= 122 and <= 139)
@@ -164,6 +191,7 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
             89 => 0x6F,  // Divide
             114 => 0x90, // Num Lock
             115 => 0x91, // Scroll Lock
+            155 => 0xE5, // IME processed
             154 => 0xE2, // OEM 102
             _ => throw new ArgumentOutOfRangeException(
                 nameof(key),
@@ -174,6 +202,11 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
 
     private void ReloadBindings()
     {
+        if (!_isWindows())
+        {
+            return;
+        }
+
         _manager.UnregisterAll();
         foreach (Binding binding in _bindings.Values)
         {

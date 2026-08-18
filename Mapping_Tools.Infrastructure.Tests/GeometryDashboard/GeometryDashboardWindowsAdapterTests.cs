@@ -1,0 +1,254 @@
+using Mapping_Tools.Application.GeometryDashboard;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Infrastructure.Editor;
+using Mapping_Tools.Infrastructure.Files;
+using Mapping_Tools.Infrastructure.Platform;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Infrastructure.Tests.GeometryDashboard;
+
+[TestClass]
+public sealed class GeometryDashboardWindowsAdapterTests
+{
+    [TestMethod]
+    public async Task FindAsync_WhenPlatformIsUnavailable_ReturnsNoProcess()
+    {
+        // Arrange
+        WindowsOsuProcessDiscovery sut = new(() => false);
+
+        // Act
+        GeometryDashboardProcess? result = await sut.FindAsync();
+
+        // Assert
+        sut.IsSupported.Should().BeFalse();
+        result.Should().BeNull();
+    }
+
+    [TestMethod]
+    public async Task ReadGeometryDashboardAsync_WhenPlatformIsUnavailable_ReturnsNoSnapshot()
+    {
+        // Arrange
+        WindowsEditorReaderAdapter sut = new(
+            new Mapping_Tools.Application.Settings.ApplicationSettings(),
+            new ApplicationDirectories(Path.Combine(Path.GetTempPath(), "Mapping Tools Tests")),
+            () => false);
+
+        // Act
+        GeometryDashboardEditorSnapshot? result =
+            await sut.ReadGeometryDashboardAsync(
+                new GeometryDashboardProcess(7, new PlatformWindowId(42), "map.osu"));
+
+        // Assert
+        result.Should().BeNull();
+        sut.Dispose();
+    }
+
+    [TestMethod]
+    public void InputMethods_WhenPlatformIsUnavailable_ReturnFalseWithoutNativeCalls()
+    {
+        // Arrange
+        WindowsGeometryDashboardInputService sut = new(() => false);
+        Hotkey hotkey = new(56, 0);
+
+        // Act
+        bool hotkeyDown = sut.IsHotkeyDown(hotkey);
+        bool mouseDown = sut.IsMouseButtonDown(GeometryDashboardMouseButton.Left);
+        bool cursorRead = sut.TryGetCursorPosition(out Vector2 position);
+        bool cursorWrite = sut.TrySetCursorPosition(new Vector2(10, 20));
+
+        // Assert
+        sut.IsSupported.Should().BeFalse();
+        hotkeyDown.Should().BeFalse();
+        mouseDown.Should().BeFalse();
+        cursorRead.Should().BeFalse();
+        cursorWrite.Should().BeFalse();
+        position.Should().Be(Vector2.Zero);
+    }
+
+    [TestMethod]
+    public void GetScreens_WhenPlatformIsUnavailable_ReturnsEmptyCollection()
+    {
+        // Arrange
+        WindowsGeometryDashboardScreenService sut = new(() => false);
+
+        // Act
+        IReadOnlyList<GeometryDashboardScreen> screens = sut.GetScreens();
+        GeometryDashboardScreen? primary = sut.GetPrimaryScreen();
+        GeometryDashboardScreen? forWindow = sut.GetScreenForWindow(new PlatformWindowId(1));
+
+        // Assert
+        sut.IsSupported.Should().BeFalse();
+        screens.Should().BeEmpty();
+        primary.Should().BeNull();
+        forWindow.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void GetWindow_WhenPlatformIsUnavailable_ReturnsNoWindow()
+    {
+        // Arrange
+        WindowsGeometryDashboardWindowService sut = new(() => false);
+
+        // Act
+        GeometryDashboardWindow? result = sut.GetWindow(new PlatformWindowId(1));
+        IReadOnlyList<GeometryDashboardWindow> windows = sut.GetTopLevelWindows();
+
+        // Assert
+        sut.IsSupported.Should().BeFalse();
+        result.Should().BeNull();
+        windows.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void Create_WhenPlatformIsUnavailable_ReturnsSafeNoOpHost()
+    {
+        // Arrange
+        WindowsGeometryDashboardWindowService windows = new(() => false);
+        WindowsGeometryDashboardOverlayHostFactory factory = new(windows, () => false);
+
+        // Act
+        using IGeometryDashboardOverlayHost host = factory.Create();
+        Action act = () =>
+        {
+            host.Initialize(new PlatformWindowId(1));
+            host.Enable();
+            host.SetBorder(true);
+            host.Update(new Box2(1, 2, 3, 4), new Vector2(1.5, 1.5), true);
+            host.Invalidate();
+            host.Disable();
+        };
+
+        // Assert
+        host.IsSupported.Should().BeFalse();
+        act.Should().NotThrow();
+        host.IsVisible.Should().BeFalse();
+        host.TargetWindow.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void Dispose_WhenCalledRepeatedlyAndAfterBorderChange_IsSafe()
+    {
+        // Arrange
+        WindowsGeometryDashboardWindowService windows = new(() => false);
+        using IGeometryDashboardOverlayHost host =
+            new WindowsGeometryDashboardOverlayHostFactory(windows, () => false).Create();
+
+        // Act
+        host.Dispose();
+        host.Dispose();
+        Action setBorder = () => host.SetBorder(true);
+
+        // Assert
+        setBorder.Should().NotThrow();
+    }
+
+    [TestMethod]
+    public void OverlayBounds_WithLiveDpi_PreservesLegacyScaleOffsetAndRounding()
+    {
+        // Arrange
+        Box2 physicalBounds = new(-1920, 100, 0, 1100);
+
+        // Act
+        bool converted = WindowsGeometryDashboardOverlayHost.TryConvertBounds(
+            physicalBounds,
+            new Vector2(2, 2),
+            true,
+            out WindowsGeometryDashboardOverlayHost.NativeBounds nativeBounds);
+
+        // Assert
+        converted.Should().BeTrue();
+        nativeBounds.Should().Be(
+            new WindowsGeometryDashboardOverlayHost.NativeBounds(-960, 50, 960, 500));
+    }
+
+    [TestMethod]
+    public void OverlayBounds_WithUnavailableDpiSourceUsesPhysicalCoordinates()
+    {
+        // Arrange
+        Box2 physicalBounds = new(-1920, 100, 0, 1100);
+
+        // Act
+        bool converted = WindowsGeometryDashboardOverlayHost.TryConvertBounds(
+            physicalBounds,
+            Vector2.Zero,
+            false,
+            out WindowsGeometryDashboardOverlayHost.NativeBounds nativeBounds);
+
+        // Assert
+        converted.Should().BeTrue();
+        nativeBounds.Should().Be(
+            new WindowsGeometryDashboardOverlayHost.NativeBounds(-1920, 100, 1920, 1000));
+    }
+
+    [TestMethod]
+    public void OverlayBounds_WithInvalidDpiOrCoordinatesIsRejected()
+    {
+        // Arrange
+        Box2 validBounds = new(0, 0, 100, 100);
+
+        // Act
+        bool invalidDpi = WindowsGeometryDashboardOverlayHost.TryConvertBounds(
+            validBounds,
+            new Vector2(0, 1),
+            true,
+            out _);
+        bool invalidCoordinates = WindowsGeometryDashboardOverlayHost.TryConvertBounds(
+            new Box2(double.NaN, 0, 100, 100),
+            Vector2.One,
+            false,
+            out _);
+
+        // Assert
+        invalidDpi.Should().BeFalse();
+        invalidCoordinates.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void Start_WhenPlatformIsUnavailable_DoesNotInvokeNativeHook()
+    {
+        // Arrange
+        WindowsGlobalHotkeyService sut = new(() => false);
+        sut.SetBinding(
+            "geometry",
+            new Mapping_Tools.Application.Settings.HotkeySettings(56, 0),
+            _ => Task.CompletedTask);
+
+        // Act
+        Action act = () =>
+        {
+            sut.Start();
+            sut.Stop();
+        };
+
+        // Assert
+        act.Should().NotThrow();
+    }
+
+    [TestMethod]
+    public void ConvertLegacyKeyToVirtualKey_PreservesPersistedWpfKeyValues()
+    {
+        // Arrange
+        int[] legacyKeys = [44, 41, 77, 101, 116, 121, 122, 132, 141, 155];
+        int[] expectedVirtualKeys = [65, 55, 99, 123, 160, 165, 166, 176, 187, 229];
+
+        // Act
+        int[] actualVirtualKeys = legacyKeys
+            .Select(WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey)
+            .ToArray();
+
+        // Assert
+        actualVirtualKeys.Should().Equal(expectedVirtualKeys);
+    }
+
+    [TestMethod]
+    public void ConvertLegacyKeyToVirtualKey_WithUnsupportedPersistedValueThrows()
+    {
+        // Arrange
+        Action act = () => WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(156);
+
+        // Act
+        // Assert
+        act.Should().Throw<ArgumentOutOfRangeException>();
+    }
+}

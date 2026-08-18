@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Infrastructure.Platform;
 
 namespace Mapping_Tools.Infrastructure.Editor;
 
@@ -150,19 +151,10 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
 
     private static bool IsOsuForegroundWindow()
     {
-        nint foreground = GetForegroundWindow();
-        Process[] processes = Process.GetProcessesByName("osu!");
-        try
-        {
-            return processes.Any(process => process.MainWindowHandle == foreground);
-        }
-        finally
-        {
-            foreach (Process process in processes)
-            {
-                process.Dispose();
-            }
-        }
+        using Process? process = OsuProcessDiscovery.FindStableProcess();
+        return process is not null &&
+               process.MainWindowHandle != nint.Zero &&
+               WindowsNativeMethods.GetForegroundWindow() == process.MainWindowHandle;
     }
 
     private static async Task<string?> TryGetHashAsync(string path)
@@ -199,6 +191,4 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
     private void ThrowIfDisposed() =>
         ObjectDisposedException.ThrowIf(_disposed, this);
 
-    [DllImport("user32.dll")]
-    private static extern nint GetForegroundWindow();
 }

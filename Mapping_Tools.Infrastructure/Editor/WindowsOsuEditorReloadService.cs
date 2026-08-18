@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Infrastructure.Platform;
 
 namespace Mapping_Tools.Infrastructure.Editor;
 
@@ -13,8 +13,6 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
     private const byte VirtualKeyControl = 0x11;
     private const byte VirtualKeyL = 0x4C;
     private const byte VirtualKeyEnter = 0x0D;
-    private const uint InputKeyboard = 1;
-    private const uint KeyboardKeyUp = 0x0002;
     private readonly Func<Process?> _findProcess;
 
     /// <summary>
@@ -31,7 +29,7 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
         _findProcess = findProcess ?? throw new ArgumentNullException(nameof(findProcess));
     }
 
-    internal static int NativeInputSize => Marshal.SizeOf<INPUT>();
+    internal static int NativeInputSize => WindowsNativeMethods.NativeInputSize;
 
     /// <inheritdoc/>
     public async Task ReloadAsync(CancellationToken cancellationToken = default)
@@ -49,9 +47,9 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
                 "Reloading osu!'s editor is only supported on Windows.");
         }
 
-        if (GetForegroundWindow() != process.MainWindowHandle)
+        if (WindowsNativeMethods.GetForegroundWindow() != process.MainWindowHandle)
         {
-            if (!SetForegroundWindow(process.MainWindowHandle))
+            if (!WindowsNativeMethods.SetForegroundWindow(process.MainWindowHandle))
             {
                 throw new InvalidOperationException(
                     "Windows did not allow Mapping Tools to focus osu!.");
@@ -73,32 +71,11 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
         SendKeyboardInput(VirtualKeyEnter, keyUp: true);
     }
 
-    private static INPUT KeyboardInput(byte virtualKey, bool keyUp)
-    {
-        return new INPUT
-        {
-            Type = InputKeyboard,
-            Data = new INPUT_UNION
-            {
-                Keyboard = new KEYBDINPUT
-                {
-                    VirtualKey = virtualKey,
-                    Flags = keyUp ? KeyboardKeyUp : 0
-                }
-            }
-        };
-    }
-
     private static void SendKeyboardInput(byte virtualKey, bool keyUp)
     {
-        INPUT[] nativeInputs = [KeyboardInput(virtualKey, keyUp)];
-        uint sent = SendInput(
-            1,
-            nativeInputs,
-            NativeInputSize);
+        (uint sent, int error) = WindowsNativeMethods.SendKeyboardInput(virtualKey, keyUp);
         if (sent != 1)
         {
-            int error = Marshal.GetLastWin32Error();
             throw new InvalidOperationException(
                 $"Windows delivered {sent} of 1 reload key events " +
                 $"(Win32 error {error}).");
@@ -110,65 +87,4 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
         Thread.Sleep(1);
     }
 
-    [DllImport("user32.dll")]
-    private static extern IntPtr GetForegroundWindow();
-
-    [DllImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool SetForegroundWindow(IntPtr window);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern uint SendInput(
-        uint numberOfInputs,
-        INPUT[] inputs,
-        int inputSize);
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct INPUT
-    {
-        public uint Type;
-        public INPUT_UNION Data;
-    }
-
-    [StructLayout(LayoutKind.Explicit)]
-    private struct INPUT_UNION
-    {
-        [FieldOffset(0)]
-        public MOUSEINPUT Mouse;
-
-        [FieldOffset(0)]
-        public KEYBDINPUT Keyboard;
-
-        [FieldOffset(0)]
-        public HARDWAREINPUT Hardware;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct MOUSEINPUT
-    {
-        public int Dx;
-        public int Dy;
-        public uint MouseData;
-        public uint Flags;
-        public uint Time;
-        public UIntPtr ExtraInfo;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct KEYBDINPUT
-    {
-        public ushort VirtualKey;
-        public ushort ScanCode;
-        public uint Flags;
-        public uint Time;
-        public UIntPtr ExtraInfo;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct HARDWAREINPUT
-    {
-        public uint Message;
-        public ushort ParameterLow;
-        public ushort ParameterHigh;
-    }
 }
