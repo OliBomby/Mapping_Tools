@@ -9,6 +9,7 @@ using Mapping_Tools.Application.HitsoundPreviewHelper;
 using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.SliderMerger;
 using Mapping_Tools.Application.SliderPicturator;
+using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
@@ -42,6 +43,34 @@ public sealed class ProjectPersistenceTests
         project.ComboColor.Should().Be(RgbaColour.FromRgb(0, 128, 255));
         project.CurrentTrackColor.Should().Be(RgbaColour.FromRgb(0, 128, 255));
         json.Should().Contain("\"$type\": \"Mapping_Tools.Viewmodels.SliderPicturatorVm, Mapping Tools\"");
+    }
+
+    [TestMethod]
+    public void DeserializeAndSerialize_LegacySlideratorProject_PreservesGraphAndSelection()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Projects",
+            "slideratorproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        SlideratorProject project = serializer.Deserialize<SlideratorProject>(File.ReadAllText(fixture));
+        string json = serializer.Serialize(project);
+
+        // Assert
+        project.LoadedHitObjects.Should().ContainSingle(item => item.IsSlider);
+        project.VisibleHitObjectIndex.Should().Be(0);
+        project.GlobalSv.Should().BeApproximately(2.1, 0.0001);
+        project.BeatSnapDivisor.Should().Be(8);
+        project.GraphState.Anchors.Should().HaveCount(5);
+        project.GraphState.MaxX.Should().Be(16);
+        json.Should().Contain(
+            "\"$type\": \"Mapping_Tools.Viewmodels.SlideratorVm, Mapping Tools\"");
+        json.Should().Contain(
+            "\"$type\": \"Mapping_Tools.Components.Graph.GraphState, Mapping Tools\"");
     }
 
     [TestMethod]

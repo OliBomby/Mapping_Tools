@@ -20,6 +20,7 @@ using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.SliderMerger;
 using Mapping_Tools.Application.SliderPicturator;
+using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Application.Workspace;
@@ -141,6 +142,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<ISliderCompletionatorService, SliderCompletionatorService>();
         services.AddSingleton<ISliderMergerService, SliderMergerService>();
         services.AddSingleton<ISliderPicturatorService, SliderPicturatorService>();
+        services.AddSingleton<ISlideratorService, SlideratorService>();
         services.AddSingleton<IComboColourStudioService, ComboColourStudioService>();
         services.AddSingleton<IMapsetMergerService, MapsetMergerService>();
         services.AddSingleton<IPatternGalleryService, PatternGalleryService>();

@@ -109,6 +109,14 @@ static internal class DesktopFeatureRegistrationExtensions {
             horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto,
             quickRunTargets: QuickRunTargets.AnySelection);
+        services.AddMappingTool<SlideratorViewModel>(
+            "sliderator",
+            "Sliderator",
+            "Create variable-velocity sliders and streams from an editable graph.",
+            ["slider", "sliderator", "variable velocity", "stream", "graph", "SV"],
+            horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
+            quickRunTargets: QuickRunTargets.SingleSelection);
         services.AddMappingTool<ComboColourStudioViewModel>(
             "combo-colour-studio",
             "Combo Colour Studio",

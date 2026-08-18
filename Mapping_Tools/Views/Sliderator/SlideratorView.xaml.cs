@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,7 +16,6 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.SystemTools.QuickRun;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Classes.Tools;
-using Mapping_Tools.Classes.Tools.SlideratorStuff;
 using Mapping_Tools.Components.Dialogs;
 using Mapping_Tools.Components.Graph;
 using Mapping_Tools.Components.Graph.Interpolation;
@@ -25,9 +24,12 @@ using Mapping_Tools.Components.ObjectVisualiser;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools.Core.Classes.Graph;
+using Mapping_Tools.Core.Classes.Graph.Interpolation;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Classes.SystemTools;
 using Mapping_Tools.Core.Classes.ToolHelpers.Sliders;
+using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Viewmodels;
 using MaterialDesignThemes.Wpf;
 using HitObject = Mapping_Tools.Core.Classes.BeatmapHelper.HitObject;
@@ -62,7 +64,7 @@ namespace Mapping_Tools.Views.Sliderator {
 
             DataContext = new SlideratorVm();
             ViewModel.PropertyChanged += ViewModelOnPropertyChanged;
-            ViewModel.SlideratorView = this;
+            ViewModel.Interaction = new WpfSlideratorInteraction(this);
 
             Graph.VerticalMarkerGenerator = GetVerticalMarkerGenerator();
             Graph.HorizontalMarkerGenerator = GetHorizontalMarkerGenerator();
@@ -255,7 +257,7 @@ namespace Mapping_Tools.Views.Sliderator {
         }
 
         private void UpdateEverything() {
-            ViewModel.SlideratorView = this;
+            ViewModel.Interaction = new WpfSlideratorInteraction(this);
             UpdateGraphModeStuff();
             if (ViewModel.PixelLength < HitObjectElement.MaxPixelLength)
                 AnimateProgress(GraphHitObjectElement);
@@ -565,245 +567,87 @@ namespace Mapping_Tools.Views.Sliderator {
             e.Result = Sliderate((SlideratorVm) e.Argument, bgw);
         }
 
+        /// <summary>Completes the legacy interaction port when a QuickRun worker fails before its normal completion event.</summary>
+        protected override void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+            if (e.Error != null && ViewModel.Quick) {
+                RunFinished?.Invoke(this, new RunToolCompletedEventArgs(false, false, true));
+            }
+
+            base.BackgroundWorker_RunWorkerCompleted(sender, e);
+        }
+
         private string Sliderate(SlideratorVm arg, BackgroundWorker worker) {
-            // Make a position function for Sliderator
-            PositionFunctionDelegate positionFunction;
-            // Test if the function is a constant velocity
-            bool constantVelocity;
-            // We convert the graph GetValue function to a function that works like ms -> px
-            // d is a value representing the number of milliseconds into the slider
-            if (arg.GraphModeSetting == SlideratorVm.GraphMode.Velocity) {
-                // Here we use SvGraphMultiplier to get an accurate conversion from SV to slider completion per beat
-                // Completion = (100 * SliderMultiplier / PixelLength) * SV * Beats
-                positionFunction = d =>
-                    arg.GraphState.GetIntegral(0, d * arg.BeatsPerMinute / 60000) * arg.SvGraphMultiplier *
-                    arg.PixelLength;
+            return SliderateWithCore(arg, worker);
+        }
 
-                constantVelocity = Precision.AlmostEquals(AnchorCollection.GetMaxValue(arg.GraphState.Anchors),
-                    AnchorCollection.GetMinValue(arg.GraphState.Anchors));
-            }
-            else {
-                positionFunction = d => arg.GraphState.GetValue(d * arg.BeatsPerMinute / 60000) * arg.PixelLength;
-
-                constantVelocity = Precision.AlmostEquals(AnchorCollection.GetMaxDerivative(arg.GraphState.Anchors),
-                    AnchorCollection.GetMinDerivative(arg.GraphState.Anchors));
-            }
-
-            // Skip Sliderator if the velocity is constant AND equal to the new velocity
-            var simplifyShape = !arg.ExportAsInvisibleSlider && !arg.ExportAsStream && 
-                                    constantVelocity && Precision.AlmostEquals(
-                                    arg.PixelLength / arg.GraphBeats / arg.GlobalSv / 100,
-                                    arg.NewVelocity);
-
-            // Get the highest velocity occuring in the graph
-            double velocity = arg.NewVelocity; // Velocity is in SV
-            // Do bad stuff to the velocity to make sure its the same SV as after writing it to .osu code
-            velocity = -100 / float.Parse((-100 / velocity).ToInvariant(), CultureInfo.InvariantCulture);
-            // New velocity is in px / ms
-            var newVelocity = velocity * arg.SvGraphMultiplier * arg.PixelLength * arg.BeatsPerMinute / 60000;
-            var newSliderType = PathType.Bezier;
-            // Placeholder value. This is the length of the input slider
-            var newLength = velocity * arg.SvGraphMultiplier * arg.PixelLength * arg.GraphBeats;
-
-            // Time between timeline ticks for stream export
-            var deltaT = 60000 / arg.BeatsPerMinute / arg.BeatSnapDivisor;
-
-            // Delegate to BPM and remove ticks when exporting as invisible slider because it uses extreme speeds
-            var delegateToBpm = arg.DelegateToBpm || arg.ExportAsInvisibleSlider;
-            var removeSliderTicks = arg.RemoveSliderTicks || arg.ExportAsInvisibleSlider;
-
-            // Update progressbar
-            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(10);
-
-            List<Vector2> slideration = new List<Vector2>();
-            var sliderator = new Classes.Tools.SlideratorStuff.Sliderator {
-                PositionFunction = positionFunction,
-                MaxT = arg.GraphBeats / arg.BeatsPerMinute * 60000,
-                Velocity = newVelocity,
-                MinDendriteLength = arg.MinDendrite
-            };
-
-            if (!simplifyShape) {
-                // Get slider path like from the hit object preview
-                var sliderPath = new SliderPath(arg.VisibleHitObject.SliderType,
-                    arg.VisibleHitObject.GetAllCurvePoints().ToArray(),
-                    GetMaxCompletion(arg, arg.GraphState.Anchors) * arg.PixelLength);
-                var path = new List<Vector2>();
-                sliderPath.GetPathToProgress(path, 0, 1);
-
-                // Update progressbar
-                if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(20);
-
-                // Do Sliderator
-                sliderator.SetPath(path);
-
-                if (arg.ExportAsStream) {
-                    slideration = sliderator.SliderateStream(deltaT);
-                } else if (arg.ExportAsInvisibleSlider) {
-                    // Calculate sbPositions
-                    int duration = (int)Math.Round(sliderator.MaxT);
-
-                    Vector2[] sbPositions = new Vector2[duration + 1];
-                    for (int i = 0; i < duration + 1; i++) {
-                        sbPositions[i] = sliderPath.SliderballPositionAt((int)Math.Round(duration * positionFunction(i) / sliderPath.Distance), duration);
-                    }
-
-                    var (controlPoints, framedist) = SliderInvisiblator.Invisiblate(duration, sbPositions, arg.GlobalSv);
-
-                    slideration.AddRange(controlPoints);
-                    newSliderType = PathType.Linear;
-                    newVelocity = framedist;
-                    // We double to abuse linear slider sliderend snapping when the last segment has length 0
-                    newLength = HitObject.QuickCalculateLength(controlPoints) * 2;
-                } else {
-                    slideration = sliderator.Sliderate();
-                    newLength = sliderator.MaxS;
-
-                    // Check for some illegal output
-                    if (double.IsInfinity(sliderator.MaxS) || double.IsNaN(sliderator.MaxS)) {
-                        return "Encountered unexpected values from Sliderator. Please check your input.";
-                    }
-                }
-
-                // Check for some illegal output
-                if (slideration.Any(v => double.IsNaN(v.X) || double.IsNaN(v.Y))) {
-                    return "Encountered NaN coordinates. Please check your input.";
-                }
-            }
-            
-            // Update progressbar
-            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(60);
-
-            // Exporting stuff
-            BeatmapEditor editor;
+        private string SliderateWithCore(SlideratorVm arg, BackgroundWorker worker) {
             bool editorRead = false;
+            BeatmapEditor editor;
             if (arg.DoEditorRead) {
                 editor = EditorReaderStuff.GetNewestVersionOrNot(arg.Path, out _, out var exception);
-
-                if (exception == null)
-                    editorRead = true;
-
+                editorRead = exception == null;
                 arg.DoEditorRead = false;
             } else {
                 editor = new BeatmapEditor(arg.Path);
             }
-            
-            var beatmap = editor.Beatmap;
-            var timing = beatmap.BeatmapTiming;
 
-            // Get hit object that might be present at the export time or make a new one
-            var hitObjectHere = beatmap.HitObjects.FirstOrDefault(o => Math.Abs(arg.ExportTime - o.Time) < 5) ??
-                                new HitObject(arg.ExportTime, 0, SampleSet.None, SampleSet.None);
-
-
-            // Clone the hit object to not affect the already existing hit object instance with changes
-            var clone = new HitObject(hitObjectHere.GetLine()) {
-                IsCircle = arg.ExportAsStream, IsSpinner = false, IsHoldNote = false, IsSlider = !arg.ExportAsStream
+            var options = new SlideratorOptions {
+                GlobalSv = arg.GlobalSv,
+                GraphBeats = arg.GraphBeats,
+                BeatsPerMinute = arg.BeatsPerMinute,
+                PixelLength = arg.PixelLength,
+                BeatSnapDivisor = arg.BeatSnapDivisor,
+                ExportTime = arg.ExportTime,
+                ExportModeSetting = (Mapping_Tools.Core.Tools.Sliderator.SlideratorExportMode)(int)arg.ExportModeSetting,
+                GraphModeSetting = (Mapping_Tools.Core.Tools.Sliderator.SlideratorGraphMode)(int)arg.GraphModeSetting,
+                VelocityLimit = arg.VelocityLimit,
+                ManualVelocity = arg.ManualVelocity,
+                NewVelocity = arg.NewVelocity,
+                MinDendrite = arg.MinDendrite,
+                DelegateToBpm = arg.DelegateToBpm,
+                RemoveSliderTicks = arg.RemoveSliderTicks,
+                ExportAsNormal = arg.ExportAsNormal,
+                ExportAsStream = arg.ExportAsStream,
+                ExportAsInvisibleSlider = arg.ExportAsInvisibleSlider,
+                GraphState = ToCoreGraphState(arg.GraphState)
             };
+            var applied = SlideratorEngine.Apply(
+                editor.Beatmap,
+                arg.VisibleHitObject,
+                options,
+                worker == null ? null : new Progress<double>(value => worker.ReportProgress((int)value)),
+                CancellationToken.None);
+            editor.Beatmap.SortHitObjects();
+            editor.SaveFile();
+            worker?.ReportProgress(100);
+            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true, arg.Reload && editorRead, arg.Quick));
+            return arg.Quick ? string.Empty : "Done!";
+        }
 
-            // Update progressbar
-            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(70);
-
-            if (!arg.ExportAsStream) {
-                // Export as a sliderated slider
-
-                // Give the new hit object the sliderated anchors
-                if (simplifyShape) {
-                    // The velocity is constant, so you can simplify to the original slider shape
-                    clone.SetAllCurvePoints(arg.VisibleHitObject.GetAllCurvePoints());
-                    clone.SliderType = arg.VisibleHitObject.SliderType;
-                } else {
-                    clone.SetAllCurvePoints(slideration);
-                    clone.SliderType = newSliderType;
-                }
-
-                clone.PixelLength = newLength;
-
-                // Remove repeats for NaN SV sliders to prevent gamebreaking
-                if (delegateToBpm && removeSliderTicks) {
-                    clone.Repeat = 1;
-                }
-
-                // Convert px/ms to SV
-                var newVelocitySV = newVelocity / (arg.SvGraphMultiplier * arg.PixelLength * arg.BeatsPerMinute / 60000);
-                clone.SliderVelocity = -100 / newVelocitySV;
-                
-                // Add hit object
-                if (arg.ExportModeSetting == SlideratorVm.ExportMode.Add) {
-                    beatmap.HitObjects.Add(clone);
-                } else {
-                    beatmap.HitObjects.Remove(hitObjectHere);
-                    beatmap.HitObjects.Add(clone);
-                }
-
-                // Add SV
-                var timingPointsChanges = new List<TimingPointsChange>();
-
-                if (delegateToBpm) {
-                    var tpAfter = timing.GetRedlineAtTime(clone.Time).Copy();
-                    var tpOn = tpAfter.Copy();
-
-                    tpAfter.Offset = clone.Time;
-                    tpOn.Offset = clone.Time - 1;  // This one will be on the slider
-
-                    tpAfter.OmitFirstBarLine = true;
-                    tpOn.OmitFirstBarLine = true;
-
-                    // Express velocity in BPM
-                    tpOn.MpB *= clone.SliderVelocity / -100;
-                    // NaN SV results in removal of slider ticks
-                    clone.SliderVelocity = removeSliderTicks ? double.NaN : -100;
-                    
-                    // Add redlines
-                    timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon));
-                    timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb: true, unInherited: true, omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon));
-
-                    clone.Time -= 1;
-                }
-
-                // Add SV for every hit object so the SV doesnt change for anything else than the sliderated slider
-                timingPointsChanges.AddRange(beatmap.HitObjects.Select(ho => {
-                        var sv = ho == clone ? ho.SliderVelocity : timing.GetSvAtTime(ho.Time);
-                        var tp = timing.GetTimingPointAtTime(ho.Time).Copy();
-                        tp.MpB = sv;
-                        tp.Offset = ho.Time;
-                        return new TimingPointsChange(tp, mpb: true, fuzzyness: Precision.DoubleEpsilon);
-                    }));
-
-                TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
-            } else {
-                // Add hit objects
-                if (arg.ExportModeSetting == SlideratorVm.ExportMode.Override) {
-                    beatmap.HitObjects.Remove(hitObjectHere);
-                }
-
-                double t = arg.ExportTime;
-                foreach (var pos in slideration) {
-                    clone.Pos = pos;
-                    clone.Time = t;
-                    beatmap.HitObjects.Add(clone);
-
-                    clone = new HitObject(clone.GetLine()) {
-                        IsCircle = true, IsSpinner = false, IsHoldNote = false, IsSlider = false, NewCombo = false
-                    };
-                    t += deltaT;
-                }
+        private static Mapping_Tools.Core.Classes.Graph.GraphState ToCoreGraphState(
+            Mapping_Tools.Components.Graph.GraphState state) {
+            if (state == null || state.Anchors == null || state.Anchors.Count == 0) {
+                return SlideratorOptions.CreatePositionGraph(3);
             }
 
-            // Update progressbar
-            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(80);
+            var anchors = state.Anchors.Select(anchor => new Mapping_Tools.Core.Classes.Graph.GraphAnchor(
+                anchor.Pos,
+                ToCoreInterpolator(anchor.Interpolator),
+                anchor.Tension));
+            return new Mapping_Tools.Core.Classes.Graph.GraphState(
+                anchors,
+                state.MinX,
+                state.MinY,
+                state.MaxX,
+                state.MaxY);
+        }
 
-            beatmap.SortHitObjects();
-
-            editor.SaveFile();
-
-            // Complete progressbar
-            if (worker != null && worker.WorkerReportsProgress) worker.ReportProgress(100);
-            
-            // Do stuff
-            RunFinished?.Invoke(this, new RunToolCompletedEventArgs(true,  arg.Reload && editorRead, arg.Quick));
-
-            return arg.Quick ? string.Empty : "Done!";
+        private static Mapping_Tools.Core.Classes.Graph.Interpolation.IGraphInterpolator ToCoreInterpolator(
+            Mapping_Tools.Components.Graph.Interpolation.IGraphInterpolator interpolator) {
+            Type? type = GraphInterpolatorCatalog.GetInterpolators().FirstOrDefault(
+                candidate => candidate.Name == interpolator.GetType().Name);
+            return GraphInterpolatorCatalog.GetInterpolator(
+                type ?? typeof(Mapping_Tools.Core.Classes.Graph.Interpolation.Interpolators.SingleCurveInterpolator));
         }
 
         public SlideratorVm GetSaveData() {

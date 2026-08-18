@@ -5,6 +5,7 @@ using Mapping_Tools.Application.HitsoundCopier;
 using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.SliderMerger;
 using Mapping_Tools.Application.SliderPicturator;
+using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.MapsetMerger;
@@ -12,6 +13,7 @@ using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.Graph;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.RhythmGuide;
@@ -108,6 +110,12 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             "Mapping_Tools.Viewmodels.SliderMergerVm";
         private const string LegacySliderPicturatorProject =
             "Mapping_Tools.Viewmodels.SliderPicturatorVm";
+        private const string LegacySlideratorProject =
+            "Mapping_Tools.Viewmodels.SlideratorVm";
+        private const string LegacyGraphState =
+            "Mapping_Tools.Components.Graph.GraphState";
+        private const string LegacyGraphAnchor =
+            "Mapping_Tools.Components.Graph.AnchorState";
         private const string LegacyMapsetMergerProject =
             "Mapping_Tools.Viewmodels.MapsetMergerVm";
         private const string LegacyMapsetMergerItem =
@@ -180,6 +188,18 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 {
                     return typeof(SliderPicturatorProject);
                 }
+                if (typeName == LegacySlideratorProject)
+                {
+                    return typeof(SlideratorProject);
+                }
+                if (typeName == LegacyGraphState)
+                {
+                    return typeof(GraphState);
+                }
+                if (typeName == LegacyGraphAnchor)
+                {
+                    return typeof(GraphAnchor);
+                }
                 if (typeName == LegacyMapsetMergerProject)
                 {
                     return typeof(MapsetMergerProject);
@@ -212,7 +232,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 // Accept both the former namespace and documents emitted by
                 // an intermediate migration build that already used Core names.
                 Type? migratedType = MigratedCoreMarker.Assembly.GetType(typeName)
-                    ?? MigratedCoreMarker.Assembly.GetType(ToCurrentTypeName(typeName));
+                    ?? MigratedCoreMarker.Assembly.GetType(ToCurrentTypeName(typeName))
+                    ?? MigratedCoreMarker.Assembly.GetType(ToCurrentGraphTypeName(typeName));
                 if (migratedType is not null)
                 {
                     return migratedType;
@@ -305,6 +326,24 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 typeName = LegacySliderPicturatorProject;
                 return;
             }
+            if (serializedType == typeof(SlideratorProject))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacySlideratorProject;
+                return;
+            }
+            if (serializedType == typeof(GraphState))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyGraphState;
+                return;
+            }
+            if (serializedType == typeof(GraphAnchor))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyGraphAnchor;
+                return;
+            }
             if (serializedType == typeof(MapsetMergerProject))
             {
                 assemblyName = LegacyAssemblyName;
@@ -363,10 +402,17 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 ? CurrentNamespacePrefix + typeName[LegacyNamespacePrefix.Length..]
                 : typeName;
 
-        private static string? ToLegacyTypeName(string? typeName) =>
-            typeName?.StartsWith(CurrentNamespacePrefix, StringComparison.Ordinal) == true
-                ? LegacyNamespacePrefix + typeName[CurrentNamespacePrefix.Length..]
+        private static string ToCurrentGraphTypeName(string typeName) =>
+            typeName.StartsWith("Mapping_Tools.Components.Graph", StringComparison.Ordinal)
+                ? "Mapping_Tools.Core.Classes.Graph" + typeName["Mapping_Tools.Components.Graph".Length..]
                 : typeName;
+
+        private static string? ToLegacyTypeName(string? typeName) =>
+            typeName?.StartsWith("Mapping_Tools.Core.Classes.Graph", StringComparison.Ordinal) == true
+                ? "Mapping_Tools.Components.Graph" + typeName["Mapping_Tools.Core.Classes.Graph".Length..]
+                : typeName?.StartsWith(CurrentNamespacePrefix, StringComparison.Ordinal) == true
+                    ? LegacyNamespacePrefix + typeName[CurrentNamespacePrefix.Length..]
+                    : typeName;
     }
 
     private sealed class Vector2Converter : JsonConverter

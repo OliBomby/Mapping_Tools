@@ -1,0 +1,366 @@
+using System.Globalization;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.Graph;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.ToolHelpers.Sliders;
+using Mapping_Tools.Core.Classes.BeatmapHelper.SliderPathStuff;
+
+namespace Mapping_Tools.Core.Tools.Sliderator;
+
+/// <summary>Describes the generated Sliderator output before it is persisted.</summary>
+/// <param name="NewLength">The output object's serialized pixel length.</param>
+/// <param name="NewVelocity">The output object's effective travel rate.</param>
+/// <param name="Simplified">Whether the source slider shape was reused.</param>
+/// <param name="ObjectCount">The number of objects emitted by the operation.</param>
+public sealed record SlideratorApplyResult(
+    double NewLength,
+    double NewVelocity,
+    bool Simplified,
+    int ObjectCount);
+
+/// <summary>
+/// Applies Sliderator's graph-driven geometry and beatmap export rules to a
+/// mutable Core beatmap without depending on a UI framework or a filesystem.
+/// </summary>
+public static class SlideratorEngine
+{
+    /// <summary>
+    /// Generates and exports one slider or stream from the selected source slider.
+    /// </summary>
+    /// <param name="beatmap">The mutable target beatmap.</param>
+    /// <param name="sourceSlider">The imported slider whose path is previewed and transformed.</param>
+    /// <param name="options">The complete graph and export settings.</param>
+    /// <param name="progress">Optional percentage progress receiver.</param>
+    /// <param name="cancellationToken">Cancels before expensive generation steps and writes.</param>
+    /// <returns>Output dimensions and whether source geometry was reused.</returns>
+    /// <exception cref="ArgumentException">A setting or generated value is invalid.</exception>
+    /// <exception cref="InvalidOperationException">The source is not a slider or its path is empty.</exception>
+    public static SlideratorApplyResult Apply(
+        Beatmap beatmap,
+        HitObject sourceSlider,
+        SlideratorOptions options,
+        IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(beatmap);
+        ArgumentNullException.ThrowIfNull(sourceSlider);
+        ArgumentNullException.ThrowIfNull(options);
+        Validate(options, sourceSlider);
+
+        GraphState graph = options.GraphState;
+        Func<double, double> positionFunction;
+        bool constantVelocity;
+        if (options.GraphModeSetting == SlideratorGraphMode.Velocity)
+        {
+            positionFunction = milliseconds =>
+                graph.GetIntegral(0, milliseconds * options.BeatsPerMinute / 60000) *
+                GetSvGraphMultiplier(options) * options.PixelLength;
+            constantVelocity = Precision.AlmostEquals(graph.GetMaxValue(), graph.GetMinValue());
+        }
+        else
+        {
+            positionFunction = milliseconds =>
+                graph.GetValue(milliseconds * options.BeatsPerMinute / 60000) * options.PixelLength;
+            constantVelocity = Precision.AlmostEquals(graph.GetMaxDerivative(), graph.GetMinDerivative());
+        }
+
+        bool simplifyShape = options.ExportAsNormal &&
+                             !options.ExportAsInvisibleSlider &&
+                             !options.ExportAsStream &&
+                             constantVelocity &&
+                             Precision.AlmostEquals(
+                                 options.PixelLength / options.GraphBeats / options.GlobalSv / 100,
+                                 options.NewVelocity);
+
+        double velocity = options.NewVelocity;
+        velocity = -100 / float.Parse(
+            (-100 / velocity).ToInvariant(),
+            CultureInfo.InvariantCulture);
+        double svGraphMultiplier = GetSvGraphMultiplier(options);
+        double newVelocity = velocity * svGraphMultiplier * options.PixelLength *
+                             options.BeatsPerMinute / 60000;
+        PathType newSliderType = PathType.Bezier;
+        double newLength = velocity * svGraphMultiplier * options.PixelLength * options.GraphBeats;
+        double deltaT = 60000 / options.BeatsPerMinute / options.BeatSnapDivisor;
+        bool delegateToBpm = options.DelegateToBpm || options.ExportAsInvisibleSlider;
+        bool removeSliderTicks = options.RemoveSliderTicks || options.ExportAsInvisibleSlider;
+        progress?.Report(10);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        List<Vector2> generated = [];
+        SlideratorPathGenerator sliderator = new()
+        {
+            PositionFunction = positionFunction,
+            MaxT = options.GraphBeats / options.BeatsPerMinute * 60000,
+            Velocity = newVelocity,
+            MinDendriteLength = options.MinDendrite
+        };
+
+        if (!simplifyShape)
+        {
+            SliderPath sourcePath = new(
+                sourceSlider.SliderType,
+                sourceSlider.GetAllCurvePoints().ToArray(),
+                GetMaxCompletion(options) * options.PixelLength);
+            List<Vector2> path = [];
+            sourcePath.GetPathToProgress(path, 0, 1);
+            progress?.Report(20);
+            cancellationToken.ThrowIfCancellationRequested();
+            sliderator.SetPath(path);
+
+            if (options.ExportAsStream)
+            {
+                generated = sliderator.SliderateStream(deltaT);
+            }
+            else if (options.ExportAsInvisibleSlider)
+            {
+                int duration = (int)Math.Round(sliderator.MaxT);
+                Vector2[] sliderballPositions = new Vector2[duration + 1];
+                for (int index = 0; index <= duration; index++)
+                {
+                    sliderballPositions[index] = sourcePath.SliderballPositionAt(
+                        (int)Math.Round(duration * positionFunction(index) / sourcePath.Distance),
+                        duration);
+                }
+
+                (Vector2[] controlPoints, double frameDistance) = SliderInvisiblator.Invisiblate(
+                    duration,
+                    sliderballPositions,
+                    options.GlobalSv);
+                generated.AddRange(controlPoints);
+                newSliderType = PathType.Linear;
+                newVelocity = frameDistance;
+                newLength = HitObject.QuickCalculateLength(controlPoints) * 2;
+            }
+            else
+            {
+                generated = sliderator.Sliderate();
+                newLength = sliderator.MaxS;
+                if (!double.IsFinite(newLength))
+                {
+                    throw new ArgumentException(
+                        "Encountered unexpected values from Sliderator. Please check your input.");
+                }
+            }
+
+            if (generated.Any(point => !double.IsFinite(point.X) || !double.IsFinite(point.Y)))
+            {
+                throw new ArgumentException(
+                    "Encountered NaN coordinates. Please check your input.");
+            }
+        }
+
+        progress?.Report(60);
+        cancellationToken.ThrowIfCancellationRequested();
+        Timing timing = beatmap.BeatmapTiming;
+        HitObject hitObjectHere = beatmap.HitObjects.FirstOrDefault(
+            hitObject => Math.Abs(options.ExportTime - hitObject.Time) < 5)
+            ?? new HitObject(options.ExportTime, 0, SampleSet.None, SampleSet.None);
+        HitObject clone = new(hitObjectHere.GetLine())
+        {
+            IsCircle = options.ExportAsStream,
+            IsSpinner = false,
+            IsHoldNote = false,
+            IsSlider = !options.ExportAsStream
+        };
+
+        progress?.Report(70);
+        cancellationToken.ThrowIfCancellationRequested();
+        int objectCount;
+        if (!options.ExportAsStream)
+        {
+            if (simplifyShape)
+            {
+                clone.SetAllCurvePoints(sourceSlider.GetAllCurvePoints());
+                clone.SliderType = sourceSlider.SliderType;
+            }
+            else
+            {
+                clone.SetAllCurvePoints(generated);
+                clone.SliderType = newSliderType;
+            }
+
+            clone.PixelLength = newLength;
+            if (delegateToBpm && removeSliderTicks)
+            {
+                clone.Repeat = 1;
+            }
+
+            double newVelocitySv = newVelocity /
+                                   (svGraphMultiplier * options.PixelLength * options.BeatsPerMinute / 60000);
+            clone.SliderVelocity = -100 / newVelocitySv;
+            if (options.ExportModeSetting == SlideratorExportMode.Add)
+            {
+                beatmap.HitObjects.Add(clone);
+            }
+            else
+            {
+                beatmap.HitObjects.Remove(hitObjectHere);
+                beatmap.HitObjects.Add(clone);
+            }
+
+            List<TimingPointChange> changes = [];
+            if (delegateToBpm)
+            {
+                TimingPoint after = timing.GetRedlineAtTime(clone.Time).Copy();
+                TimingPoint on = after.Copy();
+                after.Offset = clone.Time;
+                on.Offset = clone.Time - 1;
+                after.OmitFirstBarLine = true;
+                on.OmitFirstBarLine = true;
+                on.MpB *= clone.SliderVelocity / -100;
+                clone.SliderVelocity = removeSliderTicks ? double.NaN : -100;
+                changes.Add(new TimingPointChange(
+                    on,
+                    mpb: true,
+                    uninherited: true,
+                    omitFirstBarLine: true,
+                    fuzziness: Precision.DoubleEpsilon));
+                changes.Add(new TimingPointChange(
+                    after,
+                    mpb: true,
+                    uninherited: true,
+                    omitFirstBarLine: true,
+                    fuzziness: Precision.DoubleEpsilon));
+                clone.Time -= 1;
+            }
+
+            changes.AddRange(beatmap.HitObjects.Select(hitObject =>
+            {
+                double sv = hitObject == clone
+                    ? hitObject.SliderVelocity
+                    : timing.GetSvAtTime(hitObject.Time);
+                TimingPoint point = timing.GetTimingPointAtTime(hitObject.Time).Copy();
+                point.MpB = sv;
+                point.Offset = hitObject.Time;
+                return new TimingPointChange(point, mpb: true, fuzziness: Precision.DoubleEpsilon);
+            }));
+            TimingPointChange.Apply(timing, changes);
+            objectCount = 1;
+        }
+        else
+        {
+            if (options.ExportModeSetting == SlideratorExportMode.Override)
+            {
+                beatmap.HitObjects.Remove(hitObjectHere);
+            }
+
+            double time = options.ExportTime;
+            objectCount = 0;
+            foreach (Vector2 position in generated)
+            {
+                clone.Pos = position;
+                clone.Time = time;
+                beatmap.HitObjects.Add(clone);
+                objectCount++;
+                clone = new HitObject(clone.GetLine())
+                {
+                    IsCircle = true,
+                    IsSpinner = false,
+                    IsHoldNote = false,
+                    IsSlider = false,
+                    NewCombo = false
+                };
+                time += deltaT;
+            }
+        }
+
+        progress?.Report(80);
+        beatmap.SortHitObjects();
+        progress?.Report(100);
+        return new SlideratorApplyResult(newLength, newVelocity, simplifyShape, objectCount);
+    }
+
+    /// <summary>Calculates the normalized graph-to-slider conversion multiplier.</summary>
+    /// <param name="options">The graph and map settings.</param>
+    /// <returns>Multiplier from graph completion units to slider pixels.</returns>
+    public static double GetSvGraphMultiplier(SlideratorOptions options) =>
+        100 * options.GlobalSv / options.PixelLength;
+
+    /// <summary>Calculates the maximum preview completion represented by the graph.</summary>
+    /// <param name="options">The graph and map settings.</param>
+    /// <returns>The largest graph completion value.</returns>
+    public static double GetMaxCompletion(SlideratorOptions options) =>
+        options.GraphModeSetting == SlideratorGraphMode.Velocity
+            ? options.GraphState.GetMaxIntegral() * GetSvGraphMultiplier(options)
+            : options.GraphState.GetMaxValue();
+
+    /// <summary>Calculates the minimum preview completion represented by the graph.</summary>
+    /// <param name="options">The graph and map settings.</param>
+    /// <returns>The smallest graph completion value.</returns>
+    public static double GetMinCompletion(SlideratorOptions options) =>
+        options.GraphModeSetting == SlideratorGraphMode.Velocity
+            ? options.GraphState.GetMinIntegral() * GetSvGraphMultiplier(options)
+            : options.GraphState.GetMinValue();
+
+    /// <summary>Calculates the maximum absolute SV represented by the graph.</summary>
+    /// <param name="options">The graph and map settings.</param>
+    /// <returns>The largest absolute SV value.</returns>
+    public static double GetMaximumVelocity(SlideratorOptions options)
+    {
+        return options.GraphModeSetting == SlideratorGraphMode.Velocity
+            ? Math.Max(Math.Abs(options.GraphState.GetMaxValue()), Math.Abs(options.GraphState.GetMinValue()))
+            : Math.Max(Math.Abs(options.GraphState.GetMaxDerivative()), Math.Abs(options.GraphState.GetMinDerivative())) /
+              GetSvGraphMultiplier(options);
+    }
+
+    /// <summary>Validates the domain settings required before generation.</summary>
+    /// <param name="options">The complete Sliderator settings.</param>
+    /// <param name="sourceSlider">The imported source object.</param>
+    /// <exception cref="ArgumentException">A setting is outside the legacy contract.</exception>
+    /// <exception cref="InvalidOperationException">The source is not a slider.</exception>
+    public static void Validate(SlideratorOptions options, HitObject sourceSlider)
+    {
+        if (!sourceSlider.IsSlider)
+        {
+            throw new InvalidOperationException("Sliderator requires a slider source object.");
+        }
+
+        if (!Enum.IsDefined(options.ExportModeSetting) || !Enum.IsDefined(options.GraphModeSetting))
+        {
+            throw new ArgumentException("Sliderator contains an unknown export or graph mode.", nameof(options));
+        }
+
+        if (GetMinCompletion(options) < -1E-4)
+        {
+            throw new ArgumentException("Negative position is illegal.", nameof(options));
+        }
+
+        double maximumVelocity = options.NewVelocity;
+        if (options.ExportAsNormal && double.IsInfinity(maximumVelocity))
+        {
+            throw new ArgumentException("Infinite slope on the path is illegal.", nameof(options));
+        }
+
+        if (options.ExportAsNormal && maximumVelocity > options.VelocityLimit + Precision.DoubleEpsilon)
+        {
+            throw new ArgumentException(
+                "A velocity faster than the SV limit is illegal. Please check your graph or increase the SV limit.",
+                nameof(options));
+        }
+
+        if (!double.IsFinite(options.BeatsPerMinute) ||
+            Math.Abs(options.BeatsPerMinute) < Precision.DoubleEpsilon)
+        {
+            throw new ArgumentException("The beats per minute field has an illegal value", nameof(options));
+        }
+
+        if (!double.IsFinite(options.GraphBeats) || Math.Abs(options.GraphBeats) < Precision.DoubleEpsilon)
+        {
+            throw new ArgumentException("The beat length field has an illegal value", nameof(options));
+        }
+
+        if (!double.IsFinite(options.GlobalSv) || Math.Abs(options.GlobalSv) < Precision.DoubleEpsilon)
+        {
+            throw new ArgumentException("The global SV field has an illegal value", nameof(options));
+        }
+
+        if (!double.IsFinite(options.PixelLength) || options.PixelLength <= 0 ||
+            !double.IsFinite(options.NewVelocity) || !double.IsFinite(options.MinDendrite) ||
+            options.MinDendrite <= 0 || options.BeatSnapDivisor is < 1 or > 16)
+        {
+            throw new ArgumentException("Sliderator contains an illegal numeric setting.", nameof(options));
+        }
+    }
+}

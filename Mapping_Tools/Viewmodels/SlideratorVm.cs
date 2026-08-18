@@ -5,7 +5,7 @@ using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.ToolHelpers;
 using Mapping_Tools.Components.Domain;
 using Mapping_Tools.Components.Graph;
-using Mapping_Tools.Views.Sliderator;
+using Mapping_Tools.Application.Sliderator;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,6 +14,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Threading.Tasks;
 using Mapping_Tools.Core.Classes.SystemTools;
 using HitObject = Mapping_Tools.Core.Classes.BeatmapHelper.HitObject;
 
@@ -282,7 +283,8 @@ namespace Mapping_Tools.Viewmodels {
         public string Path { get; set; }
 
         [JsonIgnore]
-        public SlideratorView SlideratorView { get; set; }
+        /// <summary>Coordinates Shift navigation with the view's placement boundary.</summary>
+        public ISlideratorInteraction Interaction { get; set; }
 
         [JsonIgnore]
         public bool Quick { get; set; }
@@ -322,16 +324,14 @@ namespace Mapping_Tools.Viewmodels {
             );
             MoveLeftCommand = new CommandImplementation(_ => {
                 if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
-                    SlideratorView.RunFast();
-                    SlideratorView.RunFinished += SlideratorViewOnRunFinishedMoveLeftOnce;
+                    _ = RunFastThenMoveLeftAsync();
                 } else {
                     MoveLeftOnce();
                 }
             });
             MoveRightCommand = new CommandImplementation(_ => {
                 if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)) {
-                    SlideratorView.RunFast();
-                    SlideratorView.RunFinished += SlideratorViewOnRunFinishedMoveRightOnce;
+                    _ = RunFastThenMoveRightAsync();
                 } else {
                     MoveRightOnce();
                 }
@@ -339,18 +339,20 @@ namespace Mapping_Tools.Viewmodels {
             GraphToggleCommand = new CommandImplementation(ToggleGraphMode);
         }
 
-        private void SlideratorViewOnRunFinishedMoveLeftOnce(object sender, EventArgs e) {
-            System.Windows.Application.Current.Dispatcher?.Invoke(() => {
-                SlideratorView.RunFinished -= SlideratorViewOnRunFinishedMoveLeftOnce;
-                MoveLeftOnce();
-            });
+        private async Task RunFastThenMoveLeftAsync() {
+            if (Interaction != null && !await Interaction.RunFastAsync()) {
+                return;
+            }
+
+            MoveLeftOnce();
         }
 
-        private void SlideratorViewOnRunFinishedMoveRightOnce(object sender, EventArgs e) {
-            System.Windows.Application.Current.Dispatcher?.Invoke(() => {
-                SlideratorView.RunFinished -= SlideratorViewOnRunFinishedMoveRightOnce;
-                MoveRightOnce();
-            });
+        private async Task RunFastThenMoveRightAsync() {
+            if (Interaction != null && !await Interaction.RunFastAsync()) {
+                return;
+            }
+
+            MoveRightOnce();
         }
 
         private void MoveRightOnce() {
