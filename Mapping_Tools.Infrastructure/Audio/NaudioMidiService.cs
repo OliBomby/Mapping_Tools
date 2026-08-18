@@ -74,14 +74,41 @@ public sealed class NaudioMidiService : IMidiService
                         double duration = noteOn.OffEvent is null
                             ? 0
                             : CalculateTime(noteOn.OffEvent.AbsoluteTime, tempos, cumulativeTimes, file.DeltaTicksPerQuarterNote) - start;
+                        int noteBank = banks.TryGetValue(noteOn.Channel, out int importedBank) ? importedBank : 0;
+                        int notePatch = patches.TryGetValue(noteOn.Channel, out int importedPatch) ? importedPatch : 0;
+                        string instrumentName = noteBank == 128
+                            ? "Percussion"
+                            : notePatch is >= 0 and < 128
+                                ? PatchChangeEvent.GetPatchName(notePatch)
+                                : "Undefined";
+                        int channel = noteOn.Channel;
+                        string keyName;
+                        if (noteBank == 128)
+                        {
+                            noteOn.Channel = 10;
+                            keyName = noteOn.NoteName;
+                        }
+                        else if (channel == 10)
+                        {
+                            noteOn.Channel = 1;
+                            keyName = noteOn.NoteName;
+                        }
+                        else
+                        {
+                            keyName = noteOn.NoteName;
+                        }
+
+                        noteOn.Channel = channel;
                         notes.Add(new MidiNote(
                             start,
                             Math.Max(0, duration),
-                            banks.TryGetValue(noteOn.Channel, out int noteBank) ? noteBank : 0,
-                            patches.TryGetValue(noteOn.Channel, out int notePatch) ? notePatch : 0,
+                            noteBank,
+                            notePatch,
                             noteOn.NoteNumber,
                             noteOn.Velocity,
-                            noteOn.Channel));
+                            channel,
+                            instrumentName,
+                            keyName));
                         break;
                 }
             }

@@ -53,6 +53,13 @@ static internal class DesktopFeatureRegistrationExtensions {
             ["hitsound", "preview", "zone", "sample", "position"],
             verticalScrollBarVisibility: ScrollBarVisibility.Auto,
             quickRunTargets: QuickRunTargets.Always);
+        services.AddMappingTool<HitsoundStudioViewModel>(
+            "hitsound-studio",
+            "Hitsound Studio",
+            "Import, edit, preview, generate, and export hitsound layers.",
+            ["hitsound", "studio", "sample", "MIDI", "SoundFont", "export", "layer"],
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
+            quickRunTargets: QuickRunTargets.Always);
         services.AddMappingTool<HitsoundCopierViewModel>(
             "hitsound-copier",
             "Hitsound Copier",

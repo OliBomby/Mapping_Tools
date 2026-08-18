@@ -6,6 +6,7 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.ComboColourStudio;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.HitsoundPreviewHelper;
+using Mapping_Tools.Application.HitsoundStudio;
 using Mapping_Tools.Application.HitsoundCopier;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.MapCleaner;
@@ -73,6 +74,10 @@ internal static class DesktopServiceRegistration
         });
         services.AddSingleton<IPatternGalleryInputDialog>(provider =>
             new PatternGalleryInputDialog(() => provider.GetRequiredService<MainWindow>()));
+        services.AddSingleton<IHitsoundStudioDialogService>(provider =>
+            new HitsoundStudioDialogService(
+                () => provider.GetRequiredService<MainWindow>(),
+                provider.GetRequiredService<IFilePicker>()));
 
         services.AddSingleton<IFilePicker>(provider =>
         {
@@ -134,6 +139,10 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IBetterSaveService, BetterSaveService>();
         services.AddSingleton<IRhythmGuideService, RhythmGuideService>();
         services.AddSingleton<IHitsoundPreviewHelperService, HitsoundPreviewHelperService>();
+        services.AddSingleton<Mapping_Tools.Core.Tools.HitsoundStudio.HitsoundStudioEngine>();
+        services.AddSingleton<IAudioClipMixer, NaudioAudioClipMixer>();
+        services.AddSingleton<IHitsoundStudioFileSystem, PhysicalHitsoundStudioFileSystem>();
+        services.AddSingleton<IHitsoundStudioService, HitsoundStudioService>();
         services.AddSingleton<IHitsoundCopierService, HitsoundCopierService>();
         services.AddSingleton<IHitsoundSampleService, PhysicalHitsoundSampleService>();
         services.AddSingleton<IAudioDecoder, NaudioAudioDecoder>();

@@ -11,7 +11,18 @@ public sealed class MidiNote
     /// <param name="key">MIDI key number.</param>
     /// <param name="velocity">MIDI velocity.</param>
     /// <param name="channel">Source MIDI channel, or <c>-1</c> when unspecified.</param>
-    public MidiNote(double startMilliseconds, double durationMilliseconds, int bank, int patch, int key, int velocity, int channel = -1)
+    /// <param name="instrumentName">Optional source-format instrument name for display.</param>
+    /// <param name="keyName">Optional source-format note name for display.</param>
+    public MidiNote(
+        double startMilliseconds,
+        double durationMilliseconds,
+        int bank,
+        int patch,
+        int key,
+        int velocity,
+        int channel = -1,
+        string? instrumentName = null,
+        string? keyName = null)
     {
         if (!double.IsFinite(startMilliseconds) || startMilliseconds < 0)
         {
@@ -30,6 +41,8 @@ public sealed class MidiNote
         Key = key;
         Velocity = velocity;
         Channel = channel;
+        InstrumentName = instrumentName;
+        KeyName = keyName;
     }
 
     /// <summary>Gets the note start in milliseconds.</summary>
@@ -52,6 +65,12 @@ public sealed class MidiNote
 
     /// <summary>Gets the source MIDI channel, or <c>-1</c> when unspecified.</summary>
     public int Channel { get; }
+
+    /// <summary>Gets the optional source-format instrument name.</summary>
+    public string? InstrumentName { get; }
+
+    /// <summary>Gets the optional source-format note name.</summary>
+    public string? KeyName { get; }
 }
 
 /// <summary>Represents a MIDI main-volume change on a timestamp.</summary>

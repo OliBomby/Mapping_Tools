@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Mapping_Tools.Application.MapsetMerger;
+using Mapping_Tools.Application.HitsoundStudio;
 using Mapping_Tools.Application.TumourGenerator;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Infrastructure.Projects;
@@ -10,6 +11,65 @@ namespace Mapping_Tools.Infrastructure.Tests.MapsetMerger;
 [TestClass]
 public sealed class LegacyProjectJsonSerializerTests
 {
+    [TestMethod]
+    public void Deserialize_WithLegacyHitsoundStudioRoot_RestoresSavedDataShape()
+    {
+        // Arrange
+        const string json = """
+            {
+              "$type": "Mapping_Tools.Viewmodels.HitsoundStudioVm, Mapping Tools",
+              "BaseBeatmap": "C:\\Maps\\base.osu",
+              "ExportFolder": "C:\\Export",
+              "HitsoundDiffName": "Hitsounds",
+              "ExportMap": true,
+              "ExportSamples": true,
+              "UsePreviousSampleSchema": false,
+              "HitsoundLayers": []
+            }
+            """;
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        HitsoundStudioProject project = serializer.Deserialize<HitsoundStudioProject>(json);
+
+        // Assert
+        project.BaseBeatmap.Should().Be("C:\\Maps\\base.osu");
+        project.ExportFolder.Should().Be("C:\\Export");
+        project.HitsoundLayers.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void Serialize_WithHitsoundStudioProject_UsesLegacyRootName()
+    {
+        // Arrange
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        string json = serializer.Serialize(new HitsoundStudioProject());
+
+        // Assert
+        json.Should().Contain("Mapping_Tools.Viewmodels.HitsoundStudioVm, Mapping Tools");
+    }
+
+    [TestMethod]
+    public void Deserialize_WithHitsoundStudioFixture_RestoresSchemaSettingsAndSampleMetadata()
+    {
+        // Arrange
+        string json = File.ReadAllText(
+            Path.Combine(AppContext.BaseDirectory, "Fixtures", "Projects", "hsstudioproject.json"));
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        HitsoundStudioProject project = serializer.Deserialize<HitsoundStudioProject>(json);
+
+        // Assert
+        project.ShowResults.Should().BeTrue();
+        project.DeleteAllInExportFirst.Should().BeTrue();
+        project.DefaultSample.SampleSet.Should().Be(Mapping_Tools.Core.Classes.BeatmapHelper.Enums.SampleSet.Soft);
+        project.PreviousSampleSchema.Should().ContainKey("normal-hitnormal2");
+        project.PreviousSampleSchema!["normal-hitnormal2"].Should().ContainSingle();
+    }
+
     [TestMethod]
     public void Deserialize_WithLegacyMapsetMergerDocument_RestoresProjectAndItems()
     {

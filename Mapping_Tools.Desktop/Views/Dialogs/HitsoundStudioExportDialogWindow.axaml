@@ -1,0 +1,58 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Mapping_Tools.Desktop.Interactions"
+        xmlns:converters="using:Mapping_Tools.Desktop.Converters"
+        x:Class="Mapping_Tools.Desktop.Views.Dialogs.HitsoundStudioExportDialogWindow"
+        x:DataType="vm:HitsoundStudioExportDialogViewModel"
+        Title="Export Hitsound Studio"
+        Width="650" Height="650"
+        WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <converters:HitsoundStudioSampleFormatDisplayConverter x:Key="HitsoundStudioSampleFormatDisplayConverter" />
+    </Window.Resources>
+    <Grid Margin="24" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="12">
+        <TextBlock FontSize="24" FontWeight="Bold" Text="Export Hitsound Studio" />
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                    <TextBox Text="{Binding ExportFolder, Mode=TwoWay}" PlaceholderText="Export folder" ToolTip.Tip="Folder where the map, samples, or MIDI file are written." />
+                    <Button Grid.Column="1" Content="…" Command="{Binding PickFolderCommand}" ToolTip.Tip="Choose the export folder." />
+                </Grid>
+                <TextBox Text="{Binding HitsoundDiffName, Mode=TwoWay}" PlaceholderText="Hitsound map name" ToolTip.Tip="Version name written to the exported difficulty." />
+                <ComboBox ItemsSource="{Binding ExportModes}" SelectedItem="{Binding HitsoundExportModeSetting, Mode=TwoWay}" ToolTip.Tip="Choose standard custom indices, coinciding samples, storyboard, or MIDI export." />
+                <ComboBox IsVisible="{Binding GameModeVisible}" ItemsSource="{Binding GameModes}" SelectedItem="{Binding HitsoundExportGameMode, Mode=TwoWay}" ToolTip.Tip="Game mode used by the exported map." />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <TextBox IsVisible="{Binding StandardExtraSettingsVisible}" Text="{Binding ZipLayersLeniency, Mode=TwoWay}" PlaceholderText="Layer leniency (ms)" ToolTip.Tip="Maximum timestamp distance for combining layers." />
+                    <TextBox Grid.Column="1" IsVisible="{Binding StandardExtraSettingsVisible}" Text="{Binding FirstCustomIndex, Mode=TwoWay}" PlaceholderText="First custom index" ToolTip.Tip="First index assigned to a new sample schema." />
+                </Grid>
+                <CheckBox Content="Export map" IsChecked="{Binding ExportMap, Mode=TwoWay}" ToolTip.Tip="Write a hitsounding copy of the base beatmap." />
+                <CheckBox IsVisible="{Binding SampleExportSettingsVisible}" Content="Export samples" IsChecked="{Binding ExportSamples, Mode=TwoWay}" ToolTip.Tip="Generate and write source samples." />
+                <CheckBox Content="Show results" IsChecked="{Binding ShowResults, Mode=TwoWay}" ToolTip.Tip="Show the number of indices, samples, and greenlines after export." />
+                <CheckBox Content="Delete all files in export folder first" IsChecked="{Binding DeleteAllInExportFirst, Mode=TwoWay}" ToolTip.Tip="Remove existing files in the selected export folder before writing." />
+                <CheckBox IsVisible="{Binding SampleExportSettingsVisible}" Content="Use previous sample schema" IsChecked="{Binding UsePreviousSampleSchema, Mode=TwoWay}" ToolTip.Tip="Reuse sample names or custom indices from the loaded schema." />
+                <CheckBox IsVisible="{Binding SampleExportSettingsVisible}" IsEnabled="{Binding UsePreviousSampleSchema}" Content="Allow previous schema growth" IsChecked="{Binding AllowGrowthPreviousSampleSchema, Mode=TwoWay}" ToolTip.Tip="Add samples not already present in the previous schema." />
+                <CheckBox IsVisible="{Binding CoincidingExtraSettingsVisible}" Content="Add regular hitsounds in coinciding mode" IsChecked="{Binding AddCoincidingRegularHitsounds, Mode=TwoWay}" />
+                <CheckBox IsVisible="{Binding MidiExtraSettingsVisible}" Content="Add greenline volume to MIDI" IsChecked="{Binding AddGreenLineVolumeToMidi, Mode=TwoWay}" />
+                <ComboBox IsVisible="{Binding SampleExportSettingsVisible}" ItemsSource="{Binding SampleExportFormats}" SelectedItem="{Binding SingleSampleExportFormat, Mode=TwoWay}" ToolTip.Tip="Encoding for one-source samples.">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource HitsoundStudioSampleFormatDisplayConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <ComboBox IsVisible="{Binding SampleExportSettingsVisible}" ItemsSource="{Binding SampleExportFormats}" SelectedItem="{Binding MixedSampleExportFormat, Mode=TwoWay}" ToolTip.Tip="Encoding for mixed samples.">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource HitsoundStudioSampleFormatDisplayConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+        </ScrollViewer>
+        <TextBlock Grid.Row="2" Foreground="OrangeRed" Text="{Binding Error}" />
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="Cancel" Command="{Binding CancelCommand}" />
+            <Button Content="Accept" Command="{Binding AcceptCommand}" IsDefault="True" />
+        </StackPanel>
+    </Grid>
+</Window>
