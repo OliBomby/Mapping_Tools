@@ -78,8 +78,8 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
     private bool _disposed;
 
     /// <summary>
-    /// Creates the production GitHub updater with the same user-agent and
-    /// architecture-specific assets as the legacy WPF updater.
+    /// Creates the production GitHub updater with the Mapping Tools user-agent
+    /// and architecture-specific Avalonia release assets.
     /// </summary>
     public OnovaUpdateGateway()
         : this(new HttpClient(), true)

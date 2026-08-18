@@ -2,7 +2,7 @@
     "id":  "TR-tumour-generator",
     "feature":  "Tumour Generator 2",
     "status":  "accepted",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "seedInput":  "../beatmaps/ComplicatedTestMap.osu",
     "options":  "tumour-generator.options.json",
     "expectedOutput":  "expected/tumour-generator.osu",
     "expectedOutputSha256":  "BE26A9D99683DD8F31713DA20B27E34449F3510CD06AFC2B375D28A37EF8BF55",

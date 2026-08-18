@@ -19,7 +19,7 @@ jobs:
       - name: Restore
         run: dotnet restore Mapping_Tools.sln
 
-      - name: Build both frontends
+      - name: Build Avalonia frontend and shared layers
         run: dotnet build Mapping_Tools.sln --configuration Release --no-restore
 
       - name: Architecture guardrails
@@ -28,5 +28,11 @@ jobs:
       - name: Core and fixture tests
         run: dotnet test Mapping_Tools.Core.Tests/Mapping_Tools.Core.Tests.csproj --configuration Release --no-build
 
-      - name: Legacy WPF tests
-        run: dotnet test Mapping_Tools_Tests/Mapping_Tools_Tests.csproj --configuration Release --no-build
+      - name: Application tests
+        run: dotnet test Mapping_Tools.Application.Tests/Mapping_Tools.Application.Tests.csproj --configuration Release --no-build
+
+      - name: Infrastructure tests
+        run: dotnet test Mapping_Tools.Infrastructure.Tests/Mapping_Tools.Infrastructure.Tests.csproj --configuration Release --no-build
+
+      - name: Desktop tests
+        run: dotnet test Mapping_Tools.Desktop.Tests/Mapping_Tools.Desktop.Tests.csproj --configuration Release --no-build

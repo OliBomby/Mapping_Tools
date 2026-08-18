@@ -358,7 +358,7 @@ Exit: the Windows support boundary is explicit, failure when osu! is unavailable
 46. **I5 updater and updater UI.** Implement only after publish archives, runtime identifiers, installer/update paths, and rollback behavior are fixed.
 47. **Parity audit.** Check every feature row above, saved-project compatibility, hotkeys, backups, editor reload, errors, cancellation, and disposal.
 48. **Default-executable switch.** Make Avalonia the shipped application only after the parity audit; retain a separately installable legacy build for at least one release if practical.
-49. **Legacy removal.** Remove WPF/WinForms views and packages only with explicit approval and after telemetry/issues show no required fallback.
+49. **Legacy removal (completed 2026-08-18).** With explicit approval and after the step-47 parity audit plus step-48 release validation, remove the obsolete WPF/WinForms projects, views, packages, and fallback release paths while retaining legacy user-data and updater compatibility. See [wave-11-step-49-legacy-removal.md](wave-11-step-49-legacy-removal.md).
 
 ## Per-feature migration checklist
 

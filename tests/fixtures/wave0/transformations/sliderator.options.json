@@ -1,5 +1,5 @@
 {
-  "Target": "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+  "Target": "../beatmaps/ComplicatedTestMap.osu",
   "ExportTime": 2500,
   "ExportMode": "Add",
   "GraphMode": "Position",

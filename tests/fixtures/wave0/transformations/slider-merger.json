@@ -2,7 +2,7 @@
     "id":  "TR-slider-merger",
     "feature":  "Slider Merger",
     "status":  "accepted",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "seedInput":  "../beatmaps/ComplicatedTestMap.osu",
     "options":  "slider-merger.options.json",
     "expectedOutput":  "expected/slider-merger.osu",
     "expectedOutputSha256":  "0EF86314B44A53B84F546D64A716D19516B18EDDD074BB228503B59E90C4FA49",

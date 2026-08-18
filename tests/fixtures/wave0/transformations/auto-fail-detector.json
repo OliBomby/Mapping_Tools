@@ -3,7 +3,7 @@
     "feature":  "Auto-fail Detector",
     "status":  "accepted",
     "seedInput":  "../beatmaps/standard-autofail-2b.osu",
-    "secondaryInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "secondaryInput":  "../beatmaps/ComplicatedTestMap.osu",
     "options":  "auto-fail-detector.options.json",
     "expectedOutput":  "expected/auto-fail-detector.json",
     "legacyVersion":  "1.12.30",

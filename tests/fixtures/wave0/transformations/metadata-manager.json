@@ -2,7 +2,7 @@
     "id":  "TR-metadata-manager",
     "feature":  "Metadata Manager",
     "status":  "accepted",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "seedInput":  "../beatmaps/ComplicatedTestMap.osu",
     "secondaryInput":  "../beatmaps/standard-feature-rich.osu",
     "options":  "metadata-manager.options.json",
     "expectedOutput":  "expected/metadata-manager.osu",

@@ -1,7 +1,5 @@
 <Project>
-  <PropertyGroup Condition="'$(IsTestProject)' != 'true'
-                            and '$(MSBuildProjectName)' != 'Mapping_Tools'
-                            and '$(MSBuildProjectName)' != 'Mapping_Tools_Tests'">
+  <PropertyGroup Condition="'$(IsTestProject)' != 'true'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
   </PropertyGroup>

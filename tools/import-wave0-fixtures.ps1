@@ -161,7 +161,7 @@ foreach ($feature in $destructiveFeatures) {
         id = "TR-$($feature.Id)"
         feature = $feature.Name
         status = 'pending-capture'
-        seedInput = '../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu'
+        seedInput = '../beatmaps/ComplicatedTestMap.osu'
         options = if ($feature.Project) { "../projects/$($feature.Project)" } else { $null }
         expectedOutput = $null
         legacyVersion = '1.12.30'
@@ -203,9 +203,9 @@ Add-FixtureManifestEntry 'BM-STD-AUTOFAIL-001' 'beatmap' 'beatmaps\standard-auto
 Add-FixtureManifestEntry 'BM-TAIKO-001' 'beatmap' 'beatmaps\taiko.osu' 'Real-world taiko-mode map.'
 Add-FixtureManifestEntry 'BM-CATCH-001' 'beatmap' 'beatmaps\catch.osu' 'Real-world catch-mode map with bookmarks.'
 Add-FixtureManifestEntry 'BM-MANIA-001' 'beatmap' 'beatmaps\mania.osu' 'Real-world mania-mode map with bookmarks.'
-Add-FixtureManifestEntry 'BM-COMPACT-001' 'beatmap' '../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu' 'Compact standard map used by legacy parser and round-trip tests.'
-Add-FixtureManifestEntry 'BM-EMPTY-001' 'beatmap' '../../../Mapping_Tools_Tests/Resources/EmptyTestMap.osu' 'Valid empty standard map for empty-selection and no-op cases.'
-Add-FixtureManifestEntry 'SB-LARGE-001' 'storyboard' '../../../Mapping_Tools_Tests/Resources/TestStoryboard.osb' 'Large real-world storyboard command and serialization baseline.'
+Add-FixtureManifestEntry 'BM-COMPACT-001' 'beatmap' 'beatmaps\ComplicatedTestMap.osu' 'Compact standard map used by parser and round-trip tests.'
+Add-FixtureManifestEntry 'BM-EMPTY-001' 'beatmap' 'beatmaps\EmptyTestMap.osu' 'Valid empty standard map for empty-selection and no-op cases.'
+Add-FixtureManifestEntry 'SB-LARGE-001' 'storyboard' 'storyboards\TestStoryboard.osb' 'Large real-world storyboard command and serialization baseline.'
 Add-FixtureManifestEntry 'MAPSET-MULTI-001-N' 'mapset' 'mapsets\multi-difficulty\normal.osu' 'Normal difficulty in a real-world shared mapset.'
 Add-FixtureManifestEntry 'MAPSET-MULTI-001-X' 'mapset' 'mapsets\multi-difficulty\expert.osu' 'Expert difficulty in the same real-world shared mapset.'
 Add-FixtureManifestEntry 'PAT-COLLECTION-001' 'pattern' 'patterns\legacy-collection\project.json' 'Legacy Pattern Gallery collection metadata.'

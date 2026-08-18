@@ -2,7 +2,7 @@
     "id":  "TR-slider-completionator",
     "feature":  "Slider Completionator",
     "status":  "accepted",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "seedInput":  "../beatmaps/ComplicatedTestMap.osu",
     "options":  "slider-completionator.options.json",
     "expectedOutput":  "expected/slider-completionator.osu",
     "expectedOutputSha256":  "D7A646118B8EE2E3A1C51B92D2E6A40B447E004522AA2C9FEEF0BB29B003B078",

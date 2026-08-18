@@ -2,8 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles">
     <!--
-        MaterialDesignInXaml's floating-action-button styles combine the
-        control shape, size, and palette role. Material.Avalonia exposes the
+        Material floating-action-button styles combine the control shape, size,
+        and palette role. Material.Avalonia exposes the
         FloatingButton control, so keep those roles composable as classes.
     -->
     <Style Selector="materialControls|FloatingButton.mini">

@@ -13,6 +13,7 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     private readonly IToolExecutionService _execution;
     private bool _isRunning;
     private double _progress;
+    private long _runGeneration;
 
     /// <summary>
     /// Creates a single-run tool presentation model.
@@ -92,12 +93,14 @@ public abstract class SingleRunToolViewModel : ObservableValidator
 
         IsRunning = true;
         Progress = 0;
+        Interlocked.Increment(ref _runGeneration);
         try
         {
             await operation();
         }
         finally
         {
+            Interlocked.Increment(ref _runGeneration);
             Progress = 0;
             IsRunning = false;
         }
@@ -105,8 +108,17 @@ public abstract class SingleRunToolViewModel : ObservableValidator
 
     /// <summary>Creates a progress receiver that updates the shared progress property.</summary>
     /// <returns>A progress receiver for the tool execution service.</returns>
-    protected IProgress<ToolExecutionProgress> CreateProgress() =>
-        new Progress<ToolExecutionProgress>(value => Progress = value.Percent);
+    protected IProgress<ToolExecutionProgress> CreateProgress()
+    {
+        long runGeneration = Volatile.Read(ref _runGeneration);
+        return new Progress<ToolExecutionProgress>(value =>
+        {
+            if (IsRunning && Volatile.Read(ref _runGeneration) == runGeneration)
+            {
+                Progress = value.Percent;
+            }
+        });
+    }
 
     private bool CanRun() => !IsRunning;
 

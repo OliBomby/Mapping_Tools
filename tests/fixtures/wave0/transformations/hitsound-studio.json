@@ -2,7 +2,7 @@
     "id":  "TR-hitsound-studio",
     "feature":  "Hitsound Studio",
     "status":  "accepted",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "seedInput":  "../beatmaps/ComplicatedTestMap.osu",
     "secondaryInput":  "../audio/drum-hitnormal60.wav",
     "options":  "hitsound-studio.options.json",
     "expectedOutput":  "expected/hitsound-studio.osu",

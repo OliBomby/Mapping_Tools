@@ -1,5 +1,5 @@
 {
-  "Target": "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+  "Target": "../beatmaps/ComplicatedTestMap.osu",
   "PatternCollection": "../patterns/legacy-collection/project.json",
   "Pattern": "Pattern 1",
   "PatternFile": "../patterns/legacy-collection/Pattern Files/2025-06-07 21-32-54_NEsChy2u__Pattern 1.osu",

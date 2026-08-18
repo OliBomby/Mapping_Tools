@@ -1,5 +1,5 @@
 {
-  "Target": "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+  "Target": "../beatmaps/ComplicatedTestMap.osu",
   "BaseProject": "../projects/tumourgeneratorproject.json",
   "ImportModeOverride": "Everything",
   "LayerCount": 1,

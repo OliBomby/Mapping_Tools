@@ -1,5 +1,5 @@
 {
-  "BaseBeatmap": "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+  "BaseBeatmap": "../beatmaps/ComplicatedTestMap.osu",
   "Sample": "../audio/drum-hitnormal60.wav",
   "Times": [15, 334, 526, 942, 2109],
   "HitsoundDiffName": "Wave 0 Hitsounds",

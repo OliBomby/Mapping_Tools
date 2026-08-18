@@ -15,12 +15,6 @@
   <ItemGroup>
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
-    <AvaloniaResource Include="..\Mapping_Tools\Data\mt_logo_256.png">
-      <Link>Assets\mt_logo_256.png</Link>
-    </AvaloniaResource>
-    <AvaloniaResource Include="..\Mapping_Tools\Data\MTcog256.gif">
-      <Link>Assets\MTcog256.gif</Link>
-    </AvaloniaResource>
   </ItemGroup>
 
   <ItemGroup>

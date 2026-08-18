@@ -1,6 +1,6 @@
 # Mapping Tools Avalonia migration user acceptance test plan
 
-Status: initial UAT baseline, 2026-07-18  
+Status: final migration UAT baseline, updated 2026-08-18
 Applies to: migration from the legacy WPF/WinForms application to `Mapping_Tools.Desktop` on Avalonia 12.1.0  
 Related plan: [feature-dependency-graph.md](feature-dependency-graph.md)
 
@@ -50,9 +50,9 @@ UAT is performed at three levels.
 |---|---|---|
 | Feature gate | One migrated view or bounded feature slice | Feature owner and at least one mapper familiar with the legacy feature |
 | Wave gate | Integrated workflows and shared dependencies introduced by a migration wave | Migration owner and representatives for affected features |
-| Release gate | Complete Avalonia application, packaging, update, rollback, and legacy fallback | Product/release owner and designated user acceptance group |
+| Release gate | Complete Avalonia application, packaging, update, rollback, and retained legacy user-data compatibility | Product/release owner and designated user acceptance group |
 
-A feature may remain available in both frontends after feature acceptance. Acceptance does not authorize removal of the legacy implementation.
+Historical feature-gate evidence may compare the Avalonia frontend with the legacy implementation. The legacy frontend was retained through step 48 and is removed only by the explicitly approved step 49 cutover.
 
 ## 5. Roles and responsibilities
 
@@ -117,11 +117,11 @@ For text-based outputs, retain both exact expected files and a semantic comparis
 ### Feature UAT entry
 
 - The selected feature is implemented and registered in the Avalonia shell.
-- Both legacy and Avalonia frontends build from the candidate commit.
+- The Avalonia frontend and framework-neutral projects build from the candidate commit.
 - Relevant automated unit, characterization, fixture, and architecture tests pass.
 - Required shared services from earlier waves are accepted or explicitly included in the current test scope.
-- The legacy behavior and known legacy defects are documented.
-- Representative WPF and Avalonia renders exist for deterministic states.
+- The legacy behavior and known legacy defects used as migration baselines are documented.
+- Representative migration renders exist for deterministic states where visual comparison was required.
 - Test fixtures, expected outputs, and recovery copies are prepared.
 - Deferred behavior and intended design differences are declared before execution.
 - No known defect can corrupt or overwrite the tester's uncontrolled data.
@@ -131,7 +131,7 @@ For text-based outputs, retain both exact expected files and a semantic comparis
 - Every feature has passed its feature gate or has an approved deprecation.
 - All wave integration gates have passed.
 - Installers/packages exist for every claimed platform and architecture.
-- Upgrade, update, uninstall, rollback, and legacy side-by-side procedures are documented and testable.
+- Upgrade from legacy installations, update, uninstall, and rollback procedures are documented and testable.
 - No unresolved severity 1 or severity 2 defect remains.
 
 ## 9. Common acceptance scenarios
@@ -142,11 +142,11 @@ Run applicable common cases for every migrated feature.
 |---|---|---|
 | UAT-COM-001 | Open the feature from navigation, search, favorites, and keyboard navigation. | Correct view, title, state, focus, and scroll behavior; no duplicate view or stale state. |
 | UAT-COM-002 | Use the feature at default, minimum, restored, and maximized window sizes. | Required controls remain reachable; no unintended clipping or overlap. |
-| UAT-COM-003 | Compare deterministic WPF and Avalonia renders at identical dimensions. | Information hierarchy and state are equivalent; deviations are corrected or approved. |
+| UAT-COM-003 | Compare deterministic Avalonia renders with the approved migration baseline at identical dimensions. | Information hierarchy and state are equivalent; deviations are corrected or approved. |
 | UAT-COM-004 | Enter valid, boundary, empty, and invalid values. | Validation timing, message, highlighting, and command availability are understandable and equivalent. |
 | UAT-COM-005 | Cancel every picker, dialog, confirmation, and long operation. | No output mutation, leaked progress state, stale lock, or misleading success message. |
 | UAT-COM-006 | Trigger an expected service failure. | Actionable error is shown; application remains usable; partial output is absent or recoverable. |
-| UAT-COM-007 | Run the same input/options in WPF and Avalonia. | Outputs are semantically equivalent and differences are explained. |
+| UAT-COM-007 | Run the same input/options against the approved migration baseline and Avalonia. | Outputs are semantically equivalent and differences are explained. |
 | UAT-COM-008 | Start a destructive operation. | Backup is created or offered according to policy before mutation; recovery is proven. |
 | UAT-COM-009 | Save, close, reopen, and reload the feature project. | User-entered state round-trips without silent loss; legacy files remain compatible. |
 | UAT-COM-010 | Switch feature/theme/map while work is active or state is dirty. | Prompts and cancellation are correct; no cross-feature state corruption. |
@@ -249,7 +249,7 @@ Every row also inherits the common cases in section 9 and all applicable shell c
 | Feature | Minimum feature-specific scenarios | Required evidence |
 |---|---|---|
 | Updater | No update, update available, skip, download progress, offline, corrupt/interrupted package, insufficient permission, apply/restart, rollback. | Version/install manifest, logs, rollback result. |
-| Packaging | Clean install, upgrade from legacy, side-by-side legacy fallback, uninstall, retained user data, file associations/shortcuts if supported, each RID/architecture. | Install/uninstall logs and filesystem manifest. |
+| Packaging | Clean install, upgrade from legacy, uninstall, retained user data, file associations/shortcuts if supported, each RID/architecture. | Install/uninstall logs and filesystem manifest. |
 
 ## 12. Wave acceptance gates
 
@@ -266,14 +266,14 @@ Every row also inherits the common cases in section 9 and all applicable shell c
 | 8: Visual editors | Pointer interaction, previews, graph mathematics, collections, Sliderator, and Tumour workflows are accepted at supported DPI/window sizes. |
 | 9: Audio | Import, playback, generation, export, disposal, and perceived audio results are accepted by a human tester. |
 | 10: Windows runtime | Live editor, process, global input, cursor, and overlay workflows are stable and fail safely when unavailable. |
-| 11: Cutover | Packaging, updater, parity audit, rollback, and legacy fallback pass; release owner signs off. |
+| 11: Cutover | Packaging, updater, parity audit, rollback, and legacy user-data compatibility pass; release owner signs off. |
 
 ## 13. Visual acceptance procedure
 
 For every migrated view state that materially affects layout:
 
 1. Use deterministic data and the same logical dimensions.
-2. Render the WPF and Avalonia versions with `$render-desktop-view`.
+2. Render the Avalonia view and compare it with the stored migration baseline using `$render-desktop-view`.
 3. Inspect both images for hierarchy, alignment, spacing, typography, colors, wrapping, clipping, scroll affordances, enabled state, empty state, validation, and focus/default cues.
 4. Exercise the same state in a real desktop session for hover, focus, pointer capture, animation, dialogs, native window behavior, DPI, and accessibility.
 5. Classify every difference as defect, approved framework difference, or approved redesign.
@@ -289,7 +289,7 @@ For every persisted format or destructive workflow:
 2. Load the legacy format in Avalonia without pre-conversion where compatibility is promised.
 3. Save without changes and compare semantic content.
 4. Modify representative values, save, reopen in Avalonia, then open in the legacy application when backward compatibility is promised.
-5. Execute the transformation in WPF and Avalonia from identical originals.
+5. Execute the transformation in Avalonia from identical originals and compare it with the approved legacy outcome.
 6. Compare parsed models and user-visible outcomes, not only raw text.
 7. Verify backup creation precedes the first mutation.
 8. Cancel and inject a failure; confirm the original remains intact and partial output is cleaned up or clearly recoverable.
@@ -351,7 +351,7 @@ Recommended result values: `Not run`, `Pass`, `Pass with accepted deviation`, `F
 - Every user-visible feature is accepted or has an explicitly approved deprecation.
 - No severity 1 or 2 defect remains; severity 3/4 issues are published as known issues where relevant.
 - Settings, projects, collections, maps, exports, backups, and updates meet their compatibility commitments.
-- Clean install, upgrade, updater, rollback, uninstall, and legacy fallback pass.
+- Clean install, upgrade from legacy data, updater, rollback, and uninstall pass.
 - All claimed platforms and architectures pass their required matrix.
 - Resource cleanup is verified for audio, file handles, global hooks, overlays, processes, and temporary files.
 - The release owner signs the final acceptance record before changing the default executable.
@@ -362,7 +362,7 @@ Recommended result values: `Not run`, `Pass`, `Pass with accepted deviation`, `F
 - Re-run feature UAT when its observable behavior, persistence, service contract, or major Avalonia view structure changes.
 - Re-run affected wave integration cases when a shared subsystem changes.
 - Re-run complete release UAT for packaging, updater, framework-version, runtime-identifier, or legacy-data migration changes.
-- Keep the legacy build available through at least the agreed fallback period; removal requires explicit approval after production feedback is reviewed.
+- The legacy build was kept available through step 48; step 49 records its explicitly approved removal after parity, release, and compatibility validation.
 
 ## 19. UAT case template
 
@@ -392,4 +392,4 @@ Acceptance tester sign-off:
 
 ## 20. Final acceptance statement
 
-The Avalonia migration is accepted for release only when the evidence demonstrates that users can safely complete all retained Mapping Tools workflows, existing user data remains usable, destructive operations remain recoverable, platform-specific behavior is truthful and stable, and rollback to the legacy release remains possible.
+The Avalonia migration is accepted for release only when the evidence demonstrates that users can safely complete all retained Mapping Tools workflows, existing user data remains usable, destructive operations remain recoverable, platform-specific behavior is truthful and stable, and updater rollback to the previous Avalonia release remains possible.

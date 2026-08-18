@@ -41,7 +41,7 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore Mapping_Tools.sln
 
-      # Update versions in installer scripts and both frontend .csproj files using PowerShell regex.
+      # Update versions in installer scripts and the shipped frontend project using PowerShell regex.
       - name: Set version in Inno Setup (x86)
         shell: pwsh
         run: |
@@ -59,7 +59,7 @@ jobs:
       - name: Set AssemblyVersion/FileVersion in csproj
         shell: pwsh
         run: |
-          foreach ($p in @("Mapping_Tools/Mapping_Tools.csproj", "Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj")) {
+          foreach ($p in @("Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj")) {
             $c = Get-Content -Raw $p
             $c = $c -replace '(?<=<AssemblyVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
             $c = $c -replace '(?<=<FileVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
@@ -71,14 +71,6 @@ jobs:
 
       - name: Publish Avalonia x64
         run: dotnet publish Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj -c Release -r win-x64 --no-restore --self-contained true
-
-      # Keep the legacy WPF frontend available as an explicit fallback while
-      # Avalonia is the only default/shipped application.
-      - name: Publish legacy WPF fallback x86
-        run: dotnet publish Mapping_Tools/Mapping_Tools.csproj -c Release -r win-x86 --no-restore --self-contained true
-
-      - name: Publish legacy WPF fallback x64
-        run: dotnet publish Mapping_Tools/Mapping_Tools.csproj -c Release -r win-x64 --no-restore --self-contained true
 
       - name: Install Inno Setup
         shell: pwsh
@@ -106,16 +98,6 @@ jobs:
           $files = (Get-ChildItem -LiteralPath $outDir -File | Where-Object Extension -ne ".zip").FullName
           Compress-Archive -Path $files -DestinationPath "$outDir/release_x64.zip" -Force
 
-      - name: Zip legacy WPF fallback
-        shell: pwsh
-        run: |
-          $outDir = "Mapping_Tools/bin/Release/net10.0-windows/win-x86/publish"
-          $files = (Get-ChildItem -LiteralPath $outDir -File | Where-Object Extension -ne ".zip").FullName
-          Compress-Archive -Path $files -DestinationPath "Mapping_Tools/bin/Release/net10.0-windows/legacy-wpf_x86.zip" -Force
-          $outDir = "Mapping_Tools/bin/Release/net10.0-windows/win-x64/publish"
-          $files = (Get-ChildItem -LiteralPath $outDir -File | Where-Object Extension -ne ".zip").FullName
-          Compress-Archive -Path $files -DestinationPath "Mapping_Tools/bin/Release/net10.0-windows/legacy-wpf_x64.zip" -Force
-
       - name: Validate release layout
         shell: pwsh
         run: |
@@ -123,12 +105,8 @@ jobs:
             -ExpectedVersion "${env:VERSION}" `
             -PrimaryX86 "Mapping_Tools.Desktop/bin/Release/net10.0/win-x86/publish" `
             -PrimaryX64 "Mapping_Tools.Desktop/bin/Release/net10.0/win-x64/publish" `
-            -LegacyX86 "Mapping_Tools/bin/Release/net10.0-windows/win-x86/publish" `
-            -LegacyX64 "Mapping_Tools/bin/Release/net10.0-windows/win-x64/publish" `
             -PrimaryArchiveX86 "Mapping_Tools.Desktop/bin/Release/net10.0/win-x86/publish/release.zip" `
             -PrimaryArchiveX64 "Mapping_Tools.Desktop/bin/Release/net10.0/win-x64/publish/release_x64.zip" `
-            -LegacyArchiveX86 "Mapping_Tools/bin/Release/net10.0-windows/legacy-wpf_x86.zip" `
-            -LegacyArchiveX64 "Mapping_Tools/bin/Release/net10.0-windows/legacy-wpf_x64.zip" `
             -InstallerX86 "mapping_tools_installer_x86.exe" `
             -InstallerX64 "mapping_tools_installer_x64.exe"
 
@@ -142,7 +120,5 @@ jobs:
           files: |
             Mapping_Tools.Desktop/bin/Release/net10.0/win-x86/publish/release.zip
             Mapping_Tools.Desktop/bin/Release/net10.0/win-x64/publish/release_x64.zip
-            Mapping_Tools/bin/Release/net10.0-windows/legacy-wpf_x86.zip
-            Mapping_Tools/bin/Release/net10.0-windows/legacy-wpf_x64.zip
             mapping_tools_installer_x86.exe
             mapping_tools_installer_x64.exe

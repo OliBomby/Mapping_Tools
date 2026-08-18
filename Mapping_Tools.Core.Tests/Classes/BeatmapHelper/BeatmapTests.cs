@@ -8,6 +8,8 @@ public class BeatmapTests {
     [DataTestMethod]
     [DataRow("EmptyTestMap.osu")]
     [DataRow("ComplicatedTestMap.osu")]
+    [DataRow("Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].osu")]
+    [DataRow("THE ORAL CIGARETTES - GET BACK (Nikakis) [Sotarks_ Cataclysm].osu")]
     public void BeatmapDocument_ParsesAndRoundTripsFixture(string filename) {
         // Arrange
         string path = Path.Combine(AppContext.BaseDirectory, "Resources", filename);

@@ -1,5 +1,5 @@
 {
-  "Target": "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+  "Target": "../beatmaps/ComplicatedTestMap.osu",
   "ImportMode": "Everything",
   "FreeVariable": "Velocity",
   "DurationBeats": 1.5,

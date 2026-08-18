@@ -2,7 +2,7 @@
     "id":  "TR-hitsound-copier",
     "feature":  "Hitsound Copier",
     "status":  "accepted",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "seedInput":  "../beatmaps/ComplicatedTestMap.osu",
     "secondaryInput":  "../beatmaps/standard-feature-rich.osu",
     "options":  "hitsound-copier.options.json",
     "expectedOutput":  "expected/hitsound-copier.osu",

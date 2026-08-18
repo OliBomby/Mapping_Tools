@@ -2,7 +2,7 @@
     "id":  "TR-rhythm-guide",
     "feature":  "Rhythm Guide",
     "status":  "accepted",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "seedInput":  "../beatmaps/ComplicatedTestMap.osu",
     "secondaryInput":  "../beatmaps/standard-feature-rich.osu",
     "options":  "rhythm-guide.options.json",
     "expectedOutput":  "expected/rhythm-guide.osu",

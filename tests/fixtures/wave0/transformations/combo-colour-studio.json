@@ -2,7 +2,7 @@
     "id":  "TR-combo-colour-studio",
     "feature":  "Combo Colour Studio",
     "status":  "accepted",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "seedInput":  "../beatmaps/ComplicatedTestMap.osu",
     "options":  "combo-colour-studio.options.json",
     "expectedOutput":  "expected/combo-colour-studio.osu",
     "expectedOutputSha256":  "63BB178B68EF8EB3029C8341FBB746F312E26D510EB1F33497DBA1D53EC18B78",

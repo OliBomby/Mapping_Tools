@@ -1,6 +1,6 @@
 {
   "Sources": ["../beatmaps/standard-feature-rich.osu"],
-  "Target": "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+  "Target": "../beatmaps/ComplicatedTestMap.osu",
   "OutputGameMode": 0,
   "OutputName": "Wave 0 Rhythm Guide",
   "NcEverything": true,

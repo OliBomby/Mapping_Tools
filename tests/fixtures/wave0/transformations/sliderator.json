@@ -2,7 +2,7 @@
     "id":  "TR-sliderator",
     "feature":  "Sliderator",
     "status":  "accepted",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "seedInput":  "../beatmaps/ComplicatedTestMap.osu",
     "options":  "sliderator.options.json",
     "expectedOutput":  "expected/sliderator.osu",
     "expectedOutputSha256":  "E55B75CA4C918940E6244EB4141C47CEBBFEB565694720EC7A86BCF32626A81A",

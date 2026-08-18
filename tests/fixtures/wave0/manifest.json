@@ -41,21 +41,21 @@
                      {
                          "id":  "BM-COMPACT-001",
                          "group":  "beatmap",
-                         "path":  "../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+                         "path":  "beatmaps/ComplicatedTestMap.osu",
                          "sha256":  "9394E802795696AE0252F5476D9B5CFC28DD2FAF6B50017A5F146FD4DA00647B",
-                         "purpose":  "Compact standard map used by legacy parser and round-trip tests."
+                         "purpose":  "Compact standard map used by parser and round-trip tests."
                      },
                      {
                          "id":  "BM-EMPTY-001",
                          "group":  "beatmap",
-                         "path":  "../../../Mapping_Tools_Tests/Resources/EmptyTestMap.osu",
+                         "path":  "beatmaps/EmptyTestMap.osu",
                          "sha256":  "4094A7F1ACB9039846BEBF38E440C27E0EED61D6F74A9D4AD66F79C9A778109B",
                          "purpose":  "Valid empty standard map for empty-selection and no-op cases."
                      },
                      {
                          "id":  "SB-LARGE-001",
                          "group":  "storyboard",
-                         "path":  "../../../Mapping_Tools_Tests/Resources/TestStoryboard.osb",
+                         "path":  "storyboards/TestStoryboard.osb",
                          "sha256":  "805C384A3EFCA912EAACF2474915C5EE9F2A0A6006E5F90B802FD1F3E2FB4704",
                          "purpose":  "Large real-world storyboard command and serialization baseline."
                      },
@@ -280,7 +280,7 @@
                          "id":  "TR-metadata-manager",
                          "group":  "transformation",
                          "path":  "transformations/metadata-manager.json",
-                         "sha256":  "A46E19F89E5CEDFBA2EE688578FB378A6F6A4ABCD07039F77A9CCC89A4129805",
+                         "sha256":  "D0B5951FA1A2A626360E054B93C7DB06A88C89985FBD98CE01D9635C71DE6B79",
                          "purpose":  "Legacy before/after capture record for Metadata Manager."
                      },
                      {
@@ -294,7 +294,7 @@
                          "id":  "TR-timing-copier",
                          "group":  "transformation",
                          "path":  "transformations/timing-copier.json",
-                         "sha256":  "6B3A777CF64778777C777B1DE34853A718026D464563FE1CA4376C03301E9950",
+                         "sha256":  "A9F72D44A9EF062B59B4F897D8A95C79F07196C3FFC5CABCE9BA886D2C249C18",
                          "purpose":  "Legacy before/after capture record for Timing Copier."
                      },
                      {
@@ -308,70 +308,70 @@
                          "id":  "TR-rhythm-guide",
                          "group":  "transformation",
                          "path":  "transformations/rhythm-guide.json",
-                         "sha256":  "0D6A0406360E7063E6A9F7AC16BDC5F20444A3634B45F4EF42381D57767189FB",
+                         "sha256":  "534FC9C8D5905BBC07110959A3DC8C34AE4E026E59FF87209C3E0E05E0B0FD43",
                          "purpose":  "Legacy before/after capture record for Rhythm Guide."
                      },
                      {
                          "id":  "TR-hitsound-preview",
                          "group":  "transformation",
                          "path":  "transformations/hitsound-preview.json",
-                         "sha256":  "D272963ABA32AA1E153AE4D244A26777EA51B64A869D24AD482B2B2B1031E780",
+                         "sha256":  "2291D884E51386916D78C371F1EE543CED216FD945EF473DC2C0EF578CFAF571",
                          "purpose":  "Legacy before/after capture record for Hitsound Preview Helper."
                      },
                      {
                          "id":  "TR-hitsound-copier",
                          "group":  "transformation",
                          "path":  "transformations/hitsound-copier.json",
-                         "sha256":  "D6EA8E76898A464B82B5DAD9C47E5DA298C1F129E766B992E0F449817D9C80EF",
+                         "sha256":  "6C4977D284010FAAB16D1B50657F5C605C5E5E2FD183158366725C42DD4D2E86",
                          "purpose":  "Legacy before/after capture record for Hitsound Copier."
                      },
                      {
                          "id":  "TR-slider-completionator",
                          "group":  "transformation",
                          "path":  "transformations/slider-completionator.json",
-                         "sha256":  "63C1AA1FE53511B425FF7431DADEF50FFA6B7A0B60C4C741EB06FD243DE951F7",
+                         "sha256":  "26114252E7F5826C097A4219237A5BA4D6CE4D15E2F789E2B2F24CCED9B728A2",
                          "purpose":  "Legacy before/after capture record for Slider Completionator."
                      },
                      {
                          "id":  "TR-slider-merger",
                          "group":  "transformation",
                          "path":  "transformations/slider-merger.json",
-                         "sha256":  "A8057900657E0C59AF68A3387A1D9DAE758510C337F8DA9E1F545011DD3F8E4E",
+                         "sha256":  "FA5FE5926559D5DF94F6E43BF80ACF2B739BD0BE533320530FD885D507C1C9C4",
                          "purpose":  "Legacy before/after capture record for Slider Merger."
                      },
                      {
                          "id":  "TR-slider-picturator",
                          "group":  "transformation",
                          "path":  "transformations/slider-picturator.json",
-                         "sha256":  "982CD6AE4462B6F2D77DA962275903D30467F3E0EDE5BD4C1EE679758E920CE0",
+                         "sha256":  "D873DF44D516C2CD6B1DE222C99AE751D74806C472EF0B1909A07F493800E59A",
                          "purpose":  "Legacy before/after capture record for Slider Picturator."
                      },
                      {
                          "id":  "TR-sliderator",
                          "group":  "transformation",
                          "path":  "transformations/sliderator.json",
-                         "sha256":  "FD732305AF4CCC8225E1A07AD86411EAB5FF5FB3A8B089524F3EC288FB0D3F7B",
+                         "sha256":  "0D4ED4039133DD9F427ED0538E97699C758E0536964BC2E2DA051343C8F81179",
                          "purpose":  "Legacy before/after capture record for Sliderator."
                      },
                      {
                          "id":  "TR-tumour-generator",
                          "group":  "transformation",
                          "path":  "transformations/tumour-generator.json",
-                         "sha256":  "55F940C129F85533ECD46C7E1DA113D82E6E410F282EF5E44B1E04B0E51F3C4D",
+                         "sha256":  "817167DC5865D76D6EAF00173D1D34EA31A8E077CD1E208E572E236AE9C96CD1",
                          "purpose":  "Legacy before/after capture record for Tumour Generator 2."
                      },
                      {
                          "id":  "TR-combo-colour-studio",
                          "group":  "transformation",
                          "path":  "transformations/combo-colour-studio.json",
-                         "sha256":  "9DC3BAB1DD5ABBA403C263D3219CE799658AFBC94932789CC51F86184E3F2DBD",
+                         "sha256":  "FB387A2A165CFAD78DD52CE4471CE89192C9DEE11453292DF8560CCDC7D1FC58",
                          "purpose":  "Legacy before/after capture record for Combo Colour Studio."
                      },
                      {
                          "id":  "TR-pattern-gallery",
                          "group":  "transformation",
                          "path":  "transformations/pattern-gallery.json",
-                         "sha256":  "6A54BAE29184DE00742714AE3772A4F1FAAC969C6ED776104FDBBECE78C573DF",
+                         "sha256":  "C589018F1A11F7B2609A4CB0EAC5CB8846776214721AFD687E57562F524AC342",
                          "purpose":  "Legacy before/after capture record for Pattern Gallery."
                      },
                      {
@@ -385,49 +385,49 @@
                          "id":  "TR-hitsound-studio",
                          "group":  "transformation",
                          "path":  "transformations/hitsound-studio.json",
-                         "sha256":  "85BFD806BD1243AB6972537499D6F4C20537B0507B44A11BEB1E99DB80288B4E",
+                         "sha256":  "92010710C3A79736C55A559B1F6C164AEAD7FC38F8AAC497E14EE1C4CF31A234",
                          "purpose":  "Legacy before/after capture record for Hitsound Studio."
                      },
                      {
                          "id":  "TR-auto-fail-detector",
                          "group":  "transformation",
                          "path":  "transformations/auto-fail-detector.json",
-                         "sha256":  "CFD877F45A9F2DC0DFCFC00E63807E66BEF94969F09F1F1B6DC48277CD888021",
+                         "sha256":  "8DEAD6C80AD258295997D745633E999553CE3BF95452812B3B1FF0EA073773D8",
                          "purpose":  "Legacy before/after capture record for Auto-fail Detector."
                      },
                      {
                          "id":  "TR-auto-fail-detector-options",
                          "group":  "transformation",
                          "path":  "transformations/auto-fail-detector.options.json",
-                         "sha256":  "28BCAE77FDA96D6F395D870832B11D750E4D6563C970CA15351D9531A5D5FB5B",
+                         "sha256":  "1ED11C4F123B8E5449B4C1944A39AA82B40F0D8228557EE985101D9C55674F12",
                          "purpose":  "Exact legacy auto-fail-detector capture settings."
                      },
                      {
                          "id":  "TR-combo-colour-studio-options",
                          "group":  "transformation",
                          "path":  "transformations/combo-colour-studio.options.json",
-                         "sha256":  "1D755DFC79794855BC0D49FDCA8A974630D197C6B1A8F37F580BF9F0D6174C12",
+                         "sha256":  "95A0C1C0F3EDF7DF06FD13CA3969D1D3D3A052A7A29DDD585307731F71D68A85",
                          "purpose":  "Exact legacy combo-colour-studio capture settings."
                      },
                      {
                          "id":  "TR-hitsound-copier-options",
                          "group":  "transformation",
                          "path":  "transformations/hitsound-copier.options.json",
-                         "sha256":  "E88D7D2C6A00784F4B0E5CF84AF777CDA12EE59F07711EF3A2F724B0F0324CC0",
+                         "sha256":  "02F9C3EBAB691E542CB2B64BB754D7B49BD457FD63B8139DE78020A655F73383",
                          "purpose":  "Exact legacy hitsound-copier capture settings."
                      },
                      {
                          "id":  "TR-hitsound-preview-options",
                          "group":  "transformation",
                          "path":  "transformations/hitsound-preview.options.json",
-                         "sha256":  "892D05E35D0BBF11B9799BB2D5F5D49C38595FF35729C9189FA967C565313621",
+                         "sha256":  "B2B9FA643B07FEDF2AD977AB8938607414EB24A86D7E577D757D983400EEBD64",
                          "purpose":  "Exact legacy hitsound-preview capture settings."
                      },
                      {
                          "id":  "TR-hitsound-studio-options",
                          "group":  "transformation",
                          "path":  "transformations/hitsound-studio.options.json",
-                         "sha256":  "90646E759F86769C384EAD3BC8FB0F473B52945F86D4983B2D52856A21A44407",
+                         "sha256":  "8F9DACFBC0FDCE4816D66487BE932A494DED9E9F3857BA24485560D21627BA75",
                          "purpose":  "Exact legacy hitsound-studio capture settings."
                      },
                      {
@@ -448,14 +448,14 @@
                          "id":  "TR-metadata-manager-options",
                          "group":  "transformation",
                          "path":  "transformations/metadata-manager.options.json",
-                         "sha256":  "89DC6EDF5432763051CC6CCE78F22D96BAD6F54D5E07F7E79C87A471B9297DB8",
+                         "sha256":  "15F1522AB5AAD1539D19032A9E512139ECFE8177B22FFC5E390BD40ED8B89E08",
                          "purpose":  "Exact legacy metadata-manager capture settings."
                      },
                      {
                          "id":  "TR-pattern-gallery-options",
                          "group":  "transformation",
                          "path":  "transformations/pattern-gallery.options.json",
-                         "sha256":  "F221330124A24ECFC7A9E5CC2C78FDA278AF7B9CD9E73AC6D2E8899E9B508493",
+                         "sha256":  "E3459521EB7995B71D6E589AFC6B3ECF7E88A1229F6031524BFE10E3F4B63585",
                          "purpose":  "Exact legacy pattern-gallery capture settings."
                      },
                      {
@@ -469,42 +469,42 @@
                          "id":  "TR-rhythm-guide-options",
                          "group":  "transformation",
                          "path":  "transformations/rhythm-guide.options.json",
-                         "sha256":  "9C87B6840E67E983F578B116CFE472D1B8A960B6FFAE9EF1E74BA1E67900DC9A",
+                         "sha256":  "BD5DC1BDCE9EF8ABF9E4C4157FC016E8AE89E299CC346C4F741D74221A9AFCB3",
                          "purpose":  "Exact legacy rhythm-guide capture settings."
                      },
                      {
                          "id":  "TR-slider-completionator-options",
                          "group":  "transformation",
                          "path":  "transformations/slider-completionator.options.json",
-                         "sha256":  "A6B0AD3F692CD1EABCCC3DFE4612A37166B16CFD108EBCCB22EF081EB47CB012",
+                         "sha256":  "FFA9F3CD0F77696022BF1EBC1DECAE86AA9EA6358913C8F93C4028DB7E475A41",
                          "purpose":  "Exact legacy slider-completionator capture settings."
                      },
                      {
                          "id":  "TR-slider-merger-options",
                          "group":  "transformation",
                          "path":  "transformations/slider-merger.options.json",
-                         "sha256":  "C009D901D1CDBF0233DF5DAB2A591B05D745B1D157C9B33AD5F9547C6151214A",
+                         "sha256":  "97E651759874EE8D35B17112527A0804FA032E8B8AD3FEBABAAD1344033B59F6",
                          "purpose":  "Exact legacy slider-merger capture settings."
                      },
                      {
                          "id":  "TR-slider-picturator-options",
                          "group":  "transformation",
                          "path":  "transformations/slider-picturator.options.json",
-                         "sha256":  "B554F86C9BDFD8ADDA2C5C3A2526F6C8A2EA1128F7FEBFDFE394567103B8964E",
+                         "sha256":  "7D171DA6C0CA1E3CEDD5FC60AFCF87DC1D3A7C372A68008F6F8EC174CEFCDE29",
                          "purpose":  "Exact legacy slider-picturator capture settings."
                      },
                      {
                          "id":  "TR-sliderator-options",
                          "group":  "transformation",
                          "path":  "transformations/sliderator.options.json",
-                         "sha256":  "930A43469B2BD81AAFE1FCCA815E56AF008C2FDD8A3CEF10F72C9C032FBE6375",
+                         "sha256":  "FF70D78BDCC238226305CA092BAAD302C1646465E920BF097AE5F832C6DFD3F4",
                          "purpose":  "Exact legacy sliderator capture settings."
                      },
                      {
                          "id":  "TR-timing-copier-options",
                          "group":  "transformation",
                          "path":  "transformations/timing-copier.options.json",
-                         "sha256":  "519B2909A8B5BD10CCBA0423C91AFECABA3A341BE12299D5061490C03C6184E4",
+                         "sha256":  "B103CE6777B8B01DF1F66B7307BD53EFA0CE5F0CA7E6C8F882860F68C1FA0674",
                          "purpose":  "Exact legacy timing-copier capture settings."
                      },
                      {
@@ -518,7 +518,7 @@
                          "id":  "TR-tumour-generator-options",
                          "group":  "transformation",
                          "path":  "transformations/tumour-generator.options.json",
-                         "sha256":  "E7023131BD890EEB9DD5B7E20B27F5DD2132EBC0D7239CCFA7BA3864E291D027",
+                         "sha256":  "355B2DD9AB61D90510B336D7C38BD4FDBD9B50686D7E6A4DCF6C2392A1469050",
                          "purpose":  "Exact legacy tumour-generator capture settings."
                      },
                      {

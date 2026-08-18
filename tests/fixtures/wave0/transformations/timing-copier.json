@@ -2,7 +2,7 @@
     "id":  "TR-timing-copier",
     "feature":  "Timing Copier",
     "status":  "accepted",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "seedInput":  "../beatmaps/ComplicatedTestMap.osu",
     "secondaryInput":  "../beatmaps/standard-feature-rich.osu",
     "options":  "timing-copier.options.json",
     "expectedOutput":  "expected/timing-copier.osu",

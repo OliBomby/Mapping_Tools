@@ -8,7 +8,7 @@ public sealed class DefaultExecutableTests
     private static readonly string RepositoryRoot = FindRepositoryRoot();
 
     [TestMethod]
-    public void Solution_DefaultExecutable_ListsAvaloniaBeforeLegacyWpf()
+    public void Solution_ContainsOnlyAvaloniaFrontend()
     {
         // Arrange
         string solution = File.ReadAllText(Path.Combine(RepositoryRoot, "Mapping_Tools.sln"));
@@ -17,18 +17,18 @@ public sealed class DefaultExecutableTests
         int avaloniaIndex = solution.IndexOf(
             "= \"Mapping_Tools.Desktop\",",
             StringComparison.Ordinal);
-        int wpfIndex = solution.IndexOf(
+        int legacyProjectIndex = solution.IndexOf(
             "= \"Mapping_Tools\",",
             StringComparison.Ordinal);
 
         // Assert
         avaloniaIndex.Should().BeGreaterThanOrEqualTo(0);
-        wpfIndex.Should().BeGreaterThanOrEqualTo(0);
-        avaloniaIndex.Should().BeLessThan(wpfIndex);
+        legacyProjectIndex.Should().Be(-1);
+        solution.Should().NotContain("Mapping_Tools_Tests");
     }
 
     [TestMethod]
-    public void ReleaseAndDevelopmentEntryPoints_TargetAvaloniaAndKeepWpfFallback()
+    public void ReleaseAndDevelopmentEntryPoints_TargetAvaloniaOnly()
     {
         // Arrange
         string workflow = File.ReadAllText(Path.Combine(RepositoryRoot, ".github", "workflows", "release.yml"));
@@ -45,15 +45,17 @@ public sealed class DefaultExecutableTests
         bool primaryWorkflowIsAvalonia = workflow.Contains(
             "dotnet publish Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj",
             StringComparison.Ordinal);
-        bool fallbackWorkflowIsWpf = workflow.Contains(
+        bool legacyWorkflowIsRemoved = workflow.Contains(
             "legacy WPF fallback",
-            StringComparison.Ordinal) && workflow.Contains(
-            "dotnet publish Mapping_Tools/Mapping_Tools.csproj -c Release",
+            StringComparison.Ordinal) || workflow.Contains(
+            "dotnet publish Mapping_Tools/Mapping_Tools.csproj",
             StringComparison.Ordinal);
 
         // Assert
         primaryWorkflowIsAvalonia.Should().BeTrue();
-        fallbackWorkflowIsWpf.Should().BeTrue();
+        legacyWorkflowIsRemoved.Should().BeFalse();
+        workflow.Should().NotContain("legacy-wpf");
+        workflow.Should().NotContain("Mapping_Tools/Mapping_Tools.csproj");
         launch.Should().Contain("Mapping_Tools.Desktop/bin/Debug/net10.0/Mapping_Tools.Desktop.dll");
         tasks.Should().Contain(
             "\"${workspaceFolder}/Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj\"");
@@ -69,7 +71,7 @@ public sealed class DefaultExecutableTests
     }
 
     [TestMethod]
-    public void ReleaseValidation_RequiresBothArchiveFamiliesAndInstallerOutputs()
+    public void ReleaseValidation_RequiresPrimaryArchivesAndInstallerOutputs()
     {
         // Arrange
         string validator = File.ReadAllText(Path.Combine(
@@ -78,12 +80,31 @@ public sealed class DefaultExecutableTests
             "validate-release-layout.ps1"));
 
         // Assert
-        validator.Should().Contain("Assert-ArchiveLayout $PrimaryArchiveX86 $true");
-        validator.Should().Contain("Assert-ArchiveLayout $LegacyArchiveX64 $false");
+        validator.Should().Contain("Assert-ArchiveLayout $PrimaryArchiveX86");
+        validator.Should().Contain("Assert-ArchiveLayout $PrimaryArchiveX64");
+        validator.Should().NotContain("$LegacyArchive");
         validator.Should().Contain("Mapping_Tools.Desktop.dll");
         validator.Should().Contain("Mapping Tools.dll");
         validator.Should().Contain("$InstallerX86");
         validator.Should().Contain("$InstallerX64");
+    }
+
+    [TestMethod]
+    public void LegacyFrontend_AndLegacyTestProject_AreRemoved()
+    {
+        // Arrange
+        string legacyFrontendDirectory = Path.Combine(RepositoryRoot, "Mapping_Tools");
+        string legacyTestDirectory = Path.Combine(RepositoryRoot, "Mapping_Tools_Tests");
+
+        // Act
+        bool legacyFrontendExists = Directory.Exists(legacyFrontendDirectory);
+        bool legacyTestProjectExists = Directory.Exists(legacyTestDirectory);
+
+        // Assert
+        legacyFrontendExists.Should().BeFalse();
+        legacyTestProjectExists.Should().BeFalse();
+        File.Exists(Path.Combine(RepositoryRoot, "Mapping_Tools.Desktop", "Mapping_Tools.Desktop.csproj"))
+            .Should().BeTrue();
     }
 
     private static string FindRepositoryRoot()

@@ -2,7 +2,7 @@
     "id":  "TR-pattern-gallery",
     "feature":  "Pattern Gallery",
     "status":  "accepted",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "seedInput":  "../beatmaps/ComplicatedTestMap.osu",
     "options":  "pattern-gallery.options.json",
     "expectedOutput":  "expected/pattern-gallery.osu",
     "expectedOutputSha256":  "1CE4FE8A14AC41FB718B50C167DA139FBA5C458A5410C4629E0EE36644BEDDD6",

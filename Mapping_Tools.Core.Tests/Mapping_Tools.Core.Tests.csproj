@@ -20,13 +20,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\Mapping_Tools_Tests\Resources\TestStoryboard.osb" Link="Resources\TestStoryboard.osb">
+    <None Include="..\tests\fixtures\wave0\storyboards\TestStoryboard.osb" Link="Resources\TestStoryboard.osb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\Mapping_Tools_Tests\Resources\EmptyTestMap.osu" Link="Resources\EmptyTestMap.osu">
+    <None Include="..\tests\fixtures\wave0\beatmaps\EmptyTestMap.osu" Link="Resources\EmptyTestMap.osu">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\Mapping_Tools_Tests\Resources\ComplicatedTestMap.osu" Link="Resources\ComplicatedTestMap.osu">
+    <None Include="..\tests\fixtures\wave0\beatmaps\ComplicatedTestMap.osu" Link="Resources\ComplicatedTestMap.osu">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\tests\fixtures\wave0\beatmaps\Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].osu" Link="Resources\Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].osu">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\tests\fixtures\wave0\beatmaps\THE ORAL CIGARETTES - GET BACK (Nikakis) [Sotarks_ Cataclysm].osu" Link="Resources\THE ORAL CIGARETTES - GET BACK (Nikakis) [Sotarks_ Cataclysm].osu">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\tests\fixtures\wave0\beatmaps\standard-feature-rich.osu" Link="Resources\standard-feature-rich.osu">

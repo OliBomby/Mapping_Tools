@@ -1,5 +1,5 @@
 {
-  "Target": "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+  "Target": "../beatmaps/ComplicatedTestMap.osu",
   "PictureSha256": "C26767093E48551B7ECD1041F7B4EC618BC79DB2CB1EC4E82548850733F89E8B",
   "ViewportSize": 16384,
   "Quality": 4,

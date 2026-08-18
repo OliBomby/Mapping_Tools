@@ -2,7 +2,7 @@
     "id":  "TR-slider-picturator",
     "feature":  "Slider Picturator",
     "status":  "accepted",
-    "seedInput":  "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+    "seedInput":  "../beatmaps/ComplicatedTestMap.osu",
     "options":  "slider-picturator.options.json",
     "expectedOutput":  "expected/slider-picturator.osu",
     "expectedOutputSha256":  "193DD7875260CDE0E76ADC41FA118E777BFB9C07944B8242ED5DF2EF3871C754",

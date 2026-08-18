@@ -7,10 +7,9 @@ The shipped Windows application is the Avalonia desktop frontend and is
 self-contained in release installers and `release.zip` archives. Development
 launches should use `Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj`.
 
-The legacy WPF frontend remains buildable and is published only as the
-documented `legacy-wpf_x86.zip` / `legacy-wpf_x64.zip` fallback while the
-migration is completed. Extract it to a separate directory; it is not the
-default executable or installer payload.
+The legacy WPF/WinForms frontend has been removed after the Avalonia migration.
+Existing settings, project JSON, maps, backups, exports, and updater handoff
+remain compatible with the shipped application.
 
 <p align="left">
   <img src="https://i.imgur.com/7JqvlNY.png" alt="Mapping Tools logo"/>
@@ -41,17 +40,16 @@ default executable or installer payload.
 See the [Trello board](https://trello.com/b/iTmmw3eP/mapping-tools).
 
 ## Used libraries
-- [MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
+- [Avalonia](https://github.com/AvaloniaUI/Avalonia)
+- [Material.Avalonia](https://github.com/AvaloniaCommunity/Material.Avalonia)
+- [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet)
 - [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 - [NAudio](https://github.com/naudio/NAudio)
 - [NAudio Vorbis](https://github.com/naudio/Vorbis)
 - [OsuMemoryDataProvider](https://github.com/Piotrekol)
-- [Microsoft Windows API Code Pack](https://github.com/aybe/Windows-API-Code-Pack-1.1)
 - [Editor Reader](https://github.com/Karoo13/EditorReader)
 - [NonInvasiveKeyboardHook](https://github.com/kfirprods/NonInvasiveKeyboardHook)
 - [Overlay.NET](https://github.com/lolp1/Overlay.NET)
 - [.NET Ogg Vorbis Encoder](https://github.com/SteveLillis/.NET-Ogg-Vorbis-Encoder)
 - [Onova](https://github.com/Tyrrrz/Onova)
-- [Extended WPF Toolkit](https://github.com/xceedsoftware/wpftoolkit)
-- [VirtualizingWrapPanel](https://github.com/sbaeumlisberger/VirtualizingWrapPanel)
 

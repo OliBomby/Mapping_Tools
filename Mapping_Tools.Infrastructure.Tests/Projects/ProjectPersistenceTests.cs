@@ -13,6 +13,7 @@ using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Classes.HitsoundStuff;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
@@ -112,6 +113,42 @@ public sealed class ProjectPersistenceTests
 
         // Assert
         json.Should().Contain("\"$type\": \"Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools\"");
+    }
+
+    [TestMethod]
+    public void SerializeAndDeserialize_MigratedCoreTypes_PreservesLegacyAliases()
+    {
+        // Arrange
+        LegacyProjectJsonSerializer serializer = new();
+        object[] values =
+        {
+            new TimingPoint { Offset = 1250, MpB = 500 },
+            new RationalBeatDivisor(1, 4),
+            new Sample(),
+            new ComboColour(RgbaColour.FromArgb(0x7F, 0x12, 0x34, 0x56)),
+            new HitObject("256,192,1000,1,2,0:0:0:0:"),
+            new HitsoundZone()
+        };
+
+        // Act
+        Dictionary<object, (string Json, object RoundTrip)> results = values.ToDictionary(
+            value => value,
+            value =>
+            {
+                string json = serializer.Serialize(value);
+                object roundTrip = serializer.Deserialize<object>(json);
+                return (json, roundTrip);
+            });
+
+        // Assert
+        foreach ((object value, (string json, object roundTrip)) in results)
+        {
+            string legacyTypeName = value.GetType().FullName!
+                .Replace("Mapping_Tools.Core.", "Mapping_Tools.", StringComparison.Ordinal);
+
+            json.Should().Contain($"\"$type\": \"{legacyTypeName}, Mapping Tools\"");
+            roundTrip.Should().BeOfType(value.GetType());
+        }
     }
 
     [TestMethod]

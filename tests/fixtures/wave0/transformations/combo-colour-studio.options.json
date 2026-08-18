@@ -1,5 +1,5 @@
 {
-  "Target": "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+  "Target": "../beatmaps/ComplicatedTestMap.osu",
   "MaxBurstLength": 2,
   "ComboColours": [
     { "Name": "Combo1", "Color": "#FFFF3355" },

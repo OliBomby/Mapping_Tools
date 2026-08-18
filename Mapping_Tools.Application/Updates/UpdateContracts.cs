@@ -357,7 +357,7 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
 
         CancellationTokenSource downloadCancellationSource = downloadCancellation!;
         TaskCompletionSource completionSource = completion!;
-        Progress<double> progress = new(value =>
+        IProgress<double> progress = new InlineProgress(value =>
         {
             ProgressChanged?.Invoke(this, new UpdateProgressChangedEventArgs(value));
         });
@@ -573,5 +573,12 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
     private void ThrowIfDisposed()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
+    }
+
+    private sealed class InlineProgress(Action<double> callback) : IProgress<double>
+    {
+        private readonly Action<double> _callback = callback ?? throw new ArgumentNullException(nameof(callback));
+
+        public void Report(double value) => _callback(value);
     }
 }

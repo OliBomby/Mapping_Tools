@@ -1,6 +1,6 @@
 {
   "Source": "../beatmaps/standard-feature-rich.osu",
-  "Target": "../../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
+  "Target": "../beatmaps/ComplicatedTestMap.osu",
   "Artist": "Wave Zero Artist",
   "RomanisedArtist": "Wave Zero Artist",
   "Title": "Wave Zero Metadata Baseline",
