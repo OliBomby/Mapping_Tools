@@ -1,9 +1,16 @@
 # Mapping Tools [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V2HPH5F) [![Github All Releases](https://img.shields.io/github/downloads/OliBomby/Mapping_Tools/total.svg)]()
 
-Mapping Tools is a collection of tools which help you create osu! beatmaps more easily! 
+Mapping Tools is a collection of tools which help you create osu! beatmaps more easily!
 [Website](https://mappingtools.github.io/)
 
-Requires [.NET 5 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/5.0)
+The shipped Windows application is the Avalonia desktop frontend and is
+self-contained in release installers and `release.zip` archives. Development
+launches should use `Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj`.
+
+The legacy WPF frontend remains buildable and is published only as the
+documented `legacy-wpf_x86.zip` / `legacy-wpf_x64.zip` fallback while the
+migration is completed. Extract it to a separate directory; it is not the
+default executable or installer payload.
 
 <p align="left">
   <img src="https://i.imgur.com/7JqvlNY.png" alt="Mapping Tools logo"/>

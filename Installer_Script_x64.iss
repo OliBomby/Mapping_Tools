@@ -29,11 +29,11 @@
 //#define UseSql2019Express
 
 #define MyAppName "Mapping Tools"
-#define MyAppVersion "0.0.0"
+#define MyAppVersion "1.12.30"
 #define MyAppPublisher "OliBomby"
 #define MyAppURL "https://mappingtools.github.io/"
 #define MyAppExeName "Mapping Tools.exe"
-#define BuildFolderPath "Mapping_Tools\bin\Release\net10.0-windows\win-x64\publish"
+#define BuildFolderPath "Mapping_Tools.Desktop\bin\Release\net10.0\win-x64\publish"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -54,7 +54,7 @@ DisableDirPage=no
 DisableWelcomePage=no
 OutputDir=.\
 OutputBaseFilename=mapping_tools_installer_x64
-SetupIconFile=.\Mapping_Tools\Data\mt_icon.ico
+SetupIconFile=.\Mapping_Tools.Desktop\Assets\mt_icon.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern  

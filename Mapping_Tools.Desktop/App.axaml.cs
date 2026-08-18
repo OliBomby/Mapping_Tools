@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Composition;
@@ -12,6 +13,7 @@ using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Diagnostics;
 
 namespace Mapping_Tools.Desktop;
 
@@ -40,6 +42,8 @@ public partial class App : Avalonia.Application
     /// </summary>
     public override void OnFrameworkInitializationCompleted()
     {
+        Dispatcher.UIThread.UnhandledException += OnDispatcherUnhandledException;
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             _host = DesktopHostFactory.Create(desktop.Args ?? []);
@@ -67,6 +71,61 @@ public partial class App : Avalonia.Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void OnDispatcherUnhandledException(
+        object? sender,
+        DispatcherUnhandledExceptionEventArgs eventArgs)
+    {
+        WriteCrashLog(eventArgs.Exception);
+        eventArgs.Handled = true;
+    }
+
+    /// <summary>
+    /// Writes an unhandled-exception report to the legacy-compatible application
+    /// data directory so the Avalonia frontend has the same support handoff as WPF.
+    /// </summary>
+    /// <param name="exception">The exception that escaped normal application handling.</param>
+    internal static void WriteCrashLog(Exception exception)
+    {
+        ArgumentNullException.ThrowIfNull(exception);
+
+        try
+        {
+            string localApplicationData = Environment.GetFolderPath(
+                Environment.SpecialFolder.LocalApplicationData);
+            if (string.IsNullOrWhiteSpace(localApplicationData))
+            {
+                localApplicationData = AppContext.BaseDirectory;
+            }
+
+            string applicationData = Path.Combine(localApplicationData, "Mapping Tools");
+            Directory.CreateDirectory(applicationData);
+
+            List<string> lines = [
+                exception.Message,
+                exception.StackTrace ?? string.Empty,
+                exception.Source ?? string.Empty
+            ];
+            for (Exception? inner = exception.InnerException;
+                 inner is not null;
+                 inner = inner.InnerException)
+            {
+                lines.Add(string.Empty);
+                lines.Add("Inner exception:");
+                lines.Add(inner.Message);
+                lines.Add(inner.StackTrace ?? string.Empty);
+                lines.Add(inner.Source ?? string.Empty);
+            }
+
+            File.WriteAllLines(Path.Combine(applicationData, "crash-log.txt"), lines);
+        }
+        catch (Exception loggingException)
+        {
+            Trace.TraceError(
+                "Could not write the Mapping Tools crash log: {0}",
+                loggingException);
+        }
     }
 
     private void StopHost()

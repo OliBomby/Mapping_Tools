@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json;
 using Mapping_Tools.Application.Updates;
 using Onova;
@@ -64,6 +65,7 @@ public sealed record UpdateReleaseNotes(string? Title, string? Body);
 /// </summary>
 public sealed class OnovaUpdateGateway : IUpdateGateway
 {
+    private const string PublishedExecutableName = "Mapping Tools.exe";
     private const string RepositoryOwner = "OliBomby";
     private const string RepositoryName = "Mapping_Tools";
     private const string ReleaseMetadataUrl =
@@ -111,7 +113,15 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
             RepositoryOwner,
             RepositoryName,
             _assetName);
+
+        Assembly entryAssembly = Assembly.GetEntryAssembly()
+            ?? typeof(OnovaUpdateGateway).Assembly;
+        string publishedExecutablePath = ResolveExecutablePath(entryAssembly);
+        AssemblyMetadata assemblyMetadata = File.Exists(publishedExecutablePath)
+            ? AssemblyMetadata.FromAssembly(entryAssembly, publishedExecutablePath)
+            : AssemblyMetadata.FromAssembly(entryAssembly);
         _updateManager = new Onova.UpdateManager(
+            assemblyMetadata,
             _packageResolver,
             new ZipPackageExtractor());
     }
@@ -197,5 +207,25 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
     private void ThrowIfDisposed()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
+    }
+
+    private static string ResolveExecutablePath(Assembly entryAssembly)
+    {
+        string? processPath = Environment.ProcessPath;
+        if (!string.IsNullOrWhiteSpace(processPath) &&
+            string.Equals(
+                Path.GetFileName(processPath),
+                PublishedExecutableName,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return processPath;
+        }
+
+        string publishedExecutablePath = Path.Combine(
+            AppContext.BaseDirectory,
+            PublishedExecutableName);
+        return File.Exists(publishedExecutablePath)
+            ? publishedExecutablePath
+            : entryAssembly.Location;
     }
 }

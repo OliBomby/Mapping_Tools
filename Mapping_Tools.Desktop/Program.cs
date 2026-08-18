@@ -13,8 +13,31 @@ sealed class Program
     /// </summary>
     /// <param name="args">Command-line arguments forwarded to Avalonia.</param>
     [STAThread]
-    public static void Main(string[] args) => BuildAvaloniaApp()
-        .StartWithClassicDesktopLifetime(args);
+    public static void Main(string[] args)
+    {
+        AppDomain.CurrentDomain.UnhandledException += (_, eventArgs) =>
+        {
+            if (eventArgs.ExceptionObject is Exception exception)
+            {
+                App.WriteCrashLog(exception);
+            }
+        };
+        TaskScheduler.UnobservedTaskException += (_, eventArgs) =>
+        {
+            App.WriteCrashLog(eventArgs.Exception);
+            eventArgs.SetObserved();
+        };
+
+        try
+        {
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        }
+        catch (Exception exception)
+        {
+            App.WriteCrashLog(exception);
+            throw;
+        }
+    }
 
     // Avalonia configuration, don't remove; also used by visual designer.
     /// <summary>

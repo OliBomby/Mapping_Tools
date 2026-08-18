@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Mapping Tools (Avalonia)": {
+      "commandName": "Project",
+      "workingDirectory": "."
+    }
+  }
+}

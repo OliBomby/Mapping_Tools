@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31423.177
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Desktop", "Mapping_Tools.Desktop\Mapping_Tools.Desktop.csproj", "{976B6ED8-2B2F-461C-B85B-16B49DE56281}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mapping_Tools_Tests", "Mapping_Tools_Tests\Mapping_Tools_Tests.csproj", "{D01ED42E-8057-489C-96B4-FFDCEBD5E53F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mapping_Tools", "Mapping_Tools\Mapping_Tools.csproj", "{F418EF3E-C92E-4303-A00D-8D0B78793AAA}"
@@ -17,8 +19,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Application", "Mapping_Tools.Application\Mapping_Tools.Application.csproj", "{D6A368AD-33B0-4E52-B2E8-ED2615E1FEE4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Infrastructure", "Mapping_Tools.Infrastructure\Mapping_Tools.Infrastructure.csproj", "{BD6E882F-1CAA-4D18-B012-ECFA5A32E54F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Desktop", "Mapping_Tools.Desktop\Mapping_Tools.Desktop.csproj", "{976B6ED8-2B2F-461C-B85B-16B49DE56281}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapping_Tools.Core.Tests", "Mapping_Tools.Core.Tests\Mapping_Tools.Core.Tests.csproj", "{96E63447-ECF5-4F1E-AA63-DD525B4FEA86}"
 EndProject

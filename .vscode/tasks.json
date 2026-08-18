@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Mapping_Tools.sln",
+                "${workspaceFolder}/Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -19,7 +19,13 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/Mapping_Tools.sln",
+                "${workspaceFolder}/Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj",
+                "--configuration",
+                "Release",
+                "--runtime",
+                "win-x64",
+                "--self-contained",
+                "true",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -33,7 +39,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/Mapping_Tools.sln"
+                "${workspaceFolder}/Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

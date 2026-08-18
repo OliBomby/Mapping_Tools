@@ -2,6 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
@@ -46,4 +47,10 @@
     <ProjectReference Include="..\Mapping_Tools.Application\Mapping_Tools.Application.csproj" />
     <ProjectReference Include="..\Mapping_Tools.Infrastructure\Mapping_Tools.Infrastructure.csproj" />
   </ItemGroup>
+
+  <Target Name="RenamePublishedAppHost" AfterTargets="Publish">
+    <Move SourceFiles="$(PublishDir)Mapping_Tools.Desktop.exe"
+          DestinationFiles="$(PublishDir)Mapping Tools.exe"
+          Condition="Exists('$(PublishDir)Mapping_Tools.Desktop.exe')" />
+  </Target>
 </Project>
