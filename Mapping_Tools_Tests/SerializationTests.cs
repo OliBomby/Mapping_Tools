@@ -1,14 +1,15 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Windows.Input;
-using Mapping_Tools.Classes.SystemTools;
+using FluentAssertions;
 using Mapping_Tools.Classes.BeatmapHelper;
 using Mapping_Tools.Classes.HitsoundStuff;
+using Mapping_Tools.Classes.SystemTools;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
-using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
 using Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
 using Mapping_Tools.Classes.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
@@ -16,57 +17,76 @@ using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Classes.HitsoundStuff;
 using Mapping_Tools.Views;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using CoreGeneratorSettings = Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings;
+using CoreHotkey = Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization.Hotkey;
+using CoreRelevantObjectsGenerator = Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.RelevantObjectsGenerator;
+using CoreSelectionPredicate = Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate;
+using CoreSelectionPredicateCollection = Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection;
+using CoreSnappingToolsProject = Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization.SnappingToolsProject;
+using CoreSymmetryGenerator = Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SymmetryGenerator;
+using CoreSymmetryGeneratorSettings = Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SymmetryGeneratorSettings;
+using CoreUpdateMode = Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization.UpdateMode;
 
 [assembly: SupportedOSPlatform("Windows7.0")]
+
 namespace Mapping_Tools_Tests {
     [TestClass]
     public class SerializationTests {
         [TestMethod]
-        public void ComboColourSerializationPreservesLegacyProjectFormat() {
+        public void SaveJson_ComboColour_ProducesLegacyProjectFormatAndRoundTrips() {
+            // Arrange
             string path = System.IO.Path.GetTempFileName();
             try {
                 var expected = new ComboColour(
                     RgbaColour.FromArgb(0x7F, 0x12, 0x34, 0x56));
 
+                // Act
                 ProjectManager.SaveJson(path, expected);
                 string json = System.IO.File.ReadAllText(path);
                 var actual = ProjectManager.LoadJson<ComboColour>(path);
 
-                StringAssert.Contains(json, "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools");
-                StringAssert.Contains(json, "\"Color\": \"#7F123456\"");
-                Assert.AreEqual(expected.Color, actual.Color);
+                // Assert
+                json.Should().Contain("Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools");
+                json.Should().Contain("\"Color\": \"#7F123456\"");
+                actual.Color.Should().Be(expected.Color);
             } finally {
                 System.IO.File.Delete(path);
             }
         }
 
         [TestMethod]
-        public void HitObjectSerializationPreservesLegacyProjectType() {
+        public void SaveJson_HitObject_ProducesLegacyProjectTypeAndRoundTripsLine() {
+            // Arrange
             string path = System.IO.Path.GetTempFileName();
             try {
                 const string line = "256,192,1000,1,2,0:0:0:0:";
                 var expected = new HitObject(line);
 
+                // Act
                 ProjectManager.SaveJson(path, expected);
                 string json = System.IO.File.ReadAllText(path);
                 var actual = ProjectManager.LoadJson<HitObject>(path);
 
-                StringAssert.Contains(json, "Mapping_Tools.Classes.BeatmapHelper.HitObject, Mapping Tools");
-                Assert.AreEqual(line, actual.GetLine());
+                // Assert
+                json.Should().Contain("Mapping_Tools.Classes.BeatmapHelper.HitObject, Mapping Tools");
+                actual.GetLine().Should().Be(line);
             } finally {
                 System.IO.File.Delete(path);
             }
         }
 
         [TestMethod]
-        public void AllMigratedCoreTypesPreserveLegacyProjectAssemblyName() {
+        public void SaveJson_MigratedCoreTypes_UsesLegacyAssemblyNameAndRoundTripsTypes() {
+            // Arrange
             object[] migratedValues = {
                 new RationalBeatDivisor(4),
                 new Sample(),
                 new TimingPoint("1000,500,4,1,0,100,1,0"),
                 new HitsoundZone()
             };
+            var results = new List<(object Expected, string Json, object Actual)>();
 
+            // Act
             foreach (object expected in migratedValues) {
                 string path = System.IO.Path.GetTempFileName();
                 try {
@@ -74,26 +94,34 @@ namespace Mapping_Tools_Tests {
                     string json = System.IO.File.ReadAllText(path);
                     object actual = ProjectManager.LoadJson<object>(path);
 
-                    StringAssert.Contains(json, $"{expected.GetType().FullName}, Mapping Tools");
-                    Assert.AreEqual(expected.GetType(), actual.GetType());
+                    results.Add((expected, json, actual));
                 } finally {
                     System.IO.File.Delete(path);
                 }
+            }
+
+            // Assert
+            foreach ((object expected, string json, object actual) in results) {
+                string legacyTypeName = expected.GetType().FullName!
+                    .Replace("Mapping_Tools.Core.", "Mapping_Tools.", StringComparison.Ordinal);
+                json.Should().Contain($"{legacyTypeName}, Mapping Tools");
+                actual.GetType().Should().Be(expected.GetType());
             }
         }
 
         private static T LoadJsonDynamic<T>(string path, T _) {
             return ProjectManager.LoadJson<T>(path);
         }
+
         private static T LoadJsonDynamicSavable<T>(string path, ISavable<T> _) {
             return ProjectManager.LoadJson<T>(path);
         }
 
         [TestMethod]
-        public void SelectionPredicateSerializationTest() {
+        public void LoadJson_SelectionPredicate_ProducesEquivalentValue() {
+            // Arrange
             const string path = "SelectionPredicateSave.json";
-
-            SelectionPredicate expected = new SelectionPredicate {
+            CoreSelectionPredicate expected = new CoreSelectionPredicate {
                 NeedSelected = true,
                 NeedLocked = true,
                 NeedGeneratedNotByThis = true,
@@ -101,18 +129,19 @@ namespace Mapping_Tools_Tests {
                 MinRelevancy = 0.66
             };
 
+            // Act
             ProjectManager.SaveJson(path, expected);
+            CoreSelectionPredicate actual = ProjectManager.LoadJson<CoreSelectionPredicate>(path);
 
-            SelectionPredicate actual = ProjectManager.LoadJson<SelectionPredicate>(path);
-
-            Assert.AreEqual(expected, actual);
+            // Assert
+            actual.Should().Be(expected);
         }
 
         [TestMethod]
-        public void SelectionPredicateDynamicSerializationTest() {
+        public void LoadJson_DynamicSelectionPredicate_ProducesEquivalentValue() {
+            // Arrange
             const string path = "SelectionPredicateDynamicSave.json";
-
-            SelectionPredicate expected = new SelectionPredicate {
+            CoreSelectionPredicate expected = new CoreSelectionPredicate {
                 NeedSelected = true,
                 NeedLocked = true,
                 NeedGeneratedNotByThis = true,
@@ -120,20 +149,21 @@ namespace Mapping_Tools_Tests {
                 MinRelevancy = 0.66
             };
 
+            // Act
             ProjectManager.SaveJson(path, expected);
-
             dynamic actual = LoadJsonDynamic(path, (dynamic)expected);
 
-            Assert.AreEqual(expected, (SelectionPredicate)actual);
+            // Assert
+            ((CoreSelectionPredicate)actual).Should().Be(expected);
         }
 
         [TestMethod]
-        public void SelectionPredicateCollectionDynamicSerializationTest() {
+        public void LoadJson_DynamicSelectionPredicateCollection_ProducesEquivalentValue() {
+            // Arrange
             const string path = "SelectionPredicateCollectionDynamicSave.json";
-
-            SelectionPredicateCollection expected = new SelectionPredicateCollection();
+            CoreSelectionPredicateCollection expected = new CoreSelectionPredicateCollection();
             expected.Predicates.Add(
-                new SelectionPredicate {
+                new CoreSelectionPredicate {
                     NeedSelected = true,
                     NeedLocked = true,
                     NeedGeneratedNotByThis = true,
@@ -141,7 +171,7 @@ namespace Mapping_Tools_Tests {
                     MinRelevancy = 0.66
                 });
             expected.Predicates.Add(
-                new SelectionPredicate {
+                new CoreSelectionPredicate {
                     NeedSelected = false,
                     NeedLocked = false,
                     NeedGeneratedNotByThis = false,
@@ -149,70 +179,66 @@ namespace Mapping_Tools_Tests {
                     MinRelevancy = 0.001
                 });
 
+            // Act
             ProjectManager.SaveJson(path, expected);
-
             dynamic actual = LoadJsonDynamic(path, (dynamic)expected);
 
-            Assert.AreEqual(expected, (SelectionPredicateCollection)actual);
+            // Assert
+            ((CoreSelectionPredicateCollection)actual).Should().Be(expected);
         }
 
         [TestMethod]
-        public void GeometryDashboardSerializationTest() {
+        public void LoadJson_GeometryDashboardProject_PreservesPreferences() {
+            // Arrange
             var tool = new SnappingToolsSavable();
-
-            Assert.IsNotNull(tool);
-
             const string path = "GeometryDashboardSave.json";
-
-            var expected = tool.GetSaveData();
-
+            CoreSnappingToolsProject expected = tool.GetSaveData();
             expected.CurrentPreferences.AcceptableDifference = 70.1;
             expected.CurrentPreferences.DebugEnabled = true;
-            expected.CurrentPreferences.UpdateMode = UpdateMode.OsuActivated;
-            expected.CurrentPreferences.LockHotkey = new Hotkey(Key.K, ModifierKeys.Shift);
+            expected.CurrentPreferences.UpdateMode = CoreUpdateMode.OsuActivated;
+            expected.CurrentPreferences.LockHotkey = new CoreHotkey((int)Key.K, (int)ModifierKeys.Shift);
             expected.CurrentPreferences.GeneratorSettings.Values.First().IsDeep = true;
-            expected.CurrentPreferences.GeneratorSettings.Values.First().InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true});
+            expected.CurrentPreferences.GeneratorSettings.Values.First().InputPredicate.Predicates.Add(new CoreSelectionPredicate { NeedSelected = true });
 
+            // Act
             ProjectManager.SaveJson(path, expected);
+            dynamic obj = LoadJsonDynamicSavable(path, (dynamic)tool);
+            CoreSnappingToolsProject actual = (CoreSnappingToolsProject)obj;
+            CoreSnappingToolsProject actual2 = ProjectManager.LoadJson<CoreSnappingToolsProject>(path);
 
-            var obj = LoadJsonDynamicSavable(path, (dynamic)tool);
-            var actual = (SnappingToolsProject) obj;
-
-            var actual2 = ProjectManager.LoadJson<SnappingToolsProject>(path);
-
+            // Assert
+            tool.Should().NotBeNull();
             AssertSnappingToolsProjectStuff(expected, actual2);
-
             AssertSnappingToolsProjectStuff(expected, actual);
         }
 
-        private static void AssertSnappingToolsProjectStuff(SnappingToolsProject expected, SnappingToolsProject actual) {
-            Assert.AreEqual(expected.CurrentPreferences.AcceptableDifference, actual.CurrentPreferences.AcceptableDifference);
-            Assert.AreEqual(expected.CurrentPreferences.DebugEnabled, actual.CurrentPreferences.DebugEnabled);
-            Assert.AreEqual(expected.CurrentPreferences.UpdateMode, actual.CurrentPreferences.UpdateMode);
-            Assert.AreEqual(expected.CurrentPreferences.LockHotkey.Key, actual.CurrentPreferences.LockHotkey.Key);
-            Assert.AreEqual(expected.CurrentPreferences.LockHotkey.Modifiers, actual.CurrentPreferences.LockHotkey.Modifiers);
-            Assert.AreEqual(expected.CurrentPreferences.GeneratorSettings.Values.First().IsDeep, actual.CurrentPreferences.GeneratorSettings.Values.First().IsDeep);
-            Assert.AreEqual(expected.CurrentPreferences.GeneratorSettings.Values.First().InputPredicate, actual.CurrentPreferences.GeneratorSettings.Values.First().InputPredicate);
+        private static void AssertSnappingToolsProjectStuff(CoreSnappingToolsProject expected, CoreSnappingToolsProject actual) {
+            actual.CurrentPreferences.AcceptableDifference.Should().Be(expected.CurrentPreferences.AcceptableDifference);
+            actual.CurrentPreferences.DebugEnabled.Should().Be(expected.CurrentPreferences.DebugEnabled);
+            actual.CurrentPreferences.UpdateMode.Should().Be(expected.CurrentPreferences.UpdateMode);
+            actual.CurrentPreferences.LockHotkey.Key.Should().Be(expected.CurrentPreferences.LockHotkey.Key);
+            actual.CurrentPreferences.LockHotkey.Modifiers.Should().Be(expected.CurrentPreferences.LockHotkey.Modifiers);
+            actual.CurrentPreferences.GeneratorSettings.Values.First().IsDeep.Should().Be(expected.CurrentPreferences.GeneratorSettings.Values.First().IsDeep);
+            actual.CurrentPreferences.GeneratorSettings.Values.First().InputPredicate.Should().Be(expected.CurrentPreferences.GeneratorSettings.Values.First().InputPredicate);
         }
 
-        private class SnappingToolsSavable : ISavable<SnappingToolsProject> {
-            private SnappingToolsProject Project { get; set; }
-            private readonly ObservableCollection<RelevantObjectsGenerator> generators;
+        private class SnappingToolsSavable : ISavable<CoreSnappingToolsProject> {
+            private CoreSnappingToolsProject Project { get; set; }
+            private readonly ObservableCollection<CoreRelevantObjectsGenerator> generators;
 
             internal SnappingToolsSavable() {
-                Project = new SnappingToolsProject();
-
-                generators = new ObservableCollection<RelevantObjectsGenerator> {
-                    new SymmetryGenerator()
+                Project = new CoreSnappingToolsProject();
+                generators = new ObservableCollection<CoreRelevantObjectsGenerator> {
+                    new CoreSymmetryGenerator()
                 };
                 Project.SetGenerators(generators);
             }
 
-            public SnappingToolsProject GetSaveData() {
+            public CoreSnappingToolsProject GetSaveData() {
                 return Project.GetThis();
             }
 
-            public void SetSaveData(SnappingToolsProject saveData) {
+            public void SetSaveData(CoreSnappingToolsProject saveData) {
                 Project = saveData;
                 Project.SetGenerators(generators);
             }
@@ -222,53 +248,57 @@ namespace Mapping_Tools_Tests {
         }
 
         [TestMethod]
-        public void GeneratorSettingsCopyToTest() {
-            var expected = new GeneratorSettings {IsDeep = true, IsActive = true, RelevancyRatio = 0.77};
-            expected.InputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true});
-
+        public void CopyTo_GeneratorSettings_CopiesSerializableProperties() {
+            // Arrange
+            var expected = new GeneratorSettings { IsDeep = true, IsActive = true, RelevancyRatio = 0.77 };
+            expected.InputPredicate.Predicates.Add(new SelectionPredicate { NeedSelected = true });
             var actual = new GeneratorSettings();
 
+            // Act
             expected.CopyTo(actual);
 
-            Assert.AreEqual(expected.IsDeep, actual.IsDeep);
-            Assert.AreEqual(expected.IsActive, actual.IsActive);
-            Assert.AreEqual(expected.RelevancyRatio, actual.RelevancyRatio, 0.001);
-            Assert.AreEqual(true, expected.InputPredicate.Predicates.First().NeedSelected);
-            Assert.AreEqual(true, actual.InputPredicate.Predicates.First().NeedSelected);
-            Assert.AreEqual(expected.InputPredicate, actual.InputPredicate);
+            // Assert
+            actual.IsDeep.Should().Be(expected.IsDeep);
+            actual.IsActive.Should().Be(expected.IsActive);
+            actual.RelevancyRatio.Should().BeApproximately(expected.RelevancyRatio, 0.001);
+            expected.InputPredicate.Predicates.First().NeedSelected.Should().BeTrue();
+            actual.InputPredicate.Predicates.First().NeedSelected.Should().BeTrue();
+            actual.InputPredicate.Should().Be(expected.InputPredicate);
         }
 
         [TestMethod]
-        public void SymmetryGeneratorSettingsCopyToTest() {
-            GeneratorSettings expected = new SymmetryGeneratorSettings {IsDeep = true, IsActive = true, RelevancyRatio = 0.77};
-            ((SymmetryGeneratorSettings)expected).OtherInputPredicate.Predicates.Add(new SelectionPredicate {NeedSelected = true, MinRelevancy = 0.06});
-
+        public void CopyTo_SymmetryGeneratorSettings_CopiesDerivedProperties() {
+            // Arrange
+            GeneratorSettings expected = new SymmetryGeneratorSettings { IsDeep = true, IsActive = true, RelevancyRatio = 0.77 };
+            ((SymmetryGeneratorSettings)expected).OtherInputPredicate.Predicates.Add(new SelectionPredicate { NeedSelected = true, MinRelevancy = 0.06 });
             GeneratorSettings actual = new SymmetryGeneratorSettings();
 
+            // Act
             expected.CopyTo(actual);
 
-            Assert.AreEqual(expected.IsDeep, actual.IsDeep);
-            Assert.AreEqual(expected.IsActive, actual.IsActive);
-            Assert.AreEqual(expected.RelevancyRatio, actual.RelevancyRatio, 0.001);
-            Assert.AreEqual(((SymmetryGeneratorSettings)expected).OtherInputPredicate, ((SymmetryGeneratorSettings)actual).OtherInputPredicate);
+            // Assert
+            actual.IsDeep.Should().Be(expected.IsDeep);
+            actual.IsActive.Should().Be(expected.IsActive);
+            actual.RelevancyRatio.Should().BeApproximately(expected.RelevancyRatio, 0.001);
+            ((SymmetryGeneratorSettings)actual).OtherInputPredicate.Should().Be(((SymmetryGeneratorSettings)expected).OtherInputPredicate);
         }
 
         [TestMethod]
-        public void SerializationTypeRetentionTest() {
+        public void LoadJson_GeneratorSettings_RetainsConcreteSettingsType() {
+            // Arrange
             const string path = "SerializationTypeRetentionTestSave.json";
+            var symmetrySettings = new CoreSymmetryGeneratorSettings { IsActive = true };
+            symmetrySettings.OtherInputPredicate.Predicates.Add(new CoreSelectionPredicate { MinRelevancy = 0.05 });
 
-            var symmetrySettings = new SymmetryGeneratorSettings {IsActive = true};
-            symmetrySettings.OtherInputPredicate.Predicates.Add(new SelectionPredicate {MinRelevancy = 0.05});
-
+            // Act
             ProjectManager.SaveJson(path, symmetrySettings);
+            CoreGeneratorSettings deserializedSymmetrySettings = ProjectManager.LoadJson<CoreGeneratorSettings>(path);
 
-            var deserializedSymmetrySettings = ProjectManager.LoadJson<GeneratorSettings>(path);
- 
-            Assert.AreEqual(symmetrySettings.IsActive, deserializedSymmetrySettings.IsActive);
-            
-            var castedSymmetrySettings = deserializedSymmetrySettings as SymmetryGeneratorSettings;
-            Assert.IsNotNull(castedSymmetrySettings);
-            Assert.AreEqual(castedSymmetrySettings.OtherInputPredicate, symmetrySettings.OtherInputPredicate);
+            // Assert
+            deserializedSymmetrySettings.IsActive.Should().Be(symmetrySettings.IsActive);
+            deserializedSymmetrySettings.Should().BeOfType<CoreSymmetryGeneratorSettings>();
+            var castedSymmetrySettings = (CoreSymmetryGeneratorSettings)deserializedSymmetrySettings;
+            castedSymmetrySettings.OtherInputPredicate.Should().Be(symmetrySettings.OtherInputPredicate);
         }
     }
 }
