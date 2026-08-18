@@ -23,6 +23,7 @@ public sealed class LayerBoundaryTests
         "ReactiveUI",
         "MaterialDesignThemes",
         "NAudio",
+        "NVorbis",
         "OggVorbisEncoder",
         "System.Diagnostics.Process",
         "ProcessStartInfo",
@@ -40,6 +41,7 @@ public sealed class LayerBoundaryTests
         "Material.Avalonia",
         "MaterialDesign",
         "NAudio",
+        "NVorbis",
         "OggVorbisEncoder",
         "Microsoft-WindowsAPICodePack"
     ];
