@@ -8,6 +8,8 @@ namespace Mapping_Tools.Desktop.Views;
 /// <summary>Displays Pattern Gallery's collection cards and placement options.</summary>
 public sealed partial class PatternGalleryView : UserControl
 {
+    private ListBox? selectedPatternList;
+
     /// <summary>Creates the Pattern Gallery view and loads its compiled AXAML.</summary>
     public PatternGalleryView()
     {
@@ -37,6 +39,32 @@ public sealed partial class PatternGalleryView : UserControl
         {
             viewModel.SelectOnly(item);
             await viewModel.RunQuickAsync(CancellationToken.None);
+        }
+    }
+
+    private void PatternSelectionChanged(object? sender, SelectionChangedEventArgs eventArgs)
+    {
+        if (DataContext is not PatternGalleryViewModel viewModel)
+        {
+            return;
+        }
+
+        if (sender is ListBox list && !ReferenceEquals(selectedPatternList, list))
+        {
+            if (selectedPatternList is not null)
+            {
+                selectedPatternList.SelectedItem = null;
+            }
+
+            selectedPatternList = list;
+        }
+
+        PatternGalleryItemViewModel? item = eventArgs.AddedItems
+            .OfType<PatternGalleryItemViewModel>()
+            .FirstOrDefault();
+        if (item is not null)
+        {
+            viewModel.SelectOnly(item);
         }
     }
 
@@ -79,12 +107,23 @@ public sealed partial class PatternGalleryView : UserControl
 
         viewModel.SelectOnly(item);
         menu.Items.Clear();
-        menu.Items.Add(new MenuItem { Header = "Delete", Command = viewModel.RemoveCommand });
-        menu.Items.Add(new MenuItem { Header = "Open in Explorer", Command = viewModel.OpenExplorerSelectedCommand });
-        menu.Items.Add(new MenuItem { Header = "Properties", Command = viewModel.ShowDetailsCommand });
-        menu.Items.Add(new Separator());
+        MenuItem deleteItem = new()
+        {
+            Header = "_Delete",
+            Command = viewModel.RemoveCommand
+        };
+        ToolTip.SetTip(deleteItem, "Delete selected patterns. Hold shift to skip dialog.");
+        menu.Items.Add(deleteItem);
 
-        MenuItem groupMenu = new() { Header = "Group" };
+        MenuItem openItem = new()
+        {
+            Header = "_Open in File Explorer",
+            Command = viewModel.OpenExplorerSelectedCommand
+        };
+        ToolTip.SetTip(openItem, "Open the source files of the selected patterns in the File Explorer.");
+        menu.Items.Add(openItem);
+        menu.Items.Add(new Separator());
+        MenuItem groupMenu = new() { Header = "_Group" };
         groupMenu.Items.Add(new MenuItem
         {
             Header = "None",
@@ -105,5 +144,12 @@ public sealed partial class PatternGalleryView : UserControl
         groupMenu.Items.Add(new MenuItem { Header = "Type new group name...", Command = viewModel.NewGroupCommand });
         groupMenu.Items.Add(new MenuItem { Header = "Rename group...", Command = viewModel.RenameGroupCommand });
         menu.Items.Add(groupMenu);
+        MenuItem propertiesItem = new()
+        {
+            Header = "_Properties",
+            Command = viewModel.ShowDetailsCommand
+        };
+        ToolTip.SetTip(propertiesItem, "View additional properties of the pattern.");
+        menu.Items.Add(propertiesItem);
     }
 }

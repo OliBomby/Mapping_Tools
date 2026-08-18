@@ -5,7 +5,6 @@
              xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
-             xmlns:corePattern="using:Mapping_Tools.Core.Tools.PatternGallery"
              x:Class="Mapping_Tools.Desktop.Views.PatternGalleryView"
              x:Name="Root"
              x:DataType="vm:PatternGalleryViewModel">
@@ -14,15 +13,15 @@
             <Grid ColumnDefinitions="*,Auto">
                 <controls:ToolViewHeader Title="Pattern Gallery"
                                          IsQuickRunSupported="True"
-                                         HelpText="Pattern Gallery lets you collect reusable patterns from beatmaps, preview them, organize them into groups, and place them into the beatmap currently open in osu!. Select one or more patterns, choose the placement options, and click Run." />
-                <Menu Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
-                    <MenuItem Header="Collection">
-                        <MenuItem Header="Rename collection" Command="{Binding RenameCollectionCommand}" />
-                        <MenuItem Header="Import ZIP" Command="{Binding ImportCollectionCommand}" />
-                        <MenuItem Header="Export ZIP" Command="{Binding ExportCollectionCommand}" />
-                        <MenuItem Header="Restore files" Command="{Binding RestoreCollectionCommand}" />
-                    </MenuItem>
-                </Menu>
+                                         HelpText="Import and export patterns from osu! beatmaps and create pattern collections which you can share with your friends.&#x0a;You can add or remove patterns by using the buttons at the bottom.&#x0a;To export a pattern to the current beatmap simply select one or more patterns and click the run button. You can also double-click a pattern to instantly export it.&#x0a;On the right there are export options which allow for additional processing on the pattern during export.&#x0a;With the 'Project' menu you can save/load/rename/import/export your pattern collections." />
+                <TextBlock Grid.Column="1"
+                           FontSize="35"
+                           FontWeight="Thin"
+                           Foreground="{DynamicResource MaterialPrimaryLightBrush}"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Text="{Binding CollectionName}"
+                           PointerPressed="CollectionNamePointerPressed" />
             </Grid>
 
             <Grid Grid.Row="1" Margin="0,14,0,0" ColumnDefinitions="*,12,270">
@@ -38,22 +37,32 @@
                                                 <TextBlock Opacity="0.65" Text="{Binding ItemCount, StringFormat='({0})'}" />
                                             </StackPanel>
                                         </Expander.Header>
-                                        <ItemsControl ItemsSource="{Binding Patterns}">
-                                            <ItemsControl.ItemsPanel>
+                                        <ListBox ItemsSource="{Binding Patterns}"
+                                                 SelectionMode="Single"
+                                                 Background="Transparent"
+                                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                 ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                                 SelectionChanged="PatternSelectionChanged">
+                                            <ListBox.ItemContainerTheme>
+                                                <ControlTheme TargetType="ListBoxItem" x:DataType="vm:PatternGalleryItemViewModel">
+                                                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                                                </ControlTheme>
+                                            </ListBox.ItemContainerTheme>
+                                            <ListBox.ItemsPanel>
                                                 <ItemsPanelTemplate>
                                                     <WrapPanel Orientation="Horizontal" />
                                                 </ItemsPanelTemplate>
-                                            </ItemsControl.ItemsPanel>
-                                            <ItemsControl.ItemTemplate>
+                                            </ListBox.ItemsPanel>
+                                            <ListBox.ItemTemplate>
                                                 <DataTemplate x:DataType="vm:PatternGalleryItemViewModel">
-                                                    <materialControls:Card Width="170" Margin="4" Padding="5">
+                                                    <materialControls:Card Width="150" Height="150" Margin="4" Padding="0">
                                                         <Border PointerPressed="PatternPointerPressed"
                                                                 DoubleTapped="PatternDoubleTapped"
                                                                 Background="Transparent">
                                                             <Border.ContextMenu>
                                                                 <ContextMenu Opened="PatternContextMenuOpened" />
                                                             </Border.ContextMenu>
-                                                            <Grid RowDefinitions="110,Auto" ToolTip.Tip="Double-click to QuickRun this pattern.">
+                                                            <Grid RowDefinitions="*,40" ToolTip.Tip="Double-click to QuickRun this pattern.">
                                                                 <controls:ObjectVisualiserControl Scene="{Binding Scene}"
                                                                                                   Fill="{DynamicResource MappingToolsTimelineAddedInnerBrush}"
                                                                                                   Stroke="{DynamicResource MaterialLightForegroundBrush}"
@@ -63,22 +72,18 @@
                                                                                                   FollowLineBrush="{DynamicResource MaterialLightForegroundBrush}"
                                                                                                   Thickness="38"
                                                                                                   BorderThickness="0.08" />
-                                                                <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="2,5,2,0">
-                                                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                                                              VerticalAlignment="Center"
-                                                                              ToolTip.Tip="Include this pattern in the next export." />
-                                                                    <TextBlock Grid.Column="1"
+                                                                <TextBlock Grid.Row="1"
                                                                                VerticalAlignment="Center"
+                                                                               Margin="8,0"
                                                                                Text="{Binding Name}"
                                                                                TextTrimming="CharacterEllipsis"
                                                                                ToolTip.Tip="{Binding Name}" />
-                                                                </Grid>
                                                             </Grid>
                                                         </Border>
                                                     </materialControls:Card>
                                                 </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
                                     </Expander>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -104,8 +109,18 @@
                             </ComboBox>
                         </Grid>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0">
-                            <Button Classes="flat" Content="Select all" Command="{Binding SelectAllCommand}" />
-                            <Button Classes="flat" Content="Clear" Command="{Binding ClearSelectionCommand}" />
+                            <Button Classes="flat" Command="{Binding AddCodeCommand}" ToolTip.Tip="Add a pattern from .osu code.">
+                                <materialIcons:MaterialIcon Kind="CodeBraces" Width="24" Height="24" />
+                            </Button>
+                            <Button Classes="flat" Command="{Binding AddFileCommand}" ToolTip.Tip="Add a pattern from a file.">
+                                <materialIcons:MaterialIcon Kind="FilePlus" Width="24" Height="24" />
+                            </Button>
+                            <Button Classes="flat" Command="{Binding AddSelectedCommand}" ToolTip.Tip="Add a pattern from selected hit objects.">
+                                <materialIcons:MaterialIcon Kind="PlusBox" Width="24" Height="24" />
+                            </Button>
+                            <Button Classes="flat" Command="{Binding RemoveCommand}" PointerPressed="RemoveButtonPointerPressed" ToolTip.Tip="Delete selected patterns. Hold shift to skip dialog.">
+                                <materialIcons:MaterialIcon Kind="TrashCan" Width="24" Height="24" />
+                            </Button>
                         </StackPanel>
                     </Grid>
                 </Grid>
@@ -117,17 +132,6 @@
                         <TextBlock FontSize="18" FontWeight="Bold" Text="{Binding CollectionName}"
                                    PointerPressed="CollectionNamePointerPressed"
                                    ToolTip.Tip="Rename this collection." />
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Button Content="Add code" Command="{Binding AddCodeCommand}" ToolTip.Tip="Create a pattern from raw hit-object text." />
-                            <Button Content="Add file" Command="{Binding AddFileCommand}" ToolTip.Tip="Import a pattern from an osu! file." />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Button Content="Add selected" Command="{Binding AddSelectedCommand}" ToolTip.Tip="Import the selected objects from the current editor map." />
-                            <Button Content="Delete" Command="{Binding RemoveCommand}"
-                                    PointerPressed="RemoveButtonPointerPressed"
-                                    ToolTip.Tip="Delete selected patterns. Hold Shift to skip confirmation." />
-                        </StackPanel>
-
                         <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="Export options" />
                         <ComboBox ItemsSource="{Binding ExportTimeModes}"
                                   SelectedItem="{Binding ExportTimeMode, Mode=TwoWay}"
@@ -187,12 +191,6 @@
             </Grid>
 
             <Grid Grid.Row="2" Margin="0,12,0,0" ColumnDefinitions="*,Auto">
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Button Content="Rename" Command="{Binding RenameCollectionCommand}" />
-                    <Button Content="Import ZIP" Command="{Binding ImportCollectionCommand}" />
-                    <Button Content="Export ZIP" Command="{Binding ExportCollectionCommand}" />
-                    <Button Content="Restore" Command="{Binding RestoreCollectionCommand}" />
-                </StackPanel>
                 <controls:ToolRunButton Grid.Column="1" RunCommand="{Binding RunCommand}" />
             </Grid>
         </Grid>

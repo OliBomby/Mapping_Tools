@@ -15,6 +15,7 @@ using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.SliderMerger;
 using Mapping_Tools.Application.TimingHelper;
+using Mapping_Tools.Application.Updates;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.Hosting;
@@ -48,6 +49,12 @@ public sealed class DependencyInjectionTests
             typeof(AutoFailDetectorViewModel),
             typeof(MapCleanerViewModel),
             typeof(ComboColourStudioViewModel),
+            typeof(HitsoundStudioViewModel),
+            typeof(SlideratorViewModel),
+            typeof(TumourGeneratorViewModel),
+            typeof(PatternGalleryViewModel),
+            typeof(GeometryDashboardViewModel),
+            typeof(IUpdateService),
             typeof(IDialogService),
             typeof(IFilePicker),
             typeof(IClipboardService),

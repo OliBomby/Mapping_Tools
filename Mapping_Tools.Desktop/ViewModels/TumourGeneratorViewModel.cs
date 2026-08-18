@@ -44,7 +44,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     private readonly object _previewGate = new();
     private CancellationTokenSource? _previewCancellation;
     private bool _disposed;
-    private bool _isActive = true;
+    private bool _isActive;
     private HitObject _previewHitObject = new("0,0,0,2,0,L|256:0,1,256");
     private HitObject? _tumouredPreviewHitObject;
     private int _currentLayerIndex;
@@ -578,6 +578,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             OnPropertyChanged(nameof(LayerRangeSliderMaxes));
             OnPropertyChanged(nameof(TumourStartSliderMin));
             OnPropertyChanged(nameof(TumourRangeSliderMax));
+            IsProcessingPreview = false;
         }
         catch (OperationCanceledException)
         {
@@ -585,6 +586,14 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         }
         catch (Exception exception)
         {
+            lock (_previewGate)
+            {
+                if (_disposed || !_isActive || !ReferenceEquals(_previewCancellation, cancellation))
+                {
+                    return;
+                }
+            }
+
             ResultSummary = exception.Message;
             IsProcessingPreview = false;
         }
@@ -614,7 +623,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
                         reloadEditor: quick,
                         new Progress<double>(value => context.ReportProgress(value, "Generating tumours")),
                         context.CancellationToken);
-                    string summary = $"Succesfully generated tumours on {result.SlidersTumourated} " +
+                    string summary = $"Successfully generated tumours on {result.SlidersTumourated} " +
                                      $"{(result.SlidersTumourated == 1 ? "slider" : "sliders")}" +
                                      "!";
                     return new ToolExecutionOutput<TumourRunResult>(
@@ -627,7 +636,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
 
         if (execution.Status == ToolExecutionStatus.Succeeded && execution.Value is not null)
         {
-            ResultSummary = $"Succesfully generated tumours on {execution.Value.SlidersTumourated} " +
+            ResultSummary = $"Successfully generated tumours on {execution.Value.SlidersTumourated} " +
                             $"{(execution.Value.SlidersTumourated == 1 ? "slider" : "sliders")}" + "!";
         }
         else if (execution.Status == ToolExecutionStatus.Failed)

@@ -296,7 +296,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <param name="cancellationToken">Cancels editor discovery or generation.</param>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken).ConfigureAwait(false);
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
         if (string.IsNullOrWhiteSpace(path))
         {
             return;
@@ -304,12 +304,12 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
         await RunWithStateAsync(async () =>
         {
-            if (!await ImportForPathAsync(path, SlideratorImportMode.Selected, cancellationToken).ConfigureAwait(false))
+            if (!await ImportForPathAsync(path, SlideratorImportMode.Selected, cancellationToken))
             {
                 return;
             }
 
-            await RunPathAsync(path, quick: true, reloadEditor: true, cancellationToken).ConfigureAwait(false);
+            await RunPathAsync(path, quick: true, reloadEditor: true, cancellationToken);
         });
     }
 
@@ -318,7 +318,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <returns><see langword="true"/> when the placement completed successfully.</returns>
     public async Task<bool> RunFastPlacementAsync(CancellationToken cancellationToken = default)
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken).ConfigureAwait(false);
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
         if (string.IsNullOrWhiteSpace(path) || VisibleHitObject is null)
         {
             return false;
@@ -327,7 +327,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         bool succeeded = false;
         await RunWithStateAsync(async () =>
         {
-            succeeded = await RunPathAsync(path, quick: true, reloadEditor: false, cancellationToken).ConfigureAwait(false);
+            succeeded = await RunPathAsync(path, quick: true, reloadEditor: false, cancellationToken);
         });
         return succeeded;
     }
@@ -405,10 +405,10 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <inheritdoc/>
     protected override async Task RunCoreAsync()
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync().ConfigureAwait(false);
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
         if (string.IsNullOrWhiteSpace(path) || VisibleHitObject is null)
         {
-            await ShowMessageAsync("Import a slider before running Sliderator.").ConfigureAwait(false);
+            await ShowMessageAsync("Import a slider before running Sliderator.");
             return;
         }
 
@@ -416,8 +416,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                 path,
                 settings.AlwaysQuickRun,
                 reloadEditor: settings.AlwaysQuickRun,
-                CancellationToken.None)
-            .ConfigureAwait(false);
+                CancellationToken.None);
     }
 
     /// <inheritdoc/>
@@ -437,14 +436,14 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private async Task ImportAsync()
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync().ConfigureAwait(false);
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
         if (string.IsNullOrWhiteSpace(path))
         {
-            await ShowMessageAsync("No beatmap is open in osu!.").ConfigureAwait(false);
+            await ShowMessageAsync("No beatmap is open in osu!.");
             return;
         }
 
-        await ImportForPathAsync(path, ImportModeSetting, CancellationToken.None).ConfigureAwait(false);
+        await ImportForPathAsync(path, ImportModeSetting, CancellationToken.None);
     }
 
     private async Task<bool> ImportForPathAsync(
@@ -455,8 +454,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         try
         {
             SlideratorImportResult result = await sliderator
-                .ImportAsync(path, mode, TimeCode, cancellationToken)
-                .ConfigureAwait(false);
+                .ImportAsync(path, mode, TimeCode, cancellationToken);
             if (result.Sliders.Count == 0)
             {
                 return false;
@@ -480,7 +478,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         }
         catch (Exception exception)
         {
-            await ShowMessageAsync(exception.Message).ConfigureAwait(false);
+            await ShowMessageAsync(exception.Message);
             return false;
         }
     }
@@ -511,15 +509,14 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                             sourceSlider,
                             reloadEditor,
                             new Progress<double>(value => context.ReportProgress(value, "Sliderating")),
-                            context.CancellationToken).ConfigureAwait(false);
+                            context.CancellationToken);
                         return new ToolExecutionOutput<SlideratorResult>(
                             result,
                             quick ? null : "Done!",
                             reloadEditor);
                     }),
                 CreateProgress(),
-                cancellationToken)
-            .ConfigureAwait(false);
+                cancellationToken);
         return execution.Status == ToolExecutionStatus.Succeeded && execution.Value is not null;
     }
 

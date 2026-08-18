@@ -10,8 +10,7 @@ public sealed class TumourGeneratorViewParityTests
     public void View_PreservesLegacyCommandsAndTooltips_Expectation()
     {
         // Arrange
-        string axaml = File.ReadAllText(
-            Path.Combine(AppContext.BaseDirectory, "Fixtures", "TumourGeneratorView.axaml"));
+        string axaml = TestSourceReader.Read("Mapping_Tools.Desktop/Views/TumourGeneratorView.axaml");
 
         // Act
         string[] requiredPresentationContracts =

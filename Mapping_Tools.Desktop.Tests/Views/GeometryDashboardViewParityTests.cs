@@ -10,7 +10,7 @@ public sealed class GeometryDashboardViewParityTests
     public void View_AgainstLegacyDashboardContract_PreservesActionsAndStateLabels()
     {
         // Arrange
-        string source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "GeometryDashboardView.axaml"));
+        string source = TestSourceReader.Read("Mapping_Tools.Desktop/Views/GeometryDashboardView.axaml");
 
         // Act
         bool containsFeatureFooterPersistence = source.Contains("Save locked virtual objects", StringComparison.Ordinal) ||
@@ -25,5 +25,7 @@ public sealed class GeometryDashboardViewParityTests
         containsFeatureFooterPersistence.Should().BeFalse();
         source.Should().Contain("Generator settings...");
         source.Should().Contain("Made by OliBomby");
+        source.Should().Contain("MappingToolsGeometryProgressBrush");
+        source.Should().NotContain("Foreground=\"#", "view colors belong in the focused resource dictionary");
     }
 }

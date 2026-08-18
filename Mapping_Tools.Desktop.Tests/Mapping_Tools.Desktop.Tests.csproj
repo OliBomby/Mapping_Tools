@@ -6,7 +6,15 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <MappingToolsRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..'))</MappingToolsRepositoryRoot>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>MappingToolsRepositoryRoot</_Parameter1>
+      <_Parameter2>$(MappingToolsRepositoryRoot)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="8.10.0" />
@@ -17,15 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Mapping_Tools.Desktop\Mapping_Tools.Desktop.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\Mapping_Tools.Desktop\Views\TumourGeneratorView.axaml"
-          Link="Fixtures\TumourGeneratorView.axaml"
-          CopyToOutputDirectory="PreserveNewest" />
-    <None Include="..\Mapping_Tools.Desktop\Views\GeometryDashboardView.axaml"
-          Link="Fixtures\GeometryDashboardView.axaml"
-          CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

@@ -198,6 +198,26 @@ public sealed class GraphControlTests
     }
 
     [TestMethod]
+    public void WheelZoomPosition_UsesLegacyZeroLowerBoundsEvenWhenGraphMinimumIsNegative()
+    {
+        // Arrange
+        GraphState state = new(
+            [new GraphAnchor(new Vector2(0, -1)), new GraphAnchor(new Vector2(4, 2))],
+            0,
+            -1,
+            4,
+            2);
+
+        // Act
+        bool negativeYAllowed = GraphControl.IsWheelZoomPositionInLegacyBounds(new Vector2(2, -0.1f), state);
+        bool insideAllowed = GraphControl.IsWheelZoomPositionInLegacyBounds(new Vector2(2, 0.1f), state);
+
+        // Assert
+        negativeYAllowed.Should().BeFalse();
+        insideAllowed.Should().BeTrue();
+    }
+
+    [TestMethod]
     public void BoundsChange_WithScalingEnabled_TransformsAnchorCoordinatesAndResetsView()
     {
         // Arrange

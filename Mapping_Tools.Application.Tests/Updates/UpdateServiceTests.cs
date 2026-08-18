@@ -135,6 +135,33 @@ public sealed class UpdateServiceTests
     }
 
     [TestMethod]
+    public async Task DisposeAsync_WaitsForInFlightPreparationBeforeDisposingGateway()
+    {
+        // Arrange
+        FakeUpdateGateway gateway = new(new UpdatePackageInfo(
+            new Version(1, 0),
+            new Version(2, 0),
+            null,
+            null,
+            "release.zip"));
+        TaskCompletionSource preparation = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        gateway.PrepareImplementation = (_, _, _) => preparation.Task;
+        UpdateService service = new(gateway, new ApplicationSettings());
+        await service.CheckForUpdatesAsync(allowSkippedVersion: false);
+        _ = service.PrepareUpdateAsync();
+
+        // Act
+        Task dispose = service.DisposeAsync().AsTask();
+
+        // Assert
+        dispose.IsCompleted.Should().BeFalse();
+        gateway.Disposed.Should().BeFalse();
+        preparation.SetResult();
+        await dispose;
+        gateway.Disposed.Should().BeTrue();
+    }
+
+    [TestMethod]
     public async Task PrepareUpdate_WhenRequestedConcurrently_ReusesOnePreparationTask()
     {
         // Arrange
@@ -214,6 +241,8 @@ public sealed class UpdateServiceTests
 
         public bool CancellationRequested { get; set; }
 
+        public bool Disposed { get; private set; }
+
         public Func<Version, IProgress<double>, CancellationToken, Task>? PrepareImplementation { get; set; }
 
         public Task<UpdatePackageInfo> CheckForUpdatesAsync(
@@ -251,6 +280,7 @@ public sealed class UpdateServiceTests
 
         public void Dispose()
         {
+            Disposed = true;
         }
     }
 }

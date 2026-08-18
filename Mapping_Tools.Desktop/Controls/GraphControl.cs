@@ -1031,6 +1031,13 @@ public sealed class GraphControl : Control
     protected override void OnPointerWheelChanged(PointerWheelEventArgs eventArgs)
     {
         base.OnPointerWheelChanged(eventArgs);
+        CoreGraphState state = GetGraphState();
+        Vector2 zoomPoint = GetGraphPosition(eventArgs.GetPosition(this));
+        if (!IsWheelZoomPositionInLegacyBounds(zoomPoint, state))
+        {
+            return;
+        }
+
         double factor = Math.Pow(2, -eventArgs.Delta.Y / 240d);
         if (double.IsFinite(factor) && factor > 0)
         {
@@ -1042,6 +1049,10 @@ public sealed class GraphControl : Control
             eventArgs.Handled = true;
         }
     }
+
+    internal static bool IsWheelZoomPositionInLegacyBounds(Vector2 zoomPoint, CoreGraphState state) =>
+        zoomPoint.X >= 0 && zoomPoint.Y >= 0 &&
+        zoomPoint.X <= state.MaxX && zoomPoint.Y <= state.MaxY;
 
     /// <inheritdoc/>
     protected override void OnKeyDown(KeyEventArgs eventArgs)
@@ -1397,7 +1408,7 @@ public sealed class GraphControl : Control
             GraphAnchor anchor = state.Anchors[index];
             double midpoint = (previous.Pos.X + anchor.Pos.X) / 2;
             Vector2 tensionPosition = new((float)midpoint, (float)state.GetValue(midpoint));
-            if (!IsVisible(tensionPosition))
+            if (!IsGraphPositionVisible(tensionPosition))
             {
                 continue;
             }
@@ -1411,7 +1422,7 @@ public sealed class GraphControl : Control
 
         for (var index = 0; index < state.Anchors.Count; index++)
         {
-            if (!IsVisible(state.Anchors[index].Pos))
+            if (!IsGraphPositionVisible(state.Anchors[index].Pos))
             {
                 continue;
             }
@@ -1427,7 +1438,7 @@ public sealed class GraphControl : Control
         CoreGraphState state = GetGraphState();
         for (var index = 0; index < state.Anchors.Count; index++)
         {
-            if (!IsVisible(state.Anchors[index].Pos))
+            if (!IsGraphPositionVisible(state.Anchors[index].Pos))
             {
                 continue;
             }
@@ -1448,7 +1459,7 @@ public sealed class GraphControl : Control
         {
             double midpoint = (state.Anchors[index - 1].Pos.X + state.Anchors[index].Pos.X) / 2;
             Vector2 tensionPosition = new((float)midpoint, (float)state.GetValue(midpoint));
-            if (!IsVisible(tensionPosition))
+            if (!IsGraphPositionVisible(tensionPosition))
             {
                 continue;
             }
@@ -1589,7 +1600,7 @@ public sealed class GraphControl : Control
         return Math.Sqrt(x * x + y * y);
     }
 
-    private bool IsVisible(Vector2 position) =>
+    private bool IsGraphPositionVisible(Vector2 position) =>
         position.X >= viewMinX - Precision.DoubleEpsilon &&
         position.X <= viewMaxX + Precision.DoubleEpsilon &&
         position.Y >= viewMinY - Precision.DoubleEpsilon &&

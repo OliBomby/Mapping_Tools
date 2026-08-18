@@ -172,7 +172,7 @@ public interface IUpdateService : IDisposable
 /// <summary>
 /// Implements update policy above a platform-specific package gateway.
 /// </summary>
-public sealed class UpdateService : IUpdateService
+public sealed class UpdateService : IUpdateService, IAsyncDisposable
 {
     private readonly object _stateLock = new();
     private readonly IUpdateGateway _gateway;
@@ -186,6 +186,7 @@ public sealed class UpdateService : IUpdateService
     private bool _checkInProgress;
     private bool _prepared;
     private bool _disposed;
+    private Task? _disposeTask;
 
     /// <summary>Creates the update use case.</summary>
     /// <param name="gateway">The network, archive, staging, and process adapter.</param>
@@ -320,6 +321,7 @@ public sealed class UpdateService : IUpdateService
         long operationId = 0;
         lock (_stateLock)
         {
+            ThrowIfDisposed();
             if (_checkInProgress)
             {
                 throw new InvalidOperationException(
@@ -433,25 +435,54 @@ public sealed class UpdateService : IUpdateService
         }
     }
 
-    /// <inheritdoc/>
-    public void Dispose()
+    /// <summary>
+    /// Waits for an in-flight package preparation and then releases the update
+    /// gateway, coordination semaphore, and cancellation sources.
+    /// </summary>
+    /// <returns>A task that completes after all updater resources are released.</returns>
+    public ValueTask DisposeAsync()
     {
-        if (_disposed)
-        {
-            return;
-        }
-
         lock (_stateLock)
         {
+            if (_disposeTask is not null)
+            {
+                return new ValueTask(_disposeTask);
+            }
+
             _disposed = true;
             _operationId++;
             _downloadCancellation?.Cancel();
             _downloadCancellation = null;
             _lastCheck = null;
             _prepared = false;
+            _disposeCancellation.Cancel();
+            _disposeTask = DisposeCoreAsync(_activeDownloadTask);
+            return new ValueTask(_disposeTask);
         }
-        _disposeCancellation.Cancel();
+    }
+
+    /// <inheritdoc/>
+    public void Dispose() => DisposeAsync().AsTask().GetAwaiter().GetResult();
+
+    private async Task DisposeCoreAsync(Task? activeDownloadTask)
+    {
+        if (activeDownloadTask is not null)
+        {
+            try
+            {
+                await activeDownloadTask.ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                // Disposal must still release the gateway after a canceled or
+                // failed package preparation.
+            }
+        }
+
+        await _checkGate.WaitAsync().ConfigureAwait(false);
+        _checkGate.Release();
         _gateway.Dispose();
+        _checkGate.Dispose();
         _disposeCancellation.Dispose();
         ProgressChanged = null;
     }

@@ -230,7 +230,7 @@ public sealed class TumourGeneratorViewModelTests
         TestDialogService? dialogs = null)
     {
         ApplicationSettings settings = new() { AutoReload = autoReload };
-        return new TumourGeneratorViewModel(
+        TumourGeneratorViewModel viewModel = new(
             service,
             new ToolExecutionService(
                 new UserNotificationService(),
@@ -241,6 +241,8 @@ public sealed class TumourGeneratorViewModelTests
             new TestBeatmapWorkspace(),
             settings,
             dialogs ?? new TestDialogService());
+        viewModel.Activate();
+        return viewModel;
     }
 
     private sealed class RecordingGenerator : ITumourGeneratorService

@@ -17,11 +17,14 @@ public partial class ValueOrGraphControl : UserControl
     public static readonly StyledProperty<CoreGraphState?> GraphStateProperty =
         AvaloniaProperty.Register<ValueOrGraphControl, CoreGraphState?>(
             nameof(GraphState),
-            defaultValue: CreateDefaultValueGraphState(),
             defaultBindingMode: BindingMode.TwoWay);
 
-    /// <summary>Loads the compiled value-or-graph view.</summary>
-    public ValueOrGraphControl() => InitializeComponent();
+    /// <summary>Loads the compiled value-or-graph view with an independent default graph.</summary>
+    public ValueOrGraphControl()
+    {
+        InitializeComponent();
+        SetCurrentValue(GraphStateProperty, CreateDefaultValueGraphState());
+    }
 
     /// <summary>Gets or sets the scalar or graph state exposed to the host feature.</summary>
     public CoreGraphState? GraphState

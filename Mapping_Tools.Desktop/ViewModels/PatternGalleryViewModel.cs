@@ -1,11 +1,13 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using Material.Icons;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Interactions.Converters;
+using Mapping_Tools.Application.ObjectVisualiser;
 using Mapping_Tools.Application.PatternGallery;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
@@ -24,6 +26,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     IShellProjectFeature,
+    IShellExtraProjectMenuFeature,
     IShellFeatureActivation,
     IQuickRun
 {
@@ -230,6 +233,14 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     /// <inheritdoc/>
     IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
 
+    IReadOnlyList<ShellProjectMenuItem> IShellExtraProjectMenuFeature.ExtraProjectMenuItems =>
+    [
+        new("_Rename collection", "Rename this collection and the collection's directory in the Pattern Files directory.", RenameCollectionCommand, MaterialIconKind.Edit),
+        new("_Import collection", "Import a collection zip file to the projects folder.", ImportCollectionCommand, MaterialIconKind.Import),
+        new("_Export collection", "Export this collection to the Exports folder. The exported file can later be imported with the import menu.", ExportCollectionCommand, MaterialIconKind.Export),
+        new("_Restore collection", "Restore the collection from the pattern files directory. This will remove any patterns that have missing files, and add any patterns that have not been indexed. Make sure to back-up your collection before restoring it.", RestoreCollectionCommand, MaterialIconKind.Restore)
+    ];
+
     /// <inheritdoc/>
     IReadOnlyList<string> IShellProjectFeature.AdditionalAutoSavePaths =>
         _paths is not null ? [_paths.ProjectFile] : [];
@@ -245,6 +256,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             throw new InvalidDataException("Pattern Gallery project is incomplete.");
         }
 
+        CancelSceneRefresh();
         Project = typed;
         _items.Clear();
         ConfigureProject();
@@ -258,9 +270,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     /// <inheritdoc/>
     public void Deactivate()
     {
-        _sceneCancellation?.Cancel();
-        _sceneCancellation?.Dispose();
-        _sceneCancellation = null;
+        CancelSceneRefresh();
     }
 
     /// <summary>Adds a pattern from raw osu! hit-object and timing-point text.</summary>
@@ -417,6 +427,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
         try
         {
+            CancelSceneRefresh();
             await _gallery.DeleteAsync(selected, Paths);
             foreach (PatternGalleryPattern pattern in selected)
             {
@@ -546,6 +557,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         {
             if (!string.Equals(folder.Value, Project.FileHandler.CollectionFolderName, StringComparison.Ordinal))
             {
+                CancelSceneRefresh();
                 _paths = _files.RenameCollection(Paths, folder.Value);
                 Project.FileHandler.CollectionFolderName = folder.Value;
                 Project.FileHandler.BasePath = CollectionBasePath;
@@ -622,6 +634,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             imported.FileHandler.CollectionFolderName = archive.CollectionFolderName;
             if (merge)
             {
+                CancelSceneRefresh();
                 _files.EnsureCollection(Paths);
                 Dictionary<string, PatternGalleryArchiveFile> contents = archive.PatternFiles
                     .ToDictionary(file => file.FileName, StringComparer.OrdinalIgnoreCase);
@@ -646,6 +659,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 throw new IOException($"Collection folder '{imported.FileHandler.CollectionFolderName}' already exists.");
             }
 
+            CancelSceneRefresh();
             await _archives.ExtractAsync(archivePath, CollectionBasePath);
             bool load = await _dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
                 "Load imported collection",
@@ -692,6 +706,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
         try
         {
+            CancelSceneRefresh();
             PatternGalleryRestoreResult result = await _gallery.RestoreAsync(Project, Paths);
             RebuildGroups();
             StartSceneRefresh();
@@ -984,21 +999,37 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
     private void StartSceneRefresh()
     {
-        _sceneCancellation?.Cancel();
-        _sceneCancellation?.Dispose();
+        CancelSceneRefresh();
         _sceneCancellation = new CancellationTokenSource();
         _ = RefreshScenesAsync(_sceneCancellation.Token);
     }
 
+    private void CancelSceneRefresh()
+    {
+        _sceneCancellation?.Cancel();
+        _sceneCancellation?.Dispose();
+        _sceneCancellation = null;
+    }
+
     private async Task RefreshScenesAsync(CancellationToken cancellationToken)
     {
-        foreach (PatternGalleryPattern pattern in Project.Patterns)
+        PatternGalleryProject project = Project;
+        PatternGalleryCollectionPaths paths = Paths;
+        foreach (PatternGalleryPattern pattern in project.Patterns.ToArray())
         {
             cancellationToken.ThrowIfCancellationRequested();
             PatternGalleryItemViewModel item = GetItem(pattern);
             try
             {
-                item.SetScene(await _gallery.LoadSceneAsync(pattern, Paths, cancellationToken));
+                ObjectVisualiserScene? scene = await _gallery.LoadSceneAsync(pattern, paths, cancellationToken);
+                if (cancellationToken.IsCancellationRequested ||
+                    !ReferenceEquals(Project, project) ||
+                    !project.Patterns.Contains(pattern))
+                {
+                    return;
+                }
+
+                item.SetScene(scene);
             }
             catch (OperationCanceledException)
             {
@@ -1006,6 +1037,13 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             }
             catch
             {
+                if (cancellationToken.IsCancellationRequested ||
+                    !ReferenceEquals(Project, project) ||
+                    !project.Patterns.Contains(pattern))
+                {
+                    return;
+                }
+
                 item.SetScene(null);
             }
         }
