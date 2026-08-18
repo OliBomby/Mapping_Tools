@@ -1,0 +1,128 @@
+using System;
+using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
+using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
+using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
+using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
+
+namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
+
+/// <summary>Generates circles tangent to a source circle and passing through two points.</summary>
+public sealed class TangentCircleGenerator : RelevantObjectsGenerator
+{
+    /// <inheritdoc/>
+    public override string Name => "Tangent Circles on Circle";
+    /// <inheritdoc/>
+    public override string Tooltip => "Takes a virtual circle and two points and generates virtual circles which intersect the circle in exactly one point.";
+    /// <inheritdoc/>
+    public override GeneratorType GeneratorType => GeneratorType.Intermediate;
+
+    /// <summary>Creates the active non-deep tangent-circle generator.</summary>
+    public TangentCircleGenerator()
+    {
+        Settings.IsActive = true;
+        Settings.IsSequential = false;
+        Settings.IsDeep = false;
+        Settings.InputPredicate.Predicates.Add(new SelectionPredicate { NeedSelected = true, MinRelevancy = 0.8 });
+    }
+
+    /// <summary>Generates all stable tangent-circle solutions.</summary>
+    [RelevantObjectsGeneratorMethod]
+    public RelevantCircle[] GetRelevantObjects(RelevantCircle circle, RelevantPoint point1, RelevantPoint point2)
+    {
+        Vector2 p1 = point1.Child;
+        Vector2 p2 = point2.Child;
+        Vector2 centre = circle.Child.Centre;
+        double radius = circle.Child.Radius;
+        if (Precision.AlmostEquals(Vector2.DistanceSquared(p1, p2), 0)) return Array.Empty<RelevantCircle>();
+
+        double distance1 = Vector2.Distance(centre, p1);
+        double distance2 = Vector2.Distance(centre, p2);
+        if (Precision.AlmostEquals(distance1, 0) || Precision.AlmostEquals(distance2, 0)) return Array.Empty<RelevantCircle>();
+
+        if (distance1 > distance2)
+        {
+            (p1, p2) = (p2, p1);
+            (distance1, distance2) = (distance2, distance1);
+        }
+
+        if (Precision.DefinitelyBigger(radius, distance1) && Precision.DefinitelyBigger(distance2, radius)) return Array.Empty<RelevantCircle>();
+
+        if (Precision.AlmostEquals(radius, distance1, 0.5) || Precision.AlmostEquals(radius, distance2, 0.5))
+        {
+            if (Precision.AlmostEquals(radius, distance2, 0.5)) (p1, p2) = (p2, p1);
+            Line2 bisector = new((p1 + p2) / 2, (p2 - p1).PerpendicularLeft);
+            Line2 connectingLine = Line2.FromPoints(centre, p1);
+            Vector2 solutionCentre = Line2.Intersection(bisector, connectingLine);
+            return [new RelevantCircle(new Circle(solutionCentre, p1))];
+        }
+
+        Vector2 middle = (centre + p1) / 2;
+        Vector2 xAxis = (p1 - centre).Normalized();
+        Vector2 yAxis = xAxis.PerpendicularLeft;
+        Matrix2 transform = new(xAxis, yAxis);
+        Vector2 p1Transformed = Matrix2.Mult(transform, p1 - middle);
+        Vector2 p2Transformed = Matrix2.Mult(transform, p2 - middle);
+        Line2 bisectorTransformed = new((p1Transformed + p2Transformed) / 2, (p2Transformed - p1Transformed).PerpendicularLeft);
+        double halfDistance = distance1 / 2;
+        double halfRadius = radius / 2;
+        double otherAxis = Math.Sqrt(Math.Abs(halfRadius * halfRadius - halfDistance * halfDistance));
+        Vector2 firstCentre;
+        Vector2 secondCentre;
+        bool found = Precision.DefinitelyBigger(radius, distance1)
+            ? EllipsisIntersection(bisectorTransformed, halfRadius, otherAxis, out firstCentre, out secondCentre)
+            : HyperbolaIntersection(bisectorTransformed, halfRadius, otherAxis, out firstCentre, out secondCentre);
+        if (!found) return Array.Empty<RelevantCircle>();
+
+        transform.Transpose();
+        firstCentre = Matrix2.Mult(transform, firstCentre) + middle;
+        secondCentre = Matrix2.Mult(transform, secondCentre) + middle;
+        if (double.IsNaN(secondCentre.X)) return [new RelevantCircle(new Circle(firstCentre, Vector2.Distance(firstCentre, p1)))];
+        return [new RelevantCircle(new Circle(firstCentre, Vector2.Distance(firstCentre, p1))), new RelevantCircle(new Circle(secondCentre, Vector2.Distance(secondCentre, p1)))];
+    }
+
+    private static bool EllipsisIntersection(Line2 line, double a, double b, out Vector2 p1, out Vector2 p2)
+    {
+        double x1 = line.PositionVector.X, y1 = line.PositionVector.Y, dx = line.DirectionVector.X, dy = line.DirectionVector.Y;
+        double c1 = b * b * dx * dx + a * a * dy * dy;
+        double c2 = 2 * (b * b * x1 * dx + a * a * y1 * dy);
+        double c3 = b * b * x1 * x1 + a * a * y1 * y1 - a * a * b * b;
+        if (!SolveQuadratic(c1, c2, c3, out double t1, out double t2)) { p1 = p2 = Vector2.NaN; return false; }
+        p1 = line.PositionVector + t1 * line.DirectionVector;
+        p2 = line.PositionVector + t2 * line.DirectionVector;
+        if (Math.Abs(t2) > 100) p2 = Vector2.NaN;
+        if (Math.Abs(t1) > 100) { p1 = p2; p2 = Vector2.NaN; }
+        return true;
+    }
+
+    private static bool HyperbolaIntersection(Line2 line, double a, double b, out Vector2 p1, out Vector2 p2)
+    {
+        double x1 = line.PositionVector.X, y1 = line.PositionVector.Y, dx = line.DirectionVector.X, dy = line.DirectionVector.Y;
+        double c1 = b * b * dx * dx - a * a * dy * dy;
+        double c2 = 2 * (b * b * x1 * dx - a * a * y1 * dy);
+        double c3 = b * b * x1 * x1 - a * a * y1 * y1 - a * a * b * b;
+        if (!SolveQuadratic(c1, c2, c3, out double t1, out double t2)) { p1 = p2 = Vector2.NaN; return false; }
+        p1 = line.PositionVector + t1 * line.DirectionVector;
+        p2 = line.PositionVector + t2 * line.DirectionVector;
+        if (Math.Abs(t2) > 100) p2 = Vector2.NaN;
+        if (Math.Abs(t1) > 100) { p1 = p2; p2 = Vector2.NaN; }
+        return true;
+    }
+
+    private static bool SolveQuadratic(double a, double b, double c, out double t1, out double t2)
+    {
+        if (Precision.AlmostEquals(a, 0))
+        {
+            t2 = double.NaN;
+            if (Precision.AlmostEquals(b, 0)) { t1 = double.NaN; return false; }
+            t1 = -c / b;
+            return true;
+        }
+
+        if (4 * a * c > b * b) { t1 = t2 = double.NaN; return false; }
+        double s = Math.Sqrt(b * b - 4 * a * c);
+        t1 = (-b + s) / (2 * a);
+        t2 = (-b - s) / (2 * a);
+        return true;
+    }
+}
