@@ -117,7 +117,6 @@ To get started, select a slider in your beatmap and click 'Preview slider' to pr
                 }
 
                 Beatmap beatmap = editor.Beatmap;
-                Timing timing = beatmap.BeatmapTiming;
 
                 List<HitObject> markedObjects = arg.ImportModeSetting switch {
                     TumourGeneratorVm.ImportMode.Selected => selected,
@@ -141,48 +140,12 @@ To get started, select a slider in your beatmap and click 'Preview slider' to pr
                     }
                 }
 
-                if (arg.FixSv) {
-                    // Reconstruct SliderVelocity (stolen from completionator)
-                    List<TimingPointsChange> timingPointsChanges = new List<TimingPointsChange>();
-                    // Add Hitobject stuff
-                    foreach (HitObject ho in beatmap.HitObjects) {
-                        // SliderVelocity changes
-                        if (ho.IsSlider) {
-                            if (markedObjects.Contains(ho) && arg.DelegateToBpm) {
-                                var tpAfter = timing.GetRedlineAtTime(ho.Time).Copy();
-                                var tpOn = tpAfter.Copy();
-
-                                tpAfter.Offset = ho.Time;
-                                tpOn.Offset = ho.Time - 1; // This one will be on the slider
-
-                                tpAfter.OmitFirstBarLine = true;
-                                tpOn.OmitFirstBarLine = true;
-
-                                // Express velocity in BPM
-                                tpOn.MpB *= ho.SliderVelocity / -100;
-                                // NaN SV results in removal of slider ticks
-                                ho.SliderVelocity = arg.RemoveSliderTicks ? double.NaN : -100;
-
-                                // Add redlines
-                                timingPointsChanges.Add(new TimingPointsChange(tpOn, mpb: true, unInherited: true,
-                                    omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon));
-                                timingPointsChanges.Add(new TimingPointsChange(tpAfter, mpb: true, unInherited: true,
-                                    omitFirstBarLine: true, fuzzyness: Precision.DoubleEpsilon));
-
-                                ho.Time -= 1;
-                            }
-
-                            TimingPoint tp = ho.TimingPoint.Copy();
-                            tp.Offset = ho.Time;
-                            tp.MpB = ho.SliderVelocity;
-                            timingPointsChanges.Add(new TimingPointsChange(tp, mpb: true,
-                                fuzzyness: Precision.DoubleEpsilon));
-                        }
-                    }
-
-                    // Add the new SliderVelocity changes
-                    TimingPointsChange.ApplyChanges(timing, timingPointsChanges);
-                }
+                if (arg.FixSv)
+                    Mapping_Tools.Core.Tools.TumourGenerating.TumourSliderVelocityFixer.Fix(
+                        beatmap,
+                        markedObjects,
+                        arg.DelegateToBpm,
+                        arg.RemoveSliderTicks);
 
                 // Save the file
                 editor.SaveFile();

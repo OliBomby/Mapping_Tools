@@ -236,6 +236,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         }
     }
 
+    /// <inheritdoc/>
     protected override bool PrepareRun()
     {
         try { Snapshot().Validate(); return true; }
@@ -247,6 +248,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     object IShellProjectFeature.Snapshot() => Snapshot();
     void IShellProjectFeature.Install(object project) => Install((SliderPicturatorProject)project);
 
+    /// <inheritdoc/>
     protected override async Task RunCoreAsync()
     {
         string? path = await _currentBeatmap.FindCurrentBeatmapAsync();

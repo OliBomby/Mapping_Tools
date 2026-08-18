@@ -23,6 +23,7 @@ using Mapping_Tools.Application.SliderPicturator;
 using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
+using Mapping_Tools.Application.TumourGenerator;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Hosting;
@@ -143,6 +144,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<ISliderMergerService, SliderMergerService>();
         services.AddSingleton<ISliderPicturatorService, SliderPicturatorService>();
         services.AddSingleton<ISlideratorService, SlideratorService>();
+        services.AddSingleton<ITumourGeneratorService, TumourGeneratorService>();
         services.AddSingleton<IComboColourStudioService, ComboColourStudioService>();
         services.AddSingleton<IMapsetMergerService, MapsetMergerService>();
         services.AddSingleton<IPatternGalleryService, PatternGalleryService>();

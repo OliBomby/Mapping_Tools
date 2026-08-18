@@ -7,6 +7,13 @@
     public class TempoSignature : IEquatable<TempoSignature>
     {
         /// <summary>
+        /// Creates the standard four-four signature used by an uninitialized timing point.
+        /// </summary>
+        public TempoSignature() : this(4, 4)
+        {
+        }
+
+        /// <summary>
         /// The bottom value of the time signature.
         /// </summary>
         public int TempoDenominator { get; set; }

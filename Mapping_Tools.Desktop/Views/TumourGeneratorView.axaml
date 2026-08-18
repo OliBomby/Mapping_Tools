@@ -1,0 +1,238 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
+             xmlns:core="using:Mapping_Tools.Core.Tools.TumourGenerating"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="Mapping_Tools.Desktop.Views.TumourGeneratorView"
+             x:DataType="vm:TumourGeneratorViewModel"
+             x:CompileBindings="True">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <controls:ToolViewHeader Grid.Row="0"
+                                 Title="Tumour Generator 2"
+                                 IsQuickRunSupported="True"
+                                 HelpText="Tumour Generator 2 generates copious amounts of tumours on sliders.&#x0a;You can adjust the shape and size of tumours and choose where they should be placed along the path.&#x0a;You can also generate multiple layers of tumours. A layer will either merge the tumours with the tumours of the previous layer or place the tumours on top of the previous tumours.&#x0a;Enable the Advanced toggle and click the ... button to edit how a parameter changes over time. Use the arrow keys on the sliders to do fine adjustments.&#x0a;To get started, select a slider in your beatmap and click 'Preview slider' to preview changes or click the run button to instantly generate tumours on the selected sliders." />
+
+        <Grid Grid.Row="1" ColumnDefinitions="200,Auto,200,Auto,*" Margin="0,10,0,0">
+            <Grid Grid.Column="0" RowDefinitions="*,Auto,Auto" Margin="0,0,10,0">
+                    <ListBox Grid.Row="0" ItemsSource="{Binding TumourLayers}"
+                             SelectedItem="{Binding CurrentLayer, Mode=TwoWay}"
+                             SelectedIndex="{Binding CurrentLayerIndex, Mode=TwoWay}"
+                             ToolTip.Tip="Select a tumour layer to edit its settings.">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="core:TumourLayer">
+                                <Grid ColumnDefinitions="Auto,Auto,*" Margin="2">
+                                    <ToggleButton IsChecked="{Binding IsActive, Mode=TwoWay}"
+                                                  VerticalAlignment="Center" />
+                                    <materialIcons:MaterialIcon Grid.Column="1"
+                                             Kind="{Binding TumourTemplateEnum, Converter={StaticResource TumourTemplateIconConverter}}"
+                                             Width="24" Height="24" Margin="5,0"
+                                             VerticalAlignment="Center" />
+                                    <TextBox Grid.Column="2"
+                                             Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                             PointerPressed="LayerNamePointerPressed"
+                                             ToolTip.Tip="The name shown for this tumour layer." />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*" Margin="0,6,0,0">
+                        <Button Grid.Column="0" Command="{Binding AddCommand}" ToolTip.Tip="Add a new tumour layer.">
+                            <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
+                        </Button>
+                        <Button Grid.Column="1" Command="{Binding RemoveCommand}" ToolTip.Tip="Remove the selected tumour layer.">
+                            <materialIcons:MaterialIcon Kind="TrashCan" Width="22" Height="22" />
+                        </Button>
+                        <Button Grid.Column="2" Command="{Binding CopyCommand}" ToolTip.Tip="Copy the selected tumour layer.">
+                            <materialIcons:MaterialIcon Kind="ContentCopy" Width="22" Height="22" />
+                        </Button>
+                        <Button Grid.Column="3" Command="{Binding RaiseCommand}" ToolTip.Tip="Move selected layer to higher in the list.">
+                            <materialIcons:MaterialIcon Kind="KeyboardArrowUp" Width="22" Height="22" />
+                        </Button>
+                        <Button Grid.Column="4" Command="{Binding LowerCommand}" ToolTip.Tip="Move selected layer to lower in the list.">
+                            <materialIcons:MaterialIcon Kind="KeyboardArrowDown" Width="22" Height="22" />
+                        </Button>
+                    </Grid>
+
+                    <StackPanel Grid.Row="2" Margin="0,15,0,0">
+                        <TextBlock FontWeight="Bold" Text="Global options" />
+                        <Slider Margin="0,5,0,0" Minimum="0" Maximum="1" TickFrequency="0.1"
+                                Value="{Binding Scale, Mode=TwoWay}" ToolTip.Tip="Tumour scale" />
+                        <Slider Minimum="0" Maximum="10" TickFrequency="1" SmallChange="0.1" LargeChange="1" IsSnapToTickEnabled="True"
+                                Value="{Binding CircleSize, Mode=TwoWay}" ToolTip.Tip="Circle Size" />
+                        <StackPanel Orientation="Horizontal">
+                            <ToggleSwitch IsChecked="{Binding AdvancedOptions}"
+                                          ToolTip.Tip="Show advanced controls. Allows for fine control of parameters and changes over time." />
+                            <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="Advanced" />
+                        </StackPanel>
+                        <CheckBox Content="Debug construction" IsChecked="{Binding DebugConstruction}"
+                              ToolTip.Tip="Skip intelligent path reconstruction." />
+                        <CheckBox Content="Only middle anchors" IsChecked="{Binding JustMiddleAnchors}"
+                              ToolTip.Tip="Construct path with only the middle anchors of all tumours." />
+                        <CheckBox Content="Fix SV" IsChecked="{Binding FixSv}"
+                              ToolTip.Tip="Automatically adjust SV such that the slider keeps the same duration after getting tumours." />
+                        <CheckBox Content="Delegate SV to BPM" IsChecked="{Binding DelegateToBpm}"
+                              IsEnabled="{Binding FixSv}"
+                              ToolTip.Tip="Use BPM to determine the velocity of the slider instead of greenline SV." />
+                        <CheckBox Content="Remove slider ticks" IsChecked="{Binding RemoveSliderTicks}"
+                              IsEnabled="{Binding RemoveSliderTicksEnabled}"
+                              ToolTip.Tip="Use a NaN greenline to remove slider ticks from the slider." />
+                    </StackPanel>
+            </Grid>
+
+            <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center"
+                          Background="{DynamicResource MaterialDividerBrush}" />
+
+            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="7">
+                    <TextBlock FontWeight="Bold" Text="Template" />
+                    <ComboBox ItemsSource="{Binding TumourTemplates}"
+                              SelectedItem="{Binding CurrentLayer.TumourTemplateEnum, Mode=TwoWay}"
+                              materialAssists:ComboBoxAssist.Label="Template"
+                              ToolTip.Tip="Tumour template. Determines the shape of the tumour." />
+                    <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Scale" />
+                    <controls:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourScale, Mode=TwoWay}"
+                                                   IsVisible="{Binding AdvancedOptions}"
+                                                   ToolTip.Tip="The scale of the tumour determines how far it protrudes from the slider." />
+                    <Slider Minimum="0" Maximum="500"
+                            Value="{Binding CurrentLayer.TumourScale, Mode=TwoWay, Converter={StaticResource GraphStateToDoubleConverter}}"
+                            IsVisible="{Binding AdvancedOptions, Converter={StaticResource BooleanNotConverter}}"
+                            ToolTip.Tip="The scale of the tumour determines how far it protrudes from the slider." />
+                    <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Length" />
+                    <controls:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourLength, Mode=TwoWay}"
+                                                   IsVisible="{Binding AdvancedOptions}"
+                                                   ToolTip.Tip="The length of the tumour determines how much length it takes up on the slider." />
+                    <Slider Minimum="0" Maximum="500"
+                            Value="{Binding CurrentLayer.TumourLength, Mode=TwoWay, Converter={StaticResource GraphStateToDoubleConverter}}"
+                            IsVisible="{Binding AdvancedOptions, Converter={StaticResource BooleanNotConverter}}"
+                            ToolTip.Tip="The length of the tumour determines how much length it takes up on the slider." />
+                    <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Angle" />
+                    <controls:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourRotation, Mode=TwoWay}"
+                                                   IsVisible="{Binding AdvancedOptions}"
+                                                   ToolTip.Tip="The angle of the tumour determines which way the tumour points in relation to the slider." />
+                    <Slider Minimum="0" Maximum="360"
+                            Value="{Binding CurrentLayer.TumourRotation, Mode=TwoWay, Converter={StaticResource GraphStateToDoubleConverter}}"
+                            IsVisible="{Binding AdvancedOptions, Converter={StaticResource BooleanNotConverter}}"
+                            ToolTip.Tip="The angle of the tumour determines which way the tumour points in relation to the slider." />
+                    <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Parameter"
+                               IsVisible="{Binding CurrentLayer.TumourTemplate.NeedsParameter}" />
+                    <controls:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourParameter, Mode=TwoWay}"
+                                                   IsVisible="{Binding TumourParameterGraphVisible}"
+                                                   ToolTip.Tip="The special parameter changes the shape of this tumour template." />
+                    <Slider Minimum="0" Maximum="500"
+                            Value="{Binding CurrentLayer.TumourParameter, Mode=TwoWay, Converter={StaticResource GraphStateToDoubleConverter}}"
+                            IsVisible="{Binding CurrentLayer.TumourTemplate.NeedsParameter}"
+                            ToolTip.Tip="The special parameter changes the shape of this tumour template." />
+                    <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Wrapping" />
+                    <ComboBox ItemsSource="{Binding WrappingModes}"
+                              SelectedItem="{Binding CurrentLayer.WrappingMode, Mode=TwoWay}"
+                              materialAssists:ComboBoxAssist.Label="Wrapping"
+                              ToolTip.Tip="The wrapping mode controls how the tumour wraps around the shape of the slider." />
+                    <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Sidedness" />
+                    <ComboBox ItemsSource="{Binding TumourSides}"
+                              SelectedItem="{Binding CurrentLayer.TumourSidedness, Mode=TwoWay}"
+                              materialAssists:ComboBoxAssist.Label="Sidedness"
+                              ToolTip.Tip="Tumour sidedness. Determines on which side of the slider to place the tumours." />
+                    <Grid ColumnDefinitions="*,Auto"
+                          IsVisible="{Binding CurrentLayer.TumourSidedness, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Random}">
+                        <TextBox Text="{Binding CurrentLayer.RandomSeed, Mode=TwoWay, Converter={StaticResource InvariantInt32Converter}}"
+                                 materialAssists:TextFieldAssist.Label="Random seed"
+                                 ToolTip.Tip="The random seed which determines the sequence of tumour sidedness for this layer." />
+                        <Button Grid.Column="1" Command="{Binding RandomizeCommand}" Margin="5,0,0,0"
+                                ToolTip.Tip="Randomize the random seed.">
+                            <materialIcons:MaterialIcon Kind="DiceMultiple" Width="22" Height="22" />
+                        </Button>
+                    </Grid>
+                    <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Distance" />
+                    <controls:ValueOrGraphControl GraphState="{Binding CurrentLayer.TumourDistance, Mode=TwoWay}"
+                                                   IsVisible="{Binding AdvancedOptions}"
+                                                   ToolTip.Tip="The tumour distance determines the distance between the centre of each tumour." />
+                    <Slider Minimum="5" Maximum="500"
+                            Value="{Binding CurrentLayer.TumourDistance, Mode=TwoWay, Converter={StaticResource GraphStateToDoubleConverter}}"
+                            IsVisible="{Binding AdvancedOptions, Converter={StaticResource BooleanNotConverter}}"
+                            ToolTip.Tip="The tumour distance determines the distance between the centre of each tumour." />
+                    <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Count" />
+                    <TextBox Text="{Binding CurrentLayer.TumourCount, Mode=TwoWay, Converter={StaticResource InvariantInt32Converter}}"
+                             IsVisible="{Binding AdvancedOptions}"
+                             materialAssists:TextFieldAssist.Label="Count"
+                             ToolTip.Tip="The number of tumours to place on the slider. If 0 this count will be automatically determined using the distance and slider length." />
+                    <Slider Minimum="0" Maximum="20" Value="{Binding CurrentLayer.TumourCount, Mode=TwoWay}"
+                            IsVisible="{Binding AdvancedOptions, Converter={StaticResource BooleanNotConverter}}"
+                            ToolTip.Tip="The number of tumours to place on the slider. If 0 this count will be automatically determined using the distance and slider length." />
+                    <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Start" />
+                    <TextBox Text="{Binding CurrentLayer.TumourStart, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                             IsVisible="{Binding AdvancedOptions}"
+                             materialAssists:TextFieldAssist.Label="Start"
+                             ToolTip.Tip="The progression along the slider where to start the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels." />
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="120" Minimum="{Binding TumourStartSliderMin}"
+                                Maximum="{Binding TumourRangeSliderMax}" SmallChange="{Binding TumourRangeSliderSmallChange}"
+                                Value="{Binding CurrentLayer.TumourStart, Mode=TwoWay}"
+                                ToolTip.Tip="The progression along the slider where to start the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels." />
+                    </StackPanel>
+                    <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="End" />
+                    <TextBox Text="{Binding CurrentLayer.TumourEnd, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                             IsVisible="{Binding AdvancedOptions}"
+                             materialAssists:TextFieldAssist.Label="End"
+                             ToolTip.Tip="The progression along the slider where to end the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels." />
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Width="120" Minimum="0"
+                                Maximum="{Binding TumourRangeSliderMax}" SmallChange="{Binding TumourRangeSliderSmallChange}"
+                                Value="{Binding CurrentLayer.TumourEnd, Mode=TwoWay}"
+                                ToolTip.Tip="The progression along the slider where to end the placement of tumours. 0 is the slider head, 1 is the slider end. If 'Absolute range' is checked, then this distance is expressed in osu! pixels." />
+                    </StackPanel>
+                    <CheckBox Content="Absolute range" IsChecked="{Binding CurrentLayer.UseAbsoluteRange, Mode=TwoWay}"
+                              ToolTip.Tip="Enable this to change the meaning of the Scale, Length, Distance, Start, and End fields to mean length in osu! pixels instead of length relative to the length of the slider." />
+                    <CheckBox Content="Recalculate" IsChecked="{Binding CurrentLayer.Recalculate, Mode=TwoWay}"
+                              ToolTip.Tip="Whether to recalculate the distances and angles of the slider before applying this layer. If true, tumours will be placed on top of tumours of the previous layers as if they were part of the slider, instead of merging with those tumours." />
+                    <TextBlock Text="{Binding ResultSummary}" TextWrapping="Wrap" Opacity="0.75" />
+                </StackPanel>
+            </ScrollViewer>
+
+            <GridSplitter Grid.Column="3" Width="2" HorizontalAlignment="Center"
+                          Background="{DynamicResource MaterialDividerBrush}" />
+
+            <Grid Grid.Column="4" RowDefinitions="Auto,*" Margin="10,0,0,0">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <ComboBox ItemsSource="{Binding ImportModes}"
+                                  SelectedItem="{Binding ImportModeSetting, Mode=TwoWay}"
+                                  materialAssists:ComboBoxAssist.Label="Import mode"
+                                  ToolTip.Tip="Slider selection mode. Choose which sliders should be targeted by Tumour Generator 2." />
+                        <TextBox Grid.Column="1" Width="120" Margin="8,0,0,0"
+                                 IsVisible="{Binding TimeCodeVisible}"
+                                 Text="{Binding TimeCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                 materialAssists:TextFieldAssist.Label="Time code"
+                                 ToolTip.Tip="Input a time code here. Example time code: 00:56:823 (1) - " />
+                    </Grid>
+                    <Button Grid.Column="1" Margin="8,0,0,0" Command="{Binding ImportCommand}"
+                            ToolTip.Tip="Import sliders into the preview.">Preview slider</Button>
+                </Grid>
+                <Border Grid.Row="1" Margin="0,10,0,0" Padding="10"
+                        Background="{DynamicResource MaterialPaperBrush}"
+                        ToolTip.Tip="Result preview">
+                    <controls:ObjectVisualiserControl Scene="{Binding PreviewScene}"
+                                                      ShowAnchors="True"
+                                                      Thickness="{Binding CircleSize, Converter={StaticResource CircleSizeToThicknessConverter}}"
+                                                      AnchorSize="0.2"
+                                                      BorderThickness="0.1"
+                                                      Fill="DarkSlateGray"
+                                                      Stroke="YellowGreen"
+                                                      SliderBallStroke="White" />
+                </Border>
+                <ProgressBar Grid.Row="1" Height="4" HorizontalAlignment="Center" VerticalAlignment="Top"
+                             Margin="0,10,0,0" Maximum="1"
+                             Value="1" IsIndeterminate="{Binding IsProcessingPreview}"
+                             IsVisible="{Binding IsProcessingPreview}" />
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" Margin="0,10,0,0">
+            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
+            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100" Value="{Binding Progress}" />
+            <controls:ToolRunButton Grid.Column="2" RunCommand="{Binding RunCommand}" />
+        </Grid>
+    </Grid>
+</UserControl>

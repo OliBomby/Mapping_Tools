@@ -12,6 +12,7 @@ using Mapping_Tools.Application.MapsetMerger;
 using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
+using Mapping_Tools.Application.TumourGenerator;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.Graph;
 using Mapping_Tools.Core.Classes.MathUtil;
@@ -20,7 +21,9 @@ using Mapping_Tools.Core.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Tools.PatternGallery;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using System.Reflection;
 
 namespace Mapping_Tools.Infrastructure.Projects;
 
@@ -77,8 +80,51 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             Formatting = Formatting.Indented,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             SerializationBinder = new LegacyProjectTypeBinder(),
+            ContractResolver = new TumourProjectContractResolver(),
             Converters = [new Vector2Converter()]
         };
+    }
+
+    private sealed class TumourProjectContractResolver : DefaultContractResolver
+    {
+        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        {
+            JsonProperty property = base.CreateProperty(member, memberSerialization);
+            if (member.DeclaringType == typeof(Mapping_Tools.Core.Tools.TumourGenerating.TumourLayer) &&
+                property.PropertyType == typeof(GraphState))
+            {
+                property.Converter = new TumourGraphStateConverter();
+            }
+
+            return property;
+        }
+    }
+
+    /// <summary>
+    /// Reads tumour graphs into an empty graph so legacy JSON anchors replace
+    /// constructor defaults instead of being appended to them.
+    /// </summary>
+    private sealed class TumourGraphStateConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType) => objectType == typeof(GraphState);
+
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+        {
+            serializer.Serialize(writer, value);
+        }
+
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object? existingValue,
+            JsonSerializer serializer)
+        {
+            JObject graphJson = JObject.Load(reader);
+            GraphState graph = new([], 0, 0, 1, 1);
+            using JsonReader graphReader = graphJson.CreateReader();
+            serializer.Populate(graphReader, graph);
+            return graph;
+        }
     }
 
     private sealed class LegacyProjectTypeBinder : ISerializationBinder
@@ -112,6 +158,10 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             "Mapping_Tools.Viewmodels.SliderPicturatorVm";
         private const string LegacySlideratorProject =
             "Mapping_Tools.Viewmodels.SlideratorVm";
+        private const string LegacyTumourGeneratorProject =
+            "Mapping_Tools.Viewmodels.TumourGeneratorVm";
+        private const string LegacyTumourLayer =
+            "Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourLayer";
         private const string LegacyGraphState =
             "Mapping_Tools.Components.Graph.GraphState";
         private const string LegacyGraphAnchor =
@@ -191,6 +241,14 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 if (typeName == LegacySlideratorProject)
                 {
                     return typeof(SlideratorProject);
+                }
+                if (typeName == LegacyTumourGeneratorProject)
+                {
+                    return typeof(TumourGeneratorProject);
+                }
+                if (typeName == LegacyTumourLayer)
+                {
+                    return typeof(Mapping_Tools.Core.Tools.TumourGenerating.TumourLayer);
                 }
                 if (typeName == LegacyGraphState)
                 {
@@ -330,6 +388,18 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             {
                 assemblyName = LegacyAssemblyName;
                 typeName = LegacySlideratorProject;
+                return;
+            }
+            if (serializedType == typeof(TumourGeneratorProject))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyTumourGeneratorProject;
+                return;
+            }
+            if (serializedType == typeof(Mapping_Tools.Core.Tools.TumourGenerating.TumourLayer))
+            {
+                assemblyName = LegacyAssemblyName;
+                typeName = LegacyTumourLayer;
                 return;
             }
             if (serializedType == typeof(GraphState))

@@ -20,7 +20,11 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:InvariantInt32Converter x:Key="InvariantInt32Converter" />
             <converters:InvariantDoubleConverter x:Key="InvariantDoubleConverter" />
+            <converters:GraphStateToDoubleConverter x:Key="GraphStateToDoubleConverter" />
+            <converters:BooleanNotConverter x:Key="BooleanNotConverter" />
             <converters:EnumEqualsConverter x:Key="EnumEqualsConverter" />
+            <converters:TumourTemplateIconConverter x:Key="TumourTemplateIconConverter" />
+            <converters:CircleSizeToThicknessConverter x:Key="CircleSizeToThicknessConverter" />
             <converters:TimeToStringConverter x:Key="TimeToStringConverter" />
             <converters:DoubleArrayToStringConverter x:Key="DoubleArrayToStringConverter" />
             <converters:ConstantTimeSpanConverter x:Key="ConstantTimeSpanConverter" />

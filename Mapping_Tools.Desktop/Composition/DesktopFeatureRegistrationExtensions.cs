@@ -117,6 +117,14 @@ static internal class DesktopFeatureRegistrationExtensions {
             horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto,
             quickRunTargets: QuickRunTargets.SingleSelection);
+        services.AddMappingTool<TumourGeneratorViewModel>(
+            "tumour-generator",
+            "Tumour Generator 2",
+            "Generate copious amounts of tumours on sliders.",
+            ["tumour", "tumor", "slider", "layers", "graph", "templates"],
+            horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
+            quickRunTargets: QuickRunTargets.AnySelection);
         services.AddMappingTool<ComboColourStudioViewModel>(
             "combo-colour-studio",
             "Combo Colour Studio",

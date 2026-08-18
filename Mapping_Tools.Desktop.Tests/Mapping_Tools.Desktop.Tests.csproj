@@ -19,4 +19,10 @@
     <ProjectReference Include="..\Mapping_Tools.Desktop\Mapping_Tools.Desktop.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\Mapping_Tools.Desktop\Views\TumourGeneratorView.axaml"
+          Link="Fixtures\TumourGeneratorView.axaml"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
