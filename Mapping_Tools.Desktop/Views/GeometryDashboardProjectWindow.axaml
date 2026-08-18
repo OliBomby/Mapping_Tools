@@ -1,0 +1,73 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Mapping_Tools.Desktop.Interactions"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+        xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        x:Class="Mapping_Tools.Desktop.Views.GeometryDashboardProjectWindow"
+        x:DataType="vm:GeometryDashboardProjectSlotsViewModel"
+        Title="Geometry Dashboard Projects" Width="575" Height="500" MinWidth="575" MinHeight="360"
+        CanResize="True" WindowStartupLocation="CenterOwner" WindowDecorations="None"
+        Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}">
+    <Grid RowDefinitions="35,*,Auto">
+        <Grid Grid.Row="0">
+            <TextBlock Text="Savestates" Margin="12,0" VerticalAlignment="Center" FontSize="18" FontWeight="Bold"
+                       IsHitTestVisible="False" />
+            <Border Margin="0,0,47,0" Background="Transparent"
+                    PointerPressed="DragWindow" DoubleTapped="ToggleMaximizeWindow" />
+            <Button Width="47" Height="35" Padding="0" HorizontalAlignment="Right" Background="Transparent" BorderThickness="0" Click="CloseWindow">
+                <materialIcons:MaterialIcon Kind="Close" Width="22" Height="22" />
+            </Button>
+        </Grid>
+        <ListBox Grid.Row="1" Grid.RowSpan="2" ItemsSource="{Binding Project.SaveSlots}" SelectionMode="Multiple"
+                 SelectedItem="{Binding SelectedSlot, Mode=TwoWay}" SelectionChanged="SaveSlotsSelectionChanged">
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Duplicate" Command="{Binding DuplicateCommand}"
+                              ToolTip.Tip="Duplicate selected saves." />
+                    <MenuItem Header="Remove" Command="{Binding RemoveCommand}"
+                              ToolTip.Tip="Remove all selected saves." />
+                </ContextMenu>
+            </ListBox.ContextMenu>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="150,130,Auto,Auto" Margin="0,2">
+                        <TextBox Text="{Binding Name, Mode=TwoWay}" />
+                        <controls:GeometryHotkeyEditor Grid.Column="1" Hotkey="{Binding ProjectHotkey, Mode=TwoWay}" Margin="8,0" />
+                        <Button Grid.Column="2" Content="Save" Command="{Binding $parent[ListBox].DataContext.SaveCommand}"
+                                CommandParameter="{Binding}" Margin="0,0,4,0" ToolTip.Tip="Save current settings to this slot." />
+                        <Button Grid.Column="3" Content="Load" Command="{Binding $parent[ListBox].DataContext.LoadCommand}"
+                                CommandParameter="{Binding}" ToolTip.Tip="Load settings from this slot." />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
+            <materialDesign:FloatingButton Classes="mini light" Margin="0,0,8,0"
+                                            ToolTip.Tip="Re-register hotkeys in case something broke."
+                                            Command="{Binding RefreshHotkeysCommand}">
+                <materialIcons:MaterialIcon Kind="Reload" Width="22" Height="22" />
+            </materialDesign:FloatingButton>
+            <materialDesign:FloatingButton Classes="mini light" Margin="0,0,8,0"
+                                            ToolTip.Tip="Add a new save slot." Command="{Binding AddCommand}">
+                <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
+            </materialDesign:FloatingButton>
+            <materialDesign:FloatingButton Classes="mini light"
+                                            ToolTip.Tip="Remove all selected save slots or the last save if nothing is selected."
+                                            Command="{Binding RemoveCommand}">
+                <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
+            </materialDesign:FloatingButton>
+        </StackPanel>
+        <Border Grid.RowSpan="3" BorderThickness="1" BorderBrush="{DynamicResource MaterialPrimaryDarkBrush}" IsHitTestVisible="False" />
+        <Grid Grid.RowSpan="3">
+            <Border Height="5" VerticalAlignment="Top" Cursor="SizeNorthSouth" Tag="North" PointerPressed="ResizeWindow" />
+            <Border Height="5" VerticalAlignment="Bottom" Cursor="SizeNorthSouth" Tag="South" PointerPressed="ResizeWindow" />
+            <Border Width="5" HorizontalAlignment="Left" Cursor="SizeWestEast" Tag="West" PointerPressed="ResizeWindow" />
+            <Border Width="5" HorizontalAlignment="Right" Cursor="SizeWestEast" Tag="East" PointerPressed="ResizeWindow" />
+            <Border Width="8" Height="8" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="TopLeftCorner" Tag="NorthWest" PointerPressed="ResizeWindow" />
+            <Border Width="8" Height="8" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="TopRightCorner" Tag="NorthEast" PointerPressed="ResizeWindow" />
+            <Border Width="8" Height="8" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="BottomLeftCorner" Tag="SouthWest" PointerPressed="ResizeWindow" />
+            <Border Width="8" Height="8" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="BottomRightCorner" Tag="SouthEast" PointerPressed="ResizeWindow" />
+        </Grid>
+    </Grid>
+</Window>

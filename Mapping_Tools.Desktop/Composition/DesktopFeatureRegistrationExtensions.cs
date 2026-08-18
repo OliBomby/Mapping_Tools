@@ -152,6 +152,12 @@ static internal class DesktopFeatureRegistrationExtensions {
             ["pattern", "gallery", "collection", "osu", "snippet"],
             verticalScrollBarVisibility: ScrollBarVisibility.Auto,
             quickRunTargets: QuickRunTargets.Always);
+        services.AddMappingTool<GeometryDashboardViewModel>(
+            "geometry-dashboard",
+            "Geometry Dashboard",
+            "Generate, display, snap to, and save useful geometry around osu! hit objects.",
+            ["geometry", "snapping", "virtual objects", "overlay", "generators"],
+            verticalScrollBarVisibility: ScrollBarVisibility.Disabled);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
             new ShellFeatureRegistry(

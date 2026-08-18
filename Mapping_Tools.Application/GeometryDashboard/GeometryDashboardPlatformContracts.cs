@@ -1,5 +1,7 @@
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.Tools.SnappingTools;
+using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
 
 namespace Mapping_Tools.Application.GeometryDashboard;
@@ -280,9 +282,47 @@ public interface IGeometryDashboardOverlayHost : IDisposable
     /// <param name="enabled">Whether a green-yellow border should be shown.</param>
     void SetBorder(bool enabled);
 
+    /// <summary>
+    /// Replaces the geometry frame drawn by the click-through overlay.
+    /// Coordinates in the frame are physical screen pixels. The host subtracts
+    /// the bounds most recently supplied to <see cref="Update"/> before drawing.
+    /// </summary>
+    /// <param name="frame">The neutral geometry frame to draw.</param>
+    void SetFrame(GeometryDashboardOverlayFrame frame);
+
     /// <summary>Requests a redraw of the platform overlay surface.</summary>
     void Invalidate();
 }
+
+/// <summary>Describes the neutral geometry payload rendered by the native overlay.</summary>
+public sealed record GeometryDashboardOverlayFrame(
+    IReadOnlyList<GeometryDashboardOverlayShape> Shapes)
+{
+    /// <summary>Gets an empty frame that clears all previous geometry.</summary>
+    public static GeometryDashboardOverlayFrame Empty { get; } = new([]);
+}
+
+/// <summary>Identifies the primitive represented by one overlay shape.</summary>
+public enum GeometryDashboardOverlayShapeKind
+{
+    /// <summary>An outline circle centered at <see cref="GeometryDashboardOverlayShape.Start"/>.</summary>
+    Point,
+    /// <summary>A clipped line from <see cref="GeometryDashboardOverlayShape.Start"/> to End.</summary>
+    Line,
+    /// <summary>An outline circle centered at Start with Radius.</summary>
+    Circle
+}
+
+/// <summary>Contains one physical-pixel overlay primitive and its appearance.</summary>
+public sealed record GeometryDashboardOverlayShape(
+    GeometryDashboardOverlayShapeKind Kind,
+    Vector2 Start,
+    Vector2 End,
+    double Radius,
+    RgbaColour Color,
+    double Opacity,
+    double Thickness,
+    DashStylesEnum DashStyle);
 
 /// <summary>Creates target-bound Geometry Dashboard overlay hosts.</summary>
 public interface IGeometryDashboardOverlayHostFactory

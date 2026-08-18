@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Text;
 using Avalonia.Controls.Primitives;
+using Material.Icons;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing;
@@ -119,6 +120,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <summary>Gets current-map and backup actions shared by every shell feature.</summary>
     public BeatmapWorkspaceViewModel Workspace { get; }
 
+    /// <summary>Gets the active feature's standard and additional project-menu commands.</summary>
+    public IReadOnlyList<ShellProjectMenuItem> ProjectMenuItems { get; private set; } = [];
+
     /// <summary>Gets or sets the case-insensitive feature search query.</summary>
     public string SearchText
     {
@@ -187,6 +191,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         {
             activation.Deactivate();
         }
+        ProjectMenuItems = [];
+        OnPropertyChanged(nameof(ProjectMenuItems));
     }
 
     private void Activate(ShellFeatureItemViewModel item)
@@ -223,6 +229,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         ContentHorizontalScrollBarVisibility = registration.HorizontalScrollBarVisibility;
         ContentVerticalScrollBarVisibility = registration.VerticalScrollBarVisibility;
         HasProjectMenu = viewModel is IShellProjectFeature;
+        ProjectMenuItems = CreateProjectMenuItems(viewModel);
+        OnPropertyChanged(nameof(ProjectMenuItems));
         Header = item.DisplayName == "Get started"
             ? "Mapping Tools"
             : $"Mapping Tools - {item.DisplayName}";
@@ -238,6 +246,27 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         {
             _quickRunRegistry.SelectCurrent(quickRun.OperationId);
         }
+    }
+
+    private IReadOnlyList<ShellProjectMenuItem> CreateProjectMenuItems(ObservableObject viewModel)
+    {
+        if (viewModel is not IShellProjectFeature)
+        {
+            return [];
+        }
+
+        List<ShellProjectMenuItem> items =
+        [
+            new("_Save project", "Save tool settings to file.", SaveProjectCommand, MaterialIconKind.ContentSave),
+            new("_Open project", "Load tool settings from file.", OpenProjectCommand, MaterialIconKind.Folder),
+            new("_New project", "Load the default tool settings.", NewProjectCommand, MaterialIconKind.RocketLaunch)
+        ];
+        if (viewModel is IShellExtraProjectMenuFeature extra)
+        {
+            items.AddRange(extra.ExtraProjectMenuItems);
+        }
+
+        return items;
     }
 
     partial void OnSelectedFeatureChanged(ShellFeatureItemViewModel? value)

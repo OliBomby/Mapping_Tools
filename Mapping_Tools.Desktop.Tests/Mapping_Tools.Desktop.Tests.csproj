@@ -23,6 +23,9 @@
     <None Include="..\Mapping_Tools.Desktop\Views\TumourGeneratorView.axaml"
           Link="Fixtures\TumourGeneratorView.axaml"
           CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Mapping_Tools.Desktop\Views\GeometryDashboardView.axaml"
+          Link="Fixtures\GeometryDashboardView.axaml"
+          CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

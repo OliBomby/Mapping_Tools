@@ -128,6 +128,9 @@ public sealed class HotkeyEditor : TextBox
         return string.Join(" + ", parts);
     }
 
+    internal static string FormatLegacy(int key, int modifiers) =>
+        Format(new HotkeySettings(key, modifiers));
+
     private static int ToLegacyModifiers(KeyModifiers modifiers)
     {
         int result = 0;

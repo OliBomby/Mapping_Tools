@@ -1,6 +1,10 @@
+using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using Mapping_Tools.Application.GeometryDashboard;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.Tools.SnappingTools;
 
 namespace Mapping_Tools.Infrastructure.Platform;
 
@@ -46,6 +50,7 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
     private const int BorderThickness = 3;
     private static readonly object ClassGate = new();
     private static readonly Dictionary<nint, bool> BorderStates = [];
+    private static readonly Dictionary<nint, OverlayPaintState> PaintStates = [];
     private static readonly string ClassName =
         "MappingTools.GeometryDashboardOverlayWindow";
     private static WindowsNativeMethods.WindowProcedure? _windowProcedure;
@@ -127,6 +132,7 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         lock (ClassGate)
         {
             BorderStates[_window] = _borderEnabled;
+            PaintStates[_window] = new OverlayPaintState();
         }
 
         TargetWindow = targetWindow;
@@ -177,6 +183,16 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
             return;
         }
 
+        lock (ClassGate)
+        {
+            if (PaintStates.TryGetValue(_window, out OverlayPaintState? state))
+            {
+                state.PhysicalBounds = physicalBounds;
+                state.DpiMultiplier = dpiMultiplier;
+                state.DpiSourceAvailable = dpiSourceAvailable;
+            }
+        }
+
         WindowsNativeMethods.ShowWindow(
             _window,
             WindowsNativeMethods.ShowNoActivate);
@@ -214,6 +230,26 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         lock (ClassGate)
         {
             BorderStates[_window] = enabled;
+        }
+
+        Invalidate();
+    }
+
+    /// <inheritdoc/>
+    public void SetFrame(GeometryDashboardOverlayFrame frame)
+    {
+        ArgumentNullException.ThrowIfNull(frame);
+        if (_disposed || _window == 0)
+        {
+            return;
+        }
+
+        lock (ClassGate)
+        {
+            if (PaintStates.TryGetValue(_window, out OverlayPaintState? state))
+            {
+                state.Frame = frame;
+            }
         }
 
         Invalidate();
@@ -385,33 +421,35 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         {
             WindowsNativeMethods.PAINTSTRUCT paint;
             nint deviceContext = WindowsNativeMethods.BeginPaint(window, out paint);
-            bool drawBorder;
             lock (ClassGate)
             {
-                drawBorder = BorderStates.TryGetValue(window, out bool enabled) && enabled;
-            }
-
-            if (drawBorder &&
-                WindowsNativeMethods.GetClientRect(
-                    window,
-                    out WindowsNativeMethods.RECT rectangle))
-            {
-                nint brush = WindowsNativeMethods.CreateSolidBrush(GreenYellow);
-                if (brush != 0)
+                if (PaintStates.TryGetValue(window, out OverlayPaintState? paintState))
                 {
-                    for (int index = 0; index < BorderThickness; index++)
-                    {
-                        WindowsNativeMethods.FrameRect(
-                            deviceContext,
-                            ref rectangle,
-                            brush);
-                        rectangle.Left++;
-                        rectangle.Top++;
-                        rectangle.Right--;
-                        rectangle.Bottom--;
-                    }
+                    DrawFrame(deviceContext, paintState);
+                }
 
-                    WindowsNativeMethods.DeleteObject(brush);
+                if (BorderStates.TryGetValue(window, out bool drawBorder) && drawBorder &&
+                    WindowsNativeMethods.GetClientRect(
+                        window,
+                        out WindowsNativeMethods.RECT rectangle))
+                {
+                    nint brush = WindowsNativeMethods.CreateSolidBrush(GreenYellow);
+                    if (brush != 0)
+                    {
+                        for (int index = 0; index < BorderThickness; index++)
+                        {
+                            WindowsNativeMethods.FrameRect(
+                                deviceContext,
+                                ref rectangle,
+                                brush);
+                            rectangle.Left++;
+                            rectangle.Top++;
+                            rectangle.Right--;
+                            rectangle.Bottom--;
+                        }
+
+                        WindowsNativeMethods.DeleteObject(brush);
+                    }
                 }
             }
 
@@ -424,6 +462,7 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
             lock (ClassGate)
             {
                 BorderStates.Remove(window);
+                PaintStates.Remove(window);
             }
         }
 
@@ -455,6 +494,7 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         lock (ClassGate)
         {
             BorderStates.Remove(_window);
+            PaintStates.Remove(_window);
         }
 
         _window = 0;
@@ -462,4 +502,66 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
 
     private void ThrowIfDisposed() =>
         ObjectDisposedException.ThrowIf(_disposed, this);
+
+    private static void DrawFrame(nint deviceContext, OverlayPaintState state)
+    {
+        using Graphics graphics = Graphics.FromHdc(deviceContext);
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+        foreach (GeometryDashboardOverlayShape shape in state.Frame.Shapes)
+        {
+            using Pen pen = new(
+                ToDrawingColor(shape.Color, shape.Opacity),
+                (float)Math.Max(0.1, shape.Thickness));
+            pen.DashStyle = ToDashStyle(shape.DashStyle);
+            PointF start = ToClientPoint(shape.Start, state);
+            switch (shape.Kind)
+            {
+                case GeometryDashboardOverlayShapeKind.Point:
+                case GeometryDashboardOverlayShapeKind.Circle:
+                    graphics.DrawEllipse(
+                        pen,
+                        start.X - (float)shape.Radius,
+                        start.Y - (float)shape.Radius,
+                        (float)shape.Radius * 2,
+                        (float)shape.Radius * 2);
+                    break;
+                case GeometryDashboardOverlayShapeKind.Line:
+                    graphics.DrawLine(pen, start, ToClientPoint(shape.End, state));
+                    break;
+            }
+        }
+    }
+
+    private static PointF ToClientPoint(Vector2 point, OverlayPaintState state)
+    {
+        Vector2 relative = new(
+            point.X - state.PhysicalBounds.Left,
+            point.Y - state.PhysicalBounds.Top);
+        Vector2 logical = ToDpi(relative, state.DpiMultiplier, state.DpiSourceAvailable);
+        return new PointF((float)logical.X, (float)logical.Y);
+    }
+
+    private static Color ToDrawingColor(RgbaColour colour, double opacity)
+    {
+        int alpha = Convert.ToInt32(Math.Clamp(colour.A * opacity, 0, 255));
+        return Color.FromArgb(alpha, colour.R, colour.G, colour.B);
+    }
+
+    private static DashStyle ToDashStyle(DashStylesEnum dashStyle) => dashStyle switch
+    {
+        DashStylesEnum.Dash => DashStyle.Dash,
+        DashStylesEnum.Dot => DashStyle.Dot,
+        DashStylesEnum.DashSingleDot => DashStyle.DashDot,
+        DashStylesEnum.DashDoubleDot => DashStyle.DashDotDot,
+        _ => DashStyle.Solid
+    };
+
+    private sealed class OverlayPaintState
+    {
+        public GeometryDashboardOverlayFrame Frame { get; set; } = GeometryDashboardOverlayFrame.Empty;
+        public Box2 PhysicalBounds { get; set; }
+        public Vector2 DpiMultiplier { get; set; } = Vector2.One;
+        public bool DpiSourceAvailable { get; set; }
+    }
 }

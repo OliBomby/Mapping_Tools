@@ -79,6 +79,9 @@ internal static class DesktopServiceRegistration
             new HitsoundStudioDialogService(
                 () => provider.GetRequiredService<MainWindow>(),
                 provider.GetRequiredService<IFilePicker>()));
+        services.AddSingleton<IGeometryDashboardDialogService>(provider =>
+            new GeometryDashboardDialogService(
+                () => provider.GetRequiredService<MainWindow>()));
 
         services.AddSingleton<IFilePicker>(provider =>
         {
