@@ -15,7 +15,8 @@ public class BeatmapTests {
 
         // Act
         var beatmap = new Beatmap(File.ReadAllLines(path).ToList());
-        string actual = string.Join(Environment.NewLine, beatmap.GetLines());
+        // Repository fixtures use LF line endings regardless of the host platform.
+        string actual = string.Join("\n", beatmap.GetLines());
 
         // Assert
         actual.Should().Be(expected);

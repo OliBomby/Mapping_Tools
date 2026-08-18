@@ -13,7 +13,8 @@ public class StoryboardTests {
         var storyboard = new StoryBoard(File.ReadAllLines(path).ToList());
 
         // Act
-        string actualContent = string.Join(Environment.NewLine, storyboard.GetLines());
+        // Repository fixtures use LF line endings regardless of the host platform.
+        string actualContent = string.Join("\n", storyboard.GetLines());
 
         // Assert
         actualContent.Should().Be(expectedContent);

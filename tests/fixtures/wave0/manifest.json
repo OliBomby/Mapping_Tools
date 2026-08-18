@@ -7,84 +7,84 @@
                          "id":  "BM-STD-RICH-001",
                          "group":  "beatmap",
                          "path":  "beatmaps/standard-feature-rich.osu",
-                         "sha256":  "E19766C9D9DE19CE9C9BC89F850BE2B1E86D3FBD57832F025031EAC6B53C9EE8",
+                         "sha256":  "846EBD3AC75993E299EC77CAB466C3A93826B379808F6951726BC71F59D6EE9B",
                          "purpose":  "Real-world standard map with bookmarks, inherited timing, samples, colours, and complex hit objects."
                      },
                      {
                          "id":  "BM-STD-AUTOFAIL-001",
                          "group":  "beatmap",
                          "path":  "beatmaps/standard-autofail-2b.osu",
-                         "sha256":  "3B69F876B00AD2DBB90B7CD6ADC6997702A4141CF4FEE5D745E935B8ADF21947",
+                         "sha256":  "2F5573650E96299C80924AA25B089FBE3DB652F4F014B63FF3EFA3ECDE1B75D9",
                          "purpose":  "Real-world 2B standard map that triggers known auto-fail unloading behavior."
                      },
                      {
                          "id":  "BM-TAIKO-001",
                          "group":  "beatmap",
                          "path":  "beatmaps/taiko.osu",
-                         "sha256":  "31AA6F3685F8394096BEC3AF7D0A94D63C9C257497E4592ED3C5D72251C3E974",
+                         "sha256":  "391E422A5FE2F81493298D48B439222F0B5AA4EAF0A75B8E07D0DA939BD52A57",
                          "purpose":  "Real-world taiko-mode map."
                      },
                      {
                          "id":  "BM-CATCH-001",
                          "group":  "beatmap",
                          "path":  "beatmaps/catch.osu",
-                         "sha256":  "2E40E511267985414FB78FB18A52C1A7DC2D1F23098B532BA9E3B80357671369",
+                         "sha256":  "E1E7C5E6E5FC88D09B39B603469A098024078BFA45BA5B82FD681BDA3C95338A",
                          "purpose":  "Real-world catch-mode map with bookmarks."
                      },
                      {
                          "id":  "BM-MANIA-001",
                          "group":  "beatmap",
                          "path":  "beatmaps/mania.osu",
-                         "sha256":  "378CC43278110713A4DF5EF802184ECC195AEAB29235A6C64B1E51C24BB2C461",
+                         "sha256":  "4B6BF4EC38188EE07F95E5EF280B47BEB3C55A71408E8B4A623310373B988467",
                          "purpose":  "Real-world mania-mode map with bookmarks."
                      },
                      {
                          "id":  "BM-COMPACT-001",
                          "group":  "beatmap",
                          "path":  "../../../Mapping_Tools_Tests/Resources/ComplicatedTestMap.osu",
-                         "sha256":  "9DDBE49058712E1211DCEAA52BCBE3D8FF903562EEF5DD0587945407439AC341",
+                         "sha256":  "9394E802795696AE0252F5476D9B5CFC28DD2FAF6B50017A5F146FD4DA00647B",
                          "purpose":  "Compact standard map used by legacy parser and round-trip tests."
                      },
                      {
                          "id":  "BM-EMPTY-001",
                          "group":  "beatmap",
                          "path":  "../../../Mapping_Tools_Tests/Resources/EmptyTestMap.osu",
-                         "sha256":  "6B3280C36264E2D5920A8DB2AD9491FFB4F5475E89340F2DB193AF04CC93032E",
+                         "sha256":  "4094A7F1ACB9039846BEBF38E440C27E0EED61D6F74A9D4AD66F79C9A778109B",
                          "purpose":  "Valid empty standard map for empty-selection and no-op cases."
                      },
                      {
                          "id":  "SB-LARGE-001",
                          "group":  "storyboard",
                          "path":  "../../../Mapping_Tools_Tests/Resources/TestStoryboard.osb",
-                         "sha256":  "6D8BBE29BDE5283C19892496F1A2B2F01EFFA9673193409E33D7B354417B199B",
+                         "sha256":  "805C384A3EFCA912EAACF2474915C5EE9F2A0A6006E5F90B802FD1F3E2FB4704",
                          "purpose":  "Large real-world storyboard command and serialization baseline."
                      },
                      {
                          "id":  "MAPSET-MULTI-001-N",
                          "group":  "mapset",
                          "path":  "mapsets/multi-difficulty/normal.osu",
-                         "sha256":  "D90B9D010D2D732A4A7CEE0B360E05BBA8589A90920AC53EFA9BD1D2E5CC3EBD",
+                         "sha256":  "2BFE5B1CF54A3FAF868568256EDE5D6F1E28AD8580B5DBC5B5955AE393A12F04",
                          "purpose":  "Normal difficulty in a real-world shared mapset."
                      },
                      {
                          "id":  "MAPSET-MULTI-001-X",
                          "group":  "mapset",
                          "path":  "mapsets/multi-difficulty/expert.osu",
-                         "sha256":  "02C45633AA1310F7C561CB8AC499639CE7076440159806E99FB8820F5864CB27",
+                         "sha256":  "80B83D261F02F99856BC2D8C582B13155F19D84089E0F166C06A0E4097576AEC",
                          "purpose":  "Expert difficulty in the same real-world shared mapset."
                      },
                      {
                          "id":  "PAT-COLLECTION-001",
                          "group":  "pattern",
                          "path":  "patterns/legacy-collection/project.json",
-                         "sha256":  "9F207180AAACD90B65581D0FDF0355DED287F148EC6AF2A5FE35AA874A22FB65",
+                         "sha256":  "B4F29FE49AEEFF5BE6BA0D0CD49BD8A507BF3CFFB3A87EEF0F7588F6729F03B0",
                          "purpose":  "Legacy Pattern Gallery collection metadata."
                      },
                      {
                          "id":  "PAT-FILE-001",
                          "group":  "pattern",
                          "path":  "patterns/legacy-collection/Pattern Files/2025-06-07 21-32-54_NEsChy2u__Pattern 1.osu",
-                         "sha256":  "AFF8607558E84809439C1E455F40B7D13A7D8BC3DFD97EE843921992D53758A8",
+                         "sha256":  "F46510A559E84FFEC66DABE552B1BF0F572AAA201AF20A4CD6F8C2581B10ECF6",
                          "purpose":  "Loose pattern beatmap referenced by the legacy collection."
                      },
                      {
@@ -105,7 +105,7 @@
                          "id":  "SET-LEGACY-001",
                          "group":  "settings",
                          "path":  "settings/legacy-config.json",
-                         "sha256":  "C2773667F3DB101B1AA7BE71976F95CD7E4F1A987E3196D9142D981443E09858",
+                         "sha256":  "A4A23290439AE2B0D9BA273A9E8870B37714194BA9076B20BB483A5729496823",
                          "purpose":  "Sanitized representative legacy settings including paths, favorites, bounds, and hotkeys."
                      },
                      {
@@ -140,105 +140,105 @@
                          "id":  "PROJECT-MAPCLEANERPROJECT",
                          "group":  "project",
                          "path":  "projects/mapcleanerproject.json",
-                         "sha256":  "A298DD0947E92CCBF013BE35FE12E0CC99F761B0BD551AA98BE33628F60A34AE",
+                         "sha256":  "B678D7851F434AB9ECF708651AC9CE4356C55F9C399F50A34D7CE76D4CC91FD7",
                          "purpose":  "Sanitized real-world legacy mapcleanerproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-PROPERTYTRANSFORMERPROJECT",
                          "group":  "project",
                          "path":  "projects/propertytransformerproject.json",
-                         "sha256":  "E92688E47FD309D62A64D2B90901F02F0FCD9F26F8AF5AB4C0B411ABAC36259E",
+                         "sha256":  "B464F848D9BCA68190404A32CB7FFFB9703F82599823C204E392E7CFC61B2626",
                          "purpose":  "Sanitized real-world legacy propertytransformerproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-TIMINGCOPIERPROJECT",
                          "group":  "project",
                          "path":  "projects/timingcopierproject.json",
-                         "sha256":  "6097FE22AC1E6494226D2E2846AB992461D9628D0568B58147FF5F7F623CD850",
+                         "sha256":  "DF21591BC09C75378243B4715E2B8459AC780C1EF2AD56A48AB1F15ADCBACEE0",
                          "purpose":  "Sanitized real-world legacy timingcopierproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-TIMINGHELPERPROJECT",
                          "group":  "project",
                          "path":  "projects/timinghelperproject.json",
-                         "sha256":  "1044D744E713EA2D5DE00C5C6AB1D35D46BD7720CB5EECC16AC09E866CFF19F6",
+                         "sha256":  "9F49F798F3CC84D7FB5C0967A72CC65F592616E203221A2F174D826B705203CB",
                          "purpose":  "Sanitized real-world legacy timinghelperproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-SLIDERMERGERPROJECT",
                          "group":  "project",
                          "path":  "projects/slidermergerproject.json",
-                         "sha256":  "6D8D98FE6EBDF81DF01C753EEFAF4843206A474ED80D18307E89E5B67E9396CD",
+                         "sha256":  "90619D7B334361DB373CB8368BFC14A9D5D5FFD80F9CB58720B987E6312B3932",
                          "purpose":  "Sanitized real-world legacy slidermergerproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-SLIDERCOMPLETIONATORPROJECT",
                          "group":  "project",
                          "path":  "projects/slidercompletionatorproject.json",
-                         "sha256":  "16C5283D45A95782E0DCF033270B796EB43BD8D502D5EE69A655BD48D018E005",
+                         "sha256":  "433F7A9A100C22236F25384BC28757F9FE52F8E3DCE63685E8C0973F5C116CE7",
                          "purpose":  "Sanitized real-world legacy slidercompletionatorproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-SLIDERPICTURATORPROJECT",
                          "group":  "project",
                          "path":  "projects/sliderpicturatorproject.json",
-                         "sha256":  "61FE8F39880ADF8D2EB6333A22A5C2D7728734438935A52D444875DA7F34A9EE",
+                         "sha256":  "C05EA5B42D3649759E9D38EACBEAC75BB469B57DA5727D5E0F3771A47281FE14",
                          "purpose":  "Sanitized real-world legacy sliderpicturatorproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-RHYTHMGUIDEPROJECT",
                          "group":  "project",
                          "path":  "projects/rhythmguideproject.json",
-                         "sha256":  "9DA7C9B1665D5BF499A7625810484E10A23567CFE4346D521B35220FE7685404",
+                         "sha256":  "7C7E3C560EAB79883BFBDD2C14866494E07E5E2C3532F14BD5DCAA66554B0AFC",
                          "purpose":  "Sanitized real-world legacy rhythmguideproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-HITSOUNDCOPIERPROJECT",
                          "group":  "project",
                          "path":  "projects/hitsoundcopierproject.json",
-                         "sha256":  "FAFA27EAA71C88935E0D575758A3321206E26902B0E9A669109C7B14158D6AC7",
+                         "sha256":  "3784D86B2AFCBB2B7B026D0E12A8CF6F2F901816D205BC9894D5E5771D517D5D",
                          "purpose":  "Sanitized real-world legacy hitsoundcopierproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-HSPREVIEWPROJECT",
                          "group":  "project",
                          "path":  "projects/hspreviewproject.json",
-                         "sha256":  "53AA7AF6BFFC77B6DE8B76B7A4964760C12FD51615A03CE97FBCBD125B2D1C4C",
+                         "sha256":  "B92399231149DBD54A33F4DC2C832EA900435509885423D7EAF1FE9B54FE51E1",
                          "purpose":  "Sanitized real-world legacy hspreviewproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-METADATAPROJECT",
                          "group":  "project",
                          "path":  "projects/metadataproject.json",
-                         "sha256":  "1E92F0D3FE0C19FCF6B9571F9C412AC2F4DA9F5162498E144C7BD717F38A8C8D",
+                         "sha256":  "534E7AFEF66C9CE2AF3D530B30ADE6102D9AEB8C5C7D52795D293B658BC2AADB",
                          "purpose":  "Sanitized real-world legacy metadataproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-SLIDERATORPROJECT",
                          "group":  "project",
                          "path":  "projects/slideratorproject.json",
-                         "sha256":  "072BBDB5618B28005B7070B6C12FE8DF7F95668FA359E95BC685E0C9DC937596",
+                         "sha256":  "7DDB011125E3B25E14F2CC58673E0E2DAFF894A7E171A722DF46F250E81D9DB8",
                          "purpose":  "Sanitized real-world legacy slideratorproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-TUMOURGENERATORPROJECT",
                          "group":  "project",
                          "path":  "projects/tumourgeneratorproject.json",
-                         "sha256":  "3A30AA17C21B673104E6651AB1F27F6222DFAAEFFAAD86FBFB999309ADFD6832",
+                         "sha256":  "52BC791C8231357F8F69E96433E6EBD42E2B6ABA6F0C80DDE6362E99DB57CFB3",
                          "purpose":  "Sanitized real-world legacy tumourgeneratorproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-COMBOCOLOURPROJECT",
                          "group":  "project",
                          "path":  "projects/combocolourproject.json",
-                         "sha256":  "7FF6C1D3CAD82DBF32548B193B2C3194E77B2D9DC360AD2019131D4035255DC6",
+                         "sha256":  "C3878C9E72D2CFA4857CB9C54FE100C838932910947E9E47B740F42F88B469B7",
                          "purpose":  "Sanitized real-world legacy combocolourproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-MAPSETMERGERPROJECT",
                          "group":  "project",
                          "path":  "projects/mapsetmergerproject.json",
-                         "sha256":  "C2E1E6C958E21B491FFF53A7502EFB6B46043FA19F861047DD7A8DB1D1D015D5",
+                         "sha256":  "928A4C3B87FF886F7BD1DDFFA27DC26658F8A9D95D89617B18B5679E7071275F",
                          "purpose":  "Sanitized real-world legacy mapsetmergerproject.json configuration."
                      },
                      {
@@ -252,147 +252,147 @@
                          "id":  "PROJECT-GEOMETRYDASHBOARDPROJECT",
                          "group":  "project",
                          "path":  "projects/geometrydashboardproject.json",
-                         "sha256":  "45792F8F7D71ACACEE4F6B332F5B38B32857B0B0EC09D317E877BF369CBB4D89",
+                         "sha256":  "4AB65E06C99DECBDE9BAE8864C7DFD83903B8A68BD7F8650F2F750A45D78B17B",
                          "purpose":  "Sanitized real-world legacy geometrydashboardproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-HSSTUDIOPROJECT",
                          "group":  "project",
                          "path":  "projects/hsstudioproject.json",
-                         "sha256":  "391A79DE383C75451636BF15B9C92C9B292FEA5632C5A1B7FFBC320679A18629",
+                         "sha256":  "8E1EEAF09B76777102384BF783F88E8669C9BB81F5F79073EECE928B1BE14DA8",
                          "purpose":  "Sanitized real-world legacy hsstudioproject.json configuration."
                      },
                      {
                          "id":  "PROJECT-PATTERNGALLERYPROJECT",
                          "group":  "project",
                          "path":  "projects/patterngalleryproject.json",
-                         "sha256":  "E270130324F89A37478602399DA4C266B734C0FD0A1827ED726B097563FA983F",
+                         "sha256":  "97FB4D0DEF8E34F0189D9B065B03AEB5BE9CBB956DE6223C25B17A7E2869B52A",
                          "purpose":  "Sanitized real-world legacy patterngalleryproject.json configuration."
                      },
                      {
                          "id":  "TR-map-cleaner",
                          "group":  "transformation",
                          "path":  "transformations/map-cleaner.json",
-                         "sha256":  "D974B5E208582C92CF3C9763A337401A5BBBBF9EB42AA92E6FCACDA77651E971",
+                         "sha256":  "1C8E9CAB2CEABB7A2C991A774F664A97DF96A9A5E46FB7F5DEC2D3B4326C8FE8",
                          "purpose":  "Legacy before/after capture record for Map Cleaner."
                      },
                      {
                          "id":  "TR-metadata-manager",
                          "group":  "transformation",
                          "path":  "transformations/metadata-manager.json",
-                         "sha256":  "467114BD17C8A0DCC59A35F9A00A59B965F3F8B6857B8F0CC8E84522B0BBC7EC",
+                         "sha256":  "A46E19F89E5CEDFBA2EE688578FB378A6F6A4ABCD07039F77A9CCC89A4129805",
                          "purpose":  "Legacy before/after capture record for Metadata Manager."
                      },
                      {
                          "id":  "TR-property-transformer",
                          "group":  "transformation",
                          "path":  "transformations/property-transformer.json",
-                         "sha256":  "CA3B02F10F038711527CD36667C799FF41DAA9AF4314F1911056D32F3558D9D3",
+                         "sha256":  "F4A7D578125A00E248027AC4263D50B12CF777291F78C736E22AA3EA3D2E0D38",
                          "purpose":  "Legacy before/after capture record for Property Transformer."
                      },
                      {
                          "id":  "TR-timing-copier",
                          "group":  "transformation",
                          "path":  "transformations/timing-copier.json",
-                         "sha256":  "209A30A1BFCDA18C7DE5DAD41DADF3A86E31BFDBFE62166115AD9CD559CBF44C",
+                         "sha256":  "6B3A777CF64778777C777B1DE34853A718026D464563FE1CA4376C03301E9950",
                          "purpose":  "Legacy before/after capture record for Timing Copier."
                      },
                      {
                          "id":  "TR-timing-helper",
                          "group":  "transformation",
                          "path":  "transformations/timing-helper.json",
-                         "sha256":  "087761E74F269B36BFEF99B6FBFF8238F6B9E4738A23508081F971383C3B1DE5",
+                         "sha256":  "A2CA982887B3287AF782562BA820BE6BF38EC399DB76E499E867810E153E6206",
                          "purpose":  "Legacy before/after capture record for Timing Helper."
                      },
                      {
                          "id":  "TR-rhythm-guide",
                          "group":  "transformation",
                          "path":  "transformations/rhythm-guide.json",
-                         "sha256":  "872F172316DBFD02B4D7326F02834270212CAC22D38CCC121365F91F8CB1B41C",
+                         "sha256":  "0D6A0406360E7063E6A9F7AC16BDC5F20444A3634B45F4EF42381D57767189FB",
                          "purpose":  "Legacy before/after capture record for Rhythm Guide."
                      },
                      {
                          "id":  "TR-hitsound-preview",
                          "group":  "transformation",
                          "path":  "transformations/hitsound-preview.json",
-                         "sha256":  "B142C15F2BC5383264A76346EDB26089612206C7D11E36F838F160AB08538919",
+                         "sha256":  "D272963ABA32AA1E153AE4D244A26777EA51B64A869D24AD482B2B2B1031E780",
                          "purpose":  "Legacy before/after capture record for Hitsound Preview Helper."
                      },
                      {
                          "id":  "TR-hitsound-copier",
                          "group":  "transformation",
                          "path":  "transformations/hitsound-copier.json",
-                         "sha256":  "06670280C7445A4F0906BCB749AE5160A72BA07D20469DF892BBF495D3C56E8C",
+                         "sha256":  "D6EA8E76898A464B82B5DAD9C47E5DA298C1F129E766B992E0F449817D9C80EF",
                          "purpose":  "Legacy before/after capture record for Hitsound Copier."
                      },
                      {
                          "id":  "TR-slider-completionator",
                          "group":  "transformation",
                          "path":  "transformations/slider-completionator.json",
-                         "sha256":  "F58F06E8A409AB50E2E9C8718058AA859CB22C87E9F94F1D61889436A0606CAD",
+                         "sha256":  "63C1AA1FE53511B425FF7431DADEF50FFA6B7A0B60C4C741EB06FD243DE951F7",
                          "purpose":  "Legacy before/after capture record for Slider Completionator."
                      },
                      {
                          "id":  "TR-slider-merger",
                          "group":  "transformation",
                          "path":  "transformations/slider-merger.json",
-                         "sha256":  "5FF8DF77AFE889BB59F9A56403C7B179C12A287F1CB91137D9A4795132D69BC2",
+                         "sha256":  "A8057900657E0C59AF68A3387A1D9DAE758510C337F8DA9E1F545011DD3F8E4E",
                          "purpose":  "Legacy before/after capture record for Slider Merger."
                      },
                      {
                          "id":  "TR-slider-picturator",
                          "group":  "transformation",
                          "path":  "transformations/slider-picturator.json",
-                         "sha256":  "53027897410AB296602D21B60525F16AC54C8E139AC1F862EF2913FE746D1F5D",
+                         "sha256":  "982CD6AE4462B6F2D77DA962275903D30467F3E0EDE5BD4C1EE679758E920CE0",
                          "purpose":  "Legacy before/after capture record for Slider Picturator."
                      },
                      {
                          "id":  "TR-sliderator",
                          "group":  "transformation",
                          "path":  "transformations/sliderator.json",
-                         "sha256":  "4B82EDD67C6D0A856A9E1B5038D718D89C484963903F43D168AC41273044410B",
+                         "sha256":  "FD732305AF4CCC8225E1A07AD86411EAB5FF5FB3A8B089524F3EC288FB0D3F7B",
                          "purpose":  "Legacy before/after capture record for Sliderator."
                      },
                      {
                          "id":  "TR-tumour-generator",
                          "group":  "transformation",
                          "path":  "transformations/tumour-generator.json",
-                         "sha256":  "EFCF64552F7162CD584749030D0191F383953473230AFFCAE6479AC66879E57F",
+                         "sha256":  "55F940C129F85533ECD46C7E1DA113D82E6E410F282EF5E44B1E04B0E51F3C4D",
                          "purpose":  "Legacy before/after capture record for Tumour Generator 2."
                      },
                      {
                          "id":  "TR-combo-colour-studio",
                          "group":  "transformation",
                          "path":  "transformations/combo-colour-studio.json",
-                         "sha256":  "FA163B2EAFDD321E5CF823CB4EF5D864B550E52E57B7B6AEA0297EE330002AC3",
+                         "sha256":  "9DC3BAB1DD5ABBA403C263D3219CE799658AFBC94932789CC51F86184E3F2DBD",
                          "purpose":  "Legacy before/after capture record for Combo Colour Studio."
                      },
                      {
                          "id":  "TR-pattern-gallery",
                          "group":  "transformation",
                          "path":  "transformations/pattern-gallery.json",
-                         "sha256":  "E28E90115BBA3B99DF72E19E0DA711C2DE12691DD2AFCD872C60B5B5A9B5F3AF",
+                         "sha256":  "6A54BAE29184DE00742714AE3772A4F1FAAC969C6ED776104FDBBECE78C573DF",
                          "purpose":  "Legacy before/after capture record for Pattern Gallery."
                      },
                      {
                          "id":  "TR-mapset-merger",
                          "group":  "transformation",
                          "path":  "transformations/mapset-merger.json",
-                         "sha256":  "DEB52DE7365B24A24B0B5B4A76CC25BD9D72607422BE228B2DD76DAC297A460E",
+                         "sha256":  "571D5DFD3E306F6BCE8F1ADE0E685CC845CF6124C727D5CAC03DF776D59D69A4",
                          "purpose":  "Legacy before/after capture record for Mapset Merger."
                      },
                      {
                          "id":  "TR-hitsound-studio",
                          "group":  "transformation",
                          "path":  "transformations/hitsound-studio.json",
-                         "sha256":  "8AE1F8084EE451FA6E10FF4A6549AB008DE60AC4D5DCA616D94229EF66259354",
+                         "sha256":  "85BFD806BD1243AB6972537499D6F4C20537B0507B44A11BEB1E99DB80288B4E",
                          "purpose":  "Legacy before/after capture record for Hitsound Studio."
                      },
                      {
                          "id":  "TR-auto-fail-detector",
                          "group":  "transformation",
                          "path":  "transformations/auto-fail-detector.json",
-                         "sha256":  "53171DB63D124A27F4282476D339582F1EA0F602C25886439EF8C857AE424E5C",
+                         "sha256":  "CFD877F45A9F2DC0DFCFC00E63807E66BEF94969F09F1F1B6DC48277CD888021",
                          "purpose":  "Legacy before/after capture record for Auto-fail Detector."
                      },
                      {
@@ -658,112 +658,112 @@
                          "id":  "TR-combo-colour-studio-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/combo-colour-studio.osu",
-                         "sha256":  "63BB178B68EF8EB3029C8341FBB746F312E26D510EB1F33497DBA1D53EC18B78",
+                         "sha256":  "AB546DE3D6E8C28DEC3A7458EDD4B1DE2F5A74692D131925397BC26D87DFDCAA",
                          "purpose":  "Exact legacy combo-colour-studio output."
                      },
                      {
                          "id":  "TR-hitsound-copier-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/hitsound-copier.osu",
-                         "sha256":  "6B75E2932AED26F1C73B290362B4BA1355FD297D2B63526828365AE08C11F2FE",
+                         "sha256":  "DB14304A38280EAD6D2FC4DD9DEC98D7DD3FBD4DBB7CDFC67E7B6B6404A245E4",
                          "purpose":  "Exact legacy hitsound-copier output."
                      },
                      {
                          "id":  "TR-hitsound-preview-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/hitsound-preview.osu",
-                         "sha256":  "D5AEA2DE97F874B5558863E47EC7C0BB3B81156FFDD41CFCAD33A9BB55F32991",
+                         "sha256":  "8D97BC01AE837A4D7108BE3668B475BCFBA4A9D21273E40FF4760C6EFADF2A90",
                          "purpose":  "Exact legacy hitsound-preview output."
                      },
                      {
                          "id":  "TR-hitsound-studio-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/hitsound-studio.osu",
-                         "sha256":  "2DC96A9639E1E78F0931A02D50B6A7453018AED968FC28C81BF84DAEAA54AB99",
+                         "sha256":  "108112A487B74B0385320A98B6274B561717D33C8309BFDE16CDD7676CFE50F1",
                          "purpose":  "Exact legacy hitsound-studio output."
                      },
                      {
                          "id":  "TR-map-cleaner-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/map-cleaner.osu",
-                         "sha256":  "33040289283130D5E417D4303EA198DD19FD07412D3985216D25C5B1A0521C57",
+                         "sha256":  "4A549B2F6602A1FBAA969970B5EDF6C1E7CD38E42038417037782A25071A67BD",
                          "purpose":  "Exact legacy map-cleaner output."
                      },
                      {
                          "id":  "TR-metadata-manager-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/metadata-manager.osu",
-                         "sha256":  "0F9EF22EEC9843B684C7D2EB76433E3356025F5186CBBA0313BD2724373B26E2",
+                         "sha256":  "C714FC63416B1ED9057126487E11390FBB761A82848AD25750FAF57F809A1379",
                          "purpose":  "Exact legacy metadata-manager output."
                      },
                      {
                          "id":  "TR-pattern-gallery-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/pattern-gallery.osu",
-                         "sha256":  "1CE4FE8A14AC41FB718B50C167DA139FBA5C458A5410C4629E0EE36644BEDDD6",
+                         "sha256":  "4E3A88358ACB821D497DBC0AD29B53AB334CF724525FF5A0327514EB6DF0DF16",
                          "purpose":  "Exact legacy pattern-gallery output."
                      },
                      {
                          "id":  "TR-property-transformer-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/property-transformer.osu",
-                         "sha256":  "7DD458E8AF4924ABEDD285D41A5668C65CB5C473087EC0B9DB006F8F9D57A0F5",
+                         "sha256":  "B02651B47A20B88A3DA398D67A980FAEB20F2B4A5E04F017C3F5D4EE5D6EB96C",
                          "purpose":  "Exact legacy property-transformer output."
                      },
                      {
                          "id":  "TR-rhythm-guide-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/rhythm-guide.osu",
-                         "sha256":  "3BFB3DCDB9021B8DD82FDBDC31B0EC6BBFB30E3F65384F0CD7097F9B6160E394",
+                         "sha256":  "AB10E3BB3BC22DF9009649DBA26568476E4ADA554C5DCFB6EE2B6F0B2B224577",
                          "purpose":  "Exact legacy rhythm-guide output."
                      },
                      {
                          "id":  "TR-slider-completionator-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/slider-completionator.osu",
-                         "sha256":  "D7A646118B8EE2E3A1C51B92D2E6A40B447E004522AA2C9FEEF0BB29B003B078",
+                         "sha256":  "6B1F3A7FEB0BD41AB3B48DD79F00CDF67BE06104E7E3A58DCA1DF8D3074CE98B",
                          "purpose":  "Exact legacy slider-completionator output."
                      },
                      {
                          "id":  "TR-slider-merger-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/slider-merger.osu",
-                         "sha256":  "0EF86314B44A53B84F546D64A716D19516B18EDDD074BB228503B59E90C4FA49",
+                         "sha256":  "3C447D51E288F26D1FAAECBCBCACC31EE4618DBF7C46EC2512CBACA71522F077",
                          "purpose":  "Exact legacy slider-merger output."
                      },
                      {
                          "id":  "TR-slider-picturator-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/slider-picturator.osu",
-                         "sha256":  "193DD7875260CDE0E76ADC41FA118E777BFB9C07944B8242ED5DF2EF3871C754",
+                         "sha256":  "455DD1D045C2A7A8E9596780B56DA8E202329D321F65BB7518713F5E549C5760",
                          "purpose":  "Exact legacy slider-picturator output."
                      },
                      {
                          "id":  "TR-sliderator-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/sliderator.osu",
-                         "sha256":  "E55B75CA4C918940E6244EB4141C47CEBBFEB565694720EC7A86BCF32626A81A",
+                         "sha256":  "59A23D6C8612E16D0212B8EFF76B1E1BF2BD8C8E21239CD18274E8C5A51F633C",
                          "purpose":  "Exact legacy sliderator output."
                      },
                      {
                          "id":  "TR-timing-copier-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/timing-copier.osu",
-                         "sha256":  "014BE30D61715042DE03222EFE5FB4232460BAFBB4197CE5E8F8E5CB0C48C51D",
+                         "sha256":  "021E5A2DAF865D48EB9546BC2D17652B2953CF9A13C84F4B3EC777669FEE104B",
                          "purpose":  "Exact legacy timing-copier output."
                      },
                      {
                          "id":  "TR-timing-helper-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/timing-helper.osu",
-                         "sha256":  "FF0BBA48D8E8C55DC23D7A3B0AD7A8A0303BF595387C6B5ADCB5E8B18CC1D31A",
+                         "sha256":  "7565A378BF0B24D7E866CC397192C952BA564B5E4CFFE2FEEE21BE79DC6C7A67",
                          "purpose":  "Exact legacy timing-helper output."
                      },
                      {
                          "id":  "TR-tumour-generator-output",
                          "group":  "transformation",
                          "path":  "transformations/expected/tumour-generator.osu",
-                         "sha256":  "BE26A9D99683DD8F31713DA20B27E34449F3510CD06AFC2B375D28A37EF8BF55",
+                         "sha256":  "4770C646D3830299771ACD4CD3B98F15621C9223D4D2A36F85834F2F10B2A9F3",
                          "purpose":  "Exact legacy tumour-generator output."
                      },
                      {
@@ -777,7 +777,7 @@
                          "id":  "GD-SAVE-VIRTUAL-OBJECTS-001-output",
                          "group":  "geometry-dashboard",
                          "path":  "geometry-dashboard/expected/locked-virtual-objects.json",
-                         "sha256":  "F58B3ACCFCE312E0D45E441CFCA5BB59D554040FB177F3AA4AA739B6665084E1",
+                         "sha256":  "32029E958801F3B78DEB0CD0511308A5C28F4B2F0D98F4BB003239C0A3B4948A",
                          "purpose":  "Accepted locked virtual-object export from the deterministic editor state."
                      },
                      {
