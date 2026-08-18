@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:converters="using:Mapping_Tools.Desktop.Converters"
+             x:Name="Root"
+             x:Class="Mapping_Tools.Desktop.Controls.ValueOrGraphControl"
+             x:DataType="controls:ValueOrGraphControl"
+             x:CompileBindings="True">
+    <UserControl.Resources>
+        <converters:GraphStateTextConverter x:Key="GraphStateTextConverter" />
+    </UserControl.Resources>
+    <Grid ColumnDefinitions="*,Auto" Height="30">
+        <TextBox Grid.Column="0"
+                 Classes="compact"
+                 Text="{Binding GraphState, ElementName=Root, Mode=TwoWay, Converter={StaticResource GraphStateTextConverter}, UpdateSourceTrigger=LostFocus}"
+                 VerticalContentAlignment="Center"
+                 ToolTip.Tip="Enter a constant or graph anchors separated by |" />
+        <Button Grid.Column="1"
+                Content="..."
+                Margin="4,0,0,0"
+                Padding="10,0"
+                Click="OpenGraphEditor"
+                ToolTip.Tip="Edit as graph" />
+    </Grid>
+</UserControl>

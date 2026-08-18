@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+        xmlns:vm="using:Mapping_Tools.Desktop.ViewModels.Dialogs"
+        x:Class="Mapping_Tools.Desktop.Views.Dialogs.GraphEditorWindow"
+        x:DataType="vm:GraphEditorViewModel"
+        x:CompileBindings="True"
+        Title="Graph editor"
+        Width="560"
+        Height="390"
+        MinWidth="420"
+        MinHeight="300"
+        CanResize="True"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner">
+    <Grid RowDefinitions="*,Auto" Margin="12">
+        <controls:GraphControl x:Name="GraphControlElement"
+                               GraphState="{Binding GraphState, Mode=TwoWay}"
+                               Margin="54,36,12,24" />
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8"
+                    Margin="0,12,0,0">
+            <Button Content="OK"
+                    Command="{Binding AcceptCommand}"
+                    IsDefault="True"
+                    MinWidth="72" />
+            <Button Content="CANCEL"
+                    Command="{Binding CancelCommand}"
+                    IsCancel="True"
+                    MinWidth="72" />
+        </StackPanel>
+    </Grid>
+</Window>
