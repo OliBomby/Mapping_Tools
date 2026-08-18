@@ -13,6 +13,7 @@ using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services;
+using Mapping_Tools.Desktop.Updates;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -34,6 +35,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly IBetterSaveService _betterSave;
     private readonly IDialogService _dialogs;
     private readonly ProjectAutosaveCoordinator _projectCoordinator;
+    private readonly IUpdaterInteractionService? _updaterInteraction;
     private readonly Dictionary<string, ObservableObject> _featureViewModels =
         new(StringComparer.OrdinalIgnoreCase);
     private string _searchText = string.Empty;
@@ -52,6 +54,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <param name="betterSave">Saves the current live editor state through the shared safety gateway.</param>
     /// <param name="dialogs">Presents shell-owned information dialogs.</param>
     /// <param name="projectCoordinator">Owns project menus and feature autosave lifecycle.</param>
+    /// <param name="updaterInteraction">Shows update decisions and owns update shutdown interaction when supplied by runtime composition.</param>
     public MainViewModel(
         IShellFeatureRegistry registry,
         IQuickRunCommandRegistry quickRunRegistry,
@@ -62,7 +65,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         BeatmapWorkspaceViewModel workspace,
         IBetterSaveService betterSave,
         IDialogService dialogs,
-        ProjectAutosaveCoordinator projectCoordinator)
+        ProjectAutosaveCoordinator projectCoordinator,
+        IUpdaterInteractionService? updaterInteraction = null)
     {
         _registry = registry ?? throw new ArgumentNullException(nameof(registry));
         _quickRunRegistry = quickRunRegistry ??
@@ -76,6 +80,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         _projectCoordinator = projectCoordinator ??
             throw new ArgumentNullException(nameof(projectCoordinator));
+        _updaterInteraction = updaterInteraction;
 
         FeatureItems = registry.Features
             .Select((registration, order) => new ShellFeatureItemViewModel(
@@ -280,6 +285,19 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private Task OpenWebsiteAsync() =>
         OpenUriAsync(WebsiteUri, "website");
+
+    [RelayCommand]
+    private Task CheckForUpdatesAsync() =>
+        _updaterInteraction?.CheckForUpdatesAsync(
+            allowSkippedVersion: false,
+            notifyUser: true)
+        ?? Task.CompletedTask;
+
+    internal Task CheckForUpdatesOnStartupAsync() =>
+        _updaterInteraction?.CheckForUpdatesAsync(
+            allowSkippedVersion: true,
+            notifyUser: false)
+        ?? Task.CompletedTask;
 
     [RelayCommand]
     private Task OpenGitHubAsync() =>

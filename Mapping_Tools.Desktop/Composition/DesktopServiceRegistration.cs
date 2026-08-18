@@ -28,6 +28,7 @@ using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Application.TumourGenerator;
 using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Application.Updates;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Interactions;
@@ -35,6 +36,7 @@ using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
+using Mapping_Tools.Desktop.Updates;
 using Mapping_Tools.Infrastructure.Backups;
 using Mapping_Tools.Infrastructure.Audio;
 using Mapping_Tools.Infrastructure.Files;
@@ -44,6 +46,7 @@ using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Settings;
 using Mapping_Tools.Infrastructure.Images;
 using Mapping_Tools.Infrastructure.Workspace;
+using Mapping_Tools.Infrastructure.Updates;
 using Mapping_Tools.Infrastructure.MapsetMerger;
 using Mapping_Tools.Infrastructure.PatternGallery;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,6 +68,15 @@ internal static class DesktopServiceRegistration
 
         services.AddSingleton<MainWindow>();
         services.AddSingleton<IUiDispatcher, AvaloniaUiDispatcher>();
+        services.AddSingleton<IUpdateGateway, OnovaUpdateGateway>();
+        services.AddSingleton<IUpdateService, UpdateService>();
+        services.AddSingleton<IUpdaterInteractionService>(provider =>
+            new AvaloniaUpdaterInteractionService(
+                () => provider.GetRequiredService<MainWindow>(),
+                provider.GetRequiredService<IUpdateService>(),
+                provider.GetRequiredService<IUserNotificationService>(),
+                () => provider.GetRequiredService<IDialogService>(),
+                provider.GetRequiredService<IUiDispatcher>()));
         services.AddSingleton<BeatmapWorkspaceViewModel>();
         services.AddDesktopFeatures();
         services.AddSingleton<MainViewModel>();

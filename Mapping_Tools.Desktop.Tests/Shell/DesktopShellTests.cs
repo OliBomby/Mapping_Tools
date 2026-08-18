@@ -509,7 +509,8 @@ public sealed class DesktopShellTests
             new ProjectAutosaveCoordinator(
                 projectService,
                 resolvedDialogs,
-                resolvedNotifications));
+                resolvedNotifications),
+            updaterInteraction: null);
     }
 
     private static ShellFeatureRegistration Registration(

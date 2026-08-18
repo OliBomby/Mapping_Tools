@@ -59,15 +59,16 @@ jobs:
       - name: Set AssemblyVersion/FileVersion in csproj
         shell: pwsh
         run: |
-          $p = "Mapping_Tools/Mapping_Tools.csproj"
-          $c = Get-Content -Raw $p
-          $c = $c -replace '(?<=<AssemblyVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
-          $c = $c -replace '(?<=<FileVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
-          $c | Set-Content $p -Encoding UTF8
+          foreach ($p in @("Mapping_Tools/Mapping_Tools.csproj", "Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj")) {
+            $c = Get-Content -Raw $p
+            $c = $c -replace '(?<=<AssemblyVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
+            $c = $c -replace '(?<=<FileVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
+            $c | Set-Content $p -Encoding UTF8
+          }
 
       - name: Publish x86
         run: dotnet publish Mapping_Tools -c Release -r win-x86 --no-restore --self-contained true
-      
+
       - name: Publish x64
         run: dotnet publish Mapping_Tools -c Release -r win-x64 --no-restore --self-contained true
 
@@ -88,7 +89,7 @@ jobs:
         run: |
           $outDir = "Mapping_Tools/bin/Release/net10.0-windows/win-x86/publish"
           Compress-Archive -Path "$outDir/*" -DestinationPath "$outDir/release.zip" -Force
-      
+
       - name: Zip x64 app
         shell: pwsh
         run: |

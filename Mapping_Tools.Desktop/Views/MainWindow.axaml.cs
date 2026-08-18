@@ -9,6 +9,7 @@ using Material.Icons;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Updates;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Views;
@@ -21,15 +22,17 @@ public partial class MainWindow : Window
     private static readonly WindowBounds DefaultBounds = new(80, 60, 1500, 800);
     private readonly ApplicationSettings _settings;
     private readonly SettingsPersistenceHostedService? _settingsPersistence;
+    private readonly IUpdaterInteractionService? _updaterInteraction;
     private WindowBounds _normalBounds = DefaultBounds;
     private bool _restored;
+    private bool _updateCloseInProgress;
 
     /// <summary>
     /// Loads a standalone shell instance for XAML tooling and deterministic rendering.
     /// Runtime composition uses the settings-aware constructor.
     /// </summary>
     public MainWindow()
-        : this(new ApplicationSettings(), null)
+        : this(new ApplicationSettings(), null, null)
     {
     }
 
@@ -38,7 +41,7 @@ public partial class MainWindow : Window
     /// </summary>
     public MainWindow(
         ApplicationSettings settings)
-        : this(settings, null)
+        : this(settings, null, null)
     {
     }
 
@@ -50,9 +53,24 @@ public partial class MainWindow : Window
     public MainWindow(
         ApplicationSettings settings,
         SettingsPersistenceHostedService? settingsPersistence)
+        : this(settings, settingsPersistence, null)
+    {
+    }
+
+    /// <summary>
+    /// Loads the compiled shell with persisted placement and updater shutdown coordination.
+    /// </summary>
+    /// <param name="settings">The process-lifetime settings document.</param>
+    /// <param name="settingsPersistence">The orderly-shutdown boundary used by Exit without saving.</param>
+    /// <param name="updaterInteraction">The updater interaction owned by runtime composition.</param>
+    public MainWindow(
+        ApplicationSettings settings,
+        SettingsPersistenceHostedService? settingsPersistence,
+        IUpdaterInteractionService? updaterInteraction)
     {
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _settingsPersistence = settingsPersistence;
+        _updaterInteraction = updaterInteraction;
         InitializeComponent();
         AddHandler(KeyDownEvent, HandleWindowKeyDown, RoutingStrategies.Tunnel);
         PositionChanged += (_, _) => CaptureNormalBounds();
@@ -72,11 +90,23 @@ public partial class MainWindow : Window
     {
         base.OnOpened(eventArgs);
         RestoreWindowPlacement();
+        if (DataContext is MainViewModel viewModel)
+        {
+            _ = viewModel.CheckForUpdatesOnStartupAsync();
+        }
     }
 
     /// <inheritdoc/>
     protected override void OnClosing(WindowClosingEventArgs eventArgs)
     {
+        if (!_updateCloseInProgress && _updaterInteraction?.ShouldUpdateOnClose == true)
+        {
+            eventArgs.Cancel = true;
+            _updateCloseInProgress = true;
+            _ = CompleteUpdateAndCloseAsync();
+            return;
+        }
+
         if (!eventArgs.IsProgrammatic)
         {
             CaptureNormalBounds();
@@ -85,6 +115,19 @@ public partial class MainWindow : Window
         _settings.MainWindowRestoreBounds = _normalBounds;
         _settings.MainWindowMaximized = WindowState == WindowState.Maximized;
         base.OnClosing(eventArgs);
+    }
+
+    private async Task CompleteUpdateAndCloseAsync()
+    {
+        bool canClose = await _updaterInteraction!.CompleteUpdateOnCloseAsync();
+        if (canClose)
+        {
+            Close();
+        }
+        else
+        {
+            _updateCloseInProgress = false;
+        }
     }
 
     private void RestoreWindowPlacement()

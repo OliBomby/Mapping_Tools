@@ -246,7 +246,7 @@
                                     </MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="_Check for updates"
-                                          IsEnabled="False"
+                                          Command="{Binding CheckForUpdatesCommand}"
                                           ToolTip.Tip="Check if there are updates available.">
                                     <MenuItem.Icon>
                                         <materialIcons:MaterialIcon Kind="Update" />

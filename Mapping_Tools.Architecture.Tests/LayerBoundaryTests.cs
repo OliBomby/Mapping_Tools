@@ -146,6 +146,68 @@ public sealed class LayerBoundaryTests
         violations.Should().BeEmpty(string.Join(Environment.NewLine, violations));
     }
 
+    [TestMethod]
+    public void UpdaterBoundary_KeepsOnovaAndDesktopPlatformTypesOutOfApplication()
+    {
+        // Arrange
+        string applicationUpdates = Path.Combine(
+            RepositoryRoot,
+            "Mapping_Tools.Application",
+            "Updates");
+        string desktopUpdates = Path.Combine(
+            RepositoryRoot,
+            "Mapping_Tools.Desktop",
+            "Updates");
+        string[] forbiddenApplicationTokens =
+        [
+            "Onova",
+            "System.Net.Http",
+            "System.Diagnostics.Process",
+            "System.IO"
+        ];
+        string[] forbiddenDesktopTokens = ["Onova", "System.Diagnostics.Process"];
+
+        // Act
+        string[] violations =
+        [
+            .. FindDirectoryTokenViolations(applicationUpdates, forbiddenApplicationTokens),
+            .. FindDirectoryTokenViolations(desktopUpdates, forbiddenDesktopTokens)
+        ];
+        string infrastructureProject = Path.Combine(
+            RepositoryRoot,
+            "Mapping_Tools.Infrastructure",
+            "Mapping_Tools.Infrastructure.csproj");
+        bool infrastructureOwnsOnova = XDocument.Load(infrastructureProject)
+            .Descendants("PackageReference")
+            .Any(element => string.Equals(
+                element.Attribute("Include")?.Value,
+                "Onova",
+                StringComparison.OrdinalIgnoreCase));
+
+        // Assert
+        violations.Should().BeEmpty(string.Join(Environment.NewLine, violations));
+        infrastructureOwnsOnova.Should().BeTrue();
+    }
+
+    private static IEnumerable<string> FindDirectoryTokenViolations(
+        string directory,
+        IEnumerable<string> forbiddenTokens)
+    {
+        if (!Directory.Exists(directory))
+        {
+            yield break;
+        }
+
+        foreach (string path in Directory.EnumerateFiles(directory, "*.cs", SearchOption.AllDirectories))
+        {
+            string source = File.ReadAllText(path);
+            foreach (string token in forbiddenTokens.Where(source.Contains))
+            {
+                yield return $"{Path.GetRelativePath(RepositoryRoot, path)} contains forbidden token '{token}'.";
+            }
+        }
+    }
+
     private static IEnumerable<string> FindTokenViolations(string path, string source)
     {
         foreach (var token in ForbiddenSourceTokens.Where(source.Contains))

@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <AssemblyVersion>1.12.30</AssemblyVersion>
+    <FileVersion>1.12.30</FileVersion>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\mt_icon.ico</ApplicationIcon>
   </PropertyGroup>
@@ -12,6 +14,12 @@
   <ItemGroup>
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="..\Mapping_Tools\Data\mt_logo_256.png">
+      <Link>Assets\mt_logo_256.png</Link>
+    </AvaloniaResource>
+    <AvaloniaResource Include="..\Mapping_Tools\Data\MTcog256.gif">
+      <Link>Assets\MTcog256.gif</Link>
+    </AvaloniaResource>
   </ItemGroup>
 
   <ItemGroup>
