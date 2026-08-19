@@ -1,3 +1,4 @@
+using System.Text;
 using Mapping_Tools.Application.Abstractions;
 
 namespace Mapping_Tools.Infrastructure.Files;
@@ -7,13 +8,30 @@ namespace Mapping_Tools.Infrastructure.Files;
 /// <see cref="Directory"/>, and <see cref="Path"/>.
 /// </summary>
 public sealed class FileSystemFileStore : ITextFileStore {
+    private static readonly Encoding Utf8WithoutBom = new UTF8Encoding(false);
+
     /// <summary>
     /// <inheritdoc/>
     public IReadOnlyList<string> ReadAllLines(string path) => File.ReadAllLines(path);
 
     /// <summary>
     /// <inheritdoc/>
-    public void WriteAllLines(string path, IEnumerable<string> lines) => File.WriteAllLines(path, lines);
+    public void WriteAllLines(string path, IEnumerable<string> lines) {
+        ArgumentNullException.ThrowIfNull(path);
+        ArgumentNullException.ThrowIfNull(lines);
+
+        if (!path.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)) {
+            File.WriteAllLines(path, lines);
+            return;
+        }
+
+        using StreamWriter writer = new(path, append: false, Utf8WithoutBom) {
+            NewLine = "\r\n"
+        };
+        foreach (string line in lines) {
+            writer.WriteLine(line);
+        }
+    }
 
     /// <summary>
     /// <inheritdoc/>

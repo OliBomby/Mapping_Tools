@@ -1,2 +1,3 @@
 # Auto-detect text files and use LF in both the repository and working tree.
 * text=auto eol=lf
+*.osu text eol=crlf

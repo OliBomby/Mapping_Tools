@@ -271,7 +271,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         string destination = _files.GetPatternPath(paths, pattern.FileName);
         _files.WritePatternBytes(
             destination,
-            System.Text.Encoding.UTF8.GetBytes(string.Join(Environment.NewLine, patternBeatmap.GetLines())));
+            System.Text.Encoding.UTF8.GetBytes(string.Join("\r\n", patternBeatmap.GetLines())));
     }
 
     private static List<T> ParseLines<T>(string? text, Func<string, T> parse)

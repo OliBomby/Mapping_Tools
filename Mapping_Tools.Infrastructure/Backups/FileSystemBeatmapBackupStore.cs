@@ -88,6 +88,8 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
                              stream,
                              new UTF8Encoding(encoderShouldEmitUTF8Identifier: false)))
             {
+                writer.NewLine = "\r\n";
+
                 foreach (string line in lines)
                 {
                     cancellationToken.ThrowIfCancellationRequested();

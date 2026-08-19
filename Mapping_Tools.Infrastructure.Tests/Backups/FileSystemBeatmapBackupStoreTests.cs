@@ -1,3 +1,4 @@
+using System.Text;
 using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Infrastructure.Backups;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -30,6 +31,8 @@ public sealed class FileSystemBeatmapBackupStoreTests
 
             await store.WriteLinesAsync(destination, ["snapshot", "complete"]);
             (await File.ReadAllLinesAsync(destination)).Should().Equal(new[] { "snapshot", "complete" });
+            File.ReadAllBytes(destination).Should().Equal(
+                Encoding.UTF8.GetBytes("snapshot\r\ncomplete\r\n"));
             Directory.EnumerateFiles(directory)
                 .Any(path => Path.GetFileName(path)
                     .Contains(".mapping-tools-", StringComparison.Ordinal)).Should().BeFalse();
