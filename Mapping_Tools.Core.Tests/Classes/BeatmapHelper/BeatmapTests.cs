@@ -18,10 +18,26 @@ public class BeatmapTests {
         // Act
         var beatmap = new Beatmap(File.ReadAllLines(path).ToList());
         // Repository fixtures use LF line endings regardless of the host platform.
-        string actual = string.Join("\n", beatmap.GetLines());
+        string actual = string.Join("\r\n", beatmap.GetLines());
 
         // Assert
         actual.Should().Be(expected);
+    }
+
+    [DataTestMethod]
+    [DataRow("catch.osu", 2)]
+    [DataRow("mania.osu", 3)]
+    [DataRow("taiko.osu", 1)]
+    public void BeatmapDocument_ParsesAdditionalModeFixture(string filename, int expectedMode) {
+        // Arrange
+        string path = Path.Combine(AppContext.BaseDirectory, "Resources", filename);
+
+        // Act
+        var beatmap = new Beatmap(File.ReadAllLines(path).ToList());
+
+        // Assert
+        beatmap.General["Mode"].IntValue.Should().Be(expectedMode);
+        beatmap.HitObjects.Should().NotBeEmpty();
     }
 
     [TestMethod]

@@ -1,0 +1,16 @@
+{
+    "id":  "TR-combo-colour-studio",
+    "feature":  "Combo Colour Studio",
+    "status":  "accepted",
+    "seedInput":  "../Beatmaps/ComplicatedTestMap.osu",
+    "options":  "combo-colour-studio.options.json",
+    "expectedOutput":  "expected/combo-colour-studio.osu",
+    "expectedOutputSha256":  "63BB178B68EF8EB3029C8341FBB746F312E26D510EB1F33497DBA1D53EC18B78",
+    "legacyVersion":  "1.12.30",
+    "reviewer":  "Olivier",
+    "reviewedOn":  "2026-07-18",
+    "capturedOn":  "2026-07-18",
+    "observedMessage":  "Successfully exported colours to 1 beatmap!",
+    "backupSha256":  "9DDBE49058712E1211DCEAA52BCBE3D8FF903562EEF5DD0587945407439AC341",
+    "notes":  "The backup exactly matched the target seed. Accepted after the palette replacement and colour-point combo skips matched the configured sequences."
+}

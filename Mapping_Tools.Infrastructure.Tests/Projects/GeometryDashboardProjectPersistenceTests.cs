@@ -100,4 +100,24 @@ public sealed class GeometryDashboardProjectPersistenceTests
         project.CurrentPreferences.GeneratorSettings.Should().ContainKey(typeof(SymmetryGenerator));
         project.SaveSlots.Should().Contain(slot => slot.Name == "Save 1");
     }
+
+    [TestMethod]
+    public void Deserialize_WithWaveZeroSnappingToolsFixture_PreservesPreferences()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Projects",
+            "snappingtoolsproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        SnappingToolsProject project = serializer.Deserialize<SnappingToolsProject>(File.ReadAllText(fixture));
+
+        // Assert
+        project.CurrentPreferences.InceptionLevel.Should().Be(5);
+        project.CurrentPreferences.RelevantObjectPreferences.Should().HaveCount(3);
+        project.CurrentPreferences.RelevantObjectPreferences.Should().ContainKey("Virtual point preferences");
+    }
 }

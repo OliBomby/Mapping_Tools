@@ -15,7 +15,7 @@ The legacy WPF implementation was read as the normative behavioral specification
 - `Mapping_Tools/Classes/Tools/SnappingTools/CoordinateConverter.cs`
 - every source under `Mapping_Tools/Classes/Tools/SnappingTools/DataStructure/`
 - every source under `Mapping_Tools/Classes/Tools/SnappingTools/DataStructure/RelevantObjectGenerators/`
-- `Mapping_Tools_Tests/SerializationTests.cs` and the Geometry Dashboard fixtures under `tests/fixtures/wave0/`
+- `Mapping_Tools.Infrastructure.Tests/Projects/GeometryDashboardProjectPersistenceTests.cs` and the Geometry Dashboard fixtures under `Mapping_Tools.Infrastructure.Tests/Fixtures/GeometryDashboard/`
 
 Step 43 moves the neutral geometry graph, all reflection-discovered generators and settings, layer/allocation rules, project preferences/save-slot models, and coordinate formulas. It does not move process discovery, editor memory reads, global hotkeys, cursor/window tracking, overlay drawing, WPF commands, or any view.
 

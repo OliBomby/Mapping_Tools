@@ -1,0 +1,16 @@
+{
+  "BaseBeatmap": "../Beatmaps/ComplicatedTestMap.osu",
+  "Sample": "../Audio/drum-hitnormal60.wav",
+  "Times": [15, 334, 526, 942, 2109],
+  "HitsoundDiffName": "Wave 0 Hitsounds",
+  "HitsoundExportMode": "Standard",
+  "HitsoundExportGameMode": "Standard",
+  "ZipLayersLeniency": 15,
+  "FirstCustomIndex": 1,
+  "SingleSampleExportFormat": "PCM 16-bit (.wav)",
+  "MixedSampleExportFormat": "PCM 16-bit (.wav)",
+  "ExportMap": true,
+  "ExportSamples": true,
+  "ShowResults": true,
+  "DeleteAllInExportFirst": true
+}

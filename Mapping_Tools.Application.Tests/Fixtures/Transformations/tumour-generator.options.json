@@ -1,0 +1,14 @@
+{
+  "Target": "../Beatmaps/ComplicatedTestMap.osu",
+  "BaseProject": "../Projects/tumourgeneratorproject.json",
+  "ImportModeOverride": "Everything",
+  "LayerCount": 1,
+  "Template": "Triangle",
+  "WrappingMode": "Simple",
+  "UseAbsoluteRange": true,
+  "FixSv": true,
+  "DelegateToBpm": false,
+  "RemoveSliderTicks": false,
+  "UseEditorReader": false,
+  "MakeBackups": true
+}

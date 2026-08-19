@@ -1,0 +1,10 @@
+{
+  "Target": "../Beatmaps/ComplicatedTestMap.osu",
+  "ImportMode": "Everything",
+  "ConnectionMode": "Linear",
+  "Leniency": 999999,
+  "LinearOnLinear": false,
+  "MergeOnSliderEnd": true,
+  "UseEditorReader": false,
+  "MakeBackups": true
+}

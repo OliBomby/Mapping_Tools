@@ -14,7 +14,10 @@ public sealed class PatternGalleryArchiveServiceTests
         Directory.CreateDirectory(root);
         string archivePath = Path.Combine(root, "collection.zip");
         PatternGalleryArchiveService service = new();
-        byte[] patternBytes = [1, 2, 3, 4];
+        string fixtureRoot = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Patterns", "legacy-collection");
+        string patternFileName = "2025-06-07 21-32-54_NEsChy2u__Pattern 1.osu";
+        string projectJson = File.ReadAllText(Path.Combine(fixtureRoot, "project.json"));
+        byte[] patternBytes = File.ReadAllBytes(Path.Combine(fixtureRoot, "Pattern Files", patternFileName));
 
         try
         {
@@ -23,16 +26,16 @@ public sealed class PatternGalleryArchiveServiceTests
                 archivePath,
                 "Collection_01",
                 "project.json",
-                "{\"CollectionName\":\"Test\"}",
-                [new("pattern.osu", patternBytes)]);
+                projectJson,
+                [new(patternFileName, patternBytes)]);
             var archive = await service.ReadAsync(archivePath);
 
             // Assert
             archive.CollectionFolderName.Should().Be("Collection_01");
             archive.ProjectFileName.Should().Be("project.json");
-            archive.ProjectJson.Should().Contain("Test");
+            archive.ProjectJson.Should().Contain("My Pattern Collection");
             archive.PatternFiles.Should().ContainSingle();
-            archive.PatternFiles[0].FileName.Should().Be("pattern.osu");
+            archive.PatternFiles[0].FileName.Should().Be(patternFileName);
             archive.PatternFiles[0].Content.Should().Equal(patternBytes);
         }
         finally

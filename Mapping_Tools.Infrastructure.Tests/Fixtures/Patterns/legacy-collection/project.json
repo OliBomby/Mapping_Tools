@@ -1,0 +1,52 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.PatternGalleryVm, Mapping Tools",
+  "CollectionName": "My Pattern Collection",
+  "Patterns": [
+    {
+      "$type": "Mapping_Tools.Classes.Tools.PatternGallery.OsuPattern, Mapping Tools",
+      "Name": "Pattern 1",
+      "CreationTime": "2025-06-07T21:32:54.3768259+02:00",
+      "LastUsedTime": "2025-06-07T21:32:54.3768259+02:00",
+      "UseCount": 0,
+      "FileName": "2025-06-07 21-32-54_NEsChy2u__Pattern 1.osu",
+      "ObjectCount": 1,
+      "Duration": "00:00:01.0220000",
+      "BeatLength": 3.0
+    }
+  ],
+  "FileHandler": {
+    "$type": "Mapping_Tools.Classes.Tools.PatternGallery.OsuPatternFileHandler, Mapping Tools",
+    "PatternFilesFolderName": "Pattern Files",
+    "CollectionFolderName": "850qxDWVPzx9BuvDIA7i"
+  },
+  "ExportTimeMode": 2,
+  "CustomExportTime": 0.0,
+  "Padding": 5.0,
+  "PartingDistance": 4.0,
+  "PatternOverwriteMode": 1,
+  "TimingOverwriteMode": 0,
+  "IncludeHitsounds": false,
+  "IncludeKiai": false,
+  "ScaleToNewCircleSize": false,
+  "ScaleToNewTiming": true,
+  "SnapToNewTiming": true,
+  "BeatDivisors": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 16
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 12
+    }
+  ],
+  "FixGlobalSv": true,
+  "FixBpmSv": false,
+  "FixColourHax": true,
+  "FixStackLeniency": false,
+  "FixTickRate": false,
+  "CustomScale": 1.0,
+  "CustomRotate": 0.0
+}

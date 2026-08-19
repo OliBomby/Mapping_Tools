@@ -1,0 +1,14 @@
+{
+  "Target": "../Beatmaps/standard-autofail-2b.osu",
+  "NegativeControl": "../Beatmaps/ComplicatedTestMap.osu",
+  "ShowUnloadingObjects": true,
+  "ShowPotentialUnloadingObjects": false,
+  "ShowPotentialDisruptors": false,
+  "GetAutoFailFix": false,
+  "AutoPlaceFix": false,
+  "ApproachRateOverride": -1,
+  "OverallDifficultyOverride": -1,
+  "PhysicsUpdateLeniency": 9,
+  "ExpectedMutation": false,
+  "ExpectedBackup": false
+}

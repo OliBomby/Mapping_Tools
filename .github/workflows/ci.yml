@@ -25,7 +25,7 @@ jobs:
       - name: Architecture guardrails
         run: dotnet test Mapping_Tools.Architecture.Tests/Mapping_Tools.Architecture.Tests.csproj --configuration Release --no-build
 
-      - name: Core and fixture tests
+      - name: Core tests
         run: dotnet test Mapping_Tools.Core.Tests/Mapping_Tools.Core.Tests.csproj --configuration Release --no-build
 
       - name: Application tests

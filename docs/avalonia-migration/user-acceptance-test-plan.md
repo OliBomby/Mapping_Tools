@@ -95,7 +95,7 @@ Record the exact values for every test session rather than relying on a shared i
 
 ## 7. Test data and fixture catalog
 
-Wave 0 must establish a versioned fixture manifest. Each fixture receives a stable ID and an expected-purpose description.
+Wave 0 must establish versioned fixture catalogs owned by the test projects that consume them. Each fixture receives a stable purpose and is covered by a focused test or a fixture-driven characterization test.
 
 Minimum fixture groups:
 
@@ -316,7 +316,7 @@ Each executed case records:
 - candidate commit and build/package identifier;
 - tester and date;
 - operating system, architecture, display scaling, theme, and relevant osu!/audio state;
-- fixture IDs and untouched-original hashes;
+- fixture paths and untouched-original copies or hashes where byte-level preservation matters;
 - preconditions and exact options;
 - expected result, actual result, and pass/fail/blocked status;
 - WPF/Avalonia screenshots or recordings when visual or interactive;

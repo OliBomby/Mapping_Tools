@@ -1,0 +1,17 @@
+{
+  "Source": "../Beatmaps/standard-feature-rich.osu",
+  "Target": "../Beatmaps/ComplicatedTestMap.osu",
+  "CopyMode": 0,
+  "TemporalLeniency": 5.5,
+  "CopyHitsounds": true,
+  "CopyBodyHitsounds": true,
+  "CopySampleSets": true,
+  "CopyVolumes": true,
+  "AlwaysPreserve5Volume": true,
+  "CopyStoryboardedSamples": false,
+  "CopyToSliderTicks": false,
+  "CopyToSliderSlides": false,
+  "MuteSliderends": false,
+  "UseEditorReader": false,
+  "MakeBackups": true
+}

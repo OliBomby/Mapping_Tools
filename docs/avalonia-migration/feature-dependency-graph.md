@@ -200,7 +200,7 @@ The numbered order is deliberate. A later item may start earlier for research, b
 
 Exit: both frontends build, fixtures are versioned, and refactors can be checked for output drift.
 
-Implementation artifacts: the versioned catalog is `tests/fixtures/wave0/manifest.json`, test ownership is recorded in [wave-0-test-ownership.md](wave-0-test-ownership.md), and the human legacy-output gate is tracked in [wave-0-baselines.md](wave-0-baselines.md). The gate remains open while any transformation record is `pending-capture` or `captured` rather than `accepted`.
+Implementation artifacts: fixture inputs and transformation records live with their owning test projects, test ownership is recorded in [wave-0-test-ownership.md](wave-0-test-ownership.md), and the human legacy-output gate is tracked in [wave-0-baselines.md](wave-0-baselines.md). The gate remains open while any transformation record is `pending-capture` or `captured` rather than `accepted`.
 
 ### Wave 1 — Domain foundation
 

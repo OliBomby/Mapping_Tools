@@ -57,4 +57,47 @@ public sealed class PatternGalleryProjectSerializerTests
         json.Should().Contain("Mapping_Tools.Viewmodels.PatternGalleryVm, Mapping Tools");
         json.Should().Contain("Mapping_Tools.Classes.Tools.PatternGallery.OsuPattern, Mapping Tools");
     }
+
+    [TestMethod]
+    public void Deserialize_WithWaveZeroPatternGalleryFixture_RestoresCollectionAndPatternFile()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Patterns",
+            "legacy-collection",
+            "project.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        PatternGalleryProject project = serializer.Deserialize<PatternGalleryProject>(File.ReadAllText(fixture));
+
+        // Assert
+        project.CollectionName.Should().Be("My Pattern Collection");
+        project.Patterns.Should().ContainSingle();
+        project.Patterns[0].Name.Should().Be("Pattern 1");
+        project.Patterns[0].FileName.Should().Be("2025-06-07 21-32-54_NEsChy2u__Pattern 1.osu");
+    }
+
+    [TestMethod]
+    public void Deserialize_WithWaveZeroPatternGalleryProjectFixture_RestoresProjectHistory()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Projects",
+            "patterngalleryproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        PatternGalleryProject project = serializer.Deserialize<PatternGalleryProject>(File.ReadAllText(fixture));
+
+        // Assert
+        project.CollectionName.Should().Be("My Pattern Collection");
+        project.Patterns.Should().NotBeEmpty();
+        project.Patterns.Should().Contain(pattern => pattern.Name == "Pattern OVAESDLFKJA");
+        project.FileHandler.CollectionFolderName.Should().Be("NlLGMd6W0GRmEaMyE1pq");
+    }
 }

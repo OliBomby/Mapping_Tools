@@ -1,8 +1,8 @@
 # Wave 0 behavioral baseline register
 
-This register is the review surface for legacy destructive behavior. The machine-readable records live under `tests/fixtures/wave0/transformations`; each record names the seed input, project/options fixture, expected output location, and capture status.
+This register is the review surface for legacy destructive behavior. The machine-readable records live under `Mapping_Tools.Application.Tests/Fixtures/Transformations`; each record names the seed input, project/options fixture, expected output location, and capture status.
 
-Wave 0 automation guarantees that every destructive feature has a stable record and that all versioned fixture hashes remain unchanged. It does not substitute for mapper approval. A record becomes trusted only after a user compares the recorded legacy output with the stated options and changes its status from `captured` to `accepted` with reviewer/date evidence.
+The application fixture tests load every accepted record, its referenced inputs, its options, its expected output, and its capture report. This does not substitute for mapper approval. A record becomes trusted only after a user compares the recorded legacy output with the stated options and changes its status from `captured` to `accepted` with reviewer/date evidence.
 
 The initial records intentionally use the existing compact beatmap fixtures. Feature-specific before/after outputs should replace the seed expected files when each legacy workflow is captured. Never run the capture against a live Songs directory: copy the seed into a disposable run directory first.
 
@@ -16,4 +16,4 @@ The initial records intentionally use the existing compact beatmap fixtures. Fea
 
 ## Gate status
 
-Closed on 2026-07-19. Olivier reviewed and accepted all 18 destructive-feature baselines. Every record has a versioned expected result and capture evidence; CI continues to check coverage and fixture drift.
+Closed on 2026-07-19. Olivier reviewed and accepted all 18 destructive-feature baselines. Every record has a versioned expected result and capture evidence; CI continues to check that each record and its referenced fixtures remain usable.

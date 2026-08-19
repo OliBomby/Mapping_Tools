@@ -1,0 +1,27 @@
+{
+  "id": "GD-save-virtual-objects",
+  "feature": "Geometry Dashboard - Save Virtual Objects",
+  "status": "accepted",
+  "sourceInput": "../Beatmaps/standard-feature-rich.osu",
+  "sourceInputSha256": "E19766C9D9DE19CE9C9BC89F850BE2B1E86D3FBD57832F025031EAC6B53C9EE8",
+  "project": "../Projects/geometrydashboardproject.json",
+  "editorTime": 11278,
+  "editorSelection": "none",
+  "visibleSourceObjects": {
+    "count": 4,
+    "times": [10962, 11120, 11278, 11752],
+    "sliders": 2,
+    "circles": 2
+  },
+  "refreshHotkey": "B",
+  "lockAction": "Hold Shift and click the dashboard Lock button once",
+  "expectedOutput": "expected/locked-virtual-objects.json",
+  "expectedOutputSha256": "F58B3ACCFCE312E0D45E441CFCA5BB59D554040FB177F3AA4AA739B6665084E1",
+  "projectSha256": "45792F8F7D71ACACEE4F6B332F5B38B32857B0B0EC09D317E877BF369CBB4D89",
+  "legacyVersion": "1.12.30",
+  "reviewer": "Olivier",
+  "reviewedOn": "2026-07-19",
+  "capturedOn": "2026-07-19",
+  "observedMessage": "Successfully saved locked virtual objects!",
+  "notes": "The exact source was opened in the osu! editor with no selection at 11278 ms. After one manual refresh, all generated drawables were locked once and exported through Project > Save virtual objects."
+}

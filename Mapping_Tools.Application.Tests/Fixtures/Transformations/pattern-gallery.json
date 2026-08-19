@@ -1,0 +1,16 @@
+{
+    "id":  "TR-pattern-gallery",
+    "feature":  "Pattern Gallery",
+    "status":  "accepted",
+    "seedInput":  "../Beatmaps/ComplicatedTestMap.osu",
+    "options":  "pattern-gallery.options.json",
+    "expectedOutput":  "expected/pattern-gallery.osu",
+    "expectedOutputSha256":  "1CE4FE8A14AC41FB718B50C167DA139FBA5C458A5410C4629E0EE36644BEDDD6",
+    "legacyVersion":  "1.12.30",
+    "reviewer":  "Olivier",
+    "reviewedOn":  "2026-07-19",
+    "capturedOn":  "2026-07-19",
+    "observedMessage":  "Successfully exported pattern!",
+    "backupSha256":  "9DDBE49058712E1211DCEAA52BCBE3D8FF903562EEF5DD0587945407439AC341",
+    "notes":  "The backup exactly matched the target seed. The selected legacy gallery pattern was exported at the custom 2500 ms time and resnapped to 2488 ms by the configured timing rules."
+}

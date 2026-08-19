@@ -1,0 +1,16 @@
+{
+  "Target": "../Beatmaps/ComplicatedTestMap.osu",
+  "MaxBurstLength": 2,
+  "ComboColours": [
+    { "Name": "Combo1", "Color": "#FFFF3355" },
+    { "Name": "Combo2", "Color": "#FF33CC88" },
+    { "Name": "Combo3", "Color": "#FF3388FF" }
+  ],
+  "ColourPoints": [
+    { "Time": 0, "Mode": "Normal", "Sequence": ["Combo1", "Combo2", "Combo3"] },
+    { "Time": 526, "Mode": "Normal", "Sequence": ["Combo3", "Combo1"] },
+    { "Time": 1525, "Mode": "Burst", "Sequence": ["Combo2"] }
+  ],
+  "UseEditorReader": false,
+  "MakeBackups": true
+}

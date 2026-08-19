@@ -1,0 +1,16 @@
+{
+    "id":  "TR-timing-helper",
+    "feature":  "Timing Helper",
+    "status":  "accepted",
+    "seedInput":  "../Beatmaps/standard-feature-rich.osu",
+    "options":  "timing-helper.options.json",
+    "expectedOutput":  "expected/timing-helper.osu",
+    "expectedOutputSha256":  "FF0BBA48D8E8C55DC23D7A3B0AD7A8A0303BF595387C6B5ADCB5E8B18CC1D31A",
+    "legacyVersion":  "1.12.30",
+    "reviewer":  "Olivier",
+    "reviewedOn":  "2026-07-18",
+    "capturedOn":  "2026-07-18",
+    "observedMessage":  "Successfully added 415 redlines",
+    "backupSha256":  "E19766C9D9DE19CE9C9BC89F850BE2B1E86D3FBD57832F025031EAC6B53C9EE8",
+    "notes":  "The central backup exactly matched the seed input. Accepted after reviewing the semantic summary."
+}

@@ -1,0 +1,17 @@
+{
+    "id":  "TR-metadata-manager",
+    "feature":  "Metadata Manager",
+    "status":  "accepted",
+    "seedInput":  "../Beatmaps/ComplicatedTestMap.osu",
+    "secondaryInput":  "../Beatmaps/standard-feature-rich.osu",
+    "options":  "metadata-manager.options.json",
+    "expectedOutput":  "expected/metadata-manager.osu",
+    "expectedOutputSha256":  "0F9EF22EEC9843B684C7D2EB76433E3356025F5186CBBA0313BD2724373B26E2",
+    "legacyVersion":  "1.12.30",
+    "reviewer":  "Olivier",
+    "reviewedOn":  "2026-07-18",
+    "capturedOn":  "2026-07-18",
+    "observedMessage":  "Successfully exported metadata to 1 beatmap!",
+    "backupSha256":  "9DDBE49058712E1211DCEAA52BCBE3D8FF903562EEF5DD0587945407439AC341",
+    "notes":  "The backup exactly matched the target seed. Accepted after every configured metadata value and the renamed output matched the expected behavior."
+}

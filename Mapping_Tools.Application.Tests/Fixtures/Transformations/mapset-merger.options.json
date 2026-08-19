@@ -1,0 +1,21 @@
+{
+  "Mapsets": [
+    {
+      "Name": "Wave0-A",
+      "Beatmaps": ["../Mapsets/multi-difficulty/normal.osu"]
+    },
+    {
+      "Name": "Wave0-B",
+      "Beatmaps": ["../Mapsets/multi-difficulty/expert.osu"]
+    }
+  ],
+  "MoveSbToBeatmap": false,
+  "Assets": [
+    "audio.mp3",
+    "Kawaii.jpg",
+    "soft-hitclap.wav",
+    "soft-hitwhistle.wav",
+    "soft-sliderslide.wav",
+    "soft-slidertick.wav"
+  ]
+}

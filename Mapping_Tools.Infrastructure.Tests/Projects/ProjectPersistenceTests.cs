@@ -204,6 +204,26 @@ public sealed class ProjectPersistenceTests
     }
 
     [TestMethod]
+    public void Deserialize_WithWaveZeroHitsoundPreviewFixture_RestoresAllZones()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Projects",
+            "hspreviewproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        HitsoundPreviewHelperProject project = serializer.Deserialize<HitsoundPreviewHelperProject>(File.ReadAllText(fixture));
+
+        // Assert
+        project.Items.Should().HaveCount(18);
+        project.Items.Select(item => item.Name).Should().Contain("SHEEEESSHHH");
+        project.Items.Select(item => item.Filename).Should().Contain("electronic02");
+    }
+
+    [TestMethod]
     public void DeserializeAndSerialize_LegacyHitsoundCopierProject_PreservesOptionsAndTypeAlias()
     {
         // Arrange
@@ -223,6 +243,28 @@ public sealed class ProjectPersistenceTests
         project.CopyStoryboardedSamples.Should().BeTrue();
         roundTrip.Should().Contain(
             "\"$type\": \"Mapping_Tools.Viewmodels.HitsoundCopierVm, Mapping Tools\"");
+    }
+
+    [TestMethod]
+    public void Deserialize_WithWaveZeroHitsoundCopierFixture_RestoresLegacyOptions()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Projects",
+            "hitsoundcopierproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        HitsoundCopierProject project = serializer.Deserialize<HitsoundCopierProject>(File.ReadAllText(fixture));
+
+        // Assert
+        project.PathFrom.Should().Contain("Hitsounds");
+        project.PathTo.Should().Contain("Rabbit Hole Collab");
+        project.TemporalLeniency.Should().Be(5.5);
+        project.CopyStoryboardedSamples.Should().BeTrue();
+        project.BeatDivisors.Should().HaveCount(8);
     }
 
     [TestMethod]
@@ -451,6 +493,24 @@ public sealed class ProjectPersistenceTests
         Action act2 = () => serializer.Deserialize<SimpleDocument>("null");
 
         act2.Should().Throw<InvalidDataException>();
+    }
+
+    [TestMethod]
+    public void Deserialize_WithCorruptProjectFixture_ThrowsJsonSerializationException()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Projects",
+            "corrupt.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        Action act = () => serializer.Deserialize<MapCleanerProject>(File.ReadAllText(fixture));
+
+        // Assert
+        act.Should().Throw<JsonSerializationException>();
     }
 
     [TestMethod]

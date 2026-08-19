@@ -102,6 +102,29 @@ public sealed class LegacyProjectJsonSerializerTests
     }
 
     [TestMethod]
+    public void Deserialize_WithWaveZeroMapsetMergerFixture_RestoresBothMapsets()
+    {
+        // Arrange
+        string fixture = Path.Combine(
+            AppContext.BaseDirectory,
+            "Fixtures",
+            "Projects",
+            "mapsetmergerproject.json");
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        MapsetMergerProject project = serializer.Deserialize<MapsetMergerProject>(File.ReadAllText(fixture));
+
+        // Assert
+        project.ExportPath.Should().Contain("Mapping Tools");
+        project.MoveSbToBeatmap.Should().BeFalse();
+        project.Mapsets.Should().HaveCount(2);
+        project.Mapsets.Select(mapset => mapset.Name).Should().Equal(
+            "1838134 seatrus - ILLEGAL LEGACY",
+            "2146761 seatrus - ILLEGAL LEGACY");
+    }
+
+    [TestMethod]
     public void Serialize_WithMapsetMergerProject_UsesLegacyTypeNames()
     {
         // Arrange

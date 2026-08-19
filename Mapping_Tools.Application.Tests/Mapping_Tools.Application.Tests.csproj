@@ -21,8 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\tests\fixtures\wave0\beatmaps\*.osu">
-      <Link>Fixtures\Beatmaps\%(Filename)%(Extension)</Link>
+    <Content Include="Fixtures\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
