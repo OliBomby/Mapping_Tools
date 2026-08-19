@@ -271,6 +271,12 @@ public sealed class ObjectVisualiserControl : Control
     public void FitToScene()
     {
         fitToScene = true;
+        FitToSceneCore();
+        InvalidateVisual();
+    }
+
+    private void FitToSceneCore()
+    {
         if (Scene is null || Bounds.Width <= 0 || Bounds.Height <= 0)
         {
             transform = ObjectVisualiserTransform.Identity;
@@ -281,8 +287,6 @@ public sealed class ObjectVisualiserControl : Control
                 Scene.ContentBounds.Inflate(Thickness / 2, Thickness / 2),
                 new Vector2(Bounds.Width, Bounds.Height));
         }
-
-        InvalidateVisual();
     }
 
     /// <summary>Pans the scene by a viewport-pixel delta.</summary>
@@ -487,7 +491,7 @@ public sealed class ObjectVisualiserControl : Control
     {
         if (fitToScene && Scene is not null && Bounds.Width > 0 && Bounds.Height > 0)
         {
-            FitToScene();
+            FitToSceneCore();
         }
     }
 
