@@ -72,6 +72,10 @@ completing a migration.
 
 The legacy WPF implementation is the normative specification for every migrated view. Read the WPF XAML, code-behind, view model, converters, and custom controls before editing the Avalonia version.
 
+## Original project reference
+
+The original project is available locally at [.reference/Mapping_Tools-Original](.reference/Mapping_Tools-Original/). Consult it for legacy implementation details.
+
 - Keep the AXAML structurally identical to the WPF XAML. Only replace WPF-only controls or properties, move non-visual behavior out of code-behind, modernize view models, and substitute the approved shared tool controls.
 - Do not paraphrase copy, remove tooltips, change spacing, invent validation limits, add commands, or redesign interactions during a migration. Treat product improvements as separate work requiring explicit approval.
 - Inventory every legacy binding, converter, event handler, command, validation rule, tooltip, context-menu item, dialog, and completion/error branch. Preserve all behavior that belongs to the current migration wave.

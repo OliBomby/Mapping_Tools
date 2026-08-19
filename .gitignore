@@ -333,3 +333,6 @@ ASALocalRun/
 # Packages
 packages
 packages/
+
+# Local reference checkout
+.reference/
