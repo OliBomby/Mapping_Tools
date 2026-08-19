@@ -24,6 +24,7 @@ public sealed partial class SlideratorView : UserControl
     private GraphState? acceptedGraphState;
     private bool restoringGraphState;
     private bool fastNavigationRequested;
+    private bool updatingGraphBounds;
 
     /// <summary>Creates the Sliderator view and connects shared Core-backed controls.</summary>
     public SlideratorView()
@@ -189,10 +190,23 @@ public sealed partial class SlideratorView : UserControl
 
     private void UpdateGraphBounds(SlideratorViewModel viewModel)
     {
-        GraphControlElement.MinX = 0;
-        GraphControlElement.MaxX = viewModel.GraphBeats;
-        GraphControlElement.MinY = viewModel.GraphMinY;
-        GraphControlElement.MaxY = viewModel.GraphMaxY;
+        if (updatingGraphBounds)
+        {
+            return;
+        }
+
+        updatingGraphBounds = true;
+        try
+        {
+            GraphControlElement.MinX = 0;
+            GraphControlElement.MaxX = viewModel.GraphBeats;
+            GraphControlElement.MinY = viewModel.GraphMinY;
+            GraphControlElement.MaxY = viewModel.GraphMaxY;
+        }
+        finally
+        {
+            updatingGraphBounds = false;
+        }
     }
 
     private void UpdateGraphMarkers(SlideratorViewModel viewModel)
