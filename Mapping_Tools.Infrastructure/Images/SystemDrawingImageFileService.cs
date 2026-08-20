@@ -1,4 +1,6 @@
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using Mapping_Tools.Application.SliderPicturator;
 using Mapping_Tools.Core.Classes.Images;
 
@@ -22,18 +24,33 @@ public sealed class SystemDrawingImageFileService : IImageFileService
         {
             using Bitmap bitmap = new(path);
             byte[] pixels = new byte[checked(bitmap.Width * bitmap.Height * 4)];
-            for (int y = 0; y < bitmap.Height; y++)
+            Rectangle bounds = new(0, 0, bitmap.Width, bitmap.Height);
+            BitmapData data = bitmap.LockBits(bounds, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            try
             {
-                for (int x = 0; x < bitmap.Width; x++)
+                int rowLength = bitmap.Width * 4;
+                byte[] row = new byte[rowLength];
+                for (int y = 0; y < bitmap.Height; y++)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    Color colour = bitmap.GetPixel(x, y);
-                    int offset = (y * bitmap.Width + x) * 4;
-                    pixels[offset] = colour.R;
-                    pixels[offset + 1] = colour.G;
-                    pixels[offset + 2] = colour.B;
-                    pixels[offset + 3] = colour.A;
+                    IntPtr rowAddress = data.Stride >= 0
+                        ? IntPtr.Add(data.Scan0, y * data.Stride)
+                        : IntPtr.Add(data.Scan0, (bitmap.Height - 1 - y) * -data.Stride);
+                    Marshal.Copy(rowAddress, row, 0, rowLength);
+                    for (int x = 0; x < bitmap.Width; x++)
+                    {
+                        int sourceOffset = x * 4;
+                        int destinationOffset = (y * bitmap.Width + x) * 4;
+                        pixels[destinationOffset] = row[sourceOffset + 2];
+                        pixels[destinationOffset + 1] = row[sourceOffset + 1];
+                        pixels[destinationOffset + 2] = row[sourceOffset];
+                        pixels[destinationOffset + 3] = row[sourceOffset + 3];
+                    }
                 }
+            }
+            finally
+            {
+                bitmap.UnlockBits(data);
             }
             return Task.FromResult(new RgbaImage(bitmap.Width, bitmap.Height, pixels));
         }

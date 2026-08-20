@@ -66,7 +66,7 @@ public sealed class ProjectPersistenceTests
         project.VisibleHitObjectIndex.Should().Be(0);
         project.GlobalSv.Should().BeApproximately(2.1, 0.0001);
         project.BeatSnapDivisor.Should().Be(8);
-        project.GraphState.Anchors.Should().HaveCount(5);
+        project.GraphState.Anchors.Should().HaveCount(3);
         project.GraphState.MaxX.Should().Be(16);
         json.Should().Contain(
             "\"$type\": \"Mapping_Tools.Viewmodels.SlideratorVm, Mapping Tools\"");

@@ -101,7 +101,7 @@ public static partial class MapsetMergerEngine
         if (!string.IsNullOrEmpty(audioFilename))
         {
             references.OtherAudioFiles.Add(audioFilename);
-            beatmap.General["AudioFilename"].Value = CombineReference(mapsetName, audioFilename);
+            beatmap.General["AudioFilename"].Value = " " + CombineReference(mapsetName, audioFilename);
         }
 
         double sliderTickRate = beatmap.Difficulty["SliderTickRate"].DoubleValue;

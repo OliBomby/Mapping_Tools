@@ -148,7 +148,7 @@ public static class HitsoundCopierEngine
                 .ToList();
             if (double.IsFinite(sourceFirstTime) && double.IsFinite(firstTime))
             {
-                TimingPoint first = source.BeatmapTiming.GetTimingPointAtTime(sourceFirstTime).Copy();
+                TimingPoint first = source.BeatmapTiming.GetTimingPointAtTime(firstTime).Copy();
                 first.Offset = firstTime;
                 changes.Add(new TimingPointChange(
                     first,
@@ -156,7 +156,7 @@ public static class HitsoundCopierEngine
                     index: options.CopySampleSets,
                     volume: options.CopyVolumes));
             }
-            TimingPointChange.Apply(target.BeatmapTiming, changes);
+            TimingPointChange.Apply(target.BeatmapTiming, changes, allAfter: true);
             targetTimeline.GiveTimingPoints(target.BeatmapTiming);
             if (preservedMuteTimes is not null)
             {

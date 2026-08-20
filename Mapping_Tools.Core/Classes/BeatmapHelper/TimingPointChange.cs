@@ -37,15 +37,18 @@ internal readonly struct TimingPointChange
     public bool OmitFirstBarLine { get; }
     public double Fuzziness { get; }
 
-    public static void Apply(Timing timing, IEnumerable<TimingPointChange> changes)
+    public static void Apply(
+        Timing timing,
+        IEnumerable<TimingPointChange> changes,
+        bool allAfter = false)
     {
         foreach (TimingPointChange change in changes.OrderBy(change => change.TimingPoint.Offset))
         {
-            change.Add(timing);
+            change.Add(timing, allAfter);
         }
     }
 
-    private void Add(Timing timing)
+    private void Add(Timing timing, bool allAfter)
     {
         TimingPoint? adding = null;
         TimingPoint? previous = null;
@@ -142,6 +145,18 @@ internal readonly struct TimingPointChange
             (previous is null || !adding.SameEffect(previous) || Uninherited))
         {
             timing.Add(adding);
+        }
+
+        if (allAfter)
+        {
+            foreach (TimingPoint point in timing)
+            {
+                if (point.Offset <= TimingPoint.Offset) continue;
+                if (SampleSet) point.SampleSet = TimingPoint.SampleSet;
+                if (Index) point.SampleIndex = TimingPoint.SampleIndex;
+                if (Volume) point.Volume = TimingPoint.Volume;
+                if (Kiai) point.Kiai = TimingPoint.Kiai;
+            }
         }
 
     }

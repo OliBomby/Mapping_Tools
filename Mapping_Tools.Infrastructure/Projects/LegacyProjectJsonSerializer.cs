@@ -99,10 +99,9 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             JsonProperty property = base.CreateProperty(member, memberSerialization);
-            if (member.DeclaringType == typeof(Mapping_Tools.Core.Tools.TumourGenerating.TumourLayer) &&
-                property.PropertyType == typeof(GraphState))
+            if (property.PropertyType == typeof(GraphState))
             {
-                property.Converter = new TumourGraphStateConverter();
+                property.Converter = new GraphStateConverter();
             }
 
             return property;
@@ -110,10 +109,10 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
     }
 
     /// <summary>
-    /// Reads tumour graphs into an empty graph so legacy JSON anchors replace
+    /// Reads persisted graphs into an empty graph so JSON anchors replace
     /// constructor defaults instead of being appended to them.
     /// </summary>
-    private sealed class TumourGraphStateConverter : JsonConverter
+    private sealed class GraphStateConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType) => objectType == typeof(GraphState);
 

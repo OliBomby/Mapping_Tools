@@ -84,7 +84,7 @@ public sealed class SliderMergerEngineTests
     }
 
     [TestMethod]
-    public void Merge_SliderAndCircle_PreservesOuterEdgeSamplesAndNormalizesRepeat()
+    public void Merge_SliderAndCircle_RetainsExistingEdgeSamplesAndNormalizesRepeat()
     {
         // Arrange
         HitObject first = new("64,64,0,2,0,L|164:64,2,100");
@@ -106,14 +106,14 @@ public sealed class SliderMergerEngineTests
 
         // Assert
         HitObject slider = beatmap.HitObjects.Should().ContainSingle().Subject;
-        slider.EdgeHitsounds.Should().Equal(2, 8);
-        slider.EdgeSampleSets.Should().Equal(SampleSet.Drum, SampleSet.Drum);
-        slider.EdgeAdditionSets.Should().Equal(SampleSet.Soft, SampleSet.Soft);
+        slider.EdgeHitsounds.Should().Equal(2, 4, 8);
+        slider.EdgeSampleSets.Should().Equal(SampleSet.Drum, SampleSet.Soft, SampleSet.Normal);
+        slider.EdgeAdditionSets.Should().Equal(SampleSet.Soft, SampleSet.Normal, SampleSet.Drum);
         slider.Repeat.Should().Be(1);
     }
 
     [TestMethod]
-    public void Merge_CircleAndSlider_PreservesOuterEdgeHitsoundsWhenEdgeSamplesAreIncomplete()
+    public void Merge_CircleAndSlider_RetainsExistingEdgeDataWhenSourceIsIncomplete()
     {
         // Arrange
         HitObject first = new("64,64,0,1,2")
@@ -135,14 +135,14 @@ public sealed class SliderMergerEngineTests
 
         // Assert
         HitObject slider = beatmap.HitObjects.Should().ContainSingle().Subject;
-        slider.EdgeHitsounds.Should().Equal(2, 4);
-        slider.EdgeSampleSets.Should().Equal(SampleSet.Soft, SampleSet.None);
-        slider.EdgeAdditionSets.Should().Equal(SampleSet.Drum, SampleSet.None);
+        slider.EdgeHitsounds.Should().Equal(4);
+        slider.EdgeSampleSets.Should().BeEmpty();
+        slider.EdgeAdditionSets.Should().BeEmpty();
         slider.Repeat.Should().Be(1);
     }
 
     [TestMethod]
-    public void Merge_CircleSliderCircle_RemovesOnlyConsumedSourceObjectsAndContinuesChain()
+    public void Merge_CircleSliderCircle_RetainsSurvivingSliderEdgeDataAndContinuesChain()
     {
         // Arrange
         HitObject first = new("64,64,0,1,2");
@@ -160,7 +160,7 @@ public sealed class SliderMergerEngineTests
         merged.Should().Be(3);
         HitObject slider = beatmap.HitObjects.Should().ContainSingle().Subject;
         slider.Pos.Should().Be(new Vector2(64, 64));
-        slider.EdgeHitsounds.Should().Equal(2, 8);
+        slider.EdgeHitsounds.Should().Equal(0, 0);
     }
 
     [TestMethod]

@@ -285,6 +285,7 @@ public sealed class TransformationFixtureTests
             {
                 SlideratorProject project = ReadTransformationProject<SlideratorProject>(fixtureRoot, fixtureName);
                 HitObject sourceSlider = project.LoadedHitObjects.Single();
+                ApplySlideratorTransientState(project, sourceSlider);
                 await new SlideratorService(gateway).RunAsync(
                     target, project, sourceSlider, reloadEditor: false, cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
@@ -345,6 +346,21 @@ public sealed class TransformationFixtureTests
             fixturesRoot.Replace('\\', '/'),
             StringComparison.Ordinal);
         return ReadProjectJson<T>(json);
+    }
+
+    private static void ApplySlideratorTransientState(SlideratorProject project, HitObject sourceSlider)
+    {
+        // These values are JsonIgnore in the legacy project format. The desktop
+        // view model derives them when it installs the loaded source slider.
+        double temporalLength = sourceSlider.TemporalLength;
+        double beatsPerMinute = sourceSlider.UnInheritedTimingPoint?.GetBpm() ?? 180;
+        project.BeatsPerMinute = beatsPerMinute > 0 ? beatsPerMinute : 180;
+        project.GraphBeats = project.BeatsPerMinute * temporalLength / 60000;
+        project.PixelLength = sourceSlider.PixelLength;
+        if (!project.ManualVelocity)
+        {
+            project.NewVelocity = SlideratorEngine.GetMaximumVelocity(project);
+        }
     }
 
     private static void StageMapsetMergerSources(
@@ -411,7 +427,9 @@ public sealed class TransformationFixtureTests
     private static void AssertTextOutputEquivalent(string expectedPath, string actualPath)
     {
         File.Exists(actualPath).Should().BeTrue($"Tool did not write output: {actualPath}");
-        File.ReadAllText(actualPath).Should().Be(File.ReadAllText(expectedPath));
+        string actual = File.ReadAllText(actualPath);
+        string expected = File.ReadAllText(expectedPath);
+        actual.Should().Be(expected);
     }
 
     private static string ResolveFixturePath(string fixtureRoot, string relativePath)

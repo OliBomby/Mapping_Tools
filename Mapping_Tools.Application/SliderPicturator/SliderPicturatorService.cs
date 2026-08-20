@@ -35,8 +35,9 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
         double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
         RgbaColour sliderColour = options.UseMapComboColors ? options.ComboColor : options.CurrentTrackColor;
         double duration = options.SelectedSlider?.TemporalLength ?? options.Duration;
+        RgbaColour backgroundColour = RgbaColour.FromRgb(0, 0, 0);
         (List<Mapping_Tools.Core.Classes.MathUtil.Vector2> pathPoints, double frameDistance) = SliderPicturatorEngine.Picturate(
-            image, sliderColour, options.BorderColor, RgbaColour.FromArgb(0, 0, 0, 0), circleSize,
+            image, sliderColour, options.BorderColor, backgroundColour, circleSize,
             new(options.SliderStartX, options.SliderStartY), new(options.ImageStartX, options.ImageStartY),
             options.SelectedSlider, options.YResolution, options.ViewportSize, !options.BlackOn, !options.BorderOn,
             !options.AlphaOn, options.RedOn, options.GreenOn, options.BlueOn, options.Quality);
@@ -44,7 +45,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
         SliderPicturatorEngine.ApplyToBeatmap(beatmap, pathPoints, frameDistance, duration, options.TimeCode,
             sliderColour, options.BorderColor, options.SetBeatmapColors, options.UseMapComboColors);
         options.SegmentCount = SliderPicturatorEngine.Recolor(image, sliderColour, options.BorderColor,
-            RgbaColour.FromArgb(0, 0, 0, 0), options.SelectedSlider, !options.BlackOn, !options.BorderOn,
+            backgroundColour, options.SelectedSlider, !options.BlackOn, !options.BorderOn,
             !options.AlphaOn, options.RedOn, options.GreenOn, options.BlueOn, options.Quality).SegmentCount;
         await _editingGateway.SaveAsync(session, cancellationToken: cancellationToken).ConfigureAwait(false);
         progress?.Report(100);

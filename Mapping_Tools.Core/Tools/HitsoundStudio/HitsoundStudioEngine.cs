@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.Audio;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.HitsoundStuff;
 using Mapping_Tools.Core.Classes.MathUtil;
@@ -16,6 +17,40 @@ namespace Mapping_Tools.Core.Tools.HitsoundStudio;
 /// </remarks>
 public sealed class HitsoundStudioEngine
 {
+    /// <summary>Builds the timing points used by standard-mode map export.</summary>
+    /// <param name="timing">The original beatmap timing data.</param>
+    /// <param name="events">The standard-mode events to place in the map.</param>
+    /// <returns>A new timing-point list containing the exported redlines and inherited points.</returns>
+    public IReadOnlyList<TimingPoint> BuildStandardTimingPoints(
+        Timing timing,
+        IReadOnlyList<HitsoundEvent> events)
+    {
+        ArgumentNullException.ThrowIfNull(timing);
+        ArgumentNullException.ThrowIfNull(events);
+
+        List<TimingPointChange> changes = timing.Redlines
+            .Select(point => new TimingPointChange(
+                point.Copy(),
+                mpb: true,
+                meter: true,
+                uninherited: true,
+                omitFirstBarLine: true,
+                fuzziness: 0.4))
+            .ToList();
+        foreach (HitsoundEvent item in events)
+        {
+            TimingPoint point = timing.GetTimingPointAtTime(item.Time + 5)?.Copy() ?? new TimingPoint();
+            point.Offset = item.Time;
+            point.SampleIndex = item.CustomIndex;
+            point.Volume = Math.Round(point.Volume * item.Volume);
+            changes.Add(new TimingPointChange(point, index: true, volume: true));
+        }
+
+        Timing exported = new(timing.SliderMultiplier);
+        TimingPointChange.Apply(exported, changes);
+        return exported.ToList();
+    }
+
     /// <summary>
     /// Groups layer events whose timestamps are within the legacy leniency.
     /// </summary>

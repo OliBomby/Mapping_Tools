@@ -172,8 +172,7 @@ public static class SliderMergerEngine
 
         first.SetAllCurvePoints(mergedPath);
         first.SliderType = linear ? PathType.Linear : PathType.Bezier;
-        first.PixelLength += second.PixelLength + extraLength;
-        SetEndpointEdges(first, GetHeadEdges(first), GetTailEdges(second));
+        first.PixelLength = first.PixelLength + second.PixelLength + extraLength;
         first.Repeat = 1;
         return first;
     }
@@ -198,7 +197,6 @@ public static class SliderMergerEngine
         first.SetAllCurvePoints(path);
         first.SliderType = linear ? PathType.Linear : PathType.Bezier;
         first.PixelLength += extraLength;
-        SetEndpointEdges(first, GetHeadEdges(first), GetTailEdges(second));
         first.Repeat = 1;
         return first;
     }
@@ -212,7 +210,7 @@ public static class SliderMergerEngine
             second.GetAllCurvePoints(), second.SliderType);
         path.Insert(0, path.First());
         path.Insert(0, first.Pos);
-        double extraLength = Vector2.Distance(first.Pos, second.Pos);
+        double extraLength = (first.Pos - second.Pos).Length;
         path.Round();
         bool linear = options.LinearOnLinear && IsLinearBezier(path);
         if (linear)
@@ -223,7 +221,6 @@ public static class SliderMergerEngine
         second.SetAllCurvePoints(path);
         second.SliderType = linear ? PathType.Linear : PathType.Bezier;
         second.PixelLength += extraLength;
-        SetEndpointEdges(second, GetHeadEdges(first), GetTailEdges(second));
         second.Repeat = 1;
         return second;
     }
@@ -237,7 +234,7 @@ public static class SliderMergerEngine
         {
             first.SetAllCurvePoints([first.Pos, second.Pos]);
             first.SliderType = options.LinearOnLinear ? PathType.Linear : PathType.Bezier;
-            first.PixelLength = Vector2.Distance(first.Pos, second.Pos);
+            first.PixelLength = (first.Pos - second.Pos).Length;
             first.IsCircle = false;
             first.IsSlider = true;
             first.Repeat = 1;

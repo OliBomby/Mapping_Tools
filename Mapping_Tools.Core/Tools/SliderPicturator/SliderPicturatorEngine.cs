@@ -138,9 +138,9 @@ public static class SliderPicturatorEngine
         double[,] pixelDistances = CalculatePixelDistances(
             image, sliderColor, sliderBorder, backgroundColor, blackOff, borderOff, opaqueOff, r, g, b, quality);
         Vector2 imageTopLeft = new(-104, -52);
-        Vector2 sliderTopLeft = new((float)Math.Ceiling(radius * 1.15) + imageTopLeft.X, (float)Math.Ceiling(radius * 1.15) + imageTopLeft.Y);
-        Vector2 sliderBottomRight = new((float)Math.Floor(OsupxBetweenRows * gpuViewport - 1.15 * radius) + imageTopLeft.X,
-            (float)Math.Floor(OsupxBetweenRows * gpuViewport - 1.15 * radius) + imageTopLeft.Y);
+        Vector2 sliderTopLeft = new(Math.Ceiling(radius * 1.15) + imageTopLeft.X, Math.Ceiling(radius * 1.15) + imageTopLeft.Y);
+        Vector2 sliderBottomRight = new(Math.Floor(OsupxBetweenRows * gpuViewport - 1.15 * radius) + imageTopLeft.X,
+            Math.Floor(OsupxBetweenRows * gpuViewport - 1.15 * radius) + imageTopLeft.Y);
         picturePosition -= imageTopLeft;
         picturePosition *= (resolutionY - 16) / 480;
         picturePosition.Round();
@@ -186,7 +186,7 @@ public static class SliderPicturatorEngine
             new(sliderBottomRight.X, sliderTopLeft.Y), sliderTopLeft];
         paths.Add([.. current]);
         current.Clear();
-        if (imagePosition.LengthSquared > 0) current.AddRange([new(sliderTopLeft.X, imageStart.Y), imageStart]);
+        if (picturePosition.LengthSquared > 0) current.AddRange([new(sliderTopLeft.X, imageStart.Y), imageStart]);
 
         for (int y = 0; y < image.Height; y++)
         {
@@ -209,21 +209,21 @@ public static class SliderPicturatorEngine
                 }
                 int end = x + offset;
                 double flatSlope = Math.Round(gradient * (offset + 0.5)) / ((offset + 0.5) * OsupxBetweenRows);
-                double segmentSlope = flatSlope == 0 ? 0 : flatSlope / Math.Sqrt(1 - flatSlope * flatSlope);
+                double segmentSlope = flatSlope == 0 ? 0 : flatSlope / Math.Pow(1 - flatSlope * flatSlope, 0.5);
                 int relativeX = -direction * OsupxBetweenRows / 4;
-                int relativeY = (int)(segmentSlope * relativeX + Math.Sqrt(1 + segmentSlope * segmentSlope) * radius *
+                int relativeY = (int)(segmentSlope * relativeX + Math.Pow(1 + segmentSlope * segmentSlope, 0.5) * radius *
                     (pixelDistances[x, y] + gradient * (offset + 1) / 2) - segmentSlope * OsupxBetweenRows * (offset + 1) / 2);
                 lastStartX = (int)(relativeX + OsupxBetweenRows * (x + 0.5) + imageStart.X);
                 lastStartY = (int)(relativeY + OsupxBetweenRows * (y + 0.5) + imageStart.Y);
                 lastOffset = offset;
                 lastGradient = gradient;
                 current.Add(new(lastStartX, lastStartY));
-                current.Add(new(lastStartX + (float)(offset + direction * 0.5) * OsupxBetweenRows,
-                    (float)Math.Round(lastStartY + gradient * offset)));
+                current.Add(new(lastStartX + (offset + direction * 0.5) * OsupxBetweenRows,
+                    Math.Round(lastStartY + gradient * offset)));
                 x = end + direction;
             }
-            current.Add(new(lastStartX + (float)(lastOffset + 0.5) * OsupxBetweenRows,
-                (float)(lastStartY + lastGradient * lastOffset + OsupxBetweenRows)));
+            current.Add(new(lastStartX + (lastOffset + 0.5) * OsupxBetweenRows,
+                lastStartY + lastGradient * lastOffset + OsupxBetweenRows));
             if (direction == 1) { paths.Add([.. current]); current.Clear(); }
         }
         paths.Add([.. current]);
@@ -404,11 +404,15 @@ public static class SliderPicturatorEngine
 
     private static RgbaColour GetOpaqueColor(RgbaColour top, RgbaColour bottom)
     {
+        const double gamma = 1;
         double topOpacity = top.A / 255d;
         double bottomOpacity = bottom.A / 255d;
         double totalOpacity = topOpacity + bottomOpacity * (1 - topOpacity);
         if (totalOpacity == 0) return RgbaColour.FromRgb(0, 0, 0);
-        byte Mix(byte topChannel, byte bottomChannel) => (byte)Math.Round((bottomChannel * bottomOpacity * (1 - topOpacity) + topChannel * topOpacity) / totalOpacity);
+        byte Mix(byte topChannel, byte bottomChannel) => (byte)Math.Round(Math.Pow(
+            (Math.Pow(bottomChannel, gamma) * bottomOpacity * (1 - topOpacity) + Math.Pow(topChannel, gamma) * topOpacity) /
+            totalOpacity,
+            1 / gamma));
         return RgbaColour.FromArgb(255, Mix(top.R, bottom.R), Mix(top.G, bottom.G), Mix(top.B, bottom.B));
     }
 
@@ -491,7 +495,8 @@ public static class SliderPicturatorEngine
         {
             float x = (float)Math.Round(points[i - 1].X) - (float)Math.Round(points[i].X);
             float y = (float)Math.Round(points[i - 1].Y) - (float)Math.Round(points[i].Y);
-            length += Math.Sqrt(x * x + y * y);
+            float squared = x * x + y * y;
+            length += (float)Math.Sqrt(squared);
         }
         return length;
     }

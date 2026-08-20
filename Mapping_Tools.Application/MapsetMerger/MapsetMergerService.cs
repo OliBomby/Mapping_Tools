@@ -303,8 +303,10 @@ public sealed class MapsetMergerService : IMapsetMergerService
         string relativePath,
         Beatmap beatmap)
     {
-        BeatmapEditor2 editor = new(beatmap.GetLines(), _textFileStore);
-        editor.SaveFile(transaction.GetStagedPath(relativePath));
+        Editor2.SaveFile(
+            _textFileStore,
+            transaction.GetStagedPath(relativePath),
+            beatmap.GetLines());
     }
 
     private void WriteStoryboard(

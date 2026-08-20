@@ -770,7 +770,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         return count;
     }
 
-    private static void ApplyExport(
+    private void ApplyExport(
         Beatmap beatmap,
         IReadOnlyList<HitsoundEvent> events,
         HitsoundStudioProject project)
@@ -789,23 +789,16 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         }
         else
         {
-            List<TimingPoint> redlines = beatmap.BeatmapTiming.Redlines.Select(point => point.Copy()).ToList();
+            List<TimingPoint> timingPoints = project.HitsoundExportModeSetting == HitsoundStudioExportMode.Standard
+                ? _engine.BuildStandardTimingPoints(beatmap.BeatmapTiming, events).ToList()
+                : beatmap.BeatmapTiming.Redlines.Select(point => point.Copy()).ToList();
             beatmap.HitObjects.Clear();
-            List<TimingPoint> timingPoints = redlines;
             foreach (HitsoundEvent item in events)
             {
                 int customIndex = item.CustomIndex;
                 double volume = item.Volume * 100;
                 if (project.HitsoundExportModeSetting == HitsoundStudioExportMode.Standard)
                 {
-                    TimingPoint source = beatmap.BeatmapTiming
-                        .GetTimingPointAtTime(item.Time + 5)?
-                        .Copy() ?? new TimingPoint();
-                    source.Offset = item.Time;
-                    source.Uninherited = false;
-                    source.SampleIndex = customIndex;
-                    source.Volume = Math.Round(source.Volume * item.Volume);
-                    timingPoints.Add(source);
                     customIndex = 0;
                     volume = 0;
                 }

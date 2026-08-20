@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Mapping_Tools.Application.MapsetMerger;
 using Mapping_Tools.Application.HitsoundStudio;
+using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.TumourGenerator;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Infrastructure.Projects;
@@ -164,6 +165,26 @@ public sealed class LegacyProjectJsonSerializerTests
         project.TumourLayers[0].TumourLength.GetValue(0).Should().BeApproximately(34, 1e-9);
         project.TumourLayers[0].TumourDistance.GetValue(0).Should().BeApproximately(118, 1e-9);
         project.PreviewHitObject.IsSlider.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void Deserialize_WithSlideratorFixture_ReplacesGraphConstructorAnchors()
+    {
+        // Arrange
+        string json = File.ReadAllText(
+            Path.Combine(
+                AppContext.BaseDirectory,
+                "Fixtures",
+                "Projects",
+                "slideratorproject.json"));
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        SlideratorProject project = serializer.Deserialize<SlideratorProject>(json);
+
+        // Assert
+        project.GraphState.Anchors.Should().HaveCount(3);
+        project.GraphState.Anchors.Select(anchor => anchor.Pos.X).Should().Equal(0, 5.5, 16);
     }
 
     [TestMethod]
