@@ -1,0 +1,40 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.HitsoundPreviewHelperVm, Mapping Tools",
+  "ImportModeSetting": 3,
+  "TimeCode": "",
+  "Items": [
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "",
+      "Name": "Left normal",
+      "XPos": 64.0,
+      "YPos": -1.0,
+      "Hitsound": 0,
+      "SampleSet": 1,
+      "AdditionsSet": 0,
+      "CustomIndex": 1
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "",
+      "Name": "Centre whistle",
+      "XPos": 256.0,
+      "YPos": -1.0,
+      "Hitsound": 1,
+      "SampleSet": 2,
+      "AdditionsSet": 2,
+      "CustomIndex": 2
+    },
+    {
+      "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",
+      "Filename": "",
+      "Name": "Right clap",
+      "XPos": 448.0,
+      "YPos": -1.0,
+      "Hitsound": 3,
+      "SampleSet": 3,
+      "AdditionsSet": 3,
+      "CustomIndex": 3
+    }
+  ]
+}

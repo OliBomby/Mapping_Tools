@@ -1,0 +1,17 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.MapsetMergerVm, Mapping Tools",
+  "ExportPath": "{fixtureRoot}\\Transformations\\mapset-merger-actual",
+  "Mapsets": [
+    {
+      "$type": "Mapping_Tools.Viewmodels.MapsetMergerVm+MapsetItem, Mapping Tools",
+      "Name": "Wave0-A",
+      "Path": "{fixtureRoot}\\Transformations\\mapset-merger-sources\\Wave0-A"
+    },
+    {
+      "$type": "Mapping_Tools.Viewmodels.MapsetMergerVm+MapsetItem, Mapping Tools",
+      "Name": "Wave0-B",
+      "Path": "{fixtureRoot}\\Transformations\\mapset-merger-sources\\Wave0-B"
+    }
+  ],
+  "MoveSbToBeatmap": false
+}

@@ -1,0 +1,31 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.MetadataManagerVm, Mapping Tools",
+  "ImportPath": "{fixtureRoot}\\Beatmaps\\standard-feature-rich.osu",
+  "ExportPath": "{fixtureRoot}\\Beatmaps\\ComplicatedTestMap.osu",
+  "Artist": "Wave Zero Artist",
+  "RomanisedArtist": "Wave Zero Artist",
+  "Title": "Wave Zero Metadata Baseline",
+  "RomanisedTitle": "Wave Zero Metadata Baseline",
+  "BeatmapCreator": "Fixture Mapper",
+  "Source": "Wave 0",
+  "Tags": "wave zero metadata fixture wave",
+  "DoRemoveDuplicateTags": true,
+  "ResetIds": true,
+  "PreviewTime": 12345.0,
+  "UseComboColours": true,
+  "ComboColours": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools",
+      "Color": "#FFFF3366"
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools",
+      "Color": "#FF33CCFF"
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools",
+      "Color": "#FFFFCC33"
+    }
+  ],
+  "SpecialColours": []
+}

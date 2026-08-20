@@ -1,0 +1,74 @@
+{
+  "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourProject, Mapping Tools",
+  "ColourPoints": [
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 0.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFF3355"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FF33CC88"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FF3388FF"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 526.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo3",
+          "Color": "#FF3388FF"
+        },
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo1",
+          "Color": "#FFFF3355"
+        }
+      ],
+      "Mode": 0
+    },
+    {
+      "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",
+      "Time": 1525.0,
+      "ColourSequence": [
+        {
+          "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+          "Name": "Combo2",
+          "Color": "#FF33CC88"
+        }
+      ],
+      "Mode": 1
+    }
+  ],
+  "ComboColours": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+      "Name": "Combo1",
+      "Color": "#FFFF3355"
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+      "Name": "Combo2",
+      "Color": "#FF33CC88"
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools",
+      "Name": "Combo3",
+      "Color": "#FF3388FF"
+    }
+  ],
+  "MaxBurstLength": 2
+}

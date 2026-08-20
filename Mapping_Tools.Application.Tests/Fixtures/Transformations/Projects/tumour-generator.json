@@ -1,0 +1,260 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.TumourGeneratorVm, Mapping Tools",
+  "PreviewHitObject": {
+    "$type": "Mapping_Tools.Classes.BeatmapHelper.HitObject, Mapping Tools",
+    "Line": "484,8,331598,6,0,P|356:44|436:136,1,282.5172,8|0,3:3|2:2,2:2:0:0:",
+    "ActualNewCombo": true,
+    "ComboIndex": 1,
+    "ColourIndex": 3,
+    "Colour": {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.ComboColour, Mapping Tools",
+      "Color": "#FFF21839"
+    },
+    "TemporalLength": 201.99999999999986,
+    "SliderVelocity": -74.0740740740741,
+    "TimingPoint": {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools",
+      "Offset": 331598,
+      "MpB": -74.0740740740741,
+      "Meter": {
+        "$type": "Mapping_Tools.Classes.BeatmapHelper.TempoSignature, Mapping Tools",
+        "TempoDenominator": 4,
+        "TempoNumerator": 4,
+        "PartialMeasure": false
+      },
+      "SampleSet": 2,
+      "SampleIndex": 1,
+      "Volume": 70,
+      "Uninherited": false,
+      "Kiai": true,
+      "OmitFirstBarLine": false
+    },
+    "HitsoundTimingPoint": {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools",
+      "Offset": 331598,
+      "MpB": -74.0740740740741,
+      "Meter": {
+        "$type": "Mapping_Tools.Classes.BeatmapHelper.TempoSignature, Mapping Tools",
+        "TempoDenominator": 4,
+        "TempoNumerator": 4,
+        "PartialMeasure": false
+      },
+      "SampleSet": 2,
+      "SampleIndex": 1,
+      "Volume": 70,
+      "Uninherited": false,
+      "Kiai": true,
+      "OmitFirstBarLine": false
+    },
+    "UnInheritedTimingPoint": {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools",
+      "Offset": 237544,
+      "MpB": 270.27027027027,
+      "Meter": {
+        "$type": "Mapping_Tools.Classes.BeatmapHelper.TempoSignature, Mapping Tools",
+        "TempoDenominator": 4,
+        "TempoNumerator": 4,
+        "PartialMeasure": false
+      },
+      "SampleSet": 2,
+      "SampleIndex": 1,
+      "Volume": 70,
+      "Uninherited": true,
+      "Kiai": false,
+      "OmitFirstBarLine": false
+    },
+    "IsSelected": true
+  },
+  "ImportModeSetting": 3,
+  "TimeCode": "",
+  "CurrentLayerIndex": 0,
+  "AdvancedOptions": false,
+  "CircleSize": 4,
+  "TumourLayers": [
+    {
+      "$type": "Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourLayer, Mapping Tools",
+      "TumourTemplateEnum": 0,
+      "WrappingMode": 0,
+      "TumourSidedness": 1,
+      "TumourLength": {
+        "$type": "Mapping_Tools.Components.Graph.GraphState, Mapping Tools",
+        "Anchors": [
+          {
+            "$type": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools",
+            "Pos": {
+              "X": 0,
+              "Y": 34
+            },
+            "Interpolator": {
+              "$type": "Mapping_Tools.Components.Graph.Interpolation.Interpolators.SingleCurveInterpolator, Mapping Tools",
+              "P": 0
+            },
+            "Tension": 0
+          },
+          {
+            "$type": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools",
+            "Pos": {
+              "X": 1,
+              "Y": 34
+            },
+            "Interpolator": {
+              "$type": "Mapping_Tools.Components.Graph.Interpolation.Interpolators.SingleCurveInterpolator, Mapping Tools",
+              "P": 0
+            },
+            "Tension": 0
+          }
+        ],
+        "MinX": 0,
+        "MinY": 0,
+        "MaxX": 1,
+        "MaxY": 68
+      },
+      "TumourScale": {
+        "$type": "Mapping_Tools.Components.Graph.GraphState, Mapping Tools",
+        "Anchors": [
+          {
+            "$type": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools",
+            "Pos": {
+              "X": 0,
+              "Y": 24
+            },
+            "Interpolator": {
+              "$type": "Mapping_Tools.Components.Graph.Interpolation.Interpolators.SingleCurveInterpolator, Mapping Tools",
+              "P": 0
+            },
+            "Tension": 0
+          },
+          {
+            "$type": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools",
+            "Pos": {
+              "X": 1,
+              "Y": 24
+            },
+            "Interpolator": {
+              "$type": "Mapping_Tools.Components.Graph.Interpolation.Interpolators.SingleCurveInterpolator, Mapping Tools",
+              "P": 0
+            },
+            "Tension": 0
+          }
+        ],
+        "MinX": 0,
+        "MinY": 0,
+        "MaxX": 1,
+        "MaxY": 48
+      },
+      "TumourRotation": {
+        "$type": "Mapping_Tools.Components.Graph.GraphState, Mapping Tools",
+        "Anchors": [
+          {
+            "$type": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools",
+            "Pos": {
+              "X": 0,
+              "Y": 0
+            },
+            "Interpolator": {
+              "$type": "Mapping_Tools.Components.Graph.Interpolation.Interpolators.SingleCurveInterpolator, Mapping Tools",
+              "P": 0
+            },
+            "Tension": 0
+          },
+          {
+            "$type": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools",
+            "Pos": {
+              "X": 1,
+              "Y": 0
+            },
+            "Interpolator": {
+              "$type": "Mapping_Tools.Components.Graph.Interpolation.Interpolators.SingleCurveInterpolator, Mapping Tools",
+              "P": 0
+            },
+            "Tension": 0
+          }
+        ],
+        "MinX": 0,
+        "MinY": 0,
+        "MaxX": 1,
+        "MaxY": 1
+      },
+      "TumourParameter": {
+        "$type": "Mapping_Tools.Components.Graph.GraphState, Mapping Tools",
+        "Anchors": [
+          {
+            "$type": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools",
+            "Pos": {
+              "X": 0,
+              "Y": 0
+            },
+            "Interpolator": {
+              "$type": "Mapping_Tools.Components.Graph.Interpolation.Interpolators.SingleCurveInterpolator, Mapping Tools",
+              "P": 0
+            },
+            "Tension": 0
+          },
+          {
+            "$type": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools",
+            "Pos": {
+              "X": 1,
+              "Y": 0
+            },
+            "Interpolator": {
+              "$type": "Mapping_Tools.Components.Graph.Interpolation.Interpolators.SingleCurveInterpolator, Mapping Tools",
+              "P": 0
+            },
+            "Tension": 0
+          }
+        ],
+        "MinX": 0,
+        "MinY": 0,
+        "MaxX": 1,
+        "MaxY": 0
+      },
+      "TumourDistance": {
+        "$type": "Mapping_Tools.Components.Graph.GraphState, Mapping Tools",
+        "Anchors": [
+          {
+            "$type": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools",
+            "Pos": {
+              "X": 0,
+              "Y": 118
+            },
+            "Interpolator": {
+              "$type": "Mapping_Tools.Components.Graph.Interpolation.Interpolators.SingleCurveInterpolator, Mapping Tools",
+              "P": 0
+            },
+            "Tension": 0
+          },
+          {
+            "$type": "Mapping_Tools.Components.Graph.AnchorState, Mapping Tools",
+            "Pos": {
+              "X": 1,
+              "Y": 118
+            },
+            "Interpolator": {
+              "$type": "Mapping_Tools.Components.Graph.Interpolation.Interpolators.SingleCurveInterpolator, Mapping Tools",
+              "P": 0
+            },
+            "Tension": 0
+          }
+        ],
+        "MinX": 0,
+        "MinY": 0,
+        "MaxX": 1,
+        "MaxY": 236
+      },
+      "TumourCount": 1,
+      "TumourStart": 145.16964691358035,
+      "TumourEnd": 256,
+      "RandomSeed": 0,
+      "Recalculate": true,
+      "UseAbsoluteRange": true,
+      "IsActive": true,
+      "Name": "Layer"
+    }
+  ],
+  "JustMiddleAnchors": false,
+  "Scale": 1,
+  "DebugConstruction": false,
+  "FixSv": true,
+  "DelegateToBpm": false,
+  "RemoveSliderTicks": false
+}

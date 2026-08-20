@@ -1,0 +1,27 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.RhythmGuideVm, Mapping Tools",
+  "GuideGeneratorArgs": {
+    "$type": "Mapping_Tools.Classes.Tools.RhythmGuide+RhythmGuideGeneratorArgs, Mapping Tools",
+    "Paths": [
+      "{fixtureRoot}\\Beatmaps\\standard-feature-rich.osu"
+    ],
+    "OutputGameMode": 0,
+    "OutputName": "Wave 0 Rhythm Guide",
+    "NcEverything": true,
+    "SelectionMode": 1,
+    "ExportMode": 1,
+    "ExportPath": "{fixtureRoot}\\Beatmaps\\ComplicatedTestMap.osu",
+    "BeatDivisors": [
+      {
+        "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+        "Numerator": 1,
+        "Denominator": 4
+      },
+      {
+        "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+        "Numerator": 1,
+        "Denominator": 3
+      }
+    ]
+  }
+}

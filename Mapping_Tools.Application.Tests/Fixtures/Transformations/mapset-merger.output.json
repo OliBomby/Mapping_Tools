@@ -1,12 +1,12 @@
 {
   "expectedDirectory": "expected/mapset-merger",
-  "versionedBeatmaps": [
+  "beatmaps": [
     {
-      "path": "expected/mapset-merger/normal.osu",
+      "path": "expected/mapset-merger/Thaehan - Kawaii (Cris-) [Normal].osu",
       "sha256": "A749064F1FC987A82862035CC99652B5F1350630799800DB02E9079E07715018"
     },
     {
-      "path": "expected/mapset-merger/expert.osu",
+      "path": "expected/mapset-merger/Thaehan - Kawaii (Cris-) [Walao's Expert].osu",
       "sha256": "CF133933D9200FEB229B8AE1579F644BB80696080639EACE5C900959AC27D9A8"
     }
   ],

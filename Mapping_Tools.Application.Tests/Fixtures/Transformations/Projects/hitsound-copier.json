@@ -1,0 +1,94 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.HitsoundCopierVm, Mapping Tools",
+  "PathFrom": "{fixtureRoot}\\Beatmaps\\standard-feature-rich.osu",
+  "PathTo": "{fixtureRoot}\\Beatmaps\\ComplicatedTestMap.osu",
+  "CopyMode": 0,
+  "TemporalLeniency": 5.5,
+  "SourceSelectionMode": 3,
+  "TimeCode": "",
+  "TimingOffset": 0.0,
+  "CopyHitsounds": true,
+  "CopyBodyHitsounds": true,
+  "CopySampleSets": true,
+  "CopyVolumes": true,
+  "AlwaysPreserve5Volume": true,
+  "CopyStoryboardedSamples": false,
+  "IgnoreHitsoundSatisfiedSamples": false,
+  "IgnoreWheneverHitsound": false,
+  "CopyToSliderTicks": false,
+  "CopyToSliderSlides": false,
+  "StartIndex": 300,
+  "MuteSliderends": false,
+  "BeatDivisors": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 1
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 4
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 3
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 8
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 6
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 16
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 12
+    }
+  ],
+  "MutedDivisors": [
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 4
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 3
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 8
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 6
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 16
+    },
+    {
+      "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+      "Numerator": 1,
+      "Denominator": 12
+    }
+  ],
+  "MinLength": 0.4,
+  "MutedIndex": -1,
+  "MutedSampleSet": 3
+}

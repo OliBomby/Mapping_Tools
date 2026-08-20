@@ -1,0 +1,28 @@
+{
+  "$type": "Mapping_Tools.Viewmodels.MapCleanerVm, Mapping Tools",
+  "MapCleanerArgs": {
+    "$type": "Mapping_Tools.Classes.Tools.MapCleanerStuff.MapCleanerArgs, Mapping Tools",
+    "VolumeSliders": true,
+    "SampleSetSliders": false,
+    "VolumeSpinners": true,
+    "ResnapObjects": true,
+    "ResnapBookmarks": true,
+    "AnalyzeSamples": false,
+    "RemoveUnusedSamples": false,
+    "RemoveHitsounds": false,
+    "RemoveMuting": false,
+    "RemoveUnclickableHitsounds": false,
+    "BeatDivisors": [
+      {
+        "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+        "Numerator": 1,
+        "Denominator": 12
+      },
+      {
+        "$type": "Mapping_Tools.Classes.BeatmapHelper.BeatDivisors.RationalBeatDivisor, Mapping Tools",
+        "Numerator": 1,
+        "Denominator": 16
+      }
+    ]
+  }
+}
