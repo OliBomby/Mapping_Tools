@@ -10,6 +10,8 @@
     <FileVersion>1.12.30</FileVersion>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\mt_icon.ico</ApplicationIcon>
+    <!-- Disable Avalonia's build-time usage statistics task; developer tools remain enabled. -->
+    <UsedAvaloniaProducts></UsedAvaloniaProducts>
   </PropertyGroup>
 
   <ItemGroup>
