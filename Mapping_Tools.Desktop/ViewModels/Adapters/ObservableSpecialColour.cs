@@ -4,7 +4,7 @@ using Mapping_Tools.Core.Classes.BeatmapHelper;
 namespace Mapping_Tools.Desktop.ViewModels.Adapters;
 
 /// <summary>Adapts a plain special colour for Desktop palette display and editing.</summary>
-public sealed class ObservableSpecialColour : ObservableObject
+public sealed partial class ObservableSpecialColour : ObservableObject
 {
     private readonly SpecialColour model;
 
@@ -13,36 +13,25 @@ public sealed class ObservableSpecialColour : ObservableObject
     public ObservableSpecialColour(SpecialColour model)
     {
         this.model = model ?? throw new ArgumentNullException(nameof(model));
+        Name = model.Name;
+        Color = model.Color;
     }
 
     /// <summary>Gets the plain colour represented by this adapter.</summary>
     public SpecialColour Model => model;
 
     /// <summary>Gets or sets the named colour key.</summary>
-    public string? Name
-    {
-        get => model.Name;
-        set
-        {
-            if (model.Name == value) return;
-            model.Name = value;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial string? Name { get; set; }
 
     /// <summary>Gets or sets the ARGB colour value.</summary>
-    public RgbaColour Color
-    {
-        get => model.Color;
-        set
-        {
-            if (model.Color == value) return;
-            model.Color = value;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial RgbaColour Color { get; set; }
 
     /// <summary>Gets the plain colour for persistence or an Application service.</summary>
     /// <returns>The underlying mutable colour model.</returns>
     public SpecialColour Snapshot() => (SpecialColour)model.Clone();
+
+    partial void OnNameChanged(string? value) => model.Name = value;
+    partial void OnColorChanged(RgbaColour value) => model.Color = value;
 }

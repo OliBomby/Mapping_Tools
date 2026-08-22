@@ -6,7 +6,7 @@ using Mapping_Tools.Core.Tools.ComboColourStudio;
 namespace Mapping_Tools.Desktop.ViewModels.Adapters;
 
 /// <summary>Adapts a plain combo-colour point for Desktop grid editing.</summary>
-public sealed class ObservableColourPoint : ObservableObject
+public sealed partial class ObservableColourPoint : ObservableObject
 {
     private readonly ColourPoint model;
 
@@ -15,6 +15,8 @@ public sealed class ObservableColourPoint : ObservableObject
     public ObservableColourPoint(ColourPoint model)
     {
         this.model = model ?? throw new ArgumentNullException(nameof(model));
+        Time = model.Time;
+        Mode = model.Mode;
         ColourSequence = new ObservableCollection<ObservableSpecialColour>(
             model.ColourSequence.Select(colour => new ObservableSpecialColour(colour)));
     }
@@ -23,28 +25,12 @@ public sealed class ObservableColourPoint : ObservableObject
     public ColourPoint Model => model;
 
     /// <summary>Gets or sets the point offset in milliseconds.</summary>
-    public double Time
-    {
-        get => model.Time;
-        set
-        {
-            if (model.Time == value) return;
-            model.Time = value;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial double Time { get; set; }
 
     /// <summary>Gets or sets whether this point is normal or burst mode.</summary>
-    public ColourPointMode Mode
-    {
-        get => model.Mode;
-        set
-        {
-            if (model.Mode == value) return;
-            model.Mode = value;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial ColourPointMode Mode { get; set; }
 
     /// <summary>Gets the available point application modes.</summary>
     public IReadOnlyList<ColourPointMode> ColourPointModes { get; } =
@@ -59,4 +45,7 @@ public sealed class ObservableColourPoint : ObservableObject
         Time,
         ColourSequence.Select(colour => colour.Snapshot()),
         Mode);
+
+    partial void OnTimeChanged(double value) => model.Time = value;
+    partial void OnModeChanged(ColourPointMode value) => model.Mode = value;
 }

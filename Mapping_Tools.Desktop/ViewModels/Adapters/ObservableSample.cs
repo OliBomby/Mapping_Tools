@@ -5,7 +5,7 @@ using Mapping_Tools.Core.Classes.HitsoundStuff;
 namespace Mapping_Tools.Desktop.ViewModels.Adapters;
 
 /// <summary>Adapts a plain package sample for Desktop default-sample editing.</summary>
-public sealed class ObservableSample : ObservableObject
+public sealed partial class ObservableSample : ObservableObject
 {
     private readonly Sample model;
 
@@ -14,6 +14,8 @@ public sealed class ObservableSample : ObservableObject
     public ObservableSample(Sample model)
     {
         this.model = model ?? throw new ArgumentNullException(nameof(model));
+        SampleSet = model.SampleSet;
+        Hitsound = model.Hitsound;
         SampleArgs = new ObservableSampleGeneratingArgs(model.SampleArgs);
     }
 
@@ -24,30 +26,17 @@ public sealed class ObservableSample : ObservableObject
     public ObservableSampleGeneratingArgs SampleArgs { get; }
 
     /// <summary>Gets or sets the sample family.</summary>
-    public SampleSet SampleSet
-    {
-        get => model.SampleSet;
-        set
-        {
-            if (model.SampleSet == value) return;
-            model.SampleSet = value;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial SampleSet SampleSet { get; set; }
 
     /// <summary>Gets or sets the hitsound layer.</summary>
-    public Hitsound Hitsound
-    {
-        get => model.Hitsound;
-        set
-        {
-            if (model.Hitsound == value) return;
-            model.Hitsound = value;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial Hitsound Hitsound { get; set; }
 
     /// <summary>Creates an independent plain snapshot for Application services.</summary>
     /// <returns>A copied package sample with copied generation arguments.</returns>
     public Sample Snapshot() => model.Copy();
+
+    partial void OnSampleSetChanged(SampleSet value) => model.SampleSet = value;
+    partial void OnHitsoundChanged(Hitsound value) => model.Hitsound = value;
 }

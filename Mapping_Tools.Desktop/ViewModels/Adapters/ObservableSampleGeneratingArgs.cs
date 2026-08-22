@@ -4,7 +4,7 @@ using Mapping_Tools.Core.Classes.HitsoundStuff;
 namespace Mapping_Tools.Desktop.ViewModels.Adapters;
 
 /// <summary>Provides Desktop change notification for sample-generation fields.</summary>
-public sealed class ObservableSampleGeneratingArgs : ObservableObject
+public sealed partial class ObservableSampleGeneratingArgs : ObservableObject
 {
     private readonly SampleGeneratingArgs model;
 
@@ -13,92 +13,62 @@ public sealed class ObservableSampleGeneratingArgs : ObservableObject
     public ObservableSampleGeneratingArgs(SampleGeneratingArgs model)
     {
         this.model = model ?? throw new ArgumentNullException(nameof(model));
+        Path = model.Path;
+        Volume = model.Volume;
+        Panning = model.Panning;
+        PitchShift = model.PitchShift;
+        Bank = model.Bank;
+        Patch = model.Patch;
+        Instrument = model.Instrument;
+        Key = model.Key;
+        Length = model.Length;
+        Velocity = model.Velocity;
     }
 
     /// <summary>Gets the plain settings represented by this adapter.</summary>
     public SampleGeneratingArgs Model => model;
 
     /// <summary>Gets or sets the source audio or SoundFont path.</summary>
-    public string Path
-    {
-        get => model.Path;
-        set => SetValue(model.Path, value, next => model.Path = next);
-    }
+    [ObservableProperty]
+    public partial string Path { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the linear sample gain.</summary>
-    public double Volume
-    {
-        get => model.Volume;
-        set
-        {
-            if (Math.Abs(model.Volume - value) < double.Epsilon) return;
-            model.Volume = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(Velocity));
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Velocity))]
+    public partial double Volume { get; set; }
 
     /// <summary>Gets or sets the stereo pan.</summary>
-    public double Panning
-    {
-        get => model.Panning;
-        set => SetValue(model.Panning, value, next => model.Panning = next);
-    }
+    [ObservableProperty]
+    public partial double Panning { get; set; }
 
     /// <summary>Gets or sets the pitch adjustment.</summary>
-    public double PitchShift
-    {
-        get => model.PitchShift;
-        set => SetValue(model.PitchShift, value, next => model.PitchShift = next);
-    }
+    [ObservableProperty]
+    public partial double PitchShift { get; set; }
 
     /// <summary>Gets or sets the SoundFont bank, or -1 when unused.</summary>
-    public int Bank
-    {
-        get => model.Bank;
-        set => SetValue(model.Bank, value, next => model.Bank = next);
-    }
+    [ObservableProperty]
+    public partial int Bank { get; set; }
 
     /// <summary>Gets or sets the SoundFont patch, or -1 when unused.</summary>
-    public int Patch
-    {
-        get => model.Patch;
-        set => SetValue(model.Patch, value, next => model.Patch = next);
-    }
+    [ObservableProperty]
+    public partial int Patch { get; set; }
 
     /// <summary>Gets or sets the SoundFont instrument, or -1 when unused.</summary>
-    public int Instrument
-    {
-        get => model.Instrument;
-        set => SetValue(model.Instrument, value, next => model.Instrument = next);
-    }
+    [ObservableProperty]
+    public partial int Instrument { get; set; }
 
     /// <summary>Gets or sets the MIDI key, or -1 when unused.</summary>
-    public int Key
-    {
-        get => model.Key;
-        set => SetValue(model.Key, value, next => model.Key = next);
-    }
+    [ObservableProperty]
+    public partial int Key { get; set; }
 
     /// <summary>Gets or sets the generated SoundFont note length.</summary>
-    public double Length
-    {
-        get => model.Length;
-        set => SetValue(model.Length, value, next => model.Length = next);
-    }
+    [ObservableProperty]
+    public partial double Length { get; set; }
 
     /// <summary>Gets or sets the MIDI velocity and updates the corresponding gain.</summary>
-    public int Velocity
-    {
-        get => model.Velocity;
-        set
-        {
-            if (model.Velocity == value) return;
-            model.Velocity = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(Volume));
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Volume))]
+    public partial int Velocity { get; set; }
 
     /// <summary>Gets whether the source is a SoundFont.</summary>
     public bool UsesSoundFont => model.UsesSoundFont;
@@ -114,10 +84,14 @@ public sealed class ObservableSampleGeneratingArgs : ObservableObject
     /// <returns>A detached sample-generation snapshot.</returns>
     public SampleGeneratingArgs Snapshot() => model.Copy();
 
-    private void SetValue<T>(T current, T value, Action<T> setter, [System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(current, value)) return;
-        setter(value);
-        OnPropertyChanged(propertyName);
-    }
+    partial void OnPathChanged(string value) => model.Path = value;
+    partial void OnVolumeChanged(double value) => model.Volume = value;
+    partial void OnPanningChanged(double value) => model.Panning = value;
+    partial void OnPitchShiftChanged(double value) => model.PitchShift = value;
+    partial void OnBankChanged(int value) => model.Bank = value;
+    partial void OnPatchChanged(int value) => model.Patch = value;
+    partial void OnInstrumentChanged(int value) => model.Instrument = value;
+    partial void OnKeyChanged(int value) => model.Key = value;
+    partial void OnLengthChanged(double value) => model.Length = value;
+    partial void OnVelocityChanged(int value) => model.Velocity = value;
 }

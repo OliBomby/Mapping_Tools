@@ -5,7 +5,7 @@ using Mapping_Tools.Core.Classes.HitsoundStuff;
 namespace Mapping_Tools.Desktop.ViewModels.Adapters;
 
 /// <summary>Adapts a plain hitsound layer for Desktop list display and editing.</summary>
-public sealed class ObservableHitsoundLayer : ObservableObject
+public sealed partial class ObservableHitsoundLayer : ObservableObject
 {
     private readonly HitsoundLayer model;
 
@@ -14,6 +14,11 @@ public sealed class ObservableHitsoundLayer : ObservableObject
     public ObservableHitsoundLayer(HitsoundLayer model)
     {
         this.model = model ?? throw new ArgumentNullException(nameof(model));
+        Name = model.Name;
+        SampleSet = model.SampleSet;
+        Hitsound = model.Hitsound;
+        Priority = model.Priority;
+        Times = model.Times;
         SampleArgs = new ObservableSampleGeneratingArgs(model.SampleArgs);
     }
 
@@ -21,32 +26,20 @@ public sealed class ObservableHitsoundLayer : ObservableObject
     public HitsoundLayer Model => model;
 
     /// <summary>Gets or sets the display name.</summary>
-    public string Name
-    {
-        get => model.Name;
-        set => SetValue(model.Name, value, next => model.Name = next);
-    }
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the sample family.</summary>
-    public SampleSet SampleSet
-    {
-        get => model.SampleSet;
-        set => SetValue(model.SampleSet, value, next => model.SampleSet = next);
-    }
+    [ObservableProperty]
+    public partial SampleSet SampleSet { get; set; }
 
     /// <summary>Gets or sets the hitsound layer.</summary>
-    public Hitsound Hitsound
-    {
-        get => model.Hitsound;
-        set => SetValue(model.Hitsound, value, next => model.Hitsound = next);
-    }
+    [ObservableProperty]
+    public partial Hitsound Hitsound { get; set; }
 
     /// <summary>Gets or sets the export priority.</summary>
-    public int Priority
-    {
-        get => model.Priority;
-        set => SetValue(model.Priority, value, next => model.Priority = next);
-    }
+    [ObservableProperty]
+    public partial int Priority { get; set; }
 
     /// <summary>Gets the persisted import settings.</summary>
     public LayerImportArgs ImportArgs => model.ImportArgs;
@@ -55,15 +48,8 @@ public sealed class ObservableHitsoundLayer : ObservableObject
     public ObservableSampleGeneratingArgs SampleArgs { get; }
 
     /// <summary>Gets or sets the sorted timestamps assigned to this layer.</summary>
-    public List<double> Times
-    {
-        get => model.Times;
-        set
-        {
-            model.Times = value;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial List<double> Times { get; set; } = [];
 
     /// <summary>Creates a detached plain snapshot of this layer.</summary>
     /// <returns>A layer containing independent import, sample, and timing data.</returns>
@@ -96,10 +82,9 @@ public sealed class ObservableHitsoundLayer : ObservableObject
         Offset = source.Offset
     };
 
-    private void SetValue<T>(T current, T value, Action<T> setter, [System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(current, value)) return;
-        setter(value);
-        OnPropertyChanged(propertyName);
-    }
+    partial void OnNameChanged(string value) => model.Name = value;
+    partial void OnSampleSetChanged(SampleSet value) => model.SampleSet = value;
+    partial void OnHitsoundChanged(Hitsound value) => model.Hitsound = value;
+    partial void OnPriorityChanged(int value) => model.Priority = value;
+    partial void OnTimesChanged(List<double> value) => model.Times = value;
 }

@@ -5,7 +5,7 @@ using Mapping_Tools.Core.Tools.TumourGenerating;
 namespace Mapping_Tools.Desktop.ViewModels.Adapters;
 
 /// <summary>Adapts one plain tumour layer for Desktop editing and preview refresh.</summary>
-public sealed class ObservableTumourLayer : ObservableObject
+public sealed partial class ObservableTumourLayer : ObservableObject
 {
     private readonly TumourLayer model;
 
@@ -14,84 +14,114 @@ public sealed class ObservableTumourLayer : ObservableObject
     public ObservableTumourLayer(TumourLayer model)
     {
         this.model = model ?? throw new ArgumentNullException(nameof(model));
+        TumourTemplateEnum = model.TumourTemplateEnum;
+        WrappingMode = model.WrappingMode;
+        TumourSidedness = model.TumourSidedness;
+        TumourLength = model.TumourLength;
+        TumourScale = model.TumourScale;
+        TumourRotation = model.TumourRotation;
+        TumourParameter = model.TumourParameter;
+        TumourDistance = model.TumourDistance;
+        TumourCount = model.TumourCount;
+        TumourStart = model.TumourStart;
+        TumourEnd = model.TumourEnd;
+        RandomSeed = model.RandomSeed;
+        Recalculate = model.Recalculate;
+        UseAbsoluteRange = model.UseAbsoluteRange;
+        IsActive = model.IsActive;
+        Name = model.Name;
     }
 
     /// <summary>Gets the plain layer represented by this adapter.</summary>
     public TumourLayer Model => model;
 
     /// <summary>Gets or sets the selected geometric template.</summary>
-    public TumourTemplate TumourTemplateEnum
-    {
-        get => model.TumourTemplateEnum;
-        set
-        {
-            if (model.TumourTemplateEnum == value) return;
-            model.TumourTemplateEnum = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(TumourTemplate));
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TumourTemplate))]
+    public partial TumourTemplate TumourTemplateEnum { get; set; }
 
     /// <summary>Gets the configured template instance for the selected enum.</summary>
     public ITumourTemplate TumourTemplate => model.TumourTemplate;
 
     /// <summary>Gets or sets how the tumour follows the slider path.</summary>
-    public WrappingMode WrappingMode { get => model.WrappingMode; set => Set(model.WrappingMode, value, assigned => model.WrappingMode = assigned); }
+    [ObservableProperty]
+    public partial WrappingMode WrappingMode { get; set; }
 
     /// <summary>Gets or sets the side-selection policy.</summary>
-    public TumourSidedness TumourSidedness { get => model.TumourSidedness; set => Set(model.TumourSidedness, value, assigned => model.TumourSidedness = assigned); }
+    [ObservableProperty]
+    public partial TumourSidedness TumourSidedness { get; set; }
 
     /// <summary>Gets or sets the graph controlling tumour length.</summary>
-    public GraphState TumourLength { get => model.TumourLength; set => Set(model.TumourLength, value, assigned => model.TumourLength = assigned); }
+    [ObservableProperty]
+    public partial GraphState TumourLength { get; set; }
 
     /// <summary>Gets or sets the graph controlling tumour scale.</summary>
-    public GraphState TumourScale { get => model.TumourScale; set => Set(model.TumourScale, value, assigned => model.TumourScale = assigned); }
+    [ObservableProperty]
+    public partial GraphState TumourScale { get; set; }
 
     /// <summary>Gets or sets the graph controlling tumour rotation.</summary>
-    public GraphState TumourRotation { get => model.TumourRotation; set => Set(model.TumourRotation, value, assigned => model.TumourRotation = assigned); }
+    [ObservableProperty]
+    public partial GraphState TumourRotation { get; set; }
 
     /// <summary>Gets or sets the graph controlling the template parameter.</summary>
-    public GraphState TumourParameter { get => model.TumourParameter; set => Set(model.TumourParameter, value, assigned => model.TumourParameter = assigned); }
+    [ObservableProperty]
+    public partial GraphState TumourParameter { get; set; }
 
     /// <summary>Gets or sets the graph controlling tumour spacing.</summary>
-    public GraphState TumourDistance { get => model.TumourDistance; set => Set(model.TumourDistance, value, assigned => model.TumourDistance = assigned); }
+    [ObservableProperty]
+    public partial GraphState TumourDistance { get; set; }
 
     /// <summary>Gets or sets the explicit tumour count.</summary>
-    public int TumourCount { get => model.TumourCount; set => Set(model.TumourCount, value, assigned => model.TumourCount = assigned); }
+    [ObservableProperty]
+    public partial int TumourCount { get; set; }
 
     /// <summary>Gets or sets the sequence start.</summary>
-    public double TumourStart { get => model.TumourStart; set => Set(model.TumourStart, value, assigned => model.TumourStart = assigned); }
+    [ObservableProperty]
+    public partial double TumourStart { get; set; }
 
     /// <summary>Gets or sets the sequence end.</summary>
-    public double TumourEnd { get => model.TumourEnd; set => Set(model.TumourEnd, value, assigned => model.TumourEnd = assigned); }
+    [ObservableProperty]
+    public partial double TumourEnd { get; set; }
 
     /// <summary>Gets or sets the deterministic random-side seed.</summary>
-    public int RandomSeed { get => model.RandomSeed; set => Set(model.RandomSeed, value, assigned => model.RandomSeed = assigned); }
+    [ObservableProperty]
+    public partial int RandomSeed { get; set; }
 
     /// <summary>Gets or sets whether the path is recalculated before placement.</summary>
-    public bool Recalculate { get => model.Recalculate; set => Set(model.Recalculate, value, assigned => model.Recalculate = assigned); }
+    [ObservableProperty]
+    public partial bool Recalculate { get; set; }
 
     /// <summary>Gets or sets whether range and shape values are absolute pixels.</summary>
-    public bool UseAbsoluteRange { get => model.UseAbsoluteRange; set => Set(model.UseAbsoluteRange, value, assigned => model.UseAbsoluteRange = assigned); }
+    [ObservableProperty]
+    public partial bool UseAbsoluteRange { get; set; }
 
     /// <summary>Gets or sets whether this layer participates in generation.</summary>
-    public bool IsActive { get => model.IsActive; set => Set(model.IsActive, value, assigned => model.IsActive = assigned); }
+    [ObservableProperty]
+    public partial bool IsActive { get; set; }
 
     /// <summary>Gets or sets the user-facing layer name.</summary>
-    public string Name { get => model.Name; set => Set(model.Name, value ?? string.Empty, assigned => model.Name = assigned); }
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
 
     /// <summary>Creates a plain snapshot for an Application service.</summary>
     /// <returns>An independently mutable copy of this layer.</returns>
     public TumourLayer Snapshot() => model.Copy();
 
-    private void Set<T>(
-        T current,
-        T value,
-        Action<T> assign,
-        [System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(current, value)) return;
-        assign(value);
-        OnPropertyChanged(propertyName);
-    }
+    partial void OnTumourTemplateEnumChanged(TumourTemplate value) => model.TumourTemplateEnum = value;
+
+    partial void OnWrappingModeChanged(WrappingMode value) => model.WrappingMode = value;
+    partial void OnTumourSidednessChanged(TumourSidedness value) => model.TumourSidedness = value;
+    partial void OnTumourLengthChanged(GraphState value) => model.TumourLength = value;
+    partial void OnTumourScaleChanged(GraphState value) => model.TumourScale = value;
+    partial void OnTumourRotationChanged(GraphState value) => model.TumourRotation = value;
+    partial void OnTumourParameterChanged(GraphState value) => model.TumourParameter = value;
+    partial void OnTumourDistanceChanged(GraphState value) => model.TumourDistance = value;
+    partial void OnTumourCountChanged(int value) => model.TumourCount = value;
+    partial void OnTumourStartChanged(double value) => model.TumourStart = value;
+    partial void OnTumourEndChanged(double value) => model.TumourEnd = value;
+    partial void OnRandomSeedChanged(int value) => model.RandomSeed = value;
+    partial void OnRecalculateChanged(bool value) => model.Recalculate = value;
+    partial void OnUseAbsoluteRangeChanged(bool value) => model.UseAbsoluteRange = value;
+    partial void OnIsActiveChanged(bool value) => model.IsActive = value;
+    partial void OnNameChanged(string value) => model.Name = value;
 }

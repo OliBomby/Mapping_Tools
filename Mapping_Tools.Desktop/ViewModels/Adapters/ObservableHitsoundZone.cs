@@ -8,10 +8,9 @@ namespace Mapping_Tools.Desktop.ViewModels.Adapters;
 /// Adds Desktop change notification and transient list selection to a plain
 /// <see cref="HitsoundZone"/> persistence model.
 /// </summary>
-public sealed class ObservableHitsoundZone : ObservableObject
+public sealed partial class ObservableHitsoundZone : ObservableObject
 {
     private readonly HitsoundZone model;
-    private bool isSelected;
 
     /// <summary>Creates an adapter around a new wildcard zone.</summary>
     public ObservableHitsoundZone()
@@ -24,147 +23,65 @@ public sealed class ObservableHitsoundZone : ObservableObject
     public ObservableHitsoundZone(HitsoundZone model)
     {
         this.model = model ?? throw new ArgumentNullException(nameof(model));
+        Name = model.Name;
+        Filename = model.Filename;
+        XPos = model.XPos;
+        YPos = model.YPos;
+        Hitsound = model.Hitsound;
+        SampleSet = model.SampleSet;
+        AdditionsSet = model.AdditionsSet;
+        CustomIndex = model.CustomIndex;
     }
 
     /// <summary>Gets the plain model currently edited by the adapter.</summary>
     public HitsoundZone Model => model;
 
     /// <summary>Gets or sets transient list selection state.</summary>
-    public bool IsSelected
-    {
-        get => isSelected;
-        set => SetProperty(ref isSelected, value);
-    }
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
 
     /// <summary>Gets or sets the user-facing zone name.</summary>
-    public string Name
-    {
-        get => model.Name;
-        set
-        {
-            if (model.Name == value)
-            {
-                return;
-            }
-
-            model.Name = value ?? string.Empty;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the optional explicit sample filename.</summary>
-    public string Filename
-    {
-        get => model.Filename;
-        set
-        {
-            if (model.Filename == value)
-            {
-                return;
-            }
-
-            model.Filename = value ?? string.Empty;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial string Filename { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the target playfield X coordinate, or -1 for wildcard.</summary>
-    public double XPos
-    {
-        get => model.XPos;
-        set
-        {
-            if (model.XPos == value)
-            {
-                return;
-            }
-
-            model.XPos = value;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial double XPos { get; set; }
 
     /// <summary>Gets or sets the target playfield Y coordinate, or -1 for wildcard.</summary>
-    public double YPos
-    {
-        get => model.YPos;
-        set
-        {
-            if (model.YPos == value)
-            {
-                return;
-            }
-
-            model.YPos = value;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial double YPos { get; set; }
 
     /// <summary>Gets or sets the hitsound layer matched by this zone.</summary>
-    public Hitsound Hitsound
-    {
-        get => model.Hitsound;
-        set
-        {
-            if (model.Hitsound == value)
-            {
-                return;
-            }
-
-            model.Hitsound = value;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial Hitsound Hitsound { get; set; }
 
     /// <summary>Gets or sets the normal-layer sample family.</summary>
-    public SampleSet SampleSet
-    {
-        get => model.SampleSet;
-        set
-        {
-            if (model.SampleSet == value)
-            {
-                return;
-            }
-
-            model.SampleSet = value;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial SampleSet SampleSet { get; set; }
 
     /// <summary>Gets or sets the addition-layer sample family.</summary>
-    public SampleSet AdditionsSet
-    {
-        get => model.AdditionsSet;
-        set
-        {
-            if (model.AdditionsSet == value)
-            {
-                return;
-            }
-
-            model.AdditionsSet = value;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial SampleSet AdditionsSet { get; set; }
 
     /// <summary>Gets or sets the custom sample index assigned by the zone.</summary>
-    public int CustomIndex
-    {
-        get => model.CustomIndex;
-        set
-        {
-            if (model.CustomIndex == value)
-            {
-                return;
-            }
-
-            model.CustomIndex = value;
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial int CustomIndex { get; set; }
 
     /// <summary>Creates a plain snapshot without transient selection state.</summary>
     /// <returns>An independently mutable zone suitable for an Application service.</returns>
     public HitsoundZone Snapshot() => model.Copy();
+
+    partial void OnNameChanged(string value) => model.Name = value;
+    partial void OnFilenameChanged(string value) => model.Filename = value;
+    partial void OnXPosChanged(double value) => model.XPos = value;
+    partial void OnYPosChanged(double value) => model.YPos = value;
+    partial void OnHitsoundChanged(Hitsound value) => model.Hitsound = value;
+    partial void OnSampleSetChanged(SampleSet value) => model.SampleSet = value;
+    partial void OnAdditionsSetChanged(SampleSet value) => model.AdditionsSet = value;
+    partial void OnCustomIndexChanged(int value) => model.CustomIndex = value;
 }
