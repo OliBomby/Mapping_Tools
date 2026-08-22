@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using Avalonia.Input;
@@ -39,7 +38,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     private const double PointsBias = 3;
     private const double SpecialBias = 2;
     private const double SelectionRange = 80;
-    private static readonly HitObjectComparer HitObjectComparer = new(checkIsSelected: true);
+    private static readonly HitObjectComparer HitObjectComparer = new();
 
     private readonly ApplicationSettings _applicationSettings;
     private readonly IGeometryDashboardRuntime _runtime;
@@ -115,8 +114,6 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         Project.SetGenerators(Generators.Select(generator => generator.Model));
         _layers = CreateLayers();
         RebuildGroups();
-        SubscribeToGeneratorSettings();
-        SubscribePreferences();
     }
 
     /// <summary>Gets the serializable project currently edited by the dashboard.</summary>
@@ -323,9 +320,6 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         _lifetime.Cancel();
         try { _loop?.Wait(TimeSpan.FromSeconds(1)); } catch { }
         _overlay?.Dispose();
-        Preferences.PropertyChanged -= PreferencesChanged;
-        foreach (GeometryDashboardGeneratorViewModel generator in Generators)
-            generator.Model.Settings.PropertyChanged -= GeneratorSettingsChanged;
         _lifetime.Dispose();
         lock (_stateGate)
         {
@@ -488,9 +482,9 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             double approachTime = Beatmap.GetApproachTime(editor.ApproachRate);
             IEnumerable<HitObject> candidates = Preferences.SelectedHitObjectMode switch
             {
-                SelectedHitObjectMode.OnlySelected => editor.HitObjects.Where(objectModel => objectModel.IsSelected),
-                SelectedHitObjectMode.VisibleOrSelected when editor.HitObjects.Any(objectModel => objectModel.IsSelected) =>
-                    editor.HitObjects.Where(objectModel => objectModel.IsSelected),
+                SelectedHitObjectMode.OnlySelected => editor.SelectedHitObjects,
+                SelectedHitObjectMode.VisibleOrSelected when editor.SelectedHitObjects.Count > 0 =>
+                    editor.SelectedHitObjects,
                 _ => editor.HitObjects.Where(objectModel => editor.EditorTime > objectModel.Time - approachTime &&
                                                             editor.EditorTime < objectModel.EndTime + approachTime)
             };
@@ -504,12 +498,37 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
                 .ToArray();
             foreach (RelevantHitObject oldObject in removed)
                 oldObject.Dispose();
-            if (added.Length == 0 && removed.Length == 0) return false;
 
             _layers.GetRootLayer().Add(added.Select(candidate => new RelevantHitObject(candidate)));
+            bool selectionChanged = SynchronizeRootSelection(
+                _layers.GetRootRelevantHitObjects(),
+                editor.SelectedHitObjects);
+            if (added.Length == 0 && removed.Length == 0 && !selectionChanged) return false;
+
             _layers.GetRootLayer().GenerateNewObjects(true);
             return true;
         }
+    }
+
+    private static bool SynchronizeRootSelection(
+        IEnumerable<RelevantHitObject> roots,
+        IReadOnlyList<HitObject> selectedHitObjects)
+    {
+        bool changed = false;
+        foreach (RelevantHitObject root in roots)
+        {
+            bool isSelected = selectedHitObjects.Any(selectedHitObject =>
+                HitObjectComparer.Equals(root.HitObject, selectedHitObject));
+            if (root.IsSelected == isSelected) continue;
+
+            bool autoPropagate = root.AutoPropagate;
+            root.AutoPropagate = false;
+            root.IsSelected = isSelected;
+            root.AutoPropagate = autoPropagate;
+            changed = true;
+        }
+
+        return changed;
     }
 
     private void UpdateHotkeys()
@@ -849,18 +868,11 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     {
         lock (_stateGate)
         {
-        SubscribePreferences();
         _converter.EditorBoxOffset = Preferences.OverlayOffset;
         _layers.AcceptableDifference = Preferences.AcceptableDifference;
         _layers.SetInceptionLevel(Preferences.InceptionLevel);
         Regenerate();
         }
-    }
-
-    private void SubscribePreferences()
-    {
-        Preferences.PropertyChanged -= PreferencesChanged;
-        Preferences.PropertyChanged += PreferencesChanged;
     }
 
     private void SetStatus(string value) =>
@@ -925,22 +937,6 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     {
         RelevantObjectsGeneratorCollection collection = new(Generators.Select(generator => generator.Model));
         return new LayerCollection(collection, Preferences.AcceptableDifference);
-    }
-
-    private void SubscribeToGeneratorSettings()
-    {
-        foreach (GeometryDashboardGeneratorViewModel generator in Generators)
-            generator.Model.Settings.PropertyChanged += GeneratorSettingsChanged;
-    }
-
-    private void GeneratorSettingsChanged(object? sender, PropertyChangedEventArgs eventArgs)
-    {
-        if (_active) Regenerate();
-    }
-
-    private void PreferencesChanged(object? sender, PropertyChangedEventArgs eventArgs)
-    {
-        if (!_disposed) ApplyPreferences();
     }
 
     private void RebuildGroups()

@@ -69,16 +69,19 @@ public sealed class SlideratorServiceTests
             PixelLength = 100,
             ExportTime = 1000,
             NewVelocity = 1 / 4.2,
-            GraphState = SlideratorOptions.CreatePositionGraph(3),
-            DoEditorRead = true
+            GraphState = SlideratorOptions.CreatePositionGraph(3)
         };
 
         // Act
-        SlideratorResult result = await service.RunAsync("map.osu", project, source, reloadEditor: true);
+        SlideratorResult result = await service.RunAsync(
+            "map.osu",
+            project,
+            source,
+            reloadEditor: true,
+            preferLiveEditor: true);
 
         // Assert
         result.EditorReloaded.Should().BeTrue();
-        project.DoEditorRead.Should().BeFalse();
         gateway.SaveReloadRequests.Should().ContainSingle().Which.Should().BeTrue();
         gateway.Session.Editor.Beatmap.HitObjects.Should().HaveCount(3);
     }
@@ -110,7 +113,6 @@ public sealed class SlideratorServiceTests
         ];
         BeatmapEditor2 editor = new(lines, new MemoryTextFileStore());
         HitObject slider = editor.Beatmap.HitObjects[0];
-        slider.IsSelected = true;
         return new BeatmapEditingSession(editor, source, [slider]);
     }
 

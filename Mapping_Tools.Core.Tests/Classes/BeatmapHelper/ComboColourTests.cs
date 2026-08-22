@@ -43,16 +43,14 @@ public class ComboColourTests {
     }
 
     [TestMethod]
-    public void ColorChange_RaisesPropertyChanged() {
+    public void ColorChange_UpdatesPlainColourValue() {
         // Arrange
         var colour = new ComboColour(1, 2, 3);
-        string? changedProperty = null;
-        colour.PropertyChanged += (_, args) => changedProperty = args.PropertyName;
 
         // Act
         colour.Color = RgbaColour.White;
 
         // Assert
-        changedProperty.Should().Be(nameof(ComboColour.Color));
+        colour.Color.Should().Be(RgbaColour.White);
     }
 }

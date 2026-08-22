@@ -164,7 +164,7 @@ public sealed class LegacyProjectJsonSerializerTests
         project.TumourLayers[0].TumourTemplateEnum.Should().Be(TumourTemplate.Triangle);
         project.TumourLayers[0].TumourLength.GetValue(0).Should().BeApproximately(34, 1e-9);
         project.TumourLayers[0].TumourDistance.GetValue(0).Should().BeApproximately(118, 1e-9);
-        project.PreviewHitObject.IsSlider.Should().BeTrue();
+        serializer.Serialize(project).Should().NotContain("PreviewHitObject");
     }
 
     [TestMethod]

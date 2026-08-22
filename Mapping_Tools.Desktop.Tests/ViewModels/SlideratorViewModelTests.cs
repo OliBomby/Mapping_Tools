@@ -171,7 +171,8 @@ public sealed class SlideratorViewModelTests
             HitObject sourceSlider,
             bool reloadEditor,
             IProgress<double>? progress = null,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default,
+            bool preferLiveEditor = true)
         {
             RunCalled = true;
             Project = project;

@@ -5,22 +5,17 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
 /// <summary>Settings for the scale-and-rotate generator.</summary>
 public sealed class ScaleRotateGeneratorSettings : GeneratorSettings
 {
-    private double _angle;
-    private double _scalar = 1;
-    private SelectionPredicateCollection _originInputPredicate = new();
-    private SelectionPredicateCollection _otherInputPredicate = new();
-
     /// <summary>Gets or sets the rotation angle in degrees.</summary>
-    public double Angle { get => _angle; set => Set(ref _angle, value); }
+    public double Angle { get; set; }
 
     /// <summary>Gets or sets the uniform scale factor.</summary>
-    public double Scalar { get => _scalar; set => Set(ref _scalar, value); }
+    public double Scalar { get; set; } = 1;
 
     /// <summary>Gets or sets the predicate for origin lines/points.</summary>
-    public SelectionPredicateCollection OriginInputPredicate { get => _originInputPredicate; set => Set(ref _originInputPredicate, value); }
+    public SelectionPredicateCollection OriginInputPredicate { get; set; } = new();
 
     /// <summary>Gets or sets the predicate for transformed objects.</summary>
-    public SelectionPredicateCollection OtherInputPredicate { get => _otherInputPredicate; set => Set(ref _otherInputPredicate, value); }
+    public SelectionPredicateCollection OtherInputPredicate { get; set; } = new();
 
     /// <inheritdoc/>
     public override object Clone() => new ScaleRotateGeneratorSettings
@@ -36,10 +31,8 @@ public sealed class ScaleRotateGeneratorSettings : GeneratorSettings
 /// <summary>Settings for a circle generated from one point.</summary>
 public sealed class SinglePointCircleGeneratorSettings : GeneratorSettings
 {
-    private double _radius;
-
     /// <summary>Gets or sets the circle radius in editor pixels.</summary>
-    public double Radius { get => _radius; set => Set(ref _radius, value); }
+    public double Radius { get; set; }
 
     /// <inheritdoc/>
     public override object Clone() => new SinglePointCircleGeneratorSettings
@@ -53,10 +46,8 @@ public sealed class SinglePointCircleGeneratorSettings : GeneratorSettings
 /// <summary>Settings for slider-path point sampling.</summary>
 public sealed class SliderPathGeneratorSettings : GeneratorSettings
 {
-    private double _pointDensity;
-
     /// <summary>Gets or sets the number of generated points per path pixel.</summary>
-    public double PointDensity { get => _pointDensity; set => Set(ref _pointDensity, value); }
+    public double PointDensity { get; set; }
 
     /// <inheritdoc/>
     public override object Clone() => new SliderPathGeneratorSettings
@@ -70,14 +61,11 @@ public sealed class SliderPathGeneratorSettings : GeneratorSettings
 /// <summary>Settings for reflection across a selected axis.</summary>
 public sealed class SymmetryGeneratorSettings : GeneratorSettings
 {
-    private SelectionPredicateCollection _axisInputPredicate = new();
-    private SelectionPredicateCollection _otherInputPredicate = new();
-
     /// <summary>Gets or sets the predicate for axis lines.</summary>
-    public SelectionPredicateCollection AxisInputPredicate { get => _axisInputPredicate; set => Set(ref _axisInputPredicate, value); }
+    public SelectionPredicateCollection AxisInputPredicate { get; set; } = new();
 
     /// <summary>Gets or sets the predicate for objects to reflect.</summary>
-    public SelectionPredicateCollection OtherInputPredicate { get => _otherInputPredicate; set => Set(ref _otherInputPredicate, value); }
+    public SelectionPredicateCollection OtherInputPredicate { get; set; } = new();
 
     /// <inheritdoc/>
     public override object Clone() => new SymmetryGeneratorSettings

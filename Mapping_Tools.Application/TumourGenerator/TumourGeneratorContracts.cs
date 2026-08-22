@@ -20,21 +20,15 @@ public enum TumourImportMode
     Everything
 }
 
-/// <summary>Stores Tumour Generator 2 persistence and preview state.</summary>
+/// <summary>Stores the persisted Tumour Generator 2 run settings.</summary>
 public sealed class TumourGeneratorProject : TumourGeneratorOptions
 {
-    /// <summary>Creates a project with the legacy preview slider and one default layer.</summary>
+    /// <summary>Creates a project with the selected import mode and one default layer.</summary>
     public TumourGeneratorProject()
     {
-        PreviewHitObject = new HitObject("0,0,0,2,0,L|256:0,1,256");
         ImportModeSetting = TumourImportMode.Selected;
-        CurrentLayerIndex = 0;
-        CircleSize = 4;
         TumourLayers.Add(TumourLayer.GetDefaultLayer());
     }
-
-    /// <summary>Gets or sets the slider currently displayed in the preview.</summary>
-    public HitObject PreviewHitObject { get; set; }
 
     /// <summary>Gets or sets the object-selection source used by import and run.</summary>
     public TumourImportMode ImportModeSetting { get; set; }
@@ -42,14 +36,6 @@ public sealed class TumourGeneratorProject : TumourGeneratorOptions
     /// <summary>Gets or sets the time-code expression used in time mode.</summary>
     public string TimeCode { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets the selected layer index.</summary>
-    public int CurrentLayerIndex { get; set; }
-
-    /// <summary>Gets or sets whether advanced graph controls are visible.</summary>
-    public bool AdvancedOptions { get; set; }
-
-    /// <summary>Gets or sets the Circle Size used to draw the preview.</summary>
-    public double CircleSize { get; set; }
 }
 
 /// <summary>Reports imported sliders and the map's Circle Size.</summary>

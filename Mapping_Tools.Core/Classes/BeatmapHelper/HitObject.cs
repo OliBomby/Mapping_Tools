@@ -378,12 +378,6 @@ namespace Mapping_Tools.Core.Classes.BeatmapHelper {
         public TimingPoint UnInheritedTimingPoint { get; set; }
         
         /// <summary>
-        /// Gets or sets editor selection state; it is not part of the osu! file format.
-        /// </summary>
-        [JsonProperty]
-        public bool IsSelected { get; set; }
-
-        /// <summary>
         /// Timing changes inside the slider body that affect slide, whistle, or tick samples.
         /// </summary>
         public List<TimingPoint> BodyHitsounds = new List<TimingPoint>();

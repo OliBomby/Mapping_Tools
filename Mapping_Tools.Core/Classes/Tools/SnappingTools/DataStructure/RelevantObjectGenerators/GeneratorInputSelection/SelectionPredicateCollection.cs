@@ -1,5 +1,4 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
@@ -9,13 +8,13 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
 /// <summary>Combines selection predicates using the legacy OR semantics.</summary>
 public sealed class SelectionPredicateCollection : IEquatable<SelectionPredicateCollection>, ICloneable
 {
-    private ObservableCollection<SelectionPredicate> _predicates = new();
+    private List<SelectionPredicate> _predicates = [];
 
     /// <summary>Gets or sets the ordered predicates in this collection.</summary>
-    public ObservableCollection<SelectionPredicate> Predicates
+    public List<SelectionPredicate> Predicates
     {
         get => _predicates;
-        set => _predicates = value ?? new ObservableCollection<SelectionPredicate>();
+        set => _predicates = value ?? [];
     }
 
     /// <summary>Creates an empty collection, which accepts every object.</summary>

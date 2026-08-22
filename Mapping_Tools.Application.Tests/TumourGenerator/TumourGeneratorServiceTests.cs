@@ -178,7 +178,6 @@ public sealed class TumourGeneratorServiceTests
         ];
         BeatmapEditor2 editor = new(lines, new MemoryTextFileStore());
         HitObject slider = editor.Beatmap.HitObjects[0];
-        slider.IsSelected = selectedSlider;
         IReadOnlyList<HitObject> selected = selectedSlider ? [slider] : [editor.Beatmap.HitObjects[1]];
         return new BeatmapEditingSession(editor, source, selected);
     }

@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
-using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Desktop.ViewModels;
+using Mapping_Tools.Desktop.ViewModels.Adapters;
 
 namespace Mapping_Tools.Desktop.Views;
 
@@ -14,7 +14,7 @@ public sealed partial class TumourGeneratorView : UserControl
     private void LayerNamePointerPressed(object? sender, PointerPressedEventArgs eventArgs)
     {
         if (DataContext is TumourGeneratorViewModel viewModel &&
-            sender is Control { DataContext: TumourLayer layer })
+            sender is Control { DataContext: ObservableTumourLayer layer })
         {
             viewModel.CurrentLayer = layer;
         }

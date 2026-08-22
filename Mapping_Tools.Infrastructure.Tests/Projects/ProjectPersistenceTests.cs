@@ -47,7 +47,7 @@ public sealed class ProjectPersistenceTests
     }
 
     [TestMethod]
-    public void DeserializeAndSerialize_LegacySlideratorProject_PreservesGraphAndSelection()
+    public void DeserializeAndSerialize_LegacySlideratorProject_PreservesGraphAndDropsTransientState()
     {
         // Arrange
         string fixture = Path.Combine(
@@ -62,8 +62,6 @@ public sealed class ProjectPersistenceTests
         string json = serializer.Serialize(project);
 
         // Assert
-        project.LoadedHitObjects.Should().ContainSingle(item => item.IsSlider);
-        project.VisibleHitObjectIndex.Should().Be(0);
         project.GlobalSv.Should().BeApproximately(2.1, 0.0001);
         project.BeatSnapDivisor.Should().Be(8);
         project.GraphState.Anchors.Should().HaveCount(3);
@@ -72,6 +70,9 @@ public sealed class ProjectPersistenceTests
             "\"$type\": \"Mapping_Tools.Viewmodels.SlideratorVm, Mapping Tools\"");
         json.Should().Contain(
             "\"$type\": \"Mapping_Tools.Components.Graph.GraphState, Mapping Tools\"");
+        json.Should().NotContain("LoadedHitObjects");
+        json.Should().NotContain("VisibleHitObjectIndex");
+        json.Should().NotContain("DoEditorRead");
     }
 
     [TestMethod]

@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
-using Mapping_Tools.Core.Classes.SystemTools;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
@@ -57,7 +53,7 @@ public enum UpdateMode
 }
 
 /// <summary>Stores the persistent appearance and input settings of one dashboard.</summary>
-public sealed class SnappingToolsPreferences : BindableBase, ICloneable
+public sealed class SnappingToolsPreferences : ICloneable
 {
     private Dictionary<string, RelevantObjectPreferences> _relevantObjectPreferences;
     private Dictionary<Type, GeneratorSettings> _generatorSettings;
@@ -66,20 +62,6 @@ public sealed class SnappingToolsPreferences : BindableBase, ICloneable
     private Hotkey _lockHotkey;
     private Hotkey _inheritHotkey;
     private Hotkey _refreshHotkey;
-    private double _offsetLeft;
-    private double _offsetTop;
-    private double _offsetRight;
-    private double _offsetBottom;
-    private double _acceptableDifference;
-    private bool _keepRunning;
-    private bool _visiblePlayfieldBoundary;
-    private bool _debugEnabled;
-    private ViewMode _keyDownViewMode;
-    private ViewMode _keyUpViewMode;
-    private SelectedHitObjectMode _selectedHitObjectMode;
-    private UpdateMode _updateMode;
-    private int _inceptionLevel;
-
     /// <summary>Creates the legacy default Geometry Dashboard settings.</summary>
     public SnappingToolsPreferences()
     {
@@ -121,71 +103,71 @@ public sealed class SnappingToolsPreferences : BindableBase, ICloneable
         _lockHotkey = new Hotkey(57, 4);
         _inheritHotkey = new Hotkey(57, 1);
         _refreshHotkey = new Hotkey(45, 0);
-        _offsetTop = 1;
-        _offsetBottom = 1;
-        _acceptableDifference = 2;
-        _keyDownViewMode = ViewMode.Parents;
-        _keyUpViewMode = ViewMode.Everything;
-        _selectedHitObjectMode = SelectedHitObjectMode.AllwaysAllVisible;
-        _updateMode = UpdateMode.TimeChange;
-        _inceptionLevel = 5;
+        OffsetTop = 1;
+        OffsetBottom = 1;
+        AcceptableDifference = 2;
+        KeyDownViewMode = ViewMode.Parents;
+        KeyUpViewMode = ViewMode.Everything;
+        SelectedHitObjectMode = SelectedHitObjectMode.AllwaysAllVisible;
+        UpdateMode = UpdateMode.TimeChange;
+        InceptionLevel = 5;
     }
 
     /// <summary>Gets or sets appearance settings by stable preference-group name.</summary>
     public Dictionary<string, RelevantObjectPreferences> RelevantObjectPreferences
     {
         get => _relevantObjectPreferences;
-        set => Set(ref _relevantObjectPreferences, value ?? []);
+        set => _relevantObjectPreferences = value ?? [];
     }
 
     /// <summary>Gets or sets generator settings keyed by concrete generator type.</summary>
     public Dictionary<Type, GeneratorSettings> GeneratorSettings
     {
         get => _generatorSettings;
-        set => Set(ref _generatorSettings, value ?? []);
+        set => _generatorSettings = value ?? [];
     }
 
     /// <summary>Gets or sets the activation/snap key.</summary>
-    public Hotkey SnapHotkey { get => _snapHotkey; set => Set(ref _snapHotkey, value ?? new Hotkey()); }
+    public Hotkey SnapHotkey { get => _snapHotkey; set => _snapHotkey = value ?? new Hotkey(); }
     /// <summary>Gets or sets the selection key.</summary>
-    public Hotkey SelectHotkey { get => _selectHotkey; set => Set(ref _selectHotkey, value ?? new Hotkey()); }
+    public Hotkey SelectHotkey { get => _selectHotkey; set => _selectHotkey = value ?? new Hotkey(); }
     /// <summary>Gets or sets the lock/unlock key.</summary>
-    public Hotkey LockHotkey { get => _lockHotkey; set => Set(ref _lockHotkey, value ?? new Hotkey()); }
+    public Hotkey LockHotkey { get => _lockHotkey; set => _lockHotkey = value ?? new Hotkey(); }
     /// <summary>Gets or sets the inheritability key.</summary>
-    public Hotkey InheritHotkey { get => _inheritHotkey; set => Set(ref _inheritHotkey, value ?? new Hotkey()); }
+    public Hotkey InheritHotkey { get => _inheritHotkey; set => _inheritHotkey = value ?? new Hotkey(); }
     /// <summary>Gets or sets the refresh key.</summary>
-    public Hotkey RefreshHotkey { get => _refreshHotkey; set => Set(ref _refreshHotkey, value ?? new Hotkey()); }
+    public Hotkey RefreshHotkey { get => _refreshHotkey; set => _refreshHotkey = value ?? new Hotkey(); }
 
     /// <summary>Gets or sets the left editor-box correction in pixels.</summary>
-    public double OffsetLeft { get => _offsetLeft; set => Set(ref _offsetLeft, value); }
+    public double OffsetLeft { get; set; }
     /// <summary>Gets or sets the top editor-box correction in pixels.</summary>
-    public double OffsetTop { get => _offsetTop; set => Set(ref _offsetTop, value); }
+    public double OffsetTop { get; set; }
     /// <summary>Gets or sets the right editor-box correction in pixels.</summary>
-    public double OffsetRight { get => _offsetRight; set => Set(ref _offsetRight, value); }
+    public double OffsetRight { get; set; }
     /// <summary>Gets or sets the bottom editor-box correction in pixels.</summary>
-    public double OffsetBottom { get => _offsetBottom; set => Set(ref _offsetBottom, value); }
+    public double OffsetBottom { get; set; }
 
     /// <summary>Gets the four stored editor-box corrections as a box.</summary>
     public Box2 OverlayOffset => new(OffsetLeft, OffsetTop, OffsetRight, OffsetBottom);
 
     /// <summary>Gets or sets the duplicate-distance tolerance in editor pixels.</summary>
-    public double AcceptableDifference { get => _acceptableDifference; set => Set(ref _acceptableDifference, value); }
+    public double AcceptableDifference { get; set; }
     /// <summary>Gets or sets whether the engine continues when the dashboard is hidden.</summary>
-    public bool KeepRunning { get => _keepRunning; set => Set(ref _keepRunning, value); }
+    public bool KeepRunning { get; set; }
     /// <summary>Gets or sets whether the osu! playfield boundary is displayed.</summary>
-    public bool VisiblePlayfieldBoundary { get => _visiblePlayfieldBoundary; set => Set(ref _visiblePlayfieldBoundary, value); }
+    public bool VisiblePlayfieldBoundary { get; set; }
     /// <summary>Gets or sets whether platform debugging visuals are enabled.</summary>
-    public bool DebugEnabled { get => _debugEnabled; set => Set(ref _debugEnabled, value); }
+    public bool DebugEnabled { get; set; }
     /// <summary>Gets or sets the graph shown while the snap key is down.</summary>
-    public ViewMode KeyDownViewMode { get => _keyDownViewMode; set => Set(ref _keyDownViewMode, value); }
+    public ViewMode KeyDownViewMode { get; set; }
     /// <summary>Gets or sets the graph shown while the snap key is up.</summary>
-    public ViewMode KeyUpViewMode { get => _keyUpViewMode; set => Set(ref _keyUpViewMode, value); }
+    public ViewMode KeyUpViewMode { get; set; }
     /// <summary>Gets or sets the rule for selecting root hit objects.</summary>
-    public SelectedHitObjectMode SelectedHitObjectMode { get => _selectedHitObjectMode; set => Set(ref _selectedHitObjectMode, value); }
+    public SelectedHitObjectMode SelectedHitObjectMode { get; set; }
     /// <summary>Gets or sets the refresh trigger.</summary>
-    public UpdateMode UpdateMode { get => _updateMode; set => Set(ref _updateMode, value); }
+    public UpdateMode UpdateMode { get; set; }
     /// <summary>Gets or sets the number of generated layers, including the root layer.</summary>
-    public int InceptionLevel { get => _inceptionLevel; set => Set(ref _inceptionLevel, value); }
+    public int InceptionLevel { get; set; }
 
     /// <summary>Gets a configured preference group or a new empty fallback.</summary>
     /// <param name="input">The preference-group name.</param>
@@ -251,21 +233,17 @@ public sealed class SnappingToolsPreferences : BindableBase, ICloneable
 }
 
 /// <summary>A named saved snapshot of Geometry Dashboard preferences.</summary>
-public sealed class SnappingToolsSaveSlot : BindableBase, ICloneable
+public sealed class SnappingToolsSaveSlot : ICloneable
 {
     private string _name = string.Empty;
     private Hotkey _projectHotkey = new();
     private SnappingToolsPreferences _preferences = new();
 
     /// <summary>Gets or sets the user-visible slot name.</summary>
-    public string Name { get => _name; set => Set(ref _name, value ?? string.Empty); }
+    public string Name { get => _name; set => _name = value ?? string.Empty; }
 
     /// <summary>Gets or sets the slot activation hotkey.</summary>
-    public Hotkey ProjectHotkey { get => _projectHotkey; set => Set(ref _projectHotkey, value ?? new Hotkey()); }
-
-    /// <summary>Gets the owning project while the slot is attached to a project collection.</summary>
-    [Newtonsoft.Json.JsonIgnore]
-    public SnappingToolsProject? ParentProject { get; set; }
+    public Hotkey ProjectHotkey { get => _projectHotkey; set => _projectHotkey = value ?? new Hotkey(); }
 
     /// <summary>Gets or sets the preference snapshot stored by this slot.</summary>
     public SnappingToolsPreferences Preferences
@@ -284,7 +262,7 @@ public sealed class SnappingToolsSaveSlot : BindableBase, ICloneable
 }
 
 /// <summary>Serializable Geometry Dashboard preferences and ordered save slots.</summary>
-public sealed class SnappingToolsProject : BindableBase
+public sealed class SnappingToolsProject
 {
     private SnappingToolsPreferences _currentPreferences;
     private IEnumerable<RelevantObjectsGenerator>? _generators;
@@ -293,38 +271,17 @@ public sealed class SnappingToolsProject : BindableBase
     public SnappingToolsProject()
     {
         _currentPreferences = new SnappingToolsPreferences();
-        SaveSlots = new ObservableCollection<SnappingToolsSaveSlot>();
-        SaveSlots.CollectionChanged += SaveSlotsOnCollectionChanged;
     }
 
     /// <summary>Gets or sets the active preference state.</summary>
     public SnappingToolsPreferences CurrentPreferences
     {
         get => _currentPreferences;
-        set => Set(ref _currentPreferences, value ?? new SnappingToolsPreferences());
+        set => _currentPreferences = value ?? new SnappingToolsPreferences();
     }
 
     /// <summary>Gets the saved slots in their persisted order.</summary>
-    public ObservableCollection<SnappingToolsSaveSlot> SaveSlots { get; }
-
-    private void SaveSlotsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        if (e.OldItems is not null)
-        {
-            foreach (SnappingToolsSaveSlot oldItem in e.OldItems)
-            {
-                oldItem.ParentProject = null;
-            }
-        }
-
-        if (e.NewItems is not null)
-        {
-            foreach (SnappingToolsSaveSlot newItem in e.NewItems)
-            {
-                newItem.ParentProject = this;
-            }
-        }
-    }
+    public List<SnappingToolsSaveSlot> SaveSlots { get; set; } = [];
 
     /// <summary>Associates live generators so preferences can be applied or captured.</summary>
     /// <param name="generators">The generator instances owned by the calculation engine.</param>

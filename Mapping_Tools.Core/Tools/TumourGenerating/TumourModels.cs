@@ -1,5 +1,3 @@
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.Graph;
 using Mapping_Tools.Core.Classes.Graph.Interpolation;
@@ -107,31 +105,10 @@ public interface IRequireInit
 }
 
 /// <summary>Describes one configurable tumour layer without UI dependencies.</summary>
-public sealed class TumourLayer : INotifyPropertyChanged
+public sealed class TumourLayer
 {
-    private TumourTemplate tumourTemplateEnum;
-    private WrappingMode wrappingMode;
-    private TumourSidedness tumourSidedness;
-    private GraphState tumourLength = GraphState.CreateDefault();
-    private GraphState tumourScale = GraphState.CreateDefault();
-    private GraphState tumourRotation = GraphState.CreateDefault();
-    private GraphState tumourParameter = GraphState.CreateDefault();
-    private GraphState tumourDistance = GraphState.CreateDefault();
-    private int tumourCount;
-    private double tumourStart;
-    private double tumourEnd;
-    private int randomSeed;
-    private bool recalculate;
-    private bool useAbsoluteRange;
-    private bool isActive;
-    private string name = string.Empty;
-
     /// <summary>Gets or sets the selected template.</summary>
-    public TumourTemplate TumourTemplateEnum
-    {
-        get => tumourTemplateEnum;
-        set => SetField(ref tumourTemplateEnum, value, nameof(TumourTemplateEnum), nameof(TumourTemplate));
-    }
+    public TumourTemplate TumourTemplateEnum { get; set; }
 
     /// <summary>Gets a fresh configured template instance for this layer.</summary>
     [JsonIgnore]
@@ -145,49 +122,49 @@ public sealed class TumourLayer : INotifyPropertyChanged
     };
 
     /// <summary>Gets or sets how the tumour follows the slider path.</summary>
-    public WrappingMode WrappingMode { get => wrappingMode; set => SetField(ref wrappingMode, value); }
+    public WrappingMode WrappingMode { get; set; }
 
     /// <summary>Gets or sets the side-selection policy.</summary>
-    public TumourSidedness TumourSidedness { get => tumourSidedness; set => SetField(ref tumourSidedness, value); }
+    public TumourSidedness TumourSidedness { get; set; }
 
     /// <summary>Gets or sets the graph controlling tumour length.</summary>
-    public GraphState TumourLength { get => tumourLength; set => SetField(ref tumourLength, value); }
+    public GraphState TumourLength { get; set; } = GraphState.CreateDefault();
 
     /// <summary>Gets or sets the graph controlling tumour scale.</summary>
-    public GraphState TumourScale { get => tumourScale; set => SetField(ref tumourScale, value); }
+    public GraphState TumourScale { get; set; } = GraphState.CreateDefault();
 
     /// <summary>Gets or sets the graph controlling tumour rotation in degrees.</summary>
-    public GraphState TumourRotation { get => tumourRotation; set => SetField(ref tumourRotation, value); }
+    public GraphState TumourRotation { get; set; } = GraphState.CreateDefault();
 
     /// <summary>Gets or sets the graph controlling the template parameter.</summary>
-    public GraphState TumourParameter { get => tumourParameter; set => SetField(ref tumourParameter, value); }
+    public GraphState TumourParameter { get; set; } = GraphState.CreateDefault();
 
     /// <summary>Gets or sets the graph controlling spacing between tumours.</summary>
-    public GraphState TumourDistance { get => tumourDistance; set => SetField(ref tumourDistance, value); }
+    public GraphState TumourDistance { get; set; } = GraphState.CreateDefault();
 
     /// <summary>Gets or sets the explicit tumour count, or zero for distance-based count.</summary>
-    public int TumourCount { get => tumourCount; set => SetField(ref tumourCount, value); }
+    public int TumourCount { get; set; }
 
     /// <summary>Gets or sets the sequence start in relative or absolute units.</summary>
-    public double TumourStart { get => tumourStart; set => SetField(ref tumourStart, value); }
+    public double TumourStart { get; set; }
 
     /// <summary>Gets or sets the sequence end in relative or absolute units.</summary>
-    public double TumourEnd { get => tumourEnd; set => SetField(ref tumourEnd, value); }
+    public double TumourEnd { get; set; }
 
     /// <summary>Gets or sets the deterministic random-side seed; zero uses the generator sequence.</summary>
-    public int RandomSeed { get => randomSeed; set => SetField(ref randomSeed, value); }
+    public int RandomSeed { get; set; }
 
     /// <summary>Gets or sets whether this layer recalculates the path before placement.</summary>
-    public bool Recalculate { get => recalculate; set => SetField(ref recalculate, value); }
+    public bool Recalculate { get; set; }
 
     /// <summary>Gets or sets whether range and shape values are absolute osu! pixels.</summary>
-    public bool UseAbsoluteRange { get => useAbsoluteRange; set => SetField(ref useAbsoluteRange, value); }
+    public bool UseAbsoluteRange { get; set; }
 
     /// <summary>Gets or sets whether this layer participates in generation.</summary>
-    public bool IsActive { get => isActive; set => SetField(ref isActive, value); }
+    public bool IsActive { get; set; }
 
     /// <summary>Gets or sets the user-facing layer name.</summary>
-    public string Name { get => name; set => SetField(ref name, value); }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>Creates the legacy default layer, including constant graph values.</summary>
     /// <returns>A new active triangle layer.</returns>
@@ -246,19 +223,6 @@ public sealed class TumourLayer : INotifyPropertyChanged
         Name = Name
     };
 
-    /// <summary>Raised when a layer property changes.</summary>
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    private void SetField<T>(ref T field, T value, string? propertyName = null, params string[] additionalNames)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return;
-        field = value;
-        OnPropertyChanged(propertyName);
-        foreach (string additionalName in additionalNames) OnPropertyChanged(additionalName);
-    }
-
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
 /// <summary>Groups the framework-neutral settings used by the tumour generator.</summary>

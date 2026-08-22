@@ -326,10 +326,7 @@ public sealed class QuickRunServiceTests
         List<HitObject> hitObjects = [];
         for (int index = 0; index < Math.Max(3, selectedCount); index++)
         {
-            hitObjects.Add(new HitObject
-            {
-                IsSelected = index < selectedCount
-            });
+            hitObjects.Add(new HitObject());
         }
 
         return new LiveBeatmapSnapshot(
@@ -339,7 +336,8 @@ public sealed class QuickRunServiceTests
             hitObjects,
             -1,
             1.4,
-            1);
+            1,
+            selectedHitObjects: hitObjects.Take(selectedCount).ToArray());
     }
 
     private sealed class FakeLiveReader : ILiveBeatmapReader

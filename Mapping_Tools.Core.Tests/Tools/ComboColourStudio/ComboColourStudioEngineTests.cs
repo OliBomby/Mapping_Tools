@@ -27,7 +27,7 @@ public sealed class ComboColourStudioEngineTests
 
         // Assert
         point.ColourSequence[0].Color.Should().Be(RgbaColour.FromRgb(1, 2, 3));
-        point.ParentProject.Should().BeSameAs(project);
+        point.ColourSequence.Should().HaveCount(2);
     }
 
     [TestMethod]
@@ -63,7 +63,9 @@ public sealed class ComboColourStudioEngineTests
         project.AddComboColour();
         project.AddComboColour();
         SpecialColour firstColour = project.ComboColours[0];
-        project.ComboColours.Move(0, 1);
+        SpecialColour movedColour = project.ComboColours[0];
+        project.ComboColours.RemoveAt(0);
+        project.ComboColours.Insert(1, movedColour);
         project.AddColourPoint(0, [firstColour]);
 
         Beatmap beatmap = new();

@@ -12,6 +12,7 @@ using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.MetadataManager;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.ViewModels.Adapters;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -105,10 +106,10 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     public partial bool UseComboColours { get; set; } = true;
 
     /// <summary>Gets the ordered combo-colour palette edited by the form.</summary>
-    public ObservableCollection<ComboColour> ComboColours { get; } = [];
+    public ObservableCollection<ObservableComboColour> ComboColours { get; } = [];
 
     /// <summary>Gets the named special colours edited by the form.</summary>
-    public ObservableCollection<SpecialColour> SpecialColours { get; } = [];
+    public ObservableCollection<ObservableSpecialColour> SpecialColours { get; } = [];
 
     /// <summary>Gets the number of non-empty target beatmap paths.</summary>
     public string ExportMapCountText
@@ -235,7 +236,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         RgbaColour colour = ComboColours.Count == 0
             ? RgbaColour.FromRgb(255, 255, 255)
             : ComboColours[^1].Color;
-        ComboColours.Add(new ComboColour(colour));
+        ComboColours.Add(new ObservableComboColour(new ComboColour(colour)));
     }
 
     [RelayCommand]
@@ -253,7 +254,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         RgbaColour colour = SpecialColours.Count == 0
             ? RgbaColour.FromRgb(255, 255, 255)
             : SpecialColours[^1].Color;
-        SpecialColours.Add(new SpecialColour(colour));
+        SpecialColours.Add(new ObservableSpecialColour(new SpecialColour(colour)));
     }
 
     [RelayCommand]
@@ -336,9 +337,9 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         ResetIds = ResetIds,
         PreviewTime = PreviewTime,
         UseComboColours = UseComboColours,
-        ComboColours = ComboColours.Select(colour => new ComboColour(colour.Color)).ToList(),
+        ComboColours = ComboColours.Select(colour => colour.Snapshot()).ToList(),
         SpecialColours = SpecialColours
-            .Select(colour => new SpecialColour(colour.Color, colour.Name ?? string.Empty))
+            .Select(colour => (SpecialColour)colour.Snapshot())
             .ToList()
     };
 
@@ -362,13 +363,13 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         ComboColours.Clear();
         foreach (ComboColour colour in options.ComboColours)
         {
-            ComboColours.Add(new ComboColour(colour.Color));
+            ComboColours.Add(new ObservableComboColour(new ComboColour(colour.Color)));
         }
 
         SpecialColours.Clear();
         foreach (SpecialColour colour in options.SpecialColours)
         {
-            SpecialColours.Add(new SpecialColour(colour.Color, colour.Name ?? string.Empty));
+            SpecialColours.Add(new ObservableSpecialColour(new SpecialColour(colour.Color, colour.Name ?? string.Empty)));
         }
     }
 

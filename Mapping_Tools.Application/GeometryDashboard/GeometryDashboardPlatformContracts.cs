@@ -81,13 +81,15 @@ public sealed class GeometryDashboardEditorSnapshot
     /// <param name="approachRate">The live osu! approach-rate value.</param>
     /// <param name="circleSize">The live osu! circle-size value.</param>
     /// <param name="editorTime">The editor playhead in milliseconds.</param>
-    /// <param name="hitObjects">The complete live object list, including selection flags.</param>
+    /// <param name="hitObjects">The complete live object list without editor-only selection state.</param>
+    /// <param name="selectedHitObjects">The separate live editor selection snapshot.</param>
     public GeometryDashboardEditorSnapshot(
         string path,
         double approachRate,
         double circleSize,
         int editorTime,
-        IReadOnlyList<HitObject> hitObjects)
+        IReadOnlyList<HitObject> hitObjects,
+        IReadOnlyList<HitObject>? selectedHitObjects = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentNullException.ThrowIfNull(hitObjects);
@@ -97,6 +99,7 @@ public sealed class GeometryDashboardEditorSnapshot
         CircleSize = circleSize;
         EditorTime = editorTime;
         HitObjects = hitObjects.ToArray();
+        SelectedHitObjects = (selectedHitObjects ?? []).ToArray();
     }
 
     /// <summary>Gets the full path of the beatmap currently held by the editor.</summary>
@@ -111,8 +114,11 @@ public sealed class GeometryDashboardEditorSnapshot
     /// <summary>Gets the live editor playhead in milliseconds.</summary>
     public int EditorTime { get; }
 
-    /// <summary>Gets the complete live hit-object list with editor selection state preserved.</summary>
+    /// <summary>Gets the complete live hit-object list without selection state.</summary>
     public IReadOnlyList<HitObject> HitObjects { get; }
+
+    /// <summary>Gets the separate live editor selection snapshot.</summary>
+    public IReadOnlyList<HitObject> SelectedHitObjects { get; }
 }
 
 /// <summary>

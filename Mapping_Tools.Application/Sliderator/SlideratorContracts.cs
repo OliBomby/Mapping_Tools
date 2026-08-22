@@ -1,20 +1,11 @@
-using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.Sliderator;
 
 namespace Mapping_Tools.Application.Sliderator;
 
-/// <summary>Stores Sliderator's persisted form, imported objects, and graph state.</summary>
+/// <summary>Stores Sliderator's persisted generation settings.</summary>
 public sealed class SlideratorProject : SlideratorOptions
 {
-    /// <summary>Gets or sets the imported slider candidates retained by the project.</summary>
-    public List<HitObject> LoadedHitObjects { get; set; } = [];
-
-    /// <summary>Gets or sets the index of the slider shown in the preview.</summary>
-    public int VisibleHitObjectIndex { get; set; }
-
-    /// <summary>Gets or sets whether the next export should prefer the live editor state.</summary>
-    public bool DoEditorRead { get; set; }
 }
 
 /// <summary>Reports the imported slider candidates and their map multiplier.</summary>
@@ -59,6 +50,7 @@ public interface ISlideratorService
     /// <param name="reloadEditor">Whether a live editor should be refreshed after saving.</param>
     /// <param name="progress">Optional percentage progress receiver.</param>
     /// <param name="cancellationToken">Cancels generation or persistence.</param>
+    /// <param name="preferLiveEditor">Whether the application should prefer unsaved editor state for this run.</param>
     /// <returns>The written path and Core output result.</returns>
     Task<SlideratorResult> RunAsync(
         string path,
@@ -66,7 +58,8 @@ public interface ISlideratorService
         HitObject sourceSlider,
         bool reloadEditor,
         IProgress<double>? progress = null,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        bool preferLiveEditor = true);
 }
 
 /// <summary>

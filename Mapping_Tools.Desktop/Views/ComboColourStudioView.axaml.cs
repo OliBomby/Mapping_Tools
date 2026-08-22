@@ -1,8 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Desktop.ViewModels;
+using Mapping_Tools.Desktop.ViewModels.Adapters;
 
 namespace Mapping_Tools.Desktop.Views;
 
@@ -30,7 +30,7 @@ public partial class ComboColourStudioView : UserControl
     private void RemoveSequenceColour_OnClick(object? sender, RoutedEventArgs eventArgs)
     {
         if (DataContext is not ComboColourStudioViewModel viewModel ||
-            sender is not Button { Tag: SpecialColour colour })
+            sender is not Button { Tag: ObservableSpecialColour colour })
         {
             return;
         }

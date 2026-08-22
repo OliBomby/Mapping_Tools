@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
-             xmlns:hitsound="using:Mapping_Tools.Core.Classes.HitsoundStuff"
+             xmlns:adapter="using:Mapping_Tools.Desktop.ViewModels.Adapters"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -78,12 +78,12 @@
                                                 Header="Hitsound"
                                                 SortMemberPath="Hitsound">
                             <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="hitsound:HitsoundZone">
+                                <DataTemplate x:DataType="adapter:ObservableHitsoundZone">
                                     <TextBlock VerticalAlignment="Center" Text="{Binding Hitsound}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                             <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate x:DataType="hitsound:HitsoundZone">
+                                <DataTemplate x:DataType="adapter:ObservableHitsoundZone">
                                     <ComboBox Classes="compact"
                                               ItemsSource="{Binding #Root.DataContext.Hitsounds}"
                                               SelectedItem="{Binding Hitsound, Mode=TwoWay}"
@@ -95,12 +95,12 @@
                                                 Header="SampleSet"
                                                 SortMemberPath="SampleSet">
                             <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="hitsound:HitsoundZone">
+                                <DataTemplate x:DataType="adapter:ObservableHitsoundZone">
                                     <TextBlock VerticalAlignment="Center" Text="{Binding SampleSet}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                             <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate x:DataType="hitsound:HitsoundZone">
+                                <DataTemplate x:DataType="adapter:ObservableHitsoundZone">
                                     <ComboBox Classes="compact"
                                               ItemsSource="{Binding #Root.DataContext.SampleSets}"
                                               SelectedItem="{Binding SampleSet, Mode=TwoWay}"
@@ -112,12 +112,12 @@
                                                 Header="Additions"
                                                 SortMemberPath="AdditionsSet">
                             <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate x:DataType="hitsound:HitsoundZone">
+                                <DataTemplate x:DataType="adapter:ObservableHitsoundZone">
                                     <TextBlock VerticalAlignment="Center" Text="{Binding AdditionsSet}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                             <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate x:DataType="hitsound:HitsoundZone">
+                                <DataTemplate x:DataType="adapter:ObservableHitsoundZone">
                                     <ComboBox Classes="compact"
                                               ItemsSource="{Binding #Root.DataContext.SampleSets}"
                                               SelectedItem="{Binding AdditionsSet, Mode=TwoWay}"

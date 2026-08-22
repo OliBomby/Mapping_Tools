@@ -16,6 +16,7 @@ using Mapping_Tools.Core.Classes.Graph;
 using Mapping_Tools.Core.Classes.ObjectVisualiser;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.ViewModels.Adapters;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -66,7 +67,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         Enum.GetValues<TumourSidedness>();
 
     /// <summary>Gets the editable layers in generation order.</summary>
-    public ObservableCollection<TumourLayer> TumourLayers { get; } = [];
+    public ObservableCollection<ObservableTumourLayer> TumourLayers { get; } = [];
 
     /// <summary>Gets or sets the source used when importing or running.</summary>
     [ObservableProperty]
@@ -182,7 +183,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     }
 
     /// <summary>Gets or sets the layer selected by the details panel.</summary>
-    public TumourLayer? CurrentLayer
+    public ObservableTumourLayer? CurrentLayer
     {
         get => CurrentLayerIndex >= 0 && CurrentLayerIndex < TumourLayers.Count
             ? TumourLayers[CurrentLayerIndex]
@@ -252,7 +253,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
 
         TumourLayers.CollectionChanged += OnLayersChanged;
-        TumourLayers.Add(TumourLayer.GetDefaultLayer());
+        TumourLayers.Add(new ObservableTumourLayer(TumourLayer.GetDefaultLayer()));
         QueuePreview();
     }
 
@@ -298,7 +299,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void Add()
     {
-        TumourLayer layer = TumourLayer.GetDefaultLayer();
+        ObservableTumourLayer layer = new(TumourLayer.GetDefaultLayer());
         layer.Name = $"Layer {TumourLayers.Count + 1}";
         layer.TumourEnd = LayerRangeSliderMaxes.LastOrDefault(PreviewHitObject.PixelLength);
         InsertAfterCurrent(layer);
@@ -313,7 +314,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             return;
         }
 
-        TumourLayer copy = CurrentLayer.Copy();
+        ObservableTumourLayer copy = new(CurrentLayer.Snapshot());
         copy.Name = $"{copy.Name} (Copy)";
         InsertAfterCurrent(copy);
     }
@@ -483,7 +484,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         OnPropertyChanged(nameof(TumourRangeSliderMax));
     }
 
-    private void InsertAfterCurrent(TumourLayer layer)
+    private void InsertAfterCurrent(ObservableTumourLayer layer)
     {
         int index = Math.Clamp(CurrentLayerIndex + 1, 0, TumourLayers.Count);
         TumourLayers.Insert(index, layer);
@@ -494,7 +495,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     {
         if (eventArgs.OldItems is not null)
         {
-            foreach (TumourLayer layer in eventArgs.OldItems.OfType<TumourLayer>())
+            foreach (ObservableTumourLayer layer in eventArgs.OldItems.OfType<ObservableTumourLayer>())
             {
                 layer.PropertyChanged -= OnLayerChanged;
             }
@@ -502,7 +503,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
 
         if (eventArgs.NewItems is not null)
         {
-            foreach (TumourLayer layer in eventArgs.NewItems.OfType<TumourLayer>())
+            foreach (ObservableTumourLayer layer in eventArgs.NewItems.OfType<ObservableTumourLayer>())
             {
                 layer.PropertyChanged += OnLayerChanged;
             }
@@ -659,10 +660,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         {
             ImportModeSetting = ImportModeSetting,
             TimeCode = TimeCode,
-            PreviewHitObject = PreviewHitObject.DeepCopy(),
-            CurrentLayerIndex = CurrentLayerIndex,
-            AdvancedOptions = AdvancedOptions,
-            CircleSize = CircleSize,
             JustMiddleAnchors = JustMiddleAnchors,
             Scale = Scale,
             DebugConstruction = DebugConstruction,
@@ -670,13 +667,13 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             DelegateToBpm = DelegateToBpm,
             RemoveSliderTicks = RemoveSliderTicks
         };
-        project.TumourLayers = TumourLayers.Select(layer => layer.Copy()).ToList();
+        project.TumourLayers = TumourLayers.Select(layer => layer.Snapshot()).ToList();
         return project;
     }
 
     private TumourGeneratorOptions SnapshotOptions() => new()
     {
-        TumourLayers = TumourLayers.Select(layer => layer.Copy()).ToList(),
+        TumourLayers = TumourLayers.Select(layer => layer.Snapshot()).ToList(),
         JustMiddleAnchors = JustMiddleAnchors,
         Scale = Scale,
         DebugConstruction = DebugConstruction,
@@ -694,9 +691,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
 
         ImportModeSetting = project.ImportModeSetting;
         TimeCode = project.TimeCode ?? string.Empty;
-        PreviewHitObject = project.PreviewHitObject.DeepCopy();
-        AdvancedOptions = project.AdvancedOptions;
-        CircleSize = project.CircleSize;
         JustMiddleAnchors = project.JustMiddleAnchors;
         Scale = project.Scale;
         DebugConstruction = project.DebugConstruction;
@@ -707,10 +701,10 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         TumourLayers.Clear();
         foreach (TumourLayer layer in project.TumourLayers)
         {
-            TumourLayers.Add(layer.Copy());
+            TumourLayers.Add(new ObservableTumourLayer(layer.Copy()));
         }
 
-        CurrentLayerIndex = Math.Clamp(project.CurrentLayerIndex, 0, TumourLayers.Count - 1);
+        CurrentLayerIndex = 0;
         QueuePreview();
     }
 
@@ -734,7 +728,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         }
 
         TumourLayers.CollectionChanged -= OnLayersChanged;
-        foreach (TumourLayer layer in TumourLayers)
+        foreach (ObservableTumourLayer layer in TumourLayers)
         {
             layer.PropertyChanged -= OnLayerChanged;
         }
@@ -744,12 +738,11 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
 
     private static bool ValidateProject(TumourGeneratorProject? project, out string error)
     {
-        if (project is null || project.PreviewHitObject is null || !project.PreviewHitObject.IsSlider ||
+        if (project is null ||
             project.TumourLayers is null ||
             project.TumourLayers.Count == 0 ||
             !Enum.IsDefined(project.ImportModeSetting) ||
-            !double.IsFinite(project.Scale) || project.Scale < 0 ||
-            !double.IsFinite(project.CircleSize) || project.CircleSize < 0)
+            !double.IsFinite(project.Scale) || project.Scale < 0)
         {
             error = "Tumour Generator project is incomplete or contains invalid values.";
             return false;

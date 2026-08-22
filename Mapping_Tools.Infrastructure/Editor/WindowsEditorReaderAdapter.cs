@@ -237,7 +237,8 @@ public sealed class WindowsEditorReaderAdapter :
             _reader.ApproachRate,
             _reader.CircleSize,
             editorTime,
-            snapshot.HitObjects);
+            snapshot.HitObjects,
+            snapshot.SelectedHitObjects);
     }
 
     private static bool IsActiveEditor(
@@ -334,15 +335,21 @@ internal static class EditorReaderSnapshotConverter
             songsPath,
             reader.ContainingFolder,
             reader.Filename);
+        List<DomainHitObject> hitObjects = reader.hitObjects.Select(ConvertHitObject).ToList();
+        List<DomainHitObject> selectedHitObjects = reader.hitObjects
+            .Select((source, index) => source.IsSelected ? hitObjects[index] : null)
+            .OfType<DomainHitObject>()
+            .ToList();
         return new LiveBeatmapSnapshot(
             path,
             reader.bookmarks.Select(value => (double)value).ToList(),
             reader.controlPoints.Select(ConvertControlPoint).ToList(),
-            reader.hitObjects.Select(ConvertHitObject).ToList(),
+            hitObjects,
             reader.PreviewTime,
             reader.SliderMultiplier,
             reader.SliderTickRate,
-            editorTime);
+            editorTime,
+            selectedHitObjects);
     }
 
     private static bool IsInvalid(ReaderHitObject hitObject)
@@ -383,8 +390,7 @@ internal static class EditorReaderSnapshotConverter
             SampleVolume = source.SampleVolume,
             SampleSet = (SampleSet)source.SampleSet,
             AdditionSet = (SampleSet)source.SampleSetAdditions,
-            CustomIndex = source.CustomSampleSet,
-            IsSelected = source.IsSelected
+            CustomIndex = source.CustomSampleSet
         };
 
         if (hitObject.IsSlider)

@@ -14,6 +14,7 @@ using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.HitsoundStuff;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.ViewModels.Adapters;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -49,7 +50,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the default normal sample.</summary>
     [ObservableProperty]
-    public partial Sample DefaultSample { get; set; } = new() { Priority = int.MaxValue };
+    public partial ObservableSample DefaultSample { get; set; } =
+        new(new Sample { Priority = int.MaxValue });
 
     /// <summary>Gets or sets the default sample volume as a percentage.</summary>
     [ObservableProperty]
@@ -61,11 +63,11 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the editable layer collection.</summary>
     [ObservableProperty]
-    public partial ObservableCollection<HitsoundLayer> Layers { get; set; } = [];
+    public partial ObservableCollection<ObservableHitsoundLayer> Layers { get; set; } = [];
 
     /// <summary>Gets or sets the currently focused layer after a list selection.</summary>
     [ObservableProperty]
-    public partial HitsoundLayer? SelectedLayer { get; set; }
+    public partial ObservableHitsoundLayer? SelectedLayer { get; set; }
 
     /// <summary>Gets or sets the invariant comma-separated timestamps of the focused layer.</summary>
     [ObservableProperty]
@@ -134,13 +136,13 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [ObservableProperty] public partial string EditImportOffset { get; set; } = "0";
 
     /// <summary>Gets the layer selection supplied by the Avalonia list.</summary>
-    public ObservableCollection<HitsoundLayer> SelectedLayers { get; } = [];
+    public ObservableCollection<ObservableHitsoundLayer> SelectedLayers { get; } = [];
     /// <summary>Gets whether the layer editor has a selected layer to edit.</summary>
     public bool HasSelectedLayer => SelectedLayer is not null;
     /// <summary>Gets whether the layer editor has any layer to edit.</summary>
     public bool HasLayers => Layers.Count > 0;
     /// <summary>Gets whether the selected layer can be reloaded from a source.</summary>
-    public bool HasImport => SelectedLayers.Any(layer => layer.ImportArgs.CanImport);
+    public bool HasImport => SelectedLayers.Any(layer => layer.ImportArgs.ImportType != ImportType.None);
     /// <summary>Gets whether stack-specific import fields apply to the selection.</summary>
     public bool IsStackImport => SelectedLayers.Any(layer => layer.ImportArgs.ImportType == ImportType.Stack);
     /// <summary>Gets whether hitsound-import fields apply to the selection.</summary>
@@ -266,11 +268,11 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             IReadOnlyList<HitsoundLayer> imported = await _service.ImportAsync(request);
             foreach (HitsoundLayer layer in imported)
             {
-                layer.Priority = Layers.Count;
-                Layers.Add(layer);
+                ObservableHitsoundLayer adapter = new(layer) { Priority = Layers.Count };
+                Layers.Add(adapter);
             }
 
-            SetSelection(imported);
+            SetSelection(Layers.Skip(Math.Max(0, Layers.Count - imported.Count)));
             OnPropertyChanged(nameof(HasLayers));
             ResultSummary = $"Imported {imported.Count} layer{(imported.Count == 1 ? string.Empty : "s")}.";
         }
@@ -306,7 +308,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             .Where(index => index >= 0)
             .DefaultIfEmpty(0)
             .Min();
-        foreach (HitsoundLayer layer in SelectedLayers.ToArray()) Layers.Remove(layer);
+        foreach (ObservableHitsoundLayer layer in SelectedLayers.ToArray()) Layers.Remove(layer);
         RecalculatePriorities();
         SetSelection(Layers.Skip(Math.Max(0, Math.Min(firstSelectedIndex - 1, Layers.Count - 1))).Take(1));
         OnPropertyChanged(nameof(HasLayers));
@@ -324,7 +326,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
         try
         {
-            await _service.ReloadAsync(SelectedLayers.ToArray());
+        await _service.ReloadAsync(SelectedLayers.Select(layer => layer.Model).ToArray());
             ResultSummary = "Reloaded selected layers.";
         }
         catch (OperationCanceledException)
@@ -350,7 +352,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         await StopPreviewAsync();
         try
         {
-            _previewSession = await _service.PreviewAsync(SelectedLayer.SampleArgs);
+        _previewSession = await _service.PreviewAsync(SelectedLayer.SampleArgs.Snapshot());
             ResultSummary = "Playing selected layer.";
         }
         catch (FileNotFoundException)
@@ -382,7 +384,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         try
         {
             IReadOnlyDictionary<SampleGeneratingArgs, Exception> failures = await _service.ValidateSamplesAsync(
-                Layers.Select(layer => layer.SampleArgs).ToArray());
+                Layers.Select(layer => layer.SampleArgs.Snapshot()).ToArray());
             ResultSummary = failures.Count == 0
                 ? "All sample sources are valid."
                 : $"{failures.Count} sample source{(failures.Count == 1 ? " is" : "s are")} invalid.";
@@ -521,9 +523,9 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             int? key = ParseOptionalInt(fields, 2);
             int? length = ParseOptionalInt(fields, 3);
             int? velocity = ParseOptionalInt(fields, 4);
-            foreach (HitsoundLayer layer in SelectedLayers)
+            foreach (ObservableHitsoundLayer layer in SelectedLayers)
             {
-                SampleGeneratingArgs sample = layer.SampleArgs;
+                ObservableSampleGeneratingArgs sample = layer.SampleArgs;
                 if ((bank.HasValue && bank.Value != layer.ImportArgs.Bank) ||
                     (patch.HasValue && patch.Value != layer.ImportArgs.Patch) ||
                     (key.HasValue && key.Value != layer.ImportArgs.Key) ||
@@ -631,14 +633,14 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     /// <summary>Allows the view to update the focused item after an extended selection change.</summary>
     /// <param name="selected">The selected layers in list order.</param>
-    public void SetSelection(IEnumerable<HitsoundLayer> selected)
+    public void SetSelection(IEnumerable<ObservableHitsoundLayer> selected)
     {
         SelectedLayers.Clear();
-        foreach (HitsoundLayer layer in selected) SelectedLayers.Add(layer);
+        foreach (ObservableHitsoundLayer layer in selected) SelectedLayers.Add(layer);
         SelectedLayer = SelectedLayers.FirstOrDefault();
     }
 
-    partial void OnSelectedLayerChanged(HitsoundLayer? value)
+    partial void OnSelectedLayerChanged(ObservableHitsoundLayer? value)
     {
         OnPropertyChanged(nameof(HasSelectedLayer));
         RefreshEditorVisibility();
@@ -692,7 +694,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
         times.Sort();
 
-        foreach (HitsoundLayer layer in SelectedLayers.Count > 0 ? SelectedLayers : SelectedLayer is null ? [] : [SelectedLayer])
+        foreach (ObservableHitsoundLayer layer in SelectedLayers.Count > 0 ? SelectedLayers : SelectedLayer is null ? [] : [SelectedLayer])
         {
             layer.Times = times.ToList();
         }
@@ -701,44 +703,44 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     partial void OnEditNameChanged(string value)
     {
         if (_syncingEditor) return;
-        foreach (HitsoundLayer layer in Targets()) layer.Name = value;
+        foreach (ObservableHitsoundLayer layer in Targets()) layer.Name = value;
     }
 
     partial void OnEditSampleSetChanged(SampleSet value)
     {
         if (_syncingEditor) return;
-        foreach (HitsoundLayer layer in Targets()) layer.SampleSet = value;
+        foreach (ObservableHitsoundLayer layer in Targets()) layer.SampleSet = value;
     }
 
     partial void OnEditHitsoundChanged(Hitsound value)
     {
         if (_syncingEditor) return;
-        foreach (HitsoundLayer layer in Targets()) layer.Hitsound = value;
+        foreach (ObservableHitsoundLayer layer in Targets()) layer.Hitsound = value;
     }
 
     partial void OnEditSamplePathChanged(string value)
     {
         if (_syncingEditor) return;
-        foreach (HitsoundLayer layer in Targets()) layer.SampleArgs.Path = value;
+        foreach (ObservableHitsoundLayer layer in Targets()) layer.SampleArgs.Path = value;
         RefreshEditorVisibility();
     }
 
     partial void OnEditSampleVolumeChanged(string value)
     {
         if (_syncingEditor || !TryDouble(value, 100, out double parsed)) return;
-        foreach (HitsoundLayer layer in Targets()) layer.SampleArgs.Volume = parsed / 100;
+        foreach (ObservableHitsoundLayer layer in Targets()) layer.SampleArgs.Volume = parsed / 100;
     }
 
     partial void OnEditSamplePanningChanged(string value)
     {
         if (_syncingEditor || !TryDouble(value, 0, out double parsed)) return;
-        foreach (HitsoundLayer layer in Targets()) layer.SampleArgs.Panning = parsed;
+        foreach (ObservableHitsoundLayer layer in Targets()) layer.SampleArgs.Panning = parsed;
     }
 
     partial void OnEditSamplePitchShiftChanged(string value)
     {
         if (_syncingEditor || !TryDouble(value, 0, out double parsed)) return;
-        foreach (HitsoundLayer layer in Targets()) layer.SampleArgs.PitchShift = parsed;
+        foreach (ObservableHitsoundLayer layer in Targets()) layer.SampleArgs.PitchShift = parsed;
     }
 
     partial void OnEditSampleBankChanged(string value) => SetSampleInt(value, -1, (sample, parsed) => sample.Bank = parsed);
@@ -748,19 +750,19 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     partial void OnEditSampleLengthChanged(string value)
     {
         if (_syncingEditor || !TryDouble(value, -1, out double parsed)) return;
-        foreach (HitsoundLayer layer in Targets()) layer.SampleArgs.Length = parsed;
+        foreach (ObservableHitsoundLayer layer in Targets()) layer.SampleArgs.Length = parsed;
     }
 
     partial void OnEditSampleVelocityChanged(string value)
     {
         if (_syncingEditor || !TryInt(value, 127, out int parsed)) return;
-        foreach (HitsoundLayer layer in Targets()) layer.SampleArgs.Velocity = parsed;
+        foreach (ObservableHitsoundLayer layer in Targets()) layer.SampleArgs.Velocity = parsed;
     }
 
     partial void OnEditImportTypeChanged(ImportType value)
     {
         if (_syncingEditor) return;
-        foreach (HitsoundLayer layer in Targets()) layer.ImportArgs.ImportType = value;
+        foreach (ObservableHitsoundLayer layer in Targets()) layer.ImportArgs.ImportType = value;
         RefreshEditorVisibility();
     }
 
@@ -781,7 +783,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     partial void OnEditImportDetectDuplicatesChanged(bool value) => SetImportBool(value, (args, parsed) => args.DetectDuplicateSamples = parsed);
     partial void OnEditImportRemoveDuplicatesChanged(bool value) => SetImportBool(value, (args, parsed) => args.RemoveDuplicates = parsed);
 
-    private IEnumerable<HitsoundLayer> Targets() =>
+    private IEnumerable<ObservableHitsoundLayer> Targets() =>
         SelectedLayers.Count > 0 ? SelectedLayers : SelectedLayer is null ? [] : [SelectedLayer];
 
     private void RefreshEditorVisibility()
@@ -795,34 +797,34 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         OnPropertyChanged(nameof(IsSoundFontSample));
     }
 
-    private void SetSampleInt(string value, int fallback, Action<SampleGeneratingArgs, int> setter)
+    private void SetSampleInt(string value, int fallback, Action<ObservableSampleGeneratingArgs, int> setter)
     {
         if (_syncingEditor || !TryInt(value, fallback, out int parsed)) return;
-        foreach (HitsoundLayer layer in Targets()) setter(layer.SampleArgs, parsed);
+        foreach (ObservableHitsoundLayer layer in Targets()) setter(layer.SampleArgs, parsed);
     }
 
     private void SetImportString(string value, Action<LayerImportArgs, string> setter)
     {
         if (_syncingEditor) return;
-        foreach (HitsoundLayer layer in Targets()) setter(layer.ImportArgs, value);
+        foreach (ObservableHitsoundLayer layer in Targets()) setter(layer.ImportArgs, value);
     }
 
     private void SetImportDouble(string value, double fallback, Action<LayerImportArgs, double> setter)
     {
         if (_syncingEditor || !TryDouble(value, fallback, out double parsed)) return;
-        foreach (HitsoundLayer layer in Targets()) setter(layer.ImportArgs, parsed);
+        foreach (ObservableHitsoundLayer layer in Targets()) setter(layer.ImportArgs, parsed);
     }
 
     private void SetImportInt(string value, int fallback, Action<LayerImportArgs, int> setter)
     {
         if (_syncingEditor || !TryInt(value, fallback, out int parsed)) return;
-        foreach (HitsoundLayer layer in Targets()) setter(layer.ImportArgs, parsed);
+        foreach (ObservableHitsoundLayer layer in Targets()) setter(layer.ImportArgs, parsed);
     }
 
     private void SetImportBool(bool value, Action<LayerImportArgs, bool> setter)
     {
         if (_syncingEditor) return;
-        foreach (HitsoundLayer layer in Targets()) setter(layer.ImportArgs, value);
+        foreach (ObservableHitsoundLayer layer in Targets()) setter(layer.ImportArgs, value);
     }
 
     private static bool TryDouble(string value, double fallback, out double parsed) =>
@@ -848,7 +850,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         }
     }
 
-    partial void OnDefaultSampleChanged(Sample value)
+    partial void OnDefaultSampleChanged(ObservableSample value)
     {
         if (value is not null)
         {
@@ -947,7 +949,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     private HitsoundStudioProject ToProject() => new()
     {
         BaseBeatmap = BaseBeatmap,
-        DefaultSample = DefaultSample,
+        DefaultSample = DefaultSample.Snapshot(),
         ExportFolder = ExportFolder,
         HitsoundDiffName = HitsoundDiffName,
         ExportMap = ExportMap,
@@ -965,14 +967,14 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         FirstCustomIndex = FirstCustomIndex,
         SingleSampleExportFormat = SingleSampleExportFormat,
         MixedSampleExportFormat = MixedSampleExportFormat,
-        HitsoundLayers = Layers.ToList()
+        HitsoundLayers = Layers.Select(layer => layer.Snapshot()).ToList()
     };
 
     private void InstallProject(HitsoundStudioProject project)
     {
         HitsoundStudioProject copy = project.Clone();
         BaseBeatmap = copy.BaseBeatmap;
-        DefaultSample = copy.DefaultSample;
+        DefaultSample = new ObservableSample(copy.DefaultSample.Copy());
         ExportFolder = copy.ExportFolder;
         HitsoundDiffName = copy.HitsoundDiffName;
         ExportMap = copy.ExportMap;
@@ -990,7 +992,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         FirstCustomIndex = copy.FirstCustomIndex;
         SingleSampleExportFormat = copy.SingleSampleExportFormat;
         MixedSampleExportFormat = copy.MixedSampleExportFormat;
-        Layers = new ObservableCollection<HitsoundLayer>(copy.HitsoundLayers);
+        Layers = new ObservableCollection<ObservableHitsoundLayer>(
+            copy.HitsoundLayers.Select(layer => new ObservableHitsoundLayer(layer)));
         SetSelection(Layers.Take(1));
         OnPropertyChanged(nameof(HasLayers));
     }

@@ -56,6 +56,7 @@ using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Workspace;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Mapping_Tools.Application.Tests.TestDoubles;
+using Newtonsoft.Json.Linq;
 using TextJsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Mapping_Tools.Application.Tests.Execution;
@@ -284,7 +285,7 @@ public sealed class TransformationFixtureTests
             case "sliderator":
             {
                 SlideratorProject project = ReadTransformationProject<SlideratorProject>(fixtureRoot, fixtureName);
-                HitObject sourceSlider = project.LoadedHitObjects.Single();
+                HitObject sourceSlider = ReadLegacySlider(fixtureRoot, fixtureName);
                 ApplySlideratorTransientState(project, sourceSlider);
                 await new SlideratorService(gateway).RunAsync(
                     target, project, sourceSlider, reloadEditor: false, cancellationToken: cancellationToken);
@@ -346,6 +347,15 @@ public sealed class TransformationFixtureTests
             fixturesRoot.Replace('\\', '/'),
             StringComparison.Ordinal);
         return ReadProjectJson<T>(json);
+    }
+
+    private static HitObject ReadLegacySlider(string fixtureRoot, string fixtureName)
+    {
+        string projectPath = Path.Combine(fixtureRoot, "Projects", $"{fixtureName}.json");
+        JObject document = JObject.Parse(File.ReadAllText(projectPath));
+        string sliderJson = document["LoadedHitObjects"]?.SingleOrDefault()?.ToString()
+            ?? throw new InvalidDataException("The legacy Sliderator fixture contained no source slider.");
+        return ProjectJson.Deserialize<HitObject>(sliderJson);
     }
 
     private static void ApplySlideratorTransientState(SlideratorProject project, HitObject sourceSlider)

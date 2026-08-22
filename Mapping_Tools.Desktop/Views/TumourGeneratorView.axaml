@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
              xmlns:core="using:Mapping_Tools.Core.Tools.TumourGenerating"
+             xmlns:adapter="using:Mapping_Tools.Desktop.ViewModels.Adapters"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
@@ -21,7 +22,7 @@
                              SelectedIndex="{Binding CurrentLayerIndex, Mode=TwoWay}"
                              ToolTip.Tip="Select a tumour layer to edit its settings.">
                         <ListBox.ItemTemplate>
-                            <DataTemplate x:DataType="core:TumourLayer">
+            <DataTemplate x:DataType="adapter:ObservableTumourLayer">
                                 <Grid ColumnDefinitions="Auto,Auto,*" Margin="2">
                                     <ToggleButton IsChecked="{Binding IsActive, Mode=TwoWay}"
                                                   VerticalAlignment="Center" />

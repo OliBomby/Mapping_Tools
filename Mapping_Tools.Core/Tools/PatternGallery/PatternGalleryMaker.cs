@@ -14,9 +14,10 @@ public sealed class PatternGalleryMaker
     public double Padding { get; set; } = 5;
 
     /// <summary>
-    /// Creates a pattern from the objects currently marked selected in a beatmap.
+    /// Creates a pattern from an explicit editor selection snapshot.
     /// </summary>
     /// <param name="beatmap">The source map; it is deep-copied before filtering.</param>
+    /// <param name="selectedHitObjects">The selected objects from the editor session.</param>
     /// <param name="name">The display name to index.</param>
     /// <param name="patternBeatmap">Receives the filtered standalone map.</param>
     /// <returns>The indexed pattern metadata.</returns>
@@ -24,11 +25,17 @@ public sealed class PatternGalleryMaker
     public PatternGalleryPattern FromSelected(
         Beatmap beatmap,
         string name,
+        IReadOnlyCollection<HitObject> selectedHitObjects,
         out Beatmap patternBeatmap)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
-        List<HitObject> selected = beatmap.HitObjects.Where(item => item.IsSelected).ToList();
-        if (selected.Count == 0)
+        ArgumentNullException.ThrowIfNull(selectedHitObjects);
+        HashSet<HitObject> selectedSet = selectedHitObjects.ToHashSet();
+        int[] selectedIndices = beatmap.HitObjects
+            .Select((item, index) => selectedSet.Contains(item) ? index : -1)
+            .Where(index => index >= 0)
+            .ToArray();
+        if (selectedIndices.Length == 0)
         {
             throw new InvalidOperationException("No selected hit objects found.");
         }
@@ -36,7 +43,7 @@ public sealed class PatternGalleryMaker
         patternBeatmap = beatmap.DeepCopy();
         RemoveStoryboard(patternBeatmap);
         RemoveEverythingThatIsNotTheseHitObjects(patternBeatmap, patternBeatmap.HitObjects
-            .Where(item => item.IsSelected)
+            .Where((item, index) => selectedIndices.Contains(index))
             .ToList());
         return FromBeatmap(patternBeatmap, name);
     }

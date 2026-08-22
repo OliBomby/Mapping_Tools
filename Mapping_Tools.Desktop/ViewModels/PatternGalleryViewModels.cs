@@ -7,6 +7,8 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// <summary>Adapts one persisted pattern to the thumbnail gallery.</summary>
 public sealed partial class PatternGalleryItemViewModel : ObservableObject
 {
+    private bool isSelected;
+
     /// <summary>Creates a gallery item for the supplied persisted pattern.</summary>
     /// <param name="pattern">The pattern metadata owned by the project.</param>
     public PatternGalleryItemViewModel(PatternGalleryPattern pattern)
@@ -23,16 +25,10 @@ public sealed partial class PatternGalleryItemViewModel : ObservableObject
     /// <summary>Gets or sets whether this item participates in the next export.</summary>
     public bool IsSelected
     {
-        get => Pattern.IsSelected;
+        get => isSelected;
         set
         {
-            if (Pattern.IsSelected == value)
-            {
-                return;
-            }
-
-            Pattern.IsSelected = value;
-            OnPropertyChanged();
+            SetProperty(ref isSelected, value);
         }
     }
 

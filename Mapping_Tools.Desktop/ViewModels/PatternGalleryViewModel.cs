@@ -54,6 +54,11 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     private PatternGalleryCollectionPaths? _paths;
     private CancellationTokenSource? _sceneCancellation;
 
+    private IEnumerable<PatternGalleryPattern> SelectedPatterns =>
+        _items.Values
+            .Where(item => item.IsSelected)
+            .Select(item => item.Pattern);
+
     /// <summary>Gets or sets the editable project model.</summary>
     [ObservableProperty]
     public partial PatternGalleryProject Project { get; set; } = new();
@@ -400,7 +405,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     /// <returns>A task that completes after physical files and metadata are removed.</returns>
     public async Task RemoveSelectedAsync(bool skipConfirmation)
     {
-        PatternGalleryPattern[] selected = Project.Patterns.Where(pattern => pattern.IsSelected).ToArray();
+        PatternGalleryPattern[] selected = SelectedPatterns.ToArray();
         if (selected.Length == 0)
         {
             return;
@@ -447,7 +452,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task OpenExplorerSelectedAsync()
     {
-        foreach (PatternGalleryPattern pattern in Project.Patterns.Where(pattern => pattern.IsSelected))
+        foreach (PatternGalleryPattern pattern in SelectedPatterns)
         {
             await _reveal.RevealAsync(_files.GetPatternPath(Paths, pattern.FileName));
         }
@@ -457,7 +462,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ShowDetailsAsync()
     {
-        PatternGalleryPattern? pattern = Project.Patterns.FirstOrDefault(item => item.IsSelected);
+        PatternGalleryPattern? pattern = SelectedPatterns.FirstOrDefault();
         if (pattern is null)
         {
             return;
@@ -477,7 +482,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     public void AssignGroup(string? group)
     {
-        foreach (PatternGalleryPattern pattern in Project.Patterns.Where(item => item.IsSelected))
+        foreach (PatternGalleryPattern pattern in SelectedPatterns)
         {
             pattern.Group = group ?? string.Empty;
         }
@@ -504,7 +509,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task RenameGroupAsync()
     {
-        PatternGalleryPattern? selected = Project.Patterns.FirstOrDefault(item => item.IsSelected);
+        PatternGalleryPattern? selected = SelectedPatterns.FirstOrDefault();
         if (selected is null)
         {
             return;
@@ -723,14 +728,9 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     public void SelectOnly(PatternGalleryItemViewModel item)
     {
         ArgumentNullException.ThrowIfNull(item);
-        foreach (PatternGalleryPattern pattern in Project.Patterns)
-        {
-            pattern.IsSelected = ReferenceEquals(pattern, item.Pattern);
-        }
-
         foreach (PatternGalleryItemViewModel galleryItem in _items.Values)
         {
-            galleryItem.RefreshSelection();
+            galleryItem.IsSelected = ReferenceEquals(galleryItem, item);
         }
     }
 
@@ -738,14 +738,9 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     /// <param name="select">Whether all patterns should be selected.</param>
     public void SetSelectAll(bool select)
     {
-        foreach (PatternGalleryPattern pattern in Project.Patterns)
-        {
-            pattern.IsSelected = select;
-        }
-
         foreach (PatternGalleryItemViewModel item in _items.Values)
         {
-            item.RefreshSelection();
+            item.IsSelected = select;
         }
     }
 
@@ -778,7 +773,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             return false;
         }
 
-        if (Project.Patterns.All(pattern => !pattern.IsSelected))
+        if (!SelectedPatterns.Any())
         {
             ResultSummary = "Select at least one pattern before running Pattern Gallery.";
             return false;
@@ -830,8 +825,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             return;
         }
 
-        PatternGalleryProject project = Snapshot(includeSelection: true);
-        PatternGalleryPattern[] patterns = project.Patterns.Where(pattern => pattern.IsSelected).ToArray();
+        PatternGalleryProject project = Snapshot(includeSelection: false);
+        PatternGalleryPattern[] patterns = SelectedPatterns.ToArray();
         ToolExecutionResult<PatternGalleryRunResult> execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<PatternGalleryRunResult>(
                 OperationId,
@@ -857,7 +852,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         if (execution.Status == ToolExecutionStatus.Succeeded && execution.Value is not null)
         {
             DateTime usedAt = DateTime.Now;
-            foreach (PatternGalleryPattern pattern in Project.Patterns.Where(pattern => pattern.IsSelected))
+            foreach (PatternGalleryPattern pattern in SelectedPatterns)
             {
                 pattern.UseCount++;
                 pattern.LastUsedTime = usedAt;
@@ -873,6 +868,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
     private PatternGalleryProject Snapshot(bool includeSelection)
     {
+        _ = includeSelection;
         PatternGalleryProject snapshot = new()
         {
             CollectionName = CollectionName,
@@ -915,8 +911,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 FileName = pattern.FileName,
                 ObjectCount = pattern.ObjectCount,
                 Duration = pattern.Duration,
-                BeatLength = pattern.BeatLength,
-                IsSelected = includeSelection && pattern.IsSelected
+                BeatLength = pattern.BeatLength
             });
         }
 

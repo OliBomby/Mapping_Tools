@@ -50,7 +50,7 @@ public sealed class PatternGalleryMakerTests
             globalSv: 1.4);
 
         // Act
-        Action act = () => maker.FromSelected(beatmap, "Empty selection", out _);
+        Action act = () => maker.FromSelected(beatmap, "Empty selection", [], out _);
 
         // Assert
         act.Should().Throw<InvalidOperationException>()

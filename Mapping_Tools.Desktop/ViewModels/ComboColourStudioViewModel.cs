@@ -1,4 +1,5 @@
 using System.Collections.Specialized;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,6 +12,7 @@ using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.ViewModels.Adapters;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -34,12 +36,17 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         "Combo Colour Studio Projects",
         () => new ComboColourProject(),
         "combo-colour-studio-project.json");
-    private ColourPoint? _selectedColourPoint;
-    private ComboColourProject? _observedProject;
+    private ObservableColourPoint? _selectedColourPoint;
 
     /// <summary>Gets or sets the editable project.</summary>
     [ObservableProperty]
     public partial ComboColourProject Project { get; set; } = new();
+
+    /// <summary>Gets the Desktop-adapted colour points shown by the editing grid.</summary>
+    public ObservableCollection<ObservableColourPoint> ColourPoints { get; } = [];
+
+    /// <summary>Gets the palette entries shown by the sequence editor.</summary>
+    public ObservableCollection<ObservableSpecialColour> ComboColours { get; } = [];
 
     /// <summary>Gets or sets the optional source path used by imports.</summary>
     [ObservableProperty]
@@ -47,10 +54,10 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the combo colour selected for sequence insertion.</summary>
     [ObservableProperty]
-    public partial SpecialColour? SelectedSequenceColour { get; set; }
+    public partial ObservableSpecialColour? SelectedSequenceColour { get; set; }
 
     /// <summary>Gets or sets the point selected by the editing grid.</summary>
-    public ColourPoint? SelectedColourPoint
+    public ObservableColourPoint? SelectedColourPoint
     {
         get => _selectedColourPoint;
         set
@@ -61,13 +68,13 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             }
 
             SetProperty(ref _selectedColourPoint, value);
-            SelectedSequenceColour = Project.ComboColours.FirstOrDefault();
+            SelectedSequenceColour = ComboColours.FirstOrDefault();
             OnPropertyChanged(nameof(SelectedSequence));
         }
     }
 
     /// <summary>Gets the selected point's sequence for the editing preview.</summary>
-    public IReadOnlyList<SpecialColour> SelectedSequence =>
+    public IReadOnlyList<ObservableSpecialColour> SelectedSequence =>
         SelectedColourPoint?.ColourSequence ?? [];
 
     /// <summary>Gets the current sequence preview entries in time order.</summary>
@@ -102,7 +109,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         _liveReader = liveReader ?? throw new ArgumentNullException(nameof(liveReader));
         _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        ObserveProject();
+        RebuildPresentation();
         RefreshPreview();
     }
 
@@ -110,11 +117,10 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void AddColourPoint()
     {
-        double time = Project.ColourPoints.Count > 1
-            ? Project.ColourPoints.Where(point => point.IsSelected).Select(point => (double?)point.Time).Max()
-              ?? Project.ColourPoints[^1].Time
+        double time = ColourPoints.Count > 1
+            ? SelectedColourPoint?.Time ?? ColourPoints[^1].Time
             : 0;
-        SelectedColourPoint = Project.AddColourPoint(time);
+        SelectedColourPoint = AddPresentationPoint(Project.AddColourPoint(time));
         RefreshPreview();
     }
 
@@ -136,7 +142,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             // The legacy action falls back to zero when the editor cannot be read.
         }
 
-        SelectedColourPoint = Project.AddColourPoint(time);
+        SelectedColourPoint = AddPresentationPoint(Project.AddColourPoint(time));
         RefreshPreview();
     }
 
@@ -144,8 +150,17 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void RemoveColourPoint()
     {
-        Project.RemoveSelectedOrLastColourPoints();
-        SelectedColourPoint = Project.ColourPoints.LastOrDefault();
+        if (SelectedColourPoint is not null)
+        {
+            ColourPoints.Remove(SelectedColourPoint);
+        }
+        else if (ColourPoints.Count > 0)
+        {
+            ColourPoints.RemoveAt(ColourPoints.Count - 1);
+        }
+
+        SyncProjectFromPresentation();
+        SelectedColourPoint = ColourPoints.LastOrDefault();
         RefreshPreview();
     }
 
@@ -154,7 +169,8 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     private void AddComboColour()
     {
         Project.AddComboColour();
-        SelectedSequenceColour ??= Project.ComboColours.LastOrDefault();
+        RebuildPalette();
+        SelectedSequenceColour ??= ComboColours.LastOrDefault();
         RefreshPreview();
     }
 
@@ -163,14 +179,15 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     private void RemoveComboColour()
     {
         Project.RemoveLastComboColour();
-        SelectedSequenceColour = Project.ComboColours.LastOrDefault();
+        RebuildPalette();
+        SelectedSequenceColour = ComboColours.LastOrDefault();
         RefreshPreview();
     }
 
     /// <summary>Adds the selected palette colour to a point's ordered sequence.</summary>
     /// <param name="point">The destination point, or the selected point when omitted.</param>
     [RelayCommand]
-    private void AddSequenceColour(ColourPoint? point)
+    private void AddSequenceColour(ObservableColourPoint? point)
     {
         point ??= SelectedColourPoint;
         if (point is null || SelectedSequenceColour is null)
@@ -179,6 +196,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         }
 
         point.ColourSequence.Add(SelectedSequenceColour);
+        SyncProjectFromPresentation();
         RefreshPreview();
         OnPropertyChanged(nameof(SelectedSequence));
     }
@@ -186,7 +204,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     /// <summary>Removes a selected sequence entry.</summary>
     /// <param name="colour">The entry to remove, or the last entry when omitted.</param>
     [RelayCommand]
-    private void RemoveSequenceColour(SpecialColour? colour)
+    private void RemoveSequenceColour(ObservableSpecialColour? colour)
     {
         if (SelectedColourPoint is null || SelectedColourPoint.ColourSequence.Count == 0)
         {
@@ -202,6 +220,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             SelectedColourPoint.ColourSequence.Remove(colour);
         }
 
+        SyncProjectFromPresentation();
         RefreshPreview();
         OnPropertyChanged(nameof(SelectedSequence));
     }
@@ -266,7 +285,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
     IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
     string IQuickRun.OperationId => OperationId;
-    object IShellProjectFeature.Snapshot() => Project.Copy();
+    object IShellProjectFeature.Snapshot() => SnapshotProject();
 
     void IShellProjectFeature.Install(object project)
     {
@@ -277,14 +296,15 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
         Project = typed;
         Project.MatchComboColourReferences();
-        SelectedColourPoint = Project.ColourPoints.FirstOrDefault();
+        RebuildPresentation();
+        SelectedColourPoint = ColourPoints.FirstOrDefault();
         RefreshPreview();
     }
 
     partial void OnProjectChanged(ComboColourProject value)
     {
         value.MatchComboColourReferences();
-        ObserveProject();
+        RebuildPresentation();
         RefreshPreview();
         OnPropertyChanged(nameof(SelectedSequence));
     }
@@ -323,7 +343,8 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
                 await _studio.ImportComboColoursAsync(path, Project);
             }
 
-            SelectedColourPoint = Project.ColourPoints.FirstOrDefault();
+            RebuildPresentation();
+            SelectedColourPoint = ColourPoints.FirstOrDefault();
             ResultSummary = colourHax ? "Imported colour hax." : "Imported combo colours.";
             RefreshPreview();
         }
@@ -338,7 +359,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         bool quick,
         CancellationToken cancellationToken)
     {
-        ComboColourProject project = Project.Copy();
+        ComboColourProject project = SnapshotProject();
         ToolExecutionResult<ComboColourStudioRunResult> execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<ComboColourStudioRunResult>(
                 OperationId,
@@ -368,7 +389,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
     private void RefreshPreview()
     {
-        PreviewItems = Project.ColourPoints
+        PreviewItems = ColourPoints
             .OrderBy(point => point.Time)
             .SelectMany(point => point.ColourSequence.Select(colour => new ComboColourPreviewEntry(
                 point.Time,
@@ -380,54 +401,51 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         OnPropertyChanged(nameof(HasPreviewItems));
     }
 
-    private void ObserveProject()
+    private ObservableColourPoint AddPresentationPoint(ColourPoint point)
     {
-        if (_observedProject is not null)
-        {
-            _observedProject.ColourPoints.CollectionChanged -= OnProjectCollectionChanged;
-            _observedProject.ComboColours.CollectionChanged -= OnProjectCollectionChanged;
-            foreach (ColourPoint point in _observedProject.ColourPoints)
-            {
-                point.PropertyChanged -= OnPointChanged;
-                point.ColourSequence.CollectionChanged -= OnProjectCollectionChanged;
-            }
+        ObservableColourPoint adapter = new(point);
+        ColourPoints.Add(adapter);
+        SyncProjectFromPresentation();
+        return adapter;
+    }
 
-            foreach (SpecialColour colour in _observedProject.ComboColours)
-            {
-                colour.PropertyChanged -= OnColourChanged;
-            }
+    private void RebuildPresentation()
+    {
+        ColourPoints.Clear();
+        foreach (ColourPoint point in Project.ColourPoints)
+        {
+            ColourPoints.Add(new ObservableColourPoint(point));
         }
 
-        _observedProject = Project;
-        _observedProject.ColourPoints.CollectionChanged += OnProjectCollectionChanged;
-        _observedProject.ComboColours.CollectionChanged += OnProjectCollectionChanged;
-        foreach (ColourPoint point in _observedProject.ColourPoints)
+        RebuildPalette();
+    }
+
+    private void RebuildPalette()
+    {
+        foreach (ObservableSpecialColour colour in ComboColours)
         {
-            point.PropertyChanged += OnPointChanged;
-            point.ColourSequence.CollectionChanged += OnProjectCollectionChanged;
+            colour.PropertyChanged -= OnPaletteColourChanged;
         }
 
-        foreach (SpecialColour colour in _observedProject.ComboColours)
+        ComboColours.Clear();
+        foreach (SpecialColour colour in Project.ComboColours)
         {
-            colour.PropertyChanged += OnColourChanged;
+            ObservableSpecialColour adapter = new(colour);
+            adapter.PropertyChanged += OnPaletteColourChanged;
+            ComboColours.Add(adapter);
         }
     }
 
-    private void OnProjectCollectionChanged(object? sender, NotifyCollectionChangedEventArgs eventArgs)
+    private void OnPaletteColourChanged(object? sender, PropertyChangedEventArgs eventArgs) => RefreshPreview();
+
+    private void SyncProjectFromPresentation()
     {
-        ObserveProject();
-        RefreshPreview();
+        Project.ColourPoints = ColourPoints.Select(point => point.Snapshot()).ToList();
     }
 
-    private void OnPointChanged(object? sender, PropertyChangedEventArgs eventArgs)
+    private ComboColourProject SnapshotProject()
     {
-        if (eventArgs.PropertyName == nameof(ColourPoint.ColourSequence))
-        {
-            ObserveProject();
-        }
-
-        RefreshPreview();
+        SyncProjectFromPresentation();
+        return Project.Copy();
     }
-
-    private void OnColourChanged(object? sender, PropertyChangedEventArgs eventArgs) => RefreshPreview();
 }

@@ -48,7 +48,7 @@ public class HitsoundDomainTests {
         // Arrange
         // Act
         var zone = new HitsoundZone(
-            false, "centre line", "normal-hitnormal.wav",
+            "centre line", "normal-hitnormal.wav",
             xPos: -1, yPos: 100,
             Hitsound.Normal, SampleSet.Normal, SampleSet.None, 1);
 
@@ -63,7 +63,7 @@ public class HitsoundDomainTests {
     }
 
     [TestMethod]
-    public void LayerImportArgs_ExposesFrontendNeutralVisibilityAndReloadRules() {
+    public void LayerImportArgs_ExposesImportAndReloadRules() {
         // Arrange
         // Act
         var stack = new LayerImportArgs(ImportType.Stack) {
@@ -78,8 +78,7 @@ public class HitsoundDomainTests {
         };
 
         // Assert
-        stack.CoordinateVisibility.Should().BeTrue();
-        stack.KeysoundVisibility.Should().BeFalse();
+        stack.ImportType.Should().Be(ImportType.Stack);
         stack.ReloadCompatible(matchingStack).Should().BeTrue();
     }
 

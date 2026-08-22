@@ -8,10 +8,10 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.HitsoundStuff;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Desktop.Interactions;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.ViewModels.Adapters;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -36,7 +36,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
 
     /// <summary>Gets or sets the zones edited by the tool.</summary>
     [ObservableProperty]
-    public partial ObservableCollection<HitsoundZone> Items { get; set; } = [];
+    public partial ObservableCollection<ObservableHitsoundZone> Items { get; set; } = [];
 
     /// <summary>Gets or sets which beatmap objects receive preview hitsounds.</summary>
     [ObservableProperty]
@@ -80,7 +80,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
             _isAllItemsSelected = value;
             if (value.HasValue)
             {
-                foreach (HitsoundZone item in Items)
+                foreach (ObservableHitsoundZone item in Items)
                 {
                     item.IsSelected = value.Value;
                 }
@@ -186,7 +186,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
 
     /// <summary>Adds a new wildcard zone.</summary>
     [RelayCommand]
-    private void Add() => Items.Add(new HitsoundZone());
+    private void Add() => Items.Add(new ObservableHitsoundZone());
 
     /// <summary>Adds one zone for each distinct selected editor position.</summary>
     [RelayCommand]
@@ -211,7 +211,11 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
 
             foreach (Mapping_Tools.Core.Classes.MathUtil.Vector2 position in positions)
             {
-                Items.Add(new HitsoundZone { XPos = position.X, YPos = position.Y });
+                Items.Add(new ObservableHitsoundZone(new Core.Classes.HitsoundStuff.HitsoundZone
+                {
+                    XPos = position.X,
+                    YPos = position.Y
+                }));
             }
         }
         catch (Exception exception)
@@ -233,7 +237,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         {
             if (Items[index].IsSelected)
             {
-                Items.Add(Items[index].Copy());
+                Items.Add(new ObservableHitsoundZone(Items[index].Snapshot()));
             }
         }
     }
@@ -241,7 +245,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     /// <summary>Removes every selected zone.</summary>
     [RelayCommand]
     private void Remove() =>
-        Items = new ObservableCollection<HitsoundZone>(Items.Where(item => !item.IsSelected));
+        Items = new ObservableCollection<ObservableHitsoundZone>(Items.Where(item => !item.IsSelected));
 
     /// <summary>Opens the shared modeless Rhythm Guide auxiliary surface.</summary>
     [RelayCommand]
@@ -255,7 +259,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     {
         ImportModeSetting = ImportModeSetting,
         TimeCode = TimeCode,
-        Items = Items.Select(item => item.Copy()).ToList()
+        Items = Items.Select(item => item.Snapshot()).ToList()
     };
 
     void IShellProjectFeature.Install(object project)
@@ -269,7 +273,8 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
 
         ImportModeSetting = typed.ImportModeSetting;
         TimeCode = typed.TimeCode ?? string.Empty;
-        Items = new ObservableCollection<HitsoundZone>(typed.Items.Select(item => item.Copy()));
+        Items = new ObservableCollection<ObservableHitsoundZone>(
+            typed.Items.Select(item => new ObservableHitsoundZone(item.Copy())));
     }
 
     private async Task RunPathsAsync(
@@ -287,7 +292,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         {
             ImportModeSetting = ImportModeSetting,
             TimeCode = TimeCode,
-            Items = Items.Select(item => item.Copy()).ToList()
+            Items = Items.Select(item => item.Snapshot()).ToList()
         };
         ToolExecutionResult<HitsoundPreviewHelperResult> result = await Execution.ExecuteAsync(
             new ToolExecutionRequest<HitsoundPreviewHelperResult>(

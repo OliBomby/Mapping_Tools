@@ -6,6 +6,7 @@ using Mapping_Tools.Application.GeometryDashboard;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
@@ -61,10 +62,40 @@ public sealed class GeometryDashboardViewModelTests
         viewModel.SelectedCount.Should().Be(0);
     }
 
-    private static GeometryDashboardViewModel CreateViewModel(bool inputSupported = true) =>
+    [TestMethod]
+    public async Task RefreshOnceAsync_WhenEditorSelectionChanges_SynchronizesRootSelectionState()
+    {
+        // Arrange
+        HitObject initialHitObject = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject selectedHitObject = new("64,96,1000,1,0,0:0:0:0:");
+        HitObject finalHitObject = new("64,96,1000,1,0,0:0:0:0:");
+        using GeometryDashboardViewModel viewModel = CreateViewModel(
+            snapshots:
+            [
+                CreateRuntimeSnapshot(initialHitObject, 0, []),
+                CreateRuntimeSnapshot(selectedHitObject, 1, [selectedHitObject]),
+                CreateRuntimeSnapshot(finalHitObject, 2, [])
+            ]);
+
+        // Act
+        await viewModel.RefreshOnceAsync();
+        int unselectedCount = viewModel.SelectedCount;
+        await viewModel.RefreshOnceAsync();
+        int selectedCount = viewModel.SelectedCount;
+        await viewModel.RefreshOnceAsync();
+
+        // Assert
+        unselectedCount.Should().Be(0);
+        selectedCount.Should().BeGreaterThan(0);
+        viewModel.SelectedCount.Should().Be(0);
+    }
+
+    private static GeometryDashboardViewModel CreateViewModel(
+        bool inputSupported = true,
+        params GeometryDashboardRuntimeSnapshot?[] snapshots) =>
         new(
             new ApplicationSettings(),
-            new RuntimeStub(),
+            new RuntimeStub(snapshots),
             new InputStub(inputSupported),
             new OverlayFactoryStub(),
             new SerializerStub(),
@@ -74,10 +105,36 @@ public sealed class GeometryDashboardViewModelTests
             new DialogStub(),
             new DispatcherStub());
 
-    private sealed class RuntimeStub : IGeometryDashboardRuntime
+    private static GeometryDashboardRuntimeSnapshot CreateRuntimeSnapshot(
+        HitObject hitObject,
+        int editorTime,
+        IReadOnlyList<HitObject> selectedHitObjects) =>
+        new(
+            new GeometryDashboardProcess(1, new PlatformWindowId(2), "osu!.exe"),
+            new GeometryDashboardWindow(
+                new PlatformWindowId(2),
+                1,
+                "map.osu",
+                new Box2(0, 0, 800, 600),
+                true,
+                true,
+                new Vector2(1, 1),
+                true),
+            new GeometryDashboardEditorSnapshot(
+                "C:/Songs/map/map.osu",
+                5,
+                4,
+                editorTime,
+                [hitObject],
+                selectedHitObjects),
+            null);
+
+    private sealed class RuntimeStub(IEnumerable<GeometryDashboardRuntimeSnapshot?> snapshots) : IGeometryDashboardRuntime
     {
+        private readonly Queue<GeometryDashboardRuntimeSnapshot?> snapshots = new(snapshots);
+
         public Task<GeometryDashboardRuntimeSnapshot?> ReadAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<GeometryDashboardRuntimeSnapshot?>(null);
+            Task.FromResult(snapshots.Count == 0 ? null : snapshots.Dequeue());
     }
 
     private sealed class InputStub(bool isSupported) : IGeometryDashboardInputService

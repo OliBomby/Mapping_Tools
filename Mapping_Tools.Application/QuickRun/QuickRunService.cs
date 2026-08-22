@@ -68,7 +68,7 @@ public sealed class QuickRunService : IQuickRunService
                 }
 
                 string configuredName = GetConfiguredName(
-                    snapshot.HitObjects.Count(hitObject => hitObject.IsSelected));
+                    snapshot.SelectedHitObjects.Count);
                 command = string.Equals(
                     configuredName,
                     CurrentToolSentinel,

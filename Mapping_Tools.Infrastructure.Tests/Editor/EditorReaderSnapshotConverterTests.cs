@@ -49,7 +49,7 @@ public sealed class EditorReaderSnapshotConverterTests
                 "123 Artist - Title",
                 "map.osu"));
         snapshot.EditorTime.Should().Be(2222);
-        converted.IsSelected.Should().BeTrue();
+        snapshot.SelectedHitObjects.Should().ContainSingle().Which.Should().BeSameAs(converted);
         converted.Repeat.Should().Be(2);
         converted.CurvePoints.Count.Should().Be(2);
         converted.EdgeHitsounds.Count.Should().Be(3);

@@ -496,6 +496,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         }
 
         SlideratorProject project = Snapshot();
+        bool preferLiveEditor = DoEditorRead;
         DoEditorRead = false;
         ToolExecutionResult<SlideratorResult> execution = await Execution.ExecuteAsync(
                 new ToolExecutionRequest<SlideratorResult>(
@@ -509,7 +510,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                             sourceSlider,
                             reloadEditor,
                             new Progress<double>(value => context.ReportProgress(value, "Sliderating")),
-                            context.CancellationToken);
+                            context.CancellationToken,
+                            preferLiveEditor);
                         return new ToolExecutionOutput<SlideratorResult>(
                             result,
                             quick ? null : "Done!",
@@ -547,9 +549,6 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             ExportAsStream = ExportAsStream,
             ExportAsInvisibleSlider = ExportAsInvisibleSlider,
             GraphState = GraphState.Clone(),
-            LoadedHitObjects = LoadedHitObjects.ToList(),
-            VisibleHitObjectIndex = VisibleHitObjectIndex,
-            DoEditorRead = DoEditorRead
         };
     }
 
@@ -559,7 +558,6 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         if (!Enum.IsDefined(project.ImportModeSetting) ||
             !Enum.IsDefined(project.ExportModeSetting) ||
             !Enum.IsDefined(project.GraphModeSetting) ||
-            project.LoadedHitObjects is null ||
             !double.IsFinite(project.GlobalSv) ||
             !double.IsFinite(project.GraphBeats) ||
             !double.IsFinite(project.BeatsPerMinute) ||
@@ -593,13 +591,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         ExportAsInvisibleSlider = project.ExportAsInvisibleSlider;
         GraphState = project.GraphState.Clone();
         LoadedHitObjects.Clear();
-        foreach (HitObject hitObject in project.LoadedHitObjects.Where(hitObject => hitObject.IsSlider))
-        {
-            LoadedHitObjects.Add(hitObject);
-        }
-
-        VisibleHitObjectIndex = Math.Clamp(project.VisibleHitObjectIndex, 0, Math.Max(0, LoadedHitObjects.Count - 1));
-        DoEditorRead = project.DoEditorRead;
+        VisibleHitObjectIndex = 0;
+        DoEditorRead = false;
         UpdateVisibleHitObject();
         ExportTime = project.ExportTime;
     }

@@ -130,6 +130,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         PatternGalleryPattern pattern = maker.FromSelected(
             source.Editor.Beatmap,
             name,
+            source.SelectedHitObjects,
             out Beatmap filtered);
         SavePattern(pattern, filtered, paths, cancellationToken);
         return pattern;

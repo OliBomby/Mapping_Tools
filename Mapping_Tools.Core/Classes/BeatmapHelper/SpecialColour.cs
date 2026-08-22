@@ -3,15 +3,10 @@ namespace Mapping_Tools.Core.Classes.BeatmapHelper {
     /// Associates a named osu! special-colour key, such as slider border, with an RGBA value.
     /// </summary>
     public class SpecialColour : ComboColour, IEquatable<SpecialColour>, ICloneable {
-        private string? name;
-
         /// <summary>
         /// Gets or sets the key used in the beatmap <c>[Colours]</c> section.
         /// </summary>
-        public string? Name {
-            get => name;
-            set => Set(ref name, value);
-        }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Creates an unnamed colour with the base class default value.
@@ -47,7 +42,7 @@ namespace Mapping_Tools.Core.Classes.BeatmapHelper {
         public bool Equals(SpecialColour? other) {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return name == other.name && Color == other.Color;
+            return Name == other.Name && Color == other.Color;
         }
 
         /// <summary>
@@ -65,6 +60,6 @@ namespace Mapping_Tools.Core.Classes.BeatmapHelper {
         /// Returns a hash based on the section key.
         /// </summary>
         /// <returns>The key hash, or zero for an unnamed colour.</returns>
-        public override int GetHashCode() => name?.GetHashCode() ?? 0;
+        public override int GetHashCode() => Name?.GetHashCode() ?? 0;
     }
 }

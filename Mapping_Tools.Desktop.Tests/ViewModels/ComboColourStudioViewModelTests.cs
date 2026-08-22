@@ -26,16 +26,17 @@ public sealed class ComboColourStudioViewModelTests
 
         // Act
         ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
-        viewModel.SelectedSequenceColour = viewModel.Project.ComboColours[0];
+        viewModel.SelectedSequenceColour = viewModel.ComboColours[0];
         viewModel.AddSequenceColourCommand.Execute(viewModel.SelectedColourPoint);
 
         // Assert
         viewModel.Project.ComboColours.Should().ContainSingle();
         viewModel.Project.ColourPoints.Should().ContainSingle();
-        viewModel.SelectedColourPoint.Should().BeSameAs(viewModel.Project.ColourPoints[0]);
+        viewModel.SelectedColourPoint.Should().NotBeNull();
+        viewModel.SelectedColourPoint!.Model.Time.Should().Be(viewModel.Project.ColourPoints[0].Time);
         viewModel.PreviewItems.Should().ContainSingle();
 
-        viewModel.Project.ComboColours[0].Color = RgbaColour.FromRgb(1, 2, 3);
+        viewModel.ComboColours[0].Color = RgbaColour.FromRgb(1, 2, 3);
         viewModel.PreviewItems.Single().Colour.Should().Be(RgbaColour.FromRgb(1, 2, 3));
     }
 

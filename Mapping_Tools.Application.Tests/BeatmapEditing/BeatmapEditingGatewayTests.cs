@@ -24,8 +24,7 @@ public sealed class BeatmapEditingGatewayTests
             Pos = new Vector2(64, 96),
             EndPos = new Vector2(64, 96),
             Time = 2500,
-            ObjectType = 1,
-            IsSelected = true
+            ObjectType = 1
         };
         HitObject earlier = new()
         {
@@ -42,7 +41,8 @@ public sealed class BeatmapEditingGatewayTests
             1234,
             1.8,
             2,
-            2222);
+            2222,
+            [selected]);
         FakeLiveBeatmapReader reader = new(snapshot);
         BeatmapEditingGateway gateway = CreateGateway(store, reader);
 

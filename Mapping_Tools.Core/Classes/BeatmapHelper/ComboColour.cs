@@ -1,5 +1,3 @@
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using static Mapping_Tools.Core.Classes.BeatmapHelper.FileFormatHelper;
 
 namespace Mapping_Tools.Core.Classes.BeatmapHelper {
@@ -7,25 +5,19 @@ namespace Mapping_Tools.Core.Classes.BeatmapHelper {
     /// The british alternative because main developer wants to keep the spelling.
     /// Its spelled "Colours" in the game.
     /// </summary>
-    public class ComboColour : INotifyPropertyChanged {
+    public class ComboColour {
         private RgbaColour color;
         private bool hasAlpha;
 
-        /// <summary>
-        /// Gets or sets the RGBA value and raises <see cref="PropertyChanged"/> when it changes.
-        /// </summary>
+        /// <summary>Gets or sets the RGBA value.</summary>
         public RgbaColour Color {
             get => color;
             set {
-                if (Set(ref color, value) && value.A != byte.MaxValue)
+                color = value;
+                if (value.A != byte.MaxValue)
                     hasAlpha = true;
             }
         }
-
-        /// <summary>
-        /// Notifies binding clients after <see cref="Color"/> changes.
-        /// </summary>
-        public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
         /// Creates a fully transparent black combo colour.
@@ -84,22 +76,6 @@ namespace Mapping_Tools.Core.Classes.BeatmapHelper {
         /// </summary>
         /// <returns>A new combo-colour instance with the same value and alpha-format flag.</returns>
         public ComboColour Copy() => (ComboColour)MemberwiseClone();
-
-        /// <summary>
-        /// Updates a backing field and raises <see cref="PropertyChanged"/> only when its value changes.
-        /// </summary>
-        /// <typeparam name="T">The property value type.</typeparam>
-        /// <param name="field">The backing field to update.</param>
-        /// <param name="value">The proposed value.</param>
-        /// <param name="propertyName">The property name reported to binding clients.</param>
-        /// <returns><see langword="true"/> when the field changed; otherwise <see langword="false"/>.</returns>
-        protected bool Set<T>(ref T field, T value, [CallerMemberName] string? propertyName = null) {
-            if (EqualityComparer<T>.Default.Equals(field, value))
-                return false;
-            field = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            return true;
-        }
 
         /// <summary>
         /// Serializes the colour channels for the right-hand side of an osu! colour line.

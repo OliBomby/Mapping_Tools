@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Mapping_Tools.Core.Classes.HitsoundStuff;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.ViewModels;
+using Mapping_Tools.Desktop.ViewModels.Adapters;
 
 namespace Mapping_Tools.Desktop.Views;
 
@@ -24,7 +24,7 @@ public sealed partial class HitsoundStudioView : UserControl
     {
         if (DataContext is HitsoundStudioViewModel viewModel && sender is MaterialGridListView grid)
         {
-            viewModel.SetSelection(grid.SelectedItems?.OfType<HitsoundLayer>() ?? []);
+            viewModel.SetSelection(grid.SelectedItems?.OfType<ObservableHitsoundLayer>() ?? []);
         }
     }
 

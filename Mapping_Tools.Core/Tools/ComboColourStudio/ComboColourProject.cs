@@ -1,6 +1,3 @@
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 
 namespace Mapping_Tools.Core.Tools.ComboColourStudio;
@@ -8,80 +5,22 @@ namespace Mapping_Tools.Core.Tools.ComboColourStudio;
 /// <summary>
 /// Serializable, framework-neutral Combo Colour Studio state.
 /// </summary>
-public sealed class ComboColourProject : INotifyPropertyChanged
+public sealed class ComboColourProject
 {
-    private ObservableCollection<ColourPoint> _colourPoints;
-    private ObservableCollection<SpecialColour> _comboColours;
-    private int _maxBurstLength;
-
     /// <summary>Creates an empty project with the legacy burst-length default.</summary>
     public ComboColourProject()
     {
-        _colourPoints = [];
-        _comboColours = [];
-        _colourPoints.CollectionChanged += ColourPointsChanged;
-        _comboColours.CollectionChanged += ComboColoursChanged;
         MaxBurstLength = 1;
     }
 
     /// <summary>Gets or sets points in their current editing order.</summary>
-    public ObservableCollection<ColourPoint> ColourPoints
-    {
-        get => _colourPoints;
-        set
-        {
-            ArgumentNullException.ThrowIfNull(value);
-            if (ReferenceEquals(_colourPoints, value))
-            {
-                return;
-            }
-
-            _colourPoints.CollectionChanged -= ColourPointsChanged;
-            _colourPoints = value;
-            _colourPoints.CollectionChanged += ColourPointsChanged;
-            AttachPoints();
-        }
-    }
+    public List<ColourPoint> ColourPoints { get; set; } = [];
 
     /// <summary>Gets or sets the named palette, in editor order.</summary>
-    public ObservableCollection<SpecialColour> ComboColours
-    {
-        get => _comboColours;
-        set
-        {
-            ArgumentNullException.ThrowIfNull(value);
-            if (ReferenceEquals(_comboColours, value))
-            {
-                return;
-            }
-
-            _comboColours.CollectionChanged -= ComboColoursChanged;
-            _comboColours = value;
-            _comboColours.CollectionChanged += ComboColoursChanged;
-            MatchComboColourReferences();
-        }
-    }
+    public List<SpecialColour> ComboColours { get; set; } = [];
 
     /// <summary>Gets or sets the largest combo eligible for burst points.</summary>
-    public int MaxBurstLength
-    {
-        get => _maxBurstLength;
-        set
-        {
-            if (_maxBurstLength == value)
-            {
-                return;
-            }
-
-            _maxBurstLength = value;
-            PropertyChanged?.Invoke(
-                this,
-                new PropertyChangedEventArgs(nameof(MaxBurstLength)));
-        }
-    }
-
-    /// <summary>Raised when a project-level editable value changes.</summary>
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public int MaxBurstLength { get; set; }
 
     /// <summary>Adds a point using the supplied values and attaches it to this project.</summary>
     /// <param name="time">The offset in milliseconds.</param>
@@ -93,16 +32,18 @@ public sealed class ComboColourProject : INotifyPropertyChanged
         IEnumerable<SpecialColour>? colours = null,
         ColourPointMode mode = ColourPointMode.Normal)
     {
-        ColourPoint point = new(time, colours ?? [], mode, this);
+        ColourPoint point = new(time, colours ?? [], mode);
         ColourPoints.Add(point);
         return point;
     }
 
-    /// <summary>Removes selected points, or the last point when none are selected.</summary>
+    /// <summary>Removes the supplied points, or the last point when none are supplied.</summary>
+    /// <param name="selectedPoints">The points selected by the presentation layer.</param>
     /// <returns>The number of points removed.</returns>
-    public int RemoveSelectedOrLastColourPoints()
+    public int RemoveSelectedOrLastColourPoints(IEnumerable<ColourPoint> selectedPoints)
     {
-        ColourPoint[] selected = ColourPoints.Where(point => point.IsSelected).ToArray();
+        ArgumentNullException.ThrowIfNull(selectedPoints);
+        ColourPoint[] selected = selectedPoints.Where(ColourPoints.Contains).Distinct().ToArray();
         if (selected.Length > 0)
         {
             foreach (ColourPoint point in selected)
@@ -232,37 +173,4 @@ public sealed class ComboColourProject : INotifyPropertyChanged
         return errors;
     }
 
-    private void ColourPointsChanged(object? sender, NotifyCollectionChangedEventArgs eventArgs)
-    {
-        if (eventArgs.OldItems is not null)
-        {
-            foreach (ColourPoint point in eventArgs.OldItems)
-            {
-                point.ParentProject = null;
-            }
-        }
-
-        if (eventArgs.NewItems is not null)
-        {
-            foreach (ColourPoint point in eventArgs.NewItems)
-            {
-                point.ParentProject = this;
-            }
-        }
-
-        MatchComboColourReferences();
-    }
-
-    private void ComboColoursChanged(object? sender, NotifyCollectionChangedEventArgs eventArgs) =>
-        MatchComboColourReferences();
-
-    private void AttachPoints()
-    {
-        foreach (ColourPoint point in ColourPoints)
-        {
-            point.ParentProject = this;
-        }
-
-        MatchComboColourReferences();
-    }
 }

@@ -1,13 +1,7 @@
 #nullable disable
 namespace Mapping_Tools.Core.Classes.BeatmapHelper {
-    /// <summary>
-    /// Compares serialized hit-object behavior with optional editor-selection, position, and time checks.
-    /// </summary>
+        /// <summary>Compares serialized hit-object behavior with optional position and time checks.</summary>
     public class HitObjectComparer : IEqualityComparer<HitObject> {
-        /// <summary>
-        /// Controls whether transient editor selection participates in equality.
-        /// </summary>
-        public bool CheckIsSelected { get; set; }
         /// <summary>
         /// Controls whether object and slider-control-point positions participate in equality.
         /// </summary>
@@ -17,14 +11,10 @@ namespace Mapping_Tools.Core.Classes.BeatmapHelper {
         /// </summary>
         public bool CheckTime { get; set; }
 
-        /// <summary>
-        /// Creates a comparer with configurable treatment of editor-only and positional state.
-        /// </summary>
-        /// <param name="checkIsSelected">Whether selection state must match.</param>
+        /// <summary>Creates a comparer with configurable positional and time checks.</summary>
         /// <param name="checkPosition">Whether positions and slider control points must match.</param>
         /// <param name="checkTime">Whether start times must match.</param>
-        public HitObjectComparer(bool checkIsSelected = false, bool checkPosition = true, bool checkTime = true) {
-            CheckIsSelected = checkIsSelected;
+        public HitObjectComparer(bool checkPosition = true, bool checkTime = true) {
             CheckPosition = checkPosition;
             CheckTime = checkTime;
         }
@@ -39,8 +29,6 @@ namespace Mapping_Tools.Core.Classes.BeatmapHelper {
             if (x == null && y == null)
                 return true;
             if (x == null || y == null)
-                return false;
-            if (CheckIsSelected && x.IsSelected != y.IsSelected)
                 return false;
             if (CheckPosition && x.Pos != y.Pos)
                 return false;

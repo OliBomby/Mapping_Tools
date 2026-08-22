@@ -36,7 +36,6 @@ public sealed class GeometryDashboardProjectPersistenceTests
         project.CurrentPreferences.RelevantObjectPreferences["Virtual point preferences"].Color
             .Should().Be(RgbaColour.FromArgb(255, 0, 255, 255));
         project.SaveSlots.Should().ContainSingle(slot => slot.Name == "Save 1");
-        project.SaveSlots[0].ParentProject.Should().BeSameAs(project);
         json.Should().Contain("Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsProject, Mapping Tools");
         json.Should().Contain("Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AnchorPointGenerator, Mapping Tools");
         json.Should().Contain("Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SymmetryGeneratorSettings, Mapping Tools");
@@ -61,7 +60,6 @@ public sealed class GeometryDashboardProjectPersistenceTests
         // Assert
         project.CurrentPreferences.AcceptableDifference.Should().Be(70.1);
         project.CurrentPreferences.SnapHotkey.Key.Should().Be(56);
-        slot.ParentProject.Should().BeSameAs(project);
     }
 
     [TestMethod]

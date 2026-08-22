@@ -1,7 +1,5 @@
-using System.Collections.ObjectModel;
 using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Classes.MathUtil;
-using Mapping_Tools.Core.Classes.SystemTools;
 
 namespace Mapping_Tools.Core.Tools.PatternGallery;
 
@@ -9,19 +7,13 @@ namespace Mapping_Tools.Core.Tools.PatternGallery;
 /// Serializable Pattern Gallery state, including the legacy option names used
 /// by existing <c>patterngalleryproject.json</c> and collection files.
 /// </summary>
-public sealed class PatternGalleryProject : BindableBase
+public sealed class PatternGalleryProject
 {
-    private string _collectionName = "My Pattern Collection";
-
     /// <summary>Gets or sets the user-visible collection name.</summary>
-    public string CollectionName
-    {
-        get => _collectionName;
-        set => Set(ref _collectionName, value ?? string.Empty);
-    }
+    public string CollectionName { get; set; } = "My Pattern Collection";
 
     /// <summary>Gets the indexed patterns in their persisted order.</summary>
-    public ObservableCollection<PatternGalleryPattern> Patterns { get; set; } = [];
+    public List<PatternGalleryPattern> Patterns { get; set; } = [];
 
     /// <summary>Gets or sets the collection-folder metadata.</summary>
     public PatternGalleryCollectionMetadata FileHandler { get; set; } = new();

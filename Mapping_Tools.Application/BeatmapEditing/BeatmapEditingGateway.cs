@@ -215,6 +215,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         beatmap.CalculateSliderEndTimes();
         beatmap.GiveObjectsGreenlines();
 
-        return beatmap.HitObjects.Where(hitObject => hitObject.IsSelected).ToList();
+        HashSet<HitObject> selected = snapshot.SelectedHitObjects.ToHashSet();
+        return beatmap.HitObjects.Where(selected.Contains).ToList();
     }
 }

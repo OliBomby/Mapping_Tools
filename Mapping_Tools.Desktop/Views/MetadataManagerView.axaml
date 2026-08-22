@@ -4,7 +4,7 @@
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             xmlns:beatmap="using:Mapping_Tools.Core.Classes.BeatmapHelper"
+             xmlns:adapter="using:Mapping_Tools.Desktop.ViewModels.Adapters"
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              x:Class="Mapping_Tools.Desktop.Views.MetadataManagerView"
              x:DataType="vm:MetadataManagerViewModel">
@@ -109,7 +109,7 @@
                                                 </ItemsPanelTemplate>
                                             </ListBox.ItemsPanel>
                                             <ListBox.ItemTemplate>
-                                                <DataTemplate x:DataType="beatmap:ComboColour">
+                                                <DataTemplate x:DataType="adapter:ObservableComboColour">
                                                     <ColorPicker Color="{Binding Color, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}" />
                                                 </DataTemplate>
                                             </ListBox.ItemTemplate>
@@ -131,7 +131,7 @@
                                     <materialDesign:Card>
                                         <ListBox ItemsSource="{Binding SpecialColours}">
                                             <ListBox.ItemTemplate>
-                                                <DataTemplate x:DataType="beatmap:SpecialColour">
+                                                <DataTemplate x:DataType="adapter:ObservableSpecialColour">
                                                     <StackPanel Orientation="Horizontal">
                                                         <TextBox Width="202" Margin="0,0,10,0"
                                                                  Text="{Binding Name, Mode=TwoWay}"

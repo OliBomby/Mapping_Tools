@@ -21,8 +21,8 @@ public sealed class HitsoundPreviewHelperEngineTests
             globalSv: 1.4);
         List<HitsoundZone> zones =
         [
-            new(false, "first", "kick.wav", 64, 96, Hitsound.Clap, SampleSet.Drum, SampleSet.Normal, 3),
-            new(false, "second", "snare.wav", 400, 96, Hitsound.Finish, SampleSet.Normal, SampleSet.Drum, 4)
+            new("first", "kick.wav", 64, 96, Hitsound.Clap, SampleSet.Drum, SampleSet.Normal, 3),
+            new("second", "snare.wav", 400, 96, Hitsound.Finish, SampleSet.Normal, SampleSet.Drum, 4)
         ];
 
         // Act
@@ -53,7 +53,7 @@ public sealed class HitsoundPreviewHelperEngineTests
             [],
             globalSv: 1.4);
         HitsoundZone zone = new(
-            false, "selected", "selected.wav", 64, 96,
+            "selected", "selected.wav", 64, 96,
             Hitsound.Whistle, SampleSet.Normal, SampleSet.Drum, 2);
 
         // Act
@@ -99,10 +99,10 @@ public sealed class HitsoundPreviewHelperEngineTests
             [],
             globalSv: 1.4);
         HitsoundZone first = new(
-            false, "first", "first.wav", 128, 96,
+            "first", "first.wav", 128, 96,
             Hitsound.Clap, SampleSet.Normal, SampleSet.Drum, 1);
         HitsoundZone second = new(
-            false, "second", "second.wav", 384, 96,
+            "second", "second.wav", 384, 96,
             Hitsound.Finish, SampleSet.Drum, SampleSet.Normal, 2);
 
         // Act
@@ -133,7 +133,7 @@ public sealed class HitsoundPreviewHelperEngineTests
             [],
             globalSv: 1.4);
         HitsoundZone zone = new(
-            false, "custom", "custom.wav", 64, 96,
+            "custom", "custom.wav", 64, 96,
             Hitsound.Finish, SampleSet.Drum, SampleSet.Normal, 5);
 
         // Act
@@ -164,7 +164,7 @@ public sealed class HitsoundPreviewHelperEngineTests
             new List<HitObject> { selected },
             [],
             globalSv: 1.4);
-        HitsoundZone zone = new(false, "zone", "zone.wav", 64, 96, Hitsound.Clap,
+        HitsoundZone zone = new("zone", "zone.wav", 64, 96, Hitsound.Clap,
             SampleSet.Normal, SampleSet.None, 1);
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();

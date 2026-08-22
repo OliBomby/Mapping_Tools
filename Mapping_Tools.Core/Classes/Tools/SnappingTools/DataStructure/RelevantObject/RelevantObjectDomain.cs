@@ -1,9 +1,7 @@
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
-using Mapping_Tools.Core.Classes.SystemTools;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.Layers;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
@@ -463,39 +461,28 @@ public abstract class RelevantDrawable : RelevantObject, IRelevantDrawable
 }
 
 /// <summary>Stores the rendering preferences associated with one geometry kind.</summary>
-public sealed class RelevantObjectPreferences : BindableBase, ICloneable
+public sealed class RelevantObjectPreferences : ICloneable
 {
-    private string _name = string.Empty;
-    private RgbaColour _color;
-    private double _opacity;
-    private double _thickness;
-    private DashStylesEnum _dashstyle;
-    private double _size;
-    private bool _hasSizeOption;
-
     /// <summary>Gets or sets the display name of this preference group.</summary>
-    public string Name { get => _name; set => Set(ref _name, value); }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the neutral ARGB colour consumed by a frontend renderer.</summary>
-    public RgbaColour Color { get => _color; set => Set(ref _color, value); }
+    public RgbaColour Color { get; set; }
 
     /// <summary>Gets or sets the base opacity multiplier.</summary>
-    public double Opacity { get => _opacity; set => Set(ref _opacity, value); }
+    public double Opacity { get; set; }
 
     /// <summary>Gets or sets the line thickness in frontend-independent pixels.</summary>
-    public double Thickness { get => _thickness; set => Set(ref _thickness, value); }
+    public double Thickness { get; set; }
 
     /// <summary>Gets or sets the dash pattern selected by the user.</summary>
-    public DashStylesEnum Dashstyle { get => _dashstyle; set => Set(ref _dashstyle, value); }
+    public DashStylesEnum Dashstyle { get; set; }
 
     /// <summary>Gets or sets the point radius/size when this kind supports one.</summary>
-    public double Size { get => _size; set => Set(ref _size, value); }
+    public double Size { get; set; }
 
     /// <summary>Gets or sets whether the size setting applies to this geometry kind.</summary>
-    public bool HasSizeOption { get => _hasSizeOption; set => Set(ref _hasSizeOption, value); }
-
-    /// <summary>Gets every dash value in enum declaration order.</summary>
-    public static IEnumerable<DashStylesEnum> DashStylesEnumerable => Enum.GetValues<DashStylesEnum>();
+    public bool HasSizeOption { get; set; }
 
     /// <inheritdoc/>
     public object Clone() => MemberwiseClone();
@@ -694,13 +681,6 @@ public sealed class RelevantHitObject : RelevantObject
 
             Layer?.SortTimes();
         }
-    }
-
-    /// <inheritdoc/>
-    public override bool IsSelected
-    {
-        get => HitObject.IsSelected;
-        set => HitObject.IsSelected = value;
     }
 
     /// <summary>Creates a hit-object wrapper for deserialization.</summary>

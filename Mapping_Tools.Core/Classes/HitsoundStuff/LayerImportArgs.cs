@@ -1,316 +1,106 @@
-using System.ComponentModel;
 using Mapping_Tools.Core.Classes.MathUtil;
 
 // ReSharper disable CompareOfFloatsByEqualityOperator
 
 namespace Mapping_Tools.Core.Classes.HitsoundStuff {
     /// <summary>
-    /// Holds bindable filters and sample-generation settings for one hitsound import layer.
+    /// Holds filters and sample-generation settings for one hitsound import layer.
     /// </summary>
-    public class LayerImportArgs : INotifyPropertyChanged, IEquatable<LayerImportArgs> {
+    public class LayerImportArgs : IEquatable<LayerImportArgs> {
         /// <inheritdoc />
-        public LayerImportArgs() {
-            ImportType = ImportType.None;
-            Path = "";
-            X = -1;
-            Y = -1;
-            SamplePath = "";
-            Bank = -1;
-            Patch = -1;
-            Key = -1;
-            Length = -1;
-            LengthRoughness = 1;
-            Velocity = -1;
-            VelocityRoughness = 1;
-            discriminateVolumes = false;
-            DetectDuplicateSamples = false;
-            RemoveDuplicates = false;
-            Offset = 0;
-        }
+        public LayerImportArgs() { }
 
         /// <inheritdoc />
-        public LayerImportArgs(ImportType importType) {
-            ImportType = importType;
-            Path = "";
-            X = -1;
-            Y = -1;
-            SamplePath = "";
-            Bank = -1;
-            Patch = -1;
-            Key = -1;
-            Length = -1;
-            LengthRoughness = 1;
-            Velocity = -1;
-            VelocityRoughness = 1;
-            discriminateVolumes = false;
-            DetectDuplicateSamples = false;
-            RemoveDuplicates = false;
-            Offset = 0;
-        }
+        public LayerImportArgs(ImportType importType) => ImportType = importType;
 
-        private ImportType importType;
         /// <summary>
-        /// Gets or sets how the source is interpreted and updates mode-dependent UI visibility.
+        /// Gets or sets how the source is interpreted.
         /// </summary>
-        public ImportType ImportType {
-            get { return importType; }
-            set {
-                if (importType != value) {
-                    importType = value;
-                    NotifyPropertyChanged("ImportType");
-                    NotifyPropertyChanged(nameof(CoordinateVisibility));
-                    NotifyPropertyChanged(nameof(KeysoundVisibility));
-                }
-            }
-        }
+        public ImportType ImportType { get; set; }
 
-        private string path;
         /// <summary>
         /// Gets or sets the imported beatmap, stack, MIDI, or hitsound source path.
         /// </summary>
-        public string Path {
-            get => path;
-            set {
-                if (path != value) {
-                    path = value;
-                    NotifyPropertyChanged("Path");
-                }
-            }
-        }
+        public string Path { get; set; } = "";
 
-        /// <summary>
-        /// Indicates that stack-coordinate filters apply to the selected import mode.
-        /// </summary>
-        public bool CoordinateVisibility => ImportType == ImportType.Stack;
-
-        /// <summary>
-        /// Indicates that SoundFont/MIDI note filters apply to the selected import mode.
-        /// </summary>
-        public bool KeysoundVisibility => ImportType == ImportType.MIDI;
-
-        /// <summary>
-        /// Indicates that a concrete import mode has been selected.
-        /// </summary>
-        public bool CanImport => ImportType != ImportType.None;
-
-        private double x;
         /// <summary>
         /// Gets or sets the stack X filter, or -1 to accept any X coordinate.
         /// </summary>
-        public double X {
-            get => x;
-            set {
-                if (x != value) {
-                    x = value;
-                    NotifyPropertyChanged("X");
-                }
-            }
-        }
+        public double X { get; set; } = -1;
 
-        private double y;
         /// <summary>
         /// Gets or sets the stack Y filter, or -1 to accept any Y coordinate.
         /// </summary>
-        public double Y {
-            get => y;
-            set {
-                if (y != value) {
-                    y = value;
-                    NotifyPropertyChanged("Y");
-                }
-            }
-        }
+        public double Y { get; set; } = -1;
 
-        private string samplePath;
         /// <summary>
         /// Gets or sets the audio file or SoundFont used to render imported events.
         /// </summary>
-        public string SamplePath {
-            get => samplePath;
-            set {
-                if (samplePath != value) {
-                    samplePath = value;
-                    NotifyPropertyChanged("SamplePath");
-                }
-            }
-        }
+        public string SamplePath { get; set; } = "";
 
-        private double volume;
         /// <summary>
-        /// Gets or sets linear sample gain and updates the derived MIDI <see cref="Velocity"/>.
+        /// Gets or sets the linear sample gain from which <see cref="Velocity"/> is derived.
         /// </summary>
-        public double Volume {
-            get => volume;
-            set {
-                if (volume == value) return;
-                volume = value;
-                NotifyPropertyChanged("Volume");
-                NotifyPropertyChanged("Velocity");
-            }
-        }
+        public double Volume { get; set; } = -1d / 127;
 
-        private bool discriminateVolumes;
         /// <summary>
         /// Controls whether otherwise matching hitsound imports remain separate when their volumes differ.
         /// </summary>
-        public bool DiscriminateVolumes {
-            get => discriminateVolumes;
-            set {
-                if (discriminateVolumes == value) return;
-                discriminateVolumes = value;
-                NotifyPropertyChanged("DiscriminateVolumes");
-            }
-        }
+        public bool DiscriminateVolumes { get; set; }
 
-        private bool detectDuplicateSamples;
         /// <summary>
         /// Controls whether imported audio content is compared to detect duplicate files.
         /// </summary>
-        public bool DetectDuplicateSamples {
-            get => detectDuplicateSamples;
-            set {
-                if (detectDuplicateSamples == value) return;
-                detectDuplicateSamples = value;
-                NotifyPropertyChanged("DetectDuplicateSamples");
-            }
-        }
+        public bool DetectDuplicateSamples { get; set; }
 
-        private bool removeDuplicates;
         /// <summary>
         /// Controls whether detected duplicate import events are removed.
         /// </summary>
-        public bool RemoveDuplicates {
-            get => removeDuplicates;
-            set {
-                if (removeDuplicates == value) return;
-                removeDuplicates = value;
-                NotifyPropertyChanged("RemoveDuplicates");
-            }
-        }
+        public bool RemoveDuplicates { get; set; }
 
-        private int bank;
         /// <summary>
         /// Gets or sets the SoundFont bank, or -1 to accept any bank.
         /// </summary>
-        public int Bank {
-            get => bank;
-            set {
-                if (bank != value) {
-                    bank = value;
-                    NotifyPropertyChanged("Bank");
-                }
-            }
-        }
+        public int Bank { get; set; } = -1;
 
-        private int patch;
         /// <summary>
         /// Gets or sets the SoundFont patch, or -1 to accept any patch.
         /// </summary>
-        public int Patch {
-            get => patch;
-            set {
-                if (patch != value) {
-                    patch = value;
-                    NotifyPropertyChanged("Patch");
-                }
-            }
-        }
+        public int Patch { get; set; } = -1;
 
-        private int key;
         /// <summary>
         /// Gets or sets the MIDI key, or -1 to accept any note.
         /// </summary>
-        public int Key {
-            get { return key; }
-            set {
-                if (key != value) {
-                    key = value;
-                    NotifyPropertyChanged("Key");
-                }
-            }
-        }
+        public int Key { get; set; } = -1;
 
-        private double length;
         /// <summary>
         /// Gets or sets the MIDI note length, or -1 to accept any length.
         /// </summary>
-        public double Length {
-            get => length;
-            set {
-                if (length != value) {
-                    length = value;
-                    NotifyPropertyChanged("Length");
-                }
-            }
-        }
+        public double Length { get; set; } = -1;
 
-        private double lengthRoughness;
         /// <summary>
         /// Gets or sets the tolerance used when grouping MIDI note lengths.
         /// </summary>
-        public double LengthRoughness {
-            get => lengthRoughness;
-            set {
-                if (lengthRoughness != value) {
-                    lengthRoughness = value;
-                    NotifyPropertyChanged("LengthRoughness");
-                }
-            }
-        }
+        public double LengthRoughness { get; set; } = 1;
 
         /// <summary>
         /// Gets or sets MIDI velocity through the linear <see cref="Volume"/> scale.
         /// </summary>
         public int Velocity {
             get => (int)Math.Round(Volume * 127);
-            set {
-                if (Velocity == value) return;
-                Volume = value / 127d;
-                NotifyPropertyChanged("Velocity");
-            }
+            set => Volume = Velocity == value ? Volume : value / 127d;
         }
 
-        private double velocityRoughness;
         /// <summary>
         /// Gets or sets the tolerance used when grouping MIDI velocities.
         /// </summary>
-        public double VelocityRoughness {
-            get => velocityRoughness;
-            set {
-                if (velocityRoughness != value) {
-                    velocityRoughness = value;
-                    NotifyPropertyChanged("VelocityRoughness");
-                }
-            }
-        }
+        public double VelocityRoughness { get; set; } = 1;
 
-        private double offset;
         /// <summary>
         /// Gets or sets the millisecond offset applied to imported events.
         /// </summary>
-        public double Offset {
-            get => offset;
-            set {
-                if (offset != value) {
-                    offset = value;
-                    NotifyPropertyChanged("Offset");
-                }
-            }
-        }
+        public double Offset { get; set; }
 
-
-        /// <summary>
-        /// Notifies binding clients after an import option changes.
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// Raises <see cref="PropertyChanged"/> for a named import option.
-        /// </summary>
-        /// <param name="propName"></param>
-        public void NotifyPropertyChanged(string propName) {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
-        }
 
         /// <summary>
         /// Captures the subset of settings that controls source-data cache invalidation.
@@ -333,12 +123,12 @@ namespace Mapping_Tools.Core.Classes.HitsoundStuff {
                 case ImportType.Stack:
                     return Path == o.Path && (X == -1 || X == o.X) && (Y == -1 || Y == o.Y);
                 case ImportType.Hitsounds:
-                    return Path == o.Path && SamplePath == o.SamplePath && (!discriminateVolumes || Math.Abs(Volume - o.Volume) < Precision.DoubleEpsilon);
+                    return Path == o.Path && SamplePath == o.SamplePath && (!DiscriminateVolumes || Math.Abs(Volume - o.Volume) < Precision.DoubleEpsilon);
                 case ImportType.MIDI:
                     return Path == o.Path && (Bank == -1 || Bank == o.Bank) && (Patch == -1 || Patch == o.Patch) && (Key == -1 || Key == o.Key)
                                           && (Length == -1 || Length == o.Length) && (Velocity == -1 || Velocity == o.Velocity);
                 case ImportType.Storyboard:
-                    return Path == o.Path && SamplePath == o.SamplePath && (!discriminateVolumes || Math.Abs(Volume - o.Volume) < Precision.DoubleEpsilon);
+                    return Path == o.Path && SamplePath == o.SamplePath && (!DiscriminateVolumes || Math.Abs(Volume - o.Volume) < Precision.DoubleEpsilon);
                 case ImportType.None:
                     return true;
                 default:

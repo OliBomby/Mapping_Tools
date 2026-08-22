@@ -1,12 +1,11 @@
 using Mapping_Tools.Core.Classes.MathUtil;
-using Mapping_Tools.Core.Classes.SystemTools;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Core.Classes.HitsoundStuff {
     /// <summary>
     /// Describes how one source file or SoundFont note must be transformed to generate an exported sample.
     /// </summary>
-    public class SampleGeneratingArgs : BindableBase, IEquatable<SampleGeneratingArgs> {
+    public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs> {
         /// <summary>
         /// Creates an empty, unity-volume sample specification with all SoundFont selectors unset.
         /// </summary>
@@ -39,7 +38,7 @@ namespace Mapping_Tools.Core.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// Creates a complete sample specification for persisted settings and editing.
+        /// Creates a complete sample specification from persisted settings.
         /// </summary>
         /// <param name="path">The source audio or SoundFont path.</param>
         /// <param name="volume">Linear gain, where one is unchanged.</param>
@@ -98,90 +97,50 @@ namespace Mapping_Tools.Core.Classes.HitsoundStuff {
                                     Math.Abs(Panning) < Precision.DoubleEpsilon &&
                                     Math.Abs(PitchShift) < Precision.DoubleEpsilon;
 
-        private string path;
         /// <summary>
         /// Gets or sets the source audio or SoundFont path.
         /// </summary>
-        public string Path {
-            get => path;
-            set => Set(ref path, value);
-        }
+        public string Path { get; set; } = "";
 
-        private double volume;
         /// <summary>
-        /// Gets or sets linear gain and notifies bindings that derived <see cref="Velocity"/> changed.
+        /// Gets or sets the linear gain used when rendering the sample.
         /// </summary>
-        public double Volume {
-            get => volume;
-            set {
-                if (Set(ref volume, value)) {
-                    RaisePropertyChanged(nameof(Velocity));
-                }
-            }
-        }
+        public double Volume { get; set; }
 
-        private double panning;
         /// <summary>
         /// Gets or sets the stereo pan applied during generation.
         /// </summary>
-        public double Panning {
-            get => panning;
-            set => Set(ref panning, value);
-        }
+        public double Panning { get; set; }
 
-        private double pitchShift;
         /// <summary>
         /// Gets or sets the pitch adjustment applied during generation.
         /// </summary>
-        public double PitchShift {
-            get => pitchShift;
-            set => Set(ref pitchShift, value);
-        }
+        public double PitchShift { get; set; }
 
-        private int bank;
         /// <summary>
         /// Gets or sets the SoundFont bank; -1 denotes an unused selector.
         /// </summary>
-        public int Bank {
-            get => bank;
-            set => Set(ref bank, value);
-        }
+        public int Bank { get; set; }
 
-        private int patch;
         /// <summary>
         /// Gets or sets the SoundFont patch; -1 denotes an unused selector.
         /// </summary>
-        public int Patch {
-            get => patch;
-            set => Set(ref patch, value);
-        }
+        public int Patch { get; set; }
 
-        private int instrument;
         /// <summary>
         /// Gets or sets the SoundFont instrument; -1 denotes an unused selector.
         /// </summary>
-        public int Instrument {
-            get => instrument;
-            set => Set(ref instrument, value);
-        }
+        public int Instrument { get; set; }
 
-        private int key;
         /// <summary>
         /// Gets or sets the MIDI note number; -1 denotes an unused selector.
         /// </summary>
-        public int Key {
-            get => key;
-            set => Set(ref key, value);
-        }
+        public int Key { get; set; }
 
-        private double length;
         /// <summary>
         /// Gets or sets the generated SoundFont note length; -1 denotes an unspecified length.
         /// </summary>
-        public double Length {
-            get => length;
-            set => Set(ref length, value);
-        }
+        public double Length { get; set; }
 
         /// <summary>
         /// Converts between <see cref="Volume"/> and MIDI velocity on a 0-to-127 scale.
@@ -224,7 +183,7 @@ namespace Mapping_Tools.Core.Classes.HitsoundStuff {
         }
 
         /// <summary>
-        /// Copies all rendering parameters into a new bindable instance.
+        /// Copies all rendering parameters into a new independent instance.
         /// </summary>
         /// <returns>An independently mutable sample specification.</returns>
         public SampleGeneratingArgs Copy() {

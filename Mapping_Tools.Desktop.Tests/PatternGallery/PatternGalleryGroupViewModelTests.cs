@@ -27,7 +27,7 @@ public sealed class PatternGalleryGroupViewModelTests
     }
 
     [TestMethod]
-    public void PatternGalleryItemViewModel_IsSelected_UpdatesUnderlyingPattern()
+    public void PatternGalleryItemViewModel_IsSelected_StaysInPresentationState()
     {
         // Arrange
         PatternGalleryPattern pattern = new();
@@ -37,7 +37,7 @@ public sealed class PatternGalleryGroupViewModelTests
         item.IsSelected = true;
 
         // Assert
-        pattern.IsSelected.Should().BeTrue();
+        pattern.Name.Should().BeEmpty();
         item.IsSelected.Should().BeTrue();
     }
 }

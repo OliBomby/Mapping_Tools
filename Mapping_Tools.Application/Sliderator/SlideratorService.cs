@@ -58,7 +58,8 @@ public sealed class SlideratorService : ISlideratorService
         Mapping_Tools.Core.Classes.BeatmapHelper.HitObject sourceSlider,
         bool reloadEditor,
         IProgress<double>? progress = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        bool preferLiveEditor = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentNullException.ThrowIfNull(project);
@@ -67,10 +68,9 @@ public sealed class SlideratorService : ISlideratorService
         BeatmapEditingSession session = await editingGateway
             .OpenBeatmapAsync(
                 path,
-                project.DoEditorRead ? LiveBeatmapPreference.PreferLive : LiveBeatmapPreference.DiskOnly,
+                preferLiveEditor ? LiveBeatmapPreference.PreferLive : LiveBeatmapPreference.DiskOnly,
                 cancellationToken)
             .ConfigureAwait(false);
-        project.DoEditorRead = false;
         SlideratorApplyResult applied = SlideratorEngine.Apply(
             session.Editor.Beatmap,
             sourceSlider,

@@ -92,7 +92,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         ArgumentNullException.ThrowIfNull(layers);
         List<HitsoundLayer> reloaded = [];
         foreach (IGrouping<ImportReloadingArgs, HitsoundLayer> group in layers
-                     .Where(layer => layer.ImportArgs.CanImport)
+            .Where(layer => layer.ImportArgs.ImportType != ImportType.None)
                      .GroupBy(layer => layer.ImportArgs.GetImportReloadingArgs(), new ImportReloadingArgsComparer()))
         {
             cancellationToken.ThrowIfCancellationRequested();

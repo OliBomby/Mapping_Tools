@@ -322,9 +322,9 @@ public sealed class HitsoundStudioEngine
                         sample.SampleSet,
                         sample.SampleSet,
                         0,
-                        sample.Whistle,
-                        sample.Finish,
-                        sample.Clap)
+                        sample.Hitsound == Hitsound.Whistle,
+                        sample.Hitsound == Hitsound.Finish,
+                        sample.Hitsound == Hitsound.Clap)
                     : new HitsoundEvent(
                         package.Time,
                         position,
