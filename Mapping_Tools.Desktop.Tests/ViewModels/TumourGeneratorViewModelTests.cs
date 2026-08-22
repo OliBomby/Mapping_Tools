@@ -180,7 +180,7 @@ public sealed class TumourGeneratorViewModelTests
     }
 
     [TestMethod]
-    public async Task PreviewRequest_UpdatesPreviewSceneAndLayerRanges()
+    public async Task PreviewRequest_UpdatesPreviewObjectAndLayerRanges()
     {
         // Arrange
         RecordingGenerator service = new();
@@ -196,7 +196,6 @@ public sealed class TumourGeneratorViewModelTests
         // Assert
         service.PreviewCalled.Should().BeGreaterThan(0);
         viewModel.TumouredPreviewHitObject.Should().NotBeNull();
-        viewModel.PreviewScene.Should().NotBeNull();
         viewModel.LayerRangeSliderMaxes.Should().NotBeEmpty();
     }
 

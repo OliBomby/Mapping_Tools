@@ -7,12 +7,12 @@ using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Interactions.Converters;
-using Mapping_Tools.Application.ObjectVisualiser;
 using Mapping_Tools.Application.PatternGallery;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.PatternGallery;
 using Mapping_Tools.Desktop.Interactions;
@@ -52,7 +52,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         "pattern-gallery-project.json");
     private readonly Dictionary<PatternGalleryPattern, PatternGalleryItemViewModel> _items = [];
     private PatternGalleryCollectionPaths? _paths;
-    private CancellationTokenSource? _sceneCancellation;
+    private CancellationTokenSource? _thumbnailCancellation;
 
     private IEnumerable<PatternGalleryPattern> SelectedPatterns =>
         _items.Values
@@ -261,21 +261,21 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             throw new InvalidDataException("Pattern Gallery project is incomplete.");
         }
 
-        CancelSceneRefresh();
+        CancelThumbnailRefresh();
         Project = typed;
         _items.Clear();
         ConfigureProject();
         RebuildGroups();
-        StartSceneRefresh();
+        StartThumbnailRefresh();
     }
 
     /// <inheritdoc/>
-    public void Activate() => StartSceneRefresh();
+    public void Activate() => StartThumbnailRefresh();
 
     /// <inheritdoc/>
     public void Deactivate()
     {
-        CancelSceneRefresh();
+        CancelThumbnailRefresh();
     }
 
     /// <summary>Adds a pattern from raw osu! hit-object and timing-point text.</summary>
@@ -302,7 +302,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             Project.Patterns.Add(pattern);
             ResultSummary = $"Imported {pattern.Name}.";
             RebuildGroups();
-            StartSceneRefresh();
+            StartThumbnailRefresh();
         }
         catch (Exception exception)
         {
@@ -346,7 +346,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             Project.Patterns.Add(pattern);
             ResultSummary = $"Imported {pattern.Name}.";
             RebuildGroups();
-            StartSceneRefresh();
+            StartThumbnailRefresh();
         }
         catch (Exception exception)
         {
@@ -385,7 +385,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             Project.Patterns.Add(pattern);
             ResultSummary = $"Imported {pattern.Name}.";
             RebuildGroups();
-            StartSceneRefresh();
+            StartThumbnailRefresh();
         }
         catch (Exception exception)
         {
@@ -432,7 +432,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
         try
         {
-            CancelSceneRefresh();
+            CancelThumbnailRefresh();
             await _gallery.DeleteAsync(selected, Paths);
             foreach (PatternGalleryPattern pattern in selected)
             {
@@ -562,7 +562,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         {
             if (!string.Equals(folder.Value, Project.FileHandler.CollectionFolderName, StringComparison.Ordinal))
             {
-                CancelSceneRefresh();
+                CancelThumbnailRefresh();
                 _paths = _files.RenameCollection(Paths, folder.Value);
                 Project.FileHandler.CollectionFolderName = folder.Value;
                 Project.FileHandler.BasePath = CollectionBasePath;
@@ -639,7 +639,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             imported.FileHandler.CollectionFolderName = archive.CollectionFolderName;
             if (merge)
             {
-                CancelSceneRefresh();
+                CancelThumbnailRefresh();
                 _files.EnsureCollection(Paths);
                 Dictionary<string, PatternGalleryArchiveFile> contents = archive.PatternFiles
                     .ToDictionary(file => file.FileName, StringComparer.OrdinalIgnoreCase);
@@ -653,7 +653,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 }
 
                 RebuildGroups();
-                StartSceneRefresh();
+                StartThumbnailRefresh();
                 ResultSummary = "Merged Pattern Gallery collection.";
                 return;
             }
@@ -664,7 +664,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 throw new IOException($"Collection folder '{imported.FileHandler.CollectionFolderName}' already exists.");
             }
 
-            CancelSceneRefresh();
+            CancelThumbnailRefresh();
             await _archives.ExtractAsync(archivePath, CollectionBasePath);
             bool load = await _dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
                 "Load imported collection",
@@ -711,10 +711,10 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
         try
         {
-            CancelSceneRefresh();
+            CancelThumbnailRefresh();
             PatternGalleryRestoreResult result = await _gallery.RestoreAsync(Project, Paths);
             RebuildGroups();
-            StartSceneRefresh();
+            StartThumbnailRefresh();
             ResultSummary = $"Restored collection: removed {result.RemovedCount}, added {result.AddedCount}.";
         }
         catch (Exception exception)
@@ -992,21 +992,21 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         return item;
     }
 
-    private void StartSceneRefresh()
+    private void StartThumbnailRefresh()
     {
-        CancelSceneRefresh();
-        _sceneCancellation = new CancellationTokenSource();
-        _ = RefreshScenesAsync(_sceneCancellation.Token);
+        CancelThumbnailRefresh();
+        _thumbnailCancellation = new CancellationTokenSource();
+        _ = RefreshThumbnailsAsync(_thumbnailCancellation.Token);
     }
 
-    private void CancelSceneRefresh()
+    private void CancelThumbnailRefresh()
     {
-        _sceneCancellation?.Cancel();
-        _sceneCancellation?.Dispose();
-        _sceneCancellation = null;
+        _thumbnailCancellation?.Cancel();
+        _thumbnailCancellation?.Dispose();
+        _thumbnailCancellation = null;
     }
 
-    private async Task RefreshScenesAsync(CancellationToken cancellationToken)
+    private async Task RefreshThumbnailsAsync(CancellationToken cancellationToken)
     {
         PatternGalleryProject project = Project;
         PatternGalleryCollectionPaths paths = Paths;
@@ -1016,7 +1016,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             PatternGalleryItemViewModel item = GetItem(pattern);
             try
             {
-                ObjectVisualiserScene? scene = await _gallery.LoadSceneAsync(pattern, paths, cancellationToken);
+                Beatmap? beatmap = await _gallery.LoadBeatmapAsync(pattern, paths, cancellationToken);
                 if (cancellationToken.IsCancellationRequested ||
                     !ReferenceEquals(Project, project) ||
                     !project.Patterns.Contains(pattern))
@@ -1024,7 +1024,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                     return;
                 }
 
-                item.SetScene(scene);
+                item.SetThumbnail(beatmap);
             }
             catch (OperationCanceledException)
             {
@@ -1039,7 +1039,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                     return;
                 }
 
-                item.SetScene(null);
+                item.SetThumbnail(null);
             }
         }
     }

@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Application.ObjectVisualiser;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
@@ -10,7 +9,7 @@ namespace Mapping_Tools.Application.PatternGallery;
 
 /// <summary>
 /// Coordinates Pattern Gallery's Core maker/placer with collection files,
-/// Editor Reader state, safe beatmap saves, and the reusable object visualizer.
+/// Editor Reader state, and safe beatmap saves.
 /// </summary>
 public sealed class PatternGalleryService : IPatternGalleryService
 {
@@ -29,7 +28,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
     }
 
     /// <inheritdoc/>
-    public async Task<ObjectVisualiserScene> LoadSceneAsync(
+    public async Task<Beatmap> LoadBeatmapAsync(
         PatternGalleryPattern pattern,
         PatternGalleryCollectionPaths paths,
         CancellationToken cancellationToken = default)
@@ -41,10 +40,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
                 cancellationToken)
             .ConfigureAwait(false);
         session.Editor.Beatmap.UpdateStacking();
-        return ObjectVisualiserSceneBuilder.FromHitObjects(
-            session.Editor.Beatmap.HitObjects.Take(100),
-            session.Editor.Beatmap.Difficulty["CircleSize"].DoubleValue,
-            useStackedPositions: true);
+        return session.Editor.Beatmap;
     }
 
     /// <inheritdoc/>

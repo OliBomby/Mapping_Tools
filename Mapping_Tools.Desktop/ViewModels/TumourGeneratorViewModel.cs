@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
-using Mapping_Tools.Application.ObjectVisualiser;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
@@ -13,7 +12,6 @@ using Mapping_Tools.Application.TumourGenerator;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.Graph;
-using Mapping_Tools.Core.Classes.ObjectVisualiser;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels.Adapters;
@@ -147,7 +145,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             if (SetProperty(ref _tumouredPreviewHitObject, value))
             {
                 IsProcessingPreview = false;
-                OnPropertyChanged(nameof(PreviewScene));
             }
         }
     }
@@ -155,11 +152,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets whether the latest preview request is still running.</summary>
     [ObservableProperty]
     public partial bool IsProcessingPreview { get; private set; }
-
-    /// <summary>Gets the framework-neutral preview scene built by D5.</summary>
-    public ObjectVisualiserScene? PreviewScene => TumouredPreviewHitObject is null
-        ? null
-        : ObjectVisualiserSceneBuilder.FromHitObjects([TumouredPreviewHitObject], CircleSize);
 
     /// <summary>Gets or sets the selected layer index.</summary>
     public int CurrentLayerIndex
@@ -473,7 +465,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     }
 
     partial void OnScaleChanged(double value) => QueuePreview();
-    partial void OnCircleSizeChanged(double value) => OnPropertyChanged(nameof(PreviewScene));
     partial void OnJustMiddleAnchorsChanged(bool value) => QueuePreview();
     partial void OnDebugConstructionChanged(bool value) => QueuePreview();
     partial void OnFixSvChanged(bool value) => OnPropertyChanged(nameof(RemoveSliderTicksEnabled));

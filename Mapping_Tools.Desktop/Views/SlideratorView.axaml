@@ -43,7 +43,8 @@
                     Background="{DynamicResource MaterialPaperBrush}"
                     ToolTip.Tip="Result preview">
                 <controls:ObjectVisualiserControl x:Name="PreviewControl"
-                                                  Scene="{Binding PreviewScene}"
+                                                  HitObject="{Binding VisibleHitObject}"
+                                                  CustomPixelLength="{Binding PreviewPixelLength}"
                                                   Progress="{Binding PreviewProgress}"
                                                   Thickness="50"
                                                   BorderThickness="0.1"

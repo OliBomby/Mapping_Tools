@@ -143,7 +143,7 @@ public sealed partial class SlideratorView : UserControl
         {
             observedViewModel = null;
             acceptedGraphState = null;
-            PreviewControl.Markers = [];
+            PreviewControl.ExtraMarkers = [];
         }
     }
 
@@ -252,7 +252,7 @@ public sealed partial class SlideratorView : UserControl
         if (!(viewModel.ShowRedAnchors || viewModel.ShowGraphAnchors) ||
             viewModel.VisibleHitObject?.IsSlider != true)
         {
-            PreviewControl.Markers = [];
+            PreviewControl.ExtraMarkers = [];
             return;
         }
 
@@ -266,7 +266,7 @@ public sealed partial class SlideratorView : UserControl
         double maximum = SlideratorEngine.GetMaxCompletion(options);
         if (!double.IsFinite(maximum) || maximum <= 0)
         {
-            PreviewControl.Markers = [];
+            PreviewControl.ExtraMarkers = [];
             return;
         }
 
@@ -295,7 +295,7 @@ public sealed partial class SlideratorView : UserControl
                     Brushes.DodgerBlue)));
         }
 
-        PreviewControl.Markers = markers;
+        PreviewControl.ExtraMarkers = markers;
     }
 
     private void PreviewTimerTick(object? sender, EventArgs args)

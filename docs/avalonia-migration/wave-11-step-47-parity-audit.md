@@ -12,7 +12,7 @@ executable switch) and 49 (legacy removal) are explicitly out of scope.
 
 | Step | Feature | Audited behavior and disposition |
 | --- | --- | --- |
-| 37 | Pattern Gallery | Restored the WPF selectable-list contract with Avalonia `ListBox` containers, moved collection actions into the shell project menu, preserved the WPF help copy/tooltips, and made scene loading cancel safely across project/file replacement. The Avalonia object-visualiser scene is the documented rendering substitution for the WPF bitmap thumbnail converter. |
+| 37 | Pattern Gallery | Restored the WPF selectable-list contract with Avalonia `ListBox` containers, moved collection actions into the shell project menu, preserved the WPF help copy/tooltips, and made thumbnail loading cancel safely across project/file replacement. The Desktop `PatternThumbnailControl` is the presentation-side rendering substitution for the WPF bitmap thumbnail converter. |
 | 38 | Graph and value editor | Compared graph state cloning, bounds, interpolation, marker generation/snapping, context-menu commands, typed-value dialog, pointer gestures, keyboard deletion/Escape, wheel modifiers, and cancellation/clone semantics. Wheel zoom now ignores positions outside the graph bounds, matching WPF. Cursor warping remains the documented platform substitution. |
 | 39 | Sliderator | Compared import modes, lost-focus converters and validation ranges, graph bounds/markers, preview timing, navigation and Shift quick placement, empty-source branches, ordinary/QuickRun execution, persistence, and registration. No remaining parity defect was substantiated. |
 | 40 | Tumour Generator 2 | Compared layer commands/order, graph validation and serialization, import/empty states, preview cancellation/latest-request ownership, activation/disposal, ordinary/QuickRun completion/error branches, and registration. Preview work is now inactive until shell activation, and the migrated completion message matches WPF spelling. |
@@ -30,7 +30,7 @@ executable switch) and 49 (legacy removal) are explicitly out of scope.
 - Restored Pattern Gallery's `ListBox`/`ListBoxItem` selection semantics and
   shell-owned extra project commands; removed duplicate feature-local project
   actions and non-WPF selection controls.
-- Added cancellation and stale-project guards around Pattern Gallery scene
+- Added cancellation and stale-project guards around Pattern Gallery thumbnail
   refreshes when files, collections, or projects change.
 - Matched GraphControl wheel-boundary behavior to WPF and removed its stale
   `IsVisible` name collision with Avalonia's base visual API.

@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mapping_Tools.Application.ObjectVisualiser;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.PatternGallery;
 
 namespace Mapping_Tools.Desktop.ViewModels;
@@ -32,13 +32,13 @@ public sealed partial class PatternGalleryItemViewModel : ObservableObject
         }
     }
 
-    /// <summary>Gets the framework-neutral thumbnail scene, when it has loaded.</summary>
+    /// <summary>Gets the loaded thumbnail beatmap, when it is available.</summary>
     [ObservableProperty]
-    public partial ObjectVisualiserScene? Scene { get; private set; }
+    public partial Beatmap? ThumbnailBeatmap { get; private set; }
 
-    /// <summary>Publishes a newly loaded thumbnail scene.</summary>
-    /// <param name="scene">The scene built from the stored pattern map.</param>
-    internal void SetScene(ObjectVisualiserScene? scene) => Scene = scene;
+    /// <summary>Publishes a newly loaded thumbnail beatmap.</summary>
+    /// <param name="beatmap">The beatmap loaded from the stored pattern, or <see langword="null"/> on failure.</param>
+    internal void SetThumbnail(Beatmap? beatmap) => ThumbnailBeatmap = beatmap;
 
     /// <summary>Refreshes bindings after persisted metadata changes.</summary>
     internal void RefreshMetadata() => OnPropertyChanged(nameof(Name));

@@ -2,46 +2,42 @@
 
 ## Scope
 
-This step extracts reusable object scene data, slider polyline geometry, osu!
-coordinate transforms, fit/zoom/pan calculations, and deterministic object and
-anchor hit testing. `Mapping_Tools.Desktop` owns the Avalonia brushes, custom
-drawing, clipping, pointer capture, selection, hover state, and pointer-wheel
-zoom boundary.
+The object visualizer is a presentation-only feature. `Mapping_Tools.Desktop`
+owns the Avalonia control, marker type, slider-path preparation, bounds fitting,
+drawing, and thumbnail rendering. The control receives Core `HitObject` data
+directly; Application and Core do not expose scene, viewport, hit-test, or
+visualizer-specific model types.
 
-Pattern Gallery, thumbnail bitmap conversion, combo-number rendering, and
-feature-specific placement remain step 37 scope.
+The main `ObjectVisualiserControl` is intentionally close to the legacy WPF
+`HitObjectElement`: it draws one circle or slider, supports an optional custom
+slider length, progress-ball animation, slider anchors, and extra slider
+markers. It does not own selection, hover, panning, zooming, generic scene
+composition, combo labels, follow lines, or spinner rendering.
+
+Pattern Gallery uses a separate Desktop-only `PatternThumbnailControl`, based
+on the legacy `OsuPatternToThumbnailConverter`. Its Application service returns
+the loaded domain `Beatmap`; thumbnail layout and drawing stay in Desktop.
 
 ## Intentional platform substitution
 
 The WPF `HitObjectElement : FrameworkElement` is represented by
-`ObjectVisualiserControl : Avalonia.Controls.Control`. Avalonia has no
-WPF-style element template that provides this path/anchor drawing contract, so
-the control overrides `Render(DrawingContext)` and uses `PushClip` while
-drawing the same object diameter, fractional outline, endpoint, slider-ball,
-anchor, duplicate-anchor, and marker semantics. The WPF size-to-fit behavior is
-represented by the framework-neutral `ObjectVisualiserTransform` and the
-control's `FitToScene` method; fit mode is reapplied after a resize while a
-user pan or zoom remains stable. Avalonia drawing and pointer coordinates are
-logical DIPs, so no platform-specific DPI conversion is required. Middle-button
-capture pans and the wheel zooms around the pointer; left-button selection and
-pointer hover stay in the control boundary so later tools can subscribe without
-owning Avalonia input types. Avalonia's `PointerCaptureLost` callback clears an
-interrupted pan, and marker collections are observed while attached so in-place
-updates invalidate the control like the WPF observable collection.
+`ObjectVisualiserControl : Avalonia.Controls.Control`. Avalonia has no WPF-style
+element template for this path/anchor drawing contract, so the control overrides
+`Render(DrawingContext)` and performs the same direct drawing and size-to-fit
+calculation. Avalonia's logical DIPs are used directly as the control's drawing
+coordinates.
 
 ## Verification
 
-- Core: five focused transform/path tests.
-- Application: six focused scene/hit-test tests.
-- Desktop: five focused control tests; the full Desktop suite passes (161 tests).
-- Legacy WPF build and Avalonia Desktop build both pass.
+- Desktop tests cover the legacy defaults, one-object input contract, and path
+  safety limits.
+- Application/Core visualizer classes and tests were removed.
+- The Avalonia Desktop project builds successfully.
 
 Avalonia 12.1 references consulted:
 
 - https://docs.avaloniaui.net/docs/custom-controls/custom-control-class
 - https://docs.avaloniaui.net/docs/custom-controls/drawing-custom-controls
 - https://docs.avaloniaui.net/docs/input-interaction/pointer
-- https://raw.githubusercontent.com/AvaloniaUI/Avalonia/12.1.0/src/Avalonia.Base/Input/PointerEventArgs.cs
-- https://raw.githubusercontent.com/AvaloniaUI/Avalonia/12.1.0/src/Avalonia.Base/Input/InputElement.cs
-- https://raw.githubusercontent.com/AvaloniaUI/Avalonia/12.1.0/src/Avalonia.Base/Visual.cs
 - https://github.com/AvaloniaUI/Avalonia/releases/tag/12.1.0
+- https://www.nuget.org/packages/Avalonia/12.1.0

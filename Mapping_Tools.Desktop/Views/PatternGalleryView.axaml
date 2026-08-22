@@ -63,15 +63,9 @@
                                                                 <ContextMenu Opened="PatternContextMenuOpened" />
                                                             </Border.ContextMenu>
                                                             <Grid RowDefinitions="*,40" ToolTip.Tip="Double-click to QuickRun this pattern.">
-                                                                <controls:ObjectVisualiserControl Scene="{Binding Scene}"
-                                                                                                  Fill="{DynamicResource MappingToolsTimelineAddedInnerBrush}"
-                                                                                                  Stroke="{DynamicResource MaterialLightForegroundBrush}"
-                                                                                                  ShowComboNumbers="True"
-                                                                                                  ShowFollowLines="True"
-                                                                                                  ComboNumberBrush="{DynamicResource MaterialLightForegroundBrush}"
-                                                                                                  FollowLineBrush="{DynamicResource MaterialLightForegroundBrush}"
-                                                                                                  Thickness="38"
-                                                                                                  BorderThickness="0.08" />
+                                                                <controls:PatternThumbnailControl Beatmap="{Binding ThumbnailBeatmap}"
+                                                                                                   Fill="{DynamicResource MappingToolsTimelineAddedInnerBrush}"
+                                                                                                   Stroke="{DynamicResource MaterialLightForegroundBrush}" />
                                                                 <TextBlock Grid.Row="1"
                                                                                VerticalAlignment="Center"
                                                                                Margin="8,0"

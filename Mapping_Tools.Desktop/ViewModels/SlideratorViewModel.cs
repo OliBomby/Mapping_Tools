@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Interactions.Converters;
-using Mapping_Tools.Application.ObjectVisualiser;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Sliderator;
@@ -13,7 +12,6 @@ using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.Graph;
 using Mapping_Tools.Core.Classes.MathUtil;
-using Mapping_Tools.Core.Classes.ObjectVisualiser;
 using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Desktop.Shell;
 
@@ -196,8 +194,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets the graph maximum Y bound for the active mode.</summary>
     public double GraphMaxY => GraphModeSetting == SlideratorGraphMode.Position ? 1 : VelocityLimit;
 
-    /// <summary>Gets the framework-neutral preview scene built by the migrated visualizer.</summary>
-    public ObjectVisualiserScene? PreviewScene { get; private set; }
+    /// <summary>Gets the optional custom slider length used by the presentation preview.</summary>
+    public double? PreviewPixelLength { get; private set; }
 
     /// <summary>Gets the preview progress, normalized to the generated source path.</summary>
     public double PreviewProgress { get; private set; } = -1;
@@ -676,7 +674,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         OnPropertyChanged(nameof(DistanceTraveled));
         OnPropertyChanged(nameof(SvGraphMultiplier));
         OnPropertyChanged(nameof(ExpectedSegments));
-        UpdatePreviewScene();
+        UpdatePreview();
     }
 
     /// <summary>Evaluates the Core graph at one repeating animation timestamp.</summary>
@@ -721,13 +719,13 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         OnPropertyChanged(nameof(PreviewProgress));
     }
 
-    private void UpdatePreviewScene()
+    private void UpdatePreview()
     {
         HitObject? visible = VisibleHitObject;
         if (visible is null)
         {
-            PreviewScene = null;
-            OnPropertyChanged(nameof(PreviewScene));
+            PreviewPixelLength = null;
+            OnPropertyChanged(nameof(PreviewPixelLength));
             return;
         }
 
@@ -739,10 +737,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             GraphState = GraphState
         };
         double customLength = SlideratorEngine.GetMaxCompletion(options) * PixelLength;
-        PreviewScene = double.IsFinite(customLength) && customLength >= 0
-            ? ObjectVisualiserSceneBuilder.FromHitObjects([visible], 5, customPixelLength: customLength)
-            : ObjectVisualiserSceneBuilder.FromHitObjects([visible], 5);
-        OnPropertyChanged(nameof(PreviewScene));
+        PreviewPixelLength = double.IsFinite(customLength) && customLength >= 0 ? customLength : null;
+        OnPropertyChanged(nameof(PreviewPixelLength));
     }
 
     private void ToggleGraphMode()

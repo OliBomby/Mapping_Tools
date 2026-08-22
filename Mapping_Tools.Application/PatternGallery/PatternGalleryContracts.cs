@@ -1,6 +1,5 @@
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.PatternGallery;
-using Mapping_Tools.Application.ObjectVisualiser;
 
 namespace Mapping_Tools.Application.PatternGallery;
 
@@ -117,15 +116,15 @@ public sealed record PatternGalleryRunResult(int PatternCount, string Message);
 /// <summary>Reports a collection restore's indexed-file changes.</summary>
 public sealed record PatternGalleryRestoreResult(int RemovedCount, int AddedCount);
 
-/// <summary>Builds scenes, imports patterns, restores collections, and places patterns.</summary>
+/// <summary>Loads pattern data, imports patterns, restores collections, and places patterns.</summary>
 public interface IPatternGalleryService
 {
-    /// <summary>Builds a step-36 object-visualizer scene for a stored pattern.</summary>
+    /// <summary>Loads a stored pattern beatmap for presentation.</summary>
     /// <param name="pattern">The indexed pattern to load.</param>
     /// <param name="paths">The resolved collection paths.</param>
     /// <param name="cancellationToken">Cancels the beatmap read.</param>
-    /// <returns>A stacked-position scene for the thumbnail.</returns>
-    Task<ObjectVisualiserScene> LoadSceneAsync(
+    /// <returns>The loaded beatmap with stacking information updated.</returns>
+    Task<Beatmap> LoadBeatmapAsync(
         PatternGalleryPattern pattern,
         PatternGalleryCollectionPaths paths,
         CancellationToken cancellationToken = default);

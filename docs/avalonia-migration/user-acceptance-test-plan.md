@@ -225,7 +225,7 @@ Every row also inherits the common cases in section 9 and all applicable shell c
 
 | Feature | Minimum feature-specific scenarios | Required evidence |
 |---|---|---|
-| Object visualizer | Each supported object/path type; empty/dense scenes; markers; scaling; resizing; theme; invalid scene data. | Deterministic scene renders and coordinate checks. |
+| Object visualizer | Circles and sliders; empty/invalid objects; markers; progress ball; anchors; scaling; resizing; and theme changes. | Deterministic control behavior and coordinate checks. |
 | Pattern Gallery | Import from map/code/file/ZIP; organize collection; duplicate/conflicting names; preview; transformed placement; overwrite policies; project extra menus/autosave. | Collection manifests, preview renders, placed-pattern diff. |
 | Graph/value editor | Constant/graph switch; add/move/delete anchors; snapping; interpolation types; bounds; keyboard/pointer capture; zoom/resize; derivative/integral-driven consumers; save/load. | Interaction checklist, sampled curve values, graph renders. |
 | Sliderator | Position and velocity curves; imported selection; slider/stream modes; optimization choices; preview; invalid graph; QuickRun; save/load. | Sampled curve/output path comparison and preview renders. |

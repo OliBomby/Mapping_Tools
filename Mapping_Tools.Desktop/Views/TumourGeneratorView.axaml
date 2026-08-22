@@ -214,7 +214,7 @@
                 <Border Grid.Row="1" Margin="0,10,0,0" Padding="10"
                         Background="{DynamicResource MaterialPaperBrush}"
                         ToolTip.Tip="Result preview">
-                    <controls:ObjectVisualiserControl Scene="{Binding PreviewScene}"
+                    <controls:ObjectVisualiserControl HitObject="{Binding TumouredPreviewHitObject}"
                                                       ShowAnchors="True"
                                                       Thickness="{Binding CircleSize, Converter={StaticResource CircleSizeToThicknessConverter}}"
                                                       AnchorSize="0.2"

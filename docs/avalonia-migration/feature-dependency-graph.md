@@ -58,7 +58,7 @@ Rules:
 | D2 | Forms and common presentation | `Components/Domain`, `ViewHeaderComponent`, drag/drop controls | Validation, formatting, enum/boolean conversion, headers, list reordering, common inputs, and focus helpers. | Core parsing/validation rules plus small Avalonia converters, behaviors, and reusable views. |
 | D3 | Dialog system | `Components/Dialogs`, `MessageWindow`, feature dialogs | Messages, beatmap import, typed values, sample selection, reflection-driven custom forms, and confirmations. | Application interaction contracts plus typed Avalonia dialogs. Do not reproduce the reflection/WPF-control coupling in `CustomDialog`. |
 | D4 | Timeline visual | `Components/TimeLine` | Display timestamped findings and navigation markers. | Avalonia reusable control. Required by Auto-fail Detector and Map Cleaner. |
-| D5 | Object visualizer | `Components/ObjectVisualiser` | Render hit objects/pattern thumbnails and markers. | Separate framework-neutral scene data from Avalonia rendering. Required by Pattern Gallery, Sliderator, and Tumour Generator. |
+| D5 | Object visualizer | `Components/ObjectVisualiser` | Render hit objects/pattern thumbnails and markers. | Desktop presentation control based directly on Core hit-object data. Keep visualizer models, path preparation, fitting, and drawing out of Application/Core. Required by Pattern Gallery, Sliderator, and Tumour Generator. |
 | D6 | Graph/value editor | `Components/Graph`, `ValueOrGraphControl` | Editable anchors, interpolators, markers, snapping, derivatives/integrals, animations, and constant-or-curve parameters. | Interpolation/state models to Core; pointer/rendering control to Desktop. Required by Sliderator and Tumour Generator. |
 | D7 | Audio visualization | `Components/Spectrum` | Draw audio spectrum data used by hitsound workflows. | Audio analysis service plus Avalonia rendering control. |
 | I1 | osu! live integration | `EditorReader.dll`, `OsuMemoryDataProvider` | Locate the current map, inspect selected objects/editor state, read unsaved state, and request reload/save behavior. | Windows-specific Infrastructure adapters behind Application interfaces. |
@@ -328,7 +328,7 @@ Exit: non-audio hitsound semantics, colors, mapsets, and complex filesystem fixt
 
 ### Wave 8 — Reusable visual editors and collection workflows
 
-36. **D5 Object visualizer.** Separate scene/layout data from Avalonia drawing.
+36. **D5 Object visualizer.** Keep the simple legacy-style object control and thumbnail renderer entirely in Desktop presentation.
 37. **Pattern Gallery.** Reuse the visualizer, project extensions, typed dialogs, ZIP/file services, and editor placement gateway.
 38. **D6 Graph/value editor.** Move interpolator/state math to Core, then implement Avalonia pointer interaction, snapping, and rendering with dedicated control tests.
 39. **Sliderator.** Reuse C3, D5, and D6; remove its view model’s reference back to the view.
