@@ -17,7 +17,7 @@ public sealed class MetadataManagerService : IMetadataManagerService
     ///     Creates a Metadata Manager application service.
     /// </summary>
     /// <param name="editingGateway">Loads beatmaps with the configured live-editor preference.</param>
-    /// <param name="backupService">Creates the pre-write safety copy for each target.</param>
+    /// <param name="backupService">Creates the pre-write backup for each target.</param>
     public MetadataManagerService(
         IBeatmapEditingGateway editingGateway,
         IBeatmapBackupService backupService)

@@ -175,7 +175,7 @@ public sealed class BeatmapEditingSession
 {
     /// <summary>
     ///     Creates a session around a parsed beatmap and retains its initial
-    ///     serialized state for a later safety copy.
+    ///     serialized state for a later backup.
     /// </summary>
     /// <param name="editor">The mutable document editor.</param>
     /// <param name="source">Whether the document came only from disk or was overlaid with live state.</param>
@@ -274,7 +274,7 @@ public interface IBeatmapEditingGateway
     /// <param name="cancellationToken">Cancels before saving or before requesting the reload.</param>
     /// <returns>A task that completes after backup, persistence, and any requested reload.</returns>
     /// <exception cref="IOException">
-    ///     The safety copy or document write fails; a backup failure leaves the source untouched.
+    ///     The backup or document write fails; a backup failure leaves the source untouched.
     /// </exception>
     /// <exception cref="OperationCanceledException">
     ///     Cancellation occurs before backup, save, or a requested reload completes.
@@ -286,14 +286,14 @@ public interface IBeatmapEditingGateway
 
     /// <summary>
     ///     Persists a beatmap session using the session's original live state for
-    ///     the optional companion safety copy, then optionally reloads osu!.
+    ///     the optional companion backup, then optionally reloads osu!.
     /// </summary>
     /// <param name="session">The opened beatmap session to save.</param>
     /// <param name="reloadEditor">Whether an active osu! editor should be refreshed after the write.</param>
     /// <param name="cancellationToken">Cancels before saving or before requesting the reload.</param>
     /// <returns>A task that completes after backup, persistence, and any requested reload.</returns>
     /// <exception cref="IOException">
-    ///     The safety copy or document write fails; a backup failure leaves the source untouched.
+    ///     The backup or document write fails; a backup failure leaves the source untouched.
     /// </exception>
     /// <exception cref="OperationCanceledException">
     ///     Cancellation occurs before backup, save, or a requested reload completes.
