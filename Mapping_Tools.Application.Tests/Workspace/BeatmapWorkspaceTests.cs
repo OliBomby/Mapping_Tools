@@ -8,7 +8,7 @@ namespace Mapping_Tools.Application.Tests.Workspace;
 [TestClass]
 public sealed class BeatmapWorkspaceTests
 {
-    private static readonly DateTimeOffset FixedNow =
+    private static readonly DateTimeOffset fixedNow =
         new(2026, 7, 25, 14, 30, 0, TimeSpan.Zero);
 
     [TestMethod]
@@ -28,7 +28,7 @@ public sealed class BeatmapWorkspaceTests
         // Assert
         workspace.SelectedPaths.ToArray().Should().Equal(@"C:\Maps\first.osu", @"C:\Maps\second.osb");
         workspace.RecentMaps.Select(recent => recent.Path).ToArray().Should().Equal(@"C:\Maps\second.osb", @"C:\Maps\first.osu");
-        workspace.RecentMaps.All(recent => recent.DisplayDate == FixedNow.DateTime.ToString()).Should().BeTrue();
+        workspace.RecentMaps.All(recent => recent.DisplayDate == fixedNow.DateTime.ToString()).Should().BeTrue();
         (notification?.Source).Should().Be(BeatmapSelectionSource.DragAndDrop);
         (notification?.Paths.ToArray()).Should().Equal(workspace.SelectedPaths.ToArray());
     }
@@ -235,7 +235,7 @@ public sealed class BeatmapWorkspaceTests
             picker ?? new FakeFilePicker(),
             fileSystem ?? new FakeBeatmapFileSystem(),
             locator ?? new FakeCurrentBeatmapLocator(),
-            new FixedTimeProvider(FixedNow));
+            new FixedTimeProvider(fixedNow));
     }
 
     private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider

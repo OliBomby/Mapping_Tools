@@ -18,19 +18,19 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     IQuickRun,
     IShellProjectFeature
 {
-    internal const string OperationId = "slider-completionator";
+    internal const string OPERATION_ID = "slider-completionator";
 
-    private readonly ISliderCompletionatorService _completionator;
-    private readonly ICurrentBeatmapLocator _currentBeatmap;
+    private readonly ISliderCompletionatorService completionator;
+    private readonly ICurrentBeatmapLocator currentBeatmap;
 
-    private readonly ProjectDefinition<SliderCompletionatorProject> _definition = new(
+    private readonly ProjectDefinition<SliderCompletionatorProject> definition = new(
         "slidercompletionatorproject.json",
         "Slider Completionator Projects",
         static () => new SliderCompletionatorProject(),
         "slider-completionator-project.json");
 
-    private readonly ApplicationSettings _settings;
-    private readonly IBeatmapWorkspace _workspace;
+    private readonly ApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
 
     /// <summary>
     ///     Creates a Slider Completionator presentation model.
@@ -46,12 +46,12 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
         ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
         ApplicationSettings settings)
-        : base(execution, OperationId)
+        : base(execution, OPERATION_ID)
     {
-        _completionator = completionator ?? throw new ArgumentNullException(nameof(completionator));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.completionator = completionator ?? throw new ArgumentNullException(nameof(completionator));
+        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <summary>Gets the import modes in their legacy display order.</summary>
@@ -148,7 +148,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await _currentBeatmap
+        string? path = await currentBeatmap
             .FindCurrentBeatmapAsync(cancellationToken)
             .ConfigureAwait(false);
         await RunWithStateAsync(() => RunPathsAsync(
@@ -157,9 +157,9 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
             cancellationToken));
     }
 
-    string IQuickRun.OperationId => OperationId;
+    string IQuickRun.OperationId => OPERATION_ID;
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
     {
@@ -175,12 +175,12 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     protected override async Task RunCoreAsync()
     {
         string? currentPath = null;
-        if (ImportModeSetting == SliderCompletionatorImportMode.Selected) currentPath = await _currentBeatmap.FindCurrentBeatmapAsync();
+        if (ImportModeSetting == SliderCompletionatorImportMode.Selected) currentPath = await currentBeatmap.FindCurrentBeatmapAsync();
 
         var paths = ImportModeSetting == SliderCompletionatorImportMode.Selected
             ? string.IsNullOrWhiteSpace(currentPath) ? [] : [currentPath]
-            : _workspace.SelectedPaths;
-        await RunPathsAsync(paths, _settings.AlwaysQuickRun, CancellationToken.None);
+            : workspace.SelectedPaths;
+        await RunPathsAsync(paths, settings.AlwaysQuickRun, CancellationToken.None);
     }
 
     /// <inheritdoc />
@@ -200,11 +200,11 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
         SliderCompletionatorOptions options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<SliderCompletionatorResult>(
-                    OperationId,
+                    OPERATION_ID,
                     "Slider Completionator",
                     async context =>
                     {
-                        var result = await _completionator.CompleteAsync(
+                        var result = await completionator.CompleteAsync(
                             paths,
                             options,
                             new Progress<double>(value => context.ReportProgress(

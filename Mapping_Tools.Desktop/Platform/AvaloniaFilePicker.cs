@@ -9,7 +9,7 @@ namespace Mapping_Tools.Desktop.Platform;
 /// </summary>
 public sealed class AvaloniaFilePicker : IFilePicker
 {
-    private readonly Func<IStorageProvider?> _storageProviderAccessor;
+    private readonly Func<IStorageProvider?> storageProviderAccessor;
 
     /// <summary>
     ///     Creates an adapter that resolves the storage provider lazily from a top-level window.
@@ -17,21 +17,21 @@ public sealed class AvaloniaFilePicker : IFilePicker
     /// <param name="storageProviderAccessor">Returns the current storage provider, if initialized.</param>
     public AvaloniaFilePicker(Func<IStorageProvider?> storageProviderAccessor)
     {
-        _storageProviderAccessor = storageProviderAccessor
-                                   ?? throw new ArgumentNullException(nameof(storageProviderAccessor));
+        this.storageProviderAccessor = storageProviderAccessor
+                                       ?? throw new ArgumentNullException(nameof(storageProviderAccessor));
     }
 
     /// <summary>
     ///     <inheritdoc />
-    public bool CanOpenFiles => _storageProviderAccessor()?.CanOpen == true;
+    public bool CanOpenFiles => storageProviderAccessor()?.CanOpen == true;
 
     /// <summary>
     ///     <inheritdoc />
-    public bool CanSaveFiles => _storageProviderAccessor()?.CanSave == true;
+    public bool CanSaveFiles => storageProviderAccessor()?.CanSave == true;
 
     /// <summary>
     ///     <inheritdoc />
-    public bool CanPickFolders => _storageProviderAccessor()?.CanPickFolder == true;
+    public bool CanPickFolders => storageProviderAccessor()?.CanPickFolder == true;
 
     /// <summary>
     ///     <inheritdoc />
@@ -131,7 +131,7 @@ public sealed class AvaloniaFilePicker : IFilePicker
 
     private IStorageProvider GetProvider(Func<IStorageProvider, bool> capability, string operation)
     {
-        var provider = _storageProviderAccessor();
+        var provider = storageProviderAccessor();
         if (provider is null || !capability(provider))
             throw new PlatformNotSupportedException(
                 $"The current platform does not support the ability to {operation}.");

@@ -7,7 +7,7 @@ namespace Mapping_Tools.Infrastructure.PatternGallery;
 /// <summary>Creates and reads Pattern Gallery ZIP files with traversal checks.</summary>
 public sealed class PatternGalleryArchiveService : IPatternGalleryArchiveService
 {
-    private static readonly Encoding Utf8WithoutBom = new UTF8Encoding(false);
+    private static readonly Encoding utf8WithoutBom = new UTF8Encoding(false);
 
     /// <inheritdoc />
     public Task ExportAsync(
@@ -29,7 +29,7 @@ public sealed class PatternGalleryArchiveService : IPatternGalleryArchiveService
         using ZipArchive archive = new(stream, ZipArchiveMode.Create);
         var projectEntry = archive.CreateEntry($"{collectionFolderName}/{projectFileName}");
         using (var projectStream = projectEntry.Open())
-        using (StreamWriter writer = new(projectStream, Utf8WithoutBom, leaveOpen: false))
+        using (StreamWriter writer = new(projectStream, utf8WithoutBom, leaveOpen: false))
         {
             writer.Write(projectJson);
         }
@@ -71,7 +71,7 @@ public sealed class PatternGalleryArchiveService : IPatternGalleryArchiveService
             {
                 projectFileName ??= parts[1];
                 using var stream = entry.Open();
-                using StreamReader reader = new(stream, Utf8WithoutBom);
+                using StreamReader reader = new(stream, utf8WithoutBom);
                 projectJson ??= reader.ReadToEnd();
             }
             else if (parts.Length >= 3

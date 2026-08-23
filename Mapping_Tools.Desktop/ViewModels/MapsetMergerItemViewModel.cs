@@ -7,7 +7,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// <summary>Editable presentation state for one Mapset Merger source row.</summary>
 public sealed partial class MapsetMergerItemViewModel : ObservableObject
 {
-    private readonly IFilePicker _filePicker;
+    private readonly IFilePicker filePicker;
 
     /// <summary>Creates a source row with the supplied initial values.</summary>
     /// <param name="filePicker">Presents the folder picker used by Browse.</param>
@@ -15,7 +15,7 @@ public sealed partial class MapsetMergerItemViewModel : ObservableObject
     /// <param name="path">The initial source directory.</param>
     public MapsetMergerItemViewModel(IFilePicker filePicker, string name = "", string path = "")
     {
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         Name = name;
         Path = path;
     }
@@ -36,7 +36,7 @@ public sealed partial class MapsetMergerItemViewModel : ObservableObject
     [RelayCommand]
     private async Task BrowseAsync()
     {
-        var paths = await _filePicker.PickFoldersAsync(new OpenFolderPickerRequest
+        var paths = await filePicker.PickFoldersAsync(new OpenFolderPickerRequest
         {
             Title = "Select mapset",
             SuggestedStartLocation = Directory.Exists(Path) ? Path : null,

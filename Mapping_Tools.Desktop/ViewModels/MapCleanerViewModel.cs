@@ -18,19 +18,19 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature
 {
-    internal const string OperationId = "map-cleaner";
-    private readonly IMapCleanerService _cleaner;
-    private readonly ICurrentBeatmapLocator _currentBeatmap;
+    internal const string OPERATION_ID = "map-cleaner";
+    private readonly IMapCleanerService cleaner;
+    private readonly ICurrentBeatmapLocator currentBeatmap;
 
-    private readonly ProjectDefinition<MapCleanerProject> _definition = new(
+    private readonly ProjectDefinition<MapCleanerProject> definition = new(
         "mapcleanerproject.json",
         "Map Cleaner Projects",
         () => new MapCleanerProject(),
         "map-cleaner-project.json");
 
-    private readonly IPlatformLauncher _launcher;
-    private readonly ApplicationSettings _settings;
-    private readonly IBeatmapWorkspace _workspace;
+    private readonly IPlatformLauncher launcher;
+    private readonly ApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
 
     /// <summary>Creates a Map Cleaner presentation model.</summary>
     /// <param name="cleaner">Runs framework-independent cleanup operations.</param>
@@ -46,13 +46,13 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmap,
         ApplicationSettings settings,
         IPlatformLauncher launcher)
-        : base(execution, OperationId)
+        : base(execution, OPERATION_ID)
     {
-        _cleaner = cleaner ?? throw new ArgumentNullException(nameof(cleaner));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
+        this.cleaner = cleaner ?? throw new ArgumentNullException(nameof(cleaner));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
     }
 
     /// <summary>Gets or sets whether slider volume changes are preserved.</summary>
@@ -122,16 +122,16 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     /// <returns>A task that completes after QuickRun finishes.</returns>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
         await RunWithStateAsync(() => RunPathsAsync(
             string.IsNullOrWhiteSpace(path) ? [] : [path],
             true,
             cancellationToken));
     }
 
-    string IQuickRun.OperationId => OperationId;
+    string IQuickRun.OperationId => OPERATION_ID;
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
     {
@@ -146,9 +146,9 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        if (_settings.AlwaysQuickRun)
+        if (settings.AlwaysQuickRun)
         {
-            string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
+            string? path = await currentBeatmap.FindCurrentBeatmapAsync();
             await RunPathsAsync(
                 string.IsNullOrWhiteSpace(path) ? [] : [path],
                 true,
@@ -157,7 +157,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
         }
 
         await RunPathsAsync(
-            _workspace.SelectedPaths,
+            workspace.SelectedPaths,
             false,
             CancellationToken.None);
     }
@@ -165,7 +165,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private Task NavigateAsync(double time)
     {
-        return _launcher.OpenUriAsync(new Uri($"osu://edit/{Math.Round(time)}"));
+        return launcher.OpenUriAsync(new Uri($"osu://edit/{Math.Round(time)}"));
     }
 
     private async Task RunPathsAsync(IReadOnlyList<string> paths, bool quick, CancellationToken cancellationToken)
@@ -180,13 +180,13 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
 
         var execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<MapCleanerResult>(
-                OperationId,
+                OPERATION_ID,
                 "Map Cleaner",
                 async context =>
                 {
                     Progress<double> progress = new(value =>
                         context.ReportProgress(value, "Cleaning beatmaps"));
-                    var result = await _cleaner.CleanAsync(
+                    var result = await cleaner.CleanAsync(
                         paths,
                         options,
                         progress,

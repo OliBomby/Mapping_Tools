@@ -12,13 +12,13 @@ namespace Mapping_Tools.Infrastructure.Files;
 /// </summary>
 public sealed class PhysicalHitsoundSampleService : IHitsoundSampleService
 {
-    private readonly IMapCleanerSampleService _sampleAnalyzer;
+    private readonly IMapCleanerSampleService sampleAnalyzer;
 
     /// <summary>Creates the physical sample adapter.</summary>
     /// <param name="sampleAnalyzer">The existing mapset audio file analyzer.</param>
     public PhysicalHitsoundSampleService(IMapCleanerSampleService sampleAnalyzer)
     {
-        _sampleAnalyzer = sampleAnalyzer ?? throw new ArgumentNullException(nameof(sampleAnalyzer));
+        this.sampleAnalyzer = sampleAnalyzer ?? throw new ArgumentNullException(nameof(sampleAnalyzer));
     }
 
     /// <inheritdoc />
@@ -26,7 +26,7 @@ public sealed class PhysicalHitsoundSampleService : IHitsoundSampleService
         string directory,
         CancellationToken cancellationToken = default)
     {
-        return _sampleAnalyzer.AnalyzeAsync(directory, true, cancellationToken);
+        return sampleAnalyzer.AnalyzeAsync(directory, true, cancellationToken);
     }
 
     /// <inheritdoc />

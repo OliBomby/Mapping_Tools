@@ -8,7 +8,7 @@ namespace Mapping_Tools.Desktop.Shell;
 /// </summary>
 public sealed class ShellFeatureRegistration
 {
-    private readonly Func<ObservableObject> _createViewModel;
+    private readonly Func<ObservableObject> createViewModel;
 
     /// <summary>
     ///     Creates an explicit shell feature registration.
@@ -48,7 +48,7 @@ public sealed class ShellFeatureRegistration
         StartsSection = startsSection;
         HorizontalScrollBarVisibility = horizontalScrollBarVisibility;
         VerticalScrollBarVisibility = verticalScrollBarVisibility;
-        _createViewModel = createViewModel;
+        this.createViewModel = createViewModel;
     }
 
     /// <summary>Gets the stable feature identifier stored by the shell.</summary>
@@ -79,6 +79,6 @@ public sealed class ShellFeatureRegistration
     /// <returns>A new feature presentation model.</returns>
     public ObservableObject CreateViewModel()
     {
-        return _createViewModel();
+        return createViewModel();
     }
 }

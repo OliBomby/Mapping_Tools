@@ -8,7 +8,7 @@ namespace Mapping_Tools.Application.PropertyTransformer;
 /// </summary>
 public sealed class PropertyTransformerService : IPropertyTransformerService
 {
-    private readonly IBeatmapEditingGateway _editingGateway;
+    private readonly IBeatmapEditingGateway editingGateway;
 
     /// <summary>
     ///     Creates the Property Transformer application service.
@@ -16,8 +16,8 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
     /// <param name="editingGateway">Loads documents and saves them through the backup boundary.</param>
     public PropertyTransformerService(IBeatmapEditingGateway editingGateway)
     {
-        _editingGateway = editingGateway
-                          ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.editingGateway = editingGateway
+                              ?? throw new ArgumentNullException(nameof(editingGateway));
     }
 
     /// <inheritdoc />
@@ -48,7 +48,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
                     ".osb",
                     StringComparison.OrdinalIgnoreCase))
             {
-                var editor = await _editingGateway
+                var editor = await editingGateway
                     .OpenStoryboardAsync(path, cancellationToken)
                     .ConfigureAwait(false);
                 PropertyTransformerEngine.Apply(
@@ -57,14 +57,14 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
                     documentProgress,
                     cancellationToken);
                 // Save the file
-                await _editingGateway.SaveAsync(
+                await editingGateway.SaveAsync(
                         editor,
                         cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
             }
             else
             {
-                var session = await _editingGateway
+                var session = await editingGateway
                     .OpenBeatmapAsync(
                         path,
                         LiveBeatmapPreference.PreferLive,
@@ -76,7 +76,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
                     documentProgress,
                     cancellationToken);
                 // Save the file
-                await _editingGateway.SaveAsync(
+                await editingGateway.SaveAsync(
                         session,
                         cancellationToken: cancellationToken)
                     .ConfigureAwait(false);

@@ -109,9 +109,9 @@ public sealed class NaudioMidiService : IMidiService
 
     private static void Export(MidiExportRequest request, CancellationToken cancellationToken)
     {
-        const int ticksPerQuarter = 120;
+        const int ticks_per_quarter = 120;
         int microsecondsPerQuarter = (int)(60_000_000 / request.BeatsPerMinute);
-        var collection = new MidiEventCollection(0, ticksPerQuarter);
+        var collection = new MidiEventCollection(0, ticks_per_quarter);
         collection.AddEvent(new TextEvent("Note stream", MetaEventType.TextEvent, 0), 0);
         collection.AddEvent(new TempoEvent(microsecondsPerQuarter, 0), 0);
         List<(int Bank, int Patch)> channels = [];
@@ -130,15 +130,15 @@ public sealed class NaudioMidiService : IMidiService
 
                 channels.Add((bank, patch));
                 channel = channels.Count >= 10 ? channels.Count + 1 : channels.Count;
-                collection.AddEvent(new ControlChangeEvent(ToTicks(note.StartMilliseconds, microsecondsPerQuarter, ticksPerQuarter), channel,
+                collection.AddEvent(new ControlChangeEvent(ToTicks(note.StartMilliseconds, microsecondsPerQuarter, ticks_per_quarter), channel,
                     MidiController.BankSelect, bank >> 7), 0);
-                collection.AddEvent(new ControlChangeEvent(ToTicks(note.StartMilliseconds, microsecondsPerQuarter, ticksPerQuarter), channel,
+                collection.AddEvent(new ControlChangeEvent(ToTicks(note.StartMilliseconds, microsecondsPerQuarter, ticks_per_quarter), channel,
                     MidiController.BankSelectLsb, bank & 0x7f), 0);
-                collection.AddEvent(new PatchChangeEvent(ToTicks(note.StartMilliseconds, microsecondsPerQuarter, ticksPerQuarter), channel, patch), 0);
+                collection.AddEvent(new PatchChangeEvent(ToTicks(note.StartMilliseconds, microsecondsPerQuarter, ticks_per_quarter), channel, patch), 0);
             }
 
-            long tick = ToTicks(note.StartMilliseconds, microsecondsPerQuarter, ticksPerQuarter);
-            int duration = (int)Math.Max(ToTicks(note.DurationMilliseconds, microsecondsPerQuarter, ticksPerQuarter), 0);
+            long tick = ToTicks(note.StartMilliseconds, microsecondsPerQuarter, ticks_per_quarter);
+            int duration = (int)Math.Max(ToTicks(note.DurationMilliseconds, microsecondsPerQuarter, ticks_per_quarter), 0);
             collection.AddEvent(new NoteOnEvent(tick, channel, key, velocity, duration), 0);
             collection.AddEvent(new NoteEvent(tick + duration, channel, MidiCommandCode.NoteOff, key, 0), 0);
         }
@@ -147,7 +147,7 @@ public sealed class NaudioMidiService : IMidiService
         {
             cancellationToken.ThrowIfCancellationRequested();
             collection.AddEvent(new ControlChangeEvent(
-                ToTicks(volume.TimeMilliseconds, microsecondsPerQuarter, ticksPerQuarter),
+                ToTicks(volume.TimeMilliseconds, microsecondsPerQuarter, ticks_per_quarter),
                 Math.Clamp(volume.Channel, 1, 16),
                 MidiController.MainVolume,
                 Math.Clamp(volume.Volume, 0, 127)), 1);

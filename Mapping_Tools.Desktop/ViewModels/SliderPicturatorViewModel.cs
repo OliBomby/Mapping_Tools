@@ -20,25 +20,25 @@ namespace Mapping_Tools.Desktop.ViewModels;
 public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, IQuickRun, IShellProjectFeature,
     IShellFeatureActivation
 {
-    internal const string OperationId = "slider-picturator";
-    private readonly ICurrentBeatmapLocator _currentBeatmap;
+    internal const string OPERATION_ID = "slider-picturator";
+    private readonly ICurrentBeatmapLocator currentBeatmap;
 
-    private readonly ProjectDefinition<SliderPicturatorProject> _definition = new(
+    private readonly ProjectDefinition<SliderPicturatorProject> definition = new(
         "sliderpicturatorproject.json", "Slider Picturator Projects", static () => new SliderPicturatorProject(),
         "slider-picturator-project.json");
 
-    private readonly IFilePicker _filePicker;
-    private readonly IImageFileService _images;
-    private readonly IUserNotificationService _notifications;
-    private readonly ISliderPicturatorService _picturator;
-    private readonly ApplicationSettings _settings;
-    private readonly IBeatmapWorkspace _workspace;
-    private CancellationTokenSource? _colorRefreshCancellation;
-    private CancellationTokenSource? _imageLoadCancellation;
-    private bool _isActive;
-    private CancellationTokenSource? _previewCancellation;
-    private Bitmap? _previewImage;
-    private RgbaImage? _sourceImage;
+    private readonly IFilePicker filePicker;
+    private readonly IImageFileService images;
+    private readonly IUserNotificationService notifications;
+    private readonly ISliderPicturatorService picturator;
+    private readonly ApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
+    private CancellationTokenSource? colorRefreshCancellation;
+    private CancellationTokenSource? imageLoadCancellation;
+    private bool isActive;
+    private CancellationTokenSource? previewCancellation;
+    private Bitmap? previewImage;
+    private RgbaImage? sourceImage;
 
     /// <summary>Creates the Slider Picturator presentation model.</summary>
     /// <param name="picturator">Runs the framework-independent operation.</param>
@@ -52,15 +52,15 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     public SliderPicturatorViewModel(ISliderPicturatorService picturator, IImageFileService images,
         IFilePicker filePicker, IToolExecutionService execution, ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace, ApplicationSettings settings, IUserNotificationService notifications)
-        : base(execution, OperationId)
+        : base(execution, OPERATION_ID)
     {
-        _picturator = picturator ?? throw new ArgumentNullException(nameof(picturator));
-        _images = images ?? throw new ArgumentNullException(nameof(images));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.picturator = picturator ?? throw new ArgumentNullException(nameof(picturator));
+        this.images = images ?? throw new ArgumentNullException(nameof(images));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
     }
 
     /// <summary>Gets the supported GPU viewport-size choices in legacy order.</summary>
@@ -78,13 +78,13 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     /// <summary>Gets the current recoloured preview bitmap.</summary>
     public Bitmap? PreviewImage
     {
-        get => _previewImage;
+        get => previewImage;
         private set
         {
-            if (ReferenceEquals(_previewImage, value)) return;
+            if (ReferenceEquals(previewImage, value)) return;
 
-            var previous = _previewImage;
-            _previewImage = value;
+            var previous = previewImage;
+            previewImage = value;
             OnPropertyChanged();
             previous?.Dispose();
         }
@@ -193,38 +193,38 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken).ConfigureAwait(false);
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken).ConfigureAwait(false);
         await RunWithStateAsync(() => RunPathAsync(path, true, cancellationToken));
     }
 
-    string IQuickRun.OperationId => OperationId;
+    string IQuickRun.OperationId => OPERATION_ID;
 
     /// <inheritdoc />
     public void Activate()
     {
-        if (_isActive) return;
+        if (isActive) return;
 
-        _isActive = true;
-        _workspace.SelectionChanged += OnWorkspaceSelectionChanged;
+        isActive = true;
+        workspace.SelectionChanged += OnWorkspaceSelectionChanged;
         _ = RefreshColorsAsync();
-        if (_sourceImage is not null) _ = GeneratePreviewAsync();
+        if (sourceImage is not null) _ = GeneratePreviewAsync();
     }
 
     /// <inheritdoc />
     public void Deactivate()
     {
-        if (!_isActive) return;
+        if (!isActive) return;
 
-        _isActive = false;
-        _workspace.SelectionChanged -= OnWorkspaceSelectionChanged;
-        _imageLoadCancellation?.Cancel();
-        _colorRefreshCancellation?.Cancel();
-        _previewCancellation?.Cancel();
+        isActive = false;
+        workspace.SelectionChanged -= OnWorkspaceSelectionChanged;
+        imageLoadCancellation?.Cancel();
+        colorRefreshCancellation?.Cancel();
+        previewCancellation?.Cancel();
         IsProcessingPreview = false;
         PreviewImage = null;
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
     {
@@ -242,7 +242,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     {
         try
         {
-            var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+            var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
             {
                 Title = "Select an image", AllowMultiple = false, Filters =
                 [
@@ -260,9 +260,9 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     [RelayCommand]
     private async Task ImportAsync()
     {
-        string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
         if (string.IsNullOrWhiteSpace(path)) return;
-        try { SelectedSlider = await _picturator.GetSelectedSliderAsync(path); }
+        try { SelectedSlider = await picturator.GetSelectedSliderAsync(path); }
         catch (Exception exception) { await PublishFailureAsync("Could not import slider", "The selected hit object could not be read.", exception); }
     }
 
@@ -275,14 +275,14 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
 
     private async Task RefreshColorsAsync()
     {
-        _colorRefreshCancellation?.Cancel();
+        colorRefreshCancellation?.Cancel();
         CancellationTokenSource cancellation = new();
-        _colorRefreshCancellation = cancellation;
+        colorRefreshCancellation = cancellation;
         try
         {
-            string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellation.Token);
+            string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellation.Token);
             if (string.IsNullOrWhiteSpace(path)) return;
-            var colours = await _picturator.GetAvailableColorsAsync(path, cancellation.Token);
+            var colours = await picturator.GetAvailableColorsAsync(path, cancellation.Token);
             cancellation.Token.ThrowIfCancellationRequested();
             AvailableColors.Clear();
             foreach (var colour in colours) AvailableColors.Add(colour);
@@ -292,7 +292,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         catch (Exception exception) { await PublishFailureAsync("Could not read map colours", "The current beatmap palette could not be loaded.", exception); }
         finally
         {
-            if (ReferenceEquals(_colorRefreshCancellation, cancellation)) _colorRefreshCancellation = null;
+            if (ReferenceEquals(colorRefreshCancellation, cancellation)) colorRefreshCancellation = null;
 
             cancellation.Dispose();
         }
@@ -316,9 +316,9 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
-        if (string.IsNullOrWhiteSpace(path)) path = _workspace.SelectedPaths.FirstOrDefault();
-        await RunPathAsync(path, _settings.AlwaysQuickRun, CancellationToken.None);
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
+        if (string.IsNullOrWhiteSpace(path)) path = workspace.SelectedPaths.FirstOrDefault();
+        await RunPathAsync(path, settings.AlwaysQuickRun, CancellationToken.None);
     }
 
     partial void OnPictureFileChanged(string value)
@@ -399,10 +399,10 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     {
         if (string.IsNullOrWhiteSpace(path)) return;
         var options = Snapshot();
-        await Execution.ExecuteAsync(new ToolExecutionRequest<SliderPicturatorResult>(OperationId, "Slider Picturator",
+        await Execution.ExecuteAsync(new ToolExecutionRequest<SliderPicturatorResult>(OPERATION_ID, "Slider Picturator",
             async context =>
             {
-                var result = await _picturator.PicturateAsync(path, options,
+                var result = await picturator.PicturateAsync(path, options,
                     new Progress<double>(value => context.ReportProgress(value, "Generating slider picture")),
                     context.CancellationToken);
                 return new ToolExecutionOutput<SliderPicturatorResult>(
@@ -415,29 +415,29 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
 
     private async Task LoadPreviewAsync(string path)
     {
-        _imageLoadCancellation?.Cancel();
+        imageLoadCancellation?.Cancel();
         CancellationTokenSource cancellation = new();
-        _imageLoadCancellation = cancellation;
-        _previewCancellation?.Cancel();
-        _sourceImage = null;
+        imageLoadCancellation = cancellation;
+        previewCancellation?.Cancel();
+        sourceImage = null;
         PreviewImage = null;
 
         if (string.IsNullOrWhiteSpace(path))
         {
-            _sourceImage = null;
+            sourceImage = null;
             PreviewImage = null;
             cancellation.Dispose();
-            _imageLoadCancellation = null;
+            imageLoadCancellation = null;
             return;
         }
 
         try
         {
-            var image = await _images.LoadAsync(path, cancellation.Token);
+            var image = await images.LoadAsync(path, cancellation.Token);
             cancellation.Token.ThrowIfCancellationRequested();
             if (!string.Equals(PictureFile, path, StringComparison.Ordinal)) return;
 
-            _sourceImage = image;
+            sourceImage = image;
             await GeneratePreviewAsync();
         }
         catch (OperationCanceledException) { }
@@ -445,14 +445,14 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         {
             if (string.Equals(PictureFile, path, StringComparison.Ordinal))
             {
-                _sourceImage = null;
+                sourceImage = null;
                 PreviewImage = null;
                 await PublishFailureAsync("Could not load image", "Not a valid image file.", exception);
             }
         }
         finally
         {
-            if (ReferenceEquals(_imageLoadCancellation, cancellation)) _imageLoadCancellation = null;
+            if (ReferenceEquals(imageLoadCancellation, cancellation)) imageLoadCancellation = null;
 
             cancellation.Dispose();
         }
@@ -460,16 +460,16 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
 
     private async Task GeneratePreviewAsync()
     {
-        if (_sourceImage is null) return;
-        _previewCancellation?.Cancel();
+        if (sourceImage is null) return;
+        previewCancellation?.Cancel();
         CancellationTokenSource cancellation = new();
-        _previewCancellation = cancellation;
+        previewCancellation = cancellation;
         var token = cancellation.Token;
         IsProcessingPreview = true;
         try
         {
             SliderPicturatorOptions options = Snapshot();
-            var sourceImage = _sourceImage
+            var sourceImage = this.sourceImage
                               ?? throw new InvalidOperationException("The preview source image was cleared.");
             (RgbaImage image, long segments) result = await Task.Run(() => SliderPicturatorEngine.Recolor(
                 sourceImage, options.CurrentTrackColor, options.BorderColor, RgbaColour.FromArgb(0, 0, 0, 0),
@@ -483,9 +483,9 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         catch (Exception exception) { await PublishFailureAsync("Preview generation failed", "The image could not be picturated.", exception); }
         finally
         {
-            if (ReferenceEquals(_previewCancellation, cancellation))
+            if (ReferenceEquals(previewCancellation, cancellation))
             {
-                _previewCancellation = null;
+                previewCancellation = null;
                 IsProcessingPreview = false;
             }
 
@@ -541,7 +541,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
 
     private Task PublishFailureAsync(string title, string message, Exception exception)
     {
-        return _notifications.PublishAsync(
+        return notifications.PublishAsync(
             new UserNotification(UserNotificationSeverity.Error, title, message, exception));
     }
 }

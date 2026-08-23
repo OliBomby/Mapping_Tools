@@ -18,7 +18,7 @@ public sealed class TimingCopierEngineTests
         target.SetBookmarks([1500]);
         TimingCopierOptions options = new()
         {
-            ResnapMode = TimingCopierResnapModes.PreserveBeatSpacing,
+            ResnapMode = TimingCopierResnapModes.PRESERVE_BEAT_SPACING,
             BeatDivisors = [new RationalBeatDivisor(1, 4)],
         };
 
@@ -40,7 +40,7 @@ public sealed class TimingCopierEngineTests
         target.SetBookmarks([700]);
         TimingCopierOptions options = new()
         {
-            ResnapMode = TimingCopierResnapModes.Resnap,
+            ResnapMode = TimingCopierResnapModes.RESNAP,
             BeatDivisors = [new RationalBeatDivisor(1, 4)],
         };
 
@@ -61,7 +61,7 @@ public sealed class TimingCopierEngineTests
         target.SetBookmarks([900]);
         TimingCopierOptions options = new()
         {
-            ResnapMode = TimingCopierResnapModes.KeepObjectsFixed,
+            ResnapMode = TimingCopierResnapModes.KEEP_OBJECTS_FIXED,
             BeatDivisors = [new RationalBeatDivisor(1, 4)],
         };
 
@@ -93,7 +93,7 @@ public sealed class TimingCopierEngineTests
         target.BeatmapTiming.Add(targetGreenline);
         TimingCopierOptions options = new()
         {
-            ResnapMode = TimingCopierResnapModes.KeepObjectsFixed,
+            ResnapMode = TimingCopierResnapModes.KEEP_OBJECTS_FIXED,
             BeatDivisors = [new RationalBeatDivisor(1, 4)],
         };
 
@@ -115,7 +115,7 @@ public sealed class TimingCopierEngineTests
         cancellation.Cancel();
         TimingCopierOptions options = new()
         {
-            ResnapMode = TimingCopierResnapModes.KeepObjectsFixed,
+            ResnapMode = TimingCopierResnapModes.KEEP_OBJECTS_FIXED,
             BeatDivisors = [new RationalBeatDivisor(1, 4)],
         };
 

@@ -44,24 +44,24 @@ public sealed class PhysicalMapsetFileSystem : IMapsetFileSystem
 
 internal sealed class PhysicalMapsetFileTransaction : IMapsetFileTransaction
 {
-    private readonly Dictionary<string, string> _backups = new(StringComparer.OrdinalIgnoreCase);
-    private readonly HashSet<string> _createdDirectories = new(StringComparer.OrdinalIgnoreCase);
-    private readonly HashSet<string> _createdFiles = new(StringComparer.OrdinalIgnoreCase);
-    private readonly string _rollbackDirectory;
-    private readonly string _targetDirectory;
-    private bool _committed;
-    private bool _disposed;
+    private readonly Dictionary<string, string> backups = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> createdDirectories = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> createdFiles = new(StringComparer.OrdinalIgnoreCase);
+    private readonly string rollbackDirectory;
+    private readonly string targetDirectory;
+    private bool committed;
+    private bool disposed;
 
     public PhysicalMapsetFileTransaction(string targetDirectory)
     {
-        _targetDirectory = Path.GetFullPath(targetDirectory);
-        string parent = Path.GetDirectoryName(_targetDirectory)
+        this.targetDirectory = Path.GetFullPath(targetDirectory);
+        string parent = Path.GetDirectoryName(this.targetDirectory)
                         ?? throw new ArgumentException("The export path has no parent directory.", nameof(targetDirectory));
         Directory.CreateDirectory(parent);
         StagingDirectory = Path.Combine(
             parent,
-            $".{Path.GetFileName(_targetDirectory)}.mapset-merger-{Guid.NewGuid():N}");
-        _rollbackDirectory = Path.Combine(StagingDirectory, ".rollback");
+            $".{Path.GetFileName(this.targetDirectory)}.mapset-merger-{Guid.NewGuid():N}");
+        rollbackDirectory = Path.Combine(StagingDirectory, ".rollback");
         Directory.CreateDirectory(StagingDirectory);
     }
 
@@ -97,7 +97,7 @@ internal sealed class PhysicalMapsetFileTransaction : IMapsetFileTransaction
     public Task CommitAsync(CancellationToken cancellationToken = default)
     {
         EnsureNotDisposed();
-        if (_committed) return Task.CompletedTask;
+        if (committed) return Task.CompletedTask;
 
         try
         {
@@ -111,26 +111,26 @@ internal sealed class PhysicalMapsetFileTransaction : IMapsetFileTransaction
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 string relativePath = Path.GetRelativePath(StagingDirectory, stagedPath);
-                string targetPath = Path.Combine(_targetDirectory, relativePath);
+                string targetPath = Path.Combine(targetDirectory, relativePath);
                 EnsureOutputDirectory(Path.GetDirectoryName(targetPath)!);
 
-                if (File.Exists(targetPath) && !_createdFiles.Contains(targetPath) && !_backups.ContainsKey(targetPath))
+                if (File.Exists(targetPath) && !createdFiles.Contains(targetPath) && !backups.ContainsKey(targetPath))
                 {
-                    string backupPath = Path.Combine(_rollbackDirectory, relativePath);
+                    string backupPath = Path.Combine(rollbackDirectory, relativePath);
                     Directory.CreateDirectory(Path.GetDirectoryName(backupPath)!);
                     File.Copy(targetPath, backupPath, true);
-                    _backups[targetPath] = backupPath;
+                    backups[targetPath] = backupPath;
                 }
                 else
                 {
-                    _createdFiles.Add(targetPath);
+                    createdFiles.Add(targetPath);
                 }
 
                 File.Copy(stagedPath, targetPath, true);
             }
 
             DeleteStagingDirectory();
-            _committed = true;
+            committed = true;
             return Task.CompletedTask;
         }
         catch
@@ -143,9 +143,9 @@ internal sealed class PhysicalMapsetFileTransaction : IMapsetFileTransaction
     /// <inheritdoc />
     public void Rollback()
     {
-        if (_committed) return;
+        if (committed) return;
 
-        foreach (string path in _createdFiles)
+        foreach (string path in createdFiles)
         {
             if (!File.Exists(path)) continue;
 
@@ -163,14 +163,14 @@ internal sealed class PhysicalMapsetFileTransaction : IMapsetFileTransaction
             }
         }
 
-        foreach ((string targetPath, string backupPath) in _backups)
+        foreach ((string targetPath, string backupPath) in backups)
             if (File.Exists(backupPath))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
                 File.Copy(backupPath, targetPath, true);
             }
 
-        foreach (string directory in _createdDirectories
+        foreach (string directory in createdDirectories
                      .OrderByDescending(path => path.Length)
                      .ThenBy(path => path, StringComparer.OrdinalIgnoreCase))
             try
@@ -188,18 +188,18 @@ internal sealed class PhysicalMapsetFileTransaction : IMapsetFileTransaction
             }
 
         DeleteStagingDirectory();
-        _createdFiles.Clear();
-        _createdDirectories.Clear();
-        _backups.Clear();
+        createdFiles.Clear();
+        createdDirectories.Clear();
+        backups.Clear();
     }
 
     /// <inheritdoc />
     public void Dispose()
     {
-        if (_disposed) return;
+        if (disposed) return;
 
-        _disposed = true;
-        if (!_committed)
+        disposed = true;
+        if (!committed)
             Rollback();
         else
             DeleteStagingDirectory();
@@ -222,7 +222,7 @@ internal sealed class PhysicalMapsetFileTransaction : IMapsetFileTransaction
 
     private void EnsureNotDisposed()
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
+        ObjectDisposedException.ThrowIf(disposed, this);
     }
 
     private void EnsureOutputDirectory(string directory)
@@ -240,7 +240,7 @@ internal sealed class PhysicalMapsetFileTransaction : IMapsetFileTransaction
         foreach (string path in missing.AsEnumerable().Reverse())
         {
             Directory.CreateDirectory(path);
-            _createdDirectories.Add(path);
+            createdDirectories.Add(path);
         }
     }
 
@@ -251,12 +251,12 @@ internal sealed class PhysicalMapsetFileTransaction : IMapsetFileTransaction
 
     private bool IsRollbackPath(string path)
     {
-        return string.Equals(path, _rollbackDirectory, StringComparison.OrdinalIgnoreCase)
+        return string.Equals(path, rollbackDirectory, StringComparison.OrdinalIgnoreCase)
                || path.StartsWith(
-                   _rollbackDirectory + Path.DirectorySeparatorChar,
+                   rollbackDirectory + Path.DirectorySeparatorChar,
                    StringComparison.OrdinalIgnoreCase)
                || path.StartsWith(
-                   _rollbackDirectory + Path.AltDirectorySeparatorChar,
+                   rollbackDirectory + Path.AltDirectorySeparatorChar,
                    StringComparison.OrdinalIgnoreCase);
     }
 }

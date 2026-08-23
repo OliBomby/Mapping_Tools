@@ -8,9 +8,9 @@ namespace Mapping_Tools.Application.Projects;
 /// </summary>
 public sealed class ProjectService : IProjectService
 {
-    private readonly IApplicationDirectories _directories;
-    private readonly IFilePicker _filePicker;
-    private readonly IProjectStore _store;
+    private readonly IApplicationDirectories directories;
+    private readonly IFilePicker filePicker;
+    private readonly IProjectStore store;
 
     /// <summary>
     ///     Creates a project coordinator for the current application-data layout.
@@ -23,37 +23,37 @@ public sealed class ProjectService : IProjectService
         IFilePicker filePicker,
         IProjectStore store)
     {
-        _directories = directories ?? throw new ArgumentNullException(nameof(directories));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        _store = store ?? throw new ArgumentNullException(nameof(store));
+        this.directories = directories ?? throw new ArgumentNullException(nameof(directories));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.store = store ?? throw new ArgumentNullException(nameof(store));
     }
 
     /// <inheritdoc />
     public string GetAutoSavePath(IProjectDefinition definition)
     {
         ArgumentNullException.ThrowIfNull(definition);
-        return Path.Combine(_directories.ApplicationData, definition.AutoSaveFileName);
+        return Path.Combine(directories.ApplicationData, definition.AutoSaveFileName);
     }
 
     /// <inheritdoc />
     public string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition)
     {
         ArgumentNullException.ThrowIfNull(definition);
-        return Path.Combine(_directories.ApplicationData, definition.AutoSaveFileName);
+        return Path.Combine(directories.ApplicationData, definition.AutoSaveFileName);
     }
 
     /// <inheritdoc />
     public string GetProjectFolder<TProject>(ProjectDefinition<TProject> definition)
     {
         ArgumentNullException.ThrowIfNull(definition);
-        return Path.Combine(_directories.ApplicationData, definition.ProjectFolderName);
+        return Path.Combine(directories.ApplicationData, definition.ProjectFolderName);
     }
 
     /// <inheritdoc />
     public string GetProjectFolder(IProjectDefinition definition)
     {
         ArgumentNullException.ThrowIfNull(definition);
-        return Path.Combine(_directories.ApplicationData, definition.ProjectFolderName);
+        return Path.Combine(directories.ApplicationData, definition.ProjectFolderName);
     }
 
     /// <inheritdoc />
@@ -79,7 +79,7 @@ public sealed class ProjectService : IProjectService
         TProject project,
         CancellationToken cancellationToken = default)
     {
-        return _store.SaveAsync(path, project, cancellationToken);
+        return store.SaveAsync(path, project, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -87,7 +87,7 @@ public sealed class ProjectService : IProjectService
         string path,
         CancellationToken cancellationToken = default)
     {
-        return _store.LoadAsync<TProject>(path, cancellationToken);
+        return store.LoadAsync<TProject>(path, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -99,7 +99,7 @@ public sealed class ProjectService : IProjectService
         ArgumentNullException.ThrowIfNull(definition);
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         cancellationToken.ThrowIfCancellationRequested();
-        return await definition.LoadAsync(_store, path, cancellationToken);
+        return await definition.LoadAsync(store, path, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -132,7 +132,7 @@ public sealed class ProjectService : IProjectService
         foreach (string path in paths)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await _store.SaveAsync(path, project, cancellationToken);
+            await store.SaveAsync(path, project, cancellationToken);
         }
     }
 
@@ -150,7 +150,7 @@ public sealed class ProjectService : IProjectService
         foreach (string path in ResolveAutoSavePaths(definition, additionalPaths))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await definition.SaveAsync(_store, path, project, cancellationToken);
+            await definition.SaveAsync(store, path, project, cancellationToken);
         }
     }
 
@@ -165,9 +165,9 @@ public sealed class ProjectService : IProjectService
         ArgumentNullException.ThrowIfNull(project);
         cancellationToken.ThrowIfCancellationRequested();
         string projectFolder = GetProjectFolder(definition);
-        _store.EnsureDirectoryExists(projectFolder);
+        store.EnsureDirectoryExists(projectFolder);
 
-        string? path = await _filePicker.PickSaveFileAsync(
+        string? path = await filePicker.PickSaveFileAsync(
             new SaveFilePickerRequest
             {
                 Title = "Save project",
@@ -181,7 +181,7 @@ public sealed class ProjectService : IProjectService
 
         if (path is null) return null;
 
-        await _store.SaveAsync(path, project, cancellationToken);
+        await store.SaveAsync(path, project, cancellationToken);
         return path;
     }
 
@@ -195,9 +195,9 @@ public sealed class ProjectService : IProjectService
         ArgumentNullException.ThrowIfNull(project);
         cancellationToken.ThrowIfCancellationRequested();
         string projectFolder = GetProjectFolder(definition);
-        _store.EnsureDirectoryExists(projectFolder);
+        store.EnsureDirectoryExists(projectFolder);
 
-        string? path = await _filePicker.PickSaveFileAsync(
+        string? path = await filePicker.PickSaveFileAsync(
             new SaveFilePickerRequest
             {
                 Title = "Save project",
@@ -211,7 +211,7 @@ public sealed class ProjectService : IProjectService
 
         if (path is null) return null;
 
-        await definition.SaveAsync(_store, path, project, cancellationToken);
+        await definition.SaveAsync(store, path, project, cancellationToken);
         return path;
     }
 
@@ -223,9 +223,9 @@ public sealed class ProjectService : IProjectService
         ArgumentNullException.ThrowIfNull(definition);
         cancellationToken.ThrowIfCancellationRequested();
         string projectFolder = GetProjectFolder(definition);
-        _store.EnsureDirectoryExists(projectFolder);
+        store.EnsureDirectoryExists(projectFolder);
 
-        var paths = await _filePicker.PickOpenFilesAsync(
+        var paths = await filePicker.PickOpenFilesAsync(
             new OpenFilePickerRequest
             {
                 Title = "Open project",
@@ -238,7 +238,7 @@ public sealed class ProjectService : IProjectService
         if (paths.Count == 0) return null;
 
         string path = paths[0];
-        var project = await _store.LoadAsync<TProject>(path, cancellationToken);
+        var project = await store.LoadAsync<TProject>(path, cancellationToken);
         return new ProjectOpenResult<TProject>(path, project);
     }
 
@@ -250,9 +250,9 @@ public sealed class ProjectService : IProjectService
         ArgumentNullException.ThrowIfNull(definition);
         cancellationToken.ThrowIfCancellationRequested();
         string projectFolder = GetProjectFolder(definition);
-        _store.EnsureDirectoryExists(projectFolder);
+        store.EnsureDirectoryExists(projectFolder);
 
-        var paths = await _filePicker.PickOpenFilesAsync(
+        var paths = await filePicker.PickOpenFilesAsync(
             new OpenFilePickerRequest
             {
                 Title = "Open project",
@@ -265,7 +265,7 @@ public sealed class ProjectService : IProjectService
         string? path = paths.FirstOrDefault();
         if (path is null) return null;
 
-        object project = await definition.LoadAsync(_store, path, cancellationToken);
+        object project = await definition.LoadAsync(store, path, cancellationToken);
         return new ProjectOpenResult(path, project);
     }
 

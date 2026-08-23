@@ -21,13 +21,13 @@ namespace Mapping_Tools.Desktop.ViewModels;
 public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     IShellProjectFeature
 {
-    private const string OperationId = "metadata-manager";
-    private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
-    private readonly ProjectDefinition<MetadataManagerProject> _definition;
-    private readonly IFilePicker _filePicker;
+    private const string operation_id = "metadata-manager";
+    private readonly ICurrentBeatmapLocator currentBeatmapLocator;
+    private readonly ProjectDefinition<MetadataManagerProject> definition;
+    private readonly IFilePicker filePicker;
 
-    private readonly IMetadataManagerService _metadataManager;
-    private readonly IUserNotificationService _notifications;
+    private readonly IMetadataManagerService metadataManager;
+    private readonly IUserNotificationService notifications;
 
     /// <summary>Creates a Metadata Manager presentation model.</summary>
     /// <param name="metadataManager">Imports and exports metadata through application ports.</param>
@@ -43,17 +43,17 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmapLocator,
         IUserNotificationService notifications,
         IApplicationDirectories directories)
-        : base(execution, OperationId)
+        : base(execution, operation_id)
     {
-        _metadataManager = metadataManager ?? throw new ArgumentNullException(nameof(metadataManager));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        _currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.metadataManager = metadataManager ?? throw new ArgumentNullException(nameof(metadataManager));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         ArgumentNullException.ThrowIfNull(directories);
 
         ExportPath = Path.Combine(directories.Exports, "metadata_manager.osu");
         string defaultExportPath = ExportPath;
-        _definition = new ProjectDefinition<MetadataManagerProject>(
+        definition = new ProjectDefinition<MetadataManagerProject>(
             "metadataproject.json",
             "Metadata Manager Projects",
             () => CreateDefaultProject(defaultExportPath),
@@ -161,7 +161,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     public bool IsTagsOverflowVisible =>
         Tags.Length > 1024 || Tags.Split(' ').Length > 100;
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
     {
@@ -186,7 +186,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task UseCurrentImportAsync()
     {
-        string? path = await _currentBeatmapLocator.FindCurrentBeatmapAsync();
+        string? path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
         if (!string.IsNullOrWhiteSpace(path)) ImportPath = path;
     }
 
@@ -196,7 +196,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         try
         {
             string exportPath = ExportPath;
-            var options = await _metadataManager.ImportAsync(ImportPath);
+            var options = await metadataManager.ImportAsync(ImportPath);
             options.ImportPath = ImportPath;
             options.ExportPath = exportPath;
             Install(options);
@@ -226,7 +226,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task UseCurrentExportAsync()
     {
-        string? path = await _currentBeatmapLocator.FindCurrentBeatmapAsync();
+        string? path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
         if (!string.IsNullOrWhiteSpace(path)) ExportPath = path;
     }
 
@@ -275,12 +275,12 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         MetadataManagerOptions options = Snapshot();
         await Execution.ExecuteAsync(
             new ToolExecutionRequest<MetadataManagerResult>(
-                OperationId,
+                operation_id,
                 "Metadata Manager",
                 async context =>
                 {
                     context.ReportProgress(0, "Preparing metadata export");
-                    var result = await _metadataManager.ExportAsync(
+                    var result = await metadataManager.ExportAsync(
                         options,
                         new Progress<double>(value => context.ReportProgress(value, "Exporting metadata")),
                         context.CancellationToken);
@@ -361,7 +361,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     {
         try
         {
-            var paths = await _filePicker.PickOpenFilesAsync(
+            var paths = await filePicker.PickOpenFilesAsync(
                 new OpenFilePickerRequest
                 {
                     Title = title,
@@ -385,7 +385,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
 
     private Task PublishFailureAsync(string title, string message, Exception exception)
     {
-        return _notifications.PublishAsync(new UserNotification(
+        return notifications.PublishAsync(new UserNotification(
             UserNotificationSeverity.Error,
             title,
             message,

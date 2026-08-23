@@ -5,13 +5,13 @@ namespace Mapping_Tools.Architecture.Tests;
 [TestClass]
 public sealed class DefaultExecutableTests
 {
-    private static readonly string RepositoryRoot = FindRepositoryRoot();
+    private static readonly string repositoryRoot = FindRepositoryRoot();
 
     [TestMethod]
     public void Solution_ContainsOnlyAvaloniaFrontend()
     {
         // Arrange
-        string solution = File.ReadAllText(Path.Combine(RepositoryRoot, "Mapping_Tools.sln"));
+        string solution = File.ReadAllText(Path.Combine(repositoryRoot, "Mapping_Tools.sln"));
 
         // Act
         int avaloniaIndex = solution.IndexOf(
@@ -31,12 +31,12 @@ public sealed class DefaultExecutableTests
     public void ReleaseAndDevelopmentEntryPoints_TargetAvaloniaOnly()
     {
         // Arrange
-        string workflow = File.ReadAllText(Path.Combine(RepositoryRoot, ".github", "workflows", "release.yml"));
-        string launch = File.ReadAllText(Path.Combine(RepositoryRoot, ".vscode", "launch.json"));
-        string tasks = File.ReadAllText(Path.Combine(RepositoryRoot, ".vscode", "tasks.json"));
-        string installer = File.ReadAllText(Path.Combine(RepositoryRoot, "Installer_Script_x64.iss"));
+        string workflow = File.ReadAllText(Path.Combine(repositoryRoot, ".github", "workflows", "release.yml"));
+        string launch = File.ReadAllText(Path.Combine(repositoryRoot, ".vscode", "launch.json"));
+        string tasks = File.ReadAllText(Path.Combine(repositoryRoot, ".vscode", "tasks.json"));
+        string installer = File.ReadAllText(Path.Combine(repositoryRoot, "Installer_Script_x64.iss"));
         string updater = File.ReadAllText(Path.Combine(
-            RepositoryRoot,
+            repositoryRoot,
             "Mapping_Tools.Infrastructure",
             "Updates",
             "OnovaUpdateGateway.cs"));
@@ -76,7 +76,7 @@ public sealed class DefaultExecutableTests
     {
         // Arrange
         string validator = File.ReadAllText(Path.Combine(
-            RepositoryRoot,
+            repositoryRoot,
             "tools",
             "validate-release-layout.ps1"));
 
@@ -94,8 +94,8 @@ public sealed class DefaultExecutableTests
     public void LegacyFrontend_AndLegacyTestProject_AreRemoved()
     {
         // Arrange
-        string legacyFrontendDirectory = Path.Combine(RepositoryRoot, "Mapping_Tools");
-        string legacyTestDirectory = Path.Combine(RepositoryRoot, "Mapping_Tools_Tests");
+        string legacyFrontendDirectory = Path.Combine(repositoryRoot, "Mapping_Tools");
+        string legacyTestDirectory = Path.Combine(repositoryRoot, "Mapping_Tools_Tests");
 
         // Act
         bool legacyFrontendExists = Directory.Exists(legacyFrontendDirectory);
@@ -104,7 +104,7 @@ public sealed class DefaultExecutableTests
         // Assert
         legacyFrontendExists.Should().BeFalse();
         legacyTestProjectExists.Should().BeFalse();
-        File.Exists(Path.Combine(RepositoryRoot, "Mapping_Tools.Desktop", "Mapping_Tools.Desktop.csproj"))
+        File.Exists(Path.Combine(repositoryRoot, "Mapping_Tools.Desktop", "Mapping_Tools.Desktop.csproj"))
             .Should().BeTrue();
     }
 

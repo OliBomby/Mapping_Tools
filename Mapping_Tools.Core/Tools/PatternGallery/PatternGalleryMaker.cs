@@ -137,7 +137,7 @@ public sealed class PatternGalleryMaker
             globalSv,
             gameMode)
         {
-            Metadata = { ["Version"] = new TValue(name) },
+            Metadata = { ["Version"] = new StringValue(name) },
         };
         return FromBeatmap(patternBeatmap, name);
     }

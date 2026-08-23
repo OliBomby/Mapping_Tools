@@ -59,10 +59,10 @@ public sealed class AudioEffect
 /// <summary>Applies framework-neutral effects to an owned audio clip.</summary>
 public static class AudioEffectEngine
 {
-    private const double AmpDb = 8.6562;
-    private const double BaselineThresholdDb = -9;
-    private const double A = 1.017;
-    private const double B = -0.025;
+    private const double amp_db = 8.6562;
+    private const double baseline_threshold_db = -9;
+    private const double a = 1.017;
+    private const double b = -0.025;
 
     /// <summary>
     ///     Applies effects in order and returns a new clip, leaving the source unchanged.
@@ -124,22 +124,22 @@ public static class AudioEffectEngine
         double brickwall,
         CancellationToken cancellationToken)
     {
-        double threshold = BaselineThresholdDb + brickwall;
+        double threshold = baseline_threshold_db + brickwall;
         for (int index = 0; index < samples.Length; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             float sample = samples[index];
             if (sample == 0) continue;
 
-            double decibels = AmpDb * Math.Log(Math.Abs(sample)) + boost;
+            double decibels = amp_db * Math.Log(Math.Abs(sample)) + boost;
             if (decibels > threshold)
             {
                 double over = decibels - threshold;
-                over = A * over + B * over * over;
+                over = a * over + b * over * over;
                 decibels = Math.Min(threshold + over, brickwall);
             }
 
-            samples[index] = (float)(Math.Exp(decibels / AmpDb) * Math.Sign(sample));
+            samples[index] = (float)(Math.Exp(decibels / amp_db) * Math.Sign(sample));
         }
     }
 }

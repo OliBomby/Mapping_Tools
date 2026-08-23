@@ -13,8 +13,8 @@ namespace Mapping_Tools.Infrastructure.Platform;
 /// </summary>
 public sealed class WindowsGeometryDashboardOverlayHostFactory : IGeometryDashboardOverlayHostFactory
 {
-    private readonly Func<bool> _isWindows;
-    private readonly IGeometryDashboardWindowService _windows;
+    private readonly Func<bool> isWindows;
+    private readonly IGeometryDashboardWindowService windows;
 
     /// <summary>Creates a factory using the native window service and current platform guard.</summary>
     public WindowsGeometryDashboardOverlayHostFactory(
@@ -27,14 +27,14 @@ public sealed class WindowsGeometryDashboardOverlayHostFactory : IGeometryDashbo
         IGeometryDashboardWindowService windows,
         Func<bool> isWindows)
     {
-        _windows = windows ?? throw new ArgumentNullException(nameof(windows));
-        _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
+        this.windows = windows ?? throw new ArgumentNullException(nameof(windows));
+        this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
     /// <inheritdoc />
     public IGeometryDashboardOverlayHost Create()
     {
-        return new WindowsGeometryDashboardOverlayHost(_windows, _isWindows);
+        return new WindowsGeometryDashboardOverlayHost(windows, isWindows);
     }
 }
 
@@ -44,28 +44,28 @@ public sealed class WindowsGeometryDashboardOverlayHostFactory : IGeometryDashbo
 /// </summary>
 public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOverlayHost
 {
-    private const uint ExtendedStyleToolWindow = 0x00000080;
-    private const uint ExtendedStyleTransparent = 0x00000020;
-    private const uint ExtendedStyleNoActivate = 0x08000000;
-    private const uint WindowStylePopup = 0x80000000;
-    private const uint GreenYellow = 0x002FFFAD;
-    private const int BorderThickness = 3;
-    private static readonly object ClassGate = new();
-    private static readonly Dictionary<nint, bool> BorderStates = [];
-    private static readonly Dictionary<nint, OverlayPaintState> PaintStates = [];
+    private const uint extended_style_tool_window = 0x00000080;
+    private const uint extended_style_transparent = 0x00000020;
+    private const uint extended_style_no_activate = 0x08000000;
+    private const uint window_style_popup = 0x80000000;
+    private const uint green_yellow = 0x002FFFAD;
+    private const int border_thickness = 3;
+    private static readonly object classGate = new();
+    private static readonly Dictionary<nint, bool> borderStates = [];
+    private static readonly Dictionary<nint, OverlayPaintState> paintStates = [];
 
-    private static readonly string ClassName =
+    private static readonly string className =
         "MappingTools.GeometryDashboardOverlayWindow";
 
-    private static WindowsNativeMethods.WindowProcedure? _windowProcedure;
-    private static ushort _classAtom;
-    private readonly Func<bool> _isWindows;
+    private static WindowsNativeMethods.WindowProcedure? windowProcedure;
+    private static ushort classAtom;
+    private readonly Func<bool> isWindows;
 
-    private readonly IGeometryDashboardWindowService _windows;
-    private bool _borderEnabled;
-    private bool _disposed;
-    private bool _enabled;
-    private nint _window;
+    private readonly IGeometryDashboardWindowService windows;
+    private bool borderEnabled;
+    private bool disposed;
+    private bool enabled;
+    private nint window;
 
     /// <summary>
     ///     Creates a native overlay host using the supplied window tracker.
@@ -81,12 +81,12 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         IGeometryDashboardWindowService windows,
         Func<bool> isWindows)
     {
-        _windows = windows ?? throw new ArgumentNullException(nameof(windows));
-        _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
+        this.windows = windows ?? throw new ArgumentNullException(nameof(windows));
+        this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
     /// <inheritdoc />
-    public bool IsSupported => _isWindows() && _windows.IsSupported;
+    public bool IsSupported => isWindows() && windows.IsSupported;
 
     /// <inheritdoc />
     public bool IsVisible { get; private set; }
@@ -108,11 +108,11 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         TargetWindow = null;
         DestroyNativeWindow();
         EnsureWindowClass();
-        _window = WindowsNativeMethods.CreateWindowEx(
-            ExtendedStyleToolWindow | ExtendedStyleTransparent | ExtendedStyleNoActivate,
-            ClassName,
+        window = WindowsNativeMethods.CreateWindowEx(
+            extended_style_tool_window | extended_style_transparent | extended_style_no_activate,
+            className,
             string.Empty,
-            WindowStylePopup,
+            window_style_popup,
             0,
             0,
             1,
@@ -121,14 +121,14 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
             0,
             WindowsNativeMethods.GetModuleHandle(null),
             0);
-        if (_window == 0)
+        if (window == 0)
             throw new InvalidOperationException(
                 $"Windows could not create the Geometry Dashboard overlay " + $"(Win32 error {Marshal.GetLastWin32Error()}).");
 
-        lock (ClassGate)
+        lock (classGate)
         {
-            BorderStates[_window] = _borderEnabled;
-            PaintStates[_window] = new OverlayPaintState();
+            borderStates[window] = borderEnabled;
+            paintStates[window] = new OverlayPaintState();
         }
 
         TargetWindow = targetWindow;
@@ -139,14 +139,14 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
     public void Enable()
     {
         ThrowIfDisposed();
-        _enabled = true;
+        enabled = true;
     }
 
     /// <inheritdoc />
     public void Disable()
     {
         ThrowIfDisposed();
-        _enabled = false;
+        enabled = false;
         HideNativeWindow();
     }
 
@@ -157,9 +157,9 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         bool dpiSourceAvailable)
     {
         ThrowIfDisposed();
-        if (!IsSupported || !_enabled || _window == 0 || TargetWindow is null) return;
+        if (!IsSupported || !enabled || window == 0 || TargetWindow is null) return;
 
-        var target = _windows.GetWindow(TargetWindow.Value);
+        var target = windows.GetWindow(TargetWindow.Value);
         if (target is null || !target.IsActivated)
         {
             HideNativeWindow();
@@ -176,9 +176,9 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
             return;
         }
 
-        lock (ClassGate)
+        lock (classGate)
         {
-            if (PaintStates.TryGetValue(_window, out var state))
+            if (paintStates.TryGetValue(window, out var state))
             {
                 state.PhysicalBounds = physicalBounds;
                 state.DpiMultiplier = dpiMultiplier;
@@ -187,16 +187,16 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         }
 
         WindowsNativeMethods.ShowWindow(
-            _window,
-            WindowsNativeMethods.ShowNoActivate);
+            window,
+            WindowsNativeMethods.SHOW_NO_ACTIVATE);
         if (!WindowsNativeMethods.SetWindowPos(
-                _window,
+                window,
                 WindowsNativeMethods.TopMostWindow,
                 nativeBounds.Left,
                 nativeBounds.Top,
                 nativeBounds.Width,
                 nativeBounds.Height,
-                WindowsNativeMethods.SetWindowPosNoActivate | WindowsNativeMethods.SetWindowPosNoSendChanging))
+                WindowsNativeMethods.SET_WINDOW_POS_NO_ACTIVATE | WindowsNativeMethods.SET_WINDOW_POS_NO_SEND_CHANGING))
         {
             HideNativeWindow();
             return;
@@ -208,14 +208,14 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
     /// <inheritdoc />
     public void SetBorder(bool enabled)
     {
-        if (_disposed) return;
+        if (disposed) return;
 
-        _borderEnabled = enabled;
-        if (_window == 0) return;
+        borderEnabled = enabled;
+        if (window == 0) return;
 
-        lock (ClassGate)
+        lock (classGate)
         {
-            BorderStates[_window] = enabled;
+            borderStates[window] = enabled;
         }
 
         Invalidate();
@@ -225,11 +225,11 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
     public void SetFrame(GeometryDashboardOverlayFrame frame)
     {
         ArgumentNullException.ThrowIfNull(frame);
-        if (_disposed || _window == 0) return;
+        if (disposed || window == 0) return;
 
-        lock (ClassGate)
+        lock (classGate)
         {
-            if (PaintStates.TryGetValue(_window, out var state)) state.Frame = frame;
+            if (paintStates.TryGetValue(window, out var state)) state.Frame = frame;
         }
 
         Invalidate();
@@ -239,22 +239,22 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
     public void Invalidate()
     {
         ThrowIfDisposed();
-        if (_window != 0) WindowsNativeMethods.InvalidateRect(_window, 0, false);
+        if (window != 0) WindowsNativeMethods.InvalidateRect(window, 0, false);
     }
 
     /// <inheritdoc />
     public void Dispose()
     {
-        if (_disposed) return;
+        if (disposed) return;
 
-        _enabled = false;
+        enabled = false;
         try
         {
             DestroyNativeWindow();
         }
         finally
         {
-            _disposed = true;
+            disposed = true;
             IsVisible = false;
             TargetWindow = null;
             GC.SuppressFinalize(this);
@@ -335,19 +335,19 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
 
     private static void EnsureWindowClass()
     {
-        lock (ClassGate)
+        lock (classGate)
         {
-            if (_classAtom != 0) return;
+            if (classAtom != 0) return;
 
-            _windowProcedure = WindowProcedure;
-            WindowsNativeMethods.WNDCLASS windowClass = new()
+            windowProcedure = WindowProcedure;
+            WindowsNativeMethods.Wndclass windowClass = new()
             {
-                WindowProcedure = _windowProcedure,
+                WindowProcedure = windowProcedure,
                 Instance = WindowsNativeMethods.GetModuleHandle(null),
-                ClassName = ClassName,
+                ClassName = className,
             };
-            _classAtom = WindowsNativeMethods.RegisterClass(ref windowClass);
-            if (_classAtom == 0 && Marshal.GetLastWin32Error() != 1410)
+            classAtom = WindowsNativeMethods.RegisterClass(ref windowClass);
+            if (classAtom == 0 && Marshal.GetLastWin32Error() != 1410)
                 throw new InvalidOperationException(
                     $"Windows could not register the Geometry Dashboard overlay " + $"class (Win32 error {Marshal.GetLastWin32Error()}).");
         }
@@ -359,28 +359,28 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         nint wParam,
         nint lParam)
     {
-        if (message == WindowsNativeMethods.WindowMessageNcHitTest) return WindowsNativeMethods.HitTestTransparent;
+        if (message == WindowsNativeMethods.WINDOW_MESSAGE_NC_HIT_TEST) return WindowsNativeMethods.HIT_TEST_TRANSPARENT;
 
-        if (message == WindowsNativeMethods.WindowMessageEraseBackground) return 1;
+        if (message == WindowsNativeMethods.WINDOW_MESSAGE_ERASE_BACKGROUND) return 1;
 
-        if (message == WindowsNativeMethods.WindowMessagePaint)
+        if (message == WindowsNativeMethods.WINDOW_MESSAGE_PAINT)
         {
-            WindowsNativeMethods.PAINTSTRUCT paint;
+            WindowsNativeMethods.Paintstruct paint;
             nint deviceContext = WindowsNativeMethods.BeginPaint(window, out paint);
-            lock (ClassGate)
+            lock (classGate)
             {
-                if (PaintStates.TryGetValue(window, out var paintState)) DrawFrame(deviceContext, paintState);
+                if (paintStates.TryGetValue(window, out var paintState)) DrawFrame(deviceContext, paintState);
 
-                if (BorderStates.TryGetValue(window, out bool drawBorder)
+                if (borderStates.TryGetValue(window, out bool drawBorder)
                     && drawBorder
                     && WindowsNativeMethods.GetClientRect(
                         window,
                         out var rectangle))
                 {
-                    nint brush = WindowsNativeMethods.CreateSolidBrush(GreenYellow);
+                    nint brush = WindowsNativeMethods.CreateSolidBrush(green_yellow);
                     if (brush != 0)
                     {
-                        for (int index = 0; index < BorderThickness; index++)
+                        for (int index = 0; index < border_thickness; index++)
                         {
                             WindowsNativeMethods.FrameRect(
                                 deviceContext,
@@ -401,11 +401,11 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
             return 0;
         }
 
-        if (message == WindowsNativeMethods.WindowMessageNcDestroy)
-            lock (ClassGate)
+        if (message == WindowsNativeMethods.WINDOW_MESSAGE_NC_DESTROY)
+            lock (classGate)
             {
-                BorderStates.Remove(window);
-                PaintStates.Remove(window);
+                borderStates.Remove(window);
+                paintStates.Remove(window);
             }
 
         return WindowsNativeMethods.DefWindowProc(window, message, wParam, lParam);
@@ -413,38 +413,38 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
 
     private void HideNativeWindow()
     {
-        if (_window == 0)
+        if (window == 0)
         {
             IsVisible = false;
             return;
         }
 
-        WindowsNativeMethods.ShowWindow(_window, WindowsNativeMethods.ShowHide);
+        WindowsNativeMethods.ShowWindow(window, WindowsNativeMethods.SHOW_HIDE);
         IsVisible = false;
     }
 
     private void DestroyNativeWindow()
     {
-        if (_window == 0)
+        if (window == 0)
         {
             IsVisible = false;
             return;
         }
 
         HideNativeWindow();
-        WindowsNativeMethods.DestroyWindow(_window);
-        lock (ClassGate)
+        WindowsNativeMethods.DestroyWindow(window);
+        lock (classGate)
         {
-            BorderStates.Remove(_window);
-            PaintStates.Remove(_window);
+            borderStates.Remove(window);
+            paintStates.Remove(window);
         }
 
-        _window = 0;
+        window = 0;
     }
 
     private void ThrowIfDisposed()
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
+        ObjectDisposedException.ThrowIf(disposed, this);
     }
 
     private static void DrawFrame(nint deviceContext, OverlayPaintState state)

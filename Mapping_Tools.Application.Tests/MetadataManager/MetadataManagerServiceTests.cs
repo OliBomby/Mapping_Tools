@@ -63,11 +63,11 @@ public sealed class MetadataManagerServiceTests
 
     private sealed class TestEditingGateway : IBeatmapEditingGateway
     {
-        private readonly ITextFileStore _fileStore;
+        private readonly ITextFileStore fileStore;
 
         public TestEditingGateway(ITextFileStore fileStore)
         {
-            _fileStore = fileStore;
+            this.fileStore = fileStore;
         }
 
         public Task<BeatmapEditingSession> OpenBeatmapAsync(
@@ -78,7 +78,7 @@ public sealed class MetadataManagerServiceTests
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(
                 new BeatmapEditingSession(
-                    new BeatmapEditor2(path, _fileStore),
+                    new BeatmapEditor2(path, fileStore),
                     BeatmapEditingSource.Disk,
                     []));
         }

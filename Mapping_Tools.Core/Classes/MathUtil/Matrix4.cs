@@ -27,7 +27,7 @@ namespace Mapping_Tools.Core.Classes.MathUtil;
 /// <summary>
 ///     Represents a 4x4 matrix containing 3D rotation, scale, transform, and projection.
 /// </summary>
-/// <seealso cref="Matrix4d" />
+/// <seealso cref="Matrix4D" />
 [Serializable]
 [StructLayout(LayoutKind.Sequential)]
 public struct Matrix4 : IEquatable<Matrix4>

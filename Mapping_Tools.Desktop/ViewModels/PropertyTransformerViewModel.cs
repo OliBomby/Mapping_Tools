@@ -15,16 +15,16 @@ namespace Mapping_Tools.Desktop.ViewModels;
 public sealed partial class PropertyTransformerViewModel : SingleRunToolViewModel,
     IShellProjectFeature
 {
-    internal const string OperationId = "property-transformer";
+    internal const string OPERATION_ID = "property-transformer";
 
-    private readonly ProjectDefinition<PropertyTransformerProject> _definition = new(
+    private readonly ProjectDefinition<PropertyTransformerProject> definition = new(
         "propertytransformerproject.json",
         "Property Transformer Projects",
         () => new PropertyTransformerProject(),
         "property-transformer-project.json");
 
-    private readonly IPropertyTransformerService _propertyTransformer;
-    private readonly IBeatmapWorkspace _workspace;
+    private readonly IPropertyTransformerService propertyTransformer;
+    private readonly IBeatmapWorkspace workspace;
 
     /// <summary>
     ///     Creates a Property Transformer presentation model.
@@ -36,11 +36,11 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
         IPropertyTransformerService propertyTransformer,
         IToolExecutionService execution,
         IBeatmapWorkspace workspace)
-        : base(execution, OperationId)
+        : base(execution, OPERATION_ID)
     {
-        _propertyTransformer = propertyTransformer
-                               ?? throw new ArgumentNullException(nameof(propertyTransformer));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.propertyTransformer = propertyTransformer
+                                   ?? throw new ArgumentNullException(nameof(propertyTransformer));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
     }
 
     /// <summary>Gets or sets the timing-point offset multiplier.</summary>
@@ -183,7 +183,7 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
     [ObservableProperty]
     public partial bool SyncTimeFields { get; set; }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
     {
@@ -201,15 +201,15 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
         PropertyTransformerOptions options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<PropertyTransformerResult>(
-                    OperationId,
+                    OPERATION_ID,
                     "Property Transformer",
                     async context =>
                     {
                         Progress<double> progress = new(value =>
                             context.ReportProgress(value, "Transforming documents"));
-                        var result = await _propertyTransformer
+                        var result = await propertyTransformer
                             .TransformAsync(
-                                _workspace.SelectedPaths,
+                                workspace.SelectedPaths,
                                 options,
                                 progress,
                                 context.CancellationToken)

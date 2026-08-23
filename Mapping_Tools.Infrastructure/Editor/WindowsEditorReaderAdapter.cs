@@ -25,14 +25,14 @@ public sealed class WindowsEditorReaderAdapter :
     IGeometryDashboardEditorReader,
     IDisposable
 {
-    private readonly IApplicationDirectories _directories;
-    private readonly Func<bool> _isWindows;
-    private readonly object _lifecycleGate = new();
-    private readonly EditorReader _reader = new();
-    private readonly SemaphoreSlim _readerLock = new(1, 1);
-    private readonly ApplicationSettings _settings;
-    private int _activeReads;
-    private bool _disposed;
+    private readonly IApplicationDirectories directories;
+    private readonly Func<bool> isWindows;
+    private readonly object lifecycleGate = new();
+    private readonly EditorReader reader = new();
+    private readonly SemaphoreSlim readerLock = new(1, 1);
+    private readonly ApplicationSettings settings;
+    private int activeReads;
+    private bool disposed;
 
     /// <summary>
     ///     Creates the Windows adapter with the Songs root used to reconstruct the
@@ -52,9 +52,9 @@ public sealed class WindowsEditorReaderAdapter :
         IApplicationDirectories directories,
         Func<bool> isWindows)
     {
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _directories = directories ?? throw new ArgumentNullException(nameof(directories));
-        _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.directories = directories ?? throw new ArgumentNullException(nameof(directories));
+        this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
     /// <inheritdoc />
@@ -81,15 +81,15 @@ public sealed class WindowsEditorReaderAdapter :
     public void Dispose()
     {
         bool disposeReaderLock;
-        lock (_lifecycleGate)
+        lock (lifecycleGate)
         {
-            if (_disposed) return;
+            if (disposed) return;
 
-            _disposed = true;
-            disposeReaderLock = _activeReads == 0;
+            disposed = true;
+            disposeReaderLock = activeReads == 0;
         }
 
-        if (disposeReaderLock) _readerLock.Dispose();
+        if (disposeReaderLock) readerLock.Dispose();
     }
 
     /// <inheritdoc />
@@ -98,14 +98,14 @@ public sealed class WindowsEditorReaderAdapter :
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(process);
-        ObjectDisposedException.ThrowIf(_disposed, this);
-        if (!_isWindows()) return null;
+        ObjectDisposedException.ThrowIf(disposed, this);
+        if (!isWindows()) return null;
 
         EnterRead();
         bool lockTaken = false;
         try
         {
-            await _readerLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+            await readerLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             lockTaken = true;
             using var nativeProcess = OsuProcessDiscovery.FindStableProcess(process.ProcessId);
             if (nativeProcess is null || !IsActiveEditor(nativeProcess, process.MainWindow))
@@ -121,7 +121,7 @@ public sealed class WindowsEditorReaderAdapter :
         }
         finally
         {
-            if (lockTaken) _readerLock.Release();
+            if (lockTaken) readerLock.Release();
 
             ExitRead();
         }
@@ -131,14 +131,14 @@ public sealed class WindowsEditorReaderAdapter :
     public async Task<LiveBeatmapSnapshot?> ReadAsync(
         CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-        if (!_isWindows()) return null;
+        ObjectDisposedException.ThrowIf(disposed, this);
+        if (!isWindows()) return null;
 
         EnterRead();
         bool lockTaken = false;
         try
         {
-            await _readerLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+            await readerLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             lockTaken = true;
             using var process = OsuProcessDiscovery.FindStableProcess();
             if (process is null || !IsActiveEditor(process)) return null;
@@ -153,7 +153,7 @@ public sealed class WindowsEditorReaderAdapter :
         }
         finally
         {
-            if (lockTaken) _readerLock.Release();
+            if (lockTaken) readerLock.Release();
 
             ExitRead();
         }
@@ -161,41 +161,41 @@ public sealed class WindowsEditorReaderAdapter :
 
     private void EnterRead()
     {
-        lock (_lifecycleGate)
+        lock (lifecycleGate)
         {
-            ObjectDisposedException.ThrowIf(_disposed, this);
-            _activeReads++;
+            ObjectDisposedException.ThrowIf(disposed, this);
+            activeReads++;
         }
     }
 
     private void ExitRead()
     {
         bool disposeReaderLock;
-        lock (_lifecycleGate)
+        lock (lifecycleGate)
         {
-            _activeReads--;
-            disposeReaderLock = _disposed && _activeReads == 0;
+            activeReads--;
+            disposeReaderLock = disposed && activeReads == 0;
         }
 
-        if (disposeReaderLock) _readerLock.Dispose();
+        if (disposeReaderLock) readerLock.Dispose();
     }
 
     private LiveBeatmapSnapshot ReadSnapshot(Process process)
     {
-        _reader.SetProcess(process);
-        _reader.autoDeStack = true;
-        _reader.FetchAll();
+        reader.SetProcess(process);
+        reader.autoDeStack = true;
+        reader.FetchAll();
 
         try
         {
             return EditorReaderSnapshotConverter.Convert(
-                _reader,
-                _settings.SongsPath,
-                _reader.EditorTime());
+                reader,
+                settings.SongsPath,
+                reader.EditorTime());
         }
         catch (InvalidDataException)
         {
-            WriteDiagnosticLog(_reader);
+            WriteDiagnosticLog(reader);
             throw;
         }
     }
@@ -208,8 +208,8 @@ public sealed class WindowsEditorReaderAdapter :
             : checked((int)snapshot.EditorTime.Value);
         return new GeometryDashboardEditorSnapshot(
             snapshot.Path,
-            _reader.ApproachRate,
-            _reader.CircleSize,
+            reader.ApproachRate,
+            reader.CircleSize,
             editorTime,
             snapshot.HitObjects,
             snapshot.SelectedHitObjects);
@@ -236,9 +236,9 @@ public sealed class WindowsEditorReaderAdapter :
 
     private void WriteDiagnosticLog(EditorReader reader)
     {
-        _directories.EnsureCreated();
+        directories.EnsureCreated();
         string path = Path.Combine(
-            _directories.ApplicationData,
+            directories.ApplicationData,
             "editor_reader_error.txt");
         List<string> lines =
         [

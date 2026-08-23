@@ -11,10 +11,10 @@ namespace Mapping_Tools.Desktop.Controls;
 /// <summary>Draws the small pattern thumbnail used by Pattern Gallery.</summary>
 public sealed class PatternThumbnailControl : Control
 {
-    private const int ThumbnailMargin = 10;
-    private const int MaximumObjectCount = 100;
-    private const double MaximumPixelLength = 1e6;
-    private const int MaximumAnchorCount = 5000;
+    private const int thumbnail_margin = 10;
+    private const int maximum_object_count = 100;
+    private const double maximum_pixel_length = 1e6;
+    private const int maximum_anchor_count = 5000;
 
     /// <summary>Identifies the beatmap represented by the thumbnail.</summary>
     public static readonly StyledProperty<Beatmap?> BeatmapProperty =
@@ -67,8 +67,8 @@ public sealed class PatternThumbnailControl : Control
         if (Beatmap is null || Bounds.Width <= 0 || Bounds.Height <= 0) return;
 
         double scale = Math.Min(
-            Math.Max(0, Bounds.Width - ThumbnailMargin * 2) / 512,
-            Math.Max(0, Bounds.Height - ThumbnailMargin * 2) / 384);
+            Math.Max(0, Bounds.Width - thumbnail_margin * 2) / 512,
+            Math.Max(0, Bounds.Height - thumbnail_margin * 2) / 384);
         if (scale <= 0) return;
 
         double offsetX = (Bounds.Width - 512 * scale) / 2;
@@ -77,7 +77,7 @@ public sealed class PatternThumbnailControl : Control
         var sliderPaths = BuildSliderPaths();
         HitObject? next = null;
 
-        foreach (var hitObject in Beatmap.HitObjects.Take(MaximumObjectCount).Reverse())
+        foreach (var hitObject in Beatmap.HitObjects.Take(maximum_object_count).Reverse())
         {
             if (next is null)
             {
@@ -103,9 +103,9 @@ public sealed class PatternThumbnailControl : Control
     private Dictionary<HitObject, SliderPath> BuildSliderPaths()
     {
         Dictionary<HitObject, SliderPath> paths = [];
-        foreach (var hitObject in Beatmap!.HitObjects.Take(MaximumObjectCount))
+        foreach (var hitObject in Beatmap!.HitObjects.Take(maximum_object_count))
         {
-            if (!hitObject.IsSlider || hitObject.PixelLength >= MaximumPixelLength || hitObject.CurvePoints is null || hitObject.CurvePoints.Count >= MaximumAnchorCount)
+            if (!hitObject.IsSlider || hitObject.PixelLength >= maximum_pixel_length || hitObject.CurvePoints is null || hitObject.CurvePoints.Count >= maximum_anchor_count)
                 continue;
 
             try

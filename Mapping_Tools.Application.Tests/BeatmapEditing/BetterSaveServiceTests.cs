@@ -84,18 +84,18 @@ public sealed class BetterSaveServiceTests
 
     private sealed class FixedCurrentBeatmapLocator : ICurrentBeatmapLocator
     {
-        private readonly string? _path;
+        private readonly string? path;
 
         public FixedCurrentBeatmapLocator(string? path)
         {
-            _path = path;
+            this.path = path;
         }
 
         public Task<string?> FindCurrentBeatmapAsync(
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(_path);
+            return Task.FromResult(path);
         }
     }
 

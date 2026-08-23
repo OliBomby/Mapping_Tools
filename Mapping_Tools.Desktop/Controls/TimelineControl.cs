@@ -11,13 +11,13 @@ namespace Mapping_Tools.Desktop.Controls;
 /// <summary>Draws a compact, themeable timeline and invokes navigation for clicked markers.</summary>
 public sealed class TimelineControl : Control
 {
-    private const double ReservedRight = 110;
-    private const double LabelTop = 1;
-    private const double ElementTop = 14;
-    private const double ElementHeight = 52;
-    private const double DefaultHeight = ElementTop + ElementHeight;
-    private const double LineY = 50;
-    private const double HitTolerance = 4;
+    private const double reserved_right = 110;
+    private const double label_top = 1;
+    private const double element_top = 14;
+    private const double element_height = 52;
+    private const double default_height = element_top + element_height;
+    private const double line_y = 50;
+    private const double hit_tolerance = 4;
 
     /// <summary>Identifies the semantic marker collection drawn on the timeline.</summary>
     public static readonly StyledProperty<IReadOnlyList<TimelineMarker>> MarkersProperty =
@@ -85,7 +85,7 @@ public sealed class TimelineControl : Control
     public static readonly StyledProperty<IBrush?> AccentInnerBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(AccentInnerBrush));
 
-    private Cursor? _handCursor;
+    private Cursor? handCursor;
 
     static TimelineControl()
     {
@@ -171,7 +171,7 @@ public sealed class TimelineControl : Control
     /// <summary>Gets or sets the solid inner brush for highlighted markers.</summary>
     public IBrush? AccentInnerBrush { get => GetValue(AccentInnerBrushProperty); set => SetValue(AccentInnerBrushProperty, value); }
 
-    private double TimelineWidth => Math.Max(0, Bounds.Width - ReservedRight);
+    private double TimelineWidth => Math.Max(0, Bounds.Width - reserved_right);
 
     /// <inheritdoc />
     public override void Render(DrawingContext context)
@@ -179,8 +179,8 @@ public sealed class TimelineControl : Control
         base.Render(context);
         var scale = CreateScale();
         double width = TimelineWidth;
-        double elementHeight = Math.Max(0, Bounds.Height - ElementTop);
-        if (LineBrush is not null) context.DrawLine(new Pen(LineBrush, 2), new Point(0, LineY), new Point(width, LineY));
+        double elementHeight = Math.Max(0, Bounds.Height - element_top);
+        if (LineBrush is not null) context.DrawLine(new Pen(LineBrush, 2), new Point(0, line_y), new Point(width, line_y));
 
         if (TickBrush is not null)
             foreach (double tick in scale.GetTicks())
@@ -193,7 +193,7 @@ public sealed class TimelineControl : Control
                     new Typeface("Consolas"),
                     10,
                     TickBrush);
-                context.DrawText(text, new Point(x, LabelTop));
+                context.DrawText(text, new Point(x, label_top));
                 DrawMarker(context, x, NeutralOuterBrush, NeutralInnerBrush, elementHeight);
             }
 
@@ -213,7 +213,7 @@ public sealed class TimelineControl : Control
     {
         return new Size(
             double.IsInfinity(availableSize.Width) ? 300 : availableSize.Width,
-            double.IsInfinity(availableSize.Height) ? DefaultHeight : Math.Max(DefaultHeight, availableSize.Height));
+            double.IsInfinity(availableSize.Height) ? default_height : Math.Max(default_height, availableSize.Height));
     }
 
     /// <inheritdoc />
@@ -223,7 +223,7 @@ public sealed class TimelineControl : Control
         var marker = MarkerAt(eventArgs.GetPosition(this).X);
         Cursor = marker is null
             ? null
-            : _handCursor ??= new Cursor(StandardCursorType.Hand);
+            : handCursor ??= new Cursor(StandardCursorType.Hand);
         ToolTip.SetTip(this, marker is null ? null : FormatToolTip(marker));
     }
 
@@ -245,7 +245,7 @@ public sealed class TimelineControl : Control
     {
         return x < 0 || x > TimelineWidth
             ? null
-            : CreateScale().FindNearest(Markers ?? [], x, TimelineWidth, HitTolerance);
+            : CreateScale().FindNearest(Markers ?? [], x, TimelineWidth, hit_tolerance);
     }
 
     internal static string FormatToolTip(TimelineMarker marker)
@@ -270,10 +270,10 @@ public sealed class TimelineControl : Control
         if (outer is not null)
             using (context.PushOpacity(0.3))
             {
-                context.FillRectangle(outer, new Rect(x - 2.5, ElementTop, 5, height));
+                context.FillRectangle(outer, new Rect(x - 2.5, element_top, 5, height));
             }
 
-        if (inner is not null) context.FillRectangle(inner, new Rect(x - 0.5, ElementTop, 1, height));
+        if (inner is not null) context.FillRectangle(inner, new Rect(x - 0.5, element_top, 1, height));
     }
 
     private (IBrush? Outer, IBrush? Inner) GetBrushes(TimelineMarkerKind kind)

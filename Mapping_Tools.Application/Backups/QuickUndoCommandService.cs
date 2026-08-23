@@ -64,10 +64,10 @@ public interface IQuickUndoCommandService
 /// </summary>
 public sealed class QuickUndoCommandService : IQuickUndoCommandService
 {
-    private readonly IBeatmapBackupService _backupService;
-    private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
-    private readonly IUserNotificationService _notifications;
-    private readonly ApplicationSettings _settings;
+    private readonly IBeatmapBackupService backupService;
+    private readonly ICurrentBeatmapLocator currentBeatmapLocator;
+    private readonly IUserNotificationService notifications;
+    private readonly ApplicationSettings settings;
 
     /// <summary>
     ///     Creates the command over the shared live-map, backup, settings, and
@@ -83,14 +83,14 @@ public sealed class QuickUndoCommandService : IQuickUndoCommandService
         ApplicationSettings settings,
         IUserNotificationService notifications)
     {
-        _currentBeatmapLocator = currentBeatmapLocator
-                                 ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
-        _backupService = backupService
-                         ?? throw new ArgumentNullException(nameof(backupService));
-        _settings = settings
-                    ?? throw new ArgumentNullException(nameof(settings));
-        _notifications = notifications
-                         ?? throw new ArgumentNullException(nameof(notifications));
+        this.currentBeatmapLocator = currentBeatmapLocator
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+        this.backupService = backupService
+                             ?? throw new ArgumentNullException(nameof(backupService));
+        this.settings = settings
+                        ?? throw new ArgumentNullException(nameof(settings));
+        this.notifications = notifications
+                             ?? throw new ArgumentNullException(nameof(notifications));
     }
 
     /// <inheritdoc />
@@ -99,7 +99,7 @@ public sealed class QuickUndoCommandService : IQuickUndoCommandService
     {
         try
         {
-            string? path = await _currentBeatmapLocator
+            string? path = await currentBeatmapLocator
                 .FindCurrentBeatmapAsync(cancellationToken)
                 .ConfigureAwait(false);
             if (string.IsNullOrWhiteSpace(path))
@@ -113,10 +113,10 @@ public sealed class QuickUndoCommandService : IQuickUndoCommandService
                     QuickUndoCommandStatus.NoCurrentBeatmap);
             }
 
-            var restore = await _backupService
+            var restore = await backupService
                 .QuickUndoAsync(
                     path,
-                    reloadEditor: _settings.AutoReload,
+                    reloadEditor: settings.AutoReload,
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
             if (restore is null)
@@ -166,7 +166,7 @@ public sealed class QuickUndoCommandService : IQuickUndoCommandService
     {
         try
         {
-            await _notifications.PublishAsync(
+            await notifications.PublishAsync(
                     new UserNotification(severity, title, message, exception),
                     CancellationToken.None)
                 .ConfigureAwait(false);

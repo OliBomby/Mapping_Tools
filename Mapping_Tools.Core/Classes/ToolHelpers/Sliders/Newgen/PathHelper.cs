@@ -127,10 +127,10 @@ public static class PathHelper
 
             // Calculate the angles
             lastAngle = v1.HasValue
-                ? v1.Value.LengthSquared > Precision.DoubleEpsilon ? v1.Value.Theta : lastAngle
+                ? v1.Value.LengthSquared > Precision.DOUBLE_EPSILON ? v1.Value.Theta : lastAngle
                 : double.NaN;
             double nextAngle = v2.HasValue
-                ? v2.Value.LengthSquared > Precision.DoubleEpsilon ? v2.Value.Theta : lastAngle
+                ? v2.Value.LengthSquared > Precision.DOUBLE_EPSILON ? v2.Value.Theta : lastAngle
                 : double.NaN;
 
             // Update the path point of current
@@ -177,11 +177,11 @@ public static class PathHelper
 
         // Normalize v1 and v4 to prevent extreme curvature
         double length = Vector2.Distance(v2.Pos, v3.Pos);
-        v1.Pos = (v1.Pos - v2.Pos).LengthSquared > Precision.DoubleEpsilon ? v2.Pos + (v1.Pos - v2.Pos).Normalized() * length : v2.Pos + v2.Pos - v3.Pos;
-        v4.Pos = (v4.Pos - v3.Pos).LengthSquared > Precision.DoubleEpsilon ? v3.Pos + (v4.Pos - v3.Pos).Normalized() * length : v3.Pos + v3.Pos - v2.Pos;
+        v1.Pos = (v1.Pos - v2.Pos).LengthSquared > Precision.DOUBLE_EPSILON ? v2.Pos + (v1.Pos - v2.Pos).Normalized() * length : v2.Pos + v2.Pos - v3.Pos;
+        v4.Pos = (v4.Pos - v3.Pos).LengthSquared > Precision.DOUBLE_EPSILON ? v3.Pos + (v4.Pos - v3.Pos).Normalized() * length : v3.Pos + v3.Pos - v2.Pos;
         double ogLength = Vector2.Distance(v2.OgPos, v3.OgPos);
-        v1.OgPos = (v1.OgPos - v2.OgPos).LengthSquared > Precision.DoubleEpsilon ? v2.OgPos + (v1.OgPos - v2.OgPos).Normalized() * ogLength : v2.OgPos + v2.OgPos - v3.OgPos;
-        v4.OgPos = (v4.OgPos - v3.OgPos).LengthSquared > Precision.DoubleEpsilon ? v3.OgPos + (v4.OgPos - v3.OgPos).Normalized() * ogLength : v3.OgPos + v3.OgPos - v2.OgPos;
+        v1.OgPos = (v1.OgPos - v2.OgPos).LengthSquared > Precision.DOUBLE_EPSILON ? v2.OgPos + (v1.OgPos - v2.OgPos).Normalized() * ogLength : v2.OgPos + v2.OgPos - v3.OgPos;
+        v4.OgPos = (v4.OgPos - v3.OgPos).LengthSquared > Precision.DOUBLE_EPSILON ? v3.OgPos + (v4.OgPos - v3.OgPos).Normalized() * ogLength : v3.OgPos + v3.OgPos - v2.OgPos;
 
         foreach (double t in ts)
         {
@@ -408,7 +408,7 @@ public static class PathHelper
     /// <returns>The first matching occurrence from start.</returns>
     // Finds the first point from start which matches the distance and T value within the given epsilon.
     // If no such point exists, the point before the wanted distance is returned.
-    public static LinkedListNode<PathPoint> FindFirstOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DoubleEpsilon)
+    public static LinkedListNode<PathPoint> FindFirstOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DOUBLE_EPSILON)
     {
         var p = start;
         var prev = start;
@@ -450,7 +450,7 @@ public static class PathHelper
     /// <param name="t">The wanted T value. If NaN then it is ignored.</param>
     /// <param name="epsilon">The maximum difference in distance or T.</param>
     /// <returns>The last matching occurrence from start.</returns>
-    public static LinkedListNode<PathPoint> FindLastOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DoubleEpsilon)
+    public static LinkedListNode<PathPoint> FindLastOccurrence(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN, double epsilon = Precision.DOUBLE_EPSILON)
     {
         var p = start;
         var prev = start;
@@ -493,7 +493,7 @@ public static class PathHelper
     /// <param name="epsilon">The maximum difference in distance or T.</param>
     /// <returns>The first matching occurrence from start.</returns>
     public static LinkedListNode<PathPoint> FindFirstOccurrenceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN,
-        double epsilon = Precision.DoubleEpsilon)
+        double epsilon = Precision.DOUBLE_EPSILON)
     {
         var node = FindFirstOccurrence(start, cumLength, t, epsilon);
 
@@ -521,7 +521,7 @@ public static class PathHelper
     /// <param name="epsilon">The maximum difference in distance or T.</param>
     /// <returns>The last matching occurrence from start.</returns>
     public static LinkedListNode<PathPoint> FindLastOccurrenceExact(LinkedListNode<PathPoint> start, double cumLength, double t = double.NaN,
-        double epsilon = Precision.DoubleEpsilon)
+        double epsilon = Precision.DOUBLE_EPSILON)
     {
         var node = FindLastOccurrence(start, cumLength, t, epsilon);
 

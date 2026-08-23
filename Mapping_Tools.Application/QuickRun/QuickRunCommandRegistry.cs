@@ -6,18 +6,18 @@ namespace Mapping_Tools.Application.QuickRun;
 /// </summary>
 public sealed class QuickRunCommandRegistry : IQuickRunCommandRegistry
 {
-    private readonly List<QuickRunCommand> _commands = [];
-    private readonly object _gate = new();
-    private string? _currentCommandId;
+    private readonly List<QuickRunCommand> commands = [];
+    private readonly object gate = new();
+    private string? currentCommandId;
 
     /// <inheritdoc />
     public IReadOnlyList<QuickRunCommand> Commands
     {
         get
         {
-            lock (_gate)
+            lock (gate)
             {
-                return _commands.ToArray();
+                return commands.ToArray();
             }
         }
     }
@@ -27,9 +27,9 @@ public sealed class QuickRunCommandRegistry : IQuickRunCommandRegistry
     {
         get
         {
-            lock (_gate)
+            lock (gate)
             {
-                return _currentCommandId;
+                return currentCommandId;
             }
         }
     }
@@ -38,9 +38,9 @@ public sealed class QuickRunCommandRegistry : IQuickRunCommandRegistry
     public void Register(QuickRunCommand command)
     {
         ArgumentNullException.ThrowIfNull(command);
-        lock (_gate)
+        lock (gate)
         {
-            if (_commands.Any(existing =>
+            if (commands.Any(existing =>
                     string.Equals(existing.Id, command.Id, StringComparison.Ordinal)
                     || string.Equals(
                         existing.DisplayName,
@@ -49,7 +49,7 @@ public sealed class QuickRunCommandRegistry : IQuickRunCommandRegistry
                 throw new InvalidOperationException(
                     $"QuickRun command '{command.Id}' or display name " + $"'{command.DisplayName}' is already registered.");
 
-            _commands.Add(command);
+            commands.Add(command);
         }
     }
 
@@ -57,13 +57,13 @@ public sealed class QuickRunCommandRegistry : IQuickRunCommandRegistry
     public bool Remove(string id)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(id);
-        lock (_gate)
+        lock (gate)
         {
-            int index = _commands.FindIndex(command => string.Equals(command.Id, id, StringComparison.Ordinal));
+            int index = commands.FindIndex(command => string.Equals(command.Id, id, StringComparison.Ordinal));
             if (index < 0) return false;
 
-            _commands.RemoveAt(index);
-            if (string.Equals(_currentCommandId, id, StringComparison.Ordinal)) _currentCommandId = null;
+            commands.RemoveAt(index);
+            if (string.Equals(currentCommandId, id, StringComparison.Ordinal)) currentCommandId = null;
 
             return true;
         }
@@ -72,14 +72,14 @@ public sealed class QuickRunCommandRegistry : IQuickRunCommandRegistry
     /// <inheritdoc />
     public bool SelectCurrent(string? id)
     {
-        lock (_gate)
+        lock (gate)
         {
             if (id is not null
-                && !_commands.Any(command =>
+                && !commands.Any(command =>
                     string.Equals(command.Id, id, StringComparison.Ordinal)))
                 return false;
 
-            _currentCommandId = id;
+            currentCommandId = id;
             return true;
         }
     }
@@ -95,9 +95,9 @@ public sealed class QuickRunCommandRegistry : IQuickRunCommandRegistry
                 target,
                 "Exactly one live selection-size target is required.");
 
-        lock (_gate)
+        lock (gate)
         {
-            return _commands
+            return commands
                 .Where(command => (command.Targets & target) != 0)
                 .ToArray();
         }
@@ -105,18 +105,18 @@ public sealed class QuickRunCommandRegistry : IQuickRunCommandRegistry
 
     internal QuickRunCommand? FindCurrent()
     {
-        lock (_gate)
+        lock (gate)
         {
-            return _commands.FirstOrDefault(command =>
-                string.Equals(command.Id, _currentCommandId, StringComparison.Ordinal));
+            return commands.FirstOrDefault(command =>
+                string.Equals(command.Id, currentCommandId, StringComparison.Ordinal));
         }
     }
 
     internal QuickRunCommand? FindByDisplayName(string displayName)
     {
-        lock (_gate)
+        lock (gate)
         {
-            return _commands.FirstOrDefault(command =>
+            return commands.FirstOrDefault(command =>
                 string.Equals(
                     command.DisplayName,
                     displayName,

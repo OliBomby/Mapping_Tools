@@ -39,16 +39,16 @@ public interface IUpdaterInteractionService : IDisposable
 
 internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionService
 {
-    private readonly Func<IDialogService> _dialogs;
-    private readonly IUiDispatcher _dispatcher;
-    private readonly CancellationTokenSource _lifetimeCancellation = new();
-    private readonly IUserNotificationService _notifications;
-    private readonly Func<MainWindow> _owner;
-    private readonly IUpdateService _updates;
-    private Task? _checkTask;
-    private bool _disposed;
-    private UpdaterViewModel? _viewModel;
-    private UpdaterWindow? _window;
+    private readonly Func<IDialogService> dialogs;
+    private readonly IUiDispatcher dispatcher;
+    private readonly CancellationTokenSource lifetimeCancellation = new();
+    private readonly IUserNotificationService notifications;
+    private readonly Func<MainWindow> owner;
+    private readonly IUpdateService updates;
+    private Task? checkTask;
+    private bool disposed;
+    private UpdaterViewModel? viewModel;
+    private UpdaterWindow? window;
 
     internal AvaloniaUpdaterInteractionService(
         Func<MainWindow> owner,
@@ -57,11 +57,11 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         Func<IDialogService> dialogs,
         IUiDispatcher dispatcher)
     {
-        _owner = owner ?? throw new ArgumentNullException(nameof(owner));
-        _updates = updates ?? throw new ArgumentNullException(nameof(updates));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
-        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        this.updates = updates ?? throw new ArgumentNullException(nameof(updates));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
     }
 
     /// <inheritdoc />
@@ -73,43 +73,43 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         bool notifyUser,
         CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-        if (_window is not null) return Task.CompletedTask;
+        ObjectDisposedException.ThrowIf(disposed, this);
+        if (window is not null) return Task.CompletedTask;
 
-        if (_checkTask is { IsCompleted: false }) return _checkTask;
+        if (checkTask is { IsCompleted: false }) return checkTask;
 
         var linkedCancellation =
             CancellationTokenSource.CreateLinkedTokenSource(
                 cancellationToken,
-                _lifetimeCancellation.Token);
-        _checkTask = CheckCoreAsync(
+                lifetimeCancellation.Token);
+        checkTask = CheckCoreAsync(
             allowSkippedVersion,
             notifyUser,
             linkedCancellation);
-        return ObserveCheckAsync(_checkTask);
+        return ObserveCheckAsync(checkTask);
     }
 
     /// <inheritdoc />
     public async Task<bool> CompleteUpdateOnCloseAsync(
         CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
+        ObjectDisposedException.ThrowIf(disposed, this);
         if (!ShouldUpdateOnClose) return true;
 
         var linkedCancellation =
             CancellationTokenSource.CreateLinkedTokenSource(
                 cancellationToken,
-                _lifetimeCancellation.Token);
+                lifetimeCancellation.Token);
         try
         {
-            var downloadTask = _updates.ActiveDownloadTask;
-            if (downloadTask is null || downloadTask.IsFaulted || downloadTask.IsCanceled) downloadTask = _updates.PrepareUpdateAsync(linkedCancellation.Token);
+            var downloadTask = updates.ActiveDownloadTask;
+            if (downloadTask is null || downloadTask.IsFaulted || downloadTask.IsCanceled) downloadTask = updates.PrepareUpdateAsync(linkedCancellation.Token);
 
             if (!downloadTask.IsCompletedSuccessfully) await ShowShutdownDownloadAsync(downloadTask, linkedCancellation.Token);
 
             await downloadTask.ConfigureAwait(true);
             linkedCancellation.Token.ThrowIfCancellationRequested();
-            _updates.StartUpdateProcess(false);
+            updates.StartUpdateProcess(false);
             ShouldUpdateOnClose = false;
             return true;
         }
@@ -131,15 +131,15 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
     /// <inheritdoc />
     public void Dispose()
     {
-        if (_disposed) return;
+        if (disposed) return;
 
-        _disposed = true;
-        _lifetimeCancellation.Cancel();
-        if (_window is not null) _window.Close();
+        disposed = true;
+        lifetimeCancellation.Cancel();
+        if (window is not null) window.Close();
 
-        _viewModel?.Dispose();
-        _viewModel = null;
-        _lifetimeCancellation.Dispose();
+        viewModel?.Dispose();
+        viewModel = null;
+        lifetimeCancellation.Dispose();
     }
 
     private async Task CheckCoreAsync(
@@ -150,7 +150,7 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         try
         {
             var cancellationToken = linkedCancellation.Token;
-            var result = await _updates
+            var result = await updates
                 .CheckForUpdatesAsync(allowSkippedVersion, cancellationToken)
                 .ConfigureAwait(true);
             cancellationToken.ThrowIfCancellationRequested();
@@ -193,14 +193,14 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
 
     private void ShowDecisionWindow(UpdateCheckResult result)
     {
-        if (_disposed || _window is not null) return;
+        if (disposed || this.window is not null) return;
 
         UpdaterViewModel viewModel = new(
-            _updates,
+            updates,
             result,
-            _notifications,
-            _dialogs(),
-            _dispatcher);
+            notifications,
+            dialogs(),
+            dispatcher);
         UpdaterWindow window = new()
         {
             DataContext = viewModel,
@@ -210,12 +210,12 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         viewModel.ApplicationCloseRequested += (_, _) =>
         {
             CloseDecisionWindow(window);
-            _owner().Close();
+            owner().Close();
         };
         window.Closed += (_, _) => DecisionWindowClosed(window, viewModel);
-        _viewModel = viewModel;
-        _window = window;
-        window.Show(_owner());
+        this.viewModel = viewModel;
+        this.window = window;
+        window.Show(owner());
     }
 
     private void CloseDecisionWindow(UpdaterWindow window)
@@ -227,13 +227,13 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         UpdaterWindow window,
         UpdaterViewModel viewModel)
     {
-        if (!ReferenceEquals(_window, window)) return;
+        if (!ReferenceEquals(this.window, window)) return;
 
         ShouldUpdateOnClose = viewModel.UpdateAfterClose;
-        if (!ShouldUpdateOnClose) _updates.AbandonUpdate();
+        if (!ShouldUpdateOnClose) updates.AbandonUpdate();
 
-        _window = null;
-        _viewModel = null;
+        this.window = null;
+        this.viewModel = null;
         viewModel.Dispose();
     }
 
@@ -241,15 +241,15 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         Task downloadTask,
         CancellationToken cancellationToken)
     {
-        var check = _updates.LastCheck
+        var check = updates.LastCheck
                     ?? throw new InvalidOperationException(
                         "The updater lost its release check before shutdown.");
         UpdaterViewModel viewModel = new(
-            _updates,
+            updates,
             check,
-            _notifications,
-            _dialogs(),
-            _dispatcher,
+            notifications,
+            dialogs(),
+            dispatcher,
             true);
         UpdaterWindow window = new()
         {
@@ -260,7 +260,7 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         _ = CloseAfterDownloadAsync(downloadTask, window, cancellationToken);
         try
         {
-            await window.ShowDialog<object?>(_owner()).ConfigureAwait(true);
+            await window.ShowDialog<object?>(owner()).ConfigureAwait(true);
         }
         finally
         {
@@ -282,7 +282,7 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
             // The caller awaits the same task and reports the original failure.
         }
 
-        _dispatcher.Post(() =>
+        dispatcher.Post(() =>
         {
             if (window.IsVisible) window.Close();
         });
@@ -296,15 +296,15 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         }
         finally
         {
-            if (ReferenceEquals(_checkTask, checkTask)) _checkTask = null;
+            if (ReferenceEquals(this.checkTask, checkTask)) this.checkTask = null;
         }
     }
 
     private async Task ReportFailureAsync(Exception exception, bool notifyUser)
     {
-        if (_disposed) return;
+        if (disposed) return;
 
-        await _dialogs().ShowMessageAsync(new MessageDialogRequest<bool>(
+        await dialogs().ShowMessageAsync(new MessageDialogRequest<bool>(
             "Updater error",
             "UPDATER_EXCEPTION: " + exception.Message,
             [new DialogChoice<bool>("OK", true, true, true)],
@@ -324,7 +324,7 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         string message,
         Exception? exception = null)
     {
-        return _notifications.PublishAsync(new UserNotification(
+        return notifications.PublishAsync(new UserNotification(
             severity,
             title,
             message,

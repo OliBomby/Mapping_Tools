@@ -8,14 +8,14 @@ namespace Mapping_Tools.Desktop.Hosting;
 
 internal sealed class GlobalHotkeyHostedService : IHostedService, IHotkeyBindingCoordinator
 {
-    private const string QuickRunBindingId = "quick-run";
-    private const string QuickUndoBindingId = "quick-undo";
-    private const string BetterSaveBindingId = "better-save";
-    private readonly IBetterSaveService _betterSave;
-    private readonly IGlobalHotkeyService _hotkeys;
-    private readonly IQuickRunService _quickRun;
-    private readonly IQuickUndoCommandService _quickUndo;
-    private readonly ApplicationSettings _settings;
+    private const string quick_run_binding_id = "quick-run";
+    private const string quick_undo_binding_id = "quick-undo";
+    private const string better_save_binding_id = "better-save";
+    private readonly IBetterSaveService betterSave;
+    private readonly IGlobalHotkeyService hotkeys;
+    private readonly IQuickRunService quickRun;
+    private readonly IQuickUndoCommandService quickUndo;
+    private readonly ApplicationSettings settings;
 
     public GlobalHotkeyHostedService(
         IGlobalHotkeyService hotkeys,
@@ -24,50 +24,50 @@ internal sealed class GlobalHotkeyHostedService : IHostedService, IHotkeyBinding
         IBetterSaveService betterSave,
         ApplicationSettings settings)
     {
-        _hotkeys = hotkeys ?? throw new ArgumentNullException(nameof(hotkeys));
-        _quickRun = quickRun ?? throw new ArgumentNullException(nameof(quickRun));
-        _quickUndo = quickUndo ?? throw new ArgumentNullException(nameof(quickUndo));
-        _betterSave = betterSave ?? throw new ArgumentNullException(nameof(betterSave));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.hotkeys = hotkeys ?? throw new ArgumentNullException(nameof(hotkeys));
+        this.quickRun = quickRun ?? throw new ArgumentNullException(nameof(quickRun));
+        this.quickUndo = quickUndo ?? throw new ArgumentNullException(nameof(quickUndo));
+        this.betterSave = betterSave ?? throw new ArgumentNullException(nameof(betterSave));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        ApplyQuickRun(_settings.QuickRunHotkey);
-        ApplyQuickUndo(_settings.QuickUndoHotkey);
-        ApplyBetterSave(_settings.BetterSaveHotkey);
-        _hotkeys.Start();
+        ApplyQuickRun(settings.QuickRunHotkey);
+        ApplyQuickUndo(settings.QuickUndoHotkey);
+        ApplyBetterSave(settings.BetterSaveHotkey);
+        hotkeys.Start();
         return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _hotkeys.Stop();
+        hotkeys.Stop();
         return Task.CompletedTask;
     }
 
     public void ApplyQuickRun(HotkeySettings? hotkey)
     {
-        _hotkeys.SetBinding(
-            QuickRunBindingId,
+        hotkeys.SetBinding(
+            quick_run_binding_id,
             hotkey,
-            token => _quickRun.RunAsync(token));
+            token => quickRun.RunAsync(token));
     }
 
     public void ApplyQuickUndo(HotkeySettings? hotkey)
     {
-        _hotkeys.SetBinding(
-            QuickUndoBindingId,
+        hotkeys.SetBinding(
+            quick_undo_binding_id,
             hotkey,
-            token => _quickUndo.ExecuteAsync(token));
+            token => quickUndo.ExecuteAsync(token));
     }
 
     public void ApplyBetterSave(HotkeySettings? hotkey)
     {
-        _hotkeys.SetBinding(
-            BetterSaveBindingId,
+        hotkeys.SetBinding(
+            better_save_binding_id,
             hotkey,
-            token => _betterSave.ExecuteAsync(token));
+            token => betterSave.ExecuteAsync(token));
     }
 }

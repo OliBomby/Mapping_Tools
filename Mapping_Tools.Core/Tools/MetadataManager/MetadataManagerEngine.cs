@@ -50,18 +50,18 @@ public static class MetadataManagerEngine
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(options);
 
-        beatmap.Metadata["ArtistUnicode"] = new TValue(options.Artist);
-        beatmap.Metadata["Artist"] = new TValue(options.RomanisedArtist);
-        beatmap.Metadata["TitleUnicode"] = new TValue(options.Title);
-        beatmap.Metadata["Title"] = new TValue(options.RomanisedTitle);
-        beatmap.Metadata["Creator"] = new TValue(options.BeatmapCreator);
-        beatmap.Metadata["Source"] = new TValue(options.Source);
-        beatmap.Metadata["Tags"] = new TValue(
+        beatmap.Metadata["ArtistUnicode"] = new StringValue(options.Artist);
+        beatmap.Metadata["Artist"] = new StringValue(options.RomanisedArtist);
+        beatmap.Metadata["TitleUnicode"] = new StringValue(options.Title);
+        beatmap.Metadata["Title"] = new StringValue(options.RomanisedTitle);
+        beatmap.Metadata["Creator"] = new StringValue(options.BeatmapCreator);
+        beatmap.Metadata["Source"] = new StringValue(options.Source);
+        beatmap.Metadata["Tags"] = new StringValue(
             options.DoRemoveDuplicateTags
                 ? NormalizeTags(options.Tags)
                 : options.Tags);
 
-        beatmap.General["PreviewTime"] = new TValue(
+        beatmap.General["PreviewTime"] = new StringValue(
             Math.Round(options.PreviewTime).ToInvariant());
 
         if (options.UseComboColours)
@@ -85,8 +85,8 @@ public static class MetadataManagerEngine
 
         if (options.ResetIds)
         {
-            beatmap.Metadata["BeatmapID"] = new TValue("0");
-            beatmap.Metadata["BeatmapSetID"] = new TValue("-1");
+            beatmap.Metadata["BeatmapID"] = new StringValue("0");
+            beatmap.Metadata["BeatmapSetID"] = new StringValue("-1");
         }
     }
 
@@ -106,7 +106,7 @@ public static class MetadataManagerEngine
     }
 
     private static string GetText(
-        IReadOnlyDictionary<string, TValue> values,
+        IReadOnlyDictionary<string, StringValue> values,
         string key)
     {
         return values.TryGetValue(key, out var value)

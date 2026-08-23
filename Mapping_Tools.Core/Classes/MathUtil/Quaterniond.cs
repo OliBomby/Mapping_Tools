@@ -35,7 +35,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
     /// <summary>
     ///     The X, Y and Z components of this instance.
     /// </summary>
-    public Vector3d Xyz;
+    public Vector3D Xyz;
 
     /// <summary>
     ///     The W component of this instance.
@@ -47,7 +47,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
     /// </summary>
     /// <param name="v">The vector part</param>
     /// <param name="w">The w part</param>
-    public Quaterniond(Vector3d v, double w)
+    public Quaterniond(Vector3D v, double w)
     {
         Xyz = v;
         W = w;
@@ -61,7 +61,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
     /// <param name="z">The z component</param>
     /// <param name="w">The w component</param>
     public Quaterniond(double x, double y, double z, double w)
-        : this(new Vector3d(x, y, z), w)
+        : this(new Vector3D(x, y, z), w)
     {
     }
 
@@ -94,7 +94,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
     ///     Construct a new Quaterniond from given Euler angles
     /// </summary>
     /// <param name="eulerAngles">The euler angles as a Vector3d</param>
-    public Quaterniond(Vector3d eulerAngles)
+    public Quaterniond(Vector3D eulerAngles)
         : this(eulerAngles.X, eulerAngles.Y, eulerAngles.Z)
     {
     }
@@ -134,7 +134,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
     /// </summary>
     /// <param name="axis">The resultant axis</param>
     /// <param name="angle">The resultant angle</param>
-    public void ToAxisAngle(out Vector3d axis, out double angle)
+    public void ToAxisAngle(out Vector3D axis, out double angle)
     {
         var result = ToAxisAngle();
         axis = result.Xyz;
@@ -145,12 +145,12 @@ public struct Quaterniond : IEquatable<Quaterniond>
     ///     Convert this instance to an axis-angle representation.
     /// </summary>
     /// <returns>A Vector4 that is the axis-angle representation of this quaternion.</returns>
-    public Vector4d ToAxisAngle()
+    public Vector4D ToAxisAngle()
     {
         var q = this;
         if (Math.Abs(q.W) > 1.0f) q.Normalize();
 
-        var result = new Vector4d
+        var result = new Vector4D
         {
             W = 2.0f * Math.Acos(q.W), // angle
         };
@@ -160,7 +160,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
         else
             // This occurs when the angle is zero.
             // Not a problem: just set an arbitrary normalized axis.
-            result.Xyz = Vector3d.UnitX;
+            result.Xyz = Vector3D.UnitX;
 
         return result;
     }
@@ -300,8 +300,8 @@ public struct Quaterniond : IEquatable<Quaterniond>
     public static void Multiply(ref Quaterniond left, ref Quaterniond right, out Quaterniond result)
     {
         result = new Quaterniond(
-            right.W * left.Xyz + left.W * right.Xyz + Vector3d.Cross(left.Xyz, right.Xyz),
-            left.W * right.W - Vector3d.Dot(left.Xyz, right.Xyz));
+            right.W * left.Xyz + left.W * right.Xyz + Vector3D.Cross(left.Xyz, right.Xyz),
+            left.W * right.W - Vector3D.Dot(left.Xyz, right.Xyz));
     }
 
     /// <summary>
@@ -404,7 +404,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
     /// <param name="axis">The axis to rotate about</param>
     /// <param name="angle">The rotation angle in radians</param>
     /// <returns></returns>
-    public static Quaterniond FromAxisAngle(Vector3d axis, double angle)
+    public static Quaterniond FromAxisAngle(Vector3D axis, double angle)
     {
         if (axis.LengthSquared == 0.0f) return Identity;
 
@@ -435,7 +435,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
     /// </summary>
     /// <param name="eulerAngles">The euler angles as a vector</param>
     /// <returns>The equivalent Quaterniond</returns>
-    public static Quaterniond FromEulerAngles(Vector3d eulerAngles)
+    public static Quaterniond FromEulerAngles(Vector3D eulerAngles)
     {
         return new Quaterniond(eulerAngles);
     }
@@ -445,7 +445,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
     /// </summary>
     /// <param name="eulerAngles">The euler angles a vector</param>
     /// <param name="result">The equivalent Quaterniond</param>
-    public static void FromEulerAngles(ref Vector3d eulerAngles, out Quaterniond result)
+    public static void FromEulerAngles(ref Vector3D eulerAngles, out Quaterniond result)
     {
         double c1 = Math.Cos(eulerAngles.Y * 0.5);
         double c2 = Math.Cos(eulerAngles.X * 0.5);
@@ -465,7 +465,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
     /// </summary>
     /// <param name="matrix">A rotation matrix</param>
     /// <returns>The equivalent quaternion</returns>
-    public static Quaterniond FromMatrix(Matrix3d matrix)
+    public static Quaterniond FromMatrix(Matrix3D matrix)
     {
         FromMatrix(ref matrix, out var result);
         return result;
@@ -476,7 +476,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
     /// </summary>
     /// <param name="matrix">A rotation matrix</param>
     /// <param name="result">The equivalent quaternion</param>
-    public static void FromMatrix(ref Matrix3d matrix, out Quaterniond result)
+    public static void FromMatrix(ref Matrix3D matrix, out Quaterniond result)
     {
         double trace = matrix.Trace;
 
@@ -546,7 +546,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
         if (q2.LengthSquared == 0.0f) return q1;
 
 
-        double cosHalfAngle = q1.W * q2.W + Vector3d.Dot(q1.Xyz, q2.Xyz);
+        double cosHalfAngle = q1.W * q2.W + Vector3D.Dot(q1.Xyz, q2.Xyz);
 
         if (cosHalfAngle >= 1.0f || cosHalfAngle <= -1.0f)
             // angle = 0.0f, so just return one input.

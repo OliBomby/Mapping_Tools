@@ -8,9 +8,9 @@ namespace Mapping_Tools.Desktop.Hosting;
 /// </summary>
 public sealed class SettingsPersistenceHostedService : IHostedService
 {
-    private readonly ApplicationSettings _settings;
-    private readonly ISettingsService _settingsService;
-    private bool _saveOnShutdown = true;
+    private readonly ApplicationSettings settings;
+    private readonly ISettingsService settingsService;
+    private bool saveOnShutdown = true;
 
     /// <summary>
     ///     Creates the process-lifetime persistence boundary for the shared settings instance.
@@ -21,8 +21,8 @@ public sealed class SettingsPersistenceHostedService : IHostedService
         ApplicationSettings settings,
         ISettingsService settingsService)
     {
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
     }
 
     /// <inheritdoc />
@@ -34,13 +34,13 @@ public sealed class SettingsPersistenceHostedService : IHostedService
     /// <inheritdoc />
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        if (_saveOnShutdown) _settingsService.Save(_settings);
+        if (saveOnShutdown) settingsService.Save(settings);
         return Task.CompletedTask;
     }
 
     /// <summary>Prevents the current process from persisting settings during orderly shutdown.</summary>
     public void SuppressSave()
     {
-        _saveOnShutdown = false;
+        saveOnShutdown = false;
     }
 }

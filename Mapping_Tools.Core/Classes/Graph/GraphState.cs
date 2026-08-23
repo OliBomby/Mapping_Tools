@@ -195,7 +195,7 @@ public sealed class GraphState
     public double GetAverage(double start, double end)
     {
         double width = end - start;
-        return Math.Abs(width) < Precision.DoubleEpsilon ? 0 : GetIntegral(start, end) / width;
+        return Math.Abs(width) < Precision.DOUBLE_EPSILON ? 0 : GetIntegral(start, end) / width;
     }
 }
 
@@ -213,7 +213,7 @@ public static class GraphMath
 
         var (previous, next) = FindSegment(x, anchors);
         var difference = next.Pos - previous.Pos;
-        if (Math.Abs(difference.X) < Precision.DoubleEpsilon) return previous.Pos.Y;
+        if (Math.Abs(difference.X) < Precision.DOUBLE_EPSILON) return previous.Pos.Y;
         return previous.Pos.Y + difference.Y * next.Interpolator.GetInterpolation((x - previous.Pos.X) / difference.X);
     }
 
@@ -226,7 +226,7 @@ public static class GraphMath
         if (anchors.Count < 2) return 0;
         var (previous, next) = FindSegment(x, anchors);
         var difference = next.Pos - previous.Pos;
-        if (Math.Abs(difference.X) < Precision.DoubleEpsilon) return difference.Y > 0 ? double.PositiveInfinity : double.NegativeInfinity;
+        if (Math.Abs(difference.X) < Precision.DOUBLE_EPSILON) return difference.Y > 0 ? double.PositiveInfinity : double.NegativeInfinity;
 
         double derivative = next.Interpolator is IDerivableInterpolator derivable
             ? derivable.GetDerivative((x - previous.Pos.X) / difference.X)
@@ -251,10 +251,10 @@ public static class GraphMath
             var next = anchors[index];
             double start = Math.Max(t1, previous.Pos.X);
             double end = Math.Min(t2, next.Pos.X);
-            if (end <= start + Precision.DoubleEpsilon) continue;
+            if (end <= start + Precision.DOUBLE_EPSILON) continue;
 
             var difference = next.Pos - previous.Pos;
-            if (Math.Abs(difference.X) < Precision.DoubleEpsilon) continue;
+            if (Math.Abs(difference.X) < Precision.DOUBLE_EPSILON) continue;
             double u1 = (start - previous.Pos.X) / difference.X;
             double u2 = (end - previous.Pos.X) / difference.X;
             double integral = next.Interpolator is IIntegrableInterpolator integrable
@@ -386,7 +386,7 @@ public static class GraphMath
             var previous = anchors[index - 1];
             var next = anchors[index];
             double dx = next.Pos.X - previous.Pos.X;
-            if (Math.Abs(dx) < Precision.DoubleEpsilon) continue;
+            if (Math.Abs(dx) < Precision.DOUBLE_EPSILON) continue;
             double slope = next.Pos.Y - previous.Pos.Y;
             double[] positions = next.Interpolator.GetType().GetCustomAttributes(typeof(CustomDerivativeExtremaAttribute), false)
                 .OfType<CustomDerivativeExtremaAttribute>().SelectMany(attribute => attribute.ExtremaPositions).ToArray();
@@ -414,7 +414,7 @@ public static class GraphMath
             var previous = anchors[index - 1];
             var next = anchors[index];
             var difference = next.Pos - previous.Pos;
-            if (difference.X <= Precision.DoubleEpsilon) continue;
+            if (difference.X <= Precision.DOUBLE_EPSILON) continue;
 
             double endIntegral;
             Func<double, double> integralAt;

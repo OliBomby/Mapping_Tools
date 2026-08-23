@@ -32,22 +32,22 @@ public sealed class TumourGeneratorTests
         {
             var position = currentPoint.Value.Pos;
             if (position.X is >= 100 and <= 105)
-                position.Y.Should().BeApproximately(-position.X + 100, Precision.DoubleEpsilon);
-            else if (position.X is > 105 and <= 110) position.Y.Should().BeApproximately(position.X - 110, Precision.DoubleEpsilon);
+                position.Y.Should().BeApproximately(-position.X + 100, Precision.DOUBLE_EPSILON);
+            else if (position.X is > 105 and <= 110) position.Y.Should().BeApproximately(position.X - 110, Precision.DOUBLE_EPSILON);
         }
 
         pathWithHints.ReconstructionHints.Should().HaveCount(4);
         var middle = PathHelper.FindFirstOccurrence(start, 105);
-        middle.Value.CumulativeLength.Should().BeApproximately(105, Precision.DoubleEpsilon);
+        middle.Value.CumulativeLength.Should().BeApproximately(105, Precision.DOUBLE_EPSILON);
         generator.PlaceTumour(pathWithHints, layer, 0, middle, end2, 0, 1, 105, 115, false, 384);
         for (var currentPoint = start; currentPoint is not null && currentPoint != end2; currentPoint = currentPoint.Next)
         {
             var position = currentPoint.Value.Pos;
             if (position.X is >= 100 and <= 105)
-                position.Y.Should().BeApproximately(-position.X + 100, Precision.DoubleEpsilon);
+                position.Y.Should().BeApproximately(-position.X + 100, Precision.DOUBLE_EPSILON);
             else if (position.X is > 105 and <= 110)
-                position.Y.Should().BeApproximately(-5, Precision.DoubleEpsilon);
-            else if (position.X is > 110 and <= 115) position.Y.Should().BeApproximately(position.X - 115, Precision.DoubleEpsilon);
+                position.Y.Should().BeApproximately(-5, Precision.DOUBLE_EPSILON);
+            else if (position.X is > 110 and <= 115) position.Y.Should().BeApproximately(position.X - 115, Precision.DOUBLE_EPSILON);
         }
 
         pathWithHints.ReconstructionHints[0].Layer.Should().Be(-1);

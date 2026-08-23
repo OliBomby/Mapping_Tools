@@ -8,7 +8,7 @@ namespace Mapping_Tools.Application.TimingCopier;
 /// </summary>
 public sealed class TimingCopierService : ITimingCopierService
 {
-    private readonly IBeatmapEditingGateway _editingGateway;
+    private readonly IBeatmapEditingGateway editingGateway;
 
     /// <summary>
     ///     Creates the Timing Copier application service.
@@ -16,8 +16,8 @@ public sealed class TimingCopierService : ITimingCopierService
     /// <param name="editingGateway">Loads documents and saves them through the backup boundary.</param>
     public TimingCopierService(IBeatmapEditingGateway editingGateway)
     {
-        _editingGateway = editingGateway
-                          ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.editingGateway = editingGateway
+                              ?? throw new ArgumentNullException(nameof(editingGateway));
     }
 
     /// <inheritdoc />
@@ -34,9 +34,9 @@ public sealed class TimingCopierService : ITimingCopierService
                 "Timing Copier requires at least one beat divisor.",
                 nameof(options));
 
-        if (options.ResnapMode is not TimingCopierResnapModes.PreserveBeatSpacing and
-            not TimingCopierResnapModes.Resnap and
-            not TimingCopierResnapModes.KeepObjectsFixed)
+        if (options.ResnapMode is not TimingCopierResnapModes.PRESERVE_BEAT_SPACING and
+            not TimingCopierResnapModes.RESNAP and
+            not TimingCopierResnapModes.KEEP_OBJECTS_FIXED)
             throw new ArgumentException(
                 "Timing Copier received an unknown resnapping mode.",
                 nameof(options));
@@ -48,7 +48,7 @@ public sealed class TimingCopierService : ITimingCopierService
                 "Select at least one target beatmap.",
                 nameof(options));
 
-        var source = await _editingGateway
+        var source = await editingGateway
             .OpenBeatmapAsync(
                 options.ImportPath,
                 LiveBeatmapPreference.PreferLive,
@@ -61,7 +61,7 @@ public sealed class TimingCopierService : ITimingCopierService
             cancellationToken.ThrowIfCancellationRequested();
             string targetPath = targetPaths[index];
 
-            var target = await _editingGateway
+            var target = await editingGateway
                 .OpenBeatmapAsync(
                     targetPath,
                     LiveBeatmapPreference.PreferLive,
@@ -73,7 +73,7 @@ public sealed class TimingCopierService : ITimingCopierService
                 options,
                 cancellationToken);
             // Save the file
-            await _editingGateway
+            await editingGateway
                 .SaveAsync(target, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
             processedPaths.Add(targetPath);

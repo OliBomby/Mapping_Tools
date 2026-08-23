@@ -10,11 +10,11 @@ namespace Mapping_Tools.Application.QuickRun;
 /// </summary>
 public sealed class QuickRunService : IQuickRunService
 {
-    private const string CurrentToolSentinel = "<Current Tool>";
-    private readonly ILiveBeatmapReader _liveReader;
-    private readonly IUserNotificationService _notifications;
-    private readonly QuickRunCommandRegistry _registry;
-    private readonly ApplicationSettings _settings;
+    private const string current_tool_sentinel = "<Current Tool>";
+    private readonly ILiveBeatmapReader liveReader;
+    private readonly IUserNotificationService notifications;
+    private readonly QuickRunCommandRegistry registry;
+    private readonly ApplicationSettings settings;
 
     /// <summary>
     ///     Creates the resolver over the shared command catalog, live editor
@@ -30,11 +30,11 @@ public sealed class QuickRunService : IQuickRunService
         ApplicationSettings settings,
         IUserNotificationService notifications)
     {
-        _registry = registry ?? throw new ArgumentNullException(nameof(registry));
-        _liveReader = liveReader ?? throw new ArgumentNullException(nameof(liveReader));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _notifications = notifications
-                         ?? throw new ArgumentNullException(nameof(notifications));
+        this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
+        this.liveReader = liveReader ?? throw new ArgumentNullException(nameof(liveReader));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.notifications = notifications
+                             ?? throw new ArgumentNullException(nameof(notifications));
     }
 
     /// <inheritdoc />
@@ -44,14 +44,14 @@ public sealed class QuickRunService : IQuickRunService
         QuickRunCommand? command = null;
         try
         {
-            if (!_settings.SmartQuickRunEnabled)
+            if (!settings.SmartQuickRunEnabled)
             {
-                command = _registry.FindCurrent();
+                command = registry.FindCurrent();
                 if (command is null) return new QuickRunResult(QuickRunStatus.NoCurrentCommand);
             }
             else
             {
-                var snapshot = await _liveReader
+                var snapshot = await liveReader
                     .ReadAsync(cancellationToken)
                     .ConfigureAwait(false);
                 if (snapshot is null)
@@ -68,15 +68,15 @@ public sealed class QuickRunService : IQuickRunService
                     snapshot.SelectedHitObjects.Count);
                 command = string.Equals(
                     configuredName,
-                    CurrentToolSentinel,
+                    current_tool_sentinel,
                     StringComparison.Ordinal)
-                    ? _registry.FindCurrent()
-                    : _registry.FindByDisplayName(configuredName);
+                    ? registry.FindCurrent()
+                    : registry.FindByDisplayName(configuredName);
                 if (command is null)
                 {
                     var status = string.Equals(
                         configuredName,
-                        CurrentToolSentinel,
+                        current_tool_sentinel,
                         StringComparison.Ordinal)
                         ? QuickRunStatus.NoCurrentCommand
                         : QuickRunStatus.CommandNotFound;
@@ -115,11 +115,11 @@ public sealed class QuickRunService : IQuickRunService
 
     private string GetConfiguredName(int selectedHitObjectCount)
     {
-        if (selectedHitObjectCount <= 0) return _settings.NoneQuickRunTool;
+        if (selectedHitObjectCount <= 0) return settings.NoneQuickRunTool;
 
         return selectedHitObjectCount == 1
-            ? _settings.SingleQuickRunTool
-            : _settings.MultipleQuickRunTool;
+            ? settings.SingleQuickRunTool
+            : settings.MultipleQuickRunTool;
     }
 
     private async Task PublishAsync(
@@ -130,7 +130,7 @@ public sealed class QuickRunService : IQuickRunService
     {
         try
         {
-            await _notifications.PublishAsync(
+            await notifications.PublishAsync(
                     new UserNotification(severity, title, message, exception),
                     CancellationToken.None)
                 .ConfigureAwait(false);

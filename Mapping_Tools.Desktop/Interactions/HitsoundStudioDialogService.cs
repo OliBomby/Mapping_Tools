@@ -13,15 +13,15 @@ namespace Mapping_Tools.Desktop.Interactions;
 /// <summary>Shows the Hitsound Studio import and export forms as owner-modal windows.</summary>
 public sealed class HitsoundStudioDialogService : IHitsoundStudioDialogService
 {
-    private readonly IFilePicker _filePicker;
-    private readonly Func<Window> _owner;
+    private readonly IFilePicker filePicker;
+    private readonly Func<Window> owner;
 
     /// <summary>Creates the dialog adapter.</summary>
     /// <param name="owner">Returns the active shell window.</param>
     public HitsoundStudioDialogService(Func<Window> owner, IFilePicker filePicker)
     {
-        _owner = owner ?? throw new ArgumentNullException(nameof(owner));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
     }
 
     /// <inheritdoc />
@@ -29,10 +29,10 @@ public sealed class HitsoundStudioDialogService : IHitsoundStudioDialogService
         string defaultName,
         CancellationToken cancellationToken = default)
     {
-        HitsoundStudioImportDialogViewModel viewModel = new(defaultName, _filePicker);
+        HitsoundStudioImportDialogViewModel viewModel = new(defaultName, filePicker);
         HitsoundStudioImportDialogWindow window = new() { DataContext = viewModel };
         viewModel.Close = value => window.Close(value);
-        object? result = await window.ShowDialog<object?>(_owner()).WaitAsync(cancellationToken).ConfigureAwait(false);
+        object? result = await window.ShowDialog<object?>(owner()).WaitAsync(cancellationToken).ConfigureAwait(false);
         return result as HitsoundStudioImportRequest;
     }
 
@@ -42,10 +42,10 @@ public sealed class HitsoundStudioDialogService : IHitsoundStudioDialogService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(project);
-        HitsoundStudioExportDialogViewModel viewModel = new(project, _filePicker);
+        HitsoundStudioExportDialogViewModel viewModel = new(project, filePicker);
         HitsoundStudioExportDialogWindow window = new() { DataContext = viewModel };
         viewModel.Close = value => window.Close(value);
-        object? result = await window.ShowDialog<object?>(_owner()).WaitAsync(cancellationToken).ConfigureAwait(false);
+        object? result = await window.ShowDialog<object?>(owner()).WaitAsync(cancellationToken).ConfigureAwait(false);
         return result as HitsoundStudioProject;
     }
 }
@@ -53,15 +53,15 @@ public sealed class HitsoundStudioDialogService : IHitsoundStudioDialogService
 /// <summary>Owns the typed fields of the layer import form.</summary>
 public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObject
 {
-    private readonly IFilePicker _filePicker;
-    private IAsyncRelayCommand? _pickSampleCommand;
-    private IAsyncRelayCommand? _pickSourceCommand;
+    private readonly IFilePicker filePicker;
+    private IAsyncRelayCommand? pickSampleCommand;
+    private IAsyncRelayCommand? pickSourceCommand;
 
     /// <summary>Creates an import form with WPF-compatible defaults.</summary>
     /// <param name="defaultName">The suggested layer name.</param>
     public HitsoundStudioImportDialogViewModel(string defaultName, IFilePicker filePicker)
     {
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         Name = defaultName;
         AcceptCommand = new RelayCommand(Accept);
         CancelCommand = new RelayCommand(() => Close(null));
@@ -191,10 +191,10 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
     public IRelayCommand CancelCommand { get; }
 
     /// <summary>Gets the source picker command.</summary>
-    public IAsyncRelayCommand PickSourceCommand => _pickSourceCommand ??= new AsyncRelayCommand(PickSourceAsync);
+    public IAsyncRelayCommand PickSourceCommand => pickSourceCommand ??= new AsyncRelayCommand(PickSourceAsync);
 
     /// <summary>Gets the sample picker command.</summary>
-    public IAsyncRelayCommand PickSampleCommand => _pickSampleCommand ??= new AsyncRelayCommand(PickSampleAsync);
+    public IAsyncRelayCommand PickSampleCommand => pickSampleCommand ??= new AsyncRelayCommand(PickSampleAsync);
 
     /// <summary>Gets or sets the modal close callback.</summary>
     internal Action<object?> Close { get; set; } = _ => { };
@@ -224,7 +224,7 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
 
     private async Task PickSourceAsync()
     {
-        var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Choose Hitsound Studio source",
             AllowMultiple = true,
@@ -235,7 +235,7 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
 
     private async Task PickSampleAsync()
     {
-        var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Choose sample",
             AllowMultiple = false,
@@ -302,32 +302,32 @@ public sealed partial class HitsoundStudioImportDialogViewModel : ObservableObje
 /// <summary>Owns the fields of the Hitsound Studio export dialog.</summary>
 public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObject
 {
-    private readonly IFilePicker _filePicker;
-    private readonly HitsoundStudioProject _project;
-    private IAsyncRelayCommand? _pickFolderCommand;
+    private readonly IFilePicker filePicker;
+    private readonly HitsoundStudioProject project;
+    private IAsyncRelayCommand? pickFolderCommand;
 
     /// <summary>Creates export options from an independent project snapshot.</summary>
     /// <param name="project">The current feature state.</param>
     public HitsoundStudioExportDialogViewModel(HitsoundStudioProject project, IFilePicker filePicker)
     {
-        _project = project.Clone();
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        ExportFolder = _project.ExportFolder;
-        HitsoundDiffName = _project.HitsoundDiffName;
-        ExportMap = _project.ExportMap;
-        ExportSamples = _project.ExportSamples;
-        ShowResults = _project.ShowResults;
-        DeleteAllInExportFirst = _project.DeleteAllInExportFirst;
-        UsePreviousSampleSchema = _project.UsePreviousSampleSchema;
-        AllowGrowthPreviousSampleSchema = _project.AllowGrowthPreviousSampleSchema;
-        AddCoincidingRegularHitsounds = _project.AddCoincidingRegularHitsounds;
-        AddGreenLineVolumeToMidi = _project.AddGreenLineVolumeToMidi;
-        HitsoundExportModeSetting = _project.HitsoundExportModeSetting;
-        HitsoundExportGameMode = _project.HitsoundExportGameMode;
-        ZipLayersLeniency = _project.ZipLayersLeniency;
-        FirstCustomIndex = _project.FirstCustomIndex;
-        SingleSampleExportFormat = _project.SingleSampleExportFormat;
-        MixedSampleExportFormat = _project.MixedSampleExportFormat;
+        this.project = project.Clone();
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        ExportFolder = this.project.ExportFolder;
+        HitsoundDiffName = this.project.HitsoundDiffName;
+        ExportMap = this.project.ExportMap;
+        ExportSamples = this.project.ExportSamples;
+        ShowResults = this.project.ShowResults;
+        DeleteAllInExportFirst = this.project.DeleteAllInExportFirst;
+        UsePreviousSampleSchema = this.project.UsePreviousSampleSchema;
+        AllowGrowthPreviousSampleSchema = this.project.AllowGrowthPreviousSampleSchema;
+        AddCoincidingRegularHitsounds = this.project.AddCoincidingRegularHitsounds;
+        AddGreenLineVolumeToMidi = this.project.AddGreenLineVolumeToMidi;
+        HitsoundExportModeSetting = this.project.HitsoundExportModeSetting;
+        HitsoundExportGameMode = this.project.HitsoundExportGameMode;
+        ZipLayersLeniency = this.project.ZipLayersLeniency;
+        FirstCustomIndex = this.project.FirstCustomIndex;
+        SingleSampleExportFormat = this.project.SingleSampleExportFormat;
+        MixedSampleExportFormat = this.project.MixedSampleExportFormat;
         AcceptCommand = new RelayCommand(Accept);
         CancelCommand = new RelayCommand(() => Close(null));
     }
@@ -431,7 +431,7 @@ public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObje
     public IRelayCommand CancelCommand { get; }
 
     /// <summary>Gets the export-folder picker command.</summary>
-    public IAsyncRelayCommand PickFolderCommand => _pickFolderCommand ??= new AsyncRelayCommand(PickFolderAsync);
+    public IAsyncRelayCommand PickFolderCommand => pickFolderCommand ??= new AsyncRelayCommand(PickFolderAsync);
 
     /// <summary>Gets or sets the modal close callback.</summary>
     internal Action<object?> Close { get; set; } = _ => { };
@@ -452,7 +452,7 @@ public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObje
 
     private async Task PickFolderAsync()
     {
-        var paths = await _filePicker.PickFoldersAsync(new OpenFolderPickerRequest
+        var paths = await filePicker.PickFoldersAsync(new OpenFolderPickerRequest
         {
             Title = "Choose Hitsound Studio export folder",
             AllowMultiple = false,
@@ -478,22 +478,22 @@ public sealed partial class HitsoundStudioExportDialogViewModel : ObservableObje
             return;
         }
 
-        _project.ExportFolder = ExportFolder;
-        _project.HitsoundDiffName = HitsoundDiffName;
-        _project.ExportMap = ExportMap;
-        _project.ExportSamples = ExportSamples;
-        _project.ShowResults = ShowResults;
-        _project.DeleteAllInExportFirst = DeleteAllInExportFirst;
-        _project.UsePreviousSampleSchema = UsePreviousSampleSchema;
-        _project.AllowGrowthPreviousSampleSchema = AllowGrowthPreviousSampleSchema;
-        _project.AddCoincidingRegularHitsounds = AddCoincidingRegularHitsounds;
-        _project.AddGreenLineVolumeToMidi = AddGreenLineVolumeToMidi;
-        _project.HitsoundExportModeSetting = HitsoundExportModeSetting;
-        _project.HitsoundExportGameMode = HitsoundExportGameMode;
-        _project.ZipLayersLeniency = ZipLayersLeniency;
-        _project.FirstCustomIndex = FirstCustomIndex;
-        _project.SingleSampleExportFormat = SingleSampleExportFormat;
-        _project.MixedSampleExportFormat = MixedSampleExportFormat;
-        Close(_project);
+        project.ExportFolder = ExportFolder;
+        project.HitsoundDiffName = HitsoundDiffName;
+        project.ExportMap = ExportMap;
+        project.ExportSamples = ExportSamples;
+        project.ShowResults = ShowResults;
+        project.DeleteAllInExportFirst = DeleteAllInExportFirst;
+        project.UsePreviousSampleSchema = UsePreviousSampleSchema;
+        project.AllowGrowthPreviousSampleSchema = AllowGrowthPreviousSampleSchema;
+        project.AddCoincidingRegularHitsounds = AddCoincidingRegularHitsounds;
+        project.AddGreenLineVolumeToMidi = AddGreenLineVolumeToMidi;
+        project.HitsoundExportModeSetting = HitsoundExportModeSetting;
+        project.HitsoundExportGameMode = HitsoundExportGameMode;
+        project.ZipLayersLeniency = ZipLayersLeniency;
+        project.FirstCustomIndex = FirstCustomIndex;
+        project.SingleSampleExportFormat = SingleSampleExportFormat;
+        project.MixedSampleExportFormat = MixedSampleExportFormat;
+        Close(project);
     }
 }

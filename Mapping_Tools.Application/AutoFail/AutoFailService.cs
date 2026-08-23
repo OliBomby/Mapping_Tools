@@ -7,13 +7,13 @@ namespace Mapping_Tools.Application.AutoFail;
 /// <summary>Coordinates live-aware analysis and backup-before-write auto-fail fixes.</summary>
 public sealed class AutoFailService : IAutoFailService
 {
-    private readonly IBeatmapEditingGateway _editingGateway;
+    private readonly IBeatmapEditingGateway editingGateway;
 
     /// <summary>Creates a service that opens and saves beatmaps through the shared editing gateway.</summary>
     /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
     public AutoFailService(IBeatmapEditingGateway editingGateway)
     {
-        _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
     }
 
     /// <inheritdoc />
@@ -22,7 +22,7 @@ public sealed class AutoFailService : IAutoFailService
         CancellationToken cancellationToken = default)
     {
         Validate(options);
-        var session = await _editingGateway.OpenBeatmapAsync(
+        var session = await editingGateway.OpenBeatmapAsync(
             options.Path,
             LiveBeatmapPreference.PreferLive,
             cancellationToken).ConfigureAwait(false);
@@ -70,7 +70,7 @@ public sealed class AutoFailService : IAutoFailService
         var session = run.Session ?? throw new InvalidOperationException("This analysis has no editing session.");
         // Fix auto-fail
         detector.ApplyFix(plan);
-        await _editingGateway.SaveAsync(
+        await editingGateway.SaveAsync(
             session,
             cancellationToken: cancellationToken).ConfigureAwait(false);
     }

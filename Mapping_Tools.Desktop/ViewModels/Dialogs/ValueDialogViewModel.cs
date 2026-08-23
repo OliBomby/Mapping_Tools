@@ -10,12 +10,12 @@ namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 /// <summary>Owns editable dialog text and validates its converted value through DataAnnotations.</summary>
 public sealed partial class ValueDialogViewModel : ObservableValidator
 {
-    private readonly Action<object?> _accept;
-    private readonly Action _cancel;
-    private readonly IValueConverter _converter;
-    private readonly Type _targetType;
-    private readonly Func<object?, ValidationResult?> _validate;
-    private object? _parsedValue;
+    private readonly Action<object?> accept;
+    private readonly Action cancel;
+    private readonly IValueConverter converter;
+    private readonly Type targetType;
+    private readonly Func<object?, ValidationResult?> validate;
+    private object? parsedValue;
 
     /// <summary>Creates typed dialog state and validates the formatted initial value.</summary>
     /// <param name="title">The native window title.</param>
@@ -52,11 +52,11 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
         Prompt = prompt;
         AcceptLabel = acceptLabel;
         CancelLabel = cancelLabel;
-        _converter = converter;
-        _targetType = targetType;
-        _validate = validate;
-        _accept = accept;
-        _cancel = cancel;
+        this.converter = converter;
+        this.targetType = targetType;
+        this.validate = validate;
+        this.accept = accept;
+        this.cancel = cancel;
         ValueText = converter.Convert(initialValue, typeof(string), null, CultureInfo.InvariantCulture)?.ToString()
                     ?? string.Empty;
         ErrorsChanged += (_, _) => OnPropertyChanged(nameof(IsValid));
@@ -89,9 +89,9 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
         object? converted;
         try
         {
-            converted = _converter.ConvertBack(
+            converted = converter.ConvertBack(
                 value?.ToString(),
-                _targetType,
+                targetType,
                 null,
                 CultureInfo.InvariantCulture);
         }
@@ -104,8 +104,8 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
             return new ValidationResult(exception.Message);
         }
 
-        var result = _validate(converted);
-        if (result == ValidationResult.Success) _parsedValue = converted;
+        var result = validate(converted);
+        if (result == ValidationResult.Success) parsedValue = converted;
 
         return result;
     }
@@ -115,12 +115,12 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
     {
         ValidateAllProperties();
         OnPropertyChanged(nameof(IsValid));
-        if (!HasErrors) _accept(_parsedValue);
+        if (!HasErrors) accept(parsedValue);
     }
 
     [RelayCommand]
     private void Cancel()
     {
-        _cancel();
+        cancel();
     }
 }

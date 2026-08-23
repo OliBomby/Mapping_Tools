@@ -6,15 +6,15 @@ namespace Mapping_Tools.Architecture.Tests;
 [TestClass]
 public sealed class LayerBoundaryTests
 {
-    private static readonly string RepositoryRoot = FindRepositoryRoot();
+    private static readonly string repositoryRoot = FindRepositoryRoot();
 
-    private static readonly string[] FrameworkNeutralProjects =
+    private static readonly string[] frameworkNeutralProjects =
     [
         "Mapping_Tools.Core",
         "Mapping_Tools.Application",
     ];
 
-    private static readonly string[] ForbiddenSourceTokens =
+    private static readonly string[] forbiddenSourceTokens =
     [
         "System.Windows",
         "System.Windows.Forms",
@@ -37,7 +37,7 @@ public sealed class LayerBoundaryTests
         "MessageBox",
     ];
 
-    private static readonly string[] ForbiddenPackagePrefixes =
+    private static readonly string[] forbiddenPackagePrefixes =
     [
         "Avalonia",
         "ReactiveUI",
@@ -54,9 +54,9 @@ public sealed class LayerBoundaryTests
     {
         // Arrange
         // Act
-        string[] violations = FrameworkNeutralProjects
+        string[] violations = frameworkNeutralProjects
             .SelectMany(project => Directory.EnumerateFiles(
-                Path.Combine(RepositoryRoot, project), "*.cs", SearchOption.AllDirectories))
+                Path.Combine(repositoryRoot, project), "*.cs", SearchOption.AllDirectories))
             .Where(path => !IsGeneratedPath(path))
             .SelectMany(path => FindTokenViolations(path, File.ReadAllText(path)))
             .ToArray();
@@ -70,8 +70,8 @@ public sealed class LayerBoundaryTests
     {
         // Arrange
         // Act
-        string[] violations = FrameworkNeutralProjects
-            .Select(project => Path.Combine(RepositoryRoot, project, $"{project}.csproj"))
+        string[] violations = frameworkNeutralProjects
+            .Select(project => Path.Combine(repositoryRoot, project, $"{project}.csproj"))
             .SelectMany(FindForbiddenPackages)
             .ToArray();
 
@@ -94,7 +94,7 @@ public sealed class LayerBoundaryTests
         // Act
         foreach ((string project, string[] expected) in expectedReferences)
         {
-            string projectPath = Path.Combine(RepositoryRoot, project, $"{project}.csproj");
+            string projectPath = Path.Combine(repositoryRoot, project, $"{project}.csproj");
             string[] actual = XDocument.Load(projectPath)
                 .Descendants("ProjectReference")
                 .Select(element => element.Attribute("Include")?.Value)
@@ -116,7 +116,7 @@ public sealed class LayerBoundaryTests
     {
         // Arrange
         string geometryDirectory = Path.Combine(
-            RepositoryRoot,
+            repositoryRoot,
             "Mapping_Tools.Application",
             "GeometryDashboard");
         string[] forbiddenTokens =
@@ -140,7 +140,7 @@ public sealed class LayerBoundaryTests
             .SelectMany(path => forbiddenTokens
                 .Where(token => File.ReadAllText(path).Contains(token))
                 .Select(token =>
-                    $"{Path.GetRelativePath(RepositoryRoot, path)} contains forbidden token '{token}'."))
+                    $"{Path.GetRelativePath(repositoryRoot, path)} contains forbidden token '{token}'."))
             .ToArray();
 
         // Assert
@@ -152,11 +152,11 @@ public sealed class LayerBoundaryTests
     {
         // Arrange
         string applicationUpdates = Path.Combine(
-            RepositoryRoot,
+            repositoryRoot,
             "Mapping_Tools.Application",
             "Updates");
         string desktopUpdates = Path.Combine(
-            RepositoryRoot,
+            repositoryRoot,
             "Mapping_Tools.Desktop",
             "Updates");
         string[] forbiddenApplicationTokens =
@@ -175,7 +175,7 @@ public sealed class LayerBoundaryTests
             .. FindDirectoryTokenViolations(desktopUpdates, forbiddenDesktopTokens),
         ];
         string infrastructureProject = Path.Combine(
-            RepositoryRoot,
+            repositoryRoot,
             "Mapping_Tools.Infrastructure",
             "Mapping_Tools.Infrastructure.csproj");
         bool infrastructureOwnsOnova = XDocument.Load(infrastructureProject)
@@ -199,13 +199,13 @@ public sealed class LayerBoundaryTests
         foreach (string path in Directory.EnumerateFiles(directory, "*.cs", SearchOption.AllDirectories))
         {
             string source = File.ReadAllText(path);
-            foreach (string token in forbiddenTokens.Where(source.Contains)) yield return $"{Path.GetRelativePath(RepositoryRoot, path)} contains forbidden token '{token}'.";
+            foreach (string token in forbiddenTokens.Where(source.Contains)) yield return $"{Path.GetRelativePath(repositoryRoot, path)} contains forbidden token '{token}'.";
         }
     }
 
     private static IEnumerable<string> FindTokenViolations(string path, string source)
     {
-        foreach (string token in ForbiddenSourceTokens.Where(source.Contains)) yield return $"{Path.GetRelativePath(RepositoryRoot, path)} contains forbidden token '{token}'.";
+        foreach (string token in forbiddenSourceTokens.Where(source.Contains)) yield return $"{Path.GetRelativePath(repositoryRoot, path)} contains forbidden token '{token}'.";
     }
 
     private static IEnumerable<string> FindForbiddenPackages(string projectPath)
@@ -216,8 +216,8 @@ public sealed class LayerBoundaryTests
             .Where(value => value is not null);
 
         foreach (string? package in packages)
-            if (ForbiddenPackagePrefixes.Any(prefix => package!.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
-                yield return $"{Path.GetRelativePath(RepositoryRoot, projectPath)} references forbidden package '{package}'.";
+            if (forbiddenPackagePrefixes.Any(prefix => package!.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
+                yield return $"{Path.GetRelativePath(repositoryRoot, projectPath)} references forbidden package '{package}'.";
     }
 
     private static bool IsGeneratedPath(string path)

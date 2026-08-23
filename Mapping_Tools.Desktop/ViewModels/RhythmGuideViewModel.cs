@@ -17,14 +17,14 @@ namespace Mapping_Tools.Desktop.ViewModels;
 public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     IShellProjectFeature
 {
-    private const string OperationId = "rhythm-guide";
-    private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
-    private readonly ProjectDefinition<RhythmGuideProject> _definition;
-    private readonly IFilePicker _filePicker;
+    private const string operation_id = "rhythm-guide";
+    private readonly ICurrentBeatmapLocator currentBeatmapLocator;
+    private readonly ProjectDefinition<RhythmGuideProject> definition;
+    private readonly IFilePicker filePicker;
 
-    private readonly IRhythmGuideService _rhythmGuide;
-    private readonly IRhythmGuideWindowService _windowService;
-    private IBeatDivisor[] _beatDivisors = DefaultBeatDivisors();
+    private readonly IRhythmGuideService rhythmGuide;
+    private readonly IRhythmGuideWindowService windowService;
+    private IBeatDivisor[] beatDivisors = DefaultBeatDivisors();
 
     /// <summary>Creates a Rhythm Guide presentation model.</summary>
     /// <param name="rhythmGuide">Generates framework-independent guide beatmaps.</param>
@@ -40,16 +40,16 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmapLocator,
         IRhythmGuideWindowService windowService,
         IApplicationDirectories directories)
-        : base(execution, OperationId)
+        : base(execution, operation_id)
     {
-        _rhythmGuide = rhythmGuide ?? throw new ArgumentNullException(nameof(rhythmGuide));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        _currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
-        _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
+        this.rhythmGuide = rhythmGuide ?? throw new ArgumentNullException(nameof(rhythmGuide));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+        this.windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
         ArgumentNullException.ThrowIfNull(directories);
         ExportPath = Path.Combine(directories.Exports, "rhythm_guide.osu");
         string defaultExportPath = ExportPath;
-        _definition = new ProjectDefinition<RhythmGuideProject>(
+        definition = new ProjectDefinition<RhythmGuideProject>(
             "rhythmguideproject.json",
             "Rhythm Guide Projects",
             () => CreateDefaultProject(defaultExportPath),
@@ -100,7 +100,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     /// <summary>Gets the number of non-empty source beatmap paths.</summary>
     public int SourceCount => SourcePaths.Length;
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
     {
@@ -115,7 +115,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task BrowseSourcesAsync()
     {
-        var paths = await _filePicker.PickOpenFilesAsync(
+        var paths = await filePicker.PickOpenFilesAsync(
             new OpenFilePickerRequest
             {
                 Title = "Copy rhythm from",
@@ -129,14 +129,14 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task UseCurrentSourceAsync()
     {
-        string? path = await _currentBeatmapLocator.FindCurrentBeatmapAsync();
+        string? path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
         if (!string.IsNullOrWhiteSpace(path)) SourcePaths = [path];
     }
 
     [RelayCommand]
     private async Task BrowseExportAsync()
     {
-        var paths = await _filePicker.PickOpenFilesAsync(
+        var paths = await filePicker.PickOpenFilesAsync(
             new OpenFilePickerRequest
             {
                 Title = "Copy rhythm to",
@@ -150,7 +150,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task UseCurrentExportAsync()
     {
-        string? path = await _currentBeatmapLocator.FindCurrentBeatmapAsync();
+        string? path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
         if (!string.IsNullOrWhiteSpace(path)) ExportPath = path;
     }
 
@@ -160,12 +160,12 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         var options = CreateOptions();
         await Execution.ExecuteAsync(
             new ToolExecutionRequest<RhythmGuideResult>(
-                OperationId,
+                operation_id,
                 "Rhythm Guide",
                 async context =>
                 {
                     context.ReportProgress(10, "Loading beatmaps");
-                    var generated = await _rhythmGuide.GenerateAsync(
+                    var generated = await rhythmGuide.GenerateAsync(
                         options,
                         context.CancellationToken);
                     context.ReportProgress(100, "Complete");
@@ -179,7 +179,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void OpenAuxiliaryWindow()
     {
-        _windowService.Show(this);
+        windowService.Show(this);
     }
 
     private RhythmGuideProject Snapshot()
@@ -201,7 +201,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
             OutputName = OutputName,
             NcEverything = NcEverything,
             SelectionMode = SelectionMode,
-            BeatDivisors = _beatDivisors.ToArray(),
+            BeatDivisors = beatDivisors.ToArray(),
         };
     }
 
@@ -216,7 +216,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         OutputName = options.OutputName;
         NcEverything = options.NcEverything;
         SelectionMode = options.SelectionMode;
-        _beatDivisors = options.BeatDivisors.ToArray();
+        beatDivisors = options.BeatDivisors.ToArray();
     }
 
     private string? FirstPathOrNull()

@@ -8,7 +8,7 @@ namespace Mapping_Tools.Infrastructure.Files;
 /// <summary>Analyzes mapset samples and recoverably moves unused audio out of the live folder.</summary>
 public sealed class PhysicalMapCleanerSampleService : IMapCleanerSampleService
 {
-    private static readonly string[] AudioExtensions = [".wav", ".ogg", ".mp3"];
+    private static readonly string[] audioExtensions = [".wav", ".ogg", ".mp3"];
 
     /// <inheritdoc />
     public Task<IReadOnlyDictionary<string, string>> AnalyzeAsync(
@@ -107,7 +107,7 @@ public sealed class PhysicalMapCleanerSampleService : IMapCleanerSampleService
 
     private static bool IsAudio(string path)
     {
-        return AudioExtensions.Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
+        return audioExtensions.Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase);
     }
 
     private static bool IsSkinnable(string stem)

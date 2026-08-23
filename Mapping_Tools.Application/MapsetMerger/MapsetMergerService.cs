@@ -9,15 +9,15 @@ namespace Mapping_Tools.Application.MapsetMerger;
 /// <summary>Orchestrates Mapset Merger parsing, conflict resolution, and safe export.</summary>
 public sealed class MapsetMergerService : IMapsetMergerService
 {
-    private const int MaxMapsetMaps = 200;
-    private static readonly string[] AudioExtensions = [".wav", ".mp3", ".ogg"];
-    private static readonly string[] ExplicitAudioExtensions = [".wav", ".ogg", ".mp3"];
-    private static readonly string[] ImageExtensions = [".png", ".jpg"];
-    private static readonly string[] VideoExtensions = [".mp4", ".avi"];
+    private const int max_mapset_maps = 200;
+    private static readonly string[] audioExtensions = [".wav", ".mp3", ".ogg"];
+    private static readonly string[] explicitAudioExtensions = [".wav", ".ogg", ".mp3"];
+    private static readonly string[] imageExtensions = [".png", ".jpg"];
+    private static readonly string[] videoExtensions = [".mp4", ".avi"];
 
-    private readonly IBeatmapEditingGateway _editingGateway;
-    private readonly IMapsetFileSystem _fileSystem;
-    private readonly ITextFileStore _textFileStore;
+    private readonly IBeatmapEditingGateway editingGateway;
+    private readonly IMapsetFileSystem fileSystem;
+    private readonly ITextFileStore textFileStore;
 
     /// <summary>Creates the export service.</summary>
     /// <param name="editingGateway">Loads disk-only beatmaps and storyboards.</param>
@@ -28,9 +28,9 @@ public sealed class MapsetMergerService : IMapsetMergerService
         IMapsetFileSystem fileSystem,
         ITextFileStore textFileStore)
     {
-        _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
-        _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-        _textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
+        this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+        this.textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
     }
 
     /// <inheritdoc />
@@ -46,7 +46,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         MapsetMergerEngine.ResolveDuplicateMapsetNames(inputs);
         ValidateExportPathDoesNotOverlapSources(project.ExportPath, inputs);
 
-        using var transaction = _fileSystem.BeginTransaction(project.ExportPath);
+        using var transaction = fileSystem.BeginTransaction(project.ExportPath);
         HashSet<string> usedDifficultyNames = new(StringComparer.OrdinalIgnoreCase);
         HashSet<string> usedOutputPaths = new(StringComparer.OrdinalIgnoreCase);
         int nextSampleIndex = 1;
@@ -59,19 +59,19 @@ public sealed class MapsetMergerService : IMapsetMergerService
         {
             cancellationToken.ThrowIfCancellationRequested();
             var input = inputs[mapsetIndex];
-            if (!_fileSystem.DirectoryExists(input.Path))
+            if (!fileSystem.DirectoryExists(input.Path))
                 throw new DirectoryNotFoundException(
                     $"Mapset directory '{input.Path}' was not found.");
 
-            var beatmapPaths = _fileSystem.EnumerateFiles(input.Path, "*.osu");
-            var storyboardPaths = _fileSystem.EnumerateFiles(input.Path, "*.osb");
+            var beatmapPaths = fileSystem.EnumerateFiles(input.Path, "*.osu");
+            var storyboardPaths = fileSystem.EnumerateFiles(input.Path, "*.osb");
             ValidateSourceFileCounts(input, beatmapPaths, storyboardPaths);
 
             List<(string Path, Beatmap Beatmap)> beatmaps = [];
             foreach (string path in beatmapPaths)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var session = await _editingGateway
+                var session = await editingGateway
                     .OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
                     .ConfigureAwait(false);
                 beatmaps.Add((path, session.Editor.Beatmap));
@@ -81,7 +81,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
             foreach (string path in storyboardPaths)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var editor = await _editingGateway
+                var editor = await editingGateway
                     .OpenStoryboardAsync(path, cancellationToken)
                     .ConfigureAwait(false);
                 storyboards.Add((path, editor.StoryBoard));
@@ -174,7 +174,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         foreach (string filename in OrderReferences(references.HitSoundFiles))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            string? source = FindAssetFile(filename, input.Path, AudioExtensions);
+            string? source = FindAssetFile(filename, input.Path, audioExtensions);
             if (source is null || !TryGetSourceSampleIndex(filename, out int sourceIndex) || !sampleIndices.TryGetValue(sourceIndex, out int mappedIndex))
                 continue;
 
@@ -194,7 +194,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 filename,
                 input,
                 input.Name,
-                ExplicitAudioExtensions,
+                explicitAudioExtensions,
                 cancellationToken: cancellationToken);
 
         foreach (string filename in OrderReferences(references.ImageFiles))
@@ -203,7 +203,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 filename,
                 input,
                 input.Name,
-                ImageExtensions,
+                imageExtensions,
                 cancellationToken: cancellationToken);
 
         foreach (string filename in OrderReferences(references.VideoFiles))
@@ -212,7 +212,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 filename,
                 input,
                 input.Name,
-                VideoExtensions,
+                videoExtensions,
                 true,
                 cancellationToken);
 
@@ -257,7 +257,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         string originalExtension = Path.GetExtension(filename);
         string extensionless = Path.ChangeExtension(direct, null);
         if (!string.IsNullOrEmpty(originalExtension) || requireExtension)
-            return !string.IsNullOrEmpty(originalExtension) && extensions.Contains(originalExtension, StringComparer.OrdinalIgnoreCase) && _fileSystem.FileExists(direct)
+            return !string.IsNullOrEmpty(originalExtension) && extensions.Contains(originalExtension, StringComparer.OrdinalIgnoreCase) && fileSystem.FileExists(direct)
                 ? direct
                 : null;
 
@@ -265,7 +265,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         // such as beatmap skin files and the spinnerspin and spinnerbonus files.
         return extensions
             .Select(extension => extensionless + extension)
-            .FirstOrDefault(_fileSystem.FileExists);
+            .FirstOrDefault(fileSystem.FileExists);
     }
 
     private static bool TryGetSourceSampleIndex(string filename, out int index)
@@ -291,7 +291,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
     {
         // Save beatmap in new location with unique diffname
         Editor2.SaveFile(
-            _textFileStore,
+            textFileStore,
             transaction.GetStagedPath(relativePath),
             beatmap.GetLines());
     }
@@ -301,7 +301,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         string relativePath,
         StoryBoard storyboard)
     {
-        StoryboardEditor2 editor = new(storyboard.GetLines(), _textFileStore);
+        StoryboardEditor2 editor = new(storyboard.GetLines(), textFileStore);
         editor.SaveFile(transaction.GetStagedPath(relativePath));
     }
 
@@ -360,13 +360,13 @@ public sealed class MapsetMergerService : IMapsetMergerService
         IReadOnlyList<string> beatmaps,
         IReadOnlyList<string> storyboards)
     {
-        if (!_fileSystem.DirectoryExists(input.Path)) throw new DirectoryNotFoundException($"Mapset directory '{input.Path}' was not found.");
+        if (!fileSystem.DirectoryExists(input.Path)) throw new DirectoryNotFoundException($"Mapset directory '{input.Path}' was not found.");
 
         // Check map count not over the max
-        if (beatmaps.Count > MaxMapsetMaps) throw new InvalidDataException("Beatmap limit exceeded in mapset: " + input.Name);
+        if (beatmaps.Count > max_mapset_maps) throw new InvalidDataException("Beatmap limit exceeded in mapset: " + input.Name);
 
         // Check storyboard count not over the max
-        if (storyboards.Count > MaxMapsetMaps) throw new InvalidDataException("Storyboard limit exceeded in mapset: " + input.Name);
+        if (storyboards.Count > max_mapset_maps) throw new InvalidDataException("Storyboard limit exceeded in mapset: " + input.Name);
 
         if (beatmaps.Count == 0) throw new InvalidDataException("No beatmaps were found in mapset: " + input.Name);
     }

@@ -10,10 +10,10 @@ namespace Mapping_Tools.Application.RhythmGuide;
 /// <summary>Coordinates live-aware loading and backup-before-overwrite persistence for Rhythm Guide.</summary>
 public sealed class RhythmGuideService : IRhythmGuideService
 {
-    private readonly IBeatmapBackupService _backupService;
-    private readonly IBeatmapEditingGateway _editingGateway;
-    private readonly IBeatmapFileSystem _fileSystem;
-    private readonly ITextFileStore _textFileStore;
+    private readonly IBeatmapBackupService backupService;
+    private readonly IBeatmapEditingGateway editingGateway;
+    private readonly IBeatmapFileSystem fileSystem;
+    private readonly ITextFileStore textFileStore;
 
     /// <summary>Creates a service that loads source maps and safely persists guide output.</summary>
     /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
@@ -26,10 +26,10 @@ public sealed class RhythmGuideService : IRhythmGuideService
         IBeatmapFileSystem fileSystem,
         ITextFileStore textFileStore)
     {
-        _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
-        _backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
-        _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-        _textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
+        this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
+        this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+        this.textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
     }
 
     /// <inheritdoc />
@@ -42,11 +42,11 @@ public sealed class RhythmGuideService : IRhythmGuideService
         foreach (string path in options.Paths)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var source = await _editingGateway.OpenBeatmapAsync(
+            var source = await editingGateway.OpenBeatmapAsync(
                 path,
                 LiveBeatmapPreference.PreferLive,
                 cancellationToken).ConfigureAwait(false);
-            await _backupService.CreateAsync(
+            await backupService.CreateAsync(
                 source,
                 BeatmapBackupReason.Automatic,
                 false,
@@ -56,7 +56,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
 
         if (options.ExportMode == RhythmGuideExportMode.AddToMap)
         {
-            var target = await _editingGateway.OpenBeatmapAsync(
+            var target = await editingGateway.OpenBeatmapAsync(
                 options.ExportPath,
                 LiveBeatmapPreference.PreferLive,
                 cancellationToken).ConfigureAwait(false);
@@ -66,7 +66,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
                 sources,
                 options,
                 cancellationToken);
-            await _editingGateway.SaveAsync(
+            await editingGateway.SaveAsync(
                 target,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
             return new RhythmGuideResult(
@@ -79,13 +79,13 @@ public sealed class RhythmGuideService : IRhythmGuideService
             sources,
             options,
             cancellationToken);
-        BeatmapEditor2 output = new(generated.GetLines(), _textFileStore)
+        BeatmapEditor2 output = new(generated.GetLines(), textFileStore)
         {
             Path = options.ExportPath,
         };
-        if (_fileSystem.FileExists(options.ExportPath))
+        if (fileSystem.FileExists(options.ExportPath))
         {
-            await _editingGateway.SaveAsync(
+            await editingGateway.SaveAsync(
                 output,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
         }

@@ -25,29 +25,29 @@ namespace Mapping_Tools.Core.Classes.MathUtil;
 /// <summary>
 ///     Represents a 2x4 matrix.
 /// </summary>
-public struct Matrix2x4d : IEquatable<Matrix2x4d>
+public struct Matrix2X4D : IEquatable<Matrix2X4D>
 {
     /// <summary>
     ///     Top row of the matrix.
     /// </summary>
-    public Vector4d Row0;
+    public Vector4D Row0;
 
     /// <summary>
     ///     Bottom row of the matrix.
     /// </summary>
-    public Vector4d Row1;
+    public Vector4D Row1;
 
     /// <summary>
     ///     The zero matrix.
     /// </summary>
-    public static readonly Matrix2x4d Zero = new(Vector4d.Zero, Vector4d.Zero);
+    public static readonly Matrix2X4D Zero = new(Vector4D.Zero, Vector4D.Zero);
 
     /// <summary>
     ///     Constructs a new instance.
     /// </summary>
     /// <param name="row0">Top row of the matrix.</param>
     /// <param name="row1">Bottom row of the matrix.</param>
-    public Matrix2x4d(Vector4d row0, Vector4d row1)
+    public Matrix2X4D(Vector4D row0, Vector4D row1)
     {
         Row0 = row0;
         Row1 = row1;
@@ -64,18 +64,18 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="m11">Second item of the second row of the matrix.</param>
     /// <param name="m12">Third item of the second row of the matrix.</param>
     /// <param name="m13">Fourth item of the second row of the matrix.</param>
-    public Matrix2x4d(
+    public Matrix2X4D(
         double m00, double m01, double m02, double m03,
         double m10, double m11, double m12, double m13)
     {
-        Row0 = new Vector4d(m00, m01, m02, m03);
-        Row1 = new Vector4d(m10, m11, m12, m13);
+        Row0 = new Vector4D(m00, m01, m02, m03);
+        Row1 = new Vector4D(m10, m11, m12, m13);
     }
 
     /// <summary>
     ///     Gets or sets the first column of the matrix.
     /// </summary>
-    public Vector2d Column0
+    public Vector2D Column0
     {
         get => new(Row0.X, Row1.X);
         set
@@ -88,7 +88,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <summary>
     ///     Gets or sets the second column of the matrix.
     /// </summary>
-    public Vector2d Column1
+    public Vector2D Column1
     {
         get => new(Row0.Y, Row1.Y);
         set
@@ -101,7 +101,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <summary>
     ///     Gets or sets the third column of the matrix.
     /// </summary>
-    public Vector2d Column2
+    public Vector2D Column2
     {
         get => new(Row0.Z, Row1.Z);
         set
@@ -114,7 +114,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <summary>
     ///     Gets or sets the fourth column of the matrix.
     /// </summary>
-    public Vector2d Column3
+    public Vector2D Column3
     {
         get => new(Row0.W, Row1.W);
         set
@@ -199,7 +199,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <summary>
     ///     Gets or sets the values along the main diagonal of the matrix.
     /// </summary>
-    public Vector2d Diagonal
+    public Vector2D Diagonal
     {
         get => new(Row0.X, Row1.Y);
         set
@@ -242,7 +242,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix2x4d instance.</param>
-    public static void CreateRotation(double angle, out Matrix2x4d result)
+    public static void CreateRotation(double angle, out Matrix2X4D result)
     {
         double cos = Math.Cos(angle);
         double sin = Math.Sin(angle);
@@ -262,7 +262,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <returns>The resulting Matrix2x3d instance.</returns>
-    public static Matrix2x4d CreateRotation(double angle)
+    public static Matrix2X4D CreateRotation(double angle)
     {
         CreateRotation(angle, out var result);
         return result;
@@ -273,7 +273,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// </summary>
     /// <param name="scale">Single scale factor for the x, y, and z axes.</param>
     /// <param name="result">A scale matrix.</param>
-    public static void CreateScale(double scale, out Matrix2x4d result)
+    public static void CreateScale(double scale, out Matrix2X4D result)
     {
         result.Row0.X = scale;
         result.Row0.Y = 0;
@@ -290,7 +290,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// </summary>
     /// <param name="scale">Single scale factor for the x and y axes.</param>
     /// <returns>A scale matrix.</returns>
-    public static Matrix2x4d CreateScale(double scale)
+    public static Matrix2X4D CreateScale(double scale)
     {
         CreateScale(scale, out var result);
         return result;
@@ -301,7 +301,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// </summary>
     /// <param name="scale">Scale factors for the x and y axes.</param>
     /// <param name="result">A scale matrix.</param>
-    public static void CreateScale(Vector2d scale, out Matrix2x4d result)
+    public static void CreateScale(Vector2D scale, out Matrix2X4D result)
     {
         result.Row0.X = scale.X;
         result.Row0.Y = 0;
@@ -318,7 +318,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// </summary>
     /// <param name="scale">Scale factors for the x and y axes.</param>
     /// <returns>A scale matrix.</returns>
-    public static Matrix2x4d CreateScale(Vector2d scale)
+    public static Matrix2X4D CreateScale(Vector2D scale)
     {
         CreateScale(scale, out var result);
         return result;
@@ -330,7 +330,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="x">Scale factor for the x axis.</param>
     /// <param name="y">Scale factor for the y axis.</param>
     /// <param name="result">A scale matrix.</param>
-    public static void CreateScale(double x, double y, out Matrix2x4d result)
+    public static void CreateScale(double x, double y, out Matrix2X4D result)
     {
         result.Row0.X = x;
         result.Row0.Y = 0;
@@ -348,7 +348,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="x">Scale factor for the x axis.</param>
     /// <param name="y">Scale factor for the y axis.</param>
     /// <returns>A scale matrix.</returns>
-    public static Matrix2x4d CreateScale(double x, double y)
+    public static Matrix2X4D CreateScale(double x, double y)
     {
         CreateScale(x, y, out var result);
         return result;
@@ -360,7 +360,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication.</param>
-    public static void Mult(ref Matrix2x4d left, double right, out Matrix2x4d result)
+    public static void Mult(ref Matrix2X4D left, double right, out Matrix2X4D result)
     {
         result.Row0.X = left.Row0.X * right;
         result.Row0.Y = left.Row0.Y * right;
@@ -378,7 +378,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication.</returns>
-    public static Matrix2x4d Mult(Matrix2x4d left, double right)
+    public static Matrix2X4D Mult(Matrix2X4D left, double right)
     {
         Mult(ref left, right, out var result);
         return result;
@@ -390,7 +390,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication.</param>
-    public static void Mult(ref Matrix2x4d left, ref Matrix4x2 right, out Matrix2d result)
+    public static void Mult(ref Matrix2X4D left, ref Matrix4X2 right, out Matrix2D result)
     {
         double lM11 = left.Row0.X,
             lM12 = left.Row0.Y,
@@ -421,7 +421,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication.</returns>
-    public static Matrix2d Mult(Matrix2x4d left, Matrix4x2 right)
+    public static Matrix2D Mult(Matrix2X4D left, Matrix4X2 right)
     {
         Mult(ref left, ref right, out var result);
         return result;
@@ -433,7 +433,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication.</param>
-    public static void Mult(ref Matrix2x4d left, ref Matrix4x3 right, out Matrix2x3d result)
+    public static void Mult(ref Matrix2X4D left, ref Matrix4X3 right, out Matrix2X3D result)
     {
         double lM11 = left.Row0.X,
             lM12 = left.Row0.Y,
@@ -470,7 +470,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication.</returns>
-    public static Matrix2x3d Mult(Matrix2x4d left, Matrix4x3 right)
+    public static Matrix2X3D Mult(Matrix2X4D left, Matrix4X3 right)
     {
         Mult(ref left, ref right, out var result);
         return result;
@@ -482,7 +482,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication.</param>
-    public static void Mult(ref Matrix2x4d left, ref Matrix4 right, out Matrix2x4d result)
+    public static void Mult(ref Matrix2X4D left, ref Matrix4 right, out Matrix2X4D result)
     {
         double lM11 = left.Row0.X,
             lM12 = left.Row0.Y,
@@ -525,7 +525,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication.</returns>
-    public static Matrix2x4d Mult(Matrix2x4d left, Matrix4 right)
+    public static Matrix2X4D Mult(Matrix2X4D left, Matrix4 right)
     {
         Mult(ref left, ref right, out var result);
         return result;
@@ -537,7 +537,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The left operand of the addition.</param>
     /// <param name="right">The right operand of the addition.</param>
     /// <param name="result">A new instance that is the result of the addition.</param>
-    public static void Add(ref Matrix2x4d left, ref Matrix2x4d right, out Matrix2x4d result)
+    public static void Add(ref Matrix2X4D left, ref Matrix2X4D right, out Matrix2X4D result)
     {
         result.Row0.X = left.Row0.X + right.Row0.X;
         result.Row0.Y = left.Row0.Y + right.Row0.Y;
@@ -555,7 +555,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The left operand of the addition.</param>
     /// <param name="right">The right operand of the addition.</param>
     /// <returns>A new instance that is the result of the addition.</returns>
-    public static Matrix2x4d Add(Matrix2x4d left, Matrix2x4d right)
+    public static Matrix2X4D Add(Matrix2X4D left, Matrix2X4D right)
     {
         Add(ref left, ref right, out var result);
         return result;
@@ -567,7 +567,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The left operand of the subtraction.</param>
     /// <param name="right">The right operand of the subtraction.</param>
     /// <param name="result">A new instance that is the result of the subtraction.</param>
-    public static void Subtract(ref Matrix2x4d left, ref Matrix2x4d right, out Matrix2x4d result)
+    public static void Subtract(ref Matrix2X4D left, ref Matrix2X4D right, out Matrix2X4D result)
     {
         result.Row0.X = left.Row0.X - right.Row0.X;
         result.Row0.Y = left.Row0.Y - right.Row0.Y;
@@ -585,7 +585,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The left operand of the subtraction.</param>
     /// <param name="right">The right operand of the subtraction.</param>
     /// <returns>A new instance that is the result of the subtraction.</returns>
-    public static Matrix2x4d Subtract(Matrix2x4d left, Matrix2x4d right)
+    public static Matrix2X4D Subtract(Matrix2X4D left, Matrix2X4D right)
     {
         Subtract(ref left, ref right, out var result);
         return result;
@@ -596,7 +596,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// </summary>
     /// <param name="mat">The matrix to transpose.</param>
     /// <param name="result">The transpose of the given matrix.</param>
-    public static void Transpose(ref Matrix2x4d mat, out Matrix4x2d result)
+    public static void Transpose(ref Matrix2X4D mat, out Matrix4X2D result)
     {
         result.Row0.X = mat.Row0.X;
         result.Row0.Y = mat.Row1.X;
@@ -613,7 +613,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// </summary>
     /// <param name="mat">The matrix to transpose.</param>
     /// <returns>The transpose of the given matrix.</returns>
-    public static Matrix4x2d Transpose(Matrix2x4d mat)
+    public static Matrix4X2D Transpose(Matrix2X4D mat)
     {
         Transpose(ref mat, out var result);
         return result;
@@ -625,7 +625,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x4d which holds the result of the multiplication</returns>
-    public static Matrix2x4d operator *(double left, Matrix2x4d right) => Mult(right, left);
+    public static Matrix2X4D operator *(double left, Matrix2X4D right) => Mult(right, left);
 
     /// <summary>
     ///     Scalar multiplication.
@@ -633,7 +633,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x4d which holds the result of the multiplication</returns>
-    public static Matrix2x4d operator *(Matrix2x4d left, double right) => Mult(left, right);
+    public static Matrix2X4D operator *(Matrix2X4D left, double right) => Mult(left, right);
 
     /// <summary>
     ///     Matrix multiplication
@@ -641,7 +641,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2d which holds the result of the multiplication</returns>
-    public static Matrix2d operator *(Matrix2x4d left, Matrix4x2 right) => Mult(left, right);
+    public static Matrix2D operator *(Matrix2X4D left, Matrix4X2 right) => Mult(left, right);
 
     /// <summary>
     ///     Matrix multiplication
@@ -649,7 +649,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x3d which holds the result of the multiplication</returns>
-    public static Matrix2x3d operator *(Matrix2x4d left, Matrix4x3 right) => Mult(left, right);
+    public static Matrix2X3D operator *(Matrix2X4D left, Matrix4X3 right) => Mult(left, right);
 
     /// <summary>
     ///     Matrix multiplication
@@ -657,7 +657,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x4d which holds the result of the multiplication</returns>
-    public static Matrix2x4d operator *(Matrix2x4d left, Matrix4 right) => Mult(left, right);
+    public static Matrix2X4D operator *(Matrix2X4D left, Matrix4 right) => Mult(left, right);
 
     /// <summary>
     ///     Matrix addition
@@ -665,7 +665,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2d which holds the result of the addition</returns>
-    public static Matrix2x4d operator +(Matrix2x4d left, Matrix2x4d right) => Add(left, right);
+    public static Matrix2X4D operator +(Matrix2X4D left, Matrix2X4D right) => Add(left, right);
 
     /// <summary>
     ///     Matrix subtraction
@@ -673,7 +673,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x4d which holds the result of the subtraction</returns>
-    public static Matrix2x4d operator -(Matrix2x4d left, Matrix2x4d right) => Subtract(left, right);
+    public static Matrix2X4D operator -(Matrix2X4D left, Matrix2X4D right) => Subtract(left, right);
 
     /// <summary>
     ///     Compares two instances for equality.
@@ -681,7 +681,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The first instance.</param>
     /// <param name="right">The second instance.</param>
     /// <returns>True, if left equals right; false otherwise.</returns>
-    public static bool operator ==(Matrix2x4d left, Matrix2x4d right) => left.Equals(right);
+    public static bool operator ==(Matrix2X4D left, Matrix2X4D right) => left.Equals(right);
 
     /// <summary>
     ///     Compares two instances for inequality.
@@ -689,7 +689,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <param name="left">The first instance.</param>
     /// <param name="right">The second instance.</param>
     /// <returns>True, if left does not equal right; false otherwise.</returns>
-    public static bool operator !=(Matrix2x4d left, Matrix2x4d right) => !left.Equals(right);
+    public static bool operator !=(Matrix2X4D left, Matrix2X4D right) => !left.Equals(right);
 
     /// <summary>
     ///     Returns a System.string that represents the current Matrix4.
@@ -719,9 +719,9 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// <returns>True if the instances are equal; false otherwise.</returns>
     public override bool Equals(object obj)
     {
-        if (!(obj is Matrix2x4d)) return false;
+        if (!(obj is Matrix2X4D)) return false;
 
-        return Equals((Matrix2x4d)obj);
+        return Equals((Matrix2X4D)obj);
     }
 
     /// <summary>
@@ -729,7 +729,7 @@ public struct Matrix2x4d : IEquatable<Matrix2x4d>
     /// </summary>
     /// <param name="other">An matrix to compare with this matrix.</param>
     /// <returns>true if the current matrix is equal to the matrix parameter; otherwise, false.</returns>
-    public bool Equals(Matrix2x4d other)
+    public bool Equals(Matrix2X4D other)
     {
         return
             Row0 == other.Row0 && Row1 == other.Row1;

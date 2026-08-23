@@ -99,9 +99,9 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
     /// </summary>
     public bool CanCopyPaste => !string.IsNullOrEmpty(GetExtension())
                                 && !UsesSoundFont
-                                && Math.Abs(Volume - 1) < Precision.DoubleEpsilon
-                                && Math.Abs(Panning) < Precision.DoubleEpsilon
-                                && Math.Abs(PitchShift) < Precision.DoubleEpsilon;
+                                && Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON
+                                && Math.Abs(Panning) < Precision.DOUBLE_EPSILON
+                                && Math.Abs(PitchShift) < Precision.DOUBLE_EPSILON;
 
     /// <summary>
     ///     Gets or sets the source audio or SoundFont path.
@@ -168,14 +168,14 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
         if (other is null) return false;
 
         return Path == other.Path
-               && Math.Abs(Volume - other.Volume) < Precision.DoubleEpsilon
-               && Math.Abs(Panning - other.Panning) < Precision.DoubleEpsilon
-               && Math.Abs(PitchShift - other.PitchShift) < Precision.DoubleEpsilon
+               && Math.Abs(Volume - other.Volume) < Precision.DOUBLE_EPSILON
+               && Math.Abs(Panning - other.Panning) < Precision.DOUBLE_EPSILON
+               && Math.Abs(PitchShift - other.PitchShift) < Precision.DOUBLE_EPSILON
                && Bank == other.Bank
                && Patch == other.Patch
                && Instrument == other.Instrument
                && Key == other.Key
-               && Math.Abs(Length - other.Length) < Precision.DoubleEpsilon;
+               && Math.Abs(Length - other.Length) < Precision.DOUBLE_EPSILON;
     }
 
     /// <summary>Returns a string that represents the current object and can be used as a filename.</summary>
@@ -184,10 +184,10 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
         string filename = System.IO.Path.GetFileNameWithoutExtension(Path);
         return GetExtension().ToLower() == ".sf2"
             ?
-            Math.Abs(Panning) < Precision.DoubleEpsilon && Math.Abs(PitchShift) < Precision.DoubleEpsilon
+            Math.Abs(Panning) < Precision.DOUBLE_EPSILON && Math.Abs(PitchShift) < Precision.DOUBLE_EPSILON
                 ? $"{filename}-{Bank}-{Patch}-{Instrument}-{Key}-{(int)Length}-{Velocity}"
                 : $"{filename}-{(int)(Panning * 100)}-{(int)(PitchShift * 100)}-{Bank}-{Patch}-{Instrument}-{Key}-{(int)Length}-{Velocity}"
-            : Math.Abs(Volume - 1) < Precision.DoubleEpsilon && Math.Abs(Panning) < Precision.DoubleEpsilon && Math.Abs(PitchShift) < Precision.DoubleEpsilon
+            : Math.Abs(Volume - 1) < Precision.DOUBLE_EPSILON && Math.Abs(Panning) < Precision.DOUBLE_EPSILON && Math.Abs(PitchShift) < Precision.DOUBLE_EPSILON
                 ? filename
                 :
                 $"{filename}-{(int)(Volume * 100)}-{(int)(Panning * 100)}-{(int)(PitchShift * 100)}";

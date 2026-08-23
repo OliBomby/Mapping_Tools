@@ -9,7 +9,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public sealed partial class ShellNotificationViewModel : ObservableObject
 {
-    private readonly Action<ShellNotificationViewModel> _dismiss;
+    private readonly Action<ShellNotificationViewModel> dismiss;
 
     internal ShellNotificationViewModel(
         UserNotification notification,
@@ -19,7 +19,7 @@ public sealed partial class ShellNotificationViewModel : ObservableObject
         Severity = notification.Severity;
         Title = notification.Title;
         Message = notification.Message;
-        _dismiss = dismiss;
+        this.dismiss = dismiss;
     }
 
     /// <summary>Gets the notification severity.</summary>
@@ -37,6 +37,6 @@ public sealed partial class ShellNotificationViewModel : ObservableObject
     [RelayCommand]
     private void Dismiss()
     {
-        _dismiss(this);
+        dismiss(this);
     }
 }

@@ -98,7 +98,7 @@ public class HitsoundLayer
         if (Times.Count < 2) return;
 
         for (int i = 1; i < Times.Count; i++)
-            if (Math.Abs(Times[i] - Times[i - 1]) < Precision.DoubleEpsilon)
+            if (Math.Abs(Times[i] - Times[i - 1]) < Precision.DOUBLE_EPSILON)
             {
                 Times.RemoveAt(i);
                 i--;

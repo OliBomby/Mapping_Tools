@@ -9,9 +9,9 @@ namespace Mapping_Tools.Infrastructure.Audio;
 /// <summary>Generates ordinary audio files and SoundFont notes behind the Application port.</summary>
 public sealed class NaudioAudioGenerator : IAudioGenerator
 {
-    private readonly IAudioDecoder _decoder;
-    private readonly IAudioEffectService _effects;
-    private readonly ISoundFontRenderer _soundFontRenderer;
+    private readonly IAudioDecoder decoder;
+    private readonly IAudioEffectService effects;
+    private readonly ISoundFontRenderer soundFontRenderer;
 
     /// <summary>Creates the NAudio-backed sample generator.</summary>
     /// <param name="decoder">The file decoder.</param>
@@ -22,9 +22,9 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
         ISoundFontRenderer soundFontRenderer,
         IAudioEffectService effects)
     {
-        _decoder = decoder ?? throw new ArgumentNullException(nameof(decoder));
-        _soundFontRenderer = soundFontRenderer ?? throw new ArgumentNullException(nameof(soundFontRenderer));
-        _effects = effects ?? throw new ArgumentNullException(nameof(effects));
+        this.decoder = decoder ?? throw new ArgumentNullException(nameof(decoder));
+        this.soundFontRenderer = soundFontRenderer ?? throw new ArgumentNullException(nameof(soundFontRenderer));
+        this.effects = effects ?? throw new ArgumentNullException(nameof(effects));
     }
 
     /// <inheritdoc />
@@ -34,9 +34,9 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
     {
         ArgumentNullException.ThrowIfNull(request);
         var source = request.Sample.UsesSoundFont
-            ? await _soundFontRenderer.RenderAsync(new SoundFontNoteRequest(request.Sample), cancellationToken)
+            ? await soundFontRenderer.RenderAsync(new SoundFontNoteRequest(request.Sample), cancellationToken)
                 .ConfigureAwait(false)
-            : await _decoder.DecodeAsync(new AudioDecodeRequest(request.Sample.Path), cancellationToken)
+            : await decoder.DecodeAsync(new AudioDecodeRequest(request.Sample.Path), cancellationToken)
                 .ConfigureAwait(false);
 
         if (source is null) throw new InvalidDataException("No SoundFont zone matched the requested sample.");
@@ -46,7 +46,7 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
             : ApplySampleArguments(source, request.Sample, cancellationToken);
         return request.Effects.Count == 0
             ? transformed
-            : _effects.Apply(transformed, request.Effects, cancellationToken);
+            : effects.Apply(transformed, request.Effects, cancellationToken);
     }
 
     private static AudioClip ApplySampleArguments(
@@ -97,12 +97,12 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
 
     private sealed class ClipSampleProvider : ISampleProvider
     {
-        private readonly float[] _samples;
-        private int _position;
+        private readonly float[] samples;
+        private int position;
 
         public ClipSampleProvider(AudioClip clip)
         {
-            _samples = clip.CopySamples();
+            samples = clip.CopySamples();
             WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(clip.Format.SampleRate, clip.Format.Channels);
         }
 
@@ -110,11 +110,11 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
 
         public int Read(float[] buffer, int offset, int count)
         {
-            int read = Math.Min(count, _samples.Length - _position);
+            int read = Math.Min(count, samples.Length - position);
             if (read <= 0) return 0;
 
-            for (int index = 0; index < read; index++) buffer[offset + index] = _samples[_position + index];
-            _position += read;
+            for (int index = 0; index < read; index++) buffer[offset + index] = samples[position + index];
+            position += read;
             return read;
         }
     }

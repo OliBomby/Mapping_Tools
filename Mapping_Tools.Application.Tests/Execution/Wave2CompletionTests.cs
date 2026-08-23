@@ -14,7 +14,7 @@ namespace Mapping_Tools.Application.Tests.Execution;
 [TestClass]
 public sealed class Wave2CompletionTests
 {
-    private const string MapPath =
+    private const string map_path =
         @"C:\osu!\Songs\123 Artist - Title\map.osu";
 
     [TestMethod]
@@ -73,7 +73,7 @@ public sealed class Wave2CompletionTests
                                     LiveBeatmapPreference.DiskOnly,
                                     context.CancellationToken);
                             session.Editor.Beatmap.Metadata["Version"] =
-                                new TValue("Wave 2 validated");
+                                new StringValue("Wave 2 validated");
                             await gateway.SaveAsync(
                                 session.Editor,
                                 cancellationToken: context.CancellationToken);
@@ -97,14 +97,14 @@ public sealed class Wave2CompletionTests
 
         // Assert
         selection.Status.Should().Be(CurrentBeatmapSelectionStatus.Selected);
-        workspace.SelectedPaths.ToArray().Should().Equal(MapPath);
+        workspace.SelectedPaths.ToArray().Should().Equal(map_path);
         quickRunResult.Status.Should().Be(QuickRunStatus.Executed);
         toolResult.Should().NotBeNull();
         toolResult.Status.Should().Be(ToolExecutionStatus.Succeeded);
-        toolResult.Value.Should().Be(MapPath);
+        toolResult.Value.Should().Be(map_path);
         backups.CreateCount.Should().Be(1);
         backups.BackupPrecededWrite.Should().BeTrue();
-        store.Files[MapPath].Contains("Version:Wave 2 validated").Should().BeTrue();
+        store.Files[map_path].Contains("Version:Wave 2 validated").Should().BeTrue();
         published.Count.Should().Be(1);
         published[0].Severity.Should().Be(UserNotificationSeverity.Success);
     }
@@ -116,7 +116,7 @@ public sealed class Wave2CompletionTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        return new MemoryTextFileStore(MapPath, File.ReadAllLines(fixture));
+        return new MemoryTextFileStore(map_path, File.ReadAllLines(fixture));
     }
 
     private sealed class MemoryTextFileStore : ITextFileStore
@@ -160,11 +160,11 @@ public sealed class Wave2CompletionTests
 
     private sealed class RecordingBackupService : IBeatmapBackupService
     {
-        private readonly MemoryTextFileStore _store;
+        private readonly MemoryTextFileStore store;
 
         public RecordingBackupService(MemoryTextFileStore store)
         {
-            _store = store;
+            this.store = store;
         }
 
         public int CreateCount { get; private set; }
@@ -180,7 +180,7 @@ public sealed class Wave2CompletionTests
             cancellationToken.ThrowIfCancellationRequested();
             string sourcePath = sourcePaths.Single();
             CreateCount++;
-            BackupPrecededWrite = _store.WriteCount == 0;
+            BackupPrecededWrite = store.WriteCount == 0;
             BeatmapBackupArtifact artifact = new(
                 "backup.osu",
                 sourcePath,
@@ -251,7 +251,7 @@ public sealed class Wave2CompletionTests
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult<string?>(MapPath);
+            return Task.FromResult<string?>(map_path);
         }
     }
 
@@ -259,7 +259,7 @@ public sealed class Wave2CompletionTests
     {
         public bool FileExists(string path)
         {
-            return string.Equals(path, MapPath, StringComparison.Ordinal);
+            return string.Equals(path, map_path, StringComparison.Ordinal);
         }
 
         public string? GetParentDirectory(string filePath)

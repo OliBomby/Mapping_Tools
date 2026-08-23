@@ -346,15 +346,15 @@ internal sealed class TriangleTemplate : TumourTemplateBase
 
 internal sealed class SquareTemplate : TumourTemplateBase, IRequireInit
 {
-    private const double MinSideMargin = 0.0001;
+    private const double min_side_margin = 0.0001;
     private double sideMargin;
     public override bool NeedsParameter => true;
 
     public void Init()
     {
         sideMargin = Precision.AlmostEquals(Length, 0)
-            ? MinSideMargin
-            : MathHelper.Clamp(Parameter / Length, MinSideMargin, 0.5);
+            ? min_side_margin
+            : MathHelper.Clamp(Parameter / Length, min_side_margin, 0.5);
     }
 
     public override Vector2 GetOffset(double t)

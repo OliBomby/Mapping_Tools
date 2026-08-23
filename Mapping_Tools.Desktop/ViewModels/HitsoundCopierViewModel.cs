@@ -19,20 +19,20 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     IShellProjectFeature,
     IQuickRun
 {
-    internal const string OperationId = "hitsound-copier";
+    internal const string OPERATION_ID = "hitsound-copier";
 
-    private readonly IHitsoundCopierService _copier;
-    private readonly ICurrentBeatmapLocator _currentBeatmap;
+    private readonly IHitsoundCopierService copier;
+    private readonly ICurrentBeatmapLocator currentBeatmap;
 
-    private readonly ProjectDefinition<HitsoundCopierProject> _definition = new(
+    private readonly ProjectDefinition<HitsoundCopierProject> definition = new(
         "hitsoundcopierproject.json",
         "Hitsound Copier Projects",
         () => new HitsoundCopierProject(),
         "hitsound-copier-project.json");
 
-    private readonly IFilePicker _filePicker;
-    private readonly IUserNotificationService _notifications;
-    private readonly ApplicationSettings _settings;
+    private readonly IFilePicker filePicker;
+    private readonly IUserNotificationService notifications;
+    private readonly ApplicationSettings settings;
 
     /// <summary>Creates the Hitsound Copier presentation model.</summary>
     public HitsoundCopierViewModel(
@@ -42,13 +42,13 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmap,
         IUserNotificationService notifications,
         ApplicationSettings settings)
-        : base(execution, OperationId)
+        : base(execution, OPERATION_ID)
     {
-        _copier = copier ?? throw new ArgumentNullException(nameof(copier));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.copier = copier ?? throw new ArgumentNullException(nameof(copier));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <summary>Gets or sets the optional source beatmap path.</summary>
@@ -191,7 +191,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
         if (string.IsNullOrWhiteSpace(path))
         {
             ResultSummary = "Open a target beatmap in osu! before using QuickRun.";
@@ -203,9 +203,9 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         await RunWithStateAsync(() => RunOptionsAsync(options, true));
     }
 
-    string IQuickRun.OperationId => OperationId;
+    string IQuickRun.OperationId => OPERATION_ID;
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
     {
@@ -348,11 +348,11 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     {
         await Execution.ExecuteAsync(
             new ToolExecutionRequest<HitsoundCopierResult>(
-                OperationId,
+                OPERATION_ID,
                 "Hitsound Copier",
                 async context =>
                 {
-                    var result = await _copier.CopyAsync(
+                    var result = await copier.CopyAsync(
                         options,
                         new Progress<double>(value => context.ReportProgress(value, "Copying hitsounds")),
                         context.CancellationToken);
@@ -368,7 +368,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     {
         try
         {
-            string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
+            string? path = await currentBeatmap.FindCurrentBeatmapAsync();
             if (!string.IsNullOrWhiteSpace(path)) setter(path);
         }
         catch (Exception exception)
@@ -385,7 +385,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     {
         try
         {
-            var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+            var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
             {
                 Title = title,
                 SuggestedStartLocation = startLocation,
@@ -404,12 +404,12 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     {
         string? target = PathTo.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .FirstOrDefault();
-        return string.IsNullOrWhiteSpace(target) ? _settings.SongsPath : Path.GetDirectoryName(target);
+        return string.IsNullOrWhiteSpace(target) ? settings.SongsPath : Path.GetDirectoryName(target);
     }
 
     private Task PublishFailureAsync(string title, Exception exception)
     {
-        return _notifications.PublishAsync(
+        return notifications.PublishAsync(
             new UserNotification(UserNotificationSeverity.Error, title,
                 "The beatmap path could not be obtained.", exception));
     }

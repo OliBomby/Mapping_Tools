@@ -19,38 +19,38 @@ public static class MathHelper
     /// <summary>
     ///     Defines the value of Pi as a <see cref="System.Single" />.
     /// </summary>
-    public const double Pi =
+    public const double PI =
         3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148086513282306647093844609550582231725359408128481117450284102701938521105559644622948954930382f;
 
     /// <summary>
     ///     Defines the value of Pi divided by two as a <see cref="System.Single" />.
     /// </summary>
-    public const double PiOver2 = Pi / 2;
+    public const double PI_OVER2 = PI / 2;
 
     /// <summary>
     ///     Defines the value of Pi divided by three as a <see cref="System.Single" />.
     /// </summary>
-    public const double PiOver3 = Pi / 3;
+    public const double PI_OVER3 = PI / 3;
 
     /// <summary>
     ///     Definesthe value of  Pi divided by four as a <see cref="System.Single" />.
     /// </summary>
-    public const double PiOver4 = Pi / 4;
+    public const double PI_OVER4 = PI / 4;
 
     /// <summary>
     ///     Defines the value of Pi divided by six as a <see cref="System.Single" />.
     /// </summary>
-    public const double PiOver6 = Pi / 6;
+    public const double PI_OVER6 = PI / 6;
 
     /// <summary>
     ///     Defines the value of Pi multiplied by two as a <see cref="System.Single" />.
     /// </summary>
-    public const double TwoPi = 2 * Pi;
+    public const double TWO_PI = 2 * PI;
 
     /// <summary>
     ///     Defines the value of Pi multiplied by 3 and divided by two as a <see cref="System.Single" />.
     /// </summary>
-    public const double ThreePiOver2 = 3 * Pi / 2;
+    public const double THREE_PI_OVER2 = 3 * PI / 2;
 
     /// <summary>
     ///     Defines the value of E as a <see cref="System.Single" />.
@@ -60,12 +60,12 @@ public static class MathHelper
     /// <summary>
     ///     Defines the base-10 logarithm of E.
     /// </summary>
-    public const double Log10E = 0.434294482f;
+    public const double LOG10_E = 0.434294482f;
 
     /// <summary>
     ///     Defines the base-2 logarithm of E.
     /// </summary>
-    public const double Log2E = 1.442695041f;
+    public const double LOG2_E = 1.442695041f;
 
     /// <summary>
     ///     Returns the next power of two that is greater than or equal to the specified number.
@@ -156,8 +156,8 @@ public static class MathHelper
     /// <returns>The angle expressed in radians</returns>
     public static double DegreesToRadians(double degrees)
     {
-        const double degToRad = Math.PI / 180.0f;
-        return degrees * degToRad;
+        const double deg_to_rad = Math.PI / 180.0f;
+        return degrees * deg_to_rad;
     }
 
     /// <summary>
@@ -167,8 +167,8 @@ public static class MathHelper
     /// <returns>The angle expressed in degrees</returns>
     public static double RadiansToDegrees(double radians)
     {
-        const double radToDeg = 180.0f / Math.PI;
-        return radians * radToDeg;
+        const double rad_to_deg = 180.0f / Math.PI;
+        return radians * rad_to_deg;
     }
 
     /// <summary>
@@ -215,7 +215,7 @@ public static class MathHelper
     /// <returns>The angle difference a1 - a2</returns>
     public static double AngleDifference(double a1, double a2)
     {
-        return Mod(a1 - a2 + Pi, TwoPi) - Pi;
+        return Mod(a1 - a2 + PI, TWO_PI) - PI;
     }
 
     /// <summary>
@@ -301,7 +301,7 @@ public static class MathHelper
     [SuppressMessage("ReSharper", "CompareOfdoublesByEqualityOperator")]
     public static bool ApproximatelyEqualEpsilon(double a, double b, double epsilon)
     {
-        const double doubleNormal = (1L << 52) * double.Epsilon;
+        const double double_normal = (1L << 52) * double.Epsilon;
         double absA = Math.Abs(a);
         double absB = Math.Abs(b);
         double diff = Math.Abs(a - b);
@@ -310,10 +310,10 @@ public static class MathHelper
             // Shortcut, handles infinities
             return true;
 
-        if (a == 0.0f || b == 0.0f || diff < doubleNormal)
+        if (a == 0.0f || b == 0.0f || diff < double_normal)
             // a or b is zero, or both are extremely close to it.
             // relative error is less meaningful here
-            return diff < epsilon * doubleNormal;
+            return diff < epsilon * double_normal;
 
         // use relative error
         return diff / Math.Min(absA + absB, double.MaxValue) < epsilon;

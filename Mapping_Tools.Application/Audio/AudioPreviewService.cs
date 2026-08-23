@@ -5,10 +5,10 @@ namespace Mapping_Tools.Application.Audio;
 /// <summary>Coordinates source decoding/generation with deterministic playback sessions.</summary>
 public sealed class AudioPreviewService : ISpectrumService
 {
-    private readonly IAudioDecoder _decoder;
-    private readonly IAudioGenerator _generator;
-    private readonly IAudioPlaybackService _playback;
-    private readonly ISpectrumCalculator _spectrum;
+    private readonly IAudioDecoder decoder;
+    private readonly IAudioGenerator generator;
+    private readonly IAudioPlaybackService playback;
+    private readonly ISpectrumCalculator spectrum;
 
     /// <summary>Creates the reusable preview and spectrum orchestration service.</summary>
     /// <param name="decoder">The decoder port.</param>
@@ -21,10 +21,10 @@ public sealed class AudioPreviewService : ISpectrumService
         IAudioPlaybackService playback,
         ISpectrumCalculator spectrum)
     {
-        _decoder = decoder ?? throw new ArgumentNullException(nameof(decoder));
-        _generator = generator ?? throw new ArgumentNullException(nameof(generator));
-        _playback = playback ?? throw new ArgumentNullException(nameof(playback));
-        _spectrum = spectrum ?? throw new ArgumentNullException(nameof(spectrum));
+        this.decoder = decoder ?? throw new ArgumentNullException(nameof(decoder));
+        this.generator = generator ?? throw new ArgumentNullException(nameof(generator));
+        this.playback = playback ?? throw new ArgumentNullException(nameof(playback));
+        this.spectrum = spectrum ?? throw new ArgumentNullException(nameof(spectrum));
     }
 
     /// <inheritdoc />
@@ -33,8 +33,8 @@ public sealed class AudioPreviewService : ISpectrumService
         SpectrumCalculationOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var clip = await _decoder.DecodeAsync(request, cancellationToken).ConfigureAwait(false);
-        return await _spectrum.CalculateAsync(clip, options, cancellationToken).ConfigureAwait(false);
+        var clip = await decoder.DecodeAsync(request, cancellationToken).ConfigureAwait(false);
+        return await spectrum.CalculateAsync(clip, options, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>Decodes a source file and starts playback owned by the returned session.</summary>
@@ -47,8 +47,8 @@ public sealed class AudioPreviewService : ISpectrumService
         AudioPlaybackOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var clip = await _decoder.DecodeAsync(request, cancellationToken).ConfigureAwait(false);
-        return await _playback.PlayAsync(clip, options, cancellationToken).ConfigureAwait(false);
+        var clip = await decoder.DecodeAsync(request, cancellationToken).ConfigureAwait(false);
+        return await playback.PlayAsync(clip, options, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>Generates a sample and starts playback owned by the returned session.</summary>
@@ -61,24 +61,24 @@ public sealed class AudioPreviewService : ISpectrumService
         AudioPlaybackOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var clip = await _generator.GenerateAsync(request, cancellationToken).ConfigureAwait(false);
-        return await _playback.PlayAsync(clip, options, cancellationToken).ConfigureAwait(false);
+        var clip = await generator.GenerateAsync(request, cancellationToken).ConfigureAwait(false);
+        return await playback.PlayAsync(clip, options, cancellationToken).ConfigureAwait(false);
     }
 }
 
 /// <summary>Coordinates sample generation with output encoding.</summary>
 public sealed class AudioExportService
 {
-    private readonly IAudioExporter _exporter;
-    private readonly IAudioGenerator _generator;
+    private readonly IAudioExporter exporter;
+    private readonly IAudioGenerator generator;
 
     /// <summary>Creates the generated-sample export service.</summary>
     /// <param name="generator">The sample-generation port.</param>
     /// <param name="exporter">The file-encoding port.</param>
     public AudioExportService(IAudioGenerator generator, IAudioExporter exporter)
     {
-        _generator = generator ?? throw new ArgumentNullException(nameof(generator));
-        _exporter = exporter ?? throw new ArgumentNullException(nameof(exporter));
+        this.generator = generator ?? throw new ArgumentNullException(nameof(generator));
+        this.exporter = exporter ?? throw new ArgumentNullException(nameof(exporter));
     }
 
     /// <summary>Generates a sample and exports it after all source resources are closed.</summary>
@@ -91,7 +91,7 @@ public sealed class AudioExportService
         AudioExportRequest export,
         CancellationToken cancellationToken = default)
     {
-        var clip = await _generator.GenerateAsync(generation, cancellationToken).ConfigureAwait(false);
-        return await _exporter.ExportAsync(clip, export, cancellationToken).ConfigureAwait(false);
+        var clip = await generator.GenerateAsync(generation, cancellationToken).ConfigureAwait(false);
+        return await exporter.ExportAsync(clip, export, cancellationToken).ConfigureAwait(false);
     }
 }

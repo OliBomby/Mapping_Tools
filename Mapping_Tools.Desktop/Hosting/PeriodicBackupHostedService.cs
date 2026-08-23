@@ -9,12 +9,12 @@ namespace Mapping_Tools.Desktop.Hosting;
 
 internal sealed class PeriodicBackupHostedService : BackgroundService
 {
-    private static readonly TimeSpan MinimumInterval = TimeSpan.FromSeconds(1);
-    private readonly IBeatmapBackupService _backupService;
-    private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
-    private readonly IBeatmapEditingGateway _editingGateway;
-    private readonly ILogger<PeriodicBackupHostedService> _logger;
-    private readonly ApplicationSettings _settings;
+    private static readonly TimeSpan minimumInterval = TimeSpan.FromSeconds(1);
+    private readonly IBeatmapBackupService backupService;
+    private readonly ICurrentBeatmapLocator currentBeatmapLocator;
+    private readonly IBeatmapEditingGateway editingGateway;
+    private readonly ILogger<PeriodicBackupHostedService> logger;
+    private readonly ApplicationSettings settings;
 
     public PeriodicBackupHostedService(
         ApplicationSettings settings,
@@ -23,41 +23,41 @@ internal sealed class PeriodicBackupHostedService : BackgroundService
         IBeatmapBackupService backupService,
         ILogger<PeriodicBackupHostedService> logger)
     {
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _currentBeatmapLocator = currentBeatmapLocator
-                                 ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
-        _editingGateway = editingGateway
-                          ?? throw new ArgumentNullException(nameof(editingGateway));
-        _backupService = backupService
-                         ?? throw new ArgumentNullException(nameof(backupService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.currentBeatmapLocator = currentBeatmapLocator
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+        this.editingGateway = editingGateway
+                              ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.backupService = backupService
+                             ?? throw new ArgumentNullException(nameof(backupService));
+        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var interval = _settings.PeriodicBackupInterval < MinimumInterval
-                ? MinimumInterval
-                : _settings.PeriodicBackupInterval;
+            var interval = settings.PeriodicBackupInterval < minimumInterval
+                ? minimumInterval
+                : settings.PeriodicBackupInterval;
             await Task.Delay(interval, stoppingToken).ConfigureAwait(false);
 
-            if (!_settings.MakePeriodicBackups) continue;
+            if (!settings.MakePeriodicBackups) continue;
 
             try
             {
-                string? path = await _currentBeatmapLocator
+                string? path = await currentBeatmapLocator
                     .FindCurrentBeatmapAsync(stoppingToken)
                     .ConfigureAwait(false);
                 if (string.IsNullOrWhiteSpace(path)) continue;
 
-                var session = await _editingGateway
+                var session = await editingGateway
                     .OpenBeatmapAsync(
                         path,
                         LiveBeatmapPreference.RequireLive,
                         stoppingToken)
                     .ConfigureAwait(false);
-                await _backupService
+                await backupService
                     .CreatePeriodicIfChangedAsync(session, stoppingToken)
                     .ConfigureAwait(false);
             }
@@ -67,7 +67,7 @@ internal sealed class PeriodicBackupHostedService : BackgroundService
             }
             catch (Exception exception)
             {
-                _logger.LogWarning(
+                logger.LogWarning(
                     exception,
                     "Periodic beatmap backup could not be created.");
             }

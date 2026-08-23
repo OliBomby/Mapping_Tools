@@ -52,10 +52,10 @@ public sealed class GraphStateChangedEventArgs : EventArgs
 /// </summary>
 public sealed class GraphControl : Control
 {
-    private const double MinimumViewSize = 1e-9;
-    private const double AnchorHitRadius = 10;
-    private const double TensionHitRadius = 9;
-    private const int MaximumCurveSamples = 1000;
+    private const double minimum_view_size = 1e-9;
+    private const double anchor_hit_radius = 10;
+    private const double tension_hit_radius = 9;
+    private const int maximum_curve_samples = 1000;
 
     /// <summary>Identifies the graph state edited by the control.</summary>
     public static readonly StyledProperty<CoreGraphState?> GraphStateProperty =
@@ -608,9 +608,9 @@ public sealed class GraphControl : Control
     /// <summary>Gets the active pointer gesture.</summary>
     public GraphPointerGesture ActiveGesture { get; private set; }
 
-    private double ViewWidthInternal => Math.Max(viewMaxX - viewMinX, MinimumViewSize);
+    private double ViewWidthInternal => Math.Max(viewMaxX - viewMinX, minimum_view_size);
 
-    private double ViewHeightInternal => Math.Max(viewMaxY - viewMinY, MinimumViewSize);
+    private double ViewHeightInternal => Math.Max(viewMaxY - viewMinY, minimum_view_size);
 
     /// <summary>Raised after an edit produces a new cloned graph state.</summary>
     public event EventHandler<GraphStateChangedEventArgs>? StateChanged;
@@ -1096,9 +1096,9 @@ public sealed class GraphControl : Control
 
     private void NormalizeView()
     {
-        if (!double.IsFinite(viewMinX) || !double.IsFinite(viewMaxX) || viewMaxX - viewMinX < MinimumViewSize) viewMaxX = viewMinX + 1;
+        if (!double.IsFinite(viewMinX) || !double.IsFinite(viewMaxX) || viewMaxX - viewMinX < minimum_view_size) viewMaxX = viewMinX + 1;
 
-        if (!double.IsFinite(viewMinY) || !double.IsFinite(viewMaxY) || viewMaxY - viewMinY < MinimumViewSize) viewMaxY = viewMinY + 1;
+        if (!double.IsFinite(viewMinY) || !double.IsFinite(viewMaxY) || viewMaxY - viewMinY < minimum_view_size) viewMaxY = viewMinY + 1;
     }
 
     private void BeginGesture(IPointer pointer, GraphPointerGesture nextGesture, int anchorIndex, Point point)
@@ -1233,7 +1233,7 @@ public sealed class GraphControl : Control
     {
         foreach (var marker in EnumerateMarkers(GraphMarkerOrientation.Vertical))
         {
-            if (marker.Value < viewMinX - Precision.DoubleEpsilon || marker.Value > viewMaxX + Precision.DoubleEpsilon) continue;
+            if (marker.Value < viewMinX - Precision.DOUBLE_EPSILON || marker.Value > viewMaxX + Precision.DOUBLE_EPSILON) continue;
 
             var top = GetControlPosition(new Vector2((float)marker.Value, (float)viewMaxY));
             DrawMarker(context, marker, top, true);
@@ -1241,7 +1241,7 @@ public sealed class GraphControl : Control
 
         foreach (var marker in EnumerateMarkers(GraphMarkerOrientation.Horizontal))
         {
-            if (marker.Value < viewMinY - Precision.DoubleEpsilon || marker.Value > viewMaxY + Precision.DoubleEpsilon) continue;
+            if (marker.Value < viewMinY - Precision.DOUBLE_EPSILON || marker.Value > viewMaxY + Precision.DOUBLE_EPSILON) continue;
 
             var left = GetControlPosition(new Vector2((float)viewMinX, (float)marker.Value));
             DrawMarker(context, marker, left, false);
@@ -1318,7 +1318,7 @@ public sealed class GraphControl : Control
         if (end < start) return;
 
         double width = Math.Max(end - start, 0) / ViewWidthInternal * Math.Max(Bounds.Width, 1);
-        int samples = Math.Clamp((int)Math.Ceiling(Math.Max(width, 1)), 2, MaximumCurveSamples);
+        int samples = Math.Clamp((int)Math.Ceiling(Math.Max(width, 1)), 2, maximum_curve_samples);
         List<Point> points = new(samples);
         for (int index = 0; index < samples; index++)
         {
@@ -1382,7 +1382,7 @@ public sealed class GraphControl : Control
         {
             if (!IsGraphPositionVisible(state.Anchors[index].Pos)) continue;
 
-            if (Distance(point, GetControlPosition(state.Anchors[index].Pos)) <= AnchorHitRadius) return index;
+            if (Distance(point, GetControlPosition(state.Anchors[index].Pos)) <= anchor_hit_radius) return index;
         }
 
         return null;
@@ -1398,7 +1398,7 @@ public sealed class GraphControl : Control
             if (!IsGraphPositionVisible(tensionPosition)) continue;
 
             var tensionPoint = GetControlPosition(tensionPosition);
-            if (Distance(point, tensionPoint) <= TensionHitRadius) return index;
+            if (Distance(point, tensionPoint) <= tension_hit_radius) return index;
         }
 
         return null;
@@ -1515,10 +1515,10 @@ public sealed class GraphControl : Control
 
     private bool IsGraphPositionVisible(Vector2 position)
     {
-        return position.X >= viewMinX - Precision.DoubleEpsilon
-               && position.X <= viewMaxX + Precision.DoubleEpsilon
-               && position.Y >= viewMinY - Precision.DoubleEpsilon
-               && position.Y <= viewMaxY + Precision.DoubleEpsilon;
+        return position.X >= viewMinX - Precision.DOUBLE_EPSILON
+               && position.X <= viewMaxX + Precision.DOUBLE_EPSILON
+               && position.Y >= viewMinY - Precision.DOUBLE_EPSILON
+               && position.Y <= viewMaxY + Precision.DOUBLE_EPSILON;
     }
 
     private static IBrush ToBrush(uint argb)

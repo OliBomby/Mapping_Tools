@@ -6,13 +6,13 @@ namespace Mapping_Tools.Application.SliderMerger;
 /// <summary>Selects Slider Merger inputs and persists its Core transformation.</summary>
 public sealed class SliderMergerService : ISliderMergerService
 {
-    private readonly IBeatmapEditingGateway _editingGateway;
+    private readonly IBeatmapEditingGateway editingGateway;
 
     /// <summary>Creates a Slider Merger service.</summary>
     /// <param name="editingGateway">Loads live-or-disk beatmaps and performs backup-safe saves.</param>
     public SliderMergerService(IBeatmapEditingGateway editingGateway)
     {
-        _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
     }
 
     /// <inheritdoc />
@@ -39,7 +39,7 @@ public sealed class SliderMergerService : ISliderMergerService
             var preference = options.ImportModeSetting == SliderMergerImportMode.Selected
                 ? LiveBeatmapPreference.RequireLive
                 : LiveBeatmapPreference.PreferLive;
-            var session = await _editingGateway
+            var session = await editingGateway
                 .OpenBeatmapAsync(path, preference, cancellationToken)
                 .ConfigureAwait(false);
             var markedObjects = BeatmapObjectSelection.Select(
@@ -60,7 +60,7 @@ public sealed class SliderMergerService : ISliderMergerService
                 mapProgress,
                 cancellationToken);
             // Save the file
-            await _editingGateway
+            await editingGateway
                 .SaveAsync(session, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
             processedPaths.Add(path);

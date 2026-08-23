@@ -5,26 +5,26 @@ namespace Mapping_Tools.Desktop.Interactions;
 
 internal sealed class AvaloniaRhythmGuideWindowService : IRhythmGuideWindowService
 {
-    private readonly Func<MainWindow> _owner;
-    private readonly Dictionary<RhythmGuideViewModel, RhythmGuideWindow> _windows = [];
+    private readonly Func<MainWindow> owner;
+    private readonly Dictionary<RhythmGuideViewModel, RhythmGuideWindow> windows = [];
 
     public AvaloniaRhythmGuideWindowService(Func<MainWindow> owner)
     {
-        _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
     }
 
     public void Show(RhythmGuideViewModel viewModel)
     {
         ArgumentNullException.ThrowIfNull(viewModel);
-        if (_windows.TryGetValue(viewModel, out var existing))
+        if (windows.TryGetValue(viewModel, out var existing))
         {
             existing.Activate();
             return;
         }
 
         RhythmGuideWindow window = new() { DataContext = viewModel };
-        _windows.Add(viewModel, window);
-        window.Closed += (_, _) => _windows.Remove(viewModel);
-        window.Show(_owner());
+        windows.Add(viewModel, window);
+        window.Closed += (_, _) => windows.Remove(viewModel);
+        window.Show(owner());
     }
 }

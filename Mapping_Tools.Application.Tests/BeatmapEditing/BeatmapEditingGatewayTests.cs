@@ -12,7 +12,7 @@ namespace Mapping_Tools.Application.Tests.BeatmapEditing;
 [TestClass]
 public sealed class BeatmapEditingGatewayTests
 {
-    private const string MapPath = @"C:\osu!\Songs\123 Artist - Title\map.osu";
+    private const string map_path = @"C:\osu!\Songs\123 Artist - Title\map.osu";
 
     [TestMethod]
     public async Task OpenBeatmapAsync_WithMatchingLiveState_OverlaysAndPreservesSelection()
@@ -34,7 +34,7 @@ public sealed class BeatmapEditingGatewayTests
             ObjectType = 1,
         };
         LiveBeatmapSnapshot snapshot = new(
-            MapPath,
+            map_path,
             [750],
             [new TimingPoint(0, 500, 4, SampleSet.Normal, 0, 70, true, false, false)],
             [selected, earlier],
@@ -47,7 +47,7 @@ public sealed class BeatmapEditingGatewayTests
         var gateway = CreateGateway(store, reader);
 
         // Act
-        var session = await gateway.OpenBeatmapAsync(MapPath);
+        var session = await gateway.OpenBeatmapAsync(map_path);
 
         // Assert
         session.Source.Should().Be(BeatmapEditingSource.LiveEditor);
@@ -72,7 +72,7 @@ public sealed class BeatmapEditingGatewayTests
 
         // Act
         var session = await gateway.OpenBeatmapAsync(
-            MapPath,
+            map_path,
             LiveBeatmapPreference.DiskOnly);
 
         // Assert
@@ -87,7 +87,7 @@ public sealed class BeatmapEditingGatewayTests
         // Arrange
         var store = CreateStore();
         LiveBeatmapSnapshot snapshot = new(
-            MapPath.ToUpperInvariant(),
+            map_path.ToUpperInvariant(),
             [],
             [],
             [],
@@ -99,7 +99,7 @@ public sealed class BeatmapEditingGatewayTests
             new FakeLiveBeatmapReader(snapshot));
 
         // Act
-        var session = await gateway.OpenBeatmapAsync(MapPath);
+        var session = await gateway.OpenBeatmapAsync(map_path);
 
         // Assert
         session.Source.Should().Be(BeatmapEditingSource.Disk);
@@ -117,10 +117,10 @@ public sealed class BeatmapEditingGatewayTests
             store,
             new FakeLiveBeatmapReader(failure));
 
-        var fallback = await gateway.OpenBeatmapAsync(MapPath);
+        var fallback = await gateway.OpenBeatmapAsync(map_path);
         // Act
         Func<Task> act1 = () => gateway.OpenBeatmapAsync(
-            MapPath,
+            map_path,
             LiveBeatmapPreference.RequireLive);
 
         // Assert
@@ -143,7 +143,7 @@ public sealed class BeatmapEditingGatewayTests
 
         // Act
         Func<Task> act2 = () => gateway.OpenBeatmapAsync(
-            MapPath,
+            map_path,
             LiveBeatmapPreference.RequireLive);
 
         // Assert
@@ -166,9 +166,9 @@ public sealed class BeatmapEditingGatewayTests
             reloadService: reload,
             backupService: backup);
         var session = await gateway.OpenBeatmapAsync(
-            MapPath,
+            map_path,
             LiveBeatmapPreference.DiskOnly);
-        session.Editor.Beatmap.Metadata["Version"] = new TValue("Edited");
+        session.Editor.Beatmap.Metadata["Version"] = new StringValue("Edited");
 
         // Act
         await gateway.SaveAsync(session, true);
@@ -179,7 +179,7 @@ public sealed class BeatmapEditingGatewayTests
         backup.BackupPrecededWrite.Should().BeTrue();
         reload.ReloadCount.Should().Be(1);
         reload.FileHadBeenWritten.Should().BeTrue();
-        store.Files[MapPath].Any(line => line == "Version:Edited").Should().BeTrue();
+        store.Files[map_path].Any(line => line == "Version:Edited").Should().BeTrue();
     }
 
     [TestMethod]
@@ -196,7 +196,7 @@ public sealed class BeatmapEditingGatewayTests
             reloadService: reload,
             backupService: backup);
         var session = await gateway.OpenBeatmapAsync(
-            MapPath,
+            map_path,
             LiveBeatmapPreference.DiskOnly);
 
         // Act
@@ -222,7 +222,7 @@ public sealed class BeatmapEditingGatewayTests
 
         // Act
         Func<Task> act4 = () => gateway.OpenBeatmapAsync(
-            MapPath,
+            map_path,
             cancellationToken: source.Token);
 
         // Assert
@@ -255,21 +255,21 @@ public sealed class BeatmapEditingGatewayTests
             "Beatmaps",
             "standard-feature-rich.osu");
         return new MemoryTextFileStore(
-            MapPath,
+            map_path,
             File.ReadAllLines(fixture));
     }
 
     private sealed class RecordingBackupService : IBeatmapBackupService
     {
-        private readonly Exception? _failure;
-        private readonly MemoryTextFileStore _store;
+        private readonly Exception? failure;
+        private readonly MemoryTextFileStore store;
 
         public RecordingBackupService(
             MemoryTextFileStore store,
             Exception? failure = null)
         {
-            _store = store;
-            _failure = failure;
+            this.store = store;
+            this.failure = failure;
         }
 
         public int CreateCount { get; private set; }
@@ -284,8 +284,8 @@ public sealed class BeatmapEditingGatewayTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             CreateCount++;
-            BackupPrecededWrite = _store.WriteCount == 0;
-            if (_failure is not null) return Task.FromException<BeatmapBackupResult>(_failure);
+            BackupPrecededWrite = store.WriteCount == 0;
+            if (failure is not null) return Task.FromException<BeatmapBackupResult>(failure);
 
             BeatmapBackupArtifact artifact = new(
                 "backup.osu",
@@ -305,8 +305,8 @@ public sealed class BeatmapEditingGatewayTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             CreateCount++;
-            BackupPrecededWrite = _store.WriteCount == 0;
-            if (_failure is not null) return Task.FromException<BeatmapBackupResult>(_failure);
+            BackupPrecededWrite = store.WriteCount == 0;
+            if (failure is not null) return Task.FromException<BeatmapBackupResult>(failure);
 
             BeatmapBackupArtifact artifact = new(
                 "backup.osu",
@@ -347,17 +347,17 @@ public sealed class BeatmapEditingGatewayTests
 
     private sealed class FakeLiveBeatmapReader : ILiveBeatmapReader
     {
-        private readonly Exception? _failure;
-        private readonly LiveBeatmapSnapshot? _snapshot;
+        private readonly Exception? failure;
+        private readonly LiveBeatmapSnapshot? snapshot;
 
         public FakeLiveBeatmapReader(LiveBeatmapSnapshot? snapshot)
         {
-            _snapshot = snapshot;
+            this.snapshot = snapshot;
         }
 
         public FakeLiveBeatmapReader(Exception failure)
         {
-            _failure = failure;
+            this.failure = failure;
         }
 
         public int ReadCount { get; private set; }
@@ -367,19 +367,19 @@ public sealed class BeatmapEditingGatewayTests
         {
             ReadCount++;
             cancellationToken.ThrowIfCancellationRequested();
-            return _failure is null
-                ? Task.FromResult(_snapshot)
-                : Task.FromException<LiveBeatmapSnapshot?>(_failure);
+            return failure is null
+                ? Task.FromResult(snapshot)
+                : Task.FromException<LiveBeatmapSnapshot?>(failure);
         }
     }
 
     private sealed class RecordingReloadService : IEditorReloadService
     {
-        private readonly MemoryTextFileStore _store;
+        private readonly MemoryTextFileStore store;
 
         public RecordingReloadService(MemoryTextFileStore store)
         {
-            _store = store;
+            this.store = store;
         }
 
         public int ReloadCount { get; private set; }
@@ -390,7 +390,7 @@ public sealed class BeatmapEditingGatewayTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             ReloadCount++;
-            FileHadBeenWritten = _store.WriteCount > 0;
+            FileHadBeenWritten = store.WriteCount > 0;
             return Task.CompletedTask;
         }
     }

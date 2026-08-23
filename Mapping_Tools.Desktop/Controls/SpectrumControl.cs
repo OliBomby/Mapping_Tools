@@ -8,7 +8,7 @@ namespace Mapping_Tools.Desktop.Controls;
 /// <summary>Renders a reusable spectrum frame without owning audio or decoder resources.</summary>
 public sealed class SpectrumControl : Control
 {
-    private const double DefaultHeight = 64;
+    private const double default_height = 64;
 
     /// <summary>Identifies the immutable spectrum frame drawn by the control.</summary>
     public static readonly StyledProperty<SpectrumFrame?> FrameProperty =
@@ -91,7 +91,7 @@ public sealed class SpectrumControl : Control
     {
         return new Size(
             double.IsInfinity(availableSize.Width) ? 100 : Math.Max(0, availableSize.Width),
-            double.IsInfinity(availableSize.Height) ? DefaultHeight : Math.Max(0, availableSize.Height));
+            double.IsInfinity(availableSize.Height) ? default_height : Math.Max(0, availableSize.Height));
     }
 
     /// <summary>

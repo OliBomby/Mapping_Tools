@@ -171,27 +171,27 @@ public interface IUpdateService : IDisposable
 /// </summary>
 public sealed class UpdateService : IUpdateService, IAsyncDisposable
 {
-    private readonly SemaphoreSlim _checkGate = new(1, 1);
-    private readonly CancellationTokenSource _disposeCancellation = new();
-    private readonly IUpdateGateway _gateway;
-    private readonly ApplicationSettings _settings;
-    private readonly object _stateLock = new();
-    private Task? _activeDownloadTask;
-    private bool _checkInProgress;
-    private Task? _disposeTask;
-    private bool _disposed;
-    private CancellationTokenSource? _downloadCancellation;
-    private UpdateCheckResult? _lastCheck;
-    private long _operationId;
-    private bool _prepared;
+    private readonly SemaphoreSlim checkGate = new(1, 1);
+    private readonly CancellationTokenSource disposeCancellation = new();
+    private readonly IUpdateGateway gateway;
+    private readonly ApplicationSettings settings;
+    private readonly object stateLock = new();
+    private Task? activeDownloadTask;
+    private bool checkInProgress;
+    private Task? disposeTask;
+    private bool disposed;
+    private CancellationTokenSource? downloadCancellation;
+    private UpdateCheckResult? lastCheck;
+    private long operationId;
+    private bool prepared;
 
     /// <summary>Creates the update use case.</summary>
     /// <param name="gateway">The network, archive, staging, and process adapter.</param>
     /// <param name="settings">The shared settings document containing the skipped version.</param>
     public UpdateService(IUpdateGateway gateway, ApplicationSettings settings)
     {
-        _gateway = gateway ?? throw new ArgumentNullException(nameof(gateway));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.gateway = gateway ?? throw new ArgumentNullException(nameof(gateway));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <summary>
@@ -201,19 +201,19 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
     /// <returns>A task that completes after all updater resources are released.</returns>
     public ValueTask DisposeAsync()
     {
-        lock (_stateLock)
+        lock (stateLock)
         {
-            if (_disposeTask is not null) return new ValueTask(_disposeTask);
+            if (disposeTask is not null) return new ValueTask(disposeTask);
 
-            _disposed = true;
-            _operationId++;
-            _downloadCancellation?.Cancel();
-            _downloadCancellation = null;
-            _lastCheck = null;
-            _prepared = false;
-            _disposeCancellation.Cancel();
-            _disposeTask = DisposeCoreAsync(_activeDownloadTask);
-            return new ValueTask(_disposeTask);
+            disposed = true;
+            operationId++;
+            downloadCancellation?.Cancel();
+            downloadCancellation = null;
+            lastCheck = null;
+            prepared = false;
+            disposeCancellation.Cancel();
+            disposeTask = DisposeCoreAsync(activeDownloadTask);
+            return new ValueTask(disposeTask);
         }
     }
 
@@ -225,9 +225,9 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
     {
         get
         {
-            lock (_stateLock)
+            lock (stateLock)
             {
-                return _lastCheck;
+                return lastCheck;
             }
         }
     }
@@ -237,9 +237,9 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
     {
         get
         {
-            lock (_stateLock)
+            lock (stateLock)
             {
-                return _activeDownloadTask;
+                return activeDownloadTask;
             }
         }
     }
@@ -251,24 +251,24 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
     {
         ThrowIfDisposed();
 
-        await _checkGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        await checkGate.WaitAsync(cancellationToken).ConfigureAwait(false);
         var checkCancellation =
             CancellationTokenSource.CreateLinkedTokenSource(
                 cancellationToken,
-                _disposeCancellation.Token);
+                disposeCancellation.Token);
         try
         {
             ThrowIfDisposed();
 
             Task? activeDownload;
-            lock (_stateLock)
+            lock (stateLock)
             {
-                _checkInProgress = true;
-                _operationId++;
-                _downloadCancellation?.Cancel();
-                activeDownload = _activeDownloadTask;
-                _lastCheck = null;
-                _prepared = false;
+                checkInProgress = true;
+                operationId++;
+                downloadCancellation?.Cancel();
+                activeDownload = activeDownloadTask;
+                lastCheck = null;
+                prepared = false;
             }
 
             if (activeDownload is not null)
@@ -290,7 +290,7 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
                 }
 
             checkCancellation.Token.ThrowIfCancellationRequested();
-            var package = await _gateway
+            var package = await gateway
                 .CheckForUpdatesAsync(checkCancellation.Token)
                 .ConfigureAwait(false);
 
@@ -307,23 +307,23 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
                 package.ReleaseTitle,
                 package.ReleaseBody,
                 package.AssetName);
-            lock (_stateLock)
+            lock (stateLock)
             {
-                _lastCheck = result;
-                _prepared = false;
-                _activeDownloadTask = null;
+                lastCheck = result;
+                prepared = false;
+                activeDownloadTask = null;
             }
 
             return result;
         }
         finally
         {
-            lock (_stateLock)
+            lock (stateLock)
             {
-                _checkInProgress = false;
+                checkInProgress = false;
             }
 
-            _checkGate.Release();
+            checkGate.Release();
             checkCancellation.Dispose();
         }
     }
@@ -337,29 +337,29 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
         CancellationTokenSource? downloadCancellation = null;
         TaskCompletionSource? completion = null;
         long operationId = 0;
-        lock (_stateLock)
+        lock (stateLock)
         {
             ThrowIfDisposed();
-            if (_checkInProgress)
+            if (checkInProgress)
                 throw new InvalidOperationException(
                     "Do not prepare an update while checking for updates!");
 
-            check = _lastCheck
+            check = lastCheck
                     ?? throw new InvalidOperationException("Do not call this method before fetching updates!");
             if (!check.CanUpdate || check.LatestVersion is null) throw new InvalidOperationException("Do not call this method if there are no updates!");
 
-            if (_prepared) return Task.CompletedTask;
+            if (prepared) return Task.CompletedTask;
 
-            if (_activeDownloadTask is { IsCompleted: false }) return _activeDownloadTask;
+            if (activeDownloadTask is { IsCompleted: false }) return activeDownloadTask;
 
             downloadCancellation = CancellationTokenSource.CreateLinkedTokenSource(
                 cancellationToken,
-                _disposeCancellation.Token);
+                disposeCancellation.Token);
             completion = new TaskCompletionSource(
                 TaskCreationOptions.RunContinuationsAsynchronously);
-            _downloadCancellation = downloadCancellation;
-            _activeDownloadTask = completion.Task;
-            operationId = ++_operationId;
+            this.downloadCancellation = downloadCancellation;
+            activeDownloadTask = completion.Task;
+            operationId = ++this.operationId;
         }
 
         var downloadCancellationSource = downloadCancellation!;
@@ -382,15 +382,15 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
     {
         ThrowIfDisposed();
         UpdateCheckResult check;
-        lock (_stateLock)
+        lock (stateLock)
         {
-            check = _lastCheck
+            check = lastCheck
                     ?? throw new InvalidOperationException("Do not call this method before fetching updates!");
         }
 
         if (!check.CanUpdate || check.LatestVersion is null) throw new InvalidOperationException("Do not skip a version when there are no updates!");
 
-        _settings.SkipVersion = check.LatestVersion.ToString();
+        settings.SkipVersion = check.LatestVersion.ToString();
     }
 
     /// <inheritdoc />
@@ -399,21 +399,21 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
         ThrowIfDisposed();
 
         UpdateCheckResult check;
-        lock (_stateLock)
+        lock (stateLock)
         {
-            check = _lastCheck
+            check = lastCheck
                     ?? throw new InvalidOperationException("Do not call this method before fetching updates!");
             if (!check.CanUpdate || check.LatestVersion is null) throw new InvalidOperationException("Do not call this method if there are no updates!");
 
-            if (!_prepared) throw new InvalidOperationException("Do not call this method before download has finished!");
+            if (!prepared) throw new InvalidOperationException("Do not call this method before download has finished!");
         }
 
-        _gateway.LaunchUpdater(check.LatestVersion, restartAfterUpdate);
-        lock (_stateLock)
+        gateway.LaunchUpdater(check.LatestVersion, restartAfterUpdate);
+        lock (stateLock)
         {
-            _operationId++;
-            _prepared = false;
-            _activeDownloadTask = null;
+            operationId++;
+            prepared = false;
+            activeDownloadTask = null;
         }
     }
 
@@ -421,13 +421,13 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
     public void AbandonUpdate()
     {
         ThrowIfDisposed();
-        lock (_stateLock)
+        lock (stateLock)
         {
-            _operationId++;
-            _downloadCancellation?.Cancel();
-            _lastCheck = null;
-            _prepared = false;
-            if (_activeDownloadTask?.IsCompleted == true) _activeDownloadTask = null;
+            operationId++;
+            downloadCancellation?.Cancel();
+            lastCheck = null;
+            prepared = false;
+            if (activeDownloadTask?.IsCompleted == true) activeDownloadTask = null;
         }
     }
 
@@ -450,11 +450,11 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
                 // failed package preparation.
             }
 
-        await _checkGate.WaitAsync().ConfigureAwait(false);
-        _checkGate.Release();
-        _gateway.Dispose();
-        _checkGate.Dispose();
-        _disposeCancellation.Dispose();
+        await checkGate.WaitAsync().ConfigureAwait(false);
+        checkGate.Release();
+        gateway.Dispose();
+        checkGate.Dispose();
+        disposeCancellation.Dispose();
         ProgressChanged = null;
     }
 
@@ -467,15 +467,15 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
     {
         try
         {
-            await _gateway
+            await gateway
                 .PrepareUpdateAsync(check.LatestVersion!, progress, downloadCancellation.Token)
                 .ConfigureAwait(false);
             downloadCancellation.Token.ThrowIfCancellationRequested();
             bool isCurrent;
-            lock (_stateLock)
+            lock (stateLock)
             {
-                isCurrent = !_disposed && _operationId == operationId && ReferenceEquals(_lastCheck, check);
-                _prepared = isCurrent;
+                isCurrent = !disposed && this.operationId == operationId && ReferenceEquals(lastCheck, check);
+                prepared = isCurrent;
             }
 
             if (isCurrent)
@@ -485,9 +485,9 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
         }
         catch (OperationCanceledException exception)
         {
-            lock (_stateLock)
+            lock (stateLock)
             {
-                if (_operationId == operationId) _prepared = false;
+                if (this.operationId == operationId) prepared = false;
             }
 
             var token = exception.CancellationToken.IsCancellationRequested
@@ -497,18 +497,18 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
         }
         catch (Exception exception)
         {
-            lock (_stateLock)
+            lock (stateLock)
             {
-                if (_operationId == operationId) _prepared = false;
+                if (this.operationId == operationId) prepared = false;
             }
 
             completion.TrySetException(exception);
         }
         finally
         {
-            lock (_stateLock)
+            lock (stateLock)
             {
-                if (ReferenceEquals(_downloadCancellation, downloadCancellation)) _downloadCancellation = null;
+                if (ReferenceEquals(this.downloadCancellation, downloadCancellation)) this.downloadCancellation = null;
             }
 
             downloadCancellation.Dispose();
@@ -517,24 +517,24 @@ public sealed class UpdateService : IUpdateService, IAsyncDisposable
 
     private bool IsSkipped(Version? latestVersion, bool allowSkippedVersion)
     {
-        if (!allowSkippedVersion || latestVersion is null || string.IsNullOrWhiteSpace(_settings.SkipVersion))
+        if (!allowSkippedVersion || latestVersion is null || string.IsNullOrWhiteSpace(settings.SkipVersion))
             return false;
 
-        return Version.TryParse(_settings.SkipVersion, out var skippedVersion) && latestVersion <= skippedVersion;
+        return Version.TryParse(settings.SkipVersion, out var skippedVersion) && latestVersion <= skippedVersion;
     }
 
     private void ThrowIfDisposed()
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
+        ObjectDisposedException.ThrowIf(disposed, this);
     }
 
     private sealed class InlineProgress(Action<double> callback) : IProgress<double>
     {
-        private readonly Action<double> _callback = callback ?? throw new ArgumentNullException(nameof(callback));
+        private readonly Action<double> callback = callback ?? throw new ArgumentNullException(nameof(callback));
 
         public void Report(double value)
         {
-            _callback(value);
+            callback(value);
         }
     }
 }

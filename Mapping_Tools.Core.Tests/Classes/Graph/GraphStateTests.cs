@@ -41,8 +41,8 @@ public sealed class GraphStateTests
         double integral = state.GetIntegral(0, 1);
 
         // Assert
-        integral.Should().BeApproximately(5, Precision.DoubleEpsilon);
-        state.GetDerivative(0.25).Should().BeApproximately(10, Precision.DoubleEpsilon);
+        integral.Should().BeApproximately(5, Precision.DOUBLE_EPSILON);
+        state.GetDerivative(0.25).Should().BeApproximately(10, Precision.DOUBLE_EPSILON);
     }
 
     [TestMethod]
@@ -108,7 +108,7 @@ public sealed class GraphStateTests
         parsedConstant.GetValue(0.5).Should().Be(12.5);
         curveParsed.Should().BeTrue();
         parsedCurve.Anchors.Should().HaveCount(3);
-        parsedCurve.Anchors[1].Tension.Should().BeApproximately(-0.25, Precision.DoubleEpsilon);
+        parsedCurve.Anchors[1].Tension.Should().BeApproximately(-0.25, Precision.DOUBLE_EPSILON);
         parsedCurve.GetValue(0.5).Should().BeApproximately(curve.GetValue(0.5), 0.0001);
     }
 

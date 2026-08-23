@@ -29,20 +29,20 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     IAsyncDisposable,
     IDisposable
 {
-    internal const string OperationId = "hitsound-studio";
-    private readonly ICurrentBeatmapLocator _currentBeatmap;
-    private readonly ProjectDefinition<HitsoundStudioProject> _definition;
-    private readonly IHitsoundStudioDialogService _dialogs;
-    private readonly IFilePicker _filePicker;
-    private readonly IHitsoundStudioFileSystem _files;
-    private readonly IDialogService _messageDialogs;
-    private readonly IProjectStore _projectStore;
+    internal const string OPERATION_ID = "hitsound-studio";
+    private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly ProjectDefinition<HitsoundStudioProject> definition;
+    private readonly IHitsoundStudioDialogService dialogs;
+    private readonly IFilePicker filePicker;
+    private readonly IHitsoundStudioFileSystem files;
+    private readonly IDialogService messageDialogs;
+    private readonly IProjectStore projectStore;
 
-    private readonly IHitsoundStudioService _service;
-    private readonly ApplicationSettings _settings;
-    private readonly IBeatmapWorkspace _workspace;
-    private IAudioPlaybackSession? _previewSession;
-    private bool _syncingEditor;
+    private readonly IHitsoundStudioService service;
+    private readonly ApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
+    private IAudioPlaybackSession? previewSession;
+    private bool syncingEditor;
 
     /// <summary>
     ///     Creates the Hitsound Studio presentation model and binds its persisted
@@ -71,20 +71,20 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         IProjectStore projectStore,
         ApplicationSettings settings,
         IApplicationDirectories directories)
-        : base(execution, OperationId)
+        : base(execution, OPERATION_ID)
     {
-        _service = service ?? throw new ArgumentNullException(nameof(service));
-        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
-        _messageDialogs = messageDialogs ?? throw new ArgumentNullException(nameof(messageDialogs));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        _files = files ?? throw new ArgumentNullException(nameof(files));
-        _projectStore = projectStore ?? throw new ArgumentNullException(nameof(projectStore));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.service = service ?? throw new ArgumentNullException(nameof(service));
+        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        this.messageDialogs = messageDialogs ?? throw new ArgumentNullException(nameof(messageDialogs));
+        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.files = files ?? throw new ArgumentNullException(nameof(files));
+        this.projectStore = projectStore ?? throw new ArgumentNullException(nameof(projectStore));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         directories = directories ?? throw new ArgumentNullException(nameof(directories));
         ExportFolder = directories.Exports;
-        _definition = new ProjectDefinition<HitsoundStudioProject>(
+        definition = new ProjectDefinition<HitsoundStudioProject>(
             "hsstudioproject.json",
             "Hitsound Studio Projects",
             () => new HitsoundStudioProject { ExportFolder = directories.Exports });
@@ -379,12 +379,12 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
         if (!string.IsNullOrWhiteSpace(path)) BaseBeatmap = path;
         await RunWithStateAsync(() => RunExportAsync([path ?? string.Empty], cancellationToken));
     }
 
-    string IQuickRun.OperationId => OperationId;
+    string IQuickRun.OperationId => OPERATION_ID;
 
     IReadOnlyList<ShellProjectMenuItem> IShellExtraProjectMenuFeature.ExtraProjectMenuItems =>
     [
@@ -394,7 +394,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             BulkAssignSamplesCommand, MaterialIconKind.MusicBoxMultiple),
     ];
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
     {
@@ -410,10 +410,10 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        var paths = _workspace.SelectedPaths;
-        if (_settings.AlwaysQuickRun)
+        var paths = workspace.SelectedPaths;
+        if (settings.AlwaysQuickRun)
         {
-            string? current = await _currentBeatmap.FindCurrentBeatmapAsync();
+            string? current = await currentBeatmap.FindCurrentBeatmapAsync();
             paths = string.IsNullOrWhiteSpace(current) ? [] : [current];
         }
 
@@ -444,10 +444,10 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     {
         try
         {
-            var request = await _dialogs.ShowImportAsync(
+            var request = await dialogs.ShowImportAsync(
                 $"Layer {Layers.Count + 1}");
             if (request is null) return;
-            var imported = await _service.ImportAsync(request);
+            var imported = await service.ImportAsync(request);
             foreach (var layer in imported)
             {
                 ObservableHitsoundLayer adapter = new(layer) { Priority = Layers.Count };
@@ -473,7 +473,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     private async Task RemoveAsync()
     {
         if (SelectedLayers.Count == 0) return;
-        bool confirmed = await _messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
+        bool confirmed = await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
             "Confirm deletion",
             SelectedLayers.Count == 1
                 ? "Are you sure you want to delete the selected layer?"
@@ -508,7 +508,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
         try
         {
-            await _service.ReloadAsync(SelectedLayers.Select(layer => layer.Model).ToArray());
+            await service.ReloadAsync(SelectedLayers.Select(layer => layer.Model).ToArray());
             ResultSummary = "Reloaded selected layers.";
         }
         catch (OperationCanceledException)
@@ -534,7 +534,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         await StopPreviewAsync();
         try
         {
-            _previewSession = await _service.PreviewAsync(SelectedLayer.SampleArgs.Snapshot());
+            previewSession = await service.PreviewAsync(SelectedLayer.SampleArgs.Snapshot());
             ResultSummary = "Playing selected layer.";
         }
         catch (FileNotFoundException)
@@ -555,7 +555,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private Task StopPreviewAsync()
     {
-        var session = Interlocked.Exchange(ref _previewSession, null);
+        var session = Interlocked.Exchange(ref previewSession, null);
         return session is null ? Task.CompletedTask : session.StopAsync().AsTask();
     }
 
@@ -565,7 +565,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     {
         try
         {
-            var failures = await _service.ValidateSamplesAsync(
+            var failures = await service.ValidateSamplesAsync(
                 Layers.Select(layer => layer.SampleArgs.Snapshot()).ToArray());
             ResultSummary = failures.Count == 0
                 ? "All sample sources are valid."
@@ -585,7 +585,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task PickBaseBeatmapAsync()
     {
-        var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Choose base beatmap",
             AllowMultiple = false,
@@ -598,7 +598,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task PickDefaultSampleAsync()
     {
-        var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Choose default sample",
             AllowMultiple = false,
@@ -611,7 +611,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task PickEditSamplePathAsync()
     {
-        var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Choose layer sample",
             AllowMultiple = false,
@@ -624,7 +624,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task PickEditImportPathAsync()
     {
-        var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Choose import source",
             AllowMultiple = false,
@@ -637,7 +637,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task LoadEditImportPathAsync()
     {
-        string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
         if (!string.IsNullOrWhiteSpace(path)) EditImportPath = path;
     }
 
@@ -645,7 +645,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task PickEditImportSamplePathAsync()
     {
-        var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Choose imported sample",
             AllowMultiple = false,
@@ -658,7 +658,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task PickExportFolderAsync()
     {
-        var paths = await _filePicker.PickFoldersAsync(new OpenFolderPickerRequest
+        var paths = await filePicker.PickFoldersAsync(new OpenFolderPickerRequest
         {
             Title = "Choose Hitsound Studio export folder",
             AllowMultiple = false,
@@ -670,14 +670,14 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task LoadSampleSchemaAsync()
     {
-        var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Load sample schema",
             AllowMultiple = false,
             Filters = [new FilePickerFilter("JSON files", [".json"])],
         });
         if (paths.Count == 0) return;
-        PreviousSampleSchema = await _projectStore.LoadAsync<SampleSchema>(paths[0]);
+        PreviousSampleSchema = await projectStore.LoadAsync<SampleSchema>(paths[0]);
         UsePreviousSampleSchema = true;
         ResultSummary = "Loaded previous sample schema.";
     }
@@ -689,7 +689,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task BulkAssignSamplesAsync()
     {
-        var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Bulk assign samples",
             AllowMultiple = true,
@@ -748,7 +748,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     {
         OnPropertyChanged(nameof(HasSelectedLayer));
         RefreshEditorVisibility();
-        _syncingEditor = true;
+        syncingEditor = true;
         EditTimes = value is null
             ? string.Empty
             : string.Join(", ", value.Times.Select(time => time.ToString("0.###", CultureInfo.InvariantCulture)));
@@ -781,12 +781,12 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         EditImportVelocity = Format(value?.ImportArgs.Velocity, -1);
         EditImportVelocityRoughness = Format(value?.ImportArgs.VelocityRoughness, 1);
         EditImportOffset = Format(value?.ImportArgs.Offset, 0);
-        _syncingEditor = false;
+        syncingEditor = false;
     }
 
     partial void OnEditTimesChanged(string value)
     {
-        if (_syncingEditor) return;
+        if (syncingEditor) return;
         string[] fields = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         List<double> times = [];
         foreach (string field in fields)
@@ -803,44 +803,44 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     partial void OnEditNameChanged(string value)
     {
-        if (_syncingEditor) return;
+        if (syncingEditor) return;
         foreach (var layer in Targets()) layer.Name = value;
     }
 
     partial void OnEditSampleSetChanged(SampleSet value)
     {
-        if (_syncingEditor) return;
+        if (syncingEditor) return;
         foreach (var layer in Targets()) layer.SampleSet = value;
     }
 
     partial void OnEditHitsoundChanged(Hitsound value)
     {
-        if (_syncingEditor) return;
+        if (syncingEditor) return;
         foreach (var layer in Targets()) layer.Hitsound = value;
     }
 
     partial void OnEditSamplePathChanged(string value)
     {
-        if (_syncingEditor) return;
+        if (syncingEditor) return;
         foreach (var layer in Targets()) layer.SampleArgs.Path = value;
         RefreshEditorVisibility();
     }
 
     partial void OnEditSampleVolumeChanged(string value)
     {
-        if (_syncingEditor || !TryDouble(value, 100, out double parsed)) return;
+        if (syncingEditor || !TryDouble(value, 100, out double parsed)) return;
         foreach (var layer in Targets()) layer.SampleArgs.Volume = parsed / 100;
     }
 
     partial void OnEditSamplePanningChanged(string value)
     {
-        if (_syncingEditor || !TryDouble(value, 0, out double parsed)) return;
+        if (syncingEditor || !TryDouble(value, 0, out double parsed)) return;
         foreach (var layer in Targets()) layer.SampleArgs.Panning = parsed;
     }
 
     partial void OnEditSamplePitchShiftChanged(string value)
     {
-        if (_syncingEditor || !TryDouble(value, 0, out double parsed)) return;
+        if (syncingEditor || !TryDouble(value, 0, out double parsed)) return;
         foreach (var layer in Targets()) layer.SampleArgs.PitchShift = parsed;
     }
 
@@ -866,19 +866,19 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     partial void OnEditSampleLengthChanged(string value)
     {
-        if (_syncingEditor || !TryDouble(value, -1, out double parsed)) return;
+        if (syncingEditor || !TryDouble(value, -1, out double parsed)) return;
         foreach (var layer in Targets()) layer.SampleArgs.Length = parsed;
     }
 
     partial void OnEditSampleVelocityChanged(string value)
     {
-        if (_syncingEditor || !TryInt(value, 127, out int parsed)) return;
+        if (syncingEditor || !TryInt(value, 127, out int parsed)) return;
         foreach (var layer in Targets()) layer.SampleArgs.Velocity = parsed;
     }
 
     partial void OnEditImportTypeChanged(ImportType value)
     {
-        if (_syncingEditor) return;
+        if (syncingEditor) return;
         foreach (var layer in Targets()) layer.ImportArgs.ImportType = value;
         RefreshEditorVisibility();
     }
@@ -976,31 +976,31 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 
     private void SetSampleInt(string value, int fallback, Action<ObservableSampleGeneratingArgs, int> setter)
     {
-        if (_syncingEditor || !TryInt(value, fallback, out int parsed)) return;
+        if (syncingEditor || !TryInt(value, fallback, out int parsed)) return;
         foreach (var layer in Targets()) setter(layer.SampleArgs, parsed);
     }
 
     private void SetImportString(string value, Action<LayerImportArgs, string> setter)
     {
-        if (_syncingEditor) return;
+        if (syncingEditor) return;
         foreach (var layer in Targets()) setter(layer.ImportArgs, value);
     }
 
     private void SetImportDouble(string value, double fallback, Action<LayerImportArgs, double> setter)
     {
-        if (_syncingEditor || !TryDouble(value, fallback, out double parsed)) return;
+        if (syncingEditor || !TryDouble(value, fallback, out double parsed)) return;
         foreach (var layer in Targets()) setter(layer.ImportArgs, parsed);
     }
 
     private void SetImportInt(string value, int fallback, Action<LayerImportArgs, int> setter)
     {
-        if (_syncingEditor || !TryInt(value, fallback, out int parsed)) return;
+        if (syncingEditor || !TryInt(value, fallback, out int parsed)) return;
         foreach (var layer in Targets()) setter(layer.ImportArgs, parsed);
     }
 
     private void SetImportBool(bool value, Action<LayerImportArgs, bool> setter)
     {
-        if (_syncingEditor) return;
+        if (syncingEditor) return;
         foreach (var layer in Targets()) setter(layer.ImportArgs, value);
     }
 
@@ -1047,11 +1047,11 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         if (string.IsNullOrWhiteSpace(BaseBeatmap)
             && selectedPaths.FirstOrDefault(path => path.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)) is string selected) BaseBeatmap = selected;
 
-        var chosen = await _dialogs.ShowExportAsync(ToProject());
+        var chosen = await dialogs.ShowExportAsync(ToProject());
         if (chosen is null) return;
         if (chosen.UsePreviousSampleSchema && chosen.PreviousSampleSchema is null)
         {
-            await _messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
+            await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
                 "Previous sample schema not found",
                 "Load a previous sample schema before enabling this option.",
                 [new DialogChoice<bool>("OK", true, true)],
@@ -1059,9 +1059,9 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             return;
         }
 
-        if (!_files.DirectoryExists(chosen.ExportFolder))
+        if (!files.DirectoryExists(chosen.ExportFolder))
         {
-            bool create = await _messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
+            bool create = await messageDialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
                 "Export path not found",
                 $"Folder at path \"{chosen.ExportFolder}\" does not exist. Create a new folder?",
                 [
@@ -1076,11 +1076,11 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         var snapshot = chosen.Clone();
         var result = await Execution.ExecuteAsync(
             new ToolExecutionRequest<HitsoundStudioExportResult>(
-                OperationId,
+                OPERATION_ID,
                 "Hitsound Studio",
                 async context =>
                 {
-                    var output = await _service.ExportAsync(
+                    var output = await service.ExportAsync(
                         snapshot,
                         new Progress<double>(value => context.ReportProgress(value, "Exporting hitsounds")),
                         context.CancellationToken);

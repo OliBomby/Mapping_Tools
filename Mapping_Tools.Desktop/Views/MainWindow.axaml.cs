@@ -19,13 +19,13 @@ namespace Mapping_Tools.Desktop.Views;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private static readonly WindowBounds DefaultBounds = new(80, 60, 1500, 800);
-    private readonly ApplicationSettings _settings;
-    private readonly SettingsPersistenceHostedService? _settingsPersistence;
-    private readonly IUpdaterInteractionService? _updaterInteraction;
-    private WindowBounds _normalBounds = DefaultBounds;
-    private bool _restored;
-    private bool _updateCloseInProgress;
+    private static readonly WindowBounds defaultBounds = new(80, 60, 1500, 800);
+    private readonly ApplicationSettings settings;
+    private readonly SettingsPersistenceHostedService? settingsPersistence;
+    private readonly IUpdaterInteractionService? updaterInteraction;
+    private WindowBounds normalBounds = defaultBounds;
+    private bool restored;
+    private bool updateCloseInProgress;
 
     /// <summary>
     ///     Loads a standalone shell instance for XAML tooling and deterministic rendering.
@@ -68,9 +68,9 @@ public partial class MainWindow : Window
         SettingsPersistenceHostedService? settingsPersistence,
         IUpdaterInteractionService? updaterInteraction)
     {
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _settingsPersistence = settingsPersistence;
-        _updaterInteraction = updaterInteraction;
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.settingsPersistence = settingsPersistence;
+        this.updaterInteraction = updaterInteraction;
         InitializeComponent();
         AddHandler(KeyDownEvent, HandleWindowKeyDown, RoutingStrategies.Tunnel);
         PositionChanged += (_, _) => CaptureNormalBounds();
@@ -93,28 +93,28 @@ public partial class MainWindow : Window
     /// <inheritdoc />
     protected override void OnClosing(WindowClosingEventArgs eventArgs)
     {
-        if (!_updateCloseInProgress && _updaterInteraction?.ShouldUpdateOnClose == true)
+        if (!updateCloseInProgress && updaterInteraction?.ShouldUpdateOnClose == true)
         {
             eventArgs.Cancel = true;
-            _updateCloseInProgress = true;
+            updateCloseInProgress = true;
             _ = CompleteUpdateAndCloseAsync();
             return;
         }
 
         if (!eventArgs.IsProgrammatic) CaptureNormalBounds();
 
-        _settings.MainWindowRestoreBounds = _normalBounds;
-        _settings.MainWindowMaximized = WindowState == WindowState.Maximized;
+        settings.MainWindowRestoreBounds = normalBounds;
+        settings.MainWindowMaximized = WindowState == WindowState.Maximized;
         base.OnClosing(eventArgs);
     }
 
     private async Task CompleteUpdateAndCloseAsync()
     {
-        bool canClose = await _updaterInteraction!.CompleteUpdateOnCloseAsync();
+        bool canClose = await updaterInteraction!.CompleteUpdateOnCloseAsync();
         if (canClose)
             Close();
         else
-            _updateCloseInProgress = false;
+            updateCloseInProgress = false;
     }
 
     private void RestoreWindowPlacement()
@@ -123,35 +123,35 @@ public partial class MainWindow : Window
         var areas = connected
             .Select(ToWorkingArea)
             .ToList();
-        _normalBounds = WindowPlacementCalculator.Restore(
-            _settings.MainWindowRestoreBounds,
+        normalBounds = WindowPlacementCalculator.Restore(
+            settings.MainWindowRestoreBounds,
             areas,
-            DefaultBounds);
+            defaultBounds);
 
         var selectedArea = areas
-                               .OrderByDescending(area => IntersectionArea(_normalBounds, area))
-                               .FirstOrDefault(area => IntersectionArea(_normalBounds, area) > 0)
+                               .OrderByDescending(area => IntersectionArea(normalBounds, area))
+                               .FirstOrDefault(area => IntersectionArea(normalBounds, area) > 0)
                            ?? areas.FirstOrDefault(area => area.IsPrimary)
                            ?? areas[0];
         var screen = connected[
             areas.FindIndex(area => ReferenceEquals(area, selectedArea) || area == selectedArea)];
 
-        Width = _normalBounds.Width;
-        Height = _normalBounds.Height;
+        Width = normalBounds.Width;
+        Height = normalBounds.Height;
         Position = new PixelPoint(
-            (int)Math.Round(_normalBounds.X * screen.Scaling),
-            (int)Math.Round(_normalBounds.Y * screen.Scaling));
-        _restored = true;
-        if (_settings.MainWindowMaximized) WindowState = WindowState.Maximized;
+            (int)Math.Round(normalBounds.X * screen.Scaling),
+            (int)Math.Round(normalBounds.Y * screen.Scaling));
+        restored = true;
+        if (settings.MainWindowMaximized) WindowState = WindowState.Maximized;
     }
 
     private void CaptureNormalBounds()
     {
-        if (!_restored || WindowState != WindowState.Normal) return;
+        if (!restored || WindowState != WindowState.Normal) return;
 
         var screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
         double scaling = screen?.Scaling ?? 1;
-        _normalBounds = new WindowBounds(
+        normalBounds = new WindowBounds(
             Position.X / scaling,
             Position.Y / scaling,
             Math.Max(MinWidth, Bounds.Width),
@@ -200,7 +200,7 @@ public partial class MainWindow : Window
 
     private void CloseWithoutSaving(object? sender, RoutedEventArgs eventArgs)
     {
-        _settingsPersistence?.SuppressSave();
+        settingsPersistence?.SuppressSave();
         Close();
     }
 

@@ -6,27 +6,27 @@ namespace Mapping_Tools.Desktop.Hosting;
 
 internal sealed class BetterSaveOverrideHostedService : IHostedService
 {
-    private readonly IBetterSaveOverrideService _overrideService;
-    private readonly ApplicationSettings _settings;
+    private readonly IBetterSaveOverrideService overrideService;
+    private readonly ApplicationSettings settings;
 
     public BetterSaveOverrideHostedService(
         IBetterSaveOverrideService overrideService,
         ApplicationSettings settings)
     {
-        _overrideService = overrideService ?? throw new ArgumentNullException(nameof(overrideService));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.overrideService = overrideService ?? throw new ArgumentNullException(nameof(overrideService));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        _overrideService.Configure(_settings.SongsPath, _settings.OverrideOsuSave);
+        overrideService.Configure(settings.SongsPath, settings.OverrideOsuSave);
         return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _overrideService.Stop();
+        overrideService.Stop();
         return Task.CompletedTask;
     }
 }

@@ -14,16 +14,16 @@ namespace Mapping_Tools.Desktop.Controls;
 public sealed class ObjectVisualiserControl : Control
 {
     /// <summary>Maximum slider pixel length accepted by the legacy visualizer.</summary>
-    public const double MaxPixelLength = 1e6;
+    public const double MAX_PIXEL_LENGTH = 1e6;
 
     /// <summary>Maximum number of calculated slider points accepted by the visualizer.</summary>
-    public const double MaxSegmentCount = 1e6;
+    public const double MAX_SEGMENT_COUNT = 1e6;
 
     /// <summary>Maximum number of slider anchors drawn by the visualizer.</summary>
-    public const int MaxAnchorCount = 1500;
+    public const int MAX_ANCHOR_COUNT = 1500;
 
     /// <summary>Maximum number of source slider anchors accepted before path construction is skipped.</summary>
-    public const int HardMaxAnchorCount = 5000;
+    public const int HARD_MAX_ANCHOR_COUNT = 5000;
 
     /// <summary>Identifies the hit object drawn by the control.</summary>
     public static readonly StyledProperty<HitObject?> HitObjectProperty =
@@ -219,7 +219,7 @@ public sealed class ObjectVisualiserControl : Control
             return;
         }
 
-        if (HitObject.IsSlider && HitObject.PixelLength < MaxPixelLength && HitObject.CurvePoints is not null && HitObject.CurvePoints.Count < HardMaxAnchorCount)
+        if (HitObject.IsSlider && HitObject.PixelLength < MAX_PIXEL_LENGTH && HitObject.CurvePoints is not null && HitObject.CurvePoints.Count < HARD_MAX_ANCHOR_COUNT)
             try
             {
                 double? customLength = CustomPixelLength is { } value && double.IsFinite(value) && value >= 0
@@ -228,7 +228,7 @@ public sealed class ObjectVisualiserControl : Control
                 var path = customLength is null
                     ? HitObject.GetSliderPath()
                     : new SliderPath(HitObject.SliderType, HitObject.GetAllCurvePoints().ToArray(), customLength);
-                if (path.CalculatedPath.Count <= MaxSegmentCount)
+                if (path.CalculatedPath.Count <= MAX_SEGMENT_COUNT)
                 {
                     sliderPath = path;
                     controlPoints = path.ControlPoints.ToArray();
@@ -297,7 +297,7 @@ public sealed class ObjectVisualiserControl : Control
             DrawCircleAtProgress(context, Fill, sliderBallPen, Progress);
         }
 
-        if (ShowAnchors && controlPoints.Count <= MaxAnchorCount)
+        if (ShowAnchors && controlPoints.Count <= MAX_ANCHOR_COUNT)
         {
             Pen connectorPen = new(Brushes.White, scale);
             Pen outlinePen = new(Brushes.Black, scale);

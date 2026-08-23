@@ -10,9 +10,9 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public abstract class SingleRunToolViewModel : ObservableValidator
 {
-    private bool _isRunning;
-    private double _progress;
-    private long _runGeneration;
+    private bool isRunning;
+    private double progress;
+    private long runGeneration;
 
     /// <summary>
     ///     Creates a single-run tool presentation model.
@@ -43,18 +43,18 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     /// <summary>Gets whether the ordinary tool run is currently active.</summary>
     public bool IsRunning
     {
-        get => _isRunning;
+        get => isRunning;
         private set
         {
-            if (SetProperty(ref _isRunning, value)) RunCommand.NotifyCanExecuteChanged();
+            if (SetProperty(ref isRunning, value)) RunCommand.NotifyCanExecuteChanged();
         }
     }
 
     /// <summary>Gets the current ordinary-run completion percentage.</summary>
     public double Progress
     {
-        get => _progress;
-        private set => SetProperty(ref _progress, value);
+        get => progress;
+        private set => SetProperty(ref progress, value);
     }
 
     /// <summary>Gets the command that starts the tool's ordinary run.</summary>
@@ -89,14 +89,14 @@ public abstract class SingleRunToolViewModel : ObservableValidator
 
         IsRunning = true;
         Progress = 0;
-        Interlocked.Increment(ref _runGeneration);
+        Interlocked.Increment(ref runGeneration);
         try
         {
             await operation();
         }
         finally
         {
-            Interlocked.Increment(ref _runGeneration);
+            Interlocked.Increment(ref runGeneration);
             Progress = 0;
             IsRunning = false;
         }
@@ -106,10 +106,10 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     /// <returns>A progress receiver for the tool execution service.</returns>
     protected IProgress<ToolExecutionProgress> CreateProgress()
     {
-        long runGeneration = Volatile.Read(ref _runGeneration);
+        long runGeneration = Volatile.Read(ref this.runGeneration);
         return new Progress<ToolExecutionProgress>(value =>
         {
-            if (IsRunning && Volatile.Read(ref _runGeneration) == runGeneration) Progress = value.Percent;
+            if (IsRunning && Volatile.Read(ref this.runGeneration) == runGeneration) Progress = value.Percent;
         });
     }
 

@@ -8,7 +8,7 @@ namespace Mapping_Tools.Core.Tests.Classes.ToolHelpers.Sliders.NewGen;
 [TestClass]
 public class PathWithHintsTests
 {
-    private const int NumPoints = 11;
+    private const int num_points = 11;
     private PathWithHints path;
     private List<LinkedListNode<PathPoint>> points;
 
@@ -17,7 +17,7 @@ public class PathWithHintsTests
     {
         points = new List<LinkedListNode<PathPoint>>();
         path = new PathWithHints();
-        for (int i = 0; i < NumPoints; i++)
+        for (int i = 0; i < num_points; i++)
         {
             path.Path.AddLast(new PathPoint(new Vector2(i, 0), 0, 0, i));
             points.Add(path.Path.Last);
@@ -26,7 +26,7 @@ public class PathWithHintsTests
         path.AddReconstructionHint(new ReconstructionHint(path.Path.First, path.Path.Last, -1, new List<Vector2>
         {
             new(0, 0),
-            new(NumPoints - 1, 0),
+            new(num_points - 1, 0),
         }, PathType.Linear));
     }
 
@@ -207,7 +207,7 @@ public class PathWithHintsTests
         path.ReconstructionHints[2].Anchors.Should().BeNull();
         path.ReconstructionHints[3].Start.Should().Be(points[3]);
         path.ReconstructionHints[3].End.Should().Be(points[8]);
-        path.ReconstructionHints[3].StartP.Should().BeApproximately(1 / 6d, Precision.DoubleEpsilon);
+        path.ReconstructionHints[3].StartP.Should().BeApproximately(1 / 6d, Precision.DOUBLE_EPSILON);
         path.ReconstructionHints[3].EndP.Should().Be(1);
         path.ReconstructionHints[3].Anchors.Should().NotBeNull();
         path.ReconstructionHints[4].Start.Should().Be(points[8]);
@@ -246,7 +246,7 @@ public class PathWithHintsTests
         path.ReconstructionHints[1].Start.Should().Be(points[2]);
         path.ReconstructionHints[1].End.Should().Be(points[7]);
         path.ReconstructionHints[1].StartP.Should().Be(0);
-        path.ReconstructionHints[1].EndP.Should().BeApproximately(1 - 1 / 6d, Precision.DoubleEpsilon);
+        path.ReconstructionHints[1].EndP.Should().BeApproximately(1 - 1 / 6d, Precision.DOUBLE_EPSILON);
         path.ReconstructionHints[1].Anchors.Should().NotBeNull();
         path.ReconstructionHints[2].Start.Should().Be(points[7]);
         path.ReconstructionHints[2].End.Should().Be(points[8]);
@@ -294,7 +294,7 @@ public class PathWithHintsTests
         path.ReconstructionHints[1].Start.Should().Be(points[2]);
         path.ReconstructionHints[1].End.Should().Be(points[3]);
         path.ReconstructionHints[1].StartP.Should().Be(0);
-        path.ReconstructionHints[1].EndP.Should().BeApproximately(1 / 6d, Precision.DoubleEpsilon);
+        path.ReconstructionHints[1].EndP.Should().BeApproximately(1 / 6d, Precision.DOUBLE_EPSILON);
         path.ReconstructionHints[1].Anchors.Should().NotBeNull();
         path.ReconstructionHints[2].Start.Should().Be(points[3]);
         path.ReconstructionHints[2].End.Should().Be(points[7]);
@@ -303,7 +303,7 @@ public class PathWithHintsTests
         path.ReconstructionHints[2].Anchors.Should().BeNull();
         path.ReconstructionHints[3].Start.Should().Be(points[7]);
         path.ReconstructionHints[3].End.Should().Be(points[8]);
-        path.ReconstructionHints[3].StartP.Should().BeApproximately(1 - 1 / 6d, Precision.DoubleEpsilon);
+        path.ReconstructionHints[3].StartP.Should().BeApproximately(1 - 1 / 6d, Precision.DOUBLE_EPSILON);
         path.ReconstructionHints[3].EndP.Should().Be(1);
         path.ReconstructionHints[3].Anchors.Should().NotBeNull();
         path.ReconstructionHints[4].Start.Should().Be(points[8]);

@@ -16,14 +16,14 @@ namespace Mapping_Tools.Infrastructure.Platform;
 /// </remarks>
 public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
 {
-    private readonly Dictionary<string, Binding> _bindings =
+    private readonly Dictionary<string, Binding> bindings =
         new(StringComparer.Ordinal);
 
-    private readonly object _gate = new();
-    private readonly Func<bool> _isWindows;
-    private readonly KeyboardHookManager _manager = new();
-    private bool _started;
-    private CancellationTokenSource _stopping = new();
+    private readonly object gate = new();
+    private readonly Func<bool> isWindows;
+    private readonly KeyboardHookManager manager = new();
+    private bool started;
+    private CancellationTokenSource stopping = new();
 
     /// <summary>Creates the global hotkey adapter using the current platform guard.</summary>
     public WindowsGlobalHotkeyService()
@@ -33,7 +33,7 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
 
     internal WindowsGlobalHotkeyService(Func<bool> isWindows)
     {
-        _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
+        this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
     /// <inheritdoc />
@@ -50,57 +50,57 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
             _ = ConvertModifiers(hotkey.Modifiers);
         }
 
-        lock (_gate)
+        lock (gate)
         {
             if (hotkey is null || hotkey.Key == 0)
-                _bindings.Remove(id);
+                bindings.Remove(id);
             else
-                _bindings[id] = new Binding(hotkey, callback);
+                bindings[id] = new Binding(hotkey, callback);
 
-            if (_started) ReloadBindings();
+            if (started) ReloadBindings();
         }
     }
 
     /// <inheritdoc />
     public void Start()
     {
-        lock (_gate)
+        lock (gate)
         {
-            if (_started) return;
+            if (started) return;
 
-            if (_stopping.IsCancellationRequested)
+            if (stopping.IsCancellationRequested)
             {
-                _stopping.Dispose();
-                _stopping = new CancellationTokenSource();
+                stopping.Dispose();
+                stopping = new CancellationTokenSource();
             }
 
-            if (!_isWindows())
+            if (!isWindows())
             {
-                _started = true;
+                started = true;
                 return;
             }
 
             ReloadBindings();
-            _manager.Start();
-            _started = true;
+            manager.Start();
+            started = true;
         }
     }
 
     /// <inheritdoc />
     public void Stop()
     {
-        lock (_gate)
+        lock (gate)
         {
-            if (!_started) return;
+            if (!started) return;
 
-            _stopping.Cancel();
-            if (_isWindows())
+            stopping.Cancel();
+            if (isWindows())
             {
-                _manager.UnregisterAll();
-                _manager.Stop();
+                manager.UnregisterAll();
+                manager.Stop();
             }
 
-            _started = false;
+            started = false;
         }
     }
 
@@ -163,15 +163,15 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
 
     private void ReloadBindings()
     {
-        if (!_isWindows()) return;
+        if (!isWindows()) return;
 
-        _manager.UnregisterAll();
-        foreach (var binding in _bindings.Values)
+        manager.UnregisterAll();
+        foreach (var binding in bindings.Values)
         {
             int virtualKey = ConvertLegacyKeyToVirtualKey(binding.Hotkey.Key);
             var modifiers = ConvertModifiers(
                 binding.Hotkey.Modifiers);
-            _manager.RegisterHotkey(
+            manager.RegisterHotkey(
                 modifiers,
                 virtualKey,
                 () => Schedule(binding.Callback));
@@ -180,7 +180,7 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
 
     private void Schedule(Func<CancellationToken, Task> callback)
     {
-        var cancellationToken = _stopping.Token;
+        var cancellationToken = stopping.Token;
         _ = Task.Run(
             async () =>
             {
@@ -203,8 +203,8 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
 
     private static HookModifierKeys[] ConvertModifiers(int modifiers)
     {
-        const int knownModifiers = 1 | 2 | 4 | 8;
-        if ((modifiers & ~knownModifiers) != 0)
+        const int known_modifiers = 1 | 2 | 4 | 8;
+        if ((modifiers & ~known_modifiers) != 0)
             throw new ArgumentOutOfRangeException(
                 nameof(modifiers),
                 modifiers,

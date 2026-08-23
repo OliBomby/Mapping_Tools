@@ -218,13 +218,13 @@ public static class SlideratorEngine
                     true,
                     uninherited: true,
                     omitFirstBarLine: true,
-                    fuzziness: Precision.DoubleEpsilon));
+                    fuzziness: Precision.DOUBLE_EPSILON));
                 changes.Add(new TimingPointChange(
                     after,
                     true,
                     uninherited: true,
                     omitFirstBarLine: true,
-                    fuzziness: Precision.DoubleEpsilon));
+                    fuzziness: Precision.DOUBLE_EPSILON));
                 clone.Time -= 1;
             }
 
@@ -237,7 +237,7 @@ public static class SlideratorEngine
                 var point = timing.GetTimingPointAtTime(hitObject.Time).Copy();
                 point.MpB = sv;
                 point.Offset = hitObject.Time;
-                return new TimingPointChange(point, true, fuzziness: Precision.DoubleEpsilon);
+                return new TimingPointChange(point, true, fuzziness: Precision.DOUBLE_EPSILON);
             }));
             TimingPointChange.Apply(timing, changes);
             objectCount = 1;
@@ -328,18 +328,18 @@ public static class SlideratorEngine
         double maximumVelocity = options.NewVelocity;
         if (options.ExportAsNormal && double.IsInfinity(maximumVelocity)) throw new ArgumentException("Infinite slope on the path is illegal.", nameof(options));
 
-        if (options.ExportAsNormal && maximumVelocity > options.VelocityLimit + Precision.DoubleEpsilon)
+        if (options.ExportAsNormal && maximumVelocity > options.VelocityLimit + Precision.DOUBLE_EPSILON)
             throw new ArgumentException(
                 "A velocity faster than the SV limit is illegal. Please check your graph or increase the SV limit.",
                 nameof(options));
 
-        if (!double.IsFinite(options.BeatsPerMinute) || Math.Abs(options.BeatsPerMinute) < Precision.DoubleEpsilon)
+        if (!double.IsFinite(options.BeatsPerMinute) || Math.Abs(options.BeatsPerMinute) < Precision.DOUBLE_EPSILON)
             throw new ArgumentException("The beats per minute field has an illegal value", nameof(options));
 
-        if (!double.IsFinite(options.GraphBeats) || Math.Abs(options.GraphBeats) < Precision.DoubleEpsilon)
+        if (!double.IsFinite(options.GraphBeats) || Math.Abs(options.GraphBeats) < Precision.DOUBLE_EPSILON)
             throw new ArgumentException("The beat length field has an illegal value", nameof(options));
 
-        if (!double.IsFinite(options.GlobalSv) || Math.Abs(options.GlobalSv) < Precision.DoubleEpsilon)
+        if (!double.IsFinite(options.GlobalSv) || Math.Abs(options.GlobalSv) < Precision.DOUBLE_EPSILON)
             throw new ArgumentException("The global SV field has an illegal value", nameof(options));
 
         if (!double.IsFinite(options.PixelLength)

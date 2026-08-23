@@ -9,7 +9,7 @@ namespace Mapping_Tools.Application.SliderCompletionator;
 /// </summary>
 public sealed class SliderCompletionatorService : ISliderCompletionatorService
 {
-    private readonly IBeatmapEditingGateway _editingGateway;
+    private readonly IBeatmapEditingGateway editingGateway;
 
     /// <summary>
     ///     Creates a Slider Completionator service.
@@ -17,7 +17,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
     /// <param name="editingGateway">Loads live-or-disk beatmaps and persists safe edits.</param>
     public SliderCompletionatorService(IBeatmapEditingGateway editingGateway)
     {
-        _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
     }
 
     /// <inheritdoc />
@@ -49,7 +49,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
                 options.ImportModeSetting == SliderCompletionatorImportMode.Selected
                     ? LiveBeatmapPreference.RequireLive
                     : LiveBeatmapPreference.PreferLive;
-            var session = await _editingGateway
+            var session = await editingGateway
                 .OpenBeatmapAsync(path, livePreference, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -85,7 +85,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
                     (index + value / 100) / paths.Count * 100)),
                 cancellationToken);
             // Save the file
-            await _editingGateway
+            await editingGateway
                 .SaveAsync(
                     session,
                     cancellationToken: cancellationToken)

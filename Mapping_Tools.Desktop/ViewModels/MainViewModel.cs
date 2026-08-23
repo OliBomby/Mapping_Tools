@@ -23,25 +23,25 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
-    private static readonly Uri WebsiteUri = new("https://mappingtools.github.io");
-    private static readonly Uri GitHubUri = new("https://github.com/OliBomby/Mapping_Tools");
-    private static readonly Uri DonateUri = new("https://ko-fi.com/olibomby");
-    private readonly IBetterSaveService _betterSave;
-    private readonly IDialogService _dialogs;
-    private readonly IUiDispatcher _dispatcher;
+    private static readonly Uri websiteUri = new("https://mappingtools.github.io");
+    private static readonly Uri gitHubUri = new("https://github.com/OliBomby/Mapping_Tools");
+    private static readonly Uri donateUri = new("https://ko-fi.com/olibomby");
+    private readonly IBetterSaveService betterSave;
+    private readonly IDialogService dialogs;
+    private readonly IUiDispatcher dispatcher;
 
-    private readonly Dictionary<string, ObservableObject> _featureViewModels =
+    private readonly Dictionary<string, ObservableObject> featureViewModels =
         new(StringComparer.OrdinalIgnoreCase);
 
-    private readonly IPlatformLauncher _launcher;
-    private readonly IUserNotificationService _notifications;
-    private readonly ProjectAutosaveCoordinator _projectCoordinator;
-    private readonly IQuickRunCommandRegistry _quickRunRegistry;
-    private readonly IShellFeatureRegistry _registry;
-    private readonly ApplicationSettings _settings;
-    private readonly IUpdaterInteractionService? _updaterInteraction;
-    private bool _disposed;
-    private string _searchText = string.Empty;
+    private readonly IPlatformLauncher launcher;
+    private readonly IUserNotificationService notifications;
+    private readonly ProjectAutosaveCoordinator projectCoordinator;
+    private readonly IQuickRunCommandRegistry quickRunRegistry;
+    private readonly IShellFeatureRegistry registry;
+    private readonly ApplicationSettings settings;
+    private readonly IUpdaterInteractionService? updaterInteraction;
+    private bool disposed;
+    private string searchText = string.Empty;
 
     /// <summary>
     ///     Creates the desktop shell and activates the first explicit registration.
@@ -73,17 +73,17 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         ProjectAutosaveCoordinator projectCoordinator,
         IUpdaterInteractionService? updaterInteraction = null)
     {
-        _registry = registry ?? throw new ArgumentNullException(nameof(registry));
-        _quickRunRegistry = quickRunRegistry ?? throw new ArgumentNullException(nameof(quickRunRegistry));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
-        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        this.registry = registry ?? throw new ArgumentNullException(nameof(registry));
+        this.quickRunRegistry = quickRunRegistry ?? throw new ArgumentNullException(nameof(quickRunRegistry));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
+        this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         Workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _betterSave = betterSave ?? throw new ArgumentNullException(nameof(betterSave));
-        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
-        _projectCoordinator = projectCoordinator ?? throw new ArgumentNullException(nameof(projectCoordinator));
-        _updaterInteraction = updaterInteraction;
+        this.betterSave = betterSave ?? throw new ArgumentNullException(nameof(betterSave));
+        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        this.projectCoordinator = projectCoordinator ?? throw new ArgumentNullException(nameof(projectCoordinator));
+        this.updaterInteraction = updaterInteraction;
 
         FeatureItems = registry.Features
             .Select((registration, order) => new ShellFeatureItemViewModel(
@@ -96,7 +96,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         VisibleFeatures = [];
         NavigationEntries = [];
         NotificationQueue = [];
-        _notifications.Published += OnNotificationPublished;
+        this.notifications.Published += OnNotificationPublished;
         RefreshVisibleFeatures();
         SelectedFeature = FeatureItems[0];
     }
@@ -134,13 +134,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <summary>Gets or sets the case-insensitive feature search query.</summary>
     public string SearchText
     {
-        get => _searchText;
+        get => searchText;
         set
         {
             string normalized = value ?? string.Empty;
-            if (_searchText == normalized) return;
+            if (searchText == normalized) return;
 
-            if (SetProperty(ref _searchText, normalized)) RefreshVisibleFeatures();
+            if (SetProperty(ref searchText, normalized)) RefreshVisibleFeatures();
         }
     }
 
@@ -174,11 +174,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <summary>Unsubscribes the process-lifetime notification stream.</summary>
     public void Dispose()
     {
-        if (_disposed) return;
+        if (disposed) return;
 
-        _disposed = true;
-        _notifications.Published -= OnNotificationPublished;
-        if (CurrentFeature is IShellProjectFeature projectFeature) _projectCoordinator.Deactivate(projectFeature);
+        disposed = true;
+        notifications.Published -= OnNotificationPublished;
+        if (CurrentFeature is IShellProjectFeature projectFeature) projectCoordinator.Deactivate(projectFeature);
         if (CurrentFeature is IQuickRun quickRun) DeactivateQuickRun(quickRun);
         if (CurrentFeature is IShellFeatureActivation activation) activation.Deactivate();
         ProjectMenuItems = [];
@@ -192,15 +192,15 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         foreach (var featureItem in FeatureItems) featureItem.IsActive = ReferenceEquals(featureItem, item);
 
         if (CurrentFeature is IShellFeatureActivation previous) previous.Deactivate();
-        if (CurrentFeature is IShellProjectFeature previousProject) _projectCoordinator.Deactivate(previousProject);
+        if (CurrentFeature is IShellProjectFeature previousProject) projectCoordinator.Deactivate(previousProject);
         if (CurrentFeature is IQuickRun previousQuickRun) DeactivateQuickRun(previousQuickRun);
 
-        var registration = _registry.Find(item.Id)
+        var registration = registry.Find(item.Id)
                            ?? throw new InvalidOperationException($"Feature '{item.Id}' is not registered.");
-        if (!_featureViewModels.TryGetValue(item.Id, out var viewModel))
+        if (!featureViewModels.TryGetValue(item.Id, out var viewModel))
         {
             viewModel = registration.CreateViewModel();
-            _featureViewModels.Add(item.Id, viewModel);
+            featureViewModels.Add(item.Id, viewModel);
         }
 
         CurrentFeature = viewModel;
@@ -213,8 +213,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             ? "Mapping Tools"
             : $"Mapping Tools - {item.DisplayName}";
         if (viewModel is IShellFeatureActivation current) current.Activate();
-        if (viewModel is IShellProjectFeature projectFeature) _projectCoordinator.Activate(projectFeature);
-        if (viewModel is IQuickRun quickRun) _quickRunRegistry.SelectCurrent(quickRun.OperationId);
+        if (viewModel is IShellProjectFeature projectFeature) projectCoordinator.Activate(projectFeature);
+        if (viewModel is IQuickRun quickRun) quickRunRegistry.SelectCurrent(quickRun.OperationId);
     }
 
     private IReadOnlyList<ShellProjectMenuItem> CreateProjectMenuItems(ObservableObject viewModel)
@@ -240,13 +240,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private Task OpenWebsiteAsync()
     {
-        return OpenUriAsync(WebsiteUri, "website");
+        return OpenUriAsync(websiteUri, "website");
     }
 
     [RelayCommand]
     private Task CheckForUpdatesAsync()
     {
-        return _updaterInteraction?.CheckForUpdatesAsync(
+        return updaterInteraction?.CheckForUpdatesAsync(
                    false,
                    true)
                ?? Task.CompletedTask;
@@ -254,7 +254,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     internal Task CheckForUpdatesOnStartupAsync()
     {
-        return _updaterInteraction?.CheckForUpdatesAsync(
+        return updaterInteraction?.CheckForUpdatesAsync(
                    true,
                    false)
                ?? Task.CompletedTask;
@@ -263,13 +263,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private Task OpenGitHubAsync()
     {
-        return OpenUriAsync(GitHubUri, "source repository");
+        return OpenUriAsync(gitHubUri, "source repository");
     }
 
     [RelayCommand]
     private Task OpenDonateAsync()
     {
-        return OpenUriAsync(DonateUri, "donation page");
+        return OpenUriAsync(donateUri, "donation page");
     }
 
     [RelayCommand]
@@ -301,7 +301,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         message.AppendLine("Coppertine");
         message.Append("JPK314");
 
-        await _dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
+        await dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
             "Info",
             message.ToString(),
             [new DialogChoice<bool>("OK", true, true, true)],
@@ -311,7 +311,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private Task BetterSaveAsync()
     {
-        return _betterSave.ExecuteAsync();
+        return betterSave.ExecuteAsync();
     }
 
     private bool CanUseProjectActions()
@@ -321,14 +321,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     private void DeactivateQuickRun(IQuickRun quickRun)
     {
-        if (_quickRunRegistry.CurrentCommandId == quickRun.OperationId) _quickRunRegistry.SelectCurrent(null);
+        if (quickRunRegistry.CurrentCommandId == quickRun.OperationId) quickRunRegistry.SelectCurrent(null);
     }
 
     [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
     private Task SaveProjectAsync()
     {
         return CurrentFeature is IShellProjectFeature feature
-            ? _projectCoordinator.SaveAsync(feature)
+            ? projectCoordinator.SaveAsync(feature)
             : Task.CompletedTask;
     }
 
@@ -336,7 +336,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private Task OpenProjectAsync()
     {
         return CurrentFeature is IShellProjectFeature feature
-            ? _projectCoordinator.OpenAsync(feature)
+            ? projectCoordinator.OpenAsync(feature)
             : Task.CompletedTask;
     }
 
@@ -344,15 +344,15 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private Task NewProjectAsync()
     {
         return CurrentFeature is IShellProjectFeature feature
-            ? _projectCoordinator.NewAsync(feature)
+            ? projectCoordinator.NewAsync(feature)
             : Task.CompletedTask;
     }
 
     private void ToggleFavorite(ShellFeatureItemViewModel item)
     {
         item.IsFavorite = !item.IsFavorite;
-        _settings.FavoriteTools.RemoveAll(id => id.Equals(item.Id, StringComparison.OrdinalIgnoreCase));
-        if (item.IsFavorite) _settings.FavoriteTools.Add(item.Id);
+        settings.FavoriteTools.RemoveAll(id => id.Equals(item.Id, StringComparison.OrdinalIgnoreCase));
+        if (item.IsFavorite) settings.FavoriteTools.Add(item.Id);
 
         RefreshVisibleFeatures();
     }
@@ -440,7 +440,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         object? sender,
         UserNotificationPublishedEventArgs eventArgs)
     {
-        _dispatcher.Post(() =>
+        dispatcher.Post(() =>
             NotificationQueue.Add(new ShellNotificationViewModel(
                 eventArgs.Notification,
                 RemoveNotification)));
@@ -453,9 +453,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     private async Task OpenUriAsync(Uri uri, string destination)
     {
-        bool accepted = await _launcher.OpenUriAsync(uri).ConfigureAwait(false);
+        bool accepted = await launcher.OpenUriAsync(uri).ConfigureAwait(false);
         if (!accepted)
-            await _notifications.PublishAsync(new UserNotification(
+            await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Warning,
                 "Could not open link",
                 $"The {destination} could not be opened by the operating system.")).ConfigureAwait(false);

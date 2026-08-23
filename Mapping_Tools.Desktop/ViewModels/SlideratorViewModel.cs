@@ -25,7 +25,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature
 {
-    internal const string OperationId = "sliderator";
+    internal const string OPERATION_ID = "sliderator";
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
     private readonly ProjectDefinition<SlideratorProject> definition = new(
@@ -53,7 +53,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmap,
         ApplicationSettings settings,
         IDialogService dialogs)
-        : base(execution, OperationId)
+        : base(execution, OPERATION_ID)
     {
         this.sliderator = sliderator ?? throw new ArgumentNullException(nameof(sliderator));
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
@@ -300,7 +300,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         });
     }
 
-    string IQuickRun.OperationId => OperationId;
+    string IQuickRun.OperationId => OPERATION_ID;
 
     IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
@@ -396,7 +396,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             GraphModeSetting = GraphModeSetting,
             GraphState = state,
         };
-        return SlideratorEngine.GetMaximumVelocity(options) <= VelocityLimit + Precision.DoubleEpsilon;
+        return SlideratorEngine.GetMaximumVelocity(options) <= VelocityLimit + Precision.DOUBLE_EPSILON;
     }
 
     /// <inheritdoc />
@@ -480,7 +480,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         DoEditorRead = false;
         var execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<SlideratorResult>(
-                OperationId,
+                OPERATION_ID,
                 "Sliderator",
                 async context =>
                 {
@@ -690,7 +690,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             GraphModeSetting = GraphModeSetting,
             GraphState = GraphState,
         });
-        return maximum <= Precision.DoubleEpsilon
+        return maximum <= Precision.DOUBLE_EPSILON
             ? 0
             : Math.Clamp(graphValue / maximum, 0, 1);
     }
@@ -777,7 +777,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         double maximum = GraphModeSetting == SlideratorGraphMode.Velocity
             ? GraphState.GetMaxIntegral()
             : GraphState.GetMaxValue();
-        if (Math.Abs(maximum) < Precision.DoubleEpsilon) return;
+        if (Math.Abs(maximum) < Precision.DOUBLE_EPSILON) return;
 
         var result = await dialogs.ShowValueAsync(
             new ValueDialogRequest<double>(

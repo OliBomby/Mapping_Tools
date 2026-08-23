@@ -17,7 +17,7 @@ namespace Mapping_Tools.Core.Tools.TumourGenerating;
 /// </remarks>
 public sealed class TumourGenerator
 {
-    private const double RelativePropertyScale = 256;
+    private const double relative_property_scale = 256;
     private readonly List<double> layerLengths = [];
 
     /// <summary>Gets or sets the number of sampled points per osu! pixel.</summary>
@@ -99,14 +99,14 @@ public sealed class TumourGenerator
             int index = 0;
             var random = tumourLayer.RandomSeed != 0 ? new Random(tumourLayer.RandomSeed) : Random;
 
-            while (nextDistance <= Math.Min(totalLength, tumourEnd) + Precision.DoubleEpsilon
+            while (nextDistance <= Math.Min(totalLength, tumourEnd) + Precision.DOUBLE_EPSILON
                    && current is not null
                    && (tumourLayer.TumourCount == 0 || index++ < tumourLayer.TumourCount))
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 double progress = ToProgress(nextDistance, tumourStart, tumourEnd, totalLength);
                 double length = tumourLayer.TumourLength.GetValue(progress);
-                if (!tumourLayer.UseAbsoluteRange) length *= initialLength / RelativePropertyScale;
+                if (!tumourLayer.UseAbsoluteRange) length *= initialLength / relative_property_scale;
                 double endDistance = Math.Min(nextDistance + length, tumourEnd);
 
                 // Get which side the tumour should be on
@@ -122,7 +122,7 @@ public sealed class TumourGenerator
 
                 if (endDistance >= 0)
                 {
-                    double epsilon = MathHelper.Clamp(length / 2, Precision.DoubleEpsilon, 0.9);
+                    double epsilon = MathHelper.Clamp(length / 2, Precision.DOUBLE_EPSILON, 0.9);
                     var start = PathHelper.FindFirstOccurrenceExact(current, nextDistance, epsilon: epsilon);
                     var end = PathHelper.FindLastOccurrenceExact(start, endDistance, epsilon: epsilon);
                     // Calculate the T start/end for the tumour template
@@ -152,7 +152,7 @@ public sealed class TumourGenerator
                 }
 
                 double distance = Math.Max(1, tumourLayer.TumourDistance.GetValue(progress));
-                if (!tumourLayer.UseAbsoluteRange) distance *= initialLength / RelativePropertyScale;
+                if (!tumourLayer.UseAbsoluteRange) distance *= initialLength / relative_property_scale;
                 nextDistance += distance;
             }
         }
@@ -256,7 +256,7 @@ public sealed class TumourGenerator
         double endT = endPoint.T;
         double distance = endPoint.CumulativeLength - startPoint.CumulativeLength;
         double distanceT = endT - startT;
-        double betweenAngle = (endPoint.OgPos - startPoint.OgPos).LengthSquared > Precision.DoubleEpsilon
+        double betweenAngle = (endPoint.OgPos - startPoint.OgPos).LengthSquared > Precision.DOUBLE_EPSILON
             ? (endPoint.OgPos - startPoint.OgPos).Theta
             : MathHelper.LerpAngle(startPoint.AvgAngle, endPoint.AvgAngle, 0.5);
         double templateRange = endTemplateT - startTemplateT;
@@ -264,7 +264,7 @@ public sealed class TumourGenerator
         var hintEnd = end;
         double length = Vector2.Distance(start.Value.OgPos, end.Value.OgPos);
         double scale = tumourLayer.TumourScale.GetValue(startProgress) * Scalar;
-        if (!tumourLayer.UseAbsoluteRange) scale *= initialLength / RelativePropertyScale;
+        if (!tumourLayer.UseAbsoluteRange) scale *= initialLength / relative_property_scale;
         double rotation = MathHelper.DegreesToRadians(tumourLayer.TumourRotation.GetValue(startProgress));
 
         // Setup tumour template with the correct shape
@@ -324,7 +324,7 @@ public sealed class TumourGenerator
                 WrappingMode.Wrap => (point.PreAngle, point.PostAngle),
                 _ => (0, 0),
             };
-            bool isOffsetInThisLayer = Vector2.DistanceSquared(point.OgPos, position) < Precision.DoubleEpsilon;
+            bool isOffsetInThisLayer = Vector2.DistanceSquared(point.OgPos, position) < Precision.DOUBLE_EPSILON;
             bool red = tumourLayer.WrappingMode switch
             {
                 WrappingMode.Simple => isCritical || point.Red && isOffsetInThisLayer,
@@ -336,7 +336,7 @@ public sealed class TumourGenerator
             var offset = tumourTemplate.GetOffset(templateT);
 
             // Modify the path
-            if (current == start && start.Previous is not null && offset.LengthSquared > Precision.DoubleEpsilon)
+            if (current == start && start.Previous is not null && offset.LengthSquared > Precision.DOUBLE_EPSILON)
             {
                 // Copy point and leave one side at 0 offset
                 var newPosition = CalculateNewPos(point, position, offset, postAngle + rotation);
@@ -345,7 +345,7 @@ public sealed class TumourGenerator
                 start = current.Previous;
                 hintStart = current;
             }
-            else if (current == end && end.Next is not null && offset.LengthSquared > Precision.DoubleEpsilon)
+            else if (current == end && end.Next is not null && offset.LengthSquared > Precision.DOUBLE_EPSILON)
             {
                 // Copy point and leave one side at 0 offset
                 var newPosition = CalculateNewPos(point, position, offset, preAngle + rotation);
@@ -353,7 +353,7 @@ public sealed class TumourGenerator
                 current.Value = new PathPoint(point.Pos, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, 2, true);
                 hintEnd = current.Previous;
             }
-            else if (red && !double.IsNaN(preAngle) && !double.IsNaN(postAngle) && !Precision.AlmostEquals(preAngle, postAngle) && offset.LengthSquared > Precision.DoubleEpsilon)
+            else if (red && !double.IsNaN(preAngle) && !double.IsNaN(postAngle) && !Precision.AlmostEquals(preAngle, postAngle) && offset.LengthSquared > Precision.DOUBLE_EPSILON)
             {
                 // Copy point and offset it by both angles
                 var newPosition = CalculateNewPos(point, position, offset, preAngle + rotation);

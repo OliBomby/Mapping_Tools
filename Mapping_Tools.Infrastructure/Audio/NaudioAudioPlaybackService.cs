@@ -33,34 +33,34 @@ public sealed class NaudioAudioPlaybackService : IAudioPlaybackService
 
     private sealed class NaudioPlaybackSession : IAudioPlaybackSession
     {
-        private readonly TaskCompletionSource<object?> _completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
-        private readonly object _gate = new();
-        private readonly bool _loop;
-        private readonly IWavePlayer _player;
-        private readonly RawSourceWaveStream _stream;
-        private bool _disposed;
-        private TimeSpan _lastPosition;
-        private AudioPlaybackState _state = AudioPlaybackState.Stopped;
-        private bool _stopping;
+        private readonly TaskCompletionSource<object?> completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private readonly object gate = new();
+        private readonly bool loop;
+        private readonly IWavePlayer player;
+        private readonly RawSourceWaveStream stream;
+        private bool disposed;
+        private TimeSpan lastPosition;
+        private AudioPlaybackState state = AudioPlaybackState.Stopped;
+        private bool stopping;
 
         public NaudioPlaybackSession(AudioClip clip, bool loop)
         {
-            _loop = loop;
+            this.loop = loop;
             byte[] bytes = new byte[clip.Samples.Length * sizeof(float)];
             Buffer.BlockCopy(clip.CopySamples(), 0, bytes, 0, bytes.Length);
             var format = WaveFormat.CreateIeeeFloatWaveFormat(clip.Format.SampleRate, clip.Format.Channels);
-            _stream = new RawSourceWaveStream(bytes, 0, bytes.Length, format);
-            _player = new WasapiOut();
+            stream = new RawSourceWaveStream(bytes, 0, bytes.Length, format);
+            player = new WasapiOut();
             try
             {
-                _player.PlaybackStopped += OnPlaybackStopped;
-                _player.Init(_stream);
+                player.PlaybackStopped += OnPlaybackStopped;
+                player.Init(stream);
             }
             catch
             {
-                _player.PlaybackStopped -= OnPlaybackStopped;
-                _player.Dispose();
-                _stream.Dispose();
+                player.PlaybackStopped -= OnPlaybackStopped;
+                player.Dispose();
+                stream.Dispose();
                 throw;
             }
         }
@@ -69,9 +69,9 @@ public sealed class NaudioAudioPlaybackService : IAudioPlaybackService
         {
             get
             {
-                lock (_gate)
+                lock (gate)
                 {
-                    return _state;
+                    return state;
                 }
             }
         }
@@ -80,34 +80,34 @@ public sealed class NaudioAudioPlaybackService : IAudioPlaybackService
         {
             get
             {
-                lock (_gate)
+                lock (gate)
                 {
-                    return _disposed ? _lastPosition : _stream.CurrentTime;
+                    return disposed ? lastPosition : stream.CurrentTime;
                 }
             }
         }
 
-        public Task Completion => _completion.Task;
+        public Task Completion => completion.Task;
 
         public void Pause()
         {
-            lock (_gate)
+            lock (gate)
             {
-                if (_disposed || _state != AudioPlaybackState.Playing) return;
+                if (disposed || state != AudioPlaybackState.Playing) return;
 
-                _player.Pause();
-                _state = AudioPlaybackState.Paused;
+                player.Pause();
+                state = AudioPlaybackState.Paused;
             }
         }
 
         public void Resume()
         {
-            lock (_gate)
+            lock (gate)
             {
-                if (_disposed || _state != AudioPlaybackState.Paused) return;
+                if (disposed || state != AudioPlaybackState.Paused) return;
 
-                _player.Play();
-                _state = AudioPlaybackState.Playing;
+                player.Play();
+                state = AudioPlaybackState.Playing;
             }
         }
 
@@ -125,18 +125,18 @@ public sealed class NaudioAudioPlaybackService : IAudioPlaybackService
 
         public void Start()
         {
-            lock (_gate)
+            lock (gate)
             {
-                ObjectDisposedException.ThrowIf(_disposed, this);
+                ObjectDisposedException.ThrowIf(disposed, this);
                 try
                 {
-                    _player.Play();
-                    _state = AudioPlaybackState.Playing;
+                    player.Play();
+                    state = AudioPlaybackState.Playing;
                 }
                 catch (Exception exception)
                 {
-                    _state = AudioPlaybackState.Failed;
-                    _completion.TrySetException(exception);
+                    state = AudioPlaybackState.Failed;
+                    completion.TrySetException(exception);
                     throw;
                 }
             }
@@ -144,59 +144,59 @@ public sealed class NaudioAudioPlaybackService : IAudioPlaybackService
 
         private void Stop()
         {
-            lock (_gate)
+            lock (gate)
             {
-                if (_disposed) return;
+                if (disposed) return;
 
-                _stopping = true;
-                _state = AudioPlaybackState.Stopped;
+                stopping = true;
+                state = AudioPlaybackState.Stopped;
                 try
                 {
-                    _lastPosition = _stream.CurrentTime;
-                    _player.Stop();
+                    lastPosition = stream.CurrentTime;
+                    player.Stop();
                 }
                 finally
                 {
-                    _player.PlaybackStopped -= OnPlaybackStopped;
-                    _player.Dispose();
-                    _stream.Dispose();
-                    _disposed = true;
-                    _completion.TrySetResult(null);
+                    player.PlaybackStopped -= OnPlaybackStopped;
+                    player.Dispose();
+                    stream.Dispose();
+                    disposed = true;
+                    completion.TrySetResult(null);
                 }
             }
         }
 
         private void OnPlaybackStopped(object? sender, StoppedEventArgs eventArgs)
         {
-            lock (_gate)
+            lock (gate)
             {
-                if (_disposed || _stopping) return;
+                if (disposed || stopping) return;
 
                 if (eventArgs.Exception is not null)
                 {
-                    _state = AudioPlaybackState.Failed;
-                    _completion.TrySetException(eventArgs.Exception);
+                    state = AudioPlaybackState.Failed;
+                    completion.TrySetException(eventArgs.Exception);
                     return;
                 }
 
-                if (_loop)
+                if (loop)
                 {
                     try
                     {
-                        _stream.Position = 0;
-                        _player.Play();
+                        stream.Position = 0;
+                        player.Play();
                     }
                     catch (Exception exception)
                     {
-                        _state = AudioPlaybackState.Failed;
-                        _completion.TrySetException(exception);
+                        state = AudioPlaybackState.Failed;
+                        completion.TrySetException(exception);
                     }
 
                     return;
                 }
 
-                _state = AudioPlaybackState.Stopped;
-                _completion.TrySetResult(null);
+                state = AudioPlaybackState.Stopped;
+                completion.TrySetResult(null);
             }
         }
     }

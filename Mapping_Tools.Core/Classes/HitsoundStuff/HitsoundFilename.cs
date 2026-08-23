@@ -9,7 +9,7 @@ namespace Mapping_Tools.Core.Classes.HitsoundStuff;
 /// </summary>
 public static class HitsoundFilename
 {
-    private static readonly Regex StandardName = new(
+    private static readonly Regex standardName = new(
         "^(normal|soft|drum)-(hit(normal|whistle|finish|clap)|slidertick|sliderslide)",
         RegexOptions.Compiled);
 
@@ -60,7 +60,7 @@ public static class HitsoundFilename
     /// <returns>The parsed suffix, or zero when absent or malformed.</returns>
     public static int GetIndex(string filename)
     {
-        var match = StandardName.Match(filename);
+        var match = standardName.Match(filename);
         string remainder = filename.Substring(match.Index + match.Length);
         int index = 0;
 

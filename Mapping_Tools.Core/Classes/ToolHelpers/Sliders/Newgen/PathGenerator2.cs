@@ -72,7 +72,7 @@ public class PathGenerator2
 
     private Vector2? BestApproximation(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end)
     {
-        const double nullBias = 1E-3D;
+        const double null_bias = 1E-3D;
 
         // Make sure start index is before end index
         // The results will be the same for flipped indices
@@ -108,7 +108,7 @@ public class PathGenerator2
 
             // Add some bias towards not using a middle anchor
             if (!middle.HasValue)
-                loss -= nullBias;
+                loss -= null_bias;
 
             if (Precision.AlmostBigger(loss, bestLoss)) continue;
 
@@ -127,7 +127,7 @@ public class PathGenerator2
         double a1 = start.Value.PostAngle;
         double a2 = end.Value.PreAngle;
 
-        if (Math.Abs(MathHelper.AngleDifference(a1, a2)) < Precision.DoubleEpsilon) return null;
+        if (Math.Abs(MathHelper.AngleDifference(a1, a2)) < Precision.DOUBLE_EPSILON) return null;
 
         var t1 = new Line2(p1, a1);
         var t2 = new Line2(p2, a2);
@@ -240,7 +240,7 @@ public class PathGenerator2
 
                 segmentAngleChange += Math.Abs(angleChange);
 
-                if (segmentAngleChange > maxSegmentAngle + Precision.DoubleEpsilon)
+                if (segmentAngleChange > maxSegmentAngle + Precision.DOUBLE_EPSILON)
                 {
                     segments.Add((startSegment, currentSegment));
 

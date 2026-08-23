@@ -326,16 +326,16 @@ public sealed class ToolExecutionServiceTests
 
     private sealed class InlineProgress<T> : IProgress<T>
     {
-        private readonly Action<T> _report;
+        private readonly Action<T> report;
 
         public InlineProgress(Action<T> report)
         {
-            _report = report;
+            this.report = report;
         }
 
         public void Report(T value)
         {
-            _report(value);
+            report(value);
         }
     }
 

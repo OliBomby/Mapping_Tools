@@ -13,8 +13,8 @@ namespace Mapping_Tools.Infrastructure.Settings;
 /// </summary>
 public sealed class JsonSettingsStore : ISettingsStore
 {
-    private readonly IApplicationDirectories _directories;
-    private readonly JsonSerializerOptions _options;
+    private readonly IApplicationDirectories directories;
+    private readonly JsonSerializerOptions options;
 
     /// <summary>
     ///     Creates a store for the configuration path supplied by the application layout.
@@ -22,28 +22,28 @@ public sealed class JsonSettingsStore : ISettingsStore
     /// <param name="directories">Provides the configuration path and required parent directories.</param>
     public JsonSettingsStore(IApplicationDirectories directories)
     {
-        _directories = directories ?? throw new ArgumentNullException(nameof(directories));
-        _options = new JsonSerializerOptions
+        this.directories = directories ?? throw new ArgumentNullException(nameof(directories));
+        options = new JsonSerializerOptions
         {
             AllowTrailingCommas = true,
             PropertyNameCaseInsensitive = true,
             WriteIndented = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
-        _options.Converters.Add(new WindowBoundsJsonConverter());
-        _options.Converters.Add(new RecentBeatmapJsonConverter());
-        _options.Converters.Add(new JsonStringEnumConverter<ApplicationTheme>());
+        options.Converters.Add(new WindowBoundsJsonConverter());
+        options.Converters.Add(new RecentBeatmapJsonConverter());
+        options.Converters.Add(new JsonStringEnumConverter<ApplicationTheme>());
     }
 
     /// <inheritdoc />
-    public bool Exists => File.Exists(_directories.ConfigurationFile);
+    public bool Exists => File.Exists(directories.ConfigurationFile);
 
     /// <inheritdoc />
     /// <exception cref="JsonException">The file is empty, malformed, or contains invalid legacy bounds.</exception>
     public ApplicationSettings Load()
     {
-        string json = File.ReadAllText(_directories.ConfigurationFile);
-        return JsonSerializer.Deserialize<ApplicationSettings>(json, _options)
+        string json = File.ReadAllText(directories.ConfigurationFile);
+        return JsonSerializer.Deserialize<ApplicationSettings>(json, options)
                ?? throw new JsonException("The settings document contained no JSON value.");
     }
 
@@ -55,16 +55,16 @@ public sealed class JsonSettingsStore : ISettingsStore
     public void Save(ApplicationSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        _directories.EnsureCreated();
+        directories.EnsureCreated();
 
-        string json = JsonSerializer.Serialize(settings, _options);
-        string temporaryPath = _directories.ConfigurationFile + ".tmp";
+        string json = JsonSerializer.Serialize(settings, options);
+        string temporaryPath = directories.ConfigurationFile + ".tmp";
         try
         {
             File.WriteAllText(temporaryPath, json);
             File.Move(
                 temporaryPath,
-                _directories.ConfigurationFile,
+                directories.ConfigurationFile,
                 true);
         }
         finally

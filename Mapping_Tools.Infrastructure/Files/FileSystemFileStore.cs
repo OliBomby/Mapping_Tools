@@ -9,7 +9,7 @@ namespace Mapping_Tools.Infrastructure.Files;
 /// </summary>
 public sealed class FileSystemFileStore : ITextFileStore
 {
-    private static readonly Encoding Utf8WithoutBom = new UTF8Encoding(false);
+    private static readonly Encoding utf8WithoutBom = new UTF8Encoding(false);
 
     /// <summary>
     ///     <inheritdoc />
@@ -31,7 +31,7 @@ public sealed class FileSystemFileStore : ITextFileStore
             return;
         }
 
-        using StreamWriter writer = new(path, false, Utf8WithoutBom)
+        using StreamWriter writer = new(path, false, utf8WithoutBom)
         {
             NewLine = "\r\n",
         };

@@ -135,7 +135,7 @@ public sealed class ProjectAutosaveCoordinatorTests
 
     private sealed class TestProjectFeature : IShellProjectFeature
     {
-        private static readonly ProjectDefinition<TestProject> Definition = new(
+        private static readonly ProjectDefinition<TestProject> definition = new(
             "testproject.json",
             "Test Projects",
             static () => new TestProject(3),
@@ -150,7 +150,7 @@ public sealed class ProjectAutosaveCoordinatorTests
 
         public IReadOnlyList<string> AdditionalAutoSavePaths { get; init; } = [];
 
-        public IProjectDefinition ProjectDefinition => Definition;
+        public IProjectDefinition ProjectDefinition => definition;
 
         public object Snapshot()
         {

@@ -63,9 +63,9 @@ public interface IBetterSaveOverrideService
 /// </summary>
 public sealed class BetterSaveService : IBetterSaveService
 {
-    private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
-    private readonly IBeatmapEditingGateway _editingGateway;
-    private readonly IUserNotificationService _notifications;
+    private readonly ICurrentBeatmapLocator currentBeatmapLocator;
+    private readonly IBeatmapEditingGateway editingGateway;
+    private readonly IUserNotificationService notifications;
 
     /// <summary>
     ///     Creates BetterSave over the shared current-map, editing, and notification boundaries.
@@ -78,12 +78,12 @@ public sealed class BetterSaveService : IBetterSaveService
         IBeatmapEditingGateway editingGateway,
         IUserNotificationService notifications)
     {
-        _currentBeatmapLocator = currentBeatmapLocator
-                                 ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
-        _editingGateway = editingGateway
-                          ?? throw new ArgumentNullException(nameof(editingGateway));
-        _notifications = notifications
-                         ?? throw new ArgumentNullException(nameof(notifications));
+        this.currentBeatmapLocator = currentBeatmapLocator
+                                     ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+        this.editingGateway = editingGateway
+                              ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.notifications = notifications
+                             ?? throw new ArgumentNullException(nameof(notifications));
     }
 
     /// <inheritdoc />
@@ -93,7 +93,7 @@ public sealed class BetterSaveService : IBetterSaveService
         string? path = null;
         try
         {
-            path = await _currentBeatmapLocator
+            path = await currentBeatmapLocator
                 .FindCurrentBeatmapAsync(cancellationToken)
                 .ConfigureAwait(false);
             if (string.IsNullOrWhiteSpace(path))
@@ -105,13 +105,13 @@ public sealed class BetterSaveService : IBetterSaveService
                 return new BetterSaveResult(BetterSaveStatus.NoCurrentBeatmap);
             }
 
-            var session = await _editingGateway
+            var session = await editingGateway
                 .OpenBeatmapAsync(
                     path,
                     LiveBeatmapPreference.RequireLive,
                     cancellationToken)
                 .ConfigureAwait(false);
-            await _editingGateway
+            await editingGateway
                 .SaveAsync(session, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
             await PublishAsync(
@@ -143,7 +143,7 @@ public sealed class BetterSaveService : IBetterSaveService
     {
         try
         {
-            await _notifications.PublishAsync(new UserNotification(
+            await notifications.PublishAsync(new UserNotification(
                 severity,
                 title,
                 message,

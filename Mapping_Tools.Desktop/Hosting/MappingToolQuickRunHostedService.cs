@@ -12,25 +12,25 @@ internal sealed record MappingToolQuickRunRegistration(
 
 internal sealed class MappingToolQuickRunHostedService : IHostedService
 {
-    private readonly IUiDispatcher _dispatcher;
-    private readonly IQuickRunCommandRegistry _registry;
-    private readonly IReadOnlyList<MappingToolQuickRunRegistration> _tools;
+    private readonly IUiDispatcher dispatcher;
+    private readonly IQuickRunCommandRegistry registry;
+    private readonly IReadOnlyList<MappingToolQuickRunRegistration> tools;
 
     public MappingToolQuickRunHostedService(
         IQuickRunCommandRegistry registry,
         IEnumerable<MappingToolQuickRunRegistration> tools,
         IUiDispatcher dispatcher)
     {
-        _registry = registry;
-        _tools = tools.ToArray();
-        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        this.registry = registry;
+        this.tools = tools.ToArray();
+        this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        foreach (var tool in _tools)
-            if (_registry.Commands.All(command => command.Id != tool.Id))
-                _registry.Register(new QuickRunCommand(
+        foreach (var tool in tools)
+            if (registry.Commands.All(command => command.Id != tool.Id))
+                registry.Register(new QuickRunCommand(
                     tool.Id,
                     tool.DisplayName,
                     tool.Targets,
@@ -43,7 +43,7 @@ internal sealed class MappingToolQuickRunHostedService : IHostedService
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        foreach (var tool in _tools) _registry.Remove(tool.Id);
+        foreach (var tool in tools) registry.Remove(tool.Id);
 
         return Task.CompletedTask;
     }
@@ -54,10 +54,10 @@ internal sealed class MappingToolQuickRunHostedService : IHostedService
     {
         TaskCompletionSource completion = new(
             TaskCreationOptions.RunContinuationsAsynchronously);
-        _dispatcher.Post(() => _ = CompleteAsync());
+        dispatcher.Post(() => _ = completeAsync());
         return completion.Task;
 
-        async Task CompleteAsync()
+        async Task completeAsync()
         {
             try
             {

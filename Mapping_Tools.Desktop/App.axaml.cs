@@ -22,7 +22,7 @@ namespace Mapping_Tools.Desktop;
 /// </summary>
 public partial class App : Avalonia.Application
 {
-    private IHost? _host;
+    private IHost? host;
 
     static App()
     {
@@ -45,26 +45,26 @@ public partial class App : Avalonia.Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            _host = DesktopHostFactory.Create(desktop.Args ?? []);
+            host = DesktopHostFactory.Create(desktop.Args ?? []);
             try
             {
-                _host.Start();
+                host.Start();
                 var settings =
-                    _host.Services.GetRequiredService<ApplicationSettings>();
-                _host.Services
+                    host.Services.GetRequiredService<ApplicationSettings>();
+                host.Services
                     .GetRequiredService<IApplicationThemeService>()
                     .Apply(settings.Theme);
                 var mainWindow =
-                    _host.Services.GetRequiredService<MainWindow>();
+                    host.Services.GetRequiredService<MainWindow>();
                 mainWindow.DataContext =
-                    _host.Services.GetRequiredService<MainViewModel>();
+                    host.Services.GetRequiredService<MainViewModel>();
                 desktop.MainWindow = mainWindow;
                 desktop.Exit += (_, _) => StopHost();
             }
             catch
             {
-                _host.Dispose();
-                _host = null;
+                host.Dispose();
+                host = null;
                 throw;
             }
         }
@@ -127,18 +127,18 @@ public partial class App : Avalonia.Application
 
     private void StopHost()
     {
-        if (_host is null) return;
+        if (host is null) return;
 
         try
         {
-            _host.StopAsync(TimeSpan.FromSeconds(5))
+            host.StopAsync(TimeSpan.FromSeconds(5))
                 .GetAwaiter()
                 .GetResult();
         }
         finally
         {
-            _host.Dispose();
-            _host = null;
+            host.Dispose();
+            host = null;
         }
     }
 

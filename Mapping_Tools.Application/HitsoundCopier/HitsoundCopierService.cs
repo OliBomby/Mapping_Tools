@@ -9,9 +9,9 @@ namespace Mapping_Tools.Application.HitsoundCopier;
 /// <summary>Coordinates source selection, multi-map transformation, sample ports, and safe saves.</summary>
 public sealed class HitsoundCopierService : IHitsoundCopierService
 {
-    private readonly IBeatmapEditingGateway _editingGateway;
-    private readonly IHitsoundSampleService _samples;
-    private readonly ApplicationSettings _settings;
+    private readonly IBeatmapEditingGateway editingGateway;
+    private readonly IHitsoundSampleService samples;
+    private readonly ApplicationSettings settings;
 
     /// <summary>Creates the Hitsound Copier application service.</summary>
     /// <param name="editingGateway">Loads live-aware maps and saves through the backup boundary.</param>
@@ -22,9 +22,9 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
         IHitsoundSampleService samples,
         ApplicationSettings settings)
     {
-        _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
-        _samples = samples ?? throw new ArgumentNullException(nameof(samples));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.samples = samples ?? throw new ArgumentNullException(nameof(samples));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
@@ -42,7 +42,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
             var preference = options.SourceSelectionMode == HitsoundCopierSelectionMode.Selected
                 ? LiveBeatmapPreference.RequireLive
                 : LiveBeatmapPreference.PreferLive;
-            sourceSession = await _editingGateway.OpenBeatmapAsync(
+            sourceSession = await editingGateway.OpenBeatmapAsync(
                 options.PathFrom,
                 preference,
                 cancellationToken).ConfigureAwait(false);
@@ -56,7 +56,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
         for (int index = 0; index < targetPaths.Length; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var targetSession = await _editingGateway.OpenBeatmapAsync(
+            var targetSession = await editingGateway.OpenBeatmapAsync(
                 targetPaths[index],
                 LiveBeatmapPreference.PreferLive,
                 cancellationToken).ConfigureAwait(false);
@@ -71,13 +71,13 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
 
             bool inspectTargetSamples = options.CopyMode == 1 || options.CopyStoryboardedSamples && options.IgnoreHitsoundSatisfiedSamples;
             var firstSamples = inspectTargetSamples
-                ? await _samples.AnalyzeAsync(mapDirectory, cancellationToken).ConfigureAwait(false)
+                ? await samples.AnalyzeAsync(mapDirectory, cancellationToken).ConfigureAwait(false)
                 : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             string sourceDirectory = sourceSession is null
                 ? mapDirectory
                 : GetDirectory(options.PathFrom);
             var sourceSamples = sourceSession is not null && options.CopyMode == 1 && (options.CopyToSliderTicks || options.CopyToSliderSlides)
-                ? await _samples.AnalyzeAsync(sourceDirectory, cancellationToken).ConfigureAwait(false)
+                ? await samples.AnalyzeAsync(sourceDirectory, cancellationToken).ConfigureAwait(false)
                 : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var result = HitsoundCopierEngine.Apply(
                 targetSession.Editor.Beatmap,
@@ -88,7 +88,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
                 firstSamples,
                 sourceDirectory,
                 sourceSamples,
-                request => _samples.TryCreateAssignment(
+                request => samples.TryCreateAssignment(
                     sourceDirectory,
                     request.SourceFilenames,
                     sourceSamples,
@@ -98,9 +98,9 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
                     schema),
                 schema,
                 cancellationToken);
-            await _editingGateway.SaveAsync(
+            await editingGateway.SaveAsync(
                 targetSession,
-                _settings.AutoReload,
+                settings.AutoReload,
                 cancellationToken).ConfigureAwait(false);
             processed.Add(targetPaths[index]);
             matched += result.MatchedHitsoundCount;
@@ -110,7 +110,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
             progress?.Report((index + 1) * 100d / targetPaths.Length);
         }
 
-        if (schema.Count > 0) await _samples.ExportAsync(schema, cancellationToken).ConfigureAwait(false);
+        if (schema.Count > 0) await samples.ExportAsync(schema, cancellationToken).ConfigureAwait(false);
         return new HitsoundCopierResult(processed, matched, generated, muted, schema);
     }
 

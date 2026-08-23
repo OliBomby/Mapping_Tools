@@ -56,19 +56,19 @@ public sealed record UpdateReleaseNotes(string? Title, string? Body);
 /// </summary>
 public sealed class OnovaUpdateGateway : IUpdateGateway
 {
-    private const string PublishedExecutableName = "Mapping Tools.exe";
-    private const string RepositoryOwner = "OliBomby";
-    private const string RepositoryName = "Mapping_Tools";
+    private const string published_executable_name = "Mapping Tools.exe";
+    private const string repository_owner = "OliBomby";
+    private const string repository_name = "Mapping_Tools";
 
-    private const string ReleaseMetadataUrl =
+    private const string release_metadata_url =
         "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/latest";
 
-    private readonly string _assetName;
-    private readonly bool _disposeHttpClient;
-    private readonly HttpClient _httpClient;
-    private readonly GithubPackageResolver _packageResolver;
-    private readonly IUpdateManager _updateManager;
-    private bool _disposed;
+    private readonly string assetName;
+    private readonly bool disposeHttpClient;
+    private readonly HttpClient httpClient;
+    private readonly GithubPackageResolver packageResolver;
+    private readonly IUpdateManager updateManager;
+    private bool disposed;
 
     /// <summary>
     ///     Creates the production GitHub updater with the Mapping Tools user-agent
@@ -91,19 +91,19 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
 
     private OnovaUpdateGateway(HttpClient httpClient, bool disposeHttpClient)
     {
-        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        _disposeHttpClient = disposeHttpClient;
-        if (!_httpClient.DefaultRequestHeaders.UserAgent.Any())
-            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
+        this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        this.disposeHttpClient = disposeHttpClient;
+        if (!this.httpClient.DefaultRequestHeaders.UserAgent.Any())
+            this.httpClient.DefaultRequestHeaders.TryAddWithoutValidation(
                 "User-Agent",
                 "Mapping Tools");
 
-        _assetName = Environment.Is64BitProcess ? "release_x64.zip" : "release.zip";
-        _packageResolver = new GithubPackageResolver(
-            _httpClient,
-            RepositoryOwner,
-            RepositoryName,
-            _assetName);
+        assetName = Environment.Is64BitProcess ? "release_x64.zip" : "release.zip";
+        packageResolver = new GithubPackageResolver(
+            this.httpClient,
+            repository_owner,
+            repository_name,
+            assetName);
 
         var entryAssembly = Assembly.GetEntryAssembly()
                             ?? typeof(OnovaUpdateGateway).Assembly;
@@ -111,9 +111,9 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
         var assemblyMetadata = File.Exists(publishedExecutablePath)
             ? AssemblyMetadata.FromAssembly(entryAssembly, publishedExecutablePath)
             : AssemblyMetadata.FromAssembly(entryAssembly);
-        _updateManager = new UpdateManager(
+        updateManager = new UpdateManager(
             assemblyMetadata,
-            _packageResolver,
+            packageResolver,
             new ZipPackageExtractor());
     }
 
@@ -123,18 +123,18 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
     {
         ThrowIfDisposed();
 
-        var result = await _updateManager
+        var result = await updateManager
             .CheckForUpdatesAsync(cancellationToken)
             .ConfigureAwait(false);
         UpdateReleaseNotes? notes = null;
         if (result.CanUpdate && result.LastVersion is not null) notes = await ReadReleaseNotesAsync(cancellationToken).ConfigureAwait(false);
 
         return new UpdatePackageInfo(
-            _updateManager.Updatee.Version,
+            updateManager.Updatee.Version,
             result.LastVersion,
             notes?.Title,
             notes?.Body,
-            _assetName);
+            assetName);
     }
 
     /// <inheritdoc />
@@ -146,7 +146,7 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
         ArgumentNullException.ThrowIfNull(version);
         ArgumentNullException.ThrowIfNull(progress);
         ThrowIfDisposed();
-        return _updateManager.PrepareUpdateAsync(version, progress, cancellationToken);
+        return updateManager.PrepareUpdateAsync(version, progress, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -158,24 +158,24 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
             throw new PlatformNotSupportedException(
                 "The current release package uses the Windows Onova updater.");
 
-        _updateManager.LaunchUpdater(version, restartAfterUpdate);
+        updateManager.LaunchUpdater(version, restartAfterUpdate);
     }
 
     /// <inheritdoc />
     public void Dispose()
     {
-        if (_disposed) return;
+        if (disposed) return;
 
-        _disposed = true;
-        _updateManager.Dispose();
-        if (_disposeHttpClient) _httpClient.Dispose();
+        disposed = true;
+        updateManager.Dispose();
+        if (disposeHttpClient) httpClient.Dispose();
     }
 
     private async Task<UpdateReleaseNotes> ReadReleaseNotesAsync(
         CancellationToken cancellationToken)
     {
-        using var response = await _httpClient
-            .GetAsync(ReleaseMetadataUrl, cancellationToken)
+        using var response = await httpClient
+            .GetAsync(release_metadata_url, cancellationToken)
             .ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         string json = await response.Content
@@ -186,7 +186,7 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
 
     private void ThrowIfDisposed()
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
+        ObjectDisposedException.ThrowIf(disposed, this);
     }
 
     private static string ResolveExecutablePath(Assembly entryAssembly)
@@ -195,13 +195,13 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
         if (!string.IsNullOrWhiteSpace(processPath)
             && string.Equals(
                 Path.GetFileName(processPath),
-                PublishedExecutableName,
+                published_executable_name,
                 StringComparison.OrdinalIgnoreCase))
             return processPath;
 
         string publishedExecutablePath = Path.Combine(
             AppContext.BaseDirectory,
-            PublishedExecutableName);
+            published_executable_name);
         return File.Exists(publishedExecutablePath)
             ? publishedExecutablePath
             : entryAssembly.Location;

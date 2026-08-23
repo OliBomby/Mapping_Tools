@@ -121,18 +121,18 @@ public sealed class QuickUndoCommandServiceTests
 
     private sealed class FixedLocator : ICurrentBeatmapLocator
     {
-        private readonly string? _path;
+        private readonly string? path;
 
         public FixedLocator(string? path)
         {
-            _path = path;
+            this.path = path;
         }
 
         public Task<string?> FindCurrentBeatmapAsync(
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(_path);
+            return Task.FromResult(path);
         }
     }
 

@@ -16,18 +16,18 @@ public sealed class ToolRunButton : Viewbox
     public static readonly StyledProperty<ICommand?> RunCommandProperty =
         AvaloniaProperty.Register<ToolRunButton, ICommand?>(nameof(RunCommand));
 
-    private readonly FloatingButton _button;
+    private readonly FloatingButton button;
 
     static ToolRunButton()
     {
-        RunCommandProperty.Changed.AddClassHandler<ToolRunButton>(static (control, eventArgs) => control._button.Command = eventArgs.NewValue as ICommand);
+        RunCommandProperty.Changed.AddClassHandler<ToolRunButton>(static (control, eventArgs) => control.button.Command = eventArgs.NewValue as ICommand);
     }
 
     /// <summary>Creates the WPF-compatible floating play action.</summary>
     public ToolRunButton()
     {
         Width = 70;
-        _button = new FloatingButton
+        button = new FloatingButton
         {
             Content = new MaterialIcon
             {
@@ -36,8 +36,8 @@ public sealed class ToolRunButton : Viewbox
                 Kind = MaterialIconKind.Play,
             },
         };
-        ToolTip.SetTip(_button, "Run this tool.");
-        Child = _button;
+        ToolTip.SetTip(button, "Run this tool.");
+        Child = button;
     }
 
     /// <summary>Gets or sets the command invoked when the play action is selected.</summary>

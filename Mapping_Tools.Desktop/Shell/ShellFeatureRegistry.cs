@@ -19,7 +19,7 @@ public interface IShellFeatureRegistry
 /// </summary>
 public sealed class ShellFeatureRegistry : IShellFeatureRegistry
 {
-    private readonly Dictionary<string, ShellFeatureRegistration> _byId;
+    private readonly Dictionary<string, ShellFeatureRegistration> byId;
 
     /// <summary>
     ///     Builds a registry and rejects ambiguous identifiers.
@@ -29,9 +29,9 @@ public sealed class ShellFeatureRegistry : IShellFeatureRegistry
     {
         ArgumentNullException.ThrowIfNull(features);
         Features = features.ToArray();
-        _byId = new Dictionary<string, ShellFeatureRegistration>(StringComparer.OrdinalIgnoreCase);
+        byId = new Dictionary<string, ShellFeatureRegistration>(StringComparer.OrdinalIgnoreCase);
         foreach (var feature in Features)
-            if (!_byId.TryAdd(feature.Id, feature))
+            if (!byId.TryAdd(feature.Id, feature))
                 throw new ArgumentException(
                     $"Feature id '{feature.Id}' is registered more than once.",
                     nameof(features));
@@ -46,6 +46,6 @@ public sealed class ShellFeatureRegistry : IShellFeatureRegistry
     public ShellFeatureRegistration? Find(string id)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(id);
-        return _byId.GetValueOrDefault(id);
+        return byId.GetValueOrDefault(id);
     }
 }

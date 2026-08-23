@@ -10,7 +10,7 @@ namespace Mapping_Tools.Infrastructure.Platform;
 /// </summary>
 public sealed class WindowsGeometryDashboardWindowService : IGeometryDashboardWindowService
 {
-    private readonly Func<bool> _isWindows;
+    private readonly Func<bool> isWindows;
 
     /// <summary>Creates the adapter using the current platform guard.</summary>
     public WindowsGeometryDashboardWindowService()
@@ -20,16 +20,16 @@ public sealed class WindowsGeometryDashboardWindowService : IGeometryDashboardWi
 
     internal WindowsGeometryDashboardWindowService(Func<bool> isWindows)
     {
-        _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
+        this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
     /// <inheritdoc />
-    public bool IsSupported => _isWindows();
+    public bool IsSupported => isWindows();
 
     /// <inheritdoc />
     public GeometryDashboardWindow? GetWindow(PlatformWindowId window)
     {
-        if (!_isWindows() || window.IsEmpty) return null;
+        if (!isWindows() || window.IsEmpty) return null;
 
         nint nativeWindow = new(window.Value);
         if (!WindowsNativeMethods.IsWindow(nativeWindow)
@@ -72,7 +72,7 @@ public sealed class WindowsGeometryDashboardWindowService : IGeometryDashboardWi
     /// <inheritdoc />
     public IReadOnlyList<GeometryDashboardWindow> GetTopLevelWindows()
     {
-        if (!_isWindows()) return [];
+        if (!isWindows()) return [];
 
         List<GeometryDashboardWindow> windows = [];
         WindowsNativeMethods.EnumWindows(

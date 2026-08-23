@@ -49,7 +49,7 @@ public sealed record TimelineMarker
 /// <summary>Projects timestamps into a finite viewport and supplies deterministic labels/hit testing.</summary>
 public sealed class TimelineScale
 {
-    private const double MinimumSpan = 20;
+    private const double minimum_span = 20;
 
     /// <summary>Creates a finite timeline scale with evenly spaced labels.</summary>
     /// <param name="startTime">The first visible timestamp in milliseconds.</param>
@@ -60,7 +60,7 @@ public sealed class TimelineScale
         if (!double.IsFinite(startTime) || !double.IsFinite(endTime)) throw new ArgumentOutOfRangeException(nameof(endTime));
         if (intervalCount <= 0) throw new ArgumentOutOfRangeException(nameof(intervalCount));
         StartTime = startTime;
-        EndTime = Math.Max(endTime, startTime + MinimumSpan);
+        EndTime = Math.Max(endTime, startTime + minimum_span);
         IntervalCount = intervalCount;
     }
 

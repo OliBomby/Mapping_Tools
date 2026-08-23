@@ -145,7 +145,7 @@ public struct Line2 : IEquatable<Line2>
         var p3 = right.PositionVector;
         var p4 = right.PositionVector + right.DirectionVector;
         double denom = (p1.X - p2.X) * (p3.Y - p4.Y) - (p1.Y - p2.Y) * (p3.X - p4.X);
-        if (Math.Abs(denom) < Precision.DoubleEpsilon)
+        if (Math.Abs(denom) < Precision.DOUBLE_EPSILON)
         {
             result = Vector2.NaN;
             return false;
@@ -166,23 +166,23 @@ public struct Line2 : IEquatable<Line2>
     public static bool Intersection(Box2 rect, Line2 line, out Vector2[] intersections)
     {
         var candidates = new List<Vector2>(4);
-        if (Math.Abs(line.DirectionVector.X) > Precision.DoubleEpsilon)
+        if (Math.Abs(line.DirectionVector.X) > Precision.DOUBLE_EPSILON)
         {
             candidates.Add(line.PointOnLine((rect.Left - line.PositionVector.X) / line.DirectionVector.X));
             candidates.Add(line.PointOnLine((rect.Right - line.PositionVector.X) / line.DirectionVector.X));
         }
 
-        if (Math.Abs(line.DirectionVector.Y) > Precision.DoubleEpsilon)
+        if (Math.Abs(line.DirectionVector.Y) > Precision.DOUBLE_EPSILON)
         {
             candidates.Add(line.PointOnLine((rect.Top - line.PositionVector.Y) / line.DirectionVector.Y));
             candidates.Add(line.PointOnLine((rect.Bottom - line.PositionVector.Y) / line.DirectionVector.Y));
         }
 
         intersections = candidates.Where(p =>
-            p[0] > rect.Left - Precision.DoubleEpsilon
-            && p[0] < rect.Right + Precision.DoubleEpsilon
-            && p[1] > rect.Top - Precision.DoubleEpsilon
-            && p[1] < rect.Bottom + Precision.DoubleEpsilon).ToArray();
+            p[0] > rect.Left - Precision.DOUBLE_EPSILON
+            && p[0] < rect.Right + Precision.DOUBLE_EPSILON
+            && p[1] > rect.Top - Precision.DOUBLE_EPSILON
+            && p[1] < rect.Bottom + Precision.DOUBLE_EPSILON).ToArray();
         return intersections.Length >= 2;
     }
 

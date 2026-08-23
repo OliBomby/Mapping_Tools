@@ -13,8 +13,8 @@ namespace Mapping_Tools.Application.PatternGallery;
 /// </summary>
 public sealed class PatternGalleryService : IPatternGalleryService
 {
-    private readonly IBeatmapEditingGateway _editing;
-    private readonly IPatternGalleryFileService _files;
+    private readonly IBeatmapEditingGateway editing;
+    private readonly IPatternGalleryFileService files;
 
     /// <summary>Creates the Pattern Gallery application use case.</summary>
     /// <param name="editing">Loads live or disk beatmaps and saves with backups.</param>
@@ -23,8 +23,8 @@ public sealed class PatternGalleryService : IPatternGalleryService
         IBeatmapEditingGateway editing,
         IPatternGalleryFileService files)
     {
-        _editing = editing ?? throw new ArgumentNullException(nameof(editing));
-        _files = files ?? throw new ArgumentNullException(nameof(files));
+        this.editing = editing ?? throw new ArgumentNullException(nameof(editing));
+        this.files = files ?? throw new ArgumentNullException(nameof(files));
     }
 
     /// <inheritdoc />
@@ -34,8 +34,8 @@ public sealed class PatternGalleryService : IPatternGalleryService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(pattern);
-        var session = await _editing.OpenBeatmapAsync(
-                _files.GetPatternPath(paths, pattern.FileName),
+        var session = await editing.OpenBeatmapAsync(
+                files.GetPatternPath(paths, pattern.FileName),
                 LiveBeatmapPreference.DiskOnly,
                 cancellationToken)
             .ConfigureAwait(false);
@@ -83,7 +83,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourcePath);
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        var source = await _editing.OpenBeatmapAsync(
+        var source = await editing.OpenBeatmapAsync(
                 sourcePath,
                 LiveBeatmapPreference.DiskOnly,
                 cancellationToken)
@@ -105,7 +105,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         {
             pattern = maker.FromBeatmap(source.Editor.Beatmap, name);
             // Save the pattern in the collection folder by copying
-            _files.CopyPattern(sourcePath, _files.GetPatternPath(paths, pattern.FileName));
+            files.CopyPattern(sourcePath, files.GetPatternPath(paths, pattern.FileName));
         }
 
         return pattern;
@@ -118,7 +118,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         PatternGalleryCollectionPaths paths,
         CancellationToken cancellationToken = default)
     {
-        var source = await _editing.OpenBeatmapAsync(
+        var source = await editing.OpenBeatmapAsync(
                 sourcePath,
                 LiveBeatmapPreference.RequireLive,
                 cancellationToken)
@@ -151,7 +151,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         var preference = project.ExportTimeMode == ExportTimeMode.Current
             ? LiveBeatmapPreference.RequireLive
             : LiveBeatmapPreference.PreferLive;
-        var target = await _editing.OpenBeatmapAsync(
+        var target = await editing.OpenBeatmapAsync(
                 targetPath,
                 preference,
                 cancellationToken)
@@ -169,8 +169,8 @@ public sealed class PatternGalleryService : IPatternGalleryService
         {
             cancellationToken.ThrowIfCancellationRequested();
             var pattern = patterns[index];
-            var source = await _editing.OpenBeatmapAsync(
-                    _files.GetPatternPath(paths, pattern.FileName),
+            var source = await editing.OpenBeatmapAsync(
+                    files.GetPatternPath(paths, pattern.FileName),
                     LiveBeatmapPreference.DiskOnly,
                     cancellationToken)
                 .ConfigureAwait(false);
@@ -189,7 +189,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
             progress?.Report((index + 1) * 100d / patterns.Count);
         }
 
-        await _editing.SaveAsync(target, quick, cancellationToken)
+        await editing.SaveAsync(target, quick, cancellationToken)
             .ConfigureAwait(false);
         return new PatternGalleryRunResult(patterns.Count, "Successfully exported pattern!");
     }
@@ -204,7 +204,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         foreach (var pattern in patterns)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            _files.DeletePattern(_files.GetPatternPath(paths, pattern.FileName));
+            files.DeletePattern(files.GetPatternPath(paths, pattern.FileName));
         }
 
         return Task.CompletedTask;
@@ -218,7 +218,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
     {
         ArgumentNullException.ThrowIfNull(project);
         // Get all the filenames that are currently in the collection
-        string[] actual = _files.EnumeratePatternFiles(paths).ToArray();
+        string[] actual = files.EnumeratePatternFiles(paths).ToArray();
         var actualSet = actual.ToHashSet(StringComparer.OrdinalIgnoreCase);
         // Remove all patterns that are not in the actual pattern files
         var removed = project.Patterns
@@ -235,8 +235,8 @@ public sealed class PatternGalleryService : IPatternGalleryService
         foreach (string filename in actual.Where(name => !indexed.Contains(name)))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var session = await _editing.OpenBeatmapAsync(
-                    _files.GetPatternPath(paths, filename),
+            var session = await editing.OpenBeatmapAsync(
+                    files.GetPatternPath(paths, filename),
                     LiveBeatmapPreference.DiskOnly,
                     cancellationToken)
                 .ConfigureAwait(false);
@@ -259,11 +259,11 @@ public sealed class PatternGalleryService : IPatternGalleryService
     {
         cancellationToken.ThrowIfCancellationRequested();
         // Make sure the file handler always uses the right pattern files folder
-        _files.EnsureCollection(paths);
+        files.EnsureCollection(paths);
         patternBeatmap.SaveWithFloatPrecision = true;
-        string destination = _files.GetPatternPath(paths, pattern.FileName);
+        string destination = files.GetPatternPath(paths, pattern.FileName);
         // Save the modified pattern beatmap in the colleciton folder
-        _files.WritePatternBytes(
+        files.WritePatternBytes(
             destination,
             Encoding.UTF8.GetBytes(string.Join("\r\n", patternBeatmap.GetLines())));
     }

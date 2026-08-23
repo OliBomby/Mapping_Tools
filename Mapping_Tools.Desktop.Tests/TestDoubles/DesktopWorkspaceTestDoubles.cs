@@ -64,8 +64,8 @@ internal sealed class TestBetterSaveOverrideService : IBetterSaveOverrideService
 
 internal sealed class TestBeatmapWorkspace : IBeatmapWorkspace
 {
-    private readonly List<RecentBeatmap> _recentMaps = [];
-    private readonly List<string> _selectedPaths = [];
+    private readonly List<RecentBeatmap> recentMaps = [];
+    private readonly List<string> selectedPaths = [];
 
     public BeatmapSelectionSource? LastSelectionSource { get; private set; }
 
@@ -74,16 +74,16 @@ internal sealed class TestBeatmapWorkspace : IBeatmapWorkspace
 
     public event EventHandler<BeatmapSelectionChangedEventArgs>? SelectionChanged;
 
-    public IReadOnlyList<string> SelectedPaths => _selectedPaths.ToArray();
+    public IReadOnlyList<string> SelectedPaths => selectedPaths.ToArray();
 
-    public IReadOnlyList<RecentBeatmap> RecentMaps => _recentMaps.ToArray();
+    public IReadOnlyList<RecentBeatmap> RecentMaps => recentMaps.ToArray();
 
     public bool RestoreMostRecent()
     {
-        if (_recentMaps.Count == 0) return false;
+        if (recentMaps.Count == 0) return false;
 
         SetSelection(
-            _recentMaps[0].Path.Split('|', StringSplitOptions.RemoveEmptyEntries),
+            recentMaps[0].Path.Split('|', StringSplitOptions.RemoveEmptyEntries),
             BeatmapSelectionSource.Startup);
         return true;
     }
@@ -92,12 +92,12 @@ internal sealed class TestBeatmapWorkspace : IBeatmapWorkspace
         IEnumerable<string> paths,
         BeatmapSelectionSource source = BeatmapSelectionSource.Programmatic)
     {
-        _selectedPaths.Clear();
-        _selectedPaths.AddRange(paths);
+        selectedPaths.Clear();
+        selectedPaths.AddRange(paths);
         LastSelectionSource = source;
         SelectionChanged?.Invoke(
             this,
-            new BeatmapSelectionChangedEventArgs(_selectedPaths.ToArray(), source));
+            new BeatmapSelectionChangedEventArgs(selectedPaths.ToArray(), source));
     }
 
     public void ClearSelection(
@@ -108,7 +108,7 @@ internal sealed class TestBeatmapWorkspace : IBeatmapWorkspace
 
     public bool RemoveRecent(string path)
     {
-        return _recentMaps.RemoveAll(recent => recent.Path == path) > 0;
+        return recentMaps.RemoveAll(recent => recent.Path == path) > 0;
     }
 
     public IReadOnlyList<string> GetMissingSelectedPaths()
@@ -131,8 +131,8 @@ internal sealed class TestBeatmapWorkspace : IBeatmapWorkspace
 
     public void SetRecentMaps(params RecentBeatmap[] recentMaps)
     {
-        _recentMaps.Clear();
-        _recentMaps.AddRange(recentMaps);
+        this.recentMaps.Clear();
+        this.recentMaps.AddRange(recentMaps);
     }
 }
 

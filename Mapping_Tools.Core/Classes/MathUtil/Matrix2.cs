@@ -407,7 +407,7 @@ public struct Matrix2 : IEquatable<Matrix2>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication.</param>
-    public static void Mult(ref Matrix2 left, ref Matrix2x3 right, out Matrix2x3 result)
+    public static void Mult(ref Matrix2 left, ref Matrix2X3 right, out Matrix2X3 result)
     {
         double lM11 = left.Row0.X,
             lM12 = left.Row0.Y,
@@ -434,7 +434,7 @@ public struct Matrix2 : IEquatable<Matrix2>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication.</returns>
-    public static Matrix2x3 Mult(Matrix2 left, Matrix2x3 right)
+    public static Matrix2X3 Mult(Matrix2 left, Matrix2X3 right)
     {
         Mult(ref left, ref right, out var result);
         return result;
@@ -446,7 +446,7 @@ public struct Matrix2 : IEquatable<Matrix2>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication.</param>
-    public static void Mult(ref Matrix2 left, ref Matrix2x4 right, out Matrix2x4 result)
+    public static void Mult(ref Matrix2 left, ref Matrix2X4 right, out Matrix2X4 result)
     {
         double lM11 = left.Row0.X,
             lM12 = left.Row0.Y,
@@ -477,7 +477,7 @@ public struct Matrix2 : IEquatable<Matrix2>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication.</returns>
-    public static Matrix2x4 Mult(Matrix2 left, Matrix2x4 right)
+    public static Matrix2X4 Mult(Matrix2 left, Matrix2X4 right)
     {
         Mult(ref left, ref right, out var result);
         return result;
@@ -622,7 +622,7 @@ public struct Matrix2 : IEquatable<Matrix2>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x3 which holds the result of the multiplication</returns>
-    public static Matrix2x3 operator *(Matrix2 left, Matrix2x3 right) => Mult(left, right);
+    public static Matrix2X3 operator *(Matrix2 left, Matrix2X3 right) => Mult(left, right);
 
     /// <summary>
     ///     Matrix multiplication
@@ -630,7 +630,7 @@ public struct Matrix2 : IEquatable<Matrix2>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix2x4 which holds the result of the multiplication</returns>
-    public static Matrix2x4 operator *(Matrix2 left, Matrix2x4 right) => Mult(left, right);
+    public static Matrix2X4 operator *(Matrix2 left, Matrix2X4 right) => Mult(left, right);
 
     /// <summary>
     ///     Matrix addition

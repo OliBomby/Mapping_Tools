@@ -62,10 +62,10 @@ public interface IGeometryDashboardRuntime
 /// </summary>
 public sealed class GeometryDashboardRuntimeService : IGeometryDashboardRuntime
 {
-    private readonly IGeometryDashboardEditorReader _editor;
-    private readonly IGeometryDashboardProcessDiscovery _processes;
-    private readonly IGeometryDashboardScreenService _screens;
-    private readonly IGeometryDashboardWindowService _windows;
+    private readonly IGeometryDashboardEditorReader editor;
+    private readonly IGeometryDashboardProcessDiscovery processes;
+    private readonly IGeometryDashboardScreenService screens;
+    private readonly IGeometryDashboardWindowService windows;
 
     /// <summary>
     ///     Creates a runtime service from the independent platform ports.
@@ -80,10 +80,10 @@ public sealed class GeometryDashboardRuntimeService : IGeometryDashboardRuntime
         IGeometryDashboardWindowService windows,
         IGeometryDashboardScreenService screens)
     {
-        _processes = processes ?? throw new ArgumentNullException(nameof(processes));
-        _editor = editor ?? throw new ArgumentNullException(nameof(editor));
-        _windows = windows ?? throw new ArgumentNullException(nameof(windows));
-        _screens = screens ?? throw new ArgumentNullException(nameof(screens));
+        this.processes = processes ?? throw new ArgumentNullException(nameof(processes));
+        this.editor = editor ?? throw new ArgumentNullException(nameof(editor));
+        this.windows = windows ?? throw new ArgumentNullException(nameof(windows));
+        this.screens = screens ?? throw new ArgumentNullException(nameof(screens));
     }
 
     /// <inheritdoc />
@@ -91,17 +91,17 @@ public sealed class GeometryDashboardRuntimeService : IGeometryDashboardRuntime
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var process = await _processes
+        var process = await processes
             .FindAsync(cancellationToken)
             .ConfigureAwait(false);
         if (process is null) return null;
 
-        var window = _windows.GetMainWindow(process);
+        var window = windows.GetMainWindow(process);
         if (window is null) return null;
 
         if (!window.Title.EndsWith(".osu", StringComparison.Ordinal)) return null;
 
-        var editor = await _editor
+        var editor = await this.editor
             .ReadGeometryDashboardAsync(process, cancellationToken)
             .ConfigureAwait(false);
         if (editor is null) return null;
@@ -110,6 +110,6 @@ public sealed class GeometryDashboardRuntimeService : IGeometryDashboardRuntime
             process,
             window,
             editor,
-            _screens.GetPrimaryScreen());
+            screens.GetPrimaryScreen());
     }
 }

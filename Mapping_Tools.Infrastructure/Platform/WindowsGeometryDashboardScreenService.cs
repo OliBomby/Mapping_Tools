@@ -10,7 +10,7 @@ namespace Mapping_Tools.Infrastructure.Platform;
 /// </summary>
 public sealed class WindowsGeometryDashboardScreenService : IGeometryDashboardScreenService
 {
-    private readonly Func<bool> _isWindows;
+    private readonly Func<bool> isWindows;
 
     /// <summary>Creates the adapter using the current platform guard.</summary>
     public WindowsGeometryDashboardScreenService()
@@ -20,16 +20,16 @@ public sealed class WindowsGeometryDashboardScreenService : IGeometryDashboardSc
 
     internal WindowsGeometryDashboardScreenService(Func<bool> isWindows)
     {
-        _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
+        this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
     /// <inheritdoc />
-    public bool IsSupported => _isWindows();
+    public bool IsSupported => isWindows();
 
     /// <inheritdoc />
     public IReadOnlyList<GeometryDashboardScreen> GetScreens()
     {
-        if (!_isWindows()) return [];
+        if (!isWindows()) return [];
 
         List<GeometryDashboardScreen> screens = [];
         bool enumerated = WindowsNativeMethods.EnumDisplayMonitors(
@@ -54,11 +54,11 @@ public sealed class WindowsGeometryDashboardScreenService : IGeometryDashboardSc
     /// <inheritdoc />
     public GeometryDashboardScreen? GetScreenForWindow(PlatformWindowId window)
     {
-        if (!_isWindows() || window.IsEmpty) return null;
+        if (!isWindows() || window.IsEmpty) return null;
 
         nint monitor = WindowsNativeMethods.MonitorFromWindow(
             new nint(window.Value),
-            WindowsNativeMethods.MonitorDefaultToNearest);
+            WindowsNativeMethods.MONITOR_DEFAULT_TO_NEAREST);
         return monitor == 0 || !TryReadScreen(monitor, out var screen)
             ? null
             : screen;
@@ -69,9 +69,9 @@ public sealed class WindowsGeometryDashboardScreenService : IGeometryDashboardSc
         out GeometryDashboardScreen? screen)
     {
         screen = null;
-        WindowsNativeMethods.MONITORINFO info = new()
+        WindowsNativeMethods.Monitorinfo info = new()
         {
-            Size = Marshal.SizeOf<WindowsNativeMethods.MONITORINFO>(),
+            Size = Marshal.SizeOf<WindowsNativeMethods.Monitorinfo>(),
         };
         if (!WindowsNativeMethods.GetMonitorInfo(monitor, ref info)) return false;
 
@@ -81,7 +81,7 @@ public sealed class WindowsGeometryDashboardScreenService : IGeometryDashboardSc
         {
             int result = WindowsNativeMethods.GetDpiForMonitor(
                 monitor,
-                WindowsNativeMethods.DpiTypeEffective,
+                WindowsNativeMethods.DPI_TYPE_EFFECTIVE,
                 out uint dpiX,
                 out uint dpiY);
             if (result == 0 && dpiX > 0 && dpiY > 0)
@@ -101,13 +101,13 @@ public sealed class WindowsGeometryDashboardScreenService : IGeometryDashboardSc
             monitor.ToInt64(),
             ToBox(info.Monitor),
             ToBox(info.Work),
-            (info.Flags & WindowsNativeMethods.MonitorInfoPrimary) != 0,
+            (info.Flags & WindowsNativeMethods.MONITOR_INFO_PRIMARY) != 0,
             dpiScale,
             dpiAvailable);
         return true;
     }
 
-    private static Box2 ToBox(WindowsNativeMethods.RECT rectangle)
+    private static Box2 ToBox(WindowsNativeMethods.Rect rectangle)
     {
         return new Box2(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
     }

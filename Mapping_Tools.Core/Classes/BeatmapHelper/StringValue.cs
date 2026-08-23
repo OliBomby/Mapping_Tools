@@ -8,18 +8,18 @@ namespace Mapping_Tools.Core.Classes.BeatmapHelper;
 ///     Provides methods for converting data to and from string.
 /// </summary>
 #nullable disable
-public class TValue
+public class StringValue
 {
     /// <summary>
     ///     Creates an empty wrapper for serializers; <see cref="Value" /> remains unset.
     /// </summary>
-    public TValue() { }
+    public StringValue() { }
 
     /// <summary>
     ///     Wraps an existing file-format value without normalizing it.
     /// </summary>
     /// <param name="str">The raw value text.</param>
-    public TValue(string str)
+    public StringValue(string str)
     {
         Value = str;
     }

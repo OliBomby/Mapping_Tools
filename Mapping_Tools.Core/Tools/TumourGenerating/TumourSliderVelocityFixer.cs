@@ -47,13 +47,13 @@ public static class TumourSliderVelocityFixer
                     true,
                     uninherited: true,
                     omitFirstBarLine: true,
-                    fuzziness: Precision.DoubleEpsilon));
+                    fuzziness: Precision.DOUBLE_EPSILON));
                 changes.Add(new TimingPointChange(
                     after,
                     true,
                     uninherited: true,
                     omitFirstBarLine: true,
-                    fuzziness: Precision.DoubleEpsilon));
+                    fuzziness: Precision.DOUBLE_EPSILON));
                 hitObject.Time -= 1;
             }
 
@@ -63,7 +63,7 @@ public static class TumourSliderVelocityFixer
             changes.Add(new TimingPointChange(
                 sliderVelocity,
                 true,
-                fuzziness: Precision.DoubleEpsilon));
+                fuzziness: Precision.DOUBLE_EPSILON));
         }
 
         TimingPointChange.Apply(timing, changes);

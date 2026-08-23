@@ -12,7 +12,7 @@ namespace Mapping_Tools.Desktop.Platform;
 /// </summary>
 public sealed class AvaloniaDialogService : IDialogService
 {
-    private readonly Func<Window> _owner;
+    private readonly Func<Window> owner;
 
     /// <summary>
     ///     Creates a service whose dialogs are always owned by the current shell window.
@@ -21,7 +21,7 @@ public sealed class AvaloniaDialogService : IDialogService
     public AvaloniaDialogService(Func<Window> owner)
     {
         ArgumentNullException.ThrowIfNull(owner);
-        _owner = owner;
+        this.owner = owner;
     }
 
     /// <inheritdoc />
@@ -62,7 +62,7 @@ public sealed class AvaloniaDialogService : IDialogService
             request.Details,
             choices);
 
-        var lifetime = window.ShowDialog<object?>(_owner());
+        var lifetime = window.ShowDialog<object?>(owner());
         using var registration =
             RegisterCancellation(window, cancellationToken);
         object? result = await lifetime;
@@ -90,7 +90,7 @@ public sealed class AvaloniaDialogService : IDialogService
             () => window.Close());
         window.DataContext = viewModel;
 
-        var lifetime = window.ShowDialog<object?>(_owner());
+        var lifetime = window.ShowDialog<object?>(owner());
         using var registration =
             RegisterCancellation(window, cancellationToken);
         object? result = await lifetime;

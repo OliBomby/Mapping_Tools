@@ -112,7 +112,7 @@ public static class MapCleanerEngine
         foreach (TimingPoint point in timing.Redlines)
         {
             changes.Add(new TimingPointChange(point, mpb: true, meter: true,
-                uninherited: true, omitFirstBarLine: true, fuzziness: Precision.DoubleEpsilon));
+                uninherited: true, omitFirstBarLine: true, fuzziness: Precision.DOUBLE_EPSILON));
         }
 
         if (mode is GameMode.Taiko or GameMode.Mania)
@@ -309,7 +309,7 @@ public static class MapCleanerEngine
             .Where(old =>
             {
                 TimingPoint[] matching = current
-                    .Where(now => Math.Abs(now.Offset - old.Offset) < Precision.DoubleEpsilon)
+                    .Where(now => Math.Abs(now.Offset - old.Offset) < Precision.DOUBLE_EPSILON)
                     .ToArray();
                 return matching.Length > 0 && matching.All(now => !old.Equals(now));
             })

@@ -124,7 +124,7 @@ public static class FileFormatHelper
     /// <param name="dict">The section values keyed by their file-format name.</param>
     /// <param name="lines">The output list to append to.</param>
     /// <param name="spaceBeforeValue">Whether to emit a space after the colon.</param>
-    public static void AddDictionaryToLines(Dictionary<string, TValue> dict, List<string> lines, bool spaceBeforeValue = false)
+    public static void AddDictionaryToLines(Dictionary<string, StringValue> dict, List<string> lines, bool spaceBeforeValue = false)
     {
         foreach (string key in osuDictionaryKeyOrder)
             if (dict.TryGetValue(key, out var value))
@@ -145,9 +145,9 @@ public static class FileFormatHelper
     /// </summary>
     /// <param name="dict">The destination section dictionary.</param>
     /// <param name="lines">Raw key/value lines.</param>
-    public static void FillDictionary(Dictionary<string, TValue> dict, IEnumerable<string> lines)
+    public static void FillDictionary(Dictionary<string, StringValue> dict, IEnumerable<string> lines)
     {
-        foreach ((string key, string value) in lines.Select(SplitKeyValue)) dict[key] = new TValue(value);
+        foreach ((string key, string value) in lines.Select(SplitKeyValue)) dict[key] = new StringValue(value);
     }
 
     /// <summary>

@@ -18,19 +18,19 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature
 {
-    internal const string OperationId = "timing-helper";
-    private readonly ICurrentBeatmapLocator _currentBeatmap;
+    internal const string OPERATION_ID = "timing-helper";
+    private readonly ICurrentBeatmapLocator currentBeatmap;
 
-    private readonly ProjectDefinition<TimingHelperProject> _definition = new(
+    private readonly ProjectDefinition<TimingHelperProject> definition = new(
         "timinghelperproject.json",
         "Timing Helper Projects",
         static () => new TimingHelperProject(),
         "timing-helper-project.json");
 
-    private readonly ApplicationSettings _settings;
+    private readonly ApplicationSettings settings;
 
-    private readonly ITimingHelperService _timingHelper;
-    private readonly IBeatmapWorkspace _workspace;
+    private readonly ITimingHelperService timingHelper;
+    private readonly IBeatmapWorkspace workspace;
 
     /// <summary>
     ///     Creates a Timing Helper presentation model.
@@ -46,12 +46,12 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
         ApplicationSettings settings)
-        : base(execution, OperationId)
+        : base(execution, OPERATION_ID)
     {
-        _timingHelper = timingHelper ?? throw new ArgumentNullException(nameof(timingHelper));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.timingHelper = timingHelper ?? throw new ArgumentNullException(nameof(timingHelper));
+        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <summary>Gets or sets whether hit objects are counted as timing markers.</summary>
@@ -97,7 +97,7 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     /// <returns>A task that completes after QuickRun reaches a terminal state.</returns>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await _currentBeatmap
+        string? path = await currentBeatmap
             .FindCurrentBeatmapAsync(cancellationToken)
             .ConfigureAwait(false);
         await RunWithStateAsync(() => RunPathsAsync(
@@ -106,9 +106,9 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    string IQuickRun.OperationId => OperationId;
+    string IQuickRun.OperationId => OPERATION_ID;
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
     {
@@ -123,9 +123,9 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        if (_settings.AlwaysQuickRun)
+        if (settings.AlwaysQuickRun)
         {
-            string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
+            string? path = await currentBeatmap.FindCurrentBeatmapAsync();
             await RunPathsAsync(
                 string.IsNullOrWhiteSpace(path) ? [] : [path],
                 true,
@@ -133,7 +133,7 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
             return;
         }
 
-        await RunPathsAsync(_workspace.SelectedPaths, false, CancellationToken.None);
+        await RunPathsAsync(workspace.SelectedPaths, false, CancellationToken.None);
     }
 
     /// <inheritdoc />
@@ -153,13 +153,13 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
         TimingHelperOptions options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<TimingHelperResult>(
-                    OperationId,
+                    OPERATION_ID,
                     "Timing Helper",
                     async context =>
                     {
                         Progress<double> progress = new(value =>
                             context.ReportProgress(value, "Adjusting timing"));
-                        var result = await _timingHelper.AdjustAsync(
+                        var result = await timingHelper.AdjustAsync(
                             paths,
                             options,
                             progress,

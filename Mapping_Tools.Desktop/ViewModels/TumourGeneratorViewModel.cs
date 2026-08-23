@@ -27,27 +27,27 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     IShellFeatureActivation,
     IDisposable
 {
-    internal const string OperationId = "tumour-generator";
-    private readonly ICurrentBeatmapLocator _currentBeatmap;
+    internal const string OPERATION_ID = "tumour-generator";
+    private readonly ICurrentBeatmapLocator currentBeatmap;
 
-    private readonly ProjectDefinition<TumourGeneratorProject> _definition = new(
+    private readonly ProjectDefinition<TumourGeneratorProject> definition = new(
         "tumourgeneratorproject.json",
         "Tumour Generator Projects",
         static () => new TumourGeneratorProject(),
         "tumour-generator-project.json");
 
-    private readonly IDialogService _dialogs;
+    private readonly IDialogService dialogs;
 
-    private readonly ITumourGeneratorService _generator;
-    private readonly object _previewGate = new();
-    private readonly ApplicationSettings _settings;
-    private readonly IBeatmapWorkspace _workspace;
-    private int _currentLayerIndex;
-    private bool _disposed;
-    private bool _isActive;
-    private CancellationTokenSource? _previewCancellation;
-    private HitObject _previewHitObject = new("0,0,0,2,0,L|256:0,1,256");
-    private HitObject? _tumouredPreviewHitObject;
+    private readonly ITumourGeneratorService generator;
+    private readonly object previewGate = new();
+    private readonly ApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
+    private int currentLayerIndex;
+    private bool disposed;
+    private bool isActive;
+    private CancellationTokenSource? previewCancellation;
+    private HitObject previewHitObject = new("0,0,0,2,0,L|256:0,1,256");
+    private HitObject? tumouredPreviewHitObject;
 
     /// <summary>
     ///     Creates the Tumour Generator 2 presentation model.
@@ -65,13 +65,13 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         IBeatmapWorkspace workspace,
         ApplicationSettings settings,
         IDialogService dialogs)
-        : base(execution, OperationId)
+        : base(execution, OPERATION_ID)
     {
-        _generator = generator ?? throw new ArgumentNullException(nameof(generator));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        this.generator = generator ?? throw new ArgumentNullException(nameof(generator));
+        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
 
         TumourLayers.CollectionChanged += OnLayersChanged;
         TumourLayers.Add(new ObservableTumourLayer(TumourLayer.GetDefaultLayer()));
@@ -151,13 +151,13 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets the slider displayed in the preview.</summary>
     public HitObject PreviewHitObject
     {
-        get => _previewHitObject;
+        get => previewHitObject;
         set
         {
             ArgumentNullException.ThrowIfNull(value);
-            if (ReferenceEquals(_previewHitObject, value)) return;
+            if (ReferenceEquals(previewHitObject, value)) return;
 
-            SetProperty(ref _previewHitObject, value);
+            SetProperty(ref previewHitObject, value);
             QueuePreview();
         }
     }
@@ -165,10 +165,10 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets the most recently generated preview slider.</summary>
     public HitObject? TumouredPreviewHitObject
     {
-        get => _tumouredPreviewHitObject;
+        get => tumouredPreviewHitObject;
         private set
         {
-            if (SetProperty(ref _tumouredPreviewHitObject, value)) IsProcessingPreview = false;
+            if (SetProperty(ref tumouredPreviewHitObject, value)) IsProcessingPreview = false;
         }
     }
 
@@ -179,11 +179,11 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets the selected layer index.</summary>
     public int CurrentLayerIndex
     {
-        get => _currentLayerIndex;
+        get => currentLayerIndex;
         set
         {
             int normalized = Math.Clamp(value, 0, Math.Max(0, TumourLayers.Count - 1));
-            if (!SetProperty(ref _currentLayerIndex, normalized)) return;
+            if (!SetProperty(ref currentLayerIndex, normalized)) return;
 
             OnPropertyChanged(nameof(CurrentLayer));
             OnPropertyChanged(nameof(TumourParameterGraphVisible));
@@ -236,15 +236,15 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// </summary>
     public void Dispose()
     {
-        lock (_previewGate)
+        lock (previewGate)
         {
-            if (_disposed) return;
+            if (disposed) return;
 
-            _disposed = true;
-            _isActive = false;
-            _previewCancellation?.Cancel();
-            _previewCancellation?.Dispose();
-            _previewCancellation = null;
+            disposed = true;
+            isActive = false;
+            previewCancellation?.Cancel();
+            previewCancellation?.Dispose();
+            previewCancellation = null;
         }
 
         TumourLayers.CollectionChanged -= OnLayersChanged;
@@ -261,7 +261,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             return;
         }
 
-        string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
         await RunWithStateAsync(() => RunPathsAsync(
             string.IsNullOrWhiteSpace(path) ? [] : [path],
             true,
@@ -269,14 +269,14 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     }
 
     /// <inheritdoc />
-    string IQuickRun.OperationId => OperationId;
+    string IQuickRun.OperationId => OPERATION_ID;
 
     /// <inheritdoc />
     public void Activate()
     {
-        if (_disposed) return;
+        if (disposed) return;
 
-        _isActive = true;
+        isActive = true;
         QueuePreview();
     }
 
@@ -284,11 +284,11 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     public void Deactivate()
     {
         CancellationTokenSource? cancellation;
-        lock (_previewGate)
+        lock (previewGate)
         {
-            _isActive = false;
-            cancellation = _previewCancellation;
-            _previewCancellation = null;
+            isActive = false;
+            cancellation = previewCancellation;
+            previewCancellation = null;
         }
 
         cancellation?.Cancel();
@@ -297,7 +297,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     }
 
     /// <inheritdoc />
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     /// <inheritdoc />
     object IShellProjectFeature.Snapshot()
@@ -315,7 +315,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ImportAsync()
     {
-        string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
         if (string.IsNullOrWhiteSpace(path))
         {
             await ShowMessageAsync("No beatmap is open in osu!.");
@@ -324,7 +324,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
 
         try
         {
-            var result = await _generator.ImportAsync(
+            var result = await generator.ImportAsync(
                 path,
                 ImportModeSetting,
                 TimeCode,
@@ -433,9 +433,9 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             return;
         }
 
-        if (_settings.AlwaysQuickRun)
+        if (settings.AlwaysQuickRun)
         {
-            string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
+            string? path = await currentBeatmap.FindCurrentBeatmapAsync();
             await RunPathsAsync(
                 string.IsNullOrWhiteSpace(path) ? [] : [path],
                 true,
@@ -443,7 +443,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             return;
         }
 
-        await RunPathsAsync(_workspace.SelectedPaths, false, CancellationToken.None);
+        await RunPathsAsync(workspace.SelectedPaths, false, CancellationToken.None);
     }
 
     /// <inheritdoc />
@@ -534,14 +534,14 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     private void QueuePreview()
     {
         CancellationTokenSource cancellation;
-        lock (_previewGate)
+        lock (previewGate)
         {
-            if (_disposed || !_isActive) return;
+            if (disposed || !isActive) return;
 
-            _previewCancellation?.Cancel();
-            _previewCancellation?.Dispose();
-            _previewCancellation = new CancellationTokenSource();
-            cancellation = _previewCancellation;
+            previewCancellation?.Cancel();
+            previewCancellation?.Dispose();
+            previewCancellation = new CancellationTokenSource();
+            cancellation = previewCancellation;
         }
 
         IsProcessingPreview = true;
@@ -553,13 +553,13 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         try
         {
             var options = SnapshotOptions();
-            var result = await _generator.PreviewAsync(
+            var result = await generator.PreviewAsync(
                 PreviewHitObject,
                 options,
                 cancellation.Token);
-            lock (_previewGate)
+            lock (previewGate)
             {
-                if (_disposed || !_isActive || !ReferenceEquals(_previewCancellation, cancellation)) return;
+                if (disposed || !isActive || !ReferenceEquals(previewCancellation, cancellation)) return;
             }
 
             TumouredPreviewHitObject = result.HitObject;
@@ -575,9 +575,9 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         }
         catch (Exception exception)
         {
-            lock (_previewGate)
+            lock (previewGate)
             {
-                if (_disposed || !_isActive || !ReferenceEquals(_previewCancellation, cancellation)) return;
+                if (disposed || !isActive || !ReferenceEquals(previewCancellation, cancellation)) return;
             }
 
             ResultSummary = exception.Message;
@@ -599,11 +599,11 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         var project = Snapshot();
         var execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<TumourRunResult>(
-                OperationId,
+                OPERATION_ID,
                 "Tumour Generator 2",
                 async context =>
                 {
-                    var result = await _generator.RunAsync(
+                    var result = await generator.RunAsync(
                         paths,
                         project,
                         quick,
@@ -753,7 +753,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
 
     private async Task ShowMessageAsync(string message)
     {
-        await _dialogs.ShowMessageAsync(
+        await dialogs.ShowMessageAsync(
             new MessageDialogRequest<bool>(
                 "Tumour Generator 2",
                 message,

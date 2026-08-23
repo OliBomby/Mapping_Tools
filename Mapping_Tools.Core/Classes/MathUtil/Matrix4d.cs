@@ -30,32 +30,32 @@ namespace Mapping_Tools.Core.Classes.MathUtil;
 /// <seealso cref="Matrix4" />
 [Serializable]
 [StructLayout(LayoutKind.Sequential)]
-public struct Matrix4d : IEquatable<Matrix4d>
+public struct Matrix4D : IEquatable<Matrix4D>
 {
     /// <summary>
     ///     Top row of the matrix
     /// </summary>
-    public Vector4d Row0;
+    public Vector4D Row0;
 
     /// <summary>
     ///     2nd row of the matrix
     /// </summary>
-    public Vector4d Row1;
+    public Vector4D Row1;
 
     /// <summary>
     ///     3rd row of the matrix
     /// </summary>
-    public Vector4d Row2;
+    public Vector4D Row2;
 
     /// <summary>
     ///     Bottom row of the matrix
     /// </summary>
-    public Vector4d Row3;
+    public Vector4D Row3;
 
     /// <summary>
     ///     The identity matrix
     /// </summary>
-    public static Matrix4d Identity = new(Vector4d.UnitX, Vector4d.UnitY, Vector4d.UnitZ, Vector4d.UnitW);
+    public static Matrix4D Identity = new(Vector4D.UnitX, Vector4D.UnitY, Vector4D.UnitZ, Vector4D.UnitW);
 
     /// <summary>
     ///     Constructs a new instance.
@@ -64,7 +64,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="row1">Second row of the matrix</param>
     /// <param name="row2">Third row of the matrix</param>
     /// <param name="row3">Bottom row of the matrix</param>
-    public Matrix4d(Vector4d row0, Vector4d row1, Vector4d row2, Vector4d row3)
+    public Matrix4D(Vector4D row0, Vector4D row1, Vector4D row2, Vector4D row3)
     {
         Row0 = row0;
         Row1 = row1;
@@ -91,23 +91,23 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="m31">Second item of the fourth row.</param>
     /// <param name="m32">Third item of the fourth row.</param>
     /// <param name="m33">Fourth item of the fourth row.</param>
-    public Matrix4d(
+    public Matrix4D(
         double m00, double m01, double m02, double m03,
         double m10, double m11, double m12, double m13,
         double m20, double m21, double m22, double m23,
         double m30, double m31, double m32, double m33)
     {
-        Row0 = new Vector4d(m00, m01, m02, m03);
-        Row1 = new Vector4d(m10, m11, m12, m13);
-        Row2 = new Vector4d(m20, m21, m22, m23);
-        Row3 = new Vector4d(m30, m31, m32, m33);
+        Row0 = new Vector4D(m00, m01, m02, m03);
+        Row1 = new Vector4D(m10, m11, m12, m13);
+        Row2 = new Vector4D(m20, m21, m22, m23);
+        Row3 = new Vector4D(m30, m31, m32, m33);
     }
 
     /// <summary>
     ///     Constructs a new instance.
     /// </summary>
     /// <param name="topLeft">The top left 3x3 of the matrix.</param>
-    public Matrix4d(Matrix3d topLeft)
+    public Matrix4D(Matrix3D topLeft)
     {
         Row0.X = topLeft.Row0.X;
         Row0.Y = topLeft.Row0.Y;
@@ -158,7 +158,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <summary>
     ///     The first column of this matrix
     /// </summary>
-    public Vector4d Column0
+    public Vector4D Column0
     {
         get => new(Row0.X, Row1.X, Row2.X, Row3.X);
         set
@@ -173,7 +173,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <summary>
     ///     The second column of this matrix
     /// </summary>
-    public Vector4d Column1
+    public Vector4D Column1
     {
         get => new(Row0.Y, Row1.Y, Row2.Y, Row3.Y);
         set
@@ -188,7 +188,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <summary>
     ///     The third column of this matrix
     /// </summary>
-    public Vector4d Column2
+    public Vector4D Column2
     {
         get => new(Row0.Z, Row1.Z, Row2.Z, Row3.Z);
         set
@@ -203,7 +203,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <summary>
     ///     The fourth column of this matrix
     /// </summary>
-    public Vector4d Column3
+    public Vector4D Column3
     {
         get => new(Row0.W, Row1.W, Row2.W, Row3.W);
         set
@@ -362,7 +362,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <summary>
     ///     Gets or sets the values along the main diagonal of the matrix.
     /// </summary>
-    public Vector4d Diagonal
+    public Vector4D Diagonal
     {
         get => new(Row0.X, Row1.Y, Row2.Z, Row3.W);
         set
@@ -429,7 +429,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <summary>
     ///     Returns a normalised copy of this instance.
     /// </summary>
-    public Matrix4d Normalized()
+    public Matrix4D Normalized()
     {
         var m = this;
         m.Normalize();
@@ -451,7 +451,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <summary>
     ///     Returns an inverted copy of this instance.
     /// </summary>
-    public Matrix4d Inverted()
+    public Matrix4D Inverted()
     {
         var m = this;
         if (m.Determinant != 0) m.Invert();
@@ -461,17 +461,17 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <summary>
     ///     Returns a copy of this Matrix4d without translation.
     /// </summary>
-    public Matrix4d ClearTranslation()
+    public Matrix4D ClearTranslation()
     {
         var m = this;
-        m.Row3.Xyz = Vector3d.Zero;
+        m.Row3.Xyz = Vector3D.Zero;
         return m;
     }
 
     /// <summary>
     ///     Returns a copy of this Matrix4d without scale.
     /// </summary>
-    public Matrix4d ClearScale()
+    public Matrix4D ClearScale()
     {
         var m = this;
         m.Row0.Xyz = m.Row0.Xyz.Normalized();
@@ -483,34 +483,34 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <summary>
     ///     Returns a copy of this Matrix4d without rotation.
     /// </summary>
-    public Matrix4d ClearRotation()
+    public Matrix4D ClearRotation()
     {
         var m = this;
-        m.Row0.Xyz = new Vector3d(m.Row0.Xyz.Length, 0, 0);
-        m.Row1.Xyz = new Vector3d(0, m.Row1.Xyz.Length, 0);
-        m.Row2.Xyz = new Vector3d(0, 0, m.Row2.Xyz.Length);
+        m.Row0.Xyz = new Vector3D(m.Row0.Xyz.Length, 0, 0);
+        m.Row1.Xyz = new Vector3D(0, m.Row1.Xyz.Length, 0);
+        m.Row2.Xyz = new Vector3D(0, 0, m.Row2.Xyz.Length);
         return m;
     }
 
     /// <summary>
     ///     Returns a copy of this Matrix4d without projection.
     /// </summary>
-    public Matrix4d ClearProjection()
+    public Matrix4D ClearProjection()
     {
         var m = this;
-        m.Column3 = Vector4d.Zero;
+        m.Column3 = Vector4D.Zero;
         return m;
     }
 
     /// <summary>
     ///     Returns the translation component of this instance.
     /// </summary>
-    public Vector3d ExtractTranslation() { return Row3.Xyz; }
+    public Vector3D ExtractTranslation() { return Row3.Xyz; }
 
     /// <summary>
     ///     Returns the scale component of this instance.
     /// </summary>
-    public Vector3d ExtractScale() { return new Vector3d(Row0.Xyz.Length, Row1.Xyz.Length, Row2.Xyz.Length); }
+    public Vector3D ExtractScale() { return new Vector3D(Row0.Xyz.Length, Row1.Xyz.Length, Row2.Xyz.Length); }
 
     /// <summary>
     ///     Returns the rotation component of this instance. Quite slow.
@@ -585,7 +585,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <summary>
     ///     Returns the projection component of this instance.
     /// </summary>
-    public Vector4d ExtractProjection()
+    public Vector4D ExtractProjection()
     {
         return Column3;
     }
@@ -597,7 +597,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="axis">The axis to rotate about.</param>
     /// <param name="angle">Angle in radians to rotate counter-clockwise (looking in the direction of the given axis).</param>
     /// <param name="result">A matrix instance.</param>
-    public static void CreateFromAxisAngle(Vector3d axis, double angle, out Matrix4d result)
+    public static void CreateFromAxisAngle(Vector3D axis, double angle, out Matrix4D result)
     {
         // normalize and create a local copy of the vector.
         axis.Normalize();
@@ -632,7 +632,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
         result.Row2.Y = tYZ + sinX;
         result.Row2.Z = tZZ + cos;
         result.Row2.W = 0;
-        result.Row3 = Vector4d.UnitW;
+        result.Row3 = Vector4D.UnitW;
     }
 
     /// <summary>
@@ -641,7 +641,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="axis">The axis to rotate about.</param>
     /// <param name="angle">Angle in radians to rotate counter-clockwise (looking in the direction of the given axis).</param>
     /// <returns>A matrix instance.</returns>
-    public static Matrix4d CreateFromAxisAngle(Vector3d axis, double angle)
+    public static Matrix4D CreateFromAxisAngle(Vector3D axis, double angle)
     {
         CreateFromAxisAngle(axis, angle, out var result);
         return result;
@@ -652,15 +652,15 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix4d instance.</param>
-    public static void CreateRotationX(double angle, out Matrix4d result)
+    public static void CreateRotationX(double angle, out Matrix4D result)
     {
         double cos = Math.Cos(angle);
         double sin = Math.Sin(angle);
 
-        result.Row0 = Vector4d.UnitX;
-        result.Row1 = new Vector4d(0, cos, sin, 0);
-        result.Row2 = new Vector4d(0, -sin, cos, 0);
-        result.Row3 = Vector4d.UnitW;
+        result.Row0 = Vector4D.UnitX;
+        result.Row1 = new Vector4D(0, cos, sin, 0);
+        result.Row2 = new Vector4D(0, -sin, cos, 0);
+        result.Row3 = Vector4D.UnitW;
     }
 
     /// <summary>
@@ -668,7 +668,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <returns>The resulting Matrix4d instance.</returns>
-    public static Matrix4d CreateRotationX(double angle)
+    public static Matrix4D CreateRotationX(double angle)
     {
         CreateRotationX(angle, out var result);
         return result;
@@ -679,15 +679,15 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix4d instance.</param>
-    public static void CreateRotationY(double angle, out Matrix4d result)
+    public static void CreateRotationY(double angle, out Matrix4D result)
     {
         double cos = Math.Cos(angle);
         double sin = Math.Sin(angle);
 
-        result.Row0 = new Vector4d(cos, 0, -sin, 0);
-        result.Row1 = Vector4d.UnitY;
-        result.Row2 = new Vector4d(sin, 0, cos, 0);
-        result.Row3 = Vector4d.UnitW;
+        result.Row0 = new Vector4D(cos, 0, -sin, 0);
+        result.Row1 = Vector4D.UnitY;
+        result.Row2 = new Vector4D(sin, 0, cos, 0);
+        result.Row3 = Vector4D.UnitW;
     }
 
     /// <summary>
@@ -695,7 +695,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <returns>The resulting Matrix4d instance.</returns>
-    public static Matrix4d CreateRotationY(double angle)
+    public static Matrix4D CreateRotationY(double angle)
     {
         CreateRotationY(angle, out var result);
         return result;
@@ -706,15 +706,15 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix4d instance.</param>
-    public static void CreateRotationZ(double angle, out Matrix4d result)
+    public static void CreateRotationZ(double angle, out Matrix4D result)
     {
         double cos = Math.Cos(angle);
         double sin = Math.Sin(angle);
 
-        result.Row0 = new Vector4d(cos, sin, 0, 0);
-        result.Row1 = new Vector4d(-sin, cos, 0, 0);
-        result.Row2 = Vector4d.UnitZ;
-        result.Row3 = Vector4d.UnitW;
+        result.Row0 = new Vector4D(cos, sin, 0, 0);
+        result.Row1 = new Vector4D(-sin, cos, 0, 0);
+        result.Row2 = Vector4D.UnitZ;
+        result.Row3 = Vector4D.UnitW;
     }
 
     /// <summary>
@@ -722,7 +722,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <returns>The resulting Matrix4d instance.</returns>
-    public static Matrix4d CreateRotationZ(double angle)
+    public static Matrix4D CreateRotationZ(double angle)
     {
         CreateRotationZ(angle, out var result);
         return result;
@@ -735,10 +735,10 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="y">Y translation.</param>
     /// <param name="z">Z translation.</param>
     /// <param name="result">The resulting Matrix4d instance.</param>
-    public static void CreateTranslation(double x, double y, double z, out Matrix4d result)
+    public static void CreateTranslation(double x, double y, double z, out Matrix4D result)
     {
         result = Identity;
-        result.Row3 = new Vector4d(x, y, z, 1);
+        result.Row3 = new Vector4D(x, y, z, 1);
     }
 
     /// <summary>
@@ -746,10 +746,10 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="vector">The translation vector.</param>
     /// <param name="result">The resulting Matrix4d instance.</param>
-    public static void CreateTranslation(ref Vector3d vector, out Matrix4d result)
+    public static void CreateTranslation(ref Vector3D vector, out Matrix4D result)
     {
         result = Identity;
-        result.Row3 = new Vector4d(vector.X, vector.Y, vector.Z, 1);
+        result.Row3 = new Vector4D(vector.X, vector.Y, vector.Z, 1);
     }
 
     /// <summary>
@@ -759,7 +759,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="y">Y translation.</param>
     /// <param name="z">Z translation.</param>
     /// <returns>The resulting Matrix4d instance.</returns>
-    public static Matrix4d CreateTranslation(double x, double y, double z)
+    public static Matrix4D CreateTranslation(double x, double y, double z)
     {
         CreateTranslation(x, y, z, out var result);
         return result;
@@ -770,7 +770,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="vector">The translation vector.</param>
     /// <returns>The resulting Matrix4d instance.</returns>
-    public static Matrix4d CreateTranslation(Vector3d vector)
+    public static Matrix4D CreateTranslation(Vector3D vector)
     {
         CreateTranslation(vector.X, vector.Y, vector.Z, out var result);
         return result;
@@ -784,7 +784,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="zNear">The near edge of the projection volume.</param>
     /// <param name="zFar">The far edge of the projection volume.</param>
     /// <param name="result">The resulting Matrix4d instance.</param>
-    public static void CreateOrthographic(double width, double height, double zNear, double zFar, out Matrix4d result)
+    public static void CreateOrthographic(double width, double height, double zNear, double zFar, out Matrix4D result)
     {
         CreateOrthographicOffCenter(-width / 2, width / 2, -height / 2, height / 2, zNear, zFar, out result);
     }
@@ -797,7 +797,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="zNear">The near edge of the projection volume.</param>
     /// <param name="zFar">The far edge of the projection volume.</param>
     /// <rereturns>The resulting Matrix4d instance.</rereturns>
-    public static Matrix4d CreateOrthographic(double width, double height, double zNear, double zFar)
+    public static Matrix4D CreateOrthographic(double width, double height, double zNear, double zFar)
     {
         CreateOrthographicOffCenter(-width / 2, width / 2, -height / 2, height / 2, zNear, zFar, out var result);
         return result;
@@ -813,9 +813,9 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="zNear">The near edge of the projection volume.</param>
     /// <param name="zFar">The far edge of the projection volume.</param>
     /// <param name="result">The resulting Matrix4d instance.</param>
-    public static void CreateOrthographicOffCenter(double left, double right, double bottom, double top, double zNear, double zFar, out Matrix4d result)
+    public static void CreateOrthographicOffCenter(double left, double right, double bottom, double top, double zNear, double zFar, out Matrix4D result)
     {
-        result = new Matrix4d();
+        result = new Matrix4D();
 
         double invRL = 1 / (right - left);
         double invTB = 1 / (top - bottom);
@@ -841,7 +841,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="zNear">The near edge of the projection volume.</param>
     /// <param name="zFar">The far edge of the projection volume.</param>
     /// <returns>The resulting Matrix4d instance.</returns>
-    public static Matrix4d CreateOrthographicOffCenter(double left, double right, double bottom, double top, double zNear, double zFar)
+    public static Matrix4D CreateOrthographicOffCenter(double left, double right, double bottom, double top, double zNear, double zFar)
     {
         CreateOrthographicOffCenter(left, right, bottom, top, zNear, zFar, out var result);
         return result;
@@ -865,7 +865,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     ///         <item>zNear is larger than zFar</item>
     ///     </list>
     /// </exception>
-    public static void CreatePerspectiveFieldOfView(double fovy, double aspect, double zNear, double zFar, out Matrix4d result)
+    public static void CreatePerspectiveFieldOfView(double fovy, double aspect, double zNear, double zFar, out Matrix4D result)
     {
         if (fovy <= 0 || fovy > Math.PI) throw new ArgumentOutOfRangeException("fovy");
         if (aspect <= 0) throw new ArgumentOutOfRangeException("aspect");
@@ -898,7 +898,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     ///         <item>zNear is larger than zFar</item>
     ///     </list>
     /// </exception>
-    public static Matrix4d CreatePerspectiveFieldOfView(double fovy, double aspect, double zNear, double zFar)
+    public static Matrix4D CreatePerspectiveFieldOfView(double fovy, double aspect, double zNear, double zFar)
     {
         CreatePerspectiveFieldOfView(fovy, aspect, zNear, zFar, out var result);
         return result;
@@ -922,7 +922,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     ///         <item>zNear is larger than zFar</item>
     ///     </list>
     /// </exception>
-    public static void CreatePerspectiveOffCenter(double left, double right, double bottom, double top, double zNear, double zFar, out Matrix4d result)
+    public static void CreatePerspectiveOffCenter(double left, double right, double bottom, double top, double zNear, double zFar, out Matrix4D result)
     {
         if (zNear <= 0) throw new ArgumentOutOfRangeException("zNear");
         if (zFar <= 0) throw new ArgumentOutOfRangeException("zFar");
@@ -935,7 +935,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
         double c = -(zFar + zNear) / (zFar - zNear);
         double d = -(2.0 * zFar * zNear) / (zFar - zNear);
 
-        result = new Matrix4d(x, 0, 0, 0,
+        result = new Matrix4D(x, 0, 0, 0,
             0, y, 0, 0,
             a, b, c, -1,
             0, 0, d, 0);
@@ -959,7 +959,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     ///         <item>zNear is larger than zFar</item>
     ///     </list>
     /// </exception>
-    public static Matrix4d CreatePerspectiveOffCenter(double left, double right, double bottom, double top, double zNear, double zFar)
+    public static Matrix4D CreatePerspectiveOffCenter(double left, double right, double bottom, double top, double zNear, double zFar)
     {
         CreatePerspectiveOffCenter(left, right, bottom, top, zNear, zFar, out var result);
         return result;
@@ -970,7 +970,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="q">Quaternion to translate.</param>
     /// <param name="result">Matrix result.</param>
-    public static void CreateFromQuaternion(ref Quaterniond q, out Matrix4d result)
+    public static void CreateFromQuaternion(ref Quaterniond q, out Matrix4D result)
     {
         q.ToAxisAngle(out var axis, out double angle);
         CreateFromAxisAngle(axis, angle, out result);
@@ -981,7 +981,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="q">The quaternion to rotate by.</param>
     /// <returns>A matrix instance.</returns>
-    public static Matrix4d CreateFromQuaternion(Quaterniond q)
+    public static Matrix4D CreateFromQuaternion(Quaterniond q)
     {
         CreateFromQuaternion(ref q, out var result);
         return result;
@@ -992,7 +992,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="scale">Single scale factor for x,y and z axes</param>
     /// <returns>A scaling matrix</returns>
-    public static Matrix4d Scale(double scale)
+    public static Matrix4D Scale(double scale)
     {
         return Scale(scale, scale, scale);
     }
@@ -1002,7 +1002,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="scale">Scale factors for x,y and z axes</param>
     /// <returns>A scaling matrix</returns>
-    public static Matrix4d Scale(Vector3d scale)
+    public static Matrix4D Scale(Vector3D scale)
     {
         return Scale(scale.X, scale.Y, scale.Z);
     }
@@ -1014,13 +1014,13 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="y">Scale factor for y-axis</param>
     /// <param name="z">Scale factor for z-axis</param>
     /// <returns>A scaling matrix</returns>
-    public static Matrix4d Scale(double x, double y, double z)
+    public static Matrix4D Scale(double x, double y, double z)
     {
-        Matrix4d result;
-        result.Row0 = Vector4d.UnitX * x;
-        result.Row1 = Vector4d.UnitY * y;
-        result.Row2 = Vector4d.UnitZ * z;
-        result.Row3 = Vector4d.UnitW;
+        Matrix4D result;
+        result.Row0 = Vector4D.UnitX * x;
+        result.Row1 = Vector4D.UnitY * y;
+        result.Row2 = Vector4D.UnitZ * z;
+        result.Row3 = Vector4D.UnitW;
         return result;
     }
 
@@ -1029,16 +1029,16 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="angle">angle in radians to rotate counter-clockwise around the x-axis</param>
     /// <returns>A rotation matrix</returns>
-    public static Matrix4d RotateX(double angle)
+    public static Matrix4D RotateX(double angle)
     {
         double cos = Math.Cos(angle);
         double sin = Math.Sin(angle);
 
-        Matrix4d result;
-        result.Row0 = Vector4d.UnitX;
-        result.Row1 = new Vector4d(0.0, cos, sin, 0.0);
-        result.Row2 = new Vector4d(0.0, -sin, cos, 0.0);
-        result.Row3 = Vector4d.UnitW;
+        Matrix4D result;
+        result.Row0 = Vector4D.UnitX;
+        result.Row1 = new Vector4D(0.0, cos, sin, 0.0);
+        result.Row2 = new Vector4D(0.0, -sin, cos, 0.0);
+        result.Row3 = Vector4D.UnitW;
         return result;
     }
 
@@ -1047,16 +1047,16 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="angle">angle in radians to rotate counter-clockwise around the y-axis</param>
     /// <returns>A rotation matrix</returns>
-    public static Matrix4d RotateY(double angle)
+    public static Matrix4D RotateY(double angle)
     {
         double cos = Math.Cos(angle);
         double sin = Math.Sin(angle);
 
-        Matrix4d result;
-        result.Row0 = new Vector4d(cos, 0.0, -sin, 0.0);
-        result.Row1 = Vector4d.UnitY;
-        result.Row2 = new Vector4d(sin, 0.0, cos, 0.0);
-        result.Row3 = Vector4d.UnitW;
+        Matrix4D result;
+        result.Row0 = new Vector4D(cos, 0.0, -sin, 0.0);
+        result.Row1 = Vector4D.UnitY;
+        result.Row2 = new Vector4D(sin, 0.0, cos, 0.0);
+        result.Row3 = Vector4D.UnitW;
         return result;
     }
 
@@ -1065,16 +1065,16 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="angle">angle in radians to rotate counter-clockwise around the z-axis</param>
     /// <returns>A rotation matrix</returns>
-    public static Matrix4d RotateZ(double angle)
+    public static Matrix4D RotateZ(double angle)
     {
         double cos = Math.Cos(angle);
         double sin = Math.Sin(angle);
 
-        Matrix4d result;
-        result.Row0 = new Vector4d(cos, sin, 0.0, 0.0);
-        result.Row1 = new Vector4d(-sin, cos, 0.0, 0.0);
-        result.Row2 = Vector4d.UnitZ;
-        result.Row3 = Vector4d.UnitW;
+        Matrix4D result;
+        result.Row0 = new Vector4D(cos, sin, 0.0, 0.0);
+        result.Row1 = new Vector4D(-sin, cos, 0.0, 0.0);
+        result.Row2 = Vector4D.UnitZ;
+        result.Row3 = Vector4D.UnitW;
         return result;
     }
 
@@ -1084,7 +1084,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="axis">the axis to rotate about</param>
     /// <param name="angle">angle in radians to rotate counter-clockwise (looking in the direction of the given axis)</param>
     /// <returns>A rotation matrix</returns>
-    public static Matrix4d Rotate(Vector3d axis, double angle)
+    public static Matrix4D Rotate(Vector3D axis, double angle)
     {
         double cos = Math.Cos(-angle);
         double sin = Math.Sin(-angle);
@@ -1092,11 +1092,11 @@ public struct Matrix4d : IEquatable<Matrix4d>
 
         axis.Normalize();
 
-        Matrix4d result;
-        result.Row0 = new Vector4d(t * axis.X * axis.X + cos, t * axis.X * axis.Y - sin * axis.Z, t * axis.X * axis.Z + sin * axis.Y, 0.0);
-        result.Row1 = new Vector4d(t * axis.X * axis.Y + sin * axis.Z, t * axis.Y * axis.Y + cos, t * axis.Y * axis.Z - sin * axis.X, 0.0);
-        result.Row2 = new Vector4d(t * axis.X * axis.Z - sin * axis.Y, t * axis.Y * axis.Z + sin * axis.X, t * axis.Z * axis.Z + cos, 0.0);
-        result.Row3 = Vector4d.UnitW;
+        Matrix4D result;
+        result.Row0 = new Vector4D(t * axis.X * axis.X + cos, t * axis.X * axis.Y - sin * axis.Z, t * axis.X * axis.Z + sin * axis.Y, 0.0);
+        result.Row1 = new Vector4D(t * axis.X * axis.Y + sin * axis.Z, t * axis.Y * axis.Y + cos, t * axis.Y * axis.Z - sin * axis.X, 0.0);
+        result.Row2 = new Vector4D(t * axis.X * axis.Z - sin * axis.Y, t * axis.Y * axis.Z + sin * axis.X, t * axis.Z * axis.Z + cos, 0.0);
+        result.Row3 = Vector4D.UnitW;
         return result;
     }
 
@@ -1105,7 +1105,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="q">the quaternion</param>
     /// <returns>A rotation matrix</returns>
-    public static Matrix4d Rotate(Quaterniond q)
+    public static Matrix4D Rotate(Quaterniond q)
     {
         q.ToAxisAngle(out var axis, out double angle);
         return Rotate(axis, angle);
@@ -1118,16 +1118,16 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="target">Target position in world space</param>
     /// <param name="up">Up vector in world space (should not be parallel to the camera direction, that is target - eye)</param>
     /// <returns>A Matrix that transforms world space to camera space</returns>
-    public static Matrix4d LookAt(Vector3d eye, Vector3d target, Vector3d up)
+    public static Matrix4D LookAt(Vector3D eye, Vector3D target, Vector3D up)
     {
-        var z = Vector3d.Normalize(eye - target);
-        var x = Vector3d.Normalize(Vector3d.Cross(up, z));
-        var y = Vector3d.Normalize(Vector3d.Cross(z, x));
+        var z = Vector3D.Normalize(eye - target);
+        var x = Vector3D.Normalize(Vector3D.Cross(up, z));
+        var y = Vector3D.Normalize(Vector3D.Cross(z, x));
 
-        var rot = new Matrix4d(new Vector4d(x.X, y.X, z.X, 0.0),
-            new Vector4d(x.Y, y.Y, z.Y, 0.0),
-            new Vector4d(x.Z, y.Z, z.Z, 0.0),
-            Vector4d.UnitW);
+        var rot = new Matrix4D(new Vector4D(x.X, y.X, z.X, 0.0),
+            new Vector4D(x.Y, y.Y, z.Y, 0.0),
+            new Vector4D(x.Z, y.Z, z.Z, 0.0),
+            Vector4D.UnitW);
 
         var trans = CreateTranslation(-eye);
 
@@ -1147,9 +1147,9 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="upY">Up vector in world space (should not be parallel to the camera direction, that is target - eye)</param>
     /// <param name="upZ">Up vector in world space (should not be parallel to the camera direction, that is target - eye)</param>
     /// <returns>A Matrix4 that transforms world space to camera space</returns>
-    public static Matrix4d LookAt(double eyeX, double eyeY, double eyeZ, double targetX, double targetY, double targetZ, double upX, double upY, double upZ)
+    public static Matrix4D LookAt(double eyeX, double eyeY, double eyeZ, double targetX, double targetY, double targetZ, double upX, double upY, double upZ)
     {
-        return LookAt(new Vector3d(eyeX, eyeY, eyeZ), new Vector3d(targetX, targetY, targetZ), new Vector3d(upX, upY, upZ));
+        return LookAt(new Vector3D(eyeX, eyeY, eyeZ), new Vector3D(targetX, targetY, targetZ), new Vector3D(upX, upY, upZ));
     }
 
     /// <summary>
@@ -1162,15 +1162,15 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="near">Distance to the near clip plane</param>
     /// <param name="far">Distance to the far clip plane</param>
     /// <returns>A projection matrix that transforms camera space to raster space</returns>
-    public static Matrix4d Frustum(double left, double right, double bottom, double top, double near, double far)
+    public static Matrix4D Frustum(double left, double right, double bottom, double top, double near, double far)
     {
         double invRL = 1.0 / (right - left);
         double invTB = 1.0 / (top - bottom);
         double invFN = 1.0 / (far - near);
-        return new Matrix4d(new Vector4d(2.0 * near * invRL, 0.0, 0.0, 0.0),
-            new Vector4d(0.0, 2.0 * near * invTB, 0.0, 0.0),
-            new Vector4d((right + left) * invRL, (top + bottom) * invTB, -(far + near) * invFN, -1.0),
-            new Vector4d(0.0, 0.0, -2.0 * far * near * invFN, 0.0));
+        return new Matrix4D(new Vector4D(2.0 * near * invRL, 0.0, 0.0, 0.0),
+            new Vector4D(0.0, 2.0 * near * invTB, 0.0, 0.0),
+            new Vector4D((right + left) * invRL, (top + bottom) * invTB, -(far + near) * invFN, -1.0),
+            new Vector4D(0.0, 0.0, -2.0 * far * near * invFN, 0.0));
     }
 
     /// <summary>
@@ -1181,7 +1181,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="near">Distance to the near clip plane</param>
     /// <param name="far">Distance to the far clip plane</param>
     /// <returns>A projection matrix that transforms camera space to raster space</returns>
-    public static Matrix4d Perspective(double fovy, double aspect, double near, double far)
+    public static Matrix4D Perspective(double fovy, double aspect, double near, double far)
     {
         double yMax = near * Math.Tan(0.5f * fovy);
         double yMin = -yMax;
@@ -1197,7 +1197,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">The left operand of the addition.</param>
     /// <param name="right">The right operand of the addition.</param>
     /// <returns>A new instance that is the result of the addition.</returns>
-    public static Matrix4d Add(Matrix4d left, Matrix4d right)
+    public static Matrix4D Add(Matrix4D left, Matrix4D right)
     {
         Add(ref left, ref right, out var result);
         return result;
@@ -1209,7 +1209,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">The left operand of the addition.</param>
     /// <param name="right">The right operand of the addition.</param>
     /// <param name="result">A new instance that is the result of the addition.</param>
-    public static void Add(ref Matrix4d left, ref Matrix4d right, out Matrix4d result)
+    public static void Add(ref Matrix4D left, ref Matrix4D right, out Matrix4D result)
     {
         result.Row0 = left.Row0 + right.Row0;
         result.Row1 = left.Row1 + right.Row1;
@@ -1223,7 +1223,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">The left operand of the subraction.</param>
     /// <param name="right">The right operand of the subraction.</param>
     /// <returns>A new instance that is the result of the subraction.</returns>
-    public static Matrix4d Subtract(Matrix4d left, Matrix4d right)
+    public static Matrix4D Subtract(Matrix4D left, Matrix4D right)
     {
         Subtract(ref left, ref right, out var result);
         return result;
@@ -1235,7 +1235,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">The left operand of the subraction.</param>
     /// <param name="right">The right operand of the subraction.</param>
     /// <param name="result">A new instance that is the result of the subraction.</param>
-    public static void Subtract(ref Matrix4d left, ref Matrix4d right, out Matrix4d result)
+    public static void Subtract(ref Matrix4D left, ref Matrix4D right, out Matrix4D result)
     {
         result.Row0 = left.Row0 - right.Row0;
         result.Row1 = left.Row1 - right.Row1;
@@ -1249,7 +1249,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication</returns>
-    public static Matrix4d Mult(Matrix4d left, Matrix4d right)
+    public static Matrix4D Mult(Matrix4D left, Matrix4D right)
     {
         Mult(ref left, ref right, out var result);
         return result;
@@ -1261,7 +1261,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication</param>
-    public static void Mult(ref Matrix4d left, ref Matrix4d right, out Matrix4d result)
+    public static void Mult(ref Matrix4D left, ref Matrix4D right, out Matrix4D result)
     {
         double lM11 = left.Row0.X,
             lM12 = left.Row0.Y,
@@ -1320,7 +1320,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication</returns>
-    public static Matrix4d Mult(Matrix4d left, double right)
+    public static Matrix4D Mult(Matrix4D left, double right)
     {
         Mult(ref left, right, out var result);
         return result;
@@ -1332,7 +1332,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication</param>
-    public static void Mult(ref Matrix4d left, double right, out Matrix4d result)
+    public static void Mult(ref Matrix4D left, double right, out Matrix4D result)
     {
         result.Row0 = left.Row0 * right;
         result.Row1 = left.Row1 * right;
@@ -1346,7 +1346,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="mat">The matrix to invert</param>
     /// <returns>The inverse of the given matrix if it has one, or the input if it is singular</returns>
     /// <exception cref="InvalidOperationException">Thrown if the Matrix4d is singular.</exception>
-    public static Matrix4d Invert(Matrix4d mat)
+    public static Matrix4D Invert(Matrix4D mat)
     {
         int[] colIdx = { 0, 0, 0, 0 };
         int[] rowIdx = { 0, 0, 0, 0 };
@@ -1430,10 +1430,10 @@ public struct Matrix4d : IEquatable<Matrix4d>
             }
         }
 
-        mat.Row0 = new Vector4d(inverse[0, 0], inverse[0, 1], inverse[0, 2], inverse[0, 3]);
-        mat.Row1 = new Vector4d(inverse[1, 0], inverse[1, 1], inverse[1, 2], inverse[1, 3]);
-        mat.Row2 = new Vector4d(inverse[2, 0], inverse[2, 1], inverse[2, 2], inverse[2, 3]);
-        mat.Row3 = new Vector4d(inverse[3, 0], inverse[3, 1], inverse[3, 2], inverse[3, 3]);
+        mat.Row0 = new Vector4D(inverse[0, 0], inverse[0, 1], inverse[0, 2], inverse[0, 3]);
+        mat.Row1 = new Vector4D(inverse[1, 0], inverse[1, 1], inverse[1, 2], inverse[1, 3]);
+        mat.Row2 = new Vector4D(inverse[2, 0], inverse[2, 1], inverse[2, 2], inverse[2, 3]);
+        mat.Row3 = new Vector4D(inverse[3, 0], inverse[3, 1], inverse[3, 2], inverse[3, 3]);
         return mat;
     }
 
@@ -1442,9 +1442,9 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="mat">The matrix to transpose</param>
     /// <returns>The transpose of the given matrix</returns>
-    public static Matrix4d Transpose(Matrix4d mat)
+    public static Matrix4D Transpose(Matrix4D mat)
     {
-        return new Matrix4d(mat.Column0, mat.Column1, mat.Column2, mat.Column3);
+        return new Matrix4D(mat.Column0, mat.Column1, mat.Column2, mat.Column3);
     }
 
 
@@ -1453,7 +1453,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// </summary>
     /// <param name="mat">The matrix to transpose</param>
     /// <param name="result">The result of the calculation</param>
-    public static void Transpose(ref Matrix4d mat, out Matrix4d result)
+    public static void Transpose(ref Matrix4D mat, out Matrix4D result)
     {
         result.Row0 = mat.Column0;
         result.Row1 = mat.Column1;
@@ -1467,7 +1467,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix4d which holds the result of the multiplication</returns>
-    public static Matrix4d operator *(Matrix4d left, Matrix4d right) => Mult(left, right);
+    public static Matrix4D operator *(Matrix4D left, Matrix4D right) => Mult(left, right);
 
     /// <summary>
     ///     Matrix-scalar multiplication
@@ -1475,7 +1475,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix4d which holds the result of the multiplication</returns>
-    public static Matrix4d operator *(Matrix4d left, double right) => Mult(left, right);
+    public static Matrix4D operator *(Matrix4D left, double right) => Mult(left, right);
 
     /// <summary>
     ///     Matrix addition
@@ -1483,7 +1483,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix4d which holds the result of the addition</returns>
-    public static Matrix4d operator +(Matrix4d left, Matrix4d right) => Add(left, right);
+    public static Matrix4D operator +(Matrix4D left, Matrix4D right) => Add(left, right);
 
     /// <summary>
     ///     Matrix subtraction
@@ -1491,7 +1491,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix4d which holds the result of the subtraction</returns>
-    public static Matrix4d operator -(Matrix4d left, Matrix4d right) => Subtract(left, right);
+    public static Matrix4D operator -(Matrix4D left, Matrix4D right) => Subtract(left, right);
 
     /// <summary>
     ///     Compares two instances for equality.
@@ -1499,7 +1499,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">The first instance.</param>
     /// <param name="right">The second instance.</param>
     /// <returns>True, if left equals right; false otherwise.</returns>
-    public static bool operator ==(Matrix4d left, Matrix4d right) => left.Equals(right);
+    public static bool operator ==(Matrix4D left, Matrix4D right) => left.Equals(right);
 
     /// <summary>
     ///     Compares two instances for inequality.
@@ -1507,7 +1507,7 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <param name="left">The first instance.</param>
     /// <param name="right">The second instance.</param>
     /// <returns>True, if left does not equal right; false otherwise.</returns>
-    public static bool operator !=(Matrix4d left, Matrix4d right) => !left.Equals(right);
+    public static bool operator !=(Matrix4D left, Matrix4D right) => !left.Equals(right);
 
     /// <summary>
     ///     Returns a System.string that represents the current Matrix44.
@@ -1541,15 +1541,15 @@ public struct Matrix4d : IEquatable<Matrix4d>
     /// <returns>True if the instances are equal; false otherwise.</returns>
     public override bool Equals(object obj)
     {
-        if (!(obj is Matrix4d)) return false;
+        if (!(obj is Matrix4D)) return false;
 
-        return Equals((Matrix4d)obj);
+        return Equals((Matrix4D)obj);
     }
 
     /// <summary>Indicates whether the current matrix is equal to another matrix.</summary>
     /// <param name="other">A matrix to compare with this matrix.</param>
     /// <returns>true if the current matrix is equal to the matrix parameter; otherwise, false.</returns>
-    public bool Equals(Matrix4d other)
+    public bool Equals(Matrix4D other)
     {
         return
             Row0 == other.Row0 && Row1 == other.Row1 && Row2 == other.Row2 && Row3 == other.Row3;

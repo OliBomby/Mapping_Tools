@@ -24,7 +24,7 @@ public sealed class TimingCopierServiceTests
         {
             ImportPath = "source.osu",
             ExportPath = "first.osu|second.osu",
-            ResnapMode = TimingCopierResnapModes.KeepObjectsFixed,
+            ResnapMode = TimingCopierResnapModes.KEEP_OBJECTS_FIXED,
         };
         RecordingProgress progress = new();
 
@@ -54,7 +54,7 @@ public sealed class TimingCopierServiceTests
         {
             ImportPath = "source.osu",
             ExportPath = "first.osu|second.osu",
-            ResnapMode = TimingCopierResnapModes.KeepObjectsFixed,
+            ResnapMode = TimingCopierResnapModes.KEEP_OBJECTS_FIXED,
         };
 
         // Act
@@ -119,12 +119,12 @@ public sealed class TimingCopierServiceTests
 
     private sealed class RecordingGateway : IBeatmapEditingGateway
     {
-        private readonly string _fixture;
-        private int _saveCount;
+        private readonly string fixture;
+        private int saveCount;
 
         public RecordingGateway(string fixture)
         {
-            _fixture = fixture;
+            this.fixture = fixture;
         }
 
         public List<string> OpenedPaths { get; } = [];
@@ -144,7 +144,7 @@ public sealed class TimingCopierServiceTests
             OpenedPaths.Add(path);
             OpenPreferences.Add(livePreference);
             BeatmapEditor2 editor = new(
-                File.ReadAllLines(_fixture).ToList(),
+                File.ReadAllLines(fixture).ToList(),
                 new MemoryStore())
             {
                 Path = path,
@@ -164,8 +164,8 @@ public sealed class TimingCopierServiceTests
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {
-            _saveCount++;
-            if (_saveCount == FailOnSaveNumber) throw new IOException("The test target could not be written.");
+            saveCount++;
+            if (saveCount == FailOnSaveNumber) throw new IOException("The test target could not be written.");
 
             SavedPaths.Add(editor.Path);
             return Task.CompletedTask;

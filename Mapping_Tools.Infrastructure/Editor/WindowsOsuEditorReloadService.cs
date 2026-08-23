@@ -10,10 +10,10 @@ namespace Mapping_Tools.Infrastructure.Editor;
 /// </summary>
 public sealed class WindowsOsuEditorReloadService : IEditorReloadService
 {
-    private const byte VirtualKeyControl = 0x11;
-    private const byte VirtualKeyL = 0x4C;
-    private const byte VirtualKeyEnter = 0x0D;
-    private readonly Func<Process?> _findProcess;
+    private const byte virtual_key_control = 0x11;
+    private const byte virtual_key_l = 0x4C;
+    private const byte virtual_key_enter = 0x0D;
+    private readonly Func<Process?> findProcess;
 
     /// <summary>
     ///     Creates a reload adapter that discovers the active osu!stable process
@@ -26,7 +26,7 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
 
     internal WindowsOsuEditorReloadService(Func<Process?> findProcess)
     {
-        _findProcess = findProcess ?? throw new ArgumentNullException(nameof(findProcess));
+        this.findProcess = findProcess ?? throw new ArgumentNullException(nameof(findProcess));
     }
 
     internal static int NativeInputSize => WindowsNativeMethods.NativeInputSize;
@@ -35,7 +35,7 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
     public async Task ReloadAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        using var process = _findProcess();
+        using var process = findProcess();
         if (process is null || process.MainWindowHandle == IntPtr.Zero) return;
 
         if (!OperatingSystem.IsWindows())
@@ -51,17 +51,17 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
             await Task.Delay(300, cancellationToken).ConfigureAwait(false);
         }
 
-        SendKeyboardInput(VirtualKeyControl, false);
+        SendKeyboardInput(virtual_key_control, false);
         for (int index = 0; index < 10; index++)
         {
-            SendKeyboardInput(VirtualKeyL, false);
-            SendKeyboardInput(VirtualKeyL, true);
+            SendKeyboardInput(virtual_key_l, false);
+            SendKeyboardInput(virtual_key_l, true);
         }
 
-        SendKeyboardInput(VirtualKeyControl, true);
+        SendKeyboardInput(virtual_key_control, true);
         await Task.Delay(100, cancellationToken).ConfigureAwait(false);
-        SendKeyboardInput(VirtualKeyEnter, false);
-        SendKeyboardInput(VirtualKeyEnter, true);
+        SendKeyboardInput(virtual_key_enter, false);
+        SendKeyboardInput(virtual_key_enter, true);
     }
 
     private static void SendKeyboardInput(byte virtualKey, bool keyUp)

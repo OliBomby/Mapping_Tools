@@ -12,11 +12,11 @@ namespace Mapping_Tools.Application.BeatmapEditing;
 /// </summary>
 public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
 {
-    private readonly IBeatmapBackupService _backupService;
-    private readonly ITextFileStore _fileStore;
-    private readonly ILiveBeatmapReader _liveReader;
-    private readonly IEditorReloadService _reloadService;
-    private readonly ApplicationSettings _settings;
+    private readonly IBeatmapBackupService backupService;
+    private readonly ITextFileStore fileStore;
+    private readonly ILiveBeatmapReader liveReader;
+    private readonly IEditorReloadService reloadService;
+    private readonly ApplicationSettings settings;
 
     /// <summary>
     ///     Creates the application service that arbitrates between durable files
@@ -36,11 +36,11 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         IEditorReloadService reloadService,
         ApplicationSettings settings)
     {
-        _fileStore = fileStore ?? throw new ArgumentNullException(nameof(fileStore));
-        _backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
-        _liveReader = liveReader ?? throw new ArgumentNullException(nameof(liveReader));
-        _reloadService = reloadService ?? throw new ArgumentNullException(nameof(reloadService));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.fileStore = fileStore ?? throw new ArgumentNullException(nameof(fileStore));
+        this.backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
+        this.liveReader = liveReader ?? throw new ArgumentNullException(nameof(liveReader));
+        this.reloadService = reloadService ?? throw new ArgumentNullException(nameof(reloadService));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     /// <inheritdoc />
@@ -52,10 +52,10 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         cancellationToken.ThrowIfCancellationRequested();
 
-        BeatmapEditor2 diskEditor = new(path, _fileStore);
+        BeatmapEditor2 diskEditor = new(path, fileStore);
         if (livePreference == LiveBeatmapPreference.DiskOnly) return DiskSession(diskEditor);
 
-        if (!_settings.UseEditorReader)
+        if (!settings.UseEditorReader)
             return livePreference == LiveBeatmapPreference.RequireLive
                 ? throw new LiveBeatmapUnavailableException(
                     "Live editor state is disabled in Mapping Tools settings.")
@@ -63,7 +63,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
 
         try
         {
-            var snapshot = await _liveReader
+            var snapshot = await liveReader
                 .ReadAsync(cancellationToken)
                 .ConfigureAwait(false);
 
@@ -113,7 +113,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         cancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult(new StoryboardEditor2(path, _fileStore));
+        return Task.FromResult(new StoryboardEditor2(path, fileStore));
     }
 
     /// <inheritdoc />
@@ -146,14 +146,14 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (session is null)
-            await _backupService.CreateAsync(
+            await backupService.CreateAsync(
                     [editor.Path],
                     BeatmapBackupReason.Automatic,
                     true,
                     cancellationToken)
                 .ConfigureAwait(false);
         else
-            await _backupService.CreateAsync(
+            await backupService.CreateAsync(
                     session,
                     BeatmapBackupReason.Automatic,
                     true,
@@ -166,7 +166,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         if (reloadEditor)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await _reloadService.ReloadAsync(cancellationToken).ConfigureAwait(false);
+            await reloadService.ReloadAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -190,11 +190,11 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         beatmap.HitObjects = snapshot.HitObjects.ToList();
 
         beatmap.General["PreviewTime"] =
-            new TValue(snapshot.PreviewTime.ToString(CultureInfo.InvariantCulture));
+            new StringValue(snapshot.PreviewTime.ToString(CultureInfo.InvariantCulture));
         beatmap.Difficulty["SliderMultiplier"] =
-            new TValue(snapshot.SliderMultiplier.ToString(CultureInfo.InvariantCulture));
+            new StringValue(snapshot.SliderMultiplier.ToString(CultureInfo.InvariantCulture));
         beatmap.Difficulty["SliderTickRate"] =
-            new TValue(snapshot.SliderTickRate.ToString(CultureInfo.InvariantCulture));
+            new StringValue(snapshot.SliderTickRate.ToString(CultureInfo.InvariantCulture));
         beatmap.BeatmapTiming.SliderMultiplier = snapshot.SliderMultiplier;
 
         beatmap.HitObjects = beatmap.HitObjects.OrderBy(hitObject => hitObject.Time).ToList();

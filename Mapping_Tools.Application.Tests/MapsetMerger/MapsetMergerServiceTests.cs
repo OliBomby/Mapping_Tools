@@ -9,20 +9,20 @@ namespace Mapping_Tools.Application.Tests.MapsetMerger;
 [TestClass]
 public sealed class MapsetMergerServiceTests : IDisposable
 {
-    private readonly DisposableFixture _fixture = new();
+    private readonly DisposableFixture fixture = new();
 
     public void Dispose()
     {
-        _fixture.Dispose();
+        fixture.Dispose();
     }
 
     [TestMethod]
     public async Task MergeAsync_WithDuplicateNamesAndReferences_CommitsResolvedExport()
     {
         // Arrange
-        string first = _fixture.CreateMapset("first");
-        string second = _fixture.CreateMapset("second");
-        string exportPath = Path.Combine(_fixture.Root, "export");
+        string first = fixture.CreateMapset("first");
+        string second = fixture.CreateMapset("second");
+        string exportPath = Path.Combine(fixture.Root, "export");
         MapsetMergerProject project = new()
         {
             ExportPath = exportPath,
@@ -57,8 +57,8 @@ public sealed class MapsetMergerServiceTests : IDisposable
     public async Task MergeAsync_WhenCancelledBeforeProcessing_LeavesExistingExportUntouched()
     {
         // Arrange
-        string source = _fixture.CreateMapset("cancelled");
-        string exportPath = Path.Combine(_fixture.Root, "export");
+        string source = fixture.CreateMapset("cancelled");
+        string exportPath = Path.Combine(fixture.Root, "export");
         Directory.CreateDirectory(exportPath);
         string existing = Path.Combine(exportPath, "keep.txt");
         File.WriteAllText(existing, "keep");
@@ -89,8 +89,8 @@ public sealed class MapsetMergerServiceTests : IDisposable
     public async Task MergeAsync_WithNestedStoryboardAssets_RewritesAndCopiesRelativePaths()
     {
         // Arrange
-        string source = _fixture.CreateMapset("nested");
-        string exportPath = Path.Combine(_fixture.Root, "export");
+        string source = fixture.CreateMapset("nested");
+        string exportPath = Path.Combine(fixture.Root, "export");
         MapsetMergerProject project = new()
         {
             ExportPath = exportPath,
@@ -124,7 +124,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
     public async Task MergeAsync_WhenExportIsInsideSource_RejectsMutationBeforeTransaction()
     {
         // Arrange
-        string source = _fixture.CreateMapset("overlap");
+        string source = fixture.CreateMapset("overlap");
         string exportPath = Path.Combine(source, "export");
         MapsetMergerProject project = new()
         {
@@ -149,8 +149,8 @@ public sealed class MapsetMergerServiceTests : IDisposable
     public async Task MergeAsync_WhenMoveStoryboardToBeatmapIsEnabled_EmbedsFirstStoryboardWithoutOsbOutput()
     {
         // Arrange
-        string source = _fixture.CreateMapset("embedded");
-        string exportPath = Path.Combine(_fixture.Root, "export");
+        string source = fixture.CreateMapset("embedded");
+        string exportPath = Path.Combine(fixture.Root, "export");
         MapsetMergerProject project = new()
         {
             ExportPath = exportPath,
@@ -180,7 +180,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
 
     private sealed class FixtureEditingGateway : IBeatmapEditingGateway
     {
-        private static readonly FileSystemFileStore Files = new();
+        private static readonly FileSystemFileStore files = new();
 
         public Task<BeatmapEditingSession> OpenBeatmapAsync(
             string path,
@@ -188,7 +188,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            BeatmapEditor2 editor = new(path, Files);
+            BeatmapEditor2 editor = new(path, files);
             return Task.FromResult(new BeatmapEditingSession(
                 editor,
                 BeatmapEditingSource.Disk,
@@ -200,7 +200,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(new StoryboardEditor2(path, Files));
+            return Task.FromResult(new StoryboardEditor2(path, files));
         }
 
         public Task SaveAsync(

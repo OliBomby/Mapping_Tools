@@ -110,7 +110,7 @@ public class PatternGalleryPlacer
             patternBeatmap = patternBeatmap.DeepCopy();
 
         // Do the offset
-        if (Math.Abs(offset) > Precision.DoubleEpsilon) patternBeatmap.OffsetTime(offset);
+        if (Math.Abs(offset) > Precision.DOUBLE_EPSILON) patternBeatmap.OffsetTime(offset);
 
         // We adjust the pattern first so it alligns with the beatmap.
         // The right timing is applied and optional pre-processing is applied.
@@ -295,7 +295,7 @@ public class PatternGalleryPlacer
             }
             else
             {
-                if (Math.Abs(tp.MpB - lastSV) > Precision.DoubleEpsilon)
+                if (Math.Abs(tp.MpB - lastSV) > Precision.DOUBLE_EPSILON)
                 {
                     svChanges.Add(tp.Copy());
                     lastSV = tp.MpB;
@@ -387,7 +387,7 @@ public class PatternGalleryPlacer
 
             // Minus 1 the offset so its possible to have a custom BPM redline right on the start time if you have
             // the default BPM redline before it.
-            double patternDefaultMpb = transformPatternTiming.GetMpBAtTime(startTime - 2 * Precision.DoubleEpsilon);
+            double patternDefaultMpb = transformPatternTiming.GetMpBAtTime(startTime - 2 * Precision.DOUBLE_EPSILON);
 
             TimingPoint[] inPartRedlines;
             TimingPoint startPartRedline;
@@ -396,11 +396,11 @@ public class PatternGalleryPlacer
                 case TimingOverwriteMode.PatternTimingOnly:
                     // Subtract one from the end time to omit BPM changes right on the end of the part.
                     inPartRedlines = transformPatternTiming.GetRedlinesInRange(startTime,
-                        Math.Max(startTime, endTime - 2 * Precision.DoubleEpsilon)).ToArray();
+                        Math.Max(startTime, endTime - 2 * Precision.DOUBLE_EPSILON)).ToArray();
                     startPartRedline = transformPatternTiming.GetRedlineAtTime(startTime);
                     break;
                 case TimingOverwriteMode.InPatternAbsoluteTiming:
-                    var tempInPartRedlines = transformPatternTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DoubleEpsilon);
+                    var tempInPartRedlines = transformPatternTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DOUBLE_EPSILON);
 
                     // Replace all parts in the pattern which have the default BPM to timing from the target beatmap.
                     inPartRedlines = tempInPartRedlines.Select(tp =>
@@ -420,8 +420,8 @@ public class PatternGalleryPlacer
                 case TimingOverwriteMode.InPatternRelativeTiming:
                     // Multiply mix the pattern timing and the original timing together.
                     // The pattern timing divided by the default BPM will be used as a scalar for the original timing.
-                    var tempInPartRedlines2 = transformPatternTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DoubleEpsilon);
-                    var tempInOriginalRedlines = transformOriginalTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DoubleEpsilon);
+                    var tempInPartRedlines2 = transformPatternTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DOUBLE_EPSILON);
+                    var tempInOriginalRedlines = transformOriginalTiming.GetRedlinesInRange(startTime, endTime - 2 * Precision.DOUBLE_EPSILON);
 
                     // Replace all parts in the pattern which have the default BPM to timing from the target beatmap.
                     inPartRedlines = tempInPartRedlines2.Select(tp =>
@@ -442,7 +442,7 @@ public class PatternGalleryPlacer
                 default: // Original timing only
                     // Subtract one from the end time to omit BPM changes right on the end of the part.
                     inPartRedlines = transformOriginalTiming.GetRedlinesInRange(startTime,
-                        Math.Max(startTime, endTime - 2 * Precision.DoubleEpsilon)).ToArray();
+                        Math.Max(startTime, endTime - 2 * Precision.DOUBLE_EPSILON)).ToArray();
                     startPartRedline = transformOriginalTiming.GetRedlineAtTime(startTime);
                     break;
             }
@@ -455,9 +455,9 @@ public class PatternGalleryPlacer
             // and the redline may be way before that.
             // This will probably only do something on the PatternTimingOnly mode as the other modes make sure
             // the BPM at the start of the pattern will be the same as the original beatmap anyways.
-            if (Math.Abs(startPartRedline.MpB * bpmMultiplier - startOriginalRedline.MpB) > Precision.DoubleEpsilon)
+            if (Math.Abs(startPartRedline.MpB * bpmMultiplier - startOriginalRedline.MpB) > Precision.DOUBLE_EPSILON)
                 // We dont have to add the redline again if its already during the pattern.
-                if (Math.Abs(startPartRedline.Offset - startTime) > Precision.DoubleEpsilon)
+                if (Math.Abs(startPartRedline.Offset - startTime) > Precision.DOUBLE_EPSILON)
                 {
                     var copy = startPartRedline.Copy();
                     copy.Offset = startTime;
@@ -516,9 +516,9 @@ public class PatternGalleryPlacer
             // Add a redline at the end of the pattern to make sure the BPM goes back to normal after the pattern.
             var endOriginalRedline = transformOriginalTiming.GetRedlineAtTime(endTime);
             var endPartRedline = inPartRedlines.LastOrDefault() ?? startPartRedline;
-            if (Math.Abs(endPartRedline.MpB * bpmMultiplier - endOriginalRedline.MpB) > Precision.DoubleEpsilon)
+            if (Math.Abs(endPartRedline.MpB * bpmMultiplier - endOriginalRedline.MpB) > Precision.DOUBLE_EPSILON)
                 // We dont have to add the redline again if its already during the parts in between parts.
-                if (Math.Abs(endOriginalRedline.Offset - endTime) > Precision.DoubleEpsilon)
+                if (Math.Abs(endOriginalRedline.Offset - endTime) > Precision.DOUBLE_EPSILON)
                 {
                     var copy = endOriginalRedline.Copy();
                     copy.Offset = endTime;
@@ -534,7 +534,7 @@ public class PatternGalleryPlacer
         {
             // Transform back the timing
             transformNewTiming = newTiming.Copy();
-            foreach (var tp in transformNewTiming.TimingPoints) tp.Offset = Math.Floor(newTiming.GetMilliseconds(tp.Offset, patternStartTime) + Precision.DoubleEpsilon);
+            foreach (var tp in transformNewTiming.TimingPoints) tp.Offset = Math.Floor(newTiming.GetMilliseconds(tp.Offset, patternStartTime) + Precision.DOUBLE_EPSILON);
 
             // Transform back the parts
             foreach (var part in parts)
@@ -571,7 +571,7 @@ public class PatternGalleryPlacer
         }
 
         // Apply custom scale and rotate
-        if (Math.Abs(spatialScale - 1) > Precision.DoubleEpsilon || Math.Abs(CustomRotate) > Precision.DoubleEpsilon)
+        if (Math.Abs(spatialScale - 1) > Precision.DOUBLE_EPSILON || Math.Abs(CustomRotate) > Precision.DOUBLE_EPSILON)
         {
             // Create a transformation matrix for the custom scale and rotate
             // The rotation is inverted because the default osu! rotation goes clockwise
@@ -641,7 +641,7 @@ public class PatternGalleryPlacer
         foreach (var part in parts)
         {
             foreach (var tp in
-                     transformNewTiming.GetRedlinesInRange(part.StartTime - 2 * Precision.DoubleEpsilon, part.EndTime,
+                     transformNewTiming.GetRedlinesInRange(part.StartTime - 2 * Precision.DOUBLE_EPSILON, part.EndTime,
                          false)) tp.MpB /= bpmMultiplier; // MpB is the inverse of the BPM
 
             foreach (var ho in part.HitObjects) ho.SliderVelocity *= bpmMultiplier; // SliderVelocity is the inverse of the multiplier
@@ -651,7 +651,7 @@ public class PatternGalleryPlacer
 
         // Add redlines
         timingPointsChanges = transformNewTiming.Redlines.Select(tp =>
-            new TimingPointChange(tp, true, true, uninherited: true, omitFirstBarLine: true, fuzziness: Precision.DoubleEpsilon)).ToList();
+            new TimingPointChange(tp, true, true, uninherited: true, omitFirstBarLine: true, fuzziness: Precision.DOUBLE_EPSILON)).ToList();
 
         // Add SliderVelocity changes for taiko and mania
         if (includePatternSliderVelocity && (targetMode == GameMode.Taiko || targetMode == GameMode.Mania))

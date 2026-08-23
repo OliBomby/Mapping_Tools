@@ -19,19 +19,19 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShellProjectFeature
 {
-    internal const string OperationId = "mapset-merger";
-    private readonly ICurrentBeatmapLocator _currentBeatmap;
+    internal const string OPERATION_ID = "mapset-merger";
+    private readonly ICurrentBeatmapLocator currentBeatmap;
 
-    private readonly ProjectDefinition<MapsetMergerProject> _definition = new(
+    private readonly ProjectDefinition<MapsetMergerProject> definition = new(
         "mapsetmergerproject.json",
         "Mapset Merger Projects",
         static () => new MapsetMergerProject(),
         "mapset-merger-project.json");
 
-    private readonly IFilePicker _filePicker;
+    private readonly IFilePicker filePicker;
 
-    private readonly IMapsetMergerService _merger;
-    private readonly IBeatmapWorkspace _workspace;
+    private readonly IMapsetMergerService merger;
+    private readonly IBeatmapWorkspace workspace;
 
     /// <summary>Creates the Mapset Merger presentation model.</summary>
     /// <param name="merger">Stages and commits the merger operation.</param>
@@ -47,12 +47,12 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         IBeatmapWorkspace workspace,
         ICurrentBeatmapLocator currentBeatmap,
         IApplicationDirectories directories)
-        : base(execution, OperationId)
+        : base(execution, OPERATION_ID)
     {
-        _merger = merger ?? throw new ArgumentNullException(nameof(merger));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.merger = merger ?? throw new ArgumentNullException(nameof(merger));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         ArgumentNullException.ThrowIfNull(directories);
         ExportPath = directories.Exports;
     }
@@ -74,7 +74,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     [ObservableProperty]
     public partial string ResultSummary { get; private set; } = string.Empty;
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
     {
@@ -90,7 +90,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         Mapsets.Clear();
         foreach (var item in typed.Mapsets ?? [])
             Mapsets.Add(new MapsetMergerItemViewModel(
-                _filePicker,
+                filePicker,
                 item.Name ?? string.Empty,
                 item.Path ?? string.Empty));
     }
@@ -100,7 +100,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     private Task AddMapsetAsync()
     {
         return AddMapsetFromPathAsync(
-            _workspace.SelectedPaths.FirstOrDefault(),
+            workspace.SelectedPaths.FirstOrDefault(),
             "Select a beatmap in the shell or hold Shift to fetch the current osu! beatmap.");
     }
 
@@ -111,7 +111,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         try
         {
             await AddMapsetFromPathAsync(
-                await _currentBeatmap.FindCurrentBeatmapAsync(),
+                await currentBeatmap.FindCurrentBeatmapAsync(),
                 "Open a beatmap in osu! or select one in the shell before adding a mapset.");
         }
         catch (Exception exception)
@@ -132,7 +132,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         }
 
         Mapsets.Add(new MapsetMergerItemViewModel(
-            _filePicker,
+            filePicker,
             new DirectoryInfo(directory).Name,
             directory));
 
@@ -160,7 +160,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     {
         try
         {
-            var paths = await _filePicker.PickFoldersAsync(new OpenFolderPickerRequest
+            var paths = await filePicker.PickFoldersAsync(new OpenFolderPickerRequest
             {
                 Title = "Select export path",
                 SuggestedStartLocation = Directory.Exists(ExportPath) ? ExportPath : null,
@@ -225,11 +225,11 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         var project = Snapshot();
         var result = await Execution.ExecuteAsync(
             new ToolExecutionRequest<MapsetMergerResult>(
-                OperationId,
+                OPERATION_ID,
                 "Mapset Merger",
                 async context =>
                 {
-                    var merged = await _merger.MergeAsync(
+                    var merged = await merger.MergeAsync(
                         project,
                         new Progress<double>(value => context.ReportProgress(value, "Merging mapsets")),
                         context.CancellationToken);

@@ -9,7 +9,7 @@ namespace Mapping_Tools.Desktop.Platform;
 /// </summary>
 public sealed class AvaloniaClipboardService : IClipboardService
 {
-    private readonly Func<IClipboard?> _clipboardAccessor;
+    private readonly Func<IClipboard?> clipboardAccessor;
 
     /// <summary>
     ///     Creates an adapter that resolves the clipboard lazily, after the window exists.
@@ -17,8 +17,8 @@ public sealed class AvaloniaClipboardService : IClipboardService
     /// <param name="clipboardAccessor">Returns the current top-level clipboard, if initialized.</param>
     public AvaloniaClipboardService(Func<IClipboard?> clipboardAccessor)
     {
-        _clipboardAccessor = clipboardAccessor
-                             ?? throw new ArgumentNullException(nameof(clipboardAccessor));
+        this.clipboardAccessor = clipboardAccessor
+                                 ?? throw new ArgumentNullException(nameof(clipboardAccessor));
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ public sealed class AvaloniaClipboardService : IClipboardService
 
     private IClipboard GetClipboard()
     {
-        return _clipboardAccessor()
+        return clipboardAccessor()
                ?? throw new InvalidOperationException(
                    "Clipboard access requires an initialized Avalonia top-level window.");
     }

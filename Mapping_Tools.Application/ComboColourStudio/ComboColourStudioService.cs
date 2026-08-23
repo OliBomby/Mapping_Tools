@@ -9,13 +9,13 @@ namespace Mapping_Tools.Application.ComboColourStudio;
 /// </summary>
 public sealed class ComboColourStudioService : IComboColourStudioService
 {
-    private readonly IBeatmapEditingGateway _editing;
+    private readonly IBeatmapEditingGateway editing;
 
     /// <summary>Creates a service using the shared beatmap editing gateway.</summary>
     /// <param name="editing">Opens and safely saves beatmaps.</param>
     public ComboColourStudioService(IBeatmapEditingGateway editing)
     {
-        _editing = editing ?? throw new ArgumentNullException(nameof(editing));
+        this.editing = editing ?? throw new ArgumentNullException(nameof(editing));
     }
 
     /// <inheritdoc />
@@ -24,7 +24,7 @@ public sealed class ComboColourStudioService : IComboColourStudioService
         ComboColourProject project,
         CancellationToken cancellationToken = default)
     {
-        var session = await _editing.OpenBeatmapAsync(
+        var session = await editing.OpenBeatmapAsync(
                 path,
                 LiveBeatmapPreference.DiskOnly,
                 cancellationToken)
@@ -38,7 +38,7 @@ public sealed class ComboColourStudioService : IComboColourStudioService
         ComboColourProject project,
         CancellationToken cancellationToken = default)
     {
-        var session = await _editing.OpenBeatmapAsync(
+        var session = await editing.OpenBeatmapAsync(
                 path,
                 LiveBeatmapPreference.DiskOnly,
                 cancellationToken)
@@ -64,14 +64,14 @@ public sealed class ComboColourStudioService : IComboColourStudioService
         foreach (string path in paths)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var session = await _editing.OpenBeatmapAsync(
+            var session = await editing.OpenBeatmapAsync(
                     path,
                     LiveBeatmapPreference.PreferLive,
                     cancellationToken)
                 .ConfigureAwait(false);
             ComboColourStudioEngine.Apply(session.Editor.Beatmap, project);
             cancellationToken.ThrowIfCancellationRequested();
-            await _editing.SaveAsync(session, false, cancellationToken)
+            await editing.SaveAsync(session, false, cancellationToken)
                 .ConfigureAwait(false);
 
             processed++;

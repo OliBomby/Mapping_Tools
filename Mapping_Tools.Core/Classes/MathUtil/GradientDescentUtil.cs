@@ -23,7 +23,7 @@ public class GradientDescentUtil
         {
             double gradient = (func(x + d) - func(x)) / d;
 
-            if (Math.Abs(gradient) < Precision.DoubleEpsilon) break;
+            if (Math.Abs(gradient) < Precision.DOUBLE_EPSILON) break;
 
             x -= gradient * rate;
         }
@@ -49,7 +49,7 @@ public class GradientDescentUtil
         {
             double gradient = (func(x + d) - func(x)) / d;
 
-            if (Math.Abs(gradient) < Precision.DoubleEpsilon) break;
+            if (Math.Abs(gradient) < Precision.DOUBLE_EPSILON) break;
 
             x += gradient * rate;
         }

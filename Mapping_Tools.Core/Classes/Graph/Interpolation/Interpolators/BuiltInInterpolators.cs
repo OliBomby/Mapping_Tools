@@ -81,7 +81,7 @@ public sealed class HalfSineInterpolator : CustomInterpolator, IDerivableInterpo
     /// <inheritdoc />
     public double GetDerivative(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetDerivative(t);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return linearDegenerate.GetDerivative(t);
 
         double p = MathHelper.Clamp(P, -1, 1);
         double b = 2 * Math.Acos(1 / (Math.Sqrt(2) * Math.Abs(p) - Math.Abs(p) + 1));
@@ -91,7 +91,7 @@ public sealed class HalfSineInterpolator : CustomInterpolator, IDerivableInterpo
     /// <inheritdoc />
     public double GetIntegral(double t1, double t2)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetIntegral(t1, t2);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return linearDegenerate.GetIntegral(t1, t2);
 
         double p = MathHelper.Clamp(P, -1, 1);
         return Primitive(t2, p) - Primitive(t1, p);
@@ -99,7 +99,7 @@ public sealed class HalfSineInterpolator : CustomInterpolator, IDerivableInterpo
 
     private double Function(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return linearDegenerate.GetInterpolation(t);
 
         double p = MathHelper.Clamp(P, -1, 1);
         double b = 2 * Math.Acos(1 / (Math.Sqrt(2) * Math.Abs(p) - Math.Abs(p) + 1));
@@ -257,7 +257,7 @@ public sealed class SingleCurveInterpolator : CustomInterpolator, IDerivableInte
     /// <inheritdoc />
     public double GetDerivative(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return 1;
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return 1;
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return p * Math.Exp(p * t) / (Math.Exp(p) - 1);
     }
@@ -265,7 +265,7 @@ public sealed class SingleCurveInterpolator : CustomInterpolator, IDerivableInte
     /// <inheritdoc />
     public double GetIntegral(double t1, double t2)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return 0.5 * (t2 * t2 - t1 * t1);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return 0.5 * (t2 * t2 - t1 * t1);
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return Primitive(t2, p) - Primitive(t1, p);
     }
@@ -275,7 +275,7 @@ public sealed class SingleCurveInterpolator : CustomInterpolator, IDerivableInte
     /// <returns>The normalized value.</returns>
     public double Function(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return linearDegenerate.GetInterpolation(t);
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return (Math.Exp(p * t) - 1) / (Math.Exp(p) - 1);
     }
@@ -302,7 +302,7 @@ public sealed class SingleCurveInterpolator2 : CustomInterpolator, IDerivableInt
     /// <inheritdoc />
     public double GetDerivative(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return 1;
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return 1;
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return p * Math.Log(2) * Math.Pow(2, p * t) / (Math.Pow(2, p) - 1);
     }
@@ -310,7 +310,7 @@ public sealed class SingleCurveInterpolator2 : CustomInterpolator, IDerivableInt
     /// <inheritdoc />
     public double GetIntegral(double t1, double t2)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return 0.5 * (t2 * t2 - t1 * t1);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return 0.5 * (t2 * t2 - t1 * t1);
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return Primitive(t2, p) - Primitive(t1, p);
     }
@@ -320,7 +320,7 @@ public sealed class SingleCurveInterpolator2 : CustomInterpolator, IDerivableInt
     /// <returns>The normalized value.</returns>
     public double Function(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return linearDegenerate.GetInterpolation(t);
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return (Math.Pow(2, p * t) - 1) / (Math.Pow(2, p) - 1);
     }
@@ -347,7 +347,7 @@ public sealed class SingleCurveInterpolator3 : CustomInterpolator, IDerivableInt
     /// <inheritdoc />
     public double GetDerivative(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return 1;
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return 1;
         double p = MathHelper.Clamp(P, -1, 1) * 7;
         return Math.Exp(p) / Math.Pow(t * (Math.Exp(p) - 1) + 1, 2);
     }
@@ -355,7 +355,7 @@ public sealed class SingleCurveInterpolator3 : CustomInterpolator, IDerivableInt
     /// <inheritdoc />
     public double GetIntegral(double t1, double t2)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return 0.5 * (t2 * t2 - t1 * t1);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return 0.5 * (t2 * t2 - t1 * t1);
         double p = MathHelper.Clamp(P, -1, 1) * 7;
         return Primitive(t2, p) - Primitive(t1, p);
     }
@@ -365,7 +365,7 @@ public sealed class SingleCurveInterpolator3 : CustomInterpolator, IDerivableInt
     /// <returns>The normalized value.</returns>
     public double Function(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return linearDegenerate.GetInterpolation(t);
         double p = MathHelper.Clamp(P, -1, 1) * 7;
         return Math.Exp(p) * t / ((Math.Exp(p) - 1) * t + 1);
     }
@@ -393,7 +393,7 @@ public sealed class DoubleCurveInterpolator : CustomInterpolator, IDerivableInte
     /// <inheritdoc />
     public double GetDerivative(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return 1;
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return 1;
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return t < 0.5 ? Derivative(2 * t, p) : Derivative(2 - 2 * t, p);
     }
@@ -401,7 +401,7 @@ public sealed class DoubleCurveInterpolator : CustomInterpolator, IDerivableInte
     /// <inheritdoc />
     public double GetIntegral(double t1, double t2)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return 0.5 * (t2 * t2 - t1 * t1);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return 0.5 * (t2 * t2 - t1 * t1);
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return Primitive(t2, p) - Primitive(t1, p);
     }
@@ -411,7 +411,7 @@ public sealed class DoubleCurveInterpolator : CustomInterpolator, IDerivableInte
     /// <returns>The normalized value.</returns>
     public double Function(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return linearDegenerate.GetInterpolation(t);
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return t < 0.5 ? 0.5 * F(t * 2, p) : 0.5 + 0.5 * F(t * 2 - 1, -p);
     }
@@ -451,7 +451,7 @@ public sealed class DoubleCurveInterpolator2 : CustomInterpolator, IDerivableInt
     /// <inheritdoc />
     public double GetDerivative(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return 1;
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return 1;
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return t < 0.5 ? Derivative(2 * t, p) : Derivative(2 - 2 * t, p);
     }
@@ -459,7 +459,7 @@ public sealed class DoubleCurveInterpolator2 : CustomInterpolator, IDerivableInt
     /// <inheritdoc />
     public double GetIntegral(double t1, double t2)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return 0.5 * (t2 * t2 - t1 * t1);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return 0.5 * (t2 * t2 - t1 * t1);
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return Primitive(t2, p) - Primitive(t1, p);
     }
@@ -469,7 +469,7 @@ public sealed class DoubleCurveInterpolator2 : CustomInterpolator, IDerivableInt
     /// <returns>The normalized value.</returns>
     public double Function(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return linearDegenerate.GetInterpolation(t);
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return t < 0.5 ? 0.5 * F(t * 2, p) : 0.5 + 0.5 * F(t * 2 - 1, -p);
     }
@@ -509,7 +509,7 @@ public sealed class DoubleCurveInterpolator3 : CustomInterpolator, IDerivableInt
     /// <inheritdoc />
     public double GetDerivative(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return 1;
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return 1;
         double p = MathHelper.Clamp(P, -1, 1) * 7;
         return t < 0.5 ? Derivative(2 * t, p) : Derivative(2 - 2 * t, p);
     }
@@ -517,7 +517,7 @@ public sealed class DoubleCurveInterpolator3 : CustomInterpolator, IDerivableInt
     /// <inheritdoc />
     public double GetIntegral(double t1, double t2)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return 0.5 * (t2 * t2 - t1 * t1);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return 0.5 * (t2 * t2 - t1 * t1);
         double p = MathHelper.Clamp(P, -1, 1) * 7;
         return Primitive(t2, p) - Primitive(t1, p);
     }
@@ -527,7 +527,7 @@ public sealed class DoubleCurveInterpolator3 : CustomInterpolator, IDerivableInt
     /// <returns>The normalized value.</returns>
     public double Function(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+        if (Math.Abs(P) < Precision.DOUBLE_EPSILON) return linearDegenerate.GetInterpolation(t);
         double p = MathHelper.Clamp(P, -1, 1) * 7;
         return t < 0.5 ? 0.5 * F(t * 2, p) : 0.5 + 0.5 * F(t * 2 - 1, -p);
     }

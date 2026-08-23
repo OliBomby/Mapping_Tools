@@ -9,8 +9,8 @@ namespace Mapping_Tools.Infrastructure.Projects;
 /// </summary>
 public sealed class FileSystemProjectStore : IProjectStore
 {
-    private static readonly Encoding Utf8WithoutByteOrderMark = new UTF8Encoding(false);
-    private readonly IProjectSerializer _serializer;
+    private static readonly Encoding utf8WithoutByteOrderMark = new UTF8Encoding(false);
+    private readonly IProjectSerializer serializer;
 
     /// <summary>
     ///     Creates a filesystem store for the supplied project-document format.
@@ -20,7 +20,7 @@ public sealed class FileSystemProjectStore : IProjectStore
     /// </param>
     public FileSystemProjectStore(IProjectSerializer serializer)
     {
-        _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+        this.serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public sealed class FileSystemProjectStore : IProjectStore
         ArgumentNullException.ThrowIfNull(project);
         cancellationToken.ThrowIfCancellationRequested();
 
-        string json = _serializer.Serialize(project);
+        string json = serializer.Serialize(project);
         cancellationToken.ThrowIfCancellationRequested();
 
         string fullPath = Path.GetFullPath(path);
@@ -68,7 +68,7 @@ public sealed class FileSystemProjectStore : IProjectStore
             await File.WriteAllTextAsync(
                 temporaryPath,
                 json,
-                Utf8WithoutByteOrderMark,
+                utf8WithoutByteOrderMark,
                 cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             File.Move(temporaryPath, fullPath, true);
@@ -94,9 +94,9 @@ public sealed class FileSystemProjectStore : IProjectStore
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         string json = await File.ReadAllTextAsync(
             Path.GetFullPath(path),
-            Utf8WithoutByteOrderMark,
+            utf8WithoutByteOrderMark,
             cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
-        return _serializer.Deserialize<TProject>(json);
+        return serializer.Deserialize<TProject>(json);
     }
 }

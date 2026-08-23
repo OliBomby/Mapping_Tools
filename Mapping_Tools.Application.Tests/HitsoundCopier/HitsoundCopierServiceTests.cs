@@ -87,11 +87,11 @@ public sealed class HitsoundCopierServiceTests
 
     private sealed class RecordingGateway : IBeatmapEditingGateway
     {
-        private readonly string _fixture;
+        private readonly string fixture;
 
         public RecordingGateway(string fixture)
         {
-            _fixture = fixture;
+            this.fixture = fixture;
         }
 
         public List<string> OpenedPaths { get; } = [];
@@ -103,7 +103,7 @@ public sealed class HitsoundCopierServiceTests
             CancellationToken cancellationToken = default)
         {
             OpenedPaths.Add(path);
-            BeatmapEditor2 editor = new(File.ReadAllLines(_fixture).ToList(), new MemoryStore()) { Path = path };
+            BeatmapEditor2 editor = new(File.ReadAllLines(fixture).ToList(), new MemoryStore()) { Path = path };
             return Task.FromResult(new BeatmapEditingSession(editor, BeatmapEditingSource.Disk, []));
         }
 

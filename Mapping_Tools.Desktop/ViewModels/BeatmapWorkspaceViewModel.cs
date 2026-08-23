@@ -15,17 +15,17 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDisposable
 {
-    private readonly IBeatmapWorkspace _workspace;
-    private readonly IBeatmapBackupService _backupService;
-    private readonly IQuickUndoCommandService _quickUndoService;
-    private readonly IFilePicker _filePicker;
-    private readonly IFileRevealService _fileRevealService;
-    private readonly IApplicationDirectories _applicationDirectories;
-    private readonly ApplicationSettings _settings;
-    private readonly IDialogService _dialogs;
-    private readonly IUserNotificationService _notifications;
-    private readonly IUiDispatcher _dispatcher;
-    private bool _disposed;
+    private readonly IBeatmapWorkspace workspace;
+    private readonly IBeatmapBackupService backupService;
+    private readonly IQuickUndoCommandService quickUndoService;
+    private readonly IFilePicker filePicker;
+    private readonly IFileRevealService fileRevealService;
+    private readonly IApplicationDirectories applicationDirectories;
+    private readonly ApplicationSettings settings;
+    private readonly IDialogService dialogs;
+    private readonly IUserNotificationService notifications;
+    private readonly IUiDispatcher dispatcher;
+    private bool disposed;
 
     /// <summary>
     /// Creates shell workspace state over the process-lifetime selection and backup services.
@@ -52,20 +52,20 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
         IUserNotificationService notifications,
         IUiDispatcher dispatcher)
     {
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
-        _quickUndoService = quickUndoService ?? throw new ArgumentNullException(nameof(quickUndoService));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        _fileRevealService = fileRevealService ?? throw new ArgumentNullException(nameof(fileRevealService));
-        _applicationDirectories = applicationDirectories ?? throw new ArgumentNullException(nameof(applicationDirectories));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
+        this.quickUndoService = quickUndoService ?? throw new ArgumentNullException(nameof(quickUndoService));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.fileRevealService = fileRevealService ?? throw new ArgumentNullException(nameof(fileRevealService));
+        this.applicationDirectories = applicationDirectories ?? throw new ArgumentNullException(nameof(applicationDirectories));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
-        _workspace.SelectionChanged += OnSelectionChanged;
-        _workspace.RestoreMostRecent();
-        RefreshSelection(_workspace.SelectedPaths);
+        this.workspace.SelectionChanged += OnSelectionChanged;
+        this.workspace.RestoreMostRecent();
+        RefreshSelection(this.workspace.SelectedPaths);
     }
 
     /// <summary>Gets selected filenames joined in tool-consumption order.</summary>
@@ -97,25 +97,25 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     public void SetDroppedPaths(IEnumerable<string> paths)
     {
         ArgumentNullException.ThrowIfNull(paths);
-        _workspace.SetSelection(paths, BeatmapSelectionSource.DragAndDrop);
+        workspace.SetSelection(paths, BeatmapSelectionSource.DragAndDrop);
     }
 
     /// <summary>Stops observing process-lifetime workspace changes.</summary>
     public void Dispose()
     {
-        if (_disposed)
+        if (disposed)
         {
             return;
         }
 
-        _disposed = true;
-        _workspace.SelectionChanged -= OnSelectionChanged;
+        disposed = true;
+        workspace.SelectionChanged -= OnSelectionChanged;
     }
 
     [RelayCommand]
     private Task OpenBeatmapAsync() =>
         RunUserOperationAsync(
-            () => _workspace.PickBeatmapsAsync(true),
+            () => workspace.PickBeatmapsAsync(true),
             "Open beatmap");
 
     [RelayCommand]
@@ -124,7 +124,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
         await RunUserOperationAsync(async () =>
         {
             CurrentBeatmapSelectionResult result =
-                await _workspace.SelectCurrentBeatmapAsync();
+                await workspace.SelectCurrentBeatmapAsync();
             if (result.Status == CurrentBeatmapSelectionStatus.Unavailable)
             {
                 await PublishAsync(
@@ -148,8 +148,8 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     private Task CreateBackupAsync() =>
         RunUserOperationAsync(async () =>
         {
-            BeatmapBackupResult result = await _backupService.CreateAsync(
-                _workspace.SelectedPaths,
+            BeatmapBackupResult result = await backupService.CreateAsync(
+                workspace.SelectedPaths,
                 BeatmapBackupReason.User,
                 force: true);
             int count = result.Artifacts.Count;
@@ -167,11 +167,11 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     private Task RestoreBackupAsync() =>
         RunUserOperationAsync(async () =>
         {
-            IReadOnlyList<string> selected = await _filePicker.PickOpenFilesAsync(
+            IReadOnlyList<string> selected = await filePicker.PickOpenFilesAsync(
                 new OpenFilePickerRequest
                 {
                     Title = "Load backup",
-                    SuggestedStartLocation = _settings.BackupsPath,
+                    SuggestedStartLocation = settings.BackupsPath,
                     AllowMultiple = false,
                     Filters = [CommonFilePickerFilters.BeatmapBackups]
                 });
@@ -180,14 +180,14 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
                 return;
             }
 
-            string destination = _workspace.SelectedPaths.Single();
+            string destination = workspace.SelectedPaths.Single();
             try
             {
                 await RestoreAsync(selected[0], destination, false);
             }
             catch (BeatmapBackupIncompatibleException exception)
             {
-                bool restore = await _dialogs.ShowMessageAsync(
+                bool restore = await dialogs.ShowMessageAsync(
                     new MessageDialogRequest<bool>(
                         "Load backup",
                         "The backup belongs to a different beatmap. Load it anyway?",
@@ -214,32 +214,32 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     [RelayCommand]
     private Task QuickUndoAsync() =>
         RunUserOperationAsync(
-            () => _quickUndoService.ExecuteAsync(),
+            () => quickUndoService.ExecuteAsync(),
             "QuickUndo");
 
     [RelayCommand]
     private Task OpenBackupsFolderAsync() =>
-        RevealAsync(_settings.BackupsPath, "backups folder");
+        RevealAsync(settings.BackupsPath, "backups folder");
 
     [RelayCommand]
     private Task OpenApplicationFolderAsync() =>
-        RevealAsync(_applicationDirectories.ApplicationData, "Mapping Tools folder");
+        RevealAsync(applicationDirectories.ApplicationData, "Mapping Tools folder");
 
     private Task RestoreAsync(
         string backupPath,
         string destinationPath,
         bool allowDifferentFilename) =>
-        _backupService.RestoreAsync(
+        backupService.RestoreAsync(
             backupPath,
             destinationPath,
             allowDifferentFilename,
-            reloadEditor: _settings.AutoReload);
+            reloadEditor: settings.AutoReload);
 
     private async Task RevealAsync(string path, string description)
     {
         await RunUserOperationAsync(async () =>
         {
-            bool accepted = await _fileRevealService.RevealAsync(path);
+            bool accepted = await fileRevealService.RevealAsync(path);
             if (!accepted)
             {
                 await PublishAsync(
@@ -273,7 +273,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     private void OnSelectionChanged(
         object? sender,
         BeatmapSelectionChangedEventArgs eventArgs) =>
-        _dispatcher.Post(() => RefreshSelection(eventArgs.Paths));
+        dispatcher.Post(() => RefreshSelection(eventArgs.Paths));
 
     private void RefreshSelection(IReadOnlyList<string> paths)
     {
@@ -292,6 +292,6 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
         string title,
         string message,
         Exception? exception = null) =>
-        _notifications.PublishAsync(
+        notifications.PublishAsync(
             new UserNotification(severity, title, message, exception));
 }

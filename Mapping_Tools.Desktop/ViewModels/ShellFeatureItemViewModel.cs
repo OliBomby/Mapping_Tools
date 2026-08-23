@@ -9,8 +9,8 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public sealed partial class ShellFeatureItemViewModel : ObservableObject
 {
-    private readonly Action<ShellFeatureItemViewModel> _activate;
-    private readonly Action<ShellFeatureItemViewModel> _toggleFavorite;
+    private readonly Action<ShellFeatureItemViewModel> activate;
+    private readonly Action<ShellFeatureItemViewModel> toggleFavorite;
 
     internal ShellFeatureItemViewModel(
         ShellFeatureRegistration registration,
@@ -24,8 +24,8 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
         Category = registration.Category;
         Description = registration.Description;
         Order = order;
-        _activate = activate;
-        _toggleFavorite = toggleFavorite;
+        this.activate = activate;
+        this.toggleFavorite = toggleFavorite;
         SearchableText = string.Join(
             ' ',
             new[] { registration.DisplayName, registration.Category, registration.Description }
@@ -73,12 +73,12 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
     [RelayCommand]
     private void Activate()
     {
-        _activate(this);
+        activate(this);
     }
 
     [RelayCommand]
     private void ToggleFavorite()
     {
-        _toggleFavorite(this);
+        toggleFavorite(this);
     }
 }

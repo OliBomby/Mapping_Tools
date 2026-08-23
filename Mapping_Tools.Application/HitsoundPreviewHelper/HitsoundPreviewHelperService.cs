@@ -10,13 +10,13 @@ namespace Mapping_Tools.Application.HitsoundPreviewHelper;
 /// </summary>
 public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
 {
-    private readonly IBeatmapEditingGateway _editingGateway;
+    private readonly IBeatmapEditingGateway editingGateway;
 
     /// <summary>Creates the hitsound-preview application service.</summary>
     /// <param name="editingGateway">Loads live-or-disk maps and saves safe edits.</param>
     public HitsoundPreviewHelperService(IBeatmapEditingGateway editingGateway)
     {
-        _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
     }
 
     /// <inheritdoc />
@@ -57,7 +57,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
                 options.ImportModeSetting == HitsoundPreviewHelperImportMode.Selected
                     ? LiveBeatmapPreference.RequireLive
                     : LiveBeatmapPreference.PreferLive;
-            var session = await _editingGateway
+            var session = await editingGateway
                 .OpenBeatmapAsync(paths[index], livePreference, cancellationToken)
                 .ConfigureAwait(false);
 
@@ -79,7 +79,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
                 cancellationToken);
 
             // Save the file
-            await _editingGateway
+            await editingGateway
                 .SaveAsync(session, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
             processedPaths.Add(paths[index]);
@@ -96,7 +96,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        var session = await _editingGateway
+        var session = await editingGateway
             .OpenBeatmapAsync(path, LiveBeatmapPreference.RequireLive, cancellationToken)
             .ConfigureAwait(false);
         bool mania = session.Editor.Beatmap.General["Mode"].IntValue == 3;

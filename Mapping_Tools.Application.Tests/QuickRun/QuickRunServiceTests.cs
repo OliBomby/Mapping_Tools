@@ -288,20 +288,20 @@ public sealed class QuickRunServiceTests
             "none",
             "None",
             QuickRunTargets.NoSelection,
-            _ => Invoke("none")));
+            _ => invoke("none")));
         registry.Register(new QuickRunCommand(
             "single",
             "Single",
             QuickRunTargets.SingleSelection,
-            _ => Invoke("single")));
+            _ => invoke("single")));
         registry.Register(new QuickRunCommand(
             "multiple",
             "Multiple",
             QuickRunTargets.MultipleSelection,
-            _ => Invoke("multiple")));
+            _ => invoke("multiple")));
         return registry;
 
-        Task Invoke(string id)
+        Task invoke(string id)
         {
             invoked.Add(id);
             return Task.CompletedTask;
@@ -339,17 +339,17 @@ public sealed class QuickRunServiceTests
 
     private sealed class FakeLiveReader : ILiveBeatmapReader
     {
-        private readonly Exception? _failure;
-        private readonly LiveBeatmapSnapshot? _snapshot;
+        private readonly Exception? failure;
+        private readonly LiveBeatmapSnapshot? snapshot;
 
         public FakeLiveReader(LiveBeatmapSnapshot? snapshot)
         {
-            _snapshot = snapshot;
+            this.snapshot = snapshot;
         }
 
         public FakeLiveReader(Exception failure)
         {
-            _failure = failure;
+            this.failure = failure;
         }
 
         public int ReadCount { get; private set; }
@@ -359,9 +359,9 @@ public sealed class QuickRunServiceTests
         {
             ReadCount++;
             cancellationToken.ThrowIfCancellationRequested();
-            return _failure is null
-                ? Task.FromResult(_snapshot)
-                : Task.FromException<LiveBeatmapSnapshot?>(_failure);
+            return failure is null
+                ? Task.FromResult(snapshot)
+                : Task.FromException<LiveBeatmapSnapshot?>(failure);
         }
     }
 }

@@ -10,10 +10,10 @@ namespace Mapping_Tools.Desktop.Services;
 /// </summary>
 public sealed class ProjectAutosaveCoordinator
 {
-    private readonly IDialogService _dialogs;
-    private readonly Dictionary<IShellProjectFeature, Task> _loadTasks = [];
-    private readonly IUserNotificationService _notifications;
-    private readonly IProjectService _projects;
+    private readonly IDialogService dialogs;
+    private readonly Dictionary<IShellProjectFeature, Task> loadTasks = [];
+    private readonly IUserNotificationService notifications;
+    private readonly IProjectService projects;
 
     /// <summary>
     ///     Creates the shared project lifecycle coordinator.
@@ -26,9 +26,9 @@ public sealed class ProjectAutosaveCoordinator
         IDialogService dialogs,
         IUserNotificationService notifications)
     {
-        _projects = projects ?? throw new ArgumentNullException(nameof(projects));
-        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.projects = projects ?? throw new ArgumentNullException(nameof(projects));
+        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
     }
 
     /// <summary>
@@ -38,9 +38,9 @@ public sealed class ProjectAutosaveCoordinator
     public void Activate(IShellProjectFeature feature)
     {
         ArgumentNullException.ThrowIfNull(feature);
-        if (_loadTasks.ContainsKey(feature)) return;
+        if (loadTasks.ContainsKey(feature)) return;
 
-        _loadTasks.Add(feature, LoadAutosaveAsync(feature));
+        loadTasks.Add(feature, LoadAutosaveAsync(feature));
     }
 
     /// <summary>
@@ -104,9 +104,9 @@ public sealed class ProjectAutosaveCoordinator
         try
         {
             var definition = feature.ProjectDefinition;
-            object project = await _projects.LoadAsync(
+            object project = await projects.LoadAsync(
                 definition,
-                _projects.GetAutoSavePath(definition),
+                projects.GetAutoSavePath(definition),
                 CancellationToken.None);
             feature.Install(project);
         }
@@ -127,7 +127,7 @@ public sealed class ProjectAutosaveCoordinator
         await AwaitLoadAsync(feature);
         try
         {
-            await _projects.AutoSaveAsync(
+            await projects.AutoSaveAsync(
                 feature.ProjectDefinition,
                 feature.Snapshot(),
                 feature.AdditionalAutoSavePaths);
@@ -143,7 +143,7 @@ public sealed class ProjectAutosaveCoordinator
         CancellationToken cancellationToken)
     {
         await AwaitLoadAsync(feature);
-        await _projects.SaveAsAsync(
+        await projects.SaveAsAsync(
             feature.ProjectDefinition,
             feature.Snapshot(),
             cancellationToken);
@@ -154,7 +154,7 @@ public sealed class ProjectAutosaveCoordinator
         CancellationToken cancellationToken)
     {
         await AwaitLoadAsync(feature);
-        var opened = await _projects.OpenAsync(
+        var opened = await projects.OpenAsync(
             feature.ProjectDefinition,
             cancellationToken);
         if (opened is not null) feature.Install(opened.Project);
@@ -164,7 +164,7 @@ public sealed class ProjectAutosaveCoordinator
         IShellProjectFeature feature,
         CancellationToken cancellationToken)
     {
-        bool confirmed = await _dialogs.ShowMessageAsync(
+        bool confirmed = await dialogs.ShowMessageAsync(
             new MessageDialogRequest<bool>(
                 "Confirm new project",
                 "Are you sure you want to start a new project? All unsaved progress will be lost.",
@@ -177,12 +177,12 @@ public sealed class ProjectAutosaveCoordinator
         if (!confirmed) return;
 
         await AwaitLoadAsync(feature);
-        feature.Install(_projects.CreateNew(feature.ProjectDefinition));
+        feature.Install(projects.CreateNew(feature.ProjectDefinition));
     }
 
     private async Task AwaitLoadAsync(IShellProjectFeature feature)
     {
-        if (_loadTasks.TryGetValue(feature, out var loadTask)) await loadTask;
+        if (loadTasks.TryGetValue(feature, out var loadTask)) await loadTask;
     }
 
     private async Task RunAsync(Func<Task> operation, string title)
@@ -202,7 +202,7 @@ public sealed class ProjectAutosaveCoordinator
 
     private Task PublishFailureAsync(string title, Exception exception)
     {
-        return _notifications.PublishAsync(new UserNotification(
+        return notifications.PublishAsync(new UserNotification(
             UserNotificationSeverity.Error,
             title,
             exception.Message,

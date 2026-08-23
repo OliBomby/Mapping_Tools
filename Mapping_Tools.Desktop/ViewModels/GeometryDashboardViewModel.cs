@@ -32,48 +32,48 @@ namespace Mapping_Tools.Desktop.ViewModels;
 public sealed partial class GeometryDashboardViewModel : ObservableObject,
     IShellProjectFeature, IShellExtraProjectMenuFeature, IShellFeatureActivation, IDisposable
 {
-    private const double RelevancyBias = 4;
-    private const double PointsBias = 3;
-    private const double SpecialBias = 2;
-    private const double SelectionRange = 80;
-    private static readonly HitObjectComparer HitObjectComparer = new();
-    private readonly HashSet<SnappingToolsSaveSlot> _activeSaveSlots = [];
+    private const double relevancy_bias = 4;
+    private const double points_bias = 3;
+    private const double special_bias = 2;
+    private const double selection_range = 80;
+    private static readonly HitObjectComparer hitObjectComparer = new();
+    private readonly HashSet<SnappingToolsSaveSlot> activeSaveSlots = [];
 
-    private readonly ApplicationSettings _applicationSettings;
-    private readonly CoordinateConverter _converter = new();
+    private readonly ApplicationSettings applicationSettings;
+    private readonly CoordinateConverter converter = new();
 
-    private readonly ProjectDefinition<SnappingToolsProject> _definition =
+    private readonly ProjectDefinition<SnappingToolsProject> definition =
         GeometryDashboardProjectDefinition.Definition;
 
-    private readonly IGeometryDashboardDialogService _dialogs;
-    private readonly IUiDispatcher _dispatcher;
-    private readonly IFilePicker _filePicker;
-    private readonly ITextFileStore _files;
-    private readonly List<IRelevantDrawable> _inheritableDrawables = [];
-    private readonly IGeometryDashboardInputService _input;
-    private readonly LayerCollection _layers;
-    private readonly CancellationTokenSource _lifetime = new();
-    private readonly List<IRelevantDrawable> _lockedDrawables = [];
-    private readonly IUserNotificationService _notifications;
-    private readonly IGeometryDashboardOverlayHostFactory _overlayFactory;
-    private readonly IGeometryDashboardRuntime _runtime;
-    private readonly List<IRelevantDrawable> _selectedDrawables = [];
-    private readonly IProjectSerializer _serializer;
-    private readonly object _stateGate = new();
-    private bool _active;
-    private string? _configurationStatus;
-    private bool _disposed;
-    private string _filter = string.Empty;
-    private RelevantHitObject? _heldHitObject;
-    private IRelevantObject[] _heldHitObjects = [];
-    private Vector2 _heldMouseOffset;
-    private IRelevantDrawable? _lastSnapped;
-    private bool _lockedToggle;
-    private Task? _loop;
-    private IGeometryDashboardOverlayHost? _overlay;
-    private int _readerFailures;
-    private GeometryDashboardRuntimeSnapshot? _runtimeSnapshot;
-    private bool _unlockedSomething;
+    private readonly IGeometryDashboardDialogService dialogs;
+    private readonly IUiDispatcher dispatcher;
+    private readonly IFilePicker filePicker;
+    private readonly ITextFileStore files;
+    private readonly List<IRelevantDrawable> inheritableDrawables = [];
+    private readonly IGeometryDashboardInputService input;
+    private readonly LayerCollection layers;
+    private readonly CancellationTokenSource lifetime = new();
+    private readonly List<IRelevantDrawable> lockedDrawables = [];
+    private readonly IUserNotificationService notifications;
+    private readonly IGeometryDashboardOverlayHostFactory overlayFactory;
+    private readonly IGeometryDashboardRuntime runtime;
+    private readonly List<IRelevantDrawable> selectedDrawables = [];
+    private readonly IProjectSerializer serializer;
+    private readonly object stateGate = new();
+    private bool active;
+    private string? configurationStatus;
+    private bool disposed;
+    private string filter = string.Empty;
+    private RelevantHitObject? heldHitObject;
+    private IRelevantObject[] heldHitObjects = [];
+    private Vector2 heldMouseOffset;
+    private IRelevantDrawable? lastSnapped;
+    private bool lockedToggle;
+    private Task? loop;
+    private IGeometryDashboardOverlayHost? overlay;
+    private int readerFailures;
+    private GeometryDashboardRuntimeSnapshot? runtimeSnapshot;
+    private bool unlockedSomething;
 
     /// <summary>Creates the dashboard presentation and its default generator catalog.</summary>
     /// <param name="applicationSettings">Shared process settings.</param>
@@ -98,21 +98,21 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         IGeometryDashboardDialogService dialogs,
         IUiDispatcher dispatcher)
     {
-        _applicationSettings = applicationSettings ?? throw new ArgumentNullException(nameof(applicationSettings));
-        _runtime = runtime ?? throw new ArgumentNullException(nameof(runtime));
-        _input = input ?? throw new ArgumentNullException(nameof(input));
-        _overlayFactory = overlayFactory ?? throw new ArgumentNullException(nameof(overlayFactory));
-        _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        _files = files ?? throw new ArgumentNullException(nameof(files));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
-        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        this.applicationSettings = applicationSettings ?? throw new ArgumentNullException(nameof(applicationSettings));
+        this.runtime = runtime ?? throw new ArgumentNullException(nameof(runtime));
+        this.input = input ?? throw new ArgumentNullException(nameof(input));
+        this.overlayFactory = overlayFactory ?? throw new ArgumentNullException(nameof(overlayFactory));
+        this.serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.files = files ?? throw new ArgumentNullException(nameof(files));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
         Project = new SnappingToolsProject();
         Generators = new ObservableCollection<GeometryDashboardGeneratorViewModel>(CreateGenerators());
         Project.SetGenerators(Generators.Select(generator => generator.Model));
-        _layers = CreateLayers();
+        layers = CreateLayers();
         RebuildGroups();
     }
 
@@ -136,11 +136,11 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <summary>Gets or sets the case-insensitive generator search query.</summary>
     public string Filter
     {
-        get => _filter;
+        get => filter;
         set
         {
             string normalized = value ?? string.Empty;
-            if (SetProperty(ref _filter, normalized)) RebuildGroups();
+            if (SetProperty(ref filter, normalized)) RebuildGroups();
         }
     }
 
@@ -148,13 +148,13 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     public SnappingToolsPreferences Preferences => Project.CurrentPreferences;
 
     /// <summary>Gets the generated geometry count displayed in diagnostics.</summary>
-    public int DrawableCount => _layers.GetAllRelevantDrawables().Count();
+    public int DrawableCount => layers.GetAllRelevantDrawables().Count();
 
     /// <summary>Gets or sets the number of selected virtual objects.</summary>
-    public int SelectedCount => _layers.GetAllRelevantObjects().Count(objectModel => objectModel.IsSelected);
+    public int SelectedCount => layers.GetAllRelevantObjects().Count(objectModel => objectModel.IsSelected);
 
     /// <summary>Gets whether the platform and editor state are currently active.</summary>
-    public bool IsConnected => _runtimeSnapshot is not null && _overlay?.IsVisible == true;
+    public bool IsConnected => runtimeSnapshot is not null && overlay?.IsVisible == true;
 
     /// <summary>Gets whether the current feature should keep its background loop alive.</summary>
     public bool KeepRunning => Preferences.KeepRunning;
@@ -162,18 +162,18 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <inheritdoc />
     public void Dispose()
     {
-        if (_disposed) return;
-        _disposed = true;
-        _active = false;
-        _lifetime.Cancel();
-        try { _loop?.Wait(TimeSpan.FromSeconds(1)); }
+        if (disposed) return;
+        disposed = true;
+        active = false;
+        lifetime.Cancel();
+        try { loop?.Wait(TimeSpan.FromSeconds(1)); }
         catch { }
 
-        _overlay?.Dispose();
-        _lifetime.Dispose();
-        lock (_stateGate)
+        overlay?.Dispose();
+        lifetime.Dispose();
+        lock (stateGate)
         {
-            foreach (var objectModel in _layers.GetAllRelevantObjects().ToArray()) objectModel.Dispose();
+            foreach (var objectModel in layers.GetAllRelevantObjects().ToArray()) objectModel.Dispose();
         }
 
         GC.SuppressFinalize(this);
@@ -188,24 +188,24 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <inheritdoc />
     public void Activate()
     {
-        if (_disposed) return;
-        _active = true;
-        _loop ??= Task.Run(() => RunLoopAsync(_lifetime.Token));
+        if (disposed) return;
+        active = true;
+        loop ??= Task.Run(() => RunLoopAsync(lifetime.Token));
     }
 
     /// <inheritdoc />
     public void Deactivate()
     {
         if (Preferences.KeepRunning) return;
-        _active = false;
-        _overlay?.Disable();
+        active = false;
+        overlay?.Disable();
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
     {
-        lock (_stateGate)
+        lock (stateGate)
         {
             lock (Project)
             {
@@ -219,7 +219,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         if (project is not SnappingToolsProject loaded)
             throw new InvalidDataException("The Geometry Dashboard project is incomplete.");
 
-        lock (_stateGate)
+        lock (stateGate)
         {
             lock (Project)
             {
@@ -228,7 +228,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
                 Project.SetCurrentPreferences(loaded.CurrentPreferences);
             }
 
-            _activeSaveSlots.Clear();
+            activeSaveSlots.Clear();
             ApplyPreferences();
         }
     }
@@ -246,7 +246,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     public void ToggleSelected(KeyModifiers modifiers = KeyModifiers.None)
     {
         ToggleObjects(
-            _layers.GetAllRelevantDrawables(),
+            layers.GetAllRelevantDrawables(),
             (modifiers & KeyModifiers.Shift) != 0,
             (modifiers & KeyModifiers.Control) != 0,
             static objectModel => objectModel.IsSelected,
@@ -267,7 +267,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     public void ToggleInheritable(KeyModifiers modifiers = KeyModifiers.None)
     {
         ToggleObjects(
-            _layers.GetAllRelevantDrawables(),
+            layers.GetAllRelevantDrawables(),
             (modifiers & KeyModifiers.Shift) != 0,
             (modifiers & KeyModifiers.Control) != 0,
             static objectModel => objectModel.IsInheritable,
@@ -277,7 +277,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <summary>Shows the preferences dialog and applies an accepted clone.</summary>
     public async Task ShowPreferencesAsync()
     {
-        var preferences = await _dialogs.ShowPreferencesAsync(
+        var preferences = await dialogs.ShowPreferencesAsync(
             (SnappingToolsPreferences)Preferences.Clone());
         if (preferences is not null)
         {
@@ -289,7 +289,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <summary>Shows the modeless save-slot dialog for the current project.</summary>
     public Task ShowProjectSlotsAsync()
     {
-        return _dialogs.ShowProjectSlotsAsync(Project, LoadSaveSlot, RefreshSaveSlotHotkeys);
+        return dialogs.ShowProjectSlotsAsync(Project, LoadSaveSlot, RefreshSaveSlotHotkeys);
     }
 
     /// <summary>Shows a generator's typed settings dialog and regenerates after acceptance.</summary>
@@ -297,7 +297,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     public async Task ShowGeneratorSettingsAsync(GeometryDashboardGeneratorViewModel generator)
     {
         ArgumentNullException.ThrowIfNull(generator);
-        if (await _dialogs.ShowGeneratorSettingsAsync(generator.Model.Settings)) Regenerate();
+        if (await dialogs.ShowGeneratorSettingsAsync(generator.Model.Settings)) Regenerate();
     }
 
     /// <summary>Exports detached locked virtual objects using a native save picker.</summary>
@@ -306,7 +306,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     {
         try
         {
-            string? path = await _filePicker.PickSaveFileAsync(new SaveFilePickerRequest
+            string? path = await filePicker.PickSaveFileAsync(new SaveFilePickerRequest
             {
                 Title = "Save locked virtual objects",
                 SuggestedFileName = "locked-virtual-objects.json",
@@ -315,9 +315,9 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             });
             if (string.IsNullOrWhiteSpace(path)) return;
 
-            string json = _serializer.Serialize(GetLockedObjects());
-            _files.WriteAllLines(path, json.Split(["\r\n", "\n"], StringSplitOptions.None));
-            await _notifications.PublishAsync(new UserNotification(
+            string json = serializer.Serialize(GetLockedObjects());
+            files.WriteAllLines(path, json.Split(["\r\n", "\n"], StringSplitOptions.None));
+            await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Success,
                 "Save virtual objects",
                 "Successfully saved locked virtual objects!"));
@@ -327,7 +327,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         }
         catch (Exception exception)
         {
-            await _notifications.PublishAsync(new UserNotification(
+            await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Error,
                 "Could not save virtual objects",
                 exception.Message,
@@ -341,7 +341,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     {
         try
         {
-            var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+            var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
             {
                 Title = "Load locked virtual objects",
                 AllowMultiple = false,
@@ -349,10 +349,10 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             });
             if (paths.Count == 0) return;
 
-            var objects = _serializer.Deserialize<RelevantObjectCollection>(
-                string.Join(Environment.NewLine, _files.ReadAllLines(paths[0])));
+            var objects = serializer.Deserialize<RelevantObjectCollection>(
+                string.Join(Environment.NewLine, files.ReadAllLines(paths[0])));
             SetLockedObjects(objects);
-            await _notifications.PublishAsync(new UserNotification(
+            await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Success,
                 "Load virtual objects",
                 "Successfully loaded locked virtual objects!"));
@@ -365,7 +365,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         }
         catch (Exception exception)
         {
-            await _notifications.PublishAsync(new UserNotification(
+            await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Error,
                 "Could not load virtual objects",
                 exception.Message,
@@ -377,49 +377,49 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            if (_active || Preferences.KeepRunning)
+            if (active || Preferences.KeepRunning)
                 try { await RefreshOnceCoreAsync(cancellationToken).ConfigureAwait(false); }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { break; }
                 catch (Exception exception)
                 {
-                    _readerFailures++;
-                    SetStatus(_readerFailures >= 3
+                    readerFailures++;
+                    SetStatus(readerFailures >= 3
                         ? "Editor Reader seems to be failing a lot..."
                         : exception.Message);
-                    _overlay?.Disable();
+                    overlay?.Disable();
                 }
 
-            try { await Task.Delay(_runtimeSnapshot is null ? 1000 : 100, cancellationToken).ConfigureAwait(false); }
+            try { await Task.Delay(runtimeSnapshot is null ? 1000 : 100, cancellationToken).ConfigureAwait(false); }
             catch (OperationCanceledException) { break; }
         }
     }
 
     private async Task RefreshOnceCoreAsync(CancellationToken cancellationToken)
     {
-        if (!_input.IsSupported)
+        if (!input.IsSupported)
         {
             SetStatus("Geometry Dashboard requires Windows.");
-            _overlay?.Disable();
+            overlay?.Disable();
             return;
         }
 
-        if (!_applicationSettings.UseEditorReader)
+        if (!applicationSettings.UseEditorReader)
         {
             SetStatus("Enable Editor Reader in Preferences to use Geometry Dashboard.");
-            _overlay?.Disable();
+            overlay?.Disable();
             return;
         }
 
-        var snapshot = await _runtime.ReadAsync(cancellationToken);
+        var snapshot = await runtime.ReadAsync(cancellationToken);
         if (snapshot is null)
         {
             SetStatus("Waiting for an open editor...");
-            _runtimeSnapshot = null;
-            _overlay?.Disable();
+            runtimeSnapshot = null;
+            overlay?.Disable();
             return;
         }
 
-        var previousSnapshot = _runtimeSnapshot;
+        var previousSnapshot = runtimeSnapshot;
         bool shouldUpdateRoots = previousSnapshot is null
                                  || Preferences.UpdateMode switch
                                  {
@@ -429,10 +429,10 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
                                      UpdateMode.HotkeyDown => false,
                                      _ => true,
                                  };
-        _runtimeSnapshot = snapshot;
-        _readerFailures = 0;
+        runtimeSnapshot = snapshot;
+        readerFailures = 0;
         UpdateConverter(snapshot);
-        if (shouldUpdateRoots || _input.IsHotkeyDown(Preferences.RefreshHotkey)) UpdateRootObjects(snapshot.Editor);
+        if (shouldUpdateRoots || input.IsHotkeyDown(Preferences.RefreshHotkey)) UpdateRootObjects(snapshot.Editor);
         if (!snapshot.Window.IsActivated)
         {
             UpdateOverlay(snapshot);
@@ -442,8 +442,8 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
         UpdateHotkeys();
         UpdateOverlay(snapshot);
-        SetStatus(_configurationStatus
-                  ?? (_layers.GetAllRelevantObjects().Any()
+        SetStatus(configurationStatus
+                  ?? (layers.GetAllRelevantObjects().Any()
                       ? $"{DrawableCount} virtual object(s)"
                       : "No visible hit objects."));
         NotifyPropertyChanged(nameof(DrawableCount));
@@ -452,40 +452,40 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     private void UpdateConverter(GeometryDashboardRuntimeSnapshot snapshot)
     {
-        _configurationStatus = null;
-        _converter.OsuWindowPosition = new Vector2(snapshot.Window.Bounds.Left, snapshot.Window.Bounds.Top);
-        _converter.ScreenBox = snapshot.PrimaryScreen?.Bounds ?? snapshot.Window.Bounds;
-        _converter.DpiMultiplier = snapshot.Window.DpiScale;
-        _converter.DpiSourceAvailable = snapshot.Window.DpiSourceAvailable;
+        configurationStatus = null;
+        converter.OsuWindowPosition = new Vector2(snapshot.Window.Bounds.Left, snapshot.Window.Bounds.Top);
+        converter.ScreenBox = snapshot.PrimaryScreen?.Bounds ?? snapshot.Window.Bounds;
+        converter.DpiMultiplier = snapshot.Window.DpiScale;
+        converter.DpiSourceAvailable = snapshot.Window.DpiSourceAvailable;
 
-        if (!string.IsNullOrWhiteSpace(_applicationSettings.OsuConfigPath))
+        if (!string.IsNullOrWhiteSpace(applicationSettings.OsuConfigPath))
             try
             {
-                var values = ReadConfig(_applicationSettings.OsuConfigPath);
-                _converter.Fullscreen = GetBool(values, "Fullscreen", true);
-                _converter.Letterboxing = GetBool(values, "Letterboxing", true);
-                _converter.OsuResolution = new Vector2(
-                    GetDouble(values, _converter.Fullscreen ? "WidthFullscreen" : "Width", _converter.OsuResolution.X),
-                    GetDouble(values, _converter.Fullscreen ? "HeightFullscreen" : "Height", _converter.OsuResolution.Y));
-                _converter.LetterboxingPosition = new Vector2(
-                    GetDouble(values, "LetterboxPositionX", _converter.LetterboxingPosition.X),
-                    GetDouble(values, "LetterboxPositionY", _converter.LetterboxingPosition.Y));
+                var values = ReadConfig(applicationSettings.OsuConfigPath);
+                converter.Fullscreen = GetBool(values, "Fullscreen", true);
+                converter.Letterboxing = GetBool(values, "Letterboxing", true);
+                converter.OsuResolution = new Vector2(
+                    GetDouble(values, converter.Fullscreen ? "WidthFullscreen" : "Width", converter.OsuResolution.X),
+                    GetDouble(values, converter.Fullscreen ? "HeightFullscreen" : "Height", converter.OsuResolution.Y));
+                converter.LetterboxingPosition = new Vector2(
+                    GetDouble(values, "LetterboxPositionX", converter.LetterboxingPosition.X),
+                    GetDouble(values, "LetterboxPositionY", converter.LetterboxingPosition.Y));
             }
             catch (Exception exception)
             {
-                _configurationStatus = "Could not read osu! configuration: " + exception.Message;
+                configurationStatus = "Could not read osu! configuration: " + exception.Message;
             }
         else
-            _configurationStatus = "Specify your osu! user configuration file in Mapping Tools Preferences.";
+            configurationStatus = "Specify your osu! user configuration file in Mapping Tools Preferences.";
 
-        _converter.EditorBoxOffset = Preferences.OverlayOffset;
-        _layers.AcceptableDifference = Preferences.AcceptableDifference;
-        _layers.SetInceptionLevel(Preferences.InceptionLevel);
+        converter.EditorBoxOffset = Preferences.OverlayOffset;
+        layers.AcceptableDifference = Preferences.AcceptableDifference;
+        layers.SetInceptionLevel(Preferences.InceptionLevel);
     }
 
     private bool UpdateRootObjects(GeometryDashboardEditorSnapshot editor)
     {
-        lock (_stateGate)
+        lock (stateGate)
         {
             double approachTime = Beatmap.GetApproachTime(editor.ApproachRate);
             var candidates = Preferences.SelectedHitObjectMode switch
@@ -496,7 +496,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
                 _ => editor.HitObjects.Where(objectModel => editor.EditorTime > objectModel.Time - approachTime && editor.EditorTime < objectModel.EndTime + approachTime),
             };
             var objects = candidates.ToArray();
-            var existing = _layers.GetRootRelevantHitObjects().ToArray();
+            var existing = layers.GetRootRelevantHitObjects().ToArray();
             var removed = existing
                 .Where(old => !objects.Any(candidate => SameHitObject(old.HitObject, candidate)))
                 .ToArray();
@@ -506,13 +506,13 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             foreach (var oldObject in removed)
                 oldObject.Dispose();
 
-            _layers.GetRootLayer().Add(added.Select(candidate => new RelevantHitObject(candidate)));
+            layers.GetRootLayer().Add(added.Select(candidate => new RelevantHitObject(candidate)));
             bool selectionChanged = SynchronizeRootSelection(
-                _layers.GetRootRelevantHitObjects(),
+                layers.GetRootRelevantHitObjects(),
                 editor.SelectedHitObjects);
             if (added.Length == 0 && removed.Length == 0 && !selectionChanged) return false;
 
-            _layers.GetRootLayer().GenerateNewObjects(true);
+            layers.GetRootLayer().GenerateNewObjects(true);
             return true;
         }
     }
@@ -525,7 +525,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         foreach (var root in roots)
         {
             bool isSelected = selectedHitObjects.Any(selectedHitObject =>
-                HitObjectComparer.Equals(root.HitObject, selectedHitObject));
+                hitObjectComparer.Equals(root.HitObject, selectedHitObject));
             if (root.IsSelected == isSelected) continue;
 
             bool autoPropagate = root.AutoPropagate;
@@ -540,106 +540,106 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     private void UpdateHotkeys()
     {
-        lock (_stateGate)
+        lock (stateGate)
         {
             Vector2 screen;
             lock (Project)
             {
                 foreach (var slot in Project.SaveSlots.ToArray())
                 {
-                    bool isDown = _input.IsHotkeyDown(slot.ProjectHotkey);
-                    if (isDown && _activeSaveSlots.Add(slot)) LoadSaveSlot(slot);
-                    if (!isDown) _activeSaveSlots.Remove(slot);
+                    bool isDown = input.IsHotkeyDown(slot.ProjectHotkey);
+                    if (isDown && activeSaveSlots.Add(slot)) LoadSaveSlot(slot);
+                    if (!isDown) activeSaveSlots.Remove(slot);
                 }
             }
 
-            if (_input.IsMouseButtonDown(GeometryDashboardMouseButton.Left) && _input.TryGetCursorPosition(out screen))
+            if (input.IsMouseButtonDown(GeometryDashboardMouseButton.Left) && input.TryGetCursorPosition(out screen))
             {
-                var cursor = _converter.ScreenToEditorCoordinate(screen);
-                var selected = _layers.GetRootRelevantHitObjects().Where(objectModel => objectModel.IsSelected).ToArray();
-                _heldHitObjects = selected;
-                _heldHitObject = selected.OrderBy(objectModel => Vector2.Distance(objectModel.HitObject.Pos, cursor))
-                    .FirstOrDefault(objectModel => Vector2.Distance(objectModel.HitObject.Pos, cursor) <= Beatmap.GetHitObjectRadius(_runtimeSnapshot?.Editor.CircleSize ?? 5));
-                _heldMouseOffset = _heldHitObject is null ? Vector2.Zero : _heldHitObject.HitObject.Pos - cursor;
+                var cursor = converter.ScreenToEditorCoordinate(screen);
+                var selected = layers.GetRootRelevantHitObjects().Where(objectModel => objectModel.IsSelected).ToArray();
+                heldHitObjects = selected;
+                heldHitObject = selected.OrderBy(objectModel => Vector2.Distance(objectModel.HitObject.Pos, cursor))
+                    .FirstOrDefault(objectModel => Vector2.Distance(objectModel.HitObject.Pos, cursor) <= Beatmap.GetHitObjectRadius(runtimeSnapshot?.Editor.CircleSize ?? 5));
+                heldMouseOffset = heldHitObject is null ? Vector2.Zero : heldHitObject.HitObject.Pos - cursor;
             }
             else
             {
-                _heldHitObject = null;
-                _heldHitObjects = [];
-                _heldMouseOffset = Vector2.Zero;
+                heldHitObject = null;
+                heldHitObjects = [];
+                heldMouseOffset = Vector2.Zero;
             }
 
-            bool snap = _input.IsHotkeyDown(Preferences.SnapHotkey);
-            if (!snap) _lastSnapped = null;
-            if (snap && _input.TryGetCursorPosition(out screen))
+            bool snap = input.IsHotkeyDown(Preferences.SnapHotkey);
+            if (!snap) lastSnapped = null;
+            if (snap && input.TryGetCursorPosition(out screen))
             {
-                var cursor = _converter.ScreenToEditorCoordinate(screen);
+                var cursor = converter.ScreenToEditorCoordinate(screen);
                 var nearest = GetNearestDrawable(
-                    cursor + _heldMouseOffset,
-                    heldObjects: _heldHitObjects,
+                    cursor + heldMouseOffset,
+                    heldObjects: heldHitObjects,
                     specialPriority: static objectModel =>
                         objectModel.IsSelected || objectModel.IsLocked || objectModel.IsInheritable);
                 if (nearest is not null)
                 {
-                    _lastSnapped = nearest;
-                    _input.TrySetCursorPosition(_converter.EditorToScreenCoordinate(
-                        nearest.NearestPoint(cursor + _heldMouseOffset) - _heldMouseOffset));
+                    lastSnapped = nearest;
+                    input.TrySetCursorPosition(converter.EditorToScreenCoordinate(
+                        nearest.NearestPoint(cursor + heldMouseOffset) - heldMouseOffset));
                 }
             }
 
-            if (_input.IsHotkeyDown(Preferences.SelectHotkey))
-                ApplyNearestToggle(_selectedDrawables, static objectModel => objectModel.IsSelected, static (objectModel, value) => objectModel.IsSelected = value);
-            else _selectedDrawables.Clear();
-            if (_input.IsHotkeyDown(Preferences.LockHotkey))
+            if (input.IsHotkeyDown(Preferences.SelectHotkey))
+                ApplyNearestToggle(selectedDrawables, static objectModel => objectModel.IsSelected, static (objectModel, value) => objectModel.IsSelected = value);
+            else selectedDrawables.Clear();
+            if (input.IsHotkeyDown(Preferences.LockHotkey))
             {
                 ApplyNearestLock();
             }
             else
             {
-                _lockedDrawables.Clear();
-                _unlockedSomething = false;
+                lockedDrawables.Clear();
+                unlockedSomething = false;
             }
 
-            if (_input.IsHotkeyDown(Preferences.InheritHotkey))
-                ApplyNearestToggle(_inheritableDrawables, static objectModel => objectModel.IsInheritable, static (objectModel, value) => objectModel.IsInheritable = value);
-            else _inheritableDrawables.Clear();
+            if (input.IsHotkeyDown(Preferences.InheritHotkey))
+                ApplyNearestToggle(inheritableDrawables, static objectModel => objectModel.IsInheritable, static (objectModel, value) => objectModel.IsInheritable = value);
+            else inheritableDrawables.Clear();
         }
     }
 
     private void UpdateOverlay(GeometryDashboardRuntimeSnapshot snapshot)
     {
-        _overlay ??= _overlayFactory.Create();
-        if (!_overlay.IsSupported) return;
-        if (_overlay.TargetWindow != snapshot.Window.Id) _overlay.Initialize(snapshot.Window.Id);
-        _overlay.Enable();
-        var editorBox = _converter.GetEditorBox();
+        overlay ??= overlayFactory.Create();
+        if (!overlay.IsSupported) return;
+        if (overlay.TargetWindow != snapshot.Window.Id) overlay.Initialize(snapshot.Window.Id);
+        overlay.Enable();
+        var editorBox = converter.GetEditorBox();
         var frame = BuildFrame();
-        _overlay.SetFrame(frame);
-        _overlay.SetBorder(Preferences.DebugEnabled);
-        _overlay.Update(editorBox, snapshot.Window.DpiScale, snapshot.Window.DpiSourceAvailable);
+        overlay.SetFrame(frame);
+        overlay.SetBorder(Preferences.DebugEnabled);
+        overlay.Update(editorBox, snapshot.Window.DpiScale, snapshot.Window.DpiSourceAvailable);
     }
 
     private GeometryDashboardOverlayFrame BuildFrame()
     {
-        lock (_stateGate)
+        lock (stateGate)
         {
-            if (_runtimeSnapshot is null) return GeometryDashboardOverlayFrame.Empty;
-            var drawables = _layers.GetAllRelevantDrawables();
-            if (_input.IsHotkeyDown(Preferences.SnapHotkey))
+            if (runtimeSnapshot is null) return GeometryDashboardOverlayFrame.Empty;
+            var drawables = layers.GetAllRelevantDrawables();
+            if (input.IsHotkeyDown(Preferences.SnapHotkey))
             {
                 var viewMode = Preferences.KeyDownViewMode;
                 if (!viewMode.HasFlag(ViewMode.Everything))
                 {
                     List<IRelevantDrawable> related = [];
-                    if (_lastSnapped is not null)
+                    if (lastSnapped is not null)
                     {
                         if (viewMode.HasFlag(ViewMode.Parents))
-                            related.AddRange(_lastSnapped.GetParentage(int.MaxValue).OfType<IRelevantDrawable>());
-                        else if (viewMode.HasFlag(ViewMode.DirectParents)) related.AddRange(_lastSnapped.GetParentage(1).OfType<IRelevantDrawable>());
+                            related.AddRange(lastSnapped.GetParentage(int.MaxValue).OfType<IRelevantDrawable>());
+                        else if (viewMode.HasFlag(ViewMode.DirectParents)) related.AddRange(lastSnapped.GetParentage(1).OfType<IRelevantDrawable>());
 
                         if (viewMode.HasFlag(ViewMode.Children))
-                            related.AddRange(_lastSnapped.GetDescendants(int.MaxValue).OfType<IRelevantDrawable>());
-                        else if (viewMode.HasFlag(ViewMode.DirectChildren)) related.AddRange(_lastSnapped.GetDescendants(1).OfType<IRelevantDrawable>());
+                            related.AddRange(lastSnapped.GetDescendants(int.MaxValue).OfType<IRelevantDrawable>());
+                        else if (viewMode.HasFlag(ViewMode.DirectChildren)) related.AddRange(lastSnapped.GetDescendants(1).OfType<IRelevantDrawable>());
                     }
 
                     drawables = related;
@@ -714,7 +714,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
                     GeometryDashboardOverlayShapeKind.Circle,
                     ToOverlayPoint(circle.Child.Centre),
                     default,
-                    _converter.ToDpi(_converter.ScaleByRatio(new Vector2(circle.Child.Radius, 0))).X,
+                    converter.ToDpi(converter.ScaleByRatio(new Vector2(circle.Child.Radius, 0))).X,
                     colour,
                     opacity,
                     thickness,
@@ -738,17 +738,17 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     private Vector2 ToOverlayPoint(Vector2 editorCoordinate)
     {
-        var editorBox = _converter.GetEditorBox();
-        var relative = _converter.EditorToRelativeCoordinate(editorCoordinate);
+        var editorBox = converter.GetEditorBox();
+        var relative = converter.EditorToRelativeCoordinate(editorCoordinate);
         return new Vector2(editorBox.Left + relative.X, editorBox.Top + relative.Y);
     }
 
     private void ApplyNearestToggle(List<IRelevantDrawable> handled, Func<IRelevantDrawable, bool> read, Action<IRelevantDrawable, bool> write)
     {
-        if (!_input.TryGetCursorPosition(out var screen)) return;
+        if (!input.TryGetCursorPosition(out var screen)) return;
         var nearest = GetNearestDrawable(
-            _converter.ScreenToEditorCoordinate(screen),
-            SelectionRange,
+            converter.ScreenToEditorCoordinate(screen),
+            selection_range,
             specialPriority: read);
         if (nearest is null || handled.Contains(nearest)) return;
         bool value = handled.Count == 0 ? !read(nearest) : read(handled[0]);
@@ -761,24 +761,24 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     private void ApplyNearestLock()
     {
-        if (!_input.TryGetCursorPosition(out var screen)) return;
+        if (!input.TryGetCursorPosition(out var screen)) return;
         var nearest = GetNearestDrawable(
-            _converter.ScreenToEditorCoordinate(screen),
-            SelectionRange,
+            converter.ScreenToEditorCoordinate(screen),
+            selection_range,
             specialPriority: static objectModel => objectModel.IsLocked);
-        if (nearest is null || _lockedDrawables.Contains(nearest)) return;
-        if (_lockedDrawables.Count == 0) _lockedToggle = !nearest.IsLocked;
-        if (_lockedToggle)
+        if (nearest is null || lockedDrawables.Contains(nearest)) return;
+        if (lockedDrawables.Count == 0) lockedToggle = !nearest.IsLocked;
+        if (lockedToggle)
         {
-            _layers.GetRootLayer().Add(nearest.GetLockedRelevantObject());
+            layers.GetRootLayer().Add(nearest.GetLockedRelevantObject());
         }
-        else if (nearest.IsLocked && !_unlockedSomething)
+        else if (nearest.IsLocked && !unlockedSomething)
         {
             nearest.Dispose();
-            _unlockedSomething = true;
+            unlockedSomething = true;
         }
 
-        _lockedDrawables.Add(nearest);
+        lockedDrawables.Add(nearest);
         Regenerate();
     }
 
@@ -788,20 +788,20 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         IRelevantObject[]? heldObjects = null,
         Func<IRelevantDrawable, bool>? specialPriority = null)
     {
-        lock (_stateGate)
+        lock (stateGate)
         {
             IRelevantDrawable? nearest = null;
             double best = double.PositiveInfinity;
-            foreach (var drawable in _layers.GetAllRelevantDrawables())
+            foreach (var drawable in layers.GetAllRelevantDrawables())
             {
                 if (heldObjects is not null
                     && drawable.ParentObjects.Count > 0
                     && drawable.ParentObjects.All(parent => parent is RelevantHitObject hit && heldObjects.Contains(hit))) continue;
                 double distance = drawable.DistanceTo(cursor);
                 if (distance > range) continue;
-                distance -= RelevancyBias * Math.Clamp(drawable.Relevancy, 0, 1);
-                if (drawable is RelevantPoint) distance -= PointsBias;
-                if (specialPriority?.Invoke(drawable) == true) distance -= SpecialBias;
+                distance -= relevancy_bias * Math.Clamp(drawable.Relevancy, 0, 1);
+                if (drawable is RelevantPoint) distance -= points_bias;
+                if (specialPriority?.Invoke(drawable) == true) distance -= special_bias;
                 if (distance < best)
                 {
                     best = distance;
@@ -820,7 +820,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         Func<IRelevantDrawable, bool> read,
         Action<IRelevantDrawable, bool> write)
     {
-        lock (_stateGate)
+        lock (stateGate)
         {
             var values = objects.ToArray();
             bool target = enable || !disable && values.Any(value => !read(value));
@@ -838,15 +838,15 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     private void ToggleLockedObjects(bool enable, bool disable)
     {
-        lock (_stateGate)
+        lock (stateGate)
         {
-            var values = _layers.GetAllRelevantDrawables().ToArray();
+            var values = layers.GetAllRelevantDrawables().ToArray();
             bool target = enable || !disable && values.Any(value => !value.IsLocked);
             if (disable) target = false;
 
             if (target)
                 foreach (var value in values.Where(value => !value.IsLocked))
-                    _layers.GetRootLayer().Add(value.GetLockedRelevantObject());
+                    layers.GetRootLayer().Add(value.GetLockedRelevantObject());
             else
                 foreach (var value in values.Where(value => value.IsLocked))
                     value.Dispose();
@@ -857,11 +857,11 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     private void Regenerate()
     {
-        lock (_stateGate)
+        lock (stateGate)
         {
-            _layers.GetRootLayer().GenerateNewObjects(true);
-            _overlay?.SetFrame(BuildFrame());
-            _overlay?.Invalidate();
+            layers.GetRootLayer().GenerateNewObjects(true);
+            overlay?.SetFrame(BuildFrame());
+            overlay?.Invalidate();
             NotifyPropertyChanged(nameof(DrawableCount));
             NotifyPropertyChanged(nameof(SelectedCount));
         }
@@ -869,37 +869,37 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     private void ApplyPreferences()
     {
-        lock (_stateGate)
+        lock (stateGate)
         {
-            _converter.EditorBoxOffset = Preferences.OverlayOffset;
-            _layers.AcceptableDifference = Preferences.AcceptableDifference;
-            _layers.SetInceptionLevel(Preferences.InceptionLevel);
+            converter.EditorBoxOffset = Preferences.OverlayOffset;
+            layers.AcceptableDifference = Preferences.AcceptableDifference;
+            layers.SetInceptionLevel(Preferences.InceptionLevel);
             Regenerate();
         }
     }
 
     private void SetStatus(string value)
     {
-        _dispatcher.Post(() =>
+        dispatcher.Post(() =>
         {
-            if (!_disposed) Status = value;
+            if (!disposed) Status = value;
         });
     }
 
     private void NotifyPropertyChanged(string propertyName)
     {
-        _dispatcher.Post(() =>
+        dispatcher.Post(() =>
         {
-            if (!_disposed) OnPropertyChanged(propertyName);
+            if (!disposed) OnPropertyChanged(propertyName);
         });
     }
 
     private void LoadSaveSlot(SnappingToolsSaveSlot slot)
     {
-        _dispatcher.Post(() =>
+        dispatcher.Post(() =>
         {
-            if (_disposed) return;
-            lock (_stateGate)
+            if (disposed) return;
+            lock (stateGate)
             {
                 lock (Project)
                 {
@@ -913,18 +913,18 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     private void RefreshSaveSlotHotkeys()
     {
-        lock (_stateGate)
+        lock (stateGate)
         {
-            _activeSaveSlots.Clear();
+            activeSaveSlots.Clear();
         }
     }
 
     private RelevantObjectCollection GetLockedObjects()
     {
-        lock (_stateGate)
+        lock (stateGate)
         {
             RelevantObjectCollection collection = new();
-            foreach (var objectModel in _layers.GetAllRelevantObjects().Where(objectModel => objectModel.IsLocked))
+            foreach (var objectModel in layers.GetAllRelevantObjects().Where(objectModel => objectModel.IsLocked))
                 collection.GetOrCreate(objectModel.GetType()).Add(objectModel.GetLockedRelevantObject());
             return collection;
         }
@@ -932,9 +932,9 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     private void SetLockedObjects(RelevantObjectCollection objects)
     {
-        lock (_stateGate)
+        lock (stateGate)
         {
-            foreach (var values in objects.Values) _layers.GetRootLayer().Add(values.Select(value => value.GetLockedRelevantObject()));
+            foreach (var values in objects.Values) layers.GetRootLayer().Add(values.Select(value => value.GetLockedRelevantObject()));
             Regenerate();
         }
     }
@@ -969,13 +969,13 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     private static bool SameHitObject(HitObject first, HitObject second)
     {
-        return HitObjectComparer.Equals(first, second);
+        return hitObjectComparer.Equals(first, second);
     }
 
     private Dictionary<string, string> ReadConfig(string path)
     {
         return new Dictionary<string, string>(
-            _files.ReadAllLines(path)
+            files.ReadAllLines(path)
                 .Select(line => line.Split(['=', ':'], 2))
                 .Where(parts => parts.Length == 2)
                 .ToDictionary(parts => parts[0].Trim(), parts => parts[1].Trim(), StringComparer.OrdinalIgnoreCase),
@@ -1053,13 +1053,13 @@ public interface IGeometryDashboardDialogService
 /// <summary>Wraps one Core generator for compiled Avalonia bindings.</summary>
 public sealed partial class GeometryDashboardGeneratorViewModel : ObservableObject
 {
-    private readonly GeometryDashboardViewModel _owner;
+    private readonly GeometryDashboardViewModel owner;
 
     /// <summary>Creates a generator row.</summary>
     public GeometryDashboardGeneratorViewModel(RelevantObjectsGenerator model, GeometryDashboardViewModel owner)
     {
         Model = model ?? throw new ArgumentNullException(nameof(model));
-        _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
     }
 
     /// <summary>Gets the Core generator.</summary>
@@ -1078,7 +1078,7 @@ public sealed partial class GeometryDashboardGeneratorViewModel : ObservableObje
     [RelayCommand]
     private Task OpenSettingsAsync()
     {
-        return _owner.ShowGeneratorSettingsAsync(this);
+        return owner.ShowGeneratorSettingsAsync(this);
     }
 }
 

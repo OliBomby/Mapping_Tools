@@ -9,7 +9,7 @@ namespace Mapping_Tools.Desktop.Converters;
 /// </summary>
 public sealed class ConstantTimeSpanConverter : IValueConverter
 {
-    private static readonly ApplicationConstantTimeSpanConverter Converter = new();
+    private static readonly ApplicationConstantTimeSpanConverter converter = new();
 
     /// <inheritdoc />
     public object Convert(
@@ -23,7 +23,7 @@ public sealed class ConstantTimeSpanConverter : IValueConverter
             targetType,
             parameter,
             culture,
-            Converter);
+            converter);
     }
 
     /// <inheritdoc />
@@ -38,6 +38,6 @@ public sealed class ConstantTimeSpanConverter : IValueConverter
             targetType,
             parameter,
             culture,
-            Converter);
+            converter);
     }
 }

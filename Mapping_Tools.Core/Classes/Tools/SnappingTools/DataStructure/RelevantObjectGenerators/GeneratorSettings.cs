@@ -7,7 +7,7 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
 /// <summary>Serializable, frontend-neutral settings shared by all geometry generators.</summary>
 public class GeneratorSettings : ICloneable
 {
-    private SelectionPredicateCollection _inputPredicate = new();
+    private SelectionPredicateCollection inputPredicate = new();
 
     /// <summary>Creates settings with the legacy inactive/default selection behavior.</summary>
     public GeneratorSettings()
@@ -41,7 +41,7 @@ public class GeneratorSettings : ICloneable
     public bool GeneratesInheritable { get; set; } = true;
 
     /// <summary>Gets or sets the OR-combined input selection predicates.</summary>
-    public SelectionPredicateCollection InputPredicate { get => _inputPredicate; set => _inputPredicate = value ?? new SelectionPredicateCollection(); }
+    public SelectionPredicateCollection InputPredicate { get => inputPredicate; set => inputPredicate = value ?? new SelectionPredicateCollection(); }
 
     /// <inheritdoc />
     public virtual object Clone()

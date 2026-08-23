@@ -9,16 +9,16 @@ namespace Mapping_Tools.Application.Execution;
 /// </summary>
 public sealed class ToolExecutionService : IToolExecutionService
 {
-    private readonly object _gate = new();
-    private readonly IUserNotificationService _notifications;
-    private readonly IEditorReloadService _reloadService;
+    private readonly object gate = new();
+    private readonly IUserNotificationService notifications;
+    private readonly IEditorReloadService reloadService;
 
-    private readonly Dictionary<string, RunningOperation> _running =
+    private readonly Dictionary<string, RunningOperation> running =
         new(StringComparer.Ordinal);
 
-    private readonly ApplicationSettings _settings;
-    private readonly CancellationTokenSource _stopping = new();
-    private readonly TimeProvider _timeProvider;
+    private readonly ApplicationSettings settings;
+    private readonly CancellationTokenSource stopping = new();
+    private readonly TimeProvider timeProvider;
 
     /// <summary>
     ///     Creates the coordinator that owns duplicate-run prevention, application
@@ -34,14 +34,14 @@ public sealed class ToolExecutionService : IToolExecutionService
         ApplicationSettings settings,
         TimeProvider timeProvider)
     {
-        _notifications = notifications
-                         ?? throw new ArgumentNullException(nameof(notifications));
-        _reloadService = reloadService
-                         ?? throw new ArgumentNullException(nameof(reloadService));
-        _settings = settings
-                    ?? throw new ArgumentNullException(nameof(settings));
-        _timeProvider = timeProvider
-                        ?? throw new ArgumentNullException(nameof(timeProvider));
+        this.notifications = notifications
+                             ?? throw new ArgumentNullException(nameof(notifications));
+        this.reloadService = reloadService
+                             ?? throw new ArgumentNullException(nameof(reloadService));
+        this.settings = settings
+                        ?? throw new ArgumentNullException(nameof(settings));
+        this.timeProvider = timeProvider
+                            ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
     /// <inheritdoc />
@@ -51,14 +51,14 @@ public sealed class ToolExecutionService : IToolExecutionService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var startedAt = _timeProvider.GetUtcNow();
+        var startedAt = timeProvider.GetUtcNow();
         var linked = CancellationTokenSource.CreateLinkedTokenSource(
             cancellationToken,
-            _stopping.Token);
+            stopping.Token);
 
-        lock (_gate)
+        lock (gate)
         {
-            if (_running.ContainsKey(request.OperationId))
+            if (running.ContainsKey(request.OperationId))
             {
                 linked.Dispose();
                 return Task.FromResult(
@@ -76,7 +76,7 @@ public sealed class ToolExecutionService : IToolExecutionService
                 progress,
                 linked,
                 startedAt);
-            _running.Add(
+            running.Add(
                 request.OperationId,
                 new RunningOperation(linked, task));
             return task;
@@ -88,9 +88,9 @@ public sealed class ToolExecutionService : IToolExecutionService
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(operationId);
         RunningOperation operation;
-        lock (_gate)
+        lock (gate)
         {
-            if (!_running.TryGetValue(operationId, out operation!)) return false;
+            if (!running.TryGetValue(operationId, out operation!)) return false;
         }
 
         operation.TryCancel();
@@ -101,21 +101,21 @@ public sealed class ToolExecutionService : IToolExecutionService
     public bool IsRunning(string operationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(operationId);
-        lock (_gate)
+        lock (gate)
         {
-            return _running.ContainsKey(operationId);
+            return running.ContainsKey(operationId);
         }
     }
 
     /// <inheritdoc />
     public async Task StopAsync(CancellationToken cancellationToken = default)
     {
-        _stopping.Cancel();
+        stopping.Cancel();
         Task[] tasks;
         RunningOperation[] operations;
-        lock (_gate)
+        lock (gate)
         {
-            operations = _running.Values.ToArray();
+            operations = running.Values.ToArray();
             tasks = operations.Select(operation => operation.Task).ToArray();
         }
 
@@ -143,9 +143,9 @@ public sealed class ToolExecutionService : IToolExecutionService
             linked.Token.ThrowIfCancellationRequested();
 
             bool reloaded = false;
-            if (output.ReloadEditor && _settings.AutoReload)
+            if (output.ReloadEditor && settings.AutoReload)
             {
-                await _reloadService.ReloadAsync(linked.Token).ConfigureAwait(false);
+                await reloadService.ReloadAsync(linked.Token).ConfigureAwait(false);
                 reloaded = true;
             }
 
@@ -162,7 +162,7 @@ public sealed class ToolExecutionService : IToolExecutionService
                 output.Value,
                 null,
                 startedAt,
-                _timeProvider.GetUtcNow(),
+                timeProvider.GetUtcNow(),
                 reloaded);
         }
         catch (OperationCanceledException) when (linked.IsCancellationRequested)
@@ -172,7 +172,7 @@ public sealed class ToolExecutionService : IToolExecutionService
                 default,
                 null,
                 startedAt,
-                _timeProvider.GetUtcNow(),
+                timeProvider.GetUtcNow(),
                 false);
         }
         catch (Exception exception)
@@ -189,14 +189,14 @@ public sealed class ToolExecutionService : IToolExecutionService
                 default,
                 exception,
                 startedAt,
-                _timeProvider.GetUtcNow(),
+                timeProvider.GetUtcNow(),
                 false);
         }
         finally
         {
-            lock (_gate)
+            lock (gate)
             {
-                _running.Remove(request.OperationId);
+                running.Remove(request.OperationId);
             }
 
             linked.Dispose();
@@ -207,7 +207,7 @@ public sealed class ToolExecutionService : IToolExecutionService
     {
         try
         {
-            await _notifications.PublishAsync(
+            await notifications.PublishAsync(
                     notification,
                     CancellationToken.None)
                 .ConfigureAwait(false);

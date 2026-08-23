@@ -159,13 +159,13 @@ public sealed class HitsoundPreviewHelperServiceTests
 
     private sealed class RecordingGateway : IBeatmapEditingGateway
     {
-        private readonly int _selectedObjectCount;
-        private readonly Beatmap _source;
+        private readonly int selectedObjectCount;
+        private readonly Beatmap source;
 
         public RecordingGateway(int selectedObjectCount, bool bookmarkSecondObject = false)
         {
-            _selectedObjectCount = selectedObjectCount;
-            _source = new Beatmap(
+            this.selectedObjectCount = selectedObjectCount;
+            source = new Beatmap(
                 new List<HitObject>
                 {
                     new("64,96,1000,1,0,0:0:0:0:"),
@@ -173,7 +173,7 @@ public sealed class HitsoundPreviewHelperServiceTests
                 },
                 [],
                 globalSv: 1.4);
-            if (bookmarkSecondObject) _source.SetBookmarks([2000]);
+            if (bookmarkSecondObject) source.SetBookmarks([2000]);
         }
 
         public List<LiveBeatmapPreference> OpenPreferences { get; } = [];
@@ -190,14 +190,14 @@ public sealed class HitsoundPreviewHelperServiceTests
             cancellationToken.ThrowIfCancellationRequested();
             OpenPreferences.Add(livePreference);
             BeatmapEditor2 editor = new(
-                _source.GetLines(),
+                source.GetLines(),
                 new MemoryStore())
             {
                 Path = path,
             };
             LastBeatmap = editor.Beatmap;
             IReadOnlyList<HitObject> selected = editor.Beatmap.HitObjects
-                .Take(_selectedObjectCount)
+                .Take(selectedObjectCount)
                 .ToArray();
             return Task.FromResult(new BeatmapEditingSession(
                 editor,

@@ -6,7 +6,7 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
 /// <summary>Combines selection predicates using the legacy OR semantics.</summary>
 public sealed class SelectionPredicateCollection : IEquatable<SelectionPredicateCollection>, ICloneable
 {
-    private List<SelectionPredicate> _predicates = [];
+    private List<SelectionPredicate> predicates = [];
 
     /// <summary>Creates an empty collection, which accepts every object.</summary>
     public SelectionPredicateCollection()
@@ -16,8 +16,8 @@ public sealed class SelectionPredicateCollection : IEquatable<SelectionPredicate
     /// <summary>Gets or sets the ordered predicates in this collection.</summary>
     public List<SelectionPredicate> Predicates
     {
-        get => _predicates;
-        set => _predicates = value ?? [];
+        get => predicates;
+        set => predicates = value ?? [];
     }
 
     /// <inheritdoc />

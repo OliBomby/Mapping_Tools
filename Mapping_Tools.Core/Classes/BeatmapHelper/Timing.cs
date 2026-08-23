@@ -235,7 +235,7 @@ public class Timing : IList<TimingPoint>
                 var redline = redlines[i];
                 double beatDiff = lastRedline == firstRedline ? redline.Offset - startBeatTime : redline.Offset - lastRedline.Offset;
 
-                if (beatDiff * lastRedline.MpB > milliseconds + Precision.DoubleEpsilon) break;
+                if (beatDiff * lastRedline.MpB > milliseconds + Precision.DOUBLE_EPSILON) break;
 
                 milliseconds -= beatDiff * lastRedline.MpB;
                 beatTime += beatDiff;
@@ -255,7 +255,7 @@ public class Timing : IList<TimingPoint>
                 redline = redlines[i];
                 double beatDiff = redline.Offset - lastBeatTime;
 
-                if (beatDiff * redline.MpB < milliseconds - Precision.DoubleEpsilon) break;
+                if (beatDiff * redline.MpB < milliseconds - Precision.DOUBLE_EPSILON) break;
 
                 milliseconds -= beatDiff * redline.MpB;
                 beatTime += beatDiff;
@@ -291,7 +291,7 @@ public class Timing : IList<TimingPoint>
                 double msDiff = lastRedline == firstRedline ? redline.Offset - originTime : redline.Offset - lastRedline.Offset;
                 double beatDiff = round ? MultiSnapRound(msDiff / lastRedline.MpB, divisors) : msDiff / lastRedline.MpB;
 
-                if (beatDiff > beatTime + Precision.DoubleEpsilon) break;
+                if (beatDiff > beatTime + Precision.DOUBLE_EPSILON) break;
 
                 beatTime -= beatDiff;
                 ms += msDiff;
@@ -312,7 +312,7 @@ public class Timing : IList<TimingPoint>
                 double msDiff = redline.Offset - lastBeatTime;
                 double beatDiff = round ? MultiSnapRound(msDiff / redline.MpB, divisors) : msDiff / redline.MpB;
 
-                if (beatDiff < beatTime - Precision.DoubleEpsilon) break;
+                if (beatDiff < beatTime - Precision.DOUBLE_EPSILON) break;
 
                 beatTime -= beatDiff;
                 ms += msDiff;
@@ -901,13 +901,13 @@ public class Timing : IList<TimingPoint>
     {
         if (!inclusive)
         {
-            startTime += Precision.DoubleEpsilon;
-            endTime -= Precision.DoubleEpsilon;
+            startTime += Precision.DOUBLE_EPSILON;
+            endTime -= Precision.DOUBLE_EPSILON;
         }
         else
         {
-            startTime -= Precision.DoubleEpsilon;
-            endTime += Precision.DoubleEpsilon;
+            startTime -= Precision.DOUBLE_EPSILON;
+            endTime += Precision.DOUBLE_EPSILON;
         }
 
         int startIndex = BinarySearchUtil.BinarySearch(timingPoints, startTime, tp => tp.Offset, BinarySearchUtil.EqualitySelection.Leftmost);

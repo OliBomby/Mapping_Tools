@@ -97,11 +97,11 @@ public class Reconstructor
         var segmentDir = end - start;
         Matrix2 transform;
 
-        if (hintDir.LengthSquared < Precision.DoubleEpsilon && segmentDir.LengthSquared < Precision.DoubleEpsilon)
+        if (hintDir.LengthSquared < Precision.DOUBLE_EPSILON && segmentDir.LengthSquared < Precision.DOUBLE_EPSILON)
             transform = Matrix2.CreateRotation(-theta);
-        else if (hintDir.LengthSquared < Precision.DoubleEpsilon)
+        else if (hintDir.LengthSquared < Precision.DOUBLE_EPSILON)
             transform = Matrix2.CreateRotation(segmentDir.Theta);
-        else if (segmentDir.LengthSquared < Precision.DoubleEpsilon)
+        else if (segmentDir.LengthSquared < Precision.DOUBLE_EPSILON)
             transform = Matrix2.CreateRotation(hintDir.Theta - theta);
         else
             // Scale along the axis of hintDir

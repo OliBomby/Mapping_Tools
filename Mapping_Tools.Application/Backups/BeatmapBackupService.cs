@@ -12,16 +12,16 @@ namespace Mapping_Tools.Application.Backups;
 /// </summary>
 public sealed class BeatmapBackupService : IBeatmapBackupService
 {
-    private readonly SemaphoreSlim _operationLock = new(1, 1);
+    private readonly SemaphoreSlim operationLock = new(1, 1);
 
-    private readonly Dictionary<string, string> _periodicHashes =
+    private readonly Dictionary<string, string> periodicHashes =
         new(StringComparer.Ordinal);
 
-    private readonly IEditorReloadService _reloadService;
-    private readonly ApplicationSettings _settings;
-    private readonly IBeatmapBackupStore _store;
-    private readonly ITextFileStore _textFileStore;
-    private readonly TimeProvider _timeProvider;
+    private readonly IEditorReloadService reloadService;
+    private readonly ApplicationSettings settings;
+    private readonly IBeatmapBackupStore store;
+    private readonly ITextFileStore textFileStore;
+    private readonly TimeProvider timeProvider;
 
     /// <summary>
     ///     Creates a process-lifetime backup coordinator whose serialization lock
@@ -39,11 +39,11 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         ApplicationSettings settings,
         TimeProvider timeProvider)
     {
-        _store = store ?? throw new ArgumentNullException(nameof(store));
-        _textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
-        _reloadService = reloadService ?? throw new ArgumentNullException(nameof(reloadService));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+        this.store = store ?? throw new ArgumentNullException(nameof(store));
+        this.textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
+        this.reloadService = reloadService ?? throw new ArgumentNullException(nameof(reloadService));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
     /// <inheritdoc />
@@ -70,13 +70,13 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
     {
         ArgumentNullException.ThrowIfNull(session);
         cancellationToken.ThrowIfCancellationRequested();
-        if (!force && !_settings.MakeBackups) return new BeatmapBackupResult([], true);
+        if (!force && !settings.MakeBackups) return new BeatmapBackupResult([], true);
 
-        await _operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        await operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
             EnsureBackupDirectory();
-            var createdAt = _timeProvider.GetLocalNow();
+            var createdAt = timeProvider.GetLocalNow();
             var disk = await CopySourceAsync(
                     session.Editor.Path,
                     reason,
@@ -105,7 +105,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         }
         finally
         {
-            _operationLock.Release();
+            operationLock.Release();
         }
     }
 
@@ -116,20 +116,20 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
     {
         ArgumentNullException.ThrowIfNull(session);
         cancellationToken.ThrowIfCancellationRequested();
-        if (!_settings.MakePeriodicBackups) return null;
+        if (!settings.MakePeriodicBackups) return null;
 
         IReadOnlyList<string> lines = session.Editor.Beatmap.GetLines();
         string hash = ComputeHash(lines);
         cancellationToken.ThrowIfCancellationRequested();
 
-        await _operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        await operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            if (_periodicHashes.TryGetValue(session.Editor.Path, out string? previous) && string.Equals(previous, hash, StringComparison.Ordinal))
+            if (periodicHashes.TryGetValue(session.Editor.Path, out string? previous) && string.Equals(previous, hash, StringComparison.Ordinal))
                 return null;
 
             EnsureBackupDirectory();
-            var createdAt = _timeProvider.GetLocalNow();
+            var createdAt = timeProvider.GetLocalNow();
             // Save temp version
             var artifact = await WriteSnapshotAsync(
                     session.Editor.Path,
@@ -139,14 +139,14 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
                     false,
                     cancellationToken)
                 .ConfigureAwait(false);
-            _periodicHashes[session.Editor.Path] = hash;
+            periodicHashes[session.Editor.Path] = hash;
             await PruneAsync([artifact.Path], cancellationToken)
                 .ConfigureAwait(false);
             return artifact;
         }
         finally
         {
-            _operationLock.Release();
+            operationLock.Release();
         }
     }
 
@@ -174,7 +174,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         var safetyArtifact = safety.Artifacts.Single();
 
         cancellationToken.ThrowIfCancellationRequested();
-        await _store.CopyAsync(
+        await store.CopyAsync(
                 backupPath,
                 destinationPath,
                 cancellationToken)
@@ -183,7 +183,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         if (reloadEditor)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await _reloadService.ReloadAsync(cancellationToken).ConfigureAwait(false);
+            await reloadService.ReloadAsync(cancellationToken).ConfigureAwait(false);
         }
 
         return new BeatmapRestoreResult(
@@ -201,8 +201,8 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(destinationPath);
         EnsureBackupDirectory();
-        var backups = await _store
-            .ListAsync(_settings.BackupsPath, cancellationToken)
+        var backups = await store
+            .ListAsync(settings.BackupsPath, cancellationToken)
             .ConfigureAwait(false);
         var newest = backups.FirstOrDefault();
         if (newest is null) return null;
@@ -231,13 +231,13 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
                 nameof(sourcePaths));
 
         cancellationToken.ThrowIfCancellationRequested();
-        if (!force && !_settings.MakeBackups) return new BeatmapBackupResult([], true);
+        if (!force && !settings.MakeBackups) return new BeatmapBackupResult([], true);
 
-        await _operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        await operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
             EnsureBackupDirectory();
-            var createdAt = _timeProvider.GetLocalNow();
+            var createdAt = timeProvider.GetLocalNow();
             List<BeatmapBackupArtifact> artifacts = [];
             foreach (string path in paths)
             {
@@ -262,7 +262,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         }
         finally
         {
-            _operationLock.Release();
+            operationLock.Release();
         }
     }
 
@@ -270,7 +270,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         string path,
         IReadOnlyList<string> serializedLines)
     {
-        var diskLines = _textFileStore.ReadAllLines(path);
+        var diskLines = textFileStore.ReadAllLines(path);
         return diskLines.SequenceEqual(serializedLines, StringComparer.Ordinal);
     }
 
@@ -280,7 +280,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         DateTimeOffset createdAt,
         CancellationToken cancellationToken)
     {
-        if (!_store.FileExists(sourcePath))
+        if (!store.FileExists(sourcePath))
             throw new FileNotFoundException(
                 "The beatmap selected for backup does not exist.",
                 sourcePath);
@@ -291,7 +291,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
             createdAt,
             false);
         // Save normal copy
-        await _store.CopyAsync(
+        await store.CopyAsync(
                 sourcePath,
                 destination,
                 cancellationToken)
@@ -317,7 +317,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
             reason,
             createdAt,
             liveCompanion);
-        await _store.WriteLinesAsync(destination, lines, cancellationToken)
+        await store.WriteLinesAsync(destination, lines, cancellationToken)
             .ConfigureAwait(false);
         return new BeatmapBackupArtifact(
             destination,
@@ -343,13 +343,13 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         };
         string separator = liveCompanion ? "_2_" : "__";
         string prefix = $"{createdAt:yyyy-MM-dd HH-mm-ss}_{code}";
-        string fileName = _store.GetFileName(sourcePath);
-        string destination = _store.Combine(
-            _settings.BackupsPath,
+        string fileName = store.GetFileName(sourcePath);
+        string destination = store.Combine(
+            settings.BackupsPath,
             $"{prefix}{separator}{fileName}");
-        for (int collision = 2; _store.FileExists(destination); collision++)
-            destination = _store.Combine(
-                _settings.BackupsPath,
+        for (int collision = 2; store.FileExists(destination); collision++)
+            destination = store.Combine(
+                settings.BackupsPath,
                 $"{prefix}_C{collision}_{fileName}");
 
         return destination;
@@ -360,20 +360,20 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         string destinationPath,
         bool allowDifferentFilename)
     {
-        if (!_store.FileExists(backupPath))
+        if (!store.FileExists(backupPath))
             throw new FileNotFoundException(
                 "The selected backup does not exist.",
                 backupPath);
 
-        if (!_store.FileExists(destinationPath))
+        if (!store.FileExists(destinationPath))
             throw new FileNotFoundException(
                 "The restore destination does not exist.",
                 destinationPath);
 
         if (allowDifferentFilename) return;
 
-        BeatmapEditor2 backup = new(backupPath, _textFileStore);
-        BeatmapEditor2 destination = new(destinationPath, _textFileStore);
+        BeatmapEditor2 backup = new(backupPath, textFileStore);
+        BeatmapEditor2 destination = new(destinationPath, textFileStore);
         string backupFileName = backup.Beatmap.GetFileName();
         string destinationFileName = destination.Beatmap.GetFileName();
         if (!string.Equals(
@@ -392,9 +392,9 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
         HashSet<string> retained = new(
             protectedPaths,
             StringComparer.Ordinal);
-        int limit = Math.Max(Math.Max(0, _settings.MaxBackupFiles), retained.Count);
-        var backups = await _store
-            .ListAsync(_settings.BackupsPath, cancellationToken)
+        int limit = Math.Max(Math.Max(0, settings.MaxBackupFiles), retained.Count);
+        var backups = await store
+            .ListAsync(settings.BackupsPath, cancellationToken)
             .ConfigureAwait(false);
         foreach (var backup in backups)
         {
@@ -407,16 +407,16 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            await _store.DeleteAsync(backup.Path, cancellationToken)
+            await store.DeleteAsync(backup.Path, cancellationToken)
                 .ConfigureAwait(false);
         }
     }
 
     private void EnsureBackupDirectory()
     {
-        if (!_store.DirectoryExists(_settings.BackupsPath))
+        if (!store.DirectoryExists(settings.BackupsPath))
             throw new DirectoryNotFoundException(
-                $"The configured backups folder '{_settings.BackupsPath}' does not exist.");
+                $"The configured backups folder '{settings.BackupsPath}' does not exist.");
     }
 
     private static string ComputeHash(IReadOnlyList<string> lines)

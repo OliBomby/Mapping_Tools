@@ -71,13 +71,13 @@ public struct Circle : IEquatable<Circle>
         double c = d2 * p1 - d1 * p2 - d2 * c1 + d1 * c2;
         double disc = r * r * ds - c * c;
 
-        if (disc <= -Precision.DoubleEpsilon * 10)
+        if (disc <= -Precision.DOUBLE_EPSILON * 10)
         {
             intersections = new Vector2[0];
             return false;
         }
 
-        if (Math.Abs(disc) < Precision.DoubleEpsilon * 10)
+        if (Math.Abs(disc) < Precision.DOUBLE_EPSILON * 10)
         {
             intersections = new Vector2[1] { new(c * d2 / ds + c1, -c * d1 / ds + c2) };
             return true;
@@ -113,7 +113,7 @@ public struct Circle : IEquatable<Circle>
         var p2 = left.Centre + a * (right.Centre - left.Centre) / d;
         double h = Math.Sqrt(left.Radius * left.Radius - a * a);
 
-        if (Math.Abs(d - (left.Radius + right.Radius)) < Precision.DoubleEpsilon)
+        if (Math.Abs(d - (left.Radius + right.Radius)) < Precision.DOUBLE_EPSILON)
         {
             // One solution
             intersections = new[]

@@ -78,7 +78,7 @@ public class PathGenerator
             var diff = point - path.Last();
             double dist = diff.Length;
 
-            if (dist < Precision.DoubleEpsilon) continue;
+            if (dist < Precision.DOUBLE_EPSILON) continue;
 
             path.Add(point);
             this.diff.Add(diff);
@@ -161,7 +161,7 @@ public class PathGenerator
         var p1 = GetContinuousPosition(startIndex);
         var p2 = GetContinuousPosition(endIndex);
 
-        const int numTestPoints = 100;
+        const int num_test_points = 100;
         var labels = path.GetRange((int)startIndex, (int)Math.Ceiling(endIndex) - (int)startIndex + 1);
 
         Vector2?[] middles =
@@ -177,10 +177,10 @@ public class PathGenerator
         {
             var bezier = new BezierCurveQuadric(p1, p2, middle ?? (p2 - p1) / 2);
 
-            var interpolatedPoints = new Vector2[numTestPoints];
-            for (int i = 0; i < numTestPoints; i++)
+            var interpolatedPoints = new Vector2[num_test_points];
+            for (int i = 0; i < num_test_points; i++)
             {
-                double t = (double)i / (numTestPoints - 1);
+                double t = (double)i / (num_test_points - 1);
                 interpolatedPoints[i] = bezier.CalculatePoint(t);
             }
 
@@ -202,7 +202,7 @@ public class PathGenerator
         var p2 = GetContinuousPosition(endIndex);
 
         double a1 = GetContinuousAngle(startIndex);
-        double a2 = GetContinuousAngle(endIndex - 2 * Precision.DoubleEpsilon);
+        double a2 = GetContinuousAngle(endIndex - 2 * Precision.DOUBLE_EPSILON);
 
         if (Math.Abs(GetSmallestAngle(a1, a2)) > 0.1)
         {
@@ -278,8 +278,8 @@ public class PathGenerator
             //Console.WriteLine("Angle change: " + angleChange);
 
             // Check for inflection point or red anchors
-            if (angleChange * lastAngleChange < -Precision.DoubleEpsilon && Math.Abs(startSubRange - i) > 1
-                || (pos - pos.Rounded()).LengthSquared < Precision.DoubleEpsilon && Math.Abs(angleChange) > Precision.DoubleEpsilon)
+            if (angleChange * lastAngleChange < -Precision.DOUBLE_EPSILON && Math.Abs(startSubRange - i) > 1
+                || (pos - pos.Rounded()).LengthSquared < Precision.DOUBLE_EPSILON && Math.Abs(angleChange) > Precision.DOUBLE_EPSILON)
             {
                 subRanges.Add(new Tuple<double, double, double>(startSubRange, i, subRangeAngleChange));
 
@@ -317,7 +317,7 @@ public class PathGenerator
             lastAngleChange = angleChange;
         }
 
-        if (Math.Abs(startSubRange - endIndex) > Precision.DoubleEpsilon) subRanges.Add(new Tuple<double, double, double>(startSubRange, endIndex, subRangeAngleChange));
+        if (Math.Abs(startSubRange - endIndex) > Precision.DOUBLE_EPSILON) subRanges.Add(new Tuple<double, double, double>(startSubRange, endIndex, subRangeAngleChange));
 
         // Remove all sub-ranges which start and end on the same index or start at a later index
         subRanges.RemoveAll(s => s.Item1 >= s.Item2);
@@ -347,7 +347,7 @@ public class PathGenerator
 
                 segmentAngleChange += Math.Abs(angleChange);
 
-                if (segmentAngleChange > maxSegmentAngle + Precision.DoubleEpsilon)
+                if (segmentAngleChange > maxSegmentAngle + Precision.DOUBLE_EPSILON)
                 {
                     segments.Add(new Tuple<double, double>(startSegment, i));
                     //Console.WriteLine($"Adding segment for angle: {startSegment} to {i}");
@@ -359,7 +359,7 @@ public class PathGenerator
                 lastAngle = angle;
             }
 
-            if (Math.Abs(startSegment - subRange.Item2) > Precision.DoubleEpsilon) segments.Add(new Tuple<double, double>(startSegment, subRange.Item2));
+            if (Math.Abs(startSegment - subRange.Item2) > Precision.DOUBLE_EPSILON) segments.Add(new Tuple<double, double>(startSegment, subRange.Item2));
             //Console.WriteLine($"Adding segment at the end: {startSegment}, {subRange.Item2}");
         }
 
@@ -390,8 +390,8 @@ public class PathGenerator
         int segmentIndex = (int)Math.Floor(index);
         double segmentProgression = index - segmentIndex;
 
-        return Math.Abs(segmentProgression) < Precision.DoubleEpsilon ? path[segmentIndex] :
-            Math.Abs(segmentProgression - 1) < Precision.DoubleEpsilon ? path[segmentIndex + 1] :
+        return Math.Abs(segmentProgression) < Precision.DOUBLE_EPSILON ? path[segmentIndex] :
+            Math.Abs(segmentProgression - 1) < Precision.DOUBLE_EPSILON ? path[segmentIndex + 1] :
             Vector2.Lerp(path[segmentIndex], path[segmentIndex + 1], segmentProgression);
     }
 
@@ -402,7 +402,7 @@ public class PathGenerator
     /// <returns>The clamped segment angle in radians.</returns>
     public double GetContinuousAngle(double index)
     {
-        int segmentIndex = MathHelper.Clamp((int)Math.Floor(index + Precision.DoubleEpsilon), 0, angle.Count - 1);
+        int segmentIndex = MathHelper.Clamp((int)Math.Floor(index + Precision.DOUBLE_EPSILON), 0, angle.Count - 1);
 
         return angle[segmentIndex];
     }
@@ -417,8 +417,8 @@ public class PathGenerator
         int segmentIndex = (int)Math.Floor(index);
         double segmentProgression = index - segmentIndex;
 
-        return Math.Abs(segmentProgression) < Precision.DoubleEpsilon ? pathL[segmentIndex] :
-            Math.Abs(segmentProgression - 1) < Precision.DoubleEpsilon ? pathL[segmentIndex + 1] :
+        return Math.Abs(segmentProgression) < Precision.DOUBLE_EPSILON ? pathL[segmentIndex] :
+            Math.Abs(segmentProgression - 1) < Precision.DOUBLE_EPSILON ? pathL[segmentIndex + 1] :
             (1 - segmentProgression) * pathL[segmentIndex] + segmentProgression * pathL[segmentIndex + 1];
     }
 

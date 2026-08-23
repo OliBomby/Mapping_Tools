@@ -7,9 +7,9 @@ namespace Mapping_Tools.Application.MapCleaner;
 /// <summary>Runs cleaner transformations over live-aware sessions and persists each through safety copies.</summary>
 public sealed class MapCleanerService : IMapCleanerService
 {
-    private readonly IBeatmapEditingGateway _editingGateway;
-    private readonly IBeatmapFileSystem _fileSystem;
-    private readonly IMapCleanerSampleService _samples;
+    private readonly IBeatmapEditingGateway editingGateway;
+    private readonly IBeatmapFileSystem fileSystem;
+    private readonly IMapCleanerSampleService samples;
 
     /// <summary>Creates a service that cleans beatmaps and their mapset samples.</summary>
     /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
@@ -20,9 +20,9 @@ public sealed class MapCleanerService : IMapCleanerService
         IBeatmapFileSystem fileSystem,
         IMapCleanerSampleService samples)
     {
-        _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
-        _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-        _samples = samples ?? throw new ArgumentNullException(nameof(samples));
+        this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+        this.samples = samples ?? throw new ArgumentNullException(nameof(samples));
     }
 
     /// <inheritdoc />
@@ -41,12 +41,12 @@ public sealed class MapCleanerService : IMapCleanerService
         {
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
-            string directory = _fileSystem.GetParentDirectory(path) ?? throw new InvalidOperationException($"Could not resolve the folder for '{path}'.");
-            var session = await _editingGateway.OpenBeatmapAsync(
+            string directory = fileSystem.GetParentDirectory(path) ?? throw new InvalidOperationException($"Could not resolve the folder for '{path}'.");
+            var session = await editingGateway.OpenBeatmapAsync(
                 path,
                 LiveBeatmapPreference.PreferLive,
                 cancellationToken).ConfigureAwait(false);
-            var samples = await _samples.AnalyzeAsync(
+            var samples = await this.samples.AnalyzeAsync(
                 directory,
                 options.AnalyzeSamples,
                 cancellationToken).ConfigureAwait(false);
@@ -62,11 +62,11 @@ public sealed class MapCleanerService : IMapCleanerService
                 mapProgress,
                 cancellationToken);
             // Save the file
-            await _editingGateway.SaveAsync(
+            await editingGateway.SaveAsync(
                 session,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
             int removedSamples = options.RemoveUnusedSamples
-                ? await _samples.MoveUnusedToRecoveryAsync(
+                ? await this.samples.MoveUnusedToRecoveryAsync(
                     directory,
                     path,
                     session.Editor.Beatmap,

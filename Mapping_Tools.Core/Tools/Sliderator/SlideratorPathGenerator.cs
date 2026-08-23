@@ -53,7 +53,7 @@ public sealed class SlideratorPathGenerator
         {
             var delta = point - path[^1];
             double length = delta.Length;
-            if (length < Precision.DoubleEpsilon) continue;
+            if (length < Precision.DOUBLE_EPSILON) continue;
 
             path.Add(point);
             diff.Add(delta);
@@ -63,7 +63,7 @@ public sealed class SlideratorPathGenerator
             pathL.Add(sum);
         }
 
-        if (Math.Abs(sum) < Precision.DoubleEpsilon) throw new InvalidOperationException("Zero length path.");
+        if (Math.Abs(sum) < Precision.DOUBLE_EPSILON) throw new InvalidOperationException("Zero length path.");
 
         // Add last member again so these lists have the same number of elements as path
         diff.Add(diff[^1]);
@@ -90,7 +90,7 @@ public sealed class SlideratorPathGenerator
         if (!double.IsFinite(deltaT) || deltaT <= 0) throw new ArgumentOutOfRangeException(nameof(deltaT));
 
         List<Vector2> points = [];
-        for (double time = 0; time <= MaxT + Precision.DoubleEpsilon; time += deltaT) points.Add(PositionAt(PositionFunction(time)).Rounded());
+        for (double time = 0; time <= MaxT + Precision.DOUBLE_EPSILON; time += deltaT) points.Add(PositionAt(PositionFunction(time)).Rounded());
 
         return points;
     }
@@ -137,7 +137,7 @@ public sealed class SlideratorPathGenerator
         for (int index = 0; index < diff.Count - 1; index++)
         {
             double length = diffL[index];
-            if (Math.Abs(length) < Precision.DoubleEpsilon)
+            if (Math.Abs(length) < Precision.DOUBLE_EPSILON)
                 // Skip segment if degenerate
                 continue;
 
@@ -163,7 +163,7 @@ public sealed class SlideratorPathGenerator
                 double error = (latticePoint - projectedPoint).Length;
                 double perpendicularError = (j - minor) * delta[majorAxis] / length * (1 - 2 * majorAxis);
 
-                if (error > tolerance || Math.Abs(projected - 1) < Precision.DoubleEpsilon && index + 1 < diff.Count)
+                if (error > tolerance || Math.Abs(projected - 1) < Precision.DOUBLE_EPSILON && index + 1 < diff.Count)
                     continue;
 
                 if (points.Count > 0 && latticePoint == points[^1].Pos)
@@ -208,9 +208,9 @@ public sealed class SlideratorPathGenerator
     private void GenerateNeurons()
     {
         // These values are placeholders. Experimentation has to be done to find better parameters
-        const double maxOvershot = 32;
+        const double max_overshot = 32;
         const double epsilon = 0.01;
-        const double deltaT = 0.02;
+        const double delta_t = 0.02;
         slider = [];
 
         double actualLength = 0;
@@ -218,7 +218,7 @@ public sealed class SlideratorPathGenerator
         double nucleusWantedLength = 0;
         int lastDirection = 1;
         Neuron current = new(lattice.First(), 0);
-        for (double time = 0; time <= MaxT; time += deltaT)
+        for (double time = 0; time <= MaxT; time += delta_t)
         {
             double clampedTime = Math.Min(time, MaxT);
             double wantedLength = PositionFunction(clampedTime);
@@ -239,13 +239,13 @@ public sealed class SlideratorPathGenerator
                 slider.Add(current);
                 current = next;
                 nucleusWantedLength = wantedLength;
-                nucleusTime = clampedTime - deltaT;
+                nucleusTime = clampedTime - delta_t;
             }
 
             actualLength = (clampedTime - nucleusTime) * Velocity;
             double lengthError = Math.Abs(Math.Abs(wantedLength - nucleusWantedLength) - actualLength) - current.Error;
             // Make a new neuron when the error in the length becomes too large
-            if (lengthError > Math.Max(MinDendriteLength, velocity * maxOvershot)
+            if (lengthError > Math.Max(MinDendriteLength, velocity * max_overshot)
                 || nearest.Error < 0.05 && lengthError > Math.Max(MinDendriteLength, velocity * MinDendriteLength))
             {
                 if ((nearest.Pos - current.Nucleus.Pos).LengthSquared > 0.1)
@@ -319,7 +319,7 @@ public sealed class SlideratorPathGenerator
         for (int offset = 0; offset < 10; offset++)
         {
             result = diff[MathHelper.Clamp(index + offset, 0, diff.Count - 1)];
-            if (Math.Abs(result.X) > Precision.DoubleEpsilon || Math.Abs(result.Y) > Precision.DoubleEpsilon) return result;
+            if (Math.Abs(result.X) > Precision.DOUBLE_EPSILON || Math.Abs(result.Y) > Precision.DOUBLE_EPSILON) return result;
         }
 
         return result;

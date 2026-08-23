@@ -251,13 +251,13 @@ public sealed class AudioInfrastructureTests
 
     private sealed class TemporaryDirectory : IDisposable
     {
-        private readonly DirectoryInfo _directory = Directory.CreateTempSubdirectory("mapping-tools-audio-");
+        private readonly DirectoryInfo directory = Directory.CreateTempSubdirectory("mapping-tools-audio-");
 
-        public string Path => _directory.FullName;
+        public string Path => directory.FullName;
 
         public void Dispose()
         {
-            if (_directory.Exists) _directory.Delete(true);
+            if (directory.Exists) directory.Delete(true);
         }
     }
 

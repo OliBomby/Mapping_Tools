@@ -48,9 +48,9 @@ public sealed class ObjectVisualiserControlTests
         // Arrange
         // Act
         // Assert
-        ObjectVisualiserControl.MaxPixelLength.Should().Be(1e6);
-        ObjectVisualiserControl.MaxSegmentCount.Should().Be(1e6);
-        ObjectVisualiserControl.MaxAnchorCount.Should().Be(1500);
-        ObjectVisualiserControl.HardMaxAnchorCount.Should().Be(5000);
+        ObjectVisualiserControl.MAX_PIXEL_LENGTH.Should().Be(1e6);
+        ObjectVisualiserControl.MAX_SEGMENT_COUNT.Should().Be(1e6);
+        ObjectVisualiserControl.MAX_ANCHOR_COUNT.Should().Be(1500);
+        ObjectVisualiserControl.HARD_MAX_ANCHOR_COUNT.Should().Be(5000);
     }
 }

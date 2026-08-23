@@ -20,13 +20,13 @@ namespace Mapping_Tools.Desktop.Interactions;
 /// <summary>Creates Geometry Dashboard dialogs without passing Window types to its view model.</summary>
 public sealed class GeometryDashboardDialogService : IGeometryDashboardDialogService
 {
-    private readonly Func<Window> _owner;
+    private readonly Func<Window> owner;
 
     /// <summary>Creates a dialog service owned by the shell window.</summary>
     /// <param name="owner">Returns the current shell window.</param>
     public GeometryDashboardDialogService(Func<Window> owner)
     {
-        _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
     }
 
     /// <inheritdoc />
@@ -35,7 +35,7 @@ public sealed class GeometryDashboardDialogService : IGeometryDashboardDialogSer
         GeometryDashboardPreferencesDialogViewModel viewModel = new(preferences);
         GeometryDashboardPreferencesWindow window = new() { DataContext = viewModel };
         viewModel.Close = result => window.Close(result);
-        return await window.ShowDialog<SnappingToolsPreferences?>(_owner());
+        return await window.ShowDialog<SnappingToolsPreferences?>(owner());
     }
 
     /// <inheritdoc />
@@ -47,7 +47,7 @@ public sealed class GeometryDashboardDialogService : IGeometryDashboardDialogSer
         GeometryDashboardProjectSlotsViewModel viewModel = new(project, loadSlot, refreshHotkeys);
         GeometryDashboardProjectWindow window = new() { DataContext = viewModel };
         viewModel.Close = window.Close;
-        window.Show(_owner());
+        window.Show(owner());
         await Task.CompletedTask;
     }
 
@@ -57,7 +57,7 @@ public sealed class GeometryDashboardDialogService : IGeometryDashboardDialogSer
         GeometryDashboardGeneratorSettingsDialogViewModel viewModel = new(settings);
         GeometryDashboardGeneratorSettingsWindow window = new() { DataContext = viewModel };
         viewModel.Close = result => window.Close(result);
-        object? result = await window.ShowDialog<object?>(_owner());
+        object? result = await window.ShowDialog<object?>(owner());
         return result is true;
     }
 }
@@ -249,7 +249,7 @@ public sealed partial class GeometryDashboardPreferencesDialogViewModel : Observ
 /// <summary>Edits one neutral geometry appearance group.</summary>
 public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
 {
-    private string? _pendingColorText;
+    private string? pendingColorText;
 
     /// <summary>Creates a row over one cloned appearance group.</summary>
     public GeometryDashboardPreferenceRowViewModel(RelevantObjectPreferences preference)
@@ -271,7 +271,7 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
         {
             Preference.Color = RgbaColour.FromArgb(value.A, value.R, value.G, value.B);
             ColorTextError = null;
-            _pendingColorText = null;
+            pendingColorText = null;
             OnPropertyChanged();
             OnPropertyChanged(nameof(ColorText));
             OnPropertyChanged(nameof(ColorTextError));
@@ -281,7 +281,7 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
     /// <summary>Gets or sets the serialized color text.</summary>
     public string ColorText
     {
-        get => _pendingColorText ?? Preference.Color.ToString();
+        get => pendingColorText ?? Preference.Color.ToString();
         set
         {
             string hex = (value ?? string.Empty).TrimStart('#');
@@ -294,12 +294,12 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
             {
                 Preference.Color = RgbaColour.FromArgb(a, r, g, b);
                 ColorTextError = null;
-                _pendingColorText = null;
+                pendingColorText = null;
             }
             else
             {
                 ColorTextError = "Color format error.";
-                _pendingColorText = value;
+                pendingColorText = value;
             }
 
             OnPropertyChanged(nameof(Color));
@@ -365,8 +365,8 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
 /// <summary>Edits ordered Geometry Dashboard save slots.</summary>
 public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableObject
 {
-    private readonly Action<SnappingToolsSaveSlot> _loadSlot;
-    private readonly Action _refreshHotkeys;
+    private readonly Action<SnappingToolsSaveSlot> loadSlot;
+    private readonly Action refreshHotkeys;
 
     /// <summary>Creates the save-slot editor over the live project.</summary>
     public GeometryDashboardProjectSlotsViewModel(
@@ -375,8 +375,8 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
         Action refreshHotkeys)
     {
         Project = project ?? throw new ArgumentNullException(nameof(project));
-        _loadSlot = loadSlot ?? throw new ArgumentNullException(nameof(loadSlot));
-        _refreshHotkeys = refreshHotkeys ?? throw new ArgumentNullException(nameof(refreshHotkeys));
+        this.loadSlot = loadSlot ?? throw new ArgumentNullException(nameof(loadSlot));
+        this.refreshHotkeys = refreshHotkeys ?? throw new ArgumentNullException(nameof(refreshHotkeys));
     }
 
     /// <summary>Gets the live project slots.</summary>
@@ -466,8 +466,8 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
     [RelayCommand]
     private void Load(SnappingToolsSaveSlot? slot = null)
     {
-        if (slot is not null) _loadSlot(slot);
-        else if (SelectedSlot is not null) _loadSlot(SelectedSlot);
+        if (slot is not null) loadSlot(slot);
+        else if (SelectedSlot is not null) loadSlot(SelectedSlot);
     }
 
     /// <summary>Saves current dashboard preferences into the selected slot.</summary>
@@ -485,7 +485,7 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
     [RelayCommand]
     private void RefreshHotkeys()
     {
-        _refreshHotkeys();
+        refreshHotkeys();
     }
 }
 
@@ -603,31 +603,31 @@ public sealed partial class GeometryDashboardGeneratorSettingsDialogViewModel : 
 /// <summary>Provides a reflected generator property to Avalonia bindings.</summary>
 public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableObject
 {
-    private readonly PropertyInfo _property;
-    private readonly GeneratorSettings _settings;
-    private string? _pendingValueText;
+    private readonly PropertyInfo property;
+    private readonly GeneratorSettings settings;
+    private string? pendingValueText;
 
     /// <summary>Creates one reflected property row.</summary>
     public GeometryDashboardGeneratorSettingRowViewModel(GeneratorSettings settings, PropertyInfo property)
     {
-        _settings = settings;
-        _property = property;
+        this.settings = settings;
+        this.property = property;
     }
 
     /// <summary>Gets the property display name.</summary>
-    public string Name => _property.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? _property.Name;
+    public string Name => property.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? property.Name;
 
     /// <summary>Gets the explanatory tooltip declared by the Core setting.</summary>
-    public string? Description => _property.GetCustomAttribute<DescriptionAttribute>()?.Description;
+    public string? Description => property.GetCustomAttribute<DescriptionAttribute>()?.Description;
 
     /// <summary>Gets the underlying property value.</summary>
     public object? Value
     {
-        get => _property.GetValue(_settings);
+        get => property.GetValue(settings);
         set
         {
-            _property.SetValue(_settings, value);
-            _pendingValueText = null;
+            property.SetValue(settings, value);
+            pendingValueText = null;
             ValueTextError = null;
             OnPropertyChanged();
             OnPropertyChanged(nameof(ValueText));
@@ -638,32 +638,32 @@ public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableOb
     /// <summary>Gets or parses the reflected value using invariant text.</summary>
     public string ValueText
     {
-        get => _pendingValueText ?? Convert.ToString(Value, CultureInfo.InvariantCulture) ?? string.Empty;
+        get => pendingValueText ?? Convert.ToString(Value, CultureInfo.InvariantCulture) ?? string.Empty;
         set
         {
             try
             {
                 object? converted = Convert.ChangeType(
                     value,
-                    Nullable.GetUnderlyingType(_property.PropertyType) ?? _property.PropertyType,
+                    Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType,
                     CultureInfo.InvariantCulture);
                 Value = converted;
             }
             catch (FormatException)
             {
-                _pendingValueText = value;
+                pendingValueText = value;
                 ValueTextError = "Number format error.";
                 OnPropertyChanged(nameof(ValueTextError));
             }
             catch (OverflowException)
             {
-                _pendingValueText = value;
+                pendingValueText = value;
                 ValueTextError = "Number format error.";
                 OnPropertyChanged(nameof(ValueTextError));
             }
             catch (InvalidCastException)
             {
-                _pendingValueText = value;
+                pendingValueText = value;
                 ValueTextError = "Number format error.";
                 OnPropertyChanged(nameof(ValueTextError));
             }
@@ -674,10 +674,10 @@ public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableOb
     public string? ValueTextError { get; private set; }
 
     /// <summary>Gets whether the reflected value has a simple text editor.</summary>
-    public bool IsTextEditable => _property.PropertyType != typeof(bool);
+    public bool IsTextEditable => property.PropertyType != typeof(bool);
 
     /// <summary>Gets whether this row represents a Boolean setting.</summary>
-    public bool IsBoolean => _property.PropertyType == typeof(bool);
+    public bool IsBoolean => property.PropertyType == typeof(bool);
 
     /// <summary>Gets or sets the Boolean setting value.</summary>
     public bool BooleanValue
@@ -687,5 +687,5 @@ public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableOb
     }
 
     /// <summary>Gets the reflected property type.</summary>
-    public Type ValueType => _property.PropertyType;
+    public Type ValueType => property.PropertyType;
 }

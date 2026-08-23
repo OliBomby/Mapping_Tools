@@ -61,18 +61,18 @@ public enum UpdateMode
 /// <summary>Stores the persistent appearance and input settings of one dashboard.</summary>
 public sealed class SnappingToolsPreferences : ICloneable
 {
-    private Dictionary<Type, GeneratorSettings> _generatorSettings;
-    private Hotkey _inheritHotkey;
-    private Hotkey _lockHotkey;
-    private Hotkey _refreshHotkey;
-    private Dictionary<string, RelevantObjectPreferences> _relevantObjectPreferences;
-    private Hotkey _selectHotkey;
-    private Hotkey _snapHotkey;
+    private Dictionary<Type, GeneratorSettings> generatorSettings;
+    private Hotkey inheritHotkey;
+    private Hotkey lockHotkey;
+    private Hotkey refreshHotkey;
+    private Dictionary<string, RelevantObjectPreferences> relevantObjectPreferences;
+    private Hotkey selectHotkey;
+    private Hotkey snapHotkey;
 
     /// <summary>Creates the legacy default Geometry Dashboard settings.</summary>
     public SnappingToolsPreferences()
     {
-        _relevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences>
+        relevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences>
         {
             [RelevantPoint.PreferencesNameStatic] = new()
             {
@@ -104,12 +104,12 @@ public sealed class SnappingToolsPreferences : ICloneable
             },
         };
 
-        _generatorSettings = new Dictionary<Type, GeneratorSettings>();
-        _snapHotkey = new Hotkey(56);
-        _selectHotkey = new Hotkey(57);
-        _lockHotkey = new Hotkey(57, 4);
-        _inheritHotkey = new Hotkey(57, 1);
-        _refreshHotkey = new Hotkey(45);
+        generatorSettings = new Dictionary<Type, GeneratorSettings>();
+        snapHotkey = new Hotkey(56);
+        selectHotkey = new Hotkey(57);
+        lockHotkey = new Hotkey(57, 4);
+        inheritHotkey = new Hotkey(57, 1);
+        refreshHotkey = new Hotkey(45);
         OffsetTop = 1;
         OffsetBottom = 1;
         AcceptableDifference = 2;
@@ -123,31 +123,31 @@ public sealed class SnappingToolsPreferences : ICloneable
     /// <summary>Gets or sets appearance settings by stable preference-group name.</summary>
     public Dictionary<string, RelevantObjectPreferences> RelevantObjectPreferences
     {
-        get => _relevantObjectPreferences;
-        set => _relevantObjectPreferences = value ?? [];
+        get => relevantObjectPreferences;
+        set => relevantObjectPreferences = value ?? [];
     }
 
     /// <summary>Gets or sets generator settings keyed by concrete generator type.</summary>
     public Dictionary<Type, GeneratorSettings> GeneratorSettings
     {
-        get => _generatorSettings;
-        set => _generatorSettings = value ?? [];
+        get => generatorSettings;
+        set => generatorSettings = value ?? [];
     }
 
     /// <summary>Gets or sets the activation/snap key.</summary>
-    public Hotkey SnapHotkey { get => _snapHotkey; set => _snapHotkey = value ?? new Hotkey(); }
+    public Hotkey SnapHotkey { get => snapHotkey; set => snapHotkey = value ?? new Hotkey(); }
 
     /// <summary>Gets or sets the selection key.</summary>
-    public Hotkey SelectHotkey { get => _selectHotkey; set => _selectHotkey = value ?? new Hotkey(); }
+    public Hotkey SelectHotkey { get => selectHotkey; set => selectHotkey = value ?? new Hotkey(); }
 
     /// <summary>Gets or sets the lock/unlock key.</summary>
-    public Hotkey LockHotkey { get => _lockHotkey; set => _lockHotkey = value ?? new Hotkey(); }
+    public Hotkey LockHotkey { get => lockHotkey; set => lockHotkey = value ?? new Hotkey(); }
 
     /// <summary>Gets or sets the inheritability key.</summary>
-    public Hotkey InheritHotkey { get => _inheritHotkey; set => _inheritHotkey = value ?? new Hotkey(); }
+    public Hotkey InheritHotkey { get => inheritHotkey; set => inheritHotkey = value ?? new Hotkey(); }
 
     /// <summary>Gets or sets the refresh key.</summary>
-    public Hotkey RefreshHotkey { get => _refreshHotkey; set => _refreshHotkey = value ?? new Hotkey(); }
+    public Hotkey RefreshHotkey { get => refreshHotkey; set => refreshHotkey = value ?? new Hotkey(); }
 
     /// <summary>Gets or sets the left editor-box correction in pixels.</summary>
     public double OffsetLeft { get; set; }
@@ -201,11 +201,11 @@ public sealed class SnappingToolsPreferences : ICloneable
         clone.RelevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences>();
         foreach ((string key, var value) in RelevantObjectPreferences) clone.RelevantObjectPreferences.Add(key, (RelevantObjectPreferences)value.Clone());
 
-        clone._snapHotkey = (Hotkey)SnapHotkey.Clone();
-        clone._selectHotkey = (Hotkey)SelectHotkey.Clone();
-        clone._lockHotkey = (Hotkey)LockHotkey.Clone();
-        clone._inheritHotkey = (Hotkey)InheritHotkey.Clone();
-        clone._refreshHotkey = (Hotkey)RefreshHotkey.Clone();
+        clone.snapHotkey = (Hotkey)SnapHotkey.Clone();
+        clone.selectHotkey = (Hotkey)SelectHotkey.Clone();
+        clone.lockHotkey = (Hotkey)LockHotkey.Clone();
+        clone.inheritHotkey = (Hotkey)InheritHotkey.Clone();
+        clone.refreshHotkey = (Hotkey)RefreshHotkey.Clone();
 
         return clone;
     }
@@ -246,21 +246,21 @@ public sealed class SnappingToolsPreferences : ICloneable
 /// <summary>A named saved snapshot of Geometry Dashboard preferences.</summary>
 public sealed class SnappingToolsSaveSlot : ICloneable
 {
-    private string _name = string.Empty;
-    private SnappingToolsPreferences _preferences = new();
-    private Hotkey _projectHotkey = new();
+    private string name = string.Empty;
+    private SnappingToolsPreferences preferences = new();
+    private Hotkey projectHotkey = new();
 
     /// <summary>Gets or sets the user-visible slot name.</summary>
-    public string Name { get => _name; set => _name = value ?? string.Empty; }
+    public string Name { get => name; set => name = value ?? string.Empty; }
 
     /// <summary>Gets or sets the slot activation hotkey.</summary>
-    public Hotkey ProjectHotkey { get => _projectHotkey; set => _projectHotkey = value ?? new Hotkey(); }
+    public Hotkey ProjectHotkey { get => projectHotkey; set => projectHotkey = value ?? new Hotkey(); }
 
     /// <summary>Gets or sets the preference snapshot stored by this slot.</summary>
     public SnappingToolsPreferences Preferences
     {
-        get => _preferences;
-        set => _preferences = value ?? new SnappingToolsPreferences();
+        get => preferences;
+        set => preferences = value ?? new SnappingToolsPreferences();
     }
 
     /// <inheritdoc />
@@ -278,20 +278,20 @@ public sealed class SnappingToolsSaveSlot : ICloneable
 /// <summary>Serializable Geometry Dashboard preferences and ordered save slots.</summary>
 public sealed class SnappingToolsProject
 {
-    private SnappingToolsPreferences _currentPreferences;
-    private IEnumerable<RelevantObjectsGenerator>? _generators;
+    private SnappingToolsPreferences currentPreferences;
+    private IEnumerable<RelevantObjectsGenerator>? generators;
 
     /// <summary>Creates a project with legacy default preferences and no save slots.</summary>
     public SnappingToolsProject()
     {
-        _currentPreferences = new SnappingToolsPreferences();
+        currentPreferences = new SnappingToolsPreferences();
     }
 
     /// <summary>Gets or sets the active preference state.</summary>
     public SnappingToolsPreferences CurrentPreferences
     {
-        get => _currentPreferences;
-        set => _currentPreferences = value ?? new SnappingToolsPreferences();
+        get => currentPreferences;
+        set => currentPreferences = value ?? new SnappingToolsPreferences();
     }
 
     /// <summary>Gets the saved slots in their persisted order.</summary>
@@ -301,8 +301,8 @@ public sealed class SnappingToolsProject
     /// <param name="generators">The generator instances owned by the calculation engine.</param>
     public void SetGenerators(IEnumerable<RelevantObjectsGenerator>? generators)
     {
-        _generators = generators;
-        if (_generators is not null) CurrentPreferences.ApplyGeneratorSettings(_generators);
+        this.generators = generators;
+        if (this.generators is not null) CurrentPreferences.ApplyGeneratorSettings(this.generators);
     }
 
     /// <summary>Replaces active preferences with an independent cloned snapshot.</summary>
@@ -313,14 +313,14 @@ public sealed class SnappingToolsProject
         ArgumentNullException.ThrowIfNull(preferences);
 
         CurrentPreferences = (SnappingToolsPreferences)preferences.Clone();
-        if (_generators is not null) CurrentPreferences.ApplyGeneratorSettings(_generators);
+        if (generators is not null) CurrentPreferences.ApplyGeneratorSettings(generators);
     }
 
     /// <summary>Captures live generator settings and returns the active preferences object.</summary>
     /// <returns>The current preferences after generator settings are synchronized.</returns>
     public SnappingToolsPreferences GetCurrentPreferences()
     {
-        if (_generators is not null) CurrentPreferences.SaveGeneratorSettings(_generators);
+        if (generators is not null) CurrentPreferences.SaveGeneratorSettings(generators);
 
         return CurrentPreferences;
     }
@@ -329,7 +329,7 @@ public sealed class SnappingToolsProject
     /// <returns>This mutable project instance.</returns>
     public SnappingToolsProject GetThis()
     {
-        if (_generators is not null) CurrentPreferences.SaveGeneratorSettings(_generators);
+        if (generators is not null) CurrentPreferences.SaveGeneratorSettings(generators);
 
         return this;
     }

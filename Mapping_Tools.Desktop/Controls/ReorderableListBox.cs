@@ -13,14 +13,14 @@ namespace Mapping_Tools.Desktop.Controls;
 /// </summary>
 public sealed class ReorderableListBox : ListBox
 {
-    private static readonly DataFormat<object> ItemFormat =
+    private static readonly DataFormat<object> itemFormat =
         DataFormat.CreateInProcessFormat<object>("mapping-tools-reorderable-list-item");
 
-    private bool _dragStarted;
-    private PointerPressedEventArgs? _pressEventArgs;
-    private Point _pressPoint;
-    private int _pressedIndex = -1;
-    private object? _pressedItem;
+    private bool dragStarted;
+    private PointerPressedEventArgs? pressEventArgs;
+    private Point pressPoint;
+    private int pressedIndex = -1;
+    private object? pressedItem;
 
     /// <summary>Creates a list box with Avalonia 12 drag/drop handlers installed.</summary>
     public ReorderableListBox()
@@ -37,53 +37,53 @@ public sealed class ReorderableListBox : ListBox
     {
         if (!eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
 
-        _pressPoint = eventArgs.GetPosition(this);
+        pressPoint = eventArgs.GetPosition(this);
         var container = FindItemContainer(eventArgs.Source as Visual);
-        _pressedItem = container?.DataContext;
-        _pressedIndex = container is null ? -1 : IndexFromContainer(container);
-        _pressEventArgs = eventArgs;
-        _dragStarted = false;
+        pressedItem = container?.DataContext;
+        pressedIndex = container is null ? -1 : IndexFromContainer(container);
+        pressEventArgs = eventArgs;
+        dragStarted = false;
     }
 
     private async void OnPointerMoved(object? sender, PointerEventArgs eventArgs)
     {
-        if (_dragStarted || _pressedItem is null || !eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        if (dragStarted || pressedItem is null || !eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             return;
 
         var currentPoint = eventArgs.GetPosition(this);
-        if (Math.Abs(currentPoint.X - _pressPoint.X) < 4 && Math.Abs(currentPoint.Y - _pressPoint.Y) < 4)
+        if (Math.Abs(currentPoint.X - pressPoint.X) < 4 && Math.Abs(currentPoint.Y - pressPoint.Y) < 4)
             return;
 
-        _dragStarted = true;
+        dragStarted = true;
         DataTransfer transfer = new();
-        if (_pressedIndex < 0)
+        if (pressedIndex < 0)
         {
-            _dragStarted = false;
+            dragStarted = false;
             return;
         }
 
         transfer.Add(DataTransferItem.Create(
-            ItemFormat,
-            new DragItem(_pressedIndex, _pressedItem)));
+            itemFormat,
+            new DragItem(pressedIndex, pressedItem)));
         await DragDrop.DoDragDropAsync(
-            _pressEventArgs!,
+            pressEventArgs!,
             transfer,
             DragDropEffects.Move);
-        _pressedItem = null;
-        _pressedIndex = -1;
-        _dragStarted = false;
+        pressedItem = null;
+        pressedIndex = -1;
+        dragStarted = false;
     }
 
     private void OnDragOver(object? sender, DragEventArgs eventArgs)
     {
-        eventArgs.DragEffects = eventArgs.DataTransfer.TryGetValue(ItemFormat) is not null
+        eventArgs.DragEffects = eventArgs.DataTransfer.TryGetValue(itemFormat) is not null
             ? DragDropEffects.Move
             : DragDropEffects.None;
     }
 
     private void OnDrop(object? sender, DragEventArgs eventArgs)
     {
-        if (eventArgs.DataTransfer.TryGetValue(ItemFormat) is not DragItem dragItem || ItemsSource is not IList items || items.IsReadOnly || items.IsFixedSize)
+        if (eventArgs.DataTransfer.TryGetValue(itemFormat) is not DragItem dragItem || ItemsSource is not IList items || items.IsReadOnly || items.IsFixedSize)
         {
             eventArgs.DragEffects = DragDropEffects.None;
             return;

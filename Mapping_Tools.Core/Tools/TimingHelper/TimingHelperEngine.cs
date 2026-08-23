@@ -63,7 +63,7 @@ public static class TimingHelperEngine
 
         // Remove multiple markers on the same tick
         List<Marker> newMarkers =
-            [.. markers.Where((marker, index) => index == 0 || Math.Abs(marker.Time - markers[index - 1].Time) >= options.Leniency + Precision.DoubleEpsilon)];
+            [.. markers.Where((marker, index) => index == 0 || Math.Abs(marker.Time - markers[index - 1].Time) >= options.Leniency + Precision.DOUBLE_EPSILON)];
         markers = newMarkers;
 
         // Calculate the beats between time and the last time or redline for each time

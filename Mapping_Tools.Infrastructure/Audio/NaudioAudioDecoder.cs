@@ -11,7 +11,7 @@ namespace Mapping_Tools.Infrastructure.Audio;
 /// </summary>
 public sealed class NaudioAudioDecoder : IAudioDecoder
 {
-    private static readonly string[] SupportedExtensions = [".wav", ".ogg", ".mp3"];
+    private static readonly string[] supportedExtensions = [".wav", ".ogg", ".mp3"];
 
     /// <inheritdoc />
     public Task<AudioClip> DecodeAsync(AudioDecodeRequest request, CancellationToken cancellationToken = default)
@@ -26,7 +26,7 @@ public sealed class NaudioAudioDecoder : IAudioDecoder
         if (!File.Exists(path)) throw new FileNotFoundException("The audio source does not exist.", path);
 
         string extension = Path.GetExtension(path).ToLowerInvariant();
-        if (!SupportedExtensions.Contains(extension, StringComparer.Ordinal)) throw new NotSupportedException($"Audio decoding does not support '{extension}'.");
+        if (!supportedExtensions.Contains(extension, StringComparer.Ordinal)) throw new NotSupportedException($"Audio decoding does not support '{extension}'.");
 
         using var source = OpenSource(path, extension);
         var provider = ToSampleProvider(source);

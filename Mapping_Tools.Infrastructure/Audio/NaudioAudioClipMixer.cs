@@ -51,12 +51,12 @@ public sealed class NaudioAudioClipMixer : IAudioClipMixer
 
     private sealed class ClipSampleProvider : ISampleProvider
     {
-        private readonly float[] _samples;
-        private int _position;
+        private readonly float[] samples;
+        private int position;
 
         public ClipSampleProvider(AudioClip clip)
         {
-            _samples = clip.CopySamples();
+            samples = clip.CopySamples();
             WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(
                 clip.Format.SampleRate,
                 clip.Format.Channels);
@@ -66,10 +66,10 @@ public sealed class NaudioAudioClipMixer : IAudioClipMixer
 
         public int Read(float[] buffer, int offset, int count)
         {
-            int read = Math.Min(count, _samples.Length - _position);
+            int read = Math.Min(count, samples.Length - position);
             if (read <= 0) return 0;
-            Array.Copy(_samples, _position, buffer, offset, read);
-            _position += read;
+            Array.Copy(samples, position, buffer, offset, read);
+            position += read;
             return read;
         }
     }

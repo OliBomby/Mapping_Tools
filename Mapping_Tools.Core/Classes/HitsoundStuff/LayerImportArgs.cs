@@ -155,7 +155,7 @@ public class LayerImportArgs : IEquatable<LayerImportArgs>
             case ImportType.Stack:
                 return Path == o.Path && (X == -1 || X == o.X) && (Y == -1 || Y == o.Y);
             case ImportType.Hitsounds:
-                return Path == o.Path && SamplePath == o.SamplePath && (!DiscriminateVolumes || Math.Abs(Volume - o.Volume) < Precision.DoubleEpsilon);
+                return Path == o.Path && SamplePath == o.SamplePath && (!DiscriminateVolumes || Math.Abs(Volume - o.Volume) < Precision.DOUBLE_EPSILON);
             case ImportType.MIDI:
                 return Path == o.Path
                        && (Bank == -1 || Bank == o.Bank)
@@ -164,7 +164,7 @@ public class LayerImportArgs : IEquatable<LayerImportArgs>
                        && (Length == -1 || Length == o.Length)
                        && (Velocity == -1 || Velocity == o.Velocity);
             case ImportType.Storyboard:
-                return Path == o.Path && SamplePath == o.SamplePath && (!DiscriminateVolumes || Math.Abs(Volume - o.Volume) < Precision.DoubleEpsilon);
+                return Path == o.Path && SamplePath == o.SamplePath && (!DiscriminateVolumes || Math.Abs(Volume - o.Volume) < Precision.DOUBLE_EPSILON);
             case ImportType.None:
                 return true;
             default:

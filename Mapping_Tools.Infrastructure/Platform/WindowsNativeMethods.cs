@@ -5,28 +5,28 @@ namespace Mapping_Tools.Infrastructure.Platform;
 
 internal static class WindowsNativeMethods
 {
-    internal const uint MonitorDefaultToNearest = 2;
-    internal const uint MonitorInfoPrimary = 1;
-    internal const uint DpiTypeEffective = 0;
-    internal const int ShowHide = 0;
-    internal const int ShowNoActivate = 4;
-    internal const uint SetWindowPosNoActivate = 0x0010;
-    internal const uint SetWindowPosNoSendChanging = 0x0400;
-    internal const uint WindowMessagePaint = 0x000F;
-    internal const uint WindowMessageEraseBackground = 0x0014;
-    internal const uint WindowMessageNcDestroy = 0x0082;
-    internal const uint WindowMessageNcHitTest = 0x0084;
-    internal const nint HitTestTransparent = -1;
-    internal const uint InputKeyboard = 1;
-    internal const uint KeyboardKeyUp = 0x0002;
+    internal const uint MONITOR_DEFAULT_TO_NEAREST = 2;
+    internal const uint MONITOR_INFO_PRIMARY = 1;
+    internal const uint DPI_TYPE_EFFECTIVE = 0;
+    internal const int SHOW_HIDE = 0;
+    internal const int SHOW_NO_ACTIVATE = 4;
+    internal const uint SET_WINDOW_POS_NO_ACTIVATE = 0x0010;
+    internal const uint SET_WINDOW_POS_NO_SEND_CHANGING = 0x0400;
+    internal const uint WINDOW_MESSAGE_PAINT = 0x000F;
+    internal const uint WINDOW_MESSAGE_ERASE_BACKGROUND = 0x0014;
+    internal const uint WINDOW_MESSAGE_NC_DESTROY = 0x0082;
+    internal const uint WINDOW_MESSAGE_NC_HIT_TEST = 0x0084;
+    internal const nint HIT_TEST_TRANSPARENT = -1;
+    internal const uint INPUT_KEYBOARD = 1;
+    internal const uint KEYBOARD_KEY_UP = 0x0002;
 
     internal static readonly nint TopMostWindow = new(-1);
 
-    internal static int NativeInputSize => Marshal.SizeOf<INPUT>();
+    internal static int NativeInputSize => Marshal.SizeOf<Input>();
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool GetCursorPos(out POINT point);
+    internal static extern bool GetCursorPos(out Point point);
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -36,17 +36,17 @@ internal static class WindowsNativeMethods
         byte virtualKey,
         bool keyUp)
     {
-        INPUT[] nativeInputs =
+        Input[] nativeInputs =
         [
             new()
             {
-                Type = InputKeyboard,
-                Data = new INPUT_UNION
+                Type = INPUT_KEYBOARD,
+                Data = new InputUnion
                 {
-                    Keyboard = new KEYBDINPUT
+                    Keyboard = new Keybdinput
                     {
                         VirtualKey = virtualKey,
-                        Flags = keyUp ? KeyboardKeyUp : 0,
+                        Flags = keyUp ? KEYBOARD_KEY_UP : 0,
                     },
                 },
             },
@@ -61,7 +61,7 @@ internal static class WindowsNativeMethods
     [DllImport("user32.dll", SetLastError = true)]
     private static extern uint SendInput(
         uint numberOfInputs,
-        INPUT[] inputs,
+        Input[] inputs,
         int inputSize);
 
     [DllImport("user32.dll")]
@@ -74,7 +74,7 @@ internal static class WindowsNativeMethods
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool GetMonitorInfo(nint monitor, ref MONITORINFO monitorInfo);
+    internal static extern bool GetMonitorInfo(nint monitor, ref Monitorinfo monitorInfo);
 
     [DllImport("shcore.dll")]
     internal static extern int GetDpiForMonitor(
@@ -100,7 +100,7 @@ internal static class WindowsNativeMethods
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool GetWindowRect(nint window, out RECT rectangle);
+    internal static extern bool GetWindowRect(nint window, out Rect rectangle);
 
     [DllImport("user32.dll")]
     internal static extern nint GetForegroundWindow();
@@ -125,7 +125,7 @@ internal static class WindowsNativeMethods
     internal static extern nint GetModuleHandle(string? moduleName);
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    internal static extern ushort RegisterClass(ref WNDCLASS windowClass);
+    internal static extern ushort RegisterClass(ref Wndclass windowClass);
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     internal static extern nint CreateWindowEx(
@@ -169,15 +169,15 @@ internal static class WindowsNativeMethods
     internal static extern nint DefWindowProc(nint window, uint message, nint wParam, nint lParam);
 
     [DllImport("user32.dll")]
-    internal static extern nint BeginPaint(nint window, out PAINTSTRUCT paint);
+    internal static extern nint BeginPaint(nint window, out Paintstruct paint);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool EndPaint(nint window, ref PAINTSTRUCT paint);
+    internal static extern bool EndPaint(nint window, ref Paintstruct paint);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool GetClientRect(nint window, out RECT rectangle);
+    internal static extern bool GetClientRect(nint window, out Rect rectangle);
 
     [DllImport("gdi32.dll")]
     internal static extern nint CreateSolidBrush(uint color);
@@ -188,26 +188,26 @@ internal static class WindowsNativeMethods
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool FrameRect(nint deviceContext, ref RECT rectangle, nint brush);
+    internal static extern bool FrameRect(nint deviceContext, ref Rect rectangle, nint brush);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
     internal delegate bool EnumWindowsCallback(nint window, nint data);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    internal delegate bool EnumMonitorsCallback(nint monitor, nint hdc, ref RECT bounds, nint data);
+    internal delegate bool EnumMonitorsCallback(nint monitor, nint hdc, ref Rect bounds, nint data);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
     internal delegate nint WindowProcedure(nint window, uint message, nint wParam, nint lParam);
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct POINT
+    internal struct Point
     {
         internal int X;
         internal int Y;
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct RECT
+    internal struct Rect
     {
         internal int Left;
         internal int Top;
@@ -216,16 +216,16 @@ internal static class WindowsNativeMethods
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct MONITORINFO
+    internal struct Monitorinfo
     {
         internal int Size;
-        internal RECT Monitor;
-        internal RECT Work;
+        internal Rect Monitor;
+        internal Rect Work;
         internal uint Flags;
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    internal struct WNDCLASS
+    internal struct Wndclass
     {
         internal uint Style;
         internal WindowProcedure? WindowProcedure;
@@ -240,11 +240,11 @@ internal static class WindowsNativeMethods
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct PAINTSTRUCT
+    internal struct Paintstruct
     {
         internal nint DeviceContext;
         internal int Erase;
-        internal RECT Paint;
+        internal Rect Paint;
         internal int Restore;
         internal int IncUpdate;
 
@@ -253,24 +253,24 @@ internal static class WindowsNativeMethods
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct INPUT
+    internal struct Input
     {
         internal uint Type;
-        internal INPUT_UNION Data;
+        internal InputUnion Data;
     }
 
     [StructLayout(LayoutKind.Explicit)]
-    internal struct INPUT_UNION
+    internal struct InputUnion
     {
-        [FieldOffset(0)] internal MOUSEINPUT Mouse;
+        [FieldOffset(0)] internal Mouseinput Mouse;
 
-        [FieldOffset(0)] internal KEYBDINPUT Keyboard;
+        [FieldOffset(0)] internal Keybdinput Keyboard;
 
-        [FieldOffset(0)] internal HARDWAREINPUT Hardware;
+        [FieldOffset(0)] internal Hardwareinput Hardware;
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct MOUSEINPUT
+    internal struct Mouseinput
     {
         internal int Dx;
         internal int Dy;
@@ -281,7 +281,7 @@ internal static class WindowsNativeMethods
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct KEYBDINPUT
+    internal struct Keybdinput
     {
         internal ushort VirtualKey;
         internal ushort ScanCode;
@@ -291,7 +291,7 @@ internal static class WindowsNativeMethods
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HARDWAREINPUT
+    internal struct Hardwareinput
     {
         internal uint Message;
         internal ushort ParameterLow;

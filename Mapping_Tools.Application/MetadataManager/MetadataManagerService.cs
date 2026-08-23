@@ -10,8 +10,8 @@ namespace Mapping_Tools.Application.MetadataManager;
 /// </summary>
 public sealed class MetadataManagerService : IMetadataManagerService
 {
-    private readonly IBeatmapBackupService _backupService;
-    private readonly IBeatmapEditingGateway _editingGateway;
+    private readonly IBeatmapBackupService backupService;
+    private readonly IBeatmapEditingGateway editingGateway;
 
     /// <summary>
     ///     Creates a Metadata Manager application service.
@@ -22,8 +22,8 @@ public sealed class MetadataManagerService : IMetadataManagerService
         IBeatmapEditingGateway editingGateway,
         IBeatmapBackupService backupService)
     {
-        _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
-        _backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
+        this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.backupService = backupService ?? throw new ArgumentNullException(nameof(backupService));
     }
 
     /// <inheritdoc />
@@ -32,7 +32,7 @@ public sealed class MetadataManagerService : IMetadataManagerService
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        var session = await _editingGateway
+        var session = await editingGateway
             .OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
             .ConfigureAwait(false);
         return MetadataManagerEngine.Read(session.Editor.Beatmap);
@@ -56,13 +56,13 @@ public sealed class MetadataManagerService : IMetadataManagerService
         for (int index = 0; index < paths.Length; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var session = await _editingGateway
+            var session = await editingGateway
                 .OpenBeatmapAsync(
                     paths[index],
                     LiveBeatmapPreference.PreferLive,
                     cancellationToken)
                 .ConfigureAwait(false);
-            await _backupService.CreateAsync(
+            await backupService.CreateAsync(
                     session,
                     BeatmapBackupReason.Automatic,
                     false,

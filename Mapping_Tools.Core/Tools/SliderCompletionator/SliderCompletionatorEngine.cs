@@ -162,13 +162,13 @@ public static class SliderCompletionatorEngine
                     true,
                     uninherited: true,
                     omitFirstBarLine: true,
-                    fuzziness: Precision.DoubleEpsilon));
+                    fuzziness: Precision.DOUBLE_EPSILON));
                 changes.Add(new TimingPointChange(
                     redlineAfter,
                     true,
                     uninherited: true,
                     omitFirstBarLine: true,
-                    fuzziness: Precision.DoubleEpsilon));
+                    fuzziness: Precision.DOUBLE_EPSILON));
                 hitObject.Time -= 1;
             }
 
@@ -178,7 +178,7 @@ public static class SliderCompletionatorEngine
             changes.Add(new TimingPointChange(
                 timingPoint,
                 true,
-                fuzziness: Precision.DoubleEpsilon));
+                fuzziness: Precision.DOUBLE_EPSILON));
         }
 
         // Add the new SliderVelocity changes

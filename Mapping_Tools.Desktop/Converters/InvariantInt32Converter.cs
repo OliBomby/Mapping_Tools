@@ -9,7 +9,7 @@ namespace Mapping_Tools.Desktop.Converters;
 /// </summary>
 public sealed class InvariantInt32Converter : IValueConverter
 {
-    private static readonly ApplicationInvariantInt32Converter Converter = new();
+    private static readonly ApplicationInvariantInt32Converter converter = new();
 
     /// <inheritdoc />
     public object Convert(
@@ -23,7 +23,7 @@ public sealed class InvariantInt32Converter : IValueConverter
             targetType,
             parameter,
             culture,
-            Converter);
+            converter);
     }
 
     /// <inheritdoc />
@@ -38,6 +38,6 @@ public sealed class InvariantInt32Converter : IValueConverter
             targetType,
             parameter,
             culture,
-            Converter);
+            converter);
     }
 }

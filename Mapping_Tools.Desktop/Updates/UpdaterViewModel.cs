@@ -12,11 +12,11 @@ namespace Mapping_Tools.Desktop.Updates;
 /// </summary>
 internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
 {
-    private readonly IDialogService _dialogs;
-    private readonly IUiDispatcher _dispatcher;
-    private readonly IUserNotificationService _notifications;
-    private readonly IUpdateService _updates;
-    private bool _disposed;
+    private readonly IDialogService dialogs;
+    private readonly IUiDispatcher dispatcher;
+    private readonly IUserNotificationService notifications;
+    private readonly IUpdateService updates;
+    private bool disposed;
 
     [ObservableProperty] private double downloadProgress;
 
@@ -39,11 +39,11 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
         IUiDispatcher dispatcher,
         bool downloadImmediately = false)
     {
-        _updates = updates ?? throw new ArgumentNullException(nameof(updates));
+        this.updates = updates ?? throw new ArgumentNullException(nameof(updates));
         Check = check ?? throw new ArgumentNullException(nameof(check));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
-        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
         ReleaseTitle = string.IsNullOrWhiteSpace(check.ReleaseTitle)
             ? "Loading release notes..."
@@ -51,7 +51,7 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
         ReleaseBody = check.ReleaseBody ?? string.Empty;
         IsReadyPanelVisible = !downloadImmediately;
         IsDownloadPanelVisible = downloadImmediately;
-        _updates.ProgressChanged += OnProgressChanged;
+        this.updates.ProgressChanged += OnProgressChanged;
     }
 
     internal UpdateCheckResult Check { get; }
@@ -62,10 +62,10 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
-        if (_disposed) return;
+        if (disposed) return;
 
-        _disposed = true;
-        _updates.ProgressChanged -= OnProgressChanged;
+        disposed = true;
+        updates.ProgressChanged -= OnProgressChanged;
     }
 
     internal event EventHandler? CloseRequested;
@@ -81,7 +81,7 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
         try
         {
             await BeginDownloadAsync();
-            _updates.StartUpdateProcess(true);
+            updates.StartUpdateProcess(true);
             UpdateAfterClose = false;
             CloseRequested?.Invoke(this, EventArgs.Empty);
             ApplicationCloseRequested?.Invoke(this, EventArgs.Empty);
@@ -109,7 +109,7 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
 
         try
         {
-            DownloadTask = _updates.PrepareUpdateAsync();
+            DownloadTask = updates.PrepareUpdateAsync();
             _ = ObserveDownloadFailureAsync(DownloadTask);
             CloseRequested?.Invoke(this, EventArgs.Empty);
         }
@@ -125,7 +125,7 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
     {
         try
         {
-            _updates.SkipCurrentVersion();
+            updates.SkipCurrentVersion();
             UpdateAfterClose = false;
             CloseRequested?.Invoke(this, EventArgs.Empty);
         }
@@ -137,7 +137,7 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
 
     internal void SetDownloadProgress(double progress)
     {
-        if (!_disposed) DownloadProgress = progress;
+        if (!disposed) DownloadProgress = progress;
     }
 
     internal void ClearWaitAfterClose()
@@ -152,7 +152,7 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
 
     private async Task BeginDownloadAsync()
     {
-        DownloadTask = _updates.PrepareUpdateAsync();
+        DownloadTask = updates.PrepareUpdateAsync();
         await DownloadTask;
     }
 
@@ -175,14 +175,14 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
 
     private async Task ReportFailureAsync(Exception exception)
     {
-        if (_disposed) return;
+        if (disposed) return;
 
-        await _dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
+        await dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
             "Updater error",
             "UPDATER_EXCEPTION: " + exception.Message,
             [new DialogChoice<bool>("OK", true, true, true)],
             true));
-        await _notifications.PublishAsync(new UserNotification(
+        await notifications.PublishAsync(new UserNotification(
             UserNotificationSeverity.Error,
             "Error fetching update",
             exception.Message,
@@ -193,8 +193,8 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
         object? sender,
         UpdateProgressChangedEventArgs eventArgs)
     {
-        if (_disposed) return;
+        if (disposed) return;
 
-        _dispatcher.Post(() => SetDownloadProgress(eventArgs.Progress));
+        dispatcher.Post(() => SetDownloadProgress(eventArgs.Progress));
     }
 }

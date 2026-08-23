@@ -9,21 +9,21 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public sealed partial class GetStartedViewModel : ObservableObject, IDisposable
 {
-    private readonly IBeatmapWorkspace _workspace;
-    private bool _disposed;
+    private readonly IBeatmapWorkspace workspace;
+    private bool disposed;
 
     /// <summary>Creates the landing-page presentation model.</summary>
     /// <param name="workspace">Supplies live recent history and accepts activated rows.</param>
     public GetStartedViewModel(
         IBeatmapWorkspace workspace)
     {
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
 
         RecentMaps = [];
         Changelog = [];
         RecentMaps.CollectionChanged += (_, _) =>
             HasNoRecentMaps = RecentMaps.Count == 0;
-        _workspace.SelectionChanged += OnWorkspaceSelectionChanged;
+        this.workspace.SelectionChanged += OnWorkspaceSelectionChanged;
         RefreshRecentMaps();
     }
 
@@ -40,10 +40,10 @@ public sealed partial class GetStartedViewModel : ObservableObject, IDisposable
     /// <summary>Stops observing recent-history changes owned by the workspace.</summary>
     public void Dispose()
     {
-        if (_disposed) return;
+        if (disposed) return;
 
-        _disposed = true;
-        _workspace.SelectionChanged -= OnWorkspaceSelectionChanged;
+        disposed = true;
+        workspace.SelectionChanged -= OnWorkspaceSelectionChanged;
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public sealed partial class GetStartedViewModel : ObservableObject, IDisposable
     {
         ArgumentNullException.ThrowIfNull(recentMaps);
         string[] paths = recentMaps.Select(recent => recent.FullPath).ToArray();
-        if (paths.Length > 0) _workspace.SetSelection(paths, BeatmapSelectionSource.RecentHistory);
+        if (paths.Length > 0) workspace.SetSelection(paths, BeatmapSelectionSource.RecentHistory);
     }
 
     private void OnWorkspaceSelectionChanged(
@@ -67,7 +67,7 @@ public sealed partial class GetStartedViewModel : ObservableObject, IDisposable
     private void RefreshRecentMaps()
     {
         RecentMaps.Clear();
-        foreach (var recent in _workspace.RecentMaps)
+        foreach (var recent in workspace.RecentMaps)
             RecentMaps.Add(new RecentMapViewModel(
                 Path.GetFileName(recent.Path),
                 recent.Path,

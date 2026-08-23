@@ -563,14 +563,14 @@ public sealed class DesktopShellTests
 
     private sealed class StubProjectFeatureViewModel : ObservableObject, IShellProjectFeature
     {
-        private static readonly ProjectDefinition<StubProject> Definition = new(
+        private static readonly ProjectDefinition<StubProject> definition = new(
             "stubproject.json",
             "Stub Projects",
             static () => new StubProject());
 
         public int InstallCount { get; private set; }
 
-        public IProjectDefinition ProjectDefinition => Definition;
+        public IProjectDefinition ProjectDefinition => definition;
 
         public object Snapshot()
         {

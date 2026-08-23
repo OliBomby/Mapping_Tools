@@ -9,7 +9,7 @@ namespace Mapping_Tools.Desktop.Platform;
 /// </summary>
 public sealed class AvaloniaPlatformLauncher : IPlatformLauncher
 {
-    private readonly Func<ILauncher?> _launcherAccessor;
+    private readonly Func<ILauncher?> launcherAccessor;
 
     /// <summary>
     ///     Creates an adapter that resolves the launcher lazily, after the window exists.
@@ -17,8 +17,8 @@ public sealed class AvaloniaPlatformLauncher : IPlatformLauncher
     /// <param name="launcherAccessor">Returns the current top-level launcher, if initialized.</param>
     public AvaloniaPlatformLauncher(Func<ILauncher?> launcherAccessor)
     {
-        _launcherAccessor = launcherAccessor
-                            ?? throw new ArgumentNullException(nameof(launcherAccessor));
+        this.launcherAccessor = launcherAccessor
+                                ?? throw new ArgumentNullException(nameof(launcherAccessor));
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public sealed class AvaloniaPlatformLauncher : IPlatformLauncher
 
     private ILauncher GetLauncher()
     {
-        return _launcherAccessor()
+        return launcherAccessor()
                ?? throw new InvalidOperationException(
                    "Launcher access requires an initialized Avalonia top-level window.");
     }

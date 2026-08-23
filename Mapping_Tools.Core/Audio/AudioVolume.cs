@@ -5,7 +5,7 @@ namespace Mapping_Tools.Core.Audio;
 /// </summary>
 public static class AudioVolume
 {
-    private static readonly double HeightAt005 = 0.995 * Math.Pow(0.05, 1.5) + 0.005;
+    private static readonly double heightAt005 = 0.995 * Math.Pow(0.05, 1.5) + 0.005;
 
     /// <summary>
     ///     Converts a normalized osu! volume value to an amplitude multiplier.
@@ -15,7 +15,7 @@ public static class AudioVolume
     public static double ToAmplitude(double volume)
     {
         return volume < 0.05
-            ? HeightAt005 / 0.05 * volume
+            ? heightAt005 / 0.05 * volume
             : 0.995 * Math.Pow(volume, 1.5) + 0.005;
     }
 
@@ -26,8 +26,8 @@ public static class AudioVolume
     /// <returns>The corresponding normalized volume value.</returns>
     public static double FromAmplitude(double amplitude)
     {
-        return amplitude < HeightAt005
-            ? 0.05 / HeightAt005 * amplitude
+        return amplitude < heightAt005
+            ? 0.05 / heightAt005 * amplitude
             : Math.Pow((amplitude - 0.005) / 0.995, 1 / 1.5);
     }
 }

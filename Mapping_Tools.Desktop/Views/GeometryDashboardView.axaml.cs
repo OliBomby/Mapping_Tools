@@ -9,8 +9,8 @@ namespace Mapping_Tools.Desktop.Views;
 /// <summary>Hosts the Geometry Dashboard generator list and dashboard actions.</summary>
 public sealed partial class GeometryDashboardView : UserControl
 {
-    private bool _restoreGeneratorsOffset;
-    private double _savedGeneratorsOffset;
+    private bool restoreGeneratorsOffset;
+    private double savedGeneratorsOffset;
 
     /// <summary>Creates the dashboard view.</summary>
     public GeometryDashboardView()
@@ -51,14 +51,14 @@ public sealed partial class GeometryDashboardView : UserControl
         if (sender is not ScrollViewer scrollViewer || !eventArgs.GetCurrentPoint(scrollViewer).Properties.IsLeftButtonPressed)
             return;
 
-        _savedGeneratorsOffset = scrollViewer.Offset.Y;
-        _restoreGeneratorsOffset = eventArgs.Source is not ScrollViewer;
+        savedGeneratorsOffset = scrollViewer.Offset.Y;
+        restoreGeneratorsOffset = eventArgs.Source is not ScrollViewer;
     }
 
     private void GeneratorsScrollChanged(object? sender, ScrollChangedEventArgs eventArgs)
     {
-        if (sender is ScrollViewer scrollViewer && _restoreGeneratorsOffset && Math.Abs(scrollViewer.Offset.Y - _savedGeneratorsOffset) > 0.5)
-            scrollViewer.Offset = new Vector(scrollViewer.Offset.X, _savedGeneratorsOffset);
+        if (sender is ScrollViewer scrollViewer && restoreGeneratorsOffset && Math.Abs(scrollViewer.Offset.Y - savedGeneratorsOffset) > 0.5)
+            scrollViewer.Offset = new Vector(scrollViewer.Offset.X, savedGeneratorsOffset);
     }
 
     private void GeneratorsPointerWheelChanged(object? sender, PointerWheelEventArgs eventArgs)

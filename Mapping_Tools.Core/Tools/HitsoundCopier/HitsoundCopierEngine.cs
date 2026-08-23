@@ -116,7 +116,7 @@ public static class HitsoundCopierEngine
         // Save tlo times where timingpoint volume is 5%
         var preservedMuteTimes = options.CopyVolumes && options.AlwaysPreserve5Volume
             ? targetTimeline.TimelineObjects
-                .Where(item => Math.Abs(item.SampleVolume) < Precision.DoubleEpsilon && Math.Abs(item.FenoSampleVolume - 5) < Precision.DoubleEpsilon)
+                .Where(item => Math.Abs(item.SampleVolume) < Precision.DOUBLE_EPSILON && Math.Abs(item.FenoSampleVolume - 5) < Precision.DOUBLE_EPSILON)
                 .Select(item => item.Time)
                 .ToList()
             : null;
@@ -621,7 +621,7 @@ public static class HitsoundCopierEngine
         List<TimingPointChange> changes = [];
         // Exclude objects which use their own sample volume property instead
         foreach (var item in timeline.TimelineObjects.Where(item =>
-                     Math.Abs(item.SampleVolume) < Precision.DoubleEpsilon && Precision.AlmostBigger(item.Time, firstTime)))
+                     Math.Abs(item.SampleVolume) < Precision.DOUBLE_EPSILON && Precision.AlmostBigger(item.Time, firstTime)))
         {
             var point = item.HitsoundTimingPoint.Copy();
             point.Offset = item.Time;

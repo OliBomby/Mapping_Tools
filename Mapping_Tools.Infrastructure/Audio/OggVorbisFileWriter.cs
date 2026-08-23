@@ -6,7 +6,7 @@ namespace Mapping_Tools.Infrastructure.Audio;
 /// <summary>Owns an Ogg Vorbis encoder and flushes its final pages on disposal.</summary>
 internal sealed class OggVorbisFileWriter : IDisposable
 {
-    private static readonly IReadOnlyDictionary<int, int> StartBuffers = new Dictionary<int, int>
+    private static readonly IReadOnlyDictionary<int, int> startBuffers = new Dictionary<int, int>
     {
         [48000] = 1024,
         [44100] = 1024,
@@ -17,31 +17,31 @@ internal sealed class OggVorbisFileWriter : IDisposable
         [8000] = 256,
     };
 
-    private readonly OggStream _oggStream;
+    private readonly OggStream oggStream;
 
-    private readonly Stream _output;
-    private readonly ProcessingState _processingState;
-    private bool _disposed;
+    private readonly Stream output;
+    private readonly ProcessingState processingState;
+    private bool disposed;
 
     public OggVorbisFileWriter(string path, int sampleRate, int channels, float quality)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        if (!StartBuffers.ContainsKey(sampleRate)) throw new InvalidOperationException($"Vorbis writer does not support {sampleRate} sample rate.");
+        if (!startBuffers.ContainsKey(sampleRate)) throw new InvalidOperationException($"Vorbis writer does not support {sampleRate} sample rate.");
 
-        _output = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Read);
+        output = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Read);
         SampleRate = sampleRate;
         Channels = channels;
         var info = VorbisInfo.InitVariableBitRate(channels, sampleRate, quality);
-        _oggStream = new OggStream(Random.Shared.Next());
-        _oggStream.PacketIn(HeaderPacketBuilder.BuildInfoPacket(info));
-        _oggStream.PacketIn(HeaderPacketBuilder.BuildCommentsPacket(new Comments()));
-        _oggStream.PacketIn(HeaderPacketBuilder.BuildBooksPacket(info));
+        oggStream = new OggStream(Random.Shared.Next());
+        oggStream.PacketIn(HeaderPacketBuilder.BuildInfoPacket(info));
+        oggStream.PacketIn(HeaderPacketBuilder.BuildCommentsPacket(new Comments()));
+        oggStream.PacketIn(HeaderPacketBuilder.BuildBooksPacket(info));
         FlushPages(true);
-        _processingState = ProcessingState.Create(info);
+        processingState = ProcessingState.Create(info);
         float[][] silence = Enumerable.Range(0, channels)
-            .Select(_ => new float[StartBuffers[sampleRate]])
+            .Select(_ => new float[startBuffers[sampleRate]])
             .ToArray();
-        _processingState.WriteData(silence, silence[0].Length);
+        processingState.WriteData(silence, silence[0].Length);
     }
 
     public int SampleRate { get; }
@@ -49,24 +49,24 @@ internal sealed class OggVorbisFileWriter : IDisposable
 
     public void Dispose()
     {
-        if (_disposed) return;
+        if (disposed) return;
 
-        _disposed = true;
-        _processingState.WriteEndOfStream();
-        while (!_oggStream.Finished && _processingState.PacketOut(out var packet))
+        disposed = true;
+        processingState.WriteEndOfStream();
+        while (!oggStream.Finished && processingState.PacketOut(out var packet))
         {
-            _oggStream.PacketIn(packet);
+            oggStream.PacketIn(packet);
             FlushPages(false);
         }
 
         FlushPages(true);
-        _output.Dispose();
+        output.Dispose();
     }
 
     public static int GetSupportedSampleRate(int sampleRate)
     {
         int selected = 48000;
-        foreach (int supported in StartBuffers.Keys)
+        foreach (int supported in startBuffers.Keys)
             if (supported >= sampleRate && supported <= selected)
                 selected = supported;
 
@@ -75,7 +75,7 @@ internal sealed class OggVorbisFileWriter : IDisposable
 
     public void WriteWaveData(byte[] data, int count, WaveFormat format)
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
+        ObjectDisposedException.ThrowIf(disposed, this);
         int bytesPerSample = format.BitsPerSample / 8;
         double conversion = (double)format.SampleRate / SampleRate;
         int sampleCount = count / bytesPerSample / format.Channels;
@@ -100,20 +100,20 @@ internal sealed class OggVorbisFileWriter : IDisposable
             };
         }
 
-        _processingState.WriteData(output, outputCount);
-        while (!_oggStream.Finished && _processingState.PacketOut(out var packet))
+        processingState.WriteData(output, outputCount);
+        while (!oggStream.Finished && processingState.PacketOut(out var packet))
         {
-            _oggStream.PacketIn(packet);
+            oggStream.PacketIn(packet);
             FlushPages(false);
         }
     }
 
     private void FlushPages(bool force)
     {
-        while (_oggStream.PageOut(out var page, force))
+        while (oggStream.PageOut(out var page, force))
         {
-            _output.Write(page.Header, 0, page.Header.Length);
-            _output.Write(page.Body, 0, page.Body.Length);
+            output.Write(page.Header, 0, page.Header.Length);
+            output.Write(page.Body, 0, page.Body.Length);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Mapping_Tools.Core.Tools.MapsetMerger;
 /// </summary>
 public static partial class MapsetMergerEngine
 {
-    private static readonly StringComparer NameComparer = StringComparer.OrdinalIgnoreCase;
+    private static readonly StringComparer nameComparer = StringComparer.OrdinalIgnoreCase;
 
     /// <summary>
     ///     Renames repeated mapset names by appending the first available positive
@@ -23,7 +23,7 @@ public static partial class MapsetMergerEngine
     public static void ResolveDuplicateMapsetNames(IList<MapsetMergerInput> mapsets)
     {
         ArgumentNullException.ThrowIfNull(mapsets);
-        HashSet<string> used = new(NameComparer);
+        HashSet<string> used = new(nameComparer);
 
         foreach (var mapset in mapsets)
         {

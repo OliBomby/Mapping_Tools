@@ -24,18 +24,18 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     IQuickRun,
     IShellProjectFeature
 {
-    internal const string OperationId = "hitsound-preview-helper";
-    private readonly ICurrentBeatmapLocator _currentBeatmap;
-    private readonly ProjectDefinition<HitsoundPreviewHelperProject> _definition;
-    private readonly IUserNotificationService _notifications;
+    internal const string OPERATION_ID = "hitsound-preview-helper";
+    private readonly ICurrentBeatmapLocator currentBeatmap;
+    private readonly ProjectDefinition<HitsoundPreviewHelperProject> definition;
+    private readonly IUserNotificationService notifications;
 
-    private readonly IHitsoundPreviewHelperService _previewService;
-    private readonly RhythmGuideViewModel _rhythmGuideViewModel;
-    private readonly IRhythmGuideWindowService _rhythmGuideWindow;
-    private readonly ApplicationSettings _settings;
-    private readonly IBeatmapWorkspace _workspace;
+    private readonly IHitsoundPreviewHelperService previewService;
+    private readonly RhythmGuideViewModel rhythmGuideViewModel;
+    private readonly IRhythmGuideWindowService rhythmGuideWindow;
+    private readonly ApplicationSettings settings;
+    private readonly IBeatmapWorkspace workspace;
 
-    private bool? _isAllItemsSelected;
+    private bool? isAllItemsSelected;
 
     /// <summary>
     ///     Creates the Hitsound Preview Helper presentation model.
@@ -59,18 +59,18 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         IRhythmGuideWindowService rhythmGuideWindow,
         RhythmGuideViewModel rhythmGuideViewModel,
         IApplicationDirectories directories)
-        : base(execution, OperationId)
+        : base(execution, OPERATION_ID)
     {
-        _previewService = previewService ?? throw new ArgumentNullException(nameof(previewService));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        _rhythmGuideWindow = rhythmGuideWindow ?? throw new ArgumentNullException(nameof(rhythmGuideWindow));
-        _rhythmGuideViewModel = rhythmGuideViewModel ?? throw new ArgumentNullException(nameof(rhythmGuideViewModel));
+        this.previewService = previewService ?? throw new ArgumentNullException(nameof(previewService));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        this.rhythmGuideWindow = rhythmGuideWindow ?? throw new ArgumentNullException(nameof(rhythmGuideWindow));
+        this.rhythmGuideViewModel = rhythmGuideViewModel ?? throw new ArgumentNullException(nameof(rhythmGuideViewModel));
         ArgumentNullException.ThrowIfNull(directories);
 
-        _definition = new ProjectDefinition<HitsoundPreviewHelperProject>(
+        definition = new ProjectDefinition<HitsoundPreviewHelperProject>(
             "hspreviewproject.json",
             "Hitsound Preview Projects",
             static () => new HitsoundPreviewHelperProject(),
@@ -112,12 +112,12 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     /// <summary>Gets or sets the tri-state select-all value used by the zone list.</summary>
     public bool? IsAllItemsSelected
     {
-        get => _isAllItemsSelected;
+        get => isAllItemsSelected;
         set
         {
-            if (_isAllItemsSelected == value) return;
+            if (isAllItemsSelected == value) return;
 
-            _isAllItemsSelected = value;
+            isAllItemsSelected = value;
             if (value.HasValue)
                 foreach (var item in Items)
                     item.IsSelected = value.Value;
@@ -129,7 +129,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await _currentBeatmap
+        string? path = await currentBeatmap
             .FindCurrentBeatmapAsync(cancellationToken)
             .ConfigureAwait(false);
         await RunWithStateAsync(() => RunPathsAsync(
@@ -138,9 +138,9 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
             cancellationToken));
     }
 
-    string IQuickRun.OperationId => OperationId;
+    string IQuickRun.OperationId => OPERATION_ID;
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
     {
@@ -167,18 +167,18 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     protected override async Task RunCoreAsync()
     {
         string? currentPath = null;
-        if (ImportModeSetting == HitsoundPreviewHelperImportMode.Selected) currentPath = await _currentBeatmap.FindCurrentBeatmapAsync();
+        if (ImportModeSetting == HitsoundPreviewHelperImportMode.Selected) currentPath = await currentBeatmap.FindCurrentBeatmapAsync();
 
         var paths = ImportModeSetting == HitsoundPreviewHelperImportMode.Selected
             ? string.IsNullOrWhiteSpace(currentPath) ? [] : [currentPath]
-            : _workspace.SelectedPaths;
-        if (_settings.AlwaysQuickRun)
+            : workspace.SelectedPaths;
+        if (settings.AlwaysQuickRun)
         {
-            string? quickPath = await _currentBeatmap.FindCurrentBeatmapAsync();
+            string? quickPath = await currentBeatmap.FindCurrentBeatmapAsync();
             paths = string.IsNullOrWhiteSpace(quickPath) ? [] : [quickPath];
         }
 
-        await RunPathsAsync(paths, _settings.AlwaysQuickRun, CancellationToken.None);
+        await RunPathsAsync(paths, settings.AlwaysQuickRun, CancellationToken.None);
     }
 
     /// <inheritdoc />
@@ -210,7 +210,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     [RelayCommand]
     private async Task AddFromSelectionAsync()
     {
-        string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
         if (string.IsNullOrWhiteSpace(path))
         {
             await PublishSelectionWarningAsync();
@@ -220,7 +220,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         try
         {
             var positions =
-                await _previewService.GetSelectedZonePositionsAsync(path);
+                await previewService.GetSelectedZonePositionsAsync(path);
             if (positions.Count == 0)
             {
                 await PublishSelectionWarningAsync();
@@ -236,7 +236,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         }
         catch (Exception exception)
         {
-            await _notifications.PublishAsync(new UserNotification(
+            await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Error,
                 "Could not read selection",
                 "The selected editor coordinates could not be read.",
@@ -265,7 +265,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     [RelayCommand]
     private void OpenRhythmGuide()
     {
-        _rhythmGuideWindow.Show(_rhythmGuideViewModel);
+        rhythmGuideWindow.Show(rhythmGuideViewModel);
     }
 
     private async Task RunPathsAsync(
@@ -287,11 +287,11 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         };
         var result = await Execution.ExecuteAsync(
             new ToolExecutionRequest<HitsoundPreviewHelperResult>(
-                OperationId,
+                OPERATION_ID,
                 "Hitsound Preview Helper",
                 async context =>
                 {
-                    var applied = await _previewService.ApplyAsync(
+                    var applied = await previewService.ApplyAsync(
                         paths,
                         options,
                         new Progress<double>(value => context.ReportProgress(
@@ -314,7 +314,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
 
     private Task PublishSelectionWarningAsync()
     {
-        return _notifications.PublishAsync(new UserNotification(
+        return notifications.PublishAsync(new UserNotification(
             UserNotificationSeverity.Warning,
             "No selected hit objects",
             "Please select a hit object to fetch the coordinates."));

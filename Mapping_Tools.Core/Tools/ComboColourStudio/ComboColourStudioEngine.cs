@@ -263,7 +263,7 @@ public static class ComboColourStudioEngine
 
             // Factor the contribution over the cost
             double score = contribution / cost;
-            if (bestSequence is not null && (score < bestScore || Math.Abs(score - bestScore) < Precision.DoubleEpsilon && cost >= bestCost))
+            if (bestSequence is not null && (score < bestScore || Math.Abs(score - bestScore) < Precision.DOUBLE_EPSILON && cost >= bestCost))
                 continue;
 
             bestScore = score;

@@ -7,7 +7,7 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
 /// <summary>Base contract for a reflection-discovered geometry generator.</summary>
 public abstract class RelevantObjectsGenerator
 {
-    private MethodInfo[]? _generatorMethods;
+    private MethodInfo[]? generatorMethods;
 
     /// <summary>Creates a generator with default settings.</summary>
     protected RelevantObjectsGenerator()
@@ -42,14 +42,14 @@ public abstract class RelevantObjectsGenerator
     /// <exception cref="InvalidOperationException">Thrown when no operation is marked.</exception>
     public MethodInfo[] GetGeneratorMethods()
     {
-        if (_generatorMethods is not null) return _generatorMethods;
+        if (generatorMethods is not null) return generatorMethods;
 
-        _generatorMethods = GetType().GetMethods()
+        generatorMethods = GetType().GetMethods()
             .Where(method => method.GetCustomAttribute<RelevantObjectsGeneratorMethodAttribute>() is not null)
             .ToArray();
-        if (_generatorMethods.Length == 0) throw new InvalidOperationException($"Type {GetType()} does not have any generator method.");
+        if (generatorMethods.Length == 0) throw new InvalidOperationException($"Type {GetType()} does not have any generator method.");
 
-        return _generatorMethods;
+        return generatorMethods;
     }
 
     /// <summary>Gets the parameter types required by a generator method.</summary>

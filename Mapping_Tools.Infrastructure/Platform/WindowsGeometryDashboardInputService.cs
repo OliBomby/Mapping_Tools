@@ -10,16 +10,16 @@ namespace Mapping_Tools.Infrastructure.Platform;
 /// </summary>
 public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInputService
 {
-    private const int VirtualKeyLeftAlt = 0xA4;
-    private const int VirtualKeyRightAlt = 0xA5;
-    private const int VirtualKeyLeftControl = 0xA2;
-    private const int VirtualKeyRightControl = 0xA3;
-    private const int VirtualKeyLeftShift = 0xA0;
-    private const int VirtualKeyRightShift = 0xA1;
-    private const int VirtualKeyLeftWindows = 0x5B;
-    private const int VirtualKeyRightWindows = 0x5C;
-    private const int VirtualKeyLeftButton = 0x01;
-    private readonly Func<bool> _isWindows;
+    private const int virtual_key_left_alt = 0xA4;
+    private const int virtual_key_right_alt = 0xA5;
+    private const int virtual_key_left_control = 0xA2;
+    private const int virtual_key_right_control = 0xA3;
+    private const int virtual_key_left_shift = 0xA0;
+    private const int virtual_key_right_shift = 0xA1;
+    private const int virtual_key_left_windows = 0x5B;
+    private const int virtual_key_right_windows = 0x5C;
+    private const int virtual_key_left_button = 0x01;
+    private readonly Func<bool> isWindows;
 
     /// <summary>Creates the adapter using the current platform guard.</summary>
     public WindowsGeometryDashboardInputService()
@@ -29,16 +29,16 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
 
     internal WindowsGeometryDashboardInputService(Func<bool> isWindows)
     {
-        _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
+        this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
     /// <inheritdoc />
-    public bool IsSupported => _isWindows();
+    public bool IsSupported => isWindows();
 
     /// <inheritdoc />
     public bool IsHotkeyDown(Hotkey? hotkey)
     {
-        if (!_isWindows() || hotkey is null || hotkey.Key == 0) return false;
+        if (!isWindows() || hotkey is null || hotkey.Key == 0) return false;
 
         int virtualKey;
         try
@@ -52,20 +52,20 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
         }
 
         return IsKeyDown(virtualKey)
-               && HasModifier(hotkey.Modifiers, 1, VirtualKeyLeftAlt, VirtualKeyRightAlt)
-               && HasModifier(hotkey.Modifiers, 2, VirtualKeyLeftControl, VirtualKeyRightControl)
-               && HasModifier(hotkey.Modifiers, 4, VirtualKeyLeftShift, VirtualKeyRightShift)
-               && HasModifier(hotkey.Modifiers, 8, VirtualKeyLeftWindows, VirtualKeyRightWindows);
+               && HasModifier(hotkey.Modifiers, 1, virtual_key_left_alt, virtual_key_right_alt)
+               && HasModifier(hotkey.Modifiers, 2, virtual_key_left_control, virtual_key_right_control)
+               && HasModifier(hotkey.Modifiers, 4, virtual_key_left_shift, virtual_key_right_shift)
+               && HasModifier(hotkey.Modifiers, 8, virtual_key_left_windows, virtual_key_right_windows);
     }
 
     /// <inheritdoc />
     public bool IsMouseButtonDown(GeometryDashboardMouseButton button)
     {
-        if (!_isWindows()) return false;
+        if (!isWindows()) return false;
 
         return button switch
         {
-            GeometryDashboardMouseButton.Left => IsKeyDown(VirtualKeyLeftButton),
+            GeometryDashboardMouseButton.Left => IsKeyDown(virtual_key_left_button),
             _ => throw new ArgumentOutOfRangeException(nameof(button), button, null),
         };
     }
@@ -74,7 +74,7 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
     public bool TryGetCursorPosition(out Vector2 position)
     {
         position = Vector2.Zero;
-        if (!_isWindows() || !WindowsNativeMethods.GetCursorPos(out var point)) return false;
+        if (!isWindows() || !WindowsNativeMethods.GetCursorPos(out var point)) return false;
 
         position = new Vector2(point.X, point.Y);
         return true;
@@ -83,7 +83,7 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
     /// <inheritdoc />
     public bool TrySetCursorPosition(Vector2 position)
     {
-        if (!_isWindows()
+        if (!isWindows()
             || !double.IsFinite(position.X)
             || !double.IsFinite(position.Y)
             || position.X < int.MinValue

@@ -6,8 +6,8 @@ namespace Mapping_Tools.Application.Settings;
 /// </summary>
 public sealed class SettingsService : ISettingsService
 {
-    private readonly ISettingsPathService _paths;
-    private readonly ISettingsStore _store;
+    private readonly ISettingsPathService paths;
+    private readonly ISettingsStore store;
 
     /// <summary>
     ///     Creates a settings coordinator.
@@ -16,8 +16,8 @@ public sealed class SettingsService : ISettingsService
     /// <param name="paths">The service that completes machine-dependent paths.</param>
     public SettingsService(ISettingsStore store, ISettingsPathService paths)
     {
-        _store = store ?? throw new ArgumentNullException(nameof(store));
-        _paths = paths ?? throw new ArgumentNullException(nameof(paths));
+        this.store = store ?? throw new ArgumentNullException(nameof(store));
+        this.paths = paths ?? throw new ArgumentNullException(nameof(paths));
     }
 
     /// <summary>
@@ -27,14 +27,14 @@ public sealed class SettingsService : ISettingsService
     /// <returns>The initialized settings plus first-run and fallback status.</returns>
     public SettingsLoadResult LoadOrCreate()
     {
-        bool wasCreated = !_store.Exists;
+        bool wasCreated = !store.Exists;
         var settings = wasCreated
             ? new ApplicationSettings()
-            : _store.Load();
+            : store.Load();
 
-        if (wasCreated) _store.Save(settings);
+        if (wasCreated) store.Save(settings);
 
-        var pathResult = _paths.ApplyDefaults(settings);
+        var pathResult = paths.ApplyDefaults(settings);
         return new SettingsLoadResult(
             settings,
             wasCreated,
@@ -48,6 +48,6 @@ public sealed class SettingsService : ISettingsService
     public void Save(ApplicationSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        _store.Save(settings);
+        store.Save(settings);
     }
 }

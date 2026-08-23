@@ -109,14 +109,14 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
     /// <summary>Base implementation for generated objects and their ownership graph.</summary>
     public abstract class RelevantObject : IRelevantObject
     {
-        private HashSet<IRelevantObject> _childObjects = [];
-        private double _customTime;
-        private bool _isInheritable = true;
-        private bool _isLocked;
-        private bool _isSelected;
-        private HashSet<IRelevantObject> _parentObjects = [];
-        private double _relevancy;
-        private double _time;
+        private HashSet<IRelevantObject> childObjects = [];
+        private double customTime;
+        private bool isInheritable = true;
+        private bool isLocked;
+        private bool isSelected;
+        private HashSet<IRelevantObject> parentObjects = [];
+        private double relevancy;
+        private double time;
 
         /// <summary>Initializes empty graph ownership and full base relevance.</summary>
         protected RelevantObject()
@@ -129,10 +129,10 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
         /// <summary>Gets or sets the manually supplied time used by custom positioning generators.</summary>
         public double CustomTime
         {
-            get => _customTime;
+            get => customTime;
             set
             {
-                _customTime = value;
+                customTime = value;
                 if (Generator?.TemporalPositioning != GeneratorTemporalPositioning.Custom) return;
 
                 UpdateTime();
@@ -160,10 +160,10 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
         /// <inheritdoc />
         public virtual double Time
         {
-            get => _time;
+            get => time;
             set
             {
-                _time = value;
+                time = value;
                 if (ChildObjects is null) return;
 
                 foreach (var relevantObject in ChildObjects) relevantObject.UpdateTime();
@@ -175,10 +175,10 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
         /// <inheritdoc />
         public double Relevancy
         {
-            get => _isSelected ? 1 : _relevancy;
+            get => isSelected ? 1 : relevancy;
             set
             {
-                _relevancy = value;
+                relevancy = value;
                 if (ChildObjects is null) return;
 
                 foreach (var relevantObject in ChildObjects) relevantObject.UpdateRelevancy();
@@ -200,12 +200,12 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
         /// <inheritdoc />
         public virtual bool IsSelected
         {
-            get => _isSelected;
+            get => isSelected;
             set
             {
-                if (_isSelected == value) return;
+                if (isSelected == value) return;
 
-                _isSelected = value;
+                isSelected = value;
                 if (ChildObjects is not null)
                     foreach (var relevantObject in ChildObjects)
                         relevantObject.UpdateRelevancy();
@@ -217,12 +217,12 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
         /// <inheritdoc />
         public bool IsLocked
         {
-            get => _isLocked;
+            get => isLocked;
             set
             {
-                if (_isLocked == value) return;
+                if (isLocked == value) return;
 
-                _isLocked = value;
+                isLocked = value;
                 if (AutoPropagate) Layer?.NextLayer?.GenerateNewObjects(true);
             }
         }
@@ -230,15 +230,15 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
         /// <inheritdoc />
         public bool IsInheritable
         {
-            get => _isInheritable;
+            get => isInheritable;
             set
             {
-                if (_isInheritable == value) return;
+                if (isInheritable == value) return;
 
-                _isInheritable = value;
+                isInheritable = value;
                 if (!AutoPropagate) return;
 
-                if (_isInheritable)
+                if (isInheritable)
                 {
                     Layer?.NextLayer?.GenerateNewObjects(true);
                 }
@@ -261,10 +261,10 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
         /// <inheritdoc />
         public HashSet<IRelevantObject> ParentObjects
         {
-            get => _parentObjects;
+            get => parentObjects;
             set
             {
-                _parentObjects = value ?? [];
+                parentObjects = value ?? [];
                 UpdateRelevancy();
                 UpdateTime();
             }
@@ -273,8 +273,8 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
         /// <inheritdoc />
         public HashSet<IRelevantObject> ChildObjects
         {
-            get => _childObjects;
-            set => _childObjects = value ?? [];
+            get => childObjects;
+            set => childObjects = value ?? [];
         }
 
         /// <inheritdoc />

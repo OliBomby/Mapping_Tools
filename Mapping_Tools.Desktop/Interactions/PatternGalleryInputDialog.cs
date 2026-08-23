@@ -48,13 +48,13 @@ public sealed record PatternGalleryFileInput(
 /// <summary>Displays the typed Pattern Gallery import forms as owner-modal Avalonia windows.</summary>
 public sealed class PatternGalleryInputDialog : IPatternGalleryInputDialog
 {
-    private readonly Func<Window> _owner;
+    private readonly Func<Window> owner;
 
     /// <summary>Creates the dialog adapter.</summary>
     /// <param name="owner">Returns the initialized shell window.</param>
     public PatternGalleryInputDialog(Func<Window> owner)
     {
-        _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
     }
 
     /// <inheritdoc />
@@ -63,7 +63,7 @@ public sealed class PatternGalleryInputDialog : IPatternGalleryInputDialog
         var viewModel = PatternGalleryInputViewModel.ForCode(defaultName);
         PatternGalleryInputDialogWindow window = new() { DataContext = viewModel };
         viewModel.Close = value => window.Close(value);
-        object? result = await window.ShowDialog<object?>(_owner());
+        object? result = await window.ShowDialog<object?>(owner());
         return result is PatternGalleryCodeInput input ? input : null;
     }
 
@@ -73,7 +73,7 @@ public sealed class PatternGalleryInputDialog : IPatternGalleryInputDialog
         var viewModel = PatternGalleryInputViewModel.ForFile(defaultName, defaultPath);
         PatternGalleryInputDialogWindow window = new() { DataContext = viewModel };
         viewModel.Close = value => window.Close(value);
-        object? result = await window.ShowDialog<object?>(_owner());
+        object? result = await window.ShowDialog<object?>(owner());
         return result is PatternGalleryFileInput input ? input : null;
     }
 
@@ -84,7 +84,7 @@ public sealed class PatternGalleryInputDialog : IPatternGalleryInputDialog
         PatternGalleryDetailsViewModel viewModel = new(pattern);
         PatternGalleryDetailsDialogWindow window = new() { DataContext = viewModel };
         viewModel.Close = value => window.Close(value);
-        object? result = await window.ShowDialog<object?>(_owner());
+        object? result = await window.ShowDialog<object?>(owner());
         return result as string;
     }
 }

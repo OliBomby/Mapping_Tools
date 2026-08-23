@@ -447,7 +447,7 @@ public class TimelineObject
         FenoSampleSet = SampleSet == 0 ? hstp.SampleSet : SampleSet;
         FenoAdditionSet = AdditionSet == 0 ? FenoSampleSet : AdditionSet;
         FenoCustomIndex = CustomIndex == 0 ? hstp.SampleIndex : CustomIndex;
-        FenoSampleVolume = Math.Abs(SampleVolume) < Precision.DoubleEpsilon ? hstp.Volume : SampleVolume;
+        FenoSampleVolume = Math.Abs(SampleVolume) < Precision.DOUBLE_EPSILON ? hstp.Volume : SampleVolume;
     }
 
     /// <summary>

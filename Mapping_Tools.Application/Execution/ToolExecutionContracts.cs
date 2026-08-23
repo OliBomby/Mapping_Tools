@@ -67,14 +67,14 @@ public sealed record ToolExecutionProgress
 /// </summary>
 public sealed class ToolExecutionContext
 {
-    private readonly IProgress<ToolExecutionProgress>? _progress;
+    private readonly IProgress<ToolExecutionProgress>? progress;
 
     internal ToolExecutionContext(
         CancellationToken cancellationToken,
         IProgress<ToolExecutionProgress>? progress)
     {
         CancellationToken = cancellationToken;
-        _progress = progress;
+        this.progress = progress;
     }
 
     /// <summary>
@@ -90,7 +90,7 @@ public sealed class ToolExecutionContext
     public void ReportProgress(double percent, string? stage = null)
     {
         CancellationToken.ThrowIfCancellationRequested();
-        _progress?.Report(new ToolExecutionProgress(percent, stage));
+        progress?.Report(new ToolExecutionProgress(percent, stage));
     }
 }
 

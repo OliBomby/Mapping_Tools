@@ -50,7 +50,7 @@ namespace Mapping_Tools.Application.Tests.Execution;
 [TestClass]
 public sealed class TransformationFixtureTests
 {
-    private static readonly IProjectSerializer ProjectJson = new LegacyProjectJsonSerializer();
+    private static readonly IProjectSerializer projectJson = new LegacyProjectJsonSerializer();
 
     [DataTestMethod]
     [DataRow("auto-fail-detector", "Auto-fail Detector")]
@@ -338,7 +338,7 @@ public sealed class TransformationFixtureTests
         var document = JObject.Parse(File.ReadAllText(projectPath));
         string sliderJson = document["LoadedHitObjects"]?.SingleOrDefault()?.ToString()
                             ?? throw new InvalidDataException("The legacy Sliderator fixture contained no source slider.");
-        return ProjectJson.Deserialize<HitObject>(sliderJson);
+        return projectJson.Deserialize<HitObject>(sliderJson);
     }
 
     private static void ApplySlideratorTransientState(SlideratorProject project, HitObject sourceSlider)
@@ -393,7 +393,7 @@ public sealed class TransformationFixtureTests
 
     private static T ReadProjectJson<T>(string json)
     {
-        return ProjectJson.Deserialize<T>(json);
+        return projectJson.Deserialize<T>(json);
     }
 
     private static void AssertMapsetOutputEquivalent(string fixtureRoot, string expectedManifestPath, string actualDirectory)
@@ -509,7 +509,7 @@ public sealed class TransformationFixtureTests
 
     private sealed class FileBackedEditingGateway : IBeatmapEditingGateway
     {
-        private readonly FileSystemFileStore _files = new();
+        private readonly FileSystemFileStore files = new();
 
         public Task<BeatmapEditingSession> OpenBeatmapAsync(
             string path,
@@ -518,13 +518,13 @@ public sealed class TransformationFixtureTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(new BeatmapEditingSession(
-                new BeatmapEditor2(path, _files), BeatmapEditingSource.Disk, []));
+                new BeatmapEditor2(path, files), BeatmapEditingSource.Disk, []));
         }
 
         public Task<StoryboardEditor2> OpenStoryboardAsync(string path, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(new StoryboardEditor2(path, _files));
+            return Task.FromResult(new StoryboardEditor2(path, files));
         }
 
         public Task SaveAsync(Editor2 value, bool reloadEditor = false, CancellationToken cancellationToken = default)

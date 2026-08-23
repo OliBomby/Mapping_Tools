@@ -22,21 +22,21 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     IShellProjectFeature,
     IQuickRun
 {
-    internal const string OperationId = "combo-colour-studio";
-    private readonly ICurrentBeatmapLocator _currentBeatmap;
+    internal const string OPERATION_ID = "combo-colour-studio";
+    private readonly ICurrentBeatmapLocator currentBeatmap;
 
-    private readonly ProjectDefinition<ComboColourProject> _definition = new(
+    private readonly ProjectDefinition<ComboColourProject> definition = new(
         "combocolourproject.json",
         "Combo Colour Studio Projects",
         () => new ComboColourProject(),
         "combo-colour-studio-project.json");
 
-    private readonly IFilePicker _filePicker;
-    private readonly ILiveBeatmapReader _liveReader;
+    private readonly IFilePicker filePicker;
+    private readonly ILiveBeatmapReader liveReader;
 
-    private readonly IComboColourStudioService _studio;
-    private readonly IBeatmapWorkspace _workspace;
-    private ObservableColourPoint? _selectedColourPoint;
+    private readonly IComboColourStudioService studio;
+    private readonly IBeatmapWorkspace workspace;
+    private ObservableColourPoint? selectedColourPoint;
 
     /// <summary>Creates the Combo Colour Studio presentation model.</summary>
     /// <param name="studio">Runs framework-neutral imports and transformations.</param>
@@ -52,13 +52,13 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmap,
         ILiveBeatmapReader liveReader,
         IFilePicker filePicker)
-        : base(execution, OperationId)
+        : base(execution, OPERATION_ID)
     {
-        _studio = studio ?? throw new ArgumentNullException(nameof(studio));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _liveReader = liveReader ?? throw new ArgumentNullException(nameof(liveReader));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        this.studio = studio ?? throw new ArgumentNullException(nameof(studio));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.liveReader = liveReader ?? throw new ArgumentNullException(nameof(liveReader));
+        this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         RebuildPresentation();
         RefreshPreview();
     }
@@ -84,12 +84,12 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets the point selected by the editing grid.</summary>
     public ObservableColourPoint? SelectedColourPoint
     {
-        get => _selectedColourPoint;
+        get => selectedColourPoint;
         set
         {
-            if (ReferenceEquals(_selectedColourPoint, value)) return;
+            if (ReferenceEquals(selectedColourPoint, value)) return;
 
-            SetProperty(ref _selectedColourPoint, value);
+            SetProperty(ref selectedColourPoint, value);
             SelectedSequenceColour = ComboColours.FirstOrDefault();
             OnPropertyChanged(nameof(SelectedSequence));
         }
@@ -113,7 +113,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
         if (string.IsNullOrWhiteSpace(path))
         {
             ResultSummary = "Open a target beatmap in osu! before using QuickRun.";
@@ -126,9 +126,9 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    string IQuickRun.OperationId => OperationId;
+    string IQuickRun.OperationId => OPERATION_ID;
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
     {
@@ -164,7 +164,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         double time = 0;
         try
         {
-            var snapshot = await _liveReader.ReadAsync();
+            var snapshot = await liveReader.ReadAsync();
             if (snapshot?.EditorTime is double editorTime) time = editorTime;
         }
         catch
@@ -258,7 +258,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task UseCurrentImportAsync()
     {
-        string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
         if (!string.IsNullOrWhiteSpace(path)) ImportPath = path;
     }
 
@@ -272,7 +272,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             return false;
         }
 
-        if (_workspace.SelectedPaths.Count == 0)
+        if (workspace.SelectedPaths.Count == 0)
         {
             ResultSummary = "Select at least one beatmap or open one in osu! before running Combo Colour Studio.";
             return false;
@@ -284,7 +284,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        await RunPathsAsync(_workspace.SelectedPaths, false, CancellationToken.None);
+        await RunPathsAsync(workspace.SelectedPaths, false, CancellationToken.None);
     }
 
     partial void OnProjectChanged(ComboColourProject value)
@@ -300,7 +300,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         string path = ImportPath;
         if (string.IsNullOrWhiteSpace(path))
         {
-            var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+            var paths = await filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
             {
                 Title = colourHax ? "Import colour hax" : "Import colours",
                 AllowMultiple = false,
@@ -315,9 +315,9 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         try
         {
             if (colourHax)
-                await _studio.ImportColourHaxAsync(path, Project);
+                await studio.ImportColourHaxAsync(path, Project);
             else
-                await _studio.ImportComboColoursAsync(path, Project);
+                await studio.ImportComboColoursAsync(path, Project);
 
             RebuildPresentation();
             SelectedColourPoint = ColourPoints.FirstOrDefault();
@@ -338,11 +338,11 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         var project = SnapshotProject();
         var execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<ComboColourStudioRunResult>(
-                OperationId,
+                OPERATION_ID,
                 "Combo Colour Studio",
                 async context =>
                 {
-                    var result = await _studio.ApplyAsync(
+                    var result = await studio.ApplyAsync(
                         paths,
                         project,
                         new Progress<double>(value => context.ReportProgress(value, "Exporting colours")),

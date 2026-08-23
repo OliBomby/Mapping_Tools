@@ -61,11 +61,11 @@ public sealed class ValidationErrorMessageConverter : IValueConverter
     private static string Reason(Exception exception)
     {
         string message = exception.GetBaseException().Message;
-        const string formatMarker = "System.FormatException: ";
-        int start = message.IndexOf(formatMarker, StringComparison.Ordinal);
+        const string format_marker = "System.FormatException: ";
+        int start = message.IndexOf(format_marker, StringComparison.Ordinal);
         if (start < 0) return FirstLine(message);
 
-        start += formatMarker.Length;
+        start += format_marker.Length;
         int fallback = message.IndexOf(", Fallback:", start, StringComparison.Ordinal);
         int closing = message.IndexOf("}'", start, StringComparison.Ordinal);
         int lineEnd = message.IndexOfAny(['\r', '\n'], start);

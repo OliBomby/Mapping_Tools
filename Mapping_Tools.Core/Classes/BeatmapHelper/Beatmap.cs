@@ -44,8 +44,8 @@ public class Beatmap : ITextFile
         if (!BeatmapTiming.Contains(firstUnInheritedTimingPoint)) BeatmapTiming.Add(firstUnInheritedTimingPoint);
 
         // Set the global SV here too because thats absolutely necessary
-        Difficulty["SliderMultiplier"] = new TValue(globalSv.ToInvariant());
-        General["Mode"] = new TValue(((int)gameMode).ToInvariant());
+        Difficulty["SliderMultiplier"] = new StringValue(globalSv.ToInvariant());
+        General["Mode"] = new StringValue(((int)gameMode).ToInvariant());
 
         SortHitObjects();
         CalculateSliderEndTimes();
@@ -88,7 +88,7 @@ public class Beatmap : ITextFile
     ///     WidescreenStoryboard,
     ///     SamplesMatchPlaybackRate
     /// </summary>
-    public Dictionary<string, TValue> General { get; set; }
+    public Dictionary<string, StringValue> General { get; set; }
 
     /// <summary>
     ///     Contains all the values in the [Editor] section of a .osu file. The key is the variable name and the value is the
@@ -100,7 +100,7 @@ public class Beatmap : ITextFile
     ///     GridSize,
     ///     TimelineZoom
     /// </summary>
-    public Dictionary<string, TValue> Editor { get; set; }
+    public Dictionary<string, StringValue> Editor { get; set; }
 
     /// <summary>
     ///     Contains all the values in the [Metadata] section of a .osu file. The key is the variable name and the value is the
@@ -117,7 +117,7 @@ public class Beatmap : ITextFile
     ///     BeatmapID,
     ///     BeatmapSetID
     /// </summary>
-    public Dictionary<string, TValue> Metadata { get; set; }
+    public Dictionary<string, StringValue> Metadata { get; set; }
 
     /// <summary>
     ///     Contains all the values in the [Difficulty] section of a .osu file. The key is the variable name and the value is
@@ -130,7 +130,7 @@ public class Beatmap : ITextFile
     ///     SliderMultiplier,
     ///     SliderTickRate
     /// </summary>
-    public Dictionary<string, TValue> Difficulty { get; set; }
+    public Dictionary<string, StringValue> Difficulty { get; set; }
 
     /// <summary>
     ///     Contains all the basic combo colours. The order of this list is the same as how they are numbered in the .osu.
@@ -367,10 +367,10 @@ public class Beatmap : ITextFile
 
     private void Initialize()
     {
-        General = new Dictionary<string, TValue>();
-        Editor = new Dictionary<string, TValue>();
-        Metadata = new Dictionary<string, TValue>();
-        Difficulty = new Dictionary<string, TValue>();
+        General = new Dictionary<string, StringValue>();
+        Editor = new Dictionary<string, StringValue>();
+        Metadata = new Dictionary<string, StringValue>();
+        Difficulty = new Dictionary<string, StringValue>();
         ComboColours = new List<ComboColour>();
         SpecialColours = new Dictionary<string, ComboColour>();
         StoryBoard = new StoryBoard();
@@ -385,31 +385,31 @@ public class Beatmap : ITextFile
     /// </summary>
     public void FillBasicMetadata()
     {
-        General["AudioFilename"] = new TValue(string.Empty);
-        General["AudioLeadIn"] = new TValue("0");
-        General["PreviewTime"] = new TValue("-1");
-        General["Countdown"] = new TValue("0");
-        General["SampleSet"] = new TValue("Soft");
-        General["StackLeniency"] = new TValue("0.2");
-        General["Mode"] = new TValue("0");
-        General["LetterboxInBreaks"] = new TValue("0");
-        General["WidescreenStoryboard"] = new TValue("0");
+        General["AudioFilename"] = new StringValue(string.Empty);
+        General["AudioLeadIn"] = new StringValue("0");
+        General["PreviewTime"] = new StringValue("-1");
+        General["Countdown"] = new StringValue("0");
+        General["SampleSet"] = new StringValue("Soft");
+        General["StackLeniency"] = new StringValue("0.2");
+        General["Mode"] = new StringValue("0");
+        General["LetterboxInBreaks"] = new StringValue("0");
+        General["WidescreenStoryboard"] = new StringValue("0");
 
-        Metadata["Title"] = new TValue(string.Empty);
-        Metadata["TitleUnicode"] = new TValue(string.Empty);
-        Metadata["Artist"] = new TValue(string.Empty);
-        Metadata["ArtistUnicode"] = new TValue(string.Empty);
-        Metadata["Creator"] = new TValue(string.Empty);
-        Metadata["Version"] = new TValue(string.Empty);
-        Metadata["Tags"] = new TValue(string.Empty);
-        Metadata["BeatmapSetID"] = new TValue("-1");
+        Metadata["Title"] = new StringValue(string.Empty);
+        Metadata["TitleUnicode"] = new StringValue(string.Empty);
+        Metadata["Artist"] = new StringValue(string.Empty);
+        Metadata["ArtistUnicode"] = new StringValue(string.Empty);
+        Metadata["Creator"] = new StringValue(string.Empty);
+        Metadata["Version"] = new StringValue(string.Empty);
+        Metadata["Tags"] = new StringValue(string.Empty);
+        Metadata["BeatmapSetID"] = new StringValue("-1");
 
-        Difficulty["HPDrainRate"] = new TValue("5");
-        Difficulty["CircleSize"] = new TValue("5");
-        Difficulty["OverallDifficulty"] = new TValue("5");
-        Difficulty["ApproachRate"] = new TValue("5");
-        Difficulty["SliderMultiplier"] = new TValue("1.4");
-        Difficulty["SliderTickRate"] = new TValue("1");
+        Difficulty["HPDrainRate"] = new StringValue("5");
+        Difficulty["CircleSize"] = new StringValue("5");
+        Difficulty["OverallDifficulty"] = new StringValue("5");
+        Difficulty["ApproachRate"] = new StringValue("5");
+        Difficulty["SliderMultiplier"] = new StringValue("1.4");
+        Difficulty["SliderTickRate"] = new StringValue("1");
     }
 
     /// <summary>
@@ -456,7 +456,7 @@ public class Beatmap : ITextFile
         // Round the stack offset so objects only get offset by integer values
         if (rounded) stackOffset = Math.Round(stackOffset);
 
-        const int stackLenience = 3;
+        const int stack_lenience = 3;
 
         var stackVector = new Vector2(stackOffset, stackOffset);
         float stackThresold = (float)(preEmpt * stackLeniency);
@@ -482,8 +482,8 @@ public class Beatmap : ITextFile
                     //We are no longer within stacking range of the next object.
                     break;
 
-                if (Vector2.Distance(stackBaseObject.Pos, objectN.Pos) < stackLenience
-                    || stackBaseObject.IsSlider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < stackLenience)
+                if (Vector2.Distance(stackBaseObject.Pos, objectN.Pos) < stack_lenience
+                    || stackBaseObject.IsSlider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < stack_lenience)
                 {
                     stackBaseIndex = n;
 
@@ -547,12 +547,12 @@ public class Beatmap : ITextFile
                      *        o <- hitCircle has stack of -1
                      *         o <- hitCircle has stack of -2
                      */
-                    if (objectN.IsSlider && Vector2.Distance(objectN.EndPos, objectI.Pos) < stackLenience)
+                    if (objectN.IsSlider && Vector2.Distance(objectN.EndPos, objectI.Pos) < stack_lenience)
                     {
                         int offset = objectI.StackCount - objectN.StackCount + 1;
                         for (int j = n + 1; j <= i; j++)
                             //For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
-                            if (Vector2.Distance(objectN.EndPos, HitObjects[j].Pos) < stackLenience)
+                            if (Vector2.Distance(objectN.EndPos, HitObjects[j].Pos) < stack_lenience)
                                 HitObjects[j].StackCount -= offset;
 
                         //We have hit a slider.  We should restart calculation using this as the new base.
@@ -560,7 +560,7 @@ public class Beatmap : ITextFile
                         break;
                     }
 
-                    if (Vector2.Distance(objectN.Pos, objectI.Pos) < stackLenience)
+                    if (Vector2.Distance(objectN.Pos, objectI.Pos) < stack_lenience)
                     {
                         //Keep processing as if there are no sliders.  If we come across a slider, this gets cancelled out.
                         //NOTE: Sliders with start positions stacking are a special case that is also handled here.
@@ -582,7 +582,7 @@ public class Beatmap : ITextFile
                         //We are no longer within stacking range of the previous object.
                         break;
 
-                    if (Vector2.Distance(objectN.EndPos, objectI.Pos) < stackLenience)
+                    if (Vector2.Distance(objectN.EndPos, objectI.Pos) < stack_lenience)
                     {
                         objectN.StackCount = objectI.StackCount + 1;
                         objectI = objectN;
@@ -780,7 +780,7 @@ public class Beatmap : ITextFile
     /// <param name="bookmarks"></param>
     public void SetBookmarks(List<double> bookmarks)
     {
-        if (bookmarks.Count > 0) Editor["Bookmarks"] = new TValue(string.Join(",", bookmarks.Select(d => Math.Round(d))));
+        if (bookmarks.Count > 0) Editor["Bookmarks"] = new StringValue(string.Join(",", bookmarks.Select(d => Math.Round(d))));
     }
 
     /// <summary>

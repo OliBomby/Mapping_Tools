@@ -45,7 +45,7 @@ namespace Mapping_Tools.Infrastructure.Projects;
 /// </remarks>
 public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 {
-    private static readonly Type MigratedCoreMarker = typeof(Beatmap);
+    private static readonly Type migratedCoreMarker = typeof(Beatmap);
 
     /// <summary>
     ///     Serializes the runtime object graph with legacy simple assembly names,
@@ -139,88 +139,88 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
     private sealed class LegacyProjectTypeBinder : ISerializationBinder
     {
-        private const string LegacyAssemblyName = "Mapping Tools";
-        private const string LegacyHotkey = "Mapping_Tools.Classes.SystemTools.Hotkey";
-        private const string IntermediateCoreHotkey = "Mapping_Tools.Core.Classes.SystemTools.Hotkey";
-        private const string LegacyNamespacePrefix = "Mapping_Tools.";
-        private const string CurrentNamespacePrefix = "Mapping_Tools.Core.";
-        private const string LegacyRhythmGuideProject = "Mapping_Tools.Viewmodels.RhythmGuideVm";
+        private const string legacy_assembly_name = "Mapping Tools";
+        private const string legacy_hotkey = "Mapping_Tools.Classes.SystemTools.Hotkey";
+        private const string intermediate_core_hotkey = "Mapping_Tools.Core.Classes.SystemTools.Hotkey";
+        private const string legacy_namespace_prefix = "Mapping_Tools.";
+        private const string current_namespace_prefix = "Mapping_Tools.Core.";
+        private const string legacy_rhythm_guide_project = "Mapping_Tools.Viewmodels.RhythmGuideVm";
 
-        private const string LegacyHitsoundPreviewHelperProject =
+        private const string legacy_hitsound_preview_helper_project =
             "Mapping_Tools.Viewmodels.HitsoundPreviewHelperVm";
 
-        private const string LegacyHitsoundCopierProject =
+        private const string legacy_hitsound_copier_project =
             "Mapping_Tools.Viewmodels.HitsoundCopierVm";
 
-        private const string LegacyHitsoundStudioProject =
+        private const string legacy_hitsound_studio_project =
             "Mapping_Tools.Viewmodels.HitsoundStudioVm";
 
-        private const string LegacyRhythmGuideOptions =
+        private const string legacy_rhythm_guide_options =
             "Mapping_Tools.Classes.Tools.RhythmGuide+RhythmGuideGeneratorArgs";
 
-        private const string LegacyMapCleanerProject = "Mapping_Tools.Viewmodels.MapCleanerVm";
+        private const string legacy_map_cleaner_project = "Mapping_Tools.Viewmodels.MapCleanerVm";
 
-        private const string LegacyMapCleanerOptions =
+        private const string legacy_map_cleaner_options =
             "Mapping_Tools.Classes.Tools.MapCleanerStuff.MapCleanerArgs";
 
-        private const string LegacyMetadataManagerProject =
+        private const string legacy_metadata_manager_project =
             "Mapping_Tools.Viewmodels.MetadataManagerVm";
 
-        private const string LegacyPropertyTransformerProject =
+        private const string legacy_property_transformer_project =
             "Mapping_Tools.Viewmodels.PropertyTransformerVm";
 
-        private const string LegacyTimingCopierProject =
+        private const string legacy_timing_copier_project =
             "Mapping_Tools.Viewmodels.TimingCopierVm";
 
-        private const string LegacyTimingHelperProject =
+        private const string legacy_timing_helper_project =
             "Mapping_Tools.Viewmodels.TimingHelperVm";
 
-        private const string LegacySliderCompletionatorProject =
+        private const string legacy_slider_completionator_project =
             "Mapping_Tools.Viewmodels.SliderCompletionatorVm";
 
-        private const string LegacySliderMergerProject =
+        private const string legacy_slider_merger_project =
             "Mapping_Tools.Viewmodels.SliderMergerVm";
 
-        private const string LegacySliderPicturatorProject =
+        private const string legacy_slider_picturator_project =
             "Mapping_Tools.Viewmodels.SliderPicturatorVm";
 
-        private const string LegacySlideratorProject =
+        private const string legacy_sliderator_project =
             "Mapping_Tools.Viewmodels.SlideratorVm";
 
-        private const string LegacyTumourGeneratorProject =
+        private const string legacy_tumour_generator_project =
             "Mapping_Tools.Viewmodels.TumourGeneratorVm";
 
-        private const string LegacyTumourLayer =
+        private const string legacy_tumour_layer =
             "Mapping_Tools.Classes.Tools.TumourGenerating.Options.TumourLayer";
 
-        private const string LegacyGraphState =
+        private const string legacy_graph_state =
             "Mapping_Tools.Components.Graph.GraphState";
 
-        private const string LegacyGraphAnchor =
+        private const string legacy_graph_anchor =
             "Mapping_Tools.Components.Graph.AnchorState";
 
-        private const string LegacyMapsetMergerProject =
+        private const string legacy_mapset_merger_project =
             "Mapping_Tools.Viewmodels.MapsetMergerVm";
 
-        private const string LegacyMapsetMergerItem =
+        private const string legacy_mapset_merger_item =
             "Mapping_Tools.Viewmodels.MapsetMergerVm+MapsetItem";
 
-        private const string LegacyComboColourProject =
+        private const string legacy_combo_colour_project =
             "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourProject";
 
-        private const string LegacyComboColourPoint =
+        private const string legacy_combo_colour_point =
             "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint";
 
-        private const string LegacyPatternGalleryProject =
+        private const string legacy_pattern_gallery_project =
             "Mapping_Tools.Viewmodels.PatternGalleryVm";
 
-        private const string LegacyPatternGalleryPattern =
+        private const string legacy_pattern_gallery_pattern =
             "Mapping_Tools.Classes.Tools.PatternGallery.OsuPattern";
 
-        private const string LegacyPatternGalleryHandler =
+        private const string legacy_pattern_gallery_handler =
             "Mapping_Tools.Classes.Tools.PatternGallery.OsuPatternFileHandler";
 
-        private readonly DefaultSerializationBinder _fallback = new();
+        private readonly DefaultSerializationBinder fallback = new();
 
         public Type BindToType(string? assemblyName, string typeName)
         {
@@ -233,44 +233,44 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
             if (IsLegacyAssembly(assemblyName) || IsCurrentCoreAssembly(assemblyName))
             {
-                if (typeName == LegacyRhythmGuideProject) return typeof(RhythmGuideProject);
-                if (typeName == LegacyHitsoundPreviewHelperProject) return typeof(HitsoundPreviewHelperProject);
-                if (typeName == LegacyHitsoundCopierProject) return typeof(HitsoundCopierProject);
-                if (typeName == LegacyHitsoundStudioProject) return typeof(HitsoundStudioProject);
-                if (typeName == LegacyRhythmGuideOptions) return typeof(RhythmGuideOptions);
-                if (typeName == LegacyMapCleanerProject) return typeof(MapCleanerProject);
-                if (typeName == LegacyMapCleanerOptions) return typeof(MapCleanerOptions);
-                if (typeName == LegacyMetadataManagerProject) return typeof(MetadataManagerProject);
-                if (typeName == LegacyPropertyTransformerProject) return typeof(PropertyTransformerProject);
-                if (typeName == LegacyTimingCopierProject) return typeof(TimingCopierProject);
-                if (typeName == LegacyTimingHelperProject) return typeof(TimingHelperProject);
-                if (typeName == LegacySliderCompletionatorProject) return typeof(SliderCompletionatorProject);
-                if (typeName == LegacySliderMergerProject) return typeof(SliderMergerProject);
-                if (typeName == LegacySliderPicturatorProject) return typeof(SliderPicturatorProject);
-                if (typeName == LegacySlideratorProject) return typeof(SlideratorProject);
-                if (typeName == LegacyTumourGeneratorProject) return typeof(TumourGeneratorProject);
-                if (typeName == LegacyTumourLayer) return typeof(TumourLayer);
-                if (typeName == LegacyGraphState) return typeof(GraphState);
-                if (typeName == LegacyGraphAnchor) return typeof(GraphAnchor);
-                if (typeName == LegacyMapsetMergerProject) return typeof(MapsetMergerProject);
-                if (typeName == LegacyMapsetMergerItem) return typeof(MapsetMergerProject.MapsetItem);
-                if (typeName == LegacyComboColourProject) return typeof(ComboColourProject);
-                if (typeName == LegacyComboColourPoint) return typeof(ColourPoint);
-                if (typeName == LegacyPatternGalleryProject) return typeof(PatternGalleryProject);
-                if (typeName == LegacyPatternGalleryPattern) return typeof(PatternGalleryPattern);
-                if (typeName == LegacyPatternGalleryHandler) return typeof(PatternGalleryCollectionMetadata);
-                if (typeName == LegacyHotkey) return typeof(Hotkey);
-                if (typeName == IntermediateCoreHotkey) return typeof(Hotkey);
+                if (typeName == legacy_rhythm_guide_project) return typeof(RhythmGuideProject);
+                if (typeName == legacy_hitsound_preview_helper_project) return typeof(HitsoundPreviewHelperProject);
+                if (typeName == legacy_hitsound_copier_project) return typeof(HitsoundCopierProject);
+                if (typeName == legacy_hitsound_studio_project) return typeof(HitsoundStudioProject);
+                if (typeName == legacy_rhythm_guide_options) return typeof(RhythmGuideOptions);
+                if (typeName == legacy_map_cleaner_project) return typeof(MapCleanerProject);
+                if (typeName == legacy_map_cleaner_options) return typeof(MapCleanerOptions);
+                if (typeName == legacy_metadata_manager_project) return typeof(MetadataManagerProject);
+                if (typeName == legacy_property_transformer_project) return typeof(PropertyTransformerProject);
+                if (typeName == legacy_timing_copier_project) return typeof(TimingCopierProject);
+                if (typeName == legacy_timing_helper_project) return typeof(TimingHelperProject);
+                if (typeName == legacy_slider_completionator_project) return typeof(SliderCompletionatorProject);
+                if (typeName == legacy_slider_merger_project) return typeof(SliderMergerProject);
+                if (typeName == legacy_slider_picturator_project) return typeof(SliderPicturatorProject);
+                if (typeName == legacy_sliderator_project) return typeof(SlideratorProject);
+                if (typeName == legacy_tumour_generator_project) return typeof(TumourGeneratorProject);
+                if (typeName == legacy_tumour_layer) return typeof(TumourLayer);
+                if (typeName == legacy_graph_state) return typeof(GraphState);
+                if (typeName == legacy_graph_anchor) return typeof(GraphAnchor);
+                if (typeName == legacy_mapset_merger_project) return typeof(MapsetMergerProject);
+                if (typeName == legacy_mapset_merger_item) return typeof(MapsetMergerProject.MapsetItem);
+                if (typeName == legacy_combo_colour_project) return typeof(ComboColourProject);
+                if (typeName == legacy_combo_colour_point) return typeof(ColourPoint);
+                if (typeName == legacy_pattern_gallery_project) return typeof(PatternGalleryProject);
+                if (typeName == legacy_pattern_gallery_pattern) return typeof(PatternGalleryPattern);
+                if (typeName == legacy_pattern_gallery_handler) return typeof(PatternGalleryCollectionMetadata);
+                if (typeName == legacy_hotkey) return typeof(Hotkey);
+                if (typeName == intermediate_core_hotkey) return typeof(Hotkey);
 
                 // Accept both the former namespace and documents emitted by
                 // an intermediate migration build that already used Core names.
-                var migratedType = MigratedCoreMarker.Assembly.GetType(typeName)
-                                   ?? MigratedCoreMarker.Assembly.GetType(ToCurrentTypeName(typeName))
-                                   ?? MigratedCoreMarker.Assembly.GetType(ToCurrentGraphTypeName(typeName));
+                var migratedType = migratedCoreMarker.Assembly.GetType(typeName)
+                                   ?? migratedCoreMarker.Assembly.GetType(ToCurrentTypeName(typeName))
+                                   ?? migratedCoreMarker.Assembly.GetType(ToCurrentGraphTypeName(typeName));
                 if (migratedType is not null) return migratedType;
             }
 
-            return _fallback.BindToType(assemblyName, typeName);
+            return fallback.BindToType(assemblyName, typeName);
         }
 
         public void BindToName(
@@ -280,208 +280,208 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         {
             if (serializedType == typeof(RhythmGuideProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyRhythmGuideProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_rhythm_guide_project;
                 return;
             }
 
             if (serializedType == typeof(HitsoundPreviewHelperProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyHitsoundPreviewHelperProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_hitsound_preview_helper_project;
                 return;
             }
 
             if (serializedType == typeof(HitsoundCopierProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyHitsoundCopierProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_hitsound_copier_project;
                 return;
             }
 
             if (serializedType == typeof(HitsoundStudioProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyHitsoundStudioProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_hitsound_studio_project;
                 return;
             }
 
             if (serializedType == typeof(RhythmGuideOptions))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyRhythmGuideOptions;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_rhythm_guide_options;
                 return;
             }
 
             if (serializedType == typeof(MapCleanerProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyMapCleanerProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_map_cleaner_project;
                 return;
             }
 
             if (serializedType == typeof(MapCleanerOptions))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyMapCleanerOptions;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_map_cleaner_options;
                 return;
             }
 
             if (serializedType == typeof(MetadataManagerProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyMetadataManagerProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_metadata_manager_project;
                 return;
             }
 
             if (serializedType == typeof(PropertyTransformerProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyPropertyTransformerProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_property_transformer_project;
                 return;
             }
 
             if (serializedType == typeof(TimingCopierProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyTimingCopierProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_timing_copier_project;
                 return;
             }
 
             if (serializedType == typeof(TimingHelperProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyTimingHelperProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_timing_helper_project;
                 return;
             }
 
             if (serializedType == typeof(SliderCompletionatorProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacySliderCompletionatorProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_slider_completionator_project;
                 return;
             }
 
             if (serializedType == typeof(SliderMergerProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacySliderMergerProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_slider_merger_project;
                 return;
             }
 
             if (serializedType == typeof(SliderPicturatorProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacySliderPicturatorProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_slider_picturator_project;
                 return;
             }
 
             if (serializedType == typeof(SlideratorProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacySlideratorProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_sliderator_project;
                 return;
             }
 
             if (serializedType == typeof(TumourGeneratorProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyTumourGeneratorProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_tumour_generator_project;
                 return;
             }
 
             if (serializedType == typeof(TumourLayer))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyTumourLayer;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_tumour_layer;
                 return;
             }
 
             if (serializedType == typeof(GraphState))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyGraphState;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_graph_state;
                 return;
             }
 
             if (serializedType == typeof(GraphAnchor))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyGraphAnchor;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_graph_anchor;
                 return;
             }
 
             if (serializedType == typeof(MapsetMergerProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyMapsetMergerProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_mapset_merger_project;
                 return;
             }
 
             if (serializedType == typeof(MapsetMergerProject.MapsetItem))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyMapsetMergerItem;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_mapset_merger_item;
                 return;
             }
 
             if (serializedType == typeof(ComboColourProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyComboColourProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_combo_colour_project;
                 return;
             }
 
             if (serializedType == typeof(ColourPoint))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyComboColourPoint;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_combo_colour_point;
                 return;
             }
 
             if (serializedType == typeof(PatternGalleryProject))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyPatternGalleryProject;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_pattern_gallery_project;
                 return;
             }
 
             if (serializedType == typeof(PatternGalleryPattern))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyPatternGalleryPattern;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_pattern_gallery_pattern;
                 return;
             }
 
             if (serializedType == typeof(PatternGalleryCollectionMetadata))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyPatternGalleryHandler;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_pattern_gallery_handler;
                 return;
             }
 
             if (serializedType == typeof(Hotkey))
             {
-                assemblyName = LegacyAssemblyName;
-                typeName = LegacyHotkey;
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_hotkey;
                 return;
             }
 
-            if (serializedType.Assembly == MigratedCoreMarker.Assembly)
+            if (serializedType.Assembly == migratedCoreMarker.Assembly)
             {
-                assemblyName = LegacyAssemblyName;
+                assemblyName = legacy_assembly_name;
                 typeName = ToLegacyTypeName(serializedType.FullName);
                 return;
             }
 
-            _fallback.BindToName(serializedType, out assemblyName, out typeName);
+            fallback.BindToName(serializedType, out assemblyName, out typeName);
         }
 
         private static bool IsLegacyAssembly(string? assemblyName)
         {
             return string.Equals(
                 assemblyName?.Split(',', 2)[0].Trim(),
-                LegacyAssemblyName,
+                legacy_assembly_name,
                 StringComparison.Ordinal);
         }
 
@@ -489,14 +489,14 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         {
             return string.Equals(
                 assemblyName?.Split(',', 2)[0].Trim(),
-                MigratedCoreMarker.Assembly.GetName().Name,
+                migratedCoreMarker.Assembly.GetName().Name,
                 StringComparison.Ordinal);
         }
 
         private static string ToCurrentTypeName(string typeName)
         {
-            return typeName.StartsWith(LegacyNamespacePrefix, StringComparison.Ordinal)
-                ? CurrentNamespacePrefix + typeName[LegacyNamespacePrefix.Length..]
+            return typeName.StartsWith(legacy_namespace_prefix, StringComparison.Ordinal)
+                ? current_namespace_prefix + typeName[legacy_namespace_prefix.Length..]
                 : typeName;
         }
 
@@ -511,8 +511,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         {
             return typeName?.StartsWith("Mapping_Tools.Core.Classes.Graph", StringComparison.Ordinal) == true
                 ? "Mapping_Tools.Components.Graph" + typeName["Mapping_Tools.Core.Classes.Graph".Length..]
-                : typeName?.StartsWith(CurrentNamespacePrefix, StringComparison.Ordinal) == true
-                    ? LegacyNamespacePrefix + typeName[CurrentNamespacePrefix.Length..]
+                : typeName?.StartsWith(current_namespace_prefix, StringComparison.Ordinal) == true
+                    ? legacy_namespace_prefix + typeName[current_namespace_prefix.Length..]
                     : typeName;
         }
     }
@@ -593,10 +593,10 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
     private sealed class GeometryGeneratorSettingsDictionaryConverter : JsonConverter
     {
-        private const string PreferencesDictionaryType =
+        private const string preferences_dictionary_type =
             "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools]], System.Private.CoreLib";
 
-        private const string GeneratorDictionaryType =
+        private const string generator_dictionary_type =
             "System.Collections.Generic.Dictionary`2[[System.Type, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools]], System.Private.CoreLib";
 
         public override bool CanConvert(Type objectType)
@@ -611,7 +611,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 case Dictionary<Type, GeneratorSettings> generatorSettings:
                     writer.WriteStartObject();
                     writer.WritePropertyName("$type");
-                    writer.WriteValue(GeneratorDictionaryType);
+                    writer.WriteValue(generator_dictionary_type);
                     foreach (var (type, settings) in generatorSettings)
                     {
                         writer.WritePropertyName(ToLegacyGeneratorTypeKey(type));
@@ -623,7 +623,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 case Dictionary<string, RelevantObjectPreferences> preferences:
                     writer.WriteStartObject();
                     writer.WritePropertyName("$type");
-                    writer.WriteValue(PreferencesDictionaryType);
+                    writer.WriteValue(preferences_dictionary_type);
                     foreach ((string name, var preference) in preferences)
                     {
                         writer.WritePropertyName(name);

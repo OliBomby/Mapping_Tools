@@ -108,7 +108,7 @@ public sealed class DoubleMarkerGenerator : IGraphMarkerGenerator
         for (int index = 0;; index++)
         {
             double value = first + step * index;
-            if (value > end + Precision.DoubleEpsilon) yield break;
+            if (value > end + Precision.DOUBLE_EPSILON) yield break;
             yield return new GraphMarker
             {
                 Orientation = orientation,
@@ -153,7 +153,7 @@ public sealed class DividedBeatMarkerGenerator : IGraphMarkerGenerator
         for (int index = 0;; index++)
         {
             double value = first + step * index;
-            if (value > end + Precision.DoubleEpsilon) yield break;
+            if (value > end + Precision.DOUBLE_EPSILON) yield break;
             (uint color, double length) = GetMarkerStyle(value);
             yield return new GraphMarker
             {
@@ -169,12 +169,12 @@ public sealed class DividedBeatMarkerGenerator : IGraphMarkerGenerator
 
     private static (uint Color, double Length) GetMarkerStyle(double value)
     {
-        if (Math.Abs(value % 4) < Precision.DoubleEpsilon) return (0xFFFFFFFF, 20);
-        if (Math.Abs(value % 1) < Precision.DoubleEpsilon) return (0xFFFFFFFF, 12);
-        if (Math.Abs(value % 0.5) < Precision.DoubleEpsilon) return (0xFFFF0000, 7);
-        if (Math.Abs(value % 0.25) < Precision.DoubleEpsilon) return (0xFF1E90FF, 7);
-        if (Math.Abs(value % 0.125) < Precision.DoubleEpsilon) return (0xFFFFFF00, 7);
-        if (Math.Abs(value % (1d / 6)) < Precision.DoubleEpsilon) return (0xFF800080, 7);
+        if (Math.Abs(value % 4) < Precision.DOUBLE_EPSILON) return (0xFFFFFFFF, 20);
+        if (Math.Abs(value % 1) < Precision.DOUBLE_EPSILON) return (0xFFFFFFFF, 12);
+        if (Math.Abs(value % 0.5) < Precision.DOUBLE_EPSILON) return (0xFFFF0000, 7);
+        if (Math.Abs(value % 0.25) < Precision.DOUBLE_EPSILON) return (0xFF1E90FF, 7);
+        if (Math.Abs(value % 0.125) < Precision.DOUBLE_EPSILON) return (0xFFFFFF00, 7);
+        if (Math.Abs(value % (1d / 6)) < Precision.DOUBLE_EPSILON) return (0xFF800080, 7);
         return (0xFF808080, 7);
     }
 }
@@ -226,7 +226,7 @@ public sealed class CustomMarkerGenerator : IGraphMarkerGenerator
         for (int index = 0;; index++)
         {
             double value = first + step * index;
-            if (value > end + Precision.DoubleEpsilon) yield break;
+            if (value > end + Precision.DOUBLE_EPSILON) yield break;
             yield return new GraphMarker
             {
                 Orientation = orientation,

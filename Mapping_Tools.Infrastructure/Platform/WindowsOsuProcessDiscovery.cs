@@ -10,7 +10,7 @@ namespace Mapping_Tools.Infrastructure.Platform;
 /// </summary>
 public sealed class WindowsOsuProcessDiscovery : IGeometryDashboardProcessDiscovery
 {
-    private readonly Func<bool> _isWindows;
+    private readonly Func<bool> isWindows;
 
     /// <summary>Creates a process discovery adapter using the current platform guard.</summary>
     public WindowsOsuProcessDiscovery()
@@ -20,18 +20,18 @@ public sealed class WindowsOsuProcessDiscovery : IGeometryDashboardProcessDiscov
 
     internal WindowsOsuProcessDiscovery(Func<bool> isWindows)
     {
-        _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
+        this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
     /// <inheritdoc />
-    public bool IsSupported => _isWindows();
+    public bool IsSupported => isWindows();
 
     /// <inheritdoc />
     public Task<GeometryDashboardProcess?> FindAsync(
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (!_isWindows()) return Task.FromResult<GeometryDashboardProcess?>(null);
+        if (!isWindows()) return Task.FromResult<GeometryDashboardProcess?>(null);
 
         using var process = OsuProcessDiscovery.FindStableProcess();
         if (process is null) return Task.FromResult<GeometryDashboardProcess?>(null);

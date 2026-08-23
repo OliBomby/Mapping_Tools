@@ -29,27 +29,27 @@ namespace Mapping_Tools.Core.Classes.MathUtil;
 /// </summary>
 [Serializable]
 [StructLayout(LayoutKind.Sequential)]
-public struct Matrix3d : IEquatable<Matrix3d>
+public struct Matrix3D : IEquatable<Matrix3D>
 {
     /// <summary>
     ///     First row of the matrix.
     /// </summary>
-    public Vector3d Row0;
+    public Vector3D Row0;
 
     /// <summary>
     ///     Second row of the matrix.
     /// </summary>
-    public Vector3d Row1;
+    public Vector3D Row1;
 
     /// <summary>
     ///     Third row of the matrix.
     /// </summary>
-    public Vector3d Row2;
+    public Vector3D Row2;
 
     /// <summary>
     ///     The identity matrix.
     /// </summary>
-    public static Matrix3d Identity = new(Vector3d.UnitX, Vector3d.UnitY, Vector3d.UnitZ);
+    public static Matrix3D Identity = new(Vector3D.UnitX, Vector3D.UnitY, Vector3D.UnitZ);
 
 
     /// <summary>
@@ -58,7 +58,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="row0">Top row of the matrix</param>
     /// <param name="row1">Second row of the matrix</param>
     /// <param name="row2">Bottom row of the matrix</param>
-    public Matrix3d(Vector3d row0, Vector3d row1, Vector3d row2)
+    public Matrix3D(Vector3D row0, Vector3D row1, Vector3D row2)
     {
         Row0 = row0;
         Row1 = row1;
@@ -77,21 +77,21 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="m20">First item of the third row of the matrix.</param>
     /// <param name="m21">Second item of the third row of the matrix.</param>
     /// <param name="m22">Third item of the third row of the matrix.</param>
-    public Matrix3d(
+    public Matrix3D(
         double m00, double m01, double m02,
         double m10, double m11, double m12,
         double m20, double m21, double m22)
     {
-        Row0 = new Vector3d(m00, m01, m02);
-        Row1 = new Vector3d(m10, m11, m12);
-        Row2 = new Vector3d(m20, m21, m22);
+        Row0 = new Vector3D(m00, m01, m02);
+        Row1 = new Vector3D(m10, m11, m12);
+        Row2 = new Vector3D(m20, m21, m22);
     }
 
     /// <summary>
     ///     Constructs a new instance.
     /// </summary>
     /// <param name="matrix">A Matrix4d to take the upper-left 3x3 from.</param>
-    public Matrix3d(Matrix4d matrix)
+    public Matrix3D(Matrix4D matrix)
     {
         Row0 = matrix.Row0.Xyz;
         Row1 = matrix.Row1.Xyz;
@@ -129,17 +129,17 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <summary>
     ///     Gets the first column of this matrix.
     /// </summary>
-    public Vector3d Column0 => new(Row0.X, Row1.X, Row2.X);
+    public Vector3D Column0 => new(Row0.X, Row1.X, Row2.X);
 
     /// <summary>
     ///     Gets the second column of this matrix.
     /// </summary>
-    public Vector3d Column1 => new(Row0.Y, Row1.Y, Row2.Y);
+    public Vector3D Column1 => new(Row0.Y, Row1.Y, Row2.Y);
 
     /// <summary>
     ///     Gets the third column of this matrix.
     /// </summary>
-    public Vector3d Column2 => new(Row0.Z, Row1.Z, Row2.Z);
+    public Vector3D Column2 => new(Row0.Z, Row1.Z, Row2.Z);
 
     /// <summary>
     ///     Gets or sets the value at row 1, column 1 of this instance.
@@ -225,7 +225,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <summary>
     ///     Gets or sets the values along the main diagonal of the matrix.
     /// </summary>
-    public Vector3d Diagonal
+    public Vector3D Diagonal
     {
         get => new(Row0.X, Row1.Y, Row2.Z);
         set
@@ -289,7 +289,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <summary>
     ///     Returns a normalised copy of this instance.
     /// </summary>
-    public Matrix3d Normalized()
+    public Matrix3D Normalized()
     {
         var m = this;
         m.Normalize();
@@ -310,7 +310,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <summary>
     ///     Returns an inverted copy of this instance.
     /// </summary>
-    public Matrix3d Inverted()
+    public Matrix3D Inverted()
     {
         var m = this;
         if (m.Determinant != 0) m.Invert();
@@ -321,7 +321,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <summary>
     ///     Returns a copy of this Matrix3 without scale.
     /// </summary>
-    public Matrix3d ClearScale()
+    public Matrix3D ClearScale()
     {
         var m = this;
         m.Row0 = m.Row0.Normalized();
@@ -333,19 +333,19 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <summary>
     ///     Returns a copy of this Matrix3 without rotation.
     /// </summary>
-    public Matrix3d ClearRotation()
+    public Matrix3D ClearRotation()
     {
         var m = this;
-        m.Row0 = new Vector3d(m.Row0.Length, 0, 0);
-        m.Row1 = new Vector3d(0, m.Row1.Length, 0);
-        m.Row2 = new Vector3d(0, 0, m.Row2.Length);
+        m.Row0 = new Vector3D(m.Row0.Length, 0, 0);
+        m.Row1 = new Vector3D(0, m.Row1.Length, 0);
+        m.Row2 = new Vector3D(0, 0, m.Row2.Length);
         return m;
     }
 
     /// <summary>
     ///     Returns the scale component of this instance.
     /// </summary>
-    public Vector3d ExtractScale() { return new Vector3d(Row0.Length, Row1.Length, Row2.Length); }
+    public Vector3D ExtractScale() { return new Vector3D(Row0.Length, Row1.Length, Row2.Length); }
 
     /// <summary>
     ///     Returns the rotation component of this instance. Quite slow.
@@ -424,7 +424,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="axis">The axis to rotate about.</param>
     /// <param name="angle">Angle in radians to rotate counter-clockwise (looking in the direction of the given axis).</param>
     /// <param name="result">A matrix instance.</param>
-    public static void CreateFromAxisAngle(Vector3d axis, double angle, out Matrix3d result)
+    public static void CreateFromAxisAngle(Vector3D axis, double angle, out Matrix3D result)
     {
         //normalize and create a local copy of the vector.
         axis.Normalize();
@@ -464,7 +464,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="axis">The axis to rotate about.</param>
     /// <param name="angle">Angle in radians to rotate counter-clockwise (looking in the direction of the given axis).</param>
     /// <returns>A matrix instance.</returns>
-    public static Matrix3d CreateFromAxisAngle(Vector3d axis, double angle)
+    public static Matrix3D CreateFromAxisAngle(Vector3D axis, double angle)
     {
         CreateFromAxisAngle(axis, angle, out var result);
         return result;
@@ -476,7 +476,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="q">Quaternion to translate.</param>
     /// <param name="result">Matrix result.</param>
-    public static void CreateFromQuaternion(ref Quaterniond q, out Matrix3d result)
+    public static void CreateFromQuaternion(ref Quaterniond q, out Matrix3D result)
     {
         q.ToAxisAngle(out var axis, out double angle);
         CreateFromAxisAngle(axis, angle, out result);
@@ -487,7 +487,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="q">Quaternion to translate.</param>
     /// <returns>A matrix instance.</returns>
-    public static Matrix3d CreateFromQuaternion(Quaterniond q)
+    public static Matrix3D CreateFromQuaternion(Quaterniond q)
     {
         CreateFromQuaternion(ref q, out var result);
         return result;
@@ -499,7 +499,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix3d instance.</param>
-    public static void CreateRotationX(double angle, out Matrix3d result)
+    public static void CreateRotationX(double angle, out Matrix3D result)
     {
         double cos = Math.Cos(angle);
         double sin = Math.Sin(angle);
@@ -516,7 +516,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <returns>The resulting Matrix3d instance.</returns>
-    public static Matrix3d CreateRotationX(double angle)
+    public static Matrix3D CreateRotationX(double angle)
     {
         CreateRotationX(angle, out var result);
         return result;
@@ -527,7 +527,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix3d instance.</param>
-    public static void CreateRotationY(double angle, out Matrix3d result)
+    public static void CreateRotationY(double angle, out Matrix3D result)
     {
         double cos = Math.Cos(angle);
         double sin = Math.Sin(angle);
@@ -544,7 +544,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <returns>The resulting Matrix3d instance.</returns>
-    public static Matrix3d CreateRotationY(double angle)
+    public static Matrix3D CreateRotationY(double angle)
     {
         CreateRotationY(angle, out var result);
         return result;
@@ -555,7 +555,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <param name="result">The resulting Matrix3d instance.</param>
-    public static void CreateRotationZ(double angle, out Matrix3d result)
+    public static void CreateRotationZ(double angle, out Matrix3D result)
     {
         double cos = Math.Cos(angle);
         double sin = Math.Sin(angle);
@@ -572,7 +572,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="angle">The counter-clockwise angle in radians.</param>
     /// <returns>The resulting Matrix3d instance.</returns>
-    public static Matrix3d CreateRotationZ(double angle)
+    public static Matrix3D CreateRotationZ(double angle)
     {
         CreateRotationZ(angle, out var result);
         return result;
@@ -584,7 +584,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="scale">Single scale factor for the x, y, and z axes.</param>
     /// <returns>A scale matrix.</returns>
-    public static Matrix3d CreateScale(double scale)
+    public static Matrix3D CreateScale(double scale)
     {
         CreateScale(scale, out var result);
         return result;
@@ -595,7 +595,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="scale">Scale factors for the x, y, and z axes.</param>
     /// <returns>A scale matrix.</returns>
-    public static Matrix3d CreateScale(Vector3d scale)
+    public static Matrix3D CreateScale(Vector3D scale)
     {
         CreateScale(ref scale, out var result);
         return result;
@@ -608,7 +608,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="y">Scale factor for the y axis.</param>
     /// <param name="z">Scale factor for the z axis.</param>
     /// <returns>A scale matrix.</returns>
-    public static Matrix3d CreateScale(double x, double y, double z)
+    public static Matrix3D CreateScale(double x, double y, double z)
     {
         CreateScale(x, y, z, out var result);
         return result;
@@ -619,7 +619,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="scale">Single scale factor for the x, y, and z axes.</param>
     /// <param name="result">A scale matrix.</param>
-    public static void CreateScale(double scale, out Matrix3d result)
+    public static void CreateScale(double scale, out Matrix3D result)
     {
         result = Identity;
         result.Row0.X = scale;
@@ -632,7 +632,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="scale">Scale factors for the x, y, and z axes.</param>
     /// <param name="result">A scale matrix.</param>
-    public static void CreateScale(ref Vector3d scale, out Matrix3d result)
+    public static void CreateScale(ref Vector3D scale, out Matrix3D result)
     {
         result = Identity;
         result.Row0.X = scale.X;
@@ -647,7 +647,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="y">Scale factor for the y axis.</param>
     /// <param name="z">Scale factor for the z axis.</param>
     /// <param name="result">A scale matrix.</param>
-    public static void CreateScale(double x, double y, double z, out Matrix3d result)
+    public static void CreateScale(double x, double y, double z, out Matrix3D result)
     {
         result = Identity;
         result.Row0.X = x;
@@ -662,7 +662,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="left">The left operand of the addition.</param>
     /// <param name="right">The right operand of the addition.</param>
     /// <returns>A new instance that is the result of the addition.</returns>
-    public static Matrix3d Add(Matrix3d left, Matrix3d right)
+    public static Matrix3D Add(Matrix3D left, Matrix3D right)
     {
         Add(ref left, ref right, out var result);
         return result;
@@ -674,11 +674,11 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="left">The left operand of the addition.</param>
     /// <param name="right">The right operand of the addition.</param>
     /// <param name="result">A new instance that is the result of the addition.</param>
-    public static void Add(ref Matrix3d left, ref Matrix3d right, out Matrix3d result)
+    public static void Add(ref Matrix3D left, ref Matrix3D right, out Matrix3D result)
     {
-        Vector3d.Add(ref left.Row0, ref right.Row0, out result.Row0);
-        Vector3d.Add(ref left.Row1, ref right.Row1, out result.Row1);
-        Vector3d.Add(ref left.Row2, ref right.Row2, out result.Row2);
+        Vector3D.Add(ref left.Row0, ref right.Row0, out result.Row0);
+        Vector3D.Add(ref left.Row1, ref right.Row1, out result.Row1);
+        Vector3D.Add(ref left.Row2, ref right.Row2, out result.Row2);
     }
 
     /// <summary>
@@ -687,7 +687,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <returns>A new instance that is the result of the multiplication</returns>
-    public static Matrix3d Mult(Matrix3d left, Matrix3d right)
+    public static Matrix3D Mult(Matrix3D left, Matrix3D right)
     {
         Mult(ref left, ref right, out var result);
         return result;
@@ -699,7 +699,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="left">The left operand of the multiplication.</param>
     /// <param name="right">The right operand of the multiplication.</param>
     /// <param name="result">A new instance that is the result of the multiplication</param>
-    public static void Mult(ref Matrix3d left, ref Matrix3d right, out Matrix3d result)
+    public static void Mult(ref Matrix3D left, ref Matrix3D right, out Matrix3D result)
     {
         double lM11 = left.Row0.X,
             lM12 = left.Row0.Y,
@@ -738,7 +738,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="mat">The matrix to invert</param>
     /// <param name="result">The inverse of the given matrix if it has one, or the input if it is singular</param>
     /// <exception cref="InvalidOperationException">Thrown if the Matrix3d is singular.</exception>
-    public static void Invert(ref Matrix3d mat, out Matrix3d result)
+    public static void Invert(ref Matrix3D mat, out Matrix3D result)
     {
         int[] colIdx = { 0, 0, 0 };
         int[] rowIdx = { 0, 0, 0 };
@@ -834,7 +834,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="mat">The matrix to invert</param>
     /// <returns>The inverse of the given matrix if it has one, or the input if it is singular</returns>
     /// <exception cref="InvalidOperationException">Thrown if the Matrix4 is singular.</exception>
-    public static Matrix3d Invert(Matrix3d mat)
+    public static Matrix3D Invert(Matrix3D mat)
     {
         Invert(ref mat, out var result);
         return result;
@@ -846,9 +846,9 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="mat">The matrix to transpose</param>
     /// <returns>The transpose of the given matrix</returns>
-    public static Matrix3d Transpose(Matrix3d mat)
+    public static Matrix3D Transpose(Matrix3D mat)
     {
-        return new Matrix3d(mat.Column0, mat.Column1, mat.Column2);
+        return new Matrix3D(mat.Column0, mat.Column1, mat.Column2);
     }
 
     /// <summary>
@@ -856,7 +856,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// </summary>
     /// <param name="mat">The matrix to transpose</param>
     /// <param name="result">The result of the calculation</param>
-    public static void Transpose(ref Matrix3d mat, out Matrix3d result)
+    public static void Transpose(ref Matrix3D mat, out Matrix3D result)
     {
         result.Row0 = mat.Column0;
         result.Row1 = mat.Column1;
@@ -870,7 +870,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="left">left-hand operand</param>
     /// <param name="right">right-hand operand</param>
     /// <returns>A new Matrix3d which holds the result of the multiplication</returns>
-    public static Matrix3d operator *(Matrix3d left, Matrix3d right) => Mult(left, right);
+    public static Matrix3D operator *(Matrix3D left, Matrix3D right) => Mult(left, right);
 
     /// <summary>
     ///     Compares two instances for equality.
@@ -878,7 +878,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="left">The first instance.</param>
     /// <param name="right">The second instance.</param>
     /// <returns>True, if left equals right; false otherwise.</returns>
-    public static bool operator ==(Matrix3d left, Matrix3d right) => left.Equals(right);
+    public static bool operator ==(Matrix3D left, Matrix3D right) => left.Equals(right);
 
     /// <summary>
     ///     Compares two instances for inequality.
@@ -886,7 +886,7 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <param name="left">The first instance.</param>
     /// <param name="right">The second instance.</param>
     /// <returns>True, if left does not equal right; false otherwise.</returns>
-    public static bool operator !=(Matrix3d left, Matrix3d right) => !left.Equals(right);
+    public static bool operator !=(Matrix3D left, Matrix3D right) => !left.Equals(right);
 
 
     /// <summary>
@@ -922,16 +922,16 @@ public struct Matrix3d : IEquatable<Matrix3d>
     /// <returns>True if the instances are equal; false otherwise.</returns>
     public override bool Equals(object obj)
     {
-        if (!(obj is Matrix3d)) return false;
+        if (!(obj is Matrix3D)) return false;
 
-        return Equals((Matrix3d)obj);
+        return Equals((Matrix3D)obj);
     }
 
 
     /// <summary>Indicates whether the current matrix is equal to another matrix.</summary>
     /// <param name="other">A matrix to compare with this matrix.</param>
     /// <returns>true if the current matrix is equal to the matrix parameter; otherwise, false.</returns>
-    public bool Equals(Matrix3d other)
+    public bool Equals(Matrix3D other)
     {
         return
             Row0 == other.Row0 && Row1 == other.Row1 && Row2 == other.Row2;

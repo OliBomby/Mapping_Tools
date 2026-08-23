@@ -6,19 +6,19 @@ namespace Mapping_Tools.Infrastructure.Tests.MapsetMerger;
 [TestClass]
 public sealed class PhysicalMapsetFileSystemEnumerationTests : IDisposable
 {
-    private readonly string _root = Path.Combine(
+    private readonly string root = Path.Combine(
         Path.GetTempPath(),
         "mapping-tools-mapset-enumeration-" + Guid.NewGuid().ToString("N"));
 
     public void Dispose()
     {
-        if (Directory.Exists(_root)) Directory.Delete(_root, true);
+        if (Directory.Exists(root)) Directory.Delete(root, true);
     }
 
     [TestInitialize]
     public void Initialize()
     {
-        Directory.CreateDirectory(_root);
+        Directory.CreateDirectory(root);
     }
 
     [TestCleanup]
@@ -31,15 +31,15 @@ public sealed class PhysicalMapsetFileSystemEnumerationTests : IDisposable
     public void EnumerateFiles_WithNestedSources_UsesStablePathOrder()
     {
         // Arrange
-        File.WriteAllText(Path.Combine(_root, "A.osu"), string.Empty);
-        File.WriteAllText(Path.Combine(_root, "b.osu"), string.Empty);
-        string nested = Path.Combine(_root, "nested");
+        File.WriteAllText(Path.Combine(root, "A.osu"), string.Empty);
+        File.WriteAllText(Path.Combine(root, "b.osu"), string.Empty);
+        string nested = Path.Combine(root, "nested");
         Directory.CreateDirectory(nested);
         File.WriteAllText(Path.Combine(nested, "c.osu"), string.Empty);
 
         // Act
         var files = new PhysicalMapsetFileSystem()
-            .EnumerateFiles(_root, "*.osu");
+            .EnumerateFiles(root, "*.osu");
 
         // Assert
         files.Select(Path.GetFileName).Should().Equal("A.osu", "b.osu", "c.osu");

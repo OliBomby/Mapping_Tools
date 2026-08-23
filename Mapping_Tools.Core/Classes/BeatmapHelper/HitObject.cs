@@ -665,7 +665,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
     public double GetEndTime(bool floor = true)
     {
         double endTime = Time + TemporalLength * Repeat;
-        return floor ? Math.Floor(endTime + Precision.DoubleEpsilon) : endTime;
+        return floor ? Math.Floor(endTime + Precision.DOUBLE_EPSILON) : endTime;
     }
 
     private void SetEndTime(double value)
@@ -998,7 +998,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
         double newTime = GetResnappedTime(timing, beatDivisors, floor, tp, firstTp);
         double deltaTime = newTime - Time;
         MoveTime(deltaTime);
-        return Math.Abs(deltaTime) > Precision.DoubleEpsilon;
+        return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
     }
 
     /// <summary>
@@ -1038,7 +1038,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
         double deltaTime = newTime - EndTime;
         MoveEndTime(timing, deltaTime);
 
-        return Math.Abs(deltaTime) > Precision.DoubleEpsilon;
+        return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
     }
 
     /// <summary>
@@ -1055,7 +1055,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
         double deltaTime = newTemporalLength - TemporalLength;
         ChangeTemporalTime(timing, deltaTime);
 
-        return Math.Abs(deltaTime) > Precision.DoubleEpsilon;
+        return Math.Abs(deltaTime) > Precision.DOUBLE_EPSILON;
     }
 
     /// <summary>
@@ -1075,7 +1075,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
         double dY = 192 - Pos.Y;
         Move(new Vector2(dX, dY));
 
-        return Math.Abs(dX) > Precision.DoubleEpsilon || Math.Abs(dY) > Precision.DoubleEpsilon;
+        return Math.Abs(dX) > Precision.DOUBLE_EPSILON || Math.Abs(dY) > Precision.DOUBLE_EPSILON;
     }
 
     /// <summary>
@@ -1102,7 +1102,7 @@ public class HitObject : ITextLine, IComparable<HitObject>
                || SampleSet != SampleSet.None
                || AdditionSet != SampleSet.None
                || CustomIndex != 0
-               || Math.Abs(SampleVolume) > Precision.DoubleEpsilon
+               || Math.Abs(SampleVolume) > Precision.DOUBLE_EPSILON
                || !string.IsNullOrEmpty(Filename);
     }
 

@@ -9,7 +9,7 @@ namespace Mapping_Tools.Application.TimingHelper;
 /// </summary>
 public sealed class TimingHelperService : ITimingHelperService
 {
-    private readonly IBeatmapEditingGateway _editingGateway;
+    private readonly IBeatmapEditingGateway editingGateway;
 
     /// <summary>
     ///     Creates the Timing Helper application service.
@@ -17,8 +17,8 @@ public sealed class TimingHelperService : ITimingHelperService
     /// <param name="editingGateway">Loads and saves beatmaps through the shared backup boundary.</param>
     public TimingHelperService(IBeatmapEditingGateway editingGateway)
     {
-        _editingGateway = editingGateway
-                          ?? throw new ArgumentNullException(nameof(editingGateway));
+        this.editingGateway = editingGateway
+                              ?? throw new ArgumentNullException(nameof(editingGateway));
     }
 
     /// <inheritdoc />
@@ -39,7 +39,7 @@ public sealed class TimingHelperService : ITimingHelperService
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
             int pathIndex = index;
-            var session = await _editingGateway
+            var session = await editingGateway
                 .OpenBeatmapAsync(
                     path,
                     LiveBeatmapPreference.PreferLive,
@@ -53,7 +53,7 @@ public sealed class TimingHelperService : ITimingHelperService
                 options,
                 mapProgress,
                 cancellationToken);
-            await _editingGateway
+            await editingGateway
                 .SaveAsync(session, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
             processedPaths.Add(path);

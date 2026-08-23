@@ -134,7 +134,7 @@ public class CustomInterpolator : IGraphInterpolator
 /// <summary>Provides the stable legacy ordering and metadata for built-in interpolators.</summary>
 public static class GraphInterpolatorCatalog
 {
-    private static readonly Type[] BuiltInTypes =
+    private static readonly Type[] builtInTypes =
     [
         typeof(SingleCurveInterpolator),
         typeof(SingleCurveInterpolator2),
@@ -150,7 +150,7 @@ public static class GraphInterpolatorCatalog
     /// <summary>Gets the interpolator types displayed by the graph context menu.</summary>
     public static IReadOnlyList<Type> GetInterpolators()
     {
-        return BuiltInTypes;
+        return builtInTypes;
     }
 
     /// <summary>Gets the display name for an interpolator type.</summary>
@@ -172,7 +172,7 @@ public static class GraphInterpolatorCatalog
     public static int GetInterpolatorIndex(Type type)
     {
         ArgumentNullException.ThrowIfNull(type);
-        return Array.IndexOf(BuiltInTypes, type);
+        return Array.IndexOf(builtInTypes, type);
     }
 
     /// <summary>Gets an interpolator type from a persisted menu index.</summary>
@@ -180,8 +180,8 @@ public static class GraphInterpolatorCatalog
     /// <returns>The indexed type, or the default single-curve type for invalid input.</returns>
     public static Type GetInterpolatorByIndex(int index)
     {
-        return index >= 0 && index < BuiltInTypes.Length
-            ? BuiltInTypes[index]
+        return index >= 0 && index < builtInTypes.Length
+            ? builtInTypes[index]
             : typeof(SingleCurveInterpolator);
     }
 

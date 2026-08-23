@@ -326,19 +326,19 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
 
     private sealed class NaudioSampleSoundGenerator : IDisposable
     {
-        private readonly NaudioSampleSoundGenerator[]? _generators;
-        private readonly WaveStream? _wave;
-        private bool _disposed;
+        private readonly NaudioSampleSoundGenerator[]? generators;
+        private readonly WaveStream? wave;
+        private bool disposed;
 
         public NaudioSampleSoundGenerator(WaveStream wave)
         {
-            _wave = wave ?? throw new ArgumentNullException(nameof(wave));
+            this.wave = wave ?? throw new ArgumentNullException(nameof(wave));
         }
 
         public NaudioSampleSoundGenerator(NaudioSampleSoundGenerator[] generators)
         {
-            _generators = generators ?? throw new ArgumentNullException(nameof(generators));
-            if (_generators.Length == 0) throw new ArgumentException("At least one generator is required.", nameof(generators));
+            this.generators = generators ?? throw new ArgumentNullException(nameof(generators));
+            if (this.generators.Length == 0) throw new ArgumentException("At least one generator is required.", nameof(generators));
         }
 
         public double AmplitudeCorrection { get; set; } = 1;
@@ -348,17 +348,17 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
         public double FadeLength { get; set; } = -1;
         public int SampleRate { get; set; } = -1;
         public int Channels { get; set; } = -1;
-        public int OutputSampleRate => SampleRate > 0 ? SampleRate : _wave?.WaveFormat.SampleRate ?? _generators![0].OutputSampleRate;
-        public int OutputChannels => Channels > 0 ? Channels : _wave?.WaveFormat.Channels ?? _generators![0].OutputChannels;
+        public int OutputSampleRate => SampleRate > 0 ? SampleRate : wave?.WaveFormat.SampleRate ?? generators![0].OutputSampleRate;
+        public int OutputChannels => Channels > 0 ? Channels : wave?.WaveFormat.Channels ?? generators![0].OutputChannels;
 
         public void Dispose()
         {
-            if (_disposed) return;
+            if (disposed) return;
 
-            _disposed = true;
-            _wave?.Dispose();
-            if (_generators is not null)
-                foreach (var generator in _generators)
+            disposed = true;
+            wave?.Dispose();
+            if (generators is not null)
+                foreach (var generator in generators)
                     generator.Dispose();
         }
 
@@ -381,16 +381,16 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
 
         private ISampleProvider GetSampleProvider()
         {
-            ObjectDisposedException.ThrowIf(_disposed, this);
+            ObjectDisposedException.ThrowIf(disposed, this);
             ISampleProvider output;
-            if (_wave is not null)
+            if (wave is not null)
             {
-                _wave.Position = 0;
-                output = ToSampleProvider(_wave);
+                wave.Position = 0;
+                output = ToSampleProvider(wave);
             }
             else
             {
-                output = new MixingSampleProvider(_generators!.Select(generator => generator.GetSampleProvider()));
+                output = new MixingSampleProvider(generators!.Select(generator => generator.GetSampleProvider()));
             }
 
             if (FadeStart >= 0 && FadeLength >= 0)
@@ -607,38 +607,38 @@ internal static class SoundFontGeneratorExtensions
 
 internal sealed class DelayFadeOutSampleProvider : ISampleProvider
 {
-    private readonly object _gate = new();
-    private readonly ISampleProvider _source;
-    private int _fadeFrameCount;
-    private int _fadeOutDelayFrames;
-    private long _framesRead;
+    private readonly object gate = new();
+    private readonly ISampleProvider source;
+    private int fadeFrameCount;
+    private int fadeOutDelayFrames;
+    private long framesRead;
 
     public DelayFadeOutSampleProvider(ISampleProvider source)
     {
-        _source = source ?? throw new ArgumentNullException(nameof(source));
+        this.source = source ?? throw new ArgumentNullException(nameof(source));
     }
 
-    public WaveFormat WaveFormat => _source.WaveFormat;
+    public WaveFormat WaveFormat => source.WaveFormat;
 
     public int Read(float[] buffer, int offset, int count)
     {
-        int sourceSamplesRead = _source.Read(buffer, offset, count);
+        int sourceSamplesRead = source.Read(buffer, offset, count);
         if (sourceSamplesRead == 0) return 0;
 
-        lock (_gate)
+        lock (gate)
         {
             int framesRead = sourceSamplesRead / WaveFormat.Channels;
             for (int frame = 0; frame < framesRead; frame++)
             {
-                long absoluteFrame = _framesRead + frame;
+                long absoluteFrame = this.framesRead + frame;
                 float multiplier;
-                if (absoluteFrame < _fadeOutDelayFrames)
+                if (absoluteFrame < fadeOutDelayFrames)
                 {
                     multiplier = 1;
                 }
                 else
                 {
-                    double progress = (double)(absoluteFrame - _fadeOutDelayFrames) / _fadeFrameCount;
+                    double progress = (double)(absoluteFrame - fadeOutDelayFrames) / fadeFrameCount;
                     multiplier = (float)Math.Clamp(1 - progress, 0, 1);
                 }
 
@@ -646,7 +646,7 @@ internal sealed class DelayFadeOutSampleProvider : ISampleProvider
                 for (int channel = 0; channel < WaveFormat.Channels; channel++) buffer[sampleOffset + channel] *= multiplier;
             }
 
-            _framesRead += framesRead;
+            this.framesRead += framesRead;
         }
 
         return sourceSamplesRead;
@@ -654,11 +654,11 @@ internal sealed class DelayFadeOutSampleProvider : ISampleProvider
 
     public void BeginFadeOut(double delayMilliseconds, double durationMilliseconds)
     {
-        lock (_gate)
+        lock (gate)
         {
-            _framesRead = 0;
-            _fadeFrameCount = Math.Max(1, (int)(durationMilliseconds * _source.WaveFormat.SampleRate / 1000));
-            _fadeOutDelayFrames = Math.Max(0, (int)(delayMilliseconds * _source.WaveFormat.SampleRate / 1000));
+            framesRead = 0;
+            fadeFrameCount = Math.Max(1, (int)(durationMilliseconds * source.WaveFormat.SampleRate / 1000));
+            fadeOutDelayFrames = Math.Max(0, (int)(delayMilliseconds * source.WaveFormat.SampleRate / 1000));
         }
     }
 }
