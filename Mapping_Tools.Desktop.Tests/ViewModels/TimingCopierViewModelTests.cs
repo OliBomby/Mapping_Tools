@@ -52,7 +52,7 @@ public sealed class TimingCopierViewModelTests
         var viewModel = Create(service);
         viewModel.ImportPath = "source.osu";
         viewModel.ExportPath = "first.osu|second.osu";
-        viewModel.ResnapMode = TimingCopierResnapModes.RESNAP;
+        viewModel.ResnapMode = TimingCopierResnapMode.Resnap;
 
         // Act
         await viewModel.RunCommand.ExecuteAsync(null);
@@ -61,9 +61,25 @@ public sealed class TimingCopierViewModelTests
         service.Options.Should().NotBeNull();
         service.Options!.ImportPath.Should().Be("source.osu");
         service.Options.ExportPath.Should().Be("first.osu|second.osu");
-        service.Options.ResnapMode.Should().Be(TimingCopierResnapModes.RESNAP);
+        service.Options.ResnapMode.Should().Be(TimingCopierResnapMode.Resnap);
         viewModel.Progress.Should().Be(0);
         viewModel.IsRunning.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void ResnapModes_ReturnAllCoreModesInEnumOrder()
+    {
+        // Arrange
+        var viewModel = Create();
+
+        // Act
+        var modes = viewModel.ResnapModes;
+
+        // Assert
+        modes.Should().Equal(
+            TimingCopierResnapMode.PreserveBeatSpacing,
+            TimingCopierResnapMode.Resnap,
+            TimingCopierResnapMode.KeepObjectsFixed);
     }
 
     private static TimingCopierViewModel Create(

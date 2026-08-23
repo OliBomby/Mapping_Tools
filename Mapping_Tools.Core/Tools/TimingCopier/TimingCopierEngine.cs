@@ -31,7 +31,7 @@ public static class TimingCopierEngine
         var timingFrom = source.BeatmapTiming;
 
         List<Marker> markers = [];
-        if (options.ResnapMode == TimingCopierResnapModes.PRESERVE_BEAT_SPACING)
+        if (options.ResnapMode == TimingCopierResnapMode.PreserveBeatSpacing)
             // Get markers for hitobjects if mode 1 is used
             markers = GetMarkers(target, timingTo);
 
@@ -75,7 +75,7 @@ public static class TimingCopierEngine
         TimingPointChange.Apply(timingTo, timingPointChanges);
 
         IReadOnlyList<TimingPoint> redlines = timingFrom.Redlines;
-        if (options.ResnapMode == TimingCopierResnapModes.PRESERVE_BEAT_SPACING && redlines.Count > 0)
+        if (options.ResnapMode == TimingCopierResnapMode.PreserveBeatSpacing && redlines.Count > 0)
         {
             redlines = timingTo.Redlines;
             List<double> newBookmarks = [];
@@ -120,7 +120,7 @@ public static class TimingCopierEngine
 
             target.SetBookmarks(newBookmarks);
         }
-        else if (options.ResnapMode == TimingCopierResnapModes.RESNAP && redlines.Count > 0)
+        else if (options.ResnapMode == TimingCopierResnapMode.Resnap && redlines.Count > 0)
         {
             // Resnap hitobjects
             foreach (var hitObject in target.HitObjects)
@@ -163,7 +163,7 @@ public static class TimingCopierEngine
         // Apply timing changes
         TimingPointChange.Apply(timingTo, timingPointChanges);
 
-        if ((options.ResnapMode == TimingCopierResnapModes.RESNAP || options.ResnapMode == TimingCopierResnapModes.PRESERVE_BEAT_SPACING) && redlines.Count > 0)
+        if ((options.ResnapMode == TimingCopierResnapMode.Resnap || options.ResnapMode == TimingCopierResnapMode.PreserveBeatSpacing) && redlines.Count > 0)
         {
             target.GiveObjectsGreenlines();
             target.CalculateSliderEndTimes();

@@ -63,13 +63,9 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
-    /// <summary>Gets the three legacy object-placement choices in display order.</summary>
-    public IReadOnlyList<string> ResnapModes { get; } =
-    [
-        TimingCopierResnapModes.PRESERVE_BEAT_SPACING,
-        TimingCopierResnapModes.RESNAP,
-        TimingCopierResnapModes.KEEP_OBJECTS_FIXED,
-    ];
+    /// <summary>Gets the three object-placement choices in display order.</summary>
+    public IReadOnlyList<TimingCopierResnapMode> ResnapModes { get; } =
+        Enum.GetValues<TimingCopierResnapMode>();
 
     /// <summary>Gets or sets the source beatmap path.</summary>
     [ObservableProperty]
@@ -80,9 +76,9 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     [NotifyPropertyChangedFor(nameof(ExportMapCountText))]
     public partial string ExportPath { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets the legacy object-placement mode label.</summary>
+    /// <summary>Gets or sets how target markers are positioned after timing is copied.</summary>
     [ObservableProperty]
-    public partial string ResnapMode { get; set; } = TimingCopierResnapModes.PRESERVE_BEAT_SPACING;
+    public partial TimingCopierResnapMode ResnapMode { get; set; } = TimingCopierResnapMode.PreserveBeatSpacing;
 
     /// <summary>Gets or sets the positive beat snap divisors used during resnapping.</summary>
     [ObservableProperty]
@@ -220,9 +216,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         if (project.BeatDivisors is null
             || project.BeatDivisors.Length == 0
             || project.BeatDivisors.Any(divisor => divisor is null)
-            || project.ResnapMode is not TimingCopierResnapModes.PRESERVE_BEAT_SPACING and
-                not TimingCopierResnapModes.RESNAP and
-                not TimingCopierResnapModes.KEEP_OBJECTS_FIXED)
+            || !Enum.IsDefined(project.ResnapMode))
             throw new InvalidDataException("Timing Copier project is incomplete.");
 
         ImportPath = project.ImportPath;

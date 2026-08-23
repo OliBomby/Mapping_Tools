@@ -59,7 +59,13 @@
                           ItemsSource="{Binding ResnapModes}"
                           SelectedItem="{Binding ResnapMode, Mode=TwoWay}"
                           materialAssists:ComboBoxAssist.Label="Resnapping mode"
-                          ToolTip.Tip="Choose how to move hit objects to the new timing." />
+                          ToolTip.Tip="Choose how to move hit objects to the new timing.">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource TimingCopierResnapModeConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
 
                 <TextBlock Margin="0,20,0,0" FontSize="14" FontWeight="Bold"
                            Text="Signatures" ToolTip.Tip="Beat snap divisors for resnapping." />

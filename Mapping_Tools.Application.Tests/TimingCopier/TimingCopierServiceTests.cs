@@ -24,7 +24,7 @@ public sealed class TimingCopierServiceTests
         {
             ImportPath = "source.osu",
             ExportPath = "first.osu|second.osu",
-            ResnapMode = TimingCopierResnapModes.KEEP_OBJECTS_FIXED,
+            ResnapMode = TimingCopierResnapMode.KeepObjectsFixed,
         };
         RecordingProgress progress = new();
 
@@ -54,7 +54,7 @@ public sealed class TimingCopierServiceTests
         {
             ImportPath = "source.osu",
             ExportPath = "first.osu|second.osu",
-            ResnapMode = TimingCopierResnapModes.KEEP_OBJECTS_FIXED,
+            ResnapMode = TimingCopierResnapMode.KeepObjectsFixed,
         };
 
         // Act
@@ -92,7 +92,7 @@ public sealed class TimingCopierServiceTests
     }
 
     [TestMethod]
-    public async Task CopyAsync_WithUnknownResnapMode_ThrowsBeforeOpeningBeatmaps()
+    public async Task CopyAsync_WithUndefinedResnapMode_ThrowsBeforeOpeningBeatmaps()
     {
         // Arrange
         string fixture = Path.Combine(
@@ -106,7 +106,7 @@ public sealed class TimingCopierServiceTests
         {
             ImportPath = "source.osu",
             ExportPath = "target.osu",
-            ResnapMode = "unknown",
+            ResnapMode = (TimingCopierResnapMode)999,
         };
 
         // Act

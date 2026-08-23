@@ -34,9 +34,7 @@ public sealed class TimingCopierService : ITimingCopierService
                 "Timing Copier requires at least one beat divisor.",
                 nameof(options));
 
-        if (options.ResnapMode is not TimingCopierResnapModes.PRESERVE_BEAT_SPACING and
-            not TimingCopierResnapModes.RESNAP and
-            not TimingCopierResnapModes.KEEP_OBJECTS_FIXED)
+        if (!Enum.IsDefined(options.ResnapMode))
             throw new ArgumentException(
                 "Timing Copier received an unknown resnapping mode.",
                 nameof(options));

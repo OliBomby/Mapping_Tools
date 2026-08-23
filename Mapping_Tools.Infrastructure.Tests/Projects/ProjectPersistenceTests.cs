@@ -19,6 +19,7 @@ using Mapping_Tools.Core.Classes.HitsoundStuff;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.SliderMerger;
+using Mapping_Tools.Core.Tools.TimingCopier;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -352,8 +353,9 @@ public sealed class ProjectPersistenceTests
         string json = serializer.Serialize(project);
 
         // Assert
-        project.ResnapMode.Should().Be("Just resnap");
+        project.ResnapMode.Should().Be(TimingCopierResnapMode.Resnap);
         project.BeatDivisors.Should().HaveCount(2);
+        json.Should().Contain("\"ResnapMode\": \"Just resnap\"");
         json.Should().Contain(
             "\"$type\": \"Mapping_Tools.Viewmodels.TimingCopierVm, Mapping Tools\"");
     }

@@ -25,6 +25,7 @@ using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Tools.PatternGallery;
 using Mapping_Tools.Core.Tools.RhythmGuide;
+using Mapping_Tools.Core.Tools.TimingCopier;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -92,8 +93,77 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 new Vector2Converter(),
                 new GeometryGeneratorSettingsDictionaryConverter(),
                 new GeometryRelevantObjectCollectionConverter(),
+                new TimingCopierResnapModeConverter(),
             ],
         };
+    }
+
+    private sealed class TimingCopierResnapModeConverter : JsonConverter
+    {
+        private const string legacy_preserve_beat_spacing =
+            "Number of beats between objects stays the same";
+        private const string legacy_resnap = "Just resnap";
+        private const string legacy_keep_objects_fixed = "Don't move objects";
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(TimingCopierResnapMode);
+        }
+
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+        {
+            if (value is not TimingCopierResnapMode mode || !Enum.IsDefined(mode))
+                throw new JsonSerializationException("The Timing Copier resnap mode was invalid.");
+
+            writer.WriteValue(mode switch
+            {
+                TimingCopierResnapMode.PreserveBeatSpacing => legacy_preserve_beat_spacing,
+                TimingCopierResnapMode.Resnap => legacy_resnap,
+                TimingCopierResnapMode.KeepObjectsFixed => legacy_keep_objects_fixed,
+                _ => throw new JsonSerializationException("The Timing Copier resnap mode was invalid."),
+            });
+        }
+
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object? existingValue,
+            JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Integer)
+            {
+                try
+                {
+                    return Parse(Convert.ToInt32(reader.Value));
+                }
+                catch (Exception exception) when (exception is FormatException or OverflowException)
+                {
+                    throw new JsonSerializationException("The Timing Copier resnap mode was invalid.", exception);
+                }
+            }
+
+            if (reader.TokenType == JsonToken.String && reader.Value is string text)
+            {
+                if (text.Equals(legacy_preserve_beat_spacing, StringComparison.Ordinal))
+                    return TimingCopierResnapMode.PreserveBeatSpacing;
+                if (text.Equals(legacy_resnap, StringComparison.Ordinal))
+                    return TimingCopierResnapMode.Resnap;
+                if (text.Equals(legacy_keep_objects_fixed, StringComparison.Ordinal))
+                    return TimingCopierResnapMode.KeepObjectsFixed;
+                if (Enum.TryParse(text, true, out TimingCopierResnapMode mode)) return Parse((int)mode);
+            }
+
+            throw new JsonSerializationException("The Timing Copier resnap mode was invalid.");
+        }
+
+        private static TimingCopierResnapMode Parse(int value)
+        {
+            TimingCopierResnapMode mode = (TimingCopierResnapMode)value;
+            if (!Enum.IsDefined(mode))
+                throw new JsonSerializationException("The Timing Copier resnap mode was invalid.");
+
+            return mode;
+        }
     }
 
     private sealed class TumourProjectContractResolver : DefaultContractResolver
