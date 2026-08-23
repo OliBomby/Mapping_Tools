@@ -59,7 +59,7 @@ public sealed class TimingHelperServiceTests
             cancellationToken.ThrowIfCancellationRequested();
             OpenedPaths.Add(path);
             OpenPreferences.Add(livePreference);
-            BeatmapEditor2 editor = new(
+            BeatmapEditor editor = new(
                 File.ReadAllLines(fixture).ToList(),
                 new MemoryStore())
             {
@@ -68,7 +68,7 @@ public sealed class TimingHelperServiceTests
             return Task.FromResult(new BeatmapEditingSession(editor, BeatmapEditingSource.Disk, []));
         }
 
-        public Task<StoryboardEditor2> OpenStoryboardAsync(
+        public Task<StoryboardEditor> OpenStoryboardAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
@@ -76,7 +76,7 @@ public sealed class TimingHelperServiceTests
         }
 
         public Task SaveAsync(
-            Editor2 editor,
+            Editor editor,
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {

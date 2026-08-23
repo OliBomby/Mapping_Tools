@@ -174,7 +174,7 @@ public sealed class TumourGeneratorServiceTests
             "64,64,0,2,0,L|164:64,1,100",
             "128,128,500,1,0,0:0:0:0:",
         ];
-        BeatmapEditor2 editor = new(lines, new MemoryTextFileStore());
+        BeatmapEditor editor = new(lines, new MemoryTextFileStore());
         var slider = editor.Beatmap.HitObjects[0];
         IReadOnlyList<HitObject> selected = selectedSlider ? [slider] : [editor.Beatmap.HitObjects[1]];
         return new BeatmapEditingSession(editor, source, selected);
@@ -197,7 +197,7 @@ public sealed class TumourGeneratorServiceTests
             return Task.FromResult(Session);
         }
 
-        public Task<StoryboardEditor2> OpenStoryboardAsync(
+        public Task<StoryboardEditor> OpenStoryboardAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
@@ -205,7 +205,7 @@ public sealed class TumourGeneratorServiceTests
         }
 
         public Task SaveAsync(
-            Editor2 editor,
+            Editor editor,
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {

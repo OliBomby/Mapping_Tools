@@ -18,7 +18,7 @@ public sealed class PropertyTransformerServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        BeatmapEditor2 editor = new(
+        BeatmapEditor editor = new(
             File.ReadAllLines(fixture).ToList(),
             new FileSystemFileStore())
         {
@@ -48,11 +48,11 @@ public sealed class PropertyTransformerServiceTests
         progress.Values.Last().Should().Be(100);
     }
 
-    private sealed class RecordingGateway(BeatmapEditor2 editor) : IBeatmapEditingGateway
+    private sealed class RecordingGateway(BeatmapEditor editor) : IBeatmapEditingGateway
     {
         public LiveBeatmapPreference? Preference { get; private set; }
 
-        public Editor2? Saved { get; private set; }
+        public Editor? Saved { get; private set; }
 
         public Task<BeatmapEditingSession> OpenBeatmapAsync(
             string path,
@@ -66,7 +66,7 @@ public sealed class PropertyTransformerServiceTests
                 []));
         }
 
-        public Task<StoryboardEditor2> OpenStoryboardAsync(
+        public Task<StoryboardEditor> OpenStoryboardAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
@@ -74,7 +74,7 @@ public sealed class PropertyTransformerServiceTests
         }
 
         public Task SaveAsync(
-            Editor2 value,
+            Editor value,
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {

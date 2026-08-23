@@ -102,7 +102,7 @@ public sealed class RhythmGuideServiceTests
         gateway.SavedEditor!.Path.Should().Be("existing.osu");
     }
 
-    private static BeatmapEditor2 CreateEditor(
+    private static BeatmapEditor CreateEditor(
         string path,
         ITextFileStore files,
         bool includeObject)
@@ -129,7 +129,7 @@ public sealed class RhythmGuideServiceTests
             "[HitObjects]",
         ];
         if (includeObject) lines.Add("256,192,1000,1,0,0:0:0:0:");
-        return new BeatmapEditor2(lines, files) { Path = path };
+        return new BeatmapEditor(lines, files) { Path = path };
     }
 
     private sealed class RecordingEditingGateway : IBeatmapEditingGateway
@@ -142,7 +142,7 @@ public sealed class RhythmGuideServiceTests
 
         public List<(string Path, LiveBeatmapPreference Preference)> OpenRequests { get; } = [];
 
-        public Editor2? SavedEditor { get; private set; }
+        public Editor? SavedEditor { get; private set; }
 
         public Task<BeatmapEditingSession> OpenBeatmapAsync(
             string path,
@@ -153,7 +153,7 @@ public sealed class RhythmGuideServiceTests
             return Task.FromResult(Sessions[path]);
         }
 
-        public Task<StoryboardEditor2> OpenStoryboardAsync(
+        public Task<StoryboardEditor> OpenStoryboardAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
@@ -161,7 +161,7 @@ public sealed class RhythmGuideServiceTests
         }
 
         public Task SaveAsync(
-            Editor2 editor,
+            Editor editor,
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {
@@ -177,7 +177,7 @@ public sealed class RhythmGuideServiceTests
             return SaveAsync(session.Editor, reloadEditor, cancellationToken);
         }
 
-        public void Add(string path, BeatmapEditor2 editor)
+        public void Add(string path, BeatmapEditor editor)
         {
             Sessions[path] = new BeatmapEditingSession(
                 editor,

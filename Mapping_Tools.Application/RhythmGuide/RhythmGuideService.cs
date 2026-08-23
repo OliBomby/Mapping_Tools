@@ -79,7 +79,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
             sources,
             options,
             cancellationToken);
-        BeatmapEditor2 output = new(generated.GetLines(), textFileStore)
+        BeatmapEditor output = new(generated.GetLines(), textFileStore)
         {
             Path = options.ExportPath,
         };

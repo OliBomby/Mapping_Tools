@@ -43,10 +43,10 @@ public sealed class AutoFailServiceTests
         gateway.SavedEditor.Should().BeSameAs(gateway.Session.Editor);
     }
 
-    private static BeatmapEditor2 CreateEditor()
+    private static BeatmapEditor CreateEditor()
     {
         string path = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-autofail-2b.osu");
-        return new BeatmapEditor2(File.ReadAllLines(path).ToList(), new MemoryStore())
+        return new BeatmapEditor(File.ReadAllLines(path).ToList(), new MemoryStore())
         {
             Path = "accepted.osu",
         };
@@ -54,7 +54,7 @@ public sealed class AutoFailServiceTests
 
     private sealed class RecordingGateway : IBeatmapEditingGateway
     {
-        public RecordingGateway(BeatmapEditor2 editor)
+        public RecordingGateway(BeatmapEditor editor)
         {
             Session = new BeatmapEditingSession(
                 editor,
@@ -64,7 +64,7 @@ public sealed class AutoFailServiceTests
 
         public BeatmapEditingSession Session { get; }
         public LiveBeatmapPreference? OpenPreference { get; private set; }
-        public Editor2? SavedEditor { get; private set; }
+        public Editor? SavedEditor { get; private set; }
 
         public Task<BeatmapEditingSession> OpenBeatmapAsync(
             string path,
@@ -75,7 +75,7 @@ public sealed class AutoFailServiceTests
             return Task.FromResult(Session);
         }
 
-        public Task<StoryboardEditor2> OpenStoryboardAsync(
+        public Task<StoryboardEditor> OpenStoryboardAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
@@ -83,7 +83,7 @@ public sealed class AutoFailServiceTests
         }
 
         public Task SaveAsync(
-            Editor2 editor,
+            Editor editor,
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {

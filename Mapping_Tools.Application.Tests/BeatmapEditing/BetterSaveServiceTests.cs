@@ -103,7 +103,7 @@ public sealed class BetterSaveServiceTests
     {
         public RecordingEditingGateway()
         {
-            BeatmapEditor2 editor = new(
+            BeatmapEditor editor = new(
                 ["osu file format v14", "", "[HitObjects]"],
                 new MemoryTextFileStore());
             Session = new BeatmapEditingSession(
@@ -118,7 +118,7 @@ public sealed class BetterSaveServiceTests
 
         public LiveBeatmapPreference? LivePreference { get; private set; }
 
-        public Editor2? SavedEditor { get; private set; }
+        public Editor? SavedEditor { get; private set; }
 
         public Exception? Failure { get; init; }
 
@@ -135,7 +135,7 @@ public sealed class BetterSaveServiceTests
                 : Task.FromException<BeatmapEditingSession>(Failure);
         }
 
-        public Task<StoryboardEditor2> OpenStoryboardAsync(
+        public Task<StoryboardEditor> OpenStoryboardAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
@@ -143,7 +143,7 @@ public sealed class BetterSaveServiceTests
         }
 
         public Task SaveAsync(
-            Editor2 editor,
+            Editor editor,
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {

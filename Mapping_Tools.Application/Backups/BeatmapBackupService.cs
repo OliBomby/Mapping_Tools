@@ -372,8 +372,8 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
 
         if (allowDifferentFilename) return;
 
-        BeatmapEditor2 backup = new(backupPath, textFileStore);
-        BeatmapEditor2 destination = new(destinationPath, textFileStore);
+        BeatmapEditor backup = new(backupPath, textFileStore);
+        BeatmapEditor destination = new(destinationPath, textFileStore);
         string backupFileName = backup.Beatmap.GetFileName();
         string destinationFileName = destination.Beatmap.GetFileName();
         if (!string.Equals(

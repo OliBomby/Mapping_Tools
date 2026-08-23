@@ -124,7 +124,7 @@ public sealed class SliderCompletionatorServiceTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             OpenPreferences.Add(livePreference);
-            BeatmapEditor2 editor = new(
+            BeatmapEditor editor = new(
                 File.ReadAllLines(fixture).ToList(),
                 new MemoryStore())
             {
@@ -137,7 +137,7 @@ public sealed class SliderCompletionatorServiceTests
                 liveEditorTime: editorTime));
         }
 
-        public Task<StoryboardEditor2> OpenStoryboardAsync(
+        public Task<StoryboardEditor> OpenStoryboardAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
@@ -145,7 +145,7 @@ public sealed class SliderCompletionatorServiceTests
         }
 
         public Task SaveAsync(
-            Editor2 editor,
+            Editor editor,
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {

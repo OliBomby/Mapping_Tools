@@ -6,13 +6,13 @@ namespace Mapping_Tools.Application.BeatmapEditing;
 /// <summary>
 ///     Edits an osu! text file using caller-provided persistence.
 /// </summary>
-public class Editor2
+public class Editor
 {
     /// <summary>
     ///     Creates an editor without loading a document.
     /// </summary>
     /// <param name="fileStore">The persistence implementation used by the editor.</param>
-    public Editor2(ITextFileStore fileStore)
+    public Editor(ITextFileStore fileStore)
     {
         FileStore = fileStore ?? throw new ArgumentNullException(nameof(fileStore));
     }
@@ -22,7 +22,7 @@ public class Editor2
     /// </summary>
     /// <param name="lines">The serialized beatmap lines to parse.</param>
     /// <param name="fileStore">The persistence implementation used when saving.</param>
-    public Editor2(List<string> lines, ITextFileStore fileStore) : this(fileStore)
+    public Editor(List<string> lines, ITextFileStore fileStore) : this(fileStore)
     {
         TextFile = new Beatmap(lines);
     }
@@ -32,7 +32,7 @@ public class Editor2
     /// </summary>
     /// <param name="path">The source file; <c>.osb</c> selects storyboard parsing.</param>
     /// <param name="fileStore">The persistence implementation used to load and save.</param>
-    public Editor2(string path, ITextFileStore fileStore) : this(fileStore)
+    public Editor(string path, ITextFileStore fileStore) : this(fileStore)
     {
         Path = path;
         var lines = ReadFile(path);

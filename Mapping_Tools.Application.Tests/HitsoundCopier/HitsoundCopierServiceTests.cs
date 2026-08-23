@@ -103,11 +103,11 @@ public sealed class HitsoundCopierServiceTests
             CancellationToken cancellationToken = default)
         {
             OpenedPaths.Add(path);
-            BeatmapEditor2 editor = new(File.ReadAllLines(fixture).ToList(), new MemoryStore()) { Path = path };
+            BeatmapEditor editor = new(File.ReadAllLines(fixture).ToList(), new MemoryStore()) { Path = path };
             return Task.FromResult(new BeatmapEditingSession(editor, BeatmapEditingSource.Disk, []));
         }
 
-        public Task<StoryboardEditor2> OpenStoryboardAsync(
+        public Task<StoryboardEditor> OpenStoryboardAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
@@ -115,7 +115,7 @@ public sealed class HitsoundCopierServiceTests
         }
 
         public Task SaveAsync(
-            Editor2 editor,
+            Editor editor,
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {

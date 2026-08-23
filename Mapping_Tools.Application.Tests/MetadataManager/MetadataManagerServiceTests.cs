@@ -78,12 +78,12 @@ public sealed class MetadataManagerServiceTests
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(
                 new BeatmapEditingSession(
-                    new BeatmapEditor2(path, fileStore),
+                    new BeatmapEditor(path, fileStore),
                     BeatmapEditingSource.Disk,
                     []));
         }
 
-        public Task<StoryboardEditor2> OpenStoryboardAsync(
+        public Task<StoryboardEditor> OpenStoryboardAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
@@ -91,7 +91,7 @@ public sealed class MetadataManagerServiceTests
         }
 
         public Task SaveAsync(
-            Editor2 editor,
+            Editor editor,
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {

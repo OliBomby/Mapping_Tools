@@ -186,7 +186,7 @@ public sealed class BeatmapEditingSession
     /// </param>
     /// <param name="liveEditorTime">The editor playhead captured with live state, when available.</param>
     public BeatmapEditingSession(
-        BeatmapEditor2 editor,
+        BeatmapEditor editor,
         BeatmapEditingSource source,
         IReadOnlyList<HitObject> selectedHitObjects,
         Exception? liveReadFailure = null,
@@ -206,7 +206,7 @@ public sealed class BeatmapEditingSession
     /// <summary>
     ///     Gets the mutable editor used for transformations and persistence.
     /// </summary>
-    public BeatmapEditor2 Editor { get; }
+    public BeatmapEditor Editor { get; }
 
     /// <summary>
     ///     Gets whether the session reflects only disk or also unsaved editor state.
@@ -215,7 +215,7 @@ public sealed class BeatmapEditingSession
 
     /// <summary>
     ///     Gets the same hit-object instances that are marked selected inside
-    ///     <see cref="BeatmapEditor2.Beatmap" />, preserving identity for mutations.
+    ///     <see cref="BeatmapEditor.Beatmap" />, preserving identity for mutations.
     /// </summary>
     public IReadOnlyList<HitObject> SelectedHitObjects { get; }
 
@@ -261,7 +261,7 @@ public interface IBeatmapEditingGateway
     /// <param name="path">The storyboard file to parse.</param>
     /// <param name="cancellationToken">Cancels before the disk read begins.</param>
     /// <returns>A mutable storyboard editor backed by the configured file store.</returns>
-    Task<StoryboardEditor2> OpenStoryboardAsync(
+    Task<StoryboardEditor> OpenStoryboardAsync(
         string path,
         CancellationToken cancellationToken = default);
 
@@ -280,7 +280,7 @@ public interface IBeatmapEditingGateway
     ///     Cancellation occurs before backup, save, or a requested reload completes.
     /// </exception>
     Task SaveAsync(
-        Editor2 editor,
+        Editor editor,
         bool reloadEditor = false,
         CancellationToken cancellationToken = default);
 

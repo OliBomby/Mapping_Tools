@@ -136,7 +136,7 @@ public sealed class SliderMergerServiceTests
                 true,
                 false,
                 false);
-            BeatmapEditor2 editor = new(
+            BeatmapEditor editor = new(
                 new Beatmap([first, second], [redline], redline).GetLines(),
                 new MemoryStore())
             {
@@ -151,7 +151,7 @@ public sealed class SliderMergerServiceTests
                 liveEditorTime: null));
         }
 
-        public Task<StoryboardEditor2> OpenStoryboardAsync(
+        public Task<StoryboardEditor> OpenStoryboardAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
@@ -159,7 +159,7 @@ public sealed class SliderMergerServiceTests
         }
 
         public Task SaveAsync(
-            Editor2 editor,
+            Editor editor,
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {

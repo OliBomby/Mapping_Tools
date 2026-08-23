@@ -52,7 +52,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         cancellationToken.ThrowIfCancellationRequested();
 
-        BeatmapEditor2 diskEditor = new(path, fileStore);
+        BeatmapEditor diskEditor = new(path, fileStore);
         if (livePreference == LiveBeatmapPreference.DiskOnly) return DiskSession(diskEditor);
 
         if (!settings.UseEditorReader)
@@ -107,18 +107,18 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     }
 
     /// <inheritdoc />
-    public Task<StoryboardEditor2> OpenStoryboardAsync(
+    public Task<StoryboardEditor> OpenStoryboardAsync(
         string path,
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         cancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult(new StoryboardEditor2(path, fileStore));
+        return Task.FromResult(new StoryboardEditor(path, fileStore));
     }
 
     /// <inheritdoc />
     public async Task SaveAsync(
-        Editor2 editor,
+        Editor editor,
         bool reloadEditor = false,
         CancellationToken cancellationToken = default)
     {
@@ -139,7 +139,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     }
 
     private async Task SaveCoreAsync(
-        Editor2 editor,
+        Editor editor,
         BeatmapEditingSession? session,
         bool reloadEditor,
         CancellationToken cancellationToken)
@@ -171,7 +171,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     }
 
     private static BeatmapEditingSession DiskSession(
-        BeatmapEditor2 editor,
+        BeatmapEditor editor,
         Exception? liveReadFailure = null)
     {
         return new BeatmapEditingSession(

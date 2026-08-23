@@ -125,7 +125,7 @@ public sealed class BeatmapBackupServiceTests
     {
         // Arrange
         var store = CreateStore();
-        BeatmapEditor2 editor = new(map_path, store);
+        BeatmapEditor editor = new(map_path, store);
         editor.Beatmap.Metadata["Version"] = new StringValue("Unsaved");
         BeatmapEditingSession session = new(
             editor,
@@ -159,7 +159,7 @@ public sealed class BeatmapBackupServiceTests
     {
         // Arrange
         var store = CreateStore();
-        BeatmapEditor2 editor = new(map_path, store);
+        BeatmapEditor editor = new(map_path, store);
         store.Files[map_path] = editor.Beatmap.GetLines();
         BeatmapEditingSession session = new(
             editor,
@@ -184,7 +184,7 @@ public sealed class BeatmapBackupServiceTests
     {
         // Arrange
         var store = CreateStore();
-        BeatmapEditor2 editor = new(map_path, store);
+        BeatmapEditor editor = new(map_path, store);
         BeatmapEditingSession session = new(
             editor,
             BeatmapEditingSource.Disk,

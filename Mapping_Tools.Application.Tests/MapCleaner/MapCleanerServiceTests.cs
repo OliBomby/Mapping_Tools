@@ -16,7 +16,7 @@ public sealed class MapCleanerServiceTests
     public async Task CleanAsync_WithAcceptedFixture_UsesLiveStateAndBackupSaveBoundary()
     {
         // Arrange
-        BeatmapEditor2 editor = new(
+        BeatmapEditor editor = new(
             File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu")).ToList(),
             new MemoryStore()) { Path = @"C:\set\map.osu" };
         RecordingGateway gateway = new(editor);
@@ -41,10 +41,10 @@ public sealed class MapCleanerServiceTests
         samples.AnalyzedDirectory.Should().Be(@"C:\set");
     }
 
-    private sealed class RecordingGateway(BeatmapEditor2 editor) : IBeatmapEditingGateway
+    private sealed class RecordingGateway(BeatmapEditor editor) : IBeatmapEditingGateway
     {
         public LiveBeatmapPreference? Preference { get; private set; }
-        public Editor2? Saved { get; private set; }
+        public Editor? Saved { get; private set; }
 
         public Task<BeatmapEditingSession> OpenBeatmapAsync(string path, LiveBeatmapPreference livePreference = LiveBeatmapPreference.PreferLive,
             CancellationToken cancellationToken = default)
@@ -53,12 +53,12 @@ public sealed class MapCleanerServiceTests
             return Task.FromResult(new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
         }
 
-        public Task<StoryboardEditor2> OpenStoryboardAsync(string path, CancellationToken cancellationToken = default)
+        public Task<StoryboardEditor> OpenStoryboardAsync(string path, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
 
-        public Task SaveAsync(Editor2 value, bool reloadEditor = false, CancellationToken cancellationToken = default)
+        public Task SaveAsync(Editor value, bool reloadEditor = false, CancellationToken cancellationToken = default)
         {
             Saved = value;
             return Task.CompletedTask;

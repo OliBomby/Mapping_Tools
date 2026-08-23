@@ -14,7 +14,7 @@ public sealed class ComboColourStudioServiceTests
     public async Task ApplyAsync_WithMapAndValidProject_UsesLivePreferenceAndSavesProgress()
     {
         // Arrange
-        BeatmapEditor2 editor = new(
+        BeatmapEditor editor = new(
             File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu")).ToList(),
             new MemoryStore()) { Path = @"C:\set\map.osu" };
         RecordingGateway gateway = new(editor);
@@ -44,7 +44,7 @@ public sealed class ComboColourStudioServiceTests
     public async Task ApplyAsync_WithoutTargetMaps_ThrowsValidationException()
     {
         // Arrange
-        BeatmapEditor2 editor = new(
+        BeatmapEditor editor = new(
             File.ReadAllLines(Path.Combine(
                 AppContext.BaseDirectory,
                 "Fixtures",
@@ -63,10 +63,10 @@ public sealed class ComboColourStudioServiceTests
         await act.Should().ThrowAsync<ArgumentException>();
     }
 
-    private sealed class RecordingGateway(BeatmapEditor2 editor) : IBeatmapEditingGateway
+    private sealed class RecordingGateway(BeatmapEditor editor) : IBeatmapEditingGateway
     {
         public LiveBeatmapPreference? Preference { get; private set; }
-        public Editor2? Saved { get; private set; }
+        public Editor? Saved { get; private set; }
         public bool ReloadEditor { get; private set; }
 
         public Task<BeatmapEditingSession> OpenBeatmapAsync(
@@ -78,7 +78,7 @@ public sealed class ComboColourStudioServiceTests
             return Task.FromResult(new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
         }
 
-        public Task<StoryboardEditor2> OpenStoryboardAsync(
+        public Task<StoryboardEditor> OpenStoryboardAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
@@ -86,7 +86,7 @@ public sealed class ComboColourStudioServiceTests
         }
 
         public Task SaveAsync(
-            Editor2 value,
+            Editor value,
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {

@@ -290,7 +290,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         Beatmap beatmap)
     {
         // Save beatmap in new location with unique diffname
-        Editor2.SaveFile(
+        Editor.SaveFile(
             textFileStore,
             transaction.GetStagedPath(relativePath),
             beatmap.GetLines());
@@ -301,7 +301,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         string relativePath,
         StoryBoard storyboard)
     {
-        StoryboardEditor2 editor = new(storyboard.GetLines(), textFileStore);
+        StoryboardEditor editor = new(storyboard.GetLines(), textFileStore);
         editor.SaveFile(transaction.GetStagedPath(relativePath));
     }
 

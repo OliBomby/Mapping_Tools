@@ -189,7 +189,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             OpenPreferences.Add(livePreference);
-            BeatmapEditor2 editor = new(
+            BeatmapEditor editor = new(
                 source.GetLines(),
                 new MemoryStore())
             {
@@ -207,7 +207,7 @@ public sealed class HitsoundPreviewHelperServiceTests
                 selected));
         }
 
-        public Task<StoryboardEditor2> OpenStoryboardAsync(
+        public Task<StoryboardEditor> OpenStoryboardAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
@@ -215,7 +215,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         }
 
         public Task SaveAsync(
-            Editor2 editor,
+            Editor editor,
             bool reloadEditor = false,
             CancellationToken cancellationToken = default)
         {
