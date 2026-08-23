@@ -3,6 +3,7 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.TimingHelper;
@@ -112,9 +113,7 @@ public sealed class TimingHelperViewModelTests
             new TestBeatmapWorkspace(),
             new RecordingCurrentBeatmapLocator("current.osu"));
         MappingToolQuickRunRegistration registration = new(
-            "timing-helper",
-            "Timing Helper",
-            QuickRunTargets.Always,
+            MappingToolDefinitions.TimingHelper,
             viewModel.RunQuickAsync);
         MappingToolQuickRunHostedService hosted = new(
             registry,

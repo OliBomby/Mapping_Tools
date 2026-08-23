@@ -6,6 +6,7 @@ using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
@@ -194,9 +195,7 @@ public sealed class MapCleanerViewModelTests
         QuickRunCommandRegistry registry = new();
         var viewModel = Create(cleaner, currentPath: "current.osu");
         MappingToolQuickRunRegistration registration = new(
-            "map-cleaner",
-            "Map Cleaner",
-            QuickRunTargets.Always,
+            MappingToolDefinitions.MapCleaner,
             viewModel.RunQuickAsync);
         RecordingDispatcher dispatcher = new();
         MappingToolQuickRunHostedService hosted = new(

@@ -7,6 +7,7 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.SliderPicturator;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Images;
@@ -20,7 +21,6 @@ namespace Mapping_Tools.Desktop.ViewModels;
 public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, IQuickRun, IShellProjectFeature,
     IShellFeatureActivation
 {
-    internal const string OPERATION_ID = "slider-picturator";
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
     private readonly ProjectDefinition<SliderPicturatorProject> definition = new(
@@ -52,7 +52,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     public SliderPicturatorViewModel(ISliderPicturatorService picturator, IImageFileService images,
         IFilePicker filePicker, IToolExecutionService execution, ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace, ApplicationSettings settings, IUserNotificationService notifications)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.SliderPicturator)
     {
         this.picturator = picturator ?? throw new ArgumentNullException(nameof(picturator));
         this.images = images ?? throw new ArgumentNullException(nameof(images));
@@ -196,8 +196,6 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken).ConfigureAwait(false);
         await RunWithStateAsync(() => RunPathAsync(path, true, cancellationToken));
     }
-
-    string IQuickRun.OperationId => OPERATION_ID;
 
     /// <inheritdoc />
     public void Activate()
@@ -399,7 +397,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     {
         if (string.IsNullOrWhiteSpace(path)) return;
         var options = Snapshot();
-        await Execution.ExecuteAsync(new ToolExecutionRequest<SliderPicturatorResult>(OPERATION_ID, "Slider Picturator",
+        await Execution.ExecuteAsync(new ToolExecutionRequest<SliderPicturatorResult>(Tool.Id, Tool.DisplayName,
             async context =>
             {
                 var result = await picturator.PicturateAsync(path, options,

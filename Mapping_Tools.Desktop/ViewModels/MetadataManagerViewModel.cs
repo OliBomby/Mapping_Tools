@@ -7,6 +7,7 @@ using Mapping_Tools.Application.Interactions.Validation;
 using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.MetadataManager;
@@ -21,7 +22,6 @@ namespace Mapping_Tools.Desktop.ViewModels;
 public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     IShellProjectFeature
 {
-    private const string operation_id = "metadata-manager";
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
     private readonly ProjectDefinition<MetadataManagerProject> definition;
     private readonly IFilePicker filePicker;
@@ -43,7 +43,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmapLocator,
         IUserNotificationService notifications,
         IApplicationDirectories directories)
-        : base(execution, operation_id)
+        : base(execution, MappingToolDefinitions.MetadataManager)
     {
         this.metadataManager = metadataManager ?? throw new ArgumentNullException(nameof(metadataManager));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
@@ -275,8 +275,8 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         MetadataManagerOptions options = Snapshot();
         await Execution.ExecuteAsync(
             new ToolExecutionRequest<MetadataManagerResult>(
-                operation_id,
-                "Metadata Manager",
+                Tool.Id,
+                Tool.DisplayName,
                 async context =>
                 {
                     context.ReportProgress(0, "Preparing metadata export");

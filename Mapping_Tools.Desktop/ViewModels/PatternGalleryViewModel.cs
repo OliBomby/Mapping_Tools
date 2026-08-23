@@ -8,6 +8,7 @@ using Mapping_Tools.Application.PatternGallery;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.PatternGallery;
@@ -27,7 +28,6 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     IShellFeatureActivation,
     IQuickRun
 {
-    internal const string OPERATION_ID = "pattern-gallery";
     private readonly IPatternGalleryArchiveService archives;
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
@@ -83,7 +83,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         IDialogService dialogs,
         ApplicationSettings settings,
         IPatternGalleryInputDialog inputDialog)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.PatternGallery)
     {
         this.gallery = gallery ?? throw new ArgumentNullException(nameof(gallery));
         this.files = files ?? throw new ArgumentNullException(nameof(files));
@@ -245,8 +245,6 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     private string CollectionBasePath => Path.Combine(directories.ApplicationData, "Pattern Gallery Projects");
 
     /// <inheritdoc />
-    string IQuickRun.OperationId => OPERATION_ID;
-
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
@@ -777,8 +775,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         var patterns = SelectedPatterns.ToArray();
         var execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<PatternGalleryRunResult>(
-                OPERATION_ID,
-                "Pattern Gallery",
+                Tool.Id,
+                Tool.DisplayName,
                 async context =>
                 {
                     var result = await gallery.ExportAsync(

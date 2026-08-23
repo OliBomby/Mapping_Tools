@@ -6,6 +6,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.MapsetMerger;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.MapsetMerger;
 using Mapping_Tools.Desktop.Shell;
@@ -19,7 +20,6 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// </summary>
 public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShellProjectFeature
 {
-    internal const string OPERATION_ID = "mapset-merger";
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
     private readonly ProjectDefinition<MapsetMergerProject> definition = new(
@@ -47,7 +47,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         IBeatmapWorkspace workspace,
         ICurrentBeatmapLocator currentBeatmap,
         IApplicationDirectories directories)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.MapsetMerger)
     {
         this.merger = merger ?? throw new ArgumentNullException(nameof(merger));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
@@ -225,8 +225,8 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         var project = Snapshot();
         var result = await Execution.ExecuteAsync(
             new ToolExecutionRequest<MapsetMergerResult>(
-                OPERATION_ID,
-                "Mapset Merger",
+                Tool.Id,
+                Tool.DisplayName,
                 async context =>
                 {
                     var merged = await merger.MergeAsync(

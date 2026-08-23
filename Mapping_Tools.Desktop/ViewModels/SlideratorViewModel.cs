@@ -7,6 +7,7 @@ using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Interactions.Converters;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -25,7 +26,6 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature
 {
-    internal const string OPERATION_ID = "sliderator";
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
     private readonly ProjectDefinition<SlideratorProject> definition = new(
@@ -53,7 +53,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmap,
         ApplicationSettings settings,
         IDialogService dialogs)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.Sliderator)
     {
         this.sliderator = sliderator ?? throw new ArgumentNullException(nameof(sliderator));
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
@@ -300,8 +300,6 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         });
     }
 
-    string IQuickRun.OperationId => OPERATION_ID;
-
     IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
@@ -480,8 +478,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         DoEditorRead = false;
         var execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<SlideratorResult>(
-                OPERATION_ID,
-                "Sliderator",
+                Tool.Id,
+                Tool.DisplayName,
                 async context =>
                 {
                     var result = await sliderator.RunAsync(

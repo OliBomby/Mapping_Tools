@@ -9,6 +9,7 @@ using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
@@ -29,7 +30,6 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     IAsyncDisposable,
     IDisposable
 {
-    internal const string OPERATION_ID = "hitsound-studio";
     private readonly ICurrentBeatmapLocator currentBeatmap;
     private readonly ProjectDefinition<HitsoundStudioProject> definition;
     private readonly IHitsoundStudioDialogService dialogs;
@@ -71,7 +71,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         IProjectStore projectStore,
         ApplicationSettings settings,
         IApplicationDirectories directories)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.HitsoundStudio)
     {
         this.service = service ?? throw new ArgumentNullException(nameof(service));
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
@@ -383,8 +383,6 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         if (!string.IsNullOrWhiteSpace(path)) BaseBeatmap = path;
         await RunWithStateAsync(() => RunExportAsync([path ?? string.Empty], cancellationToken));
     }
-
-    string IQuickRun.OperationId => OPERATION_ID;
 
     IReadOnlyList<ShellProjectMenuItem> IShellExtraProjectMenuFeature.ExtraProjectMenuItems =>
     [
@@ -1076,8 +1074,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         var snapshot = chosen.Clone();
         var result = await Execution.ExecuteAsync(
             new ToolExecutionRequest<HitsoundStudioExportResult>(
-                OPERATION_ID,
-                "Hitsound Studio",
+                Tool.Id,
+                Tool.DisplayName,
                 async context =>
                 {
                     var output = await service.ExportAsync(

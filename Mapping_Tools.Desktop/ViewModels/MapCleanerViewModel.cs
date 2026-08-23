@@ -6,6 +6,7 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Timeline;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.MapCleaner;
@@ -18,7 +19,6 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature
 {
-    internal const string OPERATION_ID = "map-cleaner";
     private readonly IMapCleanerService cleaner;
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
@@ -46,7 +46,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmap,
         ApplicationSettings settings,
         IPlatformLauncher launcher)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.MapCleaner)
     {
         this.cleaner = cleaner ?? throw new ArgumentNullException(nameof(cleaner));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
@@ -129,8 +129,6 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    string IQuickRun.OperationId => OPERATION_ID;
-
     IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
@@ -180,8 +178,8 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
 
         var execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<MapCleanerResult>(
-                OPERATION_ID,
-                "Map Cleaner",
+                Tool.Id,
+                Tool.DisplayName,
                 async context =>
                 {
                     Progress<double> progress = new(value =>

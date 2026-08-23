@@ -5,6 +5,7 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Timeline;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.AutoFail;
 using Mapping_Tools.Desktop.Hosting;
@@ -47,9 +48,7 @@ public sealed class AutoFailDetectorViewModelTests
             service,
             currentPath: "current.osu");
         MappingToolQuickRunRegistration registration = new(
-            "auto-fail-detector",
-            "Auto-fail Detector",
-            QuickRunTargets.Always,
+            MappingToolDefinitions.AutoFailDetector,
             viewModel.RunQuickAsync);
         MappingToolQuickRunHostedService hosted = new(
             registry,

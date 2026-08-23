@@ -8,6 +8,7 @@ using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.TumourGenerator;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Graph;
@@ -27,7 +28,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     IShellFeatureActivation,
     IDisposable
 {
-    internal const string OPERATION_ID = "tumour-generator";
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
     private readonly ProjectDefinition<TumourGeneratorProject> definition = new(
@@ -65,7 +65,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         IBeatmapWorkspace workspace,
         ApplicationSettings settings,
         IDialogService dialogs)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.TumourGenerator)
     {
         this.generator = generator ?? throw new ArgumentNullException(nameof(generator));
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
@@ -269,8 +269,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     }
 
     /// <inheritdoc />
-    string IQuickRun.OperationId => OPERATION_ID;
-
     /// <inheritdoc />
     public void Activate()
     {
@@ -599,8 +597,8 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         var project = Snapshot();
         var execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<TumourRunResult>(
-                OPERATION_ID,
-                "Tumour Generator 2",
+                Tool.Id,
+                Tool.DisplayName,
                 async context =>
                 {
                     var result = await generator.RunAsync(

@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tools;
 
 namespace Mapping_Tools.Application.QuickRun;
 
@@ -41,6 +42,27 @@ public enum QuickRunTargets
 /// </summary>
 public sealed class QuickRunCommand
 {
+    /// <summary>
+    ///     Creates a command from the canonical tool metadata and a frontend-owned
+    ///     execution callback.
+    /// </summary>
+    /// <param name="definition">The tool metadata containing its stable identity and QuickRun targets.</param>
+    /// <param name="execute">The callback that performs the tool's QuickRun path.</param>
+    /// <exception cref="ArgumentException">The tool has no QuickRun targets.</exception>
+    public QuickRunCommand(
+        ToolDefinition definition,
+        Func<CancellationToken, Task> execute)
+        : this(
+            definition?.Id ?? throw new ArgumentNullException(nameof(definition)),
+            definition.DisplayName,
+            definition.QuickRunTargets
+                ?? throw new ArgumentException(
+                    "The tool definition does not declare QuickRun targets.",
+                    nameof(definition)),
+            execute)
+    {
+    }
+
     /// <summary>
     ///     Creates a command whose callback performs the same quick execution used
     ///     by an in-app button or global shortcut.

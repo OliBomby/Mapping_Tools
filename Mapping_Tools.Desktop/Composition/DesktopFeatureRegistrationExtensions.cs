@@ -1,6 +1,6 @@
 using Avalonia.Controls.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mapping_Tools.Application.QuickRun;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
@@ -27,138 +27,68 @@ internal static class DesktopFeatureRegistrationExtensions
             horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<AutoFailDetectorViewModel>(
-            "auto-fail-detector",
-            "Auto-fail Detector",
-            "Detect incorrect object loading in overlapping patterns.",
-            ["auto fail", "2b", "unloading", "objects"],
+            MappingToolDefinitions.AutoFailDetector,
             true,
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.Always);
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<MapCleanerViewModel>(
-            "map-cleaner",
-            "Map Cleaner",
-            "Rebuild useful greenlines and optionally resnap map content.",
-            ["clean", "greenline", "resnap", "samples"],
+            MappingToolDefinitions.MapCleaner,
             horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.Always);
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<RhythmGuideViewModel>(
-            "rhythm-guide",
-            "Rhythm Guide",
-            "Make a beatmap with circles from the rhythm of multiple maps.",
-            ["rhythm", "hitsound", "guide", "reference"],
+            MappingToolDefinitions.RhythmGuide,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<HitsoundPreviewHelperViewModel>(
-            "hitsound-preview-helper",
-            "Hitsound Preview Helper",
-            "Place provisional hitsounds from positional zones.",
-            ["hitsound", "preview", "zone", "sample", "position"],
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.Always);
+            MappingToolDefinitions.HitsoundPreviewHelper,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<HitsoundStudioViewModel>(
-            "hitsound-studio",
-            "Hitsound Studio",
-            "Import, edit, preview, generate, and export hitsound layers.",
-            ["hitsound", "studio", "sample", "MIDI", "SoundFont", "export", "layer"],
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.Always);
+            MappingToolDefinitions.HitsoundStudio,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<HitsoundCopierViewModel>(
-            "hitsound-copier",
-            "Hitsound Copier",
-            "Copy hitsounds, samples, and storyboard sounds between beatmaps.",
-            ["hitsound", "copy", "sample", "storyboard", "mute", "multi-map"],
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.Always);
+            MappingToolDefinitions.HitsoundCopier,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<MetadataManagerViewModel>(
-            "metadata-manager",
-            "Metadata Manager",
-            "Edit metadata once and apply it to multiple beatmaps.",
-            ["metadata", "artist", "title", "tags", "colours"],
+            MappingToolDefinitions.MetadataManager,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<PropertyTransformerViewModel>(
-            "property-transformer",
-            "Property Transformer",
-            "Multiply and add to timing, object, bookmark, and storyboard properties.",
-            ["properties", "transform", "timing", "offset", "multiplier"],
+            MappingToolDefinitions.PropertyTransformer,
             horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<TimingCopierViewModel>(
-            "timing-copier",
-            "Timing Copier",
-            "Copy timing between beatmaps with optional object resnapping.",
-            ["timing", "copy", "resnap", "beat divisors", "multi-map"],
+            MappingToolDefinitions.TimingCopier,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<TimingHelperViewModel>(
-            "timing-helper",
-            "Timing Helper",
-            "Adjust BPM and add redlines so selected markers become snapped.",
-            ["timing", "redlines", "BPM", "markers", "beat divisors"],
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.Always);
+            MappingToolDefinitions.TimingHelper,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<SliderCompletionatorViewModel>(
-            "slider-completionator",
-            "Slider Completionator",
-            "Change slider length and duration while calculating slider velocity.",
-            ["slider", "completion", "duration", "length", "velocity"],
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.AnySelection);
+            MappingToolDefinitions.SliderCompletionator,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<SliderMergerViewModel>(
-            "slider-merger",
-            "Slider Merger",
-            "Merge selected sliders and circles into one connected slider.",
-            ["slider", "merge", "bezier", "connection", "circles"],
+            MappingToolDefinitions.SliderMerger,
             horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.MultipleSelection);
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<SliderPicturatorViewModel>(
-            "slider-picturator",
-            "Slider Picturator",
-            "Generate a slider path that reproduces an imported image.",
-            ["slider", "picture", "image", "picturator", "render"],
+            MappingToolDefinitions.SliderPicturator,
             horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.AnySelection);
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<SlideratorViewModel>(
-            "sliderator",
-            "Sliderator",
-            "Create variable-velocity sliders and streams from an editable graph.",
-            ["slider", "sliderator", "variable velocity", "stream", "graph", "SV"],
+            MappingToolDefinitions.Sliderator,
             horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.SingleSelection);
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<TumourGeneratorViewModel>(
-            "tumour-generator",
-            "Tumour Generator 2",
-            "Generate copious amounts of tumours on sliders.",
-            ["tumour", "tumor", "slider", "layers", "graph", "templates"],
+            MappingToolDefinitions.TumourGenerator,
             horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.AnySelection);
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<ComboColourStudioViewModel>(
-            "combo-colour-studio",
-            "Combo Colour Studio",
-            "Customize combo-colour sequences, bursts, and colour haxing.",
-            ["combo", "colour", "color", "hax", "palette", "burst"],
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.Always);
+            MappingToolDefinitions.ComboColourStudio,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<MapsetMergerViewModel>(
-            "mapset-merger",
-            "Mapset Merger",
-            "Combine multiple mapsets and resolve beatmap, audio, image, storyboard, and sample conflicts.",
-            ["mapset", "merge", "audio", "image", "storyboard", "samples", "conflicts"],
+            MappingToolDefinitions.MapsetMerger,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<PatternGalleryViewModel>(
-            "pattern-gallery",
-            "Pattern Gallery",
-            "Collect, preview, organize, and place reusable hit-object patterns.",
-            ["pattern", "gallery", "collection", "osu", "snippet"],
-            verticalScrollBarVisibility: ScrollBarVisibility.Auto,
-            quickRunTargets: QuickRunTargets.Always);
+            MappingToolDefinitions.PatternGallery,
+            verticalScrollBarVisibility: ScrollBarVisibility.Auto);
         services.AddMappingTool<GeometryDashboardViewModel>(
-            "geometry-dashboard",
-            "Geometry Dashboard",
-            "Generate, display, snap to, and save useful geometry around osu! hit objects.",
-            ["geometry", "snapping", "virtual objects", "overlay", "generators"],
+            MappingToolDefinitions.GeometryDashboard,
             verticalScrollBarVisibility: ScrollBarVisibility.Disabled);
 
         services.AddSingleton<IShellFeatureRegistry>(provider =>
@@ -197,34 +127,29 @@ internal static class DesktopFeatureRegistrationExtensions
 
     public static IServiceCollection AddMappingTool<TViewModel>(
         this IServiceCollection services,
-        string id,
-        string displayName,
-        string description,
-        IEnumerable<string> searchTerms,
+        ToolDefinition definition,
         bool startsSection = false,
         ScrollBarVisibility horizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-        ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled,
-        QuickRunTargets? quickRunTargets = null)
+        ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled)
         where TViewModel : ObservableObject
     {
+        ArgumentNullException.ThrowIfNull(definition);
         services.AddShellFeature<TViewModel>(
-            id,
-            displayName,
+            definition.Id,
+            definition.DisplayName,
             "Tools",
-            description,
-            searchTerms,
+            definition.Description,
+            definition.SearchTerms,
             startsSection,
             horizontalScrollBarVisibility,
             verticalScrollBarVisibility);
 
-        if (quickRunTargets is not null)
+        if (definition.QuickRunTargets is not null)
             services.AddSingleton(provider => new MappingToolQuickRunRegistration(
-                id,
-                displayName,
-                quickRunTargets.Value,
+                definition,
                 cancellationToken => (provider.GetRequiredService<TViewModel>() as IQuickRun
                                       ?? throw new InvalidOperationException(
-                                          $"Feature '{id}' declares QuickRun but {typeof(TViewModel).Name} does not implement IQuickRun.")).RunQuickAsync(cancellationToken)
+                                          $"Feature '{definition.Id}' declares QuickRun but {typeof(TViewModel).Name} does not implement IQuickRun.")).RunQuickAsync(cancellationToken)
             ));
 
         return services;

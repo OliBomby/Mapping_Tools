@@ -217,7 +217,7 @@ public sealed class DesktopShellTests
         // Arrange
         QuickRunCommandRegistry quickRunRegistry = new();
         quickRunRegistry.Register(new QuickRunCommand(
-            "quick-tool",
+            "quick",
             "Quick tool",
             QuickRunTargets.Always,
             _ => Task.CompletedTask));
@@ -235,7 +235,7 @@ public sealed class DesktopShellTests
         quickItem.ActivateCommand.Execute(null);
 
         // Assert
-        quickRunRegistry.CurrentCommandId.Should().Be("quick-tool");
+        quickRunRegistry.CurrentCommandId.Should().Be("quick");
 
         // Act
         ordinaryItem.ActivateCommand.Execute(null);
@@ -553,8 +553,6 @@ public sealed class DesktopShellTests
 
     private sealed class StubQuickRunFeatureViewModel : ObservableObject, IQuickRun
     {
-        public string OperationId => "quick-tool";
-
         public Task RunQuickAsync(CancellationToken cancellationToken)
         {
             return Task.CompletedTask;

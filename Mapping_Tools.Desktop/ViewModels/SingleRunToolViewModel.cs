@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Tools;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
@@ -18,24 +19,22 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     ///     Creates a single-run tool presentation model.
     /// </summary>
     /// <param name="execution">Coordinates cancellation for the tool operation.</param>
-    /// <param name="operationId">Stable identifier used by the execution service.</param>
+    /// <param name="tool">The canonical application definition for this tool.</param>
     /// <exception cref="ArgumentNullException"><paramref name="execution" /> is <see langword="null" />.</exception>
-    /// <exception cref="ArgumentException"><paramref name="operationId" /> is empty or whitespace.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="tool" /> is <see langword="null" />.</exception>
     protected SingleRunToolViewModel(
         IToolExecutionService execution,
-        string operationId)
+        ToolDefinition tool)
     {
         Execution = execution ?? throw new ArgumentNullException(nameof(execution));
-        ExecutionOperationId = string.IsNullOrWhiteSpace(operationId)
-            ? throw new ArgumentException("An operation identifier is required.", nameof(operationId))
-            : operationId;
+        Tool = tool ?? throw new ArgumentNullException(nameof(tool));
 
         RunCommand = new AsyncRelayCommand(RunAsync, CanRun);
         CancelCommand = new RelayCommand(Cancel);
     }
 
-    /// <summary>Gets the stable execution identifier assigned to this tool.</summary>
-    protected string ExecutionOperationId { get; }
+    /// <summary>Gets the canonical application metadata for this tool.</summary>
+    protected ToolDefinition Tool { get; }
 
     /// <summary>Gets the execution service shared by this tool's operations.</summary>
     protected IToolExecutionService Execution { get; }
@@ -125,6 +124,6 @@ public abstract class SingleRunToolViewModel : ObservableValidator
 
     private void Cancel()
     {
-        Execution.Cancel(ExecutionOperationId);
+        Execution.Cancel(Tool.Id);
     }
 }

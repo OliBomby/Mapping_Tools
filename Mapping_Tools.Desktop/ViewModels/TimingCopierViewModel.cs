@@ -5,6 +5,7 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.TimingCopier;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.TimingCopier;
@@ -18,7 +19,6 @@ namespace Mapping_Tools.Desktop.ViewModels;
 public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     IShellProjectFeature
 {
-    internal const string OPERATION_ID = "timing-copier";
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
 
     private readonly ProjectDefinition<TimingCopierProject> definition = new(
@@ -52,7 +52,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         IUserNotificationService notifications,
         IBeatmapWorkspace workspace,
         ApplicationSettings settings)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.TimingCopier)
     {
         this.timingCopier = timingCopier ?? throw new ArgumentNullException(nameof(timingCopier));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
@@ -182,8 +182,8 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         TimingCopierOptions options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<TimingCopierResult>(
-                    OPERATION_ID,
-                    "Timing Copier",
+                Tool.Id,
+                Tool.DisplayName,
                     async context =>
                     {
                         var result = await timingCopier.CopyAsync(

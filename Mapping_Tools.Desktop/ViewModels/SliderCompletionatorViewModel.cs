@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.SliderCompletionator;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.SliderCompletionator;
 using Mapping_Tools.Desktop.Shell;
@@ -18,7 +19,6 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     IQuickRun,
     IShellProjectFeature
 {
-    internal const string OPERATION_ID = "slider-completionator";
 
     private readonly ISliderCompletionatorService completionator;
     private readonly ICurrentBeatmapLocator currentBeatmap;
@@ -46,7 +46,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
         ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
         ApplicationSettings settings)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.SliderCompletionator)
     {
         this.completionator = completionator ?? throw new ArgumentNullException(nameof(completionator));
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
@@ -157,8 +157,6 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
             cancellationToken));
     }
 
-    string IQuickRun.OperationId => OPERATION_ID;
-
     IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
@@ -200,8 +198,8 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
         SliderCompletionatorOptions options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<SliderCompletionatorResult>(
-                    OPERATION_ID,
-                    "Slider Completionator",
+                Tool.Id,
+                Tool.DisplayName,
                     async context =>
                     {
                         var result = await completionator.CompleteAsync(

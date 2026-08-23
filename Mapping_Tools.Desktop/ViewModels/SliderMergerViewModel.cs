@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.SliderMerger;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.SliderMerger;
 using Mapping_Tools.Desktop.Shell;
@@ -18,7 +19,6 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature
 {
-    internal const string OPERATION_ID = "slider-merger";
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
     private readonly ProjectDefinition<SliderMergerProject> definition = new(
@@ -45,7 +45,7 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
         ApplicationSettings settings)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.SliderMerger)
     {
         this.merger = merger ?? throw new ArgumentNullException(nameof(merger));
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
@@ -104,8 +104,6 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    string IQuickRun.OperationId => OPERATION_ID;
-
     IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
@@ -147,8 +145,8 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
         var options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<SliderMergerResult>(
-                    OPERATION_ID,
-                    "Slider Merger",
+                Tool.Id,
+                Tool.DisplayName,
                     async context =>
                     {
                         var result = await merger.MergeAsync(

@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.RhythmGuide;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
@@ -17,7 +18,6 @@ namespace Mapping_Tools.Desktop.ViewModels;
 public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     IShellProjectFeature
 {
-    private const string operation_id = "rhythm-guide";
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
     private readonly ProjectDefinition<RhythmGuideProject> definition;
     private readonly IFilePicker filePicker;
@@ -40,7 +40,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmapLocator,
         IRhythmGuideWindowService windowService,
         IApplicationDirectories directories)
-        : base(execution, operation_id)
+        : base(execution, MappingToolDefinitions.RhythmGuide)
     {
         this.rhythmGuide = rhythmGuide ?? throw new ArgumentNullException(nameof(rhythmGuide));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
@@ -160,8 +160,8 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         var options = CreateOptions();
         await Execution.ExecuteAsync(
             new ToolExecutionRequest<RhythmGuideResult>(
-                operation_id,
-                "Rhythm Guide",
+                Tool.Id,
+                Tool.DisplayName,
                 async context =>
                 {
                     context.ReportProgress(10, "Loading beatmaps");

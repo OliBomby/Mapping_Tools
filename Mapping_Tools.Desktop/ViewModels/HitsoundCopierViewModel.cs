@@ -6,6 +6,7 @@ using Mapping_Tools.Application.HitsoundCopier;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
@@ -19,7 +20,6 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     IShellProjectFeature,
     IQuickRun
 {
-    internal const string OPERATION_ID = "hitsound-copier";
 
     private readonly IHitsoundCopierService copier;
     private readonly ICurrentBeatmapLocator currentBeatmap;
@@ -42,7 +42,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmap,
         IUserNotificationService notifications,
         ApplicationSettings settings)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.HitsoundCopier)
     {
         this.copier = copier ?? throw new ArgumentNullException(nameof(copier));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
@@ -203,8 +203,6 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         await RunWithStateAsync(() => RunOptionsAsync(options, true));
     }
 
-    string IQuickRun.OperationId => OPERATION_ID;
-
     IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
@@ -348,8 +346,8 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     {
         await Execution.ExecuteAsync(
             new ToolExecutionRequest<HitsoundCopierResult>(
-                OPERATION_ID,
-                "Hitsound Copier",
+                Tool.Id,
+                Tool.DisplayName,
                 async context =>
                 {
                     var result = await copier.CopyAsync(

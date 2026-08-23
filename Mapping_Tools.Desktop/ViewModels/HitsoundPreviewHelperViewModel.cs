@@ -6,6 +6,7 @@ using Mapping_Tools.Application.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
@@ -24,7 +25,6 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     IQuickRun,
     IShellProjectFeature
 {
-    internal const string OPERATION_ID = "hitsound-preview-helper";
     private readonly ICurrentBeatmapLocator currentBeatmap;
     private readonly ProjectDefinition<HitsoundPreviewHelperProject> definition;
     private readonly IUserNotificationService notifications;
@@ -59,7 +59,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         IRhythmGuideWindowService rhythmGuideWindow,
         RhythmGuideViewModel rhythmGuideViewModel,
         IApplicationDirectories directories)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.HitsoundPreviewHelper)
     {
         this.previewService = previewService ?? throw new ArgumentNullException(nameof(previewService));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
@@ -137,8 +137,6 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
             true,
             cancellationToken));
     }
-
-    string IQuickRun.OperationId => OPERATION_ID;
 
     IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
@@ -287,8 +285,8 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         };
         var result = await Execution.ExecuteAsync(
             new ToolExecutionRequest<HitsoundPreviewHelperResult>(
-                OPERATION_ID,
-                "Hitsound Preview Helper",
+                Tool.Id,
+                Tool.DisplayName,
                 async context =>
                 {
                     var applied = await previewService.ApplyAsync(

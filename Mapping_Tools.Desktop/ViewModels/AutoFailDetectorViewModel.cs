@@ -6,6 +6,7 @@ using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Timeline;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.AutoFail;
 using Mapping_Tools.Desktop.Shell;
@@ -15,7 +16,6 @@ namespace Mapping_Tools.Desktop.ViewModels;
 /// <summary>Coordinates Auto-fail Detector options, execution, fixes, and timeline output.</summary>
 public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, IQuickRun
 {
-    internal const string OPERATION_ID = "auto-fail-detector";
     private readonly IAutoFailService autoFail;
     private readonly ICurrentBeatmapLocator currentBeatmap;
     private readonly IDialogService dialogs;
@@ -39,7 +39,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         ApplicationSettings settings,
         IDialogService dialogs,
         IPlatformLauncher launcher)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.AutoFailDetector)
     {
         this.autoFail = autoFail ?? throw new ArgumentNullException(nameof(autoFail));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
@@ -107,8 +107,6 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         await RunWithStateAsync(() => RunPathAsync(path, cancellationToken));
     }
 
-    string IQuickRun.OperationId => OPERATION_ID;
-
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
@@ -135,8 +133,8 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
 
         var result = await Execution.ExecuteAsync(
             new ToolExecutionRequest<AutoFailRun>(
-                OPERATION_ID,
-                "Auto-fail Detector",
+                Tool.Id,
+                Tool.DisplayName,
                 async context =>
                 {
                     context.ReportProgress(33, "Loading beatmap");
@@ -205,7 +203,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
             {
                 var applied = await Execution.ExecuteAsync(
                     new ToolExecutionRequest<bool>(
-                        OPERATION_ID + "-fix",
+                Tool.Id + "-fix",
                         "Auto-fail Fix",
                         async context =>
                         {

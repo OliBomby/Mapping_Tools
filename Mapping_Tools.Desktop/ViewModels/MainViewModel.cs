@@ -179,7 +179,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         disposed = true;
         notifications.Published -= OnNotificationPublished;
         if (CurrentFeature is IShellProjectFeature projectFeature) projectCoordinator.Deactivate(projectFeature);
-        if (CurrentFeature is IQuickRun quickRun) DeactivateQuickRun(quickRun);
+        if (CurrentFeature is IQuickRun) DeactivateQuickRun();
         if (CurrentFeature is IShellFeatureActivation activation) activation.Deactivate();
         ProjectMenuItems = [];
         OnPropertyChanged(nameof(ProjectMenuItems));
@@ -193,7 +193,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
         if (CurrentFeature is IShellFeatureActivation previous) previous.Deactivate();
         if (CurrentFeature is IShellProjectFeature previousProject) projectCoordinator.Deactivate(previousProject);
-        if (CurrentFeature is IQuickRun previousQuickRun) DeactivateQuickRun(previousQuickRun);
+        if (CurrentFeature is IQuickRun) DeactivateQuickRun();
 
         var registration = registry.Find(item.Id)
                            ?? throw new InvalidOperationException($"Feature '{item.Id}' is not registered.");
@@ -214,7 +214,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             : $"Mapping Tools - {item.DisplayName}";
         if (viewModel is IShellFeatureActivation current) current.Activate();
         if (viewModel is IShellProjectFeature projectFeature) projectCoordinator.Activate(projectFeature);
-        if (viewModel is IQuickRun quickRun) quickRunRegistry.SelectCurrent(quickRun.OperationId);
+        if (viewModel is IQuickRun) quickRunRegistry.SelectCurrent(registration.Id);
     }
 
     private IReadOnlyList<ShellProjectMenuItem> CreateProjectMenuItems(ObservableObject viewModel)
@@ -319,9 +319,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         return CurrentFeature is IShellProjectFeature;
     }
 
-    private void DeactivateQuickRun(IQuickRun quickRun)
+    private void DeactivateQuickRun()
     {
-        if (quickRunRegistry.CurrentCommandId == quickRun.OperationId) quickRunRegistry.SelectCurrent(null);
+        if (quickRunRegistry.CurrentCommandId is not null) quickRunRegistry.SelectCurrent(null);
     }
 
     [RelayCommand(CanExecute = nameof(CanUseProjectActions))]

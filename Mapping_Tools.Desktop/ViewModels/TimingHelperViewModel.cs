@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Interactions.Validation;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.TimingHelper;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.TimingHelper;
@@ -18,7 +19,6 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature
 {
-    internal const string OPERATION_ID = "timing-helper";
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
     private readonly ProjectDefinition<TimingHelperProject> definition = new(
@@ -46,7 +46,7 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
         ApplicationSettings settings)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.TimingHelper)
     {
         this.timingHelper = timingHelper ?? throw new ArgumentNullException(nameof(timingHelper));
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
@@ -106,8 +106,6 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    string IQuickRun.OperationId => OPERATION_ID;
-
     IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
     object IShellProjectFeature.Snapshot()
@@ -153,8 +151,8 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
         TimingHelperOptions options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<TimingHelperResult>(
-                    OPERATION_ID,
-                    "Timing Helper",
+                Tool.Id,
+                Tool.DisplayName,
                     async context =>
                     {
                         Progress<double> progress = new(value =>

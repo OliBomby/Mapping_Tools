@@ -1,13 +1,12 @@
 using Mapping_Tools.Application.QuickRun;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Desktop.Shell;
 using Microsoft.Extensions.Hosting;
 
 namespace Mapping_Tools.Desktop.Hosting;
 
 internal sealed record MappingToolQuickRunRegistration(
-    string Id,
-    string DisplayName,
-    QuickRunTargets Targets,
+    ToolDefinition Definition,
     Func<CancellationToken, Task> Execute);
 
 internal sealed class MappingToolQuickRunHostedService : IHostedService
@@ -29,11 +28,9 @@ internal sealed class MappingToolQuickRunHostedService : IHostedService
     public Task StartAsync(CancellationToken cancellationToken)
     {
         foreach (var tool in tools)
-            if (registry.Commands.All(command => command.Id != tool.Id))
+            if (registry.Commands.All(command => command.Id != tool.Definition.Id))
                 registry.Register(new QuickRunCommand(
-                    tool.Id,
-                    tool.DisplayName,
-                    tool.Targets,
+                    tool.Definition,
                     cancellationToken => ExecuteOnUiThreadAsync(
                         tool.Execute,
                         cancellationToken)));
@@ -43,7 +40,7 @@ internal sealed class MappingToolQuickRunHostedService : IHostedService
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        foreach (var tool in tools) registry.Remove(tool.Id);
+        foreach (var tool in tools) registry.Remove(tool.Definition.Id);
 
         return Task.CompletedTask;
     }

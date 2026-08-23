@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Core.Tools.PropertyTransformer;
 using Mapping_Tools.Desktop.Shell;
 
@@ -15,7 +16,6 @@ namespace Mapping_Tools.Desktop.ViewModels;
 public sealed partial class PropertyTransformerViewModel : SingleRunToolViewModel,
     IShellProjectFeature
 {
-    internal const string OPERATION_ID = "property-transformer";
 
     private readonly ProjectDefinition<PropertyTransformerProject> definition = new(
         "propertytransformerproject.json",
@@ -36,7 +36,7 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
         IPropertyTransformerService propertyTransformer,
         IToolExecutionService execution,
         IBeatmapWorkspace workspace)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.PropertyTransformer)
     {
         this.propertyTransformer = propertyTransformer
                                    ?? throw new ArgumentNullException(nameof(propertyTransformer));
@@ -201,8 +201,8 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
         PropertyTransformerOptions options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<PropertyTransformerResult>(
-                    OPERATION_ID,
-                    "Property Transformer",
+                Tool.Id,
+                Tool.DisplayName,
                     async context =>
                     {
                         Progress<double> progress = new(value =>

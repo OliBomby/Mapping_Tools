@@ -7,6 +7,7 @@ using Mapping_Tools.Application.ComboColourStudio;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Desktop.Shell;
@@ -22,7 +23,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     IShellProjectFeature,
     IQuickRun
 {
-    internal const string OPERATION_ID = "combo-colour-studio";
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
     private readonly ProjectDefinition<ComboColourProject> definition = new(
@@ -52,7 +52,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmap,
         ILiveBeatmapReader liveReader,
         IFilePicker filePicker)
-        : base(execution, OPERATION_ID)
+        : base(execution, MappingToolDefinitions.ComboColourStudio)
     {
         this.studio = studio ?? throw new ArgumentNullException(nameof(studio));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
@@ -125,8 +125,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             true,
             cancellationToken));
     }
-
-    string IQuickRun.OperationId => OPERATION_ID;
 
     IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
 
@@ -338,8 +336,8 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         var project = SnapshotProject();
         var execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<ComboColourStudioRunResult>(
-                OPERATION_ID,
-                "Combo Colour Studio",
+                Tool.Id,
+                Tool.DisplayName,
                 async context =>
                 {
                     var result = await studio.ApplyAsync(
