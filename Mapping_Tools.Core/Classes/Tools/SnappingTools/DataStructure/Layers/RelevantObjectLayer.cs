@@ -45,6 +45,7 @@ public sealed class RelevantObjectLayer
     /// <param name="propagate">Whether to regenerate descendants after adding.</param>
     public void Add(IEnumerable<IRelevantObject> relevantObjects, bool propagate = true)
     {
+        // Check any relevant objects get added at all
         bool addedAny = false;
         foreach (IRelevantObject relevantObject in relevantObjects)
         {
@@ -53,6 +54,7 @@ public sealed class RelevantObjectLayer
 
         if (propagate && addedAny)
         {
+            // Propagate changes if stuff got added
             NextLayer?.GenerateNewObjects();
         }
     }
@@ -69,23 +71,29 @@ public sealed class RelevantObjectLayer
 
         if (propagate && NextLayer is not null)
         {
+            // Propagate changes
             NextLayer.GenerateNewObjects();
         }
     }
 
     private bool AddCore(IRelevantObject relevantObject)
     {
+        // Don't add if this layer is over the max
         if (Objects.GetCount() >= ParentCollection.MaxObjects)
         {
             relevantObject.Dispose();
             return false;
         }
 
+        // Check if this object or something similar exists anywhere in the context or in this layer
         RelevantObjectCollectionType? previousCollection = GetAllPreviousLayersCollection();
         if (Objects.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out IRelevantObject? similarObject))
         {
+            // Consume object
             similarObject!.Consume(relevantObject);
+            // Dispose this relevant object
             relevantObject.Dispose();
+            // Set DoNotDispose for the GenerateNewObjects method
             if (!similarObject.DoNotDispose && !similarObject.DefinitelyDispose &&
                 previousCollection is not null &&
                 previousCollection.FindSimilar(similarObject, ParentCollection.AcceptableDifference, out _))
@@ -103,12 +111,17 @@ public sealed class RelevantObjectLayer
         if (previousCollection is not null &&
             previousCollection.FindSimilar(relevantObject, ParentCollection.AcceptableDifference, out _))
         {
+            // Don't consume because that causes inheritance issues
+            // Dispose this relevant object
             relevantObject.Dispose();
             return false;
         }
 
+        // Set DoNotDispose for the GenerateNewObjects method
         relevantObject.DoNotDispose = true;
+        // Insert the new object
         Objects.SortedInsert(relevantObject);
+        // Set layer variable in object
         relevantObject.Layer = this;
 
         return true;
@@ -136,71 +149,95 @@ public sealed class RelevantObjectLayer
             return;
         }
 
+        // Get all active generators for this layer
         RelevantObjectsGenerator[] activeGenerators = GeneratorCollection.GetActiveGenerators().ToArray();
+        // Get the previous layers objects if any generators are deep
         RelevantObjectCollectionType? deepObjects = activeGenerators.Any(o => o.Settings.IsDeep)
             ? GetAllPreviousLayersCollection()
             : null;
+        // Keep track of count to avoid adding too many objects
         int addedCount = 0;
 
+        // Set all DoNotDispose to false
         foreach (IRelevantObject relevantObject in Objects.Values.SelectMany(list => list))
         {
             relevantObject.DoNotDispose = false;
             relevantObject.Relevancy = 0;
         }
 
+        // Loop through all active generators
         foreach (RelevantObjectsGenerator generator in activeGenerators)
         {
+            // Get the generator methods
             IEnumerable<System.Reflection.MethodInfo> methods = generator.GetGeneratorMethods();
+            // Get the required relevant object collection for this generator
             RelevantObjectCollectionType? objects = generator.Settings.IsDeep
                 ? deepObjects?.GetSubset(generator.Settings.InputPredicate, generator)
                 : PreviousLayer?.Objects.GetSubset(generator.Settings.InputPredicate, generator);
 
+            // Loop through all generator methods in this generator
             foreach (System.Reflection.MethodInfo method in methods)
             {
+                // Get the dependencies for this generator method
                 Type[] dependencies = RelevantObjectsGenerator.GetDependencies(method);
+                // Continue if there are dependencies but nothing to get the values from
                 if (dependencies.Length > 0 && PreviousLayer is null)
                 {
                     continue;
                 }
 
+                // Get all the combinations of relevant objects to use this generator method on
                 IEnumerable<object[]> parametersList = RelevantObjectPairGenerator.GetParametersList(
                     dependencies, objects, generator.Settings.IsSequential);
 
+                // Generate all the new relevant objects
                 foreach (object[] parameterObjects in parametersList)
                 {
+                    // Generate the new relevant object(s)
+                    // Cast parameters to relevant objects
                     IRelevantObject[] parameters = parameterObjects.Cast<IRelevantObject>().ToArray();
                     object? result = method.Invoke(generator, parameterObjects);
                     HashSet<IRelevantObject> relevantParents = new(parameters);
 
+                    // Handle different return types
                     switch (result)
                     {
                         case IEnumerable<IRelevantObject> newRelevantObjectsEnumerable:
+                            // Enumerate to array
                             IRelevantObject[] newRelevantObjectsArray = newRelevantObjectsEnumerable.ToArray();
+                            // Add the new relevant objects to the children of the parents
                             foreach (IRelevantObject relevantParent in relevantParents)
                             {
                                 relevantParent.ChildObjects.UnionWith(newRelevantObjectsArray);
                             }
 
+                            // Add parents and generator to the new relevant objects
                             foreach (IRelevantObject relevantObject in newRelevantObjectsArray)
                             {
-                                relevantObject.Generator = generator;
+                                relevantObject.Generator = generator; // Generator has to be set before parents, otherwise temporal position will go wrong
                                 relevantObject.ParentObjects = relevantParents;
+                                // Set the IsInheritable setting according to the generator settings
                                 relevantObject.IsInheritable = generator.Settings.GeneratesInheritable;
                             }
 
+                            // Add the new relevant objects to this layer
                             Add(newRelevantObjectsArray, false);
                             addedCount += newRelevantObjectsArray.Length;
                             break;
 
                         case IRelevantObject newRelevantObject:
+                            // Add the new relevant object to the children of the parents
                             foreach (IRelevantObject relevantParent in relevantParents)
                             {
                                 relevantParent.ChildObjects.Add(newRelevantObject);
                             }
 
-                            newRelevantObject.Generator = generator;
+                            // Add parents and generator to the new relevant object
+                            newRelevantObject.Generator = generator; // Generator has to be set before parents, otherwise temporal position will go wrong
                             newRelevantObject.ParentObjects = relevantParents;
+                            // Set the IsInheritable setting according to the generator settings
                             newRelevantObject.IsInheritable = generator.Settings.GeneratesInheritable;
+                            // Add the new relevant objects to this layer
                             Add(newRelevantObject, false);
                             addedCount++;
                             break;
@@ -214,12 +251,14 @@ public sealed class RelevantObjectLayer
             }
         }
 
+        // Dispose all relevant objects in this layer that were generated from a generator, but not generated now.
         generationEnd:
         foreach (List<IRelevantObject> objectLayerObjects in Objects.Values)
         {
             for (int i = 0; i < objectLayerObjects.Count; i++)
             {
                 IRelevantObject relevantObject = objectLayerObjects[i];
+                // Continue for relevant objects with no generator or DoNotDispose
                 if (!relevantObject.DefinitelyDispose &&
                     (relevantObject.Generator is null || relevantObject.DoNotDispose) &&
                     relevantObject.Relevancy > 0)
@@ -232,11 +271,13 @@ public sealed class RelevantObjectLayer
             }
         }
 
+        // Don't propagate if this layer has more than the max number of relevant objects
         if (Objects.GetCount() > ParentCollection.MaxObjects)
         {
             return;
         }
 
+        // Propagate if anything was added to this layer
         if (addedCount > 0 || forcePropagate)
         {
             NextLayer?.GenerateNewObjects(forcePropagate);
@@ -259,12 +300,15 @@ public sealed class RelevantObjectLayer
     /// <param name="propagate">Whether removal should continue through descendants.</param>
     public void Remove(IRelevantObject relevantObject, bool propagate = true)
     {
+        // Remove relevant object from this layer
         Objects.RemoveRelevantObject(relevantObject);
+        // Return if there are no children
         if (!propagate || relevantObject.ChildObjects is null)
         {
             return;
         }
 
+        // Kill all children
         foreach (IRelevantObject child in relevantObject.ChildObjects)
         {
             child.Layer?.Remove(child);
@@ -274,6 +318,7 @@ public sealed class RelevantObjectLayer
     /// <summary>Disposes every object currently held by the layer.</summary>
     public void Clear()
     {
+        // Dispose all relevant objects in this layer
         foreach (IRelevantObject relevantObject in Objects.SelectMany(kvp => kvp.Value.ToArray()))
         {
             relevantObject.Dispose();

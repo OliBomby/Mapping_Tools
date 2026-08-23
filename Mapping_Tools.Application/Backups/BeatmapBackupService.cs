@@ -99,6 +99,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
                         .ConfigureAwait(false));
             }
 
+            // Delete old files if the number of backup files are over the limit
             await PruneAsync(
                     artifacts
                         .Select(artifact => artifact.Path)
@@ -143,6 +144,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
             if (session.Source == BeatmapEditingSource.LiveEditor &&
                 !HasSameContentsAsDisk(session.Editor.Path, session.InitialBeatmapLines))
             {
+                // Save second copy with newest version if possible
                 artifacts.Add(
                     await WriteSnapshotAsync(
                             session.Editor.Path,
@@ -201,6 +203,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
 
             EnsureBackupDirectory();
             DateTimeOffset createdAt = _timeProvider.GetLocalNow();
+            // Save temp version
             BeatmapBackupArtifact artifact = await WriteSnapshotAsync(
                     session.Editor.Path,
                     lines,
@@ -307,6 +310,7 @@ public sealed class BeatmapBackupService : IBeatmapBackupService
             reason,
             createdAt,
             liveCompanion: false);
+        // Save normal copy
         await _store.CopyAsync(
                 sourcePath,
                 destination,

@@ -93,6 +93,7 @@ public static class SliderCompletionatorEngine
                                       (newLength * millisecondsPerBeat);
                         break;
                     case SliderCompletionatorFreeVariable.Duration:
+                        // This actually doesn't get used anymore because the .osu doesn't store the duration
                         newDuration = newLength * newVelocity * millisecondsPerBeat /
                                       (-10000 * timing.SliderMultiplier);
                         break;
@@ -131,6 +132,7 @@ public static class SliderCompletionatorEngine
 
                 if (options.MoveAnchors)
                 {
+                    // Scale anchors to completion
                     hitObject.SetAllCurvePoints(SliderPathUtil.MoveAnchorsToLength(
                         hitObject.GetAllCurvePoints(),
                         hitObject.SliderType,
@@ -146,7 +148,9 @@ public static class SliderCompletionatorEngine
         }
 
         cancellationToken.ThrowIfCancellationRequested();
+        // Reconstruct SliderVelocity
         List<TimingPointChange> changes = [];
+        // Add Hitobject stuff
         foreach (HitObject hitObject in beatmap.HitObjects)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -155,18 +159,22 @@ public static class SliderCompletionatorEngine
                 continue;
             }
 
+            // SliderVelocity changes
             if (markedObjectSet.Contains(hitObject) && options.DelegateToBpm)
             {
                 TimingPoint redlineAfter = timing.GetRedlineAtTime(hitObject.Time).Copy();
                 TimingPoint redlineOn = redlineAfter.Copy();
 
                 redlineAfter.Offset = hitObject.Time;
-                redlineOn.Offset = hitObject.Time - 1;
+                redlineOn.Offset = hitObject.Time - 1; // This one will be on the slider
                 redlineAfter.OmitFirstBarLine = true;
                 redlineOn.OmitFirstBarLine = true;
+                // Express velocity in BPM
                 redlineOn.MpB *= hitObject.SliderVelocity / -100;
+                // NaN SV results in removal of slider ticks
                 hitObject.SliderVelocity = options.RemoveSliderTicks ? double.NaN : -100;
 
+                // Add redlines
                 changes.Add(new TimingPointChange(
                     redlineOn,
                     mpb: true,
@@ -191,6 +199,7 @@ public static class SliderCompletionatorEngine
                 fuzziness: Precision.DoubleEpsilon));
         }
 
+        // Add the new SliderVelocity changes
         TimingPointChange.Apply(timing, changes);
         progress?.Report(100);
         return slidersCompleted;

@@ -50,6 +50,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
         {
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
+            // Get the current beatmap if the selection mode is 'Selected' because otherwise the selection would always fail
             LiveBeatmapPreference livePreference =
                 options.ImportModeSetting == SliderCompletionatorImportMode.Selected
                     ? LiveBeatmapPreference.RequireLive
@@ -94,6 +95,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
                 new Progress<double>(value => progress?.Report(
                     (index + value / 100) / paths.Count * 100)),
                 cancellationToken);
+            // Save the file
             await _editingGateway
                 .SaveAsync(
                     session,

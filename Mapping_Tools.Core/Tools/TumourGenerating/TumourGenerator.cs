@@ -53,19 +53,26 @@ public sealed class TumourGenerator
         if (!hitObject.IsSlider || TumourLayers.Count == 0) return false;
 
         double oldPixelLength = hitObject.PixelLength;
+
+        // Create path
         PathWithHints pathWithHints = PathHelper.CreatePathWithHints(hitObject.GetSliderPath());
         if (pathWithHints.Path.Count == 0) return false;
 
         double totalLength = pathWithHints.Path.Last!.Value.CumulativeLength;
         double initialLength = totalLength;
+
+        // Reset the layer lengths
         layerLengths.Clear();
         var layer = 0;
 
+        // Add tumours
         foreach (TumourLayer tumourLayer in TumourLayers)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            // Skip inactive layers
             if (!tumourLayer.IsActive) continue;
 
+            // Recalculate
             if (tumourLayer.Recalculate)
             {
                 pathWithHints.RecalculateAndFixHints();
@@ -73,7 +80,10 @@ public sealed class TumourGenerator
                 layer++;
             }
 
+            // Add the length for this layer
             layerLengths.Add(totalLength);
+
+            // Get the start and end dist in osu! pixels
             double tumourStart = tumourLayer.TumourStart;
             double tumourEnd = tumourLayer.TumourEnd;
             if (!tumourLayer.UseAbsoluteRange)
@@ -82,6 +92,7 @@ public sealed class TumourGenerator
                 tumourEnd = MathHelper.Clamp(tumourEnd, 0, 1) * totalLength;
             }
 
+            // Find the start of the tumours
             LinkedListNode<PathPoint>? current = pathWithHints.Path.First;
             double nextDistance = tumourStart;
             bool side = tumourLayer.TumourSidedness == TumourSidedness.AlternatingLeft;
@@ -98,6 +109,7 @@ public sealed class TumourGenerator
                 if (!tumourLayer.UseAbsoluteRange) length *= initialLength / RelativePropertyScale;
                 double endDistance = Math.Min(nextDistance + length, tumourEnd);
 
+                // Get which side the tumour should be on
                 side = tumourLayer.TumourSidedness switch
                 {
                     TumourSidedness.Left => false,
@@ -113,6 +125,7 @@ public sealed class TumourGenerator
                     double epsilon = MathHelper.Clamp(length / 2, Precision.DoubleEpsilon, 0.9);
                     LinkedListNode<PathPoint> start = PathHelper.FindFirstOccurrenceExact(current, nextDistance, epsilon: epsilon);
                     LinkedListNode<PathPoint> end = PathHelper.FindLastOccurrenceExact(start, endDistance, epsilon: epsilon);
+                    // Calculate the T start/end for the tumour template
                     double startT = 0;
                     double endT = 1;
                     if (Precision.DefinitelyBigger(length, 0))
@@ -145,6 +158,7 @@ public sealed class TumourGenerator
         }
 
         cancellationToken.ThrowIfCancellationRequested();
+        // Reconstruct the slider
         PathHelper.Recalculate(pathWithHints.Path);
         if (pathWithHints.Path.Count == 0 || double.IsNaN(pathWithHints.Path.Last.Value.CumulativeLength)) return false;
 
@@ -153,8 +167,11 @@ public sealed class TumourGenerator
             : Reconstructor.Reconstruct(pathWithHints);
         if (anchors is null || anchors.Count < 2) return false;
 
+        // Set the new slider path
         hitObject.SetSliderPath(new SliderPath(pathType, anchors.ToArray()));
         double newPixelLength = hitObject.PixelLength;
+
+        // Update velocity
         hitObject.SliderVelocity *= oldPixelLength / newPixelLength;
         return true;
     }
@@ -198,12 +215,18 @@ public sealed class TumourGenerator
         PathPoint endPoint = end.Value;
         if (ReferenceEquals(start, end))
         {
+            // Ensure that there is a copy of the start point at the end point if we add in-between points
+            // and the start and end points are the same node.
             end = new LinkedListNode<PathPoint>(endPoint);
             path.AddAfter(start, end);
         }
 
         if (Precision.AlmostEquals(startPoint.CumulativeLength, endPoint.CumulativeLength))
         {
+            // Wii Sports Resort to T mode
+            // If T is defined, then 0 should be on the first occurance of this dist and 1 on the last occurance of this dist
+
+            // Initialize T properly
             LinkedListNode<PathPoint> firstOccurrence = PathHelper.FindFirstOccurrence(start, start.Value.CumulativeLength);
             LinkedListNode<PathPoint> lastOccurrence = PathHelper.FindLastOccurrence(end, end.Value.CumulativeLength);
             int pointsBetween = PathHelper.CountPointsBetween(firstOccurrence, lastOccurrence);
@@ -217,8 +240,11 @@ public sealed class TumourGenerator
                 point = point.Next;
             }
             lastOccurrence.Value = lastOccurrence.Value.SetT(1);
+
+            // T is initialized
         }
 
+        // Count the number of nodes between start and end
         int pointsBetweenStartEnd = PathHelper.CountPointsBetween(start, end);
         double totalLength = path.Last!.Value.CumulativeLength;
         startPoint = start.Value;
@@ -240,12 +266,15 @@ public sealed class TumourGenerator
         if (!tumourLayer.UseAbsoluteRange) scale *= initialLength / RelativePropertyScale;
         double rotation = MathHelper.DegreesToRadians(tumourLayer.TumourRotation.GetValue(startProgress));
 
+        // Setup tumour template with the correct shape
         ITumourTemplate tumourTemplate = tumourLayer.TumourTemplate;
         tumourTemplate.Width = otherSide ? -scale : scale;
         tumourTemplate.Length = Precision.AlmostEquals(templateRange, 0) ? length : length / templateRange;
         tumourTemplate.Parameter = tumourTemplate.NeedsParameter ? tumourLayer.TumourParameter.GetValue(startProgress) : 0;
+        // Initialize the template if necessary
         if (tumourTemplate is IRequireInit initializable) initializable.Init();
 
+        // Make sure there are enough points between start and end for the tumour shape and resolution
         int wantedPointsBetween = Math.Max(
             pointsBetweenStartEnd,
             (int)(tumourTemplate.GetDetailLevel() * templateRange * Resolution));
@@ -258,24 +287,30 @@ public sealed class TumourGenerator
             out LinkedList<LinkedListNode<PathPoint>> ensuredPoints);
         if (pointsBetweenStartEnd < wantedPointsBetween)
             pointsBetweenStartEnd += path.Subdivide(start, end, wantedPointsBetween);
+        // Make sure the curvature is maintained by making sure there is at least one point between each critical point
+        // And a point between start and the red point before it and a point between end and the red point after it
         pointsBetweenStartEnd += path.EnsureLocalCurvature(start, end, ensuredPoints);
 
         double startDistance = startPoint.CumulativeLength;
         LinkedListNode<PathPoint>? current = start;
+        // Add tumour offsets
         while (current is not null && current.Previous != end)
         {
             PathPoint point = current.Value;
+            // Scale to template T
             double t = Precision.AlmostEquals(distance, 0)
                 ? (point.T - startT) / distanceT
                 : (point.CumulativeLength - startDistance) / distance;
             double templateT = t * templateRange + startTemplateT;
             bool isCritical = false;
+            // Check if this is a critical point
             if (ensuredPoints?.First is not null && ensuredPoints.First.Value == current)
             {
                 ensuredPoints.RemoveFirst();
                 isCritical = true;
             }
 
+            // Get the offset, original pos, and direction
             PathPoint interpolatedPoint = PathPoint.Lerp(startPoint, endPoint, t);
             Vector2 position = tumourLayer.WrappingMode switch
             {
@@ -294,11 +329,15 @@ public sealed class TumourGenerator
                 WrappingMode.Simple => isCritical || point.Red && isOffsetInThisLayer,
                 _ => isCritical || point.Red
             };
+            // Make sure the start and end points are red
             red |= current == start || current == end;
+            // Get the tumour offset
             Vector2 offset = tumourTemplate.GetOffset(templateT);
 
+            // Modify the path
             if (current == start && start.Previous is not null && offset.LengthSquared > Precision.DoubleEpsilon)
             {
+                // Copy point and leave one side at 0 offset
                 Vector2 newPosition = CalculateNewPos(point, position, offset, postAngle + rotation);
                 current.List.AddBefore(current, new PathPoint(point.Pos, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, -1, true));
                 current.Value = new PathPoint(newPosition, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, 0, true);
@@ -307,6 +346,7 @@ public sealed class TumourGenerator
             }
             else if (current == end && end.Next is not null && offset.LengthSquared > Precision.DoubleEpsilon)
             {
+                // Copy point and leave one side at 0 offset
                 Vector2 newPosition = CalculateNewPos(point, position, offset, preAngle + rotation);
                 current.List.AddBefore(current, new PathPoint(newPosition, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, 1, true));
                 current.Value = new PathPoint(point.Pos, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, 2, true);
@@ -315,6 +355,7 @@ public sealed class TumourGenerator
             else if (red && !double.IsNaN(preAngle) && !double.IsNaN(postAngle) &&
                      !Precision.AlmostEquals(preAngle, postAngle) && offset.LengthSquared > Precision.DoubleEpsilon)
             {
+                // Copy point and offset it by both angles
                 Vector2 newPosition = CalculateNewPos(point, position, offset, preAngle + rotation);
                 Vector2 newPosition2 = CalculateNewPos(point, position, offset, postAngle + rotation);
                 current.List.AddBefore(current, new PathPoint(newPosition, point.OgPos, point.PreAngle, point.PostAngle, point.CumulativeLength, point.T, red));
@@ -322,6 +363,7 @@ public sealed class TumourGenerator
             }
             else
             {
+                // Add the offset to the point
                 double angle = MathHelper.LerpAngle(preAngle, postAngle, 0.5);
                 current.Value = new PathPoint(
                     CalculateNewPos(point, position, offset, angle + rotation),
@@ -339,6 +381,7 @@ public sealed class TumourGenerator
         if (tumourLayer.WrappingMode == WrappingMode.Simple &&
             Precision.AlmostEquals(MathHelper.AngleDifference(rotation, 0), 0, 1E-6D))
         {
+            // Maybe add a hint
             pathWithHints.AddReconstructionHint(new ReconstructionHint(
                 hintStart,
                 hintEnd,

@@ -51,8 +51,10 @@ public static class SlideratorEngine
         GraphState graph = options.GraphState;
         Func<double, double> positionFunction;
         bool constantVelocity;
+        // Make a position function for Sliderator
         if (options.GraphModeSetting == SlideratorGraphMode.Velocity)
         {
+            // We convert the graph GetValue function to a function that works like ms -> px
             positionFunction = milliseconds =>
                 graph.GetIntegral(0, milliseconds * options.BeatsPerMinute / 60000) *
                 GetSvGraphMultiplier(options) * options.PixelLength;
@@ -60,11 +62,13 @@ public static class SlideratorEngine
         }
         else
         {
+            // We convert the graph GetValue function to a function that works like ms -> px
             positionFunction = milliseconds =>
                 graph.GetValue(milliseconds * options.BeatsPerMinute / 60000) * options.PixelLength;
             constantVelocity = Precision.AlmostEquals(graph.GetMaxDerivative(), graph.GetMinDerivative());
         }
 
+        // Test if the function is a constant velocity
         bool simplifyShape = options.ExportAsNormal &&
                              !options.ExportAsInvisibleSlider &&
                              !options.ExportAsStream &&
@@ -154,9 +158,11 @@ public static class SlideratorEngine
         progress?.Report(60);
         cancellationToken.ThrowIfCancellationRequested();
         Timing timing = beatmap.BeatmapTiming;
+        // Get hit object that might be present at the export time or make a new one
         HitObject hitObjectHere = beatmap.HitObjects.FirstOrDefault(
             hitObject => Math.Abs(options.ExportTime - hitObject.Time) < 5)
             ?? new HitObject(options.ExportTime, 0, SampleSet.None, SampleSet.None);
+        // Clone the hit object to not affect the already existing hit object instance with changes
         HitObject clone = new(hitObjectHere.GetLine())
         {
             IsCircle = options.ExportAsStream,
@@ -170,10 +176,12 @@ public static class SlideratorEngine
         int objectCount;
         if (!options.ExportAsStream)
         {
+            // Exporting as a slider
             if (simplifyShape)
             {
                 clone.SetAllCurvePoints(sourceSlider.GetAllCurvePoints());
                 clone.SliderType = sourceSlider.SliderType;
+                // The velocity is constant, so you can simplify to the original slider shape
             }
             else
             {
@@ -184,14 +192,17 @@ public static class SlideratorEngine
             clone.PixelLength = newLength;
             if (delegateToBpm && removeSliderTicks)
             {
+                // Remove repeats for NaN SV sliders to prevent gamebreaking
                 clone.Repeat = 1;
             }
 
+            // Convert px/ms to SV
             double newVelocitySv = newVelocity /
                                    (svGraphMultiplier * options.PixelLength * options.BeatsPerMinute / 60000);
             clone.SliderVelocity = -100 / newVelocitySv;
             if (options.ExportModeSetting == SlideratorExportMode.Add)
             {
+                // Add hit object
                 beatmap.HitObjects.Add(clone);
             }
             else
@@ -200,9 +211,11 @@ public static class SlideratorEngine
                 beatmap.HitObjects.Add(clone);
             }
 
+            // Add SV
             List<TimingPointChange> changes = [];
             if (delegateToBpm)
             {
+                // Express velocity in BPM
                 TimingPoint after = timing.GetRedlineAtTime(clone.Time).Copy();
                 TimingPoint on = after.Copy();
                 after.Offset = clone.Time;
@@ -210,7 +223,9 @@ public static class SlideratorEngine
                 after.OmitFirstBarLine = true;
                 on.OmitFirstBarLine = true;
                 on.MpB *= clone.SliderVelocity / -100;
+                // NaN SV results in removal of slider ticks
                 clone.SliderVelocity = removeSliderTicks ? double.NaN : -100;
+                // Add redlines
                 changes.Add(new TimingPointChange(
                     on,
                     mpb: true,
@@ -226,6 +241,7 @@ public static class SlideratorEngine
                 clone.Time -= 1;
             }
 
+            // Add SV for every hit object so the SV doesnt change for anything else than the sliderated slider
             changes.AddRange(beatmap.HitObjects.Select(hitObject =>
             {
                 double sv = hitObject == clone
@@ -241,6 +257,7 @@ public static class SlideratorEngine
         }
         else
         {
+            // Add hit objects
             if (options.ExportModeSetting == SlideratorExportMode.Override)
             {
                 beatmap.HitObjects.Remove(hitObjectHere);

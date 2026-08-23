@@ -31,6 +31,7 @@ public sealed class AutoFailService : IAutoFailService
         double overallDifficulty = options.OverallDifficultyOverride < 0
             ? beatmap.Difficulty["OverallDifficulty"].DoubleValue
             : options.OverallDifficultyOverride;
+        // Get approach time and radius of the 50 score hit window
         AutoFailDetectorEngine detector = new(
             beatmap.HitObjects,
             (int)beatmap.GetMapStartTime(),
@@ -39,6 +40,7 @@ public sealed class AutoFailService : IAutoFailService
             (int)Beatmap.GetApproachTime(approachRate),
             (int)Math.Ceiling(200 - 10 * overallDifficulty),
             options.PhysicsUpdateLeniency);
+        // Detect auto-fail
         AutoFailAnalysis analysis = detector.Analyze(cancellationToken);
         return new AutoFailRun(analysis, beatmap.GetMapEndTime(), session, detector);
     }
@@ -66,6 +68,7 @@ public sealed class AutoFailService : IAutoFailService
             throw new InvalidOperationException("This analysis has no fix-planning session.");
         BeatmapEditingSession session = run.Session ??
             throw new InvalidOperationException("This analysis has no editing session.");
+        // Fix auto-fail
         detector.ApplyFix(plan);
         await _editingGateway.SaveAsync(
             session,

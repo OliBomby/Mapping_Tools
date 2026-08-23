@@ -35,13 +35,17 @@ public sealed class PatternGalleryMaker
             .Select((item, index) => selectedSet.Contains(item) ? index : -1)
             .Where(index => index >= 0)
             .ToArray();
+        // Check if it has selected objects
         if (selectedIndices.Length == 0)
         {
             throw new InvalidOperationException("No selected hit objects found.");
         }
 
+        // Copy it so the changes dont affect the given beatmap object
         patternBeatmap = beatmap.DeepCopy();
+        // Remove the storyboarding
         RemoveStoryboard(patternBeatmap);
+        // Keep the selected subset of hit objects
         RemoveEverythingThatIsNotTheseHitObjects(patternBeatmap, patternBeatmap.HitObjects
             .Where((item, index) => selectedIndices.Contains(index))
             .ToList());
@@ -65,8 +69,11 @@ public sealed class PatternGalleryMaker
         out Beatmap patternBeatmap)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
+        // Copy it so the changes dont affect the given beatmap object
         patternBeatmap = beatmap.DeepCopy();
+        // Remove the storyboarding
         RemoveStoryboard(patternBeatmap);
+        // Optionally filter stuff
         List<HitObject> objects = string.IsNullOrEmpty(filter)
             ? patternBeatmap.HitObjects
             : patternBeatmap.QueryTimeCode(filter).ToList();
@@ -161,6 +168,7 @@ public sealed class PatternGalleryMaker
             fileName += ".osu";
         }
 
+        // Remove invalid characters
         string invalidCharacters = new(Path.GetInvalidFileNameChars());
         return Regex.Replace(fileName, $"[{Regex.Escape(invalidCharacters)}]", string.Empty);
     }
@@ -179,8 +187,10 @@ public sealed class PatternGalleryMaker
         beatmap.HitObjects = hitObjects;
         double startTime = beatmap.GetHitObjectStartTime() - Padding;
         double endTime = beatmap.GetHitObjectEndTime() + Padding;
+        // Keep the timing points in the range of the hitobjects
         beatmap.BeatmapTiming.RemoveAll(point => point.Offset < startTime || point.Offset > endTime);
 
+        // Add some earlier timing points if necessary
         TimingPoint firstUninherited = beatmap.HitObjects[0].UnInheritedTimingPoint;
         TimingPoint firstNormal = beatmap.HitObjects[0].TimingPoint;
         if (!beatmap.BeatmapTiming.Contains(firstUninherited))

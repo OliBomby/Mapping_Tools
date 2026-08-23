@@ -71,6 +71,7 @@ public sealed class SlideratorService : ISlideratorService
                 preferLiveEditor ? LiveBeatmapPreference.PreferLive : LiveBeatmapPreference.DiskOnly,
                 cancellationToken)
             .ConfigureAwait(false);
+        // Do Sliderator
         SlideratorApplyResult applied = SlideratorEngine.Apply(
             session.Editor.Beatmap,
             sourceSlider,
@@ -78,6 +79,7 @@ public sealed class SlideratorService : ISlideratorService
             progress,
             cancellationToken);
         bool shouldReload = reloadEditor && session.Source == BeatmapEditingSource.LiveEditor;
+        // Save the file
         await editingGateway
             .SaveAsync(session, shouldReload, cancellationToken)
             .ConfigureAwait(false);

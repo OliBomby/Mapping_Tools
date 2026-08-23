@@ -58,6 +58,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
                     options,
                     documentProgress,
                     cancellationToken);
+                // Save the file
                 await _editingGateway.SaveAsync(
                         editor,
                         cancellationToken: cancellationToken)
@@ -76,6 +77,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
                     options,
                     documentProgress,
                     cancellationToken);
+                // Save the file
                 await _editingGateway.SaveAsync(
                         session,
                         cancellationToken: cancellationToken)

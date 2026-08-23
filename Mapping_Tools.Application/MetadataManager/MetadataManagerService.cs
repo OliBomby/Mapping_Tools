@@ -74,6 +74,7 @@ public sealed class MetadataManagerService : IMetadataManagerService
 
             MetadataManagerEngine.Apply(session.Editor.Beatmap, options);
             cancellationToken.ThrowIfCancellationRequested();
+            // Save the file with name update because we updated the metadata
             session.Editor.SaveFileWithNameUpdate();
             processedPaths.Add(session.Editor.Path);
             progress?.Report((index + 1) * 100d / paths.Length);

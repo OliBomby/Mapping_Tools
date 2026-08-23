@@ -112,6 +112,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
                     string relativePath = ResolveOutputPath(
                         input.Name + " - " + Path.GetFileName(path),
                         usedOutputPaths);
+                    // Save storyboard in new location with unique filename
                     WriteStoryboard(transaction, relativePath, storyboard);
                     storyboardsWritten++;
                 }
@@ -174,6 +175,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         CancellationToken cancellationToken)
     {
         int copied = 0;
+        // Find all used files and change references
         foreach (string filename in OrderReferences(references.HitSoundFiles))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -247,6 +249,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
             return 0;
         }
 
+        // Save assets in new location
         string extension = Path.GetExtension(source);
         string extensionless = Path.ChangeExtension(filename, null);
         string relativePath = SafeRelativePath(Path.Combine(outputFolder, extensionless + extension));
@@ -277,6 +280,8 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 : null;
         }
 
+        // We have to ignore files which are not possible to reference in a distinguishable way
+        // such as beatmap skin files and the spinnerspin and spinnerbonus files.
         return extensions
             .Select(extension => extensionless + extension)
             .FirstOrDefault(_fileSystem.FileExists);
@@ -303,6 +308,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         string relativePath,
         Beatmap beatmap)
     {
+        // Save beatmap in new location with unique diffname
         Editor2.SaveFile(
             _textFileStore,
             transaction.GetStagedPath(relativePath),
@@ -387,11 +393,13 @@ public sealed class MapsetMergerService : IMapsetMergerService
             throw new DirectoryNotFoundException($"Mapset directory '{input.Path}' was not found.");
         }
 
+        // Check map count not over the max
         if (beatmaps.Count > MaxMapsetMaps)
         {
             throw new InvalidDataException("Beatmap limit exceeded in mapset: " + input.Name);
         }
 
+        // Check storyboard count not over the max
         if (storyboards.Count > MaxMapsetMaps)
         {
             throw new InvalidDataException("Storyboard limit exceeded in mapset: " + input.Name);

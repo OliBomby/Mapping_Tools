@@ -27,6 +27,7 @@ public sealed class RelevantObjectCollection : Dictionary<Type, List<IRelevantOb
         Type type = obj.GetType();
         if (TryGetValue(type, out List<IRelevantObject>? list))
         {
+            // Insert the new object at the right index so time stays sorted
             int index = list.FindIndex(o => o.Time > obj.Time);
             if (index == -1)
             {
@@ -47,6 +48,7 @@ public sealed class RelevantObjectCollection : Dictionary<Type, List<IRelevantOb
     /// <param name="other">The collection to merge.</param>
     public void MergeWith(RelevantObjectCollection other)
     {
+        // Merge all types in this
         foreach (Type key in Keys.ToArray())
         {
             if (other.TryGetValue(key, out List<IRelevantObject>? otherValue))
@@ -55,6 +57,7 @@ public sealed class RelevantObjectCollection : Dictionary<Type, List<IRelevantOb
             }
         }
 
+        // Add the types that only the other has
         foreach (Type type in other.Keys.Except(Keys))
         {
             Add(type, other[type]);
@@ -68,6 +71,7 @@ public sealed class RelevantObjectCollection : Dictionary<Type, List<IRelevantOb
     public static RelevantObjectCollection Merge(RelevantObjectCollection collection1, RelevantObjectCollection collection2)
     {
         RelevantObjectCollection result = new();
+        // Merge all types in this
         foreach ((Type type, List<IRelevantObject> objects) in collection1)
         {
             result.Add(type, collection2.TryGetValue(type, out List<IRelevantObject>? other)
@@ -75,6 +79,7 @@ public sealed class RelevantObjectCollection : Dictionary<Type, List<IRelevantOb
                 : objects);
         }
 
+        // Add the types that only the other has
         foreach (Type type in collection2.Keys.Except(collection1.Keys))
         {
             result.Add(type, collection2[type]);

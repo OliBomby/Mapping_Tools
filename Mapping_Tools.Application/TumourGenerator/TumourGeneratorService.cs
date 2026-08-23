@@ -77,6 +77,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
         var generatedCount = 0;
         var editorReloaded = false;
         var completedPaths = new List<string>(paths.Count);
+        // Initialize the Tumour Generator
         CoreTumourGenerator generator = CreateGenerator(project);
         for (var pathIndex = 0; pathIndex < paths.Count; pathIndex++)
         {
@@ -90,16 +91,19 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
                         : LiveBeatmapPreference.DiskOnly,
                     cancellationToken)
                 .ConfigureAwait(false);
+            // Load sliders from the selector
             IReadOnlyList<HitObject> markedObjects = SelectObjects(session, project.ImportModeSetting, project.TimeCode);
             for (var objectIndex = 0; objectIndex < markedObjects.Count; objectIndex++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                // Generate copious amounts of tumours on each slider
                 if (generator.TumourGenerate(markedObjects[objectIndex], cancellationToken)) generatedCount++;
                 progress?.Report(100d * (pathIndex + (objectIndex + 1d) / Math.Max(markedObjects.Count, 1)) / paths.Count);
             }
 
             if (project.FixSv)
             {
+                // Reconstruct SliderVelocity (stolen from completionator)
                 TumourSliderVelocityFixer.Fix(
                     session.Editor.Beatmap,
                     markedObjects,
@@ -109,6 +113,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
             }
 
             bool shouldReload = reloadEditor && session.Source == BeatmapEditingSource.LiveEditor;
+            // Save the file
             await editingGateway.SaveAsync(session, shouldReload, cancellationToken).ConfigureAwait(false);
             editorReloaded |= shouldReload;
             completedPaths.Add(path);

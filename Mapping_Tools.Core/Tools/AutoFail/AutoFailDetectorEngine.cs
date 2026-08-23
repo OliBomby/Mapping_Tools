@@ -64,6 +64,8 @@ public sealed class AutoFailDetectorEngine
         _approachTime = approachTime;
         _window50 = window50;
         _physicsTime = physicsTime;
+
+        // Sort the hitobjects
         SortHitObjects();
     }
 
@@ -81,15 +83,23 @@ public sealed class AutoFailDetectorEngine
     /// <returns>The detected unloading objects and disruptors.</returns>
     public AutoFailAnalysis Analyze(CancellationToken cancellationToken = default)
     {
+        // Initialize lists
         List<double> unloading = [];
         List<double> potential = [];
         List<double> disruptorTimes = [];
+        // Get times to check
+        // These are all the times at which the startIndex can change in the object loading system.
         _timesToCheckStartIndex = new SortedSet<int>(_hitObjects.SelectMany(hitObject => new[]
         {
             (int)hitObject.EndTime + _approachTime,
             (int)hitObject.EndTime + _approachTime + 1
         }));
 
+        // Find all problematic areas which could cause auto-fail depending on the binary search
+        // A problem area consists of one object and the objects which can unload it
+        // An object B can unload another object A if it has a later index than A and an end time earlier than A's end time - approach time.
+        // A loaded object has to be loaded after its end time for any period long enough for the physics update tick to count the judgement.
+        // I ignore all unloadable objects B for which at least one unloadable object A is loaded implies B is loaded. In that case I say A contains B.
         _problemAreas = [];
         for (int index = 0; index < _hitObjects.Count; index++)
         {
@@ -97,9 +107,15 @@ public sealed class AutoFailDetectorEngine
             HitObject hitObject = _hitObjects[index];
             int adjustedEndTime = GetAdjustedEndTime(hitObject);
             bool negative = adjustedEndTime < hitObject.Time - _approachTime;
+            // Ignore all problem areas which are contained by another unloadable object,
+            // because fixing the outer problem area will also fix all of the problems inside.
+            // Added a check for the end time to prevent weird situations with the endIndex caused by negative duration.
             if (_problemAreas.Count > 0 && !negative)
             {
+                // Lower end time means that it will be loaded alongside the previous problem area.
                 int lastAdjustedEndTime = GetAdjustedEndTime(_problemAreas[^1].UnloadableHitObject);
+                // If the end time is greater but there has been no time to change the start index yet,
+                // then it is still contained in the previous problem area.
                 if (adjustedEndTime <= lastAdjustedEndTime ||
                     _timesToCheckStartIndex.GetViewBetween(
                         lastAdjustedEndTime,
@@ -109,6 +125,7 @@ public sealed class AutoFailDetectorEngine
                 }
             }
 
+            // Check all later objects for any which have an early enough end time
             HashSet<HitObject> disruptors = [];
             for (int otherIndex = index + 1; otherIndex < _hitObjects.Count; otherIndex++)
             {
@@ -125,6 +142,7 @@ public sealed class AutoFailDetectorEngine
                 continue;
             }
 
+            // The first time after the end time where the object could be loaded
             int firstRequiredLoadTime = adjustedEndTime;
             if (index > 0)
             {
@@ -132,7 +150,9 @@ public sealed class AutoFailDetectorEngine
                     adjustedEndTime,
                     (int)_hitObjects[index - 1].Time - _approachTime + 1);
             }
+            // It cant load before the map has started
             firstRequiredLoadTime = Math.Max(firstRequiredLoadTime, _mapStartTime);
+            // These are all the times to check. If the object is loaded at all these times, then it will not cause auto-fail. (terms and conditions apply)
             HashSet<int> timesToCheck = new(
                 _timesToCheckStartIndex.GetViewBetween(
                     firstRequiredLoadTime,
@@ -144,6 +164,7 @@ public sealed class AutoFailDetectorEngine
             potential.Add(hitObject.Time);
         }
 
+        // Use osu!'s object loading algorithm to find out which objects are actually loaded
         foreach (ProblemArea problemArea in _problemAreas)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -347,7 +368,10 @@ public sealed class AutoFailDetectorEngine
             {
                 return false;
             }
+            // The first element is always the lowest element equal or greater than leftPadding,
+            // because the single problem solver started iterating from leftPadding.
             int lowest = choices[0];
+            // Check if placement is possible for this area and if not, assert 0 padding
             if (_placementTimes is not null && !_placementTimes[index].HasValue &&
                 lowest != leftPadding)
             {
@@ -356,6 +380,7 @@ public sealed class AutoFailDetectorEngine
             solution[index] = lowest - leftPadding;
             leftPadding = lowest;
         }
+        // Check if placement is possible for the last area and if not, assert 0 padding
         if (_placementTimes is not null && !_placementTimes[^1].HasValue &&
             paddingCount != leftPadding)
         {
@@ -392,7 +417,10 @@ public sealed class AutoFailDetectorEngine
             {
                 yield break;
             }
+            // The first element is always the lowest element equal or greater than minimalLeft,
+            // because the single problem solver started iterating from minimalLeft.
             int lowest = choices[0];
+            // Check if placement is possible for this area and if not, assert 0 padding
             if (_placementTimes is not null && !_placementTimes[index].HasValue &&
                 lowest != minimalLeft)
             {
@@ -402,6 +430,7 @@ public sealed class AutoFailDetectorEngine
             minimalLeft = lowest;
         }
 
+        // Check if placement is possible for the last area and if not, assert 0 padding
         if (_placementTimes is not null && !_placementTimes[^1].HasValue &&
             paddingCount != minimalLeft)
         {
@@ -423,6 +452,7 @@ public sealed class AutoFailDetectorEngine
                 pads[index] = leftPadding[index] - left;
                 left = leftPadding[index];
             }
+            // If there is no placement for the last area, assert 0 padding.
             if (_placementTimes is not null && !_placementTimes[^1].HasValue &&
                 left != paddingCount)
             {
@@ -440,6 +470,7 @@ public sealed class AutoFailDetectorEngine
     {
         if (depth == allSolutions.Count - 1)
         {
+            // Loop through all solutions which are greater or equal to the minimum or assert equal to paddingCount if there is no placement spot.
             foreach (int value in allSolutions[depth].Where(value =>
                          value == minimum ||
                          !(_placementTimes is not null && !_placementTimes[depth].HasValue) &&
@@ -452,6 +483,7 @@ public sealed class AutoFailDetectorEngine
             yield break;
         }
 
+        // Loop through all solutions which are greater or equal to the minimum or assert equal to minimum if there is no placement spot.
         foreach (int value in allSolutions[depth].Where(value =>
                      value == minimum ||
                      !(_placementTimes is not null && !_placementTimes[depth].HasValue) &&

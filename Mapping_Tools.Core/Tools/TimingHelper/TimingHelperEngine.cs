@@ -40,8 +40,11 @@ public static class TimingHelperEngine
             throw new ArgumentException("Timing Helper requires at least one beat divisor.", nameof(options));
         }
 
+        // Count
         int redlinesAdded = 0;
         Timing timing = beatmap.BeatmapTiming;
+
+        // Get all the times to snap
         List<Marker> markers = [];
         if (options.Objects)
         {
@@ -53,40 +56,52 @@ public static class TimingHelperEngine
         }
         if (options.Greenlines)
         {
+            // Get the offsets of greenlines
             markers.AddRange(timing.TimingPoints
                 .Where(timingPoint => !timingPoint.Uninherited)
                 .Select(timingPoint => new Marker(timingPoint.Offset)));
         }
         if (options.Redlines)
         {
+            // Get the offsets of redlines
             markers.AddRange(timing.TimingPoints
                 .Where(timingPoint => timingPoint.Uninherited)
                 .Select(timingPoint => new Marker(timingPoint.Offset)));
         }
 
+        // Update progressbar
         progress?.Report(20);
         cancellationToken.ThrowIfCancellationRequested();
 
+        // Sort the markers
         markers = markers.OrderBy(marker => marker.Time).ToList();
         if (!timing.TimingPoints.Any(timingPoint => timingPoint.Uninherited))
         {
+            // If there are no redlines add one with a default BPM
             timing.Add(new TimingPoint(0, 1000, 4, SampleSet.Soft, 0, 100, true, false, false));
         }
 
+        // Remove multiple markers on the same tick
         List<Marker> newMarkers = [.. markers.Where(
             (marker, index) => index == 0 ||
                 Math.Abs(marker.Time - markers[index - 1].Time) >=
                 options.Leniency + Precision.DoubleEpsilon)];
         markers = newMarkers;
 
+        // Calculate the beats between time and the last time or redline for each time
+        // Time the same is 0
+        // Time a little after is smallest snap
         foreach (Marker marker in markers)
         {
             cancellationToken.ThrowIfCancellationRequested();
             double time = marker.Time;
             TimingPoint redline = timing.GetRedlineAtTime(time - 1);
+            // Resnap to that redline only
             double resnappedTime = timing.Resnap(time, options.BeatDivisors, false, tp: redline);
+            // Calculate beats from the redline
             double beatsFromRedline = (resnappedTime - redline.Offset) / redline.MpB;
 
+            // Avoid problems
             if (MathHelper.ApproximatelyEquivalent(beatsFromRedline, 0, 0.0001))
             {
                 beatsFromRedline = options.BeatDivisors.Min(divisor => divisor.GetValue());
@@ -96,16 +111,23 @@ public static class TimingHelperEngine
                 beatsFromRedline = 0;
             }
 
+            // Initialize the beats from last marker
             double beatsFromLastMarker = beatsFromRedline;
+
+            // Get the times between redline and this time
             List<Marker> timesBefore = markers
                 .Where(previous => previous.Time < time && previous.Time > redline.Offset)
                 .ToList();
             if (timesBefore.Count > 0)
             {
+                // Get the last time info
                 double lastTime = timesBefore.Last().Time;
                 double resnappedTimeLast = timing.Resnap(lastTime, options.BeatDivisors, false);
+
+                // Change the beats from last marker
                 beatsFromLastMarker = (resnappedTime - resnappedTimeLast) / redline.MpB;
 
+                // Avoid problems
                 if (MathHelper.ApproximatelyEquivalent(beatsFromLastMarker, 0, 0.0001))
                 {
                     beatsFromLastMarker = options.BeatDivisors.Min(divisor => divisor.GetValue());
@@ -116,18 +138,22 @@ public static class TimingHelperEngine
                 }
             }
 
+            // Set the variable
             marker.BeatsFromLastMarker = options.BeatsBetween != -1
                 ? options.BeatsBetween
                 : beatsFromLastMarker;
         }
 
+        // Remove redlines except the first redline
         if (!options.Redlines)
         {
             TimingPoint? first = timing.TimingPoints.FirstOrDefault(timingPoint => timingPoint.Uninherited);
             timing.RemoveAll(timingPoint => timingPoint.Uninherited && timingPoint != first);
         }
 
+        // Update progressbar
         progress?.Report(40);
+        // Loop through all the markers
         for (int index = 0; index < markers.Count; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -135,16 +161,20 @@ public static class TimingHelperEngine
             double time = marker.Time;
             TimingPoint redline = timing.GetRedlineAtTime(time - 1);
             double beatsFromLastMarker = marker.BeatsFromLastMarker;
+            // Skip if 0 beats from last marker
             if (beatsFromLastMarker == 0)
             {
                 continue;
             }
 
+            // Get the times between redline and this time including this time
             List<Marker> markersBefore = markers
                 .Where(previous => previous.Time < time && previous.Time > redline.Offset)
                 .ToList();
             markersBefore.Add(marker);
 
+            // Calculate MpB
+            // Average MpB from timesBefore and use time from redline
             double mpb = 0;
             double beatsFromRedline = 0;
             foreach (Marker markerBefore in markersBefore)
@@ -155,24 +185,32 @@ public static class TimingHelperEngine
             }
             mpb /= markersBefore.Count;
 
+            // Check if this MpB doesn't make the markers go offsnap too far
             if (CheckMpB(mpb, markersBefore, redline, options))
             {
+                // Make changes
+                // Round the MpB to human values first
                 redline.MpB = HumanRoundMpB(mpb, markersBefore, redline, options);
             }
             else
             {
+                // Get the last time info and not the current
                 markersBefore.Remove(marker);
                 double lastTime = markersBefore.Last().Time;
+
+                // Make new redline
                 TimingPoint newRedline = redline.Copy();
                 TimingPoint lastHitsounds = timing.GetTimingPointAtTime(lastTime + 5);
                 newRedline.Offset = lastTime;
-                newRedline.OmitFirstBarLine = options.OmitBarline;
+                newRedline.OmitFirstBarLine = options.OmitBarline; // Set omit to the argument
                 newRedline.Kiai = lastHitsounds.Kiai;
                 newRedline.SampleIndex = lastHitsounds.SampleIndex;
                 newRedline.SampleSet = lastHitsounds.SampleSet;
                 newRedline.Volume = lastHitsounds.Volume;
                 timing.Add(newRedline);
+                // Set the MpB
                 newRedline.MpB = GetMpB(time - lastTime, beatsFromLastMarker, options.Leniency);
+                // Update the counter
                 redlinesAdded++;
             }
 
@@ -189,6 +227,8 @@ public static class TimingHelperEngine
         TimingPoint redline,
         TimingHelperOptions options)
     {
+        // For each their beatsFromRedline must stay the same AND their time must be within leniency of their resnapped time
+        // If any of these times becomes incompatible, place a new anchor on the last time and not change the previous redline
         double mpbOld = redline.MpB;
         double beatsFromRedline = 0;
         bool canChangeRedline = true;
@@ -196,11 +236,15 @@ public static class TimingHelperEngine
         {
             double time = marker.Time;
             beatsFromRedline += marker.BeatsFromLastMarker;
+
+            // Get the beatsFromRedline after changing mpb
             redline.MpB = mpbNew;
             double resnappedTime = redline.Offset + redline.MpB * beatsFromRedline;
             double resnappedBeats = (resnappedTime - redline.Offset) / redline.MpB;
+            // Change MpB back so the redline doesn't get changed
             redline.MpB = mpbOld;
 
+            // Check changes
             if (!MathHelper.ApproximatelyEquivalent(resnappedBeats, beatsFromRedline, 0.1) ||
                 !IsSnapped(time, resnappedTime, options.Leniency))
             {
@@ -217,6 +261,8 @@ public static class TimingHelperEngine
         TimingHelperOptions options)
     {
         double bpm = 60000 / mpb;
+
+        // Round bpm
         double[] precisions = [1, 2, 10, 100, 1000];
         foreach (double precision in precisions)
         {
@@ -232,8 +278,14 @@ public static class TimingHelperEngine
 
     private static double GetMpB(double timeFromRedline, double beatsFromRedline, double leniency)
     {
+        // Will make human-like BPM values like integers, halves and tenths
+        // If that doesn't work (like the time is really far from the redline) it will try thousandths
+
+        // Exact MpB and BPM
         double mpb = timeFromRedline / beatsFromRedline;
         double bpm = 60000 / mpb;
+
+        // Round bpm
         double[] precisions = [1, 2, 10, 100, 1000];
         foreach (double precision in precisions)
         {

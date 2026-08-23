@@ -31,6 +31,7 @@ public static class PropertyTransformerEngine
         foreach (TimingPoint timingPoint in beatmap.BeatmapTiming.TimingPoints)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            // Offset
             TransformProperty(
                 options,
                 options.TimingpointOffsetMultiplier,
@@ -41,6 +42,7 @@ public static class PropertyTransformerEngine
                 round: beatmap.Version < 128);
             if (timingPoint.Uninherited)
             {
+                // BPM
                 TransformProperty(
                     options,
                     options.TimingpointBpmMultiplier,
@@ -52,6 +54,7 @@ public static class PropertyTransformerEngine
                     10000);
             }
 
+            // Slider Velocity
             TransformProperty(
                 options,
                 options.TimingpointSvMultiplier,
@@ -69,6 +72,7 @@ public static class PropertyTransformerEngine
                 timingPoint.Offset,
                 0.1,
                 10);
+            // Index
             TransformProperty(
                 options,
                 options.TimingpointIndexMultiplier,
@@ -79,6 +83,7 @@ public static class PropertyTransformerEngine
                 0,
                 int.MaxValue,
                 round: true);
+            // Volume
             TransformProperty(
                 options,
                 options.TimingpointVolumeMultiplier,
@@ -95,10 +100,13 @@ public static class PropertyTransformerEngine
 
         if (options.HitObjectTimeMultiplier != 1 || options.HitObjectTimeOffset != 0)
         {
+            // Hitobject time
             foreach (HitObject hitObject in beatmap.HitObjects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                // Get the end time early because the start time gets modified
                 double oldEndTime = hitObject.GetEndTime(false);
+                // Transform start time of hitobject
                 TransformProperty(
                     options,
                     options.HitObjectTimeMultiplier,
@@ -109,6 +117,7 @@ public static class PropertyTransformerEngine
                     round: beatmap.Version < 128);
                 if (hitObject.IsHoldNote || hitObject.IsSpinner)
                 {
+                    // Transform end time of hold notes and spinner
                     TransformProperty(
                         options,
                         options.HitObjectTimeMultiplier,
@@ -125,6 +134,7 @@ public static class PropertyTransformerEngine
 
         if (options.HitObjectVolumeMultiplier != 1 || options.HitObjectVolumeOffset != 0)
         {
+            // Hitobject volume
             foreach (HitObject hitObject in beatmap.HitObjects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -145,6 +155,7 @@ public static class PropertyTransformerEngine
 
         if (options.BookmarkTimeMultiplier != 1 || options.BookmarkTimeOffset != 0)
         {
+            // Bookmark time
             beatmap.SetBookmarks(beatmap.GetBookmarks()
                 .Select(bookmark => PassesFilter(options, bookmark, bookmark)
                     ? beatmap.Version < 128
@@ -163,6 +174,7 @@ public static class PropertyTransformerEngine
             .Concat(beatmap.StoryboardLayerOverlay);
         if (options.SbEventTimeMultiplier != 1 || options.SbEventTimeOffset != 0)
         {
+            // Storyboarded event time
             foreach (Event current in beatmapEvents)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -179,6 +191,7 @@ public static class PropertyTransformerEngine
 
         if (options.SbSampleTimeMultiplier != 1 || options.SbSampleTimeOffset != 0)
         {
+            // Storyboarded sample time
             foreach (StoryboardSoundSample sample in beatmap.StoryboardSoundSamples)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -197,6 +210,7 @@ public static class PropertyTransformerEngine
 
         if (options.SbSampleVolumeMultiplier != 1 || options.SbSampleVolumeOffset != 0)
         {
+            // Storyboarded sample volume
             foreach (StoryboardSoundSample sample in beatmap.StoryboardSoundSamples)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -217,6 +231,7 @@ public static class PropertyTransformerEngine
 
         if (options.BreakTimeMultiplier != 1 || options.BreakTimeOffset != 0)
         {
+            // Break time
             foreach (Break breakPeriod in beatmap.BreakPeriods)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -243,6 +258,7 @@ public static class PropertyTransformerEngine
 
         if (options.VideoTimeMultiplier != 1 || options.VideoTimeOffset != 0)
         {
+            // Video start time
             foreach (Event current in beatmap.BackgroundAndVideoEvents)
             {
                 if (current is not Video video)
@@ -269,6 +285,7 @@ public static class PropertyTransformerEngine
             if (beatmap.General.ContainsKey("PreviewTime") &&
                 beatmap.General["PreviewTime"].IntValue != -1)
             {
+                // Preview point time
                 double previewTime = beatmap.General["PreviewTime"].DoubleValue;
                 TransformProperty(
                     options,
@@ -307,6 +324,7 @@ public static class PropertyTransformerEngine
             .Concat(storyboard.StoryboardLayerPass)
             .Concat(storyboard.StoryboardLayerForeground)
             .Concat(storyboard.StoryboardLayerOverlay);
+        // Storyboarded event time
         if (options.SbEventTimeMultiplier != 1 || options.SbEventTimeOffset != 0)
         {
             foreach (Event current in events)
@@ -325,6 +343,7 @@ public static class PropertyTransformerEngine
 
         if (options.SbSampleTimeMultiplier != 1 || options.SbSampleTimeOffset != 0)
         {
+            // Storyboarded sample time
             foreach (StoryboardSoundSample sample in storyboard.StoryboardSoundSamples)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -343,6 +362,7 @@ public static class PropertyTransformerEngine
 
         if (options.SbSampleVolumeMultiplier != 1 || options.SbSampleVolumeOffset != 0)
         {
+            // Storyboarded sample volume
             foreach (StoryboardSoundSample sample in storyboard.StoryboardSoundSamples)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -363,6 +383,7 @@ public static class PropertyTransformerEngine
 
         if (options.VideoTimeMultiplier != 1 || options.VideoTimeOffset != 0)
         {
+            // Video start time
             foreach (Event current in storyboard.BackgroundAndVideoEvents)
             {
                 if (current is not Video video)
@@ -462,6 +483,7 @@ public static class PropertyTransformerEngine
         double offset)
     {
         int version = sourceBeatmap?.Version ?? 14;
+        // Commands under loops use relative time so they shouldn't get offset
         double eventOffset = current.ParentEvent is StandardLoop or TriggerLoop
             ? 0
             : offset;
@@ -492,6 +514,7 @@ public static class PropertyTransformerEngine
 
         if (current is IHasDuration duration)
         {
+            // Just a duration doesnt have a time to filter
             TransformProperty(
                 options,
                 multiplier,
@@ -501,6 +524,7 @@ public static class PropertyTransformerEngine
                 double.NaN);
         }
 
+        // Recurse to also transform all the children events
         foreach (Event child in current.ChildEvents)
         {
             TransformEventTime(options, sourceBeatmap, child, multiplier, offset);

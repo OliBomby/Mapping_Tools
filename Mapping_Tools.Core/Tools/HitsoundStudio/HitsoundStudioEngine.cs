@@ -95,6 +95,7 @@ public sealed class HitsoundStudioEngine
 
         if (needNormalSample)
         {
+            // Packages without a hitnormal sample
             foreach (SamplePackage package in packages.Where(package =>
                          package.Samples.All(sample => sample.Hitsound != Hitsound.Normal)))
             {
@@ -133,6 +134,7 @@ public sealed class HitsoundStudioEngine
 
             if (individualVolume)
             {
+                // Simply mix the volume in the sample to the outside volume
                 foreach (Sample sample in package.Samples)
                 {
                     sample.OutsideVolume = AudioVolume.FromAmplitude(
@@ -157,6 +159,8 @@ public sealed class HitsoundStudioEngine
                     sample.SampleArgs.Volume = 1;
                 }
 
+                // Pick the new volume such that the samples have a volume as high as possible and the greenline brings the volume down.
+                // With this equation the final amplitude stays the same while the greenline has the volume of the loudest sample at this time.
                 double newVolume = AudioVolume.FromAmplitude(
                     AudioVolume.ToAmplitude(sample.OutsideVolume) *
                     AudioVolume.ToAmplitude(sample.SampleArgs.Volume) /
@@ -164,6 +168,7 @@ public sealed class HitsoundStudioEngine
 
                 if (Math.Abs(newVolume - 1) > roughness && !alwaysFullVolume)
                 {
+                    // If roughness is not 0 it will quantize the new volume in order to reduce the number of different volumes
                     sample.SampleArgs.Volume = roughness > 0
                         ? roughness * Math.Round(newVolume / roughness)
                         : newVolume;
@@ -174,6 +179,8 @@ public sealed class HitsoundStudioEngine
                 }
             }
 
+            // Assuming the volume of the sample is always maximum, this equation makes sure that
+            // the loudest sample at this time has the wanted amplitude using the volume change from the greenline.
             package.SetAllOutsideVolume(alwaysFullVolume
                 ? AudioVolume.FromAmplitude(
                     AudioVolume.ToAmplitude(package.MaxOutsideVolume) *
@@ -278,6 +285,7 @@ public sealed class HitsoundStudioEngine
                 continue;
             }
 
+            // Validate the sample because we expect only valid samples to be present in the sample schema
             if (!isSampleValid(sample))
             {
                 names[sample] = string.Empty;
@@ -410,6 +418,7 @@ public sealed class HitsoundStudioEngine
     private static List<CustomIndex> Optimize(List<CustomIndex> indices)
     {
         List<CustomIndex> optimized = [];
+        // Try merging together CustomIndices as much as possible
         foreach (CustomIndex index in indices)
         {
             CustomIndex? merge = optimized.FirstOrDefault(candidate => candidate.CanMerge(index));
@@ -417,6 +426,7 @@ public sealed class HitsoundStudioEngine
             else merge.MergeWith(index);
         }
 
+        // Remove any CustomIndices that might be obsolete
         optimized.RemoveAll(subject => !indices.Any(candidate =>
             subject.Fits(candidate) && optimized.Where(other => !ReferenceEquals(other, subject))
                 .All(other => !other.Fits(candidate))));
@@ -450,6 +460,7 @@ public sealed class HitsoundStudioEngine
         int packageIndex = 0;
         while (packageIndex < packages.Count)
         {
+            // Find CustomIndex that fits the most packages from here
             CustomIndex? best = null;
             int bestCount = 0;
             foreach (CustomIndex candidate in schemaIndices)
@@ -470,6 +481,7 @@ public sealed class HitsoundStudioEngine
                     "Custom indices can't fit the sample packages. Maybe the previous sample schema is incompatible or growth is disabled.");
             }
 
+            // Add all the fitted packages as hitsounds
             for (int offset = 0; offset < bestCount; offset++)
             {
                 events.Add(packages[packageIndex + offset].GetHitsound(best.Index));

@@ -104,6 +104,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         else
         {
             pattern = maker.FromBeatmap(source.Editor.Beatmap, name);
+            // Save the pattern in the collection folder by copying
             _files.CopyPattern(sourcePath, _files.GetPatternPath(paths, pattern.FileName));
         }
 
@@ -189,6 +190,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
                     protectBeatmapPattern: false);
             }
 
+            // Increase pattern use count and time
             pattern.UseCount++;
             pattern.LastUsedTime = DateTime.Now;
             progress?.Report((index + 1) * 100d / patterns.Count);
@@ -222,8 +224,10 @@ public sealed class PatternGalleryService : IPatternGalleryService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(project);
+        // Get all the filenames that are currently in the collection
         string[] actual = _files.EnumeratePatternFiles(paths).ToArray();
         HashSet<string> actualSet = actual.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        // Remove all patterns that are not in the actual pattern files
         List<PatternGalleryPattern> removed = project.Patterns
             .Where(pattern => !actualSet.Contains(pattern.FileName))
             .ToList();
@@ -237,6 +241,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
         PatternGalleryMaker maker = new();
         int added = 0;
+        // Add all patterns that are in the actual pattern files but not in the indexed patterns
         foreach (string filename in actual.Where(name => !indexed.Contains(name)))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -263,9 +268,11 @@ public sealed class PatternGalleryService : IPatternGalleryService
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        // Make sure the file handler always uses the right pattern files folder
         _files.EnsureCollection(paths);
         patternBeatmap.SaveWithFloatPrecision = true;
         string destination = _files.GetPatternPath(paths, pattern.FileName);
+        // Save the modified pattern beatmap in the colleciton folder
         _files.WritePatternBytes(
             destination,
             System.Text.Encoding.UTF8.GetBytes(string.Join("\r\n", patternBeatmap.GetLines())));

@@ -98,6 +98,7 @@ public static class ComboColourStudioEngine
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(project);
+        // Add default colours if there are no colours
         ComboColour[] colours = beatmap.ComboColours.Count == 0
             ? ComboColour.GetDefaultComboColours()
             : beatmap.ComboColours.ToArray();
@@ -116,11 +117,14 @@ public static class ComboColourStudioEngine
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(project);
         ImportComboColours(beatmap, project);
+        // Remove all colour points since those are getting replaced
         project.ColourPoints.Clear();
 
+        // Get all the hit objects which can colorhax. AKA new combos and not spinners
         HitObject[] objects = beatmap.HitObjects
             .Where(hitObject => hitObject.ActualNewCombo && !hitObject.IsSpinner)
             .ToArray();
+        // Get the array with all the lengths of sequences that are going to be checked
         int[] sequenceLengthChecks = Enumerable.Range(1, project.ComboColours.Count * 2 + 2).ToArray();
         int sequenceStartIndex = 0;
         int[]? lastNormalSequence = null;
@@ -146,12 +150,16 @@ public static class ComboColourStudioEngine
             }
 
             int contribution = GetSequenceContribution(objects, sequenceStartIndex, sequence);
+            // Get the colours for every colour index. Using modulo to make sure the index is always in range.
             IEnumerable<SpecialColour> colours = sequence.Select(index =>
                 project.ComboColours[MathHelper.Mod(index, project.ComboColours.Count)]);
             ColourPointMode mode = contribution == 1 &&
                                    GetComboLengthForImport(beatmap.HitObjects, firstComboHitObject) <= project.MaxBurstLength
                 ? ColourPointMode.Burst
                 : ColourPointMode.Normal;
+            // Add a new colour point
+            // To optimize on colour points, we dont add a new colour point if the previous point was a burst and
+            // the sequence before the burst is equivalent to this sequence
             if (!(lastBurst && lastNormalSequence is not null &&
                   ComboColourProjectIsSubSequence(sequence, lastNormalSequence) &&
                   (sequence.Length == lastNormalSequence.Length || contribution <= sequence.Length)))
@@ -240,12 +248,14 @@ public static class ComboColourStudioEngine
         }
 
         HitObject firstComboHitObject = objects[sequenceStartIndex];
+        // Getting all sequences and calculating the scores
         int[][] sequences = sequenceLengthChecks
             .Select(length => GetColourSequence(objects, sequenceStartIndex, length))
             .ToArray()!;
         int[] contributions = sequences
             .Select(sequence => GetSequenceContribution(objects, sequenceStartIndex, sequence))
             .ToArray();
+        // Get the sequence with the highest score
         double bestScore = double.NegativeInfinity;
         int[]? bestSequence = null;
         int bestContribution = 0;
@@ -262,6 +272,7 @@ public static class ComboColourStudioEngine
             bool burst = contribution == 1 &&
                          GetComboLengthForImport(beatmap.HitObjects, firstComboHitObject) <= maxBurstLength;
             double cost = sequence.Length;
+            // There is no cost if the colour point doesnt have to be added
             if (lastBurst && lastNormalSequence is not null &&
                 ComboColourProjectIsSubSequence(sequence, lastNormalSequence) &&
                 (sequence.Length == lastNormalSequence.Length || contribution <= sequence.Length))
@@ -269,6 +280,7 @@ public static class ComboColourStudioEngine
                 cost = 0;
             }
 
+            // Recursively add the cost and contribution to this cost and contribution
             if (depth > 0)
             {
                 Tuple<int[], int, double>? next = GetBestSequenceAtIndex(
@@ -287,6 +299,7 @@ public static class ComboColourStudioEngine
                 }
             }
 
+            // Factor the contribution over the cost
             double score = contribution / cost;
             if (bestSequence is not null &&
                 (score < bestScore || Math.Abs(score - bestScore) < Precision.DoubleEpsilon && cost >= bestCost))

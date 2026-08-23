@@ -37,8 +37,10 @@ public class BeatmapEditor2 : Editor2 {
     /// <remarks>This method also updates <see cref="Editor2.Path"/>.</remarks>
     public void SaveFileWithNameUpdate() {
         var parentFolder = GetParentFolder();
+        // Remove the beatmap with the old filename
         FileStore.Delete(Path);
         Path = FileStore.CombinePath(parentFolder, Beatmap.GetFileName());
+        // Save beatmap with the new filename
         SaveFile();
     }
 }

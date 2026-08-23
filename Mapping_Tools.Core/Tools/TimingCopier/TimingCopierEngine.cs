@@ -34,16 +34,20 @@ public static class TimingCopierEngine
         List<Marker> markers = [];
         if (options.ResnapMode == TimingCopierResnapModes.PreserveBeatSpacing)
         {
+            // Get markers for hitobjects if mode 1 is used
             markers = GetMarkers(target, timingTo);
         }
 
         cancellationToken.ThrowIfCancellationRequested();
         List<TimingPoint> removeList = [];
+        // Rid the beatmap of redlines
         foreach (TimingPoint redline in timingTo.Redlines)
         {
             cancellationToken.ThrowIfCancellationRequested();
             TimingPoint greenlineHere = timingTo.GetGreenlineAtTime(redline.Offset);
 
+            // If a greenline exists at the same time as a redline then the redline ceizes to exist
+            // Else convert the redline to a greenline: Inherited = false & MpB = -100
             if (greenlineHere.Offset != redline.Offset)
             {
                 TimingPoint newGreenline = redline.Copy();
@@ -60,7 +64,9 @@ public static class TimingCopierEngine
             timingTo.Remove(timingPoint);
         }
 
+        // Make new timing points changes
         List<TimingPointChange> timingPointChanges = [];
+        // Add redlines
         foreach (TimingPoint timingPoint in timingFrom.Redlines)
         {
             timingPointChanges.Add(
@@ -73,6 +79,7 @@ public static class TimingCopierEngine
                     fuzziness: Precision.DoubleEpsilon));
         }
 
+        // Apply timing changes
         TimingPointChange.Apply(timingTo, timingPointChanges);
 
         IReadOnlyList<TimingPoint> redlines = timingFrom.Redlines;
@@ -91,6 +98,7 @@ public static class TimingCopierEngine
                 double beatsFromLastTime = marker.BeatsFromLastMarker;
                 while (true)
                 {
+                    // Get redlines between this and last marker
                     List<TimingPoint> redlinesBetween = redlines
                         .Where(point => point.Offset <= lastTime + redline.MpB * beatsFromLastTime &&
                                         point.Offset > lastTime)
@@ -108,6 +116,7 @@ public static class TimingCopierEngine
                     lastTime = first.Offset;
                 }
 
+                // Last time is the time of the last redline in between
                 double newTime = lastTime + redline.MpB * beatsFromLastTime;
                 newTime = timingTo.Resnap(
                     newTime,
@@ -129,6 +138,7 @@ public static class TimingCopierEngine
         }
         else if (options.ResnapMode == TimingCopierResnapModes.Resnap && redlines.Count > 0)
         {
+            // Resnap hitobjects
             foreach (HitObject hitObject in target.HitObjects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -138,6 +148,7 @@ public static class TimingCopierEngine
                     firstTp: redlines.FirstOrDefault());
             }
 
+            // Resnap greenlines
             foreach (TimingPoint timingPoint in timingTo.Greenlines)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -150,6 +161,7 @@ public static class TimingCopierEngine
             timingTo.Sort();
         }
 
+        // Fix SV for if new redlines were added
         timingPointChanges = [];
         foreach (HitObject hitObject in target.HitObjects.Where(hitObject => hitObject.IsSlider))
         {
@@ -164,6 +176,7 @@ public static class TimingCopierEngine
                     fuzziness: Precision.DoubleEpsilon));
         }
 
+        // Apply timing changes
         TimingPointChange.Apply(timingTo, timingPointChanges);
 
         if ((options.ResnapMode == TimingCopierResnapModes.Resnap ||
@@ -172,6 +185,7 @@ public static class TimingCopierEngine
         {
             target.GiveObjectsGreenlines();
             target.CalculateSliderEndTimes();
+            // Resnap slider ends and spinner ends
             foreach (HitObject hitObject in target.HitObjects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -203,6 +217,7 @@ public static class TimingCopierEngine
             markers.Add(new Marker(timingPoint));
         }
 
+        // Sort the markers
         markers = markers.OrderBy(marker => marker.Time).ToList();
         if (markers.Count == 0)
         {
@@ -212,11 +227,15 @@ public static class TimingCopierEngine
         double lastTime = redlines.First().Offset;
         foreach (Marker marker in markers)
         {
+            // Calculate the beats between this marker and the last marker
+            // If there is a redline in between then calculate beats from last marker to the redline and beats from redline to this marker
+            // Time the same is 0
             List<TimingPoint> redlinesBetween = redlines
                 .Where(point => point.Offset < marker.Time && point.Offset > lastTime)
                 .ToList();
             TimingPoint redline = timing.GetRedlineAtTime(lastTime);
 
+            // Set the variable
             double beatsFromLastMarker = 0;
             foreach (TimingPoint redlineBetween in redlinesBetween)
             {

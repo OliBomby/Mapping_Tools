@@ -113,6 +113,7 @@ public static class HitsoundCopierEngine
             }
         }
 
+        // Get the first timing point time of both beatmaps, so we can prevent hitobjects from adding greenlines before the first redline
         double sourceFirstTime = source.BeatmapTiming.TimingPoints.Count > 0
             ? source.BeatmapTiming.TimingPoints[0].Offset
             : double.PositiveInfinity;
@@ -121,6 +122,7 @@ public static class HitsoundCopierEngine
             target.BeatmapTiming.TimingPoints.Count > 0
                 ? target.BeatmapTiming.TimingPoints[0].Offset
                 : double.PositiveInfinity);
+        // Save tlo times where timingpoint volume is 5%
         List<double>? preservedMuteTimes = options.CopyVolumes && options.AlwaysPreserve5Volume
             ? targetTimeline.TimelineObjects
                 .Where(item => Math.Abs(item.SampleVolume) < Precision.DoubleEpsilon &&
@@ -131,6 +133,8 @@ public static class HitsoundCopierEngine
 
         if (options.CopyMode == 0)
         {
+            // Every defined hitsound and sampleset on hitsound gets copied to their copyTo destination
+            // Timelines
             if (options.CopyHitsounds)
             {
                 ResetHitObjectHitsounds(target);
@@ -139,6 +143,7 @@ public static class HitsoundCopierEngine
                 matchedCount += CopyMatchingHitsounds(options, sourceTimeline, targetTimeline);
             }
 
+            // Volumes and samplesets and customindices greenlines get copied with timingpointchanges and allafter enabled
             List<TimingPointChange> changes = source.BeatmapTiming.TimingPoints
                 .Select(point => new TimingPointChange(
                     ShiftTimingPoint(point, options.TimingOffset),
@@ -148,6 +153,7 @@ public static class HitsoundCopierEngine
                 .ToList();
             if (double.IsFinite(sourceFirstTime) && double.IsFinite(firstTime))
             {
+                // Add a timing point at the first time too. In case beatmapTo starts earlier than beatmapFrom
                 TimingPoint first = source.BeatmapTiming.GetTimingPointAtTime(firstTime).Copy();
                 first.Offset = firstTime;
                 changes.Add(new TimingPointChange(
@@ -156,15 +162,19 @@ public static class HitsoundCopierEngine
                     index: options.CopySampleSets,
                     volume: options.CopyVolumes));
             }
+            // Apply the timingpoint changes
             TimingPointChange.Apply(target.BeatmapTiming, changes, allAfter: true);
             targetTimeline.GiveTimingPoints(target.BeatmapTiming);
             if (preservedMuteTimes is not null)
             {
+                // Return 5% volume to tlo that had it before
                 RestorePreservedVolumes(targetTimeline, target, preservedMuteTimes, firstTime);
             }
         }
         else
         {
+            // Smarty mode
+            // Copy the defined hitsounds literally (not feno, that will be reserved for cleaner). Only the tlo that have been defined by copyFrom get overwritten.
             List<TimingPointChange> changes = [];
             GameMode mode = (GameMode)target.General["Mode"].IntValue;
             if (options.CopyHitsounds)
@@ -190,6 +200,7 @@ public static class HitsoundCopierEngine
 
             if (options.CopyBodyHitsounds)
             {
+                // Remove timingpoints in beatmapTo that are in a sliderbody/spinnerbody for both beatmapTo and BeatmapFrom
                 foreach (TimingPoint point in target.HitObjects
                              .SelectMany(item => item.BodyHitsounds)
                              .Where(point => !point.Uninherited &&
@@ -199,6 +210,7 @@ public static class HitsoundCopierEngine
                     target.BeatmapTiming.Remove(point);
                 }
 
+                // Get timingpointschanges for every timingpoint from beatmapFrom that is in a sliderbody/spinnerbody for both beatmapTo and BeatmapFrom
                 changes.AddRange(sourceObjects
                     .SelectMany(item => item.BodyHitsounds)
                     .Where(point => target.HitObjects.Any(item => item.Time < point.Offset + options.TimingOffset &&
@@ -210,10 +222,12 @@ public static class HitsoundCopierEngine
                         volume: options.CopyVolumes)));
             }
 
+            // Apply the timingpoint changes
             TimingPointChange.Apply(target.BeatmapTiming, changes);
             targetTimeline.GiveTimingPoints(target.BeatmapTiming);
             if (preservedMuteTimes is not null)
             {
+                // Return 5% volume to tlo that had it before
                 RestorePreservedVolumes(targetTimeline, target, preservedMuteTimes, firstTime);
             }
         }
@@ -258,10 +272,12 @@ public static class HitsoundCopierEngine
                     sample.Volume);
                 if (!existing.Contains(copy))
                 {
+                    // Add the StoryboardSoundSamples from beatmapFrom to beatmapTo if it doesn't already have the sample
                     target.StoryboardSoundSamples.Add(copy);
                     existing.Add(copy);
                 }
             }
+            // Sort the storyboarded samples
             target.StoryboardSoundSamples.Sort();
         }
 
@@ -278,6 +294,7 @@ public static class HitsoundCopierEngine
                 point.Offset = item.Time;
                 if (FilterMute(item, target, options))
                 {
+                    // Set volume to 5%, remove all hitsounds, apply customindex and sampleset
                     item.SampleSet = options.MutedSampleSet;
                     item.AdditionSet = SampleSet.None;
                     item.Normal = false;
@@ -290,12 +307,14 @@ public static class HitsoundCopierEngine
                     point.Volume = 5;
                     mutedCount++;
                 }
+                // Add timingpointschange to preserve index and volume and sampleset
                 changes.Add(new TimingPointChange(
                     point,
                     sampleSet: true,
                     index: options.MutedIndex >= 0,
                     volume: true));
             }
+            // Apply the timingpoint changes
             TimingPointChange.Apply(target.BeatmapTiming, changes);
         }
 
@@ -313,6 +332,7 @@ public static class HitsoundCopierEngine
             TimelineObject? targetItem = FindMatch(sourceItem, target, options.TimingOffset, options.TemporalLeniency);
             if (targetItem is not null)
             {
+                // Copy to this tlo
                 CopyHitsounds(options, sourceItem, targetItem);
                 count++;
             }
@@ -347,10 +367,12 @@ public static class HitsoundCopierEngine
             TimelineObject? targetItem = FindMatch(sourceItem, target, options.TimingOffset, options.TemporalLeniency);
             if (targetItem is not null)
             {
+                // Copy to this tlo
                 CopyHitsounds(options, sourceItem, targetItem);
                 matchedCount++;
                 if (Precision.AlmostBigger(targetItem.Time, firstTime))
                 {
+                    // Add timingpointschange to copy timingpoint hitsounds
                     TimingPoint point = sourceItem.HitsoundTimingPoint.Copy();
                     point.Offset = targetItem.Time;
                     changes.Add(new TimingPointChange(
@@ -360,6 +382,8 @@ public static class HitsoundCopierEngine
                         volume: options.CopyVolumes));
                 }
             }
+            // Try to find a slider tick in range to copy the sample to instead.
+            // This slider tick gets a custom sample and timingpoints change to imitate the copied hitsound.
             else if (options.CopyToSliderTicks &&
                      FindSliderTickInRange(
                          targetBeatmap,
@@ -379,8 +403,11 @@ public static class HitsoundCopierEngine
                     assignSample);
                 if (assignment is not null)
                 {
+                    // Add a new custom sample to this slider tick to represent the hitsounds
                     generatedSamples.MergeWith(assignment.Schema);
+                    // Make sure the slider with the slider ticks uses auto sampleset so the customized greenlines control the hitsounds
                     tickSlider!.SampleSet = SampleSet.None;
+                    // Add timingpointschange
                     AddCustomTimingChanges(changes, sourceItem, tickTime, assignment, options);
                     generatedCount += assignment.Schema.Count;
                 }
@@ -392,6 +419,7 @@ public static class HitsoundCopierEngine
             sourceItem.CanCopy = false;
         }
 
+        // Do the sliderslide hitsounds after because the ticks need to add sliderslides with strict indices.
         foreach (TimelineObject sourceItem in sliderSlides)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -414,12 +442,16 @@ public static class HitsoundCopierEngine
                 continue;
             }
 
+            // Add a new custom sample to this slider slide to represent the hitsounds
             generatedSamples.MergeWith(assignment.Schema);
+            // Add timingpointschange
             AddCustomTimingChanges(changes, sourceItem, sourceItem.Time + options.TimingOffset, assignment, options);
+            // Make sure the slider with the slider ticks uses auto sampleset so the customized greenlines control the hitsounds
             slider!.SampleSet = SampleSet.None;
             generatedCount += assignment.Schema.Count;
         }
 
+        // Timingpointchange all the undefined tlo from copyFrom
         foreach (TimelineObject targetItem in target.TimelineObjects)
         {
             if (!targetItem.CanCopy || !Precision.AlmostBigger(targetItem.Time, firstTime))
@@ -431,6 +463,7 @@ public static class HitsoundCopierEngine
             bool holdSampleSet = options.CopySampleSets && targetItem.SampleSet == SampleSet.None;
             bool holdIndex = options.CopySampleSets &&
                              !(targetItem.CanCustoms && targetItem.CustomIndex != 0);
+            // Dont hold indexes or sampleset if the sample it plays currently is the same as the sample it would play without conserving
             if (holdSampleSet || holdIndex)
             {
                 IReadOnlyList<string> native = GetResolvedSamplePaths(targetItem, mode, mapDirectory, firstSamples);
@@ -541,6 +574,7 @@ public static class HitsoundCopierEngine
             volume: options.CopyVolumes));
         TimingPoint revert = source.HitsoundTimingPoint.Copy();
         revert.Offset = targetTime + 5;
+        // Add timingpointschange 5ms later to revert the stuff back to whatever it should be
         changes.Add(new TimingPointChange(
             revert,
             sampleSet: options.CopySampleSets,
@@ -578,6 +612,7 @@ public static class HitsoundCopierEngine
             target.SampleVolume = source.SampleVolume;
             target.Filename = source.Filename;
         }
+        // Copy sliderbody hitsounds
         if (target.IsSliderHead && source.IsSliderHead && options.CopyBodyHitsounds)
         {
             target.Origin.Hitsounds = source.Origin.Hitsounds;
@@ -592,6 +627,7 @@ public static class HitsoundCopierEngine
     {
         foreach (HitObject item in beatmap.HitObjects)
         {
+            // Remove all hitsounds
             item.Hitsounds = 0;
             item.SampleSet = SampleSet.None;
             item.AdditionSet = SampleSet.None;
@@ -600,6 +636,7 @@ public static class HitsoundCopierEngine
             item.Filename = string.Empty;
             if (item.IsSlider)
             {
+                // Remove edge hitsounds
                 item.EdgeHitsounds = item.EdgeHitsounds.Select(_ => 0).ToList();
                 item.EdgeSampleSets = item.EdgeSampleSets.Select(_ => SampleSet.None).ToList();
                 item.EdgeAdditionSets = item.EdgeAdditionSets.Select(_ => SampleSet.None).ToList();
@@ -614,6 +651,7 @@ public static class HitsoundCopierEngine
         double firstTime)
     {
         List<TimingPointChange> changes = [];
+        // Exclude objects which use their own sample volume property instead
         foreach (TimelineObject item in timeline.TimelineObjects.Where(item =>
                      Math.Abs(item.SampleVolume) < Precision.DoubleEpsilon &&
                      Precision.AlmostBigger(item.Time, firstTime)))
@@ -628,6 +666,7 @@ public static class HitsoundCopierEngine
 
     private static bool FilterMute(TimelineObject item, Beatmap beatmap, HitsoundCopierOptions options)
     {
+        // Check whether it's defined
         if (!item.CanCopy || !(item.IsSliderEnd || item.IsSpinnerEnd) || item.Repeat != 1 ||
             item.Whistle || item.Finish || item.Clap ||
             options.MutedSampleSet != SampleSet.None && item.FenoSampleSet != options.MutedSampleSet)
@@ -635,14 +674,18 @@ public static class HitsoundCopierEngine
             return false;
         }
 
+        // Check filter snap
         IBeatDivisor[] all = options.BeatDivisors.Concat(options.MutedDivisors).ToArray();
         TimingPoint timingPoint = beatmap.BeatmapTiming.GetRedlineAtTime(item.Time - 1);
         double snapped = beatmap.BeatmapTiming.Resnap(item.Time, all, false, tp: timingPoint);
         double beats = (snapped - timingPoint.Offset) / timingPoint.MpB;
+        // Get all the divisors which the sliderend could possibly be snapped to
         List<IBeatDivisor> possible = all.Where(divisor =>
                 Precision.AlmostEquals(beats % divisor.GetValue(), 0) ||
                 Precision.AlmostEquals(beats % divisor.GetValue(), divisor.GetValue()))
             .ToList();
+        // Make sure all the possible beat divisors of lower priority are in the muted category
+        // Check filter temporal length
         return possible.Count > 0 &&
                !possible.TakeWhile(divisor => !options.MutedDivisors.Contains(divisor)).Any() &&
                Precision.AlmostBigger(item.Origin.TemporalLength, options.MinLength * timingPoint.MpB);
@@ -658,6 +701,7 @@ public static class HitsoundCopierEngine
         double tickRate = beatmap.Difficulty.TryGetValue("SliderTickRate", out TValue value)
             ? value.DoubleValue
             : 1;
+        // Check all sliders in range and exclude those which have NaN SV, because those dont have slider ticks
         foreach (HitObject item in beatmap.HitObjects.Where(item => item.IsSlider &&
                      !double.IsNaN(item.SliderVelocity) &&
                      (item.Time < end && item.EndTime > start)))

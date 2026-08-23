@@ -107,6 +107,7 @@ public sealed class CoordinateConverter
     public Box2 GetEditorGridBox()
     {
         Box2 editor = GetEditorBox();
+        // Screen pixels per osu pixel
         double ratio = editor.Height / 480;
         Vector2 gridDimensions = EditorGridResolution * ratio;
         Vector2 emptySpace = new Vector2(editor.Width, editor.Height) - gridDimensions;
@@ -146,6 +147,7 @@ public sealed class CoordinateConverter
     public Vector2 EditorToRelativeCoordinate(Vector2 coord)
     {
         Box2 editor = GetEditorBox();
+        // Screen pixels per osu pixel
         double ratio = editor.Height / 480;
         Vector2 gridDimensions = EditorGridResolution * ratio;
         Vector2 emptySpace = new Vector2(editor.Width, editor.Height) - gridDimensions;

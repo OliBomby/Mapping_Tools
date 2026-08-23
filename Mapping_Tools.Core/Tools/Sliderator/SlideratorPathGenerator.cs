@@ -73,6 +73,7 @@ public sealed class SlideratorPathGenerator
             throw new InvalidOperationException("Zero length path.");
         }
 
+        // Add last member again so these lists have the same number of elements as path
         diff.Add(diff[^1]);
         angle.Add(angle[^1]);
         diffL.Add(diffL[^1]);
@@ -160,11 +161,13 @@ public sealed class SlideratorPathGenerator
         double tolerance = 0.35)
     {
         List<LatticePoint> points = [];
+        // Iterate through path segments -1 because the last one is repeated
         for (int index = 0; index < diff.Count - 1; index++)
         {
             double length = diffL[index];
             if (Math.Abs(length) < Precision.DoubleEpsilon)
             {
+                // Skip segment if degenerate
                 continue;
             }
 
@@ -234,6 +237,7 @@ public sealed class SlideratorPathGenerator
 
     private void GenerateNeurons()
     {
+        // These values are placeholders. Experimentation has to be done to find better parameters
         const double maxOvershot = 32;
         const double epsilon = 0.01;
         const double deltaT = 0.02;
@@ -248,6 +252,7 @@ public sealed class SlideratorPathGenerator
         {
             double clampedTime = Math.Min(time, MaxT);
             double wantedLength = PositionFunction(clampedTime);
+            // Input is time in milliseconds and output is position in osu! pixels
             double speed = (PositionFunction(clampedTime + epsilon) - wantedLength) / epsilon;
             int direction = Math.Sign(speed);
             double velocity = Math.Abs(speed);
@@ -255,6 +260,9 @@ public sealed class SlideratorPathGenerator
 
             if (direction * lastDirection < 0 || direction == 0 && lastDirection != 0)
             {
+                // Make a new neuron if the path turns around
+                // The position of this turn-around is not entirely accurate because the actual turn-around happens somewhere in between the time steps
+                // This is the cause behind most of the error compared to the expected total length
                 Neuron next = new(nearest, clampedTime);
                 current.Terminal = next;
                 current.WantedLength += actualLength;
@@ -266,6 +274,7 @@ public sealed class SlideratorPathGenerator
 
             actualLength = (clampedTime - nucleusTime) * Velocity;
             double lengthError = Math.Abs(Math.Abs(wantedLength - nucleusWantedLength) - actualLength) - current.Error;
+            // Make a new neuron when the error in the length becomes too large
             if (lengthError > Math.Max(MinDendriteLength, velocity * maxOvershot) ||
                 nearest.Error < 0.05 && lengthError > Math.Max(MinDendriteLength, velocity * MinDendriteLength))
             {
@@ -281,6 +290,7 @@ public sealed class SlideratorPathGenerator
                 }
                 else
                 {
+                    // Pretend to add a new neuron but merged with the current one
                     current.WantedLength += actualLength;
                     nucleusWantedLength = wantedLength;
                     nucleusTime = clampedTime;
@@ -290,6 +300,7 @@ public sealed class SlideratorPathGenerator
             lastDirection = direction;
         }
 
+        // Need to add currentNeuron at the end otherwise the last neuron would get ignored
         current.WantedLength += actualLength;
         LatticePoint finalPoint = GetNearestLatticePoint(PositionFunction(MaxT));
         Neuron last = new(finalPoint, MaxT);
@@ -298,6 +309,7 @@ public sealed class SlideratorPathGenerator
         slider.Add(last);
 
         double totalWantedLength = slider.Sum(neuron => neuron.WantedLength);
+        // Multiply with ratio to exactly match the expected total length
         double ratio = MaxS / totalWantedLength;
         foreach (Neuron neuron in slider)
         {
@@ -308,6 +320,7 @@ public sealed class SlideratorPathGenerator
     private void GenerateAxons()
     {
         PathGenerator pathGenerator = new(path, diff, angle, diffL, pathL);
+        // Generate bezier points that approximate the paths between neurons
         foreach (Neuron neuron in slider.Where(neuron => neuron.Terminal is not null))
         {
             Vector2 firstPoint = neuron.Nucleus.Pos;
@@ -327,6 +340,7 @@ public sealed class SlideratorPathGenerator
             }
 
             neuron.Axon = new BezierSubdivision(generated);
+            // Calculate lengths
             neuron.AxonLength = PathGenerator.CalculatePathLength(generated);
             neuron.DendriteLength = neuron.WantedLength - neuron.AxonLength;
         }
@@ -352,11 +366,14 @@ public sealed class SlideratorPathGenerator
         double leftovers = 0;
         foreach (Neuron neuron in slider.Where(neuron => neuron.Terminal is not null))
         {
+            // Find angles for the neuron and the terminal to point the dendrites towards
             int direction = Math.Sign(neuron.Terminal!.Nucleus.PathPosition - neuron.Nucleus.PathPosition);
             direction = direction == 0 ? 1 : direction;
             Vector2 firstDirection = direction * NearbyNonZeroDiff(neuron.Nucleus.SegmentIndex).Normalized();
             Vector2 secondDirection = -direction * NearbyNonZeroDiff(neuron.Terminal.Nucleus.SegmentIndex).Normalized();
+            // Do an even split of dendrites between this neuron and the terminal
             double dendriteToAdd = neuron.DendriteLength + leftovers;
+            // Find the time at which the position function goes in between the neuron and the terminal
             double width = neuron.Terminal.Time - neuron.Time;
             double axonWidth = neuron.AxonLength / Velocity;
             double middleTime = BinarySearchUtil.DoubleBinarySearch(
@@ -365,6 +382,7 @@ public sealed class SlideratorPathGenerator
                 0.01,
                 time => PositionFunction(time) <=
                         (neuron.Nucleus.PathPosition + neuron.Terminal.Nucleus.PathPosition) / 2);
+            // Calculate the distribution of dendrites to let the axon pass through the middle at the same time as the position funciton does
             double leftPortion = Precision.AlmostEquals(width, axonWidth)
                 ? 0.5
                 : MathHelper.Clamp(
@@ -377,6 +395,7 @@ public sealed class SlideratorPathGenerator
             double rightLength = dendriteToAdd * rightPortion;
             double speedLeft = GetSpeedAtTime(neuron.Time + leftLength / Velocity / 2, 0.01);
             double speedRight = GetSpeedAtTime(neuron.Terminal.Time - rightLength / Velocity / 2, 0.01);
+            // Get the speeds at the times of the dendrites to give the dendrites appriopriate lengths to the speed at the time
             rightLength += AddDendriteLength(
                 neuron,
                 leftLength,
@@ -409,6 +428,7 @@ public sealed class SlideratorPathGenerator
             double dendriteLength = dendrite.Length;
             while (dendriteLength > 12)
             {
+                // Shorten dendrites longer than 12 pixels to keep dendrites invisible
                 size -= 0.5;
                 dendrite = (direction * size).Rounded();
                 dendriteLength = dendrite.Length;
@@ -416,6 +436,7 @@ public sealed class SlideratorPathGenerator
 
             if (dendriteLength < 1)
             {
+                // Prevent any dendrites shorter than 1 to never get an infinite loop
                 dendrite = Vector2.UnitX;
             }
 

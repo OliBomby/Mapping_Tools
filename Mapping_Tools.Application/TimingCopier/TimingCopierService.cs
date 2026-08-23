@@ -80,6 +80,7 @@ public sealed class TimingCopierService : ITimingCopierService
                 source.Editor.Beatmap,
                 options,
                 cancellationToken);
+            // Save the file
             await _editingGateway
                 .SaveAsync(target, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);

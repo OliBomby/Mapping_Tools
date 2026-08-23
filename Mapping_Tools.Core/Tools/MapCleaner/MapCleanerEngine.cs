@@ -35,9 +35,14 @@ public static class MapCleanerEngine
         GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
         double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
         List<TimingPoint> original = timing.TimingPoints.Select(point => point.Copy()).ToList();
+
+        // Collect timeline objects before resnapping, so the timingpoints
+        // are still valid and the tlo's get the correct hitsounds and offsets.
+        // Resnapping of the hit objects will move the tlo's aswell
         Timeline timeline = beatmap.GetTimeline();
         int objectsResnapped = 0;
 
+        // Collect Kiai toggles and SliderVelocity changes for mania/taiko
         List<TimingPoint> kiaiToggles = [];
         List<TimingPoint> svChanges = [];
         bool lastKiai = false;
@@ -63,6 +68,7 @@ public static class MapCleanerEngine
 
         if (options.ResnapObjects)
         {
+            // Resnap all objects
             foreach (HitObject hitObject in beatmap.HitObjects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -74,11 +80,14 @@ public static class MapCleanerEngine
                 hitObject.ResnapEnd(timing, options.BeatDivisors);
                 hitObject.ResnapPosition(mode, circleSize);
             }
+
+            // Resnap Kiai toggles
             foreach (TimingPoint point in kiaiToggles)
             {
                 point.ResnapSelf(timing, options.BeatDivisors);
             }
 
+            // Resnap SliderVelocity changes
             foreach (TimingPoint point in svChanges)
             {
                 point.ResnapSelf(timing, options.BeatDivisors);
@@ -88,6 +97,7 @@ public static class MapCleanerEngine
 
         if (options.ResnapBookmarks)
         {
+            // Resnap the bookmarks
             beatmap.SetBookmarks(beatmap.GetBookmarks()
                 .Select(bookmark => timing.Resnap(bookmark, options.BeatDivisors))
                 .Distinct()
@@ -95,7 +105,10 @@ public static class MapCleanerEngine
         }
         Report(progress, 45);
 
+        // Make new timingpoints
         List<TimingPointChange> changes = [];
+
+        // Add redlines
         foreach (TimingPoint point in timing.Redlines)
         {
             changes.Add(new TimingPointChange(point, mpb: true, meter: true,
@@ -104,17 +117,20 @@ public static class MapCleanerEngine
 
         if (mode is GameMode.Taiko or GameMode.Mania)
         {
+            // Add SliderVelocity changes for taiko and mania
             foreach (TimingPoint point in svChanges)
             {
                 changes.Add(new TimingPointChange(point, mpb: true, fuzziness: 0.4));
             }
         }
 
+        // Add Kiai toggles
         foreach (TimingPoint point in kiaiToggles)
         {
             changes.Add(new TimingPointChange(point, kiai: true));
         }
 
+        // Add Hitobject stuff
         foreach (HitObject hitObject in beatmap.HitObjects)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -127,9 +143,12 @@ public static class MapCleanerEngine
             }
             if (options.RemoveHitsounds)
             {
+                // Skip adding hitsounds if we want to remove them
                 hitObject.ResetHitsounds();
                 continue;
             }
+
+            // Body hitsounds
             bool volume = hitObject.IsSlider && options.VolumeSliders ||
                           hitObject.IsSpinner && options.VolumeSpinners;
             bool sampleSet = hitObject.IsSlider && options.SampleSetSliders && hitObject.SampleSet == 0;
@@ -169,8 +188,10 @@ public static class MapCleanerEngine
 
         if (!options.RemoveHitsounds)
         {
+            // Add timeline hitsounds
             foreach (TimelineObject timelineObject in timeline.TimelineObjects)
             {
+                // Change the samplesets in the hitobjects
                 cancellationToken.ThrowIfCancellationRequested();
                 RewriteObjectHitsound(timelineObject, mode);
                 if (timelineObject.Origin.AdditionSet == timelineObject.Origin.SampleSet)
@@ -183,6 +204,7 @@ public static class MapCleanerEngine
                     continue;
                 }
 
+                // Add greenlines for custom indexes and volumes
                 TimingPoint point = timelineObject.HitsoundTimingPoint.Copy();
                 bool unmute = timelineObject.FenoSampleVolume == 5 && options.RemoveMuting;
                 bool mute = options.RemoveUnclickableHitsounds && !options.RemoveMuting &&
@@ -191,6 +213,7 @@ public static class MapCleanerEngine
                 bool volume = !unmute;
                 if (index && options.AnalyzeSamples && firstSamples.Count > 0)
                 {
+                    // Index doesn't have to change if the sample it plays currently is the same as the sample it would play with the previous index
                     List<string> nativeSamples = timelineObject.GetFirstPlayingFilenames(
                         mode,
                         mapDirectory,
@@ -210,6 +233,7 @@ public static class MapCleanerEngine
                     }
                     point.SampleIndex = newIndex;
                     timelineObject.GiveHitsoundTimingPoint(point);
+                    // Index changes dont change sound
                     if (!nativeSamples.SequenceEqual(timelineObject.GetFirstPlayingFilenames(
                             mode,
                             mapDirectory,
@@ -227,9 +251,12 @@ public static class MapCleanerEngine
         }
         Report(progress, 85);
 
+        // Replace the old timingpoints
         timing.Clear();
         TimingPointChange.Apply(timing, changes);
         beatmap.GiveObjectsGreenlines();
+
+        // Fix this extremely specific thing
         Fix2BDoubleTaps(beatmap);
         Report(progress, 100);
         return Compare(original, timing.TimingPoints, objectsResnapped);
@@ -299,6 +326,12 @@ public static class MapCleanerEngine
 
     private static void Fix2BDoubleTaps(Beatmap beatmap)
     {
+        /*
+         * When having doubletap circle+slider on the exact same time, slider-notelock can happen if the circle is
+         * the second object instead of the first. What this means is that when hitting the object like a regular
+         * doubletap, the slider registers but the circle will always miss. This phenomenon can be observed either
+         * in the .osu file (the circle will be on the line after the slider), or the editor.
+         */
         for (int index = 0; index < beatmap.HitObjects.Count - 1; index++)
         {
             HitObject first = beatmap.HitObjects[index];

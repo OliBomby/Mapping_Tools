@@ -30,6 +30,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
         cancellationToken.ThrowIfCancellationRequested();
         RgbaImage image = await _images.LoadAsync(options.PictureFile, cancellationToken).ConfigureAwait(false);
         progress?.Report(10);
+        // Get the latest version of the beatmap
         BeatmapEditingSession session = await _editingGateway.OpenBeatmapAsync(path, LiveBeatmapPreference.PreferLive, cancellationToken).ConfigureAwait(false);
         Beatmap beatmap = session.Editor.Beatmap;
         double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
@@ -42,6 +43,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
             options.SelectedSlider, options.YResolution, options.ViewportSize, !options.BlackOn, !options.BorderOn,
             !options.AlphaOn, options.RedOn, options.GreenOn, options.BlueOn, options.Quality);
         cancellationToken.ThrowIfCancellationRequested();
+        // Set the beatmap slider colors
         SliderPicturatorEngine.ApplyToBeatmap(beatmap, pathPoints, frameDistance, duration, options.TimeCode,
             sliderColour, options.BorderColor, options.SetBeatmapColors, options.UseMapComboColors);
         options.SegmentCount = SliderPicturatorEngine.Recolor(image, sliderColour, options.BorderColor,

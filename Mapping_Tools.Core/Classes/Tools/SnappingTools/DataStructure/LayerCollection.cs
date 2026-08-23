@@ -31,6 +31,7 @@ public sealed class LayerCollection
     {
         AllGenerators = generators;
         AcceptableDifference = acceptableDifference;
+        // Generate 1 layer
         ObjectLayers.Add(new RelevantObjectLayer(this, null));
     }
 
@@ -46,6 +47,7 @@ public sealed class LayerCollection
 
         if (ObjectLayers.Count < inceptionLevel)
         {
+            // Add more layers
             int layersToAdd = inceptionLevel - ObjectLayers.Count;
             for (int i = 0; i < layersToAdd; i++)
             {
@@ -57,14 +59,17 @@ public sealed class LayerCollection
                 }
 
                 ObjectLayers.Add(newLayer);
+                // Derive new relevant objects in the new layer
                 newLayer.GenerateNewObjects();
             }
         }
         else if (ObjectLayers.Count > inceptionLevel)
         {
+            // Remove layers
             int layersToRemove = ObjectLayers.Count - inceptionLevel;
             for (int i = 0; i < layersToRemove; i++)
             {
+                // Dispose all objects from last layer
                 ObjectLayers[^1].Clear();
                 ObjectLayers.RemoveAt(ObjectLayers.Count - 1);
                 RelevantObjectLayer? lastLayer = ObjectLayers.LastOrDefault();

@@ -99,6 +99,7 @@ public static class SliderMergerEngine
     /// <returns><see langword="true"/> when every interior point is a duplicated segment endpoint.</returns>
     public static bool IsLinearBezier(IReadOnlyList<Vector2> points)
     {
+        // Every point at not the endpoints must have an anchor before or after it at the same position
         for (int index = 1; index < points.Count - 1; index++)
         {
             if (points[index] != points[index - 1] && points[index] != points[index + 1])
@@ -128,6 +129,8 @@ public static class SliderMergerEngine
     {
         if (options.MergeOnSliderEnd)
         {
+            // In order to merge on the slider end we first move the anchors such that the last anchor is exactly on the slider end
+            // After that merge as usual
             first.SetAllCurvePoints(SliderPathUtil.MoveAnchorsToLength(
                 first.GetAllCurvePoints(),
                 first.SliderType,
@@ -311,6 +314,7 @@ public static class SliderMergerEngine
 
     private static List<Vector2> MakePenis(List<Vector2> points, double sliderLength)
     {
+        // Penis shape
         List<Vector2> newPoints =
         [
             new(0, 0), new(40, -40), new(0, -70), new(-40, -40), new(0, 0), new(0, 0),
@@ -318,12 +322,13 @@ public static class SliderMergerEngine
             new(-40, 40), new(0, 70), new(40, 40), new(0, 0)
         ];
 
-        double sizeMultiplier = sliderLength / 591 * 2;
+        double sizeMultiplier = sliderLength / 591 * 2; // 591 is the size of the dick
         double normalAngle = -(points.Last() - points.First()).Theta;
         Matrix2 matrix = Matrix2.CreateRotation(normalAngle);
         matrix *= sizeMultiplier;
         for (int index = 0; index < newPoints.Count; index++)
         {
+            // transform to slider
             newPoints[index] = points.First() + Matrix2.Mult(matrix, newPoints[index]);
         }
 

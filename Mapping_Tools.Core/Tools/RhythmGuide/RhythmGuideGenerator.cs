@@ -24,13 +24,18 @@ public static class RhythmGuideGenerator
             throw new ArgumentException("There must be at least one beatmap.", nameof(sources));
         }
 
+        // Scuffed beatmap copy
         Beatmap result = new(sources[0].GetLines());
+        // Remove all greenlines
         result.BeatmapTiming.RemoveAll(point => !point.Uninherited);
+        // Remove all hitobjects
         result.HitObjects.Clear();
+        // Change some parameters;
         result.General["StackLeniency"] = new TValue("0.0");
         result.General["Mode"] = new TValue(((int)options.OutputGameMode).ToString());
         result.Metadata["Version"] = new TValue(options.OutputName);
         result.Difficulty["CircleSize"] = new TValue("4");
+        // Add hitobjects
         Append(result, sources, options, cancellationToken);
         return result;
     }
@@ -57,6 +62,7 @@ public static class RhythmGuideGenerator
             foreach (TimelineObject timelineObject in source.GetTimeline().TimelineObjects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                // Handle different selection modes
                 switch (options.SelectionMode)
                 {
                     case RhythmGuideSelectionMode.AllEvents:
@@ -85,6 +91,7 @@ public static class RhythmGuideGenerator
                         }
                         else if (target.HitObjects.Count > 0)
                         {
+                            // Extend last object
                             HitObject last = target.HitObjects[^1];
                             last.IsCircle = false;
                             last.IsHoldNote = true;

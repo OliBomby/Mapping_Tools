@@ -130,6 +130,7 @@ public static class SliderPicturatorEngine
         bool opaqueOff = false, bool r = true, bool g = true, bool b = true, int quality = 101)
     {
         ValidateImageAndQuality(image, quality);
+        // startPos, startPosPic are in osupx
         Vector2 start = startPosition;
         Vector2 picturePosition = imagePosition;
         start.Round();
@@ -149,12 +150,17 @@ public static class SliderPicturatorEngine
         Vector2[]? sliderBallPositions = null;
         Vector2[]? lastSegmentStarts = null;
         int duration = 0;
+        // Handle sliderball control calculations
         if (slider is { IsSlider: true })
         {
             duration = (int)Math.Floor(slider.TemporalLength);
             sliderBallPositions = new Vector2[duration + 1];
             for (int i = 0; i <= duration; i++) sliderBallPositions[i] = slider.SliderPath.SliderballPositionAt(i, duration);
+
+            // Before rounding sbPositions, calculate starting coordinate for each ms' final segment to make the sliderball rotate appropriately
             lastSegmentStarts = new Vector2[duration + 1];
+            // We don't care about msLastSegStart[0] so we'll leave it at 0. Technically we could save one Vector2's worth of space here but it would make indexing harder to read than necessary.
+            // Find the first angle - we can't calculate the angle between points that are the same, but the sliderball's rotation should be the same as it was before.
             double savedAngle = 0;
             for (int i = 1; i <= duration; i++)
                 if (sliderBallPositions[0] != sliderBallPositions[i])
@@ -168,6 +174,7 @@ public static class SliderPicturatorEngine
                 lastSegmentStarts[i] = new((float)(Snaptol * Math.Cos(angle) + sliderBallPositions[i].Rounded().X),
                     (float)(Snaptol * Math.Sin(angle) + sliderBallPositions[i].Rounded().Y));
             }
+            // Round all positions to float precision values
             for (int i = 0; i <= duration; i++)
             {
                 sliderBallPositions[i].Round();
@@ -186,6 +193,7 @@ public static class SliderPicturatorEngine
             new(sliderBottomRight.X, sliderTopLeft.Y), sliderTopLeft];
         paths.Add([.. current]);
         current.Clear();
+        // Move to the start of the image, avoiding sample points (could be done better)
         if (picturePosition.LengthSquared > 0) current.AddRange([new(sliderTopLeft.X, imageStart.Y), imageStart]);
 
         for (int y = 0; y < image.Height; y++)
@@ -289,6 +297,7 @@ public static class SliderPicturatorEngine
             }
         }
 
+        // Add sliderball path once (if) you run out of image to get distance
         if (currentMillisecond < duration)
         {
             Vector2 difference = currentPath[^1] - lastSegmentStarts![currentMillisecond];
@@ -313,11 +322,14 @@ public static class SliderPicturatorEngine
             path.AddRange([.. currentPath]);
             currentPath.Clear();
             currentPath.Add(path[^1]);
+            // Next just spam segments to get length
             while (currentMillisecond < duration)
             {
                 difference = currentPath[0] - lastSegmentStarts[currentMillisecond];
                 double generousLength = Math.Abs(difference.X) + Math.Abs(difference.Y);
                 available = 2 * (sliderBottomRight.X - lastSegmentStarts[currentMillisecond].X);
+                // We are assuming all slider positions are in the top left quadrant of the box centered on
+                // the top left sample point, so adding segments like this does not interfere with the picture.
                 for (int j = 0; j < Math.Floor((frameDistance - Snaptol - generousLength) / available); j++)
                 {
                     currentPath.Add(new(sliderBottomRight.X, lastSegmentStarts[currentMillisecond].Y));
@@ -444,10 +456,21 @@ public static class SliderPicturatorEngine
                 double gradientDistance = (colour - closest).LengthSquared;
                 double borderDistance = (colour - borderVector).LengthSquared;
                 double blackDistance = colour.LengthSquared;
+                // Test if border color would be better
                 if (borderOff || gradientDistance < borderDistance)
-                    distances[x, y] = !blackOff && blackDistance < gradientDistance ? 1.2 : Math.Round(quality * Math.Clamp(1 - (closest - outerVector).Length / projectionLength, 0, 1)) * (101d / quality) / 128;
+                {
+                    // Test if black would be better
+                    distances[x, y] = !blackOff && blackDistance < gradientDistance
+                        ? 1.2
+                        : Math.Round(quality * Math.Clamp(1 - (closest - outerVector).Length / projectionLength, 0, 1)) * (101d / quality) / 128;
+                }
                 else
-                    distances[x, y] = !blackOff && blackDistance < borderDistance ? 1.2 : 111d / 128;
+                {
+                    // Test if black would be better
+                    distances[x, y] = !blackOff && blackDistance < borderDistance
+                        ? 1.2
+                        : 111d / 128;
+                }
             }
         }
         return distances;
@@ -464,8 +487,10 @@ public static class SliderPicturatorEngine
 
     private static long CountSegments(double[,] distances, int width, int height)
     {
+        // Count segments
         long count = 0;
         int direction = -1;
+        // In the below loop, gradientDist means something completely different from what it means in the above loop. Here, it is being used to mean the distance in the gradient between two or more points that are evenly distributed along the slider body
         for (int y = 0; y < height; y++)
         {
             direction = -direction;
@@ -474,6 +499,7 @@ public static class SliderPicturatorEngine
             {
                 int offset = 0;
                 double gradient = 0;
+                // Look for gradients
                 if (x + direction >= 0 && x + direction < width)
                 {
                     gradient = distances[x + direction, y] - distances[x, y];

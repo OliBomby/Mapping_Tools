@@ -63,6 +63,7 @@ public sealed class MapCleanerService : IMapCleanerService
                 samples,
                 mapProgress,
                 cancellationToken);
+            // Save the file
             await _editingGateway.SaveAsync(
                 session,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -73,6 +74,7 @@ public sealed class MapCleanerService : IMapCleanerService
                     session.Editor.Beatmap,
                     cancellationToken).ConfigureAwait(false)
                 : 0;
+            // Update result with removed count
             total = total.Add(result with { SamplesRemoved = removedSamples });
         }
         return total;

@@ -60,7 +60,10 @@ public class Editor2 {
     /// </summary>
     /// <param name="path">The source file.</param>
     /// <returns>A mutable list containing the file's lines.</returns>
-    public List<string> ReadFile(string path) => new(FileStore.ReadAllLines(path));
+    public List<string> ReadFile(string path) {
+        // Get contents of the file
+        return new(FileStore.ReadAllLines(path));
+    }
 
     /// <summary>
     /// Serializes the current document and writes it to a new path.

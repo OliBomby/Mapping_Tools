@@ -105,6 +105,7 @@ public static partial class MapsetMergerEngine
         }
 
         double sliderTickRate = beatmap.Difficulty["SliderTickRate"].DoubleValue;
+        // All hitsound files with custom indices
         foreach (HitObject hitObject in beatmap.HitObjects)
         {
             references.HitSoundFiles.UnionWith(
@@ -113,6 +114,7 @@ public static partial class MapsetMergerEngine
 
         GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
         Timeline timeline = beatmap.GetTimeline();
+        // All explicitly referenced audio files like filename hs, SB samples
         foreach (TimelineObject timelineObject in timeline.TimelineObjects)
         {
             foreach (string filename in timelineObject.GetPlayingFilenames(mode, includeDefaults: false))
@@ -131,6 +133,8 @@ public static partial class MapsetMergerEngine
             }
         }
 
+        // All hitsound indices in the beatmaps. Old index to new index
+        // Adjust the remaining custom indices
         foreach (HitObject hitObject in beatmap.HitObjects)
         {
             hitObject.CustomIndex = RemapIndex(hitObject.CustomIndex, sampleIndices, ref nextSampleIndex);

@@ -25,6 +25,7 @@ public static class RelevantObjectPairGenerator
     {
         if (collection is null || dependencies.Length == 0)
         {
+            // Handle special case
             return new[] { Array.Empty<IRelevantObject>() };
         }
 
@@ -39,6 +40,7 @@ public static class RelevantObjectPairGenerator
             IRelevantObject obj = sortedObjects[i];
             if (!obj.IsInheritable)
             {
+                // Ignore the uninheritable objects
                 i++;
                 continue;
             }
@@ -86,15 +88,18 @@ public static class RelevantObjectPairGenerator
     {
         if (collection is null || dependencies.Length == 0)
         {
+            // Handle special case
             return new[] { Array.Empty<IRelevantObject>() };
         }
 
+        // Count how many of every type are in the neededCombinations
         Dictionary<Type, int> neededCombinations = new();
         foreach (Type type in dependencies)
         {
             neededCombinations[type] = neededCombinations.GetValueOrDefault(type) + 1;
         }
 
+        // Check if the collection contains enough inheritable items to ever satisfy the needed combinations
         foreach ((Type type, int count) in neededCombinations)
         {
             if (!collection.TryGetValue(type, out List<IRelevantObject>? list) || list.Count(o => o.IsInheritable) < count)
@@ -103,8 +108,11 @@ public static class RelevantObjectPairGenerator
             }
         }
 
+        // Make all combinations for every individual type & only get inheritable
         IEnumerable<IEnumerable<IRelevantObject[]>> allCombinations = neededCombinations.Select(pair =>
             CombinationsRecursion(collection[pair.Key].Where(o => o.IsInheritable).ToArray(), pair.Value));
+        // Construct all parameter combinations
+        // Make combinations of combinations
         return CartesianProduct(allCombinations).Select(o => o.SelectMany(x => x).ToArray());
     }
 
@@ -115,6 +123,7 @@ public static class RelevantObjectPairGenerator
     public static IEnumerable<IEnumerable<T>> CartesianProduct<T>(IEnumerable<IEnumerable<T>> sequences)
     {
         IEnumerable<IEnumerable<T>> emptyProduct = new[] { Enumerable.Empty<T>() };
+        // Flatten collection
         return sequences.Aggregate(emptyProduct, (accumulator, sequence) =>
             from accseq in accumulator
             from item in sequence
@@ -123,6 +132,8 @@ public static class RelevantObjectPairGenerator
 
     private static IEnumerable<int[]> CombinationsRecursion(int m, int n)
     {
+        // Enumerate all possible m-size combinations of [0, 1, ..., n-1] array
+        // in lexicographic order (first [0, 1, 2, ..., m-1]).
         int[] result = new int[m];
         Stack<int> stack = new(m);
         stack.Push(0);

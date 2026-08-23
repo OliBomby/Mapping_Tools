@@ -93,6 +93,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
                     (index + value / 100) / paths.Count * 100)),
                 cancellationToken);
 
+            // Save the file
             await _editingGateway
                 .SaveAsync(session, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);

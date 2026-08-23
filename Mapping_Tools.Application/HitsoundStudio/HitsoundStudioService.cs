@@ -118,6 +118,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         foreach (SampleGeneratingArgs sample in samples.Distinct(new SampleGeneratingArgsComparer()))
         {
             cancellationToken.ThrowIfCancellationRequested();
+            // Load the samples so validation can be done
             if (string.IsNullOrWhiteSpace(sample.Path) || IsSkinDefaultSample(sample.Path))
             {
                 continue;
@@ -173,6 +174,8 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         Func<SampleGeneratingArgs, bool> isValid = sample =>
             !validateSampleFile || IsValidSource(sample);
         HitsoundStudioExportMode mode = project.HitsoundExportModeSetting;
+        // Convert the multiple layers into packages that have the samples from all the layers at one specific time
+        // Don't add default sample when exporting midi files because that's not a final export.
         List<SamplePackage> packages = _engine.ZipLayers(
             project.HitsoundLayers,
             project.DefaultSample,
@@ -180,6 +183,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             needNormalSample: mode == HitsoundStudioExportMode.Standard && validateSampleFile).ToList();
         Report(progress, mode == HitsoundStudioExportMode.Midi ? 20 : 10);
 
+        // Balance the volume between greenlines and samples
         _engine.BalanceVolumes(
             packages,
             roughness: 0,
@@ -204,6 +208,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
 
         if (mode == HitsoundStudioExportMode.Standard)
         {
+            // Convert the packages to hitsounds that fit on an osu standard map
             standard = _engine.BuildStandard(
                 packages,
                 project.UsePreviousSampleSchema ? project.PreviousSampleSchema : null,
@@ -242,6 +247,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
                 : 50);
         if (project.DeleteAllInExportFirst && writesFiles)
         {
+            // Delete all files in the export folder before filling it again
             _files.DeleteFiles(project.ExportFolder);
         }
 
@@ -251,6 +257,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
                 ? 70
                 : 60);
 
+        // Count the number of samples
         int sampleCount = 0;
         string? mapPath = null;
         Beatmap? midiBeatmap = null;
@@ -260,6 +267,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
                 project.BaseBeatmap,
                 LiveBeatmapPreference.DiskOnly,
                 cancellationToken).ConfigureAwait(false);
+            // Export the hitsound map and sound samples
             ApplyExport(session.Editor.Beatmap, events, project);
             mapPath = Path.Combine(project.ExportFolder, session.Editor.Beatmap.GetFileName());
             session.Editor.SaveFile(mapPath);
@@ -298,6 +306,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         }
 
         Report(progress, 100);
+        // Count the number of changes of custom index
         string detailedSummary = mode switch
         {
             HitsoundStudioExportMode.Standard =>

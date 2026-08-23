@@ -44,6 +44,7 @@ public sealed class SliderMergerService : ISliderMergerService
         {
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
+            // Get the current beatmap if the selection mode is 'Selected' because otherwise the selection would always fail
             LiveBeatmapPreference preference = options.ImportModeSetting == SliderMergerImportMode.Selected
                 ? LiveBeatmapPreference.RequireLive
                 : LiveBeatmapPreference.PreferLive;
@@ -67,6 +68,7 @@ public sealed class SliderMergerService : ISliderMergerService
                 options,
                 mapProgress,
                 cancellationToken);
+            // Save the file
             await _editingGateway
                 .SaveAsync(session, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
