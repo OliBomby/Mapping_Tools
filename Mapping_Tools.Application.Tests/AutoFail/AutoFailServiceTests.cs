@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.AutoFail;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Core.Tools.AutoFail;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -13,14 +14,15 @@ public sealed class AutoFailServiceTests
     public async Task AnalyzeAsync_WithAcceptedFixture_UsesLiveAwareGatewayAndPreservesCounts()
     {
         // Arrange
-        RecordingGateway gateway = new(CreateEditor());
+        RecordingBeatmapEditingGateway gateway = new(
+            new BeatmapEditingSession(CreateEditor(), BeatmapEditingSource.Disk, []));
         AutoFailService service = new(gateway);
 
         // Act
         var run = await service.AnalyzeAsync(new AutoFailOptions("accepted.osu"));
 
         // Assert
-        gateway.OpenPreference.Should().Be(LiveBeatmapPreference.PreferLive);
+        gateway.OpenRequests.Single().Preference.Should().Be(LiveBeatmapPreference.PreferLive);
         run.Analysis.UnloadingObjects.Should().HaveCount(20);
         run.Analysis.PotentialUnloadingObjects.Should().HaveCount(63);
     }
@@ -29,7 +31,8 @@ public sealed class AutoFailServiceTests
     public async Task ApplyFixAsync_WithProposedFix_SavesThroughBackupGateway()
     {
         // Arrange
-        RecordingGateway gateway = new(CreateEditor());
+        RecordingBeatmapEditingGateway gateway = new(
+            new BeatmapEditingSession(CreateEditor(), BeatmapEditingSource.Disk, []));
         AutoFailService service = new(gateway);
         var run = await service.AnalyzeAsync(new AutoFailOptions("accepted.osu"));
         AutoFailFixPlan plan = new(
@@ -40,84 +43,16 @@ public sealed class AutoFailServiceTests
         await service.ApplyFixAsync(run, plan);
 
         // Assert
-        gateway.SavedEditor.Should().BeSameAs(gateway.Session.Editor);
+        gateway.SessionSaveRequests.Single().Session.Editor.Should().BeSameAs(gateway.Session!.Editor);
     }
 
     private static BeatmapEditor CreateEditor()
     {
         string path = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-autofail-2b.osu");
-        return new BeatmapEditor(File.ReadAllLines(path).ToList(), new MemoryStore())
+        return new BeatmapEditor(File.ReadAllLines(path).ToList(), new NoOpTextFileStore())
         {
             Path = "accepted.osu",
         };
     }
 
-    private sealed class RecordingGateway : IBeatmapEditingGateway
-    {
-        public RecordingGateway(BeatmapEditor editor)
-        {
-            Session = new BeatmapEditingSession(
-                editor,
-                BeatmapEditingSource.Disk,
-                []);
-        }
-
-        public BeatmapEditingSession Session { get; }
-        public LiveBeatmapPreference? OpenPreference { get; private set; }
-        public Editor? SavedEditor { get; private set; }
-
-        public Task<BeatmapEditingSession> OpenBeatmapAsync(
-            string path,
-            LiveBeatmapPreference livePreference = LiveBeatmapPreference.PreferLive,
-            CancellationToken cancellationToken = default)
-        {
-            OpenPreference = livePreference;
-            return Task.FromResult(Session);
-        }
-
-        public Task<StoryboardEditor> OpenStoryboardAsync(
-            string path,
-            CancellationToken cancellationToken = default)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task SaveAsync(
-            Editor editor,
-            bool reloadEditor = false,
-            CancellationToken cancellationToken = default)
-        {
-            SavedEditor = editor;
-            return Task.CompletedTask;
-        }
-
-        public Task SaveAsync(
-            BeatmapEditingSession session,
-            bool reloadEditor = false,
-            CancellationToken cancellationToken = default)
-        {
-            return SaveAsync(session.Editor, reloadEditor, cancellationToken);
-        }
-    }
-
-    private sealed class MemoryStore : ITextFileStore
-    {
-        public IReadOnlyList<string> ReadAllLines(string path)
-        {
-            throw new NotSupportedException();
-        }
-
-        public void WriteAllLines(string path, IEnumerable<string> lines) { }
-        public void Delete(string path) { }
-
-        public string GetParentFolder(string path)
-        {
-            return string.Empty;
-        }
-
-        public string CombinePath(string parent, string child)
-        {
-            return child;
-        }
-    }
 }

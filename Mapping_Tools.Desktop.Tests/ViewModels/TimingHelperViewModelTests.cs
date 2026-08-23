@@ -49,7 +49,7 @@ public sealed class TimingHelperViewModelTests
         // Arrange
         RecordingTimingHelper service = new();
         RecordingCurrentBeatmapLocator currentBeatmap = new("current.osu");
-        RecordingReloadService reload = new();
+        RecordingEditorReloadService reload = new();
         var viewModel = Create(
             service,
             new TestBeatmapWorkspace(),
@@ -186,14 +186,14 @@ public sealed class TimingHelperViewModelTests
         RecordingTimingHelper? service = null,
         TestBeatmapWorkspace? workspace = null,
         RecordingCurrentBeatmapLocator? currentBeatmap = null,
-        RecordingReloadService? reload = null)
+        RecordingEditorReloadService? reload = null)
     {
         UserNotificationService notifications = new();
         return new TimingHelperViewModel(
             service ?? new RecordingTimingHelper(),
             new ToolExecutionService(
                 notifications,
-                reload ?? new RecordingReloadService(),
+                reload ?? new RecordingEditorReloadService(),
                 new ApplicationSettings(),
                 TimeProvider.System),
             currentBeatmap ?? new RecordingCurrentBeatmapLocator(null),
@@ -220,22 +220,4 @@ public sealed class TimingHelperViewModelTests
         }
     }
 
-    private sealed class RecordingCurrentBeatmapLocator(string? path) : ICurrentBeatmapLocator
-    {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(path);
-        }
-    }
-
-    private sealed class RecordingReloadService : IEditorReloadService
-    {
-        public int ReloadCount { get; private set; }
-
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            ReloadCount++;
-            return Task.CompletedTask;
-        }
-    }
 }

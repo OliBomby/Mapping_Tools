@@ -139,7 +139,7 @@ public sealed class SliderCompletionatorViewModelTests
             service,
             new ToolExecutionService(
                 new UserNotificationService(),
-                new RecordingReloadService(),
+                new RecordingEditorReloadService(),
                 new ApplicationSettings(),
                 TimeProvider.System),
             currentBeatmap ?? new RecordingCurrentBeatmapLocator(null),
@@ -166,19 +166,4 @@ public sealed class SliderCompletionatorViewModelTests
         }
     }
 
-    private sealed class RecordingCurrentBeatmapLocator(string? path) : ICurrentBeatmapLocator
-    {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(path);
-        }
-    }
-
-    private sealed class RecordingReloadService : IEditorReloadService
-    {
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
-    }
 }

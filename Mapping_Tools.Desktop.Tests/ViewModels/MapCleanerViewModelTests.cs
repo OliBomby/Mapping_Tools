@@ -53,7 +53,7 @@ public sealed class MapCleanerViewModelTests
     {
         // Arrange
         RecordingCleaner cleaner = new();
-        RecordingReload reload = new();
+        RecordingEditorReloadService reload = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["map.osu"]);
         var viewModel = Create(
@@ -219,16 +219,16 @@ public sealed class MapCleanerViewModelTests
         RecordingCleaner cleaner,
         TestBeatmapWorkspace? workspace = null,
         string? currentPath = null,
-        RecordingReload? reload = null,
+        RecordingEditorReloadService? reload = null,
         bool autoReload = false)
     {
         UserNotificationService notifications = new();
         ApplicationSettings settings = new() { AutoReload = autoReload };
         return new MapCleanerViewModel(
             cleaner,
-            new ToolExecutionService(notifications, reload ?? new RecordingReload(), settings, TimeProvider.System),
+            new ToolExecutionService(notifications, reload ?? new RecordingEditorReloadService(), settings, TimeProvider.System),
             workspace ?? new TestBeatmapWorkspace(),
-            new StubLocator(currentPath),
+            new RecordingCurrentBeatmapLocator(currentPath),
             settings,
             new StubLauncher());
     }
@@ -243,25 +243,6 @@ public sealed class MapCleanerViewModelTests
             Paths = paths;
             progress?.Report(100);
             return Task.FromResult(new MapCleanerResult(20, 0, 16, [1000], [2000], [3000], 5000));
-        }
-    }
-
-    private sealed class StubLocator(string? path) : ICurrentBeatmapLocator
-    {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(path);
-        }
-    }
-
-    private sealed class RecordingReload : IEditorReloadService
-    {
-        public int ReloadCount { get; private set; }
-
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            ReloadCount++;
-            return Task.CompletedTask;
         }
     }
 

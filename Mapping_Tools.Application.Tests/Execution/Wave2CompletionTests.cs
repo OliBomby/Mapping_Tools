@@ -5,6 +5,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -29,18 +30,18 @@ public sealed class Wave2CompletionTests
         };
         var store = CreateStore();
         RecordingBackupService backups = new(store);
-        NullLiveReader liveReader = new();
+        RecordingLiveBeatmapReader liveReader = new((LiveBeatmapSnapshot?)null);
         BeatmapEditingGateway gateway = new(
             store,
             backups,
             liveReader,
-            new NullReloadService(),
+            new RecordingEditorReloadService(),
             settings);
         BeatmapWorkspace workspace = new(
             settings,
             new UnusedFilePicker(),
             new ExistingMapFileSystem(),
-            new FixedCurrentBeatmapLocator(),
+            new RecordingCurrentBeatmapLocator(map_path),
             TimeProvider.System);
         var selection =
             await workspace.SelectCurrentBeatmapAsync();
@@ -49,7 +50,7 @@ public sealed class Wave2CompletionTests
         notifications.Published += (_, args) => published.Add(args.Notification);
         ToolExecutionService execution = new(
             notifications,
-            new NullReloadService(),
+            new RecordingEditorReloadService(),
             settings,
             TimeProvider.System);
         ToolExecutionResult<string>? toolResult = null;
@@ -109,60 +110,21 @@ public sealed class Wave2CompletionTests
         published[0].Severity.Should().Be(UserNotificationSeverity.Success);
     }
 
-    private static MemoryTextFileStore CreateStore()
+    private static RecordingTextFileStore CreateStore()
     {
         string fixture = Path.Combine(
             AppContext.BaseDirectory,
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        return new MemoryTextFileStore(map_path, File.ReadAllLines(fixture));
-    }
-
-    private sealed class MemoryTextFileStore : ITextFileStore
-    {
-        public MemoryTextFileStore(string path, IEnumerable<string> lines)
-        {
-            Files[path] = lines.ToList();
-        }
-
-        public Dictionary<string, List<string>> Files { get; } =
-            new(StringComparer.Ordinal);
-
-        public int WriteCount { get; private set; }
-
-        public IReadOnlyList<string> ReadAllLines(string path)
-        {
-            return Files[path].ToList();
-        }
-
-        public void WriteAllLines(string path, IEnumerable<string> lines)
-        {
-            WriteCount++;
-            Files[path] = lines.ToList();
-        }
-
-        public void Delete(string path)
-        {
-            Files.Remove(path);
-        }
-
-        public string GetParentFolder(string path)
-        {
-            return Path.GetDirectoryName(path)!;
-        }
-
-        public string CombinePath(string parent, string child)
-        {
-            return Path.Combine(parent, child);
-        }
+        return new RecordingTextFileStore(map_path, File.ReadAllLines(fixture));
     }
 
     private sealed class RecordingBackupService : IBeatmapBackupService
     {
-        private readonly MemoryTextFileStore store;
+        private readonly RecordingTextFileStore store;
 
-        public RecordingBackupService(MemoryTextFileStore store)
+        public RecordingBackupService(RecordingTextFileStore store)
         {
             this.store = store;
         }
@@ -223,35 +185,6 @@ public sealed class Wave2CompletionTests
             CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
-        }
-    }
-
-    private sealed class NullLiveReader : ILiveBeatmapReader
-    {
-        public Task<LiveBeatmapSnapshot?> ReadAsync(
-            CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult<LiveBeatmapSnapshot?>(null);
-        }
-    }
-
-    private sealed class NullReloadService : IEditorReloadService
-    {
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            return Task.CompletedTask;
-        }
-    }
-
-    private sealed class FixedCurrentBeatmapLocator : ICurrentBeatmapLocator
-    {
-        public Task<string?> FindCurrentBeatmapAsync(
-            CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult<string?>(map_path);
         }
     }
 

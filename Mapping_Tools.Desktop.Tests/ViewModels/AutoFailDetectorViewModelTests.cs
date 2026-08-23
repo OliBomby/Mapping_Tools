@@ -95,14 +95,14 @@ public sealed class AutoFailDetectorViewModelTests
         UserNotificationService notifications = new();
         ToolExecutionService execution = new(
             notifications,
-            new StubReloadService(),
+            new RecordingEditorReloadService(),
             new ApplicationSettings(),
             TimeProvider.System);
         return new AutoFailDetectorViewModel(
             service,
             execution,
             workspace ?? new TestBeatmapWorkspace(),
-            new StubCurrentBeatmapLocator(currentPath),
+            new RecordingCurrentBeatmapLocator(currentPath),
             new ApplicationSettings(),
             new TestDialogService(),
             new StubLauncher());
@@ -139,22 +139,6 @@ public sealed class AutoFailDetectorViewModelTests
             AutoFailRun run,
             AutoFailFixPlan plan,
             CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
-    }
-
-    private sealed class StubCurrentBeatmapLocator(string? path) : ICurrentBeatmapLocator
-    {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(path);
-        }
-    }
-
-    private sealed class StubReloadService : IEditorReloadService
-    {
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

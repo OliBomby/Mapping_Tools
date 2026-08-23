@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Workspace;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -182,7 +183,7 @@ public sealed class BeatmapWorkspaceTests
     {
         // Arrange
         FakeBeatmapFileSystem fileSystem = new();
-        FakeCurrentBeatmapLocator locator = new();
+        RecordingCurrentBeatmapLocator locator = new();
         var workspace = CreateWorkspace(
             new ApplicationSettings(),
             fileSystem: fileSystem,
@@ -228,13 +229,13 @@ public sealed class BeatmapWorkspaceTests
         ApplicationSettings settings,
         FakeFilePicker? picker = null,
         FakeBeatmapFileSystem? fileSystem = null,
-        FakeCurrentBeatmapLocator? locator = null)
+        RecordingCurrentBeatmapLocator? locator = null)
     {
         return new BeatmapWorkspace(
             settings,
             picker ?? new FakeFilePicker(),
             fileSystem ?? new FakeBeatmapFileSystem(),
-            locator ?? new FakeCurrentBeatmapLocator(),
+            locator ?? new RecordingCurrentBeatmapLocator(),
             new FixedTimeProvider(fixedNow));
     }
 
@@ -261,18 +262,6 @@ public sealed class BeatmapWorkspaceTests
         {
             int separator = filePath.LastIndexOf('\\');
             return separator < 0 ? null : filePath[..separator];
-        }
-    }
-
-    private sealed class FakeCurrentBeatmapLocator : ICurrentBeatmapLocator
-    {
-        public string? Path { get; set; }
-
-        public Task<string?> FindCurrentBeatmapAsync(
-            CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(Path);
         }
     }
 

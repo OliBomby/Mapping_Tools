@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.TimingCopier;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Core.Tools.TimingCopier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -18,7 +19,7 @@ public sealed class TimingCopierServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        RecordingGateway gateway = new(fixture);
+        RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         TimingCopierService service = new(gateway);
         TimingCopierOptions options = new()
         {
@@ -33,9 +34,12 @@ public sealed class TimingCopierServiceTests
 
         // Assert
         result.ProcessedPaths.Should().Equal("first.osu", "second.osu");
-        gateway.OpenedPaths.Should().Equal("source.osu", "first.osu", "second.osu");
-        gateway.OpenPreferences.Should().OnlyContain(preference => preference == LiveBeatmapPreference.PreferLive);
-        gateway.SavedPaths.Should().Equal("first.osu", "second.osu");
+        gateway.OpenRequests.Select(request => request.Path)
+            .Should().Equal("source.osu", "first.osu", "second.osu");
+        gateway.OpenRequests.Select(request => request.Preference)
+            .Should().OnlyContain(preference => preference == LiveBeatmapPreference.PreferLive);
+        gateway.SessionSaveRequests.Select(request => request.Session.Editor.Path)
+            .Should().Equal("first.osu", "second.osu");
         progress.Values.Last().Should().Be(100);
     }
 
@@ -48,7 +52,12 @@ public sealed class TimingCopierServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        RecordingGateway gateway = new(fixture) { FailOnSaveNumber = 2 };
+        RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
+        gateway.SaveSessionAction = (_, _) =>
+        {
+            if (gateway.SessionSaveRequests.Count == 2)
+                throw new IOException("The test target could not be written.");
+        };
         TimingCopierService service = new(gateway);
         TimingCopierOptions options = new()
         {
@@ -62,7 +71,8 @@ public sealed class TimingCopierServiceTests
 
         // Assert
         await act.Should().ThrowAsync<IOException>();
-        gateway.SavedPaths.Should().ContainSingle().Which.Should().Be("first.osu");
+        gateway.CompletedSessionSaveRequests.Select(request => request.Session.Editor.Path)
+            .Should().ContainSingle().Which.Should().Be("first.osu");
     }
 
     [TestMethod]
@@ -74,7 +84,7 @@ public sealed class TimingCopierServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        RecordingGateway gateway = new(fixture);
+        RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         TimingCopierService service = new(gateway);
         TimingCopierOptions options = new()
         {
@@ -88,7 +98,7 @@ public sealed class TimingCopierServiceTests
 
         // Assert
         await act.Should().ThrowAsync<ArgumentException>();
-        gateway.OpenedPaths.Should().BeEmpty();
+        gateway.OpenRequests.Should().BeEmpty();
     }
 
     [TestMethod]
@@ -100,7 +110,7 @@ public sealed class TimingCopierServiceTests
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        RecordingGateway gateway = new(fixture);
+        RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         TimingCopierService service = new(gateway);
         TimingCopierOptions options = new()
         {
@@ -114,70 +124,24 @@ public sealed class TimingCopierServiceTests
 
         // Assert
         await act.Should().ThrowAsync<ArgumentException>();
-        gateway.OpenedPaths.Should().BeEmpty();
+        gateway.OpenRequests.Should().BeEmpty();
     }
 
-    private sealed class RecordingGateway : IBeatmapEditingGateway
+    private static RecordingBeatmapEditingGateway CreateGateway(string fixture)
     {
-        private readonly string fixture;
-        private int saveCount;
-
-        public RecordingGateway(string fixture)
+        return new RecordingBeatmapEditingGateway
         {
-            this.fixture = fixture;
-        }
-
-        public List<string> OpenedPaths { get; } = [];
-
-        public List<LiveBeatmapPreference> OpenPreferences { get; } = [];
-
-        public List<string> SavedPaths { get; } = [];
-
-        public int FailOnSaveNumber { get; init; }
-
-        public Task<BeatmapEditingSession> OpenBeatmapAsync(
-            string path,
-            LiveBeatmapPreference livePreference = LiveBeatmapPreference.PreferLive,
-            CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            OpenedPaths.Add(path);
-            OpenPreferences.Add(livePreference);
-            BeatmapEditor editor = new(
-                File.ReadAllLines(fixture).ToList(),
-                new MemoryStore())
+            OpenBeatmapFactory = (path, _) =>
             {
-                Path = path,
-            };
-            return Task.FromResult(new BeatmapEditingSession(editor, BeatmapEditingSource.Disk, []));
-        }
-
-        public Task<StoryboardEditor> OpenStoryboardAsync(
-            string path,
-            CancellationToken cancellationToken = default)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task SaveAsync(
-            Editor editor,
-            bool reloadEditor = false,
-            CancellationToken cancellationToken = default)
-        {
-            saveCount++;
-            if (saveCount == FailOnSaveNumber) throw new IOException("The test target could not be written.");
-
-            SavedPaths.Add(editor.Path);
-            return Task.CompletedTask;
-        }
-
-        public Task SaveAsync(
-            BeatmapEditingSession session,
-            bool reloadEditor = false,
-            CancellationToken cancellationToken = default)
-        {
-            return SaveAsync(session.Editor, reloadEditor, cancellationToken);
-        }
+                BeatmapEditor editor = new(
+                    File.ReadAllLines(fixture).ToList(),
+                    new NoOpTextFileStore())
+                {
+                    Path = path,
+                };
+                return new BeatmapEditingSession(editor, BeatmapEditingSource.Disk, []);
+            },
+        };
     }
 
     private sealed class RecordingProgress : IProgress<double>
@@ -190,29 +154,4 @@ public sealed class TimingCopierServiceTests
         }
     }
 
-    private sealed class MemoryStore : ITextFileStore
-    {
-        public IReadOnlyList<string> ReadAllLines(string path)
-        {
-            throw new NotSupportedException();
-        }
-
-        public void WriteAllLines(string path, IEnumerable<string> lines)
-        {
-        }
-
-        public void Delete(string path)
-        {
-        }
-
-        public string GetParentFolder(string path)
-        {
-            return string.Empty;
-        }
-
-        public string CombinePath(string parent, string child)
-        {
-            return child;
-        }
-    }
 }

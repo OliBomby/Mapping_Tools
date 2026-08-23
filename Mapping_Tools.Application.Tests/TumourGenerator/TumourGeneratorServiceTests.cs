@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.TumourGenerator;
 using Mapping_Tools.Core.BeatmapHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,7 +14,7 @@ public sealed class TumourGeneratorServiceTests
     public async Task ImportAsync_SelectedModeRequiresLiveEditorAndReturnsSelectedSliders()
     {
         // Arrange
-        FakeEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
         TumourGeneratorService service = new(gateway);
 
         // Act
@@ -23,7 +24,7 @@ public sealed class TumourGeneratorServiceTests
             null);
 
         // Assert
-        gateway.LastPreference.Should().Be(LiveBeatmapPreference.RequireLive);
+        gateway.OpenRequests[^1].Preference.Should().Be(LiveBeatmapPreference.RequireLive);
         result.UsedLiveEditor.Should().BeTrue();
         result.Sliders.Should().ContainSingle(item => item.IsSlider);
     }
@@ -32,7 +33,7 @@ public sealed class TumourGeneratorServiceTests
     public async Task ImportAsync_WhenSelectionContainsNoSliders_ReturnsEmptyState()
     {
         // Arrange
-        FakeEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor, false));
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor, false));
         TumourGeneratorService service = new(gateway);
 
         // Act
@@ -49,7 +50,7 @@ public sealed class TumourGeneratorServiceTests
     public async Task PreviewAsync_CopiesInputAndReportsGeneratedLayerLengths()
     {
         // Arrange
-        TumourGeneratorService service = new(new FakeEditingGateway(CreateSession(BeatmapEditingSource.Disk)));
+        TumourGeneratorService service = new(new RecordingBeatmapEditingGateway(CreateSession(BeatmapEditingSource.Disk)));
         HitObject input = new("0,0,0,2,0,L|256:0,1,256");
         string original = input.Line;
         TumourGeneratorProject project = new();
@@ -69,7 +70,7 @@ public sealed class TumourGeneratorServiceTests
     public async Task RunAsync_WithLiveSessionSavesAndRequestsEditorReloadWithProgress()
     {
         // Arrange
-        FakeEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
         TumourGeneratorService service = new(gateway);
         TumourGeneratorProject project = new();
         project.TumourLayers[0].TumourCount = 1;
@@ -86,7 +87,8 @@ public sealed class TumourGeneratorServiceTests
         result.Paths.Should().Equal("map.osu");
         result.SlidersTumourated.Should().Be(1);
         result.EditorReloaded.Should().BeTrue();
-        gateway.SaveReloadRequests.Should().ContainSingle().Which.Should().BeTrue();
+        gateway.SessionSaveRequests.Select(request => request.ReloadEditor)
+            .Should().ContainSingle().Which.Should().BeTrue();
         progress.Should().Contain(100);
     }
 
@@ -94,7 +96,7 @@ public sealed class TumourGeneratorServiceTests
     public async Task RunAsync_WithDiskSessionSavesWithoutEditorReload()
     {
         // Arrange
-        FakeEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
         TumourGeneratorService service = new(gateway);
 
         // Act
@@ -105,14 +107,15 @@ public sealed class TumourGeneratorServiceTests
 
         // Assert
         result.EditorReloaded.Should().BeFalse();
-        gateway.SaveReloadRequests.Should().ContainSingle().Which.Should().BeFalse();
+        gateway.SessionSaveRequests.Select(request => request.ReloadEditor)
+            .Should().ContainSingle().Which.Should().BeFalse();
     }
 
     [TestMethod]
     public async Task RunAsync_WhenCancelledBeforeOpening_StopsWithoutSaving()
     {
         // Arrange
-        FakeEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
+        RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
         TumourGeneratorService service = new(gateway);
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
@@ -126,14 +129,14 @@ public sealed class TumourGeneratorServiceTests
 
         // Assert
         await act.Should().ThrowAsync<OperationCanceledException>();
-        gateway.SaveReloadRequests.Should().BeEmpty();
+        gateway.SessionSaveRequests.Should().BeEmpty();
     }
 
     [TestMethod]
     public async Task PreviewAsync_WhenCancelled_StopsBeforeGeneration()
     {
         // Arrange
-        TumourGeneratorService service = new(new FakeEditingGateway(CreateSession(BeatmapEditingSource.Disk)));
+        TumourGeneratorService service = new(new RecordingBeatmapEditingGateway(CreateSession(BeatmapEditingSource.Disk)));
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
 
@@ -174,77 +177,10 @@ public sealed class TumourGeneratorServiceTests
             "64,64,0,2,0,L|164:64,1,100",
             "128,128,500,1,0,0:0:0:0:",
         ];
-        BeatmapEditor editor = new(lines, new MemoryTextFileStore());
+        BeatmapEditor editor = new(lines, new NoOpTextFileStore { ReadResult = [] });
         var slider = editor.Beatmap.HitObjects[0];
         IReadOnlyList<HitObject> selected = selectedSlider ? [slider] : [editor.Beatmap.HitObjects[1]];
         return new BeatmapEditingSession(editor, source, selected);
     }
 
-    private sealed class FakeEditingGateway(BeatmapEditingSession session) : IBeatmapEditingGateway
-    {
-        public BeatmapEditingSession Session { get; } = session;
-
-        public LiveBeatmapPreference? LastPreference { get; private set; }
-
-        public List<bool> SaveReloadRequests { get; } = [];
-
-        public Task<BeatmapEditingSession> OpenBeatmapAsync(
-            string path,
-            LiveBeatmapPreference livePreference = LiveBeatmapPreference.PreferLive,
-            CancellationToken cancellationToken = default)
-        {
-            LastPreference = livePreference;
-            return Task.FromResult(Session);
-        }
-
-        public Task<StoryboardEditor> OpenStoryboardAsync(
-            string path,
-            CancellationToken cancellationToken = default)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task SaveAsync(
-            Editor editor,
-            bool reloadEditor = false,
-            CancellationToken cancellationToken = default)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task SaveAsync(
-            BeatmapEditingSession session,
-            bool reloadEditor = false,
-            CancellationToken cancellationToken = default)
-        {
-            SaveReloadRequests.Add(reloadEditor);
-            return Task.CompletedTask;
-        }
-    }
-
-    private sealed class MemoryTextFileStore : ITextFileStore
-    {
-        public IReadOnlyList<string> ReadAllLines(string path)
-        {
-            return [];
-        }
-
-        public void WriteAllLines(string path, IEnumerable<string> lines)
-        {
-        }
-
-        public void Delete(string path)
-        {
-        }
-
-        public string GetParentFolder(string path)
-        {
-            return string.Empty;
-        }
-
-        public string CombinePath(string parent, string child)
-        {
-            return child;
-        }
-    }
 }

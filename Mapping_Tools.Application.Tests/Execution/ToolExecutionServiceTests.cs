@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Execution;
@@ -15,7 +16,7 @@ public sealed class ToolExecutionServiceTests
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
         notifications.Published += (_, args) => published.Add(args.Notification);
-        RecordingReloadService reload = new();
+        RecordingEditorReloadService reload = new();
         var service = CreateService(
             notifications,
             reload,
@@ -61,7 +62,7 @@ public sealed class ToolExecutionServiceTests
     public async Task ExecuteAsync_WithAutoReloadDisabled_SuppressesRequestedReload()
     {
         // Arrange
-        RecordingReloadService reload = new();
+        RecordingEditorReloadService reload = new();
         var service = CreateService(
             new UserNotificationService(),
             reload,
@@ -93,7 +94,7 @@ public sealed class ToolExecutionServiceTests
         InvalidDataException failure = new("Invalid timing section.");
         var service = CreateService(
             notifications,
-            new RecordingReloadService(),
+            new RecordingEditorReloadService(),
             new ApplicationSettings());
         ToolExecutionRequest<int> request = new(
             "timing",
@@ -314,12 +315,12 @@ public sealed class ToolExecutionServiceTests
 
     private static ToolExecutionService CreateService(
         IUserNotificationService? notifications = null,
-        RecordingReloadService? reload = null,
+        RecordingEditorReloadService? reload = null,
         ApplicationSettings? settings = null)
     {
         return new ToolExecutionService(
             notifications ?? new UserNotificationService(),
-            reload ?? new RecordingReloadService(),
+            reload ?? new RecordingEditorReloadService(),
             settings ?? new ApplicationSettings(),
             TimeProvider.System);
     }
@@ -339,15 +340,4 @@ public sealed class ToolExecutionServiceTests
         }
     }
 
-    private sealed class RecordingReloadService : IEditorReloadService
-    {
-        public int ReloadCount { get; private set; }
-
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ReloadCount++;
-            return Task.CompletedTask;
-        }
-    }
 }

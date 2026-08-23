@@ -115,7 +115,7 @@ public sealed class PropertyTransformerViewModelTests
             service ?? new RecordingPropertyTransformer(),
             new ToolExecutionService(
                 new UserNotificationService(),
-                new StubReloadService(),
+                new RecordingEditorReloadService(),
                 new ApplicationSettings(),
                 TimeProvider.System),
             workspace ?? new TestBeatmapWorkspace());
@@ -140,11 +140,4 @@ public sealed class PropertyTransformerViewModelTests
         }
     }
 
-    private sealed class StubReloadService : IEditorReloadService
-    {
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
-    }
 }

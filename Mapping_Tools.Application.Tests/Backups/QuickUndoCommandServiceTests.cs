@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Workspace;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,7 +18,7 @@ public sealed class QuickUndoCommandServiceTests
         RecordingBackupService backups = new();
         List<UserNotification> notifications = [];
         var service = CreateService(
-            new FixedLocator(null),
+            new RecordingCurrentBeatmapLocator(),
             backups,
             notifications);
 
@@ -37,7 +38,7 @@ public sealed class QuickUndoCommandServiceTests
         RecordingBackupService backups = new();
         List<UserNotification> notifications = [];
         var service = CreateService(
-            new FixedLocator("map.osu"),
+            new RecordingCurrentBeatmapLocator("map.osu"),
             backups,
             notifications,
             true);
@@ -69,7 +70,7 @@ public sealed class QuickUndoCommandServiceTests
         RecordingBackupService backups = new() { Restore = restore };
         List<UserNotification> notifications = [];
         var service = CreateService(
-            new FixedLocator("map.osu"),
+            new RecordingCurrentBeatmapLocator("map.osu"),
             backups,
             notifications);
 
@@ -90,7 +91,7 @@ public sealed class QuickUndoCommandServiceTests
         RecordingBackupService backups = new() { Failure = failure };
         List<UserNotification> notifications = [];
         var service = CreateService(
-            new FixedLocator("map.osu"),
+            new RecordingCurrentBeatmapLocator("map.osu"),
             backups,
             notifications);
 
@@ -117,23 +118,6 @@ public sealed class QuickUndoCommandServiceTests
             backups,
             new ApplicationSettings { AutoReload = autoReload },
             notifications);
-    }
-
-    private sealed class FixedLocator : ICurrentBeatmapLocator
-    {
-        private readonly string? path;
-
-        public FixedLocator(string? path)
-        {
-            this.path = path;
-        }
-
-        public Task<string?> FindCurrentBeatmapAsync(
-            CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(path);
-        }
     }
 
     private sealed class RecordingBackupService : IBeatmapBackupService

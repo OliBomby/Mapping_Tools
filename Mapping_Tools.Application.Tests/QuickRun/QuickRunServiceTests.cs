@@ -2,6 +2,7 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Infrastructure.Platform;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -76,7 +77,7 @@ public sealed class QuickRunServiceTests
         };
         var service = CreateService(
             registry,
-            new FakeLiveReader(Snapshot(selectedCount)),
+            new RecordingLiveBeatmapReader(Snapshot(selectedCount)),
             settings);
 
         // Act
@@ -105,7 +106,7 @@ public sealed class QuickRunServiceTests
                     return Task.CompletedTask;
                 }));
         registry.SelectCurrent("current");
-        FakeLiveReader reader = new(
+        RecordingLiveBeatmapReader reader = new(
             new InvalidOperationException("Reader should not run."));
         var service = CreateService(
             registry,
@@ -140,7 +141,7 @@ public sealed class QuickRunServiceTests
         registry.SelectCurrent("active");
         var service = CreateService(
             registry,
-            new FakeLiveReader(Snapshot(3)),
+            new RecordingLiveBeatmapReader(Snapshot(3)),
             new ApplicationSettings
             {
                 SmartQuickRunEnabled = true,
@@ -167,7 +168,7 @@ public sealed class QuickRunServiceTests
         QuickRunCommandRegistry registry = new();
         var unavailable = CreateService(
             registry,
-            new FakeLiveReader((LiveBeatmapSnapshot?)null),
+            new RecordingLiveBeatmapReader((LiveBeatmapSnapshot?)null),
             new ApplicationSettings(),
             notificationService);
 
@@ -178,7 +179,7 @@ public sealed class QuickRunServiceTests
         unavailableResult.Status.Should().Be(QuickRunStatus.EditorUnavailable);
         var stale = CreateService(
             registry,
-            new FakeLiveReader(Snapshot(1)),
+            new RecordingLiveBeatmapReader(Snapshot(1)),
             new ApplicationSettings
             {
                 SingleQuickRunTool = "Removed Tool",
@@ -203,7 +204,7 @@ public sealed class QuickRunServiceTests
         InvalidDataException readerFailure = new("Editor state is corrupt.");
         var readerService = CreateService(
             new QuickRunCommandRegistry(),
-            new FakeLiveReader(readerFailure),
+            new RecordingLiveBeatmapReader(readerFailure),
             new ApplicationSettings(),
             notificationService);
 
@@ -225,7 +226,7 @@ public sealed class QuickRunServiceTests
         registry.SelectCurrent("tool");
         var commandService = CreateService(
             registry,
-            new FakeLiveReader((LiveBeatmapSnapshot?)null),
+            new RecordingLiveBeatmapReader((LiveBeatmapSnapshot?)null),
             new ApplicationSettings { SmartQuickRunEnabled = false },
             notificationService);
 
@@ -245,7 +246,7 @@ public sealed class QuickRunServiceTests
         source.Cancel();
         var service = CreateService(
             new QuickRunCommandRegistry(),
-            new FakeLiveReader(Snapshot(0)),
+            new RecordingLiveBeatmapReader(Snapshot(0)),
             new ApplicationSettings());
 
         // Act
@@ -337,31 +338,4 @@ public sealed class QuickRunServiceTests
             selectedHitObjects: hitObjects.Take(selectedCount).ToArray());
     }
 
-    private sealed class FakeLiveReader : ILiveBeatmapReader
-    {
-        private readonly Exception? failure;
-        private readonly LiveBeatmapSnapshot? snapshot;
-
-        public FakeLiveReader(LiveBeatmapSnapshot? snapshot)
-        {
-            this.snapshot = snapshot;
-        }
-
-        public FakeLiveReader(Exception failure)
-        {
-            this.failure = failure;
-        }
-
-        public int ReadCount { get; private set; }
-
-        public Task<LiveBeatmapSnapshot?> ReadAsync(
-            CancellationToken cancellationToken = default)
-        {
-            ReadCount++;
-            cancellationToken.ThrowIfCancellationRequested();
-            return failure is null
-                ? Task.FromResult(snapshot)
-                : Task.FromException<LiveBeatmapSnapshot?>(failure);
-        }
-    }
 }

@@ -90,11 +90,11 @@ public sealed class TimingCopierViewModelTests
             service ?? new RecordingTimingCopier(),
             new ToolExecutionService(
                 new UserNotificationService(),
-                new StubReloadService(),
+                new RecordingEditorReloadService(),
                 new ApplicationSettings(),
                 TimeProvider.System),
             filePicker ?? new TestFilePicker(),
-            new StubCurrentBeatmapLocator(),
+            new RecordingCurrentBeatmapLocator(),
             new UserNotificationService(),
             new TestBeatmapWorkspace(),
             new ApplicationSettings());
@@ -117,20 +117,4 @@ public sealed class TimingCopierViewModelTests
         }
     }
 
-    private sealed class StubCurrentBeatmapLocator : ICurrentBeatmapLocator
-    {
-        public Task<string?> FindCurrentBeatmapAsync(
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<string?>(null);
-        }
-    }
-
-    private sealed class StubReloadService : IEditorReloadService
-    {
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
-    }
 }

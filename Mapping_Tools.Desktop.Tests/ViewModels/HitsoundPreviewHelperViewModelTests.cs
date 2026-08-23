@@ -65,7 +65,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
     {
         // Arrange
         RecordingPreviewService preview = new();
-        RecordingReloadService reload = new();
+        RecordingEditorReloadService reload = new();
         var viewModel = CreateViewModel(
             preview,
             reloadService: reload);
@@ -117,12 +117,12 @@ public sealed class HitsoundPreviewHelperViewModelTests
         RecordingPreviewService? preview = null,
         TestBeatmapWorkspace? workspace = null,
         RecordingRhythmGuideWindowService? windowService = null,
-        RecordingReloadService? reloadService = null)
+        RecordingEditorReloadService? reloadService = null)
     {
         UserNotificationService notifications = new();
         ToolExecutionService execution = new(
             notifications,
-            reloadService ?? new RecordingReloadService(),
+            reloadService ?? new RecordingEditorReloadService(),
             new ApplicationSettings(),
             TimeProvider.System);
         var windows = windowService ?? new RecordingRhythmGuideWindowService();
@@ -130,14 +130,14 @@ public sealed class HitsoundPreviewHelperViewModelTests
             new StubRhythmGuideService(),
             execution,
             new TestFilePicker(),
-            new StubCurrentBeatmapLocator("current.osu"),
+            new RecordingCurrentBeatmapLocator("current.osu"),
             windows,
             new TestApplicationDirectories());
         return new HitsoundPreviewHelperViewModel(
             preview ?? new RecordingPreviewService(),
             execution,
             workspace ?? new TestBeatmapWorkspace(),
-            new StubCurrentBeatmapLocator("current.osu"),
+            new RecordingCurrentBeatmapLocator("current.osu"),
             new ApplicationSettings(),
             notifications,
             windows,
@@ -172,26 +172,6 @@ public sealed class HitsoundPreviewHelperViewModelTests
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult(Positions);
-        }
-    }
-
-    private sealed class StubCurrentBeatmapLocator(string? path) : ICurrentBeatmapLocator
-    {
-        public Task<string?> FindCurrentBeatmapAsync(
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(path);
-        }
-    }
-
-    private sealed class RecordingReloadService : IEditorReloadService
-    {
-        public int ReloadCount { get; private set; }
-
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            ReloadCount++;
-            return Task.CompletedTask;
         }
     }
 

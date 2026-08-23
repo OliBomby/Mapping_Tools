@@ -78,14 +78,14 @@ public sealed class MetadataManagerViewModelTests
         UserNotificationService notifications = new();
         ToolExecutionService execution = new(
             notifications,
-            new StubReloadService(),
+            new RecordingEditorReloadService(),
             new ApplicationSettings(),
             TimeProvider.System);
         return new MetadataManagerViewModel(
             metadataManager ?? new RecordingMetadataManagerService(),
             execution,
             filePicker ?? new TestFilePicker(),
-            new StubCurrentBeatmapLocator(),
+            new RecordingCurrentBeatmapLocator(),
             notifications,
             new TestApplicationDirectories());
     }
@@ -118,20 +118,4 @@ public sealed class MetadataManagerViewModelTests
         }
     }
 
-    private sealed class StubCurrentBeatmapLocator : ICurrentBeatmapLocator
-    {
-        public Task<string?> FindCurrentBeatmapAsync(
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<string?>(null);
-        }
-    }
-
-    private sealed class StubReloadService : IEditorReloadService
-    {
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
-    }
 }

@@ -62,7 +62,7 @@ public sealed class SliderMergerViewModelTests
     {
         // Arrange
         RecordingMerger service = new();
-        RecordingReloadService reload = new();
+        RecordingEditorReloadService reload = new();
         ApplicationSettings settings = new() { AutoReload = true };
         var viewModel = Create(
             service,
@@ -116,14 +116,14 @@ public sealed class SliderMergerViewModelTests
         TestBeatmapWorkspace? workspace = null,
         RecordingCurrentBeatmapLocator? currentBeatmap = null,
         ApplicationSettings? settings = null,
-        RecordingReloadService? reload = null)
+        RecordingEditorReloadService? reload = null)
     {
         var effectiveSettings = settings ?? new ApplicationSettings();
         return new SliderMergerViewModel(
             service,
             new ToolExecutionService(
                 new UserNotificationService(),
-                reload ?? new RecordingReloadService(),
+                reload ?? new RecordingEditorReloadService(),
                 effectiveSettings,
                 TimeProvider.System),
             currentBeatmap ?? new RecordingCurrentBeatmapLocator(null),
@@ -150,22 +150,4 @@ public sealed class SliderMergerViewModelTests
         }
     }
 
-    private sealed class RecordingCurrentBeatmapLocator(string? path) : ICurrentBeatmapLocator
-    {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(path);
-        }
-    }
-
-    private sealed class RecordingReloadService : IEditorReloadService
-    {
-        public int ReloadCount { get; private set; }
-
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            ReloadCount++;
-            return Task.CompletedTask;
-        }
-    }
 }

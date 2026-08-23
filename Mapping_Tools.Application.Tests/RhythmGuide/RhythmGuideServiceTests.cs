@@ -16,11 +16,12 @@ public sealed class RhythmGuideServiceTests
     public async Task GenerateAsync_AddToMap_OpensLiveAwareSourcesAndSavesActualTarget()
     {
         // Arrange
-        MemoryTextFileStore files = new();
-        RecordingEditingGateway gateway = new(files);
+        RecordingTextFileStore files = new();
+        Dictionary<string, BeatmapEditingSession> sessions = [];
+        RecordingBeatmapEditingGateway gateway = CreateGateway(sessions);
         TestBeatmapBackupService backups = new();
-        gateway.Add("source.osu", CreateEditor("source.osu", files, true));
-        gateway.Add("target.osu", CreateEditor("target.osu", files, false));
+        sessions["source.osu"] = CreateSession(CreateEditor("source.osu", files, true));
+        sessions["target.osu"] = CreateSession(CreateEditor("target.osu", files, false));
         RhythmGuideService service = new(gateway, backups, new StubBeatmapFileSystem(), files);
         RhythmGuideOptions options = new()
         {
@@ -38,7 +39,8 @@ public sealed class RhythmGuideServiceTests
         gateway.OpenRequests.Should().Equal(
             ("source.osu", LiveBeatmapPreference.PreferLive),
             ("target.osu", LiveBeatmapPreference.PreferLive));
-        gateway.SavedEditor.Should().BeSameAs(gateway.Sessions["target.osu"].Editor);
+        gateway.SessionSaveRequests.Single().Session.Editor
+            .Should().BeSameAs(sessions["target.osu"].Editor);
         backups.CreateRequests.Should().ContainSingle();
         backups.CreateRequests[0].Paths.Should().Equal("source.osu");
         backups.CreateRequests[0].Reason.Should().Be(BeatmapBackupReason.Automatic);
@@ -49,9 +51,10 @@ public sealed class RhythmGuideServiceTests
     public async Task GenerateAsync_NewMapWithoutExistingDestination_WritesWithoutBackupGateway()
     {
         // Arrange
-        MemoryTextFileStore files = new();
-        RecordingEditingGateway gateway = new(files);
-        gateway.Add("source.osu", CreateEditor("source.osu", files, true));
+        RecordingTextFileStore files = new();
+        Dictionary<string, BeatmapEditingSession> sessions = [];
+        RecordingBeatmapEditingGateway gateway = CreateGateway(sessions);
+        sessions["source.osu"] = CreateSession(CreateEditor("source.osu", files, true));
         RhythmGuideService service = new(
             gateway,
             new TestBeatmapBackupService(),
@@ -70,17 +73,18 @@ public sealed class RhythmGuideServiceTests
 
         // Assert
         result.AddedObjectCount.Should().Be(1);
-        gateway.SavedEditor.Should().BeNull();
-        files.Writes.Should().ContainKey("new.osu");
+        gateway.SessionSaveRequests.Should().BeEmpty();
+        files.Files.Should().ContainKey("new.osu");
     }
 
     [TestMethod]
     public async Task GenerateAsync_NewMapOverExistingDestination_SavesThroughBackupGateway()
     {
         // Arrange
-        MemoryTextFileStore files = new();
-        RecordingEditingGateway gateway = new(files);
-        gateway.Add("source.osu", CreateEditor("source.osu", files, true));
+        RecordingTextFileStore files = new();
+        Dictionary<string, BeatmapEditingSession> sessions = [];
+        RecordingBeatmapEditingGateway gateway = CreateGateway(sessions);
+        sessions["source.osu"] = CreateSession(CreateEditor("source.osu", files, true));
         RhythmGuideService service = new(
             gateway,
             new TestBeatmapBackupService(),
@@ -98,8 +102,8 @@ public sealed class RhythmGuideServiceTests
         await service.GenerateAsync(options);
 
         // Assert
-        gateway.SavedEditor.Should().NotBeNull();
-        gateway.SavedEditor!.Path.Should().Be("existing.osu");
+        gateway.EditorSaveRequests.Should().ContainSingle();
+        gateway.EditorSaveRequests.Single().Editor.Path.Should().Be("existing.osu");
     }
 
     private static BeatmapEditor CreateEditor(
@@ -132,58 +136,21 @@ public sealed class RhythmGuideServiceTests
         return new BeatmapEditor(lines, files) { Path = path };
     }
 
-    private sealed class RecordingEditingGateway : IBeatmapEditingGateway
+    private static BeatmapEditingSession CreateSession(BeatmapEditor editor)
     {
-        public RecordingEditingGateway(ITextFileStore files)
+        return new BeatmapEditingSession(
+            editor,
+            BeatmapEditingSource.Disk,
+            []);
+    }
+
+    private static RecordingBeatmapEditingGateway CreateGateway(
+        Dictionary<string, BeatmapEditingSession> sessions)
+    {
+        return new RecordingBeatmapEditingGateway
         {
-        }
-
-        public Dictionary<string, BeatmapEditingSession> Sessions { get; } = [];
-
-        public List<(string Path, LiveBeatmapPreference Preference)> OpenRequests { get; } = [];
-
-        public Editor? SavedEditor { get; private set; }
-
-        public Task<BeatmapEditingSession> OpenBeatmapAsync(
-            string path,
-            LiveBeatmapPreference livePreference = LiveBeatmapPreference.PreferLive,
-            CancellationToken cancellationToken = default)
-        {
-            OpenRequests.Add((path, livePreference));
-            return Task.FromResult(Sessions[path]);
-        }
-
-        public Task<StoryboardEditor> OpenStoryboardAsync(
-            string path,
-            CancellationToken cancellationToken = default)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task SaveAsync(
-            Editor editor,
-            bool reloadEditor = false,
-            CancellationToken cancellationToken = default)
-        {
-            SavedEditor = editor;
-            return Task.CompletedTask;
-        }
-
-        public Task SaveAsync(
-            BeatmapEditingSession session,
-            bool reloadEditor = false,
-            CancellationToken cancellationToken = default)
-        {
-            return SaveAsync(session.Editor, reloadEditor, cancellationToken);
-        }
-
-        public void Add(string path, BeatmapEditor editor)
-        {
-            Sessions[path] = new BeatmapEditingSession(
-                editor,
-                BeatmapEditingSource.Disk,
-                []);
-        }
+            OpenBeatmapFactory = (path, _) => sessions[path],
+        };
     }
 
     private sealed class StubBeatmapFileSystem : IBeatmapFileSystem
@@ -201,33 +168,4 @@ public sealed class RhythmGuideServiceTests
         }
     }
 
-    private sealed class MemoryTextFileStore : ITextFileStore
-    {
-        public Dictionary<string, IReadOnlyList<string>> Writes { get; } = [];
-
-        public IReadOnlyList<string> ReadAllLines(string path)
-        {
-            return Writes[path];
-        }
-
-        public void WriteAllLines(string path, IEnumerable<string> lines)
-        {
-            Writes[path] = lines.ToArray();
-        }
-
-        public void Delete(string path)
-        {
-            Writes.Remove(path);
-        }
-
-        public string GetParentFolder(string path)
-        {
-            return string.Empty;
-        }
-
-        public string CombinePath(string parent, string child)
-        {
-            return child;
-        }
-    }
 }

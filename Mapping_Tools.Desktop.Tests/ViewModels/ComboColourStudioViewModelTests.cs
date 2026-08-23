@@ -44,12 +44,12 @@ public sealed class ComboColourStudioViewModelTests
             new StubComboColourStudioService(),
             new ToolExecutionService(
                 new UserNotificationService(),
-                new StubReloadService(),
+                new RecordingEditorReloadService(),
                 new ApplicationSettings(),
                 TimeProvider.System),
             new TestBeatmapWorkspace(),
-            new StubCurrentBeatmapLocator(),
-            new StubLiveBeatmapReader(),
+            new RecordingCurrentBeatmapLocator(),
+            new RecordingLiveBeatmapReader((LiveBeatmapSnapshot?)null),
             new TestFilePicker());
     }
 
@@ -81,27 +81,4 @@ public sealed class ComboColourStudioViewModelTests
         }
     }
 
-    private sealed class StubCurrentBeatmapLocator : ICurrentBeatmapLocator
-    {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<string?>(null);
-        }
-    }
-
-    private sealed class StubLiveBeatmapReader : ILiveBeatmapReader
-    {
-        public Task<LiveBeatmapSnapshot?> ReadAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<LiveBeatmapSnapshot?>(null);
-        }
-    }
-
-    private sealed class StubReloadService : IEditorReloadService
-    {
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
-    }
 }

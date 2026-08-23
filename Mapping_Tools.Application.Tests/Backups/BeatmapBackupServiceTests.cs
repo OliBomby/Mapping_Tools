@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Core.BeatmapHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -242,7 +243,10 @@ public sealed class BeatmapBackupServiceTests
         int previewIndex = restoredLines.FindIndex(line => line.StartsWith("PreviewTime:", StringComparison.Ordinal));
         restoredLines[previewIndex] = "PreviewTime:9876";
         store.AddFile(backup, restoredLines, now.AddMinutes(-1));
-        RecordingReloadService reload = new(store);
+        RecordingEditorReloadService reload = new()
+        {
+            FileWrittenResolver = () => store.CopyOperations.Count >= 2,
+        };
         var settings = CreateSettings();
         settings.MaxBackupFiles = 1;
         var service = CreateService(
@@ -263,7 +267,7 @@ public sealed class BeatmapBackupServiceTests
         store.CopyOperations[1].Destination.Should().Be(map_path);
         store.Files[map_path].Contains("PreviewTime:9876").Should().BeTrue();
         reload.ReloadCount.Should().Be(1);
-        reload.ReloadFollowedRestore.Should().BeTrue();
+        reload.FileHadBeenWritten.Should().BeTrue();
     }
 
     [TestMethod]
@@ -338,12 +342,15 @@ public sealed class BeatmapBackupServiceTests
     private static BeatmapBackupService CreateService(
         MemoryBackupStore store,
         ApplicationSettings settings,
-        RecordingReloadService? reload = null)
+        RecordingEditorReloadService? reload = null)
     {
         return new BeatmapBackupService(
             store,
             store,
-            reload ?? new RecordingReloadService(store),
+            reload ?? new RecordingEditorReloadService
+            {
+                FileWrittenResolver = () => store.CopyOperations.Count >= 2,
+            },
             settings,
             new FixedTimeProvider(now));
     }
@@ -401,28 +408,6 @@ public sealed class BeatmapBackupServiceTests
         public override DateTimeOffset GetUtcNow()
         {
             return now.ToUniversalTime();
-        }
-    }
-
-    private sealed class RecordingReloadService : IEditorReloadService
-    {
-        private readonly MemoryBackupStore store;
-
-        public RecordingReloadService(MemoryBackupStore store)
-        {
-            this.store = store;
-        }
-
-        public int ReloadCount { get; private set; }
-
-        public bool ReloadFollowedRestore { get; private set; }
-
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ReloadCount++;
-            ReloadFollowedRestore = store.CopyOperations.Count >= 2;
-            return Task.CompletedTask;
         }
     }
 

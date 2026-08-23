@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
@@ -43,7 +44,7 @@ public sealed class BeatmapEditingGatewayTests
             2,
             2222,
             [selected]);
-        FakeLiveBeatmapReader reader = new(snapshot);
+        RecordingLiveBeatmapReader reader = new(snapshot);
         var gateway = CreateGateway(store, reader);
 
         // Act
@@ -66,7 +67,7 @@ public sealed class BeatmapEditingGatewayTests
     {
         // Arrange
         var store = CreateStore();
-        FakeLiveBeatmapReader reader = new(
+        RecordingLiveBeatmapReader reader = new(
             new InvalidOperationException("Reader must not be called."));
         var gateway = CreateGateway(store, reader);
 
@@ -96,7 +97,7 @@ public sealed class BeatmapEditingGatewayTests
             1);
         var gateway = CreateGateway(
             store,
-            new FakeLiveBeatmapReader(snapshot));
+            new RecordingLiveBeatmapReader(snapshot));
 
         // Act
         var session = await gateway.OpenBeatmapAsync(map_path);
@@ -115,7 +116,7 @@ public sealed class BeatmapEditingGatewayTests
         InvalidDataException failure = new("corrupt memory");
         var gateway = CreateGateway(
             store,
-            new FakeLiveBeatmapReader(failure));
+            new RecordingLiveBeatmapReader(failure));
 
         var fallback = await gateway.OpenBeatmapAsync(map_path);
         // Act
@@ -135,7 +136,7 @@ public sealed class BeatmapEditingGatewayTests
     {
         // Arrange
         var store = CreateStore();
-        FakeLiveBeatmapReader reader = new((LiveBeatmapSnapshot?)null);
+        RecordingLiveBeatmapReader reader = new((LiveBeatmapSnapshot?)null);
         var gateway = CreateGateway(
             store,
             reader,
@@ -158,11 +159,14 @@ public sealed class BeatmapEditingGatewayTests
     {
         // Arrange
         var store = CreateStore();
-        RecordingReloadService reload = new(store);
+        RecordingEditorReloadService reload = new()
+        {
+            FileWrittenResolver = () => store.WriteCount > 0,
+        };
         RecordingBackupService backup = new(store);
         var gateway = CreateGateway(
             store,
-            new FakeLiveBeatmapReader((LiveBeatmapSnapshot?)null),
+            new RecordingLiveBeatmapReader((LiveBeatmapSnapshot?)null),
             reloadService: reload,
             backupService: backup);
         var session = await gateway.OpenBeatmapAsync(
@@ -187,12 +191,15 @@ public sealed class BeatmapEditingGatewayTests
     {
         // Arrange
         var store = CreateStore();
-        RecordingReloadService reload = new(store);
+        RecordingEditorReloadService reload = new()
+        {
+            FileWrittenResolver = () => store.WriteCount > 0,
+        };
         IOException failure = new("backup volume unavailable");
         RecordingBackupService backup = new(store, failure);
         var gateway = CreateGateway(
             store,
-            new FakeLiveBeatmapReader((LiveBeatmapSnapshot?)null),
+            new RecordingLiveBeatmapReader((LiveBeatmapSnapshot?)null),
             reloadService: reload,
             backupService: backup);
         var session = await gateway.OpenBeatmapAsync(
@@ -215,7 +222,7 @@ public sealed class BeatmapEditingGatewayTests
     {
         // Arrange
         var store = CreateStore();
-        FakeLiveBeatmapReader reader = new((LiveBeatmapSnapshot?)null);
+        RecordingLiveBeatmapReader reader = new((LiveBeatmapSnapshot?)null);
         var gateway = CreateGateway(store, reader);
         using CancellationTokenSource source = new();
         source.Cancel();
@@ -233,28 +240,31 @@ public sealed class BeatmapEditingGatewayTests
     }
 
     private static BeatmapEditingGateway CreateGateway(
-        MemoryTextFileStore store,
-        FakeLiveBeatmapReader reader,
+        RecordingTextFileStore store,
+        RecordingLiveBeatmapReader reader,
         ApplicationSettings? settings = null,
-        RecordingReloadService? reloadService = null,
+        RecordingEditorReloadService? reloadService = null,
         RecordingBackupService? backupService = null)
     {
         return new BeatmapEditingGateway(
             store,
             backupService ?? new RecordingBackupService(store),
             reader,
-            reloadService ?? new RecordingReloadService(store),
+            reloadService ?? new RecordingEditorReloadService
+            {
+                FileWrittenResolver = () => store.WriteCount > 0,
+            },
             settings ?? new ApplicationSettings());
     }
 
-    private static MemoryTextFileStore CreateStore()
+    private static RecordingTextFileStore CreateStore()
     {
         string fixture = Path.Combine(
             AppContext.BaseDirectory,
             "Fixtures",
             "Beatmaps",
             "standard-feature-rich.osu");
-        return new MemoryTextFileStore(
+        return new RecordingTextFileStore(
             map_path,
             File.ReadAllLines(fixture));
     }
@@ -262,10 +272,10 @@ public sealed class BeatmapEditingGatewayTests
     private sealed class RecordingBackupService : IBeatmapBackupService
     {
         private readonly Exception? failure;
-        private readonly MemoryTextFileStore store;
+        private readonly RecordingTextFileStore store;
 
         public RecordingBackupService(
-            MemoryTextFileStore store,
+            RecordingTextFileStore store,
             Exception? failure = null)
         {
             this.store = store;
@@ -345,95 +355,4 @@ public sealed class BeatmapEditingGatewayTests
         }
     }
 
-    private sealed class FakeLiveBeatmapReader : ILiveBeatmapReader
-    {
-        private readonly Exception? failure;
-        private readonly LiveBeatmapSnapshot? snapshot;
-
-        public FakeLiveBeatmapReader(LiveBeatmapSnapshot? snapshot)
-        {
-            this.snapshot = snapshot;
-        }
-
-        public FakeLiveBeatmapReader(Exception failure)
-        {
-            this.failure = failure;
-        }
-
-        public int ReadCount { get; private set; }
-
-        public Task<LiveBeatmapSnapshot?> ReadAsync(
-            CancellationToken cancellationToken = default)
-        {
-            ReadCount++;
-            cancellationToken.ThrowIfCancellationRequested();
-            return failure is null
-                ? Task.FromResult(snapshot)
-                : Task.FromException<LiveBeatmapSnapshot?>(failure);
-        }
-    }
-
-    private sealed class RecordingReloadService : IEditorReloadService
-    {
-        private readonly MemoryTextFileStore store;
-
-        public RecordingReloadService(MemoryTextFileStore store)
-        {
-            this.store = store;
-        }
-
-        public int ReloadCount { get; private set; }
-
-        public bool FileHadBeenWritten { get; private set; }
-
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ReloadCount++;
-            FileHadBeenWritten = store.WriteCount > 0;
-            return Task.CompletedTask;
-        }
-    }
-
-    private sealed class MemoryTextFileStore : ITextFileStore
-    {
-        public MemoryTextFileStore(string path, IEnumerable<string> lines)
-        {
-            Files[path] = lines.ToList();
-        }
-
-        public Dictionary<string, List<string>> Files { get; } =
-            new(StringComparer.Ordinal);
-
-        public int ReadCount { get; private set; }
-
-        public int WriteCount { get; private set; }
-
-        public IReadOnlyList<string> ReadAllLines(string path)
-        {
-            ReadCount++;
-            return Files[path].ToList();
-        }
-
-        public void WriteAllLines(string path, IEnumerable<string> lines)
-        {
-            WriteCount++;
-            Files[path] = lines.ToList();
-        }
-
-        public void Delete(string path)
-        {
-            Files.Remove(path);
-        }
-
-        public string GetParentFolder(string path)
-        {
-            return Path.GetDirectoryName(path)!;
-        }
-
-        public string CombinePath(string parent, string child)
-        {
-            return Path.Combine(parent, child);
-        }
-    }
 }

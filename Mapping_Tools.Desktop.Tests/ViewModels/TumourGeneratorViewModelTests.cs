@@ -22,7 +22,7 @@ public sealed class TumourGeneratorViewModelTests
     {
         // Arrange
         RecordingGenerator service = new();
-        RecordingReload reload = new();
+        RecordingEditorReloadService reload = new();
         var viewModel = Create(
             service,
             new RecordingCurrentBeatmapLocator("current.osu"),
@@ -216,7 +216,7 @@ public sealed class TumourGeneratorViewModelTests
     private static TumourGeneratorViewModel Create(
         RecordingGenerator service,
         RecordingCurrentBeatmapLocator? locator = null,
-        RecordingReload? reload = null,
+        RecordingEditorReloadService? reload = null,
         bool autoReload = false,
         TestDialogService? dialogs = null)
     {
@@ -225,7 +225,7 @@ public sealed class TumourGeneratorViewModelTests
             service,
             new ToolExecutionService(
                 new UserNotificationService(),
-                reload ?? new RecordingReload(),
+                reload ?? new RecordingEditorReloadService(),
                 settings,
                 TimeProvider.System),
             locator ?? new RecordingCurrentBeatmapLocator(null),
@@ -293,22 +293,4 @@ public sealed class TumourGeneratorViewModelTests
         }
     }
 
-    private sealed class RecordingCurrentBeatmapLocator(string? path) : ICurrentBeatmapLocator
-    {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(path);
-        }
-    }
-
-    private sealed class RecordingReload : IEditorReloadService
-    {
-        public int ReloadCount { get; private set; }
-
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            ReloadCount++;
-            return Task.CompletedTask;
-        }
-    }
 }

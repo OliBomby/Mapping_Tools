@@ -73,7 +73,7 @@ public sealed class RhythmGuideViewModelTests
         // Arrange
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
-        RecordingReload reload = new();
+        RecordingEditorReloadService reload = new();
         notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
         var viewModel = CreateViewModel(
             notifications: notifications,
@@ -99,14 +99,14 @@ public sealed class RhythmGuideViewModelTests
         notifications ??= new UserNotificationService();
         ToolExecutionService execution = new(
             notifications,
-            reload ?? new StubReloadService(),
+            reload ?? new RecordingEditorReloadService(),
             new ApplicationSettings(),
             TimeProvider.System);
         return new RhythmGuideViewModel(
             rhythmGuide ?? new RecordingRhythmGuideService(),
             execution,
             filePicker ?? new TestFilePicker(),
-            new StubCurrentBeatmapLocator(),
+            new RecordingCurrentBeatmapLocator(),
             new StubRhythmGuideWindowService(),
             new TestApplicationDirectories());
     }
@@ -129,34 +129,6 @@ public sealed class RhythmGuideViewModelTests
                 options.ExportPath,
                 12,
                 options.ExportMode));
-        }
-    }
-
-    private sealed class StubCurrentBeatmapLocator : ICurrentBeatmapLocator
-    {
-        public Task<string?> FindCurrentBeatmapAsync(
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<string?>(null);
-        }
-    }
-
-    private sealed class StubReloadService : IEditorReloadService
-    {
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
-    }
-
-    private sealed class RecordingReload : IEditorReloadService
-    {
-        public int ReloadCount { get; private set; }
-
-        public Task ReloadAsync(CancellationToken cancellationToken = default)
-        {
-            ReloadCount++;
-            return Task.CompletedTask;
         }
     }
 
