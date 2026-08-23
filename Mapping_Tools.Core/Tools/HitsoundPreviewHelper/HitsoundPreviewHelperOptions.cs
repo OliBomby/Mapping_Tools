@@ -3,7 +3,7 @@ using Mapping_Tools.Core.Classes.HitsoundStuff;
 namespace Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
 
 /// <summary>
-/// Identifies which beatmap objects supply hitsound-preview events.
+///     Identifies which beatmap objects supply hitsound-preview events.
 /// </summary>
 public enum HitsoundPreviewHelperImportMode
 {
@@ -13,15 +13,15 @@ public enum HitsoundPreviewHelperImportMode
     /// <summary>Uses objects covered by editor bookmarks.</summary>
     Bookmarked,
 
-    /// <summary>Uses objects matched by <see cref="HitsoundPreviewHelperOptions.TimeCode"/>.</summary>
+    /// <summary>Uses objects matched by <see cref="HitsoundPreviewHelperOptions.TimeCode" />.</summary>
     Time,
 
     /// <summary>Uses every hit object in each input beatmap.</summary>
-    Everything
+    Everything,
 }
 
 /// <summary>
-/// Stores the framework-independent settings for positional hitsound preview.
+///     Stores the framework-independent settings for positional hitsound preview.
 /// </summary>
 public class HitsoundPreviewHelperOptions
 {
@@ -30,12 +30,12 @@ public class HitsoundPreviewHelperOptions
         HitsoundPreviewHelperImportMode.Everything;
 
     /// <summary>
-    /// Gets or sets the legacy osu! time-code query used by Time mode.
+    ///     Gets or sets the legacy osu! time-code query used by Time mode.
     /// </summary>
     public string TimeCode { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the positional rules applied to each selected timeline event.
+    ///     Gets or sets the positional rules applied to each selected timeline event.
     /// </summary>
     public List<HitsoundZone> Items { get; set; } = [];
 }

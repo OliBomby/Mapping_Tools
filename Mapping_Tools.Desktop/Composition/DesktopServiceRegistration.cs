@@ -6,49 +6,50 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.ComboColourStudio;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.GeometryDashboard;
+using Mapping_Tools.Application.HitsoundCopier;
 using Mapping_Tools.Application.HitsoundPreviewHelper;
 using Mapping_Tools.Application.HitsoundStudio;
-using Mapping_Tools.Application.HitsoundCopier;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.MapCleaner;
-using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.MapsetMerger;
-using Mapping_Tools.Application.PropertyTransformer;
+using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.PatternGallery;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.SliderMerger;
 using Mapping_Tools.Application.SliderPicturator;
-using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Application.TumourGenerator;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Updates;
-using Mapping_Tools.Desktop.Platform;
+using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Core.Tools.HitsoundStudio;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Interactions;
-using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Services;
+using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Updates;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
-using Mapping_Tools.Desktop.Updates;
-using Mapping_Tools.Infrastructure.Backups;
 using Mapping_Tools.Infrastructure.Audio;
-using Mapping_Tools.Infrastructure.Files;
+using Mapping_Tools.Infrastructure.Backups;
 using Mapping_Tools.Infrastructure.Editor;
+using Mapping_Tools.Infrastructure.Files;
+using Mapping_Tools.Infrastructure.Images;
+using Mapping_Tools.Infrastructure.MapsetMerger;
+using Mapping_Tools.Infrastructure.PatternGallery;
 using Mapping_Tools.Infrastructure.Platform;
 using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Settings;
-using Mapping_Tools.Infrastructure.Images;
-using Mapping_Tools.Infrastructure.Workspace;
 using Mapping_Tools.Infrastructure.Updates;
-using Mapping_Tools.Infrastructure.MapsetMerger;
-using Mapping_Tools.Infrastructure.PatternGallery;
+using Mapping_Tools.Infrastructure.Workspace;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop.Composition;
@@ -56,9 +57,9 @@ namespace Mapping_Tools.Desktop.Composition;
 internal static class DesktopServiceRegistration
 {
     /// <summary>
-    /// Registers the Avalonia shell, platform adapters, application paths,
-    /// settings pipeline, and typed project persistence as desktop-lifetime
-    /// singletons.
+    ///     Registers the Avalonia shell, platform adapters, application paths,
+    ///     settings pipeline, and typed project persistence as desktop-lifetime
+    ///     singletons.
     /// </summary>
     /// <param name="services">The collection that owns the desktop composition root.</param>
     /// <returns>The same collection for registration chaining.</returns>
@@ -82,7 +83,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<IDialogService>(provider =>
         {
-            MainWindow window = provider.GetRequiredService<MainWindow>();
+            var window = provider.GetRequiredService<MainWindow>();
             return new AvaloniaDialogService(() => window);
         });
         services.AddSingleton<IPatternGalleryInputDialog>(provider =>
@@ -92,22 +93,21 @@ internal static class DesktopServiceRegistration
                 () => provider.GetRequiredService<MainWindow>(),
                 provider.GetRequiredService<IFilePicker>()));
         services.AddSingleton<IGeometryDashboardDialogService>(provider =>
-            new GeometryDashboardDialogService(
-                () => provider.GetRequiredService<MainWindow>()));
+            new GeometryDashboardDialogService(() => provider.GetRequiredService<MainWindow>()));
 
         services.AddSingleton<IFilePicker>(provider =>
         {
-            MainWindow window = provider.GetRequiredService<MainWindow>();
+            var window = provider.GetRequiredService<MainWindow>();
             return new AvaloniaFilePicker(() => window.StorageProvider);
         });
         services.AddSingleton<IClipboardService>(provider =>
         {
-            MainWindow window = provider.GetRequiredService<MainWindow>();
+            var window = provider.GetRequiredService<MainWindow>();
             return new AvaloniaClipboardService(() => window.Clipboard);
         });
         services.AddSingleton<IPlatformLauncher>(provider =>
         {
-            MainWindow window = provider.GetRequiredService<MainWindow>();
+            var window = provider.GetRequiredService<MainWindow>();
             return new AvaloniaPlatformLauncher(() => window.Launcher);
         });
         services.AddSingleton<IFileRevealService, WindowsFileRevealService>();
@@ -165,7 +165,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IBetterSaveService, BetterSaveService>();
         services.AddSingleton<IRhythmGuideService, RhythmGuideService>();
         services.AddSingleton<IHitsoundPreviewHelperService, HitsoundPreviewHelperService>();
-        services.AddSingleton<Mapping_Tools.Core.Tools.HitsoundStudio.HitsoundStudioEngine>();
+        services.AddSingleton<HitsoundStudioEngine>();
         services.AddSingleton<IAudioClipMixer, NaudioAudioClipMixer>();
         services.AddSingleton<IHitsoundStudioFileSystem, PhysicalHitsoundStudioFileSystem>();
         services.AddSingleton<IHitsoundStudioService, HitsoundStudioService>();

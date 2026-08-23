@@ -1,5 +1,5 @@
-using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.HitsoundPreviewHelper;
 using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.Settings;
@@ -21,7 +21,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
     public void AddCopyAndRemoveCommands_WithSelectedZones_KeepCollectionStateConsistent()
     {
         // Arrange
-        HitsoundPreviewHelperViewModel viewModel = CreateViewModel();
+        var viewModel = CreateViewModel();
 
         // Act
         viewModel.AddCommand.Execute(null);
@@ -42,9 +42,9 @@ public sealed class HitsoundPreviewHelperViewModelTests
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["first.osu", "second.osu"]);
         RecordingPreviewService preview = new();
-        HitsoundPreviewHelperViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             preview,
-            workspace: workspace);
+            workspace);
         viewModel.AddCommand.Execute(null);
 
         // Act
@@ -66,7 +66,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
         // Arrange
         RecordingPreviewService preview = new();
         RecordingReloadService reload = new();
-        HitsoundPreviewHelperViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             preview,
             reloadService: reload);
         viewModel.AddCommand.Execute(null);
@@ -86,9 +86,9 @@ public sealed class HitsoundPreviewHelperViewModelTests
         // Arrange
         RecordingPreviewService preview = new()
         {
-            Positions = [new Vector2(64, 192), new Vector2(256, 192)]
+            Positions = [new Vector2(64, 192), new Vector2(256, 192)],
         };
-        HitsoundPreviewHelperViewModel viewModel = CreateViewModel(preview);
+        var viewModel = CreateViewModel(preview);
 
         // Act
         await viewModel.AddFromSelectionCommand.ExecuteAsync(null);
@@ -104,7 +104,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
     {
         // Arrange
         RecordingRhythmGuideWindowService windows = new();
-        HitsoundPreviewHelperViewModel viewModel = CreateViewModel(windowService: windows);
+        var viewModel = CreateViewModel(windowService: windows);
 
         // Act
         viewModel.OpenRhythmGuideCommand.Execute(null);
@@ -125,7 +125,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
             reloadService ?? new RecordingReloadService(),
             new ApplicationSettings(),
             TimeProvider.System);
-        RecordingRhythmGuideWindowService windows = windowService ?? new();
+        var windows = windowService ?? new RecordingRhythmGuideWindowService();
         RhythmGuideViewModel rhythmGuide = new(
             new StubRhythmGuideService(),
             execution,
@@ -169,15 +169,19 @@ public sealed class HitsoundPreviewHelperViewModelTests
 
         public Task<IReadOnlyList<Vector2>> GetSelectedZonePositionsAsync(
             string path,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(Positions);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(Positions);
+        }
     }
 
     private sealed class StubCurrentBeatmapLocator(string? path) : ICurrentBeatmapLocator
     {
         public Task<string?> FindCurrentBeatmapAsync(
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(path);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(path);
+        }
     }
 
     private sealed class RecordingReloadService : IEditorReloadService
@@ -195,17 +199,22 @@ public sealed class HitsoundPreviewHelperViewModelTests
     {
         public Task<RhythmGuideResult> GenerateAsync(
             RhythmGuideOptions options,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(new RhythmGuideResult(
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new RhythmGuideResult(
                 options.ExportPath,
                 0,
                 options.ExportMode));
+        }
     }
 
     private sealed class RecordingRhythmGuideWindowService : IRhythmGuideWindowService
     {
         public RhythmGuideViewModel? ViewModel { get; private set; }
 
-        public void Show(RhythmGuideViewModel viewModel) => ViewModel = viewModel;
+        public void Show(RhythmGuideViewModel viewModel)
+        {
+            ViewModel = viewModel;
+        }
     }
 }

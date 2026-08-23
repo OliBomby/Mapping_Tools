@@ -23,21 +23,21 @@ public sealed class QuickRunServiceTests
             QuickRunTargets.AnySelection));
 
         // Act
-        Action act1 = () => registry.Register(
-                Command("current", "Other", QuickRunTargets.Always));
+        var act1 = () => registry.Register(
+            Command("current", "Other", QuickRunTargets.Always));
 
         // Assert
         act1.Should().Throw<InvalidOperationException>();
-        Action act2 = () => registry.Register(
-                Command("other", "Slider", QuickRunTargets.Always));
+        var act2 = () => registry.Register(
+            Command("other", "Slider", QuickRunTargets.Always));
 
         act2.Should().Throw<InvalidOperationException>();
         registry.GetCommandsFor(QuickRunTargets.NoSelection)
             .Select(command => command.Id)
-            .ToArray().Should().Equal(new[] { "current" });
+            .ToArray().Should().Equal("current");
         registry.GetCommandsFor(QuickRunTargets.SingleSelection)
             .Select(command => command.Id)
-            .ToArray().Should().Equal(new[] { "current", "slider" });
+            .ToArray().Should().Equal("current", "slider");
     }
 
     [TestMethod]
@@ -66,26 +66,26 @@ public sealed class QuickRunServiceTests
     {
         // Arrange
         List<string> invoked = [];
-        QuickRunCommandRegistry registry = RegistryWithRoutingCommands(invoked);
+        var registry = RegistryWithRoutingCommands(invoked);
         ApplicationSettings settings = new()
         {
             SmartQuickRunEnabled = true,
             NoneQuickRunTool = "None",
             SingleQuickRunTool = "Single",
-            MultipleQuickRunTool = "Multiple"
+            MultipleQuickRunTool = "Multiple",
         };
-        QuickRunService service = CreateService(
+        var service = CreateService(
             registry,
             new FakeLiveReader(Snapshot(selectedCount)),
             settings);
 
         // Act
-        QuickRunResult result = await service.RunAsync();
+        var result = await service.RunAsync();
 
         // Assert
         result.Status.Should().Be(QuickRunStatus.Executed);
         result.CommandId.Should().Be(expectedId);
-        invoked.Should().Equal(new[] { expectedId });
+        invoked.Should().Equal(expectedId);
     }
 
     [TestMethod]
@@ -107,13 +107,13 @@ public sealed class QuickRunServiceTests
         registry.SelectCurrent("current");
         FakeLiveReader reader = new(
             new InvalidOperationException("Reader should not run."));
-        QuickRunService service = CreateService(
+        var service = CreateService(
             registry,
             reader,
             new ApplicationSettings { SmartQuickRunEnabled = false });
 
         // Act
-        QuickRunResult result = await service.RunAsync();
+        var result = await service.RunAsync();
 
         // Assert
         result.Status.Should().Be(QuickRunStatus.Executed);
@@ -138,17 +138,17 @@ public sealed class QuickRunServiceTests
                     return Task.CompletedTask;
                 }));
         registry.SelectCurrent("active");
-        QuickRunService service = CreateService(
+        var service = CreateService(
             registry,
             new FakeLiveReader(Snapshot(3)),
             new ApplicationSettings
             {
                 SmartQuickRunEnabled = true,
-                MultipleQuickRunTool = "<Current Tool>"
+                MultipleQuickRunTool = "<Current Tool>",
             });
 
         // Act
-        QuickRunResult result = await service.RunAsync();
+        var result = await service.RunAsync();
 
         // Assert
         result.Status.Should().Be(QuickRunStatus.Executed);
@@ -165,32 +165,31 @@ public sealed class QuickRunServiceTests
         notificationService.Published +=
             (_, args) => notifications.Add(args.Notification);
         QuickRunCommandRegistry registry = new();
-        QuickRunService unavailable = CreateService(
+        var unavailable = CreateService(
             registry,
             new FakeLiveReader((LiveBeatmapSnapshot?)null),
             new ApplicationSettings(),
             notificationService);
 
         // Act
-        QuickRunResult unavailableResult = await unavailable.RunAsync();
+        var unavailableResult = await unavailable.RunAsync();
 
         // Assert
         unavailableResult.Status.Should().Be(QuickRunStatus.EditorUnavailable);
-        QuickRunService stale = CreateService(
+        var stale = CreateService(
             registry,
             new FakeLiveReader(Snapshot(1)),
             new ApplicationSettings
             {
-                SingleQuickRunTool = "Removed Tool"
+                SingleQuickRunTool = "Removed Tool",
             },
             notificationService);
 
-        QuickRunResult staleResult = await stale.RunAsync();
+        var staleResult = await stale.RunAsync();
 
         staleResult.Status.Should().Be(QuickRunStatus.CommandNotFound);
         notifications.Count.Should().Be(2);
-        notifications.All(
-            notification => notification.Severity == UserNotificationSeverity.Warning).Should().BeTrue();
+        notifications.All(notification => notification.Severity == UserNotificationSeverity.Warning).Should().BeTrue();
     }
 
     [TestMethod]
@@ -202,14 +201,14 @@ public sealed class QuickRunServiceTests
         notificationService.Published +=
             (_, args) => notifications.Add(args.Notification);
         InvalidDataException readerFailure = new("Editor state is corrupt.");
-        QuickRunService readerService = CreateService(
+        var readerService = CreateService(
             new QuickRunCommandRegistry(),
             new FakeLiveReader(readerFailure),
             new ApplicationSettings(),
             notificationService);
 
         // Act
-        QuickRunResult readerResult = await readerService.RunAsync();
+        var readerResult = await readerService.RunAsync();
 
         // Assert
         readerResult.Status.Should().Be(QuickRunStatus.Failed);
@@ -224,19 +223,18 @@ public sealed class QuickRunServiceTests
                 QuickRunTargets.Always,
                 _ => Task.FromException(commandFailure)));
         registry.SelectCurrent("tool");
-        QuickRunService commandService = CreateService(
+        var commandService = CreateService(
             registry,
             new FakeLiveReader((LiveBeatmapSnapshot?)null),
             new ApplicationSettings { SmartQuickRunEnabled = false },
             notificationService);
 
-        QuickRunResult commandResult = await commandService.RunAsync();
+        var commandResult = await commandService.RunAsync();
 
         commandResult.Status.Should().Be(QuickRunStatus.Failed);
         commandResult.Exception.Should().BeSameAs(commandFailure);
         notifications.Count.Should().Be(2);
-        notifications.All(
-            notification => notification.Severity == UserNotificationSeverity.Error).Should().BeTrue();
+        notifications.All(notification => notification.Severity == UserNotificationSeverity.Error).Should().BeTrue();
     }
 
     [TestMethod]
@@ -245,7 +243,7 @@ public sealed class QuickRunServiceTests
         // Arrange
         using CancellationTokenSource source = new();
         source.Cancel();
-        QuickRunService service = CreateService(
+        var service = CreateService(
             new QuickRunCommandRegistry(),
             new FakeLiveReader(Snapshot(0)),
             new ApplicationSettings());
@@ -277,8 +275,10 @@ public sealed class QuickRunServiceTests
     private static QuickRunCommand Command(
         string id,
         string name,
-        QuickRunTargets targets) =>
-        new(id, name, targets, _ => Task.CompletedTask);
+        QuickRunTargets targets)
+    {
+        return new QuickRunCommand(id, name, targets, _ => Task.CompletedTask);
+    }
 
     private static QuickRunCommandRegistry RegistryWithRoutingCommands(
         ICollection<string> invoked)
@@ -324,10 +324,7 @@ public sealed class QuickRunServiceTests
     private static LiveBeatmapSnapshot Snapshot(int selectedCount)
     {
         List<HitObject> hitObjects = [];
-        for (int index = 0; index < Math.Max(3, selectedCount); index++)
-        {
-            hitObjects.Add(new HitObject());
-        }
+        for (int index = 0; index < Math.Max(3, selectedCount); index++) hitObjects.Add(new HitObject());
 
         return new LiveBeatmapSnapshot(
             @"C:\osu!\Songs\map.osu",
@@ -342,8 +339,8 @@ public sealed class QuickRunServiceTests
 
     private sealed class FakeLiveReader : ILiveBeatmapReader
     {
-        private readonly LiveBeatmapSnapshot? _snapshot;
         private readonly Exception? _failure;
+        private readonly LiveBeatmapSnapshot? _snapshot;
 
         public FakeLiveReader(LiveBeatmapSnapshot? snapshot)
         {

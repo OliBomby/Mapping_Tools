@@ -13,7 +13,7 @@ public sealed class TimelineModelsTests
         TimelineScale scale = new(0, 0);
 
         // Act
-        IReadOnlyList<double> ticks = scale.GetTicks();
+        var ticks = scale.GetTicks();
 
         // Assert
         scale.EndTime.Should().Be(20);
@@ -46,7 +46,7 @@ public sealed class TimelineModelsTests
         TimelineMarker earlier = new(495, TimelineMarkerKind.Added);
 
         // Act
-        TimelineMarker? marker = scale.FindNearest([later, earlier], 50, 100, 2);
+        var marker = scale.FindNearest([later, earlier], 50, 100, 2);
 
         // Assert
         marker.Should().BeSameAs(earlier);
@@ -64,5 +64,4 @@ public sealed class TimelineModelsTests
         // Assert
         value.Should().Be("61:00:005");
     }
-
 }

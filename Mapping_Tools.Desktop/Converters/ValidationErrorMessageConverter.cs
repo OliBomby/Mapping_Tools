@@ -8,7 +8,7 @@ namespace Mapping_Tools.Desktop.Converters;
 public sealed class ValidationErrorMessageConverter : IValueConverter
 {
     /// <summary>
-    /// Gets the Avalonia validation-pipeline adapter that replaces raw exceptions with their concise reason.
+    ///     Gets the Avalonia validation-pipeline adapter that replaces raw exceptions with their concise reason.
     /// </summary>
     public static Func<object, object> ConvertError { get; } = Message;
 
@@ -22,14 +22,10 @@ public sealed class ValidationErrorMessageConverter : IValueConverter
         object? value,
         Type targetType,
         object? parameter,
-        CultureInfo culture) => Message(value);
-
-    private static object Message(object? value) => value switch
-        {
-            BindingNotification { Error: { } error } => Reason(error),
-            Exception exception => Reason(exception),
-            _ => FirstLine(value?.ToString())
-        };
+        CultureInfo culture)
+    {
+        return Message(value);
+    }
 
     /// <summary>Does not support converting display messages back to validation errors.</summary>
     /// <param name="value">The edited display value.</param>
@@ -41,21 +37,33 @@ public sealed class ValidationErrorMessageConverter : IValueConverter
         object? value,
         Type targetType,
         object? parameter,
-        CultureInfo culture) => BindingOperations.DoNothing;
+        CultureInfo culture)
+    {
+        return BindingOperations.DoNothing;
+    }
 
-    private static string FirstLine(string? value) =>
-        value?.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()
-        ?? string.Empty;
+    private static object Message(object? value)
+    {
+        return value switch
+        {
+            BindingNotification { Error: { } error } => Reason(error),
+            Exception exception => Reason(exception),
+            _ => FirstLine(value?.ToString()),
+        };
+    }
+
+    private static string FirstLine(string? value)
+    {
+        return value?.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()
+               ?? string.Empty;
+    }
 
     private static string Reason(Exception exception)
     {
         string message = exception.GetBaseException().Message;
         const string formatMarker = "System.FormatException: ";
         int start = message.IndexOf(formatMarker, StringComparison.Ordinal);
-        if (start < 0)
-        {
-            return FirstLine(message);
-        }
+        if (start < 0) return FirstLine(message);
 
         start += formatMarker.Length;
         int fallback = message.IndexOf(", Fallback:", start, StringComparison.Ordinal);

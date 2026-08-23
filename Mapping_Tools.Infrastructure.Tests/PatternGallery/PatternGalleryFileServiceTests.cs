@@ -1,5 +1,4 @@
 using Mapping_Tools.Application.PatternGallery;
-using Mapping_Tools.Core.Tools.PatternGallery;
 using Mapping_Tools.Infrastructure.PatternGallery;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -13,7 +12,8 @@ public sealed class PatternGalleryFileServiceTests
     {
         // Arrange
         PatternGalleryFileService service = new();
-        PatternGalleryCollectionPaths paths = new("C:\\Collections", "C:\\Collections\\Gallery", "C:\\Collections\\Gallery\\Pattern Files", "C:\\Collections\\Gallery\\project.json");
+        PatternGalleryCollectionPaths paths = new("C:\\Collections", "C:\\Collections\\Gallery", "C:\\Collections\\Gallery\\Pattern Files",
+            "C:\\Collections\\Gallery\\project.json");
 
         // Act
         Action act = () => service.GetPatternPath(paths, "..\\outside.osu");
@@ -37,7 +37,7 @@ public sealed class PatternGalleryFileServiceTests
             File.WriteAllBytes(path, original);
 
             // Act
-            Action act = () => service.WritePatternBytes(path, [4, 5, 6]);
+            var act = () => service.WritePatternBytes(path, [4, 5, 6]);
 
             // Assert
             act.Should().Throw<IOException>();
@@ -45,7 +45,7 @@ public sealed class PatternGalleryFileServiceTests
         }
         finally
         {
-            Directory.Delete(root, recursive: true);
+            Directory.Delete(root, true);
         }
     }
 }

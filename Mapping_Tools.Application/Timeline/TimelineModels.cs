@@ -18,7 +18,7 @@ public enum TimelineMarkerKind
     Removed,
 
     /// <summary>Represents a feature-specific highlighted event.</summary>
-    Accent
+    Accent,
 }
 
 /// <summary>Describes one navigable timestamp without retaining a control or brush.</summary>
@@ -30,10 +30,7 @@ public sealed record TimelineMarker
     /// <param name="label">Optional text shown when the marker is inspected.</param>
     public TimelineMarker(double time, TimelineMarkerKind kind, string? label = null)
     {
-        if (!double.IsFinite(time))
-        {
-            throw new ArgumentOutOfRangeException(nameof(time));
-        }
+        if (!double.IsFinite(time)) throw new ArgumentOutOfRangeException(nameof(time));
         Time = time;
         Kind = kind;
         Label = string.IsNullOrWhiteSpace(label) ? null : label;
@@ -60,14 +57,8 @@ public sealed class TimelineScale
     /// <param name="intervalCount">The number of equal intervals between labels.</param>
     public TimelineScale(double startTime, double endTime, int intervalCount = 10)
     {
-        if (!double.IsFinite(startTime) || !double.IsFinite(endTime))
-        {
-            throw new ArgumentOutOfRangeException(nameof(endTime));
-        }
-        if (intervalCount <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(intervalCount));
-        }
+        if (!double.IsFinite(startTime) || !double.IsFinite(endTime)) throw new ArgumentOutOfRangeException(nameof(endTime));
+        if (intervalCount <= 0) throw new ArgumentOutOfRangeException(nameof(intervalCount));
         StartTime = startTime;
         EndTime = Math.Max(endTime, startTime + MinimumSpan);
         IntervalCount = intervalCount;
@@ -84,24 +75,30 @@ public sealed class TimelineScale
 
     /// <summary>Returns all evenly spaced label timestamps, including both endpoints.</summary>
     /// <returns>The timeline label timestamps in ascending order.</returns>
-    public IReadOnlyList<double> GetTicks() => Enumerable.Range(0, IntervalCount + 1)
-        .Select(index => StartTime + (EndTime - StartTime) * index / IntervalCount)
-        .ToArray();
+    public IReadOnlyList<double> GetTicks()
+    {
+        return Enumerable.Range(0, IntervalCount + 1)
+            .Select(index => StartTime + (EndTime - StartTime) * index / IntervalCount)
+            .ToArray();
+    }
 
     /// <summary>Projects a timestamp into the inclusive zero-to-one viewport range.</summary>
     /// <param name="time">The timestamp to project.</param>
     /// <returns>The clamped relative viewport position.</returns>
-    public double ToUnit(double time) => Math.Clamp(
-        (time - StartTime) / (EndTime - StartTime),
-        0,
-        1);
+    public double ToUnit(double time)
+    {
+        return Math.Clamp(
+            (time - StartTime) / (EndTime - StartTime),
+            0,
+            1);
+    }
 
     /// <summary>Finds the closest marker within a horizontal hit-test tolerance.</summary>
     /// <param name="markers">The candidate markers.</param>
     /// <param name="x">The inspected horizontal coordinate.</param>
     /// <param name="width">The timeline viewport width.</param>
     /// <param name="tolerance">The maximum accepted distance in pixels.</param>
-    /// <returns>The closest qualifying marker, or <see langword="null"/>.</returns>
+    /// <returns>The closest qualifying marker, or <see langword="null" />.</returns>
     public TimelineMarker? FindNearest(
         IEnumerable<TimelineMarker> markers,
         double x,
@@ -109,11 +106,8 @@ public sealed class TimelineScale
         double tolerance)
     {
         ArgumentNullException.ThrowIfNull(markers);
-        if (!double.IsFinite(x) || !double.IsFinite(width) || width <= 0 ||
-            !double.IsFinite(tolerance) || tolerance < 0)
-        {
+        if (!double.IsFinite(x) || !double.IsFinite(width) || width <= 0 || !double.IsFinite(tolerance) || tolerance < 0)
             return null;
-        }
 
         return markers
             .Select(marker => (Marker: marker, Distance: Math.Abs(ToUnit(marker.Time) * width - x)))
@@ -129,7 +123,7 @@ public sealed class TimelineScale
     /// <returns>A non-negative <c>mm:ss</c> label.</returns>
     public static string FormatTick(double milliseconds)
     {
-        TimeSpan value = TimeSpan.FromMilliseconds(Math.Max(0, milliseconds));
+        var value = TimeSpan.FromMilliseconds(Math.Max(0, milliseconds));
         return $"{(int)value.TotalMinutes:00}:{value.Seconds:00}";
     }
 
@@ -138,7 +132,7 @@ public sealed class TimelineScale
     /// <returns>A non-negative <c>mm:ss:fff</c> label.</returns>
     public static string FormatMarker(double milliseconds)
     {
-        TimeSpan value = TimeSpan.FromMilliseconds(Math.Max(0, milliseconds));
+        var value = TimeSpan.FromMilliseconds(Math.Max(0, milliseconds));
         return string.Create(
             CultureInfo.InvariantCulture,
             $"{(int)value.TotalMinutes:00}:{value.Seconds:00}:{value.Milliseconds:000}");

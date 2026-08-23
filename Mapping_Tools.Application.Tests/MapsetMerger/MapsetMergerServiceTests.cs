@@ -1,8 +1,5 @@
-using FluentAssertions;
-using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.MapsetMerger;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.MapsetMerger;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,6 +10,11 @@ namespace Mapping_Tools.Application.Tests.MapsetMerger;
 public sealed class MapsetMergerServiceTests : IDisposable
 {
     private readonly DisposableFixture _fixture = new();
+
+    public void Dispose()
+    {
+        _fixture.Dispose();
+    }
 
     [TestMethod]
     public async Task MergeAsync_WithDuplicateNamesAndReferences_CommitsResolvedExport()
@@ -26,9 +28,9 @@ public sealed class MapsetMergerServiceTests : IDisposable
             ExportPath = exportPath,
             Mapsets =
             [
-                new() { Name = "Pack", Path = first },
-                new() { Name = "Pack", Path = second }
-            ]
+                new MapsetMergerProject.MapsetItem { Name = "Pack", Path = first },
+                new MapsetMergerProject.MapsetItem { Name = "Pack", Path = second },
+            ],
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),
@@ -36,7 +38,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
             new FileSystemFileStore());
 
         // Act
-        MapsetMergerResult result = await service.MergeAsync(project);
+        var result = await service.MergeAsync(project);
 
         // Assert
         result.MapsetsMerged.Should().Be(2);
@@ -63,7 +65,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         MapsetMergerProject project = new()
         {
             ExportPath = exportPath,
-            Mapsets = [new() { Name = "Cancelled", Path = source }]
+            Mapsets = [new MapsetMergerProject.MapsetItem { Name = "Cancelled", Path = source }],
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),
@@ -92,7 +94,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         MapsetMergerProject project = new()
         {
             ExportPath = exportPath,
-            Mapsets = [new() { Name = "Nested", Path = source }]
+            Mapsets = [new MapsetMergerProject.MapsetItem { Name = "Nested", Path = source }],
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),
@@ -127,7 +129,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         MapsetMergerProject project = new()
         {
             ExportPath = exportPath,
-            Mapsets = [new() { Name = "Overlap", Path = source }]
+            Mapsets = [new MapsetMergerProject.MapsetItem { Name = "Overlap", Path = source }],
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),
@@ -153,7 +155,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         {
             ExportPath = exportPath,
             MoveSbToBeatmap = true,
-            Mapsets = [new() { Name = "Embedded", Path = source }]
+            Mapsets = [new MapsetMergerProject.MapsetItem { Name = "Embedded", Path = source }],
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),
@@ -161,7 +163,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
             new FileSystemFileStore());
 
         // Act
-        MapsetMergerResult result = await service.MergeAsync(project);
+        var result = await service.MergeAsync(project);
 
         // Assert
         result.StoryboardsWritten.Should().Be(0);
@@ -171,9 +173,10 @@ public sealed class MapsetMergerServiceTests : IDisposable
     }
 
     [TestCleanup]
-    public void Cleanup() => Dispose();
-
-    public void Dispose() => _fixture.Dispose();
+    public void Cleanup()
+    {
+        Dispose();
+    }
 
     private sealed class FixtureEditingGateway : IBeatmapEditingGateway
     {
@@ -203,14 +206,18 @@ public sealed class MapsetMergerServiceTests : IDisposable
         public Task SaveAsync(
             Editor2 editor,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task SaveAsync(
             BeatmapEditingSession session,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
     }
 
     private sealed class DisposableFixture : IDisposable
@@ -222,6 +229,11 @@ public sealed class MapsetMergerServiceTests : IDisposable
         }
 
         public string Root { get; }
+
+        public void Dispose()
+        {
+            if (Directory.Exists(Root)) Directory.Delete(Root, true);
+        }
 
         public string CreateMapset(string name)
         {
@@ -242,70 +254,68 @@ public sealed class MapsetMergerServiceTests : IDisposable
             return path;
         }
 
-        public void Dispose()
+        private static string CreateBeatmap()
         {
-            if (Directory.Exists(Root))
-            {
-                Directory.Delete(Root, recursive: true);
-            }
+            return """
+                   osu file format v14
+
+                   [General]
+                   AudioFilename: audio.mp3
+                   Mode: 0
+                   StackLeniency: 0.7
+
+                   [Editor]
+
+                   [Metadata]
+                   Title:Test
+                   Artist:Artist
+                   Creator:Mapper
+                   Version:Normal
+                   BeatmapID:1
+                   BeatmapSetID:2
+
+                   [Difficulty]
+                   HPDrainRate:5
+                   CircleSize:4
+                   OverallDifficulty:5
+                   ApproachRate:5
+                   SliderMultiplier:1.4
+                   SliderTickRate:1
+
+                   [Events]
+                   //Background and Video events
+                   0,0,"nested/background.jpg"
+                   //Storyboard Layer 0 (Background)
+                   //Storyboard Layer 1 (Fail)
+                   //Storyboard Layer 2 (Pass)
+                   //Storyboard Layer 3 (Foreground)
+                   //Storyboard Layer 4 (Overlay)
+                   //Storyboard Sound Samples
+
+                   [TimingPoints]
+                   0,500,4,2,1,50,1,0
+
+                   [HitObjects]
+                   64,192,0,1,4,2:0:1:1:
+                   """;
         }
 
-        private static string CreateBeatmap() => """
-            osu file format v14
-
-            [General]
-            AudioFilename: audio.mp3
-            Mode: 0
-            StackLeniency: 0.7
-
-            [Editor]
-
-            [Metadata]
-            Title:Test
-            Artist:Artist
-            Creator:Mapper
-            Version:Normal
-            BeatmapID:1
-            BeatmapSetID:2
-
-            [Difficulty]
-            HPDrainRate:5
-            CircleSize:4
-            OverallDifficulty:5
-            ApproachRate:5
-            SliderMultiplier:1.4
-            SliderTickRate:1
-
-            [Events]
-            //Background and Video events
-            0,0,"nested/background.jpg"
-            //Storyboard Layer 0 (Background)
-            //Storyboard Layer 1 (Fail)
-            //Storyboard Layer 2 (Pass)
-            //Storyboard Layer 3 (Foreground)
-            //Storyboard Layer 4 (Overlay)
-            //Storyboard Sound Samples
-
-            [TimingPoints]
-            0,500,4,2,1,50,1,0
-
-            [HitObjects]
-            64,192,0,1,4,2:0:1:1:
-            """;
-
-        private static string CreateStoryboard() => """
-            [Events]
-            //Background and Video events
-            //Storyboard Layer 0 (Background)
-            Sprite,Background,Centre,"nested/story.png",0,0
-            //Storyboard Layer 1 (Fail)
-            //Storyboard Layer 2 (Pass)
-            //Storyboard Layer 3 (Foreground)
-            //Storyboard Layer 4 (Overlay)
-            //Storyboard Sound Samples
-            Sample,0,Background,"nested/sb.wav",100
-            Video,0,"nested/video.mp4"
-            Animation,Background,Centre,"nested/anim.png",0,0,2,100,LoopForever
-            """;
+        private static string CreateStoryboard()
+        {
+            return """
+                   [Events]
+                   //Background and Video events
+                   //Storyboard Layer 0 (Background)
+                   Sprite,Background,Centre,"nested/story.png",0,0
+                   //Storyboard Layer 1 (Fail)
+                   //Storyboard Layer 2 (Pass)
+                   //Storyboard Layer 3 (Foreground)
+                   //Storyboard Layer 4 (Overlay)
+                   //Storyboard Sound Samples
+                   Sample,0,Background,"nested/sb.wav",100
+                   Video,0,"nested/video.mp4"
+                   Animation,Background,Centre,"nested/anim.png",0,0,2,100,LoopForever
+                   """;
+        }
     }
 }

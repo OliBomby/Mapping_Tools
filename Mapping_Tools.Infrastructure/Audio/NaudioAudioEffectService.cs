@@ -6,7 +6,7 @@ namespace Mapping_Tools.Infrastructure.Audio;
 /// <summary>Adapts the framework-neutral effect engine to the Application audio port.</summary>
 public sealed class NaudioAudioEffectService : IAudioEffectService
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public AudioClip Apply(
         AudioClip source,
         IEnumerable<AudioEffect> effects,

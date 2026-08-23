@@ -4,8 +4,8 @@ using Mapping_Tools.Core.Classes.MathUtil;
 namespace Mapping_Tools.Core.Tools.PatternGallery;
 
 /// <summary>
-/// Serializable Pattern Gallery state, including the legacy option names used
-/// by existing <c>patterngalleryproject.json</c> and collection files.
+///     Serializable Pattern Gallery state, including the legacy option names used
+///     by existing <c>patterngalleryproject.json</c> and collection files.
 /// </summary>
 public sealed class PatternGalleryProject
 {
@@ -77,24 +77,27 @@ public sealed class PatternGalleryProject
 
     /// <summary>Creates the mutable Core placement helper from persisted options.</summary>
     /// <returns>A placement helper containing an independent option snapshot.</returns>
-    public PatternGalleryPlacer CreatePlacer() => new()
+    public PatternGalleryPlacer CreatePlacer()
     {
-        Padding = Padding,
-        PartingDistance = PartingDistance,
-        PatternOverwriteMode = PatternOverwriteMode,
-        TimingOverwriteMode = TimingOverwriteMode,
-        IncludeHitsounds = IncludeHitsounds,
-        IncludeKiai = IncludeKiai,
-        ScaleToNewCircleSize = ScaleToNewCircleSize,
-        ScaleToNewTiming = ScaleToNewTiming,
-        SnapToNewTiming = SnapToNewTiming,
-        BeatDivisors = BeatDivisors?.ToArray() ?? [],
-        FixGlobalSv = FixGlobalSv,
-        FixBpmSv = FixBpmSv,
-        FixColourHax = FixColourHax,
-        FixStackLeniency = FixStackLeniency,
-        FixTickRate = FixTickRate,
-        CustomScale = CustomScale,
-        CustomRotate = MathHelper.DegreesToRadians(CustomRotate)
-    };
+        return new PatternGalleryPlacer
+        {
+            Padding = Padding,
+            PartingDistance = PartingDistance,
+            PatternOverwriteMode = PatternOverwriteMode,
+            TimingOverwriteMode = TimingOverwriteMode,
+            IncludeHitsounds = IncludeHitsounds,
+            IncludeKiai = IncludeKiai,
+            ScaleToNewCircleSize = ScaleToNewCircleSize,
+            ScaleToNewTiming = ScaleToNewTiming,
+            SnapToNewTiming = SnapToNewTiming,
+            BeatDivisors = BeatDivisors?.ToArray() ?? [],
+            FixGlobalSv = FixGlobalSv,
+            FixBpmSv = FixBpmSv,
+            FixColourHax = FixColourHax,
+            FixStackLeniency = FixStackLeniency,
+            FixTickRate = FixTickRate,
+            CustomScale = CustomScale,
+            CustomRotate = MathHelper.DegreesToRadians(CustomRotate),
+        };
+    }
 }

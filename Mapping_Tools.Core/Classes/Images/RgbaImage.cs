@@ -3,12 +3,12 @@ using Mapping_Tools.Core.Classes.BeatmapHelper;
 namespace Mapping_Tools.Core.Classes.Images;
 
 /// <summary>
-/// Stores a tightly packed row-major image without depending on a UI or bitmap library.
+///     Stores a tightly packed row-major image without depending on a UI or bitmap library.
 /// </summary>
 public sealed class RgbaImage
 {
     /// <summary>
-    /// Creates an image from RGBA channel bytes in row-major order.
+    ///     Creates an image from RGBA channel bytes in row-major order.
     /// </summary>
     /// <param name="width">The positive image width in pixels.</param>
     /// <param name="height">The positive image height in pixels.</param>
@@ -56,7 +56,10 @@ public sealed class RgbaImage
 
     /// <summary>Creates an independent copy suitable for background processing.</summary>
     /// <returns>A copy with the same dimensions and pixel values.</returns>
-    public RgbaImage Clone() => new(Width, Height, Pixels);
+    public RgbaImage Clone()
+    {
+        return new RgbaImage(Width, Height, Pixels);
+    }
 
     private int GetOffset(int x, int y)
     {

@@ -10,11 +10,11 @@ namespace Mapping_Tools.Desktop.Hosting;
 internal sealed class PeriodicBackupHostedService : BackgroundService
 {
     private static readonly TimeSpan MinimumInterval = TimeSpan.FromSeconds(1);
-    private readonly ApplicationSettings _settings;
+    private readonly IBeatmapBackupService _backupService;
     private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
     private readonly IBeatmapEditingGateway _editingGateway;
-    private readonly IBeatmapBackupService _backupService;
     private readonly ILogger<PeriodicBackupHostedService> _logger;
+    private readonly ApplicationSettings _settings;
 
     public PeriodicBackupHostedService(
         ApplicationSettings settings,
@@ -25,11 +25,11 @@ internal sealed class PeriodicBackupHostedService : BackgroundService
     {
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _currentBeatmapLocator = currentBeatmapLocator
-            ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+                                 ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         _editingGateway = editingGateway
-            ?? throw new ArgumentNullException(nameof(editingGateway));
+                          ?? throw new ArgumentNullException(nameof(editingGateway));
         _backupService = backupService
-            ?? throw new ArgumentNullException(nameof(backupService));
+                         ?? throw new ArgumentNullException(nameof(backupService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -37,27 +37,21 @@ internal sealed class PeriodicBackupHostedService : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            TimeSpan interval = _settings.PeriodicBackupInterval < MinimumInterval
+            var interval = _settings.PeriodicBackupInterval < MinimumInterval
                 ? MinimumInterval
                 : _settings.PeriodicBackupInterval;
             await Task.Delay(interval, stoppingToken).ConfigureAwait(false);
 
-            if (!_settings.MakePeriodicBackups)
-            {
-                continue;
-            }
+            if (!_settings.MakePeriodicBackups) continue;
 
             try
             {
                 string? path = await _currentBeatmapLocator
                     .FindCurrentBeatmapAsync(stoppingToken)
                     .ConfigureAwait(false);
-                if (string.IsNullOrWhiteSpace(path))
-                {
-                    continue;
-                }
+                if (string.IsNullOrWhiteSpace(path)) continue;
 
-                BeatmapEditingSession session = await _editingGateway
+                var session = await _editingGateway
                     .OpenBeatmapAsync(
                         path,
                         LiveBeatmapPreference.RequireLive,

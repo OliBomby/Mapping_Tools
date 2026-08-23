@@ -3,7 +3,7 @@ using Mapping_Tools.Core.Classes.BeatmapHelper;
 namespace Mapping_Tools.Core.Tools.ComboColourStudio;
 
 /// <summary>
-/// Serializable, framework-neutral Combo Colour Studio state.
+///     Serializable, framework-neutral Combo Colour Studio state.
 /// </summary>
 public sealed class ComboColourProject
 {
@@ -43,36 +43,27 @@ public sealed class ComboColourProject
     public int RemoveSelectedOrLastColourPoints(IEnumerable<ColourPoint> selectedPoints)
     {
         ArgumentNullException.ThrowIfNull(selectedPoints);
-        ColourPoint[] selected = selectedPoints.Where(ColourPoints.Contains).Distinct().ToArray();
+        var selected = selectedPoints.Where(ColourPoints.Contains).Distinct().ToArray();
         if (selected.Length > 0)
         {
-            foreach (ColourPoint point in selected)
-            {
-                ColourPoints.Remove(point);
-            }
+            foreach (var point in selected) ColourPoints.Remove(point);
 
             return selected.Length;
         }
 
-        if (ColourPoints.Count == 0)
-        {
-            return 0;
-        }
+        if (ColourPoints.Count == 0) return 0;
 
         ColourPoints.RemoveAt(ColourPoints.Count - 1);
         return 1;
     }
 
     /// <summary>Adds a named palette colour, copying the previous colour when available.</summary>
-    /// <returns><see langword="true"/> when a colour was added; otherwise the eight-colour limit was reached.</returns>
+    /// <returns><see langword="true" /> when a colour was added; otherwise the eight-colour limit was reached.</returns>
     public bool AddComboColour()
     {
-        if (ComboColours.Count >= 8)
-        {
-            return false;
-        }
+        if (ComboColours.Count >= 8) return false;
 
-        RgbaColour colour = ComboColours.Count == 0
+        var colour = ComboColours.Count == 0
             ? RgbaColour.White
             : ComboColours[^1].Color;
         ComboColours.Add(new SpecialColour(colour, $"Combo{ComboColours.Count + 1}"));
@@ -80,13 +71,10 @@ public sealed class ComboColourProject
     }
 
     /// <summary>Removes the last palette colour, preserving sequence entries for later reattachment.</summary>
-    /// <returns><see langword="true"/> when a colour was removed.</returns>
+    /// <returns><see langword="true" /> when a colour was removed.</returns>
     public bool RemoveLastComboColour()
     {
-        if (ComboColours.Count == 0)
-        {
-            return false;
-        }
+        if (ComboColours.Count == 0) return false;
 
         ComboColours.RemoveAt(ComboColours.Count - 1);
         return true;
@@ -95,15 +83,12 @@ public sealed class ComboColourProject
     /// <summary>Replaces sequence entries with the matching palette object by name.</summary>
     public void MatchComboColourReferences()
     {
-        foreach (ColourPoint point in ColourPoints)
-        {
+        foreach (var point in ColourPoints)
             for (int index = 0; index < point.ColourSequence.Count; index++)
             {
-                SpecialColour current = point.ColourSequence[index];
-                point.ColourSequence[index] = ComboColours.FirstOrDefault(
-                    colour => colour.Name == current.Name) ?? current;
+                var current = point.ColourSequence[index];
+                point.ColourSequence[index] = ComboColours.FirstOrDefault(colour => colour.Name == current.Name) ?? current;
             }
-        }
     }
 
     /// <summary>Creates a deep copy suitable for persistence or background execution.</summary>
@@ -111,15 +96,9 @@ public sealed class ComboColourProject
     public ComboColourProject Copy()
     {
         ComboColourProject copy = new() { MaxBurstLength = MaxBurstLength };
-        foreach (SpecialColour colour in ComboColours)
-        {
-            copy.ComboColours.Add((SpecialColour)colour.Clone());
-        }
+        foreach (var colour in ComboColours) copy.ComboColours.Add((SpecialColour)colour.Clone());
 
-        foreach (ColourPoint point in ColourPoints)
-        {
-            copy.ColourPoints.Add((ColourPoint)point.Clone());
-        }
+        foreach (var point in ColourPoints) copy.ColourPoints.Add((ColourPoint)point.Clone());
 
         copy.MatchComboColourReferences();
         return copy;
@@ -130,47 +109,28 @@ public sealed class ComboColourProject
     public IReadOnlyList<string> ValidateForExport()
     {
         List<string> errors = [];
-        if (MaxBurstLength < 0)
-        {
-            errors.Add("Max burst length cannot be negative.");
-        }
+        if (MaxBurstLength < 0) errors.Add("Max burst length cannot be negative.");
 
-        if (ComboColours.Count == 0)
-        {
-            errors.Add("Add at least one combo colour before running the tool.");
-        }
+        if (ComboColours.Count == 0) errors.Add("Add at least one combo colour before running the tool.");
 
         string?[] names = ComboColours.Select(colour => colour.Name).ToArray();
-        if (names.Any(string.IsNullOrWhiteSpace))
-        {
-            errors.Add("Every combo colour must have a name.");
-        }
+        if (names.Any(string.IsNullOrWhiteSpace)) errors.Add("Every combo colour must have a name.");
 
         if (names.Where(name => !string.IsNullOrWhiteSpace(name))
             .GroupBy(name => name, StringComparer.Ordinal)
             .Any(group => group.Count() > 1))
-        {
             errors.Add("Combo colour names must be unique.");
-        }
 
         HashSet<string?> nameSet = new(names, StringComparer.Ordinal);
-        foreach (ColourPoint point in ColourPoints)
+        foreach (var point in ColourPoints)
         {
-            if (!double.IsFinite(point.Time))
-            {
-                errors.Add("Every colour point offset must be a finite number.");
-            }
+            if (!double.IsFinite(point.Time)) errors.Add("Every colour point offset must be a finite number.");
 
-            foreach (SpecialColour colour in point.ColourSequence)
-            {
+            foreach (var colour in point.ColourSequence)
                 if (!nameSet.Contains(colour.Name))
-                {
                     errors.Add($"Colour point at offset {point.Time} references missing colour '{colour.Name}'.");
-                }
-            }
         }
 
         return errors;
     }
-
 }

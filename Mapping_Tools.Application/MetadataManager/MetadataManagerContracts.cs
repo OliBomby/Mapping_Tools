@@ -3,11 +3,11 @@ using Mapping_Tools.Core.Tools.MetadataManager;
 namespace Mapping_Tools.Application.MetadataManager;
 
 /// <summary>
-/// Represents the complete Metadata Manager project persisted by the shell.
+///     Represents the complete Metadata Manager project persisted by the shell.
 /// </summary>
 /// <remarks>
-/// The direct property layout intentionally matches the legacy
-/// <c>MetadataManagerVm</c> JSON document.
+///     The direct property layout intentionally matches the legacy
+///     <c>MetadataManagerVm</c> JSON document.
 /// </remarks>
 public sealed class MetadataManagerProject : MetadataManagerOptions
 {
@@ -22,12 +22,12 @@ public sealed record MetadataManagerResult(IReadOnlyList<string> ProcessedPaths)
 }
 
 /// <summary>
-/// Imports metadata and applies it to one or more beatmaps through application ports.
+///     Imports metadata and applies it to one or more beatmaps through application ports.
 /// </summary>
 public interface IMetadataManagerService
 {
     /// <summary>
-    /// Reads metadata from a disk beatmap without modifying it.
+    ///     Reads metadata from a disk beatmap without modifying it.
     /// </summary>
     /// <param name="path">The source beatmap path.</param>
     /// <param name="cancellationToken">Cancels before or during the read.</param>
@@ -37,8 +37,8 @@ public interface IMetadataManagerService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Applies the configured state to every target and renames each output from
-    /// its resulting metadata-derived filename.
+    ///     Applies the configured state to every target and renames each output from
+    ///     its resulting metadata-derived filename.
     /// </summary>
     /// <param name="options">The metadata values and vertical-bar-separated targets.</param>
     /// <param name="progress">Receives completion percentages after each target.</param>

@@ -3,6 +3,5 @@
              x:Class="Mapping_Tools.Desktop.Controls.GeometryHotkeyEditor">
     <TextBox x:Name="Editor" IsReadOnly="True" TextAlignment="Center"
              HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-             ContextFlyout="{x:Null}" KeyDown="EditorKeyDown"
-             />
+             ContextFlyout="{x:Null}" KeyDown="EditorKeyDown" />
 </UserControl>

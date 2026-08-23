@@ -9,7 +9,8 @@
             <Setter Property="Margin" Value="0,16,1,1" />
             <Setter Property="RenderTransform" Value="scale(1)" />
         </Style>
-        <Style Selector="^:not(.outline):focus-within:not(:empty) /template/ Border#PART_LabelRootBorder,
+        <Style
+            Selector="^:not(.outline):focus-within:not(:empty) /template/ Border#PART_LabelRootBorder,
                          ^:not(.outline):focus-within /template/ Border#PART_LabelRootBorder,
                          ^:not(.outline):not(:empty) /template/ Border#PART_LabelRootBorder">
             <Setter Property="Margin" Value="0,4,1,1" />
@@ -30,7 +31,8 @@
         <Style Selector="^:disabled">
             <Setter Property="Opacity" Value="0.5" />
         </Style>
-        <Style Selector="^:not(.outline) /template/ DataValidationErrors#PART_DataValidation /template/ ContentControl#PART_ErrorPresenter">
+        <Style
+            Selector="^:not(.outline) /template/ DataValidationErrors#PART_DataValidation /template/ ContentControl#PART_ErrorPresenter">
             <Setter Property="Margin" Value="0,2,0,0" />
         </Style>
         <Style Selector="^.compact">

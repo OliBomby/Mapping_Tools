@@ -4,8 +4,8 @@ using Mapping_Tools.Core.Tools.ComboColourStudio;
 namespace Mapping_Tools.Application.ComboColourStudio;
 
 /// <summary>
-/// Coordinates Combo Colour Studio's framework-neutral engine with beatmap
-/// files, Editor Reader overlays, backups, and save progress.
+///     Coordinates Combo Colour Studio's framework-neutral engine with beatmap
+///     files, Editor Reader overlays, backups, and save progress.
 /// </summary>
 public sealed class ComboColourStudioService : IComboColourStudioService
 {
@@ -18,13 +18,13 @@ public sealed class ComboColourStudioService : IComboColourStudioService
         _editing = editing ?? throw new ArgumentNullException(nameof(editing));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task ImportComboColoursAsync(
         string path,
         ComboColourProject project,
         CancellationToken cancellationToken = default)
     {
-        BeatmapEditingSession session = await _editing.OpenBeatmapAsync(
+        var session = await _editing.OpenBeatmapAsync(
                 path,
                 LiveBeatmapPreference.DiskOnly,
                 cancellationToken)
@@ -32,13 +32,13 @@ public sealed class ComboColourStudioService : IComboColourStudioService
         ComboColourStudioEngine.ImportComboColours(session.Editor.Beatmap, project);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task ImportColourHaxAsync(
         string path,
         ComboColourProject project,
         CancellationToken cancellationToken = default)
     {
-        BeatmapEditingSession session = await _editing.OpenBeatmapAsync(
+        var session = await _editing.OpenBeatmapAsync(
                 path,
                 LiveBeatmapPreference.DiskOnly,
                 cancellationToken)
@@ -46,7 +46,7 @@ public sealed class ComboColourStudioService : IComboColourStudioService
         ComboColourStudioEngine.ImportColourHax(session.Editor.Beatmap, project);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<ComboColourStudioRunResult> ApplyAsync(
         IReadOnlyList<string> paths,
         ComboColourProject project,
@@ -55,29 +55,23 @@ public sealed class ComboColourStudioService : IComboColourStudioService
     {
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(project);
-        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace))
-        {
-            throw new ArgumentException("Select at least one beatmap.", nameof(paths));
-        }
+        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
 
-        IReadOnlyList<string> errors = project.ValidateForExport();
-        if (errors.Count > 0)
-        {
-            throw new ArgumentException(string.Join(" ", errors), nameof(project));
-        }
+        var errors = project.ValidateForExport();
+        if (errors.Count > 0) throw new ArgumentException(string.Join(" ", errors), nameof(project));
 
         int processed = 0;
         foreach (string path in paths)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            BeatmapEditingSession session = await _editing.OpenBeatmapAsync(
+            var session = await _editing.OpenBeatmapAsync(
                     path,
                     LiveBeatmapPreference.PreferLive,
                     cancellationToken)
                 .ConfigureAwait(false);
             ComboColourStudioEngine.Apply(session.Editor.Beatmap, project);
             cancellationToken.ThrowIfCancellationRequested();
-            await _editing.SaveAsync(session, reloadEditor: false, cancellationToken)
+            await _editing.SaveAsync(session, false, cancellationToken)
                 .ConfigureAwait(false);
 
             processed++;

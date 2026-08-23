@@ -3,7 +3,7 @@ using Avalonia.Controls;
 namespace Mapping_Tools.Desktop.Views;
 
 /// <summary>
-/// Displays the release notes, updater decisions, and package progress.
+///     Displays the release notes, updater decisions, and package progress.
 /// </summary>
 public sealed partial class UpdaterWindow : Window
 {

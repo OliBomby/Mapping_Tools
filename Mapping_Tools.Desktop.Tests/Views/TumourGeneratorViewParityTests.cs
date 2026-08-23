@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Views;
@@ -30,12 +29,11 @@ public sealed class TumourGeneratorViewParityTests
             "CircleSizeToThicknessConverter",
             "Thickness=\"{Binding CircleSize",
             "ColumnDefinitions=\"200,Auto,200,Auto,*\"",
-            "SmallChange=\"0.1\""
+            "SmallChange=\"0.1\"",
         ];
 
         // Assert
-        requiredPresentationContracts.Should().OnlyContain(
-            contract => axaml.Contains(contract, StringComparison.Ordinal));
+        requiredPresentationContracts.Should().OnlyContain(contract => axaml.Contains(contract, StringComparison.Ordinal));
         axaml.Should().NotContain("Height=\"200\"", "the WPF layer list fills the available left-panel row");
     }
 }

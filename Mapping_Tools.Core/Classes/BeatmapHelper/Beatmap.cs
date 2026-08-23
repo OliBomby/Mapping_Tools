@@ -5,922 +5,973 @@ using Mapping_Tools.Core.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Classes.SystemTools;
 
-namespace Mapping_Tools.Core.Classes.BeatmapHelper {
+namespace Mapping_Tools.Core.Classes.BeatmapHelper;
+
+/// <summary>
+///     Class containing all the data from a .osu beatmap file. It also supports serialization to .osu format and helper
+///     methods to get data in specific ways.
+/// </summary>
+public class Beatmap : ITextFile
+{
+    /// <summary>
+    ///     Initializes a new Beatmap.
+    /// </summary>
+    public Beatmap()
+    {
+        Initialize();
+    }
 
     /// <summary>
-    /// Class containing all the data from a .osu beatmap file. It also supports serialization to .osu format and helper methods to get data in specific ways.
+    ///     Initializes a beatmap with the provided hit objects and timing points.
     /// </summary>
-    public class Beatmap : ITextFile {
-        /// <summary>
-        /// The file format version of the .osu file. This is typically 14, but could be 128 for Lazer beatmaps.
-        /// </summary>
-        public int Version { get; set; }
+    /// <param name="hitObjects"></param>
+    /// <param name="timingPoints"></param>
+    /// <param name="firstUnInheritedTimingPoint"></param>
+    /// <param name="globalSv"></param>
+    /// <param name="gameMode"></param>
+    public Beatmap(List<HitObject> hitObjects, List<TimingPoint> timingPoints,
+        TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard)
+    {
+        Initialize();
 
-        /// <summary>
-        /// Contains all the values in the [General] section of a .osu file. The key is the variable name and the value is the value.
-        /// This section typically contains:
-        /// AudioFilename,
-        /// AudioLeadIn,
-        /// PreviewTime,
-        /// Countdown,
-        /// SampleSet,
-        /// StackLeniency,
-        /// Mode,
-        /// LetterboxInBreaks,
-        /// StoryFireInFront,
-        /// SkinPreference,
-        /// EpilepsyWarning,
-        /// CountdownOffset,
-        /// SpecialStyle,
-        /// WidescreenStoryboard,
-        /// SamplesMatchPlaybackRate
-        /// </summary>
-        public Dictionary<string, TValue> General { get; set; }
+        // Set the hit objects
+        HitObjects = hitObjects;
 
-        /// <summary>
-        /// Contains all the values in the [Editor] section of a .osu file. The key is the variable name and the value is the value.
-        /// This section typically contains:
-        /// Bookmarks,
-        /// DistanceSpacing,
-        /// BeatDivisor,
-        /// GridSize,
-        /// TimelineZoom
-        /// </summary>
-        public Dictionary<string, TValue> Editor { get; set; }
+        // Set the timing stuff
+        BeatmapTiming.SetTimingPoints(timingPoints);
+        BeatmapTiming.SliderMultiplier = globalSv;
 
-        /// <summary>
-        /// Contains all the values in the [Metadata] section of a .osu file. The key is the variable name and the value is the value.
-        /// This section typically contains:
-        /// Title,
-        /// TitleUnicode,
-        /// Artist,
-        /// ArtistUnicode,
-        /// Creator,
-        /// Version,
-        /// Source,
-        /// Tags,
-        /// BeatmapID,
-        /// BeatmapSetID
-        /// </summary>
-        public Dictionary<string, TValue> Metadata { get; set; }
+        if (!BeatmapTiming.Contains(firstUnInheritedTimingPoint)) BeatmapTiming.Add(firstUnInheritedTimingPoint);
 
-        /// <summary>
-        /// Contains all the values in the [Difficulty] section of a .osu file. The key is the variable name and the value is the value.
-        /// This section typically contains:
-        /// HPDrainRate,
-        /// CircleSize,
-        /// OverallDifficulty,
-        /// ApproachRate,
-        /// SliderMultiplier,
-        /// SliderTickRate
-        /// </summary>
-        public Dictionary<string, TValue> Difficulty { get; set; }
+        // Set the global SV here too because thats absolutely necessary
+        Difficulty["SliderMultiplier"] = new TValue(globalSv.ToInvariant());
+        General["Mode"] = new TValue(((int)gameMode).ToInvariant());
 
-        /// <summary>
-        /// Contains all the basic combo colours. The order of this list is the same as how they are numbered in the .osu.
-        /// There can not be more than 8 combo colours.
-        /// <c>Combo1 : 245,222,139</c>
-        /// </summary>
-        public List<ComboColour> ComboColours { get; set; }
+        SortHitObjects();
+        CalculateSliderEndTimes();
+        GiveObjectsGreenlines();
+        CalculateHitObjectComboStuff();
+    }
 
-        /// <summary>
-        /// Contains all the special colours. These include the colours of slider bodies or slider outlines.
-        /// The key is the name of the special colour and the value is the actual colour.
-        /// </summary>
-        public Dictionary<string, ComboColour> SpecialColours { get; set; }
+    /// <summary>
+    ///     Initializes the Beatmap file format.
+    /// </summary>
+    /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
+    public Beatmap(List<string> lines)
+    {
+        Initialize();
+        SetLines(lines);
+    }
 
-        /// <summary>
-        /// The timing of this beatmap. This objects contains all the timing points (data from the [TimingPoints] section) plus the global slider multiplier.
-        /// It also has a number of helper methods to fetch data from the timing points.
-        /// With this object you can always calculate the slider velocity at any time.
-        /// Any changes to the slider multiplier property in this object will not be serialized. Change the value in <see cref="Difficulty"/> instead.
-        /// </summary>
-        public Timing BeatmapTiming { get; set; }
+    /// <summary>
+    ///     The file format version of the .osu file. This is typically 14, but could be 128 for Lazer beatmaps.
+    /// </summary>
+    public int Version { get; set; }
 
-        /// <summary>
-        /// The storyboard of the Beatmap. Stores everything under the [Events] section.
-        /// </summary>
-        public StoryBoard StoryBoard { get; set; }
+    /// <summary>
+    ///     Contains all the values in the [General] section of a .osu file. The key is the variable name and the value is the
+    ///     value.
+    ///     This section typically contains:
+    ///     AudioFilename,
+    ///     AudioLeadIn,
+    ///     PreviewTime,
+    ///     Countdown,
+    ///     SampleSet,
+    ///     StackLeniency,
+    ///     Mode,
+    ///     LetterboxInBreaks,
+    ///     StoryFireInFront,
+    ///     SkinPreference,
+    ///     EpilepsyWarning,
+    ///     CountdownOffset,
+    ///     SpecialStyle,
+    ///     WidescreenStoryboard,
+    ///     SamplesMatchPlaybackRate
+    /// </summary>
+    public Dictionary<string, TValue> General { get; set; }
 
-        /// <summary>
-        /// A list of all the lines of .osu code under the [Events] -> (Background and Video events) section.
-        /// These strings are the actual .osu code and must be deserialized before use.
-        /// </summary>
-        public List<Event> BackgroundAndVideoEvents => StoryBoard.BackgroundAndVideoEvents;
+    /// <summary>
+    ///     Contains all the values in the [Editor] section of a .osu file. The key is the variable name and the value is the
+    ///     value.
+    ///     This section typically contains:
+    ///     Bookmarks,
+    ///     DistanceSpacing,
+    ///     BeatDivisor,
+    ///     GridSize,
+    ///     TimelineZoom
+    /// </summary>
+    public Dictionary<string, TValue> Editor { get; set; }
 
-        /// <summary>
-        /// A list of all the lines of .osu code under the [Events] -> (Break Periods) section.
-        /// These strings are the actual .osu code and must be deserialized before use.
-        /// </summary>
-        public List<Break> BreakPeriods => StoryBoard.BreakPeriods;
+    /// <summary>
+    ///     Contains all the values in the [Metadata] section of a .osu file. The key is the variable name and the value is the
+    ///     value.
+    ///     This section typically contains:
+    ///     Title,
+    ///     TitleUnicode,
+    ///     Artist,
+    ///     ArtistUnicode,
+    ///     Creator,
+    ///     Version,
+    ///     Source,
+    ///     Tags,
+    ///     BeatmapID,
+    ///     BeatmapSetID
+    /// </summary>
+    public Dictionary<string, TValue> Metadata { get; set; }
 
-        /// <summary>
-        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 0 (Background)) section.
-        /// These strings are the actual .osu code and must be deserialized before use.
-        /// </summary>
-        public List<Event> StoryboardLayerBackground => StoryBoard.StoryboardLayerBackground;
+    /// <summary>
+    ///     Contains all the values in the [Difficulty] section of a .osu file. The key is the variable name and the value is
+    ///     the value.
+    ///     This section typically contains:
+    ///     HPDrainRate,
+    ///     CircleSize,
+    ///     OverallDifficulty,
+    ///     ApproachRate,
+    ///     SliderMultiplier,
+    ///     SliderTickRate
+    /// </summary>
+    public Dictionary<string, TValue> Difficulty { get; set; }
 
-        /// <summary>
-        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 1 (Fail)) section.
-        /// These strings are the actual .osu code and must be deserialized before use.
-        /// </summary>
-        public List<Event> StoryboardLayerFail => StoryBoard.StoryboardLayerFail;
+    /// <summary>
+    ///     Contains all the basic combo colours. The order of this list is the same as how they are numbered in the .osu.
+    ///     There can not be more than 8 combo colours.
+    ///     <c>Combo1 : 245,222,139</c>
+    /// </summary>
+    public List<ComboColour> ComboColours { get; set; }
 
-        /// <summary>
-        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 2 (Pass)) section.
-        /// These strings are the actual .osu code and must be deserialized before use.
-        /// </summary>
-        public List<Event> StoryboardLayerPass => StoryBoard.StoryboardLayerPass;
+    /// <summary>
+    ///     Contains all the special colours. These include the colours of slider bodies or slider outlines.
+    ///     The key is the name of the special colour and the value is the actual colour.
+    /// </summary>
+    public Dictionary<string, ComboColour> SpecialColours { get; set; }
 
-        /// <summary>
-        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 3 (Foreground)) section.
-        /// These strings are the actual .osu code and must be deserialized before use.
-        /// </summary>
-        public List<Event> StoryboardLayerForeground => StoryBoard.StoryboardLayerForeground;
+    /// <summary>
+    ///     The timing of this beatmap. This objects contains all the timing points (data from the [TimingPoints] section) plus
+    ///     the global slider multiplier.
+    ///     It also has a number of helper methods to fetch data from the timing points.
+    ///     With this object you can always calculate the slider velocity at any time.
+    ///     Any changes to the slider multiplier property in this object will not be serialized. Change the value in
+    ///     <see cref="Difficulty" /> instead.
+    /// </summary>
+    public Timing BeatmapTiming { get; set; }
 
-        /// <summary>
-        /// A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 4 (Overlay)) section.
-        /// These strings are the actual .osu code and must be deserialized before use.
-        /// </summary>
-        public List<Event> StoryboardLayerOverlay => StoryBoard.StoryboardLayerOverlay;
+    /// <summary>
+    ///     The storyboard of the Beatmap. Stores everything under the [Events] section.
+    /// </summary>
+    public StoryBoard StoryBoard { get; set; }
 
-        /// <summary>
-        /// A list of all storyboarded sound sample events under the [Events] -> (Storyboard Sound Samples) section.
-        /// </summary>
-        public List<StoryboardSoundSample> StoryboardSoundSamples => StoryBoard.StoryboardSoundSamples;
+    /// <summary>
+    ///     A list of all the lines of .osu code under the [Events] -> (Background and Video events) section.
+    ///     These strings are the actual .osu code and must be deserialized before use.
+    /// </summary>
+    public List<Event> BackgroundAndVideoEvents => StoryBoard.BackgroundAndVideoEvents;
 
-        /// <summary>
-        /// List of all the hit objects in this beatmap.
-        /// </summary>
-        public List<HitObject> HitObjects { get; set; }
+    /// <summary>
+    ///     A list of all the lines of .osu code under the [Events] -> (Break Periods) section.
+    ///     These strings are the actual .osu code and must be deserialized before use.
+    /// </summary>
+    public List<Break> BreakPeriods => StoryBoard.BreakPeriods;
 
-        /// <summary>
-        /// Gets or sets the bookmarks of this beatmap. This returns a clone of the real bookmarks which are stored in the <see cref="Editor"/> property.
-        /// The bookmarks are represented with just a double which is the time of the bookmark.
-        /// </summary>
-        public List<double> Bookmarks { get => GetBookmarks(); set => SetBookmarks(value); }
+    /// <summary>
+    ///     A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 0 (Background)) section.
+    ///     These strings are the actual .osu code and must be deserialized before use.
+    /// </summary>
+    public List<Event> StoryboardLayerBackground => StoryBoard.StoryboardLayerBackground;
 
-        /// <summary>
-        /// When true, all coordinates and times will be serialized without rounding.
-        /// </summary>
-        public bool SaveWithFloatPrecision { get; set; }
+    /// <summary>
+    ///     A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 1 (Fail)) section.
+    ///     These strings are the actual .osu code and must be deserialized before use.
+    /// </summary>
+    public List<Event> StoryboardLayerFail => StoryBoard.StoryboardLayerFail;
 
-        /// <summary>
-        /// Initializes a new Beatmap.
-        /// </summary>
-        public Beatmap() {
-            Initialize();
+    /// <summary>
+    ///     A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 2 (Pass)) section.
+    ///     These strings are the actual .osu code and must be deserialized before use.
+    /// </summary>
+    public List<Event> StoryboardLayerPass => StoryBoard.StoryboardLayerPass;
+
+    /// <summary>
+    ///     A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 3 (Foreground)) section.
+    ///     These strings are the actual .osu code and must be deserialized before use.
+    /// </summary>
+    public List<Event> StoryboardLayerForeground => StoryBoard.StoryboardLayerForeground;
+
+    /// <summary>
+    ///     A list of all the lines of .osu code under the [Events] -> (Storyboard Layer 4 (Overlay)) section.
+    ///     These strings are the actual .osu code and must be deserialized before use.
+    /// </summary>
+    public List<Event> StoryboardLayerOverlay => StoryBoard.StoryboardLayerOverlay;
+
+    /// <summary>
+    ///     A list of all storyboarded sound sample events under the [Events] -> (Storyboard Sound Samples) section.
+    /// </summary>
+    public List<StoryboardSoundSample> StoryboardSoundSamples => StoryBoard.StoryboardSoundSamples;
+
+    /// <summary>
+    ///     List of all the hit objects in this beatmap.
+    /// </summary>
+    public List<HitObject> HitObjects { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the bookmarks of this beatmap. This returns a clone of the real bookmarks which are stored in the
+    ///     <see cref="Editor" /> property.
+    ///     The bookmarks are represented with just a double which is the time of the bookmark.
+    /// </summary>
+    public List<double> Bookmarks { get => GetBookmarks(); set => SetBookmarks(value); }
+
+    /// <summary>
+    ///     When true, all coordinates and times will be serialized without rounding.
+    /// </summary>
+    public bool SaveWithFloatPrecision { get; set; }
+
+    /// <summary>
+    ///     Deserializes an entire .osu file and stores the data to this object.
+    /// </summary>
+    /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
+    public void SetLines(List<string> lines)
+    {
+        // Parse the version to determine whether this is a Lazer beatmap.
+        Version = FileFormatHelper.TryParseInt(lines[0][17..].Trim(), out int version) ? version : 14;
+
+        // We automatically upgrade beatmaps to at least version 14
+        if (Version < 14) Version = 14;
+
+        if (Version >= 128)
+            // Lazer beatmaps save with float precision
+            // This is a bit of a hacky way to handle Lazer compatibility as some tools might want to save without float precision.
+            SaveWithFloatPrecision = true;
+
+        // Load up all the shit
+        var generalLines = FileFormatHelper.GetCategoryLines(lines, "[General]");
+        var editorLines = FileFormatHelper.GetCategoryLines(lines, "[Editor]");
+        var metadataLines = FileFormatHelper.GetCategoryLines(lines, "[Metadata]");
+        var difficultyLines = FileFormatHelper.GetCategoryLines(lines, "[Difficulty]");
+        var timingLines = FileFormatHelper.GetCategoryLines(lines, "[TimingPoints]");
+        var colourLines = FileFormatHelper.GetCategoryLines(lines, "[Colours]");
+        var hitobjectLines = FileFormatHelper.GetCategoryLines(lines, "[HitObjects]");
+
+        FileFormatHelper.FillDictionary(General, generalLines);
+        FileFormatHelper.FillDictionary(Editor, editorLines);
+        FileFormatHelper.FillDictionary(Metadata, metadataLines);
+        FileFormatHelper.FillDictionary(Difficulty, difficultyLines);
+
+        foreach (string line in colourLines)
+            if (line.Substring(0, 5) == "Combo")
+                ComboColours.Add(new ComboColour(line));
+            else
+                SpecialColours[FileFormatHelper.SplitKeyValue(line).Item1] = new ComboColour(line);
+
+        foreach (string line in hitobjectLines) HitObjects.Add(new HitObject(line));
+
+        // Give the lines to the storyboard
+        StoryBoard.SetLines(lines);
+
+        // Set the timing object
+        BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].DoubleValue);
+
+        SortHitObjects();
+        CalculateHitObjectComboStuff();
+        CalculateSliderEndTimes();
+        GiveObjectsGreenlines();
+    }
+
+    /// <summary>
+    ///     Serializes all data of this beatmap to .osu format.
+    /// </summary>
+    /// <returns>List of lines of .osu code.</returns>
+    public List<string> GetLines()
+    {
+        // Getting all the stuff
+        var lines = new List<string>
+        {
+            "osu file format v" + Version.ToInvariant(),
+            "",
+            "[General]",
+        };
+        FileFormatHelper.AddDictionaryToLines(General, lines, true);
+        lines.Add("");
+        lines.Add("[Editor]");
+        FileFormatHelper.AddDictionaryToLines(Editor, lines, true);
+        lines.Add("");
+        lines.Add("[Metadata]");
+        FileFormatHelper.AddDictionaryToLines(Metadata, lines, Version >= 128);
+        lines.Add("");
+        lines.Add("[Difficulty]");
+        FileFormatHelper.AddDictionaryToLines(Difficulty, lines, Version >= 128);
+        lines.Add("");
+        lines.Add("[Events]");
+        if (Version < 128)
+            lines.Add("//Background and Video events");
+        lines.AddRange(BackgroundAndVideoEvents.Select(e =>
+        {
+            e.SaveWithFloatPrecision = SaveWithFloatPrecision;
+            return e.GetLine();
+        }));
+        if (Version < 128)
+            lines.Add("//Break Periods");
+        lines.AddRange(BreakPeriods.Select(b =>
+        {
+            b.SaveWithFloatPrecision = SaveWithFloatPrecision;
+            return b.GetLine();
+        }));
+        if (Version < 128) // Lazer doesn't add these comments for some reason
+            lines.Add("//Storyboard Layer 0 (Background)");
+        lines.AddRange(Event.SerializeEventTree(StoryboardLayerBackground, saveWithFloatPrecision: SaveWithFloatPrecision));
+        if (Version < 128)
+            lines.Add("//Storyboard Layer 1 (Fail)");
+        lines.AddRange(Event.SerializeEventTree(StoryboardLayerFail, saveWithFloatPrecision: SaveWithFloatPrecision));
+        if (Version < 128)
+            lines.Add("//Storyboard Layer 2 (Pass)");
+        lines.AddRange(Event.SerializeEventTree(StoryboardLayerPass, saveWithFloatPrecision: SaveWithFloatPrecision));
+        if (Version < 128)
+            lines.Add("//Storyboard Layer 3 (Foreground)");
+        lines.AddRange(Event.SerializeEventTree(StoryboardLayerForeground, saveWithFloatPrecision: SaveWithFloatPrecision));
+        if (Version < 128)
+            lines.Add("//Storyboard Layer 4 (Overlay)");
+        lines.AddRange(Event.SerializeEventTree(StoryboardLayerOverlay, saveWithFloatPrecision: SaveWithFloatPrecision));
+        if (Version < 128)
+            lines.Add("//Storyboard Sound Samples");
+        lines.AddRange(StoryboardSoundSamples.Select(sbss =>
+        {
+            sbss.SaveWithFloatPrecision = SaveWithFloatPrecision;
+            return sbss.GetLine();
+        }));
+        lines.Add("");
+        lines.Add("[TimingPoints]");
+        lines.AddRange(BeatmapTiming.TimingPoints.Where(tp => tp != null).Select(tp =>
+        {
+            tp.SaveWithFloatPrecision = SaveWithFloatPrecision;
+            return tp.GetLine();
+        }));
+        if (Version < 128)
+            lines.Add("");
+        if (ComboColours.Any())
+        {
+            lines.Add("");
+            lines.Add("[Colours]");
+            lines.AddRange(ComboColours.Select((t, i) => "Combo" + (i + 1) + (Version < 128 ? " : " : ": ") + t));
+            lines.AddRange(SpecialColours.Select(specialColour => specialColour.Key + (Version < 128 ? " : " : ": ") + specialColour.Value));
         }
 
-        /// <summary>
-        /// Initializes a beatmap with the provided hit objects and timing points.
-        /// </summary>
-        /// <param name="hitObjects"></param>
-        /// <param name="timingPoints"></param>
-        /// <param name="firstUnInheritedTimingPoint"></param>
-        /// <param name="globalSv"></param>
-        /// <param name="gameMode"></param>
-        public Beatmap(List<HitObject> hitObjects, List<TimingPoint> timingPoints,
-            TimingPoint firstUnInheritedTimingPoint = null, double globalSv = 1.4, GameMode gameMode = GameMode.Standard) {
-            Initialize();
+        lines.Add("");
+        lines.Add("[HitObjects]");
+        lines.AddRange(HitObjects.Select(ho =>
+        {
+            ho.SaveWithFloatPrecision = SaveWithFloatPrecision;
+            return ho.GetLine();
+        }));
+        lines.Add("");
 
-            // Set the hit objects
-            HitObjects = hitObjects;
+        return lines;
+    }
 
-            // Set the timing stuff
-            BeatmapTiming.SetTimingPoints(timingPoints);
-            BeatmapTiming.SliderMultiplier = globalSv;
+    private void Initialize()
+    {
+        General = new Dictionary<string, TValue>();
+        Editor = new Dictionary<string, TValue>();
+        Metadata = new Dictionary<string, TValue>();
+        Difficulty = new Dictionary<string, TValue>();
+        ComboColours = new List<ComboColour>();
+        SpecialColours = new Dictionary<string, ComboColour>();
+        StoryBoard = new StoryBoard();
+        HitObjects = new List<HitObject>();
+        BeatmapTiming = new Timing(1.4);
 
-            if (!BeatmapTiming.Contains(firstUnInheritedTimingPoint)) {
-                BeatmapTiming.Add(firstUnInheritedTimingPoint);
-            }
+        FillBasicMetadata();
+    }
 
-            // Set the global SV here too because thats absolutely necessary
-            Difficulty["SliderMultiplier"] = new TValue(globalSv.ToInvariant());
-            General["Mode"] = new TValue(((int) gameMode).ToInvariant());
+    /// <summary>
+    ///     Populates required general, metadata, difficulty, and editor keys with new-beatmap defaults.
+    /// </summary>
+    public void FillBasicMetadata()
+    {
+        General["AudioFilename"] = new TValue(string.Empty);
+        General["AudioLeadIn"] = new TValue("0");
+        General["PreviewTime"] = new TValue("-1");
+        General["Countdown"] = new TValue("0");
+        General["SampleSet"] = new TValue("Soft");
+        General["StackLeniency"] = new TValue("0.2");
+        General["Mode"] = new TValue("0");
+        General["LetterboxInBreaks"] = new TValue("0");
+        General["WidescreenStoryboard"] = new TValue("0");
 
-            SortHitObjects();
-            CalculateSliderEndTimes();
-            GiveObjectsGreenlines();
-            CalculateHitObjectComboStuff();
-        }
+        Metadata["Title"] = new TValue(string.Empty);
+        Metadata["TitleUnicode"] = new TValue(string.Empty);
+        Metadata["Artist"] = new TValue(string.Empty);
+        Metadata["ArtistUnicode"] = new TValue(string.Empty);
+        Metadata["Creator"] = new TValue(string.Empty);
+        Metadata["Version"] = new TValue(string.Empty);
+        Metadata["Tags"] = new TValue(string.Empty);
+        Metadata["BeatmapSetID"] = new TValue("-1");
 
-        /// <summary>
-        /// Initializes the Beatmap file format.
-        /// </summary>
-        /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
-        public Beatmap(List<string> lines) {
-            Initialize();
-            SetLines(lines);
-        }
+        Difficulty["HPDrainRate"] = new TValue("5");
+        Difficulty["CircleSize"] = new TValue("5");
+        Difficulty["OverallDifficulty"] = new TValue("5");
+        Difficulty["ApproachRate"] = new TValue("5");
+        Difficulty["SliderMultiplier"] = new TValue("1.4");
+        Difficulty["SliderTickRate"] = new TValue("1");
+    }
 
-        private void Initialize() {
-            General = new Dictionary<string, TValue>();
-            Editor = new Dictionary<string, TValue>();
-            Metadata = new Dictionary<string, TValue>();
-            Difficulty = new Dictionary<string, TValue>();
-            ComboColours = new List<ComboColour>();
-            SpecialColours = new Dictionary<string, ComboColour>();
-            StoryBoard = new StoryBoard();
-            HitObjects = new List<HitObject>();
-            BeatmapTiming = new Timing(1.4);
+    /// <summary>
+    ///     Sorts all hitobjects in map by order of time.
+    /// </summary>
+    public void SortHitObjects()
+    {
+        HitObjects.Sort();
+    }
 
-            FillBasicMetadata();
-        }
+    /// <summary>
+    ///     Calculates the temporal length for all <see cref="HitObject" /> sliders and stores it to their internal property.
+    /// </summary>
+    public void CalculateSliderEndTimes()
+    {
+        foreach (var ho in HitObjects.Where(ho => ho.IsSlider)) ho.CalculateSliderTemporalLength(BeatmapTiming, false);
+    }
 
-        /// <summary>
-        /// Populates required general, metadata, difficulty, and editor keys with new-beatmap defaults.
-        /// </summary>
-        public void FillBasicMetadata() {
-            General["AudioFilename"] = new TValue(string.Empty);
-            General["AudioLeadIn"] = new TValue("0");
-            General["PreviewTime"] = new TValue("-1");
-            General["Countdown"] = new TValue("0");
-            General["SampleSet"] = new TValue("Soft");
-            General["StackLeniency"] = new TValue("0.2");
-            General["Mode"] = new TValue("0");
-            General["LetterboxInBreaks"] = new TValue("0");
-            General["WidescreenStoryboard"] = new TValue("0");
+    /// <summary>
+    ///     Calculates the end position for all hit objects.
+    /// </summary>
+    public void CalculateEndPositions()
+    {
+        foreach (var ho in HitObjects) ho.CalculateEndPosition();
+    }
 
-            Metadata["Title"] = new TValue(string.Empty);
-            Metadata["TitleUnicode"] = new TValue(string.Empty);
-            Metadata["Artist"] = new TValue(string.Empty);
-            Metadata["ArtistUnicode"] = new TValue(string.Empty);
-            Metadata["Creator"] = new TValue(string.Empty);
-            Metadata["Version"] = new TValue(string.Empty);
-            Metadata["Tags"] = new TValue(string.Empty);
-            Metadata["BeatmapSetID"] = new TValue("-1");
+    /// <summary>
+    ///     Actual osu! stable code for calculating stacked positions of all hit objects.
+    ///     Make sure slider end positions are calculated before using this procedure.
+    /// </summary>
+    /// <param name="startIndex"></param>
+    /// <param name="endIndex"></param>
+    /// <param name="rounded"></param>
+    public void UpdateStacking(int startIndex = 0, int endIndex = -1, bool rounded = false)
+    {
+        if (endIndex == -1)
+            endIndex = HitObjects.Count - 1;
 
-            Difficulty["HPDrainRate"] = new TValue("5");
-            Difficulty["CircleSize"] = new TValue("5");
-            Difficulty["OverallDifficulty"] = new TValue("5");
-            Difficulty["ApproachRate"] = new TValue("5");
-            Difficulty["SliderMultiplier"] = new TValue("1.4");
-            Difficulty["SliderTickRate"] = new TValue("1");
-        }
+        // Getting some variables for use later
+        double stackOffset = GetStackOffset(Difficulty["CircleSize"].DoubleValue);
+        double stackLeniency = General["StackLeniency"].DoubleValue;
+        double preEmpt = GetApproachTime(Difficulty["ApproachRate"].DoubleValue);
 
-        /// <summary>
-        /// Deserializes an entire .osu file and stores the data to this object.
-        /// </summary>
-        /// <param name="lines">List of strings where each string is another line in the .osu file.</param>
-        public void SetLines(List<string> lines) {
-            // Parse the version to determine whether this is a Lazer beatmap.
-            Version = FileFormatHelper.TryParseInt(lines[0][17..].Trim(), out int version) ? version : 14;
+        // Round the stack offset so objects only get offset by integer values
+        if (rounded) stackOffset = Math.Round(stackOffset);
 
-            // We automatically upgrade beatmaps to at least version 14
-            if (Version < 14) {
-                Version = 14;
-            }
+        const int stackLenience = 3;
 
-            if (Version >= 128) {
-                // Lazer beatmaps save with float precision
-                // This is a bit of a hacky way to handle Lazer compatibility as some tools might want to save without float precision.
-                SaveWithFloatPrecision = true;
-            }
+        var stackVector = new Vector2(stackOffset, stackOffset);
+        float stackThresold = (float)(preEmpt * stackLeniency);
 
-            // Load up all the shit
-            IEnumerable<string> generalLines = FileFormatHelper.GetCategoryLines(lines, "[General]");
-            IEnumerable<string> editorLines = FileFormatHelper.GetCategoryLines(lines, "[Editor]");
-            IEnumerable<string> metadataLines = FileFormatHelper.GetCategoryLines(lines, "[Metadata]");
-            IEnumerable<string> difficultyLines = FileFormatHelper.GetCategoryLines(lines, "[Difficulty]");
-            IEnumerable<string> timingLines = FileFormatHelper.GetCategoryLines(lines, "[TimingPoints]");
-            IEnumerable<string> colourLines = FileFormatHelper.GetCategoryLines(lines, "[Colours]");
-            IEnumerable<string> hitobjectLines = FileFormatHelper.GetCategoryLines(lines, "[HitObjects]");
+        // Reset stacking inside the update range
+        for (int i = startIndex; i <= endIndex; i++)
+            HitObjects[i].StackCount = 0;
 
-            FileFormatHelper.FillDictionary(General, generalLines);
-            FileFormatHelper.FillDictionary(Editor, editorLines);
-            FileFormatHelper.FillDictionary(Metadata, metadataLines);
-            FileFormatHelper.FillDictionary(Difficulty, difficultyLines);
+        // Extend the end index to include objects they are stacked on
+        int extendedEndIndex = endIndex;
+        for (int i = endIndex; i >= startIndex; i--)
+        {
+            int stackBaseIndex = i;
+            for (int n = stackBaseIndex + 1; n < HitObjects.Count; n++)
+            {
+                var stackBaseObject = HitObjects[stackBaseIndex];
+                if (stackBaseObject.IsSpinner) break;
 
-            foreach (string line in colourLines) {
-                if (line.Substring(0, 5) == "Combo") {
-                    ComboColours.Add(new ComboColour(line));
-                } else {
-                    SpecialColours[FileFormatHelper.SplitKeyValue(line).Item1] = new ComboColour(line);
+                var objectN = HitObjects[n];
+                if (objectN.IsSpinner) continue;
+
+                if (objectN.Time - stackBaseObject.EndTime > stackThresold)
+                    //We are no longer within stacking range of the next object.
+                    break;
+
+                if (Vector2.Distance(stackBaseObject.Pos, objectN.Pos) < stackLenience
+                    || stackBaseObject.IsSlider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < stackLenience)
+                {
+                    stackBaseIndex = n;
+
+                    // HitObjects after the specified update range haven't been reset yet
+                    objectN.StackCount = 0;
                 }
             }
 
-            foreach (string line in hitobjectLines) {
-                HitObjects.Add(new HitObject(line));
-            }
-
-            // Give the lines to the storyboard
-            StoryBoard.SetLines(lines);
-
-            // Set the timing object
-            BeatmapTiming = new Timing(timingLines, Difficulty["SliderMultiplier"].DoubleValue);
-
-            SortHitObjects();
-            CalculateHitObjectComboStuff();
-            CalculateSliderEndTimes();
-            GiveObjectsGreenlines();
-        }
-
-        /// <summary>
-        /// Sorts all hitobjects in map by order of time.
-        /// </summary>
-        public void SortHitObjects() {
-            HitObjects.Sort();
-        }
-
-        /// <summary>
-        /// Calculates the temporal length for all <see cref="HitObject"/> sliders and stores it to their internal property.
-        /// </summary>
-        public void CalculateSliderEndTimes() {
-            foreach (var ho in HitObjects.Where(ho => ho.IsSlider)) {
-                ho.CalculateSliderTemporalLength(BeatmapTiming, false);
+            if (stackBaseIndex > extendedEndIndex)
+            {
+                extendedEndIndex = stackBaseIndex;
+                if (extendedEndIndex == HitObjects.Count - 1)
+                    break;
             }
         }
 
-        /// <summary>
-        /// Calculates the end position for all hit objects.
-        /// </summary>
-        public void CalculateEndPositions() {
-            foreach (var ho in HitObjects) {
-                ho.CalculateEndPosition();
-            }
-        }
+        //Reverse pass for stack calculation.
+        int extendedStartIndex = startIndex;
+        for (int i = extendedEndIndex; i > startIndex; i--)
+        {
+            int n = i;
+            /* We should check every note which has not yet got a stack.
+             * Consider the case we have two interwound stacks and this will make sense.
+             *
+             * o <-1      o <-2
+             *  o <-3      o <-4
+             *
+             * We first process starting from 4 and handle 2,
+             * then we come backwards on the i loop iteration until we reach 3 and handle 1.
+             * 2 and 1 will be ignored in the i loop because they already have a stack value.
+             */
 
-        /// <summary>
-        /// Actual osu! stable code for calculating stacked positions of all hit objects.
-        /// Make sure slider end positions are calculated before using this procedure.
-        /// </summary>
-        /// <param name="startIndex"></param>
-        /// <param name="endIndex"></param>
-        /// <param name="rounded"></param>
-        public void UpdateStacking(int startIndex = 0, int endIndex = -1, bool rounded = false) {
-            if (endIndex == -1)
-                endIndex = HitObjects.Count - 1;
+            var objectI = HitObjects[i];
 
-            // Getting some variables for use later
-            double stackOffset = GetStackOffset(Difficulty["CircleSize"].DoubleValue);
-            double stackLeniency = General["StackLeniency"].DoubleValue;
-            double preEmpt = GetApproachTime(Difficulty["ApproachRate"].DoubleValue);
+            if (objectI.StackCount != 0 || objectI.IsSpinner) continue;
 
-            // Round the stack offset so objects only get offset by integer values
-            if (rounded) {
-                stackOffset = Math.Round(stackOffset);
-            }
+            /* If this object is a hitcircle, then we enter this "special" case.
+             * It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.
+             * Any other case is handled by the "is Slider" code below this.
+             */
+            if (objectI.IsCircle)
+                while (--n >= 0)
+                {
+                    var objectN = HitObjects[n];
 
-            const int stackLenience = 3;
-
-            Vector2 stackVector = new Vector2(stackOffset, stackOffset);
-            float stackThresold = (float) (preEmpt * stackLeniency);
-
-            // Reset stacking inside the update range
-            for (int i = startIndex; i <= endIndex; i++)
-                HitObjects[i].StackCount = 0;
-
-            // Extend the end index to include objects they are stacked on
-            int extendedEndIndex = endIndex;
-            for (int i = endIndex; i >= startIndex; i--) {
-                int stackBaseIndex = i;
-                for (int n = stackBaseIndex + 1; n < HitObjects.Count; n++) {
-                    HitObject stackBaseObject = HitObjects[stackBaseIndex];
-                    if (stackBaseObject.IsSpinner) break;
-
-                    HitObject objectN = HitObjects[n];
                     if (objectN.IsSpinner) continue;
 
-                    if (objectN.Time - stackBaseObject.EndTime > stackThresold)
-                        //We are no longer within stacking range of the next object.
+                    if (objectI.Time - objectN.EndTime > stackThresold)
+                        //We are no longer within stacking range of the previous object.
                         break;
 
-                    if (Vector2.Distance(stackBaseObject.Pos, objectN.Pos) < stackLenience ||
-                        stackBaseObject.IsSlider && Vector2.Distance(stackBaseObject.EndPos, objectN.Pos) < stackLenience) {
-                        stackBaseIndex = n;
-
-                        // HitObjects after the specified update range haven't been reset yet
+                    // HitObjects before the specified update range haven't been reset yet
+                    if (n < extendedStartIndex)
+                    {
                         objectN.StackCount = 0;
+                        extendedStartIndex = n;
                     }
-                }
 
-                if (stackBaseIndex > extendedEndIndex) {
-                    extendedEndIndex = stackBaseIndex;
-                    if (extendedEndIndex == HitObjects.Count - 1)
+                    /* This is a special case where hticircles are moved DOWN and RIGHT (negative stacking) if they are under the *last* slider in a stacked pattern.
+                     *    o==o <- slider is at original location
+                     *        o <- hitCircle has stack of -1
+                     *         o <- hitCircle has stack of -2
+                     */
+                    if (objectN.IsSlider && Vector2.Distance(objectN.EndPos, objectI.Pos) < stackLenience)
+                    {
+                        int offset = objectI.StackCount - objectN.StackCount + 1;
+                        for (int j = n + 1; j <= i; j++)
+                            //For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
+                            if (Vector2.Distance(objectN.EndPos, HitObjects[j].Pos) < stackLenience)
+                                HitObjects[j].StackCount -= offset;
+
+                        //We have hit a slider.  We should restart calculation using this as the new base.
+                        //Breaking here will mean that the slider still has StackCount of 0, so will be handled in the i-outer-loop.
                         break;
-                }
-            }
-
-            //Reverse pass for stack calculation.
-            int extendedStartIndex = startIndex;
-            for (int i = extendedEndIndex; i > startIndex; i--) {
-                int n = i;
-                /* We should check every note which has not yet got a stack.
-                    * Consider the case we have two interwound stacks and this will make sense.
-                    *
-                    * o <-1      o <-2
-                    *  o <-3      o <-4
-                    *
-                    * We first process starting from 4 and handle 2,
-                    * then we come backwards on the i loop iteration until we reach 3 and handle 1.
-                    * 2 and 1 will be ignored in the i loop because they already have a stack value.
-                    */
-
-                HitObject objectI = HitObjects[i];
-
-                if (objectI.StackCount != 0 || objectI.IsSpinner) continue;
-
-                /* If this object is a hitcircle, then we enter this "special" case.
-                    * It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.
-                    * Any other case is handled by the "is Slider" code below this.
-                    */
-                if (objectI.IsCircle) {
-                    while (--n >= 0) {
-                        HitObject objectN = HitObjects[n];
-
-                        if (objectN.IsSpinner) continue;
-
-                        if (objectI.Time - objectN.EndTime > stackThresold)
-                            //We are no longer within stacking range of the previous object.
-                            break;
-
-                        // HitObjects before the specified update range haven't been reset yet
-                        if (n < extendedStartIndex) {
-                            objectN.StackCount = 0;
-                            extendedStartIndex = n;
-                        }
-
-                        /* This is a special case where hticircles are moved DOWN and RIGHT (negative stacking) if they are under the *last* slider in a stacked pattern.
-                            *    o==o <- slider is at original location
-                            *        o <- hitCircle has stack of -1
-                            *         o <- hitCircle has stack of -2
-                            */
-                        if (objectN.IsSlider && Vector2.Distance(objectN.EndPos, objectI.Pos) < stackLenience) {
-                            int offset = objectI.StackCount - objectN.StackCount + 1;
-                            for (int j = n + 1; j <= i; j++) {
-                                //For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
-                                if (Vector2.Distance(objectN.EndPos, HitObjects[j].Pos) < stackLenience)
-                                    HitObjects[j].StackCount -= offset;
-                            }
-
-                            //We have hit a slider.  We should restart calculation using this as the new base.
-                            //Breaking here will mean that the slider still has StackCount of 0, so will be handled in the i-outer-loop.
-                            break;
-                        }
-
-                        if (Vector2.Distance(objectN.Pos, objectI.Pos) < stackLenience) {
-                            //Keep processing as if there are no sliders.  If we come across a slider, this gets cancelled out.
-                            //NOTE: Sliders with start positions stacking are a special case that is also handled here.
-
-                            objectN.StackCount = objectI.StackCount + 1;
-                            objectI = objectN;
-                        }
-                    }
-                } else if (objectI.IsSlider) {
-                    /* We have hit the first slider in a possible stack.
-                        * From this point on, we ALWAYS stack positive regardless.
-                        */
-                    while (--n >= startIndex) {
-                        HitObject objectN = HitObjects[n];
-
-                        if (objectN.IsSpinner) continue;
-
-                        if (objectI.Time - objectN.Time > stackThresold)
-                            //We are no longer within stacking range of the previous object.
-                            break;
-
-                        if (Vector2.Distance(objectN.EndPos, objectI.Pos) < stackLenience) {
-                            objectN.StackCount = objectI.StackCount + 1;
-                            objectI = objectN;
-                        }
-                    }
-                }
-            }
-
-            for (int i = startIndex; i <= endIndex; i++) {
-                HitObject currHitObject = HitObjects[i];
-                currHitObject.StackedPos = currHitObject.Pos - currHitObject.StackCount * stackVector;
-                currHitObject.StackedEndPos = currHitObject.EndPos - currHitObject.StackCount * stackVector;
-            }
-        }
-
-        /// <summary>
-        /// Calculates the which hit objects actually have a new combo.
-        /// Calculates the combo index and combo colours for each hit object.
-        /// This includes cases where the previous hit object is a spinner or doesnt exist.
-        /// </summary>
-        public void CalculateHitObjectComboStuff() {
-            HitObject previousHitObject = null;
-            int colourIndex = 0;
-            int comboIndex = 0;
-
-            // If there are no combo colours use the default combo colours so the hitobjects still have something
-            var actingComboColours = ComboColours.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColours.ToArray();
-
-            foreach (var hitObject in HitObjects) {
-                hitObject.ActualNewCombo = IsNewCombo(hitObject, previousHitObject);
-
-                if (hitObject.ActualNewCombo) {
-                    var colourIncrement = hitObject.IsSpinner ? hitObject.ComboSkip : hitObject.ComboSkip + 1;
-
-                    colourIndex = MathHelper.Mod(colourIndex + colourIncrement, actingComboColours.Length);
-                    comboIndex = 1;
-                } else {
-                    comboIndex++;
-                }
-
-                hitObject.ComboIndex = comboIndex;
-                hitObject.ColourIndex = colourIndex;
-                hitObject.Colour = actingComboColours[colourIndex];
-
-                previousHitObject = hitObject;
-            }
-        }
-
-        /// <summary>
-        /// Adjusts combo skip for all the hitobjects so colour index is correct.
-        /// </summary>
-        public void FixComboSkip() {
-            HitObject previousHitObject = null;
-            int colourIndex = 0;
-
-            // If there are no combo colours use the default combo colours so the hitobjects still have something
-            var actingComboColours = ComboColours.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColours.ToArray();
-
-            foreach (var hitObject in HitObjects) {
-                bool newCombo = IsNewCombo(hitObject, previousHitObject);
-
-                if (newCombo) {
-                    int colourIncrement = hitObject.IsSpinner ? 0 : 1;
-                    var newColourIndex = MathHelper.Mod(colourIndex + colourIncrement, actingComboColours.Length);
-                    var wantedColourIndex = hitObject.ColourIndex;
-                    var diff = wantedColourIndex - newColourIndex;
-
-                    if (diff > 0) {
-                        hitObject.ComboSkip = diff;
-                    } else if (diff < 0) {
-                        hitObject.ComboSkip = actingComboColours.Length + diff;
                     }
 
-                    int newColourIncrement = hitObject.IsSpinner ? hitObject.ComboSkip : hitObject.ComboSkip + 1;
-                    colourIndex = MathHelper.Mod(colourIndex + newColourIncrement, actingComboColours.Length);
+                    if (Vector2.Distance(objectN.Pos, objectI.Pos) < stackLenience)
+                    {
+                        //Keep processing as if there are no sliders.  If we come across a slider, this gets cancelled out.
+                        //NOTE: Sliders with start positions stacking are a special case that is also handled here.
+                        objectN.StackCount = objectI.StackCount + 1;
+                        objectI = objectN;
+                    }
                 }
+            else if (objectI.IsSlider)
+                /* We have hit the first slider in a possible stack.
+                 * From this point on, we ALWAYS stack positive regardless.
+                 */
+                while (--n >= startIndex)
+                {
+                    var objectN = HitObjects[n];
 
-                previousHitObject = hitObject;
-            }
-        }
+                    if (objectN.IsSpinner) continue;
 
-        /// <summary>
-        /// Applies osu!'s effective combo-boundary rules, including spinner boundaries.
-        /// </summary>
-        /// <param name="hitObject">The hit object.</param>
-        /// <param name="previousHitObject">The previous hit object.</param>
-        /// <returns><see langword="true"/> for explicit new combos, spinners, the first object, or an object after a spinner.</returns>
-        public static bool IsNewCombo(HitObject hitObject, HitObject previousHitObject) {
-            return hitObject.NewCombo || hitObject.IsSpinner || previousHitObject == null || previousHitObject.IsSpinner;
-        }
+                    if (objectI.Time - objectN.Time > stackThresold)
+                        //We are no longer within stacking range of the previous object.
+                        break;
 
-        /// <summary>
-        /// For each hit object it stores the timingpoints from <see cref="BeatmapTiming"/> which are affecting that hit object.
-        /// Basically making all hit objects aware of the effects on themselves coming from the <see cref="BeatmapTiming"/>.
-        /// </summary>
-        public void GiveObjectsGreenlines() {
-            foreach (var ho in HitObjects) {
-                ho.SliderVelocity = BeatmapTiming.GetSvAtTime(ho.Time);
-                ho.TimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time);
-                ho.HitsoundTimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time + 5);
-                ho.UnInheritedTimingPoint = BeatmapTiming.GetRedlineAtTime(ho.Time);
-                ho.BodyHitsounds = BeatmapTiming.GetTimingPointsInRange(ho.Time, ho.EndTime, false);
-                foreach (var time in ho.GetAllTloTimes(BeatmapTiming)) {
-                    ho.BodyHitsounds.RemoveAll(o => Math.Abs(time - o.Offset) <= 5);
+                    if (Vector2.Distance(objectN.EndPos, objectI.Pos) < stackLenience)
+                    {
+                        objectN.StackCount = objectI.StackCount + 1;
+                        objectI = objectN;
+                    }
                 }
-            }
         }
 
-        /// <summary>
-        /// Calculates the time in milliseconds between a hit object appearing on screen and getting perfectly hit for a given approach rate value.
-        /// </summary>
-        /// <param name="approachRate">The approach rate difficulty setting.</param>
-        /// <returns>The time in milliseconds between a hit object appearing on screen and getting perfectly hit.</returns>
-        public static double GetApproachTime(double approachRate) {
-            if (approachRate < 5) {
-                return 1800 - 120 * approachRate;
-            }
-
-            return 1200 - 150 * (approachRate - 5);
+        for (int i = startIndex; i <= endIndex; i++)
+        {
+            var currHitObject = HitObjects[i];
+            currHitObject.StackedPos = currHitObject.Pos - currHitObject.StackCount * stackVector;
+            currHitObject.StackedEndPos = currHitObject.EndPos - currHitObject.StackCount * stackVector;
         }
+    }
 
-        /// <summary>
-        /// Calculates the radius of a hit circle from a given Circle Size difficulty.
-        /// </summary>
-        /// <param name="circleSize"></param>
-        /// <returns></returns>
-        public static double GetHitObjectRadius(double circleSize) {
-            return (109 - 9 * circleSize) / 2;
-        }
+    /// <summary>
+    ///     Calculates the which hit objects actually have a new combo.
+    ///     Calculates the combo index and combo colours for each hit object.
+    ///     This includes cases where the previous hit object is a spinner or doesnt exist.
+    /// </summary>
+    public void CalculateHitObjectComboStuff()
+    {
+        HitObject previousHitObject = null;
+        int colourIndex = 0;
+        int comboIndex = 0;
 
-        /// <summary>
-        /// Calculates the per-stack positional displacement from circle size.
-        /// </summary>
-        /// <param name="circleSize">The circle size.</param>
-        /// <returns>One tenth of the hit-object radius in playfield pixels.</returns>
-        public static double GetStackOffset(double circleSize) {
-            return GetHitObjectRadius(circleSize) / 10;
-        }
+        // If there are no combo colours use the default combo colours so the hitobjects still have something
+        var actingComboColours = ComboColours.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColours.ToArray();
 
-        /// <summary>
-        /// Finds all hit objects from this beatmap which are within a specified range.
-        /// Just any part of the hit object has to overlap with the time range in order to be included.
-        /// </summary>
-        /// <param name="start">The start of the time range.</param>
-        /// <param name="end">The end of the time range.</param>
-        /// <returns>All <see cref="HitObject"/> that are found within specified range.</returns>
-        public List<HitObject> GetHitObjectsWithRangeInRange(double start, double end) {
-            return HitObjects.FindAll(o => o.EndTime >= start && o.Time <= end);
-        }
+        foreach (var hitObject in HitObjects)
+        {
+            hitObject.ActualNewCombo = IsNewCombo(hitObject, previousHitObject);
 
-        /// <summary>
-        /// Creates a new <see cref="Timeline"/> for this Beatmap.
-        /// Upon creation the timeline is updated with all the current timing and hitsounds of this beatmap,
-        /// but later changes wont be automatically synchronized.
-        /// </summary>
-        /// <returns></returns>
-        public Timeline GetTimeline() {
-            Timeline tl = new Timeline(HitObjects, BeatmapTiming);
-            tl.GiveTimingPoints(BeatmapTiming);
-            return tl;
-        }
-
-        /// <summary>
-        /// Grabs all bookmarks
-        /// </summary>
-        /// <returns>The list of Bookmarks.</returns>
-        public List<double> GetBookmarks() {
-            try {
-                return Editor["Bookmarks"].GetDoubleList();
-            }
-            catch (KeyNotFoundException) {
-                return new List<double>();
-            }
-        }
-
-        /// <summary>
-        /// Sets the bookmarks value in <see cref="Editor"/> with a new list of bookmarks.
-        /// Decimal values will be rounded in this process.
-        /// </summary>
-        /// <param name="bookmarks"></param>
-        public void SetBookmarks(List<double> bookmarks) {
-            if (bookmarks.Count > 0) {
-                Editor["Bookmarks"] = new TValue(string.Join(",", bookmarks.Select(d => Math.Round(d))));
-            }
-        }
-
-        /// <summary>
-        /// Returns all hit objects that have a bookmark in their range.
-        /// </summary>
-        /// <returns>A list of hit objects that have a bookmark in their range.</returns>
-        public List<HitObject> GetBookmarkedObjects(double leniency = 5) {
-            List<double> bookmarks = GetBookmarks();
-            List<HitObject> markedObjects = HitObjects.FindAll(ho =>
-                bookmarks.Exists(o => ho.Time - leniency <= o && o <= ho.EndTime + leniency));
-            return markedObjects;
-        }
-
-        /// <summary>
-        /// Serializes all data of this beatmap to .osu format.
-        /// </summary>
-        /// <returns>List of lines of .osu code.</returns>
-        public List<string> GetLines() {
-            // Getting all the stuff
-            List<string> lines = new List<string>
+            if (hitObject.ActualNewCombo)
             {
-                "osu file format v" + Version.ToInvariant(),
-                "",
-                "[General]"
-            };
-            FileFormatHelper.AddDictionaryToLines(General, lines, spaceBeforeValue: true);
-            lines.Add("");
-            lines.Add("[Editor]");
-            FileFormatHelper.AddDictionaryToLines(Editor, lines, spaceBeforeValue: true);
-            lines.Add("");
-            lines.Add("[Metadata]");
-            FileFormatHelper.AddDictionaryToLines(Metadata, lines, spaceBeforeValue: Version >= 128);
-            lines.Add("");
-            lines.Add("[Difficulty]");
-            FileFormatHelper.AddDictionaryToLines(Difficulty, lines, spaceBeforeValue: Version >= 128);
-            lines.Add("");
-            lines.Add("[Events]");
-            if (Version < 128)
-                lines.Add("//Background and Video events");
-            lines.AddRange(BackgroundAndVideoEvents.Select(e => {
-                e.SaveWithFloatPrecision = SaveWithFloatPrecision;
-                return e.GetLine();
-            }));
-            if (Version < 128)
-                lines.Add("//Break Periods");
-            lines.AddRange(BreakPeriods.Select(b => {
-                b.SaveWithFloatPrecision = SaveWithFloatPrecision;
-                return b.GetLine();
-            }));
-            if (Version < 128)  // Lazer doesn't add these comments for some reason
-                lines.Add("//Storyboard Layer 0 (Background)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerBackground, saveWithFloatPrecision: SaveWithFloatPrecision));
-            if (Version < 128)
-                lines.Add("//Storyboard Layer 1 (Fail)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerFail, saveWithFloatPrecision: SaveWithFloatPrecision));
-            if (Version < 128)
-                lines.Add("//Storyboard Layer 2 (Pass)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerPass, saveWithFloatPrecision: SaveWithFloatPrecision));
-            if (Version < 128)
-                lines.Add("//Storyboard Layer 3 (Foreground)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerForeground, saveWithFloatPrecision: SaveWithFloatPrecision));
-            if (Version < 128)
-                lines.Add("//Storyboard Layer 4 (Overlay)");
-            lines.AddRange(Event.SerializeEventTree(StoryboardLayerOverlay, saveWithFloatPrecision: SaveWithFloatPrecision));
-            if (Version < 128)
-                lines.Add("//Storyboard Sound Samples");
-            lines.AddRange(StoryboardSoundSamples.Select(sbss => {
-                sbss.SaveWithFloatPrecision = SaveWithFloatPrecision;
-                return sbss.GetLine();
-            }));
-            lines.Add("");
-            lines.Add("[TimingPoints]");
-            lines.AddRange(BeatmapTiming.TimingPoints.Where(tp => tp != null).Select(tp => {
-                tp.SaveWithFloatPrecision = SaveWithFloatPrecision;
-                return tp.GetLine();
-            }));
-            if (Version < 128)
-                lines.Add("");
-            if (ComboColours.Any()) {
-                lines.Add("");
-                lines.Add("[Colours]");
-                lines.AddRange(ComboColours.Select((t, i) => "Combo" + (i + 1) + (Version < 128 ? " : " : ": ") + t));
-                lines.AddRange(SpecialColours.Select(specialColour => specialColour.Key + (Version < 128 ? " : " : ": ") + specialColour.Value));
+                int colourIncrement = hitObject.IsSpinner ? hitObject.ComboSkip : hitObject.ComboSkip + 1;
+
+                colourIndex = MathHelper.Mod(colourIndex + colourIncrement, actingComboColours.Length);
+                comboIndex = 1;
             }
-            lines.Add("");
-            lines.Add("[HitObjects]");
-            lines.AddRange(HitObjects.Select(ho => {
-                ho.SaveWithFloatPrecision = SaveWithFloatPrecision;
-                return ho.GetLine();
-            }));
-            lines.Add("");
-
-            return lines;
-        }
-
-        /// <summary>
-        /// Finds the earliest hit-object start.
-        /// </summary>
-        /// <returns>The minimum start time in milliseconds.</returns>
-        public double GetHitObjectStartTime() {
-            return HitObjects.Min(h => h.Time);
-        }
-
-        /// <summary>
-        /// Finds the latest hit-object end.
-        /// </summary>
-        /// <returns>The maximum end time in milliseconds.</returns>
-        public double GetHitObjectEndTime() {
-            return HitObjects.Max(h => h.EndTime);
-        }
-
-        /// <summary>
-        /// Shifts timing points, hit objects, and their derived timelines by a millisecond offset.
-        /// </summary>
-        /// <param name="offset">The offset.</param>
-        public void OffsetTime(double offset) {
-            BeatmapTiming.Offset(offset);
-            HitObjects?.ForEach(h => h.MoveTime(offset));
-        }
-
-        private IEnumerable<Event> EnumerateAllEvents() {
-            return BackgroundAndVideoEvents.Concat(BreakPeriods).Concat(StoryboardSoundSamples)
-                .Concat(StoryboardLayerFail).Concat(StoryboardLayerPass).Concat(StoryboardLayerBackground)
-                .Concat(StoryboardLayerForeground).Concat(StoryboardLayerOverlay);
-        }
-
-        /// <summary>
-        /// Calculates enough pre-map time for configured lead-in, early events, approach time, the OD50 window, and a safety second.
-        /// </summary>
-        /// <returns>The required lead-in duration in milliseconds.</returns>
-        public double GetLeadInTime() {
-            var leadInTime = General["AudioLeadIn"].DoubleValue;
-            var od = Difficulty["OverallDifficulty"].DoubleValue;
-            var window50 = Math.Ceiling(200 - 10 * od);
-            var eventsWithStartTime = EnumerateAllEvents().OfType<IHasStartTime>().ToArray();
-            if (eventsWithStartTime.Length > 0)
-                leadInTime = Math.Max(-eventsWithStartTime.Min(o => o.StartTime), leadInTime);
-            if (HitObjects.Count > 0) {
-                var approachTime = GetApproachTime(Difficulty["ApproachRate"].DoubleValue);
-                leadInTime = Math.Max(approachTime - HitObjects[0].Time, leadInTime);
-            }
-            return leadInTime + window50 + 1000;
-        }
-
-        /// <summary>
-        /// Expresses the beginning of playback as a negative lead-in timestamp.
-        /// </summary>
-        /// <returns>The negative value of <see cref="GetLeadInTime"/>.</returns>
-        public double GetMapStartTime() {
-            return -GetLeadInTime();
-        }
-
-        /// <summary>
-        /// Calculates the playback end from hit-object tail padding and storyboard/event durations.
-        /// </summary>
-        /// <returns>The latest required playback time in milliseconds.</returns>
-        public double GetMapEndTime() {
-            var endTime = HitObjects.Count > 0
-                ? Math.Max(GetHitObjectEndTime() + 200, HitObjects.Last().EndTime + 3000)
-                : double.NegativeInfinity;
-            var eventsWithEndTime = EnumerateAllEvents().OfType<IHasEndTime>().ToArray();
-            if (eventsWithEndTime.Length > 0)
-                endTime = Math.Max(endTime, eventsWithEndTime.Max(o => o.EndTime) - 500);
-            return endTime;
-        }
-
-        /// <summary>
-        /// Gets the time at which auto-fail gets checked by osu!
-        /// The counted judgements must add up to the object count at this time.
-        /// </summary>
-        /// <returns></returns>
-        public double GetAutoFailCheckTime() {
-            return GetHitObjectEndTime() + 200;
-        }
-
-        /// <summary>
-        /// Finds the objects refered by specified time code.
-        /// Example time code: <example>00:56:823 (1,2,1,2) - </example>
-        /// </summary>
-        /// <param name="code">The time code</param>
-        /// <returns></returns>
-        public IEnumerable<HitObject> QueryTimeCode(string code) {
-            var startBracketIndex = code.IndexOf("(", StringComparison.Ordinal);
-            var endBracketIndex = code.IndexOf(")", StringComparison.Ordinal);
-
-            // Extract the list of combo numbers from the code
-            IEnumerable<int> comboNumbers;
-            if (startBracketIndex == -1) {
-                // If there is not start bracket, then we assume that there is no list of combo numbers in the code
-                // -1 means just get any combo number
-                comboNumbers = new[] {-1};
-            } else {
-                if (endBracketIndex == -1) {
-                    endBracketIndex = code.Length - 1;
-                }
-
-                // Get the part of the code between the brackets
-                var comboNumbersString = code.Substring(startBracketIndex + 1, endBracketIndex - startBracketIndex - 1);
-
-                comboNumbers = comboNumbersString.Split(',').Select(int.Parse);
+            else
+            {
+                comboIndex++;
             }
 
-            // Parse the time span in the code
-            var time = TypeConverters.ParseOsuTimestamp(code).TotalMilliseconds;
+            hitObject.ComboIndex = comboIndex;
+            hitObject.ColourIndex = colourIndex;
+            hitObject.Colour = actingComboColours[colourIndex];
 
-            // Enumerate through the hit objects from the first object at the time
-            int objectIndex = HitObjects.FindIndex(h => h.Time >= time);
-            foreach (var comboNumber in comboNumbers) {
-                while (comboNumber != -1 && objectIndex < HitObjects.Count && HitObjects[objectIndex].ComboIndex != comboNumber) {
-                    objectIndex++;
-                }
+            previousHitObject = hitObject;
+        }
+    }
 
-                if (objectIndex >= HitObjects.Count)
-                    yield break;
+    /// <summary>
+    ///     Adjusts combo skip for all the hitobjects so colour index is correct.
+    /// </summary>
+    public void FixComboSkip()
+    {
+        HitObject previousHitObject = null;
+        int colourIndex = 0;
 
-                yield return HitObjects[objectIndex++];
+        // If there are no combo colours use the default combo colours so the hitobjects still have something
+        var actingComboColours = ComboColours.Count == 0 ? ComboColour.GetDefaultComboColours() : ComboColours.ToArray();
+
+        foreach (var hitObject in HitObjects)
+        {
+            bool newCombo = IsNewCombo(hitObject, previousHitObject);
+
+            if (newCombo)
+            {
+                int colourIncrement = hitObject.IsSpinner ? 0 : 1;
+                int newColourIndex = MathHelper.Mod(colourIndex + colourIncrement, actingComboColours.Length);
+                int wantedColourIndex = hitObject.ColourIndex;
+                int diff = wantedColourIndex - newColourIndex;
+
+                if (diff > 0)
+                    hitObject.ComboSkip = diff;
+                else if (diff < 0) hitObject.ComboSkip = actingComboColours.Length + diff;
+
+                int newColourIncrement = hitObject.IsSpinner ? hitObject.ComboSkip : hitObject.ComboSkip + 1;
+                colourIndex = MathHelper.Mod(colourIndex + newColourIncrement, actingComboColours.Length);
             }
+
+            previousHitObject = hitObject;
+        }
+    }
+
+    /// <summary>
+    ///     Applies osu!'s effective combo-boundary rules, including spinner boundaries.
+    /// </summary>
+    /// <param name="hitObject">The hit object.</param>
+    /// <param name="previousHitObject">The previous hit object.</param>
+    /// <returns><see langword="true" /> for explicit new combos, spinners, the first object, or an object after a spinner.</returns>
+    public static bool IsNewCombo(HitObject hitObject, HitObject previousHitObject)
+    {
+        return hitObject.NewCombo || hitObject.IsSpinner || previousHitObject == null || previousHitObject.IsSpinner;
+    }
+
+    /// <summary>
+    ///     For each hit object it stores the timingpoints from <see cref="BeatmapTiming" /> which are affecting that hit
+    ///     object.
+    ///     Basically making all hit objects aware of the effects on themselves coming from the <see cref="BeatmapTiming" />.
+    /// </summary>
+    public void GiveObjectsGreenlines()
+    {
+        foreach (var ho in HitObjects)
+        {
+            ho.SliderVelocity = BeatmapTiming.GetSvAtTime(ho.Time);
+            ho.TimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time);
+            ho.HitsoundTimingPoint = BeatmapTiming.GetTimingPointAtTime(ho.Time + 5);
+            ho.UnInheritedTimingPoint = BeatmapTiming.GetRedlineAtTime(ho.Time);
+            ho.BodyHitsounds = BeatmapTiming.GetTimingPointsInRange(ho.Time, ho.EndTime, false);
+            foreach (double time in ho.GetAllTloTimes(BeatmapTiming)) ho.BodyHitsounds.RemoveAll(o => Math.Abs(time - o.Offset) <= 5);
+        }
+    }
+
+    /// <summary>
+    ///     Calculates the time in milliseconds between a hit object appearing on screen and getting perfectly hit for a given
+    ///     approach rate value.
+    /// </summary>
+    /// <param name="approachRate">The approach rate difficulty setting.</param>
+    /// <returns>The time in milliseconds between a hit object appearing on screen and getting perfectly hit.</returns>
+    public static double GetApproachTime(double approachRate)
+    {
+        if (approachRate < 5) return 1800 - 120 * approachRate;
+
+        return 1200 - 150 * (approachRate - 5);
+    }
+
+    /// <summary>
+    ///     Calculates the radius of a hit circle from a given Circle Size difficulty.
+    /// </summary>
+    /// <param name="circleSize"></param>
+    /// <returns></returns>
+    public static double GetHitObjectRadius(double circleSize)
+    {
+        return (109 - 9 * circleSize) / 2;
+    }
+
+    /// <summary>
+    ///     Calculates the per-stack positional displacement from circle size.
+    /// </summary>
+    /// <param name="circleSize">The circle size.</param>
+    /// <returns>One tenth of the hit-object radius in playfield pixels.</returns>
+    public static double GetStackOffset(double circleSize)
+    {
+        return GetHitObjectRadius(circleSize) / 10;
+    }
+
+    /// <summary>
+    ///     Finds all hit objects from this beatmap which are within a specified range.
+    ///     Just any part of the hit object has to overlap with the time range in order to be included.
+    /// </summary>
+    /// <param name="start">The start of the time range.</param>
+    /// <param name="end">The end of the time range.</param>
+    /// <returns>All <see cref="HitObject" /> that are found within specified range.</returns>
+    public List<HitObject> GetHitObjectsWithRangeInRange(double start, double end)
+    {
+        return HitObjects.FindAll(o => o.EndTime >= start && o.Time <= end);
+    }
+
+    /// <summary>
+    ///     Creates a new <see cref="Timeline" /> for this Beatmap.
+    ///     Upon creation the timeline is updated with all the current timing and hitsounds of this beatmap,
+    ///     but later changes wont be automatically synchronized.
+    /// </summary>
+    /// <returns></returns>
+    public Timeline GetTimeline()
+    {
+        var tl = new Timeline(HitObjects, BeatmapTiming);
+        tl.GiveTimingPoints(BeatmapTiming);
+        return tl;
+    }
+
+    /// <summary>
+    ///     Grabs all bookmarks
+    /// </summary>
+    /// <returns>The list of Bookmarks.</returns>
+    public List<double> GetBookmarks()
+    {
+        try
+        {
+            return Editor["Bookmarks"].GetDoubleList();
+        }
+        catch (KeyNotFoundException)
+        {
+            return new List<double>();
+        }
+    }
+
+    /// <summary>
+    ///     Sets the bookmarks value in <see cref="Editor" /> with a new list of bookmarks.
+    ///     Decimal values will be rounded in this process.
+    /// </summary>
+    /// <param name="bookmarks"></param>
+    public void SetBookmarks(List<double> bookmarks)
+    {
+        if (bookmarks.Count > 0) Editor["Bookmarks"] = new TValue(string.Join(",", bookmarks.Select(d => Math.Round(d))));
+    }
+
+    /// <summary>
+    ///     Returns all hit objects that have a bookmark in their range.
+    /// </summary>
+    /// <returns>A list of hit objects that have a bookmark in their range.</returns>
+    public List<HitObject> GetBookmarkedObjects(double leniency = 5)
+    {
+        var bookmarks = GetBookmarks();
+        var markedObjects = HitObjects.FindAll(ho =>
+            bookmarks.Exists(o => ho.Time - leniency <= o && o <= ho.EndTime + leniency));
+        return markedObjects;
+    }
+
+    /// <summary>
+    ///     Finds the earliest hit-object start.
+    /// </summary>
+    /// <returns>The minimum start time in milliseconds.</returns>
+    public double GetHitObjectStartTime()
+    {
+        return HitObjects.Min(h => h.Time);
+    }
+
+    /// <summary>
+    ///     Finds the latest hit-object end.
+    /// </summary>
+    /// <returns>The maximum end time in milliseconds.</returns>
+    public double GetHitObjectEndTime()
+    {
+        return HitObjects.Max(h => h.EndTime);
+    }
+
+    /// <summary>
+    ///     Shifts timing points, hit objects, and their derived timelines by a millisecond offset.
+    /// </summary>
+    /// <param name="offset">The offset.</param>
+    public void OffsetTime(double offset)
+    {
+        BeatmapTiming.Offset(offset);
+        HitObjects?.ForEach(h => h.MoveTime(offset));
+    }
+
+    private IEnumerable<Event> EnumerateAllEvents()
+    {
+        return BackgroundAndVideoEvents.Concat(BreakPeriods).Concat(StoryboardSoundSamples)
+            .Concat(StoryboardLayerFail).Concat(StoryboardLayerPass).Concat(StoryboardLayerBackground)
+            .Concat(StoryboardLayerForeground).Concat(StoryboardLayerOverlay);
+    }
+
+    /// <summary>
+    ///     Calculates enough pre-map time for configured lead-in, early events, approach time, the OD50 window, and a safety
+    ///     second.
+    /// </summary>
+    /// <returns>The required lead-in duration in milliseconds.</returns>
+    public double GetLeadInTime()
+    {
+        double leadInTime = General["AudioLeadIn"].DoubleValue;
+        double od = Difficulty["OverallDifficulty"].DoubleValue;
+        double window50 = Math.Ceiling(200 - 10 * od);
+        var eventsWithStartTime = EnumerateAllEvents().OfType<IHasStartTime>().ToArray();
+        if (eventsWithStartTime.Length > 0)
+            leadInTime = Math.Max(-eventsWithStartTime.Min(o => o.StartTime), leadInTime);
+        if (HitObjects.Count > 0)
+        {
+            double approachTime = GetApproachTime(Difficulty["ApproachRate"].DoubleValue);
+            leadInTime = Math.Max(approachTime - HitObjects[0].Time, leadInTime);
         }
 
-        /// <summary>
-        /// Grabs the specified file name of beatmap file.
-        /// with format of:
-        /// <c>Artist - Title (Host) [Difficulty].osu</c>
-        /// </summary>
-        /// <returns>String of file name.</returns>
-        public string GetFileName() {
-            return GetFileName(Metadata["Artist"].Value, Metadata["Title"].Value,
-                Metadata["Creator"].Value, Metadata["Version"].Value, Version);
+        return leadInTime + window50 + 1000;
+    }
+
+    /// <summary>
+    ///     Expresses the beginning of playback as a negative lead-in timestamp.
+    /// </summary>
+    /// <returns>The negative value of <see cref="GetLeadInTime" />.</returns>
+    public double GetMapStartTime()
+    {
+        return -GetLeadInTime();
+    }
+
+    /// <summary>
+    ///     Calculates the playback end from hit-object tail padding and storyboard/event durations.
+    /// </summary>
+    /// <returns>The latest required playback time in milliseconds.</returns>
+    public double GetMapEndTime()
+    {
+        double endTime = HitObjects.Count > 0
+            ? Math.Max(GetHitObjectEndTime() + 200, HitObjects.Last().EndTime + 3000)
+            : double.NegativeInfinity;
+        var eventsWithEndTime = EnumerateAllEvents().OfType<IHasEndTime>().ToArray();
+        if (eventsWithEndTime.Length > 0)
+            endTime = Math.Max(endTime, eventsWithEndTime.Max(o => o.EndTime) - 500);
+        return endTime;
+    }
+
+    /// <summary>
+    ///     Gets the time at which auto-fail gets checked by osu!
+    ///     The counted judgements must add up to the object count at this time.
+    /// </summary>
+    /// <returns></returns>
+    public double GetAutoFailCheckTime()
+    {
+        return GetHitObjectEndTime() + 200;
+    }
+
+    /// <summary>
+    ///     Finds the objects refered by specified time code.
+    ///     Example time code:
+    ///     <example>00:56:823 (1,2,1,2) - </example>
+    /// </summary>
+    /// <param name="code">The time code</param>
+    /// <returns></returns>
+    public IEnumerable<HitObject> QueryTimeCode(string code)
+    {
+        int startBracketIndex = code.IndexOf("(", StringComparison.Ordinal);
+        int endBracketIndex = code.IndexOf(")", StringComparison.Ordinal);
+
+        // Extract the list of combo numbers from the code
+        IEnumerable<int> comboNumbers;
+        if (startBracketIndex == -1)
+        {
+            // If there is not start bracket, then we assume that there is no list of combo numbers in the code
+            // -1 means just get any combo number
+            comboNumbers = new[] { -1 };
+        }
+        else
+        {
+            if (endBracketIndex == -1) endBracketIndex = code.Length - 1;
+
+            // Get the part of the code between the brackets
+            string comboNumbersString = code.Substring(startBracketIndex + 1, endBracketIndex - startBracketIndex - 1);
+
+            comboNumbers = comboNumbersString.Split(',').Select(int.Parse);
         }
 
-        /// <summary>
-        /// Grabs the specified file name of beatmap file.
-        /// with format of:
-        /// <c>Artist - Title (Host) [Difficulty].osu</c>
-        /// </summary>
-        /// <returns>String of file name.</returns>
-        public static string GetFileName(string artist, string title, string creator, string version, int formatVersion = 14) {
-            string fileName = $"{artist} - {title} ({creator}) [{version}]";
+        // Parse the time span in the code
+        double time = TypeConverters.ParseOsuTimestamp(code).TotalMilliseconds;
 
-            string regexSearch = new string(Path.GetInvalidFileNameChars());
-            Regex r = new Regex($"[{Regex.Escape(regexSearch)}]");
-            string replacement = formatVersion < 128 ? "" : "_";  // Lazer replaces with _ instead of empty string
-            fileName = r.Replace(fileName, replacement);
+        // Enumerate through the hit objects from the first object at the time
+        int objectIndex = HitObjects.FindIndex(h => h.Time >= time);
+        foreach (int comboNumber in comboNumbers)
+        {
+            while (comboNumber != -1 && objectIndex < HitObjects.Count && HitObjects[objectIndex].ComboIndex != comboNumber) objectIndex++;
 
-            return fileName.Substring(0, Math.Min(184, fileName.Length)) + ".osu";
+            if (objectIndex >= HitObjects.Count)
+                yield break;
+
+            yield return HitObjects[objectIndex++];
         }
+    }
 
-        /// <summary>
-        /// Copies mutable gameplay and timing data, then rebinds each copied object to copied timing points.
-        /// </summary>
-        /// <returns>A beatmap whose hit objects and timing points can be edited independently.</returns>
-        public Beatmap DeepCopy() {
-            var newBeatmap = (Beatmap)MemberwiseClone();
-            newBeatmap.HitObjects = HitObjects?.Select(h => h.DeepCopy()).ToList();
-            newBeatmap.BeatmapTiming = new Timing(BeatmapTiming.TimingPoints.Select(t => t.Copy()).ToList(), BeatmapTiming.SliderMultiplier);
-            newBeatmap.GiveObjectsGreenlines();
-            return newBeatmap;
-        }
+    /// <summary>
+    ///     Grabs the specified file name of beatmap file.
+    ///     with format of:
+    ///     <c>Artist - Title (Host) [Difficulty].osu</c>
+    /// </summary>
+    /// <returns>String of file name.</returns>
+    public string GetFileName()
+    {
+        return GetFileName(Metadata["Artist"].Value, Metadata["Title"].Value,
+            Metadata["Creator"].Value, Metadata["Version"].Value, Version);
+    }
+
+    /// <summary>
+    ///     Grabs the specified file name of beatmap file.
+    ///     with format of:
+    ///     <c>Artist - Title (Host) [Difficulty].osu</c>
+    /// </summary>
+    /// <returns>String of file name.</returns>
+    public static string GetFileName(string artist, string title, string creator, string version, int formatVersion = 14)
+    {
+        string fileName = $"{artist} - {title} ({creator}) [{version}]";
+
+        string regexSearch = new(Path.GetInvalidFileNameChars());
+        var r = new Regex($"[{Regex.Escape(regexSearch)}]");
+        string replacement = formatVersion < 128 ? "" : "_"; // Lazer replaces with _ instead of empty string
+        fileName = r.Replace(fileName, replacement);
+
+        return fileName.Substring(0, Math.Min(184, fileName.Length)) + ".osu";
+    }
+
+    /// <summary>
+    ///     Copies mutable gameplay and timing data, then rebinds each copied object to copied timing points.
+    /// </summary>
+    /// <returns>A beatmap whose hit objects and timing points can be edited independently.</returns>
+    public Beatmap DeepCopy()
+    {
+        var newBeatmap = (Beatmap)MemberwiseClone();
+        newBeatmap.HitObjects = HitObjects?.Select(h => h.DeepCopy()).ToList();
+        newBeatmap.BeatmapTiming = new Timing(BeatmapTiming.TimingPoints.Select(t => t.Copy()).ToList(), BeatmapTiming.SliderMultiplier);
+        newBeatmap.GiveObjectsGreenlines();
+        return newBeatmap;
     }
 }

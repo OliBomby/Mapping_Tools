@@ -1,9 +1,8 @@
-using FluentAssertions;
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
@@ -23,7 +22,7 @@ public sealed class GeometryDashboardDomainTests
         SnappingToolsPreferences preferences = new();
 
         // Act
-        RelevantObjectPreferences pointPreferences = preferences.GetReleventObjectPreferences(RelevantPoint.PreferencesNameStatic);
+        var pointPreferences = preferences.GetReleventObjectPreferences(RelevantPoint.PreferencesNameStatic);
 
         // Assert
         preferences.AcceptableDifference.Should().Be(2);
@@ -50,7 +49,7 @@ public sealed class GeometryDashboardDomainTests
         layers.GetRootLayer().Add([first, second]);
 
         // Assert
-        RelevantLine line = layers.ObjectLayers[1].Objects.Values
+        var line = layers.ObjectLayers[1].Objects.Values
             .SelectMany(objects => objects)
             .OfType<RelevantLine>()
             .Should().ContainSingle().Which;
@@ -66,13 +65,13 @@ public sealed class GeometryDashboardDomainTests
         CoordinateConverter converter = new()
         {
             ScreenBox = new Box2(0, 0, 2560, 1440),
-            OsuResolution = new Vector2(2560, 1440)
+            OsuResolution = new Vector2(2560, 1440),
         };
         Vector2 editorCoordinate = new(256, 192);
 
         // Act
-        Vector2 screenCoordinate = converter.EditorToScreenCoordinate(editorCoordinate);
-        Vector2 roundTrip = converter.ScreenToEditorCoordinate(screenCoordinate);
+        var screenCoordinate = converter.EditorToScreenCoordinate(editorCoordinate);
+        var roundTrip = converter.ScreenToEditorCoordinate(screenCoordinate);
 
         // Assert
         roundTrip.X.Should().BeApproximately(editorCoordinate.X, 0.000001);
@@ -104,7 +103,7 @@ public sealed class GeometryDashboardDomainTests
         parent.ChildObjects.Add(child);
 
         // Act
-        RelevantPoint locked = (RelevantPoint)child.GetLockedRelevantObject();
+        var locked = (RelevantPoint)child.GetLockedRelevantObject();
 
         // Assert
         parent.ChildObjects.Should().Contain(child);
@@ -118,17 +117,17 @@ public sealed class GeometryDashboardDomainTests
     public void RelevantHitObject_GetLockedRelevantObject_ClonesTheMutableHitObject()
     {
         // Arrange
-        Mapping_Tools.Core.Classes.BeatmapHelper.HitObject hitObject = new()
+        HitObject hitObject = new()
         {
             Pos = new Vector2(100, 100),
             Time = 500,
             IsCircle = true,
-            CurvePoints = []
+            CurvePoints = [],
         };
         RelevantHitObject source = new(hitObject);
 
         // Act
-        RelevantHitObject locked = (RelevantHitObject)source.GetLockedRelevantObject();
+        var locked = (RelevantHitObject)source.GetLockedRelevantObject();
         locked.HitObject.Pos = new Vector2(200, 200);
         locked.HitObject.Time = 750;
 
@@ -141,15 +140,15 @@ public sealed class GeometryDashboardDomainTests
     public void RelevantHitObject_Difference_WithUninitializedCurvePoints_TreatsThemAsEmpty()
     {
         // Arrange
-        RelevantHitObject first = new(new Mapping_Tools.Core.Classes.BeatmapHelper.HitObject
+        RelevantHitObject first = new(new HitObject
         {
             IsCircle = true,
-            Pos = new Vector2(100, 100)
+            Pos = new Vector2(100, 100),
         });
-        RelevantHitObject second = new(new Mapping_Tools.Core.Classes.BeatmapHelper.HitObject
+        RelevantHitObject second = new(new HitObject
         {
             IsCircle = true,
-            Pos = new Vector2(100, 100)
+            Pos = new Vector2(100, 100),
         });
 
         // Act
@@ -164,7 +163,7 @@ public sealed class GeometryDashboardDomainTests
     {
         // Arrange
         LayerCollection layers = new(new RelevantObjectsGeneratorCollection([]), 0);
-        RelevantPoint[] points = Enumerable.Range(0, layers.MaxObjects + 1)
+        var points = Enumerable.Range(0, layers.MaxObjects + 1)
             .Select(index => new RelevantPoint(new Vector2(index, 0)))
             .ToArray();
 
@@ -181,7 +180,7 @@ public sealed class GeometryDashboardDomainTests
     {
         // Arrange
         RelevantCircle circle = new(new Circle(new Vector2(100, 100), 25));
-        RelevantHitObject hitObject = new(new Mapping_Tools.Core.Classes.BeatmapHelper.HitObject
+        RelevantHitObject hitObject = new(new HitObject
         {
             IsSlider = true,
             SliderType = PathType.Linear,
@@ -189,16 +188,16 @@ public sealed class GeometryDashboardDomainTests
             CurvePoints = [new Vector2(100, 0)],
             PixelLength = 1,
             Time = 100,
-            EndTime = 100
+            EndTime = 100,
         });
         SliderPathGenerator pathGenerator = new();
         ((SliderPathGeneratorSettings)pathGenerator.Settings).PointDensity = 1;
 
         // Act
-        Vector2 nearest = circle.NearestPoint(circle.Child.Centre);
-        RelevantLine[] tangentLines = new CircleTangentGenerator().GetRelevantObjects(
+        var nearest = circle.NearestPoint(circle.Child.Centre);
+        var tangentLines = new CircleTangentGenerator().GetRelevantObjects(
             new RelevantPoint(circle.Child.Centre), circle);
-        RelevantPoint[] pathPoints = pathGenerator.GetRelevantObjects(hitObject)!;
+        var pathPoints = pathGenerator.GetRelevantObjects(hitObject)!;
 
         // Assert
         nearest.X.Should().NotBe(double.NaN);

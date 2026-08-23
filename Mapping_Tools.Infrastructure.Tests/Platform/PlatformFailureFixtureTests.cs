@@ -13,8 +13,8 @@ public sealed class PlatformFailureFixtureTests
         string path = Path.Combine(AppContext.BaseDirectory, "Fixtures", "PlatformFailures", "scenarios.json");
 
         // Act
-        using JsonDocument document = JsonDocument.Parse(File.ReadAllText(path));
-        JsonElement[] scenarios = document.RootElement.GetProperty("scenarios").EnumerateArray().ToArray();
+        using var document = JsonDocument.Parse(File.ReadAllText(path));
+        var scenarios = document.RootElement.GetProperty("scenarios").EnumerateArray().ToArray();
 
         // Assert
         document.RootElement.GetProperty("schemaVersion").GetInt32().Should().Be(1);

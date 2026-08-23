@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.RhythmGuide;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -12,12 +11,12 @@ public sealed class RhythmGuideGeneratorTests
     public void Append_WithAcceptedWaveZeroOptions_ReproducesLegacySemanticCounts()
     {
         // Arrange
-        Beatmap source = Load("standard-feature-rich.osu");
-        Beatmap target = Load("ComplicatedTestMap.osu");
+        var source = Load("standard-feature-rich.osu");
+        var target = Load("ComplicatedTestMap.osu");
         RhythmGuideOptions options = new()
         {
             SelectionMode = RhythmGuideSelectionMode.HitsoundEvents,
-            NcEverything = true
+            NcEverything = true,
         };
 
         // Act
@@ -34,15 +33,15 @@ public sealed class RhythmGuideGeneratorTests
     public void CreateNewMap_WithSource_RetainsRedlinesAndAppliesOutputMetadata()
     {
         // Arrange
-        Beatmap source = Load("standard-feature-rich.osu");
+        var source = Load("standard-feature-rich.osu");
         RhythmGuideOptions options = new()
         {
             OutputName = "Guide",
-            SelectionMode = RhythmGuideSelectionMode.HitsoundEvents
+            SelectionMode = RhythmGuideSelectionMode.HitsoundEvents,
         };
 
         // Act
-        Beatmap result = RhythmGuideGenerator.CreateNewMap([source], options);
+        var result = RhythmGuideGenerator.CreateNewMap([source], options);
 
         // Assert
         result.Metadata["Version"].Value.Should().Be("Guide");
@@ -50,9 +49,11 @@ public sealed class RhythmGuideGeneratorTests
         result.BeatmapTiming.TimingPoints.Should().OnlyContain(point => point.Uninherited);
     }
 
-    private static Beatmap Load(string fileName) =>
-        new(File.ReadAllLines(Path.Combine(
+    private static Beatmap Load(string fileName)
+    {
+        return new Beatmap(File.ReadAllLines(Path.Combine(
             AppContext.BaseDirectory,
             "Resources",
             fileName)).ToList());
+    }
 }

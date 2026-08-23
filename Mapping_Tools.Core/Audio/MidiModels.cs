@@ -24,15 +24,9 @@ public sealed class MidiNote
         string? instrumentName = null,
         string? keyName = null)
     {
-        if (!double.IsFinite(startMilliseconds) || startMilliseconds < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(startMilliseconds));
-        }
+        if (!double.IsFinite(startMilliseconds) || startMilliseconds < 0) throw new ArgumentOutOfRangeException(nameof(startMilliseconds));
 
-        if (!double.IsFinite(durationMilliseconds) || durationMilliseconds < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(durationMilliseconds));
-        }
+        if (!double.IsFinite(durationMilliseconds) || durationMilliseconds < 0) throw new ArgumentOutOfRangeException(nameof(durationMilliseconds));
 
         StartMilliseconds = startMilliseconds;
         DurationMilliseconds = durationMilliseconds;

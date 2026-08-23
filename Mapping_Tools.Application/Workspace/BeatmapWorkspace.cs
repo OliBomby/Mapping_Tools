@@ -5,30 +5,30 @@ using Mapping_Tools.Application.Settings;
 namespace Mapping_Tools.Application.Workspace;
 
 /// <summary>
-/// Coordinates selected paths, persisted recent history, native file picking,
-/// and live osu! lookup without relying on a window or view model.
+///     Coordinates selected paths, persisted recent history, native file picking,
+///     and live osu! lookup without relying on a window or view model.
 /// </summary>
 public sealed class BeatmapWorkspace : IBeatmapWorkspace
 {
     private const int RecentMapLimit = 20;
-
-    private readonly ApplicationSettings _settings;
+    private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
     private readonly IFilePicker _filePicker;
     private readonly IBeatmapFileSystem _fileSystem;
-    private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
+
+    private readonly ApplicationSettings _settings;
     private readonly TimeProvider _timeProvider;
     private string[] _selectedPaths = [];
 
     /// <summary>
-    /// Creates workspace state backed by the same settings instance that will
-    /// be persisted when the application exits.
+    ///     Creates workspace state backed by the same settings instance that will
+    ///     be persisted when the application exits.
     /// </summary>
     /// <param name="settings">Owns typed recent history and picker path preferences.</param>
     /// <param name="filePicker">Presents the shared beatmap file dialog.</param>
     /// <param name="fileSystem">Checks selections and derives picker start folders.</param>
     /// <param name="currentBeatmapLocator">
-        /// Supplies the current path through the same live-reader boundary used
-        /// by editing sessions, without leaking process-memory types here.
+    ///     Supplies the current path through the same live-reader boundary used
+    ///     by editing sessions, without leaking process-memory types here.
     /// </param>
     /// <param name="timeProvider">Supplies deterministic timestamps for recent history.</param>
     public BeatmapWorkspace(
@@ -42,30 +42,26 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
         _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         _currentBeatmapLocator = currentBeatmapLocator
-            ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+                                 ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _settings.RecentMaps ??= [];
         RemoveInvalidRecentEntries();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public event EventHandler<BeatmapSelectionChangedEventArgs>? SelectionChanged;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IReadOnlyList<string> SelectedPaths => _selectedPaths.ToArray();
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IReadOnlyList<RecentBeatmap> RecentMaps => _settings.RecentMaps.ToArray();
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool RestoreMostRecent()
     {
-        RecentBeatmap? recent = _settings.RecentMaps.FirstOrDefault(
-            item => !string.IsNullOrWhiteSpace(item.Path));
-        if (recent is null)
-        {
-            return false;
-        }
+        var recent = _settings.RecentMaps.FirstOrDefault(item => !string.IsNullOrWhiteSpace(item.Path));
+        if (recent is null) return false;
 
         SetSelection(
             recent.Path.Split('|', StringSplitOptions.RemoveEmptyEntries),
@@ -73,7 +69,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
         return _selectedPaths.Length > 0;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void SetSelection(
         IEnumerable<string> paths,
         BeatmapSelectionSource source = BeatmapSelectionSource.Programmatic)
@@ -90,12 +86,8 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
             .ToString(CultureInfo.CurrentCulture);
         foreach (string path in selection)
         {
-            _settings.RecentMaps.RemoveAll(
-                recent => string.Equals(recent.Path, path, StringComparison.Ordinal));
-            if (_settings.RecentMaps.Count >= RecentMapLimit)
-            {
-                _settings.RecentMaps.RemoveAt(_settings.RecentMaps.Count - 1);
-            }
+            _settings.RecentMaps.RemoveAll(recent => string.Equals(recent.Path, path, StringComparison.Ordinal));
+            if (_settings.RecentMaps.Count >= RecentMapLimit) _settings.RecentMaps.RemoveAt(_settings.RecentMaps.Count - 1);
 
             _settings.RecentMaps.Insert(0, new RecentBeatmap(path, displayDate));
         }
@@ -103,7 +95,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
         PublishSelection(source);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void ClearSelection(
         BeatmapSelectionSource source = BeatmapSelectionSource.Programmatic)
     {
@@ -111,15 +103,14 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
         PublishSelection(source);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool RemoveRecent(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        return _settings.RecentMaps.RemoveAll(
-            recent => string.Equals(recent.Path, path, StringComparison.Ordinal)) > 0;
+        return _settings.RecentMaps.RemoveAll(recent => string.Equals(recent.Path, path, StringComparison.Ordinal)) > 0;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IReadOnlyList<string> GetMissingSelectedPaths()
     {
         return _selectedPaths
@@ -127,32 +118,29 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
             .ToArray();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<bool> PickBeatmapsAsync(
         bool allowMultiple,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        IReadOnlyList<string> paths = await _filePicker.PickOpenFilesAsync(
+        var paths = await _filePicker.PickOpenFilesAsync(
             new OpenFilePickerRequest
             {
                 Title = "Open beatmap",
                 SuggestedStartLocation = GetPickerStartLocation(),
                 AllowMultiple = allowMultiple,
-                Filters = [CommonFilePickerFilters.BeatmapsAndStoryboards]
+                Filters = [CommonFilePickerFilters.BeatmapsAndStoryboards],
             },
             cancellationToken);
 
-        if (paths.Count == 0)
-        {
-            return false;
-        }
+        if (paths.Count == 0) return false;
 
         SetSelection(paths, BeatmapSelectionSource.FilePicker);
         return true;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<CurrentBeatmapSelectionResult> SelectCurrentBeatmapAsync(
         CancellationToken cancellationToken = default)
     {
@@ -162,18 +150,14 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
         cancellationToken.ThrowIfCancellationRequested();
 
         if (string.IsNullOrWhiteSpace(path))
-        {
             return new CurrentBeatmapSelectionResult(
                 CurrentBeatmapSelectionStatus.Unavailable,
                 null);
-        }
 
         if (!_fileSystem.FileExists(path))
-        {
             return new CurrentBeatmapSelectionResult(
                 CurrentBeatmapSelectionStatus.FileMissing,
                 path);
-        }
 
         SetSelection([path], BeatmapSelectionSource.CurrentEditor);
         return new CurrentBeatmapSelectionResult(
@@ -183,10 +167,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
 
     private string? GetPickerStartLocation()
     {
-        if (!_settings.CurrentBeatmapDefaultFolder)
-        {
-            return null;
-        }
+        if (!_settings.CurrentBeatmapDefaultFolder) return null;
 
         string? selectedParent = _selectedPaths.Length == 0
             ? null
@@ -198,14 +179,8 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
 
     private void RemoveInvalidRecentEntries()
     {
-        _settings.RecentMaps.RemoveAll(
-            recent => recent is null ||
-                      string.IsNullOrWhiteSpace(recent.Path) ||
-                      recent.DisplayDate is null);
-        while (_settings.RecentMaps.Count > RecentMapLimit)
-        {
-            _settings.RecentMaps.RemoveAt(_settings.RecentMaps.Count - 1);
-        }
+        _settings.RecentMaps.RemoveAll(recent => recent is null || string.IsNullOrWhiteSpace(recent.Path) || recent.DisplayDate is null);
+        while (_settings.RecentMaps.Count > RecentMapLimit) _settings.RecentMaps.RemoveAt(_settings.RecentMaps.Count - 1);
     }
 
     private void PublishSelection(BeatmapSelectionSource source)

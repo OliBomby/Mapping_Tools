@@ -4,23 +4,25 @@ using Mapping_Tools.Application.Settings;
 namespace Mapping_Tools.Application.Execution;
 
 /// <summary>
-/// Replaces view-owned BackgroundWorkers with keyed, thread-pool execution and
-/// one process-wide cancellation and completion policy.
+///     Replaces view-owned BackgroundWorkers with keyed, thread-pool execution and
+///     one process-wide cancellation and completion policy.
 /// </summary>
 public sealed class ToolExecutionService : IToolExecutionService
 {
+    private readonly object _gate = new();
     private readonly IUserNotificationService _notifications;
     private readonly IEditorReloadService _reloadService;
-    private readonly ApplicationSettings _settings;
-    private readonly TimeProvider _timeProvider;
-    private readonly object _gate = new();
+
     private readonly Dictionary<string, RunningOperation> _running =
         new(StringComparer.Ordinal);
+
+    private readonly ApplicationSettings _settings;
     private readonly CancellationTokenSource _stopping = new();
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
-    /// Creates the coordinator that owns duplicate-run prevention, application
-    /// shutdown cancellation, notifications, and post-success editor reload.
+    ///     Creates the coordinator that owns duplicate-run prevention, application
+    ///     shutdown cancellation, notifications, and post-success editor reload.
     /// </summary>
     /// <param name="notifications">The frontend-neutral outcome stream.</param>
     /// <param name="reloadService">The platform adapter invoked for successful reload requests.</param>
@@ -33,24 +35,24 @@ public sealed class ToolExecutionService : IToolExecutionService
         TimeProvider timeProvider)
     {
         _notifications = notifications
-            ?? throw new ArgumentNullException(nameof(notifications));
+                         ?? throw new ArgumentNullException(nameof(notifications));
         _reloadService = reloadService
-            ?? throw new ArgumentNullException(nameof(reloadService));
+                         ?? throw new ArgumentNullException(nameof(reloadService));
         _settings = settings
-            ?? throw new ArgumentNullException(nameof(settings));
+                    ?? throw new ArgumentNullException(nameof(settings));
         _timeProvider = timeProvider
-            ?? throw new ArgumentNullException(nameof(timeProvider));
+                        ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task<ToolExecutionResult<T>> ExecuteAsync<T>(
         ToolExecutionRequest<T> request,
         IProgress<ToolExecutionProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-        DateTimeOffset startedAt = _timeProvider.GetUtcNow();
-        CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(
+        var startedAt = _timeProvider.GetUtcNow();
+        var linked = CancellationTokenSource.CreateLinkedTokenSource(
             cancellationToken,
             _stopping.Token);
 
@@ -66,10 +68,10 @@ public sealed class ToolExecutionService : IToolExecutionService
                         null,
                         startedAt,
                         startedAt,
-                        editorReloaded: false));
+                        false));
             }
 
-            Task<ToolExecutionResult<T>> task = RunAsync(
+            var task = RunAsync(
                 request,
                 progress,
                 linked,
@@ -81,24 +83,21 @@ public sealed class ToolExecutionService : IToolExecutionService
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool Cancel(string operationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(operationId);
         RunningOperation operation;
         lock (_gate)
         {
-            if (!_running.TryGetValue(operationId, out operation!))
-            {
-                return false;
-            }
+            if (!_running.TryGetValue(operationId, out operation!)) return false;
         }
 
         operation.TryCancel();
         return true;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsRunning(string operationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(operationId);
@@ -108,7 +107,7 @@ public sealed class ToolExecutionService : IToolExecutionService
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task StopAsync(CancellationToken cancellationToken = default)
     {
         _stopping.Cancel();
@@ -120,17 +119,12 @@ public sealed class ToolExecutionService : IToolExecutionService
             tasks = operations.Select(operation => operation.Task).ToArray();
         }
 
-        foreach (RunningOperation operation in operations)
-        {
-            operation.TryCancel();
-        }
+        foreach (var operation in operations) operation.TryCancel();
 
         if (tasks.Length > 0)
-        {
             await Task.WhenAll(tasks)
                 .WaitAsync(cancellationToken)
                 .ConfigureAwait(false);
-        }
     }
 
     private async Task<ToolExecutionResult<T>> RunAsync<T>(
@@ -142,7 +136,7 @@ public sealed class ToolExecutionService : IToolExecutionService
         try
         {
             ToolExecutionContext context = new(linked.Token, progress);
-            ToolExecutionOutput<T> output = await Task.Run(
+            var output = await Task.Run(
                     () => request.Operation(context),
                     linked.Token)
                 .ConfigureAwait(false);
@@ -156,14 +150,12 @@ public sealed class ToolExecutionService : IToolExecutionService
             }
 
             if (output.Summary is not null)
-            {
                 await PublishSafelyAsync(
                         new UserNotification(
                             UserNotificationSeverity.Success,
                             request.DisplayName,
                             output.Summary))
                     .ConfigureAwait(false);
-            }
 
             return new ToolExecutionResult<T>(
                 ToolExecutionStatus.Succeeded,
@@ -181,7 +173,7 @@ public sealed class ToolExecutionService : IToolExecutionService
                 null,
                 startedAt,
                 _timeProvider.GetUtcNow(),
-                editorReloaded: false);
+                false);
         }
         catch (Exception exception)
         {
@@ -198,7 +190,7 @@ public sealed class ToolExecutionService : IToolExecutionService
                 exception,
                 startedAt,
                 _timeProvider.GetUtcNow(),
-                editorReloaded: false);
+                false);
         }
         finally
         {

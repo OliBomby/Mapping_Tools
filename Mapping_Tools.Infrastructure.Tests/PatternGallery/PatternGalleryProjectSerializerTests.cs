@@ -12,27 +12,27 @@ public sealed class PatternGalleryProjectSerializerTests
     {
         // Arrange
         const string json = """
-            {
-              "$type": "Mapping_Tools.Viewmodels.PatternGalleryVm, Mapping Tools",
-              "CollectionName": "Legacy collection",
-              "Patterns": [
-                {
-                  "$type": "Mapping_Tools.Classes.Tools.PatternGallery.OsuPattern, Mapping Tools",
-                  "Name": "Legacy pattern",
-                  "FileName": "legacy.osu",
-                  "ObjectCount": 3
-                }
-              ],
-              "FileHandler": {
-                "$type": "Mapping_Tools.Classes.Tools.PatternGallery.OsuPatternFileHandler, Mapping Tools",
-                "CollectionFolderName": "LegacyFolder"
-              }
-            }
-            """;
+                            {
+                              "$type": "Mapping_Tools.Viewmodels.PatternGalleryVm, Mapping Tools",
+                              "CollectionName": "Legacy collection",
+                              "Patterns": [
+                                {
+                                  "$type": "Mapping_Tools.Classes.Tools.PatternGallery.OsuPattern, Mapping Tools",
+                                  "Name": "Legacy pattern",
+                                  "FileName": "legacy.osu",
+                                  "ObjectCount": 3
+                                }
+                              ],
+                              "FileHandler": {
+                                "$type": "Mapping_Tools.Classes.Tools.PatternGallery.OsuPatternFileHandler, Mapping Tools",
+                                "CollectionFolderName": "LegacyFolder"
+                              }
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        PatternGalleryProject project = serializer.Deserialize<PatternGalleryProject>(json);
+        var project = serializer.Deserialize<PatternGalleryProject>(json);
 
         // Assert
         project.CollectionName.Should().Be("Legacy collection");
@@ -71,7 +71,7 @@ public sealed class PatternGalleryProjectSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        PatternGalleryProject project = serializer.Deserialize<PatternGalleryProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<PatternGalleryProject>(File.ReadAllText(fixture));
 
         // Assert
         project.CollectionName.Should().Be("My Pattern Collection");
@@ -92,7 +92,7 @@ public sealed class PatternGalleryProjectSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        PatternGalleryProject project = serializer.Deserialize<PatternGalleryProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<PatternGalleryProject>(File.ReadAllText(fixture));
 
         // Assert
         project.CollectionName.Should().Be("My Pattern Collection");

@@ -5,9 +5,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Core.Tests.Classes.BeatmapHelper;
 
 [TestClass]
-public class HitObjectTests {
+public class HitObjectTests
+{
     [TestMethod]
-    public void CircleLine_ParsesAndRoundTrips() {
+    public void CircleLine_ParsesAndRoundTrips()
+    {
         // Arrange
         // Act
         const string line = "256,192,1000,5,2,2:3:4:75:custom.wav";
@@ -26,7 +28,8 @@ public class HitObjectTests {
     }
 
     [TestMethod]
-    public void SliderLine_ParsesPathEdgesAndRoundTrips() {
+    public void SliderLine_ParsesPathEdgesAndRoundTrips()
+    {
         // Arrange
         // Act
         const string line = "64,96,1200,6,2,B|128:96|192:128,2,240,2|8|0,1:2|2:3|3:1,1:2:3:60:";
@@ -36,14 +39,15 @@ public class HitObjectTests {
         hitObject.IsSlider.Should().BeTrue();
         hitObject.SliderType.Should().Be(PathType.Bezier);
         hitObject.Repeat.Should().Be(2);
-        hitObject.EdgeHitsounds.Should().Equal(new[] { 2, 8, 0 });
-        hitObject.EdgeSampleSets.Should().Equal(new[] { SampleSet.Normal, SampleSet.Soft, SampleSet.Drum });
-        hitObject.EdgeAdditionSets.Should().Equal(new[] { SampleSet.Soft, SampleSet.Drum, SampleSet.Normal });
+        hitObject.EdgeHitsounds.Should().Equal(2, 8, 0);
+        hitObject.EdgeSampleSets.Should().Equal(SampleSet.Normal, SampleSet.Soft, SampleSet.Drum);
+        hitObject.EdgeAdditionSets.Should().Equal(SampleSet.Soft, SampleSet.Drum, SampleSet.Normal);
         hitObject.GetLine().Should().Be(line);
     }
 
     [TestMethod]
-    public void HoldNoteLine_UsesEndTimeFromObjectParams() {
+    public void HoldNoteLine_UsesEndTimeFromObjectParams()
+    {
         // Arrange
         // Act
         const string line = "128,192,2000,128,0,2500:1:2:3:40:hold.wav";
@@ -56,14 +60,15 @@ public class HitObjectTests {
     }
 
     [TestMethod]
-    public void Comparer_CanIgnorePositionAndTime() {
+    public void Comparer_CanIgnorePositionAndTime()
+    {
         // Arrange
         // Act
         var first = new HitObject("64,96,1000,1,0,0:0:0:0:");
         var second = new HitObject("128,192,2000,1,0,0:0:0:0:");
 
         // Assert
-        new HitObjectComparer(checkPosition: false, checkTime: false).Equals(first, second).Should().BeTrue();
+        new HitObjectComparer(false, false).Equals(first, second).Should().BeTrue();
         new HitObjectComparer().Equals(first, second).Should().BeFalse();
     }
 }

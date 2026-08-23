@@ -12,7 +12,7 @@ public sealed class MapCleanerEngineTests
     public void Clean_WithAcceptedFixture_ReproducesLegacySemanticCounts()
     {
         // Arrange
-        Beatmap beatmap = Load("standard-feature-rich.osu");
+        var beatmap = Load("standard-feature-rich.osu");
         MapCleanerOptions options = new()
         {
             VolumeSliders = true,
@@ -21,11 +21,11 @@ public sealed class MapCleanerEngineTests
             ResnapObjects = true,
             ResnapBookmarks = true,
             AnalyzeSamples = false,
-            BeatDivisors = [new RationalBeatDivisor(12), new RationalBeatDivisor(16)]
+            BeatDivisors = [new RationalBeatDivisor(12), new RationalBeatDivisor(16)],
         };
 
         // Act
-        MapCleanerResult result = MapCleanerEngine.Clean(beatmap, options);
+        var result = MapCleanerEngine.Clean(beatmap, options);
 
         // Assert
         result.TimingPointsRemoved.Should().Be(16);
@@ -37,6 +37,9 @@ public sealed class MapCleanerEngineTests
             File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", "expected-map-cleaner.osu")));
     }
 
-    private static Beatmap Load(string fileName) => new(
-        File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", fileName)).ToList());
+    private static Beatmap Load(string fileName)
+    {
+        return new Beatmap(
+            File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", fileName)).ToList());
+    }
 }

@@ -12,7 +12,7 @@ public sealed class GeometryDashboardFixtureTests
     {
         // Arrange
         string fixtureRoot = Path.Combine(AppContext.BaseDirectory, "Fixtures", "GeometryDashboard");
-        using JsonDocument record = JsonDocument.Parse(
+        using var record = JsonDocument.Parse(
             File.ReadAllText(Path.Combine(fixtureRoot, "save-virtual-objects.json")));
         string sourcePath = ResolveFixturePath(fixtureRoot, record.RootElement.GetProperty("sourceInput").GetString()!);
         string projectPath = ResolveFixturePath(fixtureRoot, record.RootElement.GetProperty("project").GetString()!);
@@ -20,8 +20,8 @@ public sealed class GeometryDashboardFixtureTests
 
         // Act
         Beatmap source = new(File.ReadAllLines(sourcePath).ToList());
-        using JsonDocument project = JsonDocument.Parse(File.ReadAllText(projectPath));
-        using JsonDocument expected = JsonDocument.Parse(File.ReadAllText(expectedPath));
+        using var project = JsonDocument.Parse(File.ReadAllText(projectPath));
+        using var expected = JsonDocument.Parse(File.ReadAllText(expectedPath));
         string report = File.ReadAllText(Path.Combine(fixtureRoot, "save-virtual-objects-report.md"));
 
         // Assert

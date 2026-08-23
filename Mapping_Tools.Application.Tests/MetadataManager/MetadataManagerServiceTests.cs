@@ -41,11 +41,11 @@ public sealed class MetadataManagerServiceTests
             Source = "Wave 0",
             Tags = "wave zero wave",
             ResetIds = true,
-            PreviewTime = 12345
+            PreviewTime = 12345,
         };
 
         // Act
-        MetadataManagerResult result = await service.ExportAsync(options);
+        var result = await service.ExportAsync(options);
 
         // Assert
         result.ProcessedPaths.Should().ContainSingle();
@@ -53,9 +53,7 @@ public sealed class MetadataManagerServiceTests
         File.Exists(result.ProcessedPaths[0]).Should().BeTrue();
         File.Exists(target).Should().BeFalse();
         backup.CreateRequests.Should().ContainSingle(request =>
-            request.Paths.SequenceEqual(new[] { target }) &&
-            request.Reason == BeatmapBackupReason.Automatic &&
-            !request.Force);
+            request.Paths.SequenceEqual(new[] { target }) && request.Reason == BeatmapBackupReason.Automatic && !request.Force);
         Beatmap output = new(File.ReadAllLines(result.ProcessedPaths[0]).ToList());
         output.Metadata["Artist"].Value.Should().Be("Wave Zero Artist");
         output.Metadata["Tags"].Value.Should().Be("wave zero");
@@ -87,20 +85,26 @@ public sealed class MetadataManagerServiceTests
 
         public Task<StoryboardEditor2> OpenStoryboardAsync(
             string path,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task SaveAsync(
             Editor2 editor,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task SaveAsync(
             BeatmapEditingSession session,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
     }
 
     private sealed class TemporaryDirectory : IDisposable
@@ -118,10 +122,7 @@ public sealed class MetadataManagerServiceTests
 
         public void Dispose()
         {
-            if (Directory.Exists(Path))
-            {
-                Directory.Delete(Path, recursive: true);
-            }
+            if (Directory.Exists(Path)) Directory.Delete(Path, true);
         }
     }
 }

@@ -179,8 +179,8 @@ public sealed class DialogAndValidationTests
         // Arrange
         DialogChoice<bool>[] choices =
         [
-            new("Yes", true, IsDefault: true),
-            new("No", false, IsDefault: true)
+            new("Yes", true, true),
+            new("No", false, true),
         ];
 
         // Act
@@ -202,7 +202,7 @@ public sealed class DialogAndValidationTests
         ValidationAttribute validator = new RequiredTextAttribute();
 
         // Act
-        ValidationResult? result = validator.GetValidationResult(
+        var result = validator.GetValidationResult(
             "   ",
             new ValidationContext(new object()));
 
@@ -217,11 +217,11 @@ public sealed class DialogAndValidationTests
         // Arrange
         ValidationAttribute validator = new InclusiveRangeAttribute<int>(1, 60)
         {
-            ErrorMessage = "Use 1 through 60."
+            ErrorMessage = "Use 1 through 60.",
         };
 
         // Act
-        ValidationResult? result = validator.GetValidationResult(
+        var result = validator.GetValidationResult(
             60,
             new ValidationContext(new object()));
 
@@ -238,13 +238,15 @@ public sealed class DialogAndValidationTests
             "Minutes",
             5,
             new ApplicationConverters.InvariantInt32Converter(),
-            [new InclusiveRangeAttribute<int>(1, 60)
-            {
-                ErrorMessage = "Use 1 through 60."
-            }]);
+            [
+                new InclusiveRangeAttribute<int>(1, 60)
+                {
+                    ErrorMessage = "Use 1 through 60.",
+                },
+            ]);
 
         // Act
-        ValueEvaluation<int> evaluation = request.Evaluate("90");
+        var evaluation = request.Evaluate("90");
 
         // Assert
         evaluation.IsValid.Should().BeFalse();
@@ -261,13 +263,15 @@ public sealed class DialogAndValidationTests
             "Minutes",
             5,
             new ApplicationConverters.InvariantInt32Converter(),
-            [new InclusiveRangeAttribute<int>(1, 60)
-            {
-                ErrorMessage = "Use 1 through 60."
-            }]);
+            [
+                new InclusiveRangeAttribute<int>(1, 60)
+                {
+                    ErrorMessage = "Use 1 through 60.",
+                },
+            ]);
 
         // Act
-        ValueEvaluation<int> evaluation = request.Evaluate("15");
+        var evaluation = request.Evaluate("15");
 
         // Assert
         evaluation.IsValid.Should().BeTrue();
@@ -281,8 +285,8 @@ public sealed class DialogAndValidationTests
         // Arrange
         List<DialogChoice<bool>> choices =
         [
-            new("Yes", true, IsDefault: true),
-            new("No", false, IsCancel: true)
+            new("Yes", true, true),
+            new("No", false, IsCancel: true),
         ];
         MessageDialogRequest<bool> request = new(
             "Confirm",
@@ -302,7 +306,7 @@ public sealed class DialogAndValidationTests
     {
         // Arrange
         int acceptCount = 0;
-        ValueDialogViewModel viewModel = CreateValueViewModel(
+        var viewModel = CreateValueViewModel(
             _ => ValidationResult.Success,
             _ => acceptCount++);
         // Act
@@ -339,7 +343,7 @@ public sealed class DialogAndValidationTests
     {
         // Arrange
         object? accepted = null;
-        ValueDialogViewModel viewModel = CreateValueViewModel(
+        var viewModel = CreateValueViewModel(
             _ => ValidationResult.Success,
             value => accepted = value);
         viewModel.ValueText = "not-a-number";
@@ -358,7 +362,7 @@ public sealed class DialogAndValidationTests
     {
         // Arrange
         object? accepted = null;
-        ValueDialogViewModel viewModel = CreateValueViewModel(
+        var viewModel = CreateValueViewModel(
             _ => ValidationResult.Success,
             value => accepted = value);
 
@@ -377,7 +381,7 @@ public sealed class DialogAndValidationTests
     {
         // Arrange
         int acceptCount = 0;
-        ValueDialogViewModel viewModel = CreateValueViewModel(
+        var viewModel = CreateValueViewModel(
             value => (int)value! <= 60
                 ? ValidationResult.Success
                 : new ValidationResult("Use 1 through 60."),
@@ -431,8 +435,8 @@ public sealed class DialogAndValidationTests
         int closeCount = 0;
         DialogChoiceViewModel choice = new(
             "Continue",
-            isDefault: true,
-            isCancel: false,
+            true,
+            false,
             () => closeCount++);
 
         // Act

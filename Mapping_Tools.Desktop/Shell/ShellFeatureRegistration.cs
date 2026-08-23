@@ -1,18 +1,17 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using Avalonia.Controls.Primitives;
-using Mapping_Tools.Desktop.ViewModels;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Mapping_Tools.Desktop.Shell;
 
 /// <summary>
-/// Describes one feature that can be discovered and activated by the desktop shell.
+///     Describes one feature that can be discovered and activated by the desktop shell.
 /// </summary>
 public sealed class ShellFeatureRegistration
 {
     private readonly Func<ObservableObject> _createViewModel;
 
     /// <summary>
-    /// Creates an explicit shell feature registration.
+    ///     Creates an explicit shell feature registration.
     /// </summary>
     /// <param name="id">Stable persistence identifier.</param>
     /// <param name="displayName">User-facing navigation label.</param>
@@ -78,5 +77,8 @@ public sealed class ShellFeatureRegistration
 
     /// <summary>Creates the presentation model when the feature is first opened.</summary>
     /// <returns>A new feature presentation model.</returns>
-    public ObservableObject CreateViewModel() => _createViewModel();
+    public ObservableObject CreateViewModel()
+    {
+        return _createViewModel();
+    }
 }

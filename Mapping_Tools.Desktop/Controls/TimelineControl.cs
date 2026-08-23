@@ -18,58 +18,74 @@ public sealed class TimelineControl : Control
     private const double DefaultHeight = ElementTop + ElementHeight;
     private const double LineY = 50;
     private const double HitTolerance = 4;
-    private Cursor? _handCursor;
 
     /// <summary>Identifies the semantic marker collection drawn on the timeline.</summary>
     public static readonly StyledProperty<IReadOnlyList<TimelineMarker>> MarkersProperty =
         AvaloniaProperty.Register<TimelineControl, IReadOnlyList<TimelineMarker>>(
             nameof(Markers),
             []);
+
     /// <summary>Identifies the first visible timestamp in milliseconds.</summary>
     public static readonly StyledProperty<double> StartTimeProperty =
         AvaloniaProperty.Register<TimelineControl, double>(nameof(StartTime));
+
     /// <summary>Identifies the final visible timestamp in milliseconds.</summary>
     public static readonly StyledProperty<double> EndTimeProperty =
         AvaloniaProperty.Register<TimelineControl, double>(nameof(EndTime), 20);
+
     /// <summary>Identifies the command invoked when a marker is clicked.</summary>
     public static readonly StyledProperty<ICommand?> NavigateCommandProperty =
         AvaloniaProperty.Register<TimelineControl, ICommand?>(nameof(NavigateCommand));
+
     /// <summary>Identifies the horizontal timeline brush.</summary>
     public static readonly StyledProperty<IBrush?> LineBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(LineBrush));
+
     /// <summary>Identifies the timeline-label brush.</summary>
     public static readonly StyledProperty<IBrush?> TickBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(TickBrush));
+
     /// <summary>Identifies the translucent outer brush for neutral markers.</summary>
     public static readonly StyledProperty<IBrush?> NeutralOuterBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(NeutralOuterBrush));
+
     /// <summary>Identifies the solid inner brush for neutral markers.</summary>
     public static readonly StyledProperty<IBrush?> NeutralInnerBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(NeutralInnerBrush));
+
     /// <summary>Identifies the translucent outer brush for added markers.</summary>
     public static readonly StyledProperty<IBrush?> AddedOuterBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(AddedOuterBrush));
+
     /// <summary>Identifies the solid inner brush for added markers.</summary>
     public static readonly StyledProperty<IBrush?> AddedInnerBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(AddedInnerBrush));
+
     /// <summary>Identifies the translucent outer brush for changed markers.</summary>
     public static readonly StyledProperty<IBrush?> ChangedOuterBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(ChangedOuterBrush));
+
     /// <summary>Identifies the solid inner brush for changed markers.</summary>
     public static readonly StyledProperty<IBrush?> ChangedInnerBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(ChangedInnerBrush));
+
     /// <summary>Identifies the translucent outer brush for removed markers.</summary>
     public static readonly StyledProperty<IBrush?> RemovedOuterBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(RemovedOuterBrush));
+
     /// <summary>Identifies the solid inner brush for removed markers.</summary>
     public static readonly StyledProperty<IBrush?> RemovedInnerBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(RemovedInnerBrush));
+
     /// <summary>Identifies the translucent outer brush for highlighted markers.</summary>
     public static readonly StyledProperty<IBrush?> AccentOuterBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(AccentOuterBrush));
+
     /// <summary>Identifies the solid inner brush for highlighted markers.</summary>
     public static readonly StyledProperty<IBrush?> AccentInnerBrushProperty =
         AvaloniaProperty.Register<TimelineControl, IBrush?>(nameof(AccentInnerBrush));
+
+    private Cursor? _handCursor;
 
     static TimelineControl()
     {
@@ -155,20 +171,18 @@ public sealed class TimelineControl : Control
     /// <summary>Gets or sets the solid inner brush for highlighted markers.</summary>
     public IBrush? AccentInnerBrush { get => GetValue(AccentInnerBrushProperty); set => SetValue(AccentInnerBrushProperty, value); }
 
-    /// <inheritdoc/>
+    private double TimelineWidth => Math.Max(0, Bounds.Width - ReservedRight);
+
+    /// <inheritdoc />
     public override void Render(DrawingContext context)
     {
         base.Render(context);
-        TimelineScale scale = CreateScale();
+        var scale = CreateScale();
         double width = TimelineWidth;
         double elementHeight = Math.Max(0, Bounds.Height - ElementTop);
-        if (LineBrush is not null)
-        {
-            context.DrawLine(new Pen(LineBrush, 2), new Point(0, LineY), new Point(width, LineY));
-        }
+        if (LineBrush is not null) context.DrawLine(new Pen(LineBrush, 2), new Point(0, LineY), new Point(width, LineY));
 
         if (TickBrush is not null)
-        {
             foreach (double tick in scale.GetTicks())
             {
                 double x = scale.ToUnit(tick) * width;
@@ -182,44 +196,43 @@ public sealed class TimelineControl : Control
                 context.DrawText(text, new Point(x, LabelTop));
                 DrawMarker(context, x, NeutralOuterBrush, NeutralInnerBrush, elementHeight);
             }
-        }
 
         using (context.PushClip(new Rect(0, 0, width, Bounds.Height)))
         {
-            foreach (TimelineMarker marker in Markers ?? [])
+            foreach (var marker in Markers ?? [])
             {
                 double x = scale.ToUnit(marker.Time) * width;
-                (IBrush? outer, IBrush? inner) = GetBrushes(marker.Kind);
+                var (outer, inner) = GetBrushes(marker.Kind);
                 DrawMarker(context, x, outer, inner, elementHeight);
             }
         }
     }
 
-    /// <inheritdoc/>
-    protected override Size MeasureOverride(Size availableSize) => new(
-        double.IsInfinity(availableSize.Width) ? 300 : availableSize.Width,
-        double.IsInfinity(availableSize.Height) ? DefaultHeight : Math.Max(DefaultHeight, availableSize.Height));
+    /// <inheritdoc />
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        return new Size(
+            double.IsInfinity(availableSize.Width) ? 300 : availableSize.Width,
+            double.IsInfinity(availableSize.Height) ? DefaultHeight : Math.Max(DefaultHeight, availableSize.Height));
+    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void OnPointerMoved(PointerEventArgs eventArgs)
     {
         base.OnPointerMoved(eventArgs);
-        TimelineMarker? marker = MarkerAt(eventArgs.GetPosition(this).X);
+        var marker = MarkerAt(eventArgs.GetPosition(this).X);
         Cursor = marker is null
             ? null
             : _handCursor ??= new Cursor(StandardCursorType.Hand);
         ToolTip.SetTip(this, marker is null ? null : FormatToolTip(marker));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void OnPointerPressed(PointerPressedEventArgs eventArgs)
     {
         base.OnPointerPressed(eventArgs);
-        if (!eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed ||
-            MarkerAt(eventArgs.GetPosition(this).X) is not { } marker)
-        {
+        if (!eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed || MarkerAt(eventArgs.GetPosition(this).X) is not { } marker)
             return;
-        }
 
         if (NavigateCommand?.CanExecute(marker.Time) == true)
         {
@@ -228,19 +241,24 @@ public sealed class TimelineControl : Control
         }
     }
 
-    internal TimelineMarker? MarkerAt(double x) => x < 0 || x > TimelineWidth
-        ? null
-        : CreateScale().FindNearest(Markers ?? [], x, TimelineWidth, HitTolerance);
+    internal TimelineMarker? MarkerAt(double x)
+    {
+        return x < 0 || x > TimelineWidth
+            ? null
+            : CreateScale().FindNearest(Markers ?? [], x, TimelineWidth, HitTolerance);
+    }
 
     internal static string FormatToolTip(TimelineMarker marker)
-        => TimelineScale.FormatMarker(marker.Time);
+    {
+        return TimelineScale.FormatMarker(marker.Time);
+    }
 
-    private TimelineScale CreateScale() =>
-        double.IsFinite(StartTime) && double.IsFinite(EndTime)
+    private TimelineScale CreateScale()
+    {
+        return double.IsFinite(StartTime) && double.IsFinite(EndTime)
             ? new TimelineScale(StartTime, EndTime)
             : new TimelineScale(0, 20);
-
-    private double TimelineWidth => Math.Max(0, Bounds.Width - ReservedRight);
+    }
 
     private static void DrawMarker(
         DrawingContext context,
@@ -250,26 +268,23 @@ public sealed class TimelineControl : Control
         double height)
     {
         if (outer is not null)
-        {
             using (context.PushOpacity(0.3))
             {
                 context.FillRectangle(outer, new Rect(x - 2.5, ElementTop, 5, height));
             }
-        }
 
-        if (inner is not null)
-        {
-            context.FillRectangle(inner, new Rect(x - 0.5, ElementTop, 1, height));
-        }
+        if (inner is not null) context.FillRectangle(inner, new Rect(x - 0.5, ElementTop, 1, height));
     }
 
-    private (IBrush? Outer, IBrush? Inner) GetBrushes(TimelineMarkerKind kind) => kind switch
+    private (IBrush? Outer, IBrush? Inner) GetBrushes(TimelineMarkerKind kind)
     {
-        TimelineMarkerKind.Added => (AddedOuterBrush, AddedInnerBrush),
-        TimelineMarkerKind.Changed => (ChangedOuterBrush, ChangedInnerBrush),
-        TimelineMarkerKind.Removed => (RemovedOuterBrush, RemovedInnerBrush),
-        TimelineMarkerKind.Accent => (AccentOuterBrush, AccentInnerBrush),
-        _ => (NeutralOuterBrush, NeutralInnerBrush)
-    };
-
+        return kind switch
+        {
+            TimelineMarkerKind.Added => (AddedOuterBrush, AddedInnerBrush),
+            TimelineMarkerKind.Changed => (ChangedOuterBrush, ChangedInnerBrush),
+            TimelineMarkerKind.Removed => (RemovedOuterBrush, RemovedInnerBrush),
+            TimelineMarkerKind.Accent => (AccentOuterBrush, AccentInnerBrush),
+            _ => (NeutralOuterBrush, NeutralInnerBrush),
+        };
+    }
 }

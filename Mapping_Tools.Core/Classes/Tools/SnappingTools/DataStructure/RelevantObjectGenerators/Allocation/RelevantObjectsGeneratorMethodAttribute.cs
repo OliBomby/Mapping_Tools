@@ -1,5 +1,3 @@
-using System;
-
 namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 
 /// <summary>Marks a public method as a generator operation discovered by reflection.</summary>

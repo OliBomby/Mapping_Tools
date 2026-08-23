@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs.Validation;
 
-[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Property)]
 internal sealed class DialogValueAttribute : ValidationAttribute
 {
     protected override ValidationResult? IsValid(
@@ -10,15 +10,13 @@ internal sealed class DialogValueAttribute : ValidationAttribute
         ValidationContext validationContext)
     {
         if (validationContext.ObjectInstance is not ValueDialogViewModel viewModel)
-        {
             return new ValidationResult(
                 "The dialog value validator is unavailable.",
                 validationContext.MemberName is null
                     ? null
                     : [validationContext.MemberName]);
-        }
 
-        ValidationResult? result = viewModel.ValidateDialogText(value);
+        var result = viewModel.ValidateDialogText(value);
         return result == ValidationResult.Success
             ? ValidationResult.Success
             : new ValidationResult(

@@ -1,9 +1,8 @@
-using System.ComponentModel.DataAnnotations;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
-using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Interactions.Validation;
 using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.Platform;
@@ -17,18 +16,49 @@ using Mapping_Tools.Desktop.ViewModels.Adapters;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Owns Metadata Manager form state, project persistence, file selection, and execution.
+///     Owns Metadata Manager form state, project persistence, file selection, and execution.
 /// </summary>
 public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     IShellProjectFeature
 {
     private const string OperationId = "metadata-manager";
+    private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
+    private readonly ProjectDefinition<MetadataManagerProject> _definition;
+    private readonly IFilePicker _filePicker;
 
     private readonly IMetadataManagerService _metadataManager;
-    private readonly IFilePicker _filePicker;
-    private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
     private readonly IUserNotificationService _notifications;
-    private readonly ProjectDefinition<MetadataManagerProject> _definition;
+
+    /// <summary>Creates a Metadata Manager presentation model.</summary>
+    /// <param name="metadataManager">Imports and exports metadata through application ports.</param>
+    /// <param name="execution">Coordinates background execution, cancellation, and notifications.</param>
+    /// <param name="filePicker">Presents native beatmap file dialogs.</param>
+    /// <param name="currentBeatmapLocator">Finds the beatmap currently open in osu!.</param>
+    /// <param name="notifications">Publishes project and picker failures.</param>
+    /// <param name="directories">Supplies the default export directory.</param>
+    public MetadataManagerViewModel(
+        IMetadataManagerService metadataManager,
+        IToolExecutionService execution,
+        IFilePicker filePicker,
+        ICurrentBeatmapLocator currentBeatmapLocator,
+        IUserNotificationService notifications,
+        IApplicationDirectories directories)
+        : base(execution, OperationId)
+    {
+        _metadataManager = metadataManager ?? throw new ArgumentNullException(nameof(metadataManager));
+        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        _currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        ArgumentNullException.ThrowIfNull(directories);
+
+        ExportPath = Path.Combine(directories.Exports, "metadata_manager.osu");
+        string defaultExportPath = ExportPath;
+        _definition = new ProjectDefinition<MetadataManagerProject>(
+            "metadataproject.json",
+            "Metadata Manager Projects",
+            () => CreateDefaultProject(defaultExportPath),
+            "metadata-manager-project.json");
+    }
 
     /// <summary>Gets or sets the beatmap whose metadata should be imported.</summary>
     [ObservableProperty]
@@ -131,35 +161,16 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     public bool IsTagsOverflowVisible =>
         Tags.Length > 1024 || Tags.Split(' ').Length > 100;
 
-    /// <summary>Creates a Metadata Manager presentation model.</summary>
-    /// <param name="metadataManager">Imports and exports metadata through application ports.</param>
-    /// <param name="execution">Coordinates background execution, cancellation, and notifications.</param>
-    /// <param name="filePicker">Presents native beatmap file dialogs.</param>
-    /// <param name="currentBeatmapLocator">Finds the beatmap currently open in osu!.</param>
-    /// <param name="notifications">Publishes project and picker failures.</param>
-    /// <param name="directories">Supplies the default export directory.</param>
-    public MetadataManagerViewModel(
-        IMetadataManagerService metadataManager,
-        IToolExecutionService execution,
-        IFilePicker filePicker,
-        ICurrentBeatmapLocator currentBeatmapLocator,
-        IUserNotificationService notifications,
-        IApplicationDirectories directories)
-        : base(execution, OperationId)
-    {
-        _metadataManager = metadataManager ?? throw new ArgumentNullException(nameof(metadataManager));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        _currentBeatmapLocator = currentBeatmapLocator ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        ArgumentNullException.ThrowIfNull(directories);
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
 
-        ExportPath = Path.Combine(directories.Exports, "metadata_manager.osu");
-        string defaultExportPath = ExportPath;
-        _definition = new ProjectDefinition<MetadataManagerProject>(
-            "metadataproject.json",
-            "Metadata Manager Projects",
-            () => CreateDefaultProject(defaultExportPath),
-            "metadata-manager-project.json");
+    object IShellProjectFeature.Snapshot()
+    {
+        return Snapshot();
+    }
+
+    void IShellProjectFeature.Install(object project)
+    {
+        Install((MetadataManagerProject)project);
     }
 
     [RelayCommand]
@@ -168,7 +179,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         await PickBeatmapsAsync(
             "Import metadata from",
             ImportPath,
-            allowMultiple: false,
+            false,
             paths => ImportPath = paths[0]);
     }
 
@@ -176,10 +187,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     private async Task UseCurrentImportAsync()
     {
         string? path = await _currentBeatmapLocator.FindCurrentBeatmapAsync();
-        if (!string.IsNullOrWhiteSpace(path))
-        {
-            ImportPath = path;
-        }
+        if (!string.IsNullOrWhiteSpace(path)) ImportPath = path;
     }
 
     [RelayCommand]
@@ -188,7 +196,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         try
         {
             string exportPath = ExportPath;
-            MetadataManagerOptions options = await _metadataManager.ImportAsync(ImportPath);
+            var options = await _metadataManager.ImportAsync(ImportPath);
             options.ImportPath = ImportPath;
             options.ExportPath = exportPath;
             Install(options);
@@ -211,7 +219,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         await PickBeatmapsAsync(
             "Export metadata to",
             FirstExportPathOrNull(),
-            allowMultiple: true,
+            true,
             paths => ExportPath = string.Join('|', paths));
     }
 
@@ -219,21 +227,15 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     private async Task UseCurrentExportAsync()
     {
         string? path = await _currentBeatmapLocator.FindCurrentBeatmapAsync();
-        if (!string.IsNullOrWhiteSpace(path))
-        {
-            ExportPath = path;
-        }
+        if (!string.IsNullOrWhiteSpace(path)) ExportPath = path;
     }
 
     [RelayCommand]
     private void AddComboColour()
     {
-        if (ComboColours.Count >= 8)
-        {
-            return;
-        }
+        if (ComboColours.Count >= 8) return;
 
-        RgbaColour colour = ComboColours.Count == 0
+        var colour = ComboColours.Count == 0
             ? RgbaColour.FromRgb(255, 255, 255)
             : ComboColours[^1].Color;
         ComboColours.Add(new ObservableComboColour(new ComboColour(colour)));
@@ -242,16 +244,13 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void RemoveComboColour()
     {
-        if (ComboColours.Count > 0)
-        {
-            ComboColours.RemoveAt(ComboColours.Count - 1);
-        }
+        if (ComboColours.Count > 0) ComboColours.RemoveAt(ComboColours.Count - 1);
     }
 
     [RelayCommand]
     private void AddSpecialColour()
     {
-        RgbaColour colour = SpecialColours.Count == 0
+        var colour = SpecialColours.Count == 0
             ? RgbaColour.FromRgb(255, 255, 255)
             : SpecialColours[^1].Color;
         SpecialColours.Add(new ObservableSpecialColour(new SpecialColour(colour)));
@@ -260,20 +259,17 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void RemoveSpecialColour()
     {
-        if (SpecialColours.Count > 0)
-        {
-            SpecialColours.RemoveAt(SpecialColours.Count - 1);
-        }
+        if (SpecialColours.Count > 0) SpecialColours.RemoveAt(SpecialColours.Count - 1);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override bool PrepareRun()
     {
         ValidateAllProperties();
         return !HasErrors;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
         MetadataManagerOptions options = Snapshot();
@@ -284,7 +280,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
                 async context =>
                 {
                     context.ReportProgress(0, "Preparing metadata export");
-                    MetadataManagerResult result = await _metadataManager.ExportAsync(
+                    var result = await _metadataManager.ExportAsync(
                         options,
                         new Progress<double>(value => context.ReportProgress(value, "Exporting metadata")),
                         context.CancellationToken);
@@ -295,19 +291,9 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
             CreateProgress());
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
-
-    object IShellProjectFeature.Snapshot() => Snapshot();
-
-    void IShellProjectFeature.Install(object project) =>
-        Install((MetadataManagerProject)project);
-
     partial void OnDoRemoveDuplicateTagsChanged(bool value)
     {
-        if (value)
-        {
-            Tags = MetadataManagerEngine.NormalizeTags(Tags);
-        }
+        if (value) Tags = MetadataManagerEngine.NormalizeTags(Tags);
     }
 
     partial void OnTagsChanged(string value)
@@ -315,33 +301,33 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         if (DoRemoveDuplicateTags)
         {
             string normalized = MetadataManagerEngine.NormalizeTags(value);
-            if (normalized != value)
-            {
-                Tags = normalized;
-            }
+            if (normalized != value) Tags = normalized;
         }
     }
 
-    private MetadataManagerProject Snapshot() => new()
+    private MetadataManagerProject Snapshot()
     {
-        ImportPath = ImportPath,
-        ExportPath = ExportPath,
-        Artist = Artist,
-        RomanisedArtist = RomanisedArtist,
-        Title = Title,
-        RomanisedTitle = RomanisedTitle,
-        BeatmapCreator = BeatmapCreator,
-        Source = Source,
-        Tags = Tags,
-        DoRemoveDuplicateTags = DoRemoveDuplicateTags,
-        ResetIds = ResetIds,
-        PreviewTime = PreviewTime,
-        UseComboColours = UseComboColours,
-        ComboColours = ComboColours.Select(colour => colour.Snapshot()).ToList(),
-        SpecialColours = SpecialColours
-            .Select(colour => (SpecialColour)colour.Snapshot())
-            .ToList()
-    };
+        return new MetadataManagerProject
+        {
+            ImportPath = ImportPath,
+            ExportPath = ExportPath,
+            Artist = Artist,
+            RomanisedArtist = RomanisedArtist,
+            Title = Title,
+            RomanisedTitle = RomanisedTitle,
+            BeatmapCreator = BeatmapCreator,
+            Source = Source,
+            Tags = Tags,
+            DoRemoveDuplicateTags = DoRemoveDuplicateTags,
+            ResetIds = ResetIds,
+            PreviewTime = PreviewTime,
+            UseComboColours = UseComboColours,
+            ComboColours = ComboColours.Select(colour => colour.Snapshot()).ToList(),
+            SpecialColours = SpecialColours
+                .Select(colour => colour.Snapshot())
+                .ToList(),
+        };
+    }
 
     private void Install(MetadataManagerOptions options)
     {
@@ -361,16 +347,10 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         UseComboColours = options.UseComboColours;
 
         ComboColours.Clear();
-        foreach (ComboColour colour in options.ComboColours)
-        {
-            ComboColours.Add(new ObservableComboColour(new ComboColour(colour.Color)));
-        }
+        foreach (var colour in options.ComboColours) ComboColours.Add(new ObservableComboColour(new ComboColour(colour.Color)));
 
         SpecialColours.Clear();
-        foreach (SpecialColour colour in options.SpecialColours)
-        {
-            SpecialColours.Add(new ObservableSpecialColour(new SpecialColour(colour.Color, colour.Name ?? string.Empty)));
-        }
+        foreach (var colour in options.SpecialColours) SpecialColours.Add(new ObservableSpecialColour(new SpecialColour(colour.Color, colour.Name ?? string.Empty)));
     }
 
     private async Task PickBeatmapsAsync(
@@ -381,18 +361,15 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     {
         try
         {
-            IReadOnlyList<string> paths = await _filePicker.PickOpenFilesAsync(
+            var paths = await _filePicker.PickOpenFilesAsync(
                 new OpenFilePickerRequest
                 {
                     Title = title,
                     SuggestedStartLocation = suggestedStartLocation,
                     AllowMultiple = allowMultiple,
-                    Filters = [CommonFilePickerFilters.Beatmaps]
+                    Filters = [CommonFilePickerFilters.Beatmaps],
                 });
-            if (paths.Count > 0)
-            {
-                apply(paths);
-            }
+            if (paths.Count > 0) apply(paths);
         }
         catch (OperationCanceledException)
         {
@@ -406,12 +383,14 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         }
     }
 
-    private Task PublishFailureAsync(string title, string message, Exception exception) =>
-        _notifications.PublishAsync(new UserNotification(
+    private Task PublishFailureAsync(string title, string message, Exception exception)
+    {
+        return _notifications.PublishAsync(new UserNotification(
             UserNotificationSeverity.Error,
             title,
             message,
             exception));
+    }
 
     private string? FirstExportPathOrNull()
     {
@@ -421,22 +400,23 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         return string.IsNullOrWhiteSpace(path) ? null : Path.GetDirectoryName(path);
     }
 
-    private static MetadataManagerProject CreateDefaultProject(string exportPath) => new()
+    private static MetadataManagerProject CreateDefaultProject(string exportPath)
     {
-        ExportPath = exportPath
-    };
+        return new MetadataManagerProject
+        {
+            ExportPath = exportPath,
+        };
+    }
 
     private static void ValidateProject(MetadataManagerOptions options)
     {
-        if (options is null ||
-            options.ComboColours is null ||
-            options.SpecialColours is null ||
-            options.ComboColours.Any(colour => colour is null) ||
-            options.SpecialColours.Any(colour => colour is null) ||
-            options.SpecialColours.Any(colour => string.IsNullOrWhiteSpace(colour.Name)) ||
-            !double.IsFinite(options.PreviewTime))
-        {
+        if (options is null
+            || options.ComboColours is null
+            || options.SpecialColours is null
+            || options.ComboColours.Any(colour => colour is null)
+            || options.SpecialColours.Any(colour => colour is null)
+            || options.SpecialColours.Any(colour => string.IsNullOrWhiteSpace(colour.Name))
+            || !double.IsFinite(options.PreviewTime))
             throw new InvalidDataException("The Metadata Manager project is incomplete.");
-        }
     }
 }

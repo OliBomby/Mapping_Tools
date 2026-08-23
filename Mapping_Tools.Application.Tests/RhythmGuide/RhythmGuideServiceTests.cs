@@ -19,19 +19,19 @@ public sealed class RhythmGuideServiceTests
         MemoryTextFileStore files = new();
         RecordingEditingGateway gateway = new(files);
         TestBeatmapBackupService backups = new();
-        gateway.Add("source.osu", CreateEditor("source.osu", files, includeObject: true));
-        gateway.Add("target.osu", CreateEditor("target.osu", files, includeObject: false));
+        gateway.Add("source.osu", CreateEditor("source.osu", files, true));
+        gateway.Add("target.osu", CreateEditor("target.osu", files, false));
         RhythmGuideService service = new(gateway, backups, new StubBeatmapFileSystem(), files);
         RhythmGuideOptions options = new()
         {
             Paths = ["source.osu"],
             ExportPath = "target.osu",
             ExportMode = RhythmGuideExportMode.AddToMap,
-            SelectionMode = RhythmGuideSelectionMode.AllEvents
+            SelectionMode = RhythmGuideSelectionMode.AllEvents,
         };
 
         // Act
-        RhythmGuideResult result = await service.GenerateAsync(options);
+        var result = await service.GenerateAsync(options);
 
         // Assert
         result.AddedObjectCount.Should().Be(1);
@@ -51,7 +51,7 @@ public sealed class RhythmGuideServiceTests
         // Arrange
         MemoryTextFileStore files = new();
         RecordingEditingGateway gateway = new(files);
-        gateway.Add("source.osu", CreateEditor("source.osu", files, includeObject: true));
+        gateway.Add("source.osu", CreateEditor("source.osu", files, true));
         RhythmGuideService service = new(
             gateway,
             new TestBeatmapBackupService(),
@@ -62,11 +62,11 @@ public sealed class RhythmGuideServiceTests
             Paths = ["source.osu"],
             ExportPath = "new.osu",
             ExportMode = RhythmGuideExportMode.NewMap,
-            SelectionMode = RhythmGuideSelectionMode.AllEvents
+            SelectionMode = RhythmGuideSelectionMode.AllEvents,
         };
 
         // Act
-        RhythmGuideResult result = await service.GenerateAsync(options);
+        var result = await service.GenerateAsync(options);
 
         // Assert
         result.AddedObjectCount.Should().Be(1);
@@ -80,7 +80,7 @@ public sealed class RhythmGuideServiceTests
         // Arrange
         MemoryTextFileStore files = new();
         RecordingEditingGateway gateway = new(files);
-        gateway.Add("source.osu", CreateEditor("source.osu", files, includeObject: true));
+        gateway.Add("source.osu", CreateEditor("source.osu", files, true));
         RhythmGuideService service = new(
             gateway,
             new TestBeatmapBackupService(),
@@ -91,7 +91,7 @@ public sealed class RhythmGuideServiceTests
             Paths = ["source.osu"],
             ExportPath = "existing.osu",
             ExportMode = RhythmGuideExportMode.NewMap,
-            SelectionMode = RhythmGuideSelectionMode.AllEvents
+            SelectionMode = RhythmGuideSelectionMode.AllEvents,
         };
 
         // Act
@@ -126,12 +126,9 @@ public sealed class RhythmGuideServiceTests
             "[TimingPoints]",
             "0,500,4,2,1,100,1,0",
             "",
-            "[HitObjects]"
+            "[HitObjects]",
         ];
-        if (includeObject)
-        {
-            lines.Add("256,192,1000,1,0,0:0:0:0:");
-        }
+        if (includeObject) lines.Add("256,192,1000,1,0,0:0:0:0:");
         return new BeatmapEditor2(lines, files) { Path = path };
     }
 
@@ -147,11 +144,6 @@ public sealed class RhythmGuideServiceTests
 
         public Editor2? SavedEditor { get; private set; }
 
-        public void Add(string path, BeatmapEditor2 editor) => Sessions[path] = new(
-            editor,
-            BeatmapEditingSource.Disk,
-            []);
-
         public Task<BeatmapEditingSession> OpenBeatmapAsync(
             string path,
             LiveBeatmapPreference livePreference = LiveBeatmapPreference.PreferLive,
@@ -163,8 +155,10 @@ public sealed class RhythmGuideServiceTests
 
         public Task<StoryboardEditor2> OpenStoryboardAsync(
             string path,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task SaveAsync(
             Editor2 editor,
@@ -178,32 +172,62 @@ public sealed class RhythmGuideServiceTests
         public Task SaveAsync(
             BeatmapEditingSession session,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
-            SaveAsync(session.Editor, reloadEditor, cancellationToken);
+            CancellationToken cancellationToken = default)
+        {
+            return SaveAsync(session.Editor, reloadEditor, cancellationToken);
+        }
+
+        public void Add(string path, BeatmapEditor2 editor)
+        {
+            Sessions[path] = new BeatmapEditingSession(
+                editor,
+                BeatmapEditingSource.Disk,
+                []);
+        }
     }
 
     private sealed class StubBeatmapFileSystem : IBeatmapFileSystem
     {
         public HashSet<string> Existing { get; init; } = [];
 
-        public bool FileExists(string path) => Existing.Contains(path);
+        public bool FileExists(string path)
+        {
+            return Existing.Contains(path);
+        }
 
-        public string? GetParentDirectory(string filePath) => null;
+        public string? GetParentDirectory(string filePath)
+        {
+            return null;
+        }
     }
 
     private sealed class MemoryTextFileStore : ITextFileStore
     {
         public Dictionary<string, IReadOnlyList<string>> Writes { get; } = [];
 
-        public IReadOnlyList<string> ReadAllLines(string path) => Writes[path];
+        public IReadOnlyList<string> ReadAllLines(string path)
+        {
+            return Writes[path];
+        }
 
-        public void WriteAllLines(string path, IEnumerable<string> lines) =>
+        public void WriteAllLines(string path, IEnumerable<string> lines)
+        {
             Writes[path] = lines.ToArray();
+        }
 
-        public void Delete(string path) => Writes.Remove(path);
+        public void Delete(string path)
+        {
+            Writes.Remove(path);
+        }
 
-        public string GetParentFolder(string path) => string.Empty;
+        public string GetParentFolder(string path)
+        {
+            return string.Empty;
+        }
 
-        public string CombinePath(string parent, string child) => child;
+        public string CombinePath(string parent, string child)
+        {
+            return child;
+        }
     }
 }

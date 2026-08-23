@@ -8,38 +8,29 @@ namespace Mapping_Tools.Infrastructure.Audio;
 /// <summary>Mixes step-41 owned clips through NAudio behind the Application port.</summary>
 public sealed class NaudioAudioClipMixer : IAudioClipMixer
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task<AudioClip> MixAsync(
         IReadOnlyList<AudioClip> clips,
-        CancellationToken cancellationToken = default) =>
-        Task.Run(() => Mix(clips, cancellationToken), cancellationToken);
+        CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => Mix(clips, cancellationToken), cancellationToken);
+    }
 
     private static AudioClip Mix(IReadOnlyList<AudioClip> clips, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(clips);
-        if (clips.Count == 0)
-        {
-            throw new ArgumentException("At least one clip is required.", nameof(clips));
-        }
+        if (clips.Count == 0) throw new ArgumentException("At least one clip is required.", nameof(clips));
 
         int sampleRate = clips.Max(clip => clip.Format.SampleRate);
         int channels = clips.Max(clip => clip.Format.Channels);
-        IEnumerable<ISampleProvider> providers = clips.Select(clip =>
+        var providers = clips.Select(clip =>
         {
             ISampleProvider provider = new ClipSampleProvider(clip);
             if (provider.WaveFormat.Channels == 1 && channels == 2)
-            {
                 provider = new MonoToStereoSampleProvider(provider);
-            }
-            else if (provider.WaveFormat.Channels == 2 && channels == 1)
-            {
-                provider = new StereoToMonoSampleProvider(provider);
-            }
+            else if (provider.WaveFormat.Channels == 2 && channels == 1) provider = new StereoToMonoSampleProvider(provider);
 
-            if (provider.WaveFormat.SampleRate != sampleRate)
-            {
-                provider = new WdlResamplingSampleProvider(provider, sampleRate);
-            }
+            if (provider.WaveFormat.SampleRate != sampleRate) provider = new WdlResamplingSampleProvider(provider, sampleRate);
 
             return provider;
         });

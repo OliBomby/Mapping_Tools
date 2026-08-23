@@ -3,12 +3,12 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 
 /// <summary>
-/// Supplies immutable, wrapping content and typed action adapters to a message dialog.
+///     Supplies immutable, wrapping content and typed action adapters to a message dialog.
 /// </summary>
 public sealed class MessageDialogViewModel : ObservableObject
 {
     /// <summary>
-    /// Creates presentation state for a message or confirmation dialog.
+    ///     Creates presentation state for a message or confirmation dialog.
     /// </summary>
     /// <param name="title">The native window title.</param>
     /// <param name="message">The primary message.</param>
@@ -31,27 +31,27 @@ public sealed class MessageDialogViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Gets the native window title.
+    ///     Gets the native window title.
     /// </summary>
     public string Title { get; }
 
     /// <summary>
-    /// Gets the primary message, including long content that must wrap.
+    ///     Gets the primary message, including long content that must wrap.
     /// </summary>
     public string Message { get; }
 
     /// <summary>
-    /// Gets optional secondary text for explanatory or nested-error context.
+    ///     Gets optional secondary text for explanatory or nested-error context.
     /// </summary>
     public string? Details { get; }
 
     /// <summary>
-    /// Gets whether secondary text should occupy layout space.
+    ///     Gets whether secondary text should occupy layout space.
     /// </summary>
     public bool HasDetails { get; }
 
     /// <summary>
-    /// Gets the immutable action list in display order.
+    ///     Gets the immutable action list in display order.
     /// </summary>
     public IReadOnlyList<DialogChoiceViewModel> Choices { get; }
 }

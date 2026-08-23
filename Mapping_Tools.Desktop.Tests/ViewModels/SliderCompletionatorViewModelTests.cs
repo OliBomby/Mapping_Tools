@@ -1,13 +1,12 @@
-using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Core.Tools.SliderCompletionator;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Mapping_Tools.Core.Tools.SliderCompletionator;
 
 namespace Mapping_Tools.Desktop.Tests.ViewModels;
 
@@ -21,14 +20,14 @@ public sealed class SliderCompletionatorViewModelTests
         RecordingCompletionator service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["one.osu", "two.osu"]);
-        SliderCompletionatorViewModel viewModel = Create(service, workspace);
+        var viewModel = Create(service, workspace);
         viewModel.ImportModeSetting = SliderCompletionatorImportMode.Everything;
         viewModel.FreeVariableSetting = SliderCompletionatorFreeVariable.Length;
         viewModel.Duration = 1.5;
         viewModel.MoveAnchors = true;
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         service.Paths.Should().Equal("one.osu", "two.osu");
@@ -46,7 +45,7 @@ public sealed class SliderCompletionatorViewModelTests
     {
         // Arrange
         RecordingCompletionator service = new();
-        SliderCompletionatorViewModel viewModel = Create(
+        var viewModel = Create(
             service,
             new TestBeatmapWorkspace(),
             new RecordingCurrentBeatmapLocator("current.osu"));
@@ -67,14 +66,14 @@ public sealed class SliderCompletionatorViewModelTests
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["one.osu", "two.osu"]);
         ApplicationSettings settings = new() { AlwaysQuickRun = true };
-        SliderCompletionatorViewModel viewModel = Create(
+        var viewModel = Create(
             service,
             workspace,
             settings: settings);
         viewModel.ImportModeSetting = SliderCompletionatorImportMode.Everything;
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         service.Paths.Should().Equal("one.osu", "two.osu");
@@ -87,11 +86,11 @@ public sealed class SliderCompletionatorViewModelTests
         RecordingCompletionator service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
-        SliderCompletionatorViewModel viewModel = Create(service, workspace);
+        var viewModel = Create(service, workspace);
         viewModel.Duration = double.PositiveInfinity;
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         service.Paths.Should().BeNull();
@@ -103,7 +102,7 @@ public sealed class SliderCompletionatorViewModelTests
     public void Visibility_WhenEndTimeIsEnabled_HidesDurationAndShowsEndTime()
     {
         // Arrange
-        SliderCompletionatorViewModel viewModel = Create(new RecordingCompletionator());
+        var viewModel = Create(new RecordingCompletionator());
 
         // Act
         viewModel.UseEndTime = true;
@@ -117,7 +116,7 @@ public sealed class SliderCompletionatorViewModelTests
     public void Visibility_WhenCurrentEditorTimeAndLengthAreSelected_HidesEndTimeAndLength()
     {
         // Arrange
-        SliderCompletionatorViewModel viewModel = Create(new RecordingCompletionator());
+        var viewModel = Create(new RecordingCompletionator());
         viewModel.UseEndTime = true;
 
         // Act
@@ -169,12 +168,17 @@ public sealed class SliderCompletionatorViewModelTests
 
     private sealed class RecordingCurrentBeatmapLocator(string? path) : ICurrentBeatmapLocator
     {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(path);
+        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(path);
+        }
     }
 
     private sealed class RecordingReloadService : IEditorReloadService
     {
-        public Task ReloadAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task ReloadAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

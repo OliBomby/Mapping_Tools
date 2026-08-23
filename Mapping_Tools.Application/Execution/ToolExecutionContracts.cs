@@ -1,71 +1,69 @@
 namespace Mapping_Tools.Application.Execution;
 
 /// <summary>
-/// Describes the terminal state of a tool invocation, including the
-/// non-exceptional busy and cancellation outcomes absent from BackgroundWorker.
+///     Describes the terminal state of a tool invocation, including the
+///     non-exceptional busy and cancellation outcomes absent from BackgroundWorker.
 /// </summary>
 public enum ToolExecutionStatus
 {
     /// <summary>
-    /// The operation returned a value and all requested completion behavior succeeded.
+    ///     The operation returned a value and all requested completion behavior succeeded.
     /// </summary>
     Succeeded,
 
     /// <summary>
-    /// Cooperative cancellation stopped the operation or its completion behavior.
+    ///     Cooperative cancellation stopped the operation or its completion behavior.
     /// </summary>
     Cancelled,
 
     /// <summary>
-    /// The operation or its requested editor reload threw an exception.
+    ///     The operation or its requested editor reload threw an exception.
     /// </summary>
     Failed,
 
     /// <summary>
-    /// Another invocation with the same operation identifier was already active.
+    ///     Another invocation with the same operation identifier was already active.
     /// </summary>
-    AlreadyRunning
+    AlreadyRunning,
 }
 
 /// <summary>
-/// Reports bounded percent completion and optional stage text in a format that
-/// can drive either a progress bar or a textual status surface.
+///     Reports bounded percent completion and optional stage text in a format that
+///     can drive either a progress bar or a textual status surface.
 /// </summary>
 public sealed record ToolExecutionProgress
 {
     /// <summary>
-    /// Creates one progress observation.
+    ///     Creates one progress observation.
     /// </summary>
     /// <param name="percent">Completion from zero through one hundred, inclusive.</param>
     /// <param name="stage">Optional concise text identifying the current phase.</param>
     public ToolExecutionProgress(double percent, string? stage = null)
     {
         if (!double.IsFinite(percent) || percent < 0 || percent > 100)
-        {
             throw new ArgumentOutOfRangeException(
                 nameof(percent),
                 percent,
                 "Tool progress must be a finite percentage from 0 through 100.");
-        }
 
         Percent = percent;
         Stage = string.IsNullOrWhiteSpace(stage) ? null : stage;
     }
 
     /// <summary>
-    /// Supplies a finite zero-to-one-hundred value compatible with legacy tool progress bars.
+    ///     Supplies a finite zero-to-one-hundred value compatible with legacy tool progress bars.
     /// </summary>
     public double Percent { get; }
 
     /// <summary>
-    /// Optionally identifies the current phase without embedding presentation markup.
+    ///     Optionally identifies the current phase without embedding presentation markup.
     /// </summary>
     public string? Stage { get; }
 }
 
 /// <summary>
-/// Gives a tool cooperative cancellation and progress reporting while keeping
-/// execution mechanics out of its transformation logic.
+///     Gives a tool cooperative cancellation and progress reporting while keeping
+///     execution mechanics out of its transformation logic.
 /// </summary>
 public sealed class ToolExecutionContext
 {
@@ -80,12 +78,12 @@ public sealed class ToolExecutionContext
     }
 
     /// <summary>
-    /// Signals user cancellation, application shutdown, or targeted cancellation by operation identifier.
+    ///     Signals user cancellation, application shutdown, or targeted cancellation by operation identifier.
     /// </summary>
     public CancellationToken CancellationToken { get; }
 
     /// <summary>
-    /// Sends one validated progress observation to the caller-supplied progress channel.
+    ///     Sends one validated progress observation to the caller-supplied progress channel.
     /// </summary>
     /// <param name="percent">Completion from zero through one hundred, inclusive.</param>
     /// <param name="stage">Optional phase text such as "Loading maps" or "Saving results".</param>
@@ -97,13 +95,13 @@ public sealed class ToolExecutionContext
 }
 
 /// <summary>
-/// Combines a tool's typed value with completion behavior that belongs to the
-/// execution coordinator rather than the transformation itself.
+///     Combines a tool's typed value with completion behavior that belongs to the
+///     execution coordinator rather than the transformation itself.
 /// </summary>
 public sealed record ToolExecutionOutput<T>
 {
     /// <summary>
-    /// Creates a successful operation output.
+    ///     Creates a successful operation output.
     /// </summary>
     /// <param name="value">The typed value returned to the initiating view model or command.</param>
     /// <param name="summary">Optional success text published through the notification service.</param>
@@ -119,29 +117,29 @@ public sealed record ToolExecutionOutput<T>
     }
 
     /// <summary>
-    /// Carries the operation-specific result without boxing or view-state mutation.
+    ///     Carries the operation-specific result without boxing or view-state mutation.
     /// </summary>
     public T Value { get; }
 
     /// <summary>
-    /// Supplies optional success prose for the notification stream.
+    ///     Supplies optional success prose for the notification stream.
     /// </summary>
     public string? Summary { get; }
 
     /// <summary>
-    /// Requests editor reload as part of successful completion rather than from a view event handler.
+    ///     Requests editor reload as part of successful completion rather than from a view event handler.
     /// </summary>
     public bool ReloadEditor { get; }
 }
 
 /// <summary>
-/// Defines one independently cancellable tool invocation and the stable key
-/// used to reject duplicate runs of that same feature.
+///     Defines one independently cancellable tool invocation and the stable key
+///     used to reject duplicate runs of that same feature.
 /// </summary>
 public sealed class ToolExecutionRequest<T>
 {
     /// <summary>
-    /// Creates an invocation whose delegate runs on a thread-pool thread.
+    ///     Creates an invocation whose delegate runs on a thread-pool thread.
     /// </summary>
     /// <param name="operationId">A stable feature or command key used for concurrency and targeted cancellation.</param>
     /// <param name="displayName">User-facing operation name used in completion and failure messages.</param>
@@ -159,24 +157,24 @@ public sealed class ToolExecutionRequest<T>
     }
 
     /// <summary>
-    /// Identifies the concurrency slot and targeted-cancellation handle for this feature.
+    ///     Identifies the concurrency slot and targeted-cancellation handle for this feature.
     /// </summary>
     public string OperationId { get; }
 
     /// <summary>
-    /// Names the operation in user notifications without requiring the coordinator to know the feature.
+    ///     Names the operation in user notifications without requiring the coordinator to know the feature.
     /// </summary>
     public string DisplayName { get; }
 
     /// <summary>
-    /// Supplies the work delegate that receives cancellation and progress through its context.
+    ///     Supplies the work delegate that receives cancellation and progress through its context.
     /// </summary>
     public Func<ToolExecutionContext, Task<ToolExecutionOutput<T>>> Operation { get; }
 }
 
 /// <summary>
-/// Captures a terminal tool outcome with timing and diagnostics while keeping
-/// cancellation and duplicate-run rejection out of exception-driven control flow.
+///     Captures a terminal tool outcome with timing and diagnostics while keeping
+///     cancellation and duplicate-run rejection out of exception-driven control flow.
 /// </summary>
 public sealed class ToolExecutionResult<T>
 {
@@ -197,49 +195,50 @@ public sealed class ToolExecutionResult<T>
     }
 
     /// <summary>
-    /// Distinguishes success, cooperative cancellation, failure, and an occupied concurrency slot.
+    ///     Distinguishes success, cooperative cancellation, failure, and an occupied concurrency slot.
     /// </summary>
     public ToolExecutionStatus Status { get; }
 
     /// <summary>
-    /// Carries the typed value only when <see cref="Status"/> is <see cref="ToolExecutionStatus.Succeeded"/>.
+    ///     Carries the typed value only when <see cref="Status" /> is <see cref="ToolExecutionStatus.Succeeded" />.
     /// </summary>
     public T? Value { get; }
 
     /// <summary>
-    /// Retains the operation or reload failure only when <see cref="Status"/> is <see cref="ToolExecutionStatus.Failed"/>.
+    ///     Retains the operation or reload failure only when <see cref="Status" /> is
+    ///     <see cref="ToolExecutionStatus.Failed" />.
     /// </summary>
     public Exception? Exception { get; }
 
     /// <summary>
-    /// Records when the accepted invocation acquired its concurrency slot.
+    ///     Records when the accepted invocation acquired its concurrency slot.
     /// </summary>
     public DateTimeOffset StartedAt { get; }
 
     /// <summary>
-    /// Records terminal completion; busy rejection uses the same timestamp for start and completion.
+    ///     Records terminal completion; busy rejection uses the same timestamp for start and completion.
     /// </summary>
     public DateTimeOffset CompletedAt { get; }
 
     /// <summary>
-    /// Confirms that a requested and settings-enabled osu! reload completed successfully.
+    ///     Confirms that a requested and settings-enabled osu! reload completed successfully.
     /// </summary>
     public bool EditorReloaded { get; }
 
     /// <summary>
-    /// Measures time spent in accepted work and completion behavior.
+    ///     Measures time spent in accepted work and completion behavior.
     /// </summary>
     public TimeSpan Duration => CompletedAt - StartedAt;
 }
 
 /// <summary>
-/// Runs feature use cases outside the UI thread, serializes invocations per
-/// operation identifier, and coordinates cancellation, notifications, and reload.
+///     Runs feature use cases outside the UI thread, serializes invocations per
+///     operation identifier, and coordinates cancellation, notifications, and reload.
 /// </summary>
 public interface IToolExecutionService
 {
     /// <summary>
-    /// Executes a typed request or returns an immediate busy result when its key is occupied.
+    ///     Executes a typed request or returns an immediate busy result when its key is occupied.
     /// </summary>
     /// <typeparam name="T">The operation-specific value returned on success.</typeparam>
     /// <param name="request">The keyed operation and user-facing name.</param>
@@ -252,22 +251,22 @@ public interface IToolExecutionService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Cooperatively cancels the active invocation with the specified stable key.
+    ///     Cooperatively cancels the active invocation with the specified stable key.
     /// </summary>
     /// <param name="operationId">The feature or command key supplied in its request.</param>
-    /// <returns><see langword="true"/> when an active invocation received the signal.</returns>
+    /// <returns><see langword="true" /> when an active invocation received the signal.</returns>
     bool Cancel(string operationId);
 
     /// <summary>
-    /// Checks whether a feature currently owns its keyed concurrency slot.
+    ///     Checks whether a feature currently owns its keyed concurrency slot.
     /// </summary>
     /// <param name="operationId">The feature or command key to inspect.</param>
-    /// <returns><see langword="true"/> until its accepted invocation reaches a terminal result.</returns>
+    /// <returns><see langword="true" /> until its accepted invocation reaches a terminal result.</returns>
     bool IsRunning(string operationId);
 
     /// <summary>
-    /// Cancels every active invocation and waits for cooperative completion,
-    /// bounded by the supplied shutdown token.
+    ///     Cancels every active invocation and waits for cooperative completion,
+    ///     bounded by the supplied shutdown token.
     /// </summary>
     /// <param name="cancellationToken">Limits how long graceful application shutdown waits.</param>
     /// <returns>A task that completes after all accepted operations release their slots.</returns>

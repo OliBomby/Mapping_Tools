@@ -4,11 +4,20 @@ using Mapping_Tools.Core.Classes.ToolHelpers.Sliders;
 namespace Mapping_Tools.Core.Tools.Sliderator;
 
 /// <summary>
-/// Converts a distance-parametrized slider path into osu! anchors whose
-/// travelled distance follows a requested position function.
+///     Converts a distance-parametrized slider path into osu! anchors whose
+///     travelled distance follows a requested position function.
 /// </summary>
 public sealed class SlideratorPathGenerator
 {
+    private List<double> angle = [];
+    private List<Vector2> diff = [];
+    private List<double> diffL = [];
+    private List<LatticePoint> lattice = [];
+
+    private List<Vector2> path = [];
+    private List<double> pathL = [];
+    private List<Neuron> slider = [];
+
     /// <summary>Gets or sets the position function in pixels for a time in milliseconds.</summary>
     public Func<double, double> PositionFunction { get; set; } = static _ => 0;
 
@@ -24,26 +33,15 @@ public sealed class SlideratorPathGenerator
     /// <summary>Gets the expected output pixel length.</summary>
     public double MaxS => MaxT * Velocity;
 
-    private List<Vector2> path = [];
-    private List<Vector2> diff = [];
-    private List<double> angle = [];
-    private List<double> diffL = [];
-    private List<double> pathL = [];
-    private List<LatticePoint> lattice = [];
-    private List<Neuron> slider = [];
-
     /// <summary>Sets the sampled source path and removes consecutive duplicates.</summary>
     /// <param name="pathPoints">Ordered source points with non-zero total length.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="pathPoints"/> is <see langword="null"/>.</exception>
-    /// <exception cref="ArgumentException"><paramref name="pathPoints"/> is empty.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="pathPoints" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException"><paramref name="pathPoints" /> is empty.</exception>
     /// <exception cref="InvalidOperationException">The source has zero length.</exception>
     public void SetPath(IReadOnlyList<Vector2> pathPoints)
     {
         ArgumentNullException.ThrowIfNull(pathPoints);
-        if (pathPoints.Count == 0)
-        {
-            throw new ArgumentException("The sliderator path cannot be empty.", nameof(pathPoints));
-        }
+        if (pathPoints.Count == 0) throw new ArgumentException("The sliderator path cannot be empty.", nameof(pathPoints));
 
         path = [pathPoints[0]];
         diff = [];
@@ -51,14 +49,11 @@ public sealed class SlideratorPathGenerator
         diffL = [];
         double sum = 0;
         pathL = [0];
-        foreach (Vector2 point in pathPoints.Skip(1))
+        foreach (var point in pathPoints.Skip(1))
         {
-            Vector2 delta = point - path[^1];
+            var delta = point - path[^1];
             double length = delta.Length;
-            if (length < Precision.DoubleEpsilon)
-            {
-                continue;
-            }
+            if (length < Precision.DoubleEpsilon) continue;
 
             path.Add(point);
             diff.Add(delta);
@@ -68,10 +63,7 @@ public sealed class SlideratorPathGenerator
             pathL.Add(sum);
         }
 
-        if (Math.Abs(sum) < Precision.DoubleEpsilon)
-        {
-            throw new InvalidOperationException("Zero length path.");
-        }
+        if (Math.Abs(sum) < Precision.DoubleEpsilon) throw new InvalidOperationException("Zero length path.");
 
         // Add last member again so these lists have the same number of elements as path
         diff.Add(diff[^1]);
@@ -95,16 +87,10 @@ public sealed class SlideratorPathGenerator
     /// <returns>Rounded control points for the stream.</returns>
     public List<Vector2> SliderateStream(double deltaT)
     {
-        if (!double.IsFinite(deltaT) || deltaT <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(deltaT));
-        }
+        if (!double.IsFinite(deltaT) || deltaT <= 0) throw new ArgumentOutOfRangeException(nameof(deltaT));
 
         List<Vector2> points = [];
-        for (double time = 0; time <= MaxT + Precision.DoubleEpsilon; time += deltaT)
-        {
-            points.Add(PositionAt(PositionFunction(time)).Rounded());
-        }
+        for (double time = 0; time <= MaxT + Precision.DoubleEpsilon; time += deltaT) points.Add(PositionAt(PositionFunction(time)).Rounded());
 
         return points;
     }
@@ -112,20 +98,11 @@ public sealed class SlideratorPathGenerator
     private Vector2 PositionAt(double distance)
     {
         int index = pathL.BinarySearch(distance);
-        if (index < 0)
-        {
-            index = ~index - 1;
-        }
+        if (index < 0) index = ~index - 1;
 
-        if (index == -1)
-        {
-            index = 0;
-        }
+        if (index == -1) index = 0;
 
-        if (index == diff.Count)
-        {
-            index--;
-        }
+        if (index == diff.Count) index--;
 
         return path[index] + diff[index] / diffL[index] * (distance - pathL[index]);
     }
@@ -138,17 +115,12 @@ public sealed class SlideratorPathGenerator
         {
             int middle = (left + right) / 2;
             if (lattice[middle].PathPosition > pathPosition)
-            {
                 right = middle;
-            }
             else
-            {
                 left = middle;
-            }
         }
 
-        return Math.Abs(pathPosition - lattice[left].PathPosition) <
-               Math.Abs(pathPosition - lattice[right].PathPosition)
+        return Math.Abs(pathPosition - lattice[left].PathPosition) < Math.Abs(pathPosition - lattice[right].PathPosition)
             ? lattice[left]
             : lattice[right];
     }
@@ -166,13 +138,11 @@ public sealed class SlideratorPathGenerator
         {
             double length = diffL[index];
             if (Math.Abs(length) < Precision.DoubleEpsilon)
-            {
                 // Skip segment if degenerate
                 continue;
-            }
 
-            Vector2 start = path[index];
-            Vector2 delta = diff[index];
+            var start = path[index];
+            var delta = diff[index];
             double lengthSquared = delta.LengthSquared;
             int majorAxis = Math.Abs(delta[0]) < Math.Abs(delta[1]) ? 1 : 0;
             int direction = Math.Sign(delta[majorAxis]);
@@ -183,26 +153,22 @@ public sealed class SlideratorPathGenerator
                 double progress = (i - start[majorAxis]) / delta[majorAxis];
                 double minor = start[1 - majorAxis] + progress * delta[1 - majorAxis];
                 int j = (int)Math.Round(minor);
-                Vector2 latticePoint = majorAxis == 1 ? new(j, i) : new(i, j);
+                Vector2 latticePoint = majorAxis == 1 ? new Vector2(j, i) : new Vector2(i, j);
                 double projected = MathHelper.Clamp(
                     progress + (j - minor) * delta[1 - majorAxis] / lengthSquared,
                     0,
                     1);
-                Vector2 projectedPoint = start + projected * delta;
+                var projectedPoint = start + projected * delta;
                 double position = pathL[index] + projected * length;
                 double error = (latticePoint - projectedPoint).Length;
                 double perpendicularError = (j - minor) * delta[majorAxis] / length * (1 - 2 * majorAxis);
 
-                if (error > tolerance ||
-                    Math.Abs(projected - 1) < Precision.DoubleEpsilon && index + 1 < diff.Count)
-                {
+                if (error > tolerance || Math.Abs(projected - 1) < Precision.DoubleEpsilon && index + 1 < diff.Count)
                     continue;
-                }
 
                 if (points.Count > 0 && latticePoint == points[^1].Pos)
                 {
                     if (error <= points[^1].Error)
-                    {
                         points[^1] = new LatticePoint(
                             latticePoint,
                             projectedPoint,
@@ -211,7 +177,6 @@ public sealed class SlideratorPathGenerator
                             perpendicularError,
                             index,
                             projected);
-                    }
                 }
                 else
                 {
@@ -230,10 +195,15 @@ public sealed class SlideratorPathGenerator
         return points;
     }
 
-    private void GetLatticePoints() => lattice = CreateLatticePoints(path, diff, diffL, pathL);
+    private void GetLatticePoints()
+    {
+        lattice = CreateLatticePoints(path, diff, diffL, pathL);
+    }
 
-    private double GetSpeedAtTime(double time, double epsilon) =>
-        (PositionFunction(time + epsilon) - PositionFunction(time)) / epsilon;
+    private double GetSpeedAtTime(double time, double epsilon)
+    {
+        return (PositionFunction(time + epsilon) - PositionFunction(time)) / epsilon;
+    }
 
     private void GenerateNeurons()
     {
@@ -256,7 +226,7 @@ public sealed class SlideratorPathGenerator
             double speed = (PositionFunction(clampedTime + epsilon) - wantedLength) / epsilon;
             int direction = Math.Sign(speed);
             double velocity = Math.Abs(speed);
-            LatticePoint nearest = GetNearestLatticePoint(wantedLength);
+            var nearest = GetNearestLatticePoint(wantedLength);
 
             if (direction * lastDirection < 0 || direction == 0 && lastDirection != 0)
             {
@@ -275,8 +245,8 @@ public sealed class SlideratorPathGenerator
             actualLength = (clampedTime - nucleusTime) * Velocity;
             double lengthError = Math.Abs(Math.Abs(wantedLength - nucleusWantedLength) - actualLength) - current.Error;
             // Make a new neuron when the error in the length becomes too large
-            if (lengthError > Math.Max(MinDendriteLength, velocity * maxOvershot) ||
-                nearest.Error < 0.05 && lengthError > Math.Max(MinDendriteLength, velocity * MinDendriteLength))
+            if (lengthError > Math.Max(MinDendriteLength, velocity * maxOvershot)
+                || nearest.Error < 0.05 && lengthError > Math.Max(MinDendriteLength, velocity * MinDendriteLength))
             {
                 if ((nearest.Pos - current.Nucleus.Pos).LengthSquared > 0.1)
                 {
@@ -302,7 +272,7 @@ public sealed class SlideratorPathGenerator
 
         // Need to add currentNeuron at the end otherwise the last neuron would get ignored
         current.WantedLength += actualLength;
-        LatticePoint finalPoint = GetNearestLatticePoint(PositionFunction(MaxT));
+        var finalPoint = GetNearestLatticePoint(PositionFunction(MaxT));
         Neuron last = new(finalPoint, MaxT);
         current.Terminal = last;
         slider.Add(current);
@@ -311,21 +281,18 @@ public sealed class SlideratorPathGenerator
         double totalWantedLength = slider.Sum(neuron => neuron.WantedLength);
         // Multiply with ratio to exactly match the expected total length
         double ratio = MaxS / totalWantedLength;
-        foreach (Neuron neuron in slider)
-        {
-            neuron.WantedLength *= ratio;
-        }
+        foreach (var neuron in slider) neuron.WantedLength *= ratio;
     }
 
     private void GenerateAxons()
     {
         PathGenerator pathGenerator = new(path, diff, angle, diffL, pathL);
         // Generate bezier points that approximate the paths between neurons
-        foreach (Neuron neuron in slider.Where(neuron => neuron.Terminal is not null))
+        foreach (var neuron in slider.Where(neuron => neuron.Terminal is not null))
         {
-            Vector2 firstPoint = neuron.Nucleus.Pos;
-            Vector2 lastPoint = neuron.Terminal!.Nucleus.Pos;
-            List<Vector2> generated = pathGenerator.GeneratePath(
+            var firstPoint = neuron.Nucleus.Pos;
+            var lastPoint = neuron.Terminal!.Nucleus.Pos;
+            var generated = pathGenerator.GeneratePath(
                     neuron.Nucleus.SegmentIndex + neuron.Nucleus.SegmentProgress,
                     neuron.Terminal.Nucleus.SegmentIndex + neuron.Terminal.Nucleus.SegmentProgress)
                 .ToList();
@@ -348,14 +315,11 @@ public sealed class SlideratorPathGenerator
 
     private Vector2 NearbyNonZeroDiff(int index)
     {
-        Vector2 result = Vector2.UnitX;
+        var result = Vector2.UnitX;
         for (int offset = 0; offset < 10; offset++)
         {
             result = diff[MathHelper.Clamp(index + offset, 0, diff.Count - 1)];
-            if (Math.Abs(result.X) > Precision.DoubleEpsilon || Math.Abs(result.Y) > Precision.DoubleEpsilon)
-            {
-                return result;
-            }
+            if (Math.Abs(result.X) > Precision.DoubleEpsilon || Math.Abs(result.Y) > Precision.DoubleEpsilon) return result;
         }
 
         return result;
@@ -364,13 +328,13 @@ public sealed class SlideratorPathGenerator
     private void GenerateDendrites()
     {
         double leftovers = 0;
-        foreach (Neuron neuron in slider.Where(neuron => neuron.Terminal is not null))
+        foreach (var neuron in slider.Where(neuron => neuron.Terminal is not null))
         {
             // Find angles for the neuron and the terminal to point the dendrites towards
             int direction = Math.Sign(neuron.Terminal!.Nucleus.PathPosition - neuron.Nucleus.PathPosition);
             direction = direction == 0 ? 1 : direction;
-            Vector2 firstDirection = direction * NearbyNonZeroDiff(neuron.Nucleus.SegmentIndex).Normalized();
-            Vector2 secondDirection = -direction * NearbyNonZeroDiff(neuron.Terminal.Nucleus.SegmentIndex).Normalized();
+            var firstDirection = direction * NearbyNonZeroDiff(neuron.Nucleus.SegmentIndex).Normalized();
+            var secondDirection = -direction * NearbyNonZeroDiff(neuron.Terminal.Nucleus.SegmentIndex).Normalized();
             // Do an even split of dendrites between this neuron and the terminal
             double dendriteToAdd = neuron.DendriteLength + leftovers;
             // Find the time at which the position function goes in between the neuron and the terminal
@@ -380,14 +344,12 @@ public sealed class SlideratorPathGenerator
                 neuron.Time,
                 neuron.Terminal.Time,
                 0.01,
-                time => PositionFunction(time) <=
-                        (neuron.Nucleus.PathPosition + neuron.Terminal.Nucleus.PathPosition) / 2);
+                time => PositionFunction(time) <= (neuron.Nucleus.PathPosition + neuron.Terminal.Nucleus.PathPosition) / 2);
             // Calculate the distribution of dendrites to let the axon pass through the middle at the same time as the position funciton does
             double leftPortion = Precision.AlmostEquals(width, axonWidth)
                 ? 0.5
                 : MathHelper.Clamp(
-                    (2 * (middleTime - neuron.Time) - axonWidth) /
-                    (2 * (width - axonWidth)),
+                    (2 * (middleTime - neuron.Time) - axonWidth) / (2 * (width - axonWidth)),
                     0,
                     1);
             double rightPortion = 1 - leftPortion;
@@ -424,7 +386,7 @@ public sealed class SlideratorPathGenerator
                 Math.Floor(length),
                 Math.Max(minLength, 1),
                 Math.Min(maxLength, 12));
-            Vector2 dendrite = (direction * size).Rounded();
+            var dendrite = (direction * size).Rounded();
             double dendriteLength = dendrite.Length;
             while (dendriteLength > 12)
             {
@@ -435,10 +397,8 @@ public sealed class SlideratorPathGenerator
             }
 
             if (dendriteLength < 1)
-            {
                 // Prevent any dendrites shorter than 1 to never get an infinite loop
                 dendrite = Vector2.UnitX;
-            }
 
             neuron.Dendrites.Add(dendrite);
             length -= dendrite.Length;
@@ -452,24 +412,18 @@ public sealed class SlideratorPathGenerator
         List<Vector2> anchors = [];
         for (int index = 0; index < slider.Count; index++)
         {
-            Neuron neuron = slider[index];
+            var neuron = slider[index];
             anchors.Add(neuron.Nucleus.Pos);
-            if (index != 0)
-            {
-                anchors.Add(neuron.Nucleus.Pos);
-            }
+            if (index != 0) anchors.Add(neuron.Nucleus.Pos);
 
-            foreach (Vector2 dendrite in neuron.Dendrites)
+            foreach (var dendrite in neuron.Dendrites)
             {
                 anchors.Add(neuron.Nucleus.Pos + dendrite);
                 anchors.Add(neuron.Nucleus.Pos);
                 anchors.Add(neuron.Nucleus.Pos);
             }
 
-            if (index != slider.Count - 1)
-            {
-                anchors.AddRange(neuron.Axon.Points.GetRange(1, neuron.Axon.Points.Count - 2));
-            }
+            if (index != slider.Count - 1) anchors.AddRange(neuron.Axon.Points.GetRange(1, neuron.Axon.Points.Count - 2));
         }
 
         anchors.RemoveAt(anchors.Count - 1);

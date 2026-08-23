@@ -24,7 +24,7 @@ public sealed class AudioServiceTests
         var request = new AudioGenerationRequest(new SampleGeneratingArgs("sample.wav"));
 
         // Act
-        IAudioPlaybackSession result = await service.PreviewGeneratedAsync(
+        var result = await service.PreviewGeneratedAsync(
             request,
             new AudioPlaybackOptions { Loop = true });
 
@@ -51,7 +51,7 @@ public sealed class AudioServiceTests
         var request = new AudioDecodeRequest("sample.wav");
 
         // Act
-        SpectrumFrame result = await service.CalculateFileAsync(request, options);
+        var result = await service.CalculateFileAsync(request, options);
 
         // Assert
         result.Should().BeSameAs(spectrum.Result);
@@ -71,7 +71,7 @@ public sealed class AudioServiceTests
         var export = new AudioExportRequest("out.wav", AudioExportFormat.WaveIeeeFloat);
 
         // Act
-        AudioExportResult result = await service.ExportGeneratedAsync(generation, export);
+        var result = await service.ExportGeneratedAsync(generation, export);
 
         // Assert
         result.Should().BeSameAs(exporter.Result);
@@ -142,8 +142,16 @@ public sealed class AudioServiceTests
         public Task Completion => Task.CompletedTask;
         public void Pause() { }
         public void Resume() { }
-        public ValueTask StopAsync() => ValueTask.CompletedTask;
-        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
+        public ValueTask StopAsync()
+        {
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            return ValueTask.CompletedTask;
+        }
     }
 
     private sealed class StubExporter : IAudioExporter

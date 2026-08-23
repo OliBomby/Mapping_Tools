@@ -5,12 +5,12 @@ using Mapping_Tools.Core.Classes.BeatmapHelper;
 namespace Mapping_Tools.Desktop.Converters;
 
 /// <summary>
-/// Converts osu! Circle Size values to the diameter used by the object visualizer.
+///     Converts osu! Circle Size values to the diameter used by the object visualizer.
 /// </summary>
 public sealed class CircleSizeToThicknessConverter : IValueConverter
 {
     /// <summary>
-    /// Converts a finite Circle Size value to the corresponding hit-object diameter.
+    ///     Converts a finite Circle Size value to the corresponding hit-object diameter.
     /// </summary>
     /// <param name="value">The Circle Size value supplied by the binding.</param>
     /// <param name="targetType">The requested target type.</param>
@@ -25,7 +25,7 @@ public sealed class CircleSizeToThicknessConverter : IValueConverter
     }
 
     /// <summary>
-    /// Rejects reverse conversion because the visualizer thickness is derived state.
+    ///     Rejects reverse conversion because the visualizer thickness is derived state.
     /// </summary>
     /// <param name="value">The visualizer thickness.</param>
     /// <param name="targetType">The requested target type.</param>

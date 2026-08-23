@@ -14,14 +14,14 @@ public sealed class SlideratorEngineTests
     public void Apply_WithConstantPositionGraph_ReusesSourceShapeAndExportsOneSlider()
     {
         // Arrange
-        (Beatmap beatmap, HitObject source) = CreateSliderBeatmap();
-        SlideratorOptions options = CreateOptions();
+        var (beatmap, source) = CreateSliderBeatmap();
+        var options = CreateOptions();
         options.ExportTime = 1000;
         options.NewVelocity = 1 / 4.2;
         options.GraphState = SlideratorOptions.CreatePositionGraph(options.GraphBeats);
 
         // Act
-        SlideratorApplyResult result = SlideratorEngine.Apply(beatmap, source, options);
+        var result = SlideratorEngine.Apply(beatmap, source, options);
 
         // Assert
         result.Simplified.Should().BeTrue();
@@ -35,8 +35,8 @@ public sealed class SlideratorEngineTests
     public void Apply_WithVelocityGraphAndStreamOutput_ExportsVariableDensityCircles()
     {
         // Arrange
-        (Beatmap beatmap, HitObject source) = CreateSliderBeatmap();
-        SlideratorOptions options = CreateOptions();
+        var (beatmap, source) = CreateSliderBeatmap();
+        var options = CreateOptions();
         options.GraphBeats = 1;
         options.BeatsPerMinute = 600;
         options.ExportTime = 1000;
@@ -46,7 +46,7 @@ public sealed class SlideratorEngineTests
         options.GraphState = new GraphState(
             [
                 new GraphAnchor(new Vector2(0, 1)),
-                new GraphAnchor(new Vector2(1, 2))
+                new GraphAnchor(new Vector2(1, 2)),
             ],
             0,
             0,
@@ -54,7 +54,7 @@ public sealed class SlideratorEngineTests
             2);
 
         // Act
-        SlideratorApplyResult result = SlideratorEngine.Apply(beatmap, source, options);
+        var result = SlideratorEngine.Apply(beatmap, source, options);
 
         // Assert
         result.Simplified.Should().BeFalse();
@@ -70,10 +70,9 @@ public sealed class SlideratorEngineTests
         Vector2[] sliderballPositions = [new(64, 64), new(65, 64)];
 
         // Act
-        (Vector2[] controlPoints, double frameDistance) = SliderInvisiblator.Invisiblate(
+        (var controlPoints, double frameDistance) = SliderInvisiblator.Invisiblate(
             1,
-            sliderballPositions,
-            1.4);
+            sliderballPositions);
 
         // Assert
         controlPoints.Length.Should().BeGreaterThan(2);
@@ -85,8 +84,8 @@ public sealed class SlideratorEngineTests
     public void Apply_WithInvisibleOutput_DelegatesVelocityToTimingPoints()
     {
         // Arrange
-        (Beatmap beatmap, HitObject source) = CreateSliderBeatmap();
-        SlideratorOptions options = CreateOptions();
+        var (beatmap, source) = CreateSliderBeatmap();
+        var options = CreateOptions();
         options.ExportTime = 1000;
         options.GraphBeats = 1;
         options.BeatsPerMinute = 600;
@@ -95,7 +94,7 @@ public sealed class SlideratorEngineTests
         options.GraphState = SlideratorOptions.CreatePositionGraph(options.GraphBeats);
 
         // Act
-        SlideratorApplyResult result = SlideratorEngine.Apply(beatmap, source, options);
+        var result = SlideratorEngine.Apply(beatmap, source, options);
 
         // Assert
         result.Simplified.Should().BeFalse();
@@ -107,8 +106,8 @@ public sealed class SlideratorEngineTests
     public void Apply_WhenCancellationIsRequestedBeforeGeneration_LeavesBeatmapUnchanged()
     {
         // Arrange
-        (Beatmap beatmap, HitObject source) = CreateSliderBeatmap();
-        SlideratorOptions options = CreateOptions();
+        var (beatmap, source) = CreateSliderBeatmap();
+        var options = CreateOptions();
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
 
@@ -120,19 +119,22 @@ public sealed class SlideratorEngineTests
         beatmap.HitObjects.Should().ContainSingle();
     }
 
-    private static SlideratorOptions CreateOptions() => new()
+    private static SlideratorOptions CreateOptions()
     {
-        GlobalSv = 1.4,
-        GraphBeats = 3,
-        BeatsPerMinute = 180,
-        PixelLength = 100,
-        BeatSnapDivisor = 4,
-        VelocityLimit = 10,
-        MinDendrite = 2,
-        ExportAsNormal = true,
-        ExportModeSetting = SlideratorExportMode.Add,
-        GraphModeSetting = SlideratorGraphMode.Position
-    };
+        return new SlideratorOptions
+        {
+            GlobalSv = 1.4,
+            GraphBeats = 3,
+            BeatsPerMinute = 180,
+            PixelLength = 100,
+            BeatSnapDivisor = 4,
+            VelocityLimit = 10,
+            MinDendrite = 2,
+            ExportAsNormal = true,
+            ExportModeSetting = SlideratorExportMode.Add,
+            GraphModeSetting = SlideratorGraphMode.Position,
+        };
+    }
 
     private static (Beatmap Beatmap, HitObject Slider) CreateSliderBeatmap()
     {
@@ -143,9 +145,9 @@ public sealed class SlideratorEngineTests
             SampleSet.Normal,
             0,
             100,
-            uninherited: true,
-            kiai: false,
-            omitFirstBarLine: false);
+            true,
+            false,
+            false);
         HitObject slider = new("64,64,0,2,0,L|164:64,1,100");
         Beatmap beatmap = new([slider], [redline], redline);
         beatmap.BeatmapTiming.SliderMultiplier = 1.4;

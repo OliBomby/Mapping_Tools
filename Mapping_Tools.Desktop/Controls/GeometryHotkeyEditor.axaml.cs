@@ -14,8 +14,10 @@ public sealed partial class GeometryHotkeyEditor : UserControl
         AvaloniaProperty.Register<GeometryHotkeyEditor, Hotkey?>(
             nameof(Hotkey), defaultBindingMode: BindingMode.TwoWay);
 
-    static GeometryHotkeyEditor() =>
+    static GeometryHotkeyEditor()
+    {
         HotkeyProperty.Changed.AddClassHandler<GeometryHotkeyEditor>((control, _) => control.RefreshText());
+    }
 
     /// <summary>Creates the hotkey editor.</summary>
     public GeometryHotkeyEditor()
@@ -34,8 +36,7 @@ public sealed partial class GeometryHotkeyEditor : UserControl
     private void EditorKeyDown(object? sender, KeyEventArgs eventArgs)
     {
         eventArgs.Handled = true;
-        if (eventArgs.KeyModifiers == KeyModifiers.None &&
-            eventArgs.Key is Key.Delete or Key.Back or Key.Escape)
+        if (eventArgs.KeyModifiers == KeyModifiers.None && eventArgs.Key is Key.Delete or Key.Back or Key.Escape)
         {
             Hotkey = null;
             return;
@@ -43,15 +44,10 @@ public sealed partial class GeometryHotkeyEditor : UserControl
 
         if (eventArgs.Key is Key.LeftAlt or Key.RightAlt or Key.LeftCtrl or Key.RightCtrl or
             Key.LeftShift or Key.RightShift or Key.LWin or Key.RWin)
-        {
             return;
-        }
 
-        if (eventArgs.Key is Key.Clear or Key.OemClear or Key.Apps ||
-            !HotkeyEditor.TryGetLegacyKey(eventArgs.Key, out int legacyKey))
-        {
+        if (eventArgs.Key is Key.Clear or Key.OemClear or Key.Apps || !HotkeyEditor.TryGetLegacyKey(eventArgs.Key, out int legacyKey))
             return;
-        }
 
         int modifiers = ToLegacyModifiers(eventArgs.KeyModifiers);
         Hotkey = new Hotkey(legacyKey, modifiers);

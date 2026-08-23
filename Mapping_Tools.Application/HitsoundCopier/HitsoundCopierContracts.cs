@@ -1,3 +1,4 @@
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.HitsoundStuff;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
 
@@ -37,7 +38,7 @@ public interface IHitsoundSampleService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Creates a custom sample assignment from source files already validated by the adapter.
+    ///     Creates a custom sample assignment from source files already validated by the adapter.
     /// </summary>
     /// <param name="directory">The target mapset directory.</param>
     /// <param name="sourceFilenames">Beatmap-relative filenames played by the source event.</param>
@@ -46,13 +47,13 @@ public interface IHitsoundSampleService
     /// <param name="sampleSet">The source sample family.</param>
     /// <param name="startIndex">The first custom index to consider.</param>
     /// <param name="existingSchema">Previously assigned samples whose indices must not be reused.</param>
-    /// <returns>An assignment, or <see langword="null"/> when no source file is available.</returns>
+    /// <returns>An assignment, or <see langword="null" /> when no source file is available.</returns>
     HitsoundSampleAssignment? TryCreateAssignment(
         string directory,
         IReadOnlyList<string> sourceFilenames,
         IReadOnlyDictionary<string, string> firstSamples,
         string role,
-        Mapping_Tools.Core.Classes.BeatmapHelper.Enums.SampleSet sampleSet,
+        SampleSet sampleSet,
         int startIndex,
         SampleSchema existingSchema);
 

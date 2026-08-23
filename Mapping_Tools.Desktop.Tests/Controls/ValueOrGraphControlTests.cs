@@ -1,5 +1,3 @@
-using Avalonia;
-using FluentAssertions;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Desktop.Controls;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

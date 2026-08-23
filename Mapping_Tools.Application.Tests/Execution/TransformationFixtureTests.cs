@@ -1,8 +1,6 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using FluentAssertions;
-using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Audio;
 using Mapping_Tools.Application.AutoFail;
 using Mapping_Tools.Application.BeatmapEditing;
@@ -14,39 +12,28 @@ using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.MapsetMerger;
 using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.PatternGallery;
-using Mapping_Tools.Application.PropertyTransformer;
+using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.RhythmGuide;
+using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.SliderCompletionator;
 using Mapping_Tools.Application.SliderMerger;
 using Mapping_Tools.Application.SliderPicturator;
-using Mapping_Tools.Application.Sliderator;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.TimingHelper;
 using Mapping_Tools.Application.TumourGenerator;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.Graph;
 using Mapping_Tools.Core.Classes.HitsoundStuff;
-using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.AutoFail;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
-using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Core.Tools.HitsoundStudio;
-using Mapping_Tools.Core.Tools.MapCleaner;
-using Mapping_Tools.Core.Tools.MetadataManager;
 using Mapping_Tools.Core.Tools.PatternGallery;
-using Mapping_Tools.Core.Tools.PropertyTransformer;
-using Mapping_Tools.Core.Tools.RhythmGuide;
-using Mapping_Tools.Core.Tools.SliderCompletionator;
-using Mapping_Tools.Core.Tools.SliderMerger;
-using Mapping_Tools.Core.Tools.SliderPicturator;
 using Mapping_Tools.Core.Tools.Sliderator;
-using Mapping_Tools.Core.Tools.TimingCopier;
-using Mapping_Tools.Core.Tools.TimingHelper;
 using Mapping_Tools.Infrastructure.Audio;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Images;
@@ -55,7 +42,6 @@ using Mapping_Tools.Infrastructure.PatternGallery;
 using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Workspace;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Mapping_Tools.Application.Tests.TestDoubles;
 using Newtonsoft.Json.Linq;
 using TextJsonSerializer = System.Text.Json.JsonSerializer;
 
@@ -92,10 +78,10 @@ public sealed class TransformationFixtureTests
         string fixtureRoot = Path.Combine(workspace.Root, "Transformations");
         string recordPath = Path.Combine(fixtureRoot, $"{fixtureName}.json");
         string optionsPath = Path.Combine(fixtureRoot, $"{fixtureName}.options.json");
-        using JsonDocument record = JsonDocument.Parse(File.ReadAllText(recordPath));
-        using JsonDocument options = JsonDocument.Parse(File.ReadAllText(optionsPath));
-        JsonElement recordRoot = record.RootElement;
-        JsonElement optionsRoot = options.RootElement;
+        using var record = JsonDocument.Parse(File.ReadAllText(recordPath));
+        using var options = JsonDocument.Parse(File.ReadAllText(optionsPath));
+        var recordRoot = record.RootElement;
+        var optionsRoot = options.RootElement;
         string expectedOutputPath = ResolveFixturePath(fixtureRoot, StringProperty(recordRoot, "expectedOutput"));
         string seedInput = ResolveFixturePath(fixtureRoot, StringProperty(recordRoot, "seedInput"));
         string? secondaryInput = OptionalStringProperty(recordRoot, "secondaryInput") is { } secondary
@@ -103,16 +89,13 @@ public sealed class TransformationFixtureTests
             : null;
         optionsRoot.ValueKind.Should().Be(JsonValueKind.Object);
         File.ReadAllBytes(seedInput).Should().NotBeEmpty();
-        if (secondaryInput is not null)
-        {
-            File.ReadAllBytes(secondaryInput).Should().NotBeEmpty();
-        }
+        if (secondaryInput is not null) File.ReadAllBytes(secondaryInput).Should().NotBeEmpty();
         File.ReadAllText(Path.Combine(fixtureRoot, $"{fixtureName}-report.md")).Should().NotBeNullOrWhiteSpace();
         File.ReadAllText(expectedOutputPath).Should().NotBeNullOrWhiteSpace();
         FileBackedEditingGateway gateway = new();
 
         // Act
-        FixtureExecutionResult actual = await ExecuteFixtureAsync(
+        var actual = await ExecuteFixtureAsync(
             fixtureName, fixtureRoot, seedInput, optionsRoot, gateway, CancellationToken.None);
 
         // Assert
@@ -145,10 +128,8 @@ public sealed class TransformationFixtureTests
         FileBackedEditingGateway gateway,
         CancellationToken cancellationToken)
     {
-        string target = OptionalPath(options, "Target", fixtureRoot) ??
-            OptionalPath(options, "BaseBeatmap", fixtureRoot) ??
-            OptionalPath(options, "ExportPath", fixtureRoot) ??
-            seedInput;
+        string target = OptionalPath(options, "Target", fixtureRoot)
+                        ?? OptionalPath(options, "BaseBeatmap", fixtureRoot) ?? OptionalPath(options, "ExportPath", fixtureRoot) ?? seedInput;
         switch (fixtureName)
         {
             case "auto-fail-detector":
@@ -159,8 +140,8 @@ public sealed class TransformationFixtureTests
                     NumberProperty(options, "OverallDifficultyOverride"),
                     IntProperty(options, "PhysicsUpdateLeniency"));
                 AutoFailService service = new(gateway);
-                AutoFailRun positive = await service.AnalyzeAsync(autoFailOptions, cancellationToken);
-                AutoFailRun negative = await service.AnalyzeAsync(
+                var positive = await service.AnalyzeAsync(autoFailOptions, cancellationToken);
+                var negative = await service.AnalyzeAsync(
                     autoFailOptions with { Path = RequiredPath(options, "NegativeControl", fixtureRoot) },
                     cancellationToken);
                 return new FixtureExecutionResult(
@@ -170,7 +151,7 @@ public sealed class TransformationFixtureTests
                         unloadingObjects = positive.Analysis.UnloadingObjects.Count,
                         potentialUnloadingObjects = positive.Analysis.PotentialUnloadingObjects.Count,
                         message = AutoFailMessage(positive.Analysis),
-                        negativeControlMessage = AutoFailMessage(negative.Analysis)
+                        negativeControlMessage = AutoFailMessage(negative.Analysis),
                     }));
             }
             case "combo-colour-studio":
@@ -196,17 +177,17 @@ public sealed class TransformationFixtureTests
                 return new FixtureExecutionResult([target]);
             case "hitsound-studio":
             {
-                HitsoundStudioProject project = ReadTransformationProject<HitsoundStudioProject>(
+                var project = ReadTransformationProject<HitsoundStudioProject>(
                     fixtureRoot,
                     fixtureName);
                 project.ExportFolder = Path.Combine(Path.GetDirectoryName(target)!, "hitsound-studio-export");
-                HitsoundStudioExportResult result = await CreateHitsoundStudioService(gateway)
+                var result = await CreateHitsoundStudioService(gateway)
                     .ExportAsync(project, cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([result.MapPath!]);
             }
             case "map-cleaner":
             {
-                MapCleanerProject project = ReadTransformationProject<MapCleanerProject>(fixtureRoot, fixtureName);
+                var project = ReadTransformationProject<MapCleanerProject>(fixtureRoot, fixtureName);
                 await new MapCleanerService(
                         gateway, new PhysicalBeatmapFileSystem(), new EmptyMapCleanerSampleService())
                     .CleanAsync([target], project.MapCleanerArgs, cancellationToken: cancellationToken);
@@ -214,7 +195,7 @@ public sealed class TransformationFixtureTests
             }
             case "mapset-merger":
             {
-                MapsetMergerProject project = ReadTransformationProject<MapsetMergerProject>(
+                var project = ReadTransformationProject<MapsetMergerProject>(
                     fixtureRoot,
                     fixtureName);
                 StageMapsetMergerSources(options, fixtureRoot, project);
@@ -227,7 +208,7 @@ public sealed class TransformationFixtureTests
             }
             case "metadata-manager":
             {
-                MetadataManagerResult result = await new MetadataManagerService(
+                var result = await new MetadataManagerService(
                         gateway, new TestBeatmapBackupService())
                     .ExportAsync(
                         ReadTransformationProject<MetadataManagerProject>(fixtureRoot, fixtureName),
@@ -236,14 +217,14 @@ public sealed class TransformationFixtureTests
             }
             case "pattern-gallery":
             {
-                PatternGalleryProject project = ReadTransformationProject<PatternGalleryProject>(
+                var project = ReadTransformationProject<PatternGalleryProject>(
                     fixtureRoot,
                     fixtureName);
-                PatternGalleryCollectionPaths paths = ReadPatternGalleryPaths(options, fixtureRoot);
-                PatternGalleryPattern pattern = project.Patterns.Single(item =>
+                var paths = ReadPatternGalleryPaths(options, fixtureRoot);
+                var pattern = project.Patterns.Single(item =>
                     item.Name.Equals(StringProperty(options, "Pattern"), StringComparison.Ordinal));
                 await new PatternGalleryService(gateway, new PatternGalleryFileService())
-                    .ExportAsync(target, [pattern], project, paths, quick: false, cancellationToken: cancellationToken);
+                    .ExportAsync(target, [pattern], project, paths, false, cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             }
             case "property-transformer":
@@ -254,7 +235,7 @@ public sealed class TransformationFixtureTests
                 return new FixtureExecutionResult([target]);
             case "rhythm-guide":
             {
-                RhythmGuideOptions rhythmOptions = ReadTransformationProject<RhythmGuideProject>(
+                var rhythmOptions = ReadTransformationProject<RhythmGuideProject>(
                     fixtureRoot,
                     fixtureName).GuideGeneratorArgs;
                 await new RhythmGuideService(
@@ -284,11 +265,11 @@ public sealed class TransformationFixtureTests
                 return new FixtureExecutionResult([target]);
             case "sliderator":
             {
-                SlideratorProject project = ReadTransformationProject<SlideratorProject>(fixtureRoot, fixtureName);
-                HitObject sourceSlider = ReadLegacySlider(fixtureRoot, fixtureName);
+                var project = ReadTransformationProject<SlideratorProject>(fixtureRoot, fixtureName);
+                var sourceSlider = ReadLegacySlider(fixtureRoot, fixtureName);
                 ApplySlideratorTransientState(project, sourceSlider);
                 await new SlideratorService(gateway).RunAsync(
-                    target, project, sourceSlider, reloadEditor: false, cancellationToken: cancellationToken);
+                    target, project, sourceSlider, false, cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             }
             case "timing-copier":
@@ -304,7 +285,7 @@ public sealed class TransformationFixtureTests
                 return new FixtureExecutionResult([target]);
             case "tumour-generator":
             {
-                TumourGeneratorProject project = ReadTransformationProject<TumourGeneratorProject>(
+                var project = ReadTransformationProject<TumourGeneratorProject>(
                     fixtureRoot,
                     fixtureName);
                 project.TumourLayers = project.TumourLayers
@@ -313,7 +294,7 @@ public sealed class TransformationFixtureTests
                 await new TumourGeneratorService(gateway).RunAsync(
                     [target],
                     project,
-                    reloadEditor: false, cancellationToken: cancellationToken);
+                    false, cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             }
             default:
@@ -321,10 +302,12 @@ public sealed class TransformationFixtureTests
         }
     }
 
-    private static string AutoFailMessage(AutoFailAnalysis analysis) =>
-        analysis.HasAutoFail
+    private static string AutoFailMessage(AutoFailAnalysis analysis)
+    {
+        return analysis.HasAutoFail
             ? $"{analysis.UnloadingObjects.Count} unloading objects detected and {analysis.PotentialUnloadingObjects.Count} potential unloading objects detected!"
             : "No auto-fail detected.";
+    }
 
     private static HitsoundStudioService CreateHitsoundStudioService(FileBackedEditingGateway gateway)
     {
@@ -352,9 +335,9 @@ public sealed class TransformationFixtureTests
     private static HitObject ReadLegacySlider(string fixtureRoot, string fixtureName)
     {
         string projectPath = Path.Combine(fixtureRoot, "Projects", $"{fixtureName}.json");
-        JObject document = JObject.Parse(File.ReadAllText(projectPath));
+        var document = JObject.Parse(File.ReadAllText(projectPath));
         string sliderJson = document["LoadedHitObjects"]?.SingleOrDefault()?.ToString()
-            ?? throw new InvalidDataException("The legacy Sliderator fixture contained no source slider.");
+                            ?? throw new InvalidDataException("The legacy Sliderator fixture contained no source slider.");
         return ProjectJson.Deserialize<HitObject>(sliderJson);
     }
 
@@ -367,10 +350,7 @@ public sealed class TransformationFixtureTests
         project.BeatsPerMinute = beatsPerMinute > 0 ? beatsPerMinute : 180;
         project.GraphBeats = project.BeatsPerMinute * temporalLength / 60000;
         project.PixelLength = sourceSlider.PixelLength;
-        if (!project.ManualVelocity)
-        {
-            project.NewVelocity = SlideratorEngine.GetMaximumVelocity(project);
-        }
+        if (!project.ManualVelocity) project.NewVelocity = SlideratorEngine.GetMaximumVelocity(project);
     }
 
     private static void StageMapsetMergerSources(
@@ -379,10 +359,10 @@ public sealed class TransformationFixtureTests
         MapsetMergerProject project)
     {
         string sourceRoot = ResolveFixturePath(fixtureRoot, "../Mapsets/multi-difficulty");
-        foreach (JsonElement mapsetOptions in options.GetProperty("Mapsets").EnumerateArray())
+        foreach (var mapsetOptions in options.GetProperty("Mapsets").EnumerateArray())
         {
             string name = StringProperty(mapsetOptions, "Name");
-            MapsetMergerProject.MapsetItem mapset = project.Mapsets.Single(item => item.Name == name);
+            var mapset = project.Mapsets.Single(item => item.Name == name);
             Directory.CreateDirectory(mapset.Path);
             string beatmapPath = RequiredPath(
                 mapsetOptions.GetProperty("Beatmaps").EnumerateArray().Single(),
@@ -390,14 +370,11 @@ public sealed class TransformationFixtureTests
             File.Copy(
                 beatmapPath,
                 Path.Combine(mapset.Path, Path.GetFileName(beatmapPath)),
-                overwrite: true);
+                true);
             foreach (string asset in options.GetProperty("Assets").EnumerateArray().Select(item => item.GetString()!))
             {
                 string sourceAsset = Path.Combine(sourceRoot, asset);
-                if (File.Exists(sourceAsset))
-                {
-                    File.Copy(sourceAsset, Path.Combine(mapset.Path, asset), overwrite: true);
-                }
+                if (File.Exists(sourceAsset)) File.Copy(sourceAsset, Path.Combine(mapset.Path, asset), true);
             }
         }
     }
@@ -414,18 +391,22 @@ public sealed class TransformationFixtureTests
             projectPath);
     }
 
-    private static T ReadProjectJson<T>(string json) => ProjectJson.Deserialize<T>(json);
+    private static T ReadProjectJson<T>(string json)
+    {
+        return ProjectJson.Deserialize<T>(json);
+    }
 
     private static void AssertMapsetOutputEquivalent(string fixtureRoot, string expectedManifestPath, string actualDirectory)
     {
-        using JsonDocument manifest = JsonDocument.Parse(File.ReadAllText(expectedManifestPath));
-        foreach (JsonElement item in manifest.RootElement.GetProperty("beatmaps").EnumerateArray())
+        using var manifest = JsonDocument.Parse(File.ReadAllText(expectedManifestPath));
+        foreach (var item in manifest.RootElement.GetProperty("beatmaps").EnumerateArray())
         {
             string expectedPath = ResolveFixturePath(fixtureRoot, StringProperty(item, "path"));
             string actualPath = Path.Combine(actualDirectory, Path.GetFileName(expectedPath));
             AssertTextOutputEquivalent(expectedPath, actualPath);
         }
-        foreach (JsonElement item in manifest.RootElement.GetProperty("exportedAssets").EnumerateArray())
+
+        foreach (var item in manifest.RootElement.GetProperty("exportedAssets").EnumerateArray())
         {
             string relativePath = StringProperty(item, "path");
             string actualPath = Path.Combine(actualDirectory, relativePath.Replace('/', Path.DirectorySeparatorChar));
@@ -449,29 +430,51 @@ public sealed class TransformationFixtureTests
         return path;
     }
 
-    private static string? OptionalPath(JsonElement element, string property, string fixtureRoot) =>
-        OptionalStringProperty(element, property) is { } value ? ResolveFixturePath(fixtureRoot, value) : null;
+    private static string? OptionalPath(JsonElement element, string property, string fixtureRoot)
+    {
+        return OptionalStringProperty(element, property) is { } value ? ResolveFixturePath(fixtureRoot, value) : null;
+    }
 
-    private static string RequiredPath(JsonElement element, string property, string fixtureRoot) =>
-        ResolveFixturePath(fixtureRoot, StringProperty(element, property));
+    private static string RequiredPath(JsonElement element, string property, string fixtureRoot)
+    {
+        return ResolveFixturePath(fixtureRoot, StringProperty(element, property));
+    }
 
-    private static string RequiredPath(JsonElement value, string fixtureRoot) =>
-        ResolveFixturePath(fixtureRoot, value.GetString()!);
+    private static string RequiredPath(JsonElement value, string fixtureRoot)
+    {
+        return ResolveFixturePath(fixtureRoot, value.GetString()!);
+    }
 
-    private static string StringProperty(JsonElement element, string property) =>
-        element.GetProperty(property).GetString() ?? throw new InvalidDataException($"Fixture property {property} is null.");
+    private static string StringProperty(JsonElement element, string property)
+    {
+        return element.GetProperty(property).GetString() ?? throw new InvalidDataException($"Fixture property {property} is null.");
+    }
 
-    private static string? OptionalStringProperty(JsonElement element, string property) =>
-        element.TryGetProperty(property, out JsonElement value) && value.ValueKind != JsonValueKind.Null
-            ? value.GetString() : null;
+    private static string? OptionalStringProperty(JsonElement element, string property)
+    {
+        return element.TryGetProperty(property, out var value) && value.ValueKind != JsonValueKind.Null
+            ? value.GetString()
+            : null;
+    }
 
-    private static double NumberProperty(JsonElement element, string property) => element.GetProperty(property).GetDouble();
-    private static int IntProperty(JsonElement element, string property) => element.GetProperty(property).GetInt32();
-    private static bool BoolProperty(JsonElement element, string property) => element.GetProperty(property).GetBoolean();
+    private static double NumberProperty(JsonElement element, string property)
+    {
+        return element.GetProperty(property).GetDouble();
+    }
+
+    private static int IntProperty(JsonElement element, string property)
+    {
+        return element.GetProperty(property).GetInt32();
+    }
+
+    private static bool BoolProperty(JsonElement element, string property)
+    {
+        return element.GetProperty(property).GetBoolean();
+    }
 
     private static string FileHash(string path)
     {
-        using SHA256 sha256 = SHA256.Create();
+        using var sha256 = SHA256.Create();
         return Convert.ToHexString(sha256.ComputeHash(File.ReadAllBytes(path)));
     }
 
@@ -500,10 +503,7 @@ public sealed class TransformationFixtureTests
 
         public void Dispose()
         {
-            if (Directory.Exists(Root))
-            {
-                Directory.Delete(Root, recursive: true);
-            }
+            if (Directory.Exists(Root)) Directory.Delete(Root, true);
         }
     }
 
@@ -534,36 +534,54 @@ public sealed class TransformationFixtureTests
             return Task.CompletedTask;
         }
 
-        public Task SaveAsync(BeatmapEditingSession session, bool reloadEditor = false, CancellationToken cancellationToken = default) =>
-            SaveAsync(session.Editor, reloadEditor, cancellationToken);
+        public Task SaveAsync(BeatmapEditingSession session, bool reloadEditor = false, CancellationToken cancellationToken = default)
+        {
+            return SaveAsync(session.Editor, reloadEditor, cancellationToken);
+        }
     }
 
     private sealed class EmptyHitsoundSampleService : IHitsoundSampleService
     {
-        public Task<IReadOnlyDictionary<string, string>> AnalyzeAsync(string directory, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyDictionary<string, string>>(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+        public Task<IReadOnlyDictionary<string, string>> AnalyzeAsync(string directory, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IReadOnlyDictionary<string, string>>(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+        }
 
         public HitsoundSampleAssignment? TryCreateAssignment(
             string directory, IReadOnlyList<string> sourceFilenames,
             IReadOnlyDictionary<string, string> firstSamples, string role,
-            SampleSet sampleSet, int startIndex, SampleSchema existingSchema) => null;
+            SampleSet sampleSet, int startIndex, SampleSchema existingSchema)
+        {
+            return null;
+        }
 
-        public Task ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class EmptyMapCleanerSampleService : IMapCleanerSampleService
     {
         public Task<IReadOnlyDictionary<string, string>> AnalyzeAsync(
-            string directory, bool detectDuplicates, CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyDictionary<string, string>>(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+            string directory, bool detectDuplicates, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IReadOnlyDictionary<string, string>>(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+        }
 
         public Task<int> MoveUnusedToRecoveryAsync(
             string directory, string currentBeatmapPath, Beatmap currentBeatmap,
-            CancellationToken cancellationToken = default) => Task.FromResult(0);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(0);
+        }
     }
 
-    private sealed class NoopFileRevealService : Mapping_Tools.Application.Platform.IFileRevealService
+    private sealed class NoopFileRevealService : IFileRevealService
     {
-        public Task<bool> RevealAsync(string path, CancellationToken cancellationToken = default) => Task.FromResult(true);
+        public Task<bool> RevealAsync(string path, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(true);
+        }
     }
 }

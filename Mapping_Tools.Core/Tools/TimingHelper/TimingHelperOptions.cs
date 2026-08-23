@@ -3,7 +3,7 @@ using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
 namespace Mapping_Tools.Core.Tools.TimingHelper;
 
 /// <summary>
-/// Stores the marker sources and timing rules used by Timing Helper.
+///     Stores the marker sources and timing rules used by Timing Helper.
 /// </summary>
 public class TimingHelperOptions
 {
@@ -26,8 +26,8 @@ public class TimingHelperOptions
     public double Leniency { get; set; } = 3;
 
     /// <summary>
-    /// Gets or sets the requested beat distance between markers, or <c>-1</c>
-    /// to infer the distance from the existing marker positions.
+    ///     Gets or sets the requested beat distance between markers, or <c>-1</c>
+    ///     to infer the distance from the existing marker positions.
     /// </summary>
     public double BeatsBetween { get; set; } = -1;
 

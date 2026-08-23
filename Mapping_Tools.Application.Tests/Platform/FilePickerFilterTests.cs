@@ -18,9 +18,9 @@ public sealed class FilePickerFilterTests
             ["public.data"]);
 
         // Assert
-        filter.Patterns.ToArray().Should().Equal(new[] { "*.osu", "*.osb" });
-        filter.MimeTypes.ToArray().Should().Equal(new[] { "application/x-osu-beatmap" });
-        filter.AppleUniformTypeIdentifiers.ToArray().Should().Equal(new[] { "public.data" });
+        filter.Patterns.ToArray().Should().Equal("*.osu", "*.osb");
+        filter.MimeTypes.ToArray().Should().Equal("application/x-osu-beatmap");
+        filter.AppleUniformTypeIdentifiers.ToArray().Should().Equal("public.data");
     }
 
     [TestMethod]
@@ -39,11 +39,11 @@ public sealed class FilePickerFilterTests
     {
         // Arrange
         // Act
-        FilePickerFilter beatmaps = CommonFilePickerFilters.Beatmaps;
-        FilePickerFilter beatmapsAndStoryboards = CommonFilePickerFilters.BeatmapsAndStoryboards;
-        FilePickerFilter beatmapBackups = CommonFilePickerFilters.BeatmapBackups;
-        FilePickerFilter projects = CommonFilePickerFilters.MappingToolsProjects;
-        FilePickerFilter configuration = CommonFilePickerFilters.OsuConfiguration;
+        var beatmaps = CommonFilePickerFilters.Beatmaps;
+        var beatmapsAndStoryboards = CommonFilePickerFilters.BeatmapsAndStoryboards;
+        var beatmapBackups = CommonFilePickerFilters.BeatmapBackups;
+        var projects = CommonFilePickerFilters.MappingToolsProjects;
+        var configuration = CommonFilePickerFilters.OsuConfiguration;
 
         // Assert
         beatmaps.Name.Should().Be("osu! beatmap");

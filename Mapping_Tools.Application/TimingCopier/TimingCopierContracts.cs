@@ -3,7 +3,7 @@ using Mapping_Tools.Core.Tools.TimingCopier;
 namespace Mapping_Tools.Application.TimingCopier;
 
 /// <summary>
-/// Represents the complete Timing Copier project persisted by the shell.
+///     Represents the complete Timing Copier project persisted by the shell.
 /// </summary>
 public sealed class TimingCopierProject : TimingCopierOptions
 {
@@ -18,12 +18,12 @@ public sealed record TimingCopierResult(IReadOnlyList<string> ProcessedPaths)
 }
 
 /// <summary>
-/// Loads source and target beatmaps, applies Timing Copier, and saves each target.
+///     Loads source and target beatmaps, applies Timing Copier, and saves each target.
 /// </summary>
 public interface ITimingCopierService
 {
     /// <summary>
-    /// Copies source timing to every vertical-bar-separated target in the options.
+    ///     Copies source timing to every vertical-bar-separated target in the options.
     /// </summary>
     /// <param name="options">The source, targets, resnapping mode, and beat divisors.</param>
     /// <param name="progress">Receives aggregate completion after each target.</param>

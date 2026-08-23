@@ -42,10 +42,7 @@ internal readonly struct TimingPointChange
         IEnumerable<TimingPointChange> changes,
         bool allAfter = false)
     {
-        foreach (TimingPointChange change in changes.OrderBy(change => change.TimingPoint.Offset))
-        {
-            change.Add(timing, allAfter);
-        }
+        foreach (var change in changes.OrderBy(change => change.TimingPoint.Offset)) change.Add(timing, allAfter);
     }
 
     private void Add(Timing timing, bool allAfter)
@@ -56,18 +53,12 @@ internal readonly struct TimingPointChange
         bool hasRed = false;
         bool hasGreen = false;
 
-        foreach (TimingPoint? point in timing)
+        foreach (var point in timing)
         {
-            if (point is null)
-            {
-                continue;
-            }
+            if (point is null) continue;
 
-            if (point.Offset < TimingPoint.Offset &&
-                (previous is null || point.Offset >= previous.Offset))
-            {
+            if (point.Offset < TimingPoint.Offset && (previous is null || point.Offset >= previous.Offset))
                 previous = point;
-            }
 
             if (Math.Abs(point.Offset - TimingPoint.Offset) <= Fuzziness)
             {
@@ -77,10 +68,7 @@ internal readonly struct TimingPointChange
             }
         }
 
-        if (atOffset.Count > 0)
-        {
-            previous = atOffset[^1];
-        }
+        if (atOffset.Count > 0) previous = atOffset[^1];
 
         if (Uninherited && !hasRed)
         {
@@ -95,61 +83,33 @@ internal readonly struct TimingPointChange
             adding = previous?.Copy() ?? TimingPoint.Copy();
             adding.Offset = TimingPoint.Offset;
             adding.Uninherited = false;
-            if (previous?.Uninherited == true)
-            {
-                adding.MpB = -100;
-            }
+            if (previous?.Uninherited == true) adding.MpB = -100;
 
             atOffset.Add(adding);
         }
 
-        foreach (TimingPoint point in atOffset)
+        foreach (var point in atOffset)
         {
-            if (Mpb && (Uninherited ? point.Uninherited : !point.Uninherited))
-            {
-                point.MpB = TimingPoint.MpB;
-            }
+            if (Mpb && (Uninherited ? point.Uninherited : !point.Uninherited)) point.MpB = TimingPoint.MpB;
 
-            if (Meter && Uninherited && point.Uninherited)
-            {
-                point.Meter = TimingPoint.Meter;
-            }
+            if (Meter && Uninherited && point.Uninherited) point.Meter = TimingPoint.Meter;
 
-            if (SampleSet)
-            {
-                point.SampleSet = TimingPoint.SampleSet;
-            }
+            if (SampleSet) point.SampleSet = TimingPoint.SampleSet;
 
-            if (Index)
-            {
-                point.SampleIndex = TimingPoint.SampleIndex;
-            }
+            if (Index) point.SampleIndex = TimingPoint.SampleIndex;
 
-            if (Volume)
-            {
-                point.Volume = TimingPoint.Volume;
-            }
+            if (Volume) point.Volume = TimingPoint.Volume;
 
-            if (Kiai)
-            {
-                point.Kiai = TimingPoint.Kiai;
-            }
+            if (Kiai) point.Kiai = TimingPoint.Kiai;
 
-            if (OmitFirstBarLine && Uninherited && point.Uninherited)
-            {
-                point.OmitFirstBarLine = TimingPoint.OmitFirstBarLine;
-            }
+            if (OmitFirstBarLine && Uninherited && point.Uninherited) point.OmitFirstBarLine = TimingPoint.OmitFirstBarLine;
         }
 
-        if (adding is not null &&
-            (previous is null || !adding.SameEffect(previous) || Uninherited))
-        {
+        if (adding is not null && (previous is null || !adding.SameEffect(previous) || Uninherited))
             timing.Add(adding);
-        }
 
         if (allAfter)
-        {
-            foreach (TimingPoint point in timing)
+            foreach (var point in timing)
             {
                 if (point.Offset <= TimingPoint.Offset) continue;
                 if (SampleSet) point.SampleSet = TimingPoint.SampleSet;
@@ -157,7 +117,5 @@ internal readonly struct TimingPointChange
                 if (Volume) point.Volume = TimingPoint.Volume;
                 if (Kiai) point.Kiai = TimingPoint.Kiai;
             }
-        }
-
     }
 }

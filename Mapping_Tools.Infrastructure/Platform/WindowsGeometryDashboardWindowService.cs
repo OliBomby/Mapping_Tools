@@ -5,8 +5,8 @@ using Mapping_Tools.Core.Classes.MathUtil;
 namespace Mapping_Tools.Infrastructure.Platform;
 
 /// <summary>
-/// Tracks Windows top-level windows, activation, bounds, and effective DPI
-/// for Geometry Dashboard target selection.
+///     Tracks Windows top-level windows, activation, bounds, and effective DPI
+///     for Geometry Dashboard target selection.
 /// </summary>
 public sealed class WindowsGeometryDashboardWindowService : IGeometryDashboardWindowService
 {
@@ -23,32 +23,26 @@ public sealed class WindowsGeometryDashboardWindowService : IGeometryDashboardWi
         _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsSupported => _isWindows();
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public GeometryDashboardWindow? GetWindow(PlatformWindowId window)
     {
-        if (!_isWindows() || window.IsEmpty)
-        {
-            return null;
-        }
+        if (!_isWindows() || window.IsEmpty) return null;
 
         nint nativeWindow = new(window.Value);
-        if (!WindowsNativeMethods.IsWindow(nativeWindow) ||
-            !WindowsNativeMethods.GetWindowRect(
+        if (!WindowsNativeMethods.IsWindow(nativeWindow)
+            || !WindowsNativeMethods.GetWindowRect(
                 nativeWindow,
-                out WindowsNativeMethods.RECT rectangle))
-        {
+                out var rectangle))
             return null;
-        }
 
         if (WindowsNativeMethods.GetWindowThreadProcessId(
-            nativeWindow,
-            out uint processId) == 0)
-        {
+                nativeWindow,
+                out uint processId)
+            == 0)
             return null;
-        }
 
         return new GeometryDashboardWindow(
             window,
@@ -65,34 +59,28 @@ public sealed class WindowsGeometryDashboardWindowService : IGeometryDashboardWi
             dpiAvailable);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public GeometryDashboardWindow? GetMainWindow(GeometryDashboardProcess process)
     {
         ArgumentNullException.ThrowIfNull(process);
-        GeometryDashboardWindow? window = GetWindow(process.MainWindow);
+        var window = GetWindow(process.MainWindow);
         return window is null || window.ProcessId != process.ProcessId
             ? null
             : window;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IReadOnlyList<GeometryDashboardWindow> GetTopLevelWindows()
     {
-        if (!_isWindows())
-        {
-            return [];
-        }
+        if (!_isWindows()) return [];
 
         List<GeometryDashboardWindow> windows = [];
         WindowsNativeMethods.EnumWindows(
             (window, _) =>
             {
-                GeometryDashboardWindow? snapshot = GetWindow(
+                var snapshot = GetWindow(
                     new PlatformWindowId(window.ToInt64()));
-                if (snapshot is not null)
-                {
-                    windows.Add(snapshot);
-                }
+                if (snapshot is not null) windows.Add(snapshot);
 
                 return true;
             },

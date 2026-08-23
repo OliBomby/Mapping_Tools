@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Views;
@@ -13,8 +12,8 @@ public sealed class GeometryDashboardViewParityTests
         string source = TestSourceReader.Read("Mapping_Tools.Desktop/Views/GeometryDashboardView.axaml");
 
         // Act
-        bool containsFeatureFooterPersistence = source.Contains("Save locked virtual objects", StringComparison.Ordinal) ||
-            source.Contains("Load locked virtual objects", StringComparison.Ordinal);
+        bool containsFeatureFooterPersistence = source.Contains("Save locked virtual objects", StringComparison.Ordinal)
+                                                || source.Contains("Load locked virtual objects", StringComparison.Ordinal);
 
         // Assert
         source.Should().Contain("Geometry Dashboard");

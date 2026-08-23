@@ -10,8 +10,8 @@ namespace Mapping_Tools.Application.RhythmGuide;
 /// <summary>Coordinates live-aware loading and backup-before-overwrite persistence for Rhythm Guide.</summary>
 public sealed class RhythmGuideService : IRhythmGuideService
 {
-    private readonly IBeatmapEditingGateway _editingGateway;
     private readonly IBeatmapBackupService _backupService;
+    private readonly IBeatmapEditingGateway _editingGateway;
     private readonly IBeatmapFileSystem _fileSystem;
     private readonly ITextFileStore _textFileStore;
 
@@ -32,7 +32,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
         _textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<RhythmGuideResult> GenerateAsync(
         RhythmGuideOptions options,
         CancellationToken cancellationToken = default)
@@ -42,21 +42,21 @@ public sealed class RhythmGuideService : IRhythmGuideService
         foreach (string path in options.Paths)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            BeatmapEditingSession source = await _editingGateway.OpenBeatmapAsync(
+            var source = await _editingGateway.OpenBeatmapAsync(
                 path,
                 LiveBeatmapPreference.PreferLive,
                 cancellationToken).ConfigureAwait(false);
             await _backupService.CreateAsync(
                 source,
                 BeatmapBackupReason.Automatic,
-                force: false,
+                false,
                 cancellationToken).ConfigureAwait(false);
             sources.Add(source.Editor.Beatmap);
         }
 
         if (options.ExportMode == RhythmGuideExportMode.AddToMap)
         {
-            BeatmapEditingSession target = await _editingGateway.OpenBeatmapAsync(
+            var target = await _editingGateway.OpenBeatmapAsync(
                 options.ExportPath,
                 LiveBeatmapPreference.PreferLive,
                 cancellationToken).ConfigureAwait(false);
@@ -75,13 +75,13 @@ public sealed class RhythmGuideService : IRhythmGuideService
                 options.ExportMode);
         }
 
-        Beatmap generated = RhythmGuideGenerator.CreateNewMap(
+        var generated = RhythmGuideGenerator.CreateNewMap(
             sources,
             options,
             cancellationToken);
         BeatmapEditor2 output = new(generated.GetLines(), _textFileStore)
         {
-            Path = options.ExportPath
+            Path = options.ExportPath,
         };
         if (_fileSystem.FileExists(options.ExportPath))
         {
@@ -104,19 +104,10 @@ public sealed class RhythmGuideService : IRhythmGuideService
     private static void Validate(RhythmGuideOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-        if (options.Paths is null || options.Paths.Length == 0)
-        {
-            throw new ArgumentException("Select at least one source beatmap.", nameof(options));
-        }
-        if (options.Paths.Any(string.IsNullOrWhiteSpace))
-        {
-            throw new ArgumentException("Source beatmap paths cannot be blank.", nameof(options));
-        }
+        if (options.Paths is null || options.Paths.Length == 0) throw new ArgumentException("Select at least one source beatmap.", nameof(options));
+        if (options.Paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Source beatmap paths cannot be blank.", nameof(options));
         ArgumentException.ThrowIfNullOrWhiteSpace(options.ExportPath);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.OutputName);
-        if (options.BeatDivisors is null || options.BeatDivisors.Length == 0)
-        {
-            throw new ArgumentException("Select at least one beat divisor.", nameof(options));
-        }
+        if (options.BeatDivisors is null || options.BeatDivisors.Length == 0) throw new ArgumentException("Select at least one beat divisor.", nameof(options));
     }
 }

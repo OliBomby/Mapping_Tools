@@ -14,7 +14,7 @@ public enum SlideratorImportMode
     Bookmarked,
 
     /// <summary>Uses objects matched by the time-code expression.</summary>
-    Time
+    Time,
 }
 
 /// <summary>Chooses how the generated object is written at the export time.</summary>
@@ -24,7 +24,7 @@ public enum SlideratorExportMode
     Add,
 
     /// <summary>Replaces the object already at the time.</summary>
-    Override
+    Override,
 }
 
 /// <summary>Chooses whether graph values represent position or velocity.</summary>
@@ -34,12 +34,12 @@ public enum SlideratorGraphMode
     Position,
 
     /// <summary>Interprets graph values as slider velocity in SV units.</summary>
-    Velocity
+    Velocity,
 }
 
 /// <summary>
-/// Contains the framework-neutral Sliderator inputs used by the Core engine.
-/// UI-only selection, progress, and editor state remain outside this assembly.
+///     Contains the framework-neutral Sliderator inputs used by the Core engine.
+///     UI-only selection, progress, and editor state remain outside this assembly.
 /// </summary>
 public class SlideratorOptions
 {
@@ -123,7 +123,7 @@ public class SlideratorOptions
         return new GraphState(
             [
                 new GraphAnchor(new Vector2(0, 0)),
-                new GraphAnchor(new Vector2((float)graphBeats, 1))
+                new GraphAnchor(new Vector2((float)graphBeats, 1)),
             ],
             0,
             0,
@@ -131,5 +131,8 @@ public class SlideratorOptions
             1);
     }
 
-    private static GraphState CreateDefaultGraph() => CreatePositionGraph(3);
+    private static GraphState CreateDefaultGraph()
+    {
+        return CreatePositionGraph(3);
+    }
 }

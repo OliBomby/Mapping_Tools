@@ -15,219 +15,219 @@
              FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto">
 
     <StackPanel Margin="0,0,100,0">
-            <TextBlock Text="Preferences"
-                       FontSize="32"
-                       FontWeight="Bold"
-                       Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
+        <TextBlock Text="Preferences"
+                   FontSize="32"
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource MaterialPrimaryMidBrush}" />
 
-            <Grid Margin="0,20,0,0"
-                  ColumnDefinitions="*,Auto">
-                <TextBox MinWidth="220"
-                         Margin="0,0,5,0"
-                         materialAssists:TextFieldAssist.Label="osu! folder"
-                         Text="{Binding OsuPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         ToolTip.Tip="Select the path to your osu! folder." />
-                <Button Grid.Column="1"
-                        Classes="flat path-picker"
-                        AutomationProperties.Name="Browse osu! folder"
-                        Command="{Binding BrowseOsuPathCommand}"
-                        ToolTip.Tip="Browse for the osu! folder.">
-                    <materialIcons:MaterialIcon Kind="Folder"
-                                                Width="30"
-                                                Height="30" />
-                </Button>
-            </Grid>
+        <Grid Margin="0,20,0,0"
+              ColumnDefinitions="*,Auto">
+            <TextBox MinWidth="220"
+                     Margin="0,0,5,0"
+                     materialAssists:TextFieldAssist.Label="osu! folder"
+                     Text="{Binding OsuPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     ToolTip.Tip="Select the path to your osu! folder." />
+            <Button Grid.Column="1"
+                    Classes="flat path-picker"
+                    AutomationProperties.Name="Browse osu! folder"
+                    Command="{Binding BrowseOsuPathCommand}"
+                    ToolTip.Tip="Browse for the osu! folder.">
+                <materialIcons:MaterialIcon Kind="Folder"
+                                            Width="30"
+                                            Height="30" />
+            </Button>
+        </Grid>
 
-            <Grid Margin="0,10,0,0"
-                  ColumnDefinitions="*,Auto">
-                <TextBox MinWidth="220"
-                         Margin="0,0,5,0"
-                         materialAssists:TextFieldAssist.Label="Songs folder"
-                         Text="{Binding SongsPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         ToolTip.Tip="Select the path to your osu! songs folder." />
-                <Button Grid.Column="1"
-                        Classes="flat path-picker"
-                        AutomationProperties.Name="Browse Songs folder"
-                        Command="{Binding BrowseSongsPathCommand}"
-                        ToolTip.Tip="Browse for the Songs folder.">
-                    <materialIcons:MaterialIcon Kind="Folder"
-                                                Width="30"
-                                                Height="30" />
-                </Button>
-            </Grid>
+        <Grid Margin="0,10,0,0"
+              ColumnDefinitions="*,Auto">
+            <TextBox MinWidth="220"
+                     Margin="0,0,5,0"
+                     materialAssists:TextFieldAssist.Label="Songs folder"
+                     Text="{Binding SongsPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     ToolTip.Tip="Select the path to your osu! songs folder." />
+            <Button Grid.Column="1"
+                    Classes="flat path-picker"
+                    AutomationProperties.Name="Browse Songs folder"
+                    Command="{Binding BrowseSongsPathCommand}"
+                    ToolTip.Tip="Browse for the Songs folder.">
+                <materialIcons:MaterialIcon Kind="Folder"
+                                            Width="30"
+                                            Height="30" />
+            </Button>
+        </Grid>
 
-            <Grid Margin="0,10,0,0"
-                  ColumnDefinitions="*,Auto">
-                <TextBox MinWidth="220"
-                         Margin="0,0,5,0"
-                         materialAssists:TextFieldAssist.Label="osu! user config file"
-                         Text="{Binding OsuConfigPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         ToolTip.Tip="Select the path to your osu! user config file. This file usually contains the name of your PC account." />
-                <Button Grid.Column="1"
-                        Classes="flat path-picker"
-                        AutomationProperties.Name="Browse osu! configuration"
-                        Command="{Binding BrowseOsuConfigPathCommand}"
-                        ToolTip.Tip="Browse for the osu! user configuration file.">
-                    <materialIcons:MaterialIcon Kind="Folder"
-                                                Width="30"
-                                                Height="30" />
-                </Button>
-            </Grid>
+        <Grid Margin="0,10,0,0"
+              ColumnDefinitions="*,Auto">
+            <TextBox MinWidth="220"
+                     Margin="0,0,5,0"
+                     materialAssists:TextFieldAssist.Label="osu! user config file"
+                     Text="{Binding OsuConfigPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     ToolTip.Tip="Select the path to your osu! user config file. This file usually contains the name of your PC account." />
+            <Button Grid.Column="1"
+                    Classes="flat path-picker"
+                    AutomationProperties.Name="Browse osu! configuration"
+                    Command="{Binding BrowseOsuConfigPathCommand}"
+                    ToolTip.Tip="Browse for the osu! user configuration file.">
+                <materialIcons:MaterialIcon Kind="Folder"
+                                            Width="30"
+                                            Height="30" />
+            </Button>
+        </Grid>
 
-            <Grid Margin="0,10,0,0"
-                  ColumnDefinitions="*,Auto">
-                <TextBox MinWidth="220"
-                         Margin="0,0,5,0"
-                         materialAssists:TextFieldAssist.Label="Backups folder"
-                         Text="{Binding BackupsPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         ToolTip.Tip="Select the path to your backups folder. This is where Mapping Tools will save backups." />
-                <Button Grid.Column="1"
-                        Classes="flat path-picker"
-                        AutomationProperties.Name="Browse backups folder"
-                        Command="{Binding BrowseBackupsPathCommand}"
-                        ToolTip.Tip="Browse for the backups folder.">
-                    <materialIcons:MaterialIcon Kind="Folder"
-                                                Width="30"
-                                                Height="30" />
-                </Button>
-            </Grid>
+        <Grid Margin="0,10,0,0"
+              ColumnDefinitions="*,Auto">
+            <TextBox MinWidth="220"
+                     Margin="0,0,5,0"
+                     materialAssists:TextFieldAssist.Label="Backups folder"
+                     Text="{Binding BackupsPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     ToolTip.Tip="Select the path to your backups folder. This is where Mapping Tools will save backups." />
+            <Button Grid.Column="1"
+                    Classes="flat path-picker"
+                    AutomationProperties.Name="Browse backups folder"
+                    Command="{Binding BrowseBackupsPathCommand}"
+                    ToolTip.Tip="Browse for the backups folder.">
+                <materialIcons:MaterialIcon Kind="Folder"
+                                            Width="30"
+                                            Height="30" />
+            </Button>
+        </Grid>
 
-            <TextBox MaxWidth="150"
-                     Margin="0,10,0,0"
-                     HorizontalAlignment="Left"
-                     materialAssists:TextFieldAssist.Label="Max backup files"
-                     Text="{ReflectionBinding MaxBackupFiles,
+        <TextBox MaxWidth="150"
+                 Margin="0,10,0,0"
+                 HorizontalAlignment="Left"
+                 materialAssists:TextFieldAssist.Label="Max backup files"
+                 Text="{ReflectionBinding MaxBackupFiles,
                                               Mode=TwoWay,
                                               UpdateSourceTrigger=LostFocus,
                                               Converter={StaticResource InvariantInt32Converter}}"
-                     ToolTip.Tip="Select the maximum number of backup files. The oldest beatmap backups in the backups folder will automatically get removed whenever it goes over this limit." />
+                 ToolTip.Tip="Select the maximum number of backup files. The oldest beatmap backups in the backups folder will automatically get removed whenever it goes over this limit." />
 
-            <StackPanel Margin="5,10,0,0">
+        <StackPanel Margin="5,10,0,0">
+            <CheckBox Classes="preference-check"
+                      Content="Make automatic backups"
+                      IsChecked="{Binding MakeBackups, Mode=TwoWay}"
+                      ToolTip.Tip="Automatically make a backup whenever you run a mapping tool." />
+            <StackPanel Orientation="Horizontal">
                 <CheckBox Classes="preference-check"
-                          Content="Make automatic backups"
-                          IsChecked="{Binding MakeBackups, Mode=TwoWay}"
-                          ToolTip.Tip="Automatically make a backup whenever you run a mapping tool." />
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox Classes="preference-check"
-                              Content="Make periodic backups"
-                              IsChecked="{Binding MakePeriodicBackups, Mode=TwoWay}"
-                              ToolTip.Tip="Periodically make automatic backups when the editor is open. This is useful if you forget to save often or accidentally delete your map. It will only make backups if there are changes in the beatmap." />
-                    <TextBox MaxWidth="150"
-                             Margin="20,0,0,0"
-                             HorizontalAlignment="Left"
-                             IsVisible="{Binding MakePeriodicBackups}"
-                             materialAssists:TextFieldAssist.Label="Backup interval"
-                             Text="{ReflectionBinding PeriodicBackupInterval,
+                          Content="Make periodic backups"
+                          IsChecked="{Binding MakePeriodicBackups, Mode=TwoWay}"
+                          ToolTip.Tip="Periodically make automatic backups when the editor is open. This is useful if you forget to save often or accidentally delete your map. It will only make backups if there are changes in the beatmap." />
+                <TextBox MaxWidth="150"
+                         Margin="20,0,0,0"
+                         HorizontalAlignment="Left"
+                         IsVisible="{Binding MakePeriodicBackups}"
+                         materialAssists:TextFieldAssist.Label="Backup interval"
+                         Text="{ReflectionBinding PeriodicBackupInterval,
                                                       Mode=TwoWay,
                                                       UpdateSourceTrigger=LostFocus,
                                                       Converter={StaticResource ConstantTimeSpanConverter}}"
-                             ToolTip.Tip="The time between each automatic periodic backup while the editor is open." />
-                </StackPanel>
-                <CheckBox Classes="preference-check"
-                          Content="Current beatmap default folder in all tools"
-                          IsChecked="{Binding CurrentBeatmapDefaultFolder, Mode=TwoWay}"
-                          ToolTip.Tip="Enable this to get the current beatmap folder as the default folder whenever you open a file explorer in a tool which doesn't use current beatmap (e.g. Hitsound Copier). Else it will default to the last used folder." />
-                <CheckBox Classes="preference-check"
-                          Content="Enable Editor Reader"
-                          IsChecked="{Binding UseEditorReader, Mode=TwoWay}"
-                          ToolTip.Tip="Enable functionality of Editor Reader. Editor Reader reads the memory of your osu! client to get live data from your editor. It can sometimes break, so you can choose to not use it." />
-                <CheckBox Classes="preference-check"
-                          Content="Override osu! save with BetterSave™"
-                          IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}"
-                          ToolTip.Tip="Automatically BetterSave after every osu! save. As a side-effect, this will also overwrite manual .osu changes if you have the editor open." />
-                <CheckBox Classes="preference-check"
-                          Content="Auto reload after QuickRun"
-                          IsChecked="{Binding AutoReload, Mode=TwoWay}"
-                          ToolTip.Tip="Enable this to automatically reload the editor after every QuickRun." />
-                <CheckBox Classes="preference-check"
-                          Content="Always use QuickRun"
-                          IsChecked="{Binding AlwaysQuickRun, Mode=TwoWay}"
-                          ToolTip.Tip="Enable this to use QuickRun even when you press the button to run normally." />
+                         ToolTip.Tip="The time between each automatic periodic backup while the editor is open." />
             </StackPanel>
+            <CheckBox Classes="preference-check"
+                      Content="Current beatmap default folder in all tools"
+                      IsChecked="{Binding CurrentBeatmapDefaultFolder, Mode=TwoWay}"
+                      ToolTip.Tip="Enable this to get the current beatmap folder as the default folder whenever you open a file explorer in a tool which doesn't use current beatmap (e.g. Hitsound Copier). Else it will default to the last used folder." />
+            <CheckBox Classes="preference-check"
+                      Content="Enable Editor Reader"
+                      IsChecked="{Binding UseEditorReader, Mode=TwoWay}"
+                      ToolTip.Tip="Enable functionality of Editor Reader. Editor Reader reads the memory of your osu! client to get live data from your editor. It can sometimes break, so you can choose to not use it." />
+            <CheckBox Classes="preference-check"
+                      Content="Override osu! save with BetterSave™"
+                      IsChecked="{Binding OverrideOsuSave, Mode=TwoWay}"
+                      ToolTip.Tip="Automatically BetterSave after every osu! save. As a side-effect, this will also overwrite manual .osu changes if you have the editor open." />
+            <CheckBox Classes="preference-check"
+                      Content="Auto reload after QuickRun"
+                      IsChecked="{Binding AutoReload, Mode=TwoWay}"
+                      ToolTip.Tip="Enable this to automatically reload the editor after every QuickRun." />
+            <CheckBox Classes="preference-check"
+                      Content="Always use QuickRun"
+                      IsChecked="{Binding AlwaysQuickRun, Mode=TwoWay}"
+                      ToolTip.Tip="Enable this to use QuickRun even when you press the button to run normally." />
+        </StackPanel>
 
-            <StackPanel Margin="5,10,0,0">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Width="150"
+        <StackPanel Margin="5,10,0,0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Width="150"
+                           VerticalAlignment="Center"
+                           Text="QuickRun hotkey:"
+                           ToolTip.Tip="QuickRun lets you quickly run a tool on the beatmap you have open in the editor." />
+                <controls:HotkeyEditor Width="150"
+                                       Classes="compact"
+                                       Hotkey="{Binding QuickRunHotkey, Mode=TwoWay}" />
+
+                <CheckBox Margin="15,0,0,0"
+                          VerticalAlignment="Center"
+                          IsChecked="{Binding SmartQuickRunEnabled, Mode=TwoWay}"
+                          ToolTip.Tip="Enable SmartQuickRun to modify the behavior of QuickRun based on the number of objects currently selected on the editor." />
+
+                <StackPanel Orientation="Horizontal"
+                            IsEnabled="{Binding SmartQuickRunEnabled}">
+                    <TextBlock Margin="15,0"
+                               Classes="togglable"
                                VerticalAlignment="Center"
-                               Text="QuickRun hotkey:"
-                               ToolTip.Tip="QuickRun lets you quickly run a tool on the beatmap you have open in the editor." />
-                    <controls:HotkeyEditor Width="150"
-                                           Classes="compact"
-                                           Hotkey="{Binding QuickRunHotkey, Mode=TwoWay}" />
-
-                    <CheckBox Margin="15,0,0,0"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding SmartQuickRunEnabled, Mode=TwoWay}"
-                              ToolTip.Tip="Enable SmartQuickRun to modify the behavior of QuickRun based on the number of objects currently selected on the editor." />
-
-                    <StackPanel Orientation="Horizontal"
-                                IsEnabled="{Binding SmartQuickRunEnabled}">
-                        <TextBlock Margin="15,0"
-                                   Classes="togglable"
-                                   VerticalAlignment="Center"
-                                   Text="None:"
-                                   ToolTip.Tip="This tool gets QuickRun if you have no objects selected in the editor." />
-                        <ComboBox Width="120"
-                                  Classes="compact"
-                                  ItemsSource="{Binding NoneQuickRunTools}"
-                                  SelectedItem="{Binding NoneQuickRunTool, Mode=TwoWay}"
-                                  ToolTip.Tip="This tool gets QuickRun if you have no objects selected in the editor." />
-                        <TextBlock Margin="15,0"
-                                   Classes="togglable"
-                                   VerticalAlignment="Center"
-                                   Text="Single:"
-                                   ToolTip.Tip="This tool gets QuickRun if you have one object selected in the editor." />
-                        <ComboBox Width="120"
-                                  Classes="compact"
-                                  ItemsSource="{Binding SingleQuickRunTools}"
-                                  SelectedItem="{Binding SingleQuickRunTool, Mode=TwoWay}"
-                                  ToolTip.Tip="This tool gets QuickRun if you have one object selected in the editor." />
-                        <TextBlock Margin="15,0"
-                                   Classes="togglable"
-                                   VerticalAlignment="Center"
-                                   Text="Multiple:"
-                                   ToolTip.Tip="This tool gets QuickRun if you have multiple objects selected in the editor." />
-                        <ComboBox Width="120"
-                                  Classes="compact"
-                                  ItemsSource="{Binding MultipleQuickRunTools}"
-                                  SelectedItem="{Binding MultipleQuickRunTool, Mode=TwoWay}"
-                                  ToolTip.Tip="This tool gets QuickRun if you have multiple objects selected in the editor." />
-                    </StackPanel>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Width="150"
+                               Text="None:"
+                               ToolTip.Tip="This tool gets QuickRun if you have no objects selected in the editor." />
+                    <ComboBox Width="120"
+                              Classes="compact"
+                              ItemsSource="{Binding NoneQuickRunTools}"
+                              SelectedItem="{Binding NoneQuickRunTool, Mode=TwoWay}"
+                              ToolTip.Tip="This tool gets QuickRun if you have no objects selected in the editor." />
+                    <TextBlock Margin="15,0"
+                               Classes="togglable"
                                VerticalAlignment="Center"
-                               Text="QuickUndo hotkey:"
-                               ToolTip.Tip="Quickly loads the latest backup into the beatmap currently open in the editor." />
-                    <controls:HotkeyEditor Width="150"
-                                           Classes="compact"
-                                           Hotkey="{Binding QuickUndoHotkey, Mode=TwoWay}" />
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Width="150"
+                               Text="Single:"
+                               ToolTip.Tip="This tool gets QuickRun if you have one object selected in the editor." />
+                    <ComboBox Width="120"
+                              Classes="compact"
+                              ItemsSource="{Binding SingleQuickRunTools}"
+                              SelectedItem="{Binding SingleQuickRunTool, Mode=TwoWay}"
+                              ToolTip.Tip="This tool gets QuickRun if you have one object selected in the editor." />
+                    <TextBlock Margin="15,0"
+                               Classes="togglable"
                                VerticalAlignment="Center"
-                               Text="BetterSave™ hotkey:"
-                               ToolTip.Tip="BetterSave saves the current map with proper rounding instead of truncating values." />
-                    <controls:HotkeyEditor Width="150"
-                                           Classes="compact"
-                                           Hotkey="{Binding BetterSaveHotkey, Mode=TwoWay}" />
+                               Text="Multiple:"
+                               ToolTip.Tip="This tool gets QuickRun if you have multiple objects selected in the editor." />
+                    <ComboBox Width="120"
+                              Classes="compact"
+                              ItemsSource="{Binding MultipleQuickRunTools}"
+                              SelectedItem="{Binding MultipleQuickRunTool, Mode=TwoWay}"
+                              ToolTip.Tip="This tool gets QuickRun if you have multiple objects selected in the editor." />
                 </StackPanel>
             </StackPanel>
 
-            <StackPanel Margin="0,15,0,0"
-                        Orientation="Horizontal">
-                <TextBlock Text="Light"
-                           VerticalAlignment="Center" />
-                <ToggleSwitch Margin="10,0"
-                              AutomationProperties.Name="Dark theme"
-                              IsChecked="{Binding Theme,
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Width="150"
+                           VerticalAlignment="Center"
+                           Text="QuickUndo hotkey:"
+                           ToolTip.Tip="Quickly loads the latest backup into the beatmap currently open in the editor." />
+                <controls:HotkeyEditor Width="150"
+                                       Classes="compact"
+                                       Hotkey="{Binding QuickUndoHotkey, Mode=TwoWay}" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Width="150"
+                           VerticalAlignment="Center"
+                           Text="BetterSave™ hotkey:"
+                           ToolTip.Tip="BetterSave saves the current map with proper rounding instead of truncating values." />
+                <controls:HotkeyEditor Width="150"
+                                       Classes="compact"
+                                       Hotkey="{Binding BetterSaveHotkey, Mode=TwoWay}" />
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Margin="0,15,0,0"
+                    Orientation="Horizontal">
+            <TextBlock Text="Light"
+                       VerticalAlignment="Center" />
+            <ToggleSwitch Margin="10,0"
+                          AutomationProperties.Name="Dark theme"
+                          IsChecked="{Binding Theme,
                                                   Mode=TwoWay,
                                                   Converter={StaticResource DarkThemeConverter}}"
-                              ToolTip.Tip="Change the theme of Mapping Tools" />
-                <TextBlock Text="Dark"
-                           VerticalAlignment="Center" />
-            </StackPanel>
+                          ToolTip.Tip="Change the theme of Mapping Tools" />
+            <TextBlock Text="Dark"
+                       VerticalAlignment="Center" />
+        </StackPanel>
     </StackPanel>
 </UserControl>

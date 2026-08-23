@@ -5,7 +5,7 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Presents one explicit feature registration in shell navigation.
+///     Presents one explicit feature registration in shell navigation.
 /// </summary>
 public sealed partial class ShellFeatureItemViewModel : ObservableObject
 {
@@ -71,10 +71,14 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
     internal int Order { get; }
 
     [RelayCommand]
-    private void Activate() =>
+    private void Activate()
+    {
         _activate(this);
+    }
 
     [RelayCommand]
-    private void ToggleFavorite() =>
+    private void ToggleFavorite()
+    {
         _toggleFavorite(this);
+    }
 }

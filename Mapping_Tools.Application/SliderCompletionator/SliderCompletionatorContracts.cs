@@ -3,8 +3,8 @@ using Mapping_Tools.Core.Tools.SliderCompletionator;
 namespace Mapping_Tools.Application.SliderCompletionator;
 
 /// <summary>
-/// Persists the complete Slider Completionator form while retaining the legacy
-/// project property names used by WPF JSON files.
+///     Persists the complete Slider Completionator form while retaining the legacy
+///     project property names used by WPF JSON files.
 /// </summary>
 public sealed class SliderCompletionatorProject : SliderCompletionatorOptions
 {
@@ -21,7 +21,7 @@ public sealed record SliderCompletionatorResult(
 public interface ISliderCompletionatorService
 {
     /// <summary>
-    /// Applies the configured edits to each path and saves through the gateway.
+    ///     Applies the configured edits to each path and saves through the gateway.
     /// </summary>
     /// <param name="paths">Beatmap paths in the shell's selected order.</param>
     /// <param name="options">The import and slider-edit settings.</param>

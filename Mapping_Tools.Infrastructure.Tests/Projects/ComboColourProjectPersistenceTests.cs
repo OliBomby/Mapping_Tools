@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -20,7 +19,7 @@ public sealed class ComboColourProjectPersistenceTests
 
         LegacyProjectJsonSerializer serializer = new();
         // Act
-        ComboColourProject project = serializer.Deserialize<ComboColourProject>(json);
+        var project = serializer.Deserialize<ComboColourProject>(json);
 
         // Assert
         project.ComboColours.Should().HaveCount(4);

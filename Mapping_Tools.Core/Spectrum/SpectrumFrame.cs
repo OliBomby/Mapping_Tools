@@ -9,22 +9,13 @@ public sealed class SpectrumFrame
     /// <param name="magnitudes">Magnitude values ordered from the lowest frequency upward.</param>
     public SpectrumFrame(int sampleRate, int fftSize, IEnumerable<double> magnitudes)
     {
-        if (sampleRate <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(sampleRate));
-        }
+        if (sampleRate <= 0) throw new ArgumentOutOfRangeException(nameof(sampleRate));
 
-        if (fftSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(fftSize));
-        }
+        if (fftSize <= 0) throw new ArgumentOutOfRangeException(nameof(fftSize));
 
         ArgumentNullException.ThrowIfNull(magnitudes);
         double[] values = magnitudes.ToArray();
-        if (values.Any(value => !double.IsFinite(value) || value < 0))
-        {
-            throw new ArgumentException("Spectrum magnitudes must be finite and non-negative.", nameof(magnitudes));
-        }
+        if (values.Any(value => !double.IsFinite(value) || value < 0)) throw new ArgumentException("Spectrum magnitudes must be finite and non-negative.", nameof(magnitudes));
 
         SampleRate = sampleRate;
         FftSize = fftSize;

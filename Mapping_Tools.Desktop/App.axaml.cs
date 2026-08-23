@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -6,20 +7,18 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mapping_Tools.Application.Settings;
-using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Diagnostics;
 
 namespace Mapping_Tools.Desktop;
 
 /// <summary>
-/// Owns Avalonia resource initialization and bridges its classic desktop
-/// lifetime to the .NET Generic Host.
+///     Owns Avalonia resource initialization and bridges its classic desktop
+///     lifetime to the .NET Generic Host.
 /// </summary>
 public partial class App : Avalonia.Application
 {
@@ -30,15 +29,15 @@ public partial class App : Avalonia.Application
         InputElement.PointerPressedEvent.AddClassHandler<Window>(ClearFocusFromBackground);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
     }
 
     /// <summary>
-    /// Starts hosted services after Avalonia initialization, resolves the main
-    /// window from the host, and joins host shutdown to the desktop Exit event.
+    ///     Starts hosted services after Avalonia initialization, resolves the main
+    ///     window from the host, and joins host shutdown to the desktop Exit event.
     /// </summary>
     public override void OnFrameworkInitializationCompleted()
     {
@@ -50,12 +49,12 @@ public partial class App : Avalonia.Application
             try
             {
                 _host.Start();
-                ApplicationSettings settings =
+                var settings =
                     _host.Services.GetRequiredService<ApplicationSettings>();
                 _host.Services
                     .GetRequiredService<IApplicationThemeService>()
                     .Apply(settings.Theme);
-                MainWindow mainWindow =
+                var mainWindow =
                     _host.Services.GetRequiredService<MainWindow>();
                 mainWindow.DataContext =
                     _host.Services.GetRequiredService<MainViewModel>();
@@ -82,8 +81,8 @@ public partial class App : Avalonia.Application
     }
 
     /// <summary>
-    /// Writes an unhandled-exception report to the legacy-compatible application
-    /// data directory so the Avalonia frontend has the same support handoff as WPF.
+    ///     Writes an unhandled-exception report to the legacy-compatible application
+    ///     data directory so the Avalonia frontend has the same support handoff as WPF.
     /// </summary>
     /// <param name="exception">The exception that escaped normal application handling.</param>
     internal static void WriteCrashLog(Exception exception)
@@ -94,20 +93,18 @@ public partial class App : Avalonia.Application
         {
             string localApplicationData = Environment.GetFolderPath(
                 Environment.SpecialFolder.LocalApplicationData);
-            if (string.IsNullOrWhiteSpace(localApplicationData))
-            {
-                localApplicationData = AppContext.BaseDirectory;
-            }
+            if (string.IsNullOrWhiteSpace(localApplicationData)) localApplicationData = AppContext.BaseDirectory;
 
             string applicationData = Path.Combine(localApplicationData, "Mapping Tools");
             Directory.CreateDirectory(applicationData);
 
-            List<string> lines = [
+            List<string> lines =
+            [
                 exception.Message,
                 exception.StackTrace ?? string.Empty,
-                exception.Source ?? string.Empty
+                exception.Source ?? string.Empty,
             ];
-            for (Exception? inner = exception.InnerException;
+            for (var inner = exception.InnerException;
                  inner is not null;
                  inner = inner.InnerException)
             {
@@ -130,10 +127,7 @@ public partial class App : Avalonia.Application
 
     private void StopHost()
     {
-        if (_host is null)
-        {
-            return;
-        }
+        if (_host is null) return;
 
         try
         {
@@ -152,20 +146,13 @@ public partial class App : Avalonia.Application
         Window window,
         PointerPressedEventArgs eventArgs)
     {
-        if (!eventArgs.GetCurrentPoint(window).Properties.IsLeftButtonPressed)
-        {
-            return;
-        }
+        if (!eventArgs.GetCurrentPoint(window).Properties.IsLeftButtonPressed) return;
 
-        for (Visual? current = eventArgs.Source as Visual;
+        for (var current = eventArgs.Source as Visual;
              current is not null && current != window;
              current = current.GetVisualParent())
-        {
             if (current is InputElement { Focusable: true })
-            {
                 return;
-            }
-        }
 
         TopLevel.GetTopLevel(window)?.FocusManager?.Focus(null);
     }

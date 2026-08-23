@@ -11,24 +11,47 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Owns Slider Merger form state, project persistence, ordinary runs, and
-/// current-editor QuickRun routing.
+///     Owns Slider Merger form state, project persistence, ordinary runs, and
+///     current-editor QuickRun routing.
 /// </summary>
 public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature
 {
     internal const string OperationId = "slider-merger";
-
-    private readonly ISliderMergerService _merger;
     private readonly ICurrentBeatmapLocator _currentBeatmap;
-    private readonly IBeatmapWorkspace _workspace;
-    private readonly ApplicationSettings _settings;
+
     private readonly ProjectDefinition<SliderMergerProject> _definition = new(
         "slidermergerproject.json",
         "Slider Merger Projects",
         static () => new SliderMergerProject(),
         "slider-merger-project.json");
+
+    private readonly ISliderMergerService _merger;
+    private readonly ApplicationSettings _settings;
+    private readonly IBeatmapWorkspace _workspace;
+
+    /// <summary>
+    ///     Creates a Slider Merger presentation model.
+    /// </summary>
+    /// <param name="merger">Runs the framework-independent merge transformation.</param>
+    /// <param name="execution">Coordinates background execution, cancellation, and reload.</param>
+    /// <param name="currentBeatmap">Finds the beatmap currently open in osu!.</param>
+    /// <param name="workspace">Supplies the shell's selected beatmap paths.</param>
+    /// <param name="settings">Supplies the legacy Always QuickRun preference.</param>
+    public SliderMergerViewModel(
+        ISliderMergerService merger,
+        IToolExecutionService execution,
+        ICurrentBeatmapLocator currentBeatmap,
+        IBeatmapWorkspace workspace,
+        ApplicationSettings settings)
+        : base(execution, OperationId)
+    {
+        _merger = merger ?? throw new ArgumentNullException(nameof(merger));
+        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+    }
 
     /// <summary>Gets the import modes in their legacy display order.</summary>
     public IReadOnlyList<SliderMergerImportMode> ImportModes { get; } =
@@ -69,29 +92,7 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     /// <summary>Gets whether the time-code field is visible for Time import mode.</summary>
     public bool TimeCodeVisible => ImportModeSetting == SliderMergerImportMode.Time;
 
-    /// <summary>
-    /// Creates a Slider Merger presentation model.
-    /// </summary>
-    /// <param name="merger">Runs the framework-independent merge transformation.</param>
-    /// <param name="execution">Coordinates background execution, cancellation, and reload.</param>
-    /// <param name="currentBeatmap">Finds the beatmap currently open in osu!.</param>
-    /// <param name="workspace">Supplies the shell's selected beatmap paths.</param>
-    /// <param name="settings">Supplies the legacy Always QuickRun preference.</param>
-    public SliderMergerViewModel(
-        ISliderMergerService merger,
-        IToolExecutionService execution,
-        ICurrentBeatmapLocator currentBeatmap,
-        IBeatmapWorkspace workspace,
-        ApplicationSettings settings)
-        : base(execution, OperationId)
-    {
-        _merger = merger ?? throw new ArgumentNullException(nameof(merger));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-    }
-
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
         string? path = await _currentBeatmap
@@ -99,96 +100,93 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
             .ConfigureAwait(false);
         await RunWithStateAsync(() => RunPathsAsync(
             string.IsNullOrWhiteSpace(path) ? [] : [path],
-            quick: true,
+            true,
             cancellationToken));
-    }
-
-    /// <inheritdoc/>
-    protected override async Task RunCoreAsync()
-    {
-        string? currentPath = null;
-        if (ImportModeSetting == SliderMergerImportMode.Selected)
-        {
-            currentPath = await _currentBeatmap.FindCurrentBeatmapAsync();
-        }
-
-        IReadOnlyList<string> paths = ImportModeSetting == SliderMergerImportMode.Selected
-            ? string.IsNullOrWhiteSpace(currentPath) ? [] : [currentPath]
-            : _workspace.SelectedPaths;
-        await RunPathsAsync(paths, _settings.AlwaysQuickRun, CancellationToken.None);
-    }
-
-    /// <inheritdoc/>
-    protected override bool PrepareRun()
-    {
-        ValidateAllProperties();
-        return !HasErrors;
     }
 
     string IQuickRun.OperationId => OperationId;
 
     IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
 
-    object IShellProjectFeature.Snapshot() => Snapshot();
+    object IShellProjectFeature.Snapshot()
+    {
+        return Snapshot();
+    }
 
-    void IShellProjectFeature.Install(object project) => Install((SliderMergerProject)project);
+    void IShellProjectFeature.Install(object project)
+    {
+        Install((SliderMergerProject)project);
+    }
+
+    /// <inheritdoc />
+    protected override async Task RunCoreAsync()
+    {
+        string? currentPath = null;
+        if (ImportModeSetting == SliderMergerImportMode.Selected) currentPath = await _currentBeatmap.FindCurrentBeatmapAsync();
+
+        var paths = ImportModeSetting == SliderMergerImportMode.Selected
+            ? string.IsNullOrWhiteSpace(currentPath) ? [] : [currentPath]
+            : _workspace.SelectedPaths;
+        await RunPathsAsync(paths, _settings.AlwaysQuickRun, CancellationToken.None);
+    }
+
+    /// <inheritdoc />
+    protected override bool PrepareRun()
+    {
+        ValidateAllProperties();
+        return !HasErrors;
+    }
 
     private async Task RunPathsAsync(
         IReadOnlyList<string> paths,
         bool quick,
         CancellationToken cancellationToken)
     {
-        if (paths.Count == 0)
-        {
-            return;
-        }
+        if (paths.Count == 0) return;
 
-        SliderMergerProject options = Snapshot();
+        var options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<SliderMergerResult>(
                     OperationId,
                     "Slider Merger",
                     async context =>
                     {
-                        SliderMergerResult result = await _merger.MergeAsync(
+                        var result = await _merger.MergeAsync(
                             paths,
                             options,
                             new Progress<double>(value => context.ReportProgress(
                                 value,
                                 "Merging sliders")),
                             context.CancellationToken);
-                        string message = $"Successfully merged {result.ObjectsMerged} " +
-                                         $"{(result.ObjectsMerged == 1 ? "slider" : "sliders")}!";
+                        string message = $"Successfully merged {result.ObjectsMerged} " + $"{(result.ObjectsMerged == 1 ? "slider" : "sliders")}!";
                         return new ToolExecutionOutput<SliderMergerResult>(
                             result,
                             quick ? null : message,
-                            reloadEditor: quick);
+                            quick);
                     }),
                 CreateProgress(),
                 cancellationToken)
             .ConfigureAwait(false);
     }
 
-    private SliderMergerProject Snapshot() => new()
+    private SliderMergerProject Snapshot()
     {
-        ImportModeSetting = ImportModeSetting,
-        TimeCode = TimeCode,
-        ConnectionModeSetting = ConnectionModeSetting,
-        Leniency = Leniency,
-        LinearOnLinear = LinearOnLinear,
-        MergeOnSliderEnd = MergeOnSliderEnd
-    };
+        return new SliderMergerProject
+        {
+            ImportModeSetting = ImportModeSetting,
+            TimeCode = TimeCode,
+            ConnectionModeSetting = ConnectionModeSetting,
+            Leniency = Leniency,
+            LinearOnLinear = LinearOnLinear,
+            MergeOnSliderEnd = MergeOnSliderEnd,
+        };
+    }
 
     private void Install(SliderMergerProject project)
     {
         ArgumentNullException.ThrowIfNull(project);
-        if (!Enum.IsDefined(project.ImportModeSetting) ||
-            !Enum.IsDefined(project.ConnectionModeSetting) ||
-            !double.IsFinite(project.Leniency) ||
-            project.Leniency < 0)
-        {
+        if (!Enum.IsDefined(project.ImportModeSetting) || !Enum.IsDefined(project.ConnectionModeSetting) || !double.IsFinite(project.Leniency) || project.Leniency < 0)
             throw new InvalidDataException("Slider Merger project is incomplete.");
-        }
 
         ImportModeSetting = project.ImportModeSetting;
         TimeCode = project.TimeCode ?? string.Empty;

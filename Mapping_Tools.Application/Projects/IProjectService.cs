@@ -1,8 +1,8 @@
 namespace Mapping_Tools.Application.Projects;
 
 /// <summary>
-/// Coordinates typed project lifecycle operations, autosave targets, and
-/// platform file pickers without depending on a view or control instance.
+///     Coordinates typed project lifecycle operations, autosave targets, and
+///     platform file pickers without depending on a view or control instance.
 /// </summary>
 public interface IProjectService
 {
@@ -12,7 +12,7 @@ public interface IProjectService
     string GetAutoSavePath(IProjectDefinition definition);
 
     /// <summary>
-    /// Resolves the feature's automatic recovery file beneath application data.
+    ///     Resolves the feature's automatic recovery file beneath application data.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model.</typeparam>
     /// <param name="definition">The feature's persistence metadata.</param>
@@ -25,7 +25,7 @@ public interface IProjectService
     string GetProjectFolder(IProjectDefinition definition);
 
     /// <summary>
-    /// Resolves the directory offered by the feature's Open and Save As dialogs.
+    ///     Resolves the directory offered by the feature's Open and Save As dialogs.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model.</typeparam>
     /// <param name="definition">The feature's persistence metadata.</param>
@@ -38,7 +38,7 @@ public interface IProjectService
     object CreateNew(IProjectDefinition definition);
 
     /// <summary>
-    /// Creates clean feature state after the caller has handled any discard confirmation.
+    ///     Creates clean feature state after the caller has handled any discard confirmation.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model.</typeparam>
     /// <param name="definition">Supplies the factory that establishes feature defaults.</param>
@@ -47,7 +47,7 @@ public interface IProjectService
     TProject CreateNew<TProject>(ProjectDefinition<TProject> definition);
 
     /// <summary>
-    /// Writes a project to an explicit path, for example a collection export target.
+    ///     Writes a project to an explicit path, for example a collection export target.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model.</typeparam>
     /// <param name="path">The destination JSON file.</param>
@@ -59,7 +59,7 @@ public interface IProjectService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Loads a typed project from an explicit path without mutating presentation state.
+    ///     Loads a typed project from an explicit path without mutating presentation state.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model.</typeparam>
     /// <param name="path">The existing JSON file.</param>
@@ -80,15 +80,15 @@ public interface IProjectService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Writes the primary recovery file followed by any feature-specific
-    /// recovery targets, preserving target order.
+    ///     Writes the primary recovery file followed by any feature-specific
+    ///     recovery targets, preserving target order.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model.</typeparam>
     /// <param name="definition">Identifies the primary autosave file.</param>
     /// <param name="project">The snapshot written identically to every target.</param>
     /// <param name="additionalPaths">
-    /// Optional absolute targets such as Pattern Gallery's active collection file.
-    /// Duplicate paths are written only once.
+    ///     Optional absolute targets such as Pattern Gallery's active collection file.
+    ///     Duplicate paths are written only once.
     /// </param>
     /// <param name="cancellationToken">Stops before the next target is written.</param>
     Task AutoSaveAsync<TProject>(
@@ -109,16 +109,16 @@ public interface IProjectService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Presents a project Save As picker and writes only when the user selected a path.
+    ///     Presents a project Save As picker and writes only when the user selected a path.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model.</typeparam>
     /// <param name="definition">Supplies the initial project directory.</param>
     /// <param name="project">The snapshot to save.</param>
     /// <param name="suggestedFileName">An optional filename proposed by the native dialog.</param>
     /// <param name="cancellationToken">
-    /// Cancels result processing; an already-visible native picker may remain open.
+    ///     Cancels result processing; an already-visible native picker may remain open.
     /// </param>
-    /// <returns>The selected path, or <see langword="null"/> when the user cancels.</returns>
+    /// <returns>The selected path, or <see langword="null" /> when the user cancels.</returns>
     Task<string?> SaveAsAsync<TProject>(
         ProjectDefinition<TProject> definition,
         TProject project,
@@ -129,21 +129,21 @@ public interface IProjectService
     /// <param name="definition">Supplies the project folder and typed serializer.</param>
     /// <param name="project">The complete project snapshot.</param>
     /// <param name="cancellationToken">Cancels picker result processing or persistence.</param>
-    /// <returns>The selected path, or <see langword="null"/> when cancelled.</returns>
+    /// <returns>The selected path, or <see langword="null" /> when cancelled.</returns>
     Task<string?> SaveAsAsync(
         IProjectDefinition definition,
         object project,
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Presents a project Open picker and returns loaded data without installing it in a view model.
+    ///     Presents a project Open picker and returns loaded data without installing it in a view model.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model.</typeparam>
     /// <param name="definition">Supplies the initial project directory.</param>
     /// <param name="cancellationToken">
-    /// Cancels result processing; an already-visible native picker may remain open.
+    ///     Cancels result processing; an already-visible native picker may remain open.
     /// </param>
-    /// <returns>The path and project, or <see langword="null"/> when the user cancels.</returns>
+    /// <returns>The path and project, or <see langword="null" /> when the user cancels.</returns>
     Task<ProjectOpenResult<TProject>?> OpenAsync<TProject>(
         ProjectDefinition<TProject> definition,
         CancellationToken cancellationToken = default);
@@ -151,15 +151,15 @@ public interface IProjectService
     /// <summary>Presents Open for a type-erased shell project.</summary>
     /// <param name="definition">Supplies the project folder and typed deserializer.</param>
     /// <param name="cancellationToken">Cancels picker result processing or persistence.</param>
-    /// <returns>The selected path and project, or <see langword="null"/> when cancelled.</returns>
+    /// <returns>The selected path and project, or <see langword="null" /> when cancelled.</returns>
     Task<ProjectOpenResult?> OpenAsync(
         IProjectDefinition definition,
         CancellationToken cancellationToken = default);
 }
 
 /// <summary>
-/// Carries a successfully opened project together with the path from which it
-/// was loaded, allowing the presentation layer to track subsequent saves.
+///     Carries a successfully opened project together with the path from which it
+///     was loaded, allowing the presentation layer to track subsequent saves.
 /// </summary>
 /// <typeparam name="TProject">The feature-specific project model.</typeparam>
 /// <param name="Path">The local file selected by the user.</param>
@@ -167,7 +167,7 @@ public interface IProjectService
 public sealed record ProjectOpenResult<TProject>(string Path, TProject Project);
 
 /// <summary>
-/// Carries a successfully opened project across the heterogeneous shell boundary.
+///     Carries a successfully opened project across the heterogeneous shell boundary.
 /// </summary>
 /// <param name="Path">The local file selected by the user.</param>
 /// <param name="Project">The deserialized project, not yet installed into presentation state.</param>

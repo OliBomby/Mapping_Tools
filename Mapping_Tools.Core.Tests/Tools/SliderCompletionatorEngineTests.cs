@@ -12,13 +12,13 @@ public sealed class SliderCompletionatorEngineTests
     public void Apply_WithDurationAndPreservedLength_RecalculatesVelocity()
     {
         // Arrange
-        (Beatmap beatmap, HitObject slider) = CreateSliderBeatmap();
+        var (beatmap, slider) = CreateSliderBeatmap();
         SliderCompletionatorOptions options = new()
         {
             Duration = 1,
             Length = -1,
             SliderVelocity = -1,
-            FreeVariableSetting = SliderCompletionatorFreeVariable.Velocity
+            FreeVariableSetting = SliderCompletionatorFreeVariable.Velocity,
         };
 
         // Act
@@ -36,14 +36,14 @@ public sealed class SliderCompletionatorEngineTests
     public void Apply_WithLengthAndMoveAnchors_UsesFullPathFraction()
     {
         // Arrange
-        (Beatmap beatmap, HitObject slider) = CreateSliderBeatmap();
+        var (beatmap, slider) = CreateSliderBeatmap();
         SliderCompletionatorOptions options = new()
         {
             Duration = -1,
             Length = 0.5,
             SliderVelocity = -1,
             MoveAnchors = true,
-            FreeVariableSetting = SliderCompletionatorFreeVariable.Velocity
+            FreeVariableSetting = SliderCompletionatorFreeVariable.Velocity,
         };
 
         // Act
@@ -51,14 +51,14 @@ public sealed class SliderCompletionatorEngineTests
 
         // Assert
         slider.PixelLength.Should().BeApproximately(50, 0.0001);
-        slider.GetSliderPath(fullLength: true).Distance.Should().BeApproximately(50, 0.0001);
+        slider.GetSliderPath(true).Distance.Should().BeApproximately(50, 0.0001);
     }
 
     [TestMethod]
     public void Apply_WithCurrentEditorTime_UsesEditorTimeForEndTime()
     {
         // Arrange
-        (Beatmap beatmap, HitObject slider) = CreateSliderBeatmap();
+        var (beatmap, slider) = CreateSliderBeatmap();
         SliderCompletionatorOptions options = new()
         {
             UseEndTime = true,
@@ -66,11 +66,11 @@ public sealed class SliderCompletionatorEngineTests
             EndTime = -1,
             Length = -1,
             SliderVelocity = -1,
-            FreeVariableSetting = SliderCompletionatorFreeVariable.Velocity
+            FreeVariableSetting = SliderCompletionatorFreeVariable.Velocity,
         };
 
         // Act
-        SliderCompletionatorEngine.Apply(beatmap, [slider], options, currentEditorTime: 750);
+        SliderCompletionatorEngine.Apply(beatmap, [slider], options, 750);
 
         // Assert
         slider.SliderVelocity.Should().BeApproximately(-210, 0.0001);
@@ -80,13 +80,13 @@ public sealed class SliderCompletionatorEngineTests
     public void Apply_WithLengthAsFreeVariable_RecalculatesLength()
     {
         // Arrange
-        (Beatmap beatmap, HitObject slider) = CreateSliderBeatmap();
+        var (beatmap, slider) = CreateSliderBeatmap();
         SliderCompletionatorOptions options = new()
         {
             Duration = 1,
             Length = -1,
             SliderVelocity = 1,
-            FreeVariableSetting = SliderCompletionatorFreeVariable.Length
+            FreeVariableSetting = SliderCompletionatorFreeVariable.Length,
         };
 
         // Act
@@ -101,7 +101,7 @@ public sealed class SliderCompletionatorEngineTests
     public void Apply_WithNonFiniteInput_ThrowsBeforeMutation()
     {
         // Arrange
-        (Beatmap beatmap, HitObject slider) = CreateSliderBeatmap();
+        var (beatmap, slider) = CreateSliderBeatmap();
         SliderCompletionatorOptions options = new() { Length = double.NaN };
 
         // Act
@@ -116,11 +116,11 @@ public sealed class SliderCompletionatorEngineTests
     public void Apply_WithZeroLengthAndVelocityFreeVariable_ThrowsBeforeMutation()
     {
         // Arrange
-        (Beatmap beatmap, HitObject slider) = CreateSliderBeatmap();
+        var (beatmap, slider) = CreateSliderBeatmap();
         SliderCompletionatorOptions options = new()
         {
             Length = 0,
-            FreeVariableSetting = SliderCompletionatorFreeVariable.Velocity
+            FreeVariableSetting = SliderCompletionatorFreeVariable.Velocity,
         };
 
         // Act
@@ -141,9 +141,9 @@ public sealed class SliderCompletionatorEngineTests
             SampleSet.Normal,
             0,
             100,
-            uninherited: true,
-            kiai: false,
-            omitFirstBarLine: false);
+            true,
+            false,
+            false);
         HitObject slider = new("64,64,0,2,0,L|164:64,1,100");
         Beatmap beatmap = new([slider], [redline], redline);
         beatmap.BeatmapTiming.SliderMultiplier = 1.4;

@@ -99,9 +99,10 @@
                                                     Padding="{TemplateBinding Padding}"
                                                     ScrollViewer.IsScrollInertiaEnabled="{TemplateBinding IsScrollInertiaEnabled}">
                                 <ScrollContentPresenter.GestureRecognizers>
-                                    <ScrollGestureRecognizer CanHorizontallyScroll="{Binding CanHorizontallyScroll, ElementName=PART_ContentPresenter}"
-                                                             CanVerticallyScroll="{Binding CanVerticallyScroll, ElementName=PART_ContentPresenter}"
-                                                             IsScrollInertiaEnabled="{Binding (ScrollViewer.IsScrollInertiaEnabled), ElementName=PART_ContentPresenter}" />
+                                    <ScrollGestureRecognizer
+                                        CanHorizontallyScroll="{Binding CanHorizontallyScroll, ElementName=PART_ContentPresenter}"
+                                        CanVerticallyScroll="{Binding CanVerticallyScroll, ElementName=PART_ContentPresenter}"
+                                        IsScrollInertiaEnabled="{Binding (ScrollViewer.IsScrollInertiaEnabled), ElementName=PART_ContentPresenter}" />
                                 </ScrollContentPresenter.GestureRecognizers>
                             </ScrollContentPresenter>
                         </DockPanel>
@@ -155,7 +156,8 @@
     <Style Selector="controls|MaterialGridListView TableViewRow">
         <Setter Property="Theme" Value="{StaticResource MaterialGridListRowTheme}" />
     </Style>
-    <Style Selector="controls|MaterialGridListView /template/ ScrollViewer /template/ :is(ScrollBar):horizontal /template/ Thumb">
+    <Style
+        Selector="controls|MaterialGridListView /template/ ScrollViewer /template/ :is(ScrollBar):horizontal /template/ Thumb">
         <Setter Property="Background" Value="{DynamicResource MappingToolsScrollbarThumbBrush}" />
         <Setter Property="Opacity" Value="1" />
         <Setter Property="RenderTransform" Value="none" />

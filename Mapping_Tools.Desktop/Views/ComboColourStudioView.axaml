@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
-             xmlns:core="using:Mapping_Tools.Core.Classes.BeatmapHelper"
              xmlns:combo="using:Mapping_Tools.Core.Tools.ComboColourStudio"
              xmlns:adapter="using:Mapping_Tools.Desktop.ViewModels.Adapters"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
@@ -26,8 +25,7 @@
                           SelectionMode="Extended" IsReadOnly="False"
                           ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <DataGrid.Styles>
-                        <Style Selector="DataGridRow">
-                        </Style>
+                        <Style Selector="DataGridRow" />
                     </DataGrid.Styles>
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Offset"
@@ -76,14 +74,14 @@
                                       SelectedItem="{Binding SelectedSequenceColour, Mode=TwoWay}"
                                       Classes="compact" />
                             <materialDesign:FloatingButton Grid.Column="1" Classes="mini light" Margin="5,0"
-                                                            Command="{Binding AddSequenceColourCommand}"
-                                                            CommandParameter="{Binding SelectedColourPoint}"
-                                                            ToolTip.Tip="Add the selected colour to this sequence.">
+                                                           Command="{Binding AddSequenceColourCommand}"
+                                                           CommandParameter="{Binding SelectedColourPoint}"
+                                                           ToolTip.Tip="Add the selected colour to this sequence.">
                                 <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
                             </materialDesign:FloatingButton>
                             <materialDesign:FloatingButton Grid.Column="2" Classes="mini light"
-                                                            Command="{Binding RemoveSequenceColourCommand}"
-                                                            ToolTip.Tip="Remove the last colour from this sequence.">
+                                                           Command="{Binding RemoveSequenceColourCommand}"
+                                                           ToolTip.Tip="Remove the last colour from this sequence.">
                                 <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
                             </materialDesign:FloatingButton>
                         </Grid>
@@ -132,7 +130,8 @@
                             </StackPanel>
                         </Border>
                     </Grid>
-                    <TextBlock Grid.Row="2" Text="Select a colour point to edit its ordered sequence. Drag sequence entries to reorder them."
+                    <TextBlock Grid.Row="2"
+                               Text="Select a colour point to edit its ordered sequence. Drag sequence entries to reorder them."
                                TextWrapping="Wrap" Opacity="0.7" Margin="0,10,0,0" />
                 </Grid>
             </Grid>
@@ -148,25 +147,30 @@
                                     </ItemsPanelTemplate>
                                 </ListBox.ItemsPanel>
                                 <ListBox.ItemTemplate>
-                                <DataTemplate x:DataType="adapter:ObservableSpecialColour">
-                                        <ColorPicker Color="{Binding Color, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}"
-                                                     ToolTip.Tip="{Binding Name}" />
+                                    <DataTemplate x:DataType="adapter:ObservableSpecialColour">
+                                        <ColorPicker
+                                            Color="{Binding Color, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}"
+                                            ToolTip.Tip="{Binding Name}" />
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
                         </materialDesign:Card>
-                        <materialDesign:FloatingButton Classes="mini light" Margin="8,0,4,0" Command="{Binding AddComboColourCommand}"
-                                                        ToolTip.Tip="Add a new combo colour.">
+                        <materialDesign:FloatingButton Classes="mini light" Margin="8,0,4,0"
+                                                       Command="{Binding AddComboColourCommand}"
+                                                       ToolTip.Tip="Add a new combo colour.">
                             <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
                         </materialDesign:FloatingButton>
-                        <materialDesign:FloatingButton Classes="mini light" Command="{Binding RemoveComboColourCommand}"
-                                                        ToolTip.Tip="Remove the last combo colour.">
+                        <materialDesign:FloatingButton Classes="mini light"
+                                                       Command="{Binding RemoveComboColourCommand}"
+                                                       ToolTip.Tip="Remove the last combo colour.">
                             <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
                         </materialDesign:FloatingButton>
                     </StackPanel>
                     <Grid ColumnDefinitions="Auto,Auto,*" Margin="0,8,0,0">
-                        <Button Content="Import colours" Command="{Binding ImportColoursCommand}" ToolTip.Tip="Import combo colours from a beatmap." />
-                        <Button Grid.Column="1" Content="Import colourhax" Margin="8,0,0,0" Command="{Binding ImportColourHaxCommand}"
+                        <Button Content="Import colours" Command="{Binding ImportColoursCommand}"
+                                ToolTip.Tip="Import combo colours from a beatmap." />
+                        <Button Grid.Column="1" Content="Import colourhax" Margin="8,0,0,0"
+                                Command="{Binding ImportColourHaxCommand}"
                                 ToolTip.Tip="Import colour haxing from a beatmap and populate colour points." />
                         <TextBox Grid.Column="2" Margin="8,0,0,0"
                                  materialAssists:TextFieldAssist.Label="Max burst length"
@@ -176,20 +180,24 @@
                     <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
                         <TextBox materialAssists:TextFieldAssist.Label="Import from beatmap"
                                  Text="{Binding ImportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                        <Button Grid.Column="1" Classes="flat" Margin="8,0,0,0" Command="{Binding UseCurrentImportCommand}"
+                        <Button Grid.Column="1" Classes="flat" Margin="8,0,0,0"
+                                Command="{Binding UseCurrentImportCommand}"
                                 ToolTip.Tip="Use the beatmap currently open in osu!.">
                             <materialIcons:MaterialIcon Kind="RestoreFromTrash" Width="24" Height="24" />
                         </Button>
                     </Grid>
                 </StackPanel>
-                <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal" VerticalAlignment="Bottom">
-                        <materialDesign:FloatingButton Classes="mini light" Margin="5" Command="{Binding AddColourPointCommand}"
-                                                        PointerPressed="AddColourPointButtonPointerPressed"
-                                                        ToolTip.Tip="Add a new colour point.">
+                <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal"
+                            VerticalAlignment="Bottom">
+                    <materialDesign:FloatingButton Classes="mini light" Margin="5"
+                                                   Command="{Binding AddColourPointCommand}"
+                                                   PointerPressed="AddColourPointButtonPointerPressed"
+                                                   ToolTip.Tip="Add a new colour point.">
                         <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
                     </materialDesign:FloatingButton>
-                    <materialDesign:FloatingButton Classes="mini light" Margin="5" Command="{Binding RemoveColourPointCommand}"
-                                                    ToolTip.Tip="Remove selected colour points or the last point.">
+                    <materialDesign:FloatingButton Classes="mini light" Margin="5"
+                                                   Command="{Binding RemoveColourPointCommand}"
+                                                   ToolTip.Tip="Remove selected colour points or the last point.">
                         <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
                     </materialDesign:FloatingButton>
                     <controls:ToolRunButton Margin="10,0,0,0" RunCommand="{Binding RunCommand}" />
@@ -199,7 +207,8 @@
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
             <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
-            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100" Value="{Binding Progress}" />
+            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100"
+                                      Value="{Binding Progress}" />
         </Grid>
     </Grid>
 </UserControl>

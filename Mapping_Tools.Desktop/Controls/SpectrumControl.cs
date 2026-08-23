@@ -75,35 +75,29 @@ public sealed class SpectrumControl : Control
         set => SetValue(VerticalScaleProperty, value);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Render(DrawingContext context)
     {
         base.Render(context);
-        if (BackgroundBrush is not null)
-        {
-            context.FillRectangle(BackgroundBrush, new Rect(Bounds.Size));
-        }
+        if (BackgroundBrush is not null) context.FillRectangle(BackgroundBrush, new Rect(Bounds.Size));
 
-        if (BarBrush is null)
-        {
-            return;
-        }
+        if (BarBrush is null) return;
 
-        foreach (Rect bar in CalculateBarRects(Frame, Bounds.Size, VerticalScale, MinimumBarWidth))
-        {
-            context.FillRectangle(BarBrush, bar);
-        }
+        foreach (var bar in CalculateBarRects(Frame, Bounds.Size, VerticalScale, MinimumBarWidth)) context.FillRectangle(BarBrush, bar);
     }
 
-    /// <inheritdoc/>
-    protected override Size MeasureOverride(Size availableSize) => new(
-        double.IsInfinity(availableSize.Width) ? 100 : Math.Max(0, availableSize.Width),
-        double.IsInfinity(availableSize.Height) ? DefaultHeight : Math.Max(0, availableSize.Height));
+    /// <inheritdoc />
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        return new Size(
+            double.IsInfinity(availableSize.Width) ? 100 : Math.Max(0, availableSize.Width),
+            double.IsInfinity(availableSize.Height) ? DefaultHeight : Math.Max(0, availableSize.Height));
+    }
 
     /// <summary>
-    /// Calculates the pixel rectangles used by the renderer for a frame and viewport.
+    ///     Calculates the pixel rectangles used by the renderer for a frame and viewport.
     /// </summary>
-    /// <param name="frame">The spectrum frame, or <see langword="null"/> for the empty state.</param>
+    /// <param name="frame">The spectrum frame, or <see langword="null" /> for the empty state.</param>
     /// <param name="size">The available viewport size.</param>
     /// <param name="verticalScale">The positive vertical multiplier.</param>
     /// <param name="minimumBarWidth">The minimum bar width in pixels.</param>
@@ -114,13 +108,16 @@ public sealed class SpectrumControl : Control
         double verticalScale,
         double minimumBarWidth)
     {
-        if (frame is null || frame.IsEmpty || size.Width <= 0 || size.Height <= 0 ||
-            !double.IsFinite(verticalScale) || verticalScale <= 0 ||
-            !double.IsFinite(minimumBarWidth) || minimumBarWidth <= 0 ||
-            frame.PeakMagnitude <= 0)
-        {
+        if (frame is null
+            || frame.IsEmpty
+            || size.Width <= 0
+            || size.Height <= 0
+            || !double.IsFinite(verticalScale)
+            || verticalScale <= 0
+            || !double.IsFinite(minimumBarWidth)
+            || minimumBarWidth <= 0
+            || frame.PeakMagnitude <= 0)
             return [];
-        }
 
         double possibleBarCount = Math.Floor(size.Width / minimumBarWidth);
         int maximumBarCount = possibleBarCount >= int.MaxValue
@@ -134,17 +131,11 @@ public sealed class SpectrumControl : Control
             int firstBin = index * frame.Magnitudes.Count / barCount;
             int exclusiveLastBin = (index + 1) * frame.Magnitudes.Count / barCount;
             double magnitude = 0;
-            for (int bin = firstBin; bin < exclusiveLastBin; bin++)
-            {
-                magnitude = Math.Max(magnitude, frame.Magnitudes[bin]);
-            }
+            for (int bin = firstBin; bin < exclusiveLastBin; bin++) magnitude = Math.Max(magnitude, frame.Magnitudes[bin]);
 
             double normalized = Math.Clamp(magnitude / frame.PeakMagnitude * verticalScale, 0, 1);
             double height = normalized * size.Height;
-            if (height <= 0)
-            {
-                continue;
-            }
+            if (height <= 0) continue;
 
             double x = index * width;
             bars.Add(new Rect(x, size.Height - height, width, height));

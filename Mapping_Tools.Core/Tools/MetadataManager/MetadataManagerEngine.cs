@@ -3,12 +3,12 @@ using Mapping_Tools.Core.Classes.BeatmapHelper;
 namespace Mapping_Tools.Core.Tools.MetadataManager;
 
 /// <summary>
-/// Applies and extracts Metadata Manager state without filesystem or frontend dependencies.
+///     Applies and extracts Metadata Manager state without filesystem or frontend dependencies.
 /// </summary>
 public static class MetadataManagerEngine
 {
     /// <summary>
-    /// Reads the metadata fields and colour sections from a parsed beatmap.
+    ///     Reads the metadata fields and colour sections from a parsed beatmap.
     /// </summary>
     /// <param name="beatmap">The beatmap to inspect.</param>
     /// <returns>A new options object containing independent editable colour instances.</returns>
@@ -25,7 +25,7 @@ public static class MetadataManagerEngine
             BeatmapCreator = GetText(beatmap.Metadata, "Creator"),
             Source = GetText(beatmap.Metadata, "Source"),
             Tags = GetText(beatmap.Metadata, "Tags"),
-            PreviewTime = beatmap.General.TryGetValue("PreviewTime", out TValue? preview)
+            PreviewTime = beatmap.General.TryGetValue("PreviewTime", out var preview)
                 ? preview.DoubleValue
                 : -1,
             ComboColours = beatmap.ComboColours
@@ -33,15 +33,15 @@ public static class MetadataManagerEngine
                 .ToList(),
             SpecialColours = beatmap.SpecialColours
                 .Select(pair => new SpecialColour(pair.Value.Color, pair.Key))
-                .ToList()
+                .ToList(),
         };
 
         return options;
     }
 
     /// <summary>
-    /// Applies all configured metadata fields to a parsed beatmap while leaving
-    /// timing, events, difficulty settings, and hit objects untouched.
+    ///     Applies all configured metadata fields to a parsed beatmap while leaving
+    ///     timing, events, difficulty settings, and hit objects untouched.
     /// </summary>
     /// <param name="beatmap">The mutable target beatmap.</param>
     /// <param name="options">The values to write.</param>
@@ -70,14 +70,12 @@ public static class MetadataManagerEngine
                 .Select(colour => new ComboColour(colour.Color))
                 .ToList();
             beatmap.SpecialColours.Clear();
-            foreach (SpecialColour specialColour in options.SpecialColours)
+            foreach (var specialColour in options.SpecialColours)
             {
                 if (string.IsNullOrWhiteSpace(specialColour.Name))
-                {
                     throw new ArgumentException(
                         "Every special colour must have a name.",
                         nameof(options));
-                }
 
                 beatmap.SpecialColours.Add(
                     specialColour.Name,
@@ -93,7 +91,7 @@ public static class MetadataManagerEngine
     }
 
     /// <summary>
-    /// Removes repeated space-delimited tags while retaining their first-seen order.
+    ///     Removes repeated space-delimited tags while retaining their first-seen order.
     /// </summary>
     /// <param name="tags">The original space-delimited tag text.</param>
     /// <returns>The normalized tag text.</returns>
@@ -109,8 +107,10 @@ public static class MetadataManagerEngine
 
     private static string GetText(
         IReadOnlyDictionary<string, TValue> values,
-        string key) =>
-        values.TryGetValue(key, out TValue? value)
+        string key)
+    {
+        return values.TryGetValue(key, out var value)
             ? value.Value ?? string.Empty
             : string.Empty;
+    }
 }

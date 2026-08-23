@@ -13,8 +13,8 @@ public sealed class PatternGalleryGroupViewModelTests
         // Arrange
         PatternGalleryItemViewModel[] items =
         [
-            new PatternGalleryItemViewModel(new PatternGalleryPattern { Name = "A" }),
-            new PatternGalleryItemViewModel(new PatternGalleryPattern { Name = "B" })
+            new(new PatternGalleryPattern { Name = "A" }),
+            new(new PatternGalleryPattern { Name = "B" }),
         ];
 
         // Act

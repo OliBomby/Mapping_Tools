@@ -9,11 +9,14 @@ namespace Mapping_Tools.Desktop.Views;
 /// <summary>Hosts the Geometry Dashboard generator list and dashboard actions.</summary>
 public sealed partial class GeometryDashboardView : UserControl
 {
-    private double _savedGeneratorsOffset;
     private bool _restoreGeneratorsOffset;
+    private double _savedGeneratorsOffset;
 
     /// <summary>Creates the dashboard view.</summary>
-    public GeometryDashboardView() => InitializeComponent();
+    public GeometryDashboardView()
+    {
+        InitializeComponent();
+    }
 
     private void ToggleSelected(object? sender, PointerPressedEventArgs eventArgs)
     {
@@ -45,11 +48,8 @@ public sealed partial class GeometryDashboardView : UserControl
 
     private void GeneratorsPointerPressed(object? sender, PointerPressedEventArgs eventArgs)
     {
-        if (sender is not ScrollViewer scrollViewer ||
-            !eventArgs.GetCurrentPoint(scrollViewer).Properties.IsLeftButtonPressed)
-        {
+        if (sender is not ScrollViewer scrollViewer || !eventArgs.GetCurrentPoint(scrollViewer).Properties.IsLeftButtonPressed)
             return;
-        }
 
         _savedGeneratorsOffset = scrollViewer.Offset.Y;
         _restoreGeneratorsOffset = eventArgs.Source is not ScrollViewer;
@@ -57,19 +57,13 @@ public sealed partial class GeometryDashboardView : UserControl
 
     private void GeneratorsScrollChanged(object? sender, ScrollChangedEventArgs eventArgs)
     {
-        if (sender is ScrollViewer scrollViewer && _restoreGeneratorsOffset &&
-            Math.Abs(scrollViewer.Offset.Y - _savedGeneratorsOffset) > 0.5)
-        {
+        if (sender is ScrollViewer scrollViewer && _restoreGeneratorsOffset && Math.Abs(scrollViewer.Offset.Y - _savedGeneratorsOffset) > 0.5)
             scrollViewer.Offset = new Vector(scrollViewer.Offset.X, _savedGeneratorsOffset);
-        }
     }
 
     private void GeneratorsPointerWheelChanged(object? sender, PointerWheelEventArgs eventArgs)
     {
-        if (sender is not ScrollViewer scrollViewer)
-        {
-            return;
-        }
+        if (sender is not ScrollViewer scrollViewer) return;
 
         scrollViewer.Offset = new Vector(
             scrollViewer.Offset.X,

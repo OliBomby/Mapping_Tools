@@ -13,7 +13,7 @@ public sealed class WindowsOsuEditorReloadServiceTests
         WindowsOsuEditorReloadService service = new(() => null);
 
         // Act
-        Func<Task> act = () => service.ReloadAsync();
+        var act = () => service.ReloadAsync();
 
         // Assert
         await act.Should().NotThrowAsync();

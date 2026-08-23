@@ -12,6 +12,7 @@ public sealed class BeatmapBackupServiceTests
 {
     private const string BackupDirectory = @"C:\Backups";
     private const string MapPath = @"C:\osu!\Songs\set\map.osu";
+
     private static readonly DateTimeOffset Now =
         new(2026, 7, 25, 14, 5, 6, TimeSpan.FromHours(2));
 
@@ -19,7 +20,7 @@ public sealed class BeatmapBackupServiceTests
     public async Task CreateAsync_UserBackup_UsesLegacyNameAndPrunesOldestUnprotectedFile()
     {
         // Arrange
-        MemoryBackupStore store = CreateStore();
+        var store = CreateStore();
         store.AddFile(
             Path.Combine(BackupDirectory, "old-1.osu"),
             ["old"],
@@ -28,14 +29,14 @@ public sealed class BeatmapBackupServiceTests
             Path.Combine(BackupDirectory, "old-2.osu"),
             ["old"],
             DateTimeOffset.UnixEpoch.AddMinutes(1));
-        ApplicationSettings settings = CreateSettings();
+        var settings = CreateSettings();
         settings.MaxBackupFiles = 2;
-        BeatmapBackupService service = CreateService(store, settings);
+        var service = CreateService(store, settings);
 
-        BeatmapBackupResult result = await service.CreateAsync(
+        var result = await service.CreateAsync(
             [MapPath],
             BeatmapBackupReason.User,
-            force: true);
+            true);
 
         // Act
         string expected = Path.Combine(
@@ -54,19 +55,19 @@ public sealed class BeatmapBackupServiceTests
     public async Task CreateAsync_AutomaticBackup_RespectsPreferenceUnlessDestructive()
     {
         // Arrange
-        MemoryBackupStore store = CreateStore();
-        ApplicationSettings settings = CreateSettings();
+        var store = CreateStore();
+        var settings = CreateSettings();
         settings.MakeBackups = false;
-        BeatmapBackupService service = CreateService(store, settings);
+        var service = CreateService(store, settings);
 
         // Act
-        BeatmapBackupResult skipped = await service.CreateAsync(
+        var skipped = await service.CreateAsync(
             [MapPath],
             BeatmapBackupReason.Automatic);
-        BeatmapBackupResult forced = await service.CreateAsync(
+        var forced = await service.CreateAsync(
             [MapPath],
             BeatmapBackupReason.Automatic,
-            force: true);
+            true);
 
         // Assert
         skipped.SkippedByPreference.Should().BeTrue();
@@ -79,18 +80,18 @@ public sealed class BeatmapBackupServiceTests
     public async Task CreateAsync_SameSecondBackups_DoesNotOverwriteEarlierCopy()
     {
         // Arrange
-        MemoryBackupStore store = CreateStore();
-        BeatmapBackupService service = CreateService(store, CreateSettings());
+        var store = CreateStore();
+        var service = CreateService(store, CreateSettings());
 
         // Act
-        BeatmapBackupResult first = await service.CreateAsync(
+        var first = await service.CreateAsync(
             [MapPath],
             BeatmapBackupReason.Automatic,
-            force: true);
-        BeatmapBackupResult second = await service.CreateAsync(
+            true);
+        var second = await service.CreateAsync(
             [MapPath],
             BeatmapBackupReason.Automatic,
-            force: true);
+            true);
 
         // Assert
         second.Artifacts.Single().Path.Should().NotBe(first.Artifacts.Single().Path);
@@ -103,15 +104,15 @@ public sealed class BeatmapBackupServiceTests
     public async Task CreateAsync_WithMissingDirectory_ThrowsBeforeCopy()
     {
         // Arrange
-        MemoryBackupStore store = CreateStore();
+        var store = CreateStore();
         store.Directories.Clear();
-        BeatmapBackupService service = CreateService(store, CreateSettings());
+        var service = CreateService(store, CreateSettings());
 
         // Act
         Func<Task> act1 = () => service.CreateAsync(
-                [MapPath],
-                BeatmapBackupReason.Automatic,
-                force: true);
+            [MapPath],
+            BeatmapBackupReason.Automatic,
+            true);
 
         // Assert
         await act1.Should().ThrowAsync<DirectoryNotFoundException>();
@@ -123,7 +124,7 @@ public sealed class BeatmapBackupServiceTests
     public async Task CreateAsync_WithLiveSession_CreatesDiskAndUnsavedSnapshots()
     {
         // Arrange
-        MemoryBackupStore store = CreateStore();
+        var store = CreateStore();
         BeatmapEditor2 editor = new(MapPath, store);
         editor.Beatmap.Metadata["Version"] = new TValue("Unsaved");
         BeatmapEditingSession session = new(
@@ -131,13 +132,13 @@ public sealed class BeatmapBackupServiceTests
             BeatmapEditingSource.LiveEditor,
             []);
         editor.Beatmap.Metadata["Version"] = new TValue("AfterToolRun");
-        BeatmapBackupService service = CreateService(store, CreateSettings());
+        var service = CreateService(store, CreateSettings());
 
         // Act
-        BeatmapBackupResult result = await service.CreateAsync(
+        var result = await service.CreateAsync(
             session,
             BeatmapBackupReason.User,
-            force: true);
+            true);
 
         // Assert
         result.Artifacts.Count.Should().Be(2);
@@ -157,20 +158,20 @@ public sealed class BeatmapBackupServiceTests
     public async Task CreateAsync_WithLiveSessionMatchingDisk_CreatesOnlyDirectCopy()
     {
         // Arrange
-        MemoryBackupStore store = CreateStore();
+        var store = CreateStore();
         BeatmapEditor2 editor = new(MapPath, store);
         store.Files[MapPath] = editor.Beatmap.GetLines();
         BeatmapEditingSession session = new(
             editor,
             BeatmapEditingSource.LiveEditor,
             []);
-        BeatmapBackupService service = CreateService(store, CreateSettings());
+        var service = CreateService(store, CreateSettings());
 
         // Act
-        BeatmapBackupResult result = await service.CreateAsync(
+        var result = await service.CreateAsync(
             session,
             BeatmapBackupReason.Automatic,
-            force: true);
+            true);
 
         // Assert
         result.Artifacts.Should().ContainSingle();
@@ -182,21 +183,21 @@ public sealed class BeatmapBackupServiceTests
     public async Task CreatePeriodicIfChangedAsync_WithMultipleMaps_SkipsUnchangedAndTracksSeparately()
     {
         // Arrange
-        MemoryBackupStore store = CreateStore();
+        var store = CreateStore();
         BeatmapEditor2 editor = new(MapPath, store);
         BeatmapEditingSession session = new(
             editor,
             BeatmapEditingSource.Disk,
             []);
-        BeatmapBackupService service = CreateService(store, CreateSettings());
+        var service = CreateService(store, CreateSettings());
 
         // Act
-        BeatmapBackupArtifact? first =
+        var first =
             await service.CreatePeriodicIfChangedAsync(session);
-        BeatmapBackupArtifact? unchanged =
+        var unchanged =
             await service.CreatePeriodicIfChangedAsync(session);
         editor.Beatmap.Metadata["Version"] = new TValue("Changed");
-        BeatmapBackupArtifact? changed =
+        var changed =
             await service.CreatePeriodicIfChangedAsync(session);
 
         // Assert
@@ -211,20 +212,20 @@ public sealed class BeatmapBackupServiceTests
     public async Task RestoreAsync_WithIncompatibleBackup_DoesNotBackupOrOverwrite()
     {
         // Arrange
-        MemoryBackupStore store = CreateStore();
+        var store = CreateStore();
         string incompatible = Path.Combine(BackupDirectory, "other.osu");
         store.AddFile(
             incompatible,
             ChangeDifficulty(store.Files[MapPath], "Other"),
             Now.AddMinutes(-1));
-        List<string> original = store.Files[MapPath].ToList();
-        BeatmapBackupService service = CreateService(store, CreateSettings());
+        var original = store.Files[MapPath].ToList();
+        var service = CreateService(store, CreateSettings());
 
         // Act
         Func<Task> act2 = () => service.RestoreAsync(incompatible, MapPath);
 
         // Assert
-        BeatmapBackupIncompatibleException exception = (await act2.Should().ThrowAsync<BeatmapBackupIncompatibleException>()).Which;
+        var exception = (await act2.Should().ThrowAsync<BeatmapBackupIncompatibleException>()).Which;
 
         exception.BackupFileName.Should().Contain("[Other]");
         store.Files[MapPath].Should().Equal(original);
@@ -235,23 +236,22 @@ public sealed class BeatmapBackupServiceTests
     public async Task RestoreAsync_WithCompatibleBackup_PreservesDestinationAndReloadsLast()
     {
         // Arrange
-        MemoryBackupStore store = CreateStore();
+        var store = CreateStore();
         string backup = Path.Combine(BackupDirectory, "chosen.osu");
-        List<string> restoredLines = store.Files[MapPath].ToList();
-        int previewIndex = restoredLines.FindIndex(
-            line => line.StartsWith("PreviewTime:", StringComparison.Ordinal));
+        var restoredLines = store.Files[MapPath].ToList();
+        int previewIndex = restoredLines.FindIndex(line => line.StartsWith("PreviewTime:", StringComparison.Ordinal));
         restoredLines[previewIndex] = "PreviewTime:9876";
         store.AddFile(backup, restoredLines, Now.AddMinutes(-1));
         RecordingReloadService reload = new(store);
-        ApplicationSettings settings = CreateSettings();
+        var settings = CreateSettings();
         settings.MaxBackupFiles = 1;
-        BeatmapBackupService service = CreateService(
+        var service = CreateService(
             store,
             settings,
             reload);
 
         // Act
-        BeatmapRestoreResult result = await service.RestoreAsync(
+        var result = await service.RestoreAsync(
             backup,
             MapPath,
             reloadEditor: true);
@@ -270,23 +270,21 @@ public sealed class BeatmapBackupServiceTests
     public async Task QuickUndoAsync_WithMultipleBackups_SelectsNewestBeforeSafetyCopy()
     {
         // Arrange
-        MemoryBackupStore store = CreateStore();
+        var store = CreateStore();
         string older = Path.Combine(BackupDirectory, "older.osu");
         string newer = Path.Combine(BackupDirectory, "newer.osu");
-        List<string> olderLines = store.Files[MapPath].ToList();
-        List<string> newerLines = store.Files[MapPath].ToList();
-        int olderPreview = olderLines.FindIndex(
-            line => line.StartsWith("PreviewTime:", StringComparison.Ordinal));
-        int newerPreview = newerLines.FindIndex(
-            line => line.StartsWith("PreviewTime:", StringComparison.Ordinal));
+        var olderLines = store.Files[MapPath].ToList();
+        var newerLines = store.Files[MapPath].ToList();
+        int olderPreview = olderLines.FindIndex(line => line.StartsWith("PreviewTime:", StringComparison.Ordinal));
+        int newerPreview = newerLines.FindIndex(line => line.StartsWith("PreviewTime:", StringComparison.Ordinal));
         olderLines[olderPreview] = "PreviewTime:1111";
         newerLines[newerPreview] = "PreviewTime:2222";
         store.AddFile(older, olderLines, Now.AddMinutes(-2));
         store.AddFile(newer, newerLines, Now.AddMinutes(-1));
-        BeatmapBackupService service = CreateService(store, CreateSettings());
+        var service = CreateService(store, CreateSettings());
 
         // Act
-        BeatmapRestoreResult? result = await service.QuickUndoAsync(MapPath);
+        var result = await service.QuickUndoAsync(MapPath);
 
         // Assert
         result.Should().NotBeNull();
@@ -299,16 +297,16 @@ public sealed class BeatmapBackupServiceTests
     public async Task CreateAsync_WhenRetentionRuns_PreservesCurrentSafetyCopy()
     {
         // Arrange
-        MemoryBackupStore store = CreateStore();
-        ApplicationSettings settings = CreateSettings();
+        var store = CreateStore();
+        var settings = CreateSettings();
         settings.MaxBackupFiles = 0;
-        BeatmapBackupService service = CreateService(store, settings);
+        var service = CreateService(store, settings);
 
         // Act
-        BeatmapBackupResult result = await service.CreateAsync(
+        var result = await service.CreateAsync(
             [MapPath],
             BeatmapBackupReason.Automatic,
-            force: true);
+            true);
 
         // Assert
         store.Files.ContainsKey(result.Artifacts.Single().Path).Should().BeTrue();
@@ -318,17 +316,17 @@ public sealed class BeatmapBackupServiceTests
     public async Task CreateAsync_WithPreCancelledToken_DoesNotCreateOrDeleteFiles()
     {
         // Arrange
-        MemoryBackupStore store = CreateStore();
-        BeatmapBackupService service = CreateService(store, CreateSettings());
+        var store = CreateStore();
+        var service = CreateService(store, CreateSettings());
         using CancellationTokenSource source = new();
         source.Cancel();
 
         // Act
         Func<Task> act3 = () => service.CreateAsync(
-                [MapPath],
-                BeatmapBackupReason.Automatic,
-                force: true,
-                source.Token);
+            [MapPath],
+            BeatmapBackupReason.Automatic,
+            true,
+            source.Token);
 
         // Assert
         await act3.Should().ThrowAsync<OperationCanceledException>();
@@ -357,7 +355,7 @@ public sealed class BeatmapBackupServiceTests
             BackupsPath = BackupDirectory,
             MakeBackups = true,
             MakePeriodicBackups = true,
-            MaxBackupFiles = 1000
+            MaxBackupFiles = 1000,
         };
     }
 
@@ -378,9 +376,8 @@ public sealed class BeatmapBackupServiceTests
         IEnumerable<string> lines,
         string difficulty)
     {
-        List<string> changed = lines.ToList();
-        int index = changed.FindIndex(
-            line => line.StartsWith("Version:", StringComparison.Ordinal));
+        var changed = lines.ToList();
+        int index = changed.FindIndex(line => line.StartsWith("Version:", StringComparison.Ordinal));
         changed[index] = $"Version:{difficulty}";
         return changed;
     }
@@ -394,14 +391,17 @@ public sealed class BeatmapBackupServiceTests
             _now = now;
         }
 
-        public override DateTimeOffset GetUtcNow() => _now.ToUniversalTime();
-
         public override TimeZoneInfo LocalTimeZone =>
             TimeZoneInfo.CreateCustomTimeZone(
                 "Test",
                 _now.Offset,
                 "Test",
                 "Test");
+
+        public override DateTimeOffset GetUtcNow()
+        {
+            return _now.ToUniversalTime();
+        }
     }
 
     private sealed class RecordingReloadService : IEditorReloadService
@@ -445,23 +445,25 @@ public sealed class BeatmapBackupServiceTests
 
         public List<string> DeletedPaths { get; } = [];
 
-        public void AddFile(
-            string path,
-            IEnumerable<string> lines,
-            DateTimeOffset createdAt)
+        public bool FileExists(string path)
         {
-            Files[path] = lines.ToList();
-            CreationTimes[path] = createdAt;
+            return Files.ContainsKey(path);
         }
 
-        public bool FileExists(string path) => Files.ContainsKey(path);
+        public bool DirectoryExists(string path)
+        {
+            return Directories.Contains(path);
+        }
 
-        public bool DirectoryExists(string path) => Directories.Contains(path);
+        public string GetFileName(string path)
+        {
+            return Path.GetFileName(path);
+        }
 
-        public string GetFileName(string path) => Path.GetFileName(path);
-
-        public string Combine(string directory, string fileName) =>
-            Path.Combine(directory, fileName);
+        public string Combine(string directory, string fileName)
+        {
+            return Path.Combine(directory, fileName);
+        }
 
         public Task CopyAsync(
             string sourcePath,
@@ -515,8 +517,10 @@ public sealed class BeatmapBackupServiceTests
             return Task.CompletedTask;
         }
 
-        public IReadOnlyList<string> ReadAllLines(string path) =>
-            Files[path].ToList();
+        public IReadOnlyList<string> ReadAllLines(string path)
+        {
+            return Files[path].ToList();
+        }
 
         public void WriteAllLines(string path, IEnumerable<string> lines)
         {
@@ -529,10 +533,23 @@ public sealed class BeatmapBackupServiceTests
             CreationTimes.Remove(path);
         }
 
-        public string GetParentFolder(string path) =>
-            Path.GetDirectoryName(path)!;
+        public string GetParentFolder(string path)
+        {
+            return Path.GetDirectoryName(path)!;
+        }
 
-        public string CombinePath(string parent, string child) =>
-            Path.Combine(parent, child);
+        public string CombinePath(string parent, string child)
+        {
+            return Path.Combine(parent, child);
+        }
+
+        public void AddFile(
+            string path,
+            IEnumerable<string> lines,
+            DateTimeOffset createdAt)
+        {
+            Files[path] = lines.ToList();
+            CreationTimes[path] = createdAt;
+        }
     }
 }

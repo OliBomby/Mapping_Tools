@@ -1,4 +1,3 @@
-using System;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
 
 namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
@@ -21,10 +20,28 @@ public sealed class SelectionPredicate : IEquatable<SelectionPredicate>, IClonea
     /// <summary>Gets or sets the minimum inclusive relevance required from the input.</summary>
     public double MinRelevancy { get; set; }
 
+    /// <inheritdoc />
+    public object Clone()
+    {
+        return MemberwiseClone();
+    }
+
+    /// <inheritdoc />
+    public bool Equals(SelectionPredicate? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return NeedSelected == other.NeedSelected
+               && NeedLocked == other.NeedLocked
+               && NeedGeneratedByThis == other.NeedGeneratedByThis
+               && NeedGeneratedNotByThis == other.NeedGeneratedNotByThis
+               && MinRelevancy.Equals(other.MinRelevancy);
+    }
+
     /// <summary>Checks this predicate against an object and its producing generator.</summary>
     /// <param name="relevantObject">The candidate object.</param>
     /// <param name="generator">The generator evaluating the candidate.</param>
-    /// <returns><see langword="true"/> when every configured condition passes.</returns>
+    /// <returns><see langword="true" /> when every configured condition passes.</returns>
     public bool Check(IRelevantObject relevantObject, RelevantObjectsGenerator generator)
     {
         if (NeedSelected && !relevantObject.IsSelected) return false;
@@ -34,28 +51,20 @@ public sealed class SelectionPredicate : IEquatable<SelectionPredicate>, IClonea
         return !(relevantObject.Relevancy < MinRelevancy);
     }
 
-    /// <inheritdoc/>
-    public override string ToString() => $"NeedSelected: {NeedSelected}, NeedLocked: {NeedLocked}, NeedGeneratedByThis: {NeedGeneratedByThis}, NeedGeneratedNotByThis: {NeedGeneratedNotByThis}, MinRelevancy: {MinRelevancy}";
-
-    /// <inheritdoc/>
-    public object Clone() => MemberwiseClone();
-
-    /// <inheritdoc/>
-    public bool Equals(SelectionPredicate? other)
+    /// <inheritdoc />
+    public override string ToString()
     {
-        if (other is null) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return NeedSelected == other.NeedSelected &&
-               NeedLocked == other.NeedLocked &&
-               NeedGeneratedByThis == other.NeedGeneratedByThis &&
-               NeedGeneratedNotByThis == other.NeedGeneratedNotByThis &&
-               MinRelevancy.Equals(other.MinRelevancy);
+        return
+            $"NeedSelected: {NeedSelected}, NeedLocked: {NeedLocked}, NeedGeneratedByThis: {NeedGeneratedByThis}, NeedGeneratedNotByThis: {NeedGeneratedNotByThis}, MinRelevancy: {MinRelevancy}";
     }
 
-    /// <inheritdoc/>
-    public override bool Equals(object? obj) => obj is SelectionPredicate predicate && Equals(predicate);
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        return obj is SelectionPredicate predicate && Equals(predicate);
+    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         unchecked

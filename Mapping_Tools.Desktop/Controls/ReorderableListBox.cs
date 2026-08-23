@@ -8,18 +8,19 @@ using Avalonia.VisualTree;
 namespace Mapping_Tools.Desktop.Controls;
 
 /// <summary>
-/// A ListBox that preserves its bound list's order when an item is dragged
-/// onto another item in the same control.
+///     A ListBox that preserves its bound list's order when an item is dragged
+///     onto another item in the same control.
 /// </summary>
 public sealed class ReorderableListBox : ListBox
 {
     private static readonly DataFormat<object> ItemFormat =
         DataFormat.CreateInProcessFormat<object>("mapping-tools-reorderable-list-item");
-    private Point _pressPoint;
-    private object? _pressedItem;
-    private int _pressedIndex = -1;
-    private PointerPressedEventArgs? _pressEventArgs;
+
     private bool _dragStarted;
+    private PointerPressedEventArgs? _pressEventArgs;
+    private Point _pressPoint;
+    private int _pressedIndex = -1;
+    private object? _pressedItem;
 
     /// <summary>Creates a list box with Avalonia 12 drag/drop handlers installed.</summary>
     public ReorderableListBox()
@@ -34,13 +35,10 @@ public sealed class ReorderableListBox : ListBox
 
     private void OnPointerPressed(object? sender, PointerPressedEventArgs eventArgs)
     {
-        if (!eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-        {
-            return;
-        }
+        if (!eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
 
         _pressPoint = eventArgs.GetPosition(this);
-        ListBoxItem? container = FindItemContainer(eventArgs.Source as Visual);
+        var container = FindItemContainer(eventArgs.Source as Visual);
         _pressedItem = container?.DataContext;
         _pressedIndex = container is null ? -1 : IndexFromContainer(container);
         _pressEventArgs = eventArgs;
@@ -49,18 +47,12 @@ public sealed class ReorderableListBox : ListBox
 
     private async void OnPointerMoved(object? sender, PointerEventArgs eventArgs)
     {
-        if (_dragStarted || _pressedItem is null ||
-            !eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-        {
+        if (_dragStarted || _pressedItem is null || !eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             return;
-        }
 
-        Point currentPoint = eventArgs.GetPosition(this);
-        if (Math.Abs(currentPoint.X - _pressPoint.X) < 4 &&
-            Math.Abs(currentPoint.Y - _pressPoint.Y) < 4)
-        {
+        var currentPoint = eventArgs.GetPosition(this);
+        if (Math.Abs(currentPoint.X - _pressPoint.X) < 4 && Math.Abs(currentPoint.Y - _pressPoint.Y) < 4)
             return;
-        }
 
         _dragStarted = true;
         DataTransfer transfer = new();
@@ -91,18 +83,14 @@ public sealed class ReorderableListBox : ListBox
 
     private void OnDrop(object? sender, DragEventArgs eventArgs)
     {
-        if (eventArgs.DataTransfer.TryGetValue(ItemFormat) is not DragItem dragItem ||
-            ItemsSource is not IList items ||
-            items.IsReadOnly ||
-            items.IsFixedSize)
+        if (eventArgs.DataTransfer.TryGetValue(ItemFormat) is not DragItem dragItem || ItemsSource is not IList items || items.IsReadOnly || items.IsFixedSize)
         {
             eventArgs.DragEffects = DragDropEffects.None;
             return;
         }
 
         int sourceIndex = dragItem.Index;
-        if (sourceIndex < 0 || sourceIndex >= items.Count ||
-            !ReferenceEquals(items[sourceIndex], dragItem.Item))
+        if (sourceIndex < 0 || sourceIndex >= items.Count || !ReferenceEquals(items[sourceIndex], dragItem.Item))
         {
             eventArgs.DragEffects = DragDropEffects.None;
             return;
@@ -110,10 +98,7 @@ public sealed class ReorderableListBox : ListBox
 
         int targetIndex = FindTargetIndex(eventArgs.GetPosition(this));
         items.RemoveAt(sourceIndex);
-        if (targetIndex > sourceIndex)
-        {
-            targetIndex--;
-        }
+        if (targetIndex > sourceIndex) targetIndex--;
 
         targetIndex = Math.Clamp(targetIndex, 0, items.Count);
         items.Insert(targetIndex, dragItem.Item);
@@ -124,22 +109,17 @@ public sealed class ReorderableListBox : ListBox
 
     private void OnKeyDown(object? sender, KeyEventArgs eventArgs)
     {
-        if ((eventArgs.KeyModifiers & KeyModifiers.Control) == 0 ||
-            eventArgs.Key is not (Key.Up or Key.Down) ||
-            ItemsSource is not IList items ||
-            items.IsReadOnly ||
-            items.IsFixedSize ||
-            SelectedIndex < 0 ||
-            SelectedIndex >= items.Count)
-        {
+        if ((eventArgs.KeyModifiers & KeyModifiers.Control) == 0
+            || eventArgs.Key is not (Key.Up or Key.Down)
+            || ItemsSource is not IList items
+            || items.IsReadOnly
+            || items.IsFixedSize
+            || SelectedIndex < 0
+            || SelectedIndex >= items.Count)
             return;
-        }
 
         int targetIndex = eventArgs.Key == Key.Up ? SelectedIndex - 1 : SelectedIndex + 1;
-        if (targetIndex < 0 || targetIndex >= items.Count)
-        {
-            return;
-        }
+        if (targetIndex < 0 || targetIndex >= items.Count) return;
 
         object? selectedItem = items[SelectedIndex];
         items.RemoveAt(SelectedIndex);
@@ -152,15 +132,9 @@ public sealed class ReorderableListBox : ListBox
     {
         for (int index = 0; index < ItemCount; index++)
         {
-            if (ContainerFromIndex(index) is not Control container)
-            {
-                continue;
-            }
+            if (ContainerFromIndex(index) is not Control container) continue;
 
-            if (point.Y < container.Bounds.Center.Y)
-            {
-                return index;
-            }
+            if (point.Y < container.Bounds.Center.Y) return index;
         }
 
         return ItemCount;
@@ -168,13 +142,9 @@ public sealed class ReorderableListBox : ListBox
 
     private ListBoxItem? FindItemContainer(Visual? source)
     {
-        for (Visual? current = source; current is not null && current != this; current = current.GetVisualParent())
-        {
+        for (var current = source; current is not null && current != this; current = current.GetVisualParent())
             if (current is ListBoxItem item)
-            {
                 return item;
-            }
-        }
 
         return null;
     }

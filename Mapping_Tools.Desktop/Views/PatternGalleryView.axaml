@@ -34,7 +34,8 @@
                                         <Expander.Header>
                                             <StackPanel Orientation="Horizontal" Spacing="8">
                                                 <TextBlock FontWeight="Bold" Text="{Binding Name}" />
-                                                <TextBlock Opacity="0.65" Text="{Binding ItemCount, StringFormat='({0})'}" />
+                                                <TextBlock Opacity="0.65"
+                                                           Text="{Binding ItemCount, StringFormat='({0})'}" />
                                             </StackPanel>
                                         </Expander.Header>
                                         <ListBox ItemsSource="{Binding Patterns}"
@@ -44,8 +45,10 @@
                                                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
                                                  SelectionChanged="PatternSelectionChanged">
                                             <ListBox.ItemContainerTheme>
-                                                <ControlTheme TargetType="ListBoxItem" x:DataType="vm:PatternGalleryItemViewModel">
-                                                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                                                <ControlTheme TargetType="ListBoxItem"
+                                                              x:DataType="vm:PatternGalleryItemViewModel">
+                                                    <Setter Property="IsSelected"
+                                                            Value="{Binding IsSelected, Mode=TwoWay}" />
                                                 </ControlTheme>
                                             </ListBox.ItemContainerTheme>
                                             <ListBox.ItemsPanel>
@@ -55,23 +58,26 @@
                                             </ListBox.ItemsPanel>
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate x:DataType="vm:PatternGalleryItemViewModel">
-                                                    <materialControls:Card Width="150" Height="150" Margin="4" Padding="0">
+                                                    <materialControls:Card Width="150" Height="150" Margin="4"
+                                                                           Padding="0">
                                                         <Border PointerPressed="PatternPointerPressed"
                                                                 DoubleTapped="PatternDoubleTapped"
                                                                 Background="Transparent">
                                                             <Border.ContextMenu>
                                                                 <ContextMenu Opened="PatternContextMenuOpened" />
                                                             </Border.ContextMenu>
-                                                            <Grid RowDefinitions="*,40" ToolTip.Tip="Double-click to QuickRun this pattern.">
-                                                                <controls:PatternThumbnailControl Beatmap="{Binding ThumbnailBeatmap}"
-                                                                                                   Fill="{DynamicResource MappingToolsTimelineAddedInnerBrush}"
-                                                                                                   Stroke="{DynamicResource MaterialLightForegroundBrush}" />
+                                                            <Grid RowDefinitions="*,40"
+                                                                  ToolTip.Tip="Double-click to QuickRun this pattern.">
+                                                                <controls:PatternThumbnailControl
+                                                                    Beatmap="{Binding ThumbnailBeatmap}"
+                                                                    Fill="{DynamicResource MappingToolsTimelineAddedInnerBrush}"
+                                                                    Stroke="{DynamicResource MaterialLightForegroundBrush}" />
                                                                 <TextBlock Grid.Row="1"
-                                                                               VerticalAlignment="Center"
-                                                                               Margin="8,0"
-                                                                               Text="{Binding Name}"
-                                                                               TextTrimming="CharacterEllipsis"
-                                                                               ToolTip.Tip="{Binding Name}" />
+                                                                           VerticalAlignment="Center"
+                                                                           Margin="8,0"
+                                                                           Text="{Binding Name}"
+                                                                           TextTrimming="CharacterEllipsis"
+                                                                           ToolTip.Tip="{Binding Name}" />
                                                             </Grid>
                                                         </Border>
                                                     </materialControls:Card>
@@ -103,23 +109,29 @@
                             </ComboBox>
                         </Grid>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0">
-                            <Button Classes="flat" Command="{Binding AddCodeCommand}" ToolTip.Tip="Add a pattern from .osu code.">
+                            <Button Classes="flat" Command="{Binding AddCodeCommand}"
+                                    ToolTip.Tip="Add a pattern from .osu code.">
                                 <materialIcons:MaterialIcon Kind="CodeBraces" Width="24" Height="24" />
                             </Button>
-                            <Button Classes="flat" Command="{Binding AddFileCommand}" ToolTip.Tip="Add a pattern from a file.">
+                            <Button Classes="flat" Command="{Binding AddFileCommand}"
+                                    ToolTip.Tip="Add a pattern from a file.">
                                 <materialIcons:MaterialIcon Kind="FilePlus" Width="24" Height="24" />
                             </Button>
-                            <Button Classes="flat" Command="{Binding AddSelectedCommand}" ToolTip.Tip="Add a pattern from selected hit objects.">
+                            <Button Classes="flat" Command="{Binding AddSelectedCommand}"
+                                    ToolTip.Tip="Add a pattern from selected hit objects.">
                                 <materialIcons:MaterialIcon Kind="PlusBox" Width="24" Height="24" />
                             </Button>
-                            <Button Classes="flat" Command="{Binding RemoveCommand}" PointerPressed="RemoveButtonPointerPressed" ToolTip.Tip="Delete selected patterns. Hold shift to skip dialog.">
+                            <Button Classes="flat" Command="{Binding RemoveCommand}"
+                                    PointerPressed="RemoveButtonPointerPressed"
+                                    ToolTip.Tip="Delete selected patterns. Hold shift to skip dialog.">
                                 <materialIcons:MaterialIcon Kind="TrashCan" Width="24" Height="24" />
                             </Button>
                         </StackPanel>
                     </Grid>
                 </Grid>
 
-                <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center" Background="{DynamicResource MaterialDividerBrush}" />
+                <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center"
+                              Background="{DynamicResource MaterialDividerBrush}" />
 
                 <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="8">
@@ -191,7 +203,8 @@
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
             <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
-            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100" Value="{Binding Progress}" />
+            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100"
+                                      Value="{Binding Progress}" />
         </Grid>
     </Grid>
 </UserControl>

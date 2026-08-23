@@ -1,14 +1,14 @@
 namespace Mapping_Tools.Core.Audio;
 
 /// <summary>
-/// Owns decoded, interleaved floating-point samples independently of an audio library.
+///     Owns decoded, interleaved floating-point samples independently of an audio library.
 /// </summary>
 public sealed class AudioClip
 {
     private readonly float[] _samples;
 
     /// <summary>
-    /// Creates an audio clip and copies the supplied sample values.
+    ///     Creates an audio clip and copies the supplied sample values.
     /// </summary>
     /// <param name="format">The sample rate and channel layout.</param>
     /// <param name="samples">Interleaved normalized samples.</param>
@@ -18,10 +18,7 @@ public sealed class AudioClip
         ArgumentNullException.ThrowIfNull(samples);
 
         _samples = samples.ToArray();
-        if (_samples.Length % format.Channels != 0)
-        {
-            throw new ArgumentException("The sample count must contain complete interleaved frames.", nameof(samples));
-        }
+        if (_samples.Length % format.Channels != 0) throw new ArgumentException("The sample count must contain complete interleaved frames.", nameof(samples));
 
         Format = format;
     }
@@ -43,5 +40,8 @@ public sealed class AudioClip
 
     /// <summary>Copies the interleaved sample values for a consumer that needs mutable storage.</summary>
     /// <returns>A new array containing all sample values.</returns>
-    public float[] CopySamples() => (float[])_samples.Clone();
+    public float[] CopySamples()
+    {
+        return (float[])_samples.Clone();
+    }
 }

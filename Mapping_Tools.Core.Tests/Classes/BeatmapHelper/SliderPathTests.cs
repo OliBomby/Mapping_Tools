@@ -6,11 +6,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Core.Tests.Classes.BeatmapHelper;
 
 [TestClass]
-public class SliderPathTests {
+public class SliderPathTests
+{
     [TestMethod]
-    public void RepeatedControlPoints_CreateIndependentSegments() {
+    public void RepeatedControlPoints_CreateIndependentSegments()
+    {
         // Arrange
-        var controlPoints = new[] {
+        var controlPoints = new[]
+        {
             new Vector2(42, 179),
             new Vector2(135, 234),
             new Vector2(219, 171),
@@ -19,7 +22,7 @@ public class SliderPathTests {
             new Vector2(194, 100),
             new Vector2(266, 53),
             new Vector2(345, 48),
-            new Vector2(405, 117)
+            new Vector2(405, 117),
         };
 
         // Act
@@ -30,7 +33,8 @@ public class SliderPathTests {
     }
 
     [TestMethod]
-    public void ExpectedDistance_ShortensAndLengthensLinearPath() {
+    public void ExpectedDistance_ShortensAndLengthensLinearPath()
+    {
         // Arrange
         var controlPoints = new[] { new Vector2(0, 0), new Vector2(100, 0) };
 
@@ -46,7 +50,8 @@ public class SliderPathTests {
     }
 
     [TestMethod]
-    public void EmptyPath_HasZeroDistanceAndPosition() {
+    public void EmptyPath_HasZeroDistanceAndPosition()
+    {
         // Arrange
         // Act
         var sliderPath = new SliderPath(PathType.Bezier, Array.Empty<Vector2>());

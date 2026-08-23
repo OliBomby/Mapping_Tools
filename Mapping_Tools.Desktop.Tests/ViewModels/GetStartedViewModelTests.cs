@@ -12,7 +12,7 @@ public sealed class GetStartedViewModelTests
     public void RecentMaps_WhenItemAdded_UpdatesEmptyStateAndRaisesPropertyChanged()
     {
         // Arrange
-        GetStartedViewModel viewModel = CreateViewModel();
+        var viewModel = CreateViewModel();
         List<string?> changedProperties = [];
         viewModel.PropertyChanged += (_, eventArgs) =>
             changedProperties.Add(eventArgs.PropertyName);
@@ -46,6 +46,8 @@ public sealed class GetStartedViewModelTests
         workspace.LastSelectionSource.Should().Be(BeatmapSelectionSource.RecentHistory);
     }
 
-    private static GetStartedViewModel CreateViewModel() =>
-        new(new TestBeatmapWorkspace());
+    private static GetStartedViewModel CreateViewModel()
+    {
+        return new GetStartedViewModel(new TestBeatmapWorkspace());
+    }
 }

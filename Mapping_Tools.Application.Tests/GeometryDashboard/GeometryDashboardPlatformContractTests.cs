@@ -45,7 +45,7 @@ public sealed class GeometryDashboardPlatformContractTests
         GeometryDashboardRuntimeService sut = new(processes, reader, windows, screens);
 
         // Act
-        GeometryDashboardRuntimeSnapshot? result = await sut.ReadAsync();
+        var result = await sut.ReadAsync();
 
         // Assert
         result.Should().NotBeNull();
@@ -71,7 +71,7 @@ public sealed class GeometryDashboardPlatformContractTests
         GeometryDashboardRuntimeService sut = new(processes, reader, windows, screens);
 
         // Act
-        GeometryDashboardRuntimeSnapshot? result = await sut.ReadAsync();
+        var result = await sut.ReadAsync();
 
         // Assert
         result.Should().BeNull();
@@ -106,7 +106,7 @@ public sealed class GeometryDashboardPlatformContractTests
             new FakeScreenService(null));
 
         // Act
-        GeometryDashboardRuntimeSnapshot? result = await sut.ReadAsync();
+        var result = await sut.ReadAsync();
 
         // Assert
         result.Should().BeNull();
@@ -231,8 +231,10 @@ public sealed class GeometryDashboardPlatformContractTests
 
         public bool IsSupported => true;
 
-        public GeometryDashboardWindow? GetWindow(PlatformWindowId windowId) =>
+        public GeometryDashboardWindow? GetWindow(PlatformWindowId windowId)
+        {
             throw new NotSupportedException();
+        }
 
         public GeometryDashboardWindow? GetMainWindow(GeometryDashboardProcess process)
         {
@@ -240,7 +242,10 @@ public sealed class GeometryDashboardPlatformContractTests
             return window;
         }
 
-        public IReadOnlyList<GeometryDashboardWindow> GetTopLevelWindows() => [];
+        public IReadOnlyList<GeometryDashboardWindow> GetTopLevelWindows()
+        {
+            return [];
+        }
     }
 
     private sealed class FakeScreenService(GeometryDashboardScreen? screen)
@@ -250,7 +255,10 @@ public sealed class GeometryDashboardPlatformContractTests
 
         public bool IsSupported => true;
 
-        public IReadOnlyList<GeometryDashboardScreen> GetScreens() => [];
+        public IReadOnlyList<GeometryDashboardScreen> GetScreens()
+        {
+            return [];
+        }
 
         public GeometryDashboardScreen? GetPrimaryScreen()
         {
@@ -258,7 +266,9 @@ public sealed class GeometryDashboardPlatformContractTests
             return screen;
         }
 
-        public GeometryDashboardScreen? GetScreenForWindow(PlatformWindowId window) =>
+        public GeometryDashboardScreen? GetScreenForWindow(PlatformWindowId window)
+        {
             throw new NotSupportedException();
+        }
     }
 }

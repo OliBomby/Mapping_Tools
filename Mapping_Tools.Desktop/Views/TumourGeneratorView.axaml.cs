@@ -9,14 +9,14 @@ namespace Mapping_Tools.Desktop.Views;
 public sealed partial class TumourGeneratorView : UserControl
 {
     /// <summary>Creates the view and enables compiled bindings.</summary>
-    public TumourGeneratorView() => InitializeComponent();
+    public TumourGeneratorView()
+    {
+        InitializeComponent();
+    }
 
     private void LayerNamePointerPressed(object? sender, PointerPressedEventArgs eventArgs)
     {
-        if (DataContext is TumourGeneratorViewModel viewModel &&
-            sender is Control { DataContext: ObservableTumourLayer layer })
-        {
+        if (DataContext is TumourGeneratorViewModel viewModel && sender is Control { DataContext: ObservableTumourLayer layer })
             viewModel.CurrentLayer = layer;
-        }
     }
 }

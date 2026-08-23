@@ -48,8 +48,8 @@ public sealed class AvaloniaFilePickerTests
 
         // Act
         Func<Task> act2 = () => picker.PickFoldersAsync(
-                new OpenFolderPickerRequest(),
-                cancellation.Token);
+            new OpenFolderPickerRequest(),
+            cancellation.Token);
 
         // Assert
         await act2.Should().ThrowAsync<OperationCanceledException>();

@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
@@ -9,26 +7,28 @@ using Mapping_Tools.Infrastructure.Platform;
 namespace Mapping_Tools.Infrastructure.Editor;
 
 /// <summary>
-/// Observes focused osu! saves on Windows and replaces them with the shared BetterSave workflow.
+///     Observes focused osu! saves on Windows and replaces them with the shared BetterSave workflow.
 /// </summary>
 public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideService, IDisposable
 {
-    private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
     private readonly IBetterSaveService _betterSave;
+    private readonly object _configurationGate = new();
+    private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
     private readonly IUserNotificationService _notifications;
+    private readonly SemaphoreSlim _saveGate = new(1, 1);
+
     private readonly FileSystemWatcher _watcher = new()
     {
         Filter = "*.osu",
         IncludeSubdirectories = true,
-        NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size
+        NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
     };
-    private readonly SemaphoreSlim _saveGate = new(1, 1);
-    private readonly object _configurationGate = new();
-    private string? _lastBetterSaveHash;
+
     private bool _disposed;
+    private string? _lastBetterSaveHash;
 
     /// <summary>
-    /// Creates a disabled watcher over current-map lookup and the shared BetterSave command.
+    ///     Creates a disabled watcher over current-map lookup and the shared BetterSave command.
     /// </summary>
     /// <param name="currentBeatmapLocator">Identifies whether a changed file is current in osu!.</param>
     /// <param name="betterSave">Performs live-state loading, backup, and persistence.</param>
@@ -39,13 +39,13 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
         IUserNotificationService notifications)
     {
         _currentBeatmapLocator = currentBeatmapLocator
-            ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+                                 ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         _betterSave = betterSave ?? throw new ArgumentNullException(nameof(betterSave));
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         _watcher.Changed += OnBeatmapChanged;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Configure(string songsPath, bool enabled)
     {
         lock (_configurationGate)
@@ -53,10 +53,7 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
             ThrowIfDisposed();
             _watcher.EnableRaisingEvents = false;
             _lastBetterSaveHash = null;
-            if (!enabled)
-            {
-                return;
-            }
+            if (!enabled) return;
 
             if (!OperatingSystem.IsWindows())
             {
@@ -77,15 +74,12 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Stop()
     {
         lock (_configurationGate)
         {
-            if (!_disposed)
-            {
-                _watcher.EnableRaisingEvents = false;
-            }
+            if (!_disposed) _watcher.EnableRaisingEvents = false;
         }
     }
 
@@ -94,10 +88,7 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
     {
         lock (_configurationGate)
         {
-            if (_disposed)
-            {
-                return;
-            }
+            if (_disposed) return;
 
             _disposed = true;
             _watcher.EnableRaisingEvents = false;
@@ -108,33 +99,21 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
 
     private async void OnBeatmapChanged(object sender, FileSystemEventArgs eventArgs)
     {
-        if (!await _saveGate.WaitAsync(0).ConfigureAwait(false))
-        {
-            return;
-        }
+        if (!await _saveGate.WaitAsync(0).ConfigureAwait(false)) return;
 
         try
         {
             string? currentPath = await _currentBeatmapLocator
                 .FindCurrentBeatmapAsync()
                 .ConfigureAwait(false);
-            if (!string.Equals(currentPath, eventArgs.FullPath, StringComparison.OrdinalIgnoreCase) ||
-                !IsOsuForegroundWindow())
-            {
+            if (!string.Equals(currentPath, eventArgs.FullPath, StringComparison.OrdinalIgnoreCase) || !IsOsuForegroundWindow())
                 return;
-            }
 
             string? currentHash = await TryGetHashAsync(eventArgs.FullPath).ConfigureAwait(false);
-            if (currentHash is not null && currentHash == _lastBetterSaveHash)
-            {
-                return;
-            }
+            if (currentHash is not null && currentHash == _lastBetterSaveHash) return;
 
-            BetterSaveResult result = await _betterSave.ExecuteAsync().ConfigureAwait(false);
-            if (result.Status == BetterSaveStatus.Saved)
-            {
-                _lastBetterSaveHash = await TryGetHashAsync(eventArgs.FullPath).ConfigureAwait(false);
-            }
+            var result = await _betterSave.ExecuteAsync().ConfigureAwait(false);
+            if (result.Status == BetterSaveStatus.Saved) _lastBetterSaveHash = await TryGetHashAsync(eventArgs.FullPath).ConfigureAwait(false);
         }
         catch (ObjectDisposedException) when (_disposed)
         {
@@ -151,10 +130,8 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
 
     private static bool IsOsuForegroundWindow()
     {
-        using Process? process = OsuProcessDiscovery.FindStableProcess();
-        return process is not null &&
-               process.MainWindowHandle != nint.Zero &&
-               WindowsNativeMethods.GetForegroundWindow() == process.MainWindowHandle;
+        using var process = OsuProcessDiscovery.FindStableProcess();
+        return process is not null && process.MainWindowHandle != nint.Zero && WindowsNativeMethods.GetForegroundWindow() == process.MainWindowHandle;
     }
 
     private static async Task<string?> TryGetHashAsync(string path)
@@ -181,14 +158,17 @@ public sealed class WindowsBetterSaveOverrideService : IBetterSaveOverrideServic
         }
     }
 
-    private Task PublishFailureAsync(Exception exception) =>
-        _notifications.PublishAsync(new UserNotification(
+    private Task PublishFailureAsync(Exception exception)
+    {
+        return _notifications.PublishAsync(new UserNotification(
             UserNotificationSeverity.Error,
             "BetterSave override",
             exception.Message,
             exception));
+    }
 
-    private void ThrowIfDisposed() =>
+    private void ThrowIfDisposed()
+    {
         ObjectDisposedException.ThrowIf(_disposed, this);
-
+    }
 }

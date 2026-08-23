@@ -4,13 +4,13 @@ using Mapping_Tools.Core.Classes.HitsoundStuff;
 namespace Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
 
 /// <summary>
-/// Applies positional hitsound rules to a framework-independent beatmap.
+///     Applies positional hitsound rules to a framework-independent beatmap.
 /// </summary>
 public static class HitsoundPreviewHelperEngine
 {
     /// <summary>
-    /// Places the nearest configured zone's hitsound on every timeline event
-    /// belonging to one of the supplied hit objects.
+    ///     Places the nearest configured zone's hitsound on every timeline event
+    ///     belonging to one of the supplied hit objects.
     /// </summary>
     /// <param name="beatmap">The mutable beatmap receiving the preview hitsounds.</param>
     /// <param name="selectedObjects">The hit objects whose timeline events are eligible.</param>
@@ -29,22 +29,19 @@ public static class HitsoundPreviewHelperEngine
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(selectedObjects);
         ArgumentNullException.ThrowIfNull(zones);
-        if (zones.Count == 0)
-        {
-            throw new ArgumentException("There are no zones!", nameof(zones));
-        }
+        if (zones.Count == 0) throw new ArgumentException("There are no zones!", nameof(zones));
 
-        HashSet<HitObject> selected = selectedObjects.ToHashSet();
+        var selected = selectedObjects.ToHashSet();
         List<TimelineObject> timelineObjects = beatmap.GetTimeline().TimelineObjects
             .Where(timelineObject => selected.Contains(timelineObject.Origin))
             .ToList();
         for (int index = 0; index < timelineObjects.Count; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            TimelineObject timelineObject = timelineObjects[index];
-            HitsoundZone? closest = zones[0];
+            var timelineObject = timelineObjects[index];
+            var closest = zones[0];
             double closestDistance = double.MaxValue;
-            foreach (HitsoundZone zone in zones)
+            foreach (var zone in zones)
             {
                 double distance = zone.Distance(timelineObject.Origin.Pos);
                 if (distance < closestDistance)

@@ -16,7 +16,7 @@ public sealed class SpectrumControlTests
         control.Arrange(new Rect(0, 0, 200, 64));
 
         // Act
-        IReadOnlyList<Rect> bars = SpectrumControl.CalculateBarRects(
+        var bars = SpectrumControl.CalculateBarRects(
             control.Frame,
             control.Bounds.Size,
             control.VerticalScale,
@@ -35,7 +35,7 @@ public sealed class SpectrumControlTests
         control.Arrange(new Rect(0, 0, 300, 100));
 
         // Act
-        IReadOnlyList<Rect> bars = SpectrumControl.CalculateBarRects(frame, control.Bounds.Size, 1, 1);
+        var bars = SpectrumControl.CalculateBarRects(frame, control.Bounds.Size, 1, 1);
 
         // Assert
         bars.Should().HaveCount(3);
@@ -51,11 +51,11 @@ public sealed class SpectrumControlTests
         SpectrumFrame frame = new(44_100, 8, [1, 0.5]);
         SpectrumControl control = new() { Frame = frame };
         control.Arrange(new Rect(0, 0, 100, 50));
-        IReadOnlyList<Rect> original = SpectrumControl.CalculateBarRects(frame, control.Bounds.Size, 1, 1);
+        var original = SpectrumControl.CalculateBarRects(frame, control.Bounds.Size, 1, 1);
 
         // Act
         control.Arrange(new Rect(0, 0, 200, 80));
-        IReadOnlyList<Rect> resized = SpectrumControl.CalculateBarRects(frame, control.Bounds.Size, 1, 1);
+        var resized = SpectrumControl.CalculateBarRects(frame, control.Bounds.Size, 1, 1);
 
         // Assert
         resized[0].Width.Should().BeGreaterThan(original[0].Width);
@@ -70,7 +70,7 @@ public sealed class SpectrumControlTests
         SpectrumFrame frame = new(44_100, 256, Enumerable.Repeat(1d, 100));
 
         // Act
-        IReadOnlyList<Rect> bars = SpectrumControl.CalculateBarRects(frame, new Size(10, 20), 1, 2);
+        var bars = SpectrumControl.CalculateBarRects(frame, new Size(10, 20), 1, 2);
 
         // Assert
         bars.Should().HaveCount(5);
@@ -90,8 +90,8 @@ public sealed class SpectrumControlTests
         Size size = new(100, 20);
 
         // Act
-        IReadOnlyList<Rect> nullFrameBars = SpectrumControl.CalculateBarRects(null, size, 1, 1);
-        IReadOnlyList<Rect> invalidScaleBars = SpectrumControl.CalculateBarRects(frame, size, double.NaN, 1);
+        var nullFrameBars = SpectrumControl.CalculateBarRects(null, size, 1, 1);
+        var invalidScaleBars = SpectrumControl.CalculateBarRects(frame, size, double.NaN, 1);
 
         // Assert
         nullFrameBars.Should().BeEmpty();

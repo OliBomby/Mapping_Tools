@@ -21,98 +21,24 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     IShellFeatureActivation
 {
     internal const string OperationId = "slider-picturator";
-    private readonly ISliderPicturatorService _picturator;
-    private readonly IImageFileService _images;
-    private readonly IFilePicker _filePicker;
     private readonly ICurrentBeatmapLocator _currentBeatmap;
-    private readonly IBeatmapWorkspace _workspace;
-    private readonly ApplicationSettings _settings;
-    private readonly IUserNotificationService _notifications;
+
     private readonly ProjectDefinition<SliderPicturatorProject> _definition = new(
         "sliderpicturatorproject.json", "Slider Picturator Projects", static () => new SliderPicturatorProject(),
         "slider-picturator-project.json");
-    private CancellationTokenSource? _previewCancellation;
-    private CancellationTokenSource? _imageLoadCancellation;
+
+    private readonly IFilePicker _filePicker;
+    private readonly IImageFileService _images;
+    private readonly IUserNotificationService _notifications;
+    private readonly ISliderPicturatorService _picturator;
+    private readonly ApplicationSettings _settings;
+    private readonly IBeatmapWorkspace _workspace;
     private CancellationTokenSource? _colorRefreshCancellation;
-    private RgbaImage? _sourceImage;
+    private CancellationTokenSource? _imageLoadCancellation;
     private bool _isActive;
-
-    /// <summary>Gets the supported GPU viewport-size choices in legacy order.</summary>
-    public IReadOnlyList<long> ViewportSizes { get; } = [16384, 32768];
-    /// <summary>Gets the current beatmap palette.</summary>
-    public ObservableCollection<RgbaColour> AvailableColors { get; } = [];
-    /// <summary>Gets whether the map palette selector is visible.</summary>
-    public bool ShouldShowCcPicker => UseMapComboColors;
-    /// <summary>Gets whether the manual track colour picker is visible.</summary>
-    public bool ShouldShowPalette => !UseMapComboColors;
+    private CancellationTokenSource? _previewCancellation;
     private Bitmap? _previewImage;
-    /// <summary>Gets the current recoloured preview bitmap.</summary>
-    public Bitmap? PreviewImage
-    {
-        get => _previewImage;
-        private set
-        {
-            if (ReferenceEquals(_previewImage, value))
-            {
-                return;
-            }
-
-            Bitmap? previous = _previewImage;
-            _previewImage = value;
-            OnPropertyChanged();
-            previous?.Dispose();
-        }
-    }
-    /// <summary>Gets whether a preview calculation is active.</summary>
-    [ObservableProperty] public partial bool IsProcessingPreview { get; set; }
-    /// <summary>Gets or sets the GPU viewport-size choice.</summary>
-    [ObservableProperty] public partial long ViewportSize { get; set; } = 32768;
-    /// <summary>Gets or sets the image quality.</summary>
-    [ObservableProperty] public partial int Quality { get; set; } = 1;
-    /// <summary>Gets or sets the estimated segment count.</summary>
-    [ObservableProperty] public partial long SegmentCount { get; set; }
-    /// <summary>Gets or sets the image vertical resolution.</summary>
-    [ObservableProperty] public partial double YResolution { get; set; } = 1080;
-    /// <summary>Gets or sets the slider start X coordinate.</summary>
-    [ObservableProperty] public partial double SliderStartX { get; set; } = 256;
-    /// <summary>Gets or sets the slider start Y coordinate.</summary>
-    [ObservableProperty] public partial double SliderStartY { get; set; } = 192;
-    /// <summary>Gets or sets the image start X coordinate.</summary>
-    [ObservableProperty] public partial double ImageStartX { get; set; }
-    /// <summary>Gets or sets the image start Y coordinate.</summary>
-    [ObservableProperty] public partial double ImageStartY { get; set; }
-    /// <summary>Gets or sets whether map combo colours supply the track colour.</summary>
-    [ObservableProperty] public partial bool UseMapComboColors { get; set; }
-    /// <summary>Gets or sets the selected combo colour.</summary>
-    [ObservableProperty] public partial RgbaColour ComboColor { get; set; } = RgbaColour.FromRgb(0, 0, 0);
-    /// <summary>Gets or sets the effective track colour.</summary>
-    [ObservableProperty] public partial RgbaColour CurrentTrackColor { get; set; } = RgbaColour.White;
-    /// <summary>Gets or sets the manually selected track colour.</summary>
-    [ObservableProperty] public partial RgbaColour TrackColorPickerColor { get; set; } = RgbaColour.White;
-    /// <summary>Gets or sets the border colour.</summary>
-    [ObservableProperty] public partial RgbaColour BorderColor { get; set; } = RgbaColour.White;
-    /// <summary>Gets or sets the generated start time.</summary>
-    [ObservableProperty] public partial double TimeCode { get; set; }
-    /// <summary>Gets or sets the generated duration.</summary>
-    [ObservableProperty] public partial double Duration { get; set; } = 1;
-    /// <summary>Gets or sets the selected image path.</summary>
-    [ObservableProperty] public partial string PictureFile { get; set; } = string.Empty;
-    /// <summary>Gets or sets whether transparent black can represent black pixels.</summary>
-    [ObservableProperty] public partial bool BlackOn { get; set; } = true;
-    /// <summary>Gets or sets whether the border colour can represent pixels.</summary>
-    [ObservableProperty] public partial bool BorderOn { get; set; } = true;
-    /// <summary>Gets or sets whether red participates in matching.</summary>
-    [ObservableProperty] public partial bool RedOn { get; set; } = true;
-    /// <summary>Gets or sets whether green participates in matching.</summary>
-    [ObservableProperty] public partial bool GreenOn { get; set; } = true;
-    /// <summary>Gets or sets whether blue participates in matching.</summary>
-    [ObservableProperty] public partial bool BlueOn { get; set; } = true;
-    /// <summary>Gets or sets whether alpha participates in matching.</summary>
-    [ObservableProperty] public partial bool AlphaOn { get; set; } = true;
-    /// <summary>Gets or sets whether generated map colours are persisted.</summary>
-    [ObservableProperty] public partial bool SetBeatmapColors { get; set; } = true;
-    /// <summary>Gets the transient slider whose sliderball path should be preserved.</summary>
-    [ObservableProperty] public partial HitObject? SelectedSlider { get; set; }
+    private RgbaImage? _sourceImage;
 
     /// <summary>Creates the Slider Picturator presentation model.</summary>
     /// <param name="picturator">Runs the framework-independent operation.</param>
@@ -137,30 +63,157 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
     }
 
-    /// <inheritdoc/>
+    /// <summary>Gets the supported GPU viewport-size choices in legacy order.</summary>
+    public IReadOnlyList<long> ViewportSizes { get; } = [16384, 32768];
+
+    /// <summary>Gets the current beatmap palette.</summary>
+    public ObservableCollection<RgbaColour> AvailableColors { get; } = [];
+
+    /// <summary>Gets whether the map palette selector is visible.</summary>
+    public bool ShouldShowCcPicker => UseMapComboColors;
+
+    /// <summary>Gets whether the manual track colour picker is visible.</summary>
+    public bool ShouldShowPalette => !UseMapComboColors;
+
+    /// <summary>Gets the current recoloured preview bitmap.</summary>
+    public Bitmap? PreviewImage
+    {
+        get => _previewImage;
+        private set
+        {
+            if (ReferenceEquals(_previewImage, value)) return;
+
+            var previous = _previewImage;
+            _previewImage = value;
+            OnPropertyChanged();
+            previous?.Dispose();
+        }
+    }
+
+    /// <summary>Gets whether a preview calculation is active.</summary>
+    [ObservableProperty]
+    public partial bool IsProcessingPreview { get; set; }
+
+    /// <summary>Gets or sets the GPU viewport-size choice.</summary>
+    [ObservableProperty]
+    public partial long ViewportSize { get; set; } = 32768;
+
+    /// <summary>Gets or sets the image quality.</summary>
+    [ObservableProperty]
+    public partial int Quality { get; set; } = 1;
+
+    /// <summary>Gets or sets the estimated segment count.</summary>
+    [ObservableProperty]
+    public partial long SegmentCount { get; set; }
+
+    /// <summary>Gets or sets the image vertical resolution.</summary>
+    [ObservableProperty]
+    public partial double YResolution { get; set; } = 1080;
+
+    /// <summary>Gets or sets the slider start X coordinate.</summary>
+    [ObservableProperty]
+    public partial double SliderStartX { get; set; } = 256;
+
+    /// <summary>Gets or sets the slider start Y coordinate.</summary>
+    [ObservableProperty]
+    public partial double SliderStartY { get; set; } = 192;
+
+    /// <summary>Gets or sets the image start X coordinate.</summary>
+    [ObservableProperty]
+    public partial double ImageStartX { get; set; }
+
+    /// <summary>Gets or sets the image start Y coordinate.</summary>
+    [ObservableProperty]
+    public partial double ImageStartY { get; set; }
+
+    /// <summary>Gets or sets whether map combo colours supply the track colour.</summary>
+    [ObservableProperty]
+    public partial bool UseMapComboColors { get; set; }
+
+    /// <summary>Gets or sets the selected combo colour.</summary>
+    [ObservableProperty]
+    public partial RgbaColour ComboColor { get; set; } = RgbaColour.FromRgb(0, 0, 0);
+
+    /// <summary>Gets or sets the effective track colour.</summary>
+    [ObservableProperty]
+    public partial RgbaColour CurrentTrackColor { get; set; } = RgbaColour.White;
+
+    /// <summary>Gets or sets the manually selected track colour.</summary>
+    [ObservableProperty]
+    public partial RgbaColour TrackColorPickerColor { get; set; } = RgbaColour.White;
+
+    /// <summary>Gets or sets the border colour.</summary>
+    [ObservableProperty]
+    public partial RgbaColour BorderColor { get; set; } = RgbaColour.White;
+
+    /// <summary>Gets or sets the generated start time.</summary>
+    [ObservableProperty]
+    public partial double TimeCode { get; set; }
+
+    /// <summary>Gets or sets the generated duration.</summary>
+    [ObservableProperty]
+    public partial double Duration { get; set; } = 1;
+
+    /// <summary>Gets or sets the selected image path.</summary>
+    [ObservableProperty]
+    public partial string PictureFile { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets whether transparent black can represent black pixels.</summary>
+    [ObservableProperty]
+    public partial bool BlackOn { get; set; } = true;
+
+    /// <summary>Gets or sets whether the border colour can represent pixels.</summary>
+    [ObservableProperty]
+    public partial bool BorderOn { get; set; } = true;
+
+    /// <summary>Gets or sets whether red participates in matching.</summary>
+    [ObservableProperty]
+    public partial bool RedOn { get; set; } = true;
+
+    /// <summary>Gets or sets whether green participates in matching.</summary>
+    [ObservableProperty]
+    public partial bool GreenOn { get; set; } = true;
+
+    /// <summary>Gets or sets whether blue participates in matching.</summary>
+    [ObservableProperty]
+    public partial bool BlueOn { get; set; } = true;
+
+    /// <summary>Gets or sets whether alpha participates in matching.</summary>
+    [ObservableProperty]
+    public partial bool AlphaOn { get; set; } = true;
+
+    /// <summary>Gets or sets whether generated map colours are persisted.</summary>
+    [ObservableProperty]
+    public partial bool SetBeatmapColors { get; set; } = true;
+
+    /// <summary>Gets the transient slider whose sliderball path should be preserved.</summary>
+    [ObservableProperty]
+    public partial HitObject? SelectedSlider { get; set; }
+
+    /// <inheritdoc />
+    public async Task RunQuickAsync(CancellationToken cancellationToken)
+    {
+        string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken).ConfigureAwait(false);
+        await RunWithStateAsync(() => RunPathAsync(path, true, cancellationToken));
+    }
+
+    string IQuickRun.OperationId => OperationId;
+
+    /// <inheritdoc />
     public void Activate()
     {
-        if (_isActive)
-        {
-            return;
-        }
+        if (_isActive) return;
 
         _isActive = true;
         _workspace.SelectionChanged += OnWorkspaceSelectionChanged;
         _ = RefreshColorsAsync();
-        if (_sourceImage is not null)
-        {
-            _ = GeneratePreviewAsync();
-        }
+        if (_sourceImage is not null) _ = GeneratePreviewAsync();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Deactivate()
     {
-        if (!_isActive)
-        {
-            return;
-        }
+        if (!_isActive) return;
 
         _isActive = false;
         _workspace.SelectionChanged -= OnWorkspaceSelectionChanged;
@@ -171,11 +224,16 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         PreviewImage = null;
     }
 
-    /// <inheritdoc/>
-    public async Task RunQuickAsync(CancellationToken cancellationToken)
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+
+    object IShellProjectFeature.Snapshot()
     {
-        string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken).ConfigureAwait(false);
-        await RunWithStateAsync(() => RunPathAsync(path, true, cancellationToken));
+        return Snapshot();
+    }
+
+    void IShellProjectFeature.Install(object project)
+    {
+        Install((SliderPicturatorProject)project);
     }
 
     /// <summary>Opens the legacy image filter and loads the selected image.</summary>
@@ -184,10 +242,13 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     {
         try
         {
-            IReadOnlyList<string> paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+            var paths = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
             {
-                Title = "Select an image", AllowMultiple = false, Filters = [new FilePickerFilter(
-                    "All Image Files", ["*.bmp", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.tif", "*.tiff", "*.ico"])]
+                Title = "Select an image", AllowMultiple = false, Filters =
+                [
+                    new FilePickerFilter(
+                        "All Image Files", ["*.bmp", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.tif", "*.tiff", "*.ico"]),
+                ],
             });
             if (paths.Count > 0) PictureFile = paths[0];
         }
@@ -206,7 +267,11 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     }
 
     /// <summary>Removes the imported slider so duration uses the explicit field.</summary>
-    [RelayCommand] private void Remove() => SelectedSlider = null;
+    [RelayCommand]
+    private void Remove()
+    {
+        SelectedSlider = null;
+    }
 
     private async Task RefreshColorsAsync()
     {
@@ -217,38 +282,38 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         {
             string? path = await _currentBeatmap.FindCurrentBeatmapAsync(cancellation.Token);
             if (string.IsNullOrWhiteSpace(path)) return;
-            IReadOnlyList<RgbaColour> colours = await _picturator.GetAvailableColorsAsync(path, cancellation.Token);
+            var colours = await _picturator.GetAvailableColorsAsync(path, cancellation.Token);
             cancellation.Token.ThrowIfCancellationRequested();
             AvailableColors.Clear();
-            foreach (RgbaColour colour in colours) AvailableColors.Add(colour);
+            foreach (var colour in colours) AvailableColors.Add(colour);
             if (AvailableColors.Count > 0 && UseMapComboColors && !AvailableColors.Contains(ComboColor)) ComboColor = AvailableColors[0];
         }
         catch (OperationCanceledException) { }
         catch (Exception exception) { await PublishFailureAsync("Could not read map colours", "The current beatmap palette could not be loaded.", exception); }
         finally
         {
-            if (ReferenceEquals(_colorRefreshCancellation, cancellation))
-            {
-                _colorRefreshCancellation = null;
-            }
+            if (ReferenceEquals(_colorRefreshCancellation, cancellation)) _colorRefreshCancellation = null;
 
             cancellation.Dispose();
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override bool PrepareRun()
     {
-        try { Snapshot().Validate(); return true; }
-        catch (Exception exception) { _ = PublishFailureAsync("Slider Picturator cannot run", exception.Message, exception); return false; }
+        try
+        {
+            Snapshot().Validate();
+            return true;
+        }
+        catch (Exception exception)
+        {
+            _ = PublishFailureAsync("Slider Picturator cannot run", exception.Message, exception);
+            return false;
+        }
     }
 
-    string IQuickRun.OperationId => OperationId;
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
-    object IShellProjectFeature.Snapshot() => Snapshot();
-    void IShellProjectFeature.Install(object project) => Install((SliderPicturatorProject)project);
-
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
         string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
@@ -256,8 +321,16 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         await RunPathAsync(path, _settings.AlwaysQuickRun, CancellationToken.None);
     }
 
-    partial void OnPictureFileChanged(string value) => _ = LoadPreviewAsync(value);
-    partial void OnQualityChanged(int value) => _ = GeneratePreviewAsync();
+    partial void OnPictureFileChanged(string value)
+    {
+        _ = LoadPreviewAsync(value);
+    }
+
+    partial void OnQualityChanged(int value)
+    {
+        _ = GeneratePreviewAsync();
+    }
+
     partial void OnUseMapComboColorsChanged(bool value)
     {
         CurrentTrackColor = value ? ComboColor : TrackColorPickerColor;
@@ -265,32 +338,77 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         OnPropertyChanged(nameof(ShouldShowPalette));
         _ = GeneratePreviewAsync();
     }
-    partial void OnComboColorChanged(RgbaColour value) { if (UseMapComboColors) CurrentTrackColor = value; _ = GeneratePreviewAsync(); }
-    partial void OnCurrentTrackColorChanged(RgbaColour value) => _ = GeneratePreviewAsync();
-    partial void OnTrackColorPickerColorChanged(RgbaColour value) { if (!UseMapComboColors) CurrentTrackColor = value; }
-    partial void OnBorderColorChanged(RgbaColour value) => _ = GeneratePreviewAsync();
-    partial void OnBlackOnChanged(bool value) => _ = GeneratePreviewAsync();
-    partial void OnBorderOnChanged(bool value) => _ = GeneratePreviewAsync();
-    partial void OnRedOnChanged(bool value) => _ = GeneratePreviewAsync();
-    partial void OnGreenOnChanged(bool value) => _ = GeneratePreviewAsync();
-    partial void OnBlueOnChanged(bool value) => _ = GeneratePreviewAsync();
-    partial void OnAlphaOnChanged(bool value) => _ = GeneratePreviewAsync();
-    partial void OnSelectedSliderChanged(HitObject? value) => _ = GeneratePreviewAsync();
+
+    partial void OnComboColorChanged(RgbaColour value)
+    {
+        if (UseMapComboColors) CurrentTrackColor = value;
+        _ = GeneratePreviewAsync();
+    }
+
+    partial void OnCurrentTrackColorChanged(RgbaColour value)
+    {
+        _ = GeneratePreviewAsync();
+    }
+
+    partial void OnTrackColorPickerColorChanged(RgbaColour value)
+    {
+        if (!UseMapComboColors) CurrentTrackColor = value;
+    }
+
+    partial void OnBorderColorChanged(RgbaColour value)
+    {
+        _ = GeneratePreviewAsync();
+    }
+
+    partial void OnBlackOnChanged(bool value)
+    {
+        _ = GeneratePreviewAsync();
+    }
+
+    partial void OnBorderOnChanged(bool value)
+    {
+        _ = GeneratePreviewAsync();
+    }
+
+    partial void OnRedOnChanged(bool value)
+    {
+        _ = GeneratePreviewAsync();
+    }
+
+    partial void OnGreenOnChanged(bool value)
+    {
+        _ = GeneratePreviewAsync();
+    }
+
+    partial void OnBlueOnChanged(bool value)
+    {
+        _ = GeneratePreviewAsync();
+    }
+
+    partial void OnAlphaOnChanged(bool value)
+    {
+        _ = GeneratePreviewAsync();
+    }
+
+    partial void OnSelectedSliderChanged(HitObject? value)
+    {
+        _ = GeneratePreviewAsync();
+    }
 
     private async Task RunPathAsync(string? path, bool quick, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(path)) return;
-        SliderPicturatorProject options = Snapshot();
+        var options = Snapshot();
         await Execution.ExecuteAsync(new ToolExecutionRequest<SliderPicturatorResult>(OperationId, "Slider Picturator",
             async context =>
             {
-                SliderPicturatorResult result = await _picturator.PicturateAsync(path, options,
+                var result = await _picturator.PicturateAsync(path, options,
                     new Progress<double>(value => context.ReportProgress(value, "Generating slider picture")),
                     context.CancellationToken);
                 return new ToolExecutionOutput<SliderPicturatorResult>(
                     result,
                     quick ? null : "Done!",
-                    reloadEditor: quick);
+                    quick);
             }), CreateProgress(), cancellationToken);
         SegmentCount = options.SegmentCount;
     }
@@ -315,12 +433,9 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
 
         try
         {
-            RgbaImage image = await _images.LoadAsync(path, cancellation.Token);
+            var image = await _images.LoadAsync(path, cancellation.Token);
             cancellation.Token.ThrowIfCancellationRequested();
-            if (!string.Equals(PictureFile, path, StringComparison.Ordinal))
-            {
-                return;
-            }
+            if (!string.Equals(PictureFile, path, StringComparison.Ordinal)) return;
 
             _sourceImage = image;
             await GeneratePreviewAsync();
@@ -337,10 +452,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         }
         finally
         {
-            if (ReferenceEquals(_imageLoadCancellation, cancellation))
-            {
-                _imageLoadCancellation = null;
-            }
+            if (ReferenceEquals(_imageLoadCancellation, cancellation)) _imageLoadCancellation = null;
 
             cancellation.Dispose();
         }
@@ -352,13 +464,13 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         _previewCancellation?.Cancel();
         CancellationTokenSource cancellation = new();
         _previewCancellation = cancellation;
-        CancellationToken token = cancellation.Token;
+        var token = cancellation.Token;
         IsProcessingPreview = true;
         try
         {
             SliderPicturatorOptions options = Snapshot();
-            RgbaImage sourceImage = _sourceImage
-                ?? throw new InvalidOperationException("The preview source image was cleared.");
+            var sourceImage = _sourceImage
+                              ?? throw new InvalidOperationException("The preview source image was cleared.");
             (RgbaImage image, long segments) result = await Task.Run(() => SliderPicturatorEngine.Recolor(
                 sourceImage, options.CurrentTrackColor, options.BorderColor, RgbaColour.FromArgb(0, 0, 0, 0),
                 options.SelectedSlider, !options.BlackOn, !options.BorderOn, !options.AlphaOn,
@@ -381,31 +493,55 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         }
     }
 
-    private void OnWorkspaceSelectionChanged(object? sender, BeatmapSelectionChangedEventArgs eventArgs) =>
-        _ = RefreshColorsAsync();
-
-    private SliderPicturatorProject Snapshot() => new()
+    private void OnWorkspaceSelectionChanged(object? sender, BeatmapSelectionChangedEventArgs eventArgs)
     {
-        ViewportSize = ViewportSize, Quality = Quality, SegmentCount = SegmentCount, YResolution = YResolution,
-        SliderStartX = SliderStartX, SliderStartY = SliderStartY, ImageStartX = ImageStartX, ImageStartY = ImageStartY,
-        UseMapComboColors = UseMapComboColors, ComboColor = ComboColor, CurrentTrackColor = CurrentTrackColor,
-        TrackColorPickerColor = TrackColorPickerColor, BorderColor = BorderColor, TimeCode = TimeCode, Duration = Duration,
-        PictureFile = PictureFile, BlackOn = BlackOn, BorderOn = BorderOn, RedOn = RedOn, GreenOn = GreenOn,
-        BlueOn = BlueOn, AlphaOn = AlphaOn, SetBeatmapColors = SetBeatmapColors, SelectedSlider = SelectedSlider
-    };
+        _ = RefreshColorsAsync();
+    }
+
+    private SliderPicturatorProject Snapshot()
+    {
+        return new SliderPicturatorProject
+        {
+            ViewportSize = ViewportSize, Quality = Quality, SegmentCount = SegmentCount, YResolution = YResolution,
+            SliderStartX = SliderStartX, SliderStartY = SliderStartY, ImageStartX = ImageStartX, ImageStartY = ImageStartY,
+            UseMapComboColors = UseMapComboColors, ComboColor = ComboColor, CurrentTrackColor = CurrentTrackColor,
+            TrackColorPickerColor = TrackColorPickerColor, BorderColor = BorderColor, TimeCode = TimeCode, Duration = Duration,
+            PictureFile = PictureFile, BlackOn = BlackOn, BorderOn = BorderOn, RedOn = RedOn, GreenOn = GreenOn,
+            BlueOn = BlueOn, AlphaOn = AlphaOn, SetBeatmapColors = SetBeatmapColors, SelectedSlider = SelectedSlider,
+        };
+    }
 
     private void Install(SliderPicturatorProject project)
     {
         ArgumentNullException.ThrowIfNull(project);
-        ViewportSize = project.ViewportSize; Quality = project.Quality; SegmentCount = project.SegmentCount;
-        YResolution = project.YResolution; SliderStartX = project.SliderStartX; SliderStartY = project.SliderStartY;
-        ImageStartX = project.ImageStartX; ImageStartY = project.ImageStartY; UseMapComboColors = project.UseMapComboColors;
-        ComboColor = project.ComboColor; CurrentTrackColor = project.CurrentTrackColor; TrackColorPickerColor = project.TrackColorPickerColor;
-        BorderColor = project.BorderColor; TimeCode = project.TimeCode; Duration = project.Duration; PictureFile = project.PictureFile ?? string.Empty;
-        BlackOn = project.BlackOn; BorderOn = project.BorderOn; RedOn = project.RedOn; GreenOn = project.GreenOn;
-        BlueOn = project.BlueOn; AlphaOn = project.AlphaOn; SetBeatmapColors = project.SetBeatmapColors;
+        ViewportSize = project.ViewportSize;
+        Quality = project.Quality;
+        SegmentCount = project.SegmentCount;
+        YResolution = project.YResolution;
+        SliderStartX = project.SliderStartX;
+        SliderStartY = project.SliderStartY;
+        ImageStartX = project.ImageStartX;
+        ImageStartY = project.ImageStartY;
+        UseMapComboColors = project.UseMapComboColors;
+        ComboColor = project.ComboColor;
+        CurrentTrackColor = project.CurrentTrackColor;
+        TrackColorPickerColor = project.TrackColorPickerColor;
+        BorderColor = project.BorderColor;
+        TimeCode = project.TimeCode;
+        Duration = project.Duration;
+        PictureFile = project.PictureFile ?? string.Empty;
+        BlackOn = project.BlackOn;
+        BorderOn = project.BorderOn;
+        RedOn = project.RedOn;
+        GreenOn = project.GreenOn;
+        BlueOn = project.BlueOn;
+        AlphaOn = project.AlphaOn;
+        SetBeatmapColors = project.SetBeatmapColors;
     }
 
-    private Task PublishFailureAsync(string title, string message, Exception exception) => _notifications.PublishAsync(
-        new UserNotification(UserNotificationSeverity.Error, title, message, exception));
+    private Task PublishFailureAsync(string title, string message, Exception exception)
+    {
+        return _notifications.PublishAsync(
+            new UserNotification(UserNotificationSeverity.Error, title, message, exception));
+    }
 }

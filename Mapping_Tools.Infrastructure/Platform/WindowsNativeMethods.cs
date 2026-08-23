@@ -22,116 +22,7 @@ internal static class WindowsNativeMethods
 
     internal static readonly nint TopMostWindow = new(-1);
 
-    [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    internal delegate bool EnumWindowsCallback(nint window, nint data);
-
-    [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    internal delegate bool EnumMonitorsCallback(nint monitor, nint hdc, ref RECT bounds, nint data);
-
-    [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    internal delegate nint WindowProcedure(nint window, uint message, nint wParam, nint lParam);
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct POINT
-    {
-        internal int X;
-        internal int Y;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct RECT
-    {
-        internal int Left;
-        internal int Top;
-        internal int Right;
-        internal int Bottom;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct MONITORINFO
-    {
-        internal int Size;
-        internal RECT Monitor;
-        internal RECT Work;
-        internal uint Flags;
-    }
-
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    internal struct WNDCLASS
-    {
-        internal uint Style;
-        internal WindowProcedure? WindowProcedure;
-        internal int ClassExtra;
-        internal int WindowExtra;
-        internal nint Instance;
-        internal nint Icon;
-        internal nint Cursor;
-        internal nint Background;
-        internal string? MenuName;
-        internal string ClassName;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct PAINTSTRUCT
-    {
-        internal nint DeviceContext;
-        internal int Erase;
-        internal RECT Paint;
-        internal int Restore;
-        internal int IncUpdate;
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-        internal byte[]? Reserved;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct INPUT
-    {
-        internal uint Type;
-        internal INPUT_UNION Data;
-    }
-
-    [StructLayout(LayoutKind.Explicit)]
-    internal struct INPUT_UNION
-    {
-        [FieldOffset(0)]
-        internal MOUSEINPUT Mouse;
-
-        [FieldOffset(0)]
-        internal KEYBDINPUT Keyboard;
-
-        [FieldOffset(0)]
-        internal HARDWAREINPUT Hardware;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct MOUSEINPUT
-    {
-        internal int Dx;
-        internal int Dy;
-        internal uint MouseData;
-        internal uint Flags;
-        internal uint Time;
-        internal UIntPtr ExtraInfo;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct KEYBDINPUT
-    {
-        internal ushort VirtualKey;
-        internal ushort ScanCode;
-        internal uint Flags;
-        internal uint Time;
-        internal UIntPtr ExtraInfo;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct HARDWAREINPUT
-    {
-        internal uint Message;
-        internal ushort ParameterLow;
-        internal ushort ParameterHigh;
-    }
+    internal static int NativeInputSize => Marshal.SizeOf<INPUT>();
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -141,15 +32,13 @@ internal static class WindowsNativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool SetCursorPos(int x, int y);
 
-    internal static int NativeInputSize => Marshal.SizeOf<INPUT>();
-
     internal static (uint Sent, int Error) SendKeyboardInput(
         byte virtualKey,
         bool keyUp)
     {
         INPUT[] nativeInputs =
         [
-            new INPUT
+            new()
             {
                 Type = InputKeyboard,
                 Data = new INPUT_UNION
@@ -157,10 +46,10 @@ internal static class WindowsNativeMethods
                     Keyboard = new KEYBDINPUT
                     {
                         VirtualKey = virtualKey,
-                        Flags = keyUp ? KeyboardKeyUp : 0
-                    }
-                }
-            }
+                        Flags = keyUp ? KeyboardKeyUp : 0,
+                    },
+                },
+            },
         ];
         uint sent = SendInput(1, nativeInputs, NativeInputSize);
         return (sent, sent == 1 ? 0 : Marshal.GetLastWin32Error());
@@ -300,4 +189,112 @@ internal static class WindowsNativeMethods
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool FrameRect(nint deviceContext, ref RECT rectangle, nint brush);
+
+    [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+    internal delegate bool EnumWindowsCallback(nint window, nint data);
+
+    [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+    internal delegate bool EnumMonitorsCallback(nint monitor, nint hdc, ref RECT bounds, nint data);
+
+    [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+    internal delegate nint WindowProcedure(nint window, uint message, nint wParam, nint lParam);
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct POINT
+    {
+        internal int X;
+        internal int Y;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct RECT
+    {
+        internal int Left;
+        internal int Top;
+        internal int Right;
+        internal int Bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct MONITORINFO
+    {
+        internal int Size;
+        internal RECT Monitor;
+        internal RECT Work;
+        internal uint Flags;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    internal struct WNDCLASS
+    {
+        internal uint Style;
+        internal WindowProcedure? WindowProcedure;
+        internal int ClassExtra;
+        internal int WindowExtra;
+        internal nint Instance;
+        internal nint Icon;
+        internal nint Cursor;
+        internal nint Background;
+        internal string? MenuName;
+        internal string ClassName;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct PAINTSTRUCT
+    {
+        internal nint DeviceContext;
+        internal int Erase;
+        internal RECT Paint;
+        internal int Restore;
+        internal int IncUpdate;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+        internal byte[]? Reserved;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct INPUT
+    {
+        internal uint Type;
+        internal INPUT_UNION Data;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    internal struct INPUT_UNION
+    {
+        [FieldOffset(0)] internal MOUSEINPUT Mouse;
+
+        [FieldOffset(0)] internal KEYBDINPUT Keyboard;
+
+        [FieldOffset(0)] internal HARDWAREINPUT Hardware;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct MOUSEINPUT
+    {
+        internal int Dx;
+        internal int Dy;
+        internal uint MouseData;
+        internal uint Flags;
+        internal uint Time;
+        internal UIntPtr ExtraInfo;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct KEYBDINPUT
+    {
+        internal ushort VirtualKey;
+        internal ushort ScanCode;
+        internal uint Flags;
+        internal uint Time;
+        internal UIntPtr ExtraInfo;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct HARDWAREINPUT
+    {
+        internal uint Message;
+        internal ushort ParameterLow;
+        internal ushort ParameterHigh;
+    }
 }

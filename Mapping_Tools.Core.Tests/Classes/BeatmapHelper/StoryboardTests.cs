@@ -4,9 +4,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Core.Tests.Classes.BeatmapHelper;
 
 [TestClass]
-public class StoryboardTests {
+public class StoryboardTests
+{
     [TestMethod]
-    public void ParseAndSerialize_PreservesStoryboardFileExactly() {
+    public void ParseAndSerialize_PreservesStoryboardFileExactly()
+    {
         // Arrange
         const string path = "Resources\\TestStoryboard.osb";
         string expectedContent = File.ReadAllText(path);
@@ -21,12 +23,14 @@ public class StoryboardTests {
     }
 
     [TestMethod]
-    public void Parse_InvalidBreakTime_ThrowsBeatmapParsingException() {
+    public void Parse_InvalidBreakTime_ThrowsBeatmapParsingException()
+    {
         // Arrange
-        var lines = new List<string> {
+        var lines = new List<string>
+        {
             "[Events]",
             "//Break Periods",
-            "2,not-a-time,2000"
+            "2,not-a-time,2000",
         };
 
         // Act

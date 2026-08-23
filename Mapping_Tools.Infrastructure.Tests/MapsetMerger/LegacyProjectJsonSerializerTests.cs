@@ -1,8 +1,8 @@
-using FluentAssertions;
-using Mapping_Tools.Application.MapsetMerger;
 using Mapping_Tools.Application.HitsoundStudio;
+using Mapping_Tools.Application.MapsetMerger;
 using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.TumourGenerator;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -17,21 +17,21 @@ public sealed class LegacyProjectJsonSerializerTests
     {
         // Arrange
         const string json = """
-            {
-              "$type": "Mapping_Tools.Viewmodels.HitsoundStudioVm, Mapping Tools",
-              "BaseBeatmap": "C:\\Maps\\base.osu",
-              "ExportFolder": "C:\\Export",
-              "HitsoundDiffName": "Hitsounds",
-              "ExportMap": true,
-              "ExportSamples": true,
-              "UsePreviousSampleSchema": false,
-              "HitsoundLayers": []
-            }
-            """;
+                            {
+                              "$type": "Mapping_Tools.Viewmodels.HitsoundStudioVm, Mapping Tools",
+                              "BaseBeatmap": "C:\\Maps\\base.osu",
+                              "ExportFolder": "C:\\Export",
+                              "HitsoundDiffName": "Hitsounds",
+                              "ExportMap": true,
+                              "ExportSamples": true,
+                              "UsePreviousSampleSchema": false,
+                              "HitsoundLayers": []
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundStudioProject project = serializer.Deserialize<HitsoundStudioProject>(json);
+        var project = serializer.Deserialize<HitsoundStudioProject>(json);
 
         // Assert
         project.BaseBeatmap.Should().Be("C:\\Maps\\base.osu");
@@ -61,12 +61,12 @@ public sealed class LegacyProjectJsonSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundStudioProject project = serializer.Deserialize<HitsoundStudioProject>(json);
+        var project = serializer.Deserialize<HitsoundStudioProject>(json);
 
         // Assert
         project.ShowResults.Should().BeTrue();
         project.DeleteAllInExportFirst.Should().BeTrue();
-        project.DefaultSample.SampleSet.Should().Be(Mapping_Tools.Core.Classes.BeatmapHelper.Enums.SampleSet.Soft);
+        project.DefaultSample.SampleSet.Should().Be(SampleSet.Soft);
         project.PreviousSampleSchema.Should().ContainKey("normal-hitnormal2");
         project.PreviousSampleSchema!["normal-hitnormal2"].Should().ContainSingle();
     }
@@ -76,23 +76,23 @@ public sealed class LegacyProjectJsonSerializerTests
     {
         // Arrange
         const string json = """
-            {
-              "$type": "Mapping_Tools.Viewmodels.MapsetMergerVm, Mapping Tools",
-              "ExportPath": "C:\\Export",
-              "MoveSbToBeatmap": true,
-              "Mapsets": [
-                {
-                  "$type": "Mapping_Tools.Viewmodels.MapsetMergerVm+MapsetItem, Mapping Tools",
-                  "Name": "Pack",
-                  "Path": "C:\\Pack"
-                }
-              ]
-            }
-            """;
+                            {
+                              "$type": "Mapping_Tools.Viewmodels.MapsetMergerVm, Mapping Tools",
+                              "ExportPath": "C:\\Export",
+                              "MoveSbToBeatmap": true,
+                              "Mapsets": [
+                                {
+                                  "$type": "Mapping_Tools.Viewmodels.MapsetMergerVm+MapsetItem, Mapping Tools",
+                                  "Name": "Pack",
+                                  "Path": "C:\\Pack"
+                                }
+                              ]
+                            }
+                            """;
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        MapsetMergerProject project = serializer.Deserialize<MapsetMergerProject>(json);
+        var project = serializer.Deserialize<MapsetMergerProject>(json);
 
         // Assert
         project.ExportPath.Should().Be("C:\\Export");
@@ -114,7 +114,7 @@ public sealed class LegacyProjectJsonSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        MapsetMergerProject project = serializer.Deserialize<MapsetMergerProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<MapsetMergerProject>(File.ReadAllText(fixture));
 
         // Assert
         project.ExportPath.Should().Contain("Mapping Tools");
@@ -132,7 +132,7 @@ public sealed class LegacyProjectJsonSerializerTests
         MapsetMergerProject project = new()
         {
             ExportPath = "C:\\Export",
-            Mapsets = [new() { Name = "Pack", Path = "C:\\Pack" }]
+            Mapsets = [new MapsetMergerProject.MapsetItem { Name = "Pack", Path = "C:\\Pack" }],
         };
         LegacyProjectJsonSerializer serializer = new();
 
@@ -157,7 +157,7 @@ public sealed class LegacyProjectJsonSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        TumourGeneratorProject project = serializer.Deserialize<TumourGeneratorProject>(json);
+        var project = serializer.Deserialize<TumourGeneratorProject>(json);
 
         // Assert
         project.TumourLayers.Should().ContainSingle();
@@ -180,7 +180,7 @@ public sealed class LegacyProjectJsonSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        SlideratorProject project = serializer.Deserialize<SlideratorProject>(json);
+        var project = serializer.Deserialize<SlideratorProject>(json);
 
         // Assert
         project.GraphState.Anchors.Should().HaveCount(3);

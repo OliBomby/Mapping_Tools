@@ -8,8 +8,8 @@ using Mapping_Tools.Core.Classes.MathUtil;
 namespace Mapping_Tools.Desktop.Controls;
 
 /// <summary>
-/// Draws one osu! hit object and its optional slider annotations inside the
-/// available control bounds.
+///     Draws one osu! hit object and its optional slider annotations inside the
+///     available control bounds.
 /// </summary>
 public sealed class ObjectVisualiserControl : Control
 {
@@ -24,12 +24,6 @@ public sealed class ObjectVisualiserControl : Control
 
     /// <summary>Maximum number of source slider anchors accepted before path construction is skipped.</summary>
     public const int HardMaxAnchorCount = 5000;
-
-    private SliderPath? sliderPath;
-    private IReadOnlyList<Vector2> controlPoints = [];
-    private IReadOnlyList<Vector2> pathPoints = [];
-    private Rect contentBounds = new(0, 0, 1, 1);
-    private double scale = 1;
 
     /// <summary>Identifies the hit object drawn by the control.</summary>
     public static readonly StyledProperty<HitObject?> HitObjectProperty =
@@ -75,6 +69,13 @@ public sealed class ObjectVisualiserControl : Control
     public static readonly StyledProperty<IReadOnlyList<ObjectVisualiserMarker>> ExtraMarkersProperty =
         AvaloniaProperty.Register<ObjectVisualiserControl, IReadOnlyList<ObjectVisualiserMarker>>(
             nameof(ExtraMarkers), []);
+
+    private Rect contentBounds = new(0, 0, 1, 1);
+    private IReadOnlyList<Vector2> controlPoints = [];
+    private IReadOnlyList<Vector2> pathPoints = [];
+    private double scale = 1;
+
+    private SliderPath? sliderPath;
 
     static ObjectVisualiserControl()
     {
@@ -181,34 +182,29 @@ public sealed class ObjectVisualiserControl : Control
         set => SetValue(ExtraMarkersProperty, value);
     }
 
-    /// <inheritdoc/>
-    protected override Size MeasureOverride(Size availableSize) => new(
-        double.IsInfinity(availableSize.Width) ? 100 : availableSize.Width,
-        double.IsInfinity(availableSize.Height) ? 100 : availableSize.Height);
-
-    /// <inheritdoc/>
-    public override void Render(DrawingContext context)
-    {
-        base.Render(context);
-        if (HitObject is null)
-        {
-            return;
-        }
-
-        using IDisposable clip = context.PushClip(new Rect(Bounds.Size));
-        if (HitObject.IsSlider && sliderPath is not null)
-        {
-            DrawSlider(context);
-        }
-        else if (HitObject.IsCircle)
-        {
-            DrawCircle(context, Fill, GetOutlinePen(), HitObject.Pos, ThicknessWithoutOutline / 2);
-        }
-    }
-
     private double ThicknessWithoutOutline => (1 - BorderThickness) * Thickness;
 
     private double ThicknessInsideOutline => (1 - BorderThickness * 2) * Thickness;
+
+    /// <inheritdoc />
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        return new Size(
+            double.IsInfinity(availableSize.Width) ? 100 : availableSize.Width,
+            double.IsInfinity(availableSize.Height) ? 100 : availableSize.Height);
+    }
+
+    /// <inheritdoc />
+    public override void Render(DrawingContext context)
+    {
+        base.Render(context);
+        if (HitObject is null) return;
+
+        using IDisposable clip = context.PushClip(new Rect(Bounds.Size));
+        if (HitObject.IsSlider && sliderPath is not null)
+            DrawSlider(context);
+        else if (HitObject.IsCircle) DrawCircle(context, Fill, GetOutlinePen(), HitObject.Pos, ThicknessWithoutOutline / 2);
+    }
 
     private void SetHitObject()
     {
@@ -223,17 +219,13 @@ public sealed class ObjectVisualiserControl : Control
             return;
         }
 
-        if (HitObject.IsSlider &&
-            HitObject.PixelLength < MaxPixelLength &&
-            HitObject.CurvePoints is not null &&
-            HitObject.CurvePoints.Count < HardMaxAnchorCount)
-        {
+        if (HitObject.IsSlider && HitObject.PixelLength < MaxPixelLength && HitObject.CurvePoints is not null && HitObject.CurvePoints.Count < HardMaxAnchorCount)
             try
             {
                 double? customLength = CustomPixelLength is { } value && double.IsFinite(value) && value >= 0
                     ? value
                     : null;
-                SliderPath path = customLength is null
+                var path = customLength is null
                     ? HitObject.GetSliderPath()
                     : new SliderPath(HitObject.SliderType, HitObject.GetAllCurvePoints().ToArray(), customLength);
                 if (path.CalculatedPath.Count <= MaxSegmentCount)
@@ -247,7 +239,6 @@ public sealed class ObjectVisualiserControl : Control
             {
                 // A malformed or extreme slider is simply not drawn.
             }
-        }
 
         UpdateBounds();
     }
@@ -290,23 +281,17 @@ public sealed class ObjectVisualiserControl : Control
 
     private void DrawSlider(DrawingContext context)
     {
-        Pen? pathOutlinePen = Stroke is null ? null : new Pen(Stroke, Thickness * scale);
-        Pen? pathFillPen = Fill is null ? null : new Pen(Fill, ThicknessInsideOutline * scale);
-        if (pathOutlinePen is not null)
-        {
-            DrawPolyline(context, pathOutlinePen);
-        }
+        var pathOutlinePen = Stroke is null ? null : new Pen(Stroke, Thickness * scale);
+        var pathFillPen = Fill is null ? null : new Pen(Fill, ThicknessInsideOutline * scale);
+        if (pathOutlinePen is not null) DrawPolyline(context, pathOutlinePen);
 
-        if (pathFillPen is not null)
-        {
-            DrawPolyline(context, pathFillPen);
-        }
+        if (pathFillPen is not null) DrawPolyline(context, pathFillPen);
 
         DrawCircleAtProgress(context, Fill, GetOutlinePen(), 0);
         DrawCircleAtProgress(context, Fill, GetOutlinePen(), 1);
         if (Progress is >= 0 and <= 1)
         {
-            Pen? sliderBallPen = SliderBallStroke is null
+            var sliderBallPen = SliderBallStroke is null
                 ? null
                 : new Pen(SliderBallStroke, Thickness * BorderThickness * scale);
             DrawCircleAtProgress(context, Fill, sliderBallPen, Progress);
@@ -316,12 +301,9 @@ public sealed class ObjectVisualiserControl : Control
         {
             Pen connectorPen = new(Brushes.White, scale);
             Pen outlinePen = new(Brushes.Black, scale);
-            for (var index = 0; index < controlPoints.Count - 1; index++)
-            {
-                context.DrawLine(connectorPen, ToPoint(controlPoints[index]), ToPoint(controlPoints[index + 1]));
-            }
+            for (int index = 0; index < controlPoints.Count - 1; index++) context.DrawLine(connectorPen, ToPoint(controlPoints[index]), ToPoint(controlPoints[index + 1]));
 
-            for (var index = 0; index < controlPoints.Count; index++)
+            for (int index = 0; index < controlPoints.Count; index++)
             {
                 IBrush brush = index != 0 && controlPoints[index] == controlPoints[index - 1]
                     ? Brushes.Red
@@ -331,23 +313,19 @@ public sealed class ObjectVisualiserControl : Control
         }
 
         Pen markerOutlinePen = new(Brushes.Black, scale);
-        foreach (ObjectVisualiserMarker marker in ExtraMarkers)
-        {
+        foreach (var marker in ExtraMarkers)
             if (marker.Brush is not null && marker.Progress is >= 0 and <= 1)
-            {
                 DrawSquare(context, marker.Brush, markerOutlinePen, sliderPath!.Value.PositionAt(marker.Progress), marker.Size);
-            }
-        }
     }
 
-    private Pen? GetOutlinePen() => Stroke is null ? null : new Pen(Stroke, Thickness * BorderThickness * scale);
+    private Pen? GetOutlinePen()
+    {
+        return Stroke is null ? null : new Pen(Stroke, Thickness * BorderThickness * scale);
+    }
 
     private void DrawPolyline(DrawingContext context, Pen pen)
     {
-        for (var index = 1; index < pathPoints.Count; index++)
-        {
-            context.DrawLine(pen, ToPoint(pathPoints[index - 1]), ToPoint(pathPoints[index]));
-        }
+        for (int index = 1; index < pathPoints.Count; index++) context.DrawLine(pen, ToPoint(pathPoints[index - 1]), ToPoint(pathPoints[index]));
     }
 
     private void DrawCircleAtProgress(DrawingContext context, IBrush? fill, Pen? pen, double progress)
@@ -357,23 +335,23 @@ public sealed class ObjectVisualiserControl : Control
 
     private void DrawCircle(DrawingContext context, IBrush? fill, Pen? pen, Vector2 position, double radius)
     {
-        if (fill is null && pen is null)
-        {
-            return;
-        }
+        if (fill is null && pen is null) return;
 
         context.DrawEllipse(fill, pen, ToPoint(position), radius * scale, radius * scale);
     }
 
     private void DrawSquare(DrawingContext context, IBrush fill, Pen outline, Vector2 position, double size)
     {
-        Point point = ToPoint(position);
+        var point = ToPoint(position);
         double scaledSize = size * scale;
         context.DrawRectangle(fill, outline,
             new Rect(point.X - scaledSize / 2, point.Y - scaledSize / 2, scaledSize, scaledSize));
     }
 
-    private Point ToPoint(Vector2 position) => new(
-        (position.X - contentBounds.Left) * scale,
-        (position.Y - contentBounds.Top) * scale);
+    private Point ToPoint(Vector2 position)
+    {
+        return new Point(
+            (position.X - contentBounds.Left) * scale,
+            (position.Y - contentBounds.Top) * scale);
+    }
 }

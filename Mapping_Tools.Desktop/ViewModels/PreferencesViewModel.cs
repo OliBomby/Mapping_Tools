@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
-using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
@@ -13,58 +12,50 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Edits the process-lifetime settings document and applies live-only side
-/// effects without exposing Avalonia controls or storage-provider objects.
+///     Edits the process-lifetime settings document and applies live-only side
+///     effects without exposing Avalonia controls or storage-provider objects.
 /// </summary>
 public sealed partial class PreferencesViewModel : ObservableValidator, IShellFeatureActivation
 {
     private const string CurrentTool = "<Current Tool>";
-
-    private readonly ApplicationSettings _settings;
+    private readonly IBetterSaveOverrideService _betterSaveOverride;
     private readonly IFilePicker _filePicker;
-    private readonly IApplicationThemeService _themeService;
+    private readonly IHotkeyBindingCoordinator _hotkeyBindings;
     private readonly IUserNotificationService _notifications;
     private readonly IQuickRunCommandRegistry _quickRunRegistry;
-    private readonly IHotkeyBindingCoordinator _hotkeyBindings;
-    private readonly IBetterSaveOverrideService _betterSaveOverride;
-    private IReadOnlyList<string> _noneQuickRunTools = [CurrentTool];
-    private IReadOnlyList<string> _singleQuickRunTools = [CurrentTool];
-    private IReadOnlyList<string> _multipleQuickRunTools = [CurrentTool];
 
-    /// <summary>Gets or edits the directory containing the osu! executable.</summary>
-    [ObservableProperty]
-    [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "Select a path.")]
-    private string _osuPath;
-
-    /// <summary>Gets or edits osu!'s beatmap-library directory.</summary>
-    [ObservableProperty]
-    [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "Select a path.")]
-    private string _songsPath;
-
-    /// <summary>Gets or edits the current user's osu! configuration file.</summary>
-    [ObservableProperty]
-    [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "Select a path.")]
-    private string _osuConfigPath;
+    private readonly ApplicationSettings _settings;
+    private readonly IApplicationThemeService _themeService;
 
     /// <summary>Gets or edits the directory that receives beatmap backups.</summary>
-    [ObservableProperty]
-    [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "Select a path.")]
+    [ObservableProperty] [NotifyDataErrorInfo] [Required(ErrorMessage = "Select a path.")]
     private string _backupsPath;
 
     /// <summary>Gets or edits the retained-backup limit as a typed count.</summary>
-    [ObservableProperty]
-    private int _maxBackupFiles;
+    [ObservableProperty] private int _maxBackupFiles;
+
+    private IReadOnlyList<string> _multipleQuickRunTools = [CurrentTool];
+    private IReadOnlyList<string> _noneQuickRunTools = [CurrentTool];
+
+    /// <summary>Gets or edits the current user's osu! configuration file.</summary>
+    [ObservableProperty] [NotifyDataErrorInfo] [Required(ErrorMessage = "Select a path.")]
+    private string _osuConfigPath;
+
+    /// <summary>Gets or edits the directory containing the osu! executable.</summary>
+    [ObservableProperty] [NotifyDataErrorInfo] [Required(ErrorMessage = "Select a path.")]
+    private string _osuPath;
 
     /// <summary>Gets or edits the periodic-backup interval as a typed duration.</summary>
-    [ObservableProperty]
-    private TimeSpan _periodicBackupInterval;
+    [ObservableProperty] private TimeSpan _periodicBackupInterval;
+
+    private IReadOnlyList<string> _singleQuickRunTools = [CurrentTool];
+
+    /// <summary>Gets or edits osu!'s beatmap-library directory.</summary>
+    [ObservableProperty] [NotifyDataErrorInfo] [Required(ErrorMessage = "Select a path.")]
+    private string _songsPath;
 
     /// <summary>
-    /// Creates an editor over the process-lifetime settings document.
+    ///     Creates an editor over the process-lifetime settings document.
     /// </summary>
     /// <param name="settings">The mutable document shared by desktop services.</param>
     /// <param name="filePicker">Presents native folder and configuration-file pickers.</param>
@@ -129,7 +120,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
             value,
             _settings,
             static (settings, enabled) => settings.MakeBackups = enabled,
-            validate: false);
+            false);
     }
 
     /// <summary>Gets or sets whether the background backup timer is enabled.</summary>
@@ -141,11 +132,11 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
             value,
             _settings,
             static (settings, enabled) => settings.MakePeriodicBackups = enabled,
-            validate: false);
+            false);
     }
 
     /// <summary>
-    /// Gets or sets whether general file pickers begin beside the current beatmap.
+    ///     Gets or sets whether general file pickers begin beside the current beatmap.
     /// </summary>
     public bool CurrentBeatmapDefaultFolder
     {
@@ -155,7 +146,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
             value,
             _settings,
             static (settings, enabled) => settings.CurrentBeatmapDefaultFolder = enabled,
-            validate: false);
+            false);
     }
 
     /// <summary>Gets or sets whether live editor memory may be read.</summary>
@@ -167,7 +158,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
             value,
             _settings,
             static (settings, enabled) => settings.UseEditorReader = enabled,
-            validate: false);
+            false);
     }
 
     /// <summary>Gets or sets whether Mapping Tools overwrites osu!'s own save with BetterSave.</summary>
@@ -181,10 +172,8 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
                     value,
                     _settings,
                     static (settings, enabled) => settings.OverrideOsuSave = enabled,
-                    validate: false))
-            {
+                    false))
                 _betterSaveOverride.Configure(_settings.SongsPath, value);
-            }
         }
     }
 
@@ -197,7 +186,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
             value,
             _settings,
             static (settings, enabled) => settings.AutoReload = enabled,
-            validate: false);
+            false);
     }
 
     /// <summary>Gets or sets whether ordinary Run actions use each feature's QuickRun path.</summary>
@@ -209,7 +198,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
             value,
             _settings,
             static (settings, enabled) => settings.AlwaysQuickRun = enabled,
-            validate: false);
+            false);
     }
 
     /// <summary>Gets or sets whether QuickRun routes by the live selected-object count.</summary>
@@ -221,7 +210,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
             value,
             _settings,
             static (settings, enabled) => settings.SmartQuickRunEnabled = enabled,
-            validate: false);
+            false);
     }
 
     /// <summary>Gets or sets the target used when no hit objects are selected.</summary>
@@ -298,56 +287,70 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
                     value,
                     _settings,
                     static (settings, theme) => settings.Theme = theme,
-                    validate: false))
-            {
+                    false))
                 _themeService.Apply(value);
-            }
         }
     }
 
-    partial void OnOsuPathChanged(string value) =>
-        ApplyValidatedValue(value, static (settings, path) => settings.OsuPath = path, nameof(OsuPath));
-
-    partial void OnSongsPathChanged(string value)
+    /// <inheritdoc />
+    public void Activate()
     {
-        ApplyValidatedValue(value, static (settings, path) => settings.SongsPath = path, nameof(SongsPath));
-        if (!GetErrors(nameof(SongsPath)).Cast<object>().Any())
-        {
-            _betterSaveOverride.Configure(value, _settings.OverrideOsuSave);
-        }
+        RefreshQuickRunTools();
     }
 
-    partial void OnOsuConfigPathChanged(string value) =>
-        ApplyValidatedValue(value, static (settings, path) => settings.OsuConfigPath = path, nameof(OsuConfigPath));
-
-    partial void OnBackupsPathChanged(string value) =>
-        ApplyValidatedValue(value, static (settings, path) => settings.BackupsPath = path, nameof(BackupsPath));
-
-    partial void OnMaxBackupFilesChanged(int value) =>
-        ApplyValidatedValue(value, static (settings, count) => settings.MaxBackupFiles = count, nameof(MaxBackupFiles));
-
-    partial void OnPeriodicBackupIntervalChanged(TimeSpan value) =>
-        ApplyValidatedValue(value, static (settings, interval) => settings.PeriodicBackupInterval = interval, nameof(PeriodicBackupInterval));
-
-    /// <inheritdoc/>
-    public void Activate() => RefreshQuickRunTools();
-
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Deactivate()
     {
     }
 
-    [RelayCommand]
-    private Task BrowseOsuPathAsync() =>
-        PickFolderAsync("Select the osu! folder", OsuPath, path => OsuPath = path);
+    partial void OnOsuPathChanged(string value)
+    {
+        ApplyValidatedValue(value, static (settings, path) => settings.OsuPath = path, nameof(OsuPath));
+    }
+
+    partial void OnSongsPathChanged(string value)
+    {
+        ApplyValidatedValue(value, static (settings, path) => settings.SongsPath = path, nameof(SongsPath));
+        if (!GetErrors(nameof(SongsPath)).Cast<object>().Any()) _betterSaveOverride.Configure(value, _settings.OverrideOsuSave);
+    }
+
+    partial void OnOsuConfigPathChanged(string value)
+    {
+        ApplyValidatedValue(value, static (settings, path) => settings.OsuConfigPath = path, nameof(OsuConfigPath));
+    }
+
+    partial void OnBackupsPathChanged(string value)
+    {
+        ApplyValidatedValue(value, static (settings, path) => settings.BackupsPath = path, nameof(BackupsPath));
+    }
+
+    partial void OnMaxBackupFilesChanged(int value)
+    {
+        ApplyValidatedValue(value, static (settings, count) => settings.MaxBackupFiles = count, nameof(MaxBackupFiles));
+    }
+
+    partial void OnPeriodicBackupIntervalChanged(TimeSpan value)
+    {
+        ApplyValidatedValue(value, static (settings, interval) => settings.PeriodicBackupInterval = interval, nameof(PeriodicBackupInterval));
+    }
 
     [RelayCommand]
-    private Task BrowseSongsPathAsync() =>
-        PickFolderAsync("Select the osu! Songs folder", SongsPath, path => SongsPath = path);
+    private Task BrowseOsuPathAsync()
+    {
+        return PickFolderAsync("Select the osu! folder", OsuPath, path => OsuPath = path);
+    }
 
     [RelayCommand]
-    private Task BrowseBackupsPathAsync() =>
-        PickFolderAsync("Select the Mapping Tools backups folder", BackupsPath, path => BackupsPath = path);
+    private Task BrowseSongsPathAsync()
+    {
+        return PickFolderAsync("Select the osu! Songs folder", SongsPath, path => SongsPath = path);
+    }
+
+    [RelayCommand]
+    private Task BrowseBackupsPathAsync()
+    {
+        return PickFolderAsync("Select the Mapping Tools backups folder", BackupsPath, path => BackupsPath = path);
+    }
 
     private void ApplyValidatedValue<T>(
         T value,
@@ -355,10 +358,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
         string propertyName)
     {
         ValidationContext context = new(this) { MemberName = propertyName };
-        if (Validator.TryValidateProperty(value, context, null))
-        {
-            apply(_settings, value);
-        }
+        if (Validator.TryValidateProperty(value, context, null)) apply(_settings, value);
     }
 
     private async Task PickFolderAsync(
@@ -368,17 +368,14 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     {
         try
         {
-            IReadOnlyList<string> paths = await _filePicker.PickFoldersAsync(
+            var paths = await _filePicker.PickFoldersAsync(
                 new OpenFolderPickerRequest
                 {
                     Title = title,
                     SuggestedStartLocation = startLocation,
-                    AllowMultiple = false
+                    AllowMultiple = false,
                 });
-            if (paths.Count > 0)
-            {
-                apply(paths[0]);
-            }
+            if (paths.Count > 0) apply(paths[0]);
         }
         catch (OperationCanceledException)
         {
@@ -397,18 +394,15 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     {
         try
         {
-            IReadOnlyList<string> paths = await _filePicker.PickOpenFilesAsync(
+            var paths = await _filePicker.PickOpenFilesAsync(
                 new OpenFilePickerRequest
                 {
                     Title = "Select the osu! user configuration file",
                     SuggestedStartLocation = OsuPath,
                     AllowMultiple = false,
-                    Filters = [CommonFilePickerFilters.OsuConfiguration]
+                    Filters = [CommonFilePickerFilters.OsuConfiguration],
                 });
-            if (paths.Count > 0)
-            {
-                OsuConfigPath = paths[0];
-            }
+            if (paths.Count > 0) OsuConfigPath = paths[0];
         }
         catch (OperationCanceledException)
         {
@@ -425,12 +419,14 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     private Task PublishFailureAsync(
         string title,
         string message,
-        Exception exception) =>
-        _notifications.PublishAsync(new UserNotification(
+        Exception exception)
+    {
+        return _notifications.PublishAsync(new UserNotification(
             UserNotificationSeverity.Error,
             title,
             message,
             exception));
+    }
 
     private void RefreshQuickRunTools()
     {
@@ -439,24 +435,24 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
         MultipleQuickRunTools = GetQuickRunTools(QuickRunTargets.MultipleSelection);
     }
 
-    private IReadOnlyList<string> GetQuickRunTools(QuickRunTargets target) =>
+    private IReadOnlyList<string> GetQuickRunTools(QuickRunTargets target)
+    {
+        return
         [
             CurrentTool,
             .. _quickRunRegistry.GetCommandsFor(target)
-                .Select(command => command.DisplayName)
+                .Select(command => command.DisplayName),
         ];
+    }
 
     private void SetQuickRunTarget(
         string current,
         string value,
         Action<ApplicationSettings, string> apply)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return;
-        }
+        if (string.IsNullOrWhiteSpace(value)) return;
 
-        SetProperty(current, value, _settings, apply, validate: false);
+        SetProperty(current, value, _settings, apply, false);
     }
 
     private void SetHotkey(
@@ -465,9 +461,6 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
         Action<ApplicationSettings, HotkeySettings?> apply,
         Action<HotkeySettings?> applyBinding)
     {
-        if (SetProperty(current, value, _settings, apply, validate: false))
-        {
-            applyBinding(value);
-        }
+        if (SetProperty(current, value, _settings, apply, false)) applyBinding(value);
     }
 }

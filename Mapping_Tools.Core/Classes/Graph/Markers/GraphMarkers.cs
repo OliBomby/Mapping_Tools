@@ -9,7 +9,7 @@ public enum GraphMarkerOrientation
     Horizontal,
 
     /// <summary>A vertical line representing an X value.</summary>
-    Vertical
+    Vertical,
 }
 
 /// <summary>Describes marker geometry and snapping semantics without a UI brush type.</summary>
@@ -105,7 +105,7 @@ public sealed class DoubleMarkerGenerator : IGraphMarkerGenerator
         double step = Step;
         while ((end - start) / step > maxMarkers) step *= 2;
         double first = Math.Ceiling((start - Offset) / step) * step + Offset;
-        for (var index = 0; ; index++)
+        for (int index = 0;; index++)
         {
             double value = first + step * index;
             if (value > end + Precision.DoubleEpsilon) yield break;
@@ -114,7 +114,7 @@ public sealed class DoubleMarkerGenerator : IGraphMarkerGenerator
                 Orientation = orientation,
                 Value = value,
                 Text = $"{value:g2}{Unit}",
-                Snappable = Snappable
+                Snappable = Snappable,
             };
         }
     }
@@ -150,7 +150,7 @@ public sealed class DividedBeatMarkerGenerator : IGraphMarkerGenerator
         double step = 1d / BeatDivisor;
         while ((end - start) / step > maxMarkers) step *= 2;
         double first = Math.Ceiling(start / step) * step;
-        for (var index = 0; ; index++)
+        for (int index = 0;; index++)
         {
             double value = first + step * index;
             if (value > end + Precision.DoubleEpsilon) yield break;
@@ -162,7 +162,7 @@ public sealed class DividedBeatMarkerGenerator : IGraphMarkerGenerator
                 DrawMarker = true,
                 MarkerColorArgb = color,
                 MarkerLength = length,
-                Snappable = Snappable
+                Snappable = Snappable,
             };
         }
     }
@@ -223,7 +223,7 @@ public sealed class CustomMarkerGenerator : IGraphMarkerGenerator
         }
 
         double first = Math.Ceiling((start - Offset) / step) * step + Offset;
-        for (var index = 0; ; index++)
+        for (int index = 0;; index++)
         {
             double value = first + step * index;
             if (value > end + Precision.DoubleEpsilon) yield break;
@@ -235,7 +235,7 @@ public sealed class CustomMarkerGenerator : IGraphMarkerGenerator
                 Snappable = Snappable,
                 DrawMarker = DrawMarker,
                 MarkerLength = MarkerLength,
-                MarkerColorArgb = MarkerColorArgb
+                MarkerColorArgb = MarkerColorArgb,
             };
         }
     }
@@ -246,8 +246,10 @@ public sealed class CompositeMarkerGenerator : IGraphMarkerGenerator
 {
     /// <summary>Creates a composite marker generator.</summary>
     /// <param name="generators">The generators to invoke in order.</param>
-    public CompositeMarkerGenerator(IEnumerable<IGraphMarkerGenerator> generators) =>
+    public CompositeMarkerGenerator(IEnumerable<IGraphMarkerGenerator> generators)
+    {
         Generators = generators?.ToArray() ?? throw new ArgumentNullException(nameof(generators));
+    }
 
     /// <summary>Gets the child generators.</summary>
     public IReadOnlyList<IGraphMarkerGenerator> Generators { get; }
@@ -255,12 +257,8 @@ public sealed class CompositeMarkerGenerator : IGraphMarkerGenerator
     /// <inheritdoc />
     public IEnumerable<GraphMarker> GenerateMarkers(double start, double end, GraphMarkerOrientation orientation, int maxMarkers)
     {
-        foreach (IGraphMarkerGenerator generator in Generators)
-        {
-            foreach (GraphMarker marker in generator.GenerateMarkers(start, end, orientation, maxMarkers))
-            {
-                yield return marker;
-            }
-        }
+        foreach (var generator in Generators)
+        foreach (var marker in generator.GenerateMarkers(start, end, orientation, maxMarkers))
+            yield return marker;
     }
 }

@@ -1,5 +1,4 @@
 using System.Text;
-using FluentAssertions;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -30,7 +29,7 @@ public sealed class FileSystemFileStoreTests
         }
         finally
         {
-            Directory.Delete(directory, recursive: true);
+            Directory.Delete(directory, true);
         }
     }
 }

@@ -5,28 +5,27 @@ using Mapping_Tools.Application.Execution;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Provides the shared command and presentation state for a tool that has one
-/// ordinary run at a time.
+///     Provides the shared command and presentation state for a tool that has one
+///     ordinary run at a time.
 /// </summary>
 public abstract class SingleRunToolViewModel : ObservableValidator
 {
-    private readonly IToolExecutionService _execution;
     private bool _isRunning;
     private double _progress;
     private long _runGeneration;
 
     /// <summary>
-    /// Creates a single-run tool presentation model.
+    ///     Creates a single-run tool presentation model.
     /// </summary>
     /// <param name="execution">Coordinates cancellation for the tool operation.</param>
     /// <param name="operationId">Stable identifier used by the execution service.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="execution"/> is <see langword="null"/>.</exception>
-    /// <exception cref="ArgumentException"><paramref name="operationId"/> is empty or whitespace.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="execution" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException"><paramref name="operationId" /> is empty or whitespace.</exception>
     protected SingleRunToolViewModel(
         IToolExecutionService execution,
         string operationId)
     {
-        _execution = execution ?? throw new ArgumentNullException(nameof(execution));
+        Execution = execution ?? throw new ArgumentNullException(nameof(execution));
         ExecutionOperationId = string.IsNullOrWhiteSpace(operationId)
             ? throw new ArgumentException("An operation identifier is required.", nameof(operationId))
             : operationId;
@@ -39,7 +38,7 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     protected string ExecutionOperationId { get; }
 
     /// <summary>Gets the execution service shared by this tool's operations.</summary>
-    protected IToolExecutionService Execution => _execution;
+    protected IToolExecutionService Execution { get; }
 
     /// <summary>Gets whether the ordinary tool run is currently active.</summary>
     public bool IsRunning
@@ -47,10 +46,7 @@ public abstract class SingleRunToolViewModel : ObservableValidator
         get => _isRunning;
         private set
         {
-            if (SetProperty(ref _isRunning, value))
-            {
-                RunCommand.NotifyCanExecuteChanged();
-            }
+            if (SetProperty(ref _isRunning, value)) RunCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -68,17 +64,20 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     public IRelayCommand CancelCommand { get; }
 
     /// <summary>
-    /// Performs feature-specific validation before the run state is entered.
+    ///     Performs feature-specific validation before the run state is entered.
     /// </summary>
-    /// <returns><see langword="true"/> when the ordinary run may start.</returns>
-    protected virtual bool PrepareRun() => true;
+    /// <returns><see langword="true" /> when the ordinary run may start.</returns>
+    protected virtual bool PrepareRun()
+    {
+        return true;
+    }
 
     /// <summary>Executes the feature-specific ordinary run.</summary>
     /// <returns>A task that completes when the ordinary run reaches a terminal state.</returns>
     protected abstract Task RunCoreAsync();
 
     /// <summary>
-    /// Runs an operation while maintaining the shared busy and progress state.
+    ///     Runs an operation while maintaining the shared busy and progress state.
     /// </summary>
     /// <param name="operation">The feature-specific operation to invoke.</param>
     /// <returns>A task that completes when the operation reaches a terminal state.</returns>
@@ -86,10 +85,7 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     {
         ArgumentNullException.ThrowIfNull(operation);
 
-        if (IsRunning)
-        {
-            return;
-        }
+        if (IsRunning) return;
 
         IsRunning = true;
         Progress = 0;
@@ -113,22 +109,22 @@ public abstract class SingleRunToolViewModel : ObservableValidator
         long runGeneration = Volatile.Read(ref _runGeneration);
         return new Progress<ToolExecutionProgress>(value =>
         {
-            if (IsRunning && Volatile.Read(ref _runGeneration) == runGeneration)
-            {
-                Progress = value.Percent;
-            }
+            if (IsRunning && Volatile.Read(ref _runGeneration) == runGeneration) Progress = value.Percent;
         });
     }
 
-    private bool CanRun() => !IsRunning;
+    private bool CanRun()
+    {
+        return !IsRunning;
+    }
 
     private async Task RunAsync()
     {
-        if (PrepareRun())
-        {
-            await RunWithStateAsync(RunCoreAsync);
-        }
+        if (PrepareRun()) await RunWithStateAsync(RunCoreAsync);
     }
 
-    private void Cancel() => _execution.Cancel(ExecutionOperationId);
+    private void Cancel()
+    {
+        Execution.Cancel(ExecutionOperationId);
+    }
 }

@@ -9,8 +9,11 @@ namespace Mapping_Tools.Core.Classes.Graph;
 /// <summary>Describes one editable anchor and the interpolation leading into it.</summary>
 public sealed class GraphAnchor
 {
+    private IGraphInterpolator interpolator = new SingleCurveInterpolator();
+    private double tension;
+
     /// <summary>Creates an anchor with the legacy single-curve interpolation by default.</summary>
-    public GraphAnchor() : this(Vector2.Zero, new SingleCurveInterpolator(), 0)
+    public GraphAnchor() : this(Vector2.Zero, new SingleCurveInterpolator())
     {
     }
 
@@ -30,7 +33,7 @@ public sealed class GraphAnchor
     public Vector2 Pos { get; set; }
 
     /// <summary>Gets or sets the interpolation used from the previous anchor.</summary>
-    /// <exception cref="ArgumentNullException">Thrown when the value is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when the value is <see langword="null" />.</exception>
     public IGraphInterpolator Interpolator
     {
         get => interpolator;
@@ -48,19 +51,16 @@ public sealed class GraphAnchor
         set
         {
             tension = value;
-            if (Interpolator is not null)
-            {
-                Interpolator.P = value;
-            }
+            if (Interpolator is not null) Interpolator.P = value;
         }
     }
 
     /// <summary>Creates an independent copy of the anchor and its interpolator.</summary>
     /// <returns>A mutable copy suitable for editing.</returns>
-    public GraphAnchor Clone() => new(Pos, GraphInterpolatorCatalog.Clone(Interpolator), Tension);
-
-    private IGraphInterpolator interpolator = new SingleCurveInterpolator();
-    private double tension;
+    public GraphAnchor Clone()
+    {
+        return new GraphAnchor(Pos, GraphInterpolatorCatalog.Clone(Interpolator), Tension);
+    }
 }
 
 /// <summary>Contains the bounds, anchors, and evaluation rules for one value graph.</summary>
@@ -71,7 +71,7 @@ public sealed class GraphState
         : this(new List<GraphAnchor>
         {
             new(new Vector2(0, 0.5f)),
-            new(new Vector2(1, 0.5f))
+            new(new Vector2(1, 0.5f)),
         }, 0, 0, 1, 1)
     {
     }
@@ -85,7 +85,7 @@ public sealed class GraphState
     public GraphState(IEnumerable<GraphAnchor>? anchors, double minX, double minY, double maxX, double maxY)
     {
         Anchors = anchors?.Select(anchor => anchor ?? throw new ArgumentException("An anchor cannot be null.", nameof(anchors))).ToList()
-                   ?? [];
+                  ?? [];
         MinX = minX;
         MinY = minY;
         MaxX = maxX;
@@ -109,51 +109,84 @@ public sealed class GraphState
 
     /// <summary>Creates the unit-bounded default curve used by an empty value editor.</summary>
     /// <returns>A graph with two zero-valued edge anchors.</returns>
-    public static GraphState CreateDefault() => new();
+    public static GraphState CreateDefault()
+    {
+        return new GraphState();
+    }
 
     /// <summary>Evaluates the graph at the supplied X value.</summary>
     /// <param name="x">The graph X value.</param>
     /// <returns>The interpolated Y value, or zero when no anchors exist.</returns>
-    public double GetValue(double x) => GraphMath.GetValue(x, Anchors);
+    public double GetValue(double x)
+    {
+        return GraphMath.GetValue(x, Anchors);
+    }
 
     /// <summary>Evaluates the graph derivative at the supplied X value.</summary>
     /// <param name="x">The graph X value.</param>
     /// <returns>The derivative, with infinity for a vertical segment and zero for empty or single-anchor state.</returns>
-    public double GetDerivative(double x) => GraphMath.GetDerivative(x, Anchors);
+    public double GetDerivative(double x)
+    {
+        return GraphMath.GetDerivative(x, Anchors);
+    }
 
     /// <summary>Integrates the graph over a graph-space interval.</summary>
     /// <param name="t1">The interval start.</param>
     /// <param name="t2">The interval end.</param>
     /// <returns>The signed area under the graph.</returns>
-    public double GetIntegral(double t1, double t2) => GraphMath.GetIntegral(t1, t2, Anchors);
+    public double GetIntegral(double t1, double t2)
+    {
+        return GraphMath.GetIntegral(t1, t2, Anchors);
+    }
 
     /// <summary>Gets the largest graph value sampled at anchors and declared curve extrema.</summary>
     /// <returns>The largest graph Y value, or zero when no segment exists.</returns>
-    public double GetMaxValue() => GraphMath.GetMaxValue(Anchors);
+    public double GetMaxValue()
+    {
+        return GraphMath.GetMaxValue(Anchors);
+    }
 
     /// <summary>Gets the smallest graph value sampled at anchors and declared curve extrema.</summary>
     /// <returns>The smallest graph Y value, or zero when no segment exists.</returns>
-    public double GetMinValue() => GraphMath.GetMinValue(Anchors);
+    public double GetMinValue()
+    {
+        return GraphMath.GetMinValue(Anchors);
+    }
 
     /// <summary>Gets the largest signed derivative sampled at segment extrema.</summary>
     /// <returns>The largest derivative, or zero when no segment exists.</returns>
-    public double GetMaxDerivative() => GraphMath.GetMaxDerivative(Anchors);
+    public double GetMaxDerivative()
+    {
+        return GraphMath.GetMaxDerivative(Anchors);
+    }
 
     /// <summary>Gets the smallest signed derivative sampled at segment extrema.</summary>
     /// <returns>The smallest derivative, or zero when no segment exists.</returns>
-    public double GetMinDerivative() => GraphMath.GetMinDerivative(Anchors);
+    public double GetMinDerivative()
+    {
+        return GraphMath.GetMinDerivative(Anchors);
+    }
 
     /// <summary>Gets the largest accumulated integral across the graph segments.</summary>
     /// <returns>The largest accumulated integral, or zero when no segment exists.</returns>
-    public double GetMaxIntegral() => GraphMath.GetMaxIntegral(Anchors);
+    public double GetMaxIntegral()
+    {
+        return GraphMath.GetMaxIntegral(Anchors);
+    }
 
     /// <summary>Gets the smallest accumulated integral across the graph segments.</summary>
     /// <returns>The smallest accumulated integral, or zero when no segment exists.</returns>
-    public double GetMinIntegral() => GraphMath.GetMinIntegral(Anchors);
+    public double GetMinIntegral()
+    {
+        return GraphMath.GetMinIntegral(Anchors);
+    }
 
     /// <summary>Creates a deep, mutable copy of this state.</summary>
     /// <returns>A copy whose anchors and interpolators can be changed independently.</returns>
-    public GraphState Clone() => new(Anchors.Select(anchor => anchor.Clone()), MinX, MinY, MaxX, MaxY);
+    public GraphState Clone()
+    {
+        return new GraphState(Anchors.Select(anchor => anchor.Clone()), MinX, MinY, MaxX, MaxY);
+    }
 
     /// <summary>Returns the average graph value over an interval.</summary>
     /// <param name="start">The interval start.</param>
@@ -178,8 +211,8 @@ public static class GraphMath
         if (anchors.Count == 0) return 0;
         if (anchors.Count == 1) return anchors[0].Pos.Y;
 
-        (GraphAnchor previous, GraphAnchor next) = FindSegment(x, anchors);
-        Vector2 difference = next.Pos - previous.Pos;
+        var (previous, next) = FindSegment(x, anchors);
+        var difference = next.Pos - previous.Pos;
         if (Math.Abs(difference.X) < Precision.DoubleEpsilon) return previous.Pos.Y;
         return previous.Pos.Y + difference.Y * next.Interpolator.GetInterpolation((x - previous.Pos.X) / difference.X);
     }
@@ -191,12 +224,9 @@ public static class GraphMath
     public static double GetDerivative(double x, IReadOnlyList<GraphAnchor> anchors)
     {
         if (anchors.Count < 2) return 0;
-        (GraphAnchor previous, GraphAnchor next) = FindSegment(x, anchors);
-        Vector2 difference = next.Pos - previous.Pos;
-        if (Math.Abs(difference.X) < Precision.DoubleEpsilon)
-        {
-            return difference.Y > 0 ? double.PositiveInfinity : double.NegativeInfinity;
-        }
+        var (previous, next) = FindSegment(x, anchors);
+        var difference = next.Pos - previous.Pos;
+        if (Math.Abs(difference.X) < Precision.DoubleEpsilon) return difference.Y > 0 ? double.PositiveInfinity : double.NegativeInfinity;
 
         double derivative = next.Interpolator is IDerivableInterpolator derivable
             ? derivable.GetDerivative((x - previous.Pos.X) / difference.X)
@@ -215,15 +245,15 @@ public static class GraphMath
         if (t2 < t1) return -GetIntegral(t2, t1, anchors);
 
         double height = 0;
-        for (var index = 1; index < anchors.Count; index++)
+        for (int index = 1; index < anchors.Count; index++)
         {
-            GraphAnchor previous = anchors[index - 1];
-            GraphAnchor next = anchors[index];
+            var previous = anchors[index - 1];
+            var next = anchors[index];
             double start = Math.Max(t1, previous.Pos.X);
             double end = Math.Min(t2, next.Pos.X);
             if (end <= start + Precision.DoubleEpsilon) continue;
 
-            Vector2 difference = next.Pos - previous.Pos;
+            var difference = next.Pos - previous.Pos;
             if (Math.Abs(difference.X) < Precision.DoubleEpsilon) continue;
             double u1 = (start - previous.Pos.X) / difference.X;
             double u2 = (end - previous.Pos.X) / difference.X;
@@ -239,32 +269,50 @@ public static class GraphMath
     /// <summary>Gets the largest value at anchors and declared curve extrema.</summary>
     /// <param name="anchors">The ordered graph anchors.</param>
     /// <returns>The maximum value, or zero when there are no segments.</returns>
-    public static double GetMaxValue(IReadOnlyList<GraphAnchor> anchors) => GetExtremum(anchors, true, false);
+    public static double GetMaxValue(IReadOnlyList<GraphAnchor> anchors)
+    {
+        return GetExtremum(anchors, true, false);
+    }
 
     /// <summary>Gets the smallest value at anchors and declared curve extrema.</summary>
     /// <param name="anchors">The ordered graph anchors.</param>
     /// <returns>The minimum value, or zero when there are no segments.</returns>
-    public static double GetMinValue(IReadOnlyList<GraphAnchor> anchors) => GetExtremum(anchors, false, false);
+    public static double GetMinValue(IReadOnlyList<GraphAnchor> anchors)
+    {
+        return GetExtremum(anchors, false, false);
+    }
 
     /// <summary>Gets the largest derivative at segment endpoints and declared extrema.</summary>
     /// <param name="anchors">The ordered graph anchors.</param>
     /// <returns>The maximum derivative, or zero when there are no segments.</returns>
-    public static double GetMaxDerivative(IReadOnlyList<GraphAnchor> anchors) => GetDerivativeExtremum(anchors, true);
+    public static double GetMaxDerivative(IReadOnlyList<GraphAnchor> anchors)
+    {
+        return GetDerivativeExtremum(anchors, true);
+    }
 
     /// <summary>Gets the smallest derivative at segment endpoints and declared extrema.</summary>
     /// <param name="anchors">The ordered graph anchors.</param>
     /// <returns>The minimum derivative, or zero when there are no segments.</returns>
-    public static double GetMinDerivative(IReadOnlyList<GraphAnchor> anchors) => GetDerivativeExtremum(anchors, false);
+    public static double GetMinDerivative(IReadOnlyList<GraphAnchor> anchors)
+    {
+        return GetDerivativeExtremum(anchors, false);
+    }
 
     /// <summary>Gets the largest accumulated integral using declared integral extrema.</summary>
     /// <param name="anchors">The ordered graph anchors.</param>
     /// <returns>The maximum accumulated integral, or zero when there are no segments.</returns>
-    public static double GetMaxIntegral(IReadOnlyList<GraphAnchor> anchors) => GetIntegralExtremum(anchors, true);
+    public static double GetMaxIntegral(IReadOnlyList<GraphAnchor> anchors)
+    {
+        return GetIntegralExtremum(anchors, true);
+    }
 
     /// <summary>Gets the smallest accumulated integral using declared integral extrema.</summary>
     /// <param name="anchors">The ordered graph anchors.</param>
     /// <returns>The minimum accumulated integral, or zero when there are no segments.</returns>
-    public static double GetMinIntegral(IReadOnlyList<GraphAnchor> anchors) => GetIntegralExtremum(anchors, false);
+    public static double GetMinIntegral(IReadOnlyList<GraphAnchor> anchors)
+    {
+        return GetIntegralExtremum(anchors, false);
+    }
 
     /// <summary>Gets the absolute value-distance travelled through graph segments.</summary>
     /// <param name="anchors">The ordered graph anchors.</param>
@@ -272,10 +320,7 @@ public static class GraphMath
     public static double GetDistanceTraveled(IReadOnlyList<GraphAnchor> anchors)
     {
         double distance = 0;
-        for (var index = 1; index < anchors.Count; index++)
-        {
-            distance += Math.Abs(GetValue(anchors[index].Pos.X, anchors) - GetValue(anchors[index - 1].Pos.X, anchors));
-        }
+        for (int index = 1; index < anchors.Count; index++) distance += Math.Abs(GetValue(anchors[index].Pos.X, anchors) - GetValue(anchors[index - 1].Pos.X, anchors));
 
         return distance;
     }
@@ -286,20 +331,16 @@ public static class GraphMath
     public static double GetIntegralDistanceTraveled(IReadOnlyList<GraphAnchor> anchors)
     {
         double distance = 0;
-        for (var index = 1; index < anchors.Count; index++)
-        {
-            distance += Math.Abs(GetIntegral(anchors[index - 1].Pos.X, anchors[index].Pos.X, anchors));
-        }
+        for (int index = 1; index < anchors.Count; index++) distance += Math.Abs(GetIntegral(anchors[index - 1].Pos.X, anchors[index].Pos.X, anchors));
 
         return distance;
     }
 
     private static (GraphAnchor Previous, GraphAnchor Next) FindSegment(double x, IReadOnlyList<GraphAnchor> anchors)
     {
-        GraphAnchor previous = anchors[0];
-        GraphAnchor next = anchors[^1];
-        foreach (GraphAnchor anchor in anchors)
-        {
+        var previous = anchors[0];
+        var next = anchors[^1];
+        foreach (var anchor in anchors)
             if (anchor.Pos.X < x)
             {
                 previous = anchor;
@@ -309,7 +350,6 @@ public static class GraphMath
                 next = anchor;
                 break;
             }
-        }
 
         return (previous, next);
     }
@@ -319,11 +359,11 @@ public static class GraphMath
         if (anchors.Count == 0) return 0;
         if (anchors.Count == 1) return anchors[0].Pos.Y;
         double result = maximum ? double.NegativeInfinity : double.PositiveInfinity;
-        for (var index = 1; index < anchors.Count; index++)
+        for (int index = 1; index < anchors.Count; index++)
         {
-            GraphAnchor previous = anchors[index - 1];
-            GraphAnchor next = anchors[index];
-            Vector2 difference = next.Pos - previous.Pos;
+            var previous = anchors[index - 1];
+            var next = anchors[index];
+            var difference = next.Pos - previous.Pos;
             double[] positions = next.Interpolator.GetType().GetCustomAttributes(typeof(CustomExtremaAttribute), false)
                 .OfType<CustomExtremaAttribute>().SelectMany(attribute => attribute.ExtremaPositions).ToArray();
             if (positions.Length == 0) positions = [0, 1];
@@ -341,10 +381,10 @@ public static class GraphMath
     {
         if (anchors.Count < 2) return 0;
         double result = maximum ? double.NegativeInfinity : double.PositiveInfinity;
-        for (var index = 1; index < anchors.Count; index++)
+        for (int index = 1; index < anchors.Count; index++)
         {
-            GraphAnchor previous = anchors[index - 1];
-            GraphAnchor next = anchors[index];
+            var previous = anchors[index - 1];
+            var next = anchors[index];
             double dx = next.Pos.X - previous.Pos.X;
             if (Math.Abs(dx) < Precision.DoubleEpsilon) continue;
             double slope = next.Pos.Y - previous.Pos.Y;
@@ -369,21 +409,19 @@ public static class GraphMath
 
         double accumulated = 0;
         double result = maximum ? 0 : double.PositiveInfinity;
-        for (var index = 1; index < anchors.Count; index++)
+        for (int index = 1; index < anchors.Count; index++)
         {
-            GraphAnchor previous = anchors[index - 1];
-            GraphAnchor next = anchors[index];
-            Vector2 difference = next.Pos - previous.Pos;
+            var previous = anchors[index - 1];
+            var next = anchors[index];
+            var difference = next.Pos - previous.Pos;
             if (difference.X <= Precision.DoubleEpsilon) continue;
 
             double endIntegral;
             Func<double, double> integralAt;
             if (next.Interpolator is IIntegrableInterpolator integrable)
             {
-                endIntegral = integrable.GetIntegral(0, 1) * difference.X * difference.Y +
-                              difference.X * previous.Pos.Y;
-                integralAt = position => integrable.GetIntegral(0, position) * difference.X * difference.Y +
-                                         position * difference.X * previous.Pos.Y;
+                endIntegral = integrable.GetIntegral(0, 1) * difference.X * difference.Y + difference.X * previous.Pos.Y;
+                integralAt = position => integrable.GetIntegral(0, position) * difference.X * difference.Y + position * difference.X * previous.Pos.Y;
 
                 double[] extremaPositions = next.Interpolator.GetType()
                     .GetCustomAttributes(typeof(CustomIntegralExtremaAttribute), false)
@@ -399,18 +437,19 @@ public static class GraphMath
                 if (difference.Y * previous.Pos.Y < 0)
                 {
                     double target = -previous.Pos.Y / difference.Y;
-                    IEnumerable<double> zeroes = next.Interpolator is IInvertibleInterpolator invertible
+                    var zeroes = next.Interpolator is IInvertibleInterpolator invertible
                         ? invertible.GetInverse(target).Where(position => position is >= 0 and <= 1)
-                        : [maximum
-                            ? GradientDescentUtil.GradientAscent(integralAt, 0, 1, 0.1)
-                            : GradientDescentUtil.GradientDescent(integralAt, 0, 1, 0.1)];
+                        :
+                        [
+                            maximum
+                                ? GradientDescentUtil.GradientAscent(integralAt, 0, 1, 0.1)
+                                : GradientDescentUtil.GradientDescent(integralAt, 0, 1, 0.1),
+                        ];
 
                     foreach (double zero in zeroes)
-                    {
                         localExtremum = maximum
                             ? Math.Max(localExtremum, integralAt(zero))
                             : Math.Min(localExtremum, integralAt(zero));
-                    }
                 }
 
                 result = maximum
@@ -420,8 +459,7 @@ public static class GraphMath
             else
             {
                 endIntegral = 0.5 * difference.X * difference.Y + difference.X * previous.Pos.Y;
-                integralAt = position => 0.5 * position * position * difference.X * difference.Y +
-                                         position * difference.X * previous.Pos.Y;
+                integralAt = position => 0.5 * position * position * difference.X * difference.Y + position * difference.X * previous.Pos.Y;
                 double localExtremum = endIntegral;
 
                 if (difference.Y * previous.Pos.Y < 0)
@@ -446,7 +484,6 @@ public static class GraphMath
 
         return double.IsInfinity(result) ? 0 : result;
     }
-
 }
 
 /// <summary>Provides the legacy text representation for graph values.</summary>
@@ -458,22 +495,19 @@ public static class GraphStateTextCodec
     public static string Format(GraphState? state)
     {
         if (state?.Anchors.FirstOrDefault() is not { } first) return string.Empty;
-        if (state.Anchors.All(anchor => Precision.AlmostEquals(anchor.Pos.Y, first.Pos.Y)))
-        {
-            return first.Pos.Y.ToString(CultureInfo.InvariantCulture);
-        }
+        if (state.Anchors.All(anchor => Precision.AlmostEquals(anchor.Pos.Y, first.Pos.Y))) return first.Pos.Y.ToString(CultureInfo.InvariantCulture);
 
         return string.Join('|', state.Anchors.Select(anchor =>
-            $"{anchor.Pos.X.ToString("0.###", CultureInfo.InvariantCulture)}:" +
-            $"{anchor.Pos.Y.ToString("0.###", CultureInfo.InvariantCulture)}:" +
-            $"{GraphInterpolatorCatalog.GetInterpolatorIndex(anchor.Interpolator.GetType()).ToString(CultureInfo.InvariantCulture)}:" +
-            $"{anchor.Tension.ToString("0.###", CultureInfo.InvariantCulture)}"));
+            $"{anchor.Pos.X.ToString("0.###", CultureInfo.InvariantCulture)}:"
+            + $"{anchor.Pos.Y.ToString("0.###", CultureInfo.InvariantCulture)}:"
+            + $"{GraphInterpolatorCatalog.GetInterpolatorIndex(anchor.Interpolator.GetType()).ToString(CultureInfo.InvariantCulture)}:"
+            + $"{anchor.Tension.ToString("0.###", CultureInfo.InvariantCulture)}"));
     }
 
     /// <summary>Parses a constant or pipe-separated graph string.</summary>
     /// <param name="text">The text to parse.</param>
     /// <param name="state">The parsed graph, or a safe default for malformed graph input.</param>
-    /// <returns><see langword="true"/> for a complete valid graph representation.</returns>
+    /// <returns><see langword="true" /> for a complete valid graph representation.</returns>
     public static bool TryParse(string? text, out GraphState state)
     {
         state = GraphState.CreateDefault();
@@ -485,37 +519,29 @@ public static class GraphStateTextCodec
         }
 
         string[] anchorTexts = text.Split('|', StringSplitOptions.RemoveEmptyEntries);
-        if (anchorTexts.Length == 0)
-        {
-            return false;
-        }
+        if (anchorTexts.Length == 0) return false;
 
         List<GraphAnchor> anchors = [];
         foreach (string anchorText in anchorTexts)
         {
             string[] values = anchorText.Split(':');
-            if (values.Length < 4 ||
-                !TypeConverters.TryParseDouble(values[0], out double x) ||
-                !TypeConverters.TryParseDouble(values[1], out double y) ||
-                !TypeConverters.TryParseInt(values[2], out int index) ||
-                !TypeConverters.TryParseDouble(values[3], out double tension))
-            {
+            if (values.Length < 4
+                || !TypeConverters.TryParseDouble(values[0], out double x)
+                || !TypeConverters.TryParseDouble(values[1], out double y)
+                || !TypeConverters.TryParseInt(values[2], out int index)
+                || !TypeConverters.TryParseDouble(values[3], out double tension))
                 return false;
-            }
 
-            IGraphInterpolator interpolator = GraphInterpolatorCatalog.GetInterpolator(
+            var interpolator = GraphInterpolatorCatalog.GetInterpolator(
                 GraphInterpolatorCatalog.GetInterpolatorByIndex(index));
             anchors.Add(new GraphAnchor(new Vector2(x, y), interpolator, tension));
         }
 
-        if (anchors.Count < 2)
-        {
-            return false;
-        }
+        if (anchors.Count < 2) return false;
 
-        Vector2 min = anchors.Select(anchor => anchor.Pos).Aggregate(Vector2.ComponentMin);
-        Vector2 max = anchors.Select(anchor => anchor.Pos).Aggregate(Vector2.ComponentMax);
-        Vector2 size = Vector2.ComponentMax(Vector2.One, max - min);
+        var min = anchors.Select(anchor => anchor.Pos).Aggregate(Vector2.ComponentMin);
+        var max = anchors.Select(anchor => anchor.Pos).Aggregate(Vector2.ComponentMax);
+        var size = Vector2.ComponentMax(Vector2.One, max - min);
         state = new GraphState(anchors, min.X, min.Y, min.X + size.X, min.Y + size.Y);
         return true;
     }
@@ -523,9 +549,12 @@ public static class GraphStateTextCodec
     /// <summary>Creates a constant graph with bounds that include the entered value.</summary>
     /// <param name="value">The constant value.</param>
     /// <returns>A two-anchor constant graph.</returns>
-    public static GraphState CreateConstant(double value) => new(
+    public static GraphState CreateConstant(double value)
+    {
+        return new GraphState(
         [
             new GraphAnchor(new Vector2(0, value), new SingleCurveInterpolator()),
-            new GraphAnchor(new Vector2(1, value), new SingleCurveInterpolator())
+            new GraphAnchor(new Vector2(1, value), new SingleCurveInterpolator()),
         ], 0, Math.Min(0, value * 2), 1, Math.Max(1, value * 2));
+    }
 }

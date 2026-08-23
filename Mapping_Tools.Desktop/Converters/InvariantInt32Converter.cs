@@ -5,35 +5,39 @@ using ApplicationInvariantInt32Converter = Mapping_Tools.Application.Interaction
 namespace Mapping_Tools.Desktop.Converters;
 
 /// <summary>
-/// Converts signed 32-bit integers to and from invariant-culture editable text.
+///     Converts signed 32-bit integers to and from invariant-culture editable text.
 /// </summary>
 public sealed class InvariantInt32Converter : IValueConverter
 {
     private static readonly ApplicationInvariantInt32Converter Converter = new();
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public object Convert(
         object? value,
         Type targetType,
         object? parameter,
-        CultureInfo culture) =>
-        ValueConverterHelper.Convert(
+        CultureInfo culture)
+    {
+        return ValueConverterHelper.Convert(
             value,
             targetType,
             parameter,
             culture,
             Converter);
+    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public object ConvertBack(
         object? value,
         Type targetType,
         object? parameter,
-        CultureInfo culture) =>
-        ValueConverterHelper.ConvertBack(
+        CultureInfo culture)
+    {
+        return ValueConverterHelper.ConvertBack(
             value,
             targetType,
             parameter,
             culture,
             Converter);
+    }
 }

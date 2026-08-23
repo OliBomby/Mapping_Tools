@@ -2,7 +2,7 @@ using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.HitsoundCopier;
 using Mapping_Tools.Application.Settings;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.HitsoundStuff;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -24,11 +24,11 @@ public sealed class HitsoundCopierServiceTests
         {
             PathFrom = "source.osu",
             PathTo = "first.osu|second.osu",
-            SourceSelectionMode = HitsoundCopierSelectionMode.Everything
+            SourceSelectionMode = HitsoundCopierSelectionMode.Everything,
         };
 
         // Act
-        HitsoundCopierResult result = await service.CopyAsync(options);
+        var result = await service.CopyAsync(options);
 
         // Assert
         result.ProcessedPaths.Should().Equal("first.osu", "second.osu");
@@ -46,7 +46,7 @@ public sealed class HitsoundCopierServiceTests
         HitsoundCopierOptions options = new()
         {
             PathTo = "target.osu",
-            SourceSelectionMode = HitsoundCopierSelectionMode.Time
+            SourceSelectionMode = HitsoundCopierSelectionMode.Time,
         };
 
         // Act
@@ -61,28 +61,39 @@ public sealed class HitsoundCopierServiceTests
     {
         public Task<IReadOnlyDictionary<string, string>> AnalyzeAsync(
             string directory,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyDictionary<string, string>>(
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IReadOnlyDictionary<string, string>>(
                 new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+        }
 
         public HitsoundSampleAssignment? TryCreateAssignment(
             string directory,
             IReadOnlyList<string> sourceFilenames,
             IReadOnlyDictionary<string, string> firstSamples,
             string role,
-            Mapping_Tools.Core.Classes.BeatmapHelper.Enums.SampleSet sampleSet,
+            SampleSet sampleSet,
             int startIndex,
-            SampleSchema existingSchema) => null;
+            SampleSchema existingSchema)
+        {
+            return null;
+        }
 
-        public Task ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
+        public Task ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class RecordingGateway : IBeatmapEditingGateway
     {
         private readonly string _fixture;
 
-        public RecordingGateway(string fixture) => _fixture = fixture;
+        public RecordingGateway(string fixture)
+        {
+            _fixture = fixture;
+        }
+
         public List<string> OpenedPaths { get; } = [];
         public List<string> SavedPaths { get; } = [];
 
@@ -98,7 +109,10 @@ public sealed class HitsoundCopierServiceTests
 
         public Task<StoryboardEditor2> OpenStoryboardAsync(
             string path,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+            CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
 
         public Task SaveAsync(
             Editor2 editor,
@@ -112,16 +126,30 @@ public sealed class HitsoundCopierServiceTests
         public Task SaveAsync(
             BeatmapEditingSession session,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
-            SaveAsync(session.Editor, reloadEditor, cancellationToken);
+            CancellationToken cancellationToken = default)
+        {
+            return SaveAsync(session.Editor, reloadEditor, cancellationToken);
+        }
     }
 
     private sealed class MemoryStore : ITextFileStore
     {
-        public IReadOnlyList<string> ReadAllLines(string path) => [];
+        public IReadOnlyList<string> ReadAllLines(string path)
+        {
+            return [];
+        }
+
         public void WriteAllLines(string path, IEnumerable<string> lines) { }
         public void Delete(string path) { }
-        public string GetParentFolder(string path) => string.Empty;
-        public string CombinePath(string parent, string child) => child;
+
+        public string GetParentFolder(string path)
+        {
+            return string.Empty;
+        }
+
+        public string CombinePath(string parent, string child)
+        {
+            return child;
+        }
     }
 }

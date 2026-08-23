@@ -1,7 +1,6 @@
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.TimingCopier;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.TimingCopier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -25,18 +24,17 @@ public sealed class TimingCopierServiceTests
         {
             ImportPath = "source.osu",
             ExportPath = "first.osu|second.osu",
-            ResnapMode = TimingCopierResnapModes.KeepObjectsFixed
+            ResnapMode = TimingCopierResnapModes.KeepObjectsFixed,
         };
         RecordingProgress progress = new();
 
         // Act
-        TimingCopierResult result = await service.CopyAsync(options, progress);
+        var result = await service.CopyAsync(options, progress);
 
         // Assert
         result.ProcessedPaths.Should().Equal("first.osu", "second.osu");
         gateway.OpenedPaths.Should().Equal("source.osu", "first.osu", "second.osu");
-        gateway.OpenPreferences.Should().OnlyContain(
-            preference => preference == LiveBeatmapPreference.PreferLive);
+        gateway.OpenPreferences.Should().OnlyContain(preference => preference == LiveBeatmapPreference.PreferLive);
         gateway.SavedPaths.Should().Equal("first.osu", "second.osu");
         progress.Values.Last().Should().Be(100);
     }
@@ -56,7 +54,7 @@ public sealed class TimingCopierServiceTests
         {
             ImportPath = "source.osu",
             ExportPath = "first.osu|second.osu",
-            ResnapMode = TimingCopierResnapModes.KeepObjectsFixed
+            ResnapMode = TimingCopierResnapModes.KeepObjectsFixed,
         };
 
         // Act
@@ -82,7 +80,7 @@ public sealed class TimingCopierServiceTests
         {
             ImportPath = "source.osu",
             ExportPath = "target.osu",
-            BeatDivisors = []
+            BeatDivisors = [],
         };
 
         // Act
@@ -108,7 +106,7 @@ public sealed class TimingCopierServiceTests
         {
             ImportPath = "source.osu",
             ExportPath = "target.osu",
-            ResnapMode = "unknown"
+            ResnapMode = "unknown",
         };
 
         // Act
@@ -149,15 +147,17 @@ public sealed class TimingCopierServiceTests
                 File.ReadAllLines(_fixture).ToList(),
                 new MemoryStore())
             {
-                Path = path
+                Path = path,
             };
             return Task.FromResult(new BeatmapEditingSession(editor, BeatmapEditingSource.Disk, []));
         }
 
         public Task<StoryboardEditor2> OpenStoryboardAsync(
             string path,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task SaveAsync(
             Editor2 editor,
@@ -165,10 +165,7 @@ public sealed class TimingCopierServiceTests
             CancellationToken cancellationToken = default)
         {
             _saveCount++;
-            if (_saveCount == FailOnSaveNumber)
-            {
-                throw new IOException("The test target could not be written.");
-            }
+            if (_saveCount == FailOnSaveNumber) throw new IOException("The test target could not be written.");
 
             SavedPaths.Add(editor.Path);
             return Task.CompletedTask;
@@ -177,20 +174,28 @@ public sealed class TimingCopierServiceTests
         public Task SaveAsync(
             BeatmapEditingSession session,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
-            SaveAsync(session.Editor, reloadEditor, cancellationToken);
+            CancellationToken cancellationToken = default)
+        {
+            return SaveAsync(session.Editor, reloadEditor, cancellationToken);
+        }
     }
 
     private sealed class RecordingProgress : IProgress<double>
     {
         public List<double> Values { get; } = [];
 
-        public void Report(double value) => Values.Add(value);
+        public void Report(double value)
+        {
+            Values.Add(value);
+        }
     }
 
     private sealed class MemoryStore : ITextFileStore
     {
-        public IReadOnlyList<string> ReadAllLines(string path) => throw new NotSupportedException();
+        public IReadOnlyList<string> ReadAllLines(string path)
+        {
+            throw new NotSupportedException();
+        }
 
         public void WriteAllLines(string path, IEnumerable<string> lines)
         {
@@ -200,8 +205,14 @@ public sealed class TimingCopierServiceTests
         {
         }
 
-        public string GetParentFolder(string path) => string.Empty;
+        public string GetParentFolder(string path)
+        {
+            return string.Empty;
+        }
 
-        public string CombinePath(string parent, string child) => child;
+        public string CombinePath(string parent, string child)
+        {
+            return child;
+        }
     }
 }

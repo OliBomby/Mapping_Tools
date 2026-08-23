@@ -1,9 +1,8 @@
-using Mapping_Tools.Application.BeatmapEditing;
+using System.Text.RegularExpressions;
 using Mapping_Tools.Application.Abstractions;
-using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.MapsetMerger;
-using System.Text.RegularExpressions;
 
 namespace Mapping_Tools.Application.MapsetMerger;
 
@@ -34,20 +33,20 @@ public sealed class MapsetMergerService : IMapsetMergerService
         _textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<MapsetMergerResult> MergeAsync(
         MapsetMergerProject project,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
         Validate(project);
-        List<MapsetMergerInput> inputs = project.Mapsets
+        var inputs = project.Mapsets
             .Select(item => new MapsetMergerInput(item.Name, item.Path))
             .ToList();
         MapsetMergerEngine.ResolveDuplicateMapsetNames(inputs);
         ValidateExportPathDoesNotOverlapSources(project.ExportPath, inputs);
 
-        using IMapsetFileTransaction transaction = _fileSystem.BeginTransaction(project.ExportPath);
+        using var transaction = _fileSystem.BeginTransaction(project.ExportPath);
         HashSet<string> usedDifficultyNames = new(StringComparer.OrdinalIgnoreCase);
         HashSet<string> usedOutputPaths = new(StringComparer.OrdinalIgnoreCase);
         int nextSampleIndex = 1;
@@ -59,22 +58,20 @@ public sealed class MapsetMergerService : IMapsetMergerService
         for (int mapsetIndex = 0; mapsetIndex < inputs.Count; mapsetIndex++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            MapsetMergerInput input = inputs[mapsetIndex];
+            var input = inputs[mapsetIndex];
             if (!_fileSystem.DirectoryExists(input.Path))
-            {
                 throw new DirectoryNotFoundException(
                     $"Mapset directory '{input.Path}' was not found.");
-            }
 
-            IReadOnlyList<string> beatmapPaths = _fileSystem.EnumerateFiles(input.Path, "*.osu");
-            IReadOnlyList<string> storyboardPaths = _fileSystem.EnumerateFiles(input.Path, "*.osb");
+            var beatmapPaths = _fileSystem.EnumerateFiles(input.Path, "*.osu");
+            var storyboardPaths = _fileSystem.EnumerateFiles(input.Path, "*.osb");
             ValidateSourceFileCounts(input, beatmapPaths, storyboardPaths);
 
             List<(string Path, Beatmap Beatmap)> beatmaps = [];
             foreach (string path in beatmapPaths)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                BeatmapEditingSession session = await _editingGateway
+                var session = await _editingGateway
                     .OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
                     .ConfigureAwait(false);
                 beatmaps.Add((path, session.Editor.Beatmap));
@@ -84,7 +81,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
             foreach (string path in storyboardPaths)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                StoryboardEditor2 editor = await _editingGateway
+                var editor = await _editingGateway
                     .OpenStoryboardAsync(path, cancellationToken)
                     .ConfigureAwait(false);
                 storyboards.Add((path, editor.StoryBoard));
@@ -96,15 +93,13 @@ public sealed class MapsetMergerService : IMapsetMergerService
             {
                 sharedStoryboard = storyboards.Count == 0 ? null : storyboards[0].Storyboard;
                 if (sharedStoryboard is not null)
-                {
                     references.Add(MapsetMergerEngine.RewriteStoryboardReferences(
                         sharedStoryboard,
                         input.Name));
-                }
             }
             else
             {
-                foreach ((string path, StoryBoard storyboard) in storyboards)
+                foreach ((string path, var storyboard) in storyboards)
                 {
                     references.Add(MapsetMergerEngine.RewriteStoryboardReferences(
                         storyboard,
@@ -120,7 +115,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
 
             Dictionary<int, int> sampleIndices = new();
             string prefix = input.Name + " - ";
-            foreach ((string _, Beatmap beatmap) in beatmaps)
+            foreach ((string _, var beatmap) in beatmaps)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 references.Add(MapsetMergerEngine.RewriteBeatmapReferences(
@@ -180,11 +175,8 @@ public sealed class MapsetMergerService : IMapsetMergerService
         {
             cancellationToken.ThrowIfCancellationRequested();
             string? source = FindAssetFile(filename, input.Path, AudioExtensions);
-            if (source is null || !TryGetSourceSampleIndex(filename, out int sourceIndex) ||
-                !sampleIndices.TryGetValue(sourceIndex, out int mappedIndex))
-            {
+            if (source is null || !TryGetSourceSampleIndex(filename, out int sourceIndex) || !sampleIndices.TryGetValue(sourceIndex, out int mappedIndex))
                 continue;
-            }
 
             string outputName = MapsetMergerEngine.GetRemappedHitsoundFilename(
                 Path.GetFileName(source),
@@ -197,7 +189,6 @@ public sealed class MapsetMergerService : IMapsetMergerService
         }
 
         foreach (string filename in OrderReferences(references.OtherAudioFiles))
-        {
             copied += CopyAsset(
                 transaction,
                 filename,
@@ -205,10 +196,8 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 input.Name,
                 ExplicitAudioExtensions,
                 cancellationToken: cancellationToken);
-        }
 
         foreach (string filename in OrderReferences(references.ImageFiles))
-        {
             copied += CopyAsset(
                 transaction,
                 filename,
@@ -216,10 +205,8 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 input.Name,
                 ImageExtensions,
                 cancellationToken: cancellationToken);
-        }
 
         foreach (string filename in OrderReferences(references.VideoFiles))
-        {
             copied += CopyAsset(
                 transaction,
                 filename,
@@ -228,7 +215,6 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 VideoExtensions,
                 true,
                 cancellationToken);
-        }
 
         return copied;
     }
@@ -244,10 +230,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
     {
         cancellationToken.ThrowIfCancellationRequested();
         string? source = FindAssetFile(filename, input.Path, extensions, requireExtension);
-        if (source is null)
-        {
-            return 0;
-        }
+        if (source is null) return 0;
 
         // Save assets in new location
         string extension = Path.GetExtension(source);
@@ -257,10 +240,12 @@ public sealed class MapsetMergerService : IMapsetMergerService
         return 1;
     }
 
-    private static IEnumerable<string> OrderReferences(IEnumerable<string> references) =>
-        references
+    private static IEnumerable<string> OrderReferences(IEnumerable<string> references)
+    {
+        return references
             .OrderBy(reference => reference, StringComparer.OrdinalIgnoreCase)
             .ThenBy(reference => reference, StringComparer.Ordinal);
+    }
 
     private string? FindAssetFile(
         string filename,
@@ -272,13 +257,9 @@ public sealed class MapsetMergerService : IMapsetMergerService
         string originalExtension = Path.GetExtension(filename);
         string extensionless = Path.ChangeExtension(direct, null);
         if (!string.IsNullOrEmpty(originalExtension) || requireExtension)
-        {
-            return !string.IsNullOrEmpty(originalExtension) &&
-                   extensions.Contains(originalExtension, StringComparer.OrdinalIgnoreCase) &&
-                   _fileSystem.FileExists(direct)
+            return !string.IsNullOrEmpty(originalExtension) && extensions.Contains(originalExtension, StringComparer.OrdinalIgnoreCase) && _fileSystem.FileExists(direct)
                 ? direct
                 : null;
-        }
 
         // We have to ignore files which are not possible to reference in a distinguishable way
         // such as beatmap skin files and the spinnerspin and spinnerbonus files.
@@ -290,7 +271,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
     private static bool TryGetSourceSampleIndex(string filename, out int index)
     {
         string extensionless = Path.GetFileNameWithoutExtension(filename);
-        Match match = Regex.Match(
+        var match = Regex.Match(
             extensionless,
             "^(normal|soft|drum)-(hit(normal|whistle|finish|clap)|slidertick|sliderslide|sliderwhistle)(.*)$",
             RegexOptions.IgnoreCase);
@@ -327,10 +308,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
     private static string ResolveOutputPath(string requestedPath, ISet<string> usedOutputPaths)
     {
         string safePath = SafeRelativePath(requestedPath);
-        if (usedOutputPaths.Add(safePath))
-        {
-            return safePath;
-        }
+        if (usedOutputPaths.Add(safePath)) return safePath;
 
         string directory = Path.GetDirectoryName(safePath) ?? string.Empty;
         string filename = Path.GetFileNameWithoutExtension(safePath);
@@ -340,8 +318,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         do
         {
             candidate = Path.Combine(directory, filename + suffix + extension);
-        }
-        while (!usedOutputPaths.Add(candidate));
+        } while (!usedOutputPaths.Add(candidate));
 
         return candidate;
     }
@@ -350,12 +327,9 @@ public sealed class MapsetMergerService : IMapsetMergerService
     {
         ArgumentNullException.ThrowIfNull(project);
         ArgumentException.ThrowIfNullOrWhiteSpace(project.ExportPath);
-        if (project.Mapsets is null || project.Mapsets.Count == 0)
-        {
-            throw new ArgumentException("Add at least one mapset.", nameof(project));
-        }
+        if (project.Mapsets is null || project.Mapsets.Count == 0) throw new ArgumentException("Add at least one mapset.", nameof(project));
 
-        foreach (MapsetMergerProject.MapsetItem item in project.Mapsets)
+        foreach (var item in project.Mapsets)
         {
             ArgumentNullException.ThrowIfNull(item);
             MapsetMergerEngine.ValidateMapsetName(item.Name);
@@ -368,18 +342,16 @@ public sealed class MapsetMergerService : IMapsetMergerService
         IEnumerable<MapsetMergerInput> inputs)
     {
         string exportFullPath = Path.GetFullPath(exportPath);
-        foreach (MapsetMergerInput input in inputs)
+        foreach (var input in inputs)
         {
             string sourceFullPath = Path.GetFullPath(input.Path);
             string relative = Path.GetRelativePath(sourceFullPath, exportFullPath);
-            if (relative is "." ||
-                (relative is not null &&
-                 !relative.Split([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar])
-                     .Any(part => part is "..")))
-            {
+            if (relative is "."
+                || relative is not null
+                && !relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                    .Any(part => part is ".."))
                 throw new InvalidOperationException(
                     $"The export directory '{exportPath}' must not be the same as or inside mapset '{input.Path}'.");
-            }
         }
     }
 
@@ -388,45 +360,27 @@ public sealed class MapsetMergerService : IMapsetMergerService
         IReadOnlyList<string> beatmaps,
         IReadOnlyList<string> storyboards)
     {
-        if (!_fileSystem.DirectoryExists(input.Path))
-        {
-            throw new DirectoryNotFoundException($"Mapset directory '{input.Path}' was not found.");
-        }
+        if (!_fileSystem.DirectoryExists(input.Path)) throw new DirectoryNotFoundException($"Mapset directory '{input.Path}' was not found.");
 
         // Check map count not over the max
-        if (beatmaps.Count > MaxMapsetMaps)
-        {
-            throw new InvalidDataException("Beatmap limit exceeded in mapset: " + input.Name);
-        }
+        if (beatmaps.Count > MaxMapsetMaps) throw new InvalidDataException("Beatmap limit exceeded in mapset: " + input.Name);
 
         // Check storyboard count not over the max
-        if (storyboards.Count > MaxMapsetMaps)
-        {
-            throw new InvalidDataException("Storyboard limit exceeded in mapset: " + input.Name);
-        }
+        if (storyboards.Count > MaxMapsetMaps) throw new InvalidDataException("Storyboard limit exceeded in mapset: " + input.Name);
 
-        if (beatmaps.Count == 0)
-        {
-            throw new InvalidDataException("No beatmaps were found in mapset: " + input.Name);
-        }
+        if (beatmaps.Count == 0) throw new InvalidDataException("No beatmaps were found in mapset: " + input.Name);
     }
 
     private static string SafeRelativePath(string path)
     {
-        if (Path.IsPathRooted(path) || path.Split(['/', '\\']).Any(part => part is ".."))
-        {
-            throw new InvalidDataException($"The output path '{path}' is not safe.");
-        }
+        if (Path.IsPathRooted(path) || path.Split('/', '\\').Any(part => part is "..")) throw new InvalidDataException($"The output path '{path}' is not safe.");
 
         string root = Path.Combine(Path.GetTempPath(), "mapset-merger-relative-root");
         string normalized = Path.GetFullPath(Path.Combine(root, path));
         string relative = Path.GetRelativePath(root, normalized);
         if (relative is "." || relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal))
-        {
             throw new InvalidDataException($"The output path '{path}' is not safe.");
-        }
 
         return relative;
     }
-
 }

@@ -1,276 +1,283 @@
 ﻿using Mapping_Tools.Core.Classes.MathUtil;
 
-namespace Mapping_Tools.Core.Classes.ToolHelpers.Sliders.Newgen {
+namespace Mapping_Tools.Core.Classes.ToolHelpers.Sliders.Newgen;
+
+/// <summary>
+///     Version of <see cref="PathGenerator" /> but working with <see cref="PathPoint" /> instead.
+/// </summary>
+public class PathGenerator2
+{
     /// <summary>
-    /// Version of <see cref="PathGenerator"/> but working with <see cref="PathPoint"/> instead.
+    ///     Defines values for approximation mode.
     /// </summary>
-    public class PathGenerator2 {
+    public enum ApproximationMode
+    {
         /// <summary>
-        /// Gets or sets the maximum tangent-angle change allowed in one generated segment, in radians.
+        ///     Use the intersection of endpoint tangents as the Bézier control construction.
         /// </summary>
-        public double MaxAngle { get; set; } = Math.PI * 1 / 3;
-        /// <summary>
-        /// Gets or sets the construction strategy used for each non-inflecting interval.
-        /// </summary>
-        public ApproximationMode Approximation { get; set; } = ApproximationMode.Best;
-        /// <summary>
-        /// Gets or sets how many interior samples are used to compare candidate reconstruction loss.
-        /// </summary>
-        public int NumTestPoints { get; set; } = 10;
+        TangentIntersection,
 
         /// <summary>
-        /// Generates anchors which approximate the path between the given path nodes.
-        /// Accurate angle and distances must be calculated on the path beforehand.
+        ///     Join two curve pieces around an estimated middle point.
         /// </summary>
-        /// <returns>Bezier anchors which approximate the given path</returns>
-        public IEnumerable<Vector2> GeneratePath(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end) {
-            var segments = GetNonInflectionSegments(start, end);
+        DoubleMiddle,
 
-            foreach ((LinkedListNode<PathPoint> segmentStart, LinkedListNode<PathPoint> segmentEnd) in segments) {
-                yield return segmentStart.Value.Pos;
+        /// <summary>
+        ///     Evaluate both constructions and retain the lower-loss result.
+        /// </summary>
+        Best,
+    }
 
-                Vector2? middle = Approximation switch {
-                    ApproximationMode.TangentIntersection => TangentIntersectionApproximation(segmentStart, segmentEnd),
-                    ApproximationMode.DoubleMiddle => DoubleMiddleApproximation(segmentStart, segmentEnd),
-                    ApproximationMode.Best => BestApproximation(segmentStart, segmentEnd),
-                    _ => null
-                };
+    /// <summary>
+    ///     Gets or sets the maximum tangent-angle change allowed in one generated segment, in radians.
+    /// </summary>
+    public double MaxAngle { get; set; } = Math.PI * 1 / 3;
 
-                if (middle.HasValue) {
-                    yield return middle.Value;
-                }
+    /// <summary>
+    ///     Gets or sets the construction strategy used for each non-inflecting interval.
+    /// </summary>
+    public ApproximationMode Approximation { get; set; } = ApproximationMode.Best;
 
-                yield return segmentEnd.Value.Pos;
-            }
-        }
+    /// <summary>
+    ///     Gets or sets how many interior samples are used to compare candidate reconstruction loss.
+    /// </summary>
+    public int NumTestPoints { get; set; } = 10;
 
-        private Vector2? BestApproximation(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end) {
-            const double nullBias = 1E-3D;
+    /// <summary>
+    ///     Generates anchors which approximate the path between the given path nodes.
+    ///     Accurate angle and distances must be calculated on the path beforehand.
+    /// </summary>
+    /// <returns>Bezier anchors which approximate the given path</returns>
+    public IEnumerable<Vector2> GeneratePath(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end)
+    {
+        var segments = GetNonInflectionSegments(start, end);
 
-            // Make sure start index is before end index
-            // The results will be the same for flipped indices
-            if (start.Value > end.Value) {
-                (end, start) = (start, end);
-            }
+        foreach (var (segmentStart, segmentEnd) in segments)
+        {
+            yield return segmentStart.Value.Pos;
 
-            var p1 = start.Value.Pos;
-            var p2 = end.Value.Pos;
-
-            var labels = PathHelper.EnumerateBetween(start, end).Select(o => o.Pos).ToList();
-
-            Vector2?[] middles = {
-                null,
-                TangentIntersectionApproximation(start, end),
-                DoubleMiddleApproximation(start, end)
+            var middle = Approximation switch
+            {
+                ApproximationMode.TangentIntersection => TangentIntersectionApproximation(segmentStart, segmentEnd),
+                ApproximationMode.DoubleMiddle => DoubleMiddleApproximation(segmentStart, segmentEnd),
+                ApproximationMode.Best => BestApproximation(segmentStart, segmentEnd),
+                _ => null,
             };
 
-            Vector2? bestMiddle = null;
-            double bestLoss = double.PositiveInfinity;
+            if (middle.HasValue) yield return middle.Value;
 
-            foreach (var middle in middles) {
-                var bezier = new BezierCurveQuadric(p1, p2, middle ?? (p2 + p1) / 2);
+            yield return segmentEnd.Value.Pos;
+        }
+    }
 
-                var interpolatedPoints = new Vector2[NumTestPoints];
-                for (int i = 0; i < NumTestPoints; i++) {
-                    double t = (double) i / (NumTestPoints - 1);
-                    interpolatedPoints[i] = bezier.CalculatePoint(t);
-                }
+    private Vector2? BestApproximation(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end)
+    {
+        const double nullBias = 1E-3D;
 
-                var loss = SliderPathUtil.CalculateLoss(interpolatedPoints, labels);
+        // Make sure start index is before end index
+        // The results will be the same for flipped indices
+        if (start.Value > end.Value) (end, start) = (start, end);
 
-                // Add some bias towards not using a middle anchor
-                if (!middle.HasValue)
-                    loss -= nullBias;
+        var p1 = start.Value.Pos;
+        var p2 = end.Value.Pos;
 
-                if (Precision.AlmostBigger(loss, bestLoss)) {
-                    continue;
-                }
+        var labels = PathHelper.EnumerateBetween(start, end).Select(o => o.Pos).ToList();
 
-                bestLoss = loss;
-                bestMiddle = middle;
+        Vector2?[] middles =
+        {
+            null,
+            TangentIntersectionApproximation(start, end),
+            DoubleMiddleApproximation(start, end),
+        };
+
+        Vector2? bestMiddle = null;
+        double bestLoss = double.PositiveInfinity;
+
+        foreach (var middle in middles)
+        {
+            var bezier = new BezierCurveQuadric(p1, p2, middle ?? (p2 + p1) / 2);
+
+            var interpolatedPoints = new Vector2[NumTestPoints];
+            for (int i = 0; i < NumTestPoints; i++)
+            {
+                double t = (double)i / (NumTestPoints - 1);
+                interpolatedPoints[i] = bezier.CalculatePoint(t);
             }
 
-            return bestMiddle;
+            double loss = SliderPathUtil.CalculateLoss(interpolatedPoints, labels);
+
+            // Add some bias towards not using a middle anchor
+            if (!middle.HasValue)
+                loss -= nullBias;
+
+            if (Precision.AlmostBigger(loss, bestLoss)) continue;
+
+            bestLoss = loss;
+            bestMiddle = middle;
         }
 
-        private static Vector2? TangentIntersectionApproximation(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end) {
-            var p1 = start.Value.Pos;
-            var p2 = end.Value.Pos;
+        return bestMiddle;
+    }
 
-            var a1 = start.Value.PostAngle;
-            var a2 = end.Value.PreAngle;
+    private static Vector2? TangentIntersectionApproximation(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end)
+    {
+        var p1 = start.Value.Pos;
+        var p2 = end.Value.Pos;
 
-            if (Math.Abs(MathHelper.AngleDifference(a1, a2)) < Precision.DoubleEpsilon) {
-                return null;
-            }
+        double a1 = start.Value.PostAngle;
+        double a2 = end.Value.PreAngle;
 
-            var t1 = new Line2(p1, a1);
-            var t2 = new Line2(p2, a2);
+        if (Math.Abs(MathHelper.AngleDifference(a1, a2)) < Precision.DoubleEpsilon) return null;
 
-            var middleAnchor = Line2.Intersection(t1, t2);
-            if (middleAnchor != Vector2.NaN &&
-                Vector2.DistanceSquared(p1, middleAnchor) > 0.5 &&
-                Vector2.DistanceSquared(p2, middleAnchor) > 0.5) {
-                return middleAnchor;
-            }
+        var t1 = new Line2(p1, a1);
+        var t2 = new Line2(p2, a2);
 
-            return null;
+        var middleAnchor = Line2.Intersection(t1, t2);
+        if (middleAnchor != Vector2.NaN && Vector2.DistanceSquared(p1, middleAnchor) > 0.5 && Vector2.DistanceSquared(p2, middleAnchor) > 0.5)
+            return middleAnchor;
+
+        return null;
+    }
+
+    private Vector2? DoubleMiddleApproximation(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end)
+    {
+        var p1 = start.Value.Pos;
+        var p2 = end.Value.Pos;
+        var averagePoint = (p1 + p2) / 2;
+
+        double d1 = start.Value.CumulativeLength;
+        double d2 = end.Value.CumulativeLength;
+        double dm = (d1 + d2) / 2;
+        var middle = GetExactPointAtDistance(start, dm);
+        var middlePoint = middle.Pos;
+
+
+        if (Vector2.DistanceSquared(averagePoint, middlePoint) < 0.1) return null;
+
+        var doubleMiddlePoint = averagePoint + (middlePoint - averagePoint) * 2;
+
+        return doubleMiddlePoint;
+    }
+
+    /// <summary>
+    ///     Calculates the indices of sub-ranges such that the sub-ranges have no inflection points or sharp curves inside.
+    /// </summary>
+    private List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>)> GetNonInflectionSegments(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end)
+    {
+        int dir = Math.Sign(end.Value.CumulativeLength - start.Value.CumulativeLength);
+
+        switch (dir)
+        {
+            case 0:
+                return new List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>)> { (start, end) };
+            case -1:
+                // If the direction is reversed, just swap the start and end index and then reverse the result at the end
+                (start, end) = (end, start);
+                break;
         }
 
-        private Vector2? DoubleMiddleApproximation(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end) {
-            var p1 = start.Value.Pos;
-            var p2 = end.Value.Pos;
-            var averagePoint = (p1 + p2) / 2;
+        double lastAngleChange = 0;
+        var startSubRange = start;
+        var current = start;
+        double subRangeAngleChange = 0;
+        var subRanges = new List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>, double)>();
+        // Loop through the whole path and divide it into sub-ranges at every inflection point
+        while (current is not null && current.Previous != end)
+        {
+            double angleChange = current == start || current == end || current.Value.Red ? 0 : MathHelper.AngleDifference(current.Value.PreAngle, current.Value.PostAngle);
 
-            var d1 = start.Value.CumulativeLength;
-            var d2 = end.Value.CumulativeLength;
-            var dm = (d1 + d2) / 2;
-            var middle = GetExactPointAtDistance(start, dm);
-            var middlePoint = middle.Pos;
+            // Check for inflection point or red anchors
+            if (angleChange * lastAngleChange < -1E-5D && current != startSubRange && current.Previous != startSubRange || current.Value.Red && current != startSubRange)
+            {
+                subRanges.Add((startSubRange, current, subRangeAngleChange));
 
+                startSubRange = current;
+                subRangeAngleChange = -Math.Abs(angleChange); // Negate the angle change because this point invalidates the angle
+            }
+            else if (Precision.AlmostEquals(angleChange, 0) && !Precision.AlmostEquals(lastAngleChange, 0))
+            {
+                subRanges.Add((startSubRange, current, subRangeAngleChange));
 
-            if (Vector2.DistanceSquared(averagePoint, middlePoint) < 0.1) {
-                return null;
+                startSubRange = current;
+                subRangeAngleChange = -Math.Abs(angleChange); // Negate the angle change because this point invalidates the angle
+            }
+            else if (!Precision.AlmostEquals(angleChange, 0) && Precision.AlmostEquals(lastAngleChange, 0) && current != startSubRange && current.Previous != startSubRange)
+            {
+                // Extra check to prevent subranges going backwards with i - 1
+                // Place on the previous index for symmetry with the part going into the zero chain
+                subRanges.Add((startSubRange, current.Previous, 0));
+
+                startSubRange = current.Previous;
             }
 
-            var doubleMiddlePoint = averagePoint + (middlePoint - averagePoint) * 2;
+            subRangeAngleChange += Math.Abs(angleChange);
 
-            return doubleMiddlePoint;
+            lastAngleChange = angleChange;
+            current = current.Next;
         }
 
-        /// <summary>
-        /// Calculates the indices of sub-ranges such that the sub-ranges have no inflection points or sharp curves inside.
-        /// </summary>
-        private List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>)> GetNonInflectionSegments(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end) {
-            int dir = Math.Sign(end.Value.CumulativeLength - start.Value.CumulativeLength);
+        if (startSubRange != end) subRanges.Add((startSubRange, end, subRangeAngleChange));
 
-            switch (dir) {
-                case 0:
-                    return new List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>)> {(start, end)};
-                case -1:
-                    // If the direction is reversed, just swap the start and end index and then reverse the result at the end
-                    (start, end) = (end, start);
-                    break;
-            }
+        // Remove all sub-ranges which start and end on the same index or start at a later index
+        subRanges.RemoveAll(s => s.Item1.Value >= s.Item2.Value);
 
-            double lastAngleChange = 0;
-            var startSubRange = start;
-            var current = start;
-            double subRangeAngleChange = 0;
-            var subRanges = new List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>, double)>();
-            // Loop through the whole path and divide it into sub-ranges at every inflection point
-            while (current is not null && current.Previous != end) {
-                var angleChange = current == start || current == end || current.Value.Red ? 0 : MathHelper.AngleDifference(current.Value.PreAngle, current.Value.PostAngle);
+        var segments = new List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>)>();
+        // Divide each sub-range into evenly spaced segments which have an aggregate angle change less than the max
+        foreach ((var startRange, var endRange, double angleRange) in subRanges)
+        {
+            int numSegments = (int)Math.Floor(angleRange / MaxAngle) + 1;
+            double maxSegmentAngle = angleRange / numSegments;
 
-                // Check for inflection point or red anchors
-                if (angleChange * lastAngleChange < -1E-5D && current != startSubRange && current.Previous != startSubRange ||
-                    current.Value.Red && current != startSubRange) {
-                    subRanges.Add((startSubRange, current, subRangeAngleChange));
+            double segmentAngleChange = 0;
+            var startSegment = startRange;
+            var currentSegment = startRange;
+            // Loop through the sub-range and count the angle change to make even divisions of the angle
+            while (currentSegment is not null && currentSegment.Previous != endRange)
+            {
+                double angleChange = currentSegment == startRange || currentSegment == endRange
+                    ? 0
+                    : MathHelper.AngleDifference(currentSegment.Value.PreAngle, currentSegment.Value.PostAngle);
 
-                    startSubRange = current;
-                    subRangeAngleChange = -Math.Abs(angleChange);  // Negate the angle change because this point invalidates the angle
+                segmentAngleChange += Math.Abs(angleChange);
+
+                if (segmentAngleChange > maxSegmentAngle + Precision.DoubleEpsilon)
+                {
+                    segments.Add((startSegment, currentSegment));
+
+                    startSegment = currentSegment;
+                    segmentAngleChange -= maxSegmentAngle;
                 }
-                else if (Precision.AlmostEquals(angleChange, 0) && !Precision.AlmostEquals(lastAngleChange, 0)) {
-                    subRanges.Add((startSubRange, current, subRangeAngleChange));
 
-                    startSubRange = current;
-                    subRangeAngleChange = -Math.Abs(angleChange);  // Negate the angle change because this point invalidates the angle
-                } else if (!Precision.AlmostEquals(angleChange, 0) && Precision.AlmostEquals(lastAngleChange, 0) && current != startSubRange && current.Previous != startSubRange) {  // Extra check to prevent subranges going backwards with i - 1
-                    // Place on the previous index for symmetry with the part going into the zero chain
-                    subRanges.Add((startSubRange, current.Previous, 0));
-
-                    startSubRange = current.Previous;
-                }
-
-                subRangeAngleChange += Math.Abs(angleChange);
-
-                lastAngleChange = angleChange;
-                current = current.Next;
+                currentSegment = currentSegment.Next;
             }
 
-            if (startSubRange != end) {
-                subRanges.Add((startSubRange, end, subRangeAngleChange));
-            }
-
-            // Remove all sub-ranges which start and end on the same index or start at a later index
-            subRanges.RemoveAll(s => s.Item1.Value >= s.Item2.Value);
-
-            List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>)> segments = new List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>)>();
-            // Divide each sub-range into evenly spaced segments which have an aggregate angle change less than the max
-            foreach ((LinkedListNode<PathPoint> startRange, LinkedListNode<PathPoint> endRange, double angleRange) in subRanges) {
-                int numSegments = (int) Math.Floor(angleRange / MaxAngle) + 1;
-                double maxSegmentAngle = angleRange / numSegments;
-
-                double segmentAngleChange = 0;
-                var startSegment = startRange;
-                var currentSegment = startRange;
-                // Loop through the sub-range and count the angle change to make even divisions of the angle
-                while (currentSegment is not null && currentSegment.Previous != endRange) {
-                    var angleChange = currentSegment == startRange || currentSegment == endRange ? 0 :
-                        MathHelper.AngleDifference(currentSegment.Value.PreAngle, currentSegment.Value.PostAngle);
-
-                    segmentAngleChange += Math.Abs(angleChange);
-
-                    if (segmentAngleChange > maxSegmentAngle + Precision.DoubleEpsilon) {
-                        segments.Add((startSegment, currentSegment));
-
-                        startSegment = currentSegment;
-                        segmentAngleChange -= maxSegmentAngle;
-                    }
-
-                    currentSegment = currentSegment.Next;
-                }
-
-                if (startSegment != endRange) {
-                    segments.Add((startSegment, endRange));
-                }
-            }
-
-            if (dir != -1) {
-                return segments;
-            }
-
-            // Reverse the result
-            List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>)> reversedSegments = new List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>)>(segments.Count);
-
-            for (int i = segments.Count - 1; i >= 0; i--) {
-                var s = segments[i];
-                reversedSegments.Add((s.Item2, s.Item1));
-            }
-
-            return reversedSegments;
+            if (startSegment != endRange) segments.Add((startSegment, endRange));
         }
 
-        private static PathPoint GetExactPointAtDistance(LinkedListNode<PathPoint> start, double distance) {
-            var middleFirst = PathHelper.FindFirstOccurrence(start, distance).Value;
-            var middleLast = PathHelper.FindLastOccurrence(start, distance).Value;
+        if (dir != -1) return segments;
 
-            if (Precision.AlmostEquals(middleFirst.CumulativeLength, middleLast.CumulativeLength)) {
-                return middleFirst;
-            }
+        // Reverse the result
+        var reversedSegments = new List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>)>(segments.Count);
 
-            var dt = (distance - middleFirst.CumulativeLength) / (middleLast.CumulativeLength - middleFirst.CumulativeLength);
-            var middle = PathPoint.Lerp(middleFirst, middleLast, dt);
-
-            return middle;
+        for (int i = segments.Count - 1; i >= 0; i--)
+        {
+            var s = segments[i];
+            reversedSegments.Add((s.Item2, s.Item1));
         }
 
-        /// <summary>
-        /// Defines values for approximation mode.
-        /// </summary>
-        public enum ApproximationMode {
-            /// <summary>
-            /// Use the intersection of endpoint tangents as the Bézier control construction.
-            /// </summary>
-            TangentIntersection,
-            /// <summary>
-            /// Join two curve pieces around an estimated middle point.
-            /// </summary>
-            DoubleMiddle,
-            /// <summary>
-            /// Evaluate both constructions and retain the lower-loss result.
-            /// </summary>
-            Best
-        }
+        return reversedSegments;
+    }
+
+    private static PathPoint GetExactPointAtDistance(LinkedListNode<PathPoint> start, double distance)
+    {
+        var middleFirst = PathHelper.FindFirstOccurrence(start, distance).Value;
+        var middleLast = PathHelper.FindLastOccurrence(start, distance).Value;
+
+        if (Precision.AlmostEquals(middleFirst.CumulativeLength, middleLast.CumulativeLength)) return middleFirst;
+
+        double dt = (distance - middleFirst.CumulativeLength) / (middleLast.CumulativeLength - middleFirst.CumulativeLength);
+        var middle = PathPoint.Lerp(middleFirst, middleLast, dt);
+
+        return middle;
     }
 }

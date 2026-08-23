@@ -1,5 +1,4 @@
 using Avalonia.Input;
-using FluentAssertions;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.GeometryDashboard;
@@ -10,6 +9,7 @@ using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -22,7 +22,7 @@ public sealed class GeometryDashboardViewModelTests
     public void Constructor_WithCoreGenerators_GroupsAndFiltersRows()
     {
         // Arrange
-        using GeometryDashboardViewModel viewModel = CreateViewModel();
+        using var viewModel = CreateViewModel();
 
         // Act
         viewModel.Generators.Should().NotBeEmpty();
@@ -39,7 +39,7 @@ public sealed class GeometryDashboardViewModelTests
     public async Task RefreshOnceAsync_WhenInputPlatformIsUnavailable_ShowsGracefulStatus()
     {
         // Arrange
-        using GeometryDashboardViewModel viewModel = CreateViewModel(inputSupported: false);
+        using var viewModel = CreateViewModel(false);
 
         // Act
         await viewModel.RefreshOnceAsync();
@@ -52,7 +52,7 @@ public sealed class GeometryDashboardViewModelTests
     public void ToggleSelected_WithShiftModifierAndEmptyGraph_DoesNotCreateObjects()
     {
         // Arrange
-        using GeometryDashboardViewModel viewModel = CreateViewModel();
+        using var viewModel = CreateViewModel();
 
         // Act
         viewModel.ToggleSelected(KeyModifiers.Shift);
@@ -69,12 +69,12 @@ public sealed class GeometryDashboardViewModelTests
         HitObject initialHitObject = new("64,96,1000,1,0,0:0:0:0:");
         HitObject selectedHitObject = new("64,96,1000,1,0,0:0:0:0:");
         HitObject finalHitObject = new("64,96,1000,1,0,0:0:0:0:");
-        using GeometryDashboardViewModel viewModel = CreateViewModel(
+        using var viewModel = CreateViewModel(
             snapshots:
             [
                 CreateRuntimeSnapshot(initialHitObject, 0, []),
                 CreateRuntimeSnapshot(selectedHitObject, 1, [selectedHitObject]),
-                CreateRuntimeSnapshot(finalHitObject, 2, [])
+                CreateRuntimeSnapshot(finalHitObject, 2, []),
             ]);
 
         // Act
@@ -92,8 +92,9 @@ public sealed class GeometryDashboardViewModelTests
 
     private static GeometryDashboardViewModel CreateViewModel(
         bool inputSupported = true,
-        params GeometryDashboardRuntimeSnapshot?[] snapshots) =>
-        new(
+        params GeometryDashboardRuntimeSnapshot?[] snapshots)
+    {
+        return new GeometryDashboardViewModel(
             new ApplicationSettings(),
             new RuntimeStub(snapshots),
             new InputStub(inputSupported),
@@ -104,12 +105,14 @@ public sealed class GeometryDashboardViewModelTests
             new NotificationStub(),
             new DialogStub(),
             new DispatcherStub());
+    }
 
     private static GeometryDashboardRuntimeSnapshot CreateRuntimeSnapshot(
         HitObject hitObject,
         int editorTime,
-        IReadOnlyList<HitObject> selectedHitObjects) =>
-        new(
+        IReadOnlyList<HitObject> selectedHitObjects)
+    {
+        return new GeometryDashboardRuntimeSnapshot(
             new GeometryDashboardProcess(1, new PlatformWindowId(2), "osu!.exe"),
             new GeometryDashboardWindow(
                 new PlatformWindowId(2),
@@ -128,27 +131,50 @@ public sealed class GeometryDashboardViewModelTests
                 [hitObject],
                 selectedHitObjects),
             null);
+    }
 
     private sealed class RuntimeStub(IEnumerable<GeometryDashboardRuntimeSnapshot?> snapshots) : IGeometryDashboardRuntime
     {
         private readonly Queue<GeometryDashboardRuntimeSnapshot?> snapshots = new(snapshots);
 
-        public Task<GeometryDashboardRuntimeSnapshot?> ReadAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(snapshots.Count == 0 ? null : snapshots.Dequeue());
+        public Task<GeometryDashboardRuntimeSnapshot?> ReadAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(snapshots.Count == 0 ? null : snapshots.Dequeue());
+        }
     }
 
     private sealed class InputStub(bool isSupported) : IGeometryDashboardInputService
     {
         public bool IsSupported => isSupported;
-        public bool IsHotkeyDown(Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization.Hotkey? hotkey) => false;
-        public bool IsMouseButtonDown(GeometryDashboardMouseButton button) => false;
-        public bool TryGetCursorPosition(out Vector2 position) { position = Vector2.Zero; return false; }
-        public bool TrySetCursorPosition(Vector2 position) => false;
+
+        public bool IsHotkeyDown(Hotkey? hotkey)
+        {
+            return false;
+        }
+
+        public bool IsMouseButtonDown(GeometryDashboardMouseButton button)
+        {
+            return false;
+        }
+
+        public bool TryGetCursorPosition(out Vector2 position)
+        {
+            position = Vector2.Zero;
+            return false;
+        }
+
+        public bool TrySetCursorPosition(Vector2 position)
+        {
+            return false;
+        }
     }
 
     private sealed class OverlayFactoryStub : IGeometryDashboardOverlayHostFactory
     {
-        public IGeometryDashboardOverlayHost Create() => new OverlayStub();
+        public IGeometryDashboardOverlayHost Create()
+        {
+            return new OverlayStub();
+        }
     }
 
     private sealed class OverlayStub : IGeometryDashboardOverlayHost
@@ -168,8 +194,15 @@ public sealed class GeometryDashboardViewModelTests
 
     private sealed class SerializerStub : IProjectSerializer
     {
-        public string Serialize<TProject>(TProject project) => "{}";
-        public TProject Deserialize<TProject>(string json) => Activator.CreateInstance<TProject>();
+        public string Serialize<TProject>(TProject project)
+        {
+            return "{}";
+        }
+
+        public TProject Deserialize<TProject>(string json)
+        {
+            return Activator.CreateInstance<TProject>();
+        }
     }
 
     private sealed class FilePickerStub : IFilePicker
@@ -177,38 +210,80 @@ public sealed class GeometryDashboardViewModelTests
         public bool CanOpenFiles => false;
         public bool CanSaveFiles => false;
         public bool CanPickFolders => false;
-        public Task<IReadOnlyList<string>> PickOpenFilesAsync(OpenFilePickerRequest request, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<string>>([]);
-        public Task<string?> PickSaveFileAsync(SaveFilePickerRequest request, CancellationToken cancellationToken = default) => Task.FromResult<string?>(null);
-        public Task<IReadOnlyList<string>> PickFoldersAsync(OpenFolderPickerRequest request, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<string>>([]);
+
+        public Task<IReadOnlyList<string>> PickOpenFilesAsync(OpenFilePickerRequest request, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IReadOnlyList<string>>([]);
+        }
+
+        public Task<string?> PickSaveFileAsync(SaveFilePickerRequest request, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<string?>(null);
+        }
+
+        public Task<IReadOnlyList<string>> PickFoldersAsync(OpenFolderPickerRequest request, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IReadOnlyList<string>>([]);
+        }
     }
 
     private sealed class TextFileStoreStub : ITextFileStore
     {
-        public IReadOnlyList<string> ReadAllLines(string path) => [];
+        public IReadOnlyList<string> ReadAllLines(string path)
+        {
+            return [];
+        }
+
         public void WriteAllLines(string path, IEnumerable<string> lines) { }
         public void Delete(string path) { }
-        public string GetParentFolder(string path) => string.Empty;
-        public string CombinePath(string parent, string child) => child;
+
+        public string GetParentFolder(string path)
+        {
+            return string.Empty;
+        }
+
+        public string CombinePath(string parent, string child)
+        {
+            return child;
+        }
     }
 
     private sealed class NotificationStub : IUserNotificationService
     {
         public event EventHandler<UserNotificationPublishedEventArgs>? Published;
-        public Task PublishAsync(UserNotification notification, CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task PublishAsync(UserNotification notification, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class DialogStub : IGeometryDashboardDialogService
     {
-        public Task<SnappingToolsPreferences?> ShowPreferencesAsync(SnappingToolsPreferences preferences) => Task.FromResult<SnappingToolsPreferences?>(null);
+        public Task<SnappingToolsPreferences?> ShowPreferencesAsync(SnappingToolsPreferences preferences)
+        {
+            return Task.FromResult<SnappingToolsPreferences?>(null);
+        }
+
         public Task ShowProjectSlotsAsync(
             SnappingToolsProject project,
             Action<SnappingToolsSaveSlot> loadSlot,
-            Action refreshHotkeys) => Task.CompletedTask;
-        public Task<bool> ShowGeneratorSettingsAsync(GeneratorSettings settings) => Task.FromResult(false);
+            Action refreshHotkeys)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task<bool> ShowGeneratorSettingsAsync(GeneratorSettings settings)
+        {
+            return Task.FromResult(false);
+        }
     }
 
-    private sealed class DispatcherStub : Mapping_Tools.Desktop.Shell.IUiDispatcher
+    private sealed class DispatcherStub : IUiDispatcher
     {
-        public void Post(Action action) => action();
+        public void Post(Action action)
+        {
+            action();
+        }
     }
 }

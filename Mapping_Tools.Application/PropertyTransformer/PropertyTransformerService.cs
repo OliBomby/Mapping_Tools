@@ -4,23 +4,23 @@ using Mapping_Tools.Core.Tools.PropertyTransformer;
 namespace Mapping_Tools.Application.PropertyTransformer;
 
 /// <summary>
-/// Coordinates live-aware beatmap loading, transformation, backups, and persistence.
+///     Coordinates live-aware beatmap loading, transformation, backups, and persistence.
 /// </summary>
 public sealed class PropertyTransformerService : IPropertyTransformerService
 {
     private readonly IBeatmapEditingGateway _editingGateway;
 
     /// <summary>
-    /// Creates the Property Transformer application service.
+    ///     Creates the Property Transformer application service.
     /// </summary>
     /// <param name="editingGateway">Loads documents and saves them through the backup boundary.</param>
     public PropertyTransformerService(IBeatmapEditingGateway editingGateway)
     {
         _editingGateway = editingGateway
-            ?? throw new ArgumentNullException(nameof(editingGateway));
+                          ?? throw new ArgumentNullException(nameof(editingGateway));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<PropertyTransformerResult> TransformAsync(
         IReadOnlyList<string> paths,
         PropertyTransformerOptions options,
@@ -30,18 +30,16 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(options);
         if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace))
-        {
             throw new ArgumentException(
                 "Select at least one beatmap or storyboard.",
                 nameof(paths));
-        }
 
         List<string> processedPaths = [];
         for (int index = 0; index < paths.Count; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
-            Progress<double>? documentProgress = progress is null
+            var documentProgress = progress is null
                 ? null
                 : new Progress<double>(value =>
                     progress.Report((index * 100 + value) / paths.Count));
@@ -50,7 +48,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
                     ".osb",
                     StringComparison.OrdinalIgnoreCase))
             {
-                StoryboardEditor2 editor = await _editingGateway
+                var editor = await _editingGateway
                     .OpenStoryboardAsync(path, cancellationToken)
                     .ConfigureAwait(false);
                 PropertyTransformerEngine.Apply(
@@ -66,7 +64,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
             }
             else
             {
-                BeatmapEditingSession session = await _editingGateway
+                var session = await _editingGateway
                     .OpenBeatmapAsync(
                         path,
                         LiveBeatmapPreference.PreferLive,

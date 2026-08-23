@@ -17,13 +17,13 @@ public sealed class TimelineControlTests
         {
             StartTime = 0,
             EndTime = 1000,
-            Markers = [expected]
+            Markers = [expected],
         };
         control.Arrange(new Rect(0, 0, 200, 100));
 
         // Act
-        TimelineMarker? marker = control.MarkerAt(46);
-        TimelineMarker? reservedAreaMarker = control.MarkerAt(145);
+        var marker = control.MarkerAt(46);
+        var reservedAreaMarker = control.MarkerAt(145);
 
         // Assert
         marker.Should().BeSameAs(expected);

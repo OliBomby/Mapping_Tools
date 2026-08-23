@@ -16,5 +16,5 @@ public enum DashStylesEnum
     DashDoubleDot = 3,
 
     /// <summary>A continuous line.</summary>
-    Solid = 4
+    Solid = 4,
 }

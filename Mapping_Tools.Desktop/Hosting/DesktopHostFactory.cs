@@ -8,7 +8,7 @@ internal static class DesktopHostFactory
 {
     internal static IHost Create(string[] args)
     {
-        HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+        var builder = Host.CreateApplicationBuilder(args);
         builder.Services.AddMappingToolsDesktop();
         builder.Services.AddMappingToolsHostedServices();
         return builder.Build();

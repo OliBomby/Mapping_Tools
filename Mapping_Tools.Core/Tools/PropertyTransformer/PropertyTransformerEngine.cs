@@ -1,17 +1,16 @@
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Core.Classes.MathUtil;
-using Mapping_Tools.Core.Tools.MapCleaner;
 
 namespace Mapping_Tools.Core.Tools.PropertyTransformer;
 
 /// <summary>
-/// Applies Property Transformer changes to parsed beatmaps and storyboards.
+///     Applies Property Transformer changes to parsed beatmaps and storyboards.
 /// </summary>
 public static class PropertyTransformerEngine
 {
     /// <summary>
-    /// Transforms timing points, hit objects, bookmarks, and beatmap events in place.
+    ///     Transforms timing points, hit objects, bookmarks, and beatmap events in place.
     /// </summary>
     /// <param name="beatmap">The mutable beatmap to transform.</param>
     /// <param name="options">The multipliers, offsets, clipping, and filters to apply.</param>
@@ -28,7 +27,7 @@ public static class PropertyTransformerEngine
 
         List<TimingPointChange> timingPointChanges = [];
 
-        foreach (TimingPoint timingPoint in beatmap.BeatmapTiming.TimingPoints)
+        foreach (var timingPoint in beatmap.BeatmapTiming.TimingPoints)
         {
             cancellationToken.ThrowIfCancellationRequested();
             // Offset
@@ -41,7 +40,6 @@ public static class PropertyTransformerEngine
                 timingPoint.Offset,
                 round: beatmap.Version < 128);
             if (timingPoint.Uninherited)
-            {
                 // BPM
                 TransformProperty(
                     options,
@@ -52,7 +50,6 @@ public static class PropertyTransformerEngine
                     timingPoint.Offset,
                     15,
                     10000);
-            }
 
             // Slider Velocity
             TransformProperty(
@@ -62,11 +59,11 @@ public static class PropertyTransformerEngine
                 () => beatmap.BeatmapTiming.GetSvMultiplierAtTime(timingPoint.Offset),
                 value =>
                 {
-                    TimingPoint changed = timingPoint.Copy();
+                    var changed = timingPoint.Copy();
                     changed.MpB = -100 / value;
                     timingPointChanges.Add(new TimingPointChange(
                         changed,
-                        mpb: true,
+                        true,
                         fuzziness: 0.4));
                 },
                 timingPoint.Offset,
@@ -82,7 +79,7 @@ public static class PropertyTransformerEngine
                 timingPoint.Offset,
                 0,
                 int.MaxValue,
-                round: true);
+                true);
             // Volume
             TransformProperty(
                 options,
@@ -93,15 +90,14 @@ public static class PropertyTransformerEngine
                 timingPoint.Offset,
                 5,
                 100,
-                round: true);
+                true);
         }
 
         Report(progress, 20);
 
         if (options.HitObjectTimeMultiplier != 1 || options.HitObjectTimeOffset != 0)
-        {
             // Hitobject time
-            foreach (HitObject hitObject in beatmap.HitObjects)
+            foreach (var hitObject in beatmap.HitObjects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 // Get the end time early because the start time gets modified
@@ -116,7 +112,6 @@ public static class PropertyTransformerEngine
                     hitObject.Time,
                     round: beatmap.Version < 128);
                 if (hitObject.IsHoldNote || hitObject.IsSpinner)
-                {
                     // Transform end time of hold notes and spinner
                     TransformProperty(
                         options,
@@ -126,16 +121,13 @@ public static class PropertyTransformerEngine
                         value => hitObject.EndTime = value,
                         oldEndTime,
                         round: beatmap.Version < 128);
-                }
             }
-        }
 
         Report(progress, 25);
 
         if (options.HitObjectVolumeMultiplier != 1 || options.HitObjectVolumeOffset != 0)
-        {
             // Hitobject volume
-            foreach (HitObject hitObject in beatmap.HitObjects)
+            foreach (var hitObject in beatmap.HitObjects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 TransformProperty(
@@ -147,14 +139,12 @@ public static class PropertyTransformerEngine
                     hitObject.Time,
                     0,
                     100,
-                    round: true);
+                    true);
             }
-        }
 
         Report(progress, 30);
 
         if (options.BookmarkTimeMultiplier != 1 || options.BookmarkTimeOffset != 0)
-        {
             // Bookmark time
             beatmap.SetBookmarks(beatmap.GetBookmarks()
                 .Select(bookmark => PassesFilter(options, bookmark, bookmark)
@@ -163,7 +153,6 @@ public static class PropertyTransformerEngine
                         : bookmark * options.BookmarkTimeMultiplier + options.BookmarkTimeOffset
                     : bookmark)
                 .ToList());
-        }
 
         Report(progress, 40);
 
@@ -173,9 +162,8 @@ public static class PropertyTransformerEngine
             .Concat(beatmap.StoryboardLayerForeground)
             .Concat(beatmap.StoryboardLayerOverlay);
         if (options.SbEventTimeMultiplier != 1 || options.SbEventTimeOffset != 0)
-        {
             // Storyboarded event time
-            foreach (Event current in beatmapEvents)
+            foreach (var current in beatmapEvents)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 TransformEventTime(
@@ -185,14 +173,12 @@ public static class PropertyTransformerEngine
                     options.SbEventTimeMultiplier,
                     options.SbEventTimeOffset);
             }
-        }
 
         Report(progress, 50);
 
         if (options.SbSampleTimeMultiplier != 1 || options.SbSampleTimeOffset != 0)
-        {
             // Storyboarded sample time
-            foreach (StoryboardSoundSample sample in beatmap.StoryboardSoundSamples)
+            foreach (var sample in beatmap.StoryboardSoundSamples)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 TransformProperty(
@@ -204,14 +190,12 @@ public static class PropertyTransformerEngine
                     sample.StartTime,
                     round: beatmap.Version < 128);
             }
-        }
 
         Report(progress, 55);
 
         if (options.SbSampleVolumeMultiplier != 1 || options.SbSampleVolumeOffset != 0)
-        {
             // Storyboarded sample volume
-            foreach (StoryboardSoundSample sample in beatmap.StoryboardSoundSamples)
+            foreach (var sample in beatmap.StoryboardSoundSamples)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 TransformProperty(
@@ -223,16 +207,14 @@ public static class PropertyTransformerEngine
                     sample.StartTime,
                     8,
                     100,
-                    round: true);
+                    true);
             }
-        }
 
         Report(progress, 60);
 
         if (options.BreakTimeMultiplier != 1 || options.BreakTimeOffset != 0)
-        {
             // Break time
-            foreach (Break breakPeriod in beatmap.BreakPeriods)
+            foreach (var breakPeriod in beatmap.BreakPeriods)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 TransformProperty(
@@ -252,19 +234,14 @@ public static class PropertyTransformerEngine
                     breakPeriod.EndTime,
                     round: beatmap.Version < 128);
             }
-        }
 
         Report(progress, 70);
 
         if (options.VideoTimeMultiplier != 1 || options.VideoTimeOffset != 0)
-        {
             // Video start time
-            foreach (Event current in beatmap.BackgroundAndVideoEvents)
+            foreach (var current in beatmap.BackgroundAndVideoEvents)
             {
-                if (current is not Video video)
-                {
-                    continue;
-                }
+                if (current is not Video video) continue;
 
                 cancellationToken.ThrowIfCancellationRequested();
                 TransformProperty(
@@ -276,14 +253,11 @@ public static class PropertyTransformerEngine
                     video.StartTime,
                     round: beatmap.Version < 128);
             }
-        }
 
         Report(progress, 80);
 
         if (options.PreviewTimeMultiplier != 1 || options.PreviewTimeOffset != 0)
-        {
-            if (beatmap.General.ContainsKey("PreviewTime") &&
-                beatmap.General["PreviewTime"].IntValue != -1)
+            if (beatmap.General.ContainsKey("PreviewTime") && beatmap.General["PreviewTime"].IntValue != -1)
             {
                 // Preview point time
                 double previewTime = beatmap.General["PreviewTime"].DoubleValue;
@@ -296,7 +270,6 @@ public static class PropertyTransformerEngine
                     previewTime,
                     round: beatmap.Version < 128);
             }
-        }
 
         Report(progress, 90);
         TimingPointChange.Apply(beatmap.BeatmapTiming, timingPointChanges);
@@ -304,7 +277,7 @@ public static class PropertyTransformerEngine
     }
 
     /// <summary>
-    /// Transforms storyboard events, storyboard samples, and video start times in place.
+    ///     Transforms storyboard events, storyboard samples, and video start times in place.
     /// </summary>
     /// <param name="storyboard">The mutable storyboard to transform.</param>
     /// <param name="options">The multipliers, offsets, clipping, and filters to apply.</param>
@@ -326,8 +299,7 @@ public static class PropertyTransformerEngine
             .Concat(storyboard.StoryboardLayerOverlay);
         // Storyboarded event time
         if (options.SbEventTimeMultiplier != 1 || options.SbEventTimeOffset != 0)
-        {
-            foreach (Event current in events)
+            foreach (var current in events)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 TransformEventTime(
@@ -337,14 +309,12 @@ public static class PropertyTransformerEngine
                     options.SbEventTimeMultiplier,
                     options.SbEventTimeOffset);
             }
-        }
 
         Report(progress, 50);
 
         if (options.SbSampleTimeMultiplier != 1 || options.SbSampleTimeOffset != 0)
-        {
             // Storyboarded sample time
-            foreach (StoryboardSoundSample sample in storyboard.StoryboardSoundSamples)
+            foreach (var sample in storyboard.StoryboardSoundSamples)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 TransformProperty(
@@ -356,14 +326,12 @@ public static class PropertyTransformerEngine
                     sample.StartTime,
                     round: true);
             }
-        }
 
         Report(progress, 60);
 
         if (options.SbSampleVolumeMultiplier != 1 || options.SbSampleVolumeOffset != 0)
-        {
             // Storyboarded sample volume
-            foreach (StoryboardSoundSample sample in storyboard.StoryboardSoundSamples)
+            foreach (var sample in storyboard.StoryboardSoundSamples)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 TransformProperty(
@@ -375,21 +343,16 @@ public static class PropertyTransformerEngine
                     sample.StartTime,
                     8,
                     100,
-                    round: true);
+                    true);
             }
-        }
 
         Report(progress, 70);
 
         if (options.VideoTimeMultiplier != 1 || options.VideoTimeOffset != 0)
-        {
             // Video start time
-            foreach (Event current in storyboard.BackgroundAndVideoEvents)
+            foreach (var current in storyboard.BackgroundAndVideoEvents)
             {
-                if (current is not Video video)
-                {
-                    continue;
-                }
+                if (current is not Video video) continue;
 
                 cancellationToken.ThrowIfCancellationRequested();
                 TransformProperty(
@@ -401,7 +364,6 @@ public static class PropertyTransformerEngine
                     video.StartTime,
                     round: true);
             }
-        }
 
         Report(progress, 90);
         Report(progress, 100);
@@ -414,9 +376,7 @@ public static class PropertyTransformerEngine
     {
         bool doFilterMatch = options.MatchFilter.Length > 0 && options.EnableFilters;
         bool doFilterUnmatch = options.UnmatchFilter.Length > 0 && options.EnableFilters;
-        bool doFilterRange = (options.MinTimeFilter != -1 || options.MaxTimeFilter != -1) &&
-                             options.EnableFilters &&
-                             !double.IsNaN(time);
+        bool doFilterRange = (options.MinTimeFilter != -1 || options.MaxTimeFilter != -1) && options.EnableFilters && !double.IsNaN(time);
         double min = options.MinTimeFilter == -1
             ? double.NegativeInfinity
             : options.MinTimeFilter;
@@ -424,11 +384,9 @@ public static class PropertyTransformerEngine
             ? double.PositiveInfinity
             : options.MaxTimeFilter;
 
-        return (!doFilterMatch || options.MatchFilter.Any(
-                    candidate => Precision.AlmostEquals(value, candidate, 0.001))) &&
-               (!doFilterUnmatch || !options.UnmatchFilter.Any(
-                    candidate => Precision.AlmostEquals(value, candidate, 0.001))) &&
-               (!doFilterRange || time >= min && time <= max);
+        return (!doFilterMatch || options.MatchFilter.Any(candidate => Precision.AlmostEquals(value, candidate, 0.001)))
+               && (!doFilterUnmatch || !options.UnmatchFilter.Any(candidate => Precision.AlmostEquals(value, candidate, 0.001)))
+               && (!doFilterRange || time >= min && time <= max);
     }
 
     private static void TransformProperty(
@@ -442,34 +400,19 @@ public static class PropertyTransformerEngine
         double? max = null,
         bool round = false)
     {
-        if (multiplier == 1 && offset == 0)
-        {
-            return;
-        }
+        if (multiplier == 1 && offset == 0) return;
 
         double value = getter();
-        if (!PassesFilter(options, value, time))
-        {
-            return;
-        }
+        if (!PassesFilter(options, value, time)) return;
 
         double newValue = value * multiplier + offset;
-        if (round)
-        {
-            newValue = Math.Round(newValue);
-        }
+        if (round) newValue = Math.Round(newValue);
 
         if (options.ClipProperties)
         {
-            if (min.HasValue)
-            {
-                newValue = Math.Max(newValue, min.Value);
-            }
+            if (min.HasValue) newValue = Math.Max(newValue, min.Value);
 
-            if (max.HasValue)
-            {
-                newValue = Math.Min(newValue, max.Value);
-            }
+            if (max.HasValue) newValue = Math.Min(newValue, max.Value);
         }
 
         setter(newValue);
@@ -489,7 +432,6 @@ public static class PropertyTransformerEngine
             : offset;
 
         if (current is IHasStartTime start)
-        {
             TransformProperty(
                 options,
                 multiplier,
@@ -498,10 +440,8 @@ public static class PropertyTransformerEngine
                 value => start.StartTime = value,
                 start.StartTime,
                 round: version < 128);
-        }
 
         if (current is IHasEndTime end)
-        {
             TransformProperty(
                 options,
                 multiplier,
@@ -510,10 +450,8 @@ public static class PropertyTransformerEngine
                 value => end.EndTime = value,
                 end.EndTime,
                 round: version < 128);
-        }
 
         if (current is IHasDuration duration)
-        {
             // Just a duration doesnt have a time to filter
             TransformProperty(
                 options,
@@ -522,15 +460,13 @@ public static class PropertyTransformerEngine
                 () => duration.Duration,
                 value => duration.Duration = value,
                 double.NaN);
-        }
 
         // Recurse to also transform all the children events
-        foreach (Event child in current.ChildEvents)
-        {
-            TransformEventTime(options, sourceBeatmap, child, multiplier, offset);
-        }
+        foreach (var child in current.ChildEvents) TransformEventTime(options, sourceBeatmap, child, multiplier, offset);
     }
 
-    private static void Report(IProgress<double>? progress, double value) =>
+    private static void Report(IProgress<double>? progress, double value)
+    {
         progress?.Report(value);
+    }
 }

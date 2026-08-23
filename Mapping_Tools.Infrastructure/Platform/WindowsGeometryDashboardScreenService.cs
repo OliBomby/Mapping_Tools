@@ -5,8 +5,8 @@ using Mapping_Tools.Core.Classes.MathUtil;
 namespace Mapping_Tools.Infrastructure.Platform;
 
 /// <summary>
-/// Enumerates the Windows virtual desktop and translates monitor rectangles
-/// and effective DPI into neutral Geometry Dashboard records.
+///     Enumerates the Windows virtual desktop and translates monitor rectangles
+///     and effective DPI into neutral Geometry Dashboard records.
 /// </summary>
 public sealed class WindowsGeometryDashboardScreenService : IGeometryDashboardScreenService
 {
@@ -23,27 +23,21 @@ public sealed class WindowsGeometryDashboardScreenService : IGeometryDashboardSc
         _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsSupported => _isWindows();
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IReadOnlyList<GeometryDashboardScreen> GetScreens()
     {
-        if (!_isWindows())
-        {
-            return [];
-        }
+        if (!_isWindows()) return [];
 
         List<GeometryDashboardScreen> screens = [];
         bool enumerated = WindowsNativeMethods.EnumDisplayMonitors(
             0,
             0,
-            (nint monitor, nint deviceContext, ref WindowsNativeMethods.RECT bounds, nint data) =>
+            (monitor, deviceContext, ref bounds, data) =>
             {
-                if (TryReadScreen(monitor, out GeometryDashboardScreen? screen))
-                {
-                    screens.Add(screen!);
-                }
+                if (TryReadScreen(monitor, out var screen)) screens.Add(screen!);
 
                 return true;
             },
@@ -51,24 +45,21 @@ public sealed class WindowsGeometryDashboardScreenService : IGeometryDashboardSc
         return enumerated ? screens : [];
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public GeometryDashboardScreen? GetPrimaryScreen()
     {
         return GetScreens().FirstOrDefault(screen => screen.IsPrimary);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public GeometryDashboardScreen? GetScreenForWindow(PlatformWindowId window)
     {
-        if (!_isWindows() || window.IsEmpty)
-        {
-            return null;
-        }
+        if (!_isWindows() || window.IsEmpty) return null;
 
         nint monitor = WindowsNativeMethods.MonitorFromWindow(
             new nint(window.Value),
             WindowsNativeMethods.MonitorDefaultToNearest);
-        return monitor == 0 || !TryReadScreen(monitor, out GeometryDashboardScreen? screen)
+        return monitor == 0 || !TryReadScreen(monitor, out var screen)
             ? null
             : screen;
     }
@@ -80,14 +71,11 @@ public sealed class WindowsGeometryDashboardScreenService : IGeometryDashboardSc
         screen = null;
         WindowsNativeMethods.MONITORINFO info = new()
         {
-            Size = Marshal.SizeOf<WindowsNativeMethods.MONITORINFO>()
+            Size = Marshal.SizeOf<WindowsNativeMethods.MONITORINFO>(),
         };
-        if (!WindowsNativeMethods.GetMonitorInfo(monitor, ref info))
-        {
-            return false;
-        }
+        if (!WindowsNativeMethods.GetMonitorInfo(monitor, ref info)) return false;
 
-        Vector2 dpiScale = Vector2.One;
+        var dpiScale = Vector2.One;
         bool dpiAvailable = false;
         try
         {
@@ -119,6 +107,8 @@ public sealed class WindowsGeometryDashboardScreenService : IGeometryDashboardSc
         return true;
     }
 
-    private static Box2 ToBox(WindowsNativeMethods.RECT rectangle) =>
-        new(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
+    private static Box2 ToBox(WindowsNativeMethods.RECT rectangle)
+    {
+        return new Box2(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
+    }
 }

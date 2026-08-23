@@ -7,18 +7,18 @@ using Mapping_Tools.Desktop.Views;
 namespace Mapping_Tools.Desktop.Updates;
 
 /// <summary>
-/// Bridges the Application updater lifecycle to owner-modal and modeless
-/// Avalonia windows without exposing an Avalonia type to Application.
+///     Bridges the Application updater lifecycle to owner-modal and modeless
+///     Avalonia windows without exposing an Avalonia type to Application.
 /// </summary>
 public interface IUpdaterInteractionService : IDisposable
 {
     /// <summary>
-    /// Gets whether the shell must finish a wait-after-close update before it exits.
+    ///     Gets whether the shell must finish a wait-after-close update before it exits.
     /// </summary>
     bool ShouldUpdateOnClose { get; }
 
     /// <summary>
-    /// Checks the release channel and shows the legacy decision window for an available update.
+    ///     Checks the release channel and shows the legacy decision window for an available update.
     /// </summary>
     /// <param name="allowSkippedVersion">Suppresses the persisted skipped version for startup checks when true.</param>
     /// <param name="notifyUser">Shows no-update and skipped-version messages for a manual check.</param>
@@ -29,27 +29,26 @@ public interface IUpdaterInteractionService : IDisposable
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Completes a wait-after-close download, showing the legacy progress dialog
-    /// when preparation is not already finished, then launches the updater.
+    ///     Completes a wait-after-close download, showing the legacy progress dialog
+    ///     when preparation is not already finished, then launches the updater.
     /// </summary>
     /// <param name="cancellationToken">Cancels the shutdown wait and package preparation.</param>
-    /// <returns><see langword="true"/> when the owner may close; otherwise the update remains pending.</returns>
+    /// <returns><see langword="true" /> when the owner may close; otherwise the update remains pending.</returns>
     Task<bool> CompleteUpdateOnCloseAsync(CancellationToken cancellationToken = default);
 }
 
 internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionService
 {
-    private readonly Func<MainWindow> _owner;
-    private readonly IUpdateService _updates;
-    private readonly IUserNotificationService _notifications;
     private readonly Func<IDialogService> _dialogs;
     private readonly IUiDispatcher _dispatcher;
     private readonly CancellationTokenSource _lifetimeCancellation = new();
-    private UpdaterWindow? _window;
-    private UpdaterViewModel? _viewModel;
+    private readonly IUserNotificationService _notifications;
+    private readonly Func<MainWindow> _owner;
+    private readonly IUpdateService _updates;
     private Task? _checkTask;
-    private bool _waitAfterClose;
     private bool _disposed;
+    private UpdaterViewModel? _viewModel;
+    private UpdaterWindow? _window;
 
     internal AvaloniaUpdaterInteractionService(
         Func<MainWindow> owner,
@@ -60,33 +59,26 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
     {
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         _updates = updates ?? throw new ArgumentNullException(nameof(updates));
-        _notifications = notifications ??
-            throw new ArgumentNullException(nameof(notifications));
+        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
     }
 
-    /// <inheritdoc/>
-    public bool ShouldUpdateOnClose => _waitAfterClose;
+    /// <inheritdoc />
+    public bool ShouldUpdateOnClose { get; private set; }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task CheckForUpdatesAsync(
         bool allowSkippedVersion,
         bool notifyUser,
         CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        if (_window is not null)
-        {
-            return Task.CompletedTask;
-        }
+        if (_window is not null) return Task.CompletedTask;
 
-        if (_checkTask is { IsCompleted: false })
-        {
-            return _checkTask;
-        }
+        if (_checkTask is { IsCompleted: false }) return _checkTask;
 
-        CancellationTokenSource linkedCancellation =
+        var linkedCancellation =
             CancellationTokenSource.CreateLinkedTokenSource(
                 cancellationToken,
                 _lifetimeCancellation.Token);
@@ -97,37 +89,28 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         return ObserveCheckAsync(_checkTask);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<bool> CompleteUpdateOnCloseAsync(
         CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        if (!_waitAfterClose)
-        {
-            return true;
-        }
+        if (!ShouldUpdateOnClose) return true;
 
-        CancellationTokenSource linkedCancellation =
+        var linkedCancellation =
             CancellationTokenSource.CreateLinkedTokenSource(
                 cancellationToken,
                 _lifetimeCancellation.Token);
         try
         {
-            Task? downloadTask = _updates.ActiveDownloadTask;
-            if (downloadTask is null || downloadTask.IsFaulted || downloadTask.IsCanceled)
-            {
-                downloadTask = _updates.PrepareUpdateAsync(linkedCancellation.Token);
-            }
+            var downloadTask = _updates.ActiveDownloadTask;
+            if (downloadTask is null || downloadTask.IsFaulted || downloadTask.IsCanceled) downloadTask = _updates.PrepareUpdateAsync(linkedCancellation.Token);
 
-            if (!downloadTask.IsCompletedSuccessfully)
-            {
-                await ShowShutdownDownloadAsync(downloadTask, linkedCancellation.Token);
-            }
+            if (!downloadTask.IsCompletedSuccessfully) await ShowShutdownDownloadAsync(downloadTask, linkedCancellation.Token);
 
             await downloadTask.ConfigureAwait(true);
             linkedCancellation.Token.ThrowIfCancellationRequested();
-            _updates.StartUpdateProcess(restartAfterUpdate: false);
-            _waitAfterClose = false;
+            _updates.StartUpdateProcess(false);
+            ShouldUpdateOnClose = false;
             return true;
         }
         catch (OperationCanceledException) when (linkedCancellation.IsCancellationRequested)
@@ -136,7 +119,7 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         }
         catch (Exception exception)
         {
-            await ReportFailureAsync(exception, notifyUser: true);
+            await ReportFailureAsync(exception, true);
             return false;
         }
         finally
@@ -145,20 +128,14 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Dispose()
     {
-        if (_disposed)
-        {
-            return;
-        }
+        if (_disposed) return;
 
         _disposed = true;
         _lifetimeCancellation.Cancel();
-        if (_window is not null)
-        {
-            _window.Close();
-        }
+        if (_window is not null) _window.Close();
 
         _viewModel?.Dispose();
         _viewModel = null;
@@ -172,8 +149,8 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
     {
         try
         {
-            CancellationToken cancellationToken = linkedCancellation.Token;
-            UpdateCheckResult result = await _updates
+            var cancellationToken = linkedCancellation.Token;
+            var result = await _updates
                 .CheckForUpdatesAsync(allowSkippedVersion, cancellationToken)
                 .ConfigureAwait(true);
             cancellationToken.ThrowIfCancellationRequested();
@@ -216,10 +193,7 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
 
     private void ShowDecisionWindow(UpdateCheckResult result)
     {
-        if (_disposed || _window is not null)
-        {
-            return;
-        }
+        if (_disposed || _window is not null) return;
 
         UpdaterViewModel viewModel = new(
             _updates,
@@ -230,7 +204,7 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         UpdaterWindow window = new()
         {
             DataContext = viewModel,
-            ShowActivated = true
+            ShowActivated = true,
         };
         viewModel.CloseRequested += (_, _) => CloseDecisionWindow(window);
         viewModel.ApplicationCloseRequested += (_, _) =>
@@ -246,26 +220,17 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
 
     private void CloseDecisionWindow(UpdaterWindow window)
     {
-        if (window.IsVisible)
-        {
-            window.Close();
-        }
+        if (window.IsVisible) window.Close();
     }
 
     private void DecisionWindowClosed(
         UpdaterWindow window,
         UpdaterViewModel viewModel)
     {
-        if (!ReferenceEquals(_window, window))
-        {
-            return;
-        }
+        if (!ReferenceEquals(_window, window)) return;
 
-        _waitAfterClose = viewModel.UpdateAfterClose;
-        if (!_waitAfterClose)
-        {
-            _updates.AbandonUpdate();
-        }
+        ShouldUpdateOnClose = viewModel.UpdateAfterClose;
+        if (!ShouldUpdateOnClose) _updates.AbandonUpdate();
 
         _window = null;
         _viewModel = null;
@@ -276,20 +241,20 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         Task downloadTask,
         CancellationToken cancellationToken)
     {
-        UpdateCheckResult check = _updates.LastCheck
-            ?? throw new InvalidOperationException(
-                "The updater lost its release check before shutdown.");
+        var check = _updates.LastCheck
+                    ?? throw new InvalidOperationException(
+                        "The updater lost its release check before shutdown.");
         UpdaterViewModel viewModel = new(
             _updates,
             check,
             _notifications,
             _dialogs(),
             _dispatcher,
-            downloadImmediately: true);
+            true);
         UpdaterWindow window = new()
         {
             DataContext = viewModel,
-            ShowActivated = true
+            ShowActivated = true,
         };
 
         _ = CloseAfterDownloadAsync(downloadTask, window, cancellationToken);
@@ -319,10 +284,7 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
 
         _dispatcher.Post(() =>
         {
-            if (window.IsVisible)
-            {
-                window.Close();
-            }
+            if (window.IsVisible) window.Close();
         });
     }
 
@@ -334,44 +296,38 @@ internal sealed class AvaloniaUpdaterInteractionService : IUpdaterInteractionSer
         }
         finally
         {
-            if (ReferenceEquals(_checkTask, checkTask))
-            {
-                _checkTask = null;
-            }
+            if (ReferenceEquals(_checkTask, checkTask)) _checkTask = null;
         }
     }
 
     private async Task ReportFailureAsync(Exception exception, bool notifyUser)
     {
-        if (_disposed)
-        {
-            return;
-        }
+        if (_disposed) return;
 
         await _dialogs().ShowMessageAsync(new MessageDialogRequest<bool>(
             "Updater error",
             "UPDATER_EXCEPTION: " + exception.Message,
-            [new DialogChoice<bool>("OK", true, IsDefault: true, IsCancel: true)],
+            [new DialogChoice<bool>("OK", true, true, true)],
             true)).ConfigureAwait(true);
 
         if (notifyUser)
-        {
             await PublishAsync(
                 UserNotificationSeverity.Error,
                 "Error fetching update",
                 exception.Message,
                 exception);
-        }
     }
 
     private Task PublishAsync(
         UserNotificationSeverity severity,
         string title,
         string message,
-        Exception? exception = null) =>
-        _notifications.PublishAsync(new UserNotification(
+        Exception? exception = null)
+    {
+        return _notifications.PublishAsync(new UserNotification(
             severity,
             title,
             message,
             exception));
+    }
 }

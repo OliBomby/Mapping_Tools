@@ -1,11 +1,12 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.Sliderator;
 
 namespace Mapping_Tools.Application.Sliderator;
 
 /// <summary>
-/// Imports Sliderator sources and delegates geometry, backup, saving, and
-/// optional reload behavior to the shared application boundaries.
+///     Imports Sliderator sources and delegates geometry, backup, saving, and
+///     optional reload behavior to the shared application boundaries.
 /// </summary>
 public sealed class SlideratorService : ISlideratorService
 {
@@ -18,7 +19,7 @@ public sealed class SlideratorService : ISlideratorService
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<SlideratorImportResult> ImportAsync(
         string path,
         SlideratorImportMode mode,
@@ -26,23 +27,20 @@ public sealed class SlideratorService : ISlideratorService
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        if (!Enum.IsDefined(mode))
-        {
-            throw new ArgumentException("Sliderator contains an unknown import mode.", nameof(mode));
-        }
+        if (!Enum.IsDefined(mode)) throw new ArgumentException("Sliderator contains an unknown import mode.", nameof(mode));
 
-        LiveBeatmapPreference preference = mode == SlideratorImportMode.Selected
+        var preference = mode == SlideratorImportMode.Selected
             ? LiveBeatmapPreference.RequireLive
             : LiveBeatmapPreference.DiskOnly;
-        BeatmapEditingSession session = await editingGateway
+        var session = await editingGateway
             .OpenBeatmapAsync(path, preference, cancellationToken)
             .ConfigureAwait(false);
-        IReadOnlyList<Mapping_Tools.Core.Classes.BeatmapHelper.HitObject> selected = mode switch
+        var selected = mode switch
         {
             SlideratorImportMode.Selected => session.SelectedHitObjects,
             SlideratorImportMode.Bookmarked => session.Editor.Beatmap.GetBookmarkedObjects(),
             SlideratorImportMode.Time => session.Editor.Beatmap.QueryTimeCode(timeCode ?? string.Empty).ToList(),
-            _ => throw new ArgumentException("Sliderator contains an unknown import mode.", nameof(mode))
+            _ => throw new ArgumentException("Sliderator contains an unknown import mode.", nameof(mode)),
         };
         return new SlideratorImportResult(
             selected.Where(hitObject => hitObject.IsSlider).ToArray(),
@@ -51,11 +49,11 @@ public sealed class SlideratorService : ISlideratorService
             true);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<SlideratorResult> RunAsync(
         string path,
         SlideratorProject project,
-        Mapping_Tools.Core.Classes.BeatmapHelper.HitObject sourceSlider,
+        HitObject sourceSlider,
         bool reloadEditor,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default,
@@ -65,14 +63,14 @@ public sealed class SlideratorService : ISlideratorService
         ArgumentNullException.ThrowIfNull(project);
         ArgumentNullException.ThrowIfNull(sourceSlider);
 
-        BeatmapEditingSession session = await editingGateway
+        var session = await editingGateway
             .OpenBeatmapAsync(
                 path,
                 preferLiveEditor ? LiveBeatmapPreference.PreferLive : LiveBeatmapPreference.DiskOnly,
                 cancellationToken)
             .ConfigureAwait(false);
         // Do Sliderator
-        SlideratorApplyResult applied = SlideratorEngine.Apply(
+        var applied = SlideratorEngine.Apply(
             session.Editor.Beatmap,
             sourceSlider,
             project,

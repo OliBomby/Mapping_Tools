@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.MathUtil;
@@ -17,10 +16,9 @@ public sealed class ComboColourStudioEngineTests
         ComboColourProject project = new();
         project.AddComboColour();
         project.AddComboColour();
-        ColourPoint point = project.AddColourPoint(
+        var point = project.AddColourPoint(
             100,
-            [project.ComboColours[0], project.ComboColours[1]],
-            ColourPointMode.Normal);
+            [project.ComboColours[0], project.ComboColours[1]]);
 
         // Act
         project.ComboColours[0].Color = RgbaColour.FromRgb(1, 2, 3);
@@ -62,8 +60,8 @@ public sealed class ComboColourStudioEngineTests
         ComboColourProject project = new();
         project.AddComboColour();
         project.AddComboColour();
-        SpecialColour firstColour = project.ComboColours[0];
-        SpecialColour movedColour = project.ComboColours[0];
+        var firstColour = project.ComboColours[0];
+        var movedColour = project.ComboColours[0];
         project.ComboColours.RemoveAt(0);
         project.ComboColours.Insert(1, movedColour);
         project.AddColourPoint(0, [firstColour]);
@@ -105,7 +103,7 @@ public sealed class ComboColourStudioEngineTests
         project.AddColourPoint(5, [new SpecialColour(RgbaColour.White, "Combo2")]);
 
         // Act
-        IReadOnlyList<string> errors = project.ValidateForExport();
+        var errors = project.ValidateForExport();
 
         // Assert
         errors.Should().ContainSingle()
@@ -122,7 +120,7 @@ public sealed class ComboColourStudioEngineTests
         project.ComboColours[1].Name = project.ComboColours[0].Name;
 
         // Act
-        IReadOnlyList<string> errors = project.ValidateForExport();
+        var errors = project.ValidateForExport();
 
         // Assert
         errors.Should().ContainSingle().Which.Should().Contain("unique");
@@ -152,15 +150,15 @@ public sealed class ComboColourStudioEngineTests
             HitObjectType.Circle,
             newCombo,
             0,
-            normal: true,
-            whistle: false,
-            finish: false,
-            clap: false,
+            true,
+            false,
+            false,
+            false,
             SampleSet.None,
             SampleSet.None,
-            index: 0,
-            volume: 0,
-            filename: string.Empty);
+            0,
+            0,
+            string.Empty);
         hitObject.ActualNewCombo = newCombo;
         hitObject.ColourIndex = colourIndex;
         return hitObject;

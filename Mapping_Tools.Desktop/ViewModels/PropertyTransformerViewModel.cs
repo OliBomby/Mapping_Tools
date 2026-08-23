@@ -10,20 +10,38 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Owns Property Transformer form state, synchronized time fields, project persistence, and execution.
+///     Owns Property Transformer form state, synchronized time fields, project persistence, and execution.
 /// </summary>
 public sealed partial class PropertyTransformerViewModel : SingleRunToolViewModel,
     IShellProjectFeature
 {
     internal const string OperationId = "property-transformer";
 
-    private readonly IPropertyTransformerService _propertyTransformer;
-    private readonly IBeatmapWorkspace _workspace;
     private readonly ProjectDefinition<PropertyTransformerProject> _definition = new(
         "propertytransformerproject.json",
         "Property Transformer Projects",
         () => new PropertyTransformerProject(),
         "property-transformer-project.json");
+
+    private readonly IPropertyTransformerService _propertyTransformer;
+    private readonly IBeatmapWorkspace _workspace;
+
+    /// <summary>
+    ///     Creates a Property Transformer presentation model.
+    /// </summary>
+    /// <param name="propertyTransformer">Runs the framework-independent transformation.</param>
+    /// <param name="execution">Coordinates background execution and notifications.</param>
+    /// <param name="workspace">Supplies the selected beatmap and storyboard paths.</param>
+    public PropertyTransformerViewModel(
+        IPropertyTransformerService propertyTransformer,
+        IToolExecutionService execution,
+        IBeatmapWorkspace workspace)
+        : base(execution, OperationId)
+    {
+        _propertyTransformer = propertyTransformer
+                               ?? throw new ArgumentNullException(nameof(propertyTransformer));
+        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+    }
 
     /// <summary>Gets or sets the timing-point offset multiplier.</summary>
     [ObservableProperty]
@@ -165,24 +183,19 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
     [ObservableProperty]
     public partial bool SyncTimeFields { get; set; }
 
-    /// <summary>
-    /// Creates a Property Transformer presentation model.
-    /// </summary>
-    /// <param name="propertyTransformer">Runs the framework-independent transformation.</param>
-    /// <param name="execution">Coordinates background execution and notifications.</param>
-    /// <param name="workspace">Supplies the selected beatmap and storyboard paths.</param>
-    public PropertyTransformerViewModel(
-        IPropertyTransformerService propertyTransformer,
-        IToolExecutionService execution,
-        IBeatmapWorkspace workspace)
-        : base(execution, OperationId)
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+
+    object IShellProjectFeature.Snapshot()
     {
-        _propertyTransformer = propertyTransformer
-            ?? throw new ArgumentNullException(nameof(propertyTransformer));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        return Snapshot();
     }
 
-    /// <inheritdoc/>
+    void IShellProjectFeature.Install(object project)
+    {
+        Install((PropertyTransformerProject)project);
+    }
+
+    /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
         PropertyTransformerOptions options = Snapshot();
@@ -194,7 +207,7 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
                     {
                         Progress<double> progress = new(value =>
                             context.ReportProgress(value, "Transforming documents"));
-                        PropertyTransformerResult result = await _propertyTransformer
+                        var result = await _propertyTransformer
                             .TransformAsync(
                                 _workspace.SelectedPaths,
                                 options,
@@ -209,190 +222,138 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
             .ConfigureAwait(false);
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
-
-    object IShellProjectFeature.Snapshot() => Snapshot();
-
-    void IShellProjectFeature.Install(object project) =>
-        Install((PropertyTransformerProject)project);
-
     partial void OnTimingpointOffsetMultiplierChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeMultipliers(value);
-        }
+        if (SyncTimeFields) SetAllTimeMultipliers(value);
     }
 
     partial void OnTimingpointOffsetOffsetChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeOffsets(value);
-        }
+        if (SyncTimeFields) SetAllTimeOffsets(value);
     }
 
     partial void OnHitObjectTimeMultiplierChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeMultipliers(value);
-        }
+        if (SyncTimeFields) SetAllTimeMultipliers(value);
     }
 
     partial void OnHitObjectTimeOffsetChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeOffsets(value);
-        }
+        if (SyncTimeFields) SetAllTimeOffsets(value);
     }
 
     partial void OnBookmarkTimeMultiplierChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeMultipliers(value);
-        }
+        if (SyncTimeFields) SetAllTimeMultipliers(value);
     }
 
     partial void OnBookmarkTimeOffsetChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeOffsets(value);
-        }
+        if (SyncTimeFields) SetAllTimeOffsets(value);
     }
 
     partial void OnSbEventTimeMultiplierChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeMultipliers(value);
-        }
+        if (SyncTimeFields) SetAllTimeMultipliers(value);
     }
 
     partial void OnSbEventTimeOffsetChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeOffsets(value);
-        }
+        if (SyncTimeFields) SetAllTimeOffsets(value);
     }
 
     partial void OnSbSampleTimeMultiplierChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeMultipliers(value);
-        }
+        if (SyncTimeFields) SetAllTimeMultipliers(value);
     }
 
     partial void OnSbSampleTimeOffsetChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeOffsets(value);
-        }
+        if (SyncTimeFields) SetAllTimeOffsets(value);
     }
 
     partial void OnBreakTimeMultiplierChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeMultipliers(value);
-        }
+        if (SyncTimeFields) SetAllTimeMultipliers(value);
     }
 
     partial void OnBreakTimeOffsetChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeOffsets(value);
-        }
+        if (SyncTimeFields) SetAllTimeOffsets(value);
     }
 
     partial void OnVideoTimeMultiplierChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeMultipliers(value);
-        }
+        if (SyncTimeFields) SetAllTimeMultipliers(value);
     }
 
     partial void OnVideoTimeOffsetChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeOffsets(value);
-        }
+        if (SyncTimeFields) SetAllTimeOffsets(value);
     }
 
     partial void OnPreviewTimeMultiplierChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeMultipliers(value);
-        }
+        if (SyncTimeFields) SetAllTimeMultipliers(value);
     }
 
     partial void OnPreviewTimeOffsetChanged(double value)
     {
-        if (SyncTimeFields)
-        {
-            SetAllTimeOffsets(value);
-        }
+        if (SyncTimeFields) SetAllTimeOffsets(value);
     }
 
     [RelayCommand]
-    private void Reset() => ResetMultipliersAndOffsets();
-
-    private PropertyTransformerProject Snapshot() => new()
+    private void Reset()
     {
-        TimingpointOffsetMultiplier = TimingpointOffsetMultiplier,
-        TimingpointOffsetOffset = TimingpointOffsetOffset,
-        TimingpointBpmMultiplier = TimingpointBpmMultiplier,
-        TimingpointBpmOffset = TimingpointBpmOffset,
-        TimingpointSvMultiplier = TimingpointSvMultiplier,
-        TimingpointSvOffset = TimingpointSvOffset,
-        TimingpointIndexMultiplier = TimingpointIndexMultiplier,
-        TimingpointIndexOffset = TimingpointIndexOffset,
-        TimingpointVolumeMultiplier = TimingpointVolumeMultiplier,
-        TimingpointVolumeOffset = TimingpointVolumeOffset,
-        HitObjectTimeMultiplier = HitObjectTimeMultiplier,
-        HitObjectTimeOffset = HitObjectTimeOffset,
-        HitObjectVolumeMultiplier = HitObjectVolumeMultiplier,
-        HitObjectVolumeOffset = HitObjectVolumeOffset,
-        BookmarkTimeMultiplier = BookmarkTimeMultiplier,
-        BookmarkTimeOffset = BookmarkTimeOffset,
-        SbEventTimeMultiplier = SbEventTimeMultiplier,
-        SbEventTimeOffset = SbEventTimeOffset,
-        SbSampleTimeMultiplier = SbSampleTimeMultiplier,
-        SbSampleTimeOffset = SbSampleTimeOffset,
-        SbSampleVolumeMultiplier = SbSampleVolumeMultiplier,
-        SbSampleVolumeOffset = SbSampleVolumeOffset,
-        BreakTimeMultiplier = BreakTimeMultiplier,
-        BreakTimeOffset = BreakTimeOffset,
-        VideoTimeMultiplier = VideoTimeMultiplier,
-        VideoTimeOffset = VideoTimeOffset,
-        PreviewTimeMultiplier = PreviewTimeMultiplier,
-        PreviewTimeOffset = PreviewTimeOffset,
-        ClipProperties = ClipProperties,
-        EnableFilters = EnableFilters,
-        MatchFilter = MatchFilter.ToArray(),
-        UnmatchFilter = UnmatchFilter.ToArray(),
-        MinTimeFilter = MinTimeFilter,
-        MaxTimeFilter = MaxTimeFilter,
-        SyncTimeFields = SyncTimeFields
-    };
+        ResetMultipliersAndOffsets();
+    }
+
+    private PropertyTransformerProject Snapshot()
+    {
+        return new PropertyTransformerProject
+        {
+            TimingpointOffsetMultiplier = TimingpointOffsetMultiplier,
+            TimingpointOffsetOffset = TimingpointOffsetOffset,
+            TimingpointBpmMultiplier = TimingpointBpmMultiplier,
+            TimingpointBpmOffset = TimingpointBpmOffset,
+            TimingpointSvMultiplier = TimingpointSvMultiplier,
+            TimingpointSvOffset = TimingpointSvOffset,
+            TimingpointIndexMultiplier = TimingpointIndexMultiplier,
+            TimingpointIndexOffset = TimingpointIndexOffset,
+            TimingpointVolumeMultiplier = TimingpointVolumeMultiplier,
+            TimingpointVolumeOffset = TimingpointVolumeOffset,
+            HitObjectTimeMultiplier = HitObjectTimeMultiplier,
+            HitObjectTimeOffset = HitObjectTimeOffset,
+            HitObjectVolumeMultiplier = HitObjectVolumeMultiplier,
+            HitObjectVolumeOffset = HitObjectVolumeOffset,
+            BookmarkTimeMultiplier = BookmarkTimeMultiplier,
+            BookmarkTimeOffset = BookmarkTimeOffset,
+            SbEventTimeMultiplier = SbEventTimeMultiplier,
+            SbEventTimeOffset = SbEventTimeOffset,
+            SbSampleTimeMultiplier = SbSampleTimeMultiplier,
+            SbSampleTimeOffset = SbSampleTimeOffset,
+            SbSampleVolumeMultiplier = SbSampleVolumeMultiplier,
+            SbSampleVolumeOffset = SbSampleVolumeOffset,
+            BreakTimeMultiplier = BreakTimeMultiplier,
+            BreakTimeOffset = BreakTimeOffset,
+            VideoTimeMultiplier = VideoTimeMultiplier,
+            VideoTimeOffset = VideoTimeOffset,
+            PreviewTimeMultiplier = PreviewTimeMultiplier,
+            PreviewTimeOffset = PreviewTimeOffset,
+            ClipProperties = ClipProperties,
+            EnableFilters = EnableFilters,
+            MatchFilter = MatchFilter.ToArray(),
+            UnmatchFilter = UnmatchFilter.ToArray(),
+            MinTimeFilter = MinTimeFilter,
+            MaxTimeFilter = MaxTimeFilter,
+            SyncTimeFields = SyncTimeFields,
+        };
+    }
 
     private void Install(PropertyTransformerProject project)
     {
         ArgumentNullException.ThrowIfNull(project);
-        if (project.MatchFilter is null || project.UnmatchFilter is null)
-        {
-            throw new InvalidDataException("Property Transformer project is incomplete.");
-        }
+        if (project.MatchFilter is null || project.UnmatchFilter is null) throw new InvalidDataException("Property Transformer project is incomplete.");
 
         SyncTimeFields = false;
         TimingpointOffsetMultiplier = project.TimingpointOffsetMultiplier;

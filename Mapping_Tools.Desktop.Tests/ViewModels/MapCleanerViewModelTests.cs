@@ -1,5 +1,5 @@
+using System.Globalization;
 using Avalonia.Data;
-using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.MapCleaner;
@@ -29,10 +29,10 @@ public sealed class MapCleanerViewModelTests
         RecordingCleaner cleaner = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["map.osu"]);
-        MapCleanerViewModel viewModel = Create(cleaner, workspace: workspace);
+        var viewModel = Create(cleaner, workspace);
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         cleaner.Paths.Should().Equal("map.osu");
@@ -55,14 +55,14 @@ public sealed class MapCleanerViewModelTests
         RecordingReload reload = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["map.osu"]);
-        MapCleanerViewModel viewModel = Create(
+        var viewModel = Create(
             cleaner,
-            workspace: workspace,
+            workspace,
             reload: reload,
             autoReload: true);
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         reload.ReloadCount.Should().Be(0);
@@ -75,10 +75,10 @@ public sealed class MapCleanerViewModelTests
         // Arrange
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["first.osu", "second.osu"]);
-        MapCleanerViewModel viewModel = Create(new RecordingCleaner(), workspace: workspace);
+        var viewModel = Create(new RecordingCleaner(), workspace);
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         viewModel.HasRun.Should().BeFalse();
@@ -96,7 +96,7 @@ public sealed class MapCleanerViewModelTests
             "1/16, 0.25",
             typeof(IBeatDivisor[]),
             null,
-            System.Globalization.CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture);
 
         // Assert
         converted.Should().BeOfType<IBeatDivisor[]>()
@@ -113,7 +113,7 @@ public sealed class MapCleanerViewModelTests
         IBeatDivisor[] divisors =
         [
             new RationalBeatDivisor(1, 16),
-            new IrrationalBeatDivisor(0.25)
+            new IrrationalBeatDivisor(0.25),
         ];
 
         // Act
@@ -121,7 +121,7 @@ public sealed class MapCleanerViewModelTests
             divisors,
             typeof(string),
             null,
-            new System.Globalization.CultureInfo("nl-NL"));
+            new CultureInfo("nl-NL"));
 
         // Assert
         converted.Should().Be("1/16, 0.25");
@@ -138,10 +138,10 @@ public sealed class MapCleanerViewModelTests
             "1/16, nope",
             typeof(IBeatDivisor[]),
             null,
-            System.Globalization.CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture);
 
         // Assert
-        BindingNotification notification = converted.Should()
+        var notification = converted.Should()
             .BeOfType<BindingNotification>()
             .Which;
         notification.ErrorType.Should().Be(BindingErrorType.DataValidationError);
@@ -161,7 +161,7 @@ public sealed class MapCleanerViewModelTests
             string.Empty,
             typeof(IBeatDivisor[]),
             null,
-            System.Globalization.CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture);
 
         // Assert
         converted.Should().BeOfType<BindingNotification>()
@@ -179,7 +179,7 @@ public sealed class MapCleanerViewModelTests
             "0",
             typeof(IBeatDivisor[]),
             null,
-            System.Globalization.CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture);
 
         // Assert
         converted.Should().BeOfType<BindingNotification>()
@@ -192,7 +192,7 @@ public sealed class MapCleanerViewModelTests
         // Arrange
         RecordingCleaner cleaner = new();
         QuickRunCommandRegistry registry = new();
-        MapCleanerViewModel viewModel = Create(cleaner, currentPath: "current.osu");
+        var viewModel = Create(cleaner, currentPath: "current.osu");
         MappingToolQuickRunRegistration registration = new(
             "map-cleaner",
             "Map Cleaner",
@@ -206,7 +206,7 @@ public sealed class MapCleanerViewModelTests
 
         // Act
         await hosted.StartAsync(CancellationToken.None);
-        QuickRunCommand command = registry.Commands.Single();
+        var command = registry.Commands.Single();
         await command.Execute(CancellationToken.None);
 
         // Assert
@@ -237,7 +237,9 @@ public sealed class MapCleanerViewModelTests
     private sealed class RecordingCleaner : IMapCleanerService
     {
         public IReadOnlyList<string>? Paths { get; private set; }
-        public Task<MapCleanerResult> CleanAsync(IReadOnlyList<string> paths, MapCleanerOptions options, IProgress<double>? progress = null, CancellationToken cancellationToken = default)
+
+        public Task<MapCleanerResult> CleanAsync(IReadOnlyList<string> paths, MapCleanerOptions options, IProgress<double>? progress = null,
+            CancellationToken cancellationToken = default)
         {
             Paths = paths;
             progress?.Report(100);
@@ -247,7 +249,10 @@ public sealed class MapCleanerViewModelTests
 
     private sealed class StubLocator(string? path) : ICurrentBeatmapLocator
     {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default) => Task.FromResult(path);
+        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(path);
+        }
     }
 
     private sealed class RecordingReload : IEditorReloadService
@@ -274,9 +279,19 @@ public sealed class MapCleanerViewModelTests
 
     private sealed class StubLauncher : IPlatformLauncher
     {
-        public Task<bool> OpenUriAsync(Uri uri, CancellationToken cancellationToken = default) => Task.FromResult(true);
-        public Task<bool> OpenFileAsync(string path, CancellationToken cancellationToken = default) => Task.FromResult(true);
-        public Task<bool> OpenFolderAsync(string path, CancellationToken cancellationToken = default) => Task.FromResult(true);
-    }
+        public Task<bool> OpenUriAsync(Uri uri, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(true);
+        }
 
+        public Task<bool> OpenFileAsync(string path, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(true);
+        }
+
+        public Task<bool> OpenFolderAsync(string path, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(true);
+        }
+    }
 }

@@ -1,5 +1,4 @@
 using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,14 +12,14 @@ public sealed class HitsoundCopierEngineTests
     public void Apply_OverwriteModeWithSubset_ClearsUnmatchedTargetHitsoundsAndCopiesEdges()
     {
         // Arrange
-        Beatmap source = LoadFixture();
+        var source = LoadFixture();
         Beatmap target = new(source.GetLines());
-        HitObject selected = source.HitObjects[0];
+        var selected = source.HitObjects[0];
         int selectedHitsounds = selected.Hitsounds;
         HitsoundCopierOptions options = new() { CopyMode = 0 };
 
         // Act
-        HitsoundCopierApplyResult result = HitsoundCopierEngine.Apply(
+        var result = HitsoundCopierEngine.Apply(
             target,
             source,
             [selected],
@@ -37,7 +36,7 @@ public sealed class HitsoundCopierEngineTests
     public void Apply_ShiftedStoryboardSamples_UsesTheConfiguredTimingOffset()
     {
         // Arrange
-        Beatmap source = LoadStoryboardFixture();
+        var source = LoadStoryboardFixture();
         source.StoryboardSoundSamples.Clear();
         source.StoryboardSoundSamples.Add(new StoryboardSoundSample(100, StoryboardLayer.Foreground, "sample.wav", 80));
         Beatmap target = new(source.GetLines());
@@ -47,7 +46,7 @@ public sealed class HitsoundCopierEngineTests
             CopyHitsounds = false,
             CopyStoryboardedSamples = true,
             IgnoreHitsoundSatisfiedSamples = false,
-            TimingOffset = 12
+            TimingOffset = 12,
         };
 
         // Act
@@ -63,15 +62,21 @@ public sealed class HitsoundCopierEngineTests
         target.StoryboardSoundSamples[0].StartTime.Should().Be(original + 12);
     }
 
-    private static Beatmap LoadFixture() => new(
-        File.ReadAllLines(Path.Combine(
-            AppContext.BaseDirectory,
-            "Resources",
-            "ComplicatedTestMap.osu")).ToList());
+    private static Beatmap LoadFixture()
+    {
+        return new Beatmap(
+            File.ReadAllLines(Path.Combine(
+                AppContext.BaseDirectory,
+                "Resources",
+                "ComplicatedTestMap.osu")).ToList());
+    }
 
-    private static Beatmap LoadStoryboardFixture() => new(
-        File.ReadAllLines(Path.Combine(
-            AppContext.BaseDirectory,
-            "Resources",
-            "EmptyTestMap.osu")).ToList());
+    private static Beatmap LoadStoryboardFixture()
+    {
+        return new Beatmap(
+            File.ReadAllLines(Path.Combine(
+                AppContext.BaseDirectory,
+                "Resources",
+                "EmptyTestMap.osu")).ToList());
+    }
 }

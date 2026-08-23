@@ -7,13 +7,13 @@ using Mapping_Tools.Core.Classes.MathUtil;
 namespace Mapping_Tools.Core.Tools.HitsoundStudio;
 
 /// <summary>
-/// Applies the framework-neutral layer, package, custom-index, and schema
-/// algorithms used by Hitsound Studio.
+///     Applies the framework-neutral layer, package, custom-index, and schema
+///     algorithms used by Hitsound Studio.
 /// </summary>
 /// <remarks>
-/// File decoding, SoundFont rendering, playback, and encoding deliberately do
-/// not appear here. Callers provide a source-validation policy so the same
-/// rules work for ordinary audio exports, MIDI-chord exports, and tests.
+///     File decoding, SoundFont rendering, playback, and encoding deliberately do
+///     not appear here. Callers provide a source-validation policy so the same
+///     rules work for ordinary audio exports, MIDI-chord exports, and tests.
 /// </remarks>
 public sealed class HitsoundStudioEngine
 {
@@ -28,18 +28,18 @@ public sealed class HitsoundStudioEngine
         ArgumentNullException.ThrowIfNull(timing);
         ArgumentNullException.ThrowIfNull(events);
 
-        List<TimingPointChange> changes = timing.Redlines
+        var changes = timing.Redlines
             .Select(point => new TimingPointChange(
                 point.Copy(),
-                mpb: true,
-                meter: true,
+                true,
+                true,
                 uninherited: true,
                 omitFirstBarLine: true,
                 fuzziness: 0.4))
             .ToList();
-        foreach (HitsoundEvent item in events)
+        foreach (var item in events)
         {
-            TimingPoint point = timing.GetTimingPointAtTime(item.Time + 5)?.Copy() ?? new TimingPoint();
+            var point = timing.GetTimingPointAtTime(item.Time + 5)?.Copy() ?? new TimingPoint();
             point.Offset = item.Time;
             point.SampleIndex = item.CustomIndex;
             point.Volume = Math.Round(point.Volume * item.Volume);
@@ -52,7 +52,7 @@ public sealed class HitsoundStudioEngine
     }
 
     /// <summary>
-    /// Groups layer events whose timestamps are within the legacy leniency.
+    ///     Groups layer events whose timestamps are within the legacy leniency.
     /// </summary>
     /// <param name="layers">The editable layers to group.</param>
     /// <param name="defaultSample">The normal sample inserted into addition-only packages.</param>
@@ -67,47 +67,35 @@ public sealed class HitsoundStudioEngine
     {
         ArgumentNullException.ThrowIfNull(layers);
         ArgumentNullException.ThrowIfNull(defaultSample);
-        if (!double.IsFinite(leniency) || leniency < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(leniency));
-        }
+        if (!double.IsFinite(leniency) || leniency < 0) throw new ArgumentOutOfRangeException(nameof(leniency));
 
         List<SamplePackage> packages = [];
-        foreach (HitsoundLayer layer in layers)
+        foreach (var layer in layers)
         {
             ArgumentNullException.ThrowIfNull(layer);
             foreach (double time in layer.Times ?? [])
             {
-                SamplePackage? package = packages.FirstOrDefault(
-                    candidate => Math.Abs(candidate.Time - time) <= leniency);
+                var package = packages.FirstOrDefault(candidate => Math.Abs(candidate.Time - time) <= leniency);
                 if (package is null)
-                {
                     packages.Add(new SamplePackage(
                         time,
                         [new Sample(layer)]));
-                }
                 else
-                {
                     package.Samples.Add(new Sample(layer));
-                }
             }
         }
 
         if (needNormalSample)
-        {
             // Packages without a hitnormal sample
-            foreach (SamplePackage package in packages.Where(package =>
+            foreach (var package in packages.Where(package =>
                          package.Samples.All(sample => sample.Hitsound != Hitsound.Normal)))
-            {
                 package.Samples.Add(defaultSample.Copy());
-            }
-        }
 
         return packages.OrderBy(package => package.Time).ToArray();
     }
 
     /// <summary>
-    /// Moves gain into osu!'s event volume while retaining the legacy roughness rules.
+    ///     Moves gain into osu!'s event volume while retaining the legacy roughness rules.
     /// </summary>
     /// <param name="packages">Packages to mutate.</param>
     /// <param name="roughness">Quantization step for generated sample volumes.</param>
@@ -120,26 +108,19 @@ public sealed class HitsoundStudioEngine
         bool individualVolume = false)
     {
         ArgumentNullException.ThrowIfNull(packages);
-        if (!double.IsFinite(roughness) || roughness < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(roughness));
-        }
+        if (!double.IsFinite(roughness) || roughness < 0) throw new ArgumentOutOfRangeException(nameof(roughness));
 
-        foreach (SamplePackage package in packages)
+        foreach (var package in packages)
         {
-            if (package.Samples.Count == 0)
-            {
-                continue;
-            }
+            if (package.Samples.Count == 0) continue;
 
             if (individualVolume)
             {
                 // Simply mix the volume in the sample to the outside volume
-                foreach (Sample sample in package.Samples)
+                foreach (var sample in package.Samples)
                 {
                     sample.OutsideVolume = AudioVolume.FromAmplitude(
-                        AudioVolume.ToAmplitude(sample.OutsideVolume) *
-                        AudioVolume.ToAmplitude(sample.SampleArgs.Volume));
+                        AudioVolume.ToAmplitude(sample.OutsideVolume) * AudioVolume.ToAmplitude(sample.SampleArgs.Volume));
                     sample.SampleArgs.Volume = 1;
                 }
 
@@ -147,50 +128,37 @@ public sealed class HitsoundStudioEngine
             }
 
             double maxVolume = package.Samples.Max(sample => sample.SampleArgs.Volume);
-            if (NearlyEqual(maxVolume, -0.01))
-            {
-                maxVolume = 1;
-            }
+            if (NearlyEqual(maxVolume, -0.01)) maxVolume = 1;
 
-            foreach (Sample sample in package.Samples)
+            foreach (var sample in package.Samples)
             {
-                if (NearlyEqual(sample.SampleArgs.Volume, -0.01))
-                {
-                    sample.SampleArgs.Volume = 1;
-                }
+                if (NearlyEqual(sample.SampleArgs.Volume, -0.01)) sample.SampleArgs.Volume = 1;
 
                 // Pick the new volume such that the samples have a volume as high as possible and the greenline brings the volume down.
                 // With this equation the final amplitude stays the same while the greenline has the volume of the loudest sample at this time.
                 double newVolume = AudioVolume.FromAmplitude(
-                    AudioVolume.ToAmplitude(sample.OutsideVolume) *
-                    AudioVolume.ToAmplitude(sample.SampleArgs.Volume) /
-                    AudioVolume.ToAmplitude(maxVolume));
+                    AudioVolume.ToAmplitude(sample.OutsideVolume) * AudioVolume.ToAmplitude(sample.SampleArgs.Volume) / AudioVolume.ToAmplitude(maxVolume));
 
                 if (Math.Abs(newVolume - 1) > roughness && !alwaysFullVolume)
-                {
                     // If roughness is not 0 it will quantize the new volume in order to reduce the number of different volumes
                     sample.SampleArgs.Volume = roughness > 0
                         ? roughness * Math.Round(newVolume / roughness)
                         : newVolume;
-                }
                 else
-                {
                     sample.SampleArgs.Volume = 1;
-                }
             }
 
             // Assuming the volume of the sample is always maximum, this equation makes sure that
             // the loudest sample at this time has the wanted amplitude using the volume change from the greenline.
             package.SetAllOutsideVolume(alwaysFullVolume
                 ? AudioVolume.FromAmplitude(
-                    AudioVolume.ToAmplitude(package.MaxOutsideVolume) *
-                    AudioVolume.ToAmplitude(maxVolume))
+                    AudioVolume.ToAmplitude(package.MaxOutsideVolume) * AudioVolume.ToAmplitude(maxVolume))
                 : maxVolume);
         }
     }
 
     /// <summary>
-    /// Builds custom-index assignments and events for standard-mode export.
+    ///     Builds custom-index assignments and events for standard-mode export.
     /// </summary>
     /// <param name="packages">Balanced packages in chronological order.</param>
     /// <param name="previousSchema">Optional schema loaded from a previous project.</param>
@@ -209,45 +177,33 @@ public sealed class HitsoundStudioEngine
     {
         ArgumentNullException.ThrowIfNull(packages);
         ArgumentNullException.ThrowIfNull(isSampleValid);
-        if (firstCustomIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(firstCustomIndex));
-        }
+        if (firstCustomIndex < 0) throw new ArgumentOutOfRangeException(nameof(firstCustomIndex));
 
-        List<SamplePackage> packageList = packages.ToList();
-        SampleGeneratingArgsComparer identity = comparer ?? new();
-        List<CustomIndex> indices = packageList
+        var packageList = packages.ToList();
+        var identity = comparer ?? new SampleGeneratingArgsComparer();
+        var indices = packageList
             .Select(package => package.GetCustomIndex(identity))
             .ToList();
-        foreach (CustomIndex index in indices)
-        {
-            index.CleanInvalids(isSampleValid);
-        }
+        foreach (var index in indices) index.CleanInvalids(isSampleValid);
 
-        List<CustomIndex>? previousIndices = previousSchema?.GetCustomIndices(identity);
+        var previousIndices = previousSchema?.GetCustomIndices(identity);
         List<CustomIndex> schemaIndices;
         if (previousIndices is null)
-        {
-            schemaIndices = GiveIndices(Optimize(indices), keepExisting: false, firstCustomIndex);
-        }
+            schemaIndices = GiveIndices(Optimize(indices), false, firstCustomIndex);
         else if (allowGrowth)
-        {
             schemaIndices = GiveIndices(
                 Optimize(previousIndices.Concat(indices).ToList()),
-                keepExisting: true,
+                true,
                 firstCustomIndex);
-        }
         else
-        {
             schemaIndices = previousIndices;
-        }
 
-        List<HitsoundEvent> events = MatchPackages(packageList, indices, schemaIndices);
+        var events = MatchPackages(packageList, indices, schemaIndices);
         return new HitsoundStudioStandardResult(events, new SampleSchema(schemaIndices));
     }
 
     /// <summary>
-    /// Builds named events for coinciding and storyboard modes.
+    ///     Builds named events for coinciding and storyboard modes.
     /// </summary>
     /// <param name="packages">Balanced packages in chronological order.</param>
     /// <param name="previousSchema">Optional singleton-name schema to reuse.</param>
@@ -269,21 +225,18 @@ public sealed class HitsoundStudioEngine
         ArgumentNullException.ThrowIfNull(packages);
         ArgumentNullException.ThrowIfNull(isSampleValid);
 
-        List<SamplePackage> packageList = packages.ToList();
-        SampleGeneratingArgsComparer identity = comparer ?? new();
+        var packageList = packages.ToList();
+        var identity = comparer ?? new SampleGeneratingArgsComparer();
         HashSet<SampleGeneratingArgs> allSamples = new(
             packageList.SelectMany(package => package.Samples.Select(sample => sample.SampleArgs)),
             identity);
-        Dictionary<SampleGeneratingArgs, string> names = previousSchema?.GetSampleNames(identity)
-            ?? new(identity);
-        HashSet<string> usedNames = names.Values.Where(name => !string.IsNullOrEmpty(name)).ToHashSet(StringComparer.Ordinal);
+        var names = previousSchema?.GetSampleNames(identity)
+                    ?? new Dictionary<SampleGeneratingArgs, string>(identity);
+        var usedNames = names.Values.Where(name => !string.IsNullOrEmpty(name)).ToHashSet(StringComparer.Ordinal);
 
-        foreach (SampleGeneratingArgs sample in allSamples)
+        foreach (var sample in allSamples)
         {
-            if (names.ContainsKey(sample))
-            {
-                continue;
-            }
+            if (names.ContainsKey(sample)) continue;
 
             // Validate the sample because we expect only valid samples to be present in the sample schema
             if (!isSampleValid(sample))
@@ -293,58 +246,51 @@ public sealed class HitsoundStudioEngine
             }
 
             if (!allowGrowth && previousSchema is not null)
-            {
                 throw new InvalidDataException(
                     $"Given sample schema doesn't support sample ({sample}) and growth is disabled.");
-            }
 
             string baseName = sample.GetFilename();
             string name = baseName;
             int suffix = 1;
-            while (!usedNames.Add(name))
-            {
-                name = $"{baseName}-{++suffix}";
-            }
+            while (!usedNames.Add(name)) name = $"{baseName}-{++suffix}";
 
             names[sample] = name;
         }
 
-        Dictionary<SampleGeneratingArgs, Vector2> positions = maniaPositions
+        var positions = maniaPositions
             ? GenerateManiaPositions(allSamples, identity)
             : GeneratePositions(allSamples, identity);
         List<HitsoundEvent> events = [];
-        foreach (SamplePackage package in packageList)
+        foreach (var package in packageList)
+        foreach (var sample in package.Samples)
         {
-            foreach (Sample sample in package.Samples)
-            {
-                string filename = names.TryGetValue(sample.SampleArgs, out string? value)
-                    ? value
-                    : string.Empty;
-                Vector2 position = positions[sample.SampleArgs];
-                events.Add(includeRegularHitsounds
-                    ? new HitsoundEvent(
-                        package.Time,
-                        position,
-                        sample.OutsideVolume,
-                        filename,
-                        sample.SampleSet,
-                        sample.SampleSet,
-                        0,
-                        sample.Hitsound == Hitsound.Whistle,
-                        sample.Hitsound == Hitsound.Finish,
-                        sample.Hitsound == Hitsound.Clap)
-                    : new HitsoundEvent(
-                        package.Time,
-                        position,
-                        sample.OutsideVolume,
-                        filename,
-                        SampleSet.None,
-                        SampleSet.None,
-                        0,
-                        false,
-                        false,
-                        false));
-            }
+            string filename = names.TryGetValue(sample.SampleArgs, out string? value)
+                ? value
+                : string.Empty;
+            var position = positions[sample.SampleArgs];
+            events.Add(includeRegularHitsounds
+                ? new HitsoundEvent(
+                    package.Time,
+                    position,
+                    sample.OutsideVolume,
+                    filename,
+                    sample.SampleSet,
+                    sample.SampleSet,
+                    0,
+                    sample.Hitsound == Hitsound.Whistle,
+                    sample.Hitsound == Hitsound.Finish,
+                    sample.Hitsound == Hitsound.Clap)
+                : new HitsoundEvent(
+                    package.Time,
+                    position,
+                    sample.OutsideVolume,
+                    filename,
+                    SampleSet.None,
+                    SampleSet.None,
+                    0,
+                    false,
+                    false,
+                    false));
         }
 
         return new HitsoundStudioNamedResult(events, new SampleSchema(names), names, positions);
@@ -353,8 +299,10 @@ public sealed class HitsoundStudioEngine
     /// <summary>Creates a schema from the supplied names without copying invalid entries.</summary>
     /// <param name="names">Source names keyed by generation arguments.</param>
     /// <returns>A persisted schema containing non-empty names.</returns>
-    public SampleSchema CreateSchema(IEnumerable<KeyValuePair<SampleGeneratingArgs, string>> names) =>
-        new(names.ToDictionary(pair => pair.Key, pair => pair.Value));
+    public SampleSchema CreateSchema(IEnumerable<KeyValuePair<SampleGeneratingArgs, string>> names)
+    {
+        return new SampleSchema(names.ToDictionary(pair => pair.Key, pair => pair.Value));
+    }
 
     /// <summary>Generates standard osu! playfield positions for unique samples.</summary>
     /// <param name="samples">The distinct generation arguments.</param>
@@ -364,7 +312,7 @@ public sealed class HitsoundStudioEngine
         IEnumerable<SampleGeneratingArgs> samples,
         SampleGeneratingArgsComparer? comparer = null)
     {
-        SampleGeneratingArgs[] values = samples.ToArray();
+        var values = samples.ToArray();
         int spacingX = 128;
         int spacingY = 128;
         bool reduceX = false;
@@ -375,10 +323,10 @@ public sealed class HitsoundStudioEngine
             else spacingY /= 2;
         }
 
-        Dictionary<SampleGeneratingArgs, Vector2> positions = new(comparer ?? new());
+        Dictionary<SampleGeneratingArgs, Vector2> positions = new(comparer ?? new SampleGeneratingArgsComparer());
         int x = 0;
         int y = 0;
-        foreach (SampleGeneratingArgs value in values)
+        foreach (var value in values)
         {
             positions[value] = new Vector2(x, y);
             x += spacingX;
@@ -401,11 +349,11 @@ public sealed class HitsoundStudioEngine
         IEnumerable<SampleGeneratingArgs> samples,
         SampleGeneratingArgsComparer? comparer = null)
     {
-        SampleGeneratingArgs[] values = samples.ToArray();
+        var values = samples.ToArray();
         int keys = Math.Clamp(values.Length, 1, 18);
-        Dictionary<SampleGeneratingArgs, Vector2> positions = new(comparer ?? new());
+        Dictionary<SampleGeneratingArgs, Vector2> positions = new(comparer ?? new SampleGeneratingArgsComparer());
         double x = 256d / keys;
-        foreach (SampleGeneratingArgs value in values)
+        foreach (var value in values)
         {
             positions[value] = new Vector2(Math.Round(x), 192);
             x += 512d / keys;
@@ -419,16 +367,17 @@ public sealed class HitsoundStudioEngine
     {
         List<CustomIndex> optimized = [];
         // Try merging together CustomIndices as much as possible
-        foreach (CustomIndex index in indices)
+        foreach (var index in indices)
         {
-            CustomIndex? merge = optimized.FirstOrDefault(candidate => candidate.CanMerge(index));
+            var merge = optimized.FirstOrDefault(candidate => candidate.CanMerge(index));
             if (merge is null) optimized.Add(index.Copy());
             else merge.MergeWith(index);
         }
 
         // Remove any CustomIndices that might be obsolete
         optimized.RemoveAll(subject => !indices.Any(candidate =>
-            subject.Fits(candidate) && optimized.Where(other => !ReferenceEquals(other, subject))
+            subject.Fits(candidate)
+            && optimized.Where(other => !ReferenceEquals(other, subject))
                 .All(other => !other.Fits(candidate))));
         return optimized;
     }
@@ -439,8 +388,8 @@ public sealed class HitsoundStudioEngine
         int firstCustomIndex)
     {
         int next = firstCustomIndex;
-        HashSet<int> used = indices.Where(index => index.Index >= 0).Select(index => index.Index).ToHashSet();
-        foreach (CustomIndex index in indices)
+        var used = indices.Where(index => index.Index >= 0).Select(index => index.Index).ToHashSet();
+        foreach (var index in indices)
         {
             if (keepExisting && index.Index >= 0) continue;
             while (used.Contains(next)) next++;
@@ -463,11 +412,10 @@ public sealed class HitsoundStudioEngine
             // Find CustomIndex that fits the most packages from here
             CustomIndex? best = null;
             int bestCount = 0;
-            foreach (CustomIndex candidate in schemaIndices)
+            foreach (var candidate in schemaIndices)
             {
                 int count = 0;
-                while (packageIndex + count < packageIndices.Count &&
-                       candidate.Fits(packageIndices[packageIndex + count])) count++;
+                while (packageIndex + count < packageIndices.Count && candidate.Fits(packageIndices[packageIndex + count])) count++;
                 if (count > bestCount)
                 {
                     best = candidate;
@@ -476,16 +424,11 @@ public sealed class HitsoundStudioEngine
             }
 
             if (best is null || bestCount == 0)
-            {
                 throw new InvalidDataException(
                     "Custom indices can't fit the sample packages. Maybe the previous sample schema is incompatible or growth is disabled.");
-            }
 
             // Add all the fitted packages as hitsounds
-            for (int offset = 0; offset < bestCount; offset++)
-            {
-                events.Add(packages[packageIndex + offset].GetHitsound(best.Index));
-            }
+            for (int offset = 0; offset < bestCount; offset++) events.Add(packages[packageIndex + offset].GetHitsound(best.Index));
 
             packageIndex += bestCount;
         }
@@ -493,8 +436,10 @@ public sealed class HitsoundStudioEngine
         return events;
     }
 
-    private static bool NearlyEqual(double left, double right) =>
-        Math.Abs(left - right) < 1e-9;
+    private static bool NearlyEqual(double left, double right)
+    {
+        return Math.Abs(left - right) < 1e-9;
+    }
 }
 
 /// <summary>Contains standard-mode events and the schema that generated them.</summary>

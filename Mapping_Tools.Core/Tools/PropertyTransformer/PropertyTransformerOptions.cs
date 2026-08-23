@@ -1,7 +1,7 @@
 namespace Mapping_Tools.Core.Tools.PropertyTransformer;
 
 /// <summary>
-/// Stores the multipliers, offsets, clipping, and filters used by Property Transformer.
+///     Stores the multipliers, offsets, clipping, and filters used by Property Transformer.
 /// </summary>
 public class PropertyTransformerOptions
 {

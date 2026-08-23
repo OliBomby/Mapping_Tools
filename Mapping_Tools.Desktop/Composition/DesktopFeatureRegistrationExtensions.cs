@@ -1,5 +1,5 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using Avalonia.Controls.Primitives;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Shell;
@@ -8,8 +8,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop.Composition;
 
-static internal class DesktopFeatureRegistrationExtensions {
-    public static IServiceCollection AddDesktopFeatures(this IServiceCollection services) {
+internal static class DesktopFeatureRegistrationExtensions
+{
+    public static IServiceCollection AddDesktopFeatures(this IServiceCollection services)
+    {
         services.AddShellFeature<GetStartedViewModel>(
             "get-started",
             "Get started",
@@ -29,7 +31,7 @@ static internal class DesktopFeatureRegistrationExtensions {
             "Auto-fail Detector",
             "Detect incorrect object loading in overlapping patterns.",
             ["auto fail", "2b", "unloading", "objects"],
-            startsSection: true,
+            true,
             verticalScrollBarVisibility: ScrollBarVisibility.Auto,
             quickRunTargets: QuickRunTargets.Always);
         services.AddMappingTool<MapCleanerViewModel>(
@@ -176,7 +178,8 @@ static internal class DesktopFeatureRegistrationExtensions {
         bool startsSection = false,
         ScrollBarVisibility horizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
         ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled)
-        where TViewModel : ObservableObject {
+        where TViewModel : ObservableObject
+    {
         services.AddSingleton<TViewModel>();
         services.AddSingleton(provider => new ShellFeatureRegistration(
             id,
@@ -202,7 +205,8 @@ static internal class DesktopFeatureRegistrationExtensions {
         ScrollBarVisibility horizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
         ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled,
         QuickRunTargets? quickRunTargets = null)
-        where TViewModel : ObservableObject {
+        where TViewModel : ObservableObject
+    {
         services.AddShellFeature<TViewModel>(
             id,
             displayName,
@@ -213,16 +217,15 @@ static internal class DesktopFeatureRegistrationExtensions {
             horizontalScrollBarVisibility,
             verticalScrollBarVisibility);
 
-        if (quickRunTargets is not null) {
+        if (quickRunTargets is not null)
             services.AddSingleton(provider => new MappingToolQuickRunRegistration(
                 id,
                 displayName,
                 quickRunTargets.Value,
-                cancellationToken => (provider.GetRequiredService<TViewModel>() as IQuickRun ??
-                                      throw new InvalidOperationException(
+                cancellationToken => (provider.GetRequiredService<TViewModel>() as IQuickRun
+                                      ?? throw new InvalidOperationException(
                                           $"Feature '{id}' declares QuickRun but {typeof(TViewModel).Name} does not implement IQuickRun.")).RunQuickAsync(cancellationToken)
             ));
-        }
 
         return services;
     }

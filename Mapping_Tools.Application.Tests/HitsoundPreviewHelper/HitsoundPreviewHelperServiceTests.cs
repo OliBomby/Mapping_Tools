@@ -16,16 +16,16 @@ public sealed class HitsoundPreviewHelperServiceTests
     public async Task ApplyAsync_WithSelectedMode_RequiresLiveStateAndLeavesReloadToExecutionHost()
     {
         // Arrange
-        RecordingGateway gateway = new(selectedObjectCount: 1);
+        RecordingGateway gateway = new(1);
         HitsoundPreviewHelperService service = new(gateway);
         HitsoundPreviewHelperOptions options = new()
         {
             ImportModeSetting = HitsoundPreviewHelperImportMode.Selected,
-            Items = [new HitsoundZone { Hitsound = Hitsound.Clap, CustomIndex = 2 }]
+            Items = [new HitsoundZone { Hitsound = Hitsound.Clap, CustomIndex = 2 }],
         };
 
         // Act
-        HitsoundPreviewHelperResult result = await service.ApplyAsync(
+        var result = await service.ApplyAsync(
             ["selected.osu"],
             options);
 
@@ -44,17 +44,17 @@ public sealed class HitsoundPreviewHelperServiceTests
     public async Task ApplyAsync_WithTimeMode_UsesTimeCodeAndPreferLive()
     {
         // Arrange
-        RecordingGateway gateway = new(selectedObjectCount: 0);
+        RecordingGateway gateway = new(0);
         HitsoundPreviewHelperService service = new(gateway);
         HitsoundPreviewHelperOptions options = new()
         {
             ImportModeSetting = HitsoundPreviewHelperImportMode.Time,
             TimeCode = "00:02:000",
-            Items = [new HitsoundZone { Hitsound = Hitsound.Finish }]
+            Items = [new HitsoundZone { Hitsound = Hitsound.Finish }],
         };
 
         // Act
-        HitsoundPreviewHelperResult result = await service.ApplyAsync(
+        var result = await service.ApplyAsync(
             ["time.osu"],
             options);
 
@@ -72,16 +72,16 @@ public sealed class HitsoundPreviewHelperServiceTests
     public async Task ApplyAsync_WithBookmarkedMode_UsesOnlyBookmarkedObjects()
     {
         // Arrange
-        RecordingGateway gateway = new(selectedObjectCount: 0, bookmarkSecondObject: true);
+        RecordingGateway gateway = new(0, true);
         HitsoundPreviewHelperService service = new(gateway);
         HitsoundPreviewHelperOptions options = new()
         {
             ImportModeSetting = HitsoundPreviewHelperImportMode.Bookmarked,
-            Items = [new HitsoundZone { Hitsound = Hitsound.Clap }]
+            Items = [new HitsoundZone { Hitsound = Hitsound.Clap }],
         };
 
         // Act
-        HitsoundPreviewHelperResult result = await service.ApplyAsync(
+        var result = await service.ApplyAsync(
             ["bookmarked.osu"],
             options);
 
@@ -95,16 +95,16 @@ public sealed class HitsoundPreviewHelperServiceTests
     public async Task ApplyAsync_WithEverythingMode_ProcessesEveryObjectInInputOrder()
     {
         // Arrange
-        RecordingGateway gateway = new(selectedObjectCount: 0);
+        RecordingGateway gateway = new(0);
         HitsoundPreviewHelperService service = new(gateway);
         HitsoundPreviewHelperOptions options = new()
         {
             ImportModeSetting = HitsoundPreviewHelperImportMode.Everything,
-            Items = [new HitsoundZone { Hitsound = Hitsound.Whistle }]
+            Items = [new HitsoundZone { Hitsound = Hitsound.Whistle }],
         };
 
         // Act
-        HitsoundPreviewHelperResult result = await service.ApplyAsync(
+        var result = await service.ApplyAsync(
             ["first.osu", "second.osu"],
             options);
 
@@ -122,12 +122,12 @@ public sealed class HitsoundPreviewHelperServiceTests
     public async Task ApplyAsync_WithTimeModeAndBlankTimeCode_ThrowsBeforeOpeningBeatmaps()
     {
         // Arrange
-        RecordingGateway gateway = new(selectedObjectCount: 0);
+        RecordingGateway gateway = new(0);
         HitsoundPreviewHelperService service = new(gateway);
         HitsoundPreviewHelperOptions options = new()
         {
             ImportModeSetting = HitsoundPreviewHelperImportMode.Time,
-            Items = [new HitsoundZone()]
+            Items = [new HitsoundZone()],
         };
 
         // Act
@@ -143,7 +143,7 @@ public sealed class HitsoundPreviewHelperServiceTests
     public async Task ApplyAsync_WithoutZones_ThrowsBeforeOpeningBeatmaps()
     {
         // Arrange
-        RecordingGateway gateway = new(selectedObjectCount: 0);
+        RecordingGateway gateway = new(0);
         HitsoundPreviewHelperService service = new(gateway);
 
         // Act
@@ -159,8 +159,8 @@ public sealed class HitsoundPreviewHelperServiceTests
 
     private sealed class RecordingGateway : IBeatmapEditingGateway
     {
-        private readonly Beatmap _source;
         private readonly int _selectedObjectCount;
+        private readonly Beatmap _source;
 
         public RecordingGateway(int selectedObjectCount, bool bookmarkSecondObject = false)
         {
@@ -169,14 +169,11 @@ public sealed class HitsoundPreviewHelperServiceTests
                 new List<HitObject>
                 {
                     new("64,96,1000,1,0,0:0:0:0:"),
-                    new("400,96,2000,1,0,0:0:0:0:")
+                    new("400,96,2000,1,0,0:0:0:0:"),
                 },
                 [],
                 globalSv: 1.4);
-            if (bookmarkSecondObject)
-            {
-                _source.SetBookmarks([2000]);
-            }
+            if (bookmarkSecondObject) _source.SetBookmarks([2000]);
         }
 
         public List<LiveBeatmapPreference> OpenPreferences { get; } = [];
@@ -196,7 +193,7 @@ public sealed class HitsoundPreviewHelperServiceTests
                 _source.GetLines(),
                 new MemoryStore())
             {
-                Path = path
+                Path = path,
             };
             LastBeatmap = editor.Beatmap;
             IReadOnlyList<HitObject> selected = editor.Beatmap.HitObjects
@@ -212,8 +209,10 @@ public sealed class HitsoundPreviewHelperServiceTests
 
         public Task<StoryboardEditor2> OpenStoryboardAsync(
             string path,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task SaveAsync(
             Editor2 editor,
@@ -227,12 +226,17 @@ public sealed class HitsoundPreviewHelperServiceTests
         public Task SaveAsync(
             BeatmapEditingSession session,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
-            SaveAsync(session.Editor, reloadEditor, cancellationToken);
+            CancellationToken cancellationToken = default)
+        {
+            return SaveAsync(session.Editor, reloadEditor, cancellationToken);
+        }
 
         private sealed class MemoryStore : ITextFileStore
         {
-            public IReadOnlyList<string> ReadAllLines(string path) => throw new NotSupportedException();
+            public IReadOnlyList<string> ReadAllLines(string path)
+            {
+                throw new NotSupportedException();
+            }
 
             public void WriteAllLines(string path, IEnumerable<string> lines)
             {
@@ -242,9 +246,15 @@ public sealed class HitsoundPreviewHelperServiceTests
             {
             }
 
-            public string GetParentFolder(string path) => string.Empty;
+            public string GetParentFolder(string path)
+            {
+                return string.Empty;
+            }
 
-            public string CombinePath(string parent, string child) => child;
+            public string CombinePath(string parent, string child)
+            {
+                return child;
+            }
         }
     }
 }

@@ -13,12 +13,12 @@ public sealed class TimingHelperEngineTests
     public void Apply_WithUnevenObjectMarkers_AddsRedlineAtPreviousMarker()
     {
         // Arrange
-        Beatmap beatmap = CreateBeatmap(500, 500, 1300);
+        var beatmap = CreateBeatmap(500, 500, 1300);
         TimingHelperOptions options = new()
         {
             Bookmarks = false,
             Greenlines = false,
-            BeatDivisors = [new RationalBeatDivisor(1, 4)]
+            BeatDivisors = [new RationalBeatDivisor(1, 4)],
         };
 
         // Act
@@ -36,7 +36,7 @@ public sealed class TimingHelperEngineTests
     public void Apply_WithRedlinesDisabled_RemovesAllRedlinesExceptTheFirst()
     {
         // Arrange
-        Beatmap beatmap = CreateBeatmap(500, 500);
+        var beatmap = CreateBeatmap(500, 500);
         beatmap.BeatmapTiming.Add(CreateTimingPoint(1000, 500));
         TimingHelperOptions options = new()
         {
@@ -44,7 +44,7 @@ public sealed class TimingHelperEngineTests
             Bookmarks = false,
             Greenlines = false,
             Redlines = false,
-            BeatDivisors = [new RationalBeatDivisor(1, 4)]
+            BeatDivisors = [new RationalBeatDivisor(1, 4)],
         };
 
         // Act
@@ -59,11 +59,11 @@ public sealed class TimingHelperEngineTests
     public void Apply_WithNegativeLeniency_ThrowsBeforeMutatingTiming()
     {
         // Arrange
-        Beatmap beatmap = CreateBeatmap(500, 500);
+        var beatmap = CreateBeatmap(500, 500);
         TimingHelperOptions options = new()
         {
             Leniency = -1,
-            BeatDivisors = [new RationalBeatDivisor(1, 4)]
+            BeatDivisors = [new RationalBeatDivisor(1, 4)],
         };
 
         // Act
@@ -77,7 +77,7 @@ public sealed class TimingHelperEngineTests
 
     private static Beatmap CreateBeatmap(double millisecondsPerBeat, params double[] objectTimes)
     {
-        TimingPoint redline = CreateTimingPoint(0, millisecondsPerBeat);
+        var redline = CreateTimingPoint(0, millisecondsPerBeat);
         return new Beatmap(
             objectTimes
                 .Select(time => new HitObject(time, 0, SampleSet.None, SampleSet.None))
@@ -86,15 +86,17 @@ public sealed class TimingHelperEngineTests
             redline);
     }
 
-    private static TimingPoint CreateTimingPoint(double offset, double millisecondsPerBeat) =>
-        new(
+    private static TimingPoint CreateTimingPoint(double offset, double millisecondsPerBeat)
+    {
+        return new TimingPoint(
             offset,
             millisecondsPerBeat,
             4,
             SampleSet.Normal,
             0,
             100,
-            uninherited: true,
-            kiai: false,
-            omitFirstBarLine: false);
+            true,
+            false,
+            false);
+    }
 }

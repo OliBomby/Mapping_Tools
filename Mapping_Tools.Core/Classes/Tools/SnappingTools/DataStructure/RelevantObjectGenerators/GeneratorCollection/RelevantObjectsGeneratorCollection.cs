@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 
 /// <summary>Ordered generator catalog used by the layer calculation engine.</summary>
@@ -14,5 +11,8 @@ public sealed class RelevantObjectsGeneratorCollection : List<RelevantObjectsGen
 
     /// <summary>Gets generators whose settings currently mark them active.</summary>
     /// <returns>The active generators in catalog order.</returns>
-    public IEnumerable<RelevantObjectsGenerator> GetActiveGenerators() => this.Where(o => o.Settings.IsActive);
+    public IEnumerable<RelevantObjectsGenerator> GetActiveGenerators()
+    {
+        return this.Where(o => o.Settings.IsActive);
+    }
 }

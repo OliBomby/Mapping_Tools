@@ -59,12 +59,15 @@ public sealed record MapCleanerResult(
     /// <summary>Combines this result with another beatmap's cleanup summary.</summary>
     /// <param name="other">The result to append.</param>
     /// <returns>A result containing summed counts, concatenated markers, and the later end time.</returns>
-    public MapCleanerResult Add(MapCleanerResult other) => new(
-        ObjectsResnapped + other.ObjectsResnapped,
-        SamplesRemoved + other.SamplesRemoved,
-        TimingPointsRemoved + other.TimingPointsRemoved,
-        TimingPointsAdded.Concat(other.TimingPointsAdded).ToArray(),
-        TimingPointsChanged.Concat(other.TimingPointsChanged).ToArray(),
-        TimingPointsRemovedAt.Concat(other.TimingPointsRemovedAt).ToArray(),
-        Math.Max(TimelineEndTime, other.TimelineEndTime));
+    public MapCleanerResult Add(MapCleanerResult other)
+    {
+        return new MapCleanerResult(
+            ObjectsResnapped + other.ObjectsResnapped,
+            SamplesRemoved + other.SamplesRemoved,
+            TimingPointsRemoved + other.TimingPointsRemoved,
+            TimingPointsAdded.Concat(other.TimingPointsAdded).ToArray(),
+            TimingPointsChanged.Concat(other.TimingPointsChanged).ToArray(),
+            TimingPointsRemovedAt.Concat(other.TimingPointsRemovedAt).ToArray(),
+            Math.Max(TimelineEndTime, other.TimelineEndTime));
+    }
 }

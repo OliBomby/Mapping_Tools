@@ -6,9 +6,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Core.Tests.Classes.BeatmapHelper;
 
 [TestClass]
-public class TimingTests {
+public class TimingTests
+{
     [TestMethod]
-    public void TimingPoint_ParseAndSerialize_PreservesLine() {
+    public void TimingPoint_ParseAndSerialize_PreservesLine()
+    {
         // Arrange
         const string line = "1000,500,4,2,3,75,1,9";
 
@@ -24,7 +26,8 @@ public class TimingTests {
     }
 
     [TestMethod]
-    public void TimingPoint_InvalidMillisecondsPerBeat_ThrowsParsingException() {
+    public void TimingPoint_InvalidMillisecondsPerBeat_ThrowsParsingException()
+    {
         // Arrange
         const string line = "1000,not-a-number,4,2,3,75,1,0";
 
@@ -36,14 +39,15 @@ public class TimingTests {
     }
 
     [TestMethod]
-    public void Timing_SortsAndResnapsAgainstActiveRedline() {
+    public void Timing_SortsAndResnapsAgainstActiveRedline()
+    {
         // Arrange
         var laterGreenline = new TimingPoint("2000,-100,4,1,0,50,0,0");
         var redline = new TimingPoint("1000,500,4,1,0,100,1,0");
         var timing = new Timing(new List<TimingPoint> { laterGreenline, redline }, 1.4);
 
         // Act
-        double snapped = timing.Resnap(1260, new IBeatDivisor[] { new RationalBeatDivisor(4) }, floor: false);
+        double snapped = timing.Resnap(1260, new IBeatDivisor[] { new RationalBeatDivisor(4) }, false);
 
         // Assert
         timing[0].Should().BeSameAs(redline);
@@ -51,7 +55,8 @@ public class TimingTests {
     }
 
     [TestMethod]
-    public void ResnapInRange_WhenSnapWouldCrossBoundary_KeepsOriginalTime() {
+    public void ResnapInRange_WhenSnapWouldCrossBoundary_KeepsOriginalTime()
+    {
         // Arrange
         var timing = new Timing(new[] { "1000,500,4,1,0,100,1,0" }, 1.4);
 
@@ -59,9 +64,9 @@ public class TimingTests {
         double snapped = timing.ResnapInRange(
             1110,
             new IBeatDivisor[] { new RationalBeatDivisor(4) },
-            rangeStart: 1124,
-            rangeEnd: 2000,
-            floor: false);
+            1124,
+            2000,
+            false);
 
         // Assert
         snapped.Should().BeApproximately(1110, 0.0001);

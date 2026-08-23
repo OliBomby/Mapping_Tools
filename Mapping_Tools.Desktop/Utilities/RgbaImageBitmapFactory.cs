@@ -16,12 +16,13 @@ public static class RgbaImageBitmapFactory
     {
         ArgumentNullException.ThrowIfNull(image);
         WriteableBitmap bitmap = new(new PixelSize(image.Width, image.Height), new Vector(96, 96), PixelFormat.Rgba8888, AlphaFormat.Unpremul);
-        using (ILockedFramebuffer framebuffer = bitmap.Lock())
+        using (var framebuffer = bitmap.Lock())
         {
             int rowBytes = image.Width * 4;
             for (int y = 0; y < image.Height; y++)
                 Marshal.Copy(image.Pixels, y * rowBytes, framebuffer.Address + y * framebuffer.RowBytes, rowBytes);
         }
+
         return bitmap;
     }
 }

@@ -73,7 +73,8 @@
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
             <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
-            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100" Value="{Binding Progress}" />
+            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100"
+                                      Value="{Binding Progress}" />
         </Grid>
     </Grid>
 </UserControl>

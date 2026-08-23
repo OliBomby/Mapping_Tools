@@ -16,13 +16,13 @@ public sealed class QuickUndoCommandServiceTests
         // Arrange
         RecordingBackupService backups = new();
         List<UserNotification> notifications = [];
-        QuickUndoCommandService service = CreateService(
+        var service = CreateService(
             new FixedLocator(null),
             backups,
             notifications);
 
         // Act
-        QuickUndoCommandResult result = await service.ExecuteAsync();
+        var result = await service.ExecuteAsync();
 
         // Assert
         result.Status.Should().Be(QuickUndoCommandStatus.NoCurrentBeatmap);
@@ -36,14 +36,14 @@ public sealed class QuickUndoCommandServiceTests
         // Arrange
         RecordingBackupService backups = new();
         List<UserNotification> notifications = [];
-        QuickUndoCommandService service = CreateService(
+        var service = CreateService(
             new FixedLocator("map.osu"),
             backups,
             notifications,
-            autoReload: true);
+            true);
 
         // Act
-        QuickUndoCommandResult result = await service.ExecuteAsync();
+        var result = await service.ExecuteAsync();
 
         // Assert
         result.Status.Should().Be(QuickUndoCommandStatus.NoBackup);
@@ -68,13 +68,13 @@ public sealed class QuickUndoCommandServiceTests
             safety);
         RecordingBackupService backups = new() { Restore = restore };
         List<UserNotification> notifications = [];
-        QuickUndoCommandService service = CreateService(
+        var service = CreateService(
             new FixedLocator("map.osu"),
             backups,
             notifications);
 
         // Act
-        QuickUndoCommandResult result = await service.ExecuteAsync();
+        var result = await service.ExecuteAsync();
 
         // Assert
         result.Status.Should().Be(QuickUndoCommandStatus.Restored);
@@ -89,13 +89,13 @@ public sealed class QuickUndoCommandServiceTests
         IOException failure = new("Backup is locked.");
         RecordingBackupService backups = new() { Failure = failure };
         List<UserNotification> notifications = [];
-        QuickUndoCommandService service = CreateService(
+        var service = CreateService(
             new FixedLocator("map.osu"),
             backups,
             notifications);
 
         // Act
-        QuickUndoCommandResult result = await service.ExecuteAsync();
+        var result = await service.ExecuteAsync();
 
         // Assert
         result.Status.Should().Be(QuickUndoCommandStatus.Failed);
@@ -164,27 +164,35 @@ public sealed class QuickUndoCommandServiceTests
             IEnumerable<string> sourcePaths,
             BeatmapBackupReason reason,
             bool force = false,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task<BeatmapBackupResult> CreateAsync(
             BeatmapEditingSession session,
             BeatmapBackupReason reason,
             bool force = false,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task<BeatmapBackupArtifact?> CreatePeriodicIfChangedAsync(
             BeatmapEditingSession session,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task<BeatmapRestoreResult> RestoreAsync(
             string backupPath,
             string destinationPath,
             bool allowDifferentFilename = false,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
     }
 }

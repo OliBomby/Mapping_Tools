@@ -11,8 +11,8 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Owns Slider Completionator form state, project persistence, ordinary runs,
-/// and the current-editor QuickRun path.
+///     Owns Slider Completionator form state, project persistence, ordinary runs,
+///     and the current-editor QuickRun path.
 /// </summary>
 public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewModel,
     IQuickRun,
@@ -22,13 +22,37 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
 
     private readonly ISliderCompletionatorService _completionator;
     private readonly ICurrentBeatmapLocator _currentBeatmap;
-    private readonly IBeatmapWorkspace _workspace;
-    private readonly ApplicationSettings _settings;
+
     private readonly ProjectDefinition<SliderCompletionatorProject> _definition = new(
         "slidercompletionatorproject.json",
         "Slider Completionator Projects",
         static () => new SliderCompletionatorProject(),
         "slider-completionator-project.json");
+
+    private readonly ApplicationSettings _settings;
+    private readonly IBeatmapWorkspace _workspace;
+
+    /// <summary>
+    ///     Creates a Slider Completionator presentation model.
+    /// </summary>
+    /// <param name="completionator">Runs the framework-independent slider transformation.</param>
+    /// <param name="execution">Coordinates background execution and notifications.</param>
+    /// <param name="currentBeatmap">Finds the beatmap currently open in osu!.</param>
+    /// <param name="workspace">Supplies the shell's selected beatmap paths.</param>
+    /// <param name="settings">Supplies QuickRun preferences.</param>
+    public SliderCompletionatorViewModel(
+        ISliderCompletionatorService completionator,
+        IToolExecutionService execution,
+        ICurrentBeatmapLocator currentBeatmap,
+        IBeatmapWorkspace workspace,
+        ApplicationSettings settings)
+        : base(execution, OperationId)
+    {
+        _completionator = completionator ?? throw new ArgumentNullException(nameof(completionator));
+        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+    }
 
     /// <summary>Gets the import modes in their legacy display order.</summary>
     public IReadOnlyList<SliderCompletionatorImportMode> ImportModes { get; } =
@@ -113,9 +137,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
 
     /// <summary>Gets whether the explicit end-time field is visible.</summary>
     public bool EndTimeVisible =>
-        FreeVariableSetting != SliderCompletionatorFreeVariable.Duration &&
-        UseEndTime &&
-        !UseCurrentEditorTime;
+        FreeVariableSetting != SliderCompletionatorFreeVariable.Duration && UseEndTime && !UseCurrentEditorTime;
 
     /// <summary>Gets whether the slider length field is visible.</summary>
     public bool LengthVisible => FreeVariableSetting != SliderCompletionatorFreeVariable.Length;
@@ -123,29 +145,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     /// <summary>Gets whether the slider velocity field is visible.</summary>
     public bool VelocityVisible => FreeVariableSetting != SliderCompletionatorFreeVariable.Velocity;
 
-    /// <summary>
-    /// Creates a Slider Completionator presentation model.
-    /// </summary>
-    /// <param name="completionator">Runs the framework-independent slider transformation.</param>
-    /// <param name="execution">Coordinates background execution and notifications.</param>
-    /// <param name="currentBeatmap">Finds the beatmap currently open in osu!.</param>
-    /// <param name="workspace">Supplies the shell's selected beatmap paths.</param>
-    /// <param name="settings">Supplies QuickRun preferences.</param>
-    public SliderCompletionatorViewModel(
-        ISliderCompletionatorService completionator,
-        IToolExecutionService execution,
-        ICurrentBeatmapLocator currentBeatmap,
-        IBeatmapWorkspace workspace,
-        ApplicationSettings settings)
-        : base(execution, OperationId)
-    {
-        _completionator = completionator ?? throw new ArgumentNullException(nameof(completionator));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-    }
-
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
         string? path = await _currentBeatmap
@@ -153,49 +153,49 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
             .ConfigureAwait(false);
         await RunWithStateAsync(() => RunPathsAsync(
             string.IsNullOrWhiteSpace(path) ? [] : [path],
-            quick: true,
+            true,
             cancellationToken));
-    }
-
-    /// <inheritdoc/>
-    protected override async Task RunCoreAsync()
-    {
-        string? currentPath = null;
-        if (ImportModeSetting == SliderCompletionatorImportMode.Selected)
-        {
-            currentPath = await _currentBeatmap.FindCurrentBeatmapAsync();
-        }
-
-        IReadOnlyList<string> paths = ImportModeSetting == SliderCompletionatorImportMode.Selected
-            ? string.IsNullOrWhiteSpace(currentPath) ? [] : [currentPath]
-            : _workspace.SelectedPaths;
-        await RunPathsAsync(paths, quick: _settings.AlwaysQuickRun, CancellationToken.None);
-    }
-
-    /// <inheritdoc/>
-    protected override bool PrepareRun()
-    {
-        ValidateAllProperties();
-        return !HasErrors;
     }
 
     string IQuickRun.OperationId => OperationId;
 
     IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
 
-    object IShellProjectFeature.Snapshot() => Snapshot();
+    object IShellProjectFeature.Snapshot()
+    {
+        return Snapshot();
+    }
 
-    void IShellProjectFeature.Install(object project) => Install((SliderCompletionatorProject)project);
+    void IShellProjectFeature.Install(object project)
+    {
+        Install((SliderCompletionatorProject)project);
+    }
+
+    /// <inheritdoc />
+    protected override async Task RunCoreAsync()
+    {
+        string? currentPath = null;
+        if (ImportModeSetting == SliderCompletionatorImportMode.Selected) currentPath = await _currentBeatmap.FindCurrentBeatmapAsync();
+
+        var paths = ImportModeSetting == SliderCompletionatorImportMode.Selected
+            ? string.IsNullOrWhiteSpace(currentPath) ? [] : [currentPath]
+            : _workspace.SelectedPaths;
+        await RunPathsAsync(paths, _settings.AlwaysQuickRun, CancellationToken.None);
+    }
+
+    /// <inheritdoc />
+    protected override bool PrepareRun()
+    {
+        ValidateAllProperties();
+        return !HasErrors;
+    }
 
     private async Task RunPathsAsync(
         IReadOnlyList<string> paths,
         bool quick,
         CancellationToken cancellationToken)
     {
-        if (paths.Count == 0)
-        {
-            return;
-        }
+        if (paths.Count == 0) return;
 
         SliderCompletionatorOptions options = Snapshot();
         await Execution.ExecuteAsync(
@@ -204,53 +204,53 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
                     "Slider Completionator",
                     async context =>
                     {
-                        SliderCompletionatorResult result = await _completionator.CompleteAsync(
+                        var result = await _completionator.CompleteAsync(
                             paths,
                             options,
                             new Progress<double>(value => context.ReportProgress(
                                 value,
                                 "Completing sliders")),
                             context.CancellationToken);
-                        string message = $"Successfully completed {result.SlidersCompleted} " +
-                                         $"{(result.SlidersCompleted == 1 ? "slider" : "sliders") }!";
+                        string message = $"Successfully completed {result.SlidersCompleted} " + $"{(result.SlidersCompleted == 1 ? "slider" : "sliders")}!";
                         return new ToolExecutionOutput<SliderCompletionatorResult>(
                             result,
                             quick ? null : message,
-                            reloadEditor: quick);
+                            quick);
                     }),
                 CreateProgress(),
                 cancellationToken)
             .ConfigureAwait(false);
     }
 
-    private SliderCompletionatorProject Snapshot() => new()
+    private SliderCompletionatorProject Snapshot()
     {
-        ImportModeSetting = ImportModeSetting,
-        FreeVariableSetting = FreeVariableSetting,
-        TimeCode = TimeCode,
-        Duration = Duration,
-        EndTime = EndTime,
-        Length = Length,
-        SliderVelocity = SliderVelocity,
-        MoveAnchors = MoveAnchors,
-        UseEndTime = UseEndTime,
-        UseCurrentEditorTime = UseCurrentEditorTime,
-        DelegateToBpm = DelegateToBpm,
-        RemoveSliderTicks = RemoveSliderTicks
-    };
+        return new SliderCompletionatorProject
+        {
+            ImportModeSetting = ImportModeSetting,
+            FreeVariableSetting = FreeVariableSetting,
+            TimeCode = TimeCode,
+            Duration = Duration,
+            EndTime = EndTime,
+            Length = Length,
+            SliderVelocity = SliderVelocity,
+            MoveAnchors = MoveAnchors,
+            UseEndTime = UseEndTime,
+            UseCurrentEditorTime = UseCurrentEditorTime,
+            DelegateToBpm = DelegateToBpm,
+            RemoveSliderTicks = RemoveSliderTicks,
+        };
+    }
 
     private void Install(SliderCompletionatorProject project)
     {
         ArgumentNullException.ThrowIfNull(project);
-        if (!Enum.IsDefined(project.ImportModeSetting) ||
-            !Enum.IsDefined(project.FreeVariableSetting) ||
-            !double.IsFinite(project.Duration) ||
-            !double.IsFinite(project.EndTime) ||
-            !double.IsFinite(project.Length) ||
-            !double.IsFinite(project.SliderVelocity))
-        {
+        if (!Enum.IsDefined(project.ImportModeSetting)
+            || !Enum.IsDefined(project.FreeVariableSetting)
+            || !double.IsFinite(project.Duration)
+            || !double.IsFinite(project.EndTime)
+            || !double.IsFinite(project.Length)
+            || !double.IsFinite(project.SliderVelocity))
             throw new InvalidDataException("Slider Completionator project is incomplete.");
-        }
 
         ImportModeSetting = project.ImportModeSetting;
         FreeVariableSetting = project.FreeVariableSetting;

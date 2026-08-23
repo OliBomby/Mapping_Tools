@@ -15,18 +15,18 @@ public sealed class HitsoundStudioEngineTests
         HitsoundLayer normal = new("normal", SampleSet.Normal, Hitsound.Normal,
             new SampleGeneratingArgs("normal.wav"), new LayerImportArgs())
         {
-            Times = [1000]
+            Times = [1000],
         };
         HitsoundLayer whistle = new("whistle", SampleSet.Drum, Hitsound.Whistle,
             new SampleGeneratingArgs("whistle.wav"), new LayerImportArgs())
         {
-            Times = [1014]
+            Times = [1014],
         };
         Sample fallback = new(SampleSet.Normal, Hitsound.Normal, new SampleGeneratingArgs("fallback.wav"), 99, 1);
 
         // Act
-        IReadOnlyList<SamplePackage> packages = new HitsoundStudioEngine().ZipLayers(
-            [normal, whistle], fallback, leniency: 15);
+        var packages = new HitsoundStudioEngine().ZipLayers(
+            [normal, whistle], fallback);
 
         // Assert
         packages.Should().ContainSingle();
@@ -41,13 +41,13 @@ public sealed class HitsoundStudioEngineTests
         HitsoundLayer whistle = new("whistle", SampleSet.Drum, Hitsound.Whistle,
             new SampleGeneratingArgs("whistle.wav"), new LayerImportArgs())
         {
-            Times = [1000, 1001]
+            Times = [1000, 1001],
         };
         Sample fallback = new(SampleSet.Normal, Hitsound.Normal, new SampleGeneratingArgs("fallback.wav"), 99, 1);
 
         // Act
-        IReadOnlyList<SamplePackage> packages = new HitsoundStudioEngine().ZipLayers(
-            [whistle], fallback, leniency: 0, needNormalSample: false);
+        var packages = new HitsoundStudioEngine().ZipLayers(
+            [whistle], fallback, 0, false);
 
         // Assert
         packages.Should().HaveCount(2);
@@ -62,23 +62,23 @@ public sealed class HitsoundStudioEngineTests
         HitsoundLayer layer = new("kick", SampleSet.Normal, Hitsound.Normal,
             new SampleGeneratingArgs("kick.wav"), new LayerImportArgs())
         {
-            Times = [500]
+            Times = [500],
         };
         HitsoundStudioEngine engine = new();
-        IReadOnlyList<SamplePackage> packages = engine.ZipLayers(
+        var packages = engine.ZipLayers(
             [layer],
             new Sample(SampleSet.Normal, Hitsound.Normal, new SampleGeneratingArgs("kick.wav"), 0, 1));
         SampleSchema previous = new()
         {
-            ["normal-hitnormal"] = [new SampleGeneratingArgs("kick.wav")]
+            ["normal-hitnormal"] = [new SampleGeneratingArgs("kick.wav")],
         };
 
         // Act
-        HitsoundStudioStandardResult result = engine.BuildStandard(
+        var result = engine.BuildStandard(
             packages,
             previous,
-            allowGrowth: false,
-            firstCustomIndex: 1,
+            false,
+            1,
             sample => !string.IsNullOrEmpty(sample.Path));
 
         // Assert
@@ -94,21 +94,21 @@ public sealed class HitsoundStudioEngineTests
         HitsoundLayer layer = new("missing", SampleSet.Normal, Hitsound.Normal,
             new SampleGeneratingArgs("missing.wav"), new LayerImportArgs())
         {
-            Times = [100]
+            Times = [100],
         };
         HitsoundStudioEngine engine = new();
-        IReadOnlyList<SamplePackage> packages = engine.ZipLayers(
+        var packages = engine.ZipLayers(
             [layer],
             new Sample(SampleSet.Normal, Hitsound.Normal, new SampleGeneratingArgs("fallback.wav"), 0, 1),
             needNormalSample: false);
 
         // Act
-        HitsoundStudioNamedResult result = engine.BuildNamed(
+        var result = engine.BuildNamed(
             packages,
-            previousSchema: null,
-            maniaPositions: false,
-            includeRegularHitsounds: true,
-            allowGrowth: false,
+            null,
+            false,
+            true,
+            false,
             sample => false);
 
         // Assert
@@ -121,12 +121,12 @@ public sealed class HitsoundStudioEngineTests
     public void GenerateManiaPositions_ClampsKeyCountToOsuMaximum()
     {
         // Arrange
-        SampleGeneratingArgs[] samples = Enumerable.Range(0, 24)
+        var samples = Enumerable.Range(0, 24)
             .Select(index => new SampleGeneratingArgs($"sample-{index}.wav"))
             .ToArray();
 
         // Act
-        Dictionary<SampleGeneratingArgs, Mapping_Tools.Core.Classes.MathUtil.Vector2> positions =
+        var positions =
             new HitsoundStudioEngine().GenerateManiaPositions(samples);
 
         // Assert

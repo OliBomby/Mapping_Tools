@@ -1,9 +1,8 @@
-using CommunityToolkit.Mvvm.Input;
+using System.Globalization;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.Settings;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.PropertyTransformer;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
@@ -19,7 +18,7 @@ public sealed class PropertyTransformerViewModelTests
     public void SyncTimeFields_WhenMultiplierChanges_SynchronizesOnlyTimeFields()
     {
         // Arrange
-        PropertyTransformerViewModel viewModel = Create();
+        var viewModel = Create();
         viewModel.SyncTimeFields = true;
 
         // Act
@@ -41,7 +40,7 @@ public sealed class PropertyTransformerViewModelTests
     public void ResetCommand_WithConfiguredValues_RestoresLegacyDefaults()
     {
         // Arrange
-        PropertyTransformerViewModel viewModel = Create();
+        var viewModel = Create();
         viewModel.SyncTimeFields = true;
         viewModel.TimingpointOffsetMultiplier = 2;
         viewModel.TimingpointBpmOffset = 50;
@@ -69,12 +68,12 @@ public sealed class PropertyTransformerViewModelTests
         RecordingPropertyTransformer service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["first.osu", "second.osb"]);
-        PropertyTransformerViewModel viewModel = Create(service, workspace);
+        var viewModel = Create(service, workspace);
         viewModel.BookmarkTimeOffset = 5;
         viewModel.ClipProperties = true;
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         service.Paths.Should().Equal("first.osu", "second.osb");
@@ -96,12 +95,12 @@ public sealed class PropertyTransformerViewModelTests
             new[] { 1.25, 2.5 },
             typeof(string),
             null,
-            System.Globalization.CultureInfo.GetCultureInfo("nl-NL"));
+            CultureInfo.GetCultureInfo("nl-NL"));
         object values = converter.ConvertBack(
             text,
             typeof(double[]),
             null,
-            System.Globalization.CultureInfo.GetCultureInfo("nl-NL"));
+            CultureInfo.GetCultureInfo("nl-NL"));
 
         // Assert
         text.Should().Be("1.25, 2.5");
@@ -143,7 +142,9 @@ public sealed class PropertyTransformerViewModelTests
 
     private sealed class StubReloadService : IEditorReloadService
     {
-        public Task ReloadAsync(CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
+        public Task ReloadAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

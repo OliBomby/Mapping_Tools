@@ -1,12 +1,11 @@
-using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
 
 namespace Mapping_Tools.Application.HitsoundPreviewHelper;
 
 /// <summary>
-/// Persists the complete hitsound-preview form while retaining the legacy
-/// <c>Items</c> zone property used by WPF project files.
+///     Persists the complete hitsound-preview form while retaining the legacy
+///     <c>Items</c> zone property used by WPF project files.
 /// </summary>
 public sealed class HitsoundPreviewHelperProject : HitsoundPreviewHelperOptions
 {
@@ -23,8 +22,8 @@ public sealed record HitsoundPreviewHelperResult(
 public interface IHitsoundPreviewHelperService
 {
     /// <summary>
-    /// Applies positional rules to each input map and saves every changed map
-    /// through the backup-aware editor gateway.
+    ///     Applies positional rules to each input map and saves every changed map
+    ///     through the backup-aware editor gateway.
     /// </summary>
     /// <param name="paths">Beatmap paths in the shell's selected order.</param>
     /// <param name="options">The persisted object-selection and zone settings.</param>
@@ -38,7 +37,7 @@ public interface IHitsoundPreviewHelperService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Reads selected live-editor object positions for the Shift-add workflow.
+    ///     Reads selected live-editor object positions for the Shift-add workflow.
     /// </summary>
     /// <param name="path">The beatmap currently open in the editor.</param>
     /// <param name="cancellationToken">Cancels the live-state read.</param>

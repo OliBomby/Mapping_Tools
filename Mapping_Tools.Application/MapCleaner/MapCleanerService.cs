@@ -25,7 +25,7 @@ public sealed class MapCleanerService : IMapCleanerService
         _samples = samples ?? throw new ArgumentNullException(nameof(samples));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<MapCleanerResult> CleanAsync(
         IReadOnlyList<string> paths,
         MapCleanerOptions options,
@@ -34,29 +34,27 @@ public sealed class MapCleanerService : IMapCleanerService
     {
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(options);
-        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace))
-        {
-            throw new ArgumentException("Select at least one beatmap.", nameof(paths));
-        }
+        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
 
         MapCleanerResult total = new(0, 0, 0, [], [], [], 20);
         for (int index = 0; index < paths.Count; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
-            string directory = _fileSystem.GetParentDirectory(path) ??
-                throw new InvalidOperationException($"Could not resolve the folder for '{path}'.");
-            BeatmapEditingSession session = await _editingGateway.OpenBeatmapAsync(
+            string directory = _fileSystem.GetParentDirectory(path) ?? throw new InvalidOperationException($"Could not resolve the folder for '{path}'.");
+            var session = await _editingGateway.OpenBeatmapAsync(
                 path,
                 LiveBeatmapPreference.PreferLive,
                 cancellationToken).ConfigureAwait(false);
-            IReadOnlyDictionary<string, string> samples = await _samples.AnalyzeAsync(
+            var samples = await _samples.AnalyzeAsync(
                 directory,
                 options.AnalyzeSamples,
                 cancellationToken).ConfigureAwait(false);
-            Progress<double>? mapProgress = progress is null ? null : new Progress<double>(value =>
-                progress.Report((index * 100 + value) / paths.Count));
-            MapCleanerResult result = Mapping_Tools.Core.Tools.MapCleaner.MapCleanerEngine.Clean(
+            var mapProgress = progress is null
+                ? null
+                : new Progress<double>(value =>
+                    progress.Report((index * 100 + value) / paths.Count));
+            var result = MapCleanerEngine.Clean(
                 session.Editor.Beatmap,
                 options,
                 directory,
@@ -77,6 +75,7 @@ public sealed class MapCleanerService : IMapCleanerService
             // Update result with removed count
             total = total.Add(result with { SamplesRemoved = removedSamples });
         }
+
         return total;
     }
 }

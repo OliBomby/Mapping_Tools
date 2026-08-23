@@ -20,10 +20,10 @@ public sealed class PreferencesViewModelTests
     public void Constructor_WithPersistedSettings_ExposesValuesWithoutSaving()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
+        var settings = CreateSettings();
 
         // Act
-        PreferencesViewModel viewModel = CreateViewModel(settings);
+        var viewModel = CreateViewModel(settings);
 
         // Assert
         viewModel.OsuPath.Should().Be(@"C:\osu!");
@@ -36,8 +36,8 @@ public sealed class PreferencesViewModelTests
     public void OsuPath_WithBlankText_ShowsValidationAndPreservesPersistedValue()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
-        PreferencesViewModel viewModel = CreateViewModel(settings);
+        var settings = CreateSettings();
+        var viewModel = CreateViewModel(settings);
 
         // Act
         viewModel.OsuPath = "   ";
@@ -56,8 +56,8 @@ public sealed class PreferencesViewModelTests
     public void OsuPath_WithInvalidThenValidText_UpdatesBindingValidationErrors()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
-        PreferencesViewModel viewModel = CreateViewModel(settings);
+        var settings = CreateSettings();
+        var viewModel = CreateViewModel(settings);
         INotifyDataErrorInfo validation = viewModel;
         List<string?> changedProperties = [];
         validation.ErrorsChanged += (_, eventArgs) =>
@@ -94,8 +94,8 @@ public sealed class PreferencesViewModelTests
     public void OsuPath_WithNonBlankText_UpdatesSharedSettingsInMemory()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
-        PreferencesViewModel viewModel = CreateViewModel(settings);
+        var settings = CreateSettings();
+        var viewModel = CreateViewModel(settings);
 
         // Act
         viewModel.OsuPath = @"D:\Games\osu!";
@@ -109,8 +109,8 @@ public sealed class PreferencesViewModelTests
     public void MaxBackupFiles_WithZeroAndLargeValue_AppliesWithoutInventedRange()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
-        PreferencesViewModel viewModel = CreateViewModel(settings);
+        var settings = CreateSettings();
+        var viewModel = CreateViewModel(settings);
 
         // Act
         viewModel.MaxBackupFiles = 0;
@@ -125,8 +125,8 @@ public sealed class PreferencesViewModelTests
     public void PeriodicBackupInterval_WithZero_AppliesWithoutInventedMinimum()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
-        PreferencesViewModel viewModel = CreateViewModel(settings);
+        var settings = CreateSettings();
+        var viewModel = CreateViewModel(settings);
 
         // Act
         viewModel.PeriodicBackupInterval = TimeSpan.Zero;
@@ -140,9 +140,9 @@ public sealed class PreferencesViewModelTests
     public void Theme_WhenChanged_AppliesLightThemeInMemory()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
+        var settings = CreateSettings();
         RecordingThemeService themes = new();
-        PreferencesViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             settings,
             themeService: themes);
 
@@ -158,9 +158,9 @@ public sealed class PreferencesViewModelTests
     public void Theme_WhenUnchanged_DoesNotReapplyTheme()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
+        var settings = CreateSettings();
         RecordingThemeService themes = new();
-        PreferencesViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             settings,
             themeService: themes);
 
@@ -175,8 +175,8 @@ public sealed class PreferencesViewModelTests
     public void MakePeriodicBackups_WhenChanged_UpdatesLivePolicyInMemory()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
-        PreferencesViewModel viewModel = CreateViewModel(settings);
+        var settings = CreateSettings();
+        var viewModel = CreateViewModel(settings);
 
         // Act
         viewModel.MakePeriodicBackups = false;
@@ -189,7 +189,7 @@ public sealed class PreferencesViewModelTests
     public void Constructor_WithQuickRunSettings_ExposesPersistedValues()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
+        var settings = CreateSettings();
         settings.OverrideOsuSave = true;
         settings.AutoReload = true;
         settings.AlwaysQuickRun = true;
@@ -202,7 +202,7 @@ public sealed class PreferencesViewModelTests
         settings.BetterSaveHotkey = new HotkeySettings(31, 2);
 
         // Act
-        PreferencesViewModel viewModel = CreateViewModel(settings);
+        var viewModel = CreateViewModel(settings);
 
         // Assert
         viewModel.OverrideOsuSave.Should().BeTrue();
@@ -221,9 +221,9 @@ public sealed class PreferencesViewModelTests
     public void Activate_WithRegisteredCommands_RefreshesTargetsBySelectionSize()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
+        var settings = CreateSettings();
         QuickRunCommandRegistry registry = new();
-        PreferencesViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             settings,
             quickRunRegistry: registry);
         registry.Register(new QuickRunCommand(
@@ -250,9 +250,9 @@ public sealed class PreferencesViewModelTests
     public void QuickRunHotkey_WhenChanged_UpdatesSettingsAndLiveBinding()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
+        var settings = CreateSettings();
         TestHotkeyBindingCoordinator bindings = new();
-        PreferencesViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             settings,
             hotkeyBindings: bindings);
         HotkeySettings hotkey = new(90, 6);
@@ -269,9 +269,9 @@ public sealed class PreferencesViewModelTests
     public void OverrideOsuSave_WhenChanged_ReconfiguresWatcherImmediately()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
+        var settings = CreateSettings();
         TestBetterSaveOverrideService betterSaveOverride = new();
-        PreferencesViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             settings,
             betterSaveOverride: betterSaveOverride);
 
@@ -287,10 +287,10 @@ public sealed class PreferencesViewModelTests
     public void SongsPath_WithValidValue_ReconfiguresEnabledWatcher()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
+        var settings = CreateSettings();
         settings.OverrideOsuSave = true;
         TestBetterSaveOverrideService betterSaveOverride = new();
-        PreferencesViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             settings,
             betterSaveOverride: betterSaveOverride);
 
@@ -306,14 +306,14 @@ public sealed class PreferencesViewModelTests
     public async Task BrowseBackupsPathCommand_WithSelectedFolder_UpdatesPathInMemory()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
+        var settings = CreateSettings();
         StubFilePicker picker = new()
         {
-            FolderResults = [@"D:\Mapping Tools Backups"]
+            FolderResults = [@"D:\Mapping Tools Backups"],
         };
-        PreferencesViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             settings,
-            filePicker: picker);
+            picker);
 
         // Act
         await ExecuteAsync(viewModel.BrowseBackupsPathCommand);
@@ -328,11 +328,11 @@ public sealed class PreferencesViewModelTests
     public async Task BrowseOsuConfigPathCommand_WhenCancelled_PreservesPathWithoutSaving()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
+        var settings = CreateSettings();
         StubFilePicker picker = new();
-        PreferencesViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             settings,
-            filePicker: picker);
+            picker);
 
         // Act
         await ExecuteAsync(viewModel.BrowseOsuConfigPathCommand);
@@ -347,18 +347,18 @@ public sealed class PreferencesViewModelTests
     public async Task BrowseBackupsPathCommand_WhenPickerFails_PublishesErrorWithoutChangingPath()
     {
         // Arrange
-        ApplicationSettings settings = CreateSettings();
+        var settings = CreateSettings();
         StubFilePicker picker = new()
         {
-            ExceptionToThrow = new IOException("Picker unavailable.")
+            ExceptionToThrow = new IOException("Picker unavailable."),
         };
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
         notifications.Published += (_, eventArgs) =>
             published.Add(eventArgs.Notification);
-        PreferencesViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             settings,
-            filePicker: picker,
+            picker,
             notifications: notifications);
 
         // Act
@@ -371,8 +371,9 @@ public sealed class PreferencesViewModelTests
         published[0].Title.Should().Be("Could not select folder");
     }
 
-    private static ApplicationSettings CreateSettings() =>
-        new()
+    private static ApplicationSettings CreateSettings()
+    {
+        return new ApplicationSettings
         {
             OsuPath = @"C:\osu!",
             SongsPath = @"C:\osu!\Songs",
@@ -381,8 +382,9 @@ public sealed class PreferencesViewModelTests
             MaxBackupFiles = 25,
             MakePeriodicBackups = true,
             PeriodicBackupInterval = TimeSpan.FromMinutes(5),
-            Theme = ApplicationTheme.Dark
+            Theme = ApplicationTheme.Dark,
         };
+    }
 
     private static PreferencesViewModel CreateViewModel(
         ApplicationSettings settings,
@@ -391,8 +393,9 @@ public sealed class PreferencesViewModelTests
         IUserNotificationService? notifications = null,
         IQuickRunCommandRegistry? quickRunRegistry = null,
         IHotkeyBindingCoordinator? hotkeyBindings = null,
-        IBetterSaveOverrideService? betterSaveOverride = null) =>
-        new(
+        IBetterSaveOverrideService? betterSaveOverride = null)
+    {
+        return new PreferencesViewModel(
             settings,
             filePicker ?? new StubFilePicker(),
             themeService ?? new RecordingThemeService(),
@@ -400,26 +403,26 @@ public sealed class PreferencesViewModelTests
             quickRunRegistry ?? new QuickRunCommandRegistry(),
             hotkeyBindings ?? new TestHotkeyBindingCoordinator(),
             betterSaveOverride ?? new TestBetterSaveOverrideService());
+    }
 
-    private static Task ExecuteAsync(IAsyncRelayCommand command) =>
-        command.ExecuteAsync(null);
+    private static Task ExecuteAsync(IAsyncRelayCommand command)
+    {
+        return command.ExecuteAsync(null);
+    }
 
     private sealed class RecordingThemeService : IApplicationThemeService
     {
         public List<ApplicationTheme> AppliedThemes { get; } = [];
 
-        public void Apply(ApplicationTheme theme) => AppliedThemes.Add(theme);
+        public void Apply(ApplicationTheme theme)
+        {
+            AppliedThemes.Add(theme);
+        }
     }
 
     private sealed class StubFilePicker : IFilePicker
     {
-        public bool CanOpenFiles => true;
-
-        public bool CanSaveFiles => true;
-
-        public bool CanPickFolders => true;
-
-        public IReadOnlyList<string> OpenFileResults { get; init; } = [];
+        public IReadOnlyList<string> OpenFileResults { get; } = [];
 
         public IReadOnlyList<string> FolderResults { get; init; } = [];
 
@@ -428,15 +431,17 @@ public sealed class PreferencesViewModelTests
         public OpenFilePickerRequest? LastOpenFileRequest { get; private set; }
 
         public OpenFolderPickerRequest? LastFolderRequest { get; private set; }
+        public bool CanOpenFiles => true;
+
+        public bool CanSaveFiles => true;
+
+        public bool CanPickFolders => true;
 
         public Task<IReadOnlyList<string>> PickOpenFilesAsync(
             OpenFilePickerRequest request,
             CancellationToken cancellationToken = default)
         {
-            if (ExceptionToThrow is not null)
-            {
-                throw ExceptionToThrow;
-            }
+            if (ExceptionToThrow is not null) throw ExceptionToThrow;
 
             LastOpenFileRequest = request;
             return Task.FromResult(OpenFileResults);
@@ -444,17 +449,16 @@ public sealed class PreferencesViewModelTests
 
         public Task<string?> PickSaveFileAsync(
             SaveFilePickerRequest request,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult<string?>(null);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<string?>(null);
+        }
 
         public Task<IReadOnlyList<string>> PickFoldersAsync(
             OpenFolderPickerRequest request,
             CancellationToken cancellationToken = default)
         {
-            if (ExceptionToThrow is not null)
-            {
-                throw ExceptionToThrow;
-            }
+            if (ExceptionToThrow is not null) throw ExceptionToThrow;
 
             LastFolderRequest = request;
             return Task.FromResult(FolderResults);

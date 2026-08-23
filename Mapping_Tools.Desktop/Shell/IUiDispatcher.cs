@@ -3,7 +3,7 @@ using Avalonia.Threading;
 namespace Mapping_Tools.Desktop.Shell;
 
 /// <summary>
-/// Marshals application notifications to the desktop UI thread.
+///     Marshals application notifications to the desktop UI thread.
 /// </summary>
 public interface IUiDispatcher
 {

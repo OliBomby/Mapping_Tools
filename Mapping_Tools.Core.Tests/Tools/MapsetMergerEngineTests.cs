@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Mapping_Tools.Core.Tools.MapsetMerger;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -16,7 +15,7 @@ public sealed class MapsetMergerEngineTests
             new("Pack", "one"),
             new("Pack", "two"),
             new("Pack", "three"),
-            new("Pack1", "four")
+            new("Pack1", "four"),
         ];
 
         // Act

@@ -8,16 +8,28 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.Updates;
 
 /// <summary>
-/// Holds the updater decision and package-preparation state for one window.
+///     Holds the updater decision and package-preparation state for one window.
 /// </summary>
 internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
 {
-    private readonly IUpdateService _updates;
-    private readonly IUserNotificationService _notifications;
     private readonly IDialogService _dialogs;
     private readonly IUiDispatcher _dispatcher;
-    private Task? _downloadTask;
+    private readonly IUserNotificationService _notifications;
+    private readonly IUpdateService _updates;
     private bool _disposed;
+
+    [ObservableProperty] private double downloadProgress;
+
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(InstallNowCommand))]
+    private bool isBusy;
+
+    [ObservableProperty] private bool isDownloadPanelVisible;
+
+    [ObservableProperty] private bool isReadyPanelVisible;
+
+    [ObservableProperty] private string releaseBody = string.Empty;
+
+    [ObservableProperty] private string releaseTitle = string.Empty;
 
     internal UpdaterViewModel(
         IUpdateService updates,
@@ -29,8 +41,7 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
     {
         _updates = updates ?? throw new ArgumentNullException(nameof(updates));
         Check = check ?? throw new ArgumentNullException(nameof(check));
-        _notifications = notifications ??
-            throw new ArgumentNullException(nameof(notifications));
+        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
@@ -43,34 +54,23 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
         _updates.ProgressChanged += OnProgressChanged;
     }
 
-    internal event EventHandler? CloseRequested;
-
-    internal event EventHandler? ApplicationCloseRequested;
-
     internal UpdateCheckResult Check { get; }
 
     internal bool UpdateAfterClose { get; private set; }
 
-    internal Task? DownloadTask => _downloadTask;
+    internal Task? DownloadTask { get; private set; }
 
-    [ObservableProperty]
-    private string releaseTitle = string.Empty;
+    public void Dispose()
+    {
+        if (_disposed) return;
 
-    [ObservableProperty]
-    private string releaseBody = string.Empty;
+        _disposed = true;
+        _updates.ProgressChanged -= OnProgressChanged;
+    }
 
-    [ObservableProperty]
-    private bool isReadyPanelVisible;
+    internal event EventHandler? CloseRequested;
 
-    [ObservableProperty]
-    private bool isDownloadPanelVisible;
-
-    [ObservableProperty]
-    private double downloadProgress;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(InstallNowCommand))]
-    private bool isBusy;
+    internal event EventHandler? ApplicationCloseRequested;
 
     [RelayCommand(CanExecute = nameof(CanInstallNow))]
     private async Task InstallNowAsync()
@@ -81,7 +81,7 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
         try
         {
             await BeginDownloadAsync();
-            _updates.StartUpdateProcess(restartAfterUpdate: true);
+            _updates.StartUpdateProcess(true);
             UpdateAfterClose = false;
             CloseRequested?.Invoke(this, EventArgs.Empty);
             ApplicationCloseRequested?.Invoke(this, EventArgs.Empty);
@@ -109,8 +109,8 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
 
         try
         {
-            _downloadTask = _updates.PrepareUpdateAsync();
-            _ = ObserveDownloadFailureAsync(_downloadTask);
+            DownloadTask = _updates.PrepareUpdateAsync();
+            _ = ObserveDownloadFailureAsync(DownloadTask);
             CloseRequested?.Invoke(this, EventArgs.Empty);
         }
         catch (Exception exception)
@@ -137,31 +137,23 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
 
     internal void SetDownloadProgress(double progress)
     {
-        if (!_disposed)
-        {
-            DownloadProgress = progress;
-        }
+        if (!_disposed) DownloadProgress = progress;
     }
 
-    internal void ClearWaitAfterClose() => UpdateAfterClose = false;
-
-    public void Dispose()
+    internal void ClearWaitAfterClose()
     {
-        if (_disposed)
-        {
-            return;
-        }
-
-        _disposed = true;
-        _updates.ProgressChanged -= OnProgressChanged;
+        UpdateAfterClose = false;
     }
 
-    private bool CanInstallNow() => !IsBusy;
+    private bool CanInstallNow()
+    {
+        return !IsBusy;
+    }
 
     private async Task BeginDownloadAsync()
     {
-        _downloadTask = _updates.PrepareUpdateAsync();
-        await _downloadTask;
+        DownloadTask = _updates.PrepareUpdateAsync();
+        await DownloadTask;
     }
 
     private async Task ObserveDownloadFailureAsync(Task downloadTask)
@@ -183,15 +175,12 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
 
     private async Task ReportFailureAsync(Exception exception)
     {
-        if (_disposed)
-        {
-            return;
-        }
+        if (_disposed) return;
 
         await _dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
             "Updater error",
             "UPDATER_EXCEPTION: " + exception.Message,
-            [new DialogChoice<bool>("OK", true, IsDefault: true, IsCancel: true)],
+            [new DialogChoice<bool>("OK", true, true, true)],
             true));
         await _notifications.PublishAsync(new UserNotification(
             UserNotificationSeverity.Error,
@@ -204,10 +193,7 @@ internal sealed partial class UpdaterViewModel : ObservableObject, IDisposable
         object? sender,
         UpdateProgressChangedEventArgs eventArgs)
     {
-        if (_disposed)
-        {
-            return;
-        }
+        if (_disposed) return;
 
         _dispatcher.Post(() => SetDownloadProgress(eventArgs.Progress));
     }

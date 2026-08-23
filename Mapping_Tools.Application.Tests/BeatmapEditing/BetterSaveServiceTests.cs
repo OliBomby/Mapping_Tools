@@ -23,7 +23,7 @@ public sealed class BetterSaveServiceTests
             notifications);
 
         // Act
-        BetterSaveResult result = await service.ExecuteAsync();
+        var result = await service.ExecuteAsync();
 
         // Assert
         result.Status.Should().Be(BetterSaveStatus.Saved);
@@ -49,7 +49,7 @@ public sealed class BetterSaveServiceTests
             notifications);
 
         // Act
-        BetterSaveResult result = await service.ExecuteAsync();
+        var result = await service.ExecuteAsync();
 
         // Assert
         result.Status.Should().Be(BetterSaveStatus.NoCurrentBeatmap);
@@ -73,14 +73,13 @@ public sealed class BetterSaveServiceTests
             notifications);
 
         // Act
-        BetterSaveResult result = await service.ExecuteAsync();
+        var result = await service.ExecuteAsync();
 
         // Assert
         result.Status.Should().Be(BetterSaveStatus.Failed);
         result.Exception.Should().BeSameAs(failure);
         published.Should().ContainSingle(notification =>
-            notification.Severity == UserNotificationSeverity.Error &&
-            notification.Exception == failure);
+            notification.Severity == UserNotificationSeverity.Error && notification.Exception == failure);
     }
 
     private sealed class FixedCurrentBeatmapLocator : ICurrentBeatmapLocator
@@ -138,8 +137,10 @@ public sealed class BetterSaveServiceTests
 
         public Task<StoryboardEditor2> OpenStoryboardAsync(
             string path,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task SaveAsync(
             Editor2 editor,
@@ -154,13 +155,18 @@ public sealed class BetterSaveServiceTests
         public Task SaveAsync(
             BeatmapEditingSession session,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
-            SaveAsync(session.Editor, reloadEditor, cancellationToken);
+            CancellationToken cancellationToken = default)
+        {
+            return SaveAsync(session.Editor, reloadEditor, cancellationToken);
+        }
     }
 
     private sealed class MemoryTextFileStore : ITextFileStore
     {
-        public IReadOnlyList<string> ReadAllLines(string path) => [];
+        public IReadOnlyList<string> ReadAllLines(string path)
+        {
+            return [];
+        }
 
         public void WriteAllLines(string path, IEnumerable<string> lines)
         {
@@ -170,8 +176,14 @@ public sealed class BetterSaveServiceTests
         {
         }
 
-        public string GetParentFolder(string path) => string.Empty;
+        public string GetParentFolder(string path)
+        {
+            return string.Empty;
+        }
 
-        public string CombinePath(string parent, string child) => child;
+        public string CombinePath(string parent, string child)
+        {
+            return child;
+        }
     }
 }

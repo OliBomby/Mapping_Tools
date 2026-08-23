@@ -5,9 +5,11 @@ using Newtonsoft.Json;
 namespace Mapping_Tools.Core.Tests.Classes.BeatmapHelper;
 
 [TestClass]
-public class ComboColourTests {
+public class ComboColourTests
+{
     [TestMethod]
-    public void RgbLine_RoundTripsWithoutAlpha() {
+    public void RgbLine_RoundTripsWithoutAlpha()
+    {
         // Arrange
         // Act
         var colour = new ComboColour("Combo1 : 12,34,56");
@@ -18,7 +20,8 @@ public class ComboColourTests {
     }
 
     [TestMethod]
-    public void RgbaLine_RoundTripsWithAlpha() {
+    public void RgbaLine_RoundTripsWithAlpha()
+    {
         // Arrange
         // Act
         var colour = new ComboColour("SliderTrackOverride : 12,34,56,78");
@@ -29,7 +32,8 @@ public class ComboColourTests {
     }
 
     [TestMethod]
-    public void ColourJson_PreservesLegacyArgbString() {
+    public void ColourJson_PreservesLegacyArgbString()
+    {
         // Arrange
         var expected = RgbaColour.FromArgb(0x7F, 0x12, 0x34, 0x56);
 
@@ -43,7 +47,8 @@ public class ComboColourTests {
     }
 
     [TestMethod]
-    public void ColorChange_UpdatesPlainColourValue() {
+    public void ColorChange_UpdatesPlainColourValue()
+    {
         // Arrange
         var colour = new ComboColour(1, 2, 3);
 

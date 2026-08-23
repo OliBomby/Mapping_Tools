@@ -8,20 +8,19 @@ using Material.Styles.Controls;
 namespace Mapping_Tools.Desktop.Controls;
 
 /// <summary>
-/// Presents the ordinary play action used to start a mapping tool inside a 70-pixel view box.
+///     Presents the ordinary play action used to start a mapping tool inside a 70-pixel view box.
 /// </summary>
 public sealed class ToolRunButton : Viewbox
 {
-    private readonly FloatingButton _button;
-
     /// <summary>Identifies the command invoked when the play action is selected.</summary>
     public static readonly StyledProperty<ICommand?> RunCommandProperty =
         AvaloniaProperty.Register<ToolRunButton, ICommand?>(nameof(RunCommand));
 
+    private readonly FloatingButton _button;
+
     static ToolRunButton()
     {
-        RunCommandProperty.Changed.AddClassHandler<ToolRunButton>(
-            static (control, eventArgs) => control._button.Command = eventArgs.NewValue as ICommand);
+        RunCommandProperty.Changed.AddClassHandler<ToolRunButton>(static (control, eventArgs) => control._button.Command = eventArgs.NewValue as ICommand);
     }
 
     /// <summary>Creates the WPF-compatible floating play action.</summary>
@@ -34,8 +33,8 @@ public sealed class ToolRunButton : Viewbox
             {
                 Width = 36,
                 Height = 36,
-                Kind = MaterialIconKind.Play
-            }
+                Kind = MaterialIconKind.Play,
+            },
         };
         ToolTip.SetTip(_button, "Run this tool.");
         Child = _button;

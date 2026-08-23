@@ -10,7 +10,7 @@ namespace Mapping_Tools.Infrastructure.Audio;
 /// <summary>Renders legacy and current NAudio SoundFont zones into owned clips.</summary>
 public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task<AudioClip?> RenderAsync(
         SoundFontNoteRequest request,
         CancellationToken cancellationToken = default)
@@ -22,44 +22,29 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
     private static AudioClip? Render(SampleGeneratingArgs args, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (!File.Exists(args.Path))
-        {
-            throw new FileNotFoundException("The SoundFont source does not exist.", args.Path);
-        }
+        if (!File.Exists(args.Path)) throw new FileNotFoundException("The SoundFont source does not exist.", args.Path);
 
         SoundFont soundFont = new(args.Path);
-        NaudioSampleSoundGenerator[] sounds = Array.Empty<NaudioSampleSoundGenerator>();
+        var sounds = Array.Empty<NaudioSampleSoundGenerator>();
         NaudioSampleSoundGenerator? mixer = null;
         try
         {
-            foreach (Preset preset in soundFont.Presets)
+            foreach (var preset in soundFont.Presets)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (preset.PatchNumber != args.Patch && args.Patch != -1 ||
-                    preset.Bank != args.Bank && args.Bank != -1)
-                {
+                if (preset.PatchNumber != args.Patch && args.Patch != -1 || preset.Bank != args.Bank && args.Bank != -1)
                     continue;
-                }
 
                 sounds = ImportPreset(soundFont, preset, args, cancellationToken);
-                if (sounds.Length > 0)
-                {
-                    break;
-                }
+                if (sounds.Length > 0) break;
             }
 
-            if (sounds.Length == 0)
-            {
-                sounds = ImportInstruments(soundFont, args, cancellationToken);
-            }
+            if (sounds.Length == 0) sounds = ImportInstruments(soundFont, args, cancellationToken);
 
-            if (sounds.Length == 0)
-            {
-                return null;
-            }
+            if (sounds.Length == 0) return null;
 
             int sampleRate = Math.Min(sounds.Max(sound => sound.OutputSampleRate), 44100);
-            foreach (NaudioSampleSoundGenerator sound in sounds)
+            foreach (var sound in sounds)
             {
                 sound.SampleRate = sampleRate;
                 sound.Channels = 2;
@@ -68,7 +53,7 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
             mixer = new NaudioSampleSoundGenerator(sounds)
             {
                 Panning = args.Panning,
-                PitchShift = args.PitchShift
+                PitchShift = args.PitchShift,
             };
 
             return mixer.Render(cancellationToken);
@@ -76,16 +61,10 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
         finally
         {
             if (mixer is not null)
-            {
                 mixer.Dispose();
-            }
             else
-            {
-                foreach (NaudioSampleSoundGenerator sound in sounds)
-                {
+                foreach (var sound in sounds)
                     sound.Dispose();
-                }
-            }
         }
     }
 
@@ -100,19 +79,13 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
         {
             if (args.Instrument != -1)
             {
-                if (args.Instrument >= preset.Zones.Length)
-                {
-                    return [];
-                }
+                if (args.Instrument >= preset.Zones.Length) return [];
 
                 result.AddRange(ImportInstrument(soundFont, preset.Zones[args.Instrument].Instrument(), args, cancellationToken));
                 return result.ToArray();
             }
 
-            foreach (Zone zone in ValidZones(preset.Zones, args, instrument: true))
-            {
-                result.AddRange(ImportInstrument(soundFont, zone.Instrument(), args, cancellationToken));
-            }
+            foreach (var zone in ValidZones(preset.Zones, args, true)) result.AddRange(ImportInstrument(soundFont, zone.Instrument(), args, cancellationToken));
 
             return result.ToArray();
         }
@@ -129,20 +102,14 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
         bool instrument = false,
         bool sampleHeader = false)
     {
-        List<Zone> validZones = zones
-            .Where(zone => IsZoneValid(zone, args.Key, args.Velocity) &&
-                          (!instrument || zone.Instrument() is not null) &&
-                          (!sampleHeader || zone.SampleHeader() is not null))
+        var validZones = zones
+            .Where(zone => IsZoneValid(zone, args.Key, args.Velocity) && (!instrument || zone.Instrument() is not null) && (!sampleHeader || zone.SampleHeader() is not null))
             .ToList();
-        if (validZones.Count == 0 || args.Key != -1 && args.Velocity != -1)
-        {
-            return validZones;
-        }
+        if (validZones.Count == 0 || args.Key != -1 && args.Velocity != -1) return validZones;
 
-        Zone firstZone = validZones[0];
+        var firstZone = validZones[0];
         return validZones.Where(zone =>
-            RangeOverlap(firstZone.KeyRange(), zone.KeyRange()) &&
-            RangeOverlap(firstZone.VelocityRange(), zone.VelocityRange()));
+            RangeOverlap(firstZone.KeyRange(), zone.KeyRange()) && RangeOverlap(firstZone.VelocityRange(), zone.VelocityRange()));
     }
 
     private static bool RangeOverlap(ushort first, ushort second)
@@ -162,8 +129,7 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
         ushort velocityRange = zone.VelocityRange();
         byte velocityLow = (byte)velocityRange;
         byte velocityHigh = (byte)(velocityRange >> 8);
-        return (velocityRange == 0 || velocity == -1 || velocity >= velocityLow && velocity <= velocityHigh) &&
-               (keyRange == 0 || key == -1 || key >= keyLow && key <= keyHigh);
+        return (velocityRange == 0 || velocity == -1 || velocity >= velocityLow && velocity <= velocityHigh) && (keyRange == 0 || key == -1 || key >= keyLow && key <= keyHigh);
     }
 
     private static NaudioSampleSoundGenerator[] ImportInstruments(
@@ -173,22 +139,16 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
     {
         if (args.Instrument != -1)
         {
-            if (args.Instrument >= soundFont.Instruments.Length)
-            {
-                return [];
-            }
+            if (args.Instrument >= soundFont.Instruments.Length) return [];
 
             return ImportInstrument(soundFont, soundFont.Instruments[args.Instrument], args, cancellationToken);
         }
 
-        foreach (Instrument instrument in soundFont.Instruments)
+        foreach (var instrument in soundFont.Instruments)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            NaudioSampleSoundGenerator[] sounds = ImportInstrument(soundFont, instrument, args, cancellationToken);
-            if (sounds.Length > 0)
-            {
-                return sounds;
-            }
+            var sounds = ImportInstrument(soundFont, instrument, args, cancellationToken);
+            if (sounds.Length > 0) return sounds;
         }
 
         return [];
@@ -200,19 +160,13 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
         SampleGeneratingArgs args,
         CancellationToken cancellationToken)
     {
-        if (instrument is null || instrument.Zones.Length == 0)
-        {
-            return [];
-        }
+        if (instrument is null || instrument.Zones.Length == 0) return [];
 
-        Zone? globalZone = instrument.Zones[0].SampleHeader() is null ? instrument.Zones[0] : null;
+        var globalZone = instrument.Zones[0].SampleHeader() is null ? instrument.Zones[0] : null;
         List<NaudioSampleSoundGenerator> result = [];
         try
         {
-            foreach (Zone zone in ValidZones(instrument.Zones, args, sampleHeader: true))
-            {
-                result.Add(GenerateSample(soundFont, zone, args, globalZone, cancellationToken));
-            }
+            foreach (var zone in ValidZones(instrument.Zones, args, sampleHeader: true)) result.Add(GenerateSample(soundFont, zone, args, globalZone, cancellationToken));
 
             return result.ToArray();
         }
@@ -232,17 +186,16 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
     {
         cancellationToken.ThrowIfCancellationRequested();
         Generator[] generators = zone.Generators;
-        if (globalZone is not null)
-        {
-            generators = generators.Concat(globalZone.Generators).ToArray();
-        }
+        if (globalZone is not null) generators = generators.Concat(globalZone.Generators).ToArray();
 
-        NaudioSampleSoundGenerator output = GetSampleWithLength(generators, soundFont.SampleData, args);
+        var output = GetSampleWithLength(generators, soundFont.SampleData, args);
         try
         {
             int velocity = generators.Velocity() is var overrideVelocity && overrideVelocity != 0
                 ? overrideVelocity
-                : args.Velocity != -1 ? args.Velocity : 127;
+                : args.Velocity != -1
+                    ? args.Velocity
+                    : 127;
             output.AmplitudeCorrection = velocity / 127d * Math.Pow(10, generators.Attenuation() / -20d);
             output.Panning = generators.Pan();
             return output;
@@ -257,12 +210,15 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
     private static NaudioSampleSoundGenerator GetSampleWithLength(
         Generator[] generators,
         byte[] sample,
-        SampleGeneratingArgs args) => generators.SampleModes() switch
+        SampleGeneratingArgs args)
+    {
+        return generators.SampleModes() switch
         {
             1 => GetSampleContinuous(generators, sample, args),
             3 => GetSampleRemainder(generators, sample, args),
-            _ => GetSampleWithoutLoop(generators, sample, args)
+            _ => GetSampleWithoutLoop(generators, sample, args),
         };
+    }
 
     private static NaudioSampleSoundGenerator GetSampleWithoutLoop(
         Generator[] generators,
@@ -270,14 +226,11 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
         SampleGeneratingArgs args,
         bool needsFade = false)
     {
-        SampleHeader header = generators.SampleHeader() ?? throw new InvalidDataException("SoundFont zone has no sample header.");
+        var header = generators.SampleHeader() ?? throw new InvalidDataException("SoundFont zone has no sample header.");
         int start = (int)header.Start + generators.FullStartAddressOffset();
         int end = (int)header.End + generators.FullEndAddressOffset();
         int length = end - start;
-        if (start < 0 || length < 0 || start * 2 + length * 2 > sample.Length)
-        {
-            throw new InvalidDataException("SoundFont sample bounds are invalid.");
-        }
+        if (start < 0 || length < 0 || start * 2 + length * 2 > sample.Length) throw new InvalidDataException("SoundFont sample bounds are invalid.");
 
         double lengthInSeconds = length / (double)header.SampleRate;
         bool fade = args.Length >= 0 && args.Length / 1000 < lengthInSeconds || needsFade;
@@ -306,53 +259,39 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
 
     private static NaudioSampleSoundGenerator GetSampleContinuous(Generator[] generators, byte[] sample, SampleGeneratingArgs args)
     {
-        if (args.Length < 0)
-        {
-            return GetSampleWithoutLoop(generators, sample, args, true);
-        }
+        if (args.Length < 0) return GetSampleWithoutLoop(generators, sample, args, true);
 
-        SampleHeader header = generators.SampleHeader() ?? throw new InvalidDataException("SoundFont zone has no sample header.");
+        var header = generators.SampleHeader() ?? throw new InvalidDataException("SoundFont zone has no sample header.");
         int start = (int)header.Start + generators.FullStartAddressOffset();
         int startLoop = (int)header.StartLoop + generators.FullStartLoopAddressOffset();
         int endLoop = (int)header.EndLoop + generators.FullEndLoopAddressOffset();
         int firstLength = startLoop - start;
         int loopLength = endLoop - startLoop;
-        if (firstLength < 0 || loopLength <= 0)
-        {
-            return GetSampleWithoutLoop(generators, sample, args, true);
-        }
+        if (firstLength < 0 || loopLength <= 0) return GetSampleWithoutLoop(generators, sample, args, true);
 
         double lengthInSeconds = args.Length / 1000d * GetRateFactor(args, generators) + 0.4;
         int numberOfSamples = (int)Math.Ceiling(lengthInSeconds * header.SampleRate);
         int loopSamples = numberOfSamples - firstLength;
-        if (loopSamples <= 0)
-        {
-            return GetSampleWithoutLoop(generators, sample, args, true);
-        }
+        if (loopSamples <= 0) return GetSampleWithoutLoop(generators, sample, args, true);
 
         byte[] buffer = new byte[numberOfSamples * 2];
         Array.Copy(sample, start * 2, buffer, 0, firstLength * 2);
         for (int index = 0; index < (loopSamples + loopLength - 1) / loopLength; index++)
-        {
             Array.Copy(sample, startLoop * 2, buffer, firstLength * 2 + index * loopLength * 2,
                 Math.Min(loopLength * 2, buffer.Length - (firstLength * 2 + index * loopLength * 2)));
-        }
 
         return new NaudioSampleSoundGenerator(BufferToWaveStream(buffer, (uint)(header.SampleRate * GetRateFactor(args, generators))))
         {
             FadeStart = lengthInSeconds - 0.4,
-            FadeLength = 0.3
+            FadeLength = 0.3,
         };
     }
 
     private static NaudioSampleSoundGenerator GetSampleRemainder(Generator[] generators, byte[] sample, SampleGeneratingArgs args)
     {
-        if (args.Length < 0)
-        {
-            return GetSampleWithoutLoop(generators, sample, args);
-        }
+        if (args.Length < 0) return GetSampleWithoutLoop(generators, sample, args);
 
-        SampleHeader header = generators.SampleHeader() ?? throw new InvalidDataException("SoundFont zone has no sample header.");
+        var header = generators.SampleHeader() ?? throw new InvalidDataException("SoundFont zone has no sample header.");
         int start = (int)header.Start + generators.FullStartAddressOffset();
         int end = (int)header.End + generators.FullEndAddressOffset();
         int startLoop = (int)header.StartLoop + generators.FullStartLoopAddressOffset();
@@ -360,48 +299,46 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
         int loopLength = endLoop - startLoop;
         int firstLength = startLoop - start;
         int secondLength = end - endLoop;
-        if (loopLength <= 0 || firstLength < 0 || secondLength < 0)
-        {
-            return GetSampleWithoutLoop(generators, sample, args);
-        }
+        if (loopLength <= 0 || firstLength < 0 || secondLength < 0) return GetSampleWithoutLoop(generators, sample, args);
 
         int numberOfSamples = (int)Math.Ceiling(args.Length / 1000d * GetRateFactor(args, generators) * header.SampleRate);
         int loopSamples = numberOfSamples - firstLength;
         loopSamples = (loopSamples + loopLength - 1) / loopLength * loopLength;
-        if (loopSamples <= 0)
-        {
-            return GetSampleWithoutLoop(generators, sample, args);
-        }
+        if (loopSamples <= 0) return GetSampleWithoutLoop(generators, sample, args);
 
         byte[] buffer = new byte[(firstLength + loopSamples + secondLength) * 2];
         Array.Copy(sample, start * 2, buffer, 0, firstLength * 2);
-        for (int index = 0; index < loopSamples / loopLength; index++)
-        {
-            Array.Copy(sample, startLoop * 2, buffer, firstLength * 2 + index * loopLength * 2, loopLength * 2);
-        }
+        for (int index = 0; index < loopSamples / loopLength; index++) Array.Copy(sample, startLoop * 2, buffer, firstLength * 2 + index * loopLength * 2, loopLength * 2);
 
         Array.Copy(sample, endLoop * 2, buffer, firstLength * 2 + loopSamples * 2, secondLength * 2);
         return new NaudioSampleSoundGenerator(BufferToWaveStream(buffer, (uint)(header.SampleRate * GetRateFactor(args, generators))));
     }
 
-    private static WaveStream BufferToWaveStream(byte[] buffer, uint sampleRate) =>
-        new RawSourceWaveStream(buffer, 0, buffer.Length, new WaveFormat((int)sampleRate, 16, 1));
+    private static WaveStream BufferToWaveStream(byte[] buffer, uint sampleRate)
+    {
+        return new RawSourceWaveStream(buffer, 0, buffer.Length, new WaveFormat((int)sampleRate, 16, 1));
+    }
+
+    private static void DisposeAll(IEnumerable<NaudioSampleSoundGenerator> sounds)
+    {
+        foreach (var sound in sounds) sound.Dispose();
+    }
 
     private sealed class NaudioSampleSoundGenerator : IDisposable
     {
-        private readonly WaveStream? _wave;
         private readonly NaudioSampleSoundGenerator[]? _generators;
+        private readonly WaveStream? _wave;
         private bool _disposed;
 
-        public NaudioSampleSoundGenerator(WaveStream wave) => _wave = wave ?? throw new ArgumentNullException(nameof(wave));
+        public NaudioSampleSoundGenerator(WaveStream wave)
+        {
+            _wave = wave ?? throw new ArgumentNullException(nameof(wave));
+        }
 
         public NaudioSampleSoundGenerator(NaudioSampleSoundGenerator[] generators)
         {
             _generators = generators ?? throw new ArgumentNullException(nameof(generators));
-            if (_generators.Length == 0)
-            {
-                throw new ArgumentException("At least one generator is required.", nameof(generators));
-            }
+            if (_generators.Length == 0) throw new ArgumentException("At least one generator is required.", nameof(generators));
         }
 
         public double AmplitudeCorrection { get; set; } = 1;
@@ -414,19 +351,27 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
         public int OutputSampleRate => SampleRate > 0 ? SampleRate : _wave?.WaveFormat.SampleRate ?? _generators![0].OutputSampleRate;
         public int OutputChannels => Channels > 0 ? Channels : _wave?.WaveFormat.Channels ?? _generators![0].OutputChannels;
 
+        public void Dispose()
+        {
+            if (_disposed) return;
+
+            _disposed = true;
+            _wave?.Dispose();
+            if (_generators is not null)
+                foreach (var generator in _generators)
+                    generator.Dispose();
+        }
+
         public AudioClip Render(CancellationToken cancellationToken)
         {
-            ISampleProvider provider = GetSampleProvider();
+            var provider = GetSampleProvider();
             var samples = new List<float>();
             float[] buffer = new float[Math.Max(provider.WaveFormat.SampleRate * provider.WaveFormat.Channels, 4096)];
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 int read = provider.Read(buffer, 0, buffer.Length);
-                if (read == 0)
-                {
-                    break;
-                }
+                if (read == 0) break;
 
                 samples.AddRange(buffer.AsSpan(0, read).ToArray());
             }
@@ -455,138 +400,218 @@ public sealed class NaudioSoundFontRenderer : ISoundFontRenderer
                 output = fade;
             }
 
-            if (Math.Abs(AmplitudeCorrection - 1) >= 1e-12)
-            {
-                output = new VolumeSampleProvider(output) { Volume = (float)AmplitudeCorrection };
-            }
+            if (Math.Abs(AmplitudeCorrection - 1) >= 1e-12) output = new VolumeSampleProvider(output) { Volume = (float)AmplitudeCorrection };
 
             if (Math.Abs(Panning) >= 1e-12)
             {
-                if (output.WaveFormat.Channels == 2)
-                {
-                    output = new StereoToMonoSampleProvider(output);
-                }
+                if (output.WaveFormat.Channels == 2) output = new StereoToMonoSampleProvider(output);
 
                 output = new PanningSampleProvider(output) { Pan = (float)Panning };
             }
 
-            if (Math.Abs(PitchShift) >= 1e-12)
-            {
-                output = new SmbPitchShiftingSampleProvider(output, 1024, 4, (float)Math.Pow(2, PitchShift / 12d));
-            }
+            if (Math.Abs(PitchShift) >= 1e-12) output = new SmbPitchShiftingSampleProvider(output, 1024, 4, (float)Math.Pow(2, PitchShift / 12d));
 
-            if (SampleRate > 0)
-            {
-                output = new WdlResamplingSampleProvider(output, SampleRate);
-            }
+            if (SampleRate > 0) output = new WdlResamplingSampleProvider(output, SampleRate);
 
             if (Channels > 0)
-            {
                 output = Channels == 1
                     ? output.WaveFormat.Channels == 2 ? new StereoToMonoSampleProvider(output) : output
-                    : output.WaveFormat.Channels == 1 ? new MonoToStereoSampleProvider(output) : output;
-            }
+                    : output.WaveFormat.Channels == 1
+                        ? new MonoToStereoSampleProvider(output)
+                        : output;
 
             return output;
         }
 
-        private static ISampleProvider ToSampleProvider(WaveStream wave) => wave.WaveFormat.Encoding switch
+        private static ISampleProvider ToSampleProvider(WaveStream wave)
         {
-            WaveFormatEncoding.Pcm when wave.WaveFormat.BitsPerSample == 8 => new Pcm8BitToSampleProvider(wave),
-            WaveFormatEncoding.Pcm when wave.WaveFormat.BitsPerSample == 16 => new Pcm16BitToSampleProvider(wave),
-            WaveFormatEncoding.Pcm when wave.WaveFormat.BitsPerSample == 24 => new Pcm24BitToSampleProvider(wave),
-            WaveFormatEncoding.Pcm when wave.WaveFormat.BitsPerSample == 32 => new Pcm32BitToSampleProvider(wave),
-            WaveFormatEncoding.IeeeFloat => new WaveToSampleProvider(wave),
-            _ => throw new NotSupportedException($"SoundFont stream encoding {wave.WaveFormat.Encoding} is not supported.")
-        };
-
-        public void Dispose()
-        {
-            if (_disposed)
+            return wave.WaveFormat.Encoding switch
             {
-                return;
-            }
-
-            _disposed = true;
-            _wave?.Dispose();
-            if (_generators is not null)
-            {
-                foreach (NaudioSampleSoundGenerator generator in _generators)
-                {
-                    generator.Dispose();
-                }
-            }
-        }
-    }
-
-    private static void DisposeAll(IEnumerable<NaudioSampleSoundGenerator> sounds)
-    {
-        foreach (NaudioSampleSoundGenerator sound in sounds)
-        {
-            sound.Dispose();
+                WaveFormatEncoding.Pcm when wave.WaveFormat.BitsPerSample == 8 => new Pcm8BitToSampleProvider(wave),
+                WaveFormatEncoding.Pcm when wave.WaveFormat.BitsPerSample == 16 => new Pcm16BitToSampleProvider(wave),
+                WaveFormatEncoding.Pcm when wave.WaveFormat.BitsPerSample == 24 => new Pcm24BitToSampleProvider(wave),
+                WaveFormatEncoding.Pcm when wave.WaveFormat.BitsPerSample == 32 => new Pcm32BitToSampleProvider(wave),
+                WaveFormatEncoding.IeeeFloat => new WaveToSampleProvider(wave),
+                _ => throw new NotSupportedException($"SoundFont stream encoding {wave.WaveFormat.Encoding} is not supported."),
+            };
         }
     }
 }
 
 internal static class SoundFontGeneratorExtensions
 {
-    public static Instrument? Instrument(this Zone zone) => zone.Generators.Instrument();
+    public static Instrument? Instrument(this Zone zone)
+    {
+        return zone.Generators.Instrument();
+    }
 
-    public static Instrument? Instrument(this Generator[] generators) =>
-        generators.SelectByGenerator(GeneratorEnum.Instrument)?.Instrument;
+    public static Instrument? Instrument(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.Instrument)?.Instrument;
+    }
 
-    public static short StartAddressOffset(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.StartAddressOffset)?.Int16Amount ?? 0;
-    public static short StartAddressCoarseOffset(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.StartAddressCoarseOffset)?.Int16Amount ?? 0;
-    public static int FullStartAddressOffset(this Generator[] generators) => generators.StartAddressOffset() + 0x8000 * generators.StartAddressCoarseOffset();
-    public static short EndAddressOffset(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.EndAddressOffset)?.Int16Amount ?? 0;
-    public static short EndAddressCoarseOffset(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.EndAddressCoarseOffset)?.Int16Amount ?? 0;
-    public static int FullEndAddressOffset(this Generator[] generators) => generators.EndAddressOffset() + 0x8000 * generators.EndAddressCoarseOffset();
-    public static short StartLoopAddressOffset(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.StartLoopAddressOffset)?.Int16Amount ?? 0;
-    public static short StartLoopAddressCoarseOffset(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.StartLoopAddressCoarseOffset)?.Int16Amount ?? 0;
-    public static int FullStartLoopAddressOffset(this Generator[] generators) => generators.StartLoopAddressOffset() + 0x8000 * generators.StartLoopAddressCoarseOffset();
-    public static short EndLoopAddressOffset(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.EndLoopAddressOffset)?.Int16Amount ?? 0;
-    public static short EndLoopAddressCoarseOffset(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.EndLoopAddressCoarseOffset)?.Int16Amount ?? 0;
-    public static int FullEndLoopAddressOffset(this Generator[] generators) => generators.EndLoopAddressOffset() + 0x8000 * generators.EndLoopAddressCoarseOffset();
-    public static ushort KeyRange(this Zone zone) => zone.Generators.KeyRange();
-    public static ushort KeyRange(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.KeyRange)?.UInt16Amount ?? 0;
-    public static ushort VelocityRange(this Zone zone) => zone.Generators.VelocityRange();
-    public static ushort VelocityRange(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.VelocityRange)?.UInt16Amount ?? 0;
-    public static byte Velocity(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.Velocity)?.LowByteAmount ?? 0;
-    public static byte OverridingRootKey(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.OverridingRootKey)?.LowByteAmount ?? 0;
-    public static double Pan(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.Pan)?.Int16Amount / 500d ?? 0;
-    public static double Attenuation(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.InitialAttenuation)?.Int16Amount / 10d ?? 0;
-    public static sbyte Correction(this Generator[] generators) => generators.SampleHeader()?.PitchCorrection ?? 0;
-    public static short CoarseTune(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.CoarseTune)?.Int16Amount ?? 0;
-    public static short FineTune(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.FineTune)?.Int16Amount ?? 0;
-    public static int TotalCorrection(this Generator[] generators) => generators.Correction() + generators.CoarseTune() * 100 + generators.FineTune();
+    public static short StartAddressOffset(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.StartAddressOffset)?.Int16Amount ?? 0;
+    }
+
+    public static short StartAddressCoarseOffset(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.StartAddressCoarseOffset)?.Int16Amount ?? 0;
+    }
+
+    public static int FullStartAddressOffset(this Generator[] generators)
+    {
+        return generators.StartAddressOffset() + 0x8000 * generators.StartAddressCoarseOffset();
+    }
+
+    public static short EndAddressOffset(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.EndAddressOffset)?.Int16Amount ?? 0;
+    }
+
+    public static short EndAddressCoarseOffset(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.EndAddressCoarseOffset)?.Int16Amount ?? 0;
+    }
+
+    public static int FullEndAddressOffset(this Generator[] generators)
+    {
+        return generators.EndAddressOffset() + 0x8000 * generators.EndAddressCoarseOffset();
+    }
+
+    public static short StartLoopAddressOffset(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.StartLoopAddressOffset)?.Int16Amount ?? 0;
+    }
+
+    public static short StartLoopAddressCoarseOffset(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.StartLoopAddressCoarseOffset)?.Int16Amount ?? 0;
+    }
+
+    public static int FullStartLoopAddressOffset(this Generator[] generators)
+    {
+        return generators.StartLoopAddressOffset() + 0x8000 * generators.StartLoopAddressCoarseOffset();
+    }
+
+    public static short EndLoopAddressOffset(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.EndLoopAddressOffset)?.Int16Amount ?? 0;
+    }
+
+    public static short EndLoopAddressCoarseOffset(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.EndLoopAddressCoarseOffset)?.Int16Amount ?? 0;
+    }
+
+    public static int FullEndLoopAddressOffset(this Generator[] generators)
+    {
+        return generators.EndLoopAddressOffset() + 0x8000 * generators.EndLoopAddressCoarseOffset();
+    }
+
+    public static ushort KeyRange(this Zone zone)
+    {
+        return zone.Generators.KeyRange();
+    }
+
+    public static ushort KeyRange(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.KeyRange)?.UInt16Amount ?? 0;
+    }
+
+    public static ushort VelocityRange(this Zone zone)
+    {
+        return zone.Generators.VelocityRange();
+    }
+
+    public static ushort VelocityRange(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.VelocityRange)?.UInt16Amount ?? 0;
+    }
+
+    public static byte Velocity(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.Velocity)?.LowByteAmount ?? 0;
+    }
+
+    public static byte OverridingRootKey(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.OverridingRootKey)?.LowByteAmount ?? 0;
+    }
+
+    public static double Pan(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.Pan)?.Int16Amount / 500d ?? 0;
+    }
+
+    public static double Attenuation(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.InitialAttenuation)?.Int16Amount / 10d ?? 0;
+    }
+
+    public static sbyte Correction(this Generator[] generators)
+    {
+        return generators.SampleHeader()?.PitchCorrection ?? 0;
+    }
+
+    public static short CoarseTune(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.CoarseTune)?.Int16Amount ?? 0;
+    }
+
+    public static short FineTune(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.FineTune)?.Int16Amount ?? 0;
+    }
+
+    public static int TotalCorrection(this Generator[] generators)
+    {
+        return generators.Correction() + generators.CoarseTune() * 100 + generators.FineTune();
+    }
+
     public static byte Key(this Generator[] generators)
     {
-        SampleHeader? header = generators.SampleHeader();
-        if (header is null)
-        {
-            return 0;
-        }
+        var header = generators.SampleHeader();
+        if (header is null) return 0;
 
         byte overriding = generators.OverridingRootKey();
         return overriding != 0 ? overriding : header.OriginalPitch;
     }
 
-    public static short ScaleTuning(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.ScaleTuning)?.Int16Amount ?? 100;
-    public static int SampleModes(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.SampleModes)?.UInt16Amount ?? 0;
-    public static SampleHeader? SampleHeader(this Zone zone) => zone.Generators.SampleHeader();
-    public static SampleHeader? SampleHeader(this Generator[] generators) => generators.SelectByGenerator(GeneratorEnum.SampleID)?.SampleHeader;
+    public static short ScaleTuning(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.ScaleTuning)?.Int16Amount ?? 100;
+    }
 
-    public static Generator? SelectByGenerator(this Generator[] generators, GeneratorEnum type) =>
-        generators.FirstOrDefault(generator => generator.GeneratorType == type);
+    public static int SampleModes(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.SampleModes)?.UInt16Amount ?? 0;
+    }
+
+    public static SampleHeader? SampleHeader(this Zone zone)
+    {
+        return zone.Generators.SampleHeader();
+    }
+
+    public static SampleHeader? SampleHeader(this Generator[] generators)
+    {
+        return generators.SelectByGenerator(GeneratorEnum.SampleID)?.SampleHeader;
+    }
+
+    public static Generator? SelectByGenerator(this Generator[] generators, GeneratorEnum type)
+    {
+        return generators.FirstOrDefault(generator => generator.GeneratorType == type);
+    }
 }
 
 internal sealed class DelayFadeOutSampleProvider : ISampleProvider
 {
     private readonly object _gate = new();
     private readonly ISampleProvider _source;
-    private long _framesRead;
     private int _fadeFrameCount;
     private int _fadeOutDelayFrames;
+    private long _framesRead;
 
     public DelayFadeOutSampleProvider(ISampleProvider source)
     {
@@ -595,23 +620,10 @@ internal sealed class DelayFadeOutSampleProvider : ISampleProvider
 
     public WaveFormat WaveFormat => _source.WaveFormat;
 
-    public void BeginFadeOut(double delayMilliseconds, double durationMilliseconds)
-    {
-        lock (_gate)
-        {
-            _framesRead = 0;
-            _fadeFrameCount = Math.Max(1, (int)(durationMilliseconds * _source.WaveFormat.SampleRate / 1000));
-            _fadeOutDelayFrames = Math.Max(0, (int)(delayMilliseconds * _source.WaveFormat.SampleRate / 1000));
-        }
-    }
-
     public int Read(float[] buffer, int offset, int count)
     {
         int sourceSamplesRead = _source.Read(buffer, offset, count);
-        if (sourceSamplesRead == 0)
-        {
-            return 0;
-        }
+        if (sourceSamplesRead == 0) return 0;
 
         lock (_gate)
         {
@@ -631,15 +643,22 @@ internal sealed class DelayFadeOutSampleProvider : ISampleProvider
                 }
 
                 int sampleOffset = offset + frame * WaveFormat.Channels;
-                for (int channel = 0; channel < WaveFormat.Channels; channel++)
-                {
-                    buffer[sampleOffset + channel] *= multiplier;
-                }
+                for (int channel = 0; channel < WaveFormat.Channels; channel++) buffer[sampleOffset + channel] *= multiplier;
             }
 
             _framesRead += framesRead;
         }
 
         return sourceSamplesRead;
+    }
+
+    public void BeginFadeOut(double delayMilliseconds, double durationMilliseconds)
+    {
+        lock (_gate)
+        {
+            _framesRead = 0;
+            _fadeFrameCount = Math.Max(1, (int)(durationMilliseconds * _source.WaveFormat.SampleRate / 1000));
+            _fadeOutDelayFrames = Math.Max(0, (int)(delayMilliseconds * _source.WaveFormat.SampleRate / 1000));
+        }
     }
 }

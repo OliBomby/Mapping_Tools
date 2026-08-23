@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -5,7 +6,6 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Mapping_Tools.Application.Sliderator;
-using Mapping_Tools.Core.Classes.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.Classes.Graph;
 using Mapping_Tools.Core.Classes.Graph.Markers;
 using Mapping_Tools.Core.Classes.ToolHelpers.Sliders;
@@ -18,12 +18,12 @@ namespace Mapping_Tools.Desktop.Views;
 /// <summary>Displays Sliderator's graph, source controls, and shared object preview.</summary>
 public sealed partial class SlideratorView : UserControl
 {
-    private readonly DispatcherTimer previewTimer;
     private readonly Stopwatch previewClock = new();
-    private SlideratorViewModel? observedViewModel;
+    private readonly DispatcherTimer previewTimer;
     private GraphState? acceptedGraphState;
-    private bool restoringGraphState;
     private bool fastNavigationRequested;
+    private SlideratorViewModel? observedViewModel;
+    private bool restoringGraphState;
     private bool updatingGraphBounds;
 
     /// <summary>Creates the Sliderator view and connects shared Core-backed controls.</summary>
@@ -38,18 +38,12 @@ public sealed partial class SlideratorView : UserControl
         {
             previewClock.Restart();
             previewTimer.Start();
-            if (observedViewModel is not null)
-            {
-                observedViewModel.Interaction ??= new AvaloniaSlideratorInteraction(observedViewModel);
-            }
+            if (observedViewModel is not null) observedViewModel.Interaction ??= new AvaloniaSlideratorInteraction(observedViewModel);
         };
         DetachedFromVisualTree += (_, _) =>
         {
             previewTimer.Stop();
-            if (observedViewModel is not null)
-            {
-                observedViewModel.Interaction = null;
-            }
+            if (observedViewModel is not null) observedViewModel.Interaction = null;
         };
     }
 
@@ -58,10 +52,7 @@ public sealed partial class SlideratorView : UserControl
     /// <param name="args">The routed click event.</param>
     private async void MoveLeft(object? sender, RoutedEventArgs args)
     {
-        if (DataContext is not SlideratorViewModel viewModel)
-        {
-            return;
-        }
+        if (DataContext is not SlideratorViewModel viewModel) return;
 
         bool fast = fastNavigationRequested;
         fastNavigationRequested = false;
@@ -74,10 +65,7 @@ public sealed partial class SlideratorView : UserControl
     /// <param name="args">The routed click event.</param>
     private async void MoveRight(object? sender, RoutedEventArgs args)
     {
-        if (DataContext is not SlideratorViewModel viewModel)
-        {
-            return;
-        }
+        if (DataContext is not SlideratorViewModel viewModel) return;
 
         bool fast = fastNavigationRequested;
         fastNavigationRequested = false;
@@ -89,10 +77,7 @@ public sealed partial class SlideratorView : UserControl
     {
         if (DataContext is SlideratorViewModel viewModel)
         {
-            if (restoringGraphState)
-            {
-                return;
-            }
+            if (restoringGraphState) return;
 
             if (!viewModel.IsGraphWithinVelocityLimit(args.State) && acceptedGraphState is not null)
             {
@@ -147,11 +132,11 @@ public sealed partial class SlideratorView : UserControl
         }
     }
 
-    private void ViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs args)
+    private void ViewModelPropertyChanged(object? sender, PropertyChangedEventArgs args)
     {
         previewClock.Restart();
-        if (sender is SlideratorViewModel viewModel &&
-            args.PropertyName is nameof(SlideratorViewModel.GraphBeats) or
+        if (sender is SlideratorViewModel viewModel
+            && args.PropertyName is nameof(SlideratorViewModel.GraphBeats) or
                 nameof(SlideratorViewModel.GraphMinY) or
                 nameof(SlideratorViewModel.GraphMaxY) or
                 nameof(SlideratorViewModel.VelocityLimit) or
@@ -164,8 +149,8 @@ public sealed partial class SlideratorView : UserControl
             UpdateGraphMarkers(viewModel);
         }
 
-        if (sender is SlideratorViewModel markerViewModel &&
-            args.PropertyName is nameof(SlideratorViewModel.GraphState) or
+        if (sender is SlideratorViewModel markerViewModel
+            && args.PropertyName is nameof(SlideratorViewModel.GraphState) or
                 nameof(SlideratorViewModel.GraphModeSetting) or
                 nameof(SlideratorViewModel.GlobalSv) or
                 nameof(SlideratorViewModel.PixelLength) or
@@ -174,15 +159,10 @@ public sealed partial class SlideratorView : UserControl
                 nameof(SlideratorViewModel.VisibleHitObject))
         {
             if (args.PropertyName == nameof(SlideratorViewModel.GraphState))
-            {
                 Dispatcher.UIThread.Post(() =>
                 {
-                    if (!restoringGraphState && ReferenceEquals(observedViewModel, markerViewModel))
-                    {
-                        acceptedGraphState = markerViewModel.GraphState.Clone();
-                    }
+                    if (!restoringGraphState && ReferenceEquals(observedViewModel, markerViewModel)) acceptedGraphState = markerViewModel.GraphState.Clone();
                 });
-            }
 
             UpdatePreviewMarkers(markerViewModel);
         }
@@ -190,10 +170,7 @@ public sealed partial class SlideratorView : UserControl
 
     private void UpdateGraphBounds(SlideratorViewModel viewModel)
     {
-        if (updatingGraphBounds)
-        {
-            return;
-        }
+        if (updatingGraphBounds) return;
 
         updatingGraphBounds = true;
         try
@@ -213,22 +190,20 @@ public sealed partial class SlideratorView : UserControl
     {
         GraphControlElement.HorizontalMarkerGenerator = new CompositeMarkerGenerator(
         [
-            new DividedBeatMarkerGenerator(viewModel.BeatSnapDivisor, snappable: true),
+            new DividedBeatMarkerGenerator(viewModel.BeatSnapDivisor, true),
             new CustomMarkerGenerator
             {
                 Snappable = true,
-                StepSize = viewModel.BeatsPerMinute / 60000
-            }
+                StepSize = viewModel.BeatsPerMinute / 60000,
+            },
         ]);
         GraphControlElement.VerticalMarkerGenerator = viewModel.GraphModeSetting == SlideratorGraphMode.Velocity
             ? new DoubleMarkerGenerator(0, 1 / 4d, "x")
             : new DoubleMarkerGenerator(0, 1 / 4d);
 
-        if (viewModel.ShowRedAnchors &&
-            viewModel.GraphModeSetting == SlideratorGraphMode.Position &&
-            viewModel.VisibleHitObject?.IsSlider == true)
+        if (viewModel.ShowRedAnchors && viewModel.GraphModeSetting == SlideratorGraphMode.Position && viewModel.VisibleHitObject?.IsSlider == true)
         {
-            SliderPath sourcePath = viewModel.VisibleHitObject.GetSliderPath();
+            var sourcePath = viewModel.VisibleHitObject.GetSliderPath();
             GraphControlElement.Markers = SliderPathUtil
                 .GetRedAnchorCompletions(sourcePath)
                 .Select(completion => new GraphMarker
@@ -237,7 +212,7 @@ public sealed partial class SlideratorView : UserControl
                     Value = completion,
                     Text = null,
                     Snappable = true,
-                    CustomLineColorArgb = 0xFFFF0000
+                    CustomLineColorArgb = 0xFFFF0000,
                 })
                 .ToArray();
         }
@@ -249,8 +224,7 @@ public sealed partial class SlideratorView : UserControl
 
     private void UpdatePreviewMarkers(SlideratorViewModel viewModel)
     {
-        if (!(viewModel.ShowRedAnchors || viewModel.ShowGraphAnchors) ||
-            viewModel.VisibleHitObject?.IsSlider != true)
+        if (!(viewModel.ShowRedAnchors || viewModel.ShowGraphAnchors) || viewModel.VisibleHitObject?.IsSlider != true)
         {
             PreviewControl.ExtraMarkers = [];
             return;
@@ -261,7 +235,7 @@ public sealed partial class SlideratorView : UserControl
             GlobalSv = viewModel.GlobalSv,
             PixelLength = viewModel.PixelLength,
             GraphModeSetting = viewModel.GraphModeSetting,
-            GraphState = viewModel.GraphState
+            GraphState = viewModel.GraphState,
         };
         double maximum = SlideratorEngine.GetMaxCompletion(options);
         if (!double.IsFinite(maximum) || maximum <= 0)
@@ -271,23 +245,21 @@ public sealed partial class SlideratorView : UserControl
         }
 
         List<ObjectVisualiserMarker> markers = [];
-        SliderPath sourcePath = viewModel.VisibleHitObject.GetSliderPath();
+        var sourcePath = viewModel.VisibleHitObject.GetSliderPath();
         if (viewModel.ShowRedAnchors)
-        {
             markers.AddRange(
                 SliderPathUtil.GetRedAnchorCompletions(sourcePath)
                     .Select(completion => new ObjectVisualiserMarker(
                         completion / maximum,
                         0.2,
                         Brushes.Red)));
-        }
 
         if (viewModel.ShowGraphAnchors)
         {
-            IEnumerable<double> completions = viewModel.GraphModeSetting == SlideratorGraphMode.Velocity
+            var completions = viewModel.GraphModeSetting == SlideratorGraphMode.Velocity
                 ? viewModel.GraphState.Anchors.Select(anchor =>
                     viewModel.GraphState.GetIntegral(0, anchor.Pos.X) * SlideratorEngine.GetSvGraphMultiplier(options))
-                : viewModel.GraphState.Anchors.Select(anchor => (double)anchor.Pos.Y);
+                : viewModel.GraphState.Anchors.Select(anchor => anchor.Pos.Y);
             markers.AddRange(
                 completions.Select(completion => new ObjectVisualiserMarker(
                     completion / maximum,
@@ -300,10 +272,7 @@ public sealed partial class SlideratorView : UserControl
 
     private void PreviewTimerTick(object? sender, EventArgs args)
     {
-        if (DataContext is SlideratorViewModel viewModel)
-        {
-            viewModel.SetPreviewProgress(viewModel.EvaluatePreviewProgress(previewClock.Elapsed.TotalMilliseconds));
-        }
+        if (DataContext is SlideratorViewModel viewModel) viewModel.SetPreviewProgress(viewModel.EvaluatePreviewProgress(previewClock.Elapsed.TotalMilliseconds));
     }
 
     private sealed class AvaloniaSlideratorInteraction : ISlideratorInteraction
@@ -315,7 +284,9 @@ public sealed partial class SlideratorView : UserControl
             this.viewModel = viewModel;
         }
 
-        public Task<bool> RunFastAsync(CancellationToken cancellationToken = default) =>
-            viewModel.RunFastPlacementAsync(cancellationToken);
+        public Task<bool> RunFastAsync(CancellationToken cancellationToken = default)
+        {
+            return viewModel.RunFastPlacementAsync(cancellationToken);
+        }
     }
 }

@@ -92,7 +92,7 @@ public enum AudioPlaybackState
     Paused,
 
     /// <summary>The output device reported an unrecoverable failure.</summary>
-    Failed
+    Failed,
 }
 
 /// <summary>Owns one active playback device and its generated stream.</summary>
@@ -141,7 +141,7 @@ public enum AudioExportFormat
     WavePcm,
 
     /// <summary>Ogg Vorbis.</summary>
-    OggVorbis
+    OggVorbis,
 }
 
 /// <summary>Describes one file export request.</summary>
@@ -154,10 +154,7 @@ public sealed class AudioExportRequest
     public AudioExportRequest(string path, AudioExportFormat format, float quality = 0.5f)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        if (!float.IsFinite(quality) || quality is < -0.1f or > 1f)
-        {
-            throw new ArgumentOutOfRangeException(nameof(quality));
-        }
+        if (!float.IsFinite(quality) || quality is < -0.1f or > 1f) throw new ArgumentOutOfRangeException(nameof(quality));
 
         Path = path;
         Format = format;
@@ -238,10 +235,7 @@ public sealed class MidiExportRequest
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentNullException.ThrowIfNull(sequence);
-        if (!double.IsFinite(beatsPerMinute) || beatsPerMinute <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(beatsPerMinute));
-        }
+        if (!double.IsFinite(beatsPerMinute) || beatsPerMinute <= 0) throw new ArgumentOutOfRangeException(nameof(beatsPerMinute));
 
         Path = path;
         Sequence = sequence;
@@ -281,10 +275,7 @@ public sealed class SoundFontNoteRequest
     public SoundFontNoteRequest(SampleGeneratingArgs sample)
     {
         ArgumentNullException.ThrowIfNull(sample);
-        if (!sample.UsesSoundFont)
-        {
-            throw new ArgumentException("The sample specification must point to an .sf2 file.", nameof(sample));
-        }
+        if (!sample.UsesSoundFont) throw new ArgumentException("The sample specification must point to an .sf2 file.", nameof(sample));
 
         Sample = sample.Copy();
     }
@@ -299,6 +290,6 @@ public interface ISoundFontRenderer
     /// <summary>Renders a SoundFont note into owned floating-point samples.</summary>
     /// <param name="request">The SoundFont note request.</param>
     /// <param name="cancellationToken">Token checked during rendering.</param>
-    /// <returns>The generated clip, or <see langword="null"/> when no zone matches.</returns>
+    /// <returns>The generated clip, or <see langword="null" /> when no zone matches.</returns>
     Task<AudioClip?> RenderAsync(SoundFontNoteRequest request, CancellationToken cancellationToken = default);
 }

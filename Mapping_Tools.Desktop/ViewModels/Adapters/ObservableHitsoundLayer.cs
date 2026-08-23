@@ -7,13 +7,11 @@ namespace Mapping_Tools.Desktop.ViewModels.Adapters;
 /// <summary>Adapts a plain hitsound layer for Desktop list display and editing.</summary>
 public sealed partial class ObservableHitsoundLayer : ObservableObject
 {
-    private readonly HitsoundLayer model;
-
     /// <summary>Creates an adapter around the supplied layer.</summary>
     /// <param name="model">The plain layer edited by this adapter.</param>
     public ObservableHitsoundLayer(HitsoundLayer model)
     {
-        this.model = model ?? throw new ArgumentNullException(nameof(model));
+        this.Model = model ?? throw new ArgumentNullException(nameof(model));
         Name = model.Name;
         SampleSet = model.SampleSet;
         Hitsound = model.Hitsound;
@@ -23,7 +21,7 @@ public sealed partial class ObservableHitsoundLayer : ObservableObject
     }
 
     /// <summary>Gets the plain layer represented by this adapter.</summary>
-    public HitsoundLayer Model => model;
+    public HitsoundLayer Model { get; }
 
     /// <summary>Gets or sets the display name.</summary>
     [ObservableProperty]
@@ -42,7 +40,7 @@ public sealed partial class ObservableHitsoundLayer : ObservableObject
     public partial int Priority { get; set; }
 
     /// <summary>Gets the persisted import settings.</summary>
-    public LayerImportArgs ImportArgs => model.ImportArgs;
+    public LayerImportArgs ImportArgs => Model.ImportArgs;
 
     /// <summary>Gets the observable sample-generation settings.</summary>
     public ObservableSampleGeneratingArgs SampleArgs { get; }
@@ -53,38 +51,63 @@ public sealed partial class ObservableHitsoundLayer : ObservableObject
 
     /// <summary>Creates a detached plain snapshot of this layer.</summary>
     /// <returns>A layer containing independent import, sample, and timing data.</returns>
-    public HitsoundLayer Snapshot() => new(
-        model.Name,
-        model.SampleSet,
-        model.Hitsound,
-        model.Priority,
-        CloneImportArgs(model.ImportArgs),
-        SampleArgs.Snapshot(),
-        model.Times.ToList());
-
-    private static LayerImportArgs CloneImportArgs(LayerImportArgs source) => new(source.ImportType)
+    public HitsoundLayer Snapshot()
     {
-        Path = source.Path,
-        X = source.X,
-        Y = source.Y,
-        SamplePath = source.SamplePath,
-        Volume = source.Volume,
-        DiscriminateVolumes = source.DiscriminateVolumes,
-        DetectDuplicateSamples = source.DetectDuplicateSamples,
-        RemoveDuplicates = source.RemoveDuplicates,
-        Bank = source.Bank,
-        Patch = source.Patch,
-        Key = source.Key,
-        Length = source.Length,
-        LengthRoughness = source.LengthRoughness,
-        Velocity = source.Velocity,
-        VelocityRoughness = source.VelocityRoughness,
-        Offset = source.Offset
-    };
+        return new HitsoundLayer(
+            Model.Name,
+            Model.SampleSet,
+            Model.Hitsound,
+            Model.Priority,
+            CloneImportArgs(Model.ImportArgs),
+            SampleArgs.Snapshot(),
+            Model.Times.ToList());
+    }
 
-    partial void OnNameChanged(string value) => model.Name = value;
-    partial void OnSampleSetChanged(SampleSet value) => model.SampleSet = value;
-    partial void OnHitsoundChanged(Hitsound value) => model.Hitsound = value;
-    partial void OnPriorityChanged(int value) => model.Priority = value;
-    partial void OnTimesChanged(List<double> value) => model.Times = value;
+    private static LayerImportArgs CloneImportArgs(LayerImportArgs source)
+    {
+        return new LayerImportArgs(source.ImportType)
+        {
+            Path = source.Path,
+            X = source.X,
+            Y = source.Y,
+            SamplePath = source.SamplePath,
+            Volume = source.Volume,
+            DiscriminateVolumes = source.DiscriminateVolumes,
+            DetectDuplicateSamples = source.DetectDuplicateSamples,
+            RemoveDuplicates = source.RemoveDuplicates,
+            Bank = source.Bank,
+            Patch = source.Patch,
+            Key = source.Key,
+            Length = source.Length,
+            LengthRoughness = source.LengthRoughness,
+            Velocity = source.Velocity,
+            VelocityRoughness = source.VelocityRoughness,
+            Offset = source.Offset,
+        };
+    }
+
+    partial void OnNameChanged(string value)
+    {
+        Model.Name = value;
+    }
+
+    partial void OnSampleSetChanged(SampleSet value)
+    {
+        Model.SampleSet = value;
+    }
+
+    partial void OnHitsoundChanged(Hitsound value)
+    {
+        Model.Hitsound = value;
+    }
+
+    partial void OnPriorityChanged(int value)
+    {
+        Model.Priority = value;
+    }
+
+    partial void OnTimesChanged(List<double> value)
+    {
+        Model.Times = value;
+    }
 }

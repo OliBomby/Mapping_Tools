@@ -4,25 +4,25 @@ using Mapping_Tools.Application.Platform;
 namespace Mapping_Tools.Desktop.Platform;
 
 /// <summary>
-/// Adapts the clipboard owned by an initialized Avalonia top-level window to
-/// the frontend-neutral text clipboard contract.
+///     Adapts the clipboard owned by an initialized Avalonia top-level window to
+///     the frontend-neutral text clipboard contract.
 /// </summary>
 public sealed class AvaloniaClipboardService : IClipboardService
 {
     private readonly Func<IClipboard?> _clipboardAccessor;
 
     /// <summary>
-    /// Creates an adapter that resolves the clipboard lazily, after the window exists.
+    ///     Creates an adapter that resolves the clipboard lazily, after the window exists.
     /// </summary>
     /// <param name="clipboardAccessor">Returns the current top-level clipboard, if initialized.</param>
     public AvaloniaClipboardService(Func<IClipboard?> clipboardAccessor)
     {
         _clipboardAccessor = clipboardAccessor
-            ?? throw new ArgumentNullException(nameof(clipboardAccessor));
+                             ?? throw new ArgumentNullException(nameof(clipboardAccessor));
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    ///     <inheritdoc />
     public async Task<string?> ReadTextAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -32,7 +32,7 @@ public sealed class AvaloniaClipboardService : IClipboardService
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    ///     <inheritdoc />
     public async Task WriteTextAsync(string text, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(text);
@@ -42,7 +42,7 @@ public sealed class AvaloniaClipboardService : IClipboardService
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    ///     <inheritdoc />
     public async Task ClearAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -51,7 +51,7 @@ public sealed class AvaloniaClipboardService : IClipboardService
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    ///     <inheritdoc />
     public async Task FlushAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -62,7 +62,7 @@ public sealed class AvaloniaClipboardService : IClipboardService
     private IClipboard GetClipboard()
     {
         return _clipboardAccessor()
-            ?? throw new InvalidOperationException(
-                "Clipboard access requires an initialized Avalonia top-level window.");
+               ?? throw new InvalidOperationException(
+                   "Clipboard access requires an initialized Avalonia top-level window.");
     }
 }

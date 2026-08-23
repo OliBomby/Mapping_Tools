@@ -3,15 +3,15 @@ using System.ComponentModel;
 namespace Mapping_Tools.Core.Tools.PatternGallery;
 
 /// <summary>
-/// Stores the indexed metadata for one pattern file. The beatmap content stays
-/// in the collection's Pattern Files directory and is addressed by
-/// <see cref="FileName"/>.
+///     Stores the indexed metadata for one pattern file. The beatmap content stays
+///     in the collection's Pattern Files directory and is addressed by
+///     <see cref="FileName" />.
 /// </summary>
 public sealed class PatternGalleryPattern
 {
-    private string name = string.Empty;
-    private string group = string.Empty;
     private string fileName = string.Empty;
+    private string group = string.Empty;
+    private string name = string.Empty;
 
     /// <summary>Gets or sets the display name shown below the thumbnail.</summary>
     [DisplayName("Name")]

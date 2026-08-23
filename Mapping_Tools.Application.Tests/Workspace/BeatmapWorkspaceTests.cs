@@ -16,7 +16,7 @@ public sealed class BeatmapWorkspaceTests
     {
         // Arrange
         ApplicationSettings settings = new();
-        BeatmapWorkspace workspace = CreateWorkspace(settings);
+        var workspace = CreateWorkspace(settings);
         BeatmapSelectionChangedEventArgs? notification = null;
         workspace.SelectionChanged += (_, args) => notification = args;
 
@@ -26,10 +26,9 @@ public sealed class BeatmapWorkspaceTests
             BeatmapSelectionSource.DragAndDrop);
 
         // Assert
-        workspace.SelectedPaths.ToArray().Should().Equal(new[] { @"C:\Maps\first.osu", @"C:\Maps\second.osb" });
-        workspace.RecentMaps.Select(recent => recent.Path).ToArray().Should().Equal(new[] { @"C:\Maps\second.osb", @"C:\Maps\first.osu" });
-        workspace.RecentMaps.All(
-            recent => recent.DisplayDate == FixedNow.DateTime.ToString()).Should().BeTrue();
+        workspace.SelectedPaths.ToArray().Should().Equal(@"C:\Maps\first.osu", @"C:\Maps\second.osb");
+        workspace.RecentMaps.Select(recent => recent.Path).ToArray().Should().Equal(@"C:\Maps\second.osb", @"C:\Maps\first.osu");
+        workspace.RecentMaps.All(recent => recent.DisplayDate == FixedNow.DateTime.ToString()).Should().BeTrue();
         (notification?.Source).Should().Be(BeatmapSelectionSource.DragAndDrop);
         (notification?.Paths.ToArray()).Should().Equal(workspace.SelectedPaths.ToArray());
     }
@@ -42,16 +41,16 @@ public sealed class BeatmapWorkspaceTests
         {
             RecentMaps = Enumerable.Range(0, 20)
                 .Select(index => new RecentBeatmap($"map-{index}.osu", $"date-{index}"))
-                .ToList()
+                .ToList(),
         };
-        BeatmapWorkspace workspace = CreateWorkspace(settings);
+        var workspace = CreateWorkspace(settings);
 
         // Act
         workspace.SetSelection(["map-5.osu", "MAP-5.osu", "new.osu"]);
 
         // Assert
         workspace.RecentMaps.Count.Should().Be(20);
-        workspace.RecentMaps.Take(3).Select(recent => recent.Path).ToArray().Should().Equal(new[] { "new.osu", "MAP-5.osu", "map-5.osu" });
+        workspace.RecentMaps.Take(3).Select(recent => recent.Path).ToArray().Should().Equal("new.osu", "MAP-5.osu", "map-5.osu");
         workspace.RecentMaps.Count(recent => recent.Path == "map-5.osu").Should().Be(1);
     }
 
@@ -64,10 +63,10 @@ public sealed class BeatmapWorkspaceTests
             RecentMaps =
             [
                 new RecentBeatmap("one.osu|two.osu", "legacy date"),
-                new RecentBeatmap("older.osu", "older date")
-            ]
+                new RecentBeatmap("older.osu", "older date"),
+            ],
         };
-        BeatmapWorkspace workspace = CreateWorkspace(settings);
+        var workspace = CreateWorkspace(settings);
         BeatmapSelectionChangedEventArgs? notification = null;
         workspace.SelectionChanged += (_, args) => notification = args;
 
@@ -76,7 +75,7 @@ public sealed class BeatmapWorkspaceTests
 
         // Assert
         restored.Should().BeTrue();
-        workspace.SelectedPaths.ToArray().Should().Equal(new[] { "one.osu", "two.osu" });
+        workspace.SelectedPaths.ToArray().Should().Equal("one.osu", "two.osu");
         (notification?.Source).Should().Be(BeatmapSelectionSource.Startup);
     }
 
@@ -85,7 +84,7 @@ public sealed class BeatmapWorkspaceTests
     {
         // Arrange
         ApplicationSettings settings = new();
-        BeatmapWorkspace workspace = CreateWorkspace(settings);
+        var workspace = CreateWorkspace(settings);
 
         // Act
         bool restored = workspace.RestoreMostRecent();
@@ -103,20 +102,20 @@ public sealed class BeatmapWorkspaceTests
         // Arrange
         FakeFilePicker picker = new() { OpenPaths = [] };
         ApplicationSettings settings = new() { SongsPath = @"C:\osu!\Songs" };
-        BeatmapWorkspace workspace = CreateWorkspace(settings, picker: picker);
+        var workspace = CreateWorkspace(settings, picker);
         workspace.SetSelection([@"C:\Maps\selected.osu"]);
-        RecentBeatmap[] history = workspace.RecentMaps.ToArray();
+        var history = workspace.RecentMaps.ToArray();
 
         // Act
-        bool selected = await workspace.PickBeatmapsAsync(allowMultiple: true);
+        bool selected = await workspace.PickBeatmapsAsync(true);
 
         // Assert
         selected.Should().BeFalse();
-        workspace.SelectedPaths.ToArray().Should().Equal(new[] { @"C:\Maps\selected.osu" });
+        workspace.SelectedPaths.ToArray().Should().Equal(@"C:\Maps\selected.osu");
         workspace.RecentMaps.ToArray().Should().Equal(history);
         (picker.LastOpenRequest?.SuggestedStartLocation).Should().Be(@"C:\Maps");
         (picker.LastOpenRequest?.AllowMultiple).Should().BeTrue();
-        (picker.LastOpenRequest?.Filters.Single().Patterns.ToArray()).Should().Equal(new[] { "*.osu", "*.osb" });
+        (picker.LastOpenRequest?.Filters.Single().Patterns.ToArray()).Should().Equal("*.osu", "*.osb");
     }
 
     [TestMethod]
@@ -125,16 +124,16 @@ public sealed class BeatmapWorkspaceTests
         // Arrange
         FakeFilePicker picker = new() { OpenPaths = [@"D:\Songs\picked.osu"] };
         ApplicationSettings settings = new() { SongsPath = @"D:\Songs" };
-        BeatmapWorkspace workspace = CreateWorkspace(settings, picker: picker);
+        var workspace = CreateWorkspace(settings, picker);
         BeatmapSelectionChangedEventArgs? notification = null;
         workspace.SelectionChanged += (_, args) => notification = args;
 
         // Act
-        bool selected = await workspace.PickBeatmapsAsync(allowMultiple: false);
+        bool selected = await workspace.PickBeatmapsAsync(false);
 
         // Assert
         selected.Should().BeTrue();
-        workspace.SelectedPaths.ToArray().Should().Equal(new[] { @"D:\Songs\picked.osu" });
+        workspace.SelectedPaths.ToArray().Should().Equal(@"D:\Songs\picked.osu");
         (picker.LastOpenRequest?.SuggestedStartLocation).Should().Be(@"D:\Songs");
         (notification?.Source).Should().Be(BeatmapSelectionSource.FilePicker);
     }
@@ -147,13 +146,13 @@ public sealed class BeatmapWorkspaceTests
         ApplicationSettings settings = new()
         {
             SongsPath = @"D:\Songs",
-            CurrentBeatmapDefaultFolder = false
+            CurrentBeatmapDefaultFolder = false,
         };
-        BeatmapWorkspace workspace = CreateWorkspace(settings, picker: picker);
+        var workspace = CreateWorkspace(settings, picker);
         workspace.SetSelection([@"C:\Maps\selected.osu"]);
 
         // Act
-        await workspace.PickBeatmapsAsync(allowMultiple: false);
+        await workspace.PickBeatmapsAsync(false);
 
         // Assert
         (picker.LastOpenRequest?.SuggestedStartLocation).Should().BeNull();
@@ -165,17 +164,17 @@ public sealed class BeatmapWorkspaceTests
         // Arrange
         FakeBeatmapFileSystem fileSystem = new();
         fileSystem.ExistingPaths.Add("present.osu");
-        BeatmapWorkspace workspace = CreateWorkspace(
+        var workspace = CreateWorkspace(
             new ApplicationSettings(),
             fileSystem: fileSystem);
         workspace.SetSelection(["present.osu", "missing.osu"]);
 
         // Act
-        IReadOnlyList<string> missing = workspace.GetMissingSelectedPaths();
+        var missing = workspace.GetMissingSelectedPaths();
 
         // Assert
-        missing.ToArray().Should().Equal(new[] { "missing.osu" });
-        workspace.SelectedPaths.ToArray().Should().Equal(new[] { "present.osu", "missing.osu" });
+        missing.ToArray().Should().Equal("missing.osu");
+        workspace.SelectedPaths.ToArray().Should().Equal("present.osu", "missing.osu");
     }
 
     [TestMethod]
@@ -184,21 +183,21 @@ public sealed class BeatmapWorkspaceTests
         // Arrange
         FakeBeatmapFileSystem fileSystem = new();
         FakeCurrentBeatmapLocator locator = new();
-        BeatmapWorkspace workspace = CreateWorkspace(
+        var workspace = CreateWorkspace(
             new ApplicationSettings(),
             fileSystem: fileSystem,
             locator: locator);
         workspace.SetSelection(["fallback.osu"]);
 
         // Act
-        CurrentBeatmapSelectionResult unavailable =
+        var unavailable =
             await workspace.SelectCurrentBeatmapAsync();
         locator.Path = "stale.osu";
-        CurrentBeatmapSelectionResult missing =
+        var missing =
             await workspace.SelectCurrentBeatmapAsync();
         locator.Path = "live.osu";
         fileSystem.ExistingPaths.Add("live.osu");
-        CurrentBeatmapSelectionResult selected =
+        var selected =
             await workspace.SelectCurrentBeatmapAsync();
 
         // Assert
@@ -206,14 +205,14 @@ public sealed class BeatmapWorkspaceTests
         missing.Status.Should().Be(CurrentBeatmapSelectionStatus.FileMissing);
         missing.Path.Should().Be("stale.osu");
         selected.Status.Should().Be(CurrentBeatmapSelectionStatus.Selected);
-        workspace.SelectedPaths.ToArray().Should().Equal(new[] { "live.osu" });
+        workspace.SelectedPaths.ToArray().Should().Equal("live.osu");
     }
 
     [TestMethod]
     public void RemoveRecent_WithSelectedEntry_RemovesHistoryOnly()
     {
         // Arrange
-        BeatmapWorkspace workspace = CreateWorkspace(new ApplicationSettings());
+        var workspace = CreateWorkspace(new ApplicationSettings());
         workspace.SetSelection(["keep-selected.osu", "forget.osu"]);
 
         // Act
@@ -222,7 +221,7 @@ public sealed class BeatmapWorkspaceTests
         // Assert
         removed.Should().BeTrue();
         workspace.RecentMaps.Any(recent => recent.Path == "forget.osu").Should().BeFalse();
-        workspace.SelectedPaths.ToArray().Should().Equal(new[] { "keep-selected.osu", "forget.osu" });
+        workspace.SelectedPaths.ToArray().Should().Equal("keep-selected.osu", "forget.osu");
     }
 
     private static BeatmapWorkspace CreateWorkspace(
@@ -241,16 +240,22 @@ public sealed class BeatmapWorkspaceTests
 
     private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
     {
-        public override DateTimeOffset GetUtcNow() => now;
-
         public override TimeZoneInfo LocalTimeZone => TimeZoneInfo.Utc;
+
+        public override DateTimeOffset GetUtcNow()
+        {
+            return now;
+        }
     }
 
     private sealed class FakeBeatmapFileSystem : IBeatmapFileSystem
     {
         public HashSet<string> ExistingPaths { get; } = [];
 
-        public bool FileExists(string path) => ExistingPaths.Contains(path);
+        public bool FileExists(string path)
+        {
+            return ExistingPaths.Contains(path);
+        }
 
         public string? GetParentDirectory(string filePath)
         {
@@ -273,15 +278,14 @@ public sealed class BeatmapWorkspaceTests
 
     private sealed class FakeFilePicker : IFilePicker
     {
+        public IReadOnlyList<string> OpenPaths { get; init; } = [];
+
+        public OpenFilePickerRequest? LastOpenRequest { get; private set; }
         public bool CanOpenFiles => true;
 
         public bool CanSaveFiles => false;
 
         public bool CanPickFolders => false;
-
-        public IReadOnlyList<string> OpenPaths { get; init; } = [];
-
-        public OpenFilePickerRequest? LastOpenRequest { get; private set; }
 
         public Task<IReadOnlyList<string>> PickOpenFilesAsync(
             OpenFilePickerRequest request,

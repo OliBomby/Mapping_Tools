@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.MathUtil;
@@ -17,50 +16,38 @@ public sealed class TumourGeneratorTests
         // Arrange
         const int resolution = 10;
         HitObject hitObject = new("0,0,384,2,0,B|192:0|192:0|192:192,1,384");
-        PathWithHints pathWithHints = PathHelper.CreatePathWithHints(hitObject.GetSliderPath());
+        var pathWithHints = PathHelper.CreatePathWithHints(hitObject.GetSliderPath());
         TumourGenerator generator = new() { Resolution = resolution };
-        TumourLayer layer = TumourLayer.GetDefaultLayer();
+        var layer = TumourLayer.GetDefaultLayer();
         layer.TumourLength = TumourLayer.GetGraphState(10);
         layer.TumourScale = TumourLayer.GetGraphState(5);
-        LinkedList<PathPoint> sourcePath = pathWithHints.Path;
-        LinkedListNode<PathPoint> start = PathHelper.FindFirstOccurrenceExact(sourcePath.First!, 100, epsilon: 0.5);
-        LinkedListNode<PathPoint> end = PathHelper.FindLastOccurrenceExact(start, 110, epsilon: 0.5);
-        LinkedListNode<PathPoint> end2 = PathHelper.FindLastOccurrenceExact(start, 115, epsilon: 0.5);
+        var sourcePath = pathWithHints.Path;
+        var start = PathHelper.FindFirstOccurrenceExact(sourcePath.First!, 100, epsilon: 0.5);
+        var end = PathHelper.FindLastOccurrenceExact(start, 110, epsilon: 0.5);
+        var end2 = PathHelper.FindLastOccurrenceExact(start, 115, epsilon: 0.5);
 
         // Act
         generator.PlaceTumour(pathWithHints, layer, 0, start, end, 0, 1, 100, 110, false, 384);
-        for (LinkedListNode<PathPoint>? currentPoint = start; currentPoint is not null && currentPoint != end; currentPoint = currentPoint.Next)
+        for (var currentPoint = start; currentPoint is not null && currentPoint != end; currentPoint = currentPoint.Next)
         {
-            Vector2 position = currentPoint.Value.Pos;
+            var position = currentPoint.Value.Pos;
             if (position.X is >= 100 and <= 105)
-            {
                 position.Y.Should().BeApproximately(-position.X + 100, Precision.DoubleEpsilon);
-            }
-            else if (position.X is > 105 and <= 110)
-            {
-                position.Y.Should().BeApproximately(position.X - 110, Precision.DoubleEpsilon);
-            }
+            else if (position.X is > 105 and <= 110) position.Y.Should().BeApproximately(position.X - 110, Precision.DoubleEpsilon);
         }
 
         pathWithHints.ReconstructionHints.Should().HaveCount(4);
-        LinkedListNode<PathPoint> middle = PathHelper.FindFirstOccurrence(start, 105);
+        var middle = PathHelper.FindFirstOccurrence(start, 105);
         middle.Value.CumulativeLength.Should().BeApproximately(105, Precision.DoubleEpsilon);
         generator.PlaceTumour(pathWithHints, layer, 0, middle, end2, 0, 1, 105, 115, false, 384);
-        for (LinkedListNode<PathPoint>? currentPoint = start; currentPoint is not null && currentPoint != end2; currentPoint = currentPoint.Next)
+        for (var currentPoint = start; currentPoint is not null && currentPoint != end2; currentPoint = currentPoint.Next)
         {
-            Vector2 position = currentPoint.Value.Pos;
+            var position = currentPoint.Value.Pos;
             if (position.X is >= 100 and <= 105)
-            {
                 position.Y.Should().BeApproximately(-position.X + 100, Precision.DoubleEpsilon);
-            }
             else if (position.X is > 105 and <= 110)
-            {
                 position.Y.Should().BeApproximately(-5, Precision.DoubleEpsilon);
-            }
-            else if (position.X is > 110 and <= 115)
-            {
-                position.Y.Should().BeApproximately(position.X - 115, Precision.DoubleEpsilon);
-            }
+            else if (position.X is > 110 and <= 115) position.Y.Should().BeApproximately(position.X - 115, Precision.DoubleEpsilon);
         }
 
         pathWithHints.ReconstructionHints[0].Layer.Should().Be(-1);
@@ -72,7 +59,7 @@ public sealed class TumourGeneratorTests
         pathWithHints.ReconstructionHints[3].Anchors.Should().NotBeNull();
         pathWithHints.ReconstructionHints[4].Layer.Should().Be(-1);
         pathWithHints.ReconstructionHints[5].Layer.Should().Be(-1);
-        (List<Vector2> anchors, PathType pathType) = new Reconstructor().Reconstruct(pathWithHints);
+        var (anchors, pathType) = new Reconstructor().Reconstruct(pathWithHints);
 
         // Assert
         pathWithHints.ReconstructionHints.Should().HaveCount(6);
@@ -100,15 +87,15 @@ public sealed class TumourGeneratorTests
     {
         // Arrange
         HitObject leftInput = new("0,0,0,2,0,L|256:0,1,256");
-        HitObject rightInput = leftInput.DeepCopy();
-        TumourLayer leftLayer = TumourLayer.GetDefaultLayer();
+        var rightInput = leftInput.DeepCopy();
+        var leftLayer = TumourLayer.GetDefaultLayer();
         leftLayer.TumourCount = 1;
         leftLayer.TumourStart = 0.25;
         leftLayer.TumourEnd = 0.75;
-        TumourLayer rightLayer = leftLayer.Copy();
+        var rightLayer = leftLayer.Copy();
         rightLayer.TumourSidedness = TumourSidedness.Right;
-        PathWithHints leftPath = PathHelper.CreatePathWithHints(leftInput.GetSliderPath());
-        PathWithHints rightPath = PathHelper.CreatePathWithHints(rightInput.GetSliderPath());
+        var leftPath = PathHelper.CreatePathWithHints(leftInput.GetSliderPath());
+        var rightPath = PathHelper.CreatePathWithHints(rightInput.GetSliderPath());
         TumourGenerator leftGenerator = new();
         TumourGenerator rightGenerator = new();
 
@@ -123,8 +110,8 @@ public sealed class TumourGeneratorTests
             1,
             0,
             256,
-            otherSide: false,
-            initialLength: 256);
+            false,
+            256);
         rightGenerator.PlaceTumour(
             rightPath,
             rightLayer,
@@ -135,8 +122,8 @@ public sealed class TumourGeneratorTests
             1,
             0,
             256,
-            otherSide: true,
-            initialLength: 256);
+            true,
+            256);
 
         // Assert
         leftPath.Path.Select(point => point.Pos).Should().NotBeEquivalentTo(
@@ -149,13 +136,13 @@ public sealed class TumourGeneratorTests
     public void TumourGenerate_EachWrappingMode_ProducesFiniteSliderGeometry()
     {
         // Arrange
-        WrappingMode[] wrappingModes = Enum.GetValues<WrappingMode>();
+        var wrappingModes = Enum.GetValues<WrappingMode>();
 
         // Act
-        List<HitObject> generated = wrappingModes.Select(wrappingMode =>
+        var generated = wrappingModes.Select(wrappingMode =>
         {
             HitObject hitObject = new("0,0,0,2,0,B|128:0|128:128,1,256");
-            TumourLayer layer = TumourLayer.GetDefaultLayer();
+            var layer = TumourLayer.GetDefaultLayer();
             layer.WrappingMode = wrappingMode;
             layer.TumourCount = 1;
             layer.TumourStart = 0.2;
@@ -168,8 +155,6 @@ public sealed class TumourGeneratorTests
         // Assert
         generated.Should().HaveCount(3);
         generated.Should().OnlyContain(hitObject =>
-            hitObject.IsSlider &&
-            double.IsFinite(hitObject.PixelLength) &&
-            hitObject.GetSliderPath().Distance > 0);
+            hitObject.IsSlider && double.IsFinite(hitObject.PixelLength) && hitObject.GetSliderPath().Distance > 0);
     }
 }

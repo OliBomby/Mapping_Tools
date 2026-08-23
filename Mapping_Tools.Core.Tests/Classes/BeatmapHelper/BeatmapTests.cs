@@ -4,13 +4,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Core.Tests.Classes.BeatmapHelper;
 
 [TestClass]
-public class BeatmapTests {
+public class BeatmapTests
+{
     [DataTestMethod]
     [DataRow("EmptyTestMap.osu")]
     [DataRow("ComplicatedTestMap.osu")]
     [DataRow("Camellia - Body F10ating in the Zero Gravity Space (Orange_) [Nonsubmersible].osu")]
     [DataRow("THE ORAL CIGARETTES - GET BACK (Nikakis) [Sotarks_ Cataclysm].osu")]
-    public void BeatmapDocument_ParsesAndRoundTripsFixture(string filename) {
+    public void BeatmapDocument_ParsesAndRoundTripsFixture(string filename)
+    {
         // Arrange
         string path = Path.Combine(AppContext.BaseDirectory, "Resources", filename);
         string expected = File.ReadAllText(path);
@@ -28,7 +30,8 @@ public class BeatmapTests {
     [DataRow("catch.osu", 2)]
     [DataRow("mania.osu", 3)]
     [DataRow("taiko.osu", 1)]
-    public void BeatmapDocument_ParsesAdditionalModeFixture(string filename, int expectedMode) {
+    public void BeatmapDocument_ParsesAdditionalModeFixture(string filename, int expectedMode)
+    {
         // Arrange
         string path = Path.Combine(AppContext.BaseDirectory, "Resources", filename);
 
@@ -41,18 +44,20 @@ public class BeatmapTests {
     }
 
     [TestMethod]
-    public void QueryTimeCode_SelectsRequestedComboObjects() {
+    public void QueryTimeCode_SelectsRequestedComboObjects()
+    {
         // Arrange
-        var beatmap = new Beatmap(new List<HitObject> {
+        var beatmap = new Beatmap(new List<HitObject>
+        {
             new("64,96,1000,5,0,0:0:0:0:"),
             new("128,96,1100,1,0,0:0:0:0:"),
-            new("192,96,1200,1,0,0:0:0:0:")
+            new("192,96,1200,1,0,0:0:0:0:"),
         }, new List<TimingPoint>(), globalSv: 1.4);
 
         // Act
         var matches = beatmap.QueryTimeCode("00:01:000 (1,2) - ").ToList();
 
         // Assert
-        matches.Should().Equal(new[] { beatmap.HitObjects[0], beatmap.HitObjects[1] });
+        matches.Should().Equal(beatmap.HitObjects[0], beatmap.HitObjects[1]);
     }
 }

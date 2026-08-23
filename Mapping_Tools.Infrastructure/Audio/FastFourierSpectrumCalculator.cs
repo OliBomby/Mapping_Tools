@@ -7,7 +7,7 @@ namespace Mapping_Tools.Infrastructure.Audio;
 /// <summary>Calculates a Hann-windowed single-frame FFT without exposing a numerical/audio library.</summary>
 public sealed class FastFourierSpectrumCalculator : ISpectrumCalculator
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task<SpectrumFrame> CalculateAsync(
         AudioClip clip,
         SpectrumCalculationOptions? options = null,
@@ -18,18 +18,12 @@ public sealed class FastFourierSpectrumCalculator : ISpectrumCalculator
         Validate(options);
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (clip.IsEmpty)
-        {
-            return Task.FromResult(new SpectrumFrame(clip.Format.SampleRate, options.FftSize, []));
-        }
+        if (clip.IsEmpty) return Task.FromResult(new SpectrumFrame(clip.Format.SampleRate, options.FftSize, []));
 
         int start = Math.Clamp(options.StartFrame, 0, clip.FrameCount);
         int available = clip.FrameCount - start;
         int requested = options.FrameCount == 0 ? available : Math.Min(options.FrameCount, available);
-        if (requested <= 0)
-        {
-            return Task.FromResult(new SpectrumFrame(clip.Format.SampleRate, options.FftSize, []));
-        }
+        if (requested <= 0) return Task.FromResult(new SpectrumFrame(clip.Format.SampleRate, options.FftSize, []));
 
         return Task.FromResult(Calculate(clip, options.FftSize, start, requested, cancellationToken));
     }
@@ -53,10 +47,7 @@ public sealed class FastFourierSpectrumCalculator : ISpectrumCalculator
             if (frame < start + requested)
             {
                 int sampleOffset = frame * channels;
-                for (int channel = 0; channel < channels; channel++)
-                {
-                    sample += source[sampleOffset + channel];
-                }
+                for (int channel = 0; channel < channels; channel++) sample += source[sampleOffset + channel];
 
                 sample /= channels;
             }
@@ -83,10 +74,7 @@ public sealed class FastFourierSpectrumCalculator : ISpectrumCalculator
         {
             cancellationToken.ThrowIfCancellationRequested();
             int bit = length >> 1;
-            for (; (reverse & bit) != 0; bit >>= 1)
-            {
-                reverse ^= bit;
-            }
+            for (; (reverse & bit) != 0; bit >>= 1) reverse ^= bit;
 
             reverse ^= bit;
             if (index < reverse)
@@ -127,19 +115,11 @@ public sealed class FastFourierSpectrumCalculator : ISpectrumCalculator
 
     private static void Validate(SpectrumCalculationOptions options)
     {
-        if (options.FftSize < 2 || options.FftSize > (1 << 20) || (options.FftSize & (options.FftSize - 1)) != 0)
-        {
+        if (options.FftSize < 2 || options.FftSize > 1 << 20 || (options.FftSize & options.FftSize - 1) != 0)
             throw new ArgumentOutOfRangeException(nameof(options.FftSize), "FFT size must be a power of two between 2 and 1048576.");
-        }
 
-        if (options.StartFrame < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(options.StartFrame));
-        }
+        if (options.StartFrame < 0) throw new ArgumentOutOfRangeException(nameof(options.StartFrame));
 
-        if (options.FrameCount < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(options.FrameCount));
-        }
+        if (options.FrameCount < 0) throw new ArgumentOutOfRangeException(nameof(options.FrameCount));
     }
 }

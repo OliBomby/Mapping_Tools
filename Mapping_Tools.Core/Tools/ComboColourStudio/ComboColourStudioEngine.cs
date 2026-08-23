@@ -4,7 +4,7 @@ using Mapping_Tools.Core.Classes.MathUtil;
 namespace Mapping_Tools.Core.Tools.ComboColourStudio;
 
 /// <summary>
-/// Applies Combo Colour Studio projects and infers projects from existing maps.
+///     Applies Combo Colour Studio projects and infers projects from existing maps.
 /// </summary>
 public static class ComboColourStudioEngine
 {
@@ -15,48 +15,38 @@ public static class ComboColourStudioEngine
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(project);
-        IReadOnlyList<string> errors = project.ValidateForExport();
-        if (errors.Count > 0)
-        {
-            throw new ArgumentException(string.Join(" ", errors), nameof(project));
-        }
+        var errors = project.ValidateForExport();
+        if (errors.Count > 0) throw new ArgumentException(string.Join(" ", errors), nameof(project));
 
-        List<ColourPoint> colourPoints = project.ColourPoints.OrderBy(point => point.Time).ToList();
+        var colourPoints = project.ColourPoints.OrderBy(point => point.Time).ToList();
         // Collection order is the osu! palette order. Names are stable
         // sequence references, not a second ordering instruction.
-        List<SpecialColour> comboColours = project.ComboColours.ToList();
+        var comboColours = project.ComboColours.ToList();
         beatmap.ComboColours = project.ComboColours
             .Select(colour => new ComboColour(colour.Color))
             .ToList();
 
-        if (beatmap.HitObjects.Count == 0 || colourPoints.Count == 0)
-        {
-            return;
-        }
+        if (beatmap.HitObjects.Count == 0 || colourPoints.Count == 0) return;
 
         int lastColourPointColourIndex = -1;
-        ColourPoint lastColourPoint = colourPoints[0];
+        var lastColourPoint = colourPoints[0];
         int lastColourIndex = 0;
         List<ColourPoint> exceptions = [];
 
-        foreach (HitObject newCombo in beatmap.HitObjects.Where(objectToColour =>
+        foreach (var newCombo in beatmap.HitObjects.Where(objectToColour =>
                      objectToColour.ActualNewCombo && !objectToColour.IsSpinner))
         {
             int comboLength = GetComboLength(newCombo, beatmap.HitObjects);
-            ColourPoint colourPoint = GetColourPoint(
+            var colourPoint = GetColourPoint(
                 colourPoints,
                 newCombo.Time,
                 exceptions,
                 comboLength <= project.MaxBurstLength);
-            List<SpecialColour> colourSequence = colourPoint.ColourSequence.ToList();
+            var colourSequence = colourPoint.ColourSequence.ToList();
 
-            if (colourPoint.Mode == ColourPointMode.Burst)
-            {
-                exceptions.Add(colourPoint);
-            }
+            if (colourPoint.Mode == ColourPointMode.Burst) exceptions.Add(colourPoint);
 
-            lastColourPointColourIndex = lastColourPointColourIndex == -1 ||
-                                         lastColourPoint.Equals(colourPoint)
+            lastColourPointColourIndex = lastColourPointColourIndex == -1 || lastColourPoint.Equals(colourPoint)
                 ? lastColourPointColourIndex
                 : colourSequence.FindIndex(colour => colour.Name == comboColours[lastColourIndex].Name);
 
@@ -64,26 +54,23 @@ public static class ComboColourStudioEngine
                 ? 0
                 : lastColourPoint.Equals(colourPoint)
                     ? MathHelper.Mod(lastColourPointColourIndex + 1, colourSequence.Count)
-                    : lastColourPointColourIndex == 0 && colourSequence.Count > 1 ? 1 : 0;
+                    : lastColourPointColourIndex == 0 && colourSequence.Count > 1
+                        ? 1
+                        : 0;
 
             int colourIndex = colourSequence.Count == 0
                 ? MathHelper.Mod(lastColourIndex + 1, comboColours.Count)
                 : comboColours.FindIndex(colour =>
                     colour.Name == colourSequence[colourPointColourIndex].Name);
             if (colourIndex == -1)
-            {
                 throw new ArgumentException(
-                    $"Can not use colour {colourSequence[colourPointColourIndex].Name} " +
-                    $"of colour point at offset {colourPoint.Time} because it does not exist in the combo colours.",
+                    $"Can not use colour {colourSequence[colourPointColourIndex].Name} "
+                    + $"of colour point at offset {colourPoint.Time} because it does not exist in the combo colours.",
                     nameof(project));
-            }
 
             int comboIncrease = MathHelper.Mod(colourIndex - lastColourIndex, project.ComboColours.Count);
             newCombo.ComboSkip = MathHelper.Mod(comboIncrease - 1, project.ComboColours.Count);
-            if (!newCombo.NewCombo && newCombo.ComboSkip != 0)
-            {
-                newCombo.NewCombo = true;
-            }
+            if (!newCombo.NewCombo && newCombo.ComboSkip != 0) newCombo.NewCombo = true;
 
             lastColourPointColourIndex = colourPointColourIndex;
             lastColourPoint = colourPoint;
@@ -103,10 +90,7 @@ public static class ComboColourStudioEngine
             ? ComboColour.GetDefaultComboColours()
             : beatmap.ComboColours.ToArray();
         project.ComboColours.Clear();
-        for (int index = 0; index < colours.Length; index++)
-        {
-            project.ComboColours.Add(new SpecialColour(colours[index].Color, $"Combo{index + 1}"));
-        }
+        for (int index = 0; index < colours.Length; index++) project.ComboColours.Add(new SpecialColour(colours[index].Color, $"Combo{index + 1}"));
     }
 
     /// <summary>Infers normal and burst points from the map's existing combo skips.</summary>
@@ -131,8 +115,8 @@ public static class ComboColourStudioEngine
         bool lastBurst = false;
         while (sequenceStartIndex < objects.Length)
         {
-            HitObject firstComboHitObject = objects[sequenceStartIndex];
-            Tuple<int[], int, double>? bestSequence = GetBestSequenceAtIndex(
+            var firstComboHitObject = objects[sequenceStartIndex];
+            var bestSequence = GetBestSequenceAtIndex(
                 sequenceStartIndex,
                 3,
                 objects,
@@ -151,21 +135,19 @@ public static class ComboColourStudioEngine
 
             int contribution = GetSequenceContribution(objects, sequenceStartIndex, sequence);
             // Get the colours for every colour index. Using modulo to make sure the index is always in range.
-            IEnumerable<SpecialColour> colours = sequence.Select(index =>
+            var colours = sequence.Select(index =>
                 project.ComboColours[MathHelper.Mod(index, project.ComboColours.Count)]);
-            ColourPointMode mode = contribution == 1 &&
-                                   GetComboLengthForImport(beatmap.HitObjects, firstComboHitObject) <= project.MaxBurstLength
+            var mode = contribution == 1 && GetComboLengthForImport(beatmap.HitObjects, firstComboHitObject) <= project.MaxBurstLength
                 ? ColourPointMode.Burst
                 : ColourPointMode.Normal;
             // Add a new colour point
             // To optimize on colour points, we dont add a new colour point if the previous point was a burst and
             // the sequence before the burst is equivalent to this sequence
-            if (!(lastBurst && lastNormalSequence is not null &&
-                  ComboColourProjectIsSubSequence(sequence, lastNormalSequence) &&
-                  (sequence.Length == lastNormalSequence.Length || contribution <= sequence.Length)))
-            {
+            if (!(lastBurst
+                  && lastNormalSequence is not null
+                  && ComboColourProjectIsSubSequence(sequence, lastNormalSequence)
+                  && (sequence.Length == lastNormalSequence.Length || contribution <= sequence.Length)))
                 project.AddColourPoint(firstComboHitObject.Time, colours, mode);
-            }
 
             lastBurst = mode == ColourPointMode.Burst;
             sequenceStartIndex += contribution;
@@ -185,31 +167,20 @@ public static class ComboColourStudioEngine
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(project);
-        if (maximumItems < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maximumItems));
-        }
+        if (maximumItems < 0) throw new ArgumentOutOfRangeException(nameof(maximumItems));
 
-        if (maximumItems == 0)
-        {
-            return [];
-        }
+        if (maximumItems == 0) return [];
 
         List<ComboColourPreviewEntry> result = [];
-        foreach (ColourPoint point in project.ColourPoints.OrderBy(point => point.Time))
+        foreach (var point in project.ColourPoints.OrderBy(point => point.Time))
+        foreach (var colour in point.ColourSequence)
         {
-            foreach (SpecialColour colour in point.ColourSequence)
-            {
-                result.Add(new ComboColourPreviewEntry(
-                    point.Time,
-                    point.Mode,
-                    colour.Name ?? string.Empty,
-                    colour.Color));
-                if (result.Count >= maximumItems)
-                {
-                    return result;
-                }
-            }
+            result.Add(new ComboColourPreviewEntry(
+                point.Time,
+                point.Mode,
+                colour.Name ?? string.Empty,
+                colour.Color));
+            if (result.Count >= maximumItems) return result;
         }
 
         return result;
@@ -218,19 +189,18 @@ public static class ComboColourStudioEngine
     /// <summary>Tests whether a sequence is the prefix of a larger sequence.</summary>
     /// <param name="sequence">The candidate prefix.</param>
     /// <param name="biggerSequence">The sequence to inspect.</param>
-    /// <returns><see langword="true"/> when every candidate element matches.</returns>
+    /// <returns><see langword="true" /> when every candidate element matches.</returns>
     public static bool IsSubSequence(IReadOnlyList<int> sequence, IReadOnlyList<int>? biggerSequence)
     {
-        if (biggerSequence is null || sequence.Count > biggerSequence.Count)
-        {
-            return false;
-        }
+        if (biggerSequence is null || sequence.Count > biggerSequence.Count) return false;
 
-        return sequence.Where((value, index) => value != biggerSequence[index]).Any() == false;
+        return !sequence.Where((value, index) => value != biggerSequence[index]).Any();
     }
 
-    private static bool ComboColourProjectIsSubSequence(int[] sequence, int[] biggerSequence) =>
-        IsSubSequence(sequence, biggerSequence);
+    private static bool ComboColourProjectIsSubSequence(int[] sequence, int[] biggerSequence)
+    {
+        return IsSubSequence(sequence, biggerSequence);
+    }
 
     private static Tuple<int[], int, double>? GetBestSequenceAtIndex(
         int sequenceStartIndex,
@@ -242,12 +212,9 @@ public static class ComboColourStudioEngine
         bool lastBurst,
         int[]? lastNormalSequence)
     {
-        if (sequenceStartIndex >= objects.Count)
-        {
-            return null;
-        }
+        if (sequenceStartIndex >= objects.Count) return null;
 
-        HitObject firstComboHitObject = objects[sequenceStartIndex];
+        var firstComboHitObject = objects[sequenceStartIndex];
         // Getting all sequences and calculating the scores
         int[][] sequences = sequenceLengthChecks
             .Select(length => GetColourSequence(objects, sequenceStartIndex, length))
@@ -263,27 +230,22 @@ public static class ComboColourStudioEngine
         for (int index = 0; index < sequences.Length; index++)
         {
             int[]? sequence = sequences[index];
-            if (sequence is null)
-            {
-                continue;
-            }
+            if (sequence is null) continue;
 
             int contribution = contributions[index];
-            bool burst = contribution == 1 &&
-                         GetComboLengthForImport(beatmap.HitObjects, firstComboHitObject) <= maxBurstLength;
+            bool burst = contribution == 1 && GetComboLengthForImport(beatmap.HitObjects, firstComboHitObject) <= maxBurstLength;
             double cost = sequence.Length;
             // There is no cost if the colour point doesnt have to be added
-            if (lastBurst && lastNormalSequence is not null &&
-                ComboColourProjectIsSubSequence(sequence, lastNormalSequence) &&
-                (sequence.Length == lastNormalSequence.Length || contribution <= sequence.Length))
-            {
+            if (lastBurst
+                && lastNormalSequence is not null
+                && ComboColourProjectIsSubSequence(sequence, lastNormalSequence)
+                && (sequence.Length == lastNormalSequence.Length || contribution <= sequence.Length))
                 cost = 0;
-            }
 
             // Recursively add the cost and contribution to this cost and contribution
             if (depth > 0)
             {
-                Tuple<int[], int, double>? next = GetBestSequenceAtIndex(
+                var next = GetBestSequenceAtIndex(
                     sequenceStartIndex + contribution,
                     depth - 1,
                     objects,
@@ -301,20 +263,14 @@ public static class ComboColourStudioEngine
 
             // Factor the contribution over the cost
             double score = contribution / cost;
-            if (bestSequence is not null &&
-                (score < bestScore || Math.Abs(score - bestScore) < Precision.DoubleEpsilon && cost >= bestCost))
-            {
+            if (bestSequence is not null && (score < bestScore || Math.Abs(score - bestScore) < Precision.DoubleEpsilon && cost >= bestCost))
                 continue;
-            }
 
             bestScore = score;
             bestSequence = sequence;
             bestContribution = contribution;
             bestCost = cost;
-            if (double.IsPositiveInfinity(bestScore))
-            {
-                break;
-            }
+            if (double.IsPositiveInfinity(bestScore)) break;
         }
 
         return bestSequence is null ? null : new Tuple<int[], int, double>(bestSequence, bestContribution, bestCost);
@@ -324,53 +280,39 @@ public static class ComboColourStudioEngine
     {
         int index = -1;
         for (int objectIndex = 0; objectIndex < objects.Count; objectIndex++)
-        {
             if (ReferenceEquals(objects[objectIndex], first))
             {
                 index = objectIndex;
                 break;
             }
-        }
 
-        if (index == -1)
-        {
-            return 0;
-        }
+        if (index == -1) return 0;
 
         int count = 1;
-        while (++index < objects.Count && !objects[index].NewCombo)
-        {
-            count++;
-        }
+        while (++index < objects.Count && !objects[index].NewCombo) count++;
 
         return count;
     }
 
-    private static int GetComboLength(IReadOnlyList<HitObject> objects, HitObject first) =>
-        GetComboLength(first, objects);
+    private static int GetComboLength(IReadOnlyList<HitObject> objects, HitObject first)
+    {
+        return GetComboLength(first, objects);
+    }
 
     private static int GetComboLengthForImport(IReadOnlyList<HitObject> objects, HitObject first)
     {
         int index = -1;
         for (int objectIndex = 0; objectIndex < objects.Count; objectIndex++)
-        {
             if (ReferenceEquals(objects[objectIndex], first))
             {
                 index = objectIndex;
                 break;
             }
-        }
 
-        if (index == -1)
-        {
-            return 0;
-        }
+        if (index == -1) return 0;
 
         int count = 1;
-        while (++index < objects.Count && !objects[index].ActualNewCombo)
-        {
-            count++;
-        }
+        while (++index < objects.Count && !objects[index].ActualNewCombo) count++;
 
         return count;
     }
@@ -380,10 +322,7 @@ public static class ComboColourStudioEngine
         int[] sequence = new int[length];
         for (int index = 0; index < length; index++)
         {
-            if (startIndex + index >= objects.Count)
-            {
-                return null;
-            }
+            if (startIndex + index >= objects.Count) return null;
 
             sequence[index] = objects[startIndex + index].ColourIndex;
         }
@@ -396,10 +335,7 @@ public static class ComboColourStudioEngine
         int startIndex,
         IReadOnlyList<int>? sequence)
     {
-        if (sequence is null)
-        {
-            return 0;
-        }
+        if (sequence is null) return 0;
 
         int index = startIndex;
         int sequenceIndex = 0;
@@ -418,12 +354,12 @@ public static class ComboColourStudioEngine
         IReadOnlyList<ColourPoint> points,
         double time,
         IReadOnlyCollection<ColourPoint> exceptions,
-        bool includeBurst) =>
-        points.Except(exceptions).LastOrDefault(point =>
-            point.Time <= time + 5 &&
-            (point.Mode != ColourPointMode.Burst || point.Time >= time - 5 && includeBurst)) ??
-        points.Except(exceptions).FirstOrDefault(point => point.Mode != ColourPointMode.Burst) ??
-        points[0];
+        bool includeBurst)
+    {
+        return points.Except(exceptions).LastOrDefault(point =>
+                   point.Time <= time + 5 && (point.Mode != ColourPointMode.Burst || point.Time >= time - 5 && includeBurst))
+               ?? points.Except(exceptions).FirstOrDefault(point => point.Mode != ColourPointMode.Burst) ?? points[0];
+    }
 }
 
 /// <summary>Describes one non-mutating Combo Colour Studio preview entry.</summary>

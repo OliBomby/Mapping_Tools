@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 
@@ -17,7 +16,7 @@ public enum TumourImportMode
     Time,
 
     /// <summary>Uses every object in the beatmap.</summary>
-    Everything
+    Everything,
 }
 
 /// <summary>Stores the persisted Tumour Generator 2 run settings.</summary>
@@ -35,7 +34,6 @@ public sealed class TumourGeneratorProject : TumourGeneratorOptions
 
     /// <summary>Gets or sets the time-code expression used in time mode.</summary>
     public string TimeCode { get; set; } = string.Empty;
-
 }
 
 /// <summary>Reports imported sliders and the map's Circle Size.</summary>
@@ -69,7 +67,7 @@ public interface ITumourGeneratorService
     /// <summary>Imports sliders through the shared disk/live beatmap gateway.</summary>
     /// <param name="path">The beatmap path to inspect.</param>
     /// <param name="mode">The import source.</param>
-    /// <param name="timeCode">The time query when <paramref name="mode"/> is time-based.</param>
+    /// <param name="timeCode">The time query when <paramref name="mode" /> is time-based.</param>
     /// <param name="cancellationToken">Cancels the read.</param>
     /// <returns>The imported sliders and preview difficulty value.</returns>
     Task<TumourImportResult> ImportAsync(

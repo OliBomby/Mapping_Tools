@@ -12,161 +12,184 @@
         <Grid Margin="0,0,0,10">
             <Grid RowDefinitions="Auto,*,Auto">
                 <controls:ToolViewHeader
-                Title="Metadata Manager"
-                HelpText="To save you the time of editing metadata on every individual difficulty, edit metadata in this tool and copy it to multiple diffs anytime.&#x0a;&#x0a;You can also import metadata from beatmaps, so you can copy metadata from A to B.&#x0a;&#x0a;Save and load metadata configurations, so you can work on multiple mapsets without hassle." />
+                    Title="Metadata Manager"
+                    HelpText="To save you the time of editing metadata on every individual difficulty, edit metadata in this tool and copy it to multiple diffs anytime.&#x0a;&#x0a;You can also import metadata from beatmaps, so you can copy metadata from A to B.&#x0a;&#x0a;Save and load metadata configurations, so you can work on multiple mapsets without hassle." />
 
-            <ScrollViewer Grid.Row="1" Margin="0,0,100,0"
-                          VerticalScrollBarVisibility="Visible">
-                <StackPanel Margin="0,0,20,0">
-                    <Grid Margin="0,20,0,0" ColumnDefinitions="*,Auto,5,Auto,5,Auto">
-                        <TextBox Margin="0,0,5,0"
-                                 materialAssists:TextFieldAssist.Label="Import metadata from"
-                                 Text="{Binding ImportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                 ToolTip.Tip="Beatmap to import metadata from. This is optional." />
-                        <Button Grid.Column="1" Classes="flat path-picker" Cursor="Hand"
-                                VerticalAlignment="Bottom"
-                                Command="{Binding UseCurrentImportCommand}"
-                                ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
-                            <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
-                        </Button>
-                        <Button Grid.Column="3" Classes="flat path-picker" Cursor="Hand"
-                                VerticalAlignment="Bottom"
-                                Command="{Binding BrowseImportCommand}"
-                                ToolTip.Tip="Select beatmaps with File Explorer.">
-                            <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
-                        </Button>
-                        <Button Grid.Column="5" VerticalAlignment="Bottom"
-                                Command="{Binding ImportCommand}"
-                                ToolTip.Tip="Import metadata from the specified beatmap. This is optional."
-                                Content="Import metadata" />
-                    </Grid>
+                <ScrollViewer Grid.Row="1" Margin="0,0,100,0"
+                              VerticalScrollBarVisibility="Visible">
+                    <StackPanel Margin="0,0,20,0">
+                        <Grid Margin="0,20,0,0" ColumnDefinitions="*,Auto,5,Auto,5,Auto">
+                            <TextBox Margin="0,0,5,0"
+                                     materialAssists:TextFieldAssist.Label="Import metadata from"
+                                     Text="{Binding ImportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     ToolTip.Tip="Beatmap to import metadata from. This is optional." />
+                            <Button Grid.Column="1" Classes="flat path-picker" Cursor="Hand"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding UseCurrentImportCommand}"
+                                    ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                                <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
+                            </Button>
+                            <Button Grid.Column="3" Classes="flat path-picker" Cursor="Hand"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding BrowseImportCommand}"
+                                    ToolTip.Tip="Select beatmaps with File Explorer.">
+                                <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+                            </Button>
+                            <Button Grid.Column="5" VerticalAlignment="Bottom"
+                                    Command="{Binding ImportCommand}"
+                                    ToolTip.Tip="Import metadata from the specified beatmap. This is optional."
+                                    Content="Import metadata" />
+                        </Grid>
 
-                    <Grid Margin="0,10,0,0" ColumnDefinitions="*,Auto,Auto,5,Auto">
-                        <TextBox Margin="0,0,5,0"
-                                 materialAssists:TextFieldAssist.Label="Export metadata to"
-                                 Text="{Binding ExportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                 ToolTip.Tip="Beatmap(s) to export the metadata to. You can input multiple map paths seperated by '|'." />
-                        <TextBlock Grid.Column="1" Margin="3,15,2,0" Padding="0 0 3 0" FontStyle="Italic"
-                                   ToolTip.Tip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
-                                   Text="{Binding ExportMapCountText}" />
-                        <Button Grid.Column="2" Classes="flat path-picker" Cursor="Hand"
-                                VerticalAlignment="Bottom"
-                                Command="{Binding UseCurrentExportCommand}"
-                                ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
-                            <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
-                        </Button>
-                        <Button Grid.Column="4" Classes="flat path-picker" Cursor="Hand"
-                                VerticalAlignment="Bottom"
-                                Command="{Binding BrowseExportCommand}"
-                                ToolTip.Tip="Select beatmaps with File Explorer.">
-                            <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
-                        </Button>
-                    </Grid>
+                        <Grid Margin="0,10,0,0" ColumnDefinitions="*,Auto,Auto,5,Auto">
+                            <TextBox Margin="0,0,5,0"
+                                     materialAssists:TextFieldAssist.Label="Export metadata to"
+                                     Text="{Binding ExportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     ToolTip.Tip="Beatmap(s) to export the metadata to. You can input multiple map paths seperated by '|'." />
+                            <TextBlock Grid.Column="1" Margin="3,15,2,0" Padding="0 0 3 0" FontStyle="Italic"
+                                       ToolTip.Tip="Multiple beatmaps can be inputted in this field. Separate the paths with the '|' character."
+                                       Text="{Binding ExportMapCountText}" />
+                            <Button Grid.Column="2" Classes="flat path-picker" Cursor="Hand"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding UseCurrentExportCommand}"
+                                    ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
+                                <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
+                            </Button>
+                            <Button Grid.Column="4" Classes="flat path-picker" Cursor="Hand"
+                                    VerticalAlignment="Bottom"
+                                    Command="{Binding BrowseExportCommand}"
+                                    ToolTip.Tip="Select beatmaps with File Explorer.">
+                                <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
+                            </Button>
+                        </Grid>
 
-                    <Separator Margin="0,10" />
+                        <Separator Margin="0,10" />
 
-                    <Grid ColumnDefinitions="150,10,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
-                        <TextBlock Grid.Column="0" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Artist" />
-                        <TextBlock Grid.Column="0" Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Romanised Artist" />
-                        <TextBlock Grid.Column="0" Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Title" />
-                        <TextBlock Grid.Column="0" Grid.Row="3" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Romanised Title" />
-                        <TextBlock Grid.Column="0" Grid.Row="4" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Beatmap Creator" />
-                        <TextBlock Grid.Column="0" Grid.Row="5" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Source" />
-                        <TextBlock Grid.Column="0" Grid.Row="6" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Tags" />
-                        <TextBlock Grid.Column="0" Grid.Row="7" Margin="0,50,0,0" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" Text="Preview Time" />
-                        <TextBlock Grid.Column="0" Grid.Row="8" Margin="0,10,0,0" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Top" Text="Colours" />
+                        <Grid ColumnDefinitions="150,10,*"
+                              RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                            <TextBlock Grid.Column="0" FontWeight="Bold" HorizontalAlignment="Right"
+                                       VerticalAlignment="Center" Text="Artist" />
+                            <TextBlock Grid.Column="0" Grid.Row="1" FontWeight="Bold" HorizontalAlignment="Right"
+                                       VerticalAlignment="Center" Text="Romanised Artist" />
+                            <TextBlock Grid.Column="0" Grid.Row="2" FontWeight="Bold" HorizontalAlignment="Right"
+                                       VerticalAlignment="Center" Text="Title" />
+                            <TextBlock Grid.Column="0" Grid.Row="3" FontWeight="Bold" HorizontalAlignment="Right"
+                                       VerticalAlignment="Center" Text="Romanised Title" />
+                            <TextBlock Grid.Column="0" Grid.Row="4" FontWeight="Bold" HorizontalAlignment="Right"
+                                       VerticalAlignment="Center" Text="Beatmap Creator" />
+                            <TextBlock Grid.Column="0" Grid.Row="5" FontWeight="Bold" HorizontalAlignment="Right"
+                                       VerticalAlignment="Center" Text="Source" />
+                            <TextBlock Grid.Column="0" Grid.Row="6" FontWeight="Bold" HorizontalAlignment="Right"
+                                       VerticalAlignment="Center" Text="Tags" />
+                            <TextBlock Grid.Column="0" Grid.Row="7" Margin="0,50,0,0" FontWeight="Bold"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center" Text="Preview Time" />
+                            <TextBlock Grid.Column="0" Grid.Row="8" Margin="0,10,0,0" FontWeight="Bold"
+                                       HorizontalAlignment="Right" VerticalAlignment="Top" Text="Colours" />
 
-                        <TextBox Grid.Column="2" Grid.Row="0" Classes="compact" Text="{Binding Artist, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                        <TextBox Grid.Column="2" Grid.Row="1" Classes="compact" Text="{Binding RomanisedArtist, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                        <TextBox Grid.Column="2" Grid.Row="2" Classes="compact" Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                        <TextBox Grid.Column="2" Grid.Row="3" Classes="compact" Text="{Binding RomanisedTitle, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                        <TextBox Grid.Column="2" Grid.Row="4" Classes="compact" Text="{Binding BeatmapCreator, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                        <TextBox Grid.Column="2" Grid.Row="5" Classes="compact" Text="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                        <TextBox Grid.Column="2" Grid.Row="6" Classes="compact multiline" TextWrapping="Wrap"
-                                 Text="{Binding Tags, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                            <TextBox Grid.Column="2" Grid.Row="0" Classes="compact"
+                                     Text="{Binding Artist, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                            <TextBox Grid.Column="2" Grid.Row="1" Classes="compact"
+                                     Text="{Binding RomanisedArtist, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                            <TextBox Grid.Column="2" Grid.Row="2" Classes="compact"
+                                     Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                            <TextBox Grid.Column="2" Grid.Row="3" Classes="compact"
+                                     Text="{Binding RomanisedTitle, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                            <TextBox Grid.Column="2" Grid.Row="4" Classes="compact"
+                                     Text="{Binding BeatmapCreator, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                            <TextBox Grid.Column="2" Grid.Row="5" Classes="compact"
+                                     Text="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                            <TextBox Grid.Column="2" Grid.Row="6" Classes="compact multiline" TextWrapping="Wrap"
+                                     Text="{Binding Tags, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
 
-                        <CheckBox Grid.Column="2" Grid.Row="7" VerticalAlignment="Top"
-                                  Content="Remove duplicate tags"
-                                  IsChecked="{Binding DoRemoveDuplicateTags}" />
-                        <CheckBox Grid.Column="2" Grid.Row="7" Margin="0,24,0,0" VerticalAlignment="Top"
-                                  Content="Reset beatmap IDs"
-                                  IsChecked="{Binding ResetIds}"
-                                  ToolTip.Tip="Reset the BeatmapID and BeatmapSetID on all beatmaps. This might fix the 'The beatmap you're trying to submit isn't yours!' issue." />
-                        <TextBox Grid.Column="2" Grid.Row="7" Classes="compact" Margin="0,50,0,0" TextWrapping="Wrap"
-                                 Text="{Binding PreviewTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}" />
+                            <CheckBox Grid.Column="2" Grid.Row="7" VerticalAlignment="Top"
+                                      Content="Remove duplicate tags"
+                                      IsChecked="{Binding DoRemoveDuplicateTags}" />
+                            <CheckBox Grid.Column="2" Grid.Row="7" Margin="0,24,0,0" VerticalAlignment="Top"
+                                      Content="Reset beatmap IDs"
+                                      IsChecked="{Binding ResetIds}"
+                                      ToolTip.Tip="Reset the BeatmapID and BeatmapSetID on all beatmaps. This might fix the 'The beatmap you're trying to submit isn't yours!' issue." />
+                            <TextBox Grid.Column="2" Grid.Row="7" Classes="compact" Margin="0,50,0,0"
+                                     TextWrapping="Wrap"
+                                     Text="{Binding PreviewTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}" />
 
-                        <StackPanel Grid.Column="2" Grid.Row="8">
-                            <ToggleSwitch HorizontalAlignment="Left" Margin="5,10,0,10"
-                                          IsChecked="{Binding UseComboColours}"
-                                          ToolTip.Tip="Choose to export combo colours. You can disable this to have different colours between maps." />
-                            <StackPanel IsEnabled="{Binding UseComboColours}">
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:Card>
-                                        <ListBox ItemsSource="{Binding ComboColours}">
-                                            <ListBox.ItemsPanel>
-                                                <ItemsPanelTemplate>
-                                                    <StackPanel Orientation="Horizontal" />
-                                                </ItemsPanelTemplate>
-                                            </ListBox.ItemsPanel>
-                                            <ListBox.ItemTemplate>
-                                                <DataTemplate x:DataType="adapter:ObservableComboColour">
-                                                    <ColorPicker Color="{Binding Color, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}" />
-                                                </DataTemplate>
-                                            </ListBox.ItemTemplate>
-                                        </ListBox>
-                                    </materialDesign:Card>
-                                    <materialDesign:FloatingButton Classes="mini light" Margin="5" VerticalAlignment="Bottom"
-                                                    Command="{Binding AddComboColourCommand}"
-                                                    ToolTip.Tip="Add a new combo colour.">
-                                        <materialIcons:MaterialIcon Width="24" Height="24" Kind="Plus" />
-                                    </materialDesign:FloatingButton>
-                                    <materialDesign:FloatingButton Classes="mini light" Margin="5" VerticalAlignment="Bottom"
-                                            Command="{Binding RemoveComboColourCommand}"
-                                            ToolTip.Tip="Remove last combo colour.">
-                                        <materialIcons:MaterialIcon Width="24" Height="24" Kind="Minus" />
-                                    </materialDesign:FloatingButton>
-                                </StackPanel>
+                            <StackPanel Grid.Column="2" Grid.Row="8">
+                                <ToggleSwitch HorizontalAlignment="Left" Margin="5,10,0,10"
+                                              IsChecked="{Binding UseComboColours}"
+                                              ToolTip.Tip="Choose to export combo colours. You can disable this to have different colours between maps." />
+                                <StackPanel IsEnabled="{Binding UseComboColours}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:Card>
+                                            <ListBox ItemsSource="{Binding ComboColours}">
+                                                <ListBox.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Horizontal" />
+                                                    </ItemsPanelTemplate>
+                                                </ListBox.ItemsPanel>
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate x:DataType="adapter:ObservableComboColour">
+                                                        <ColorPicker
+                                                            Color="{Binding Color, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}" />
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                        </materialDesign:Card>
+                                        <materialDesign:FloatingButton Classes="mini light" Margin="5"
+                                                                       VerticalAlignment="Bottom"
+                                                                       Command="{Binding AddComboColourCommand}"
+                                                                       ToolTip.Tip="Add a new combo colour.">
+                                            <materialIcons:MaterialIcon Width="24" Height="24" Kind="Plus" />
+                                        </materialDesign:FloatingButton>
+                                        <materialDesign:FloatingButton Classes="mini light" Margin="5"
+                                                                       VerticalAlignment="Bottom"
+                                                                       Command="{Binding RemoveComboColourCommand}"
+                                                                       ToolTip.Tip="Remove last combo colour.">
+                                            <materialIcons:MaterialIcon Width="24" Height="24" Kind="Minus" />
+                                        </materialDesign:FloatingButton>
+                                    </StackPanel>
 
-                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                    <materialDesign:Card>
-                                        <ListBox ItemsSource="{Binding SpecialColours}">
-                                            <ListBox.ItemTemplate>
-                                                <DataTemplate x:DataType="adapter:ObservableSpecialColour">
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <TextBox Width="202" Margin="0,0,10,0"
-                                                                 Text="{Binding Name, Mode=TwoWay}"
-                                                                 ToolTip.Tip="Special colour name. Some example keywords are 'SliderTrackOverride' and 'SliderBorder'." />
-                                                        <ColorPicker Color="{Binding Color, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}" />
-                                                    </StackPanel>
-                                                </DataTemplate>
-                                            </ListBox.ItemTemplate>
-                                        </ListBox>
-                                    </materialDesign:Card>
-                                    <materialDesign:FloatingButton Classes="mini light" Margin="5" VerticalAlignment="Bottom"
-                                            Command="{Binding AddSpecialColourCommand}"
-                                            ToolTip.Tip="Add a new special colour.">
-                                        <materialIcons:MaterialIcon Width="24" Height="24" Kind="Plus" />
-                                    </materialDesign:FloatingButton>
-                                    <materialDesign:FloatingButton Classes="mini light" Margin="5" VerticalAlignment="Bottom"
-                                            Command="{Binding RemoveSpecialColourCommand}"
-                                            ToolTip.Tip="Remove last special colour.">
-                                        <materialIcons:MaterialIcon Width="24" Height="24" Kind="Minus" />
-                                    </materialDesign:FloatingButton>
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <materialDesign:Card>
+                                            <ListBox ItemsSource="{Binding SpecialColours}">
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate x:DataType="adapter:ObservableSpecialColour">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBox Width="202" Margin="0,0,10,0"
+                                                                     Text="{Binding Name, Mode=TwoWay}"
+                                                                     ToolTip.Tip="Special colour name. Some example keywords are 'SliderTrackOverride' and 'SliderBorder'." />
+                                                            <ColorPicker
+                                                                Color="{Binding Color, Mode=TwoWay, Converter={StaticResource RgbaColourToAvaloniaColorConverter}}" />
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                        </materialDesign:Card>
+                                        <materialDesign:FloatingButton Classes="mini light" Margin="5"
+                                                                       VerticalAlignment="Bottom"
+                                                                       Command="{Binding AddSpecialColourCommand}"
+                                                                       ToolTip.Tip="Add a new special colour.">
+                                            <materialIcons:MaterialIcon Width="24" Height="24" Kind="Plus" />
+                                        </materialDesign:FloatingButton>
+                                        <materialDesign:FloatingButton Classes="mini light" Margin="5"
+                                                                       VerticalAlignment="Bottom"
+                                                                       Command="{Binding RemoveSpecialColourCommand}"
+                                                                       ToolTip.Tip="Remove last special colour.">
+                                            <materialIcons:MaterialIcon Width="24" Height="24" Kind="Minus" />
+                                        </materialDesign:FloatingButton>
+                                    </StackPanel>
                                 </StackPanel>
                             </StackPanel>
-                        </StackPanel>
-                    </Grid>
-                </StackPanel>
-            </ScrollViewer>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
 
-            <StackPanel Grid.Row="2">
-                <TextBlock Margin="10" Foreground="{DynamicResource MaterialValidationErrorBrush}"
-                           Text="Beatmap file name can not be over 255 characters long."
-                           IsVisible="{Binding IsBeatmapFileNameOverflowVisible}" />
-                <TextBlock Margin="10" Foreground="{DynamicResource MaterialValidationErrorBrush}"
-                           Text="Tags can have at most 100 words and 1024 characters."
-                           IsVisible="{Binding IsTagsOverflowVisible}" />
-            </StackPanel>
+                <StackPanel Grid.Row="2">
+                    <TextBlock Margin="10" Foreground="{DynamicResource MaterialValidationErrorBrush}"
+                               Text="Beatmap file name can not be over 255 characters long."
+                               IsVisible="{Binding IsBeatmapFileNameOverflowVisible}" />
+                    <TextBlock Margin="10" Foreground="{DynamicResource MaterialValidationErrorBrush}"
+                               Text="Tags can have at most 100 words and 1024 characters."
+                               IsVisible="{Binding IsTagsOverflowVisible}" />
+                </StackPanel>
 
             </Grid>
             <controls:ToolRunButton Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
@@ -175,7 +198,8 @@
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
             <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
-            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100" Value="{Binding Progress}" />
+            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100"
+                                      Value="{Binding Progress}" />
         </Grid>
     </Grid>
 </UserControl>

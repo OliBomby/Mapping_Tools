@@ -5,11 +5,11 @@ using Mapping_Tools.Application.Settings;
 namespace Mapping_Tools.Desktop.Converters;
 
 /// <summary>
-/// Converts the application theme to the checked state of the dark-theme toggle.
+///     Converts the application theme to the checked state of the dark-theme toggle.
 /// </summary>
 public sealed class DarkThemeConverter : IValueConverter
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public object Convert(
         object? value,
         Type targetType,
@@ -17,17 +17,15 @@ public sealed class DarkThemeConverter : IValueConverter
         CultureInfo culture)
     {
         if (value is not ApplicationTheme theme
-            || (targetType != typeof(bool) && targetType != typeof(bool?)))
-        {
+            || targetType != typeof(bool) && targetType != typeof(bool?))
             return ValueConverterHelper.TypeError(
                 typeof(ApplicationTheme),
                 targetType);
-        }
 
         return theme == ApplicationTheme.Dark;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public object ConvertBack(
         object? value,
         Type targetType,
@@ -35,13 +33,11 @@ public sealed class DarkThemeConverter : IValueConverter
         CultureInfo culture)
     {
         if (value is not bool isDark
-            || (targetType != typeof(ApplicationTheme)
-                && targetType != typeof(object)))
-        {
+            || targetType != typeof(ApplicationTheme)
+            && targetType != typeof(object))
             return ValueConverterHelper.TypeError(
                 typeof(bool),
                 targetType);
-        }
 
         return isDark
             ? ApplicationTheme.Dark

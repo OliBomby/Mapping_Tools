@@ -1,5 +1,5 @@
-using Mapping_Tools.Desktop.Interactions;
 using Mapping_Tools.Core.Tools.PatternGallery;
+using Mapping_Tools.Desktop.Interactions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.PatternGallery;
@@ -11,7 +11,7 @@ public sealed class PatternGalleryInputViewModelTests
     public void ForFile_Accept_WithBlankAndOsuTimestampBounds_UsesLegacyOptionalTimeValues()
     {
         // Arrange
-        PatternGalleryInputViewModel viewModel = PatternGalleryInputViewModel.ForFile("Pattern", "pattern.osu");
+        var viewModel = PatternGalleryInputViewModel.ForFile("Pattern", "pattern.osu");
         object? result = null;
         viewModel.Close = value => result = value;
         viewModel.StartTimeText = string.Empty;
@@ -21,7 +21,7 @@ public sealed class PatternGalleryInputViewModelTests
         viewModel.AcceptCommand.Execute(null);
 
         // Assert
-        PatternGalleryFileInput input = result.Should().BeOfType<PatternGalleryFileInput>().Subject;
+        var input = result.Should().BeOfType<PatternGalleryFileInput>().Subject;
         input.StartTime.Should().Be(-1);
         input.EndTime.Should().Be(1500);
     }
@@ -39,7 +39,7 @@ public sealed class PatternGalleryInputViewModelTests
             ObjectCount = 4,
             Duration = TimeSpan.FromMilliseconds(1500),
             BeatLength = 375,
-            FileName = "pattern.osu"
+            FileName = "pattern.osu",
         };
         PatternGalleryDetailsViewModel viewModel = new(pattern);
         object? result = null;

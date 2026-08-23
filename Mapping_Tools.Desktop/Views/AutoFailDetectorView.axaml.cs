@@ -6,5 +6,8 @@ namespace Mapping_Tools.Desktop.Views;
 public sealed partial class AutoFailDetectorView : UserControl
 {
     /// <summary>Creates the Auto-fail Detector view.</summary>
-    public AutoFailDetectorView() => InitializeComponent();
+    public AutoFailDetectorView()
+    {
+        InitializeComponent();
+    }
 }

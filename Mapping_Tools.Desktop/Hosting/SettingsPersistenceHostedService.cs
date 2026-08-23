@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 namespace Mapping_Tools.Desktop.Hosting;
 
 /// <summary>
-/// Writes the shared settings document once during orderly application shutdown.
+///     Writes the shared settings document once during orderly application shutdown.
 /// </summary>
 public sealed class SettingsPersistenceHostedService : IHostedService
 {
@@ -13,7 +13,7 @@ public sealed class SettingsPersistenceHostedService : IHostedService
     private bool _saveOnShutdown = true;
 
     /// <summary>
-    /// Creates the process-lifetime persistence boundary for the shared settings instance.
+    ///     Creates the process-lifetime persistence boundary for the shared settings instance.
     /// </summary>
     /// <param name="settings">The mutable settings document used by desktop services.</param>
     /// <param name="settingsService">The storage service invoked during host shutdown.</param>
@@ -25,20 +25,22 @@ public sealed class SettingsPersistenceHostedService : IHostedService
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
     }
 
-    /// <inheritdoc/>
-    public Task StartAsync(CancellationToken cancellationToken) =>
-        Task.CompletedTask;
+    /// <inheritdoc />
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        if (_saveOnShutdown)
-        {
-            _settingsService.Save(_settings);
-        }
+        if (_saveOnShutdown) _settingsService.Save(_settings);
         return Task.CompletedTask;
     }
 
     /// <summary>Prevents the current process from persisting settings during orderly shutdown.</summary>
-    public void SuppressSave() => _saveOnShutdown = false;
+    public void SuppressSave()
+    {
+        _saveOnShutdown = false;
+    }
 }

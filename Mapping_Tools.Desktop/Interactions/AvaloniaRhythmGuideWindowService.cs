@@ -16,7 +16,7 @@ internal sealed class AvaloniaRhythmGuideWindowService : IRhythmGuideWindowServi
     public void Show(RhythmGuideViewModel viewModel)
     {
         ArgumentNullException.ThrowIfNull(viewModel);
-        if (_windows.TryGetValue(viewModel, out RhythmGuideWindow? existing))
+        if (_windows.TryGetValue(viewModel, out var existing))
         {
             existing.Activate();
             return;

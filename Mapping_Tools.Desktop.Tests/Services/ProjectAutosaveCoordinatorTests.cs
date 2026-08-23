@@ -16,10 +16,10 @@ public sealed class ProjectAutosaveCoordinatorTests
         // Arrange
         RecordingProjectService projects = new()
         {
-            LoadedProject = new TestProject(42)
+            LoadedProject = new TestProject(42),
         };
         TestProjectFeature feature = new();
-        ProjectAutosaveCoordinator coordinator = CreateCoordinator(projects);
+        var coordinator = CreateCoordinator(projects);
 
         // Act
         coordinator.Activate(feature);
@@ -36,7 +36,7 @@ public sealed class ProjectAutosaveCoordinatorTests
         // Arrange
         RecordingProjectService projects = new();
         TestProjectFeature feature = new() { Value = 7 };
-        ProjectAutosaveCoordinator coordinator = CreateCoordinator(projects);
+        var coordinator = CreateCoordinator(projects);
         coordinator.Activate(feature);
 
         // Act
@@ -56,9 +56,9 @@ public sealed class ProjectAutosaveCoordinatorTests
         TestProjectFeature feature = new()
         {
             Value = 7,
-            AdditionalAutoSavePaths = ["gallery\\project.json"]
+            AdditionalAutoSavePaths = ["gallery\\project.json"],
         };
-        ProjectAutosaveCoordinator coordinator = CreateCoordinator(projects);
+        var coordinator = CreateCoordinator(projects);
 
         // Act
         coordinator.Deactivate(feature);
@@ -74,7 +74,7 @@ public sealed class ProjectAutosaveCoordinatorTests
         // Arrange
         RecordingProjectService projects = new();
         TestProjectFeature feature = new() { Value = 11 };
-        ProjectAutosaveCoordinator coordinator = CreateCoordinator(projects);
+        var coordinator = CreateCoordinator(projects);
 
         // Act
         await coordinator.SaveAsync(feature);
@@ -91,10 +91,10 @@ public sealed class ProjectAutosaveCoordinatorTests
         // Arrange
         RecordingProjectService projects = new()
         {
-            OpenedProject = new TestProject(23)
+            OpenedProject = new TestProject(23),
         };
         TestProjectFeature feature = new();
-        ProjectAutosaveCoordinator coordinator = CreateCoordinator(projects);
+        var coordinator = CreateCoordinator(projects);
 
         // Act
         await coordinator.OpenAsync(feature);
@@ -112,7 +112,7 @@ public sealed class ProjectAutosaveCoordinatorTests
         RecordingProjectService projects = new();
         TestDialogService dialogs = new() { BooleanResult = true };
         TestProjectFeature feature = new() { Value = 99 };
-        ProjectAutosaveCoordinator coordinator = CreateCoordinator(projects, dialogs);
+        var coordinator = CreateCoordinator(projects, dialogs);
 
         // Act
         await coordinator.NewAsync(feature);
@@ -125,11 +125,13 @@ public sealed class ProjectAutosaveCoordinatorTests
 
     private static ProjectAutosaveCoordinator CreateCoordinator(
         RecordingProjectService projects,
-        TestDialogService? dialogs = null) =>
-        new(
+        TestDialogService? dialogs = null)
+    {
+        return new ProjectAutosaveCoordinator(
             projects,
             dialogs ?? new TestDialogService { BooleanResult = true },
             new UserNotificationService());
+    }
 
     private sealed class TestProjectFeature : IShellProjectFeature
     {
@@ -150,11 +152,14 @@ public sealed class ProjectAutosaveCoordinatorTests
 
         public IProjectDefinition ProjectDefinition => Definition;
 
-        public object Snapshot() => new TestProject(Value);
+        public object Snapshot()
+        {
+            return new TestProject(Value);
+        }
 
         public void Install(object project)
         {
-            TestProject typed = (TestProject)project;
+            var typed = (TestProject)project;
             Value = typed.Value;
             InstallCount++;
             Installed.TrySetResult(typed);
@@ -186,15 +191,25 @@ public sealed class ProjectAutosaveCoordinatorTests
 
         public int CreateNewCount { get; private set; }
 
-        public string GetAutoSavePath(IProjectDefinition definition) => definition.AutoSaveFileName;
+        public string GetAutoSavePath(IProjectDefinition definition)
+        {
+            return definition.AutoSaveFileName;
+        }
 
-        public string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition) =>
-            definition.AutoSaveFileName;
+        public string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition)
+        {
+            return definition.AutoSaveFileName;
+        }
 
-        public string GetProjectFolder(IProjectDefinition definition) => definition.ProjectFolderName;
+        public string GetProjectFolder(IProjectDefinition definition)
+        {
+            return definition.ProjectFolderName;
+        }
 
-        public string GetProjectFolder<TProject>(ProjectDefinition<TProject> definition) =>
-            definition.ProjectFolderName;
+        public string GetProjectFolder<TProject>(ProjectDefinition<TProject> definition)
+        {
+            return definition.ProjectFolderName;
+        }
 
         public object CreateNew(IProjectDefinition definition)
         {
@@ -202,34 +217,44 @@ public sealed class ProjectAutosaveCoordinatorTests
             return new TestProject(3);
         }
 
-        public TProject CreateNew<TProject>(ProjectDefinition<TProject> definition) =>
-            definition.CreateProject();
+        public TProject CreateNew<TProject>(ProjectDefinition<TProject> definition)
+        {
+            return definition.CreateProject();
+        }
 
         public Task SaveAsync<TProject>(
             string path,
             TProject project,
-            CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
+            CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
 
         public Task<TProject> LoadAsync<TProject>(
             string path,
-            CancellationToken cancellationToken = default) =>
-            Task.FromException<TProject>(new FileNotFoundException());
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromException<TProject>(new FileNotFoundException());
+        }
 
         public Task<object> LoadAsync(
             IProjectDefinition definition,
             string path,
-            CancellationToken cancellationToken = default) =>
-            LoadedProject is null
+            CancellationToken cancellationToken = default)
+        {
+            return LoadedProject is null
                 ? Task.FromException<object>(new FileNotFoundException())
                 : Task.FromResult<object>(LoadedProject);
+        }
 
         public Task AutoSaveAsync<TProject>(
             ProjectDefinition<TProject> definition,
             TProject project,
             IEnumerable<string>? additionalPaths = null,
-            CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
+            CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
 
         public Task AutoSaveAsync(
             IProjectDefinition definition,
@@ -247,8 +272,10 @@ public sealed class ProjectAutosaveCoordinatorTests
             ProjectDefinition<TProject> definition,
             TProject project,
             string? suggestedFileName = null,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult<string?>(null);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<string?>(null);
+        }
 
         public Task<string?> SaveAsAsync(
             IProjectDefinition definition,
@@ -263,8 +290,10 @@ public sealed class ProjectAutosaveCoordinatorTests
 
         public Task<ProjectOpenResult<TProject>?> OpenAsync<TProject>(
             ProjectDefinition<TProject> definition,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult<ProjectOpenResult<TProject>?>(null);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<ProjectOpenResult<TProject>?>(null);
+        }
 
         public Task<ProjectOpenResult?> OpenAsync(
             IProjectDefinition definition,

@@ -6,5 +6,8 @@ namespace Mapping_Tools.Desktop.Views.Dialogs;
 public sealed partial class PatternGalleryDetailsDialogWindow : Window
 {
     /// <summary>Creates the compiled Pattern Gallery details window.</summary>
-    public PatternGalleryDetailsDialogWindow() => InitializeComponent();
+    public PatternGalleryDetailsDialogWindow()
+    {
+        InitializeComponent();
+    }
 }

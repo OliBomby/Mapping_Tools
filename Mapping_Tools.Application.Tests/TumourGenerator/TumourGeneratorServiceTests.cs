@@ -1,9 +1,7 @@
-using FluentAssertions;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.TumourGenerator;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Tools.TumourGenerating;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.TumourGenerator;
@@ -19,7 +17,7 @@ public sealed class TumourGeneratorServiceTests
         TumourGeneratorService service = new(gateway);
 
         // Act
-        TumourImportResult result = await service.ImportAsync(
+        var result = await service.ImportAsync(
             "map.osu",
             TumourImportMode.Selected,
             null);
@@ -34,11 +32,11 @@ public sealed class TumourGeneratorServiceTests
     public async Task ImportAsync_WhenSelectionContainsNoSliders_ReturnsEmptyState()
     {
         // Arrange
-        FakeEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor, selectedSlider: false));
+        FakeEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor, false));
         TumourGeneratorService service = new(gateway);
 
         // Act
-        TumourImportResult result = await service.ImportAsync(
+        var result = await service.ImportAsync(
             "map.osu",
             TumourImportMode.Selected,
             null);
@@ -58,7 +56,7 @@ public sealed class TumourGeneratorServiceTests
         project.TumourLayers[0].TumourCount = 1;
 
         // Act
-        TumourPreviewResult result = await service.PreviewAsync(input, project);
+        var result = await service.PreviewAsync(input, project);
 
         // Assert
         input.Line.Should().Be(original);
@@ -78,10 +76,10 @@ public sealed class TumourGeneratorServiceTests
         List<double> progress = [];
 
         // Act
-        TumourRunResult result = await service.RunAsync(
+        var result = await service.RunAsync(
             ["map.osu"],
             project,
-            reloadEditor: true,
+            true,
             new Progress<double>(progress.Add));
 
         // Assert
@@ -100,10 +98,10 @@ public sealed class TumourGeneratorServiceTests
         TumourGeneratorService service = new(gateway);
 
         // Act
-        TumourRunResult result = await service.RunAsync(
+        var result = await service.RunAsync(
             ["map.osu"],
             new TumourGeneratorProject(),
-            reloadEditor: true);
+            true);
 
         // Assert
         result.EditorReloaded.Should().BeFalse();
@@ -123,7 +121,7 @@ public sealed class TumourGeneratorServiceTests
         Func<Task> act = () => service.RunAsync(
             ["map.osu"],
             new TumourGeneratorProject(),
-            reloadEditor: false,
+            false,
             cancellationToken: cancellation.Token);
 
         // Assert
@@ -174,10 +172,10 @@ public sealed class TumourGeneratorServiceTests
             "",
             "[HitObjects]",
             "64,64,0,2,0,L|164:64,1,100",
-            "128,128,500,1,0,0:0:0:0:"
+            "128,128,500,1,0,0:0:0:0:",
         ];
         BeatmapEditor2 editor = new(lines, new MemoryTextFileStore());
-        HitObject slider = editor.Beatmap.HitObjects[0];
+        var slider = editor.Beatmap.HitObjects[0];
         IReadOnlyList<HitObject> selected = selectedSlider ? [slider] : [editor.Beatmap.HitObjects[1]];
         return new BeatmapEditingSession(editor, source, selected);
     }
@@ -201,14 +199,18 @@ public sealed class TumourGeneratorServiceTests
 
         public Task<StoryboardEditor2> OpenStoryboardAsync(
             string path,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task SaveAsync(
             Editor2 editor,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task SaveAsync(
             BeatmapEditingSession session,
@@ -222,7 +224,10 @@ public sealed class TumourGeneratorServiceTests
 
     private sealed class MemoryTextFileStore : ITextFileStore
     {
-        public IReadOnlyList<string> ReadAllLines(string path) => [];
+        public IReadOnlyList<string> ReadAllLines(string path)
+        {
+            return [];
+        }
 
         public void WriteAllLines(string path, IEnumerable<string> lines)
         {
@@ -232,8 +237,14 @@ public sealed class TumourGeneratorServiceTests
         {
         }
 
-        public string GetParentFolder(string path) => string.Empty;
+        public string GetParentFolder(string path)
+        {
+            return string.Empty;
+        }
 
-        public string CombinePath(string parent, string child) => child;
+        public string CombinePath(string parent, string child)
+        {
+            return child;
+        }
     }
 }

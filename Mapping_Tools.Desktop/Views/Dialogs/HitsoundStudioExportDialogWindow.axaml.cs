@@ -6,5 +6,8 @@ namespace Mapping_Tools.Desktop.Views.Dialogs;
 public sealed partial class HitsoundStudioExportDialogWindow : Window
 {
     /// <summary>Creates the export window.</summary>
-    public HitsoundStudioExportDialogWindow() => InitializeComponent();
+    public HitsoundStudioExportDialogWindow()
+    {
+        InitializeComponent();
+    }
 }

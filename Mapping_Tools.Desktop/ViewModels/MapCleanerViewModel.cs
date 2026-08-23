@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.Platform;
@@ -21,15 +20,40 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
 {
     internal const string OperationId = "map-cleaner";
     private readonly IMapCleanerService _cleaner;
-    private readonly IBeatmapWorkspace _workspace;
     private readonly ICurrentBeatmapLocator _currentBeatmap;
-    private readonly ApplicationSettings _settings;
-    private readonly IPlatformLauncher _launcher;
+
     private readonly ProjectDefinition<MapCleanerProject> _definition = new(
         "mapcleanerproject.json",
         "Map Cleaner Projects",
         () => new MapCleanerProject(),
         "map-cleaner-project.json");
+
+    private readonly IPlatformLauncher _launcher;
+    private readonly ApplicationSettings _settings;
+    private readonly IBeatmapWorkspace _workspace;
+
+    /// <summary>Creates a Map Cleaner presentation model.</summary>
+    /// <param name="cleaner">Runs framework-independent cleanup operations.</param>
+    /// <param name="execution">Coordinates cancellation, backup, and notifications.</param>
+    /// <param name="workspace">Supplies selected beatmaps for ordinary runs.</param>
+    /// <param name="currentBeatmap">Finds the beatmap open in osu! for QuickRun.</param>
+    /// <param name="settings">Supplies shared execution preferences.</param>
+    /// <param name="launcher">Navigates osu! to selected timeline markers.</param>
+    public MapCleanerViewModel(
+        IMapCleanerService cleaner,
+        IToolExecutionService execution,
+        IBeatmapWorkspace workspace,
+        ICurrentBeatmapLocator currentBeatmap,
+        ApplicationSettings settings,
+        IPlatformLauncher launcher)
+        : base(execution, OperationId)
+    {
+        _cleaner = cleaner ?? throw new ArgumentNullException(nameof(cleaner));
+        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
+    }
 
     /// <summary>Gets or sets whether slider volume changes are preserved.</summary>
     [ObservableProperty]
@@ -93,47 +117,6 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     public partial bool HasRun { get; private set; }
 
-    /// <summary>Creates a Map Cleaner presentation model.</summary>
-    /// <param name="cleaner">Runs framework-independent cleanup operations.</param>
-    /// <param name="execution">Coordinates cancellation, backup, and notifications.</param>
-    /// <param name="workspace">Supplies selected beatmaps for ordinary runs.</param>
-    /// <param name="currentBeatmap">Finds the beatmap open in osu! for QuickRun.</param>
-    /// <param name="settings">Supplies shared execution preferences.</param>
-    /// <param name="launcher">Navigates osu! to selected timeline markers.</param>
-    public MapCleanerViewModel(
-        IMapCleanerService cleaner,
-        IToolExecutionService execution,
-        IBeatmapWorkspace workspace,
-        ICurrentBeatmapLocator currentBeatmap,
-        ApplicationSettings settings,
-        IPlatformLauncher launcher)
-        : base(execution, OperationId)
-    {
-        _cleaner = cleaner ?? throw new ArgumentNullException(nameof(cleaner));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
-    }
-
-    /// <inheritdoc/>
-    protected override async Task RunCoreAsync()
-    {
-        if (_settings.AlwaysQuickRun)
-        {
-            string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
-            await RunPathsAsync(
-                string.IsNullOrWhiteSpace(path) ? [] : [path],
-                quick: true,
-                CancellationToken.None);
-            return;
-        }
-        await RunPathsAsync(
-            _workspace.SelectedPaths,
-            quick: false,
-            CancellationToken.None);
-    }
-
     /// <summary>Cleans the beatmap currently open in osu! through the QuickRun path.</summary>
     /// <param name="cancellationToken">Cancels beatmap discovery or cleanup.</param>
     /// <returns>A task that completes after QuickRun finishes.</returns>
@@ -148,9 +131,42 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
 
     string IQuickRun.OperationId => OperationId;
 
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+
+    object IShellProjectFeature.Snapshot()
+    {
+        return Snapshot();
+    }
+
+    void IShellProjectFeature.Install(object project)
+    {
+        Install((MapCleanerProject)project);
+    }
+
+    /// <inheritdoc />
+    protected override async Task RunCoreAsync()
+    {
+        if (_settings.AlwaysQuickRun)
+        {
+            string? path = await _currentBeatmap.FindCurrentBeatmapAsync();
+            await RunPathsAsync(
+                string.IsNullOrWhiteSpace(path) ? [] : [path],
+                true,
+                CancellationToken.None);
+            return;
+        }
+
+        await RunPathsAsync(
+            _workspace.SelectedPaths,
+            false,
+            CancellationToken.None);
+    }
+
     [RelayCommand]
-    private Task NavigateAsync(double time) =>
-        _launcher.OpenUriAsync(new Uri($"osu://edit/{Math.Round(time)}"));
+    private Task NavigateAsync(double time)
+    {
+        return _launcher.OpenUriAsync(new Uri($"osu://edit/{Math.Round(time)}"));
+    }
 
     private async Task RunPathsAsync(IReadOnlyList<string> paths, bool quick, CancellationToken cancellationToken)
     {
@@ -160,9 +176,9 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
             return;
         }
 
-        MapCleanerOptions options = Snapshot().MapCleanerArgs;
+        var options = Snapshot().MapCleanerArgs;
 
-        ToolExecutionResult<MapCleanerResult> execution = await Execution.ExecuteAsync(
+        var execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<MapCleanerResult>(
                 OperationId,
                 "Map Cleaner",
@@ -170,7 +186,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
                 {
                     Progress<double> progress = new(value =>
                         context.ReportProgress(value, "Cleaning beatmaps"));
-                    MapCleanerResult result = await _cleaner.CleanAsync(
+                    var result = await _cleaner.CleanAsync(
                         paths,
                         options,
                         progress,
@@ -178,7 +194,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
                     return new ToolExecutionOutput<MapCleanerResult>(
                         result,
                         quick ? null : Summarize(result, options),
-                        reloadEditor: quick);
+                        quick);
                 }),
             CreateProgress(),
             cancellationToken);
@@ -191,35 +207,30 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
         }
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
-
-    object IShellProjectFeature.Snapshot() => Snapshot();
-
-    void IShellProjectFeature.Install(object project) =>
-        Install((MapCleanerProject)project);
-
-    private MapCleanerProject Snapshot() => new()
+    private MapCleanerProject Snapshot()
     {
-        MapCleanerArgs = new MapCleanerOptions
+        return new MapCleanerProject
         {
-            VolumeSliders = VolumeSliders,
-            SampleSetSliders = SampleSetSliders,
-            VolumeSpinners = VolumeSpinners,
-            ResnapObjects = ResnapObjects,
-            ResnapBookmarks = ResnapBookmarks,
-            AnalyzeSamples = AnalyzeSamples,
-            RemoveUnusedSamples = RemoveUnusedSamples,
-            RemoveHitsounds = RemoveHitsounds,
-            RemoveMuting = RemoveMuting,
-            RemoveUnclickableHitsounds = RemoveUnclickableHitsounds,
-            BeatDivisors = BeatDivisors.ToArray()
-        }
-    };
+            MapCleanerArgs = new MapCleanerOptions
+            {
+                VolumeSliders = VolumeSliders,
+                SampleSetSliders = SampleSetSliders,
+                VolumeSpinners = VolumeSpinners,
+                ResnapObjects = ResnapObjects,
+                ResnapBookmarks = ResnapBookmarks,
+                AnalyzeSamples = AnalyzeSamples,
+                RemoveUnusedSamples = RemoveUnusedSamples,
+                RemoveHitsounds = RemoveHitsounds,
+                RemoveMuting = RemoveMuting,
+                RemoveUnclickableHitsounds = RemoveUnclickableHitsounds,
+                BeatDivisors = BeatDivisors.ToArray(),
+            },
+        };
+    }
 
     private void Install(MapCleanerProject project)
     {
-        MapCleanerOptions options = project?.MapCleanerArgs ??
-            throw new InvalidDataException("Map Cleaner project is incomplete.");
+        var options = project?.MapCleanerArgs ?? throw new InvalidDataException("Map Cleaner project is incomplete.");
         VolumeSliders = options.VolumeSliders;
         SampleSetSliders = options.SampleSetSliders;
         VolumeSpinners = options.VolumeSpinners;
@@ -233,8 +244,9 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
         BeatDivisors = options.BeatDivisors.ToArray();
     }
 
-    private static IReadOnlyList<TimelineMarker> CreateMarkers(MapCleanerResult result) =>
-        result.TimingPointsAdded
+    private static IReadOnlyList<TimelineMarker> CreateMarkers(MapCleanerResult result)
+    {
+        return result.TimingPointsAdded
             .Select(time => new TimelineMarker(
                 time,
                 TimelineMarkerKind.Added,
@@ -249,19 +261,19 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
                 "Greenline removed")))
             .OrderBy(marker => marker.Time)
             .ToArray();
+    }
 
-    private static string Summarize(MapCleanerResult result, MapCleanerOptions options) =>
-        $"Successfully {(result.TimingPointsRemoved < 0 ? "added" : "removed")} " +
-        $"{Math.Abs(result.TimingPointsRemoved)} " +
-        $"{(Math.Abs(result.TimingPointsRemoved) == 1 ? "greenline" : "greenlines")}" +
-        (options.ResnapObjects
-            ? $" and resnapped {result.ObjectsResnapped} " +
-              $"{(result.ObjectsResnapped == 1 ? "object" : "objects")}"
-            : string.Empty) +
-        (options.RemoveUnusedSamples
-            ? $" and removed {result.SamplesRemoved} unused " +
-              $"{(result.SamplesRemoved == 1 ? "sample" : "samples")}"
-            : string.Empty) +
-        "!";
-
+    private static string Summarize(MapCleanerResult result, MapCleanerOptions options)
+    {
+        return $"Successfully {(result.TimingPointsRemoved < 0 ? "added" : "removed")} "
+               + $"{Math.Abs(result.TimingPointsRemoved)} "
+               + $"{(Math.Abs(result.TimingPointsRemoved) == 1 ? "greenline" : "greenlines")}"
+               + (options.ResnapObjects
+                   ? $" and resnapped {result.ObjectsResnapped} " + $"{(result.ObjectsResnapped == 1 ? "object" : "objects")}"
+                   : string.Empty)
+               + (options.RemoveUnusedSamples
+                   ? $" and removed {result.SamplesRemoved} unused " + $"{(result.SamplesRemoved == 1 ? "sample" : "samples")}"
+                   : string.Empty)
+               + "!";
+    }
 }

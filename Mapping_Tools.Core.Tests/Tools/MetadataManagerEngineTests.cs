@@ -11,7 +11,7 @@ public sealed class MetadataManagerEngineTests
     public void Apply_WithConfiguredMetadata_PreservesMapContentAndWritesMetadata()
     {
         // Arrange
-        Beatmap beatmap = Load("standard-feature-rich.osu");
+        var beatmap = Load("standard-feature-rich.osu");
         int timingPointCount = beatmap.BeatmapTiming.TimingPoints.Count;
         int hitObjectCount = beatmap.HitObjects.Count;
         MetadataManagerOptions options = new()
@@ -25,7 +25,7 @@ public sealed class MetadataManagerEngineTests
             Tags = "wave zero metadata fixture wave",
             PreviewTime = 12345,
             ResetIds = true,
-            ComboColours = [new ComboColour(RgbaColour.FromRgb(255, 51, 102))]
+            ComboColours = [new ComboColour(RgbaColour.FromRgb(255, 51, 102))],
         };
 
         // Act
@@ -50,10 +50,10 @@ public sealed class MetadataManagerEngineTests
     public void Read_WithBeatmap_ReturnsIndependentMetadataAndColours()
     {
         // Arrange
-        Beatmap beatmap = Load("standard-feature-rich.osu");
+        var beatmap = Load("standard-feature-rich.osu");
 
         // Act
-        MetadataManagerOptions options = MetadataManagerEngine.Read(beatmap);
+        var options = MetadataManagerEngine.Read(beatmap);
         options.ComboColours[0].Color = RgbaColour.FromRgb(1, 2, 3);
 
         // Assert
@@ -63,6 +63,9 @@ public sealed class MetadataManagerEngineTests
         beatmap.ComboColours[0].Color.Should().NotBe(RgbaColour.FromRgb(1, 2, 3));
     }
 
-    private static Beatmap Load(string fileName) => new(
-        File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", fileName)).ToList());
+    private static Beatmap Load(string fileName)
+    {
+        return new Beatmap(
+            File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", fileName)).ToList());
+    }
 }

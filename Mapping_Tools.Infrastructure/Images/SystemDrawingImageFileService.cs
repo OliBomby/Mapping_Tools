@@ -8,14 +8,14 @@ namespace Mapping_Tools.Infrastructure.Images;
 
 /// <summary>Decodes local images through the Windows bitmap codecs at the infrastructure boundary.</summary>
 /// <remarks>
-/// This is the explicitly Windows-specific adapter for the portable
-/// <see cref="IImageFileService"/> contract. Core and Application consume only
-/// <see cref="RgbaImage"/>; a non-Windows decoder can replace this registration
-/// without changing the feature layers.
+///     This is the explicitly Windows-specific adapter for the portable
+///     <see cref="IImageFileService" /> contract. Core and Application consume only
+///     <see cref="RgbaImage" />; a non-Windows decoder can replace this registration
+///     without changing the feature layers.
 /// </remarks>
 public sealed class SystemDrawingImageFileService : IImageFileService
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task<RgbaImage> LoadAsync(string path, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
@@ -25,7 +25,7 @@ public sealed class SystemDrawingImageFileService : IImageFileService
             using Bitmap bitmap = new(path);
             byte[] pixels = new byte[checked(bitmap.Width * bitmap.Height * 4)];
             Rectangle bounds = new(0, 0, bitmap.Width, bitmap.Height);
-            BitmapData data = bitmap.LockBits(bounds, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            var data = bitmap.LockBits(bounds, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
             try
             {
                 int rowLength = bitmap.Width * 4;
@@ -52,10 +52,11 @@ public sealed class SystemDrawingImageFileService : IImageFileService
             {
                 bitmap.UnlockBits(data);
             }
+
             return Task.FromResult(new RgbaImage(bitmap.Width, bitmap.Height, pixels));
         }
         catch (Exception exception) when (exception is ArgumentException or
-            System.Runtime.InteropServices.ExternalException or IOException or OutOfMemoryException)
+                                              ExternalException or IOException or OutOfMemoryException)
         {
             throw new InvalidDataException("Not a valid image file.", exception);
         }

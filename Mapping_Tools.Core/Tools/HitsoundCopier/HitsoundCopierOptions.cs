@@ -16,7 +16,7 @@ public enum HitsoundCopierSelectionMode
     Time,
 
     /// <summary>Uses every object in the source beatmap.</summary>
-    Everything
+    Everything,
 }
 
 /// <summary>Stores the source, target, matching, and hitsound-copy settings.</summary>
@@ -85,14 +85,14 @@ public class HitsoundCopierOptions
     [
         new RationalBeatDivisor(1), new RationalBeatDivisor(4), new RationalBeatDivisor(3),
         new RationalBeatDivisor(8), new RationalBeatDivisor(6), new RationalBeatDivisor(16),
-        new RationalBeatDivisor(12)
+        new RationalBeatDivisor(12),
     ];
 
     /// <summary>Gets or sets beat divisors classified as muted by the filter.</summary>
     public IBeatDivisor[] MutedDivisors { get; set; } =
     [
         new RationalBeatDivisor(4), new RationalBeatDivisor(3), new RationalBeatDivisor(8),
-        new RationalBeatDivisor(6), new RationalBeatDivisor(16), new RationalBeatDivisor(12)
+        new RationalBeatDivisor(6), new RationalBeatDivisor(16), new RationalBeatDivisor(12),
     ];
 
     /// <summary>Gets or sets the minimum slider duration in beats eligible for muting.</summary>

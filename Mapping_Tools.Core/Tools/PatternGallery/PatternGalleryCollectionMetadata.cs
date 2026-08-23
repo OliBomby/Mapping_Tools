@@ -4,8 +4,8 @@ using Newtonsoft.Json;
 namespace Mapping_Tools.Core.Tools.PatternGallery;
 
 /// <summary>
-/// Persists the collection-folder identity needed to resolve pattern files.
-/// Filesystem operations are implemented by Infrastructure.
+///     Persists the collection-folder identity needed to resolve pattern files.
+///     Filesystem operations are implemented by Infrastructure.
 /// </summary>
 public sealed class PatternGalleryCollectionMetadata
 {
@@ -16,8 +16,8 @@ public sealed class PatternGalleryCollectionMetadata
     public string CollectionFolderName { get; set; } = RNG.RandomString(20);
 
     /// <summary>
-    /// Gets or sets the configured root used only by compatibility callers;
-    /// this property is never persisted in a project document.
+    ///     Gets or sets the configured root used only by compatibility callers;
+    ///     this property is never persisted in a project document.
     /// </summary>
     [JsonIgnore]
     public string BasePath { get; set; } = string.Empty;

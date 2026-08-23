@@ -1,5 +1,4 @@
 using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Tools.SliderMerger;
 
 namespace Mapping_Tools.Application.SliderMerger;
@@ -16,7 +15,7 @@ public sealed class SliderMergerService : ISliderMergerService
         _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<SliderMergerResult> MergeAsync(
         IReadOnlyList<string> paths,
         SliderMergerOptions options,
@@ -25,18 +24,10 @@ public sealed class SliderMergerService : ISliderMergerService
     {
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(options);
-        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace))
-        {
-            throw new ArgumentException("Select at least one beatmap.", nameof(paths));
-        }
+        if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
 
-        if (!Enum.IsDefined(options.ImportModeSetting) ||
-            !Enum.IsDefined(options.ConnectionModeSetting) ||
-            !double.IsFinite(options.Leniency) ||
-            options.Leniency < 0)
-        {
+        if (!Enum.IsDefined(options.ImportModeSetting) || !Enum.IsDefined(options.ConnectionModeSetting) || !double.IsFinite(options.Leniency) || options.Leniency < 0)
             throw new ArgumentException("Slider Merger contains invalid settings.", nameof(options));
-        }
 
         List<string> processedPaths = [];
         int objectsMerged = 0;
@@ -45,13 +36,13 @@ public sealed class SliderMergerService : ISliderMergerService
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
             // Get the current beatmap if the selection mode is 'Selected' because otherwise the selection would always fail
-            LiveBeatmapPreference preference = options.ImportModeSetting == SliderMergerImportMode.Selected
+            var preference = options.ImportModeSetting == SliderMergerImportMode.Selected
                 ? LiveBeatmapPreference.RequireLive
                 : LiveBeatmapPreference.PreferLive;
-            BeatmapEditingSession session = await _editingGateway
+            var session = await _editingGateway
                 .OpenBeatmapAsync(path, preference, cancellationToken)
                 .ConfigureAwait(false);
-            IReadOnlyList<HitObject> markedObjects = BeatmapObjectSelection.Select(
+            var markedObjects = BeatmapObjectSelection.Select(
                 session,
                 options.ImportModeSetting,
                 SliderMergerImportMode.Selected,
@@ -59,7 +50,7 @@ public sealed class SliderMergerService : ISliderMergerService
                 SliderMergerImportMode.Time,
                 SliderMergerImportMode.Everything,
                 options.TimeCode);
-            Progress<double>? mapProgress = progress is null
+            var mapProgress = progress is null
                 ? null
                 : new Progress<double>(value => progress.Report((index * 100 + value) / paths.Count));
             objectsMerged += SliderMergerEngine.Merge(

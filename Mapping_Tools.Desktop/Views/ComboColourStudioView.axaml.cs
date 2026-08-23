@@ -17,11 +17,8 @@ public partial class ComboColourStudioView : UserControl
 
     private void AddColourPointButtonPointerPressed(object? sender, PointerPressedEventArgs eventArgs)
     {
-        if ((eventArgs.KeyModifiers & KeyModifiers.Shift) == 0 ||
-            DataContext is not ComboColourStudioViewModel viewModel)
-        {
+        if ((eventArgs.KeyModifiers & KeyModifiers.Shift) == 0 || DataContext is not ComboColourStudioViewModel viewModel)
             return;
-        }
 
         eventArgs.Handled = true;
         viewModel.AddColourPointAtEditorTimeCommand.Execute(null);
@@ -29,11 +26,8 @@ public partial class ComboColourStudioView : UserControl
 
     private void RemoveSequenceColour_OnClick(object? sender, RoutedEventArgs eventArgs)
     {
-        if (DataContext is not ComboColourStudioViewModel viewModel ||
-            sender is not Button { Tag: ObservableSpecialColour colour })
-        {
+        if (DataContext is not ComboColourStudioViewModel viewModel || sender is not Button { Tag: ObservableSpecialColour colour })
             return;
-        }
 
         viewModel.RemoveSequenceColourCommand.Execute(colour);
     }

@@ -7,13 +7,11 @@ namespace Mapping_Tools.Desktop.ViewModels.Adapters;
 /// <summary>Adapts one plain tumour layer for Desktop editing and preview refresh.</summary>
 public sealed partial class ObservableTumourLayer : ObservableObject
 {
-    private readonly TumourLayer model;
-
     /// <summary>Creates an adapter around the supplied plain layer.</summary>
     /// <param name="model">The domain layer edited by this adapter.</param>
     public ObservableTumourLayer(TumourLayer model)
     {
-        this.model = model ?? throw new ArgumentNullException(nameof(model));
+        this.Model = model ?? throw new ArgumentNullException(nameof(model));
         TumourTemplateEnum = model.TumourTemplateEnum;
         WrappingMode = model.WrappingMode;
         TumourSidedness = model.TumourSidedness;
@@ -33,7 +31,7 @@ public sealed partial class ObservableTumourLayer : ObservableObject
     }
 
     /// <summary>Gets the plain layer represented by this adapter.</summary>
-    public TumourLayer Model => model;
+    public TumourLayer Model { get; }
 
     /// <summary>Gets or sets the selected geometric template.</summary>
     [ObservableProperty]
@@ -41,7 +39,7 @@ public sealed partial class ObservableTumourLayer : ObservableObject
     public partial TumourTemplate TumourTemplateEnum { get; set; }
 
     /// <summary>Gets the configured template instance for the selected enum.</summary>
-    public ITumourTemplate TumourTemplate => model.TumourTemplate;
+    public ITumourTemplate TumourTemplate => Model.TumourTemplate;
 
     /// <summary>Gets or sets how the tumour follows the slider path.</summary>
     [ObservableProperty]
@@ -105,23 +103,88 @@ public sealed partial class ObservableTumourLayer : ObservableObject
 
     /// <summary>Creates a plain snapshot for an Application service.</summary>
     /// <returns>An independently mutable copy of this layer.</returns>
-    public TumourLayer Snapshot() => model.Copy();
+    public TumourLayer Snapshot()
+    {
+        return Model.Copy();
+    }
 
-    partial void OnTumourTemplateEnumChanged(TumourTemplate value) => model.TumourTemplateEnum = value;
+    partial void OnTumourTemplateEnumChanged(TumourTemplate value)
+    {
+        Model.TumourTemplateEnum = value;
+    }
 
-    partial void OnWrappingModeChanged(WrappingMode value) => model.WrappingMode = value;
-    partial void OnTumourSidednessChanged(TumourSidedness value) => model.TumourSidedness = value;
-    partial void OnTumourLengthChanged(GraphState value) => model.TumourLength = value;
-    partial void OnTumourScaleChanged(GraphState value) => model.TumourScale = value;
-    partial void OnTumourRotationChanged(GraphState value) => model.TumourRotation = value;
-    partial void OnTumourParameterChanged(GraphState value) => model.TumourParameter = value;
-    partial void OnTumourDistanceChanged(GraphState value) => model.TumourDistance = value;
-    partial void OnTumourCountChanged(int value) => model.TumourCount = value;
-    partial void OnTumourStartChanged(double value) => model.TumourStart = value;
-    partial void OnTumourEndChanged(double value) => model.TumourEnd = value;
-    partial void OnRandomSeedChanged(int value) => model.RandomSeed = value;
-    partial void OnRecalculateChanged(bool value) => model.Recalculate = value;
-    partial void OnUseAbsoluteRangeChanged(bool value) => model.UseAbsoluteRange = value;
-    partial void OnIsActiveChanged(bool value) => model.IsActive = value;
-    partial void OnNameChanged(string value) => model.Name = value;
+    partial void OnWrappingModeChanged(WrappingMode value)
+    {
+        Model.WrappingMode = value;
+    }
+
+    partial void OnTumourSidednessChanged(TumourSidedness value)
+    {
+        Model.TumourSidedness = value;
+    }
+
+    partial void OnTumourLengthChanged(GraphState value)
+    {
+        Model.TumourLength = value;
+    }
+
+    partial void OnTumourScaleChanged(GraphState value)
+    {
+        Model.TumourScale = value;
+    }
+
+    partial void OnTumourRotationChanged(GraphState value)
+    {
+        Model.TumourRotation = value;
+    }
+
+    partial void OnTumourParameterChanged(GraphState value)
+    {
+        Model.TumourParameter = value;
+    }
+
+    partial void OnTumourDistanceChanged(GraphState value)
+    {
+        Model.TumourDistance = value;
+    }
+
+    partial void OnTumourCountChanged(int value)
+    {
+        Model.TumourCount = value;
+    }
+
+    partial void OnTumourStartChanged(double value)
+    {
+        Model.TumourStart = value;
+    }
+
+    partial void OnTumourEndChanged(double value)
+    {
+        Model.TumourEnd = value;
+    }
+
+    partial void OnRandomSeedChanged(int value)
+    {
+        Model.RandomSeed = value;
+    }
+
+    partial void OnRecalculateChanged(bool value)
+    {
+        Model.Recalculate = value;
+    }
+
+    partial void OnUseAbsoluteRangeChanged(bool value)
+    {
+        Model.UseAbsoluteRange = value;
+    }
+
+    partial void OnIsActiveChanged(bool value)
+    {
+        Model.IsActive = value;
+    }
+
+    partial void OnNameChanged(string value)
+    {
+        Model.Name = value;
+    }
 }

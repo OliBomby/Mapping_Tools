@@ -11,7 +11,7 @@ public sealed class LayerBoundaryTests
     private static readonly string[] FrameworkNeutralProjects =
     [
         "Mapping_Tools.Core",
-        "Mapping_Tools.Application"
+        "Mapping_Tools.Application",
     ];
 
     private static readonly string[] ForbiddenSourceTokens =
@@ -34,7 +34,7 @@ public sealed class LayerBoundaryTests
         "SaveFileDialog",
         "FolderBrowserDialog",
         "CommonOpenFileDialog",
-        "MessageBox"
+        "MessageBox",
     ];
 
     private static readonly string[] ForbiddenPackagePrefixes =
@@ -46,7 +46,7 @@ public sealed class LayerBoundaryTests
         "NAudio",
         "NVorbis",
         "OggVorbisEncoder",
-        "Microsoft-WindowsAPICodePack"
+        "Microsoft-WindowsAPICodePack",
     ];
 
     [TestMethod]
@@ -54,7 +54,7 @@ public sealed class LayerBoundaryTests
     {
         // Arrange
         // Act
-        var violations = FrameworkNeutralProjects
+        string[] violations = FrameworkNeutralProjects
             .SelectMany(project => Directory.EnumerateFiles(
                 Path.Combine(RepositoryRoot, project), "*.cs", SearchOption.AllDirectories))
             .Where(path => !IsGeneratedPath(path))
@@ -70,7 +70,7 @@ public sealed class LayerBoundaryTests
     {
         // Arrange
         // Act
-        var violations = FrameworkNeutralProjects
+        string[] violations = FrameworkNeutralProjects
             .Select(project => Path.Combine(RepositoryRoot, project, $"{project}.csproj"))
             .SelectMany(FindForbiddenPackages)
             .ToArray();
@@ -86,16 +86,16 @@ public sealed class LayerBoundaryTests
         var expectedReferences = new Dictionary<string, string[]>(StringComparer.Ordinal)
         {
             ["Mapping_Tools.Core"] = [],
-            ["Mapping_Tools.Application"] = ["Mapping_Tools.Core"]
+            ["Mapping_Tools.Application"] = ["Mapping_Tools.Core"],
         };
 
         var violations = new List<string>();
 
         // Act
-        foreach (var (project, expected) in expectedReferences)
+        foreach ((string project, string[] expected) in expectedReferences)
         {
-            var projectPath = Path.Combine(RepositoryRoot, project, $"{project}.csproj");
-            var actual = XDocument.Load(projectPath)
+            string projectPath = Path.Combine(RepositoryRoot, project, $"{project}.csproj");
+            string[] actual = XDocument.Load(projectPath)
                 .Descendants("ProjectReference")
                 .Select(element => element.Attribute("Include")?.Value)
                 .Where(value => value is not null)
@@ -104,9 +104,7 @@ public sealed class LayerBoundaryTests
                 .ToArray();
 
             if (!actual.SequenceEqual(expected.Order(StringComparer.Ordinal)))
-            {
                 violations.Add($"{project}: expected [{string.Join(", ", expected)}], actual [{string.Join(", ", actual)}]");
-            }
         }
 
         // Assert
@@ -131,7 +129,7 @@ public sealed class LayerBoundaryTests
             "DllImport",
             "LibraryImport",
             "IntPtr",
-            "nint"
+            "nint",
         ];
 
         // Act
@@ -166,7 +164,7 @@ public sealed class LayerBoundaryTests
             "Onova",
             "System.Net.Http",
             "System.Diagnostics.Process",
-            "System.IO"
+            "System.IO",
         ];
         string[] forbiddenDesktopTokens = ["Onova", "System.Diagnostics.Process"];
 
@@ -174,7 +172,7 @@ public sealed class LayerBoundaryTests
         string[] violations =
         [
             .. FindDirectoryTokenViolations(applicationUpdates, forbiddenApplicationTokens),
-            .. FindDirectoryTokenViolations(desktopUpdates, forbiddenDesktopTokens)
+            .. FindDirectoryTokenViolations(desktopUpdates, forbiddenDesktopTokens),
         ];
         string infrastructureProject = Path.Combine(
             RepositoryRoot,
@@ -196,27 +194,18 @@ public sealed class LayerBoundaryTests
         string directory,
         IEnumerable<string> forbiddenTokens)
     {
-        if (!Directory.Exists(directory))
-        {
-            yield break;
-        }
+        if (!Directory.Exists(directory)) yield break;
 
         foreach (string path in Directory.EnumerateFiles(directory, "*.cs", SearchOption.AllDirectories))
         {
             string source = File.ReadAllText(path);
-            foreach (string token in forbiddenTokens.Where(source.Contains))
-            {
-                yield return $"{Path.GetRelativePath(RepositoryRoot, path)} contains forbidden token '{token}'.";
-            }
+            foreach (string token in forbiddenTokens.Where(source.Contains)) yield return $"{Path.GetRelativePath(RepositoryRoot, path)} contains forbidden token '{token}'.";
         }
     }
 
     private static IEnumerable<string> FindTokenViolations(string path, string source)
     {
-        foreach (var token in ForbiddenSourceTokens.Where(source.Contains))
-        {
-            yield return $"{Path.GetRelativePath(RepositoryRoot, path)} contains forbidden token '{token}'.";
-        }
+        foreach (string token in ForbiddenSourceTokens.Where(source.Contains)) yield return $"{Path.GetRelativePath(RepositoryRoot, path)} contains forbidden token '{token}'.";
     }
 
     private static IEnumerable<string> FindForbiddenPackages(string projectPath)
@@ -226,27 +215,22 @@ public sealed class LayerBoundaryTests
             .Select(element => element.Attribute("Include")?.Value)
             .Where(value => value is not null);
 
-        foreach (var package in packages)
-        {
+        foreach (string? package in packages)
             if (ForbiddenPackagePrefixes.Any(prefix => package!.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
-            {
                 yield return $"{Path.GetRelativePath(RepositoryRoot, projectPath)} references forbidden package '{package}'.";
-            }
-        }
     }
 
-    private static bool IsGeneratedPath(string path) =>
-        path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase) ||
-        path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase);
+    private static bool IsGeneratedPath(string path)
+    {
+        return path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase)
+               || path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase);
+    }
 
     private static string FindRepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
 
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Mapping_Tools.sln")))
-        {
-            directory = directory.Parent;
-        }
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Mapping_Tools.sln"))) directory = directory.Parent;
 
         return directory?.FullName ?? throw new DirectoryNotFoundException("Could not find Mapping_Tools.sln.");
     }

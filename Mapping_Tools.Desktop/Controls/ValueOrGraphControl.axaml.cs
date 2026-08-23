@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Data;
+using Avalonia.Interactivity;
 using Mapping_Tools.Core.Classes.Graph;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
@@ -35,29 +35,26 @@ public partial class ValueOrGraphControl : UserControl
 
     private async void OpenGraphEditor(object? sender, RoutedEventArgs eventArgs)
     {
-        if (TopLevel.GetTopLevel(this) is not Window owner)
-        {
-            return;
-        }
+        if (TopLevel.GetTopLevel(this) is not Window owner) return;
 
         GraphEditorViewModel viewModel = new(GraphState?.Clone() ?? CreateDefaultValueGraphState());
         GraphEditorWindow dialog = new(viewModel);
         bool accepted = await dialog.ShowDialog<bool>(owner);
-        if (accepted)
-        {
-            SetCurrentValue(GraphStateProperty, viewModel.GraphState.Clone());
-        }
+        if (accepted) SetCurrentValue(GraphStateProperty, viewModel.GraphState.Clone());
 
         eventArgs.Handled = true;
     }
 
-    private static CoreGraphState CreateDefaultValueGraphState() => new(
-        [
-            new GraphAnchor(new Vector2(0, 0)),
-            new GraphAnchor(new Vector2(1, 1))
-        ],
-        0,
-        0,
-        1,
-        1);
+    private static CoreGraphState CreateDefaultValueGraphState()
+    {
+        return new CoreGraphState(
+            [
+                new GraphAnchor(new Vector2(0, 0)),
+                new GraphAnchor(new Vector2(1, 1)),
+            ],
+            0,
+            0,
+            1,
+            1);
+    }
 }

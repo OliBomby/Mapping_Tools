@@ -28,7 +28,7 @@ public sealed class ProjectServiceTests
         // Act
         TestDirectories directories = new(@"C:\MappingToolsData");
         ProjectService service = new(directories, new FakeFilePicker(), new FakeProjectStore());
-        ProjectDefinition<TestProject> definition = CreateDefinition();
+        var definition = CreateDefinition();
 
         // Assert
         service.GetAutoSavePath(definition).Should().Be(Path.Combine(directories.ApplicationData, "featureproject.json"));
@@ -39,11 +39,11 @@ public sealed class ProjectServiceTests
     public void CreateNew_DefaultDefinition_UsesFeatureFactory()
     {
         // Arrange
-        ProjectService service = CreateService(new FakeFilePicker(), new FakeProjectStore());
-        ProjectDefinition<TestProject> definition = CreateDefinition();
+        var service = CreateService(new FakeFilePicker(), new FakeProjectStore());
+        var definition = CreateDefinition();
 
         // Act
-        TestProject project = service.CreateNew(definition);
+        var project = service.CreateNew(definition);
 
         // Assert
         project.Name.Should().Be("new project");
@@ -56,7 +56,7 @@ public sealed class ProjectServiceTests
         FakeProjectStore store = new();
         TestDirectories directories = new(Path.GetTempPath());
         ProjectService service = new(directories, new FakeFilePicker(), store);
-        ProjectDefinition<TestProject> definition = CreateDefinition();
+        var definition = CreateDefinition();
         string primary = service.GetAutoSavePath(definition);
         string collection = Path.Combine(directories.ApplicationData, "Collection", "project.json");
 
@@ -67,7 +67,7 @@ public sealed class ProjectServiceTests
             [collection, primary]);
 
         // Assert
-        store.SavedPaths.ToArray().Should().Equal(new[] { Path.GetFullPath(primary), Path.GetFullPath(collection) });
+        store.SavedPaths.ToArray().Should().Equal(Path.GetFullPath(primary), Path.GetFullPath(collection));
         store.SavedProjects.All(project => project.Name == "snapshot").Should().BeTrue();
     }
 
@@ -76,15 +76,15 @@ public sealed class ProjectServiceTests
     {
         // Arrange
         FakeProjectStore store = new();
-        ProjectService service = CreateService(new FakeFilePicker(), store);
+        var service = CreateService(new FakeFilePicker(), store);
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
 
         // Act
-        Func<Task> act3 = () => service.AutoSaveAsync(
-                CreateDefinition(),
-                new TestProject("cancelled"),
-                cancellationToken: cancellation.Token);
+        var act3 = () => service.AutoSaveAsync(
+            CreateDefinition(),
+            new TestProject("cancelled"),
+            cancellationToken: cancellation.Token);
 
         // Assert
         await act3.Should().ThrowAsync<OperationCanceledException>();
@@ -98,7 +98,7 @@ public sealed class ProjectServiceTests
         // Arrange
         FakeFilePicker picker = new() { SavePath = null };
         FakeProjectStore store = new();
-        ProjectService service = CreateService(picker, store);
+        var service = CreateService(picker, store);
 
         // Act
         string? path = await service.SaveAsAsync(
@@ -121,7 +121,7 @@ public sealed class ProjectServiceTests
         string selectedPath = Path.Combine(Path.GetTempPath(), "chosen.json");
         FakeFilePicker picker = new() { SavePath = selectedPath };
         FakeProjectStore store = new();
-        ProjectService service = CreateService(picker, store);
+        var service = CreateService(picker, store);
 
         // Act
         string? path = await service.SaveAsAsync(
@@ -130,7 +130,7 @@ public sealed class ProjectServiceTests
 
         // Assert
         path.Should().Be(selectedPath);
-        store.SavedPaths.ToArray().Should().Equal(new[] { selectedPath });
+        store.SavedPaths.ToArray().Should().Equal(selectedPath);
     }
 
     [TestMethod]
@@ -139,10 +139,10 @@ public sealed class ProjectServiceTests
         // Arrange
         FakeFilePicker picker = new() { OpenPaths = [] };
         FakeProjectStore store = new();
-        ProjectService service = CreateService(picker, store);
+        var service = CreateService(picker, store);
 
         // Act
-        ProjectOpenResult<TestProject>? result =
+        var result =
             await service.OpenAsync(CreateDefinition());
 
         // Assert
@@ -158,19 +158,19 @@ public sealed class ProjectServiceTests
         FakeFilePicker picker = new() { OpenPaths = [selectedPath] };
         FakeProjectStore store = new()
         {
-            ProjectToLoad = new TestProject("loaded")
+            ProjectToLoad = new TestProject("loaded"),
         };
-        ProjectService service = CreateService(picker, store);
+        var service = CreateService(picker, store);
 
         // Act
-        ProjectOpenResult<TestProject>? result =
+        var result =
             await service.OpenAsync(CreateDefinition());
 
         // Assert
         result.Should().NotBeNull();
         result.Path.Should().Be(selectedPath);
         result.Project.Name.Should().Be("loaded");
-        store.LoadedPaths.ToArray().Should().Equal(new[] { selectedPath });
+        store.LoadedPaths.ToArray().Should().Equal(selectedPath);
         (picker.LastOpenRequest?.AllowMultiple).Should().Be(false);
     }
 
@@ -233,10 +233,7 @@ public sealed class ProjectServiceTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             SavedPaths.Add(path);
-            if (project is TestProject testProject)
-            {
-                SavedProjects.Add(testProject);
-            }
+            if (project is TestProject testProject) SavedProjects.Add(testProject);
 
             return Task.CompletedTask;
         }
@@ -253,12 +250,6 @@ public sealed class ProjectServiceTests
 
     private sealed class FakeFilePicker : IFilePicker
     {
-        public bool CanOpenFiles => true;
-
-        public bool CanSaveFiles => true;
-
-        public bool CanPickFolders => true;
-
         public string? SavePath { get; init; }
 
         public IReadOnlyList<string> OpenPaths { get; init; } = [];
@@ -266,6 +257,11 @@ public sealed class ProjectServiceTests
         public SaveFilePickerRequest? LastSaveRequest { get; private set; }
 
         public OpenFilePickerRequest? LastOpenRequest { get; private set; }
+        public bool CanOpenFiles => true;
+
+        public bool CanSaveFiles => true;
+
+        public bool CanPickFolders => true;
 
         public Task<IReadOnlyList<string>> PickOpenFilesAsync(
             OpenFilePickerRequest request,

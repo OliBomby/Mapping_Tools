@@ -2,47 +2,49 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Text;
 using Avalonia.Controls.Primitives;
-using Material.Icons;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.QuickRun;
-using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Desktop.Services;
+using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Updates;
+using Material.Icons;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Coordinates explicit feature discovery, navigation, favorites, activation,
-/// and the shell notification queue.
+///     Coordinates explicit feature discovery, navigation, favorites, activation,
+///     and the shell notification queue.
 /// </summary>
 public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
     private static readonly Uri WebsiteUri = new("https://mappingtools.github.io");
     private static readonly Uri GitHubUri = new("https://github.com/OliBomby/Mapping_Tools");
     private static readonly Uri DonateUri = new("https://ko-fi.com/olibomby");
-    private readonly IShellFeatureRegistry _registry;
-    private readonly IQuickRunCommandRegistry _quickRunRegistry;
-    private readonly ApplicationSettings _settings;
-    private readonly IUserNotificationService _notifications;
-    private readonly IPlatformLauncher _launcher;
-    private readonly IUiDispatcher _dispatcher;
     private readonly IBetterSaveService _betterSave;
     private readonly IDialogService _dialogs;
-    private readonly ProjectAutosaveCoordinator _projectCoordinator;
-    private readonly IUpdaterInteractionService? _updaterInteraction;
+    private readonly IUiDispatcher _dispatcher;
+
     private readonly Dictionary<string, ObservableObject> _featureViewModels =
         new(StringComparer.OrdinalIgnoreCase);
-    private string _searchText = string.Empty;
+
+    private readonly IPlatformLauncher _launcher;
+    private readonly IUserNotificationService _notifications;
+    private readonly ProjectAutosaveCoordinator _projectCoordinator;
+    private readonly IQuickRunCommandRegistry _quickRunRegistry;
+    private readonly IShellFeatureRegistry _registry;
+    private readonly ApplicationSettings _settings;
+    private readonly IUpdaterInteractionService? _updaterInteraction;
     private bool _disposed;
+    private string _searchText = string.Empty;
 
     /// <summary>
-    /// Creates the desktop shell and activates the first explicit registration.
+    ///     Creates the desktop shell and activates the first explicit registration.
     /// </summary>
     /// <param name="registry">Supplies explicitly registered features in navigation order.</param>
     /// <param name="quickRunRegistry">Tracks the command for the active QuickRun-capable feature.</param>
@@ -54,7 +56,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <param name="betterSave">Saves the current live editor state through the shared safety gateway.</param>
     /// <param name="dialogs">Presents shell-owned information dialogs.</param>
     /// <param name="projectCoordinator">Owns project menus and feature autosave lifecycle.</param>
-    /// <param name="updaterInteraction">Shows update decisions and owns update shutdown interaction when supplied by runtime composition.</param>
+    /// <param name="updaterInteraction">
+    ///     Shows update decisions and owns update shutdown interaction when supplied by runtime
+    ///     composition.
+    /// </param>
     public MainViewModel(
         IShellFeatureRegistry registry,
         IQuickRunCommandRegistry quickRunRegistry,
@@ -69,8 +74,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         IUpdaterInteractionService? updaterInteraction = null)
     {
         _registry = registry ?? throw new ArgumentNullException(nameof(registry));
-        _quickRunRegistry = quickRunRegistry ??
-            throw new ArgumentNullException(nameof(quickRunRegistry));
+        _quickRunRegistry = quickRunRegistry ?? throw new ArgumentNullException(nameof(quickRunRegistry));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
@@ -78,8 +82,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         Workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         _betterSave = betterSave ?? throw new ArgumentNullException(nameof(betterSave));
         _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
-        _projectCoordinator = projectCoordinator ??
-            throw new ArgumentNullException(nameof(projectCoordinator));
+        _projectCoordinator = projectCoordinator ?? throw new ArgumentNullException(nameof(projectCoordinator));
         _updaterInteraction = updaterInteraction;
 
         FeatureItems = registry.Features
@@ -105,12 +108,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public ObservableCollection<ShellFeatureItemViewModel> VisibleFeatures { get; }
 
     /// <summary>
-    /// Gets the visible feature rows interleaved with inert section-divider markers.
+    ///     Gets the visible feature rows interleaved with inert section-divider markers.
     /// </summary>
     public ObservableCollection<object> NavigationEntries { get; }
 
     /// <summary>
-    /// Gets or sets the selected navigation item and activates its registered feature.
+    ///     Gets or sets the selected navigation item and activates its registered feature.
     /// </summary>
     [ObservableProperty]
     public partial ShellFeatureItemViewModel? SelectedFeature { get; set; }
@@ -135,15 +138,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         set
         {
             string normalized = value ?? string.Empty;
-            if (_searchText == normalized)
-            {
-                return;
-            }
+            if (_searchText == normalized) return;
 
-            if (SetProperty(ref _searchText, normalized))
-            {
-                RefreshVisibleFeatures();
-            }
+            if (SetProperty(ref _searchText, normalized)) RefreshVisibleFeatures();
         }
     }
 
@@ -177,25 +174,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <summary>Unsubscribes the process-lifetime notification stream.</summary>
     public void Dispose()
     {
-        if (_disposed)
-        {
-            return;
-        }
+        if (_disposed) return;
 
         _disposed = true;
         _notifications.Published -= OnNotificationPublished;
-        if (CurrentFeature is IShellProjectFeature projectFeature)
-        {
-            _projectCoordinator.Deactivate(projectFeature);
-        }
-        if (CurrentFeature is IQuickRun quickRun)
-        {
-            DeactivateQuickRun(quickRun);
-        }
-        if (CurrentFeature is IShellFeatureActivation activation)
-        {
-            activation.Deactivate();
-        }
+        if (CurrentFeature is IShellProjectFeature projectFeature) _projectCoordinator.Deactivate(projectFeature);
+        if (CurrentFeature is IQuickRun quickRun) DeactivateQuickRun(quickRun);
+        if (CurrentFeature is IShellFeatureActivation activation) activation.Deactivate();
         ProjectMenuItems = [];
         OnPropertyChanged(nameof(ProjectMenuItems));
     }
@@ -204,27 +189,15 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     {
         HighlightedFeature = item;
 
-        foreach (ShellFeatureItemViewModel featureItem in FeatureItems)
-        {
-            featureItem.IsActive = ReferenceEquals(featureItem, item);
-        }
+        foreach (var featureItem in FeatureItems) featureItem.IsActive = ReferenceEquals(featureItem, item);
 
-        if (CurrentFeature is IShellFeatureActivation previous)
-        {
-            previous.Deactivate();
-        }
-        if (CurrentFeature is IShellProjectFeature previousProject)
-        {
-            _projectCoordinator.Deactivate(previousProject);
-        }
-        if (CurrentFeature is IQuickRun previousQuickRun)
-        {
-            DeactivateQuickRun(previousQuickRun);
-        }
+        if (CurrentFeature is IShellFeatureActivation previous) previous.Deactivate();
+        if (CurrentFeature is IShellProjectFeature previousProject) _projectCoordinator.Deactivate(previousProject);
+        if (CurrentFeature is IQuickRun previousQuickRun) DeactivateQuickRun(previousQuickRun);
 
-        ShellFeatureRegistration registration = _registry.Find(item.Id)
-            ?? throw new InvalidOperationException($"Feature '{item.Id}' is not registered.");
-        if (!_featureViewModels.TryGetValue(item.Id, out ObservableObject? viewModel))
+        var registration = _registry.Find(item.Id)
+                           ?? throw new InvalidOperationException($"Feature '{item.Id}' is not registered.");
+        if (!_featureViewModels.TryGetValue(item.Id, out var viewModel))
         {
             viewModel = registration.CreateViewModel();
             _featureViewModels.Add(item.Id, viewModel);
@@ -239,78 +212,70 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         Header = item.DisplayName == "Get started"
             ? "Mapping Tools"
             : $"Mapping Tools - {item.DisplayName}";
-        if (viewModel is IShellFeatureActivation current)
-        {
-            current.Activate();
-        }
-        if (viewModel is IShellProjectFeature projectFeature)
-        {
-            _projectCoordinator.Activate(projectFeature);
-        }
-        if (viewModel is IQuickRun quickRun)
-        {
-            _quickRunRegistry.SelectCurrent(quickRun.OperationId);
-        }
+        if (viewModel is IShellFeatureActivation current) current.Activate();
+        if (viewModel is IShellProjectFeature projectFeature) _projectCoordinator.Activate(projectFeature);
+        if (viewModel is IQuickRun quickRun) _quickRunRegistry.SelectCurrent(quickRun.OperationId);
     }
 
     private IReadOnlyList<ShellProjectMenuItem> CreateProjectMenuItems(ObservableObject viewModel)
     {
-        if (viewModel is not IShellProjectFeature)
-        {
-            return [];
-        }
+        if (viewModel is not IShellProjectFeature) return [];
 
         List<ShellProjectMenuItem> items =
         [
             new("_Save project", "Save tool settings to file.", SaveProjectCommand, MaterialIconKind.ContentSave),
             new("_Open project", "Load tool settings from file.", OpenProjectCommand, MaterialIconKind.Folder),
-            new("_New project", "Load the default tool settings.", NewProjectCommand, MaterialIconKind.RocketLaunch)
+            new("_New project", "Load the default tool settings.", NewProjectCommand, MaterialIconKind.RocketLaunch),
         ];
-        if (viewModel is IShellExtraProjectMenuFeature extra)
-        {
-            items.AddRange(extra.ExtraProjectMenuItems);
-        }
+        if (viewModel is IShellExtraProjectMenuFeature extra) items.AddRange(extra.ExtraProjectMenuItems);
 
         return items;
     }
 
     partial void OnSelectedFeatureChanged(ShellFeatureItemViewModel? value)
     {
-        if (value is not null)
-        {
-            Activate(value);
-        }
+        if (value is not null) Activate(value);
     }
 
     [RelayCommand]
-    private Task OpenWebsiteAsync() =>
-        OpenUriAsync(WebsiteUri, "website");
+    private Task OpenWebsiteAsync()
+    {
+        return OpenUriAsync(WebsiteUri, "website");
+    }
 
     [RelayCommand]
-    private Task CheckForUpdatesAsync() =>
-        _updaterInteraction?.CheckForUpdatesAsync(
-            allowSkippedVersion: false,
-            notifyUser: true)
-        ?? Task.CompletedTask;
+    private Task CheckForUpdatesAsync()
+    {
+        return _updaterInteraction?.CheckForUpdatesAsync(
+                   false,
+                   true)
+               ?? Task.CompletedTask;
+    }
 
-    internal Task CheckForUpdatesOnStartupAsync() =>
-        _updaterInteraction?.CheckForUpdatesAsync(
-            allowSkippedVersion: true,
-            notifyUser: false)
-        ?? Task.CompletedTask;
+    internal Task CheckForUpdatesOnStartupAsync()
+    {
+        return _updaterInteraction?.CheckForUpdatesAsync(
+                   true,
+                   false)
+               ?? Task.CompletedTask;
+    }
 
     [RelayCommand]
-    private Task OpenGitHubAsync() =>
-        OpenUriAsync(GitHubUri, "source repository");
+    private Task OpenGitHubAsync()
+    {
+        return OpenUriAsync(GitHubUri, "source repository");
+    }
 
     [RelayCommand]
-    private Task OpenDonateAsync() =>
-        OpenUriAsync(DonateUri, "donation page");
+    private Task OpenDonateAsync()
+    {
+        return OpenUriAsync(DonateUri, "donation page");
+    }
 
     [RelayCommand]
     private async Task OpenAboutAsync()
     {
-        Version? version = Assembly.GetEntryAssembly()?.GetName().Version;
+        var version = Assembly.GetEntryAssembly()?.GetName().Version;
         StringBuilder message = new();
         message.AppendLine($"Mapping Tools {version}");
         message.AppendLine();
@@ -339,110 +304,100 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         await _dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
             "Info",
             message.ToString(),
-            [new DialogChoice<bool>("OK", true, IsDefault: true, IsCancel: true)],
+            [new DialogChoice<bool>("OK", true, true, true)],
             true));
     }
 
     [RelayCommand]
-    private Task BetterSaveAsync() => _betterSave.ExecuteAsync();
+    private Task BetterSaveAsync()
+    {
+        return _betterSave.ExecuteAsync();
+    }
 
-    private bool CanUseProjectActions() =>
-        CurrentFeature is IShellProjectFeature;
+    private bool CanUseProjectActions()
+    {
+        return CurrentFeature is IShellProjectFeature;
+    }
 
     private void DeactivateQuickRun(IQuickRun quickRun)
     {
-        if (_quickRunRegistry.CurrentCommandId == quickRun.OperationId)
-        {
-            _quickRunRegistry.SelectCurrent(null);
-        }
+        if (_quickRunRegistry.CurrentCommandId == quickRun.OperationId) _quickRunRegistry.SelectCurrent(null);
     }
 
     [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
-    private Task SaveProjectAsync() =>
-        CurrentFeature is IShellProjectFeature feature
+    private Task SaveProjectAsync()
+    {
+        return CurrentFeature is IShellProjectFeature feature
             ? _projectCoordinator.SaveAsync(feature)
             : Task.CompletedTask;
+    }
 
     [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
-    private Task OpenProjectAsync() =>
-        CurrentFeature is IShellProjectFeature feature
+    private Task OpenProjectAsync()
+    {
+        return CurrentFeature is IShellProjectFeature feature
             ? _projectCoordinator.OpenAsync(feature)
             : Task.CompletedTask;
+    }
 
     [RelayCommand(CanExecute = nameof(CanUseProjectActions))]
-    private Task NewProjectAsync() =>
-        CurrentFeature is IShellProjectFeature feature
+    private Task NewProjectAsync()
+    {
+        return CurrentFeature is IShellProjectFeature feature
             ? _projectCoordinator.NewAsync(feature)
             : Task.CompletedTask;
+    }
 
     private void ToggleFavorite(ShellFeatureItemViewModel item)
     {
         item.IsFavorite = !item.IsFavorite;
-        _settings.FavoriteTools.RemoveAll(
-            id => id.Equals(item.Id, StringComparison.OrdinalIgnoreCase));
-        if (item.IsFavorite)
-        {
-            _settings.FavoriteTools.Add(item.Id);
-        }
+        _settings.FavoriteTools.RemoveAll(id => id.Equals(item.Id, StringComparison.OrdinalIgnoreCase));
+        if (item.IsFavorite) _settings.FavoriteTools.Add(item.Id);
 
         RefreshVisibleFeatures();
     }
 
     private void RefreshVisibleFeatures()
     {
-        ShellFeatureItemViewModel[] matches = FeatureItems
+        var matches = FeatureItems
             .Where(MatchesSearch)
             .ToArray();
-        ShellFeatureItemViewModel[] foundational = matches
+        var foundational = matches
             .Where(item => !item.Category.Equals("Tools", StringComparison.OrdinalIgnoreCase))
             .OrderBy(item => item.Order)
             .ToArray();
-        ShellFeatureItemViewModel[] favorites = matches
+        var favorites = matches
             .Where(item =>
-                item.Category.Equals("Tools", StringComparison.OrdinalIgnoreCase) &&
-                item.IsFavorite)
+                item.Category.Equals("Tools", StringComparison.OrdinalIgnoreCase) && item.IsFavorite)
             .OrderBy(item => item.Order)
             .ToArray();
-        ShellFeatureItemViewModel[] tools = matches
+        var tools = matches
             .Where(item =>
-                item.Category.Equals("Tools", StringComparison.OrdinalIgnoreCase) &&
-                !item.IsFavorite)
+                item.Category.Equals("Tools", StringComparison.OrdinalIgnoreCase) && !item.IsFavorite)
             .OrderBy(item => item.Order)
             .ToArray();
 
         VisibleFeatures.Clear();
-        foreach (ShellFeatureItemViewModel item in foundational.Concat(favorites).Concat(tools))
-        {
-            VisibleFeatures.Add(item);
-        }
+        foreach (var item in foundational.Concat(favorites).Concat(tools)) VisibleFeatures.Add(item);
 
         NavigationEntries.Clear();
-        AddNavigationSection(foundational, includeDivider: false);
+        AddNavigationSection(foundational, false);
         AddNavigationSection(favorites, foundational.Length > 0);
         AddNavigationSection(tools, foundational.Length + favorites.Length > 0);
 
-        if (HighlightedFeature is null || !VisibleFeatures.Contains(HighlightedFeature))
-        {
-            HighlightedFeature = VisibleFeatures.FirstOrDefault();
-        }
+        if (HighlightedFeature is null || !VisibleFeatures.Contains(HighlightedFeature)) HighlightedFeature = VisibleFeatures.FirstOrDefault();
     }
 
     private bool MatchesSearch(ShellFeatureItemViewModel item)
     {
-        if (string.IsNullOrWhiteSpace(SearchText))
-        {
-            return true;
-        }
+        if (string.IsNullOrWhiteSpace(SearchText)) return true;
 
         return item.SearchableText.Contains(SearchText.Trim(), StringComparison.CurrentCultureIgnoreCase);
     }
 
     internal void MoveHighlightedFeature(int offset)
     {
-        if (VisibleFeatures.Count == 0)
-        {
-            return;
-        }
+        if (VisibleFeatures.Count == 0) return;
 
         int currentIndex = HighlightedFeature is null
             ? -1
@@ -458,53 +413,51 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private void SelectPreviousFeature() => MoveHighlightedFeature(-1);
+    private void SelectPreviousFeature()
+    {
+        MoveHighlightedFeature(-1);
+    }
 
     [RelayCommand]
-    private void SelectNextFeature() => MoveHighlightedFeature(1);
+    private void SelectNextFeature()
+    {
+        MoveHighlightedFeature(1);
+    }
 
     private void AddNavigationSection(
         IEnumerable<ShellFeatureItemViewModel> section,
         bool includeDivider)
     {
-        ShellFeatureItemViewModel[] items = section.ToArray();
-        if (items.Length == 0)
-        {
-            return;
-        }
+        var items = section.ToArray();
+        if (items.Length == 0) return;
 
-        if (includeDivider)
-        {
-            NavigationEntries.Add(new NavigationDividerViewModel());
-        }
+        if (includeDivider) NavigationEntries.Add(new NavigationDividerViewModel());
 
-        foreach (ShellFeatureItemViewModel item in items)
-        {
-            NavigationEntries.Add(item);
-        }
+        foreach (var item in items) NavigationEntries.Add(item);
     }
 
     private void OnNotificationPublished(
         object? sender,
-        UserNotificationPublishedEventArgs eventArgs) =>
+        UserNotificationPublishedEventArgs eventArgs)
+    {
         _dispatcher.Post(() =>
             NotificationQueue.Add(new ShellNotificationViewModel(
                 eventArgs.Notification,
                 RemoveNotification)));
+    }
 
-    private void RemoveNotification(ShellNotificationViewModel notification) =>
+    private void RemoveNotification(ShellNotificationViewModel notification)
+    {
         NotificationQueue.Remove(notification);
+    }
 
     private async Task OpenUriAsync(Uri uri, string destination)
     {
         bool accepted = await _launcher.OpenUriAsync(uri).ConfigureAwait(false);
         if (!accepted)
-        {
             await _notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Warning,
                 "Could not open link",
                 $"The {destination} could not be opened by the operating system.")).ConfigureAwait(false);
-        }
     }
-
 }

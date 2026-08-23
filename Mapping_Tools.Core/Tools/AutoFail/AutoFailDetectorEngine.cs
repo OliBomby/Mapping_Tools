@@ -24,16 +24,16 @@ public sealed record AutoFailFixPlan(IReadOnlyList<int> Padding, string Guide);
 public sealed class AutoFailDetectorEngine
 {
     private const int MaxPaddingCount = 2000;
-    private readonly int _mapStartTime;
-    private readonly int _mapEndTime;
-    private readonly int _autoFailCheckTime;
     private readonly int _approachTime;
-    private readonly int _window50;
+    private readonly int _autoFailCheckTime;
+    private readonly int _mapEndTime;
+    private readonly int _mapStartTime;
     private readonly int _physicsTime;
+    private readonly int _window50;
     private List<HitObject> _hitObjects;
+    private int?[]? _placementTimes;
     private List<ProblemArea>? _problemAreas;
     private SortedSet<int>? _timesToCheckStartIndex;
-    private int?[]? _placementTimes;
 
     /// <summary>Creates an analyzer for one beatmap and one set of difficulty windows.</summary>
     /// <param name="hitObjects">The mutable hit-object collection to inspect and optionally repair.</param>
@@ -53,10 +53,7 @@ public sealed class AutoFailDetectorEngine
         int physicsTime)
     {
         ArgumentNullException.ThrowIfNull(hitObjects);
-        if (physicsTime < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(physicsTime));
-        }
+        if (physicsTime < 0) throw new ArgumentOutOfRangeException(nameof(physicsTime));
         _hitObjects = hitObjects;
         _mapStartTime = mapStartTime;
         _mapEndTime = mapEndTime;
@@ -92,7 +89,7 @@ public sealed class AutoFailDetectorEngine
         _timesToCheckStartIndex = new SortedSet<int>(_hitObjects.SelectMany(hitObject => new[]
         {
             (int)hitObject.EndTime + _approachTime,
-            (int)hitObject.EndTime + _approachTime + 1
+            (int)hitObject.EndTime + _approachTime + 1,
         }));
 
         // Find all problematic areas which could cause auto-fail depending on the binary search
@@ -104,7 +101,7 @@ public sealed class AutoFailDetectorEngine
         for (int index = 0; index < _hitObjects.Count; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            HitObject hitObject = _hitObjects[index];
+            var hitObject = _hitObjects[index];
             int adjustedEndTime = GetAdjustedEndTime(hitObject);
             bool negative = adjustedEndTime < hitObject.Time - _approachTime;
             // Ignore all problem areas which are contained by another unloadable object,
@@ -116,20 +113,19 @@ public sealed class AutoFailDetectorEngine
                 int lastAdjustedEndTime = GetAdjustedEndTime(_problemAreas[^1].UnloadableHitObject);
                 // If the end time is greater but there has been no time to change the start index yet,
                 // then it is still contained in the previous problem area.
-                if (adjustedEndTime <= lastAdjustedEndTime ||
-                    _timesToCheckStartIndex.GetViewBetween(
+                if (adjustedEndTime <= lastAdjustedEndTime
+                    || _timesToCheckStartIndex.GetViewBetween(
                         lastAdjustedEndTime,
-                        adjustedEndTime + _physicsTime).Count == 0)
-                {
+                        adjustedEndTime + _physicsTime).Count
+                    == 0)
                     continue;
-                }
             }
 
             // Check all later objects for any which have an early enough end time
             HashSet<HitObject> disruptors = [];
             for (int otherIndex = index + 1; otherIndex < _hitObjects.Count; otherIndex++)
             {
-                HitObject other = _hitObjects[otherIndex];
+                var other = _hitObjects[otherIndex];
                 if (other.EndTime < adjustedEndTime + _physicsTime - _approachTime)
                 {
                     disruptors.Add(other);
@@ -137,19 +133,14 @@ public sealed class AutoFailDetectorEngine
                 }
             }
 
-            if (disruptors.Count == 0 && !negative)
-            {
-                continue;
-            }
+            if (disruptors.Count == 0 && !negative) continue;
 
             // The first time after the end time where the object could be loaded
             int firstRequiredLoadTime = adjustedEndTime;
             if (index > 0)
-            {
                 firstRequiredLoadTime = Math.Max(
                     adjustedEndTime,
                     (int)_hitObjects[index - 1].Time - _approachTime + 1);
-            }
             // It cant load before the map has started
             firstRequiredLoadTime = Math.Max(firstRequiredLoadTime, _mapStartTime);
             // These are all the times to check. If the object is loaded at all these times, then it will not cause auto-fail. (terms and conditions apply)
@@ -158,14 +149,14 @@ public sealed class AutoFailDetectorEngine
                     firstRequiredLoadTime,
                     firstRequiredLoadTime + _physicsTime))
             {
-                firstRequiredLoadTime + _physicsTime
+                firstRequiredLoadTime + _physicsTime,
             };
             _problemAreas.Add(new ProblemArea(index, hitObject, disruptors, timesToCheck));
             potential.Add(hitObject.Time);
         }
 
         // Use osu!'s object loading algorithm to find out which objects are actually loaded
-        foreach (ProblemArea problemArea in _problemAreas)
+        foreach (var problemArea in _problemAreas)
         {
             cancellationToken.ThrowIfCancellationRequested();
             foreach (int time in problemArea.TimesToCheck)
@@ -174,12 +165,9 @@ public sealed class AutoFailDetectorEngine
                 int endIndex = _hitObjects.FindIndex(
                     startIndex,
                     hitObject => hitObject.Time > time + _approachTime);
-                if (endIndex < 0)
-                {
-                    endIndex = _hitObjects.Count - 1;
-                }
+                if (endIndex < 0) endIndex = _hitObjects.Count - 1;
 
-                List<HitObject> loaded = _hitObjects.GetRange(
+                var loaded = _hitObjects.GetRange(
                     startIndex,
                     1 + endIndex - startIndex);
                 if (!loaded.Contains(problemArea.UnloadableHitObject) || time > _autoFailCheckTime)
@@ -204,10 +192,7 @@ public sealed class AutoFailDetectorEngine
         CancellationToken cancellationToken = default)
     {
         EnsureAnalyzed();
-        if (_problemAreas!.Count == 0)
-        {
-            yield break;
-        }
+        if (_problemAreas!.Count == 0) yield break;
 
         _placementTimes = GetAllSafePlacementTimes();
         int[] firstSolution = SolveAutoFailPadding();
@@ -220,19 +205,13 @@ public sealed class AutoFailDetectorEngine
     }
 
     /// <summary>Applies one repair plan to the mutable hit-object collection.</summary>
-    /// <param name="plan">The plan produced by <see cref="GetFixPlans"/>.</param>
+    /// <param name="plan">The plan produced by <see cref="GetFixPlans" />.</param>
     public void ApplyFix(AutoFailFixPlan plan)
     {
         ArgumentNullException.ThrowIfNull(plan);
         EnsureAnalyzed();
-        if (_placementTimes is null)
-        {
-            _placementTimes = GetAllSafePlacementTimes();
-        }
-        if (plan.Padding.Count != _problemAreas!.Count + 1)
-        {
-            throw new ArgumentException("The fix plan does not match this analysis.", nameof(plan));
-        }
+        if (_placementTimes is null) _placementTimes = GetAllSafePlacementTimes();
+        if (plan.Padding.Count != _problemAreas!.Count + 1) throw new ArgumentException("The fix plan does not match this analysis.", nameof(plan));
         PlaceFixGuide(plan.Padding);
     }
 
@@ -244,21 +223,15 @@ public sealed class AutoFailDetectorEngine
         int lastTime = 0;
         for (int index = 0; index < _problemAreas!.Count; index++)
         {
-            if (!(_placementTimes is not null && !_placementTimes[index].HasValue) &&
-                paddingSolution[index] > 0)
-            {
+            if (!(_placementTimes is not null && !_placementTimes[index].HasValue) && paddingSolution[index] > 0)
                 guide.AppendLine(index == 0
                     ? $"Extra objects before {_problemAreas[index].StartTime}: {paddingSolution[index]}"
                     : $"Extra objects between {lastTime} - {_problemAreas[index].StartTime}: {paddingSolution[index]}");
-            }
             lastTime = GetAdjustedEndTime(_problemAreas[index].UnloadableHitObject) - _approachTime;
         }
 
-        if (!(_placementTimes is not null && !_placementTimes[^1].HasValue) &&
-            paddingSolution[^1] > 0)
-        {
+        if (!(_placementTimes is not null && !_placementTimes[^1].HasValue) && paddingSolution[^1] > 0)
             guide.AppendLine($"Extra objects after {lastTime}: {paddingSolution[^1]}");
-        }
         return guide.ToString().TrimEnd();
     }
 
@@ -273,15 +246,11 @@ public sealed class AutoFailDetectorEngine
                     ? _placementTimes[index]
                     : GetSafePlacementTime(lastTime, _problemAreas[index].StartTime);
                 if (!time.HasValue)
-                {
                     throw new InvalidOperationException(
                         $"Can't find a safe place to place objects between {lastTime} and {_problemAreas[index].StartTime}.");
-                }
-                for (int count = 0; count < paddingSolution[index]; count++)
-                {
-                    _hitObjects.Add(PaddingObject(time.Value));
-                }
+                for (int count = 0; count < paddingSolution[index]; count++) _hitObjects.Add(PaddingObject(time.Value));
             }
+
             lastTime = GetAdjustedEndTime(_problemAreas[index].UnloadableHitObject) - _approachTime;
         }
 
@@ -291,25 +260,24 @@ public sealed class AutoFailDetectorEngine
                 ? _placementTimes[^1]
                 : GetSafePlacementTime(lastTime, _autoFailCheckTime - _physicsTime);
             if (!time.HasValue)
-            {
                 throw new InvalidOperationException(
                     $"Can't find a safe place to place objects between {lastTime} and {_mapEndTime}.");
-            }
-            for (int count = 0; count < paddingSolution[^1]; count++)
-            {
-                _hitObjects.Add(PaddingObject(time.Value));
-            }
+            for (int count = 0; count < paddingSolution[^1]; count++) _hitObjects.Add(PaddingObject(time.Value));
         }
+
         SortHitObjects();
     }
 
-    private static HitObject PaddingObject(int time) => new()
+    private static HitObject PaddingObject(int time)
     {
-        Pos = Vector2.Zero,
-        Time = time,
-        ObjectType = 8,
-        EndTime = time - 1
-    };
+        return new HitObject
+        {
+            Pos = Vector2.Zero,
+            Time = time,
+            ObjectType = 8,
+            EndTime = time - 1,
+        };
+    }
 
     private int?[] GetAllSafePlacementTimes()
     {
@@ -320,23 +288,19 @@ public sealed class AutoFailDetectorEngine
             result[index] = GetSafePlacementTime(lastTime, _problemAreas[index].StartTime);
             lastTime = GetAdjustedEndTime(_problemAreas[index].UnloadableHitObject) - _approachTime;
         }
+
         result[^1] = GetSafePlacementTime(lastTime, _autoFailCheckTime - _physicsTime);
         return result;
     }
 
     private int? GetSafePlacementTime(int start, int end)
     {
-        List<HitObject> rangeObjects = _hitObjects.FindAll(
-            hitObject => hitObject.EndTime >= start && hitObject.Time <= end);
+        var rangeObjects = _hitObjects.FindAll(hitObject => hitObject.EndTime >= start && hitObject.Time <= end);
         for (int time = end - 1; time >= start; time--)
-        {
             if (!rangeObjects.Any(hitObject =>
-                    time >= (int)hitObject.Time &&
-                    time <= GetAdjustedEndTime(hitObject) - _approachTime))
-            {
+                    time >= (int)hitObject.Time && time <= GetAdjustedEndTime(hitObject) - _approachTime))
                 return time;
-            }
-        }
+
         return null;
     }
 
@@ -345,12 +309,9 @@ public sealed class AutoFailDetectorEngine
         int padding = startPaddingCount;
         int[] solution;
         while (!SolveAutoFailPadding(padding++, out solution))
-        {
             if (padding > MaxPaddingCount)
-            {
                 throw new InvalidOperationException("No auto-fail fix padding solution found.");
-            }
-        }
+
         return solution;
     }
 
@@ -360,32 +321,24 @@ public sealed class AutoFailDetectorEngine
         int leftPadding = 0;
         for (int index = 0; index < _problemAreas.Count; index++)
         {
-            List<int> choices = SolveSingleProblemAreaPadding(
+            var choices = SolveSingleProblemAreaPadding(
                 _problemAreas[index],
                 paddingCount,
                 leftPadding);
-            if (choices.Count == 0 || choices.Max() < leftPadding)
-            {
-                return false;
-            }
+            if (choices.Count == 0 || choices.Max() < leftPadding) return false;
             // The first element is always the lowest element equal or greater than leftPadding,
             // because the single problem solver started iterating from leftPadding.
             int lowest = choices[0];
             // Check if placement is possible for this area and if not, assert 0 padding
-            if (_placementTimes is not null && !_placementTimes[index].HasValue &&
-                lowest != leftPadding)
-            {
+            if (_placementTimes is not null && !_placementTimes[index].HasValue && lowest != leftPadding)
                 return false;
-            }
             solution[index] = lowest - leftPadding;
             leftPadding = lowest;
         }
+
         // Check if placement is possible for the last area and if not, assert 0 padding
-        if (_placementTimes is not null && !_placementTimes[^1].HasValue &&
-            paddingCount != leftPadding)
-        {
+        if (_placementTimes is not null && !_placementTimes[^1].HasValue && paddingCount != leftPadding)
             return false;
-        }
         solution[^1] = paddingCount - leftPadding;
         return true;
     }
@@ -395,47 +348,35 @@ public sealed class AutoFailDetectorEngine
         int paddingCount = initialPaddingCount;
         while (true)
         {
-            foreach (int[] solution in SolveAutoFailPaddingEnumerable(paddingCount))
-            {
-                yield return solution;
-            }
+            foreach (int[] solution in SolveAutoFailPaddingEnumerable(paddingCount)) yield return solution;
             paddingCount++;
         }
     }
 
     private IEnumerable<int[]> SolveAutoFailPaddingEnumerable(int paddingCount)
     {
-        List<int>[] allSolutions = new List<int>[_problemAreas!.Count];
+        var allSolutions = new List<int>[_problemAreas!.Count];
         int minimalLeft = 0;
         for (int index = 0; index < _problemAreas.Count; index++)
         {
-            List<int> choices = SolveSingleProblemAreaPadding(
+            var choices = SolveSingleProblemAreaPadding(
                 _problemAreas[index],
                 paddingCount,
                 minimalLeft);
-            if (choices.Count == 0 || choices[^1] < minimalLeft)
-            {
-                yield break;
-            }
+            if (choices.Count == 0 || choices[^1] < minimalLeft) yield break;
             // The first element is always the lowest element equal or greater than minimalLeft,
             // because the single problem solver started iterating from minimalLeft.
             int lowest = choices[0];
             // Check if placement is possible for this area and if not, assert 0 padding
-            if (_placementTimes is not null && !_placementTimes[index].HasValue &&
-                lowest != minimalLeft)
-            {
+            if (_placementTimes is not null && !_placementTimes[index].HasValue && lowest != minimalLeft)
                 yield break;
-            }
             allSolutions[index] = choices;
             minimalLeft = lowest;
         }
 
         // Check if placement is possible for the last area and if not, assert 0 padding
-        if (_placementTimes is not null && !_placementTimes[^1].HasValue &&
-            paddingCount != minimalLeft)
-        {
+        if (_placementTimes is not null && !_placementTimes[^1].HasValue && paddingCount != minimalLeft)
             yield break;
-        }
         int maximalLeft = paddingCount;
         for (int index = allSolutions.Length - 1; index >= 0; index--)
         {
@@ -452,12 +393,10 @@ public sealed class AutoFailDetectorEngine
                 pads[index] = leftPadding[index] - left;
                 left = leftPadding[index];
             }
+
             // If there is no placement for the last area, assert 0 padding.
-            if (_placementTimes is not null && !_placementTimes[^1].HasValue &&
-                left != paddingCount)
-            {
+            if (_placementTimes is not null && !_placementTimes[^1].HasValue && left != paddingCount)
                 continue;
-            }
             pads[^1] = paddingCount - left;
             yield return pads;
         }
@@ -472,28 +411,23 @@ public sealed class AutoFailDetectorEngine
         {
             // Loop through all solutions which are greater or equal to the minimum or assert equal to paddingCount if there is no placement spot.
             foreach (int value in allSolutions[depth].Where(value =>
-                         value == minimum ||
-                         !(_placementTimes is not null && !_placementTimes[depth].HasValue) &&
-                         value > minimum))
+                         value == minimum || !(_placementTimes is not null && !_placementTimes[depth].HasValue) && value > minimum))
             {
                 int[] solution = new int[allSolutions.Count];
                 solution[depth] = value;
                 yield return solution;
             }
+
             yield break;
         }
 
         // Loop through all solutions which are greater or equal to the minimum or assert equal to minimum if there is no placement spot.
         foreach (int value in allSolutions[depth].Where(value =>
-                     value == minimum ||
-                     !(_placementTimes is not null && !_placementTimes[depth].HasValue) &&
-                     value > minimum))
+                     value == minimum || !(_placementTimes is not null && !_placementTimes[depth].HasValue) && value > minimum))
+        foreach (int[] solution in EnumerateSolutions(allSolutions, depth + 1, value))
         {
-            foreach (int[] solution in EnumerateSolutions(allSolutions, depth + 1, value))
-            {
-                solution[depth] = value;
-                yield return solution;
-            }
+            solution[depth] = value;
+            yield return solution;
         }
     }
 
@@ -504,12 +438,9 @@ public sealed class AutoFailDetectorEngine
     {
         List<int> solution = new(paddingCount - minimalLeft + 1);
         for (int left = minimalLeft; left <= paddingCount; left++)
-        {
             if (ProblemAreaPaddingWorks(problemArea, left, paddingCount - left))
-            {
                 solution.Add(left);
-            }
-        }
+
         return solution;
     }
 
@@ -521,17 +452,11 @@ public sealed class AutoFailDetectorEngine
             int endIndex = _hitObjects.FindIndex(
                 Math.Max(0, startIndex),
                 hitObject => hitObject.Time > time + _approachTime);
-            if (endIndex < 0)
-            {
-                endIndex = _hitObjects.Count - 1;
-            }
-            if (startIndex > problemArea.Index ||
-                endIndex < problemArea.Index ||
-                time > _autoFailCheckTime)
-            {
+            if (endIndex < 0) endIndex = _hitObjects.Count - 1;
+            if (startIndex > problemArea.Index || endIndex < problemArea.Index || time > _autoFailCheckTime)
                 return false;
-            }
         }
+
         return true;
     }
 
@@ -543,19 +468,13 @@ public sealed class AutoFailDetectorEngine
         {
             int middle = minimum + (maximum - minimum) / 2;
             int endTime = (int)_hitObjects[middle].EndTime;
-            if (time == endTime)
-            {
-                return middle;
-            }
+            if (time == endTime) return middle;
             if (time > endTime)
-            {
                 minimum = middle + 1;
-            }
             else
-            {
                 maximum = middle - 1;
-            }
         }
+
         return minimum;
     }
 
@@ -571,43 +490,31 @@ public sealed class AutoFailDetectorEngine
                 : middle > _hitObjects.Count - 1
                     ? int.MaxValue
                     : (int)_hitObjects[middle].EndTime;
-            if (time == endTime)
-            {
-                return middle;
-            }
+            if (time == endTime) return middle;
             if (time > endTime)
-            {
                 minimum = middle + 1;
-            }
             else
-            {
                 maximum = middle - 1;
-            }
         }
+
         return minimum;
     }
 
     private int GetAdjustedEndTime(HitObject hitObject)
     {
-        if (hitObject.IsCircle)
-        {
-            return (int)hitObject.Time + _window50;
-        }
-        if (hitObject.IsSlider || hitObject.IsSpinner)
-        {
-            return (int)hitObject.EndTime;
-        }
+        if (hitObject.IsCircle) return (int)hitObject.Time + _window50;
+        if (hitObject.IsSlider || hitObject.IsSpinner) return (int)hitObject.EndTime;
         return (int)Math.Max(hitObject.Time + _window50, hitObject.EndTime);
     }
 
-    private void SortHitObjects() => _hitObjects.Sort();
+    private void SortHitObjects()
+    {
+        _hitObjects.Sort();
+    }
 
     private void EnsureAnalyzed()
     {
-        if (_problemAreas is null)
-        {
-            throw new InvalidOperationException("Analyze must run before requesting or applying a fix.");
-        }
+        if (_problemAreas is null) throw new InvalidOperationException("Analyze must run before requesting or applying a fix.");
     }
 
     private sealed record ProblemArea(

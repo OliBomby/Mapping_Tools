@@ -1,9 +1,7 @@
 using CommunityToolkit.Mvvm.Input;
-using FluentAssertions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.ComboColourStudio;
 using Mapping_Tools.Application.Execution;
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
@@ -21,8 +19,8 @@ public sealed class ComboColourStudioViewModelTests
     public void AddColourPointCommand_AfterAddingPaletteColour_SelectsPointAndBuildsPreview()
     {
         // Arrange
-        ComboColourStudioViewModel viewModel = CreateViewModel();
-        ((IRelayCommand)viewModel.AddComboColourCommand).Execute(null);
+        var viewModel = CreateViewModel();
+        viewModel.AddComboColourCommand.Execute(null);
 
         // Act
         ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
@@ -40,8 +38,9 @@ public sealed class ComboColourStudioViewModelTests
         viewModel.PreviewItems.Single().Colour.Should().Be(RgbaColour.FromRgb(1, 2, 3));
     }
 
-    private static ComboColourStudioViewModel CreateViewModel() =>
-        new(
+    private static ComboColourStudioViewModel CreateViewModel()
+    {
+        return new ComboColourStudioViewModel(
             new StubComboColourStudioService(),
             new ToolExecutionService(
                 new UserNotificationService(),
@@ -52,41 +51,57 @@ public sealed class ComboColourStudioViewModelTests
             new StubCurrentBeatmapLocator(),
             new StubLiveBeatmapReader(),
             new TestFilePicker());
+    }
 
     private sealed class StubComboColourStudioService : IComboColourStudioService
     {
         public Task ImportComboColoursAsync(
             string path,
             ComboColourProject project,
-            CancellationToken cancellationToken = default) => Task.CompletedTask;
+            CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
 
         public Task ImportColourHaxAsync(
             string path,
             ComboColourProject project,
-            CancellationToken cancellationToken = default) => Task.CompletedTask;
+            CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
 
         public Task<ComboColourStudioRunResult> ApplyAsync(
             IReadOnlyList<string> paths,
             ComboColourProject project,
             IProgress<double>? progress = null,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(new ComboColourStudioRunResult(paths.Count));
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new ComboColourStudioRunResult(paths.Count));
+        }
     }
 
     private sealed class StubCurrentBeatmapLocator : ICurrentBeatmapLocator
     {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<string?>(null);
+        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<string?>(null);
+        }
     }
 
     private sealed class StubLiveBeatmapReader : ILiveBeatmapReader
     {
-        public Task<LiveBeatmapSnapshot?> ReadAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult<LiveBeatmapSnapshot?>(null);
+        public Task<LiveBeatmapSnapshot?> ReadAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<LiveBeatmapSnapshot?>(null);
+        }
     }
 
     private sealed class StubReloadService : IEditorReloadService
     {
-        public Task ReloadAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task ReloadAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

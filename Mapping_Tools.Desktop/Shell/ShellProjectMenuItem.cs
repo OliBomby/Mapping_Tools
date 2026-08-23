@@ -21,10 +21,13 @@ public sealed class ShellProjectMenuItem
 
     /// <summary>Gets the menu label.</summary>
     public string Header { get; }
+
     /// <summary>Gets the menu tooltip.</summary>
     public string ToolTip { get; }
+
     /// <summary>Gets the command invoked by the item.</summary>
     public ICommand Command { get; }
+
     /// <summary>Gets the icon rendered beside the item.</summary>
     public MaterialIconKind Icon { get; }
 }

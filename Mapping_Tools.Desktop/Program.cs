@@ -1,15 +1,14 @@
 ﻿using Avalonia;
-using System;
 
 namespace Mapping_Tools.Desktop;
 
-sealed class Program
+internal sealed class Program
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     /// <summary>
-    /// Starts Mapping Tools with Avalonia's classic desktop lifetime.
+    ///     Starts Mapping Tools with Avalonia's classic desktop lifetime.
     /// </summary>
     /// <param name="args">Command-line arguments forwarded to Avalonia.</param>
     [STAThread]
@@ -17,10 +16,7 @@ sealed class Program
     {
         AppDomain.CurrentDomain.UnhandledException += (_, eventArgs) =>
         {
-            if (eventArgs.ExceptionObject is Exception exception)
-            {
-                App.WriteCrashLog(exception);
-            }
+            if (eventArgs.ExceptionObject is Exception exception) App.WriteCrashLog(exception);
         };
         TaskScheduler.UnobservedTaskException += (_, eventArgs) =>
         {
@@ -41,7 +37,7 @@ sealed class Program
 
     // Avalonia configuration, don't remove; also used by visual designer.
     /// <summary>
-    /// Creates the shared Avalonia configuration used by the executable and designer.
+    ///     Creates the shared Avalonia configuration used by the executable and designer.
     /// </summary>
     /// <returns>An application builder configured for platform detection, Inter, and tracing.</returns>
     public static AppBuilder BuildAvaloniaApp()

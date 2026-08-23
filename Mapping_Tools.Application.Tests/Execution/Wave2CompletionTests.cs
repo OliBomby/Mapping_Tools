@@ -25,9 +25,9 @@ public sealed class Wave2CompletionTests
         {
             SmartQuickRunEnabled = false,
             UseEditorReader = false,
-            AutoReload = false
+            AutoReload = false,
         };
-        MemoryTextFileStore store = CreateStore();
+        var store = CreateStore();
         RecordingBackupService backups = new(store);
         NullLiveReader liveReader = new();
         BeatmapEditingGateway gateway = new(
@@ -42,7 +42,7 @@ public sealed class Wave2CompletionTests
             new ExistingMapFileSystem(),
             new FixedCurrentBeatmapLocator(),
             TimeProvider.System);
-        CurrentBeatmapSelectionResult selection =
+        var selection =
             await workspace.SelectCurrentBeatmapAsync();
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
@@ -67,7 +67,7 @@ public sealed class Wave2CompletionTests
                         async context =>
                         {
                             string path = workspace.SelectedPaths.Single();
-                            BeatmapEditingSession session = await gateway
+                            var session = await gateway
                                 .OpenBeatmapAsync(
                                     path,
                                     LiveBeatmapPreference.DiskOnly,
@@ -93,11 +93,11 @@ public sealed class Wave2CompletionTests
             notifications);
 
         // Act
-        QuickRunResult quickRunResult = await quickRun.RunAsync();
+        var quickRunResult = await quickRun.RunAsync();
 
         // Assert
         selection.Status.Should().Be(CurrentBeatmapSelectionStatus.Selected);
-        workspace.SelectedPaths.ToArray().Should().Equal(new[] { MapPath });
+        workspace.SelectedPaths.ToArray().Should().Equal(MapPath);
         quickRunResult.Status.Should().Be(QuickRunStatus.Executed);
         toolResult.Should().NotBeNull();
         toolResult.Status.Should().Be(ToolExecutionStatus.Succeeded);
@@ -131,8 +131,10 @@ public sealed class Wave2CompletionTests
 
         public int WriteCount { get; private set; }
 
-        public IReadOnlyList<string> ReadAllLines(string path) =>
-            Files[path].ToList();
+        public IReadOnlyList<string> ReadAllLines(string path)
+        {
+            return Files[path].ToList();
+        }
 
         public void WriteAllLines(string path, IEnumerable<string> lines)
         {
@@ -140,13 +142,20 @@ public sealed class Wave2CompletionTests
             Files[path] = lines.ToList();
         }
 
-        public void Delete(string path) => Files.Remove(path);
+        public void Delete(string path)
+        {
+            Files.Remove(path);
+        }
 
-        public string GetParentFolder(string path) =>
-            Path.GetDirectoryName(path)!;
+        public string GetParentFolder(string path)
+        {
+            return Path.GetDirectoryName(path)!;
+        }
 
-        public string CombinePath(string parent, string child) =>
-            Path.Combine(parent, child);
+        public string CombinePath(string parent, string child)
+        {
+            return Path.Combine(parent, child);
+        }
     }
 
     private sealed class RecordingBackupService : IBeatmapBackupService
@@ -185,28 +194,36 @@ public sealed class Wave2CompletionTests
             BeatmapEditingSession session,
             BeatmapBackupReason reason,
             bool force = false,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task<BeatmapBackupArtifact?> CreatePeriodicIfChangedAsync(
             BeatmapEditingSession session,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task<BeatmapRestoreResult> RestoreAsync(
             string backupPath,
             string destinationPath,
             bool allowDifferentFilename = false,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task<BeatmapRestoreResult?> QuickUndoAsync(
             string destinationPath,
             bool allowDifferentFilename = false,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
     }
 
     private sealed class NullLiveReader : ILiveBeatmapReader
@@ -240,11 +257,15 @@ public sealed class Wave2CompletionTests
 
     private sealed class ExistingMapFileSystem : IBeatmapFileSystem
     {
-        public bool FileExists(string path) =>
-            string.Equals(path, MapPath, StringComparison.Ordinal);
+        public bool FileExists(string path)
+        {
+            return string.Equals(path, MapPath, StringComparison.Ordinal);
+        }
 
-        public string? GetParentDirectory(string filePath) =>
-            Path.GetDirectoryName(filePath);
+        public string? GetParentDirectory(string filePath)
+        {
+            return Path.GetDirectoryName(filePath);
+        }
     }
 
     private sealed class UnusedFilePicker : IFilePicker
@@ -257,17 +278,23 @@ public sealed class Wave2CompletionTests
 
         public Task<IReadOnlyList<string>> PickOpenFilesAsync(
             OpenFilePickerRequest request,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task<string?> PickSaveFileAsync(
             SaveFilePickerRequest request,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task<IReadOnlyList<string>> PickFoldersAsync(
             OpenFolderPickerRequest request,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
     }
 }

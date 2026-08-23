@@ -23,24 +23,28 @@ internal sealed class ValueDialogConverter : IValueConverter
         object? value,
         Type targetType,
         object? parameter,
-        CultureInfo culture) =>
-        ValueConverterHelper.Convert(
+        CultureInfo culture)
+    {
+        return ValueConverterHelper.Convert(
             value,
             targetType,
             parameter,
             culture,
             _converter);
+    }
 
     public object ConvertBack(
         object? value,
         Type targetType,
         object? parameter,
-        CultureInfo culture) =>
-        ValueConverterHelper.ConvertBack(
+        CultureInfo culture)
+    {
+        return ValueConverterHelper.ConvertBack(
             value,
             targetType,
             parameter,
             culture,
             _converter,
             _reportConversionError);
+    }
 }

@@ -1,22 +1,20 @@
-﻿namespace Mapping_Tools.Core.Classes.BeatmapHelper
+﻿namespace Mapping_Tools.Core.Classes.BeatmapHelper;
+
+/// <summary>
+///     Interface for a text file.
+/// </summary>
+#nullable disable
+public interface ITextFile
 {
     /// <summary>
-    /// Interface for a text file.
+    ///     Returns with all lines found within text file.
     /// </summary>
-#nullable disable
+    /// <returns></returns>
+    List<string> GetLines();
 
-    public interface ITextFile
-    {
-        /// <summary>
-        /// Returns with all lines found within text file.
-        /// </summary>
-        /// <returns></returns>
-        List<string> GetLines();
-
-        /// <summary>
-        /// Edits the spesified text file with passed through lines.
-        /// </summary>
-        /// <param name="lines"></param>
-        void SetLines(List<string> lines);
-    }
+    /// <summary>
+    ///     Edits the spesified text file with passed through lines.
+    /// </summary>
+    /// <param name="lines"></param>
+    void SetLines(List<string> lines);
 }

@@ -1,7 +1,4 @@
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using Material.Icons;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
@@ -12,17 +9,17 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.PatternGallery;
 using Mapping_Tools.Desktop.Interactions;
 using Mapping_Tools.Desktop.Shell;
+using Material.Icons;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Owns Pattern Gallery collection state, thumbnail loading, typed imports,
-/// ZIP persistence, placement options, project recovery, and QuickRun.
+///     Owns Pattern Gallery collection state, thumbnail loading, typed imports,
+///     ZIP persistence, placement options, project recovery, and QuickRun.
 /// </summary>
 public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     IShellProjectFeature,
@@ -31,28 +28,79 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     IQuickRun
 {
     internal const string OperationId = "pattern-gallery";
-
-    private readonly IPatternGalleryService _gallery;
-    private readonly IPatternGalleryFileService _files;
     private readonly IPatternGalleryArchiveService _archives;
-    private readonly IBeatmapWorkspace _workspace;
     private readonly ICurrentBeatmapLocator _currentBeatmap;
-    private readonly IFilePicker _filePicker;
-    private readonly IFileRevealService _reveal;
-    private readonly IProjectService _projects;
-    private readonly IProjectSerializer _serializer;
-    private readonly IApplicationDirectories _directories;
-    private readonly IDialogService _dialogs;
-    private readonly ApplicationSettings _settings;
-    private readonly IPatternGalleryInputDialog _inputDialog;
+
     private readonly ProjectDefinition<PatternGalleryProject> _definition = new(
         "patterngalleryproject.json",
         "Pattern Gallery Projects",
         () => new PatternGalleryProject(),
         "pattern-gallery-project.json");
+
+    private readonly IDialogService _dialogs;
+    private readonly IApplicationDirectories _directories;
+    private readonly IFilePicker _filePicker;
+    private readonly IPatternGalleryFileService _files;
+
+    private readonly IPatternGalleryService _gallery;
+    private readonly IPatternGalleryInputDialog _inputDialog;
     private readonly Dictionary<PatternGalleryPattern, PatternGalleryItemViewModel> _items = [];
+    private readonly IProjectService _projects;
+    private readonly IFileRevealService _reveal;
+    private readonly IProjectSerializer _serializer;
+    private readonly ApplicationSettings _settings;
+    private readonly IBeatmapWorkspace _workspace;
     private PatternGalleryCollectionPaths? _paths;
     private CancellationTokenSource? _thumbnailCancellation;
+
+    /// <summary>Creates the Pattern Gallery presentation model.</summary>
+    /// <param name="gallery">Runs framework-neutral Pattern Gallery use cases.</param>
+    /// <param name="files">Resolves and writes collection files.</param>
+    /// <param name="archives">Reads and creates collection ZIP files.</param>
+    /// <param name="execution">Coordinates cancellable tool runs.</param>
+    /// <param name="workspace">Supplies ordinary-run beatmap selection.</param>
+    /// <param name="currentBeatmap">Finds the beatmap open in osu!.</param>
+    /// <param name="filePicker">Presents native file and save dialogs.</param>
+    /// <param name="reveal">Reveals files in the platform file manager.</param>
+    /// <param name="projects">Loads and saves explicit collection JSON.</param>
+    /// <param name="serializer">Serializes legacy-compatible project JSON.</param>
+    /// <param name="directories">Provides the application-data collection root.</param>
+    /// <param name="dialogs">Presents typed confirmations and value fields.</param>
+    /// <param name="settings">Provides the shared QuickRun preference.</param>
+    /// <param name="inputDialog">Presents Pattern Gallery's multi-field forms.</param>
+    public PatternGalleryViewModel(
+        IPatternGalleryService gallery,
+        IPatternGalleryFileService files,
+        IPatternGalleryArchiveService archives,
+        IToolExecutionService execution,
+        IBeatmapWorkspace workspace,
+        ICurrentBeatmapLocator currentBeatmap,
+        IFilePicker filePicker,
+        IFileRevealService reveal,
+        IProjectService projects,
+        IProjectSerializer serializer,
+        IApplicationDirectories directories,
+        IDialogService dialogs,
+        ApplicationSettings settings,
+        IPatternGalleryInputDialog inputDialog)
+        : base(execution, OperationId)
+    {
+        _gallery = gallery ?? throw new ArgumentNullException(nameof(gallery));
+        _files = files ?? throw new ArgumentNullException(nameof(files));
+        _archives = archives ?? throw new ArgumentNullException(nameof(archives));
+        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        _reveal = reveal ?? throw new ArgumentNullException(nameof(reveal));
+        _projects = projects ?? throw new ArgumentNullException(nameof(projects));
+        _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+        _directories = directories ?? throw new ArgumentNullException(nameof(directories));
+        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _inputDialog = inputDialog ?? throw new ArgumentNullException(nameof(inputDialog));
+        ConfigureProject();
+        RebuildGroups();
+    }
 
     private IEnumerable<PatternGalleryPattern> SelectedPatterns =>
         _items.Values
@@ -183,83 +231,72 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     public partial string ResultSummary { get; private set; } = string.Empty;
 
-    /// <summary>Creates the Pattern Gallery presentation model.</summary>
-    /// <param name="gallery">Runs framework-neutral Pattern Gallery use cases.</param>
-    /// <param name="files">Resolves and writes collection files.</param>
-    /// <param name="archives">Reads and creates collection ZIP files.</param>
-    /// <param name="execution">Coordinates cancellable tool runs.</param>
-    /// <param name="workspace">Supplies ordinary-run beatmap selection.</param>
-    /// <param name="currentBeatmap">Finds the beatmap open in osu!.</param>
-    /// <param name="filePicker">Presents native file and save dialogs.</param>
-    /// <param name="reveal">Reveals files in the platform file manager.</param>
-    /// <param name="projects">Loads and saves explicit collection JSON.</param>
-    /// <param name="serializer">Serializes legacy-compatible project JSON.</param>
-    /// <param name="directories">Provides the application-data collection root.</param>
-    /// <param name="dialogs">Presents typed confirmations and value fields.</param>
-    /// <param name="settings">Provides the shared QuickRun preference.</param>
-    /// <param name="inputDialog">Presents Pattern Gallery's multi-field forms.</param>
-    public PatternGalleryViewModel(
-        IPatternGalleryService gallery,
-        IPatternGalleryFileService files,
-        IPatternGalleryArchiveService archives,
-        IToolExecutionService execution,
-        IBeatmapWorkspace workspace,
-        ICurrentBeatmapLocator currentBeatmap,
-        IFilePicker filePicker,
-        IFileRevealService reveal,
-        IProjectService projects,
-        IProjectSerializer serializer,
-        IApplicationDirectories directories,
-        IDialogService dialogs,
-        ApplicationSettings settings,
-        IPatternGalleryInputDialog inputDialog)
-        : base(execution, OperationId)
-    {
-        _gallery = gallery ?? throw new ArgumentNullException(nameof(gallery));
-        _files = files ?? throw new ArgumentNullException(nameof(files));
-        _archives = archives ?? throw new ArgumentNullException(nameof(archives));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        _reveal = reveal ?? throw new ArgumentNullException(nameof(reveal));
-        _projects = projects ?? throw new ArgumentNullException(nameof(projects));
-        _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-        _directories = directories ?? throw new ArgumentNullException(nameof(directories));
-        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _inputDialog = inputDialog ?? throw new ArgumentNullException(nameof(inputDialog));
-        ConfigureProject();
-        RebuildGroups();
-    }
+    /// <summary>Gets the current physical collection paths for view commands.</summary>
+    public PatternGalleryCollectionPaths Paths => _paths ?? throw new InvalidOperationException("Pattern Gallery collection paths are not initialized.");
 
-    /// <inheritdoc/>
+    /// <summary>Gets the group names suitable for a context menu.</summary>
+    public IReadOnlyList<string> GroupNames => Project.Patterns
+        .Select(pattern => pattern.Group)
+        .Where(group => !string.IsNullOrWhiteSpace(group))
+        .Distinct(StringComparer.Ordinal)
+        .OrderBy(group => group, StringComparer.Ordinal)
+        .ToArray();
+
+    private string CollectionBasePath => Path.Combine(_directories.ApplicationData, "Pattern Gallery Projects");
+
+    /// <inheritdoc />
     string IQuickRun.OperationId => OperationId;
 
-    /// <inheritdoc/>
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+    /// <inheritdoc />
+    public async Task RunQuickAsync(CancellationToken cancellationToken)
+    {
+        string? current = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        await RunWithStateAsync(() => RunPathsAsync(
+            string.IsNullOrWhiteSpace(current) ? [] : [current],
+            true,
+            cancellationToken));
+    }
 
     IReadOnlyList<ShellProjectMenuItem> IShellExtraProjectMenuFeature.ExtraProjectMenuItems =>
     [
         new("_Rename collection", "Rename this collection and the collection's directory in the Pattern Files directory.", RenameCollectionCommand, MaterialIconKind.Edit),
         new("_Import collection", "Import a collection zip file to the projects folder.", ImportCollectionCommand, MaterialIconKind.Import),
-        new("_Export collection", "Export this collection to the Exports folder. The exported file can later be imported with the import menu.", ExportCollectionCommand, MaterialIconKind.Export),
-        new("_Restore collection", "Restore the collection from the pattern files directory. This will remove any patterns that have missing files, and add any patterns that have not been indexed. Make sure to back-up your collection before restoring it.", RestoreCollectionCommand, MaterialIconKind.Restore)
+        new("_Export collection", "Export this collection to the Exports folder. The exported file can later be imported with the import menu.", ExportCollectionCommand,
+            MaterialIconKind.Export),
+        new("_Restore collection",
+            "Restore the collection from the pattern files directory. This will remove any patterns that have missing files, and add any patterns that have not been indexed. Make sure to back-up your collection before restoring it.",
+            RestoreCollectionCommand, MaterialIconKind.Restore),
     ];
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
+    public void Activate()
+    {
+        StartThumbnailRefresh();
+    }
+
+    /// <inheritdoc />
+    public void Deactivate()
+    {
+        CancelThumbnailRefresh();
+    }
+
+    /// <inheritdoc />
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+
+    /// <inheritdoc />
     IReadOnlyList<string> IShellProjectFeature.AdditionalAutoSavePaths =>
         _paths is not null ? [_paths.ProjectFile] : [];
 
-    /// <inheritdoc/>
-    object IShellProjectFeature.Snapshot() => Snapshot(includeSelection: false);
+    /// <inheritdoc />
+    object IShellProjectFeature.Snapshot()
+    {
+        return Snapshot(false);
+    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     void IShellProjectFeature.Install(object project)
     {
-        if (project is not PatternGalleryProject typed)
-        {
-            throw new InvalidDataException("Pattern Gallery project is incomplete.");
-        }
+        if (project is not PatternGalleryProject typed) throw new InvalidDataException("Pattern Gallery project is incomplete.");
 
         CancelThumbnailRefresh();
         Project = typed;
@@ -269,28 +306,16 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         StartThumbnailRefresh();
     }
 
-    /// <inheritdoc/>
-    public void Activate() => StartThumbnailRefresh();
-
-    /// <inheritdoc/>
-    public void Deactivate()
-    {
-        CancelThumbnailRefresh();
-    }
-
     /// <summary>Adds a pattern from raw osu! hit-object and timing-point text.</summary>
     [RelayCommand]
     private async Task AddCodeAsync()
     {
-        PatternGalleryCodeInput? input = await _inputDialog.ShowCodeAsync($"Pattern {Project.Patterns.Count + 1}");
-        if (input is null)
-        {
-            return;
-        }
+        var input = await _inputDialog.ShowCodeAsync($"Pattern {Project.Patterns.Count + 1}");
+        if (input is null) return;
 
         try
         {
-            PatternGalleryPattern pattern = await _gallery.ImportCodeAsync(
+            var pattern = await _gallery.ImportCodeAsync(
                 input.Name,
                 input.HitObjects,
                 input.TimingPoints,
@@ -314,28 +339,22 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task AddFileAsync()
     {
-        IReadOnlyList<string> selected = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        var selected = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Import pattern file",
             AllowMultiple = false,
-            Filters = [CommonFilePickerFilters.Beatmaps]
+            Filters = [CommonFilePickerFilters.Beatmaps],
         });
         string? path = selected.FirstOrDefault();
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            return;
-        }
+        if (string.IsNullOrWhiteSpace(path)) return;
 
-        PatternGalleryFileInput? input = await _inputDialog.ShowFileAsync(
+        var input = await _inputDialog.ShowFileAsync(
             $"Pattern {Project.Patterns.Count + 1}", path);
-        if (input is null)
-        {
-            return;
-        }
+        if (input is null) return;
 
         try
         {
-            PatternGalleryPattern pattern = await _gallery.ImportFileAsync(
+            var pattern = await _gallery.ImportFileAsync(
                 input.FilePath,
                 input.Name,
                 input.Filter,
@@ -365,19 +384,16 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             return;
         }
 
-        ValueDialogResult<string> name = await _dialogs.ShowValueAsync(new ValueDialogRequest<string>(
+        var name = await _dialogs.ShowValueAsync(new ValueDialogRequest<string>(
             "Import selected objects",
             "Pattern name",
             $"Pattern {Project.Patterns.Count + 1}",
             new StringConverter()));
-        if (!name.Accepted || string.IsNullOrWhiteSpace(name.Value))
-        {
-            return;
-        }
+        if (!name.Accepted || string.IsNullOrWhiteSpace(name.Value)) return;
 
         try
         {
-            PatternGalleryPattern pattern = await _gallery.ImportSelectedAsync(
+            var pattern = await _gallery.ImportSelectedAsync(
                 sourcePath,
                 name.Value,
                 Paths,
@@ -395,21 +411,21 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
     /// <summary>Deletes selected patterns after a typed confirmation.</summary>
     [RelayCommand]
-    private Task RemoveAsync() => RemoveSelectedAsync(skipConfirmation: false);
+    private Task RemoveAsync()
+    {
+        return RemoveSelectedAsync(false);
+    }
 
     /// <summary>
-    /// Deletes selected patterns, optionally honoring the legacy Shift shortcut
-    /// that bypasses the confirmation dialog.
+    ///     Deletes selected patterns, optionally honoring the legacy Shift shortcut
+    ///     that bypasses the confirmation dialog.
     /// </summary>
     /// <param name="skipConfirmation">Whether to omit the confirmation step.</param>
     /// <returns>A task that completes after physical files and metadata are removed.</returns>
     public async Task RemoveSelectedAsync(bool skipConfirmation)
     {
-        PatternGalleryPattern[] selected = SelectedPatterns.ToArray();
-        if (selected.Length == 0)
-        {
-            return;
-        }
+        var selected = SelectedPatterns.ToArray();
+        if (selected.Length == 0) return;
 
         string message = selected.Length == 1
             ? $"Are you sure you want to delete \"{selected[0].Name}\"?"
@@ -420,24 +436,18 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 "Confirm deletion",
                 message,
                 [
-                    new DialogChoice<bool>("Yes", true, IsDefault: true),
-                    new DialogChoice<bool>("No", false, IsCancel: true)
+                    new DialogChoice<bool>("Yes", true, true),
+                    new DialogChoice<bool>("No", false, IsCancel: true),
                 ],
                 false));
-            if (!confirmed)
-            {
-                return;
-            }
+            if (!confirmed) return;
         }
 
         try
         {
             CancelThumbnailRefresh();
             await _gallery.DeleteAsync(selected, Paths);
-            foreach (PatternGalleryPattern pattern in selected)
-            {
-                Project.Patterns.Remove(pattern);
-            }
+            foreach (var pattern in selected) Project.Patterns.Remove(pattern);
 
             ResultSummary = $"Deleted {selected.Length} pattern{(selected.Length == 1 ? string.Empty : "s")}.";
             RebuildGroups();
@@ -452,21 +462,15 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task OpenExplorerSelectedAsync()
     {
-        foreach (PatternGalleryPattern pattern in SelectedPatterns)
-        {
-            await _reveal.RevealAsync(_files.GetPatternPath(Paths, pattern.FileName));
-        }
+        foreach (var pattern in SelectedPatterns) await _reveal.RevealAsync(_files.GetPatternPath(Paths, pattern.FileName));
     }
 
     /// <summary>Displays and optionally renames the first selected pattern.</summary>
     [RelayCommand]
     private async Task ShowDetailsAsync()
     {
-        PatternGalleryPattern? pattern = SelectedPatterns.FirstOrDefault();
-        if (pattern is null)
-        {
-            return;
-        }
+        var pattern = SelectedPatterns.FirstOrDefault();
+        if (pattern is null) return;
 
         string? name = await _inputDialog.ShowDetailsAsync(pattern);
         if (!string.IsNullOrWhiteSpace(name))
@@ -482,10 +486,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     public void AssignGroup(string? group)
     {
-        foreach (PatternGalleryPattern pattern in SelectedPatterns)
-        {
-            pattern.Group = group ?? string.Empty;
-        }
+        foreach (var pattern in SelectedPatterns) pattern.Group = group ?? string.Empty;
 
         RebuildGroups();
     }
@@ -494,42 +495,30 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task NewGroupAsync()
     {
-        ValueDialogResult<string> result = await _dialogs.ShowValueAsync(new ValueDialogRequest<string>(
+        var result = await _dialogs.ShowValueAsync(new ValueDialogRequest<string>(
             "New pattern group",
             "Group name",
             $"Group {Project.Patterns.Select(pattern => pattern.Group).Distinct().Count()}",
             new StringConverter()));
-        if (result.Accepted && !string.IsNullOrWhiteSpace(result.Value))
-        {
-            AssignGroup(result.Value);
-        }
+        if (result.Accepted && !string.IsNullOrWhiteSpace(result.Value)) AssignGroup(result.Value);
     }
 
     /// <summary>Renames the group containing the first selected pattern.</summary>
     [RelayCommand]
     private async Task RenameGroupAsync()
     {
-        PatternGalleryPattern? selected = SelectedPatterns.FirstOrDefault();
-        if (selected is null)
-        {
-            return;
-        }
+        var selected = SelectedPatterns.FirstOrDefault();
+        if (selected is null) return;
 
         string currentGroup = selected.Group;
-        ValueDialogResult<string> result = await _dialogs.ShowValueAsync(new ValueDialogRequest<string>(
+        var result = await _dialogs.ShowValueAsync(new ValueDialogRequest<string>(
             "Rename pattern group",
             "Group name",
             string.IsNullOrWhiteSpace(currentGroup) ? "None" : currentGroup,
             new StringConverter()));
-        if (!result.Accepted || string.IsNullOrWhiteSpace(result.Value))
-        {
-            return;
-        }
+        if (!result.Accepted || string.IsNullOrWhiteSpace(result.Value)) return;
 
-        foreach (PatternGalleryPattern pattern in Project.Patterns.Where(item => item.Group == currentGroup))
-        {
-            pattern.Group = result.Value;
-        }
+        foreach (var pattern in Project.Patterns.Where(item => item.Group == currentGroup)) pattern.Group = result.Value;
 
         RebuildGroups();
     }
@@ -538,25 +527,19 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task RenameCollectionAsync()
     {
-        ValueDialogResult<string> display = await _dialogs.ShowValueAsync(new ValueDialogRequest<string>(
+        var display = await _dialogs.ShowValueAsync(new ValueDialogRequest<string>(
             "Rename collection",
             "Collection name",
             CollectionName,
             new StringConverter()));
-        if (!display.Accepted || string.IsNullOrWhiteSpace(display.Value))
-        {
-            return;
-        }
+        if (!display.Accepted || string.IsNullOrWhiteSpace(display.Value)) return;
 
-        ValueDialogResult<string> folder = await _dialogs.ShowValueAsync(new ValueDialogRequest<string>(
+        var folder = await _dialogs.ShowValueAsync(new ValueDialogRequest<string>(
             "Rename collection folder",
             "Folder name",
             Project.FileHandler.CollectionFolderName,
             new StringConverter()));
-        if (!folder.Accepted || string.IsNullOrWhiteSpace(folder.Value))
-        {
-            return;
-        }
+        if (!folder.Accepted || string.IsNullOrWhiteSpace(folder.Value)) return;
 
         try
         {
@@ -586,8 +569,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
         try
         {
-            PatternGalleryProject snapshot = Snapshot(includeSelection: false);
-            List<PatternGalleryArchiveFile> files = snapshot.Patterns
+            var snapshot = Snapshot(false);
+            var files = snapshot.Patterns
                 .Select(pattern => new PatternGalleryArchiveFile(
                     pattern.FileName,
                     _files.ReadPatternBytes(_files.GetPatternPath(Paths, pattern.FileName))))
@@ -611,46 +594,41 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ImportCollectionAsync()
     {
-        IReadOnlyList<string> selected = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
+        var selected = await _filePicker.PickOpenFilesAsync(new OpenFilePickerRequest
         {
             Title = "Import Pattern Gallery collection",
             AllowMultiple = false,
-            Filters = [new FilePickerFilter("ZIP archive", ["*.zip"], ["application/zip"])]
+            Filters = [new FilePickerFilter("ZIP archive", ["*.zip"], ["application/zip"])],
         });
         string? archivePath = selected.FirstOrDefault();
-        if (string.IsNullOrWhiteSpace(archivePath))
-        {
-            return;
-        }
+        if (string.IsNullOrWhiteSpace(archivePath)) return;
 
         try
         {
-            PatternGalleryArchive archive = await _archives.ReadAsync(archivePath);
+            var archive = await _archives.ReadAsync(archivePath);
             bool merge = await _dialogs.ShowMessageAsync(new MessageDialogRequest<bool>(
                 "Import Pattern Gallery collection",
                 "Merge the imported patterns into the current collection?",
                 [
-                    new DialogChoice<bool>("Merge", true, IsDefault: true),
-                    new DialogChoice<bool>("New collection", false, IsCancel: true)
+                    new DialogChoice<bool>("Merge", true, true),
+                    new DialogChoice<bool>("New collection", false, IsCancel: true),
                 ],
                 false));
 
-            PatternGalleryProject imported = _serializer.Deserialize<PatternGalleryProject>(archive.ProjectJson);
+            var imported = _serializer.Deserialize<PatternGalleryProject>(archive.ProjectJson);
             imported.FileHandler.CollectionFolderName = archive.CollectionFolderName;
             if (merge)
             {
                 CancelThumbnailRefresh();
                 _files.EnsureCollection(Paths);
-                Dictionary<string, PatternGalleryArchiveFile> contents = archive.PatternFiles
+                var contents = archive.PatternFiles
                     .ToDictionary(file => file.FileName, StringComparer.OrdinalIgnoreCase);
-                foreach (PatternGalleryPattern pattern in imported.Patterns)
-                {
-                    if (contents.TryGetValue(pattern.FileName, out PatternGalleryArchiveFile? file))
+                foreach (var pattern in imported.Patterns)
+                    if (contents.TryGetValue(pattern.FileName, out var file))
                     {
                         _files.WritePatternBytes(_files.GetPatternPath(Paths, pattern.FileName), file.Content);
                         Project.Patterns.Add(pattern);
                     }
-                }
 
                 RebuildGroups();
                 StartThumbnailRefresh();
@@ -658,11 +636,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 return;
             }
 
-            PatternGalleryCollectionPaths importedPaths = _files.Resolve(CollectionBasePath, imported.FileHandler);
-            if (Directory.Exists(importedPaths.Collection))
-            {
-                throw new IOException($"Collection folder '{imported.FileHandler.CollectionFolderName}' already exists.");
-            }
+            var importedPaths = _files.Resolve(CollectionBasePath, imported.FileHandler);
+            if (Directory.Exists(importedPaths.Collection)) throw new IOException($"Collection folder '{imported.FileHandler.CollectionFolderName}' already exists.");
 
             CancelThumbnailRefresh();
             await _archives.ExtractAsync(archivePath, CollectionBasePath);
@@ -670,16 +645,13 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 "Load imported collection",
                 $"Load '{imported.CollectionName}' as the active Pattern Gallery collection?",
                 [
-                    new DialogChoice<bool>("Load", true, IsDefault: true),
-                    new DialogChoice<bool>("Keep current", false, IsCancel: true)
+                    new DialogChoice<bool>("Load", true, true),
+                    new DialogChoice<bool>("Keep current", false, IsCancel: true),
                 ],
                 false));
             if (load)
             {
-                if (Project.Patterns.Count > 0)
-                {
-                    await _projects.SaveAsync(Paths.ProjectFile, Snapshot(includeSelection: false));
-                }
+                if (Project.Patterns.Count > 0) await _projects.SaveAsync(Paths.ProjectFile, Snapshot(false));
 
                 ((IShellProjectFeature)this).Install(imported);
             }
@@ -700,19 +672,16 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             "Restore Pattern Gallery collection",
             "Remove missing patterns and add pattern files that are not indexed?",
             [
-                new DialogChoice<bool>("Restore", true, IsDefault: true),
-                new DialogChoice<bool>("Cancel", false, IsCancel: true)
+                new DialogChoice<bool>("Restore", true, true),
+                new DialogChoice<bool>("Cancel", false, IsCancel: true),
             ],
             false));
-        if (!confirmed)
-        {
-            return;
-        }
+        if (!confirmed) return;
 
         try
         {
             CancelThumbnailRefresh();
-            PatternGalleryRestoreResult result = await _gallery.RestoreAsync(Project, Paths);
+            var result = await _gallery.RestoreAsync(Project, Paths);
             RebuildGroups();
             StartThumbnailRefresh();
             ResultSummary = $"Restored collection: removed {result.RemovedCount}, added {result.AddedCount}.";
@@ -728,42 +697,31 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     public void SelectOnly(PatternGalleryItemViewModel item)
     {
         ArgumentNullException.ThrowIfNull(item);
-        foreach (PatternGalleryItemViewModel galleryItem in _items.Values)
-        {
-            galleryItem.IsSelected = ReferenceEquals(galleryItem, item);
-        }
+        foreach (var galleryItem in _items.Values) galleryItem.IsSelected = ReferenceEquals(galleryItem, item);
     }
 
     /// <summary>Selects or clears every indexed pattern.</summary>
     /// <param name="select">Whether all patterns should be selected.</param>
     public void SetSelectAll(bool select)
     {
-        foreach (PatternGalleryItemViewModel item in _items.Values)
-        {
-            item.IsSelected = select;
-        }
+        foreach (var item in _items.Values) item.IsSelected = select;
     }
 
     /// <summary>Selects every indexed pattern.</summary>
     [RelayCommand]
-    private void SelectAll() => SetSelectAll(true);
+    private void SelectAll()
+    {
+        SetSelectAll(true);
+    }
 
     /// <summary>Clears selection from every indexed pattern.</summary>
     [RelayCommand]
-    private void ClearSelection() => SetSelectAll(false);
+    private void ClearSelection()
+    {
+        SetSelectAll(false);
+    }
 
-    /// <summary>Gets the current physical collection paths for view commands.</summary>
-    public PatternGalleryCollectionPaths Paths => _paths ?? throw new InvalidOperationException("Pattern Gallery collection paths are not initialized.");
-
-    /// <summary>Gets the group names suitable for a context menu.</summary>
-    public IReadOnlyList<string> GroupNames => Project.Patterns
-        .Select(pattern => pattern.Group)
-        .Where(group => !string.IsNullOrWhiteSpace(group))
-        .Distinct(StringComparer.Ordinal)
-        .OrderBy(group => group, StringComparer.Ordinal)
-        .ToArray();
-
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override bool PrepareRun()
     {
         ValidateAllProperties();
@@ -788,7 +746,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         return true;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
         if (ExportTimeMode == ExportTimeMode.Current)
@@ -796,22 +754,12 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             string? current = await _currentBeatmap.FindCurrentBeatmapAsync();
             await RunPathsAsync(
                 string.IsNullOrWhiteSpace(current) ? [] : [current],
-                quick: _settings.AlwaysQuickRun,
+                _settings.AlwaysQuickRun,
                 CancellationToken.None);
             return;
         }
 
-        await RunPathsAsync(_workspace.SelectedPaths, quick: _settings.AlwaysQuickRun, CancellationToken.None);
-    }
-
-    /// <inheritdoc/>
-    public async Task RunQuickAsync(CancellationToken cancellationToken)
-    {
-        string? current = await _currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
-        await RunWithStateAsync(() => RunPathsAsync(
-            string.IsNullOrWhiteSpace(current) ? [] : [current],
-            quick: true,
-            cancellationToken));
+        await RunPathsAsync(_workspace.SelectedPaths, _settings.AlwaysQuickRun, CancellationToken.None);
     }
 
     private async Task RunPathsAsync(
@@ -825,15 +773,15 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             return;
         }
 
-        PatternGalleryProject project = Snapshot(includeSelection: false);
-        PatternGalleryPattern[] patterns = SelectedPatterns.ToArray();
-        ToolExecutionResult<PatternGalleryRunResult> execution = await Execution.ExecuteAsync(
+        var project = Snapshot(false);
+        var patterns = SelectedPatterns.ToArray();
+        var execution = await Execution.ExecuteAsync(
             new ToolExecutionRequest<PatternGalleryRunResult>(
                 OperationId,
                 "Pattern Gallery",
                 async context =>
                 {
-                    PatternGalleryRunResult result = await _gallery.ExportAsync(
+                    var result = await _gallery.ExportAsync(
                         targetPaths[0],
                         patterns,
                         project,
@@ -844,15 +792,15 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                     return new ToolExecutionOutput<PatternGalleryRunResult>(
                         result,
                         quick ? null : result.Message,
-                        reloadEditor: quick);
+                        quick);
                 }),
             CreateProgress(),
             cancellationToken);
 
         if (execution.Status == ToolExecutionStatus.Succeeded && execution.Value is not null)
         {
-            DateTime usedAt = DateTime.Now;
-            foreach (PatternGalleryPattern pattern in SelectedPatterns)
+            var usedAt = DateTime.Now;
+            foreach (var pattern in SelectedPatterns)
             {
                 pattern.UseCount++;
                 pattern.LastUsedTime = usedAt;
@@ -876,7 +824,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             {
                 BasePath = CollectionBasePath,
                 PatternFilesFolderName = Project.FileHandler.PatternFilesFolderName,
-                CollectionFolderName = Project.FileHandler.CollectionFolderName
+                CollectionFolderName = Project.FileHandler.CollectionFolderName,
             },
             ExportTimeMode = ExportTimeMode,
             CustomExportTime = CustomExportTime,
@@ -896,11 +844,10 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             FixStackLeniency = FixStackLeniency,
             FixTickRate = FixTickRate,
             CustomScale = CustomScale,
-            CustomRotate = CustomRotate
+            CustomRotate = CustomRotate,
         };
 
-        foreach (PatternGalleryPattern pattern in Project.Patterns)
-        {
+        foreach (var pattern in Project.Patterns)
             snapshot.Patterns.Add(new PatternGalleryPattern
             {
                 Name = pattern.Name,
@@ -911,9 +858,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 FileName = pattern.FileName,
                 ObjectCount = pattern.ObjectCount,
                 Duration = pattern.Duration,
-                BeatLength = pattern.BeatLength
+                BeatLength = pattern.BeatLength,
             });
-        }
 
         return snapshot;
     }
@@ -952,9 +898,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
     private void RebuildGroups()
     {
-        IEnumerable<PatternGalleryPattern> visible = Project.Patterns.Where(pattern =>
-            string.IsNullOrWhiteSpace(SearchFilter) ||
-            pattern.Name.Contains(SearchFilter, StringComparison.OrdinalIgnoreCase));
+        var visible = Project.Patterns.Where(pattern =>
+            string.IsNullOrWhiteSpace(SearchFilter) || pattern.Name.Contains(SearchFilter, StringComparison.OrdinalIgnoreCase));
         visible = SortPatterns(visible);
         Groups = visible
             .GroupBy(pattern => pattern.Group ?? string.Empty, StringComparer.Ordinal)
@@ -968,7 +913,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
     private IEnumerable<PatternGalleryPattern> SortPatterns(IEnumerable<PatternGalleryPattern> patterns)
     {
-        IOrderedEnumerable<PatternGalleryPattern> ordered = SortProperty switch
+        var ordered = SortProperty switch
         {
             "Name" => patterns.OrderBy(pattern => pattern.Name, StringComparer.Ordinal),
             "Last used time" => patterns.OrderBy(pattern => pattern.LastUsedTime),
@@ -976,14 +921,14 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             "Object count" => patterns.OrderBy(pattern => pattern.ObjectCount),
             "Duration" => patterns.OrderBy(pattern => pattern.Duration),
             "Beat length" => patterns.OrderBy(pattern => pattern.BeatLength),
-            _ => patterns.OrderBy(pattern => pattern.CreationTime)
+            _ => patterns.OrderBy(pattern => pattern.CreationTime),
         };
         return SortDirection == 0 ? ordered : ordered.Reverse();
     }
 
     private PatternGalleryItemViewModel GetItem(PatternGalleryPattern pattern)
     {
-        if (!_items.TryGetValue(pattern, out PatternGalleryItemViewModel? item))
+        if (!_items.TryGetValue(pattern, out var item))
         {
             item = new PatternGalleryItemViewModel(pattern);
             _items.Add(pattern, item);
@@ -1008,21 +953,17 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
 
     private async Task RefreshThumbnailsAsync(CancellationToken cancellationToken)
     {
-        PatternGalleryProject project = Project;
-        PatternGalleryCollectionPaths paths = Paths;
-        foreach (PatternGalleryPattern pattern in project.Patterns.ToArray())
+        var project = Project;
+        var paths = Paths;
+        foreach (var pattern in project.Patterns.ToArray())
         {
             cancellationToken.ThrowIfCancellationRequested();
-            PatternGalleryItemViewModel item = GetItem(pattern);
+            var item = GetItem(pattern);
             try
             {
-                Beatmap? beatmap = await _gallery.LoadBeatmapAsync(pattern, paths, cancellationToken);
-                if (cancellationToken.IsCancellationRequested ||
-                    !ReferenceEquals(Project, project) ||
-                    !project.Patterns.Contains(pattern))
-                {
+                var beatmap = await _gallery.LoadBeatmapAsync(pattern, paths, cancellationToken);
+                if (cancellationToken.IsCancellationRequested || !ReferenceEquals(Project, project) || !project.Patterns.Contains(pattern))
                     return;
-                }
 
                 item.SetThumbnail(beatmap);
             }
@@ -1032,25 +973,31 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             }
             catch
             {
-                if (cancellationToken.IsCancellationRequested ||
-                    !ReferenceEquals(Project, project) ||
-                    !project.Patterns.Contains(pattern))
-                {
+                if (cancellationToken.IsCancellationRequested || !ReferenceEquals(Project, project) || !project.Patterns.Contains(pattern))
                     return;
-                }
 
                 item.SetThumbnail(null);
             }
         }
     }
 
-    private string CollectionBasePath => Path.Combine(_directories.ApplicationData, "Pattern Gallery Projects");
+    partial void OnSearchFilterChanged(string value)
+    {
+        RebuildGroups();
+    }
 
-    partial void OnSearchFilterChanged(string value) => RebuildGroups();
+    partial void OnSortPropertyChanged(string value)
+    {
+        RebuildGroups();
+    }
 
-    partial void OnSortPropertyChanged(string value) => RebuildGroups();
+    partial void OnSortDirectionChanged(int value)
+    {
+        RebuildGroups();
+    }
 
-    partial void OnSortDirectionChanged(int value) => RebuildGroups();
-
-    partial void OnExportTimeModeChanged(ExportTimeMode value) => OnPropertyChanged(nameof(CustomExportTimeVisible));
+    partial void OnExportTimeModeChanged(ExportTimeMode value)
+    {
+        OnPropertyChanged(nameof(CustomExportTimeVisible));
+    }
 }

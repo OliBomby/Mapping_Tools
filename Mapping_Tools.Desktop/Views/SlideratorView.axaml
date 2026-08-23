@@ -21,21 +21,21 @@
                 <ColumnDefinition Width="90" />
             </Grid.ColumnDefinitions>
             <controls:GraphControl x:Name="GraphControlElement"
-                                    Grid.Row="0"
-                                    Grid.Column="1"
-                                    Grid.ColumnSpan="3"
-                                    Margin="43,0,0,43"
-                                    MinMarkerSpacing="20"
-                                    GraphState="{Binding GraphState, Mode=TwoWay}"
-                                    HorizontalAxisVisible="{Binding HorizontalAxisVisible}"
-                                    VerticalAxisVisible="{Binding VerticalAxisVisible}"
-                                    StartPointLockedY="{Binding StartPointLockedY}"
-                                    IsEditable="True"
-                                    MarkerSnappingHorizontal="True"
-                                    MarkerSnappingVertical="True"
-                                    MarkerSnappingRangeVertical="0.01"
-                                    Stroke="Cyan"
-                                    ToolTip.Tip="Edit the position/velocity graph with pointer gestures and the context menu." />
+                                   Grid.Row="0"
+                                   Grid.Column="1"
+                                   Grid.ColumnSpan="3"
+                                   Margin="43,0,0,43"
+                                   MinMarkerSpacing="20"
+                                   GraphState="{Binding GraphState, Mode=TwoWay}"
+                                   HorizontalAxisVisible="{Binding HorizontalAxisVisible}"
+                                   VerticalAxisVisible="{Binding VerticalAxisVisible}"
+                                   StartPointLockedY="{Binding StartPointLockedY}"
+                                   IsEditable="True"
+                                   MarkerSnappingHorizontal="True"
+                                   MarkerSnappingVertical="True"
+                                   MarkerSnappingRangeVertical="0.01"
+                                   Stroke="Cyan"
+                                   ToolTip.Tip="Edit the position/velocity graph with pointer gestures and the context menu." />
 
             <Border Grid.Row="1"
                     Grid.Column="2"
@@ -86,7 +86,8 @@
                     </Grid>
 
                     <Grid Margin="0,10,0,0" ColumnDefinitions="Auto,*">
-                        <TextBlock Grid.Column="0" Text="{Binding LoadedHitObjects.Count, StringFormat='Loaded {0} slider(s)'}" />
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding LoadedHitObjects.Count, StringFormat='Loaded {0} slider(s)'}" />
                         <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
                             <Button Margin="0,0,5,0"
                                     Click="MoveLeft"
@@ -191,14 +192,16 @@
                              materialAssists:TextFieldAssist.Label="SV limit"
                              ToolTip.Tip="Self-imposed SV limit to help you make sure the slope in the graph doesn't become greater than this speed limit. For example use 10x SV limit to match the osu! speed limit." />
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Margin="0,0,5,0" Command="{Binding ScaleCompleteCommand}" ToolTip.Tip="Scale graph to completion.">
+                        <Button Margin="0,0,5,0" Command="{Binding ScaleCompleteCommand}"
+                                ToolTip.Tip="Scale graph to completion.">
                             <materialIcons:MaterialIcon Kind="RelativeScale" Width="24" Height="24" />
                         </Button>
                         <Button Margin="0,0,5,0" Command="{Binding ClearGraphCommand}" ToolTip.Tip="Reset graph.">
                             <materialIcons:MaterialIcon Kind="Rocket" Width="24" Height="24" />
                         </Button>
                         <Button Command="{Binding GraphToggleCommand}" ToolTip.Tip="Toggle graph mode.">
-                            <TextBlock Text="{Binding GraphModeText}" FontWeight="Bold" Width="24" HorizontalAlignment="Center" />
+                            <TextBlock Text="{Binding GraphModeText}" FontWeight="Bold" Width="24"
+                                       HorizontalAlignment="Center" />
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -230,7 +233,8 @@
         </Grid>
 
         <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
-            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby, Karoo, &amp; JPK314" />
+            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58"
+                       Text="Made by OliBomby, Karoo, &amp; JPK314" />
             <controls:ToolProgressBar Grid.Column="1"
                                       Height="20"
                                       Margin="20,0"

@@ -1,5 +1,4 @@
 using Avalonia;
-using FluentAssertions;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Desktop.Controls;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

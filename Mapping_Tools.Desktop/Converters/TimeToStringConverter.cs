@@ -6,33 +6,27 @@ using Mapping_Tools.Core.Classes.SystemTools;
 namespace Mapping_Tools.Desktop.Converters;
 
 /// <summary>
-/// Displays preview timestamps as osu! time text and parses timestamp or numeric input.
+///     Displays preview timestamps as osu! time text and parses timestamp or numeric input.
 /// </summary>
 public sealed class TimeToStringConverter : IValueConverter
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public object Convert(
         object? value,
         Type targetType,
         object? parameter,
         CultureInfo culture)
     {
-        if (value is not double milliseconds)
-        {
-            return string.Empty;
-        }
+        if (value is not double milliseconds) return string.Empty;
 
-        if (parameter is not null)
-        {
-            return milliseconds.ToString("R", CultureInfo.InvariantCulture);
-        }
+        if (parameter is not null) return milliseconds.ToString("R", CultureInfo.InvariantCulture);
 
         try
         {
-            TimeSpan time = TimeSpan.FromMilliseconds(milliseconds);
-            return $"{(time.Days > 0 ? $"{time.Days:####}:" : string.Empty)}" +
-                   $"{(time.Hours > 0 ? $"{time.Hours:00}:" : string.Empty)}" +
-                   $"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds:000}";
+            var time = TimeSpan.FromMilliseconds(milliseconds);
+            return $"{(time.Days > 0 ? $"{time.Days:####}:" : string.Empty)}"
+                   + $"{(time.Hours > 0 ? $"{time.Hours:00}:" : string.Empty)}"
+                   + $"{time.Minutes:00}:{time.Seconds:00}:{time.Milliseconds:000}";
         }
         catch (OverflowException)
         {
@@ -40,7 +34,7 @@ public sealed class TimeToStringConverter : IValueConverter
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public object ConvertBack(
         object? value,
         Type targetType,
@@ -48,11 +42,9 @@ public sealed class TimeToStringConverter : IValueConverter
         CultureInfo culture)
     {
         if (value is not string text)
-        {
             return new BindingNotification(
                 new FormatException("Enter a valid time."),
                 BindingErrorType.DataValidationError);
-        }
 
         try
         {
@@ -60,15 +52,9 @@ public sealed class TimeToStringConverter : IValueConverter
         }
         catch (Exception)
         {
-            if (TypeConverters.TryParseDouble(text, out double result))
-            {
-                return result;
-            }
+            if (TypeConverters.TryParseDouble(text, out double result)) return result;
 
-            if (parameter is not null)
-            {
-                return -1d;
-            }
+            if (parameter is not null) return -1d;
 
             return new BindingNotification(
                 new FormatException("Time format error."),

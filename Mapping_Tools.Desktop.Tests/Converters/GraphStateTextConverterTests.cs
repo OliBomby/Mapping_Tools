@@ -1,3 +1,5 @@
+using System.Globalization;
+using Avalonia.Data;
 using Mapping_Tools.Core.Classes.Graph;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Desktop.Converters;
@@ -15,7 +17,7 @@ public sealed class GraphStateTextConverterTests
         GraphStateTextConverter converter = new();
 
         // Act
-        object result = converter.Convert(GraphStateTextCodec.CreateConstant(2.5), typeof(string), null, System.Globalization.CultureInfo.InvariantCulture);
+        object result = converter.Convert(GraphStateTextCodec.CreateConstant(2.5), typeof(string), null, CultureInfo.InvariantCulture);
 
         // Assert
         result.Should().Be("2.5");
@@ -35,7 +37,7 @@ public sealed class GraphStateTextConverterTests
         string text = GraphStateTextCodec.Format(source);
 
         // Act
-        object result = converter.ConvertBack(text, typeof(GraphState), null, System.Globalization.CultureInfo.InvariantCulture);
+        object result = converter.ConvertBack(text, typeof(GraphState), null, CultureInfo.InvariantCulture);
 
         // Assert
         result.Should().BeOfType<GraphState>();
@@ -49,10 +51,10 @@ public sealed class GraphStateTextConverterTests
         GraphStateTextConverter converter = new();
 
         // Act
-        object result = converter.ConvertBack(string.Empty, typeof(GraphState), null, System.Globalization.CultureInfo.InvariantCulture);
+        object result = converter.ConvertBack(string.Empty, typeof(GraphState), null, CultureInfo.InvariantCulture);
 
         // Assert
-        result.Should().BeOfType<Avalonia.Data.BindingNotification>();
-        ((Avalonia.Data.BindingNotification)result).ErrorType.Should().Be(Avalonia.Data.BindingErrorType.DataValidationError);
+        result.Should().BeOfType<BindingNotification>();
+        ((BindingNotification)result).ErrorType.Should().Be(BindingErrorType.DataValidationError);
     }
 }

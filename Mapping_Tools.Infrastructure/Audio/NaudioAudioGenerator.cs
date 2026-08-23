@@ -10,8 +10,8 @@ namespace Mapping_Tools.Infrastructure.Audio;
 public sealed class NaudioAudioGenerator : IAudioGenerator
 {
     private readonly IAudioDecoder _decoder;
-    private readonly ISoundFontRenderer _soundFontRenderer;
     private readonly IAudioEffectService _effects;
+    private readonly ISoundFontRenderer _soundFontRenderer;
 
     /// <summary>Creates the NAudio-backed sample generator.</summary>
     /// <param name="decoder">The file decoder.</param>
@@ -27,24 +27,21 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
         _effects = effects ?? throw new ArgumentNullException(nameof(effects));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<AudioClip> GenerateAsync(
         AudioGenerationRequest request,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-        AudioClip? source = request.Sample.UsesSoundFont
+        var source = request.Sample.UsesSoundFont
             ? await _soundFontRenderer.RenderAsync(new SoundFontNoteRequest(request.Sample), cancellationToken)
                 .ConfigureAwait(false)
             : await _decoder.DecodeAsync(new AudioDecodeRequest(request.Sample.Path), cancellationToken)
                 .ConfigureAwait(false);
 
-        if (source is null)
-        {
-            throw new InvalidDataException("No SoundFont zone matched the requested sample.");
-        }
+        if (source is null) throw new InvalidDataException("No SoundFont zone matched the requested sample.");
 
-        AudioClip transformed = request.Sample.UsesSoundFont
+        var transformed = request.Sample.UsesSoundFont
             ? source
             : ApplySampleArguments(source, request.Sample, cancellationToken);
         return request.Effects.Count == 0
@@ -59,19 +56,14 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
     {
         ISampleProvider provider = new ClipSampleProvider(source);
         if (!NearlyEqual(arguments.Volume, 1))
-        {
             provider = new VolumeSampleProvider(provider)
             {
-                Volume = (float)AudioVolume.ToAmplitude(arguments.Volume)
+                Volume = (float)AudioVolume.ToAmplitude(arguments.Volume),
             };
-        }
 
         if (!NearlyEqual(arguments.Panning, 0))
         {
-            if (provider.WaveFormat.Channels == 2)
-            {
-                provider = new StereoToMonoSampleProvider(provider);
-            }
+            if (provider.WaveFormat.Channels == 2) provider = new StereoToMonoSampleProvider(provider);
 
             provider = new PanningSampleProvider(provider) { Pan = (float)arguments.Panning };
         }
@@ -88,10 +80,7 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
         {
             cancellationToken.ThrowIfCancellationRequested();
             int read = provider.Read(buffer, 0, buffer.Length);
-            if (read == 0)
-            {
-                break;
-            }
+            if (read == 0) break;
 
             samples.AddRange(buffer.AsSpan(0, read).ToArray());
         }
@@ -101,7 +90,10 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
             samples);
     }
 
-    private static bool NearlyEqual(double left, double right) => Math.Abs(left - right) < 1e-12;
+    private static bool NearlyEqual(double left, double right)
+    {
+        return Math.Abs(left - right) < 1e-12;
+    }
 
     private sealed class ClipSampleProvider : ISampleProvider
     {
@@ -119,15 +111,9 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
         public int Read(float[] buffer, int offset, int count)
         {
             int read = Math.Min(count, _samples.Length - _position);
-            if (read <= 0)
-            {
-                return 0;
-            }
+            if (read <= 0) return 0;
 
-            for (int index = 0; index < read; index++)
-            {
-                buffer[offset + index] = _samples[_position + index];
-            }
+            for (int index = 0; index < read; index++) buffer[offset + index] = _samples[_position + index];
             _position += read;
             return read;
         }

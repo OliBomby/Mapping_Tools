@@ -1,3 +1,4 @@
+using System.Globalization;
 using Mapping_Tools.Application.Audio;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.MapCleaner;
@@ -7,27 +8,26 @@ using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Events;
 using Mapping_Tools.Core.Classes.HitsoundStuff;
-using Mapping_Tools.Core.Classes.SystemTools;
 using Mapping_Tools.Core.Tools.HitsoundStudio;
 
 namespace Mapping_Tools.Application.HitsoundStudio;
 
 /// <summary>
-/// Coordinates Hitsound Studio imports, neutral audio services, schema rules,
-/// package export, and cancellation without referencing a desktop framework.
+///     Coordinates Hitsound Studio imports, neutral audio services, schema rules,
+///     package export, and cancellation without referencing a desktop framework.
 /// </summary>
 public sealed class HitsoundStudioService : IHitsoundStudioService
 {
-    private readonly IBeatmapEditingGateway _beatmaps;
-    private readonly IMapCleanerSampleService _sampleAnalyzer;
-    private readonly IAudioGenerator _generator;
-    private readonly AudioPreviewService _preview;
     private readonly IAudioExporter _audioExporter;
-    private readonly IAudioClipMixer _mixer;
-    private readonly IMidiService _midi;
-    private readonly IHitsoundStudioFileSystem _files;
-    private readonly IFileRevealService _reveal;
+    private readonly IBeatmapEditingGateway _beatmaps;
     private readonly HitsoundStudioEngine _engine;
+    private readonly IHitsoundStudioFileSystem _files;
+    private readonly IAudioGenerator _generator;
+    private readonly IMidiService _midi;
+    private readonly IAudioClipMixer _mixer;
+    private readonly AudioPreviewService _preview;
+    private readonly IFileRevealService _reveal;
+    private readonly IMapCleanerSampleService _sampleAnalyzer;
 
     /// <summary>Creates the Hitsound Studio application service.</summary>
     /// <param name="beatmaps">Loads disk-only beatmaps and writes export copies.</param>
@@ -64,7 +64,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         _engine = engine ?? throw new ArgumentNullException(nameof(engine));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<IReadOnlyList<HitsoundLayer>> ImportAsync(
         HitsoundStudioImportRequest request,
         CancellationToken cancellationToken = default)
@@ -74,40 +74,39 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         return request.ImportType switch
         {
             ImportType.None =>
-                [new HitsoundLayer(request.Name, SampleSetOrDefault(request.SampleSet), request.Hitsound,
-                    new SampleGeneratingArgs(request.SamplePath), new LayerImportArgs())],
+            [
+                new HitsoundLayer(request.Name, SampleSetOrDefault(request.SampleSet), request.Hitsound,
+                    new SampleGeneratingArgs(request.SamplePath), new LayerImportArgs()),
+            ],
             ImportType.Stack => await ImportStackAsync(request, cancellationToken).ConfigureAwait(false),
             ImportType.Hitsounds => await ImportHitsoundsAsync(request, cancellationToken).ConfigureAwait(false),
             ImportType.Storyboard => await ImportStoryboardAsync(request, cancellationToken).ConfigureAwait(false),
             ImportType.MIDI => await ImportMidiAsync(request, cancellationToken).ConfigureAwait(false),
-            _ => throw new ArgumentOutOfRangeException(nameof(request.ImportType), request.ImportType, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(request.ImportType), request.ImportType, null),
         };
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<IReadOnlyList<HitsoundLayer>> ReloadAsync(
         IReadOnlyList<HitsoundLayer> layers,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(layers);
         List<HitsoundLayer> reloaded = [];
-        foreach (IGrouping<ImportReloadingArgs, HitsoundLayer> group in layers
-            .Where(layer => layer.ImportArgs.ImportType != ImportType.None)
+        foreach (var group in layers
+                     .Where(layer => layer.ImportArgs.ImportType != ImportType.None)
                      .GroupBy(layer => layer.ImportArgs.GetImportReloadingArgs(), new ImportReloadingArgsComparer()))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            IReadOnlyList<HitsoundLayer> imported = await ImportAsync(
+            var imported = await ImportAsync(
                 ToImportRequest(group.Key), cancellationToken).ConfigureAwait(false);
-            foreach (HitsoundLayer layer in group)
-            {
-                layer.Reload(imported.ToList());
-            }
+            foreach (var layer in group) layer.Reload(imported.ToList());
         }
 
         return layers;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<IReadOnlyDictionary<SampleGeneratingArgs, Exception>> ValidateSamplesAsync(
         IReadOnlyList<SampleGeneratingArgs> samples,
         CancellationToken cancellationToken = default)
@@ -115,14 +114,11 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         ArgumentNullException.ThrowIfNull(samples);
         Dictionary<SampleGeneratingArgs, Exception> failures =
             new(new SampleGeneratingArgsComparer());
-        foreach (SampleGeneratingArgs sample in samples.Distinct(new SampleGeneratingArgsComparer()))
+        foreach (var sample in samples.Distinct(new SampleGeneratingArgsComparer()))
         {
             cancellationToken.ThrowIfCancellationRequested();
             // Load the samples so validation can be done
-            if (string.IsNullOrWhiteSpace(sample.Path) || IsSkinDefaultSample(sample.Path))
-            {
-                continue;
-            }
+            if (string.IsNullOrWhiteSpace(sample.Path) || IsSkinDefaultSample(sample.Path)) continue;
 
             if (!_files.FileExists(sample.Path))
             {
@@ -145,7 +141,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         return failures;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task<IAudioPlaybackSession> PreviewAsync(
         SampleGeneratingArgs sample,
         CancellationToken cancellationToken = default)
@@ -154,7 +150,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         return _preview.PreviewGeneratedAsync(new AudioGenerationRequest(sample), cancellationToken: cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<HitsoundStudioExportResult> ExportAsync(
         HitsoundStudioProject project,
         IProgress<double>? progress = null,
@@ -168,27 +164,27 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             : project.ExportMap || project.ExportSamples;
 
         Report(progress, 5);
-        bool validateSampleFile = project.SingleSampleExportFormat != HitsoundStudioSampleExportFormat.MidiChords &&
-                                  project.MixedSampleExportFormat != HitsoundStudioSampleExportFormat.MidiChords;
+        bool validateSampleFile = project.SingleSampleExportFormat != HitsoundStudioSampleExportFormat.MidiChords
+                                  && project.MixedSampleExportFormat != HitsoundStudioSampleExportFormat.MidiChords;
         SampleGeneratingArgsComparer comparer = new(validateSampleFile);
         Func<SampleGeneratingArgs, bool> isValid = sample =>
             !validateSampleFile || IsValidSource(sample);
-        HitsoundStudioExportMode mode = project.HitsoundExportModeSetting;
+        var mode = project.HitsoundExportModeSetting;
         // Convert the multiple layers into packages that have the samples from all the layers at one specific time
         // Don't add default sample when exporting midi files because that's not a final export.
-        List<SamplePackage> packages = _engine.ZipLayers(
+        var packages = _engine.ZipLayers(
             project.HitsoundLayers,
             project.DefaultSample,
             mode == HitsoundStudioExportMode.Standard ? project.ZipLayersLeniency : 0,
-            needNormalSample: mode == HitsoundStudioExportMode.Standard && validateSampleFile).ToList();
+            mode == HitsoundStudioExportMode.Standard && validateSampleFile).ToList();
         Report(progress, mode == HitsoundStudioExportMode.Midi ? 20 : 10);
 
         // Balance the volume between greenlines and samples
         _engine.BalanceVolumes(
             packages,
-            roughness: 0,
-            alwaysFullVolume: false,
-            individualVolume: mode is HitsoundStudioExportMode.Coinciding or
+            0,
+            false,
+            mode is HitsoundStudioExportMode.Coinciding or
                 HitsoundStudioExportMode.Storyboard);
         Report(progress, 20);
         Report(progress, mode == HitsoundStudioExportMode.Standard
@@ -202,9 +198,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         SampleSchema schema;
         IReadOnlyList<HitsoundEvent> events;
         if (project.UsePreviousSampleSchema && project.PreviousSampleSchema is null)
-        {
             throw new InvalidDataException("A previous sample schema is required when that option is enabled.");
-        }
 
         if (mode == HitsoundStudioExportMode.Standard)
         {
@@ -229,10 +223,8 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             named = _engine.BuildNamed(
                 packages,
                 project.UsePreviousSampleSchema ? project.PreviousSampleSchema : null,
-                mode == HitsoundStudioExportMode.Coinciding &&
-                    project.HitsoundExportGameMode == GameMode.Mania,
-                mode == HitsoundStudioExportMode.Coinciding &&
-                    project.AddCoincidingRegularHitsounds,
+                mode == HitsoundStudioExportMode.Coinciding && project.HitsoundExportGameMode == GameMode.Mania,
+                mode == HitsoundStudioExportMode.Coinciding && project.AddCoincidingRegularHitsounds,
                 project.AllowGrowthPreviousSampleSchema,
                 isValid,
                 comparer);
@@ -246,10 +238,8 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
                 ? 60
                 : 50);
         if (project.DeleteAllInExportFirst && writesFiles)
-        {
             // Delete all files in the export folder before filling it again
             _files.DeleteFiles(project.ExportFolder);
-        }
 
         Report(progress, mode == HitsoundStudioExportMode.Midi
             ? 40
@@ -263,7 +253,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         Beatmap? midiBeatmap = null;
         if (project.ExportMap && mode != HitsoundStudioExportMode.Midi)
         {
-            BeatmapEditingSession session = await _beatmaps.OpenBeatmapAsync(
+            var session = await _beatmaps.OpenBeatmapAsync(
                 project.BaseBeatmap,
                 LiveBeatmapPreference.DiskOnly,
                 cancellationToken).ConfigureAwait(false);
@@ -275,7 +265,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         }
         else if (mode == HitsoundStudioExportMode.Midi)
         {
-            BeatmapEditingSession session = await _beatmaps.OpenBeatmapAsync(
+            var session = await _beatmaps.OpenBeatmapAsync(
                 project.BaseBeatmap,
                 LiveBeatmapPreference.DiskOnly,
                 cancellationToken).ConfigureAwait(false);
@@ -290,35 +280,30 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         }
 
         if (project.ExportSamples && mode != HitsoundStudioExportMode.Midi)
-        {
             sampleCount = standard is not null
                 ? await ExportStandardSamplesAsync(standard.Schema, project, comparer, cancellationToken)
                     .ConfigureAwait(false)
                 : await ExportNamedSamplesAsync(named!, project, comparer, cancellationToken)
                     .ConfigureAwait(false);
-        }
 
         Report(progress, mode == HitsoundStudioExportMode.Midi ? 100 : 99);
 
-        if (writesFiles)
-        {
-            await _reveal.RevealAsync(project.ExportFolder, cancellationToken).ConfigureAwait(false);
-        }
+        if (writesFiles) await _reveal.RevealAsync(project.ExportFolder, cancellationToken).ConfigureAwait(false);
 
         Report(progress, 100);
         // Count the number of changes of custom index
         string detailedSummary = mode switch
         {
             HitsoundStudioExportMode.Standard =>
-                $"Number of sample indices: {standard!.Schema.GetCustomIndices(comparer).Count}, " +
-                $"Number of samples: {standard.Schema.Count(entry => entry.Value.Any(isValid))}, " +
-                $"Number of greenlines: {CountIndexChanges(events)}",
+                $"Number of sample indices: {standard!.Schema.GetCustomIndices(comparer).Count}, "
+                + $"Number of samples: {standard.Schema.Count(entry => entry.Value.Any(isValid))}, "
+                + $"Number of greenlines: {CountIndexChanges(events)}",
             HitsoundStudioExportMode.Coinciding or HitsoundStudioExportMode.Storyboard =>
-                $"Number of sample indices: 0, Number of samples: " +
-                $"{packages.SelectMany(package => package.Samples).Select(sample => sample.SampleArgs).Distinct(comparer).Count()}, " +
-                "Number of greenlines: 0",
-            _ => $"Number of notes: {packages.Sum(package => package.Samples.Count)}, " +
-                 $"Number of volume changes: {(project.AddGreenLineVolumeToMidi ? midiBeatmap?.BeatmapTiming.TimingPoints.Count ?? 0 : 0)}"
+                $"Number of sample indices: 0, Number of samples: "
+                + $"{packages.SelectMany(package => package.Samples).Select(sample => sample.SampleArgs).Distinct(comparer).Count()}, "
+                + "Number of greenlines: 0",
+            _ => $"Number of notes: {packages.Sum(package => package.Samples.Count)}, "
+                 + $"Number of volume changes: {(project.AddGreenLineVolumeToMidi ? midiBeatmap?.BeatmapTiming.TimingPoints.Count ?? 0 : 0)}",
         };
         return new HitsoundStudioExportResult(
             mapPath,
@@ -336,11 +321,10 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         CancellationToken cancellationToken)
     {
         string path = OnePath(request);
-        BeatmapEditingSession session = await _beatmaps.OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
+        var session = await _beatmaps.OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
             .ConfigureAwait(false);
-        List<double> times = session.Editor.Beatmap.HitObjects
-            .Where(hitObject => (request.X == -1 || Math.Abs(hitObject.Pos.X - request.X) < 3) &&
-                                (request.Y == -1 || Math.Abs(hitObject.Pos.Y - request.Y) < 3))
+        var times = session.Editor.Beatmap.HitObjects
+            .Where(hitObject => (request.X == -1 || Math.Abs(hitObject.Pos.X - request.X) < 3) && (request.Y == -1 || Math.Abs(hitObject.Pos.Y - request.Y) < 3))
             .Select(hitObject => hitObject.Time)
             .ToList();
         HitsoundLayer layer = new(request.Name, SampleSetOrDefault(request.SampleSet), request.Hitsound,
@@ -348,10 +332,10 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             {
                 Path = path,
                 X = request.X,
-                Y = request.Y
+                Y = request.Y,
             })
         {
-            Times = times
+            Times = times,
         };
         return [layer];
     }
@@ -363,7 +347,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         List<HitsoundLayer> all = [];
         foreach (string path in request.Paths.Where(path => !string.IsNullOrWhiteSpace(path)))
         {
-            HitsoundStudioImportRequest one = request with { Paths = [path] };
+            var one = request with { Paths = [path] };
             all.AddRange(await ImportHitsoundsForPathAsync(one, cancellationToken).ConfigureAwait(false));
         }
 
@@ -377,39 +361,35 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         CancellationToken cancellationToken)
     {
         string path = OnePath(request);
-        BeatmapEditingSession session = await _beatmaps.OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
+        var session = await _beatmaps.OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
             .ConfigureAwait(false);
-        Beatmap beatmap = session.Editor.Beatmap;
-        Mapping_Tools.Core.Classes.BeatmapHelper.Timeline timeline = beatmap.GetTimeline();
-        GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
+        var beatmap = session.Editor.Beatmap;
+        var timeline = beatmap.GetTimeline();
+        var mode = (GameMode)beatmap.General["Mode"].IntValue;
         string mapDirectory = session.Editor.GetParentFolder();
-        IReadOnlyDictionary<string, string> firstSamples = await _sampleAnalyzer.AnalyzeAsync(
+        var firstSamples = await _sampleAnalyzer.AnalyzeAsync(
             mapDirectory,
             request.DetectDuplicateSamples,
             cancellationToken).ConfigureAwait(false);
         List<HitsoundLayer> layers = [];
-        foreach (TimelineObject item in timeline.TimelineObjects.Where(item => item.HasHitsound))
+        foreach (var item in timeline.TimelineObjects.Where(item => item.HasHitsound))
         {
             cancellationToken.ThrowIfCancellationRequested();
             double volume = request.DiscriminateVolumes ? item.FenoSampleVolume / 100 : 1;
             foreach (string filename in item.GetPlayingFilenames(mode))
             {
                 bool explicitFilename = item.UsesFilename;
-                SampleSet sampleSet = explicitFilename ? item.FenoSampleSet : HitsoundFilename.GetSampleSet(filename);
-                Hitsound hitsound = explicitFilename ? item.GetHitsound() : HitsoundFilename.GetHitsound(filename);
+                var sampleSet = explicitFilename ? item.FenoSampleSet : HitsoundFilename.GetSampleSet(filename);
+                var hitsound = explicitFilename ? item.GetHitsound() : HitsoundFilename.GetHitsound(filename);
                 string source = Path.Combine(mapDirectory, filename);
                 string extensionless = Path.Combine(
                     Path.GetDirectoryName(source) ?? mapDirectory,
                     Path.GetFileNameWithoutExtension(source));
                 if (firstSamples.TryGetValue(extensionless, out string? canonical))
-                {
                     source = canonical;
-                }
                 else if (!explicitFilename)
-                {
                     source = Path.Combine(mapDirectory,
                         $"{sampleSet.ToString().ToLowerInvariant()}-hit{hitsound.ToString().ToLowerInvariant()}-1.wav");
-                }
 
                 LayerImportArgs import = new(ImportType.Hitsounds)
                 {
@@ -418,9 +398,9 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
                     Volume = volume,
                     DetectDuplicateSamples = request.DetectDuplicateSamples,
                     DiscriminateVolumes = request.DiscriminateVolumes,
-                    RemoveDuplicates = request.RemoveDuplicates
+                    RemoveDuplicates = request.RemoveDuplicates,
                 };
-                HitsoundLayer? existing = layers.FirstOrDefault(layer => layer.ImportArgs.Equals(import));
+                var existing = layers.FirstOrDefault(layer => layer.ImportArgs.Equals(import));
                 if (existing is null)
                 {
                     existing = new HitsoundLayer(
@@ -436,10 +416,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             }
         }
 
-        if (request.IncludeStoryboard)
-        {
-            layers.AddRange(ImportStoryboardFromBeatmap(path, beatmap, mapDirectory, request, prefix: "SB: "));
-        }
+        if (request.IncludeStoryboard) layers.AddRange(ImportStoryboardFromBeatmap(path, beatmap, mapDirectory, request, "SB: "));
 
         return layers.OrderBy(layer => layer.Name).ToArray();
     }
@@ -451,7 +428,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         List<HitsoundLayer> all = [];
         foreach (string path in request.Paths.Where(path => !string.IsNullOrWhiteSpace(path)))
         {
-            HitsoundStudioImportRequest one = request with { Paths = [path] };
+            var one = request with { Paths = [path] };
             all.AddRange(await ImportStoryboardForPathAsync(one, cancellationToken).ConfigureAwait(false));
         }
 
@@ -465,14 +442,14 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         CancellationToken cancellationToken)
     {
         string path = OnePath(request);
-        BeatmapEditingSession session = await _beatmaps.OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
+        var session = await _beatmaps.OpenBeatmapAsync(path, LiveBeatmapPreference.DiskOnly, cancellationToken)
             .ConfigureAwait(false);
-        List<HitsoundLayer> layers = ImportStoryboardFromBeatmap(
+        var layers = ImportStoryboardFromBeatmap(
             path,
             session.Editor.Beatmap,
             session.Editor.GetParentFolder(),
             request,
-            prefix: string.Empty);
+            string.Empty);
         return layers.OrderBy(layer => layer.Name).ToArray();
     }
 
@@ -481,10 +458,10 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         CancellationToken cancellationToken)
     {
         string path = OnePath(request);
-        MidiSequence sequence = await _midi.ImportAsync(new MidiImportRequest(path), cancellationToken)
+        var sequence = await _midi.ImportAsync(new MidiImportRequest(path), cancellationToken)
             .ConfigureAwait(false);
         List<HitsoundLayer> layers = [];
-        foreach (MidiNote note in sequence.Notes)
+        foreach (var note in sequence.Notes)
         {
             cancellationToken.ThrowIfCancellationRequested();
             int bank = request.DiscriminateInstruments ? note.Bank : -1;
@@ -507,17 +484,16 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
                 LengthRoughness = request.LengthRoughness,
                 Velocity = velocity,
                 VelocityRoughness = request.VelocityRoughness,
-                Offset = request.Offset
+                Offset = request.Offset,
             };
-            HitsoundLayer? layer = layers.FirstOrDefault(candidate => candidate.ImportArgs.Equals(import));
+            var layer = layers.FirstOrDefault(candidate => candidate.ImportArgs.Equals(import));
             if (layer is null)
             {
-                string instrumentName = note.InstrumentName ??
-                    (bank == 128 ? "Percussion" : patch is >= 0 and < 128 ? patch.ToString() : "Undefined");
+                string instrumentName = note.InstrumentName ?? (bank == 128 ? "Percussion" : patch is >= 0 and < 128 ? patch.ToString() : "Undefined");
                 string keyName = note.KeyName ?? key.ToString();
                 string name = instrumentName;
                 if (request.DiscriminateKeys || percussion) name += "," + keyName;
-                if (request.DiscriminateLengths) name += "," + Math.Round(length).ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
+                if (request.DiscriminateLengths) name += "," + Math.Round(length).ToString("0.###", CultureInfo.InvariantCulture);
                 if (request.DiscriminateVelocities) name += "," + velocity;
                 layer = new HitsoundLayer(
                     name,
@@ -533,14 +509,10 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
 
         int maximumVelocity = layers.Count == 0 ? 0 : layers.Max(layer => layer.SampleArgs.Velocity);
         if (maximumVelocity > 0)
-        {
-            foreach (HitsoundLayer layer in layers)
-            {
+            foreach (var layer in layers)
                 layer.SampleArgs.Velocity = (int)Math.Round(layer.SampleArgs.Velocity / (double)maximumVelocity * 127);
-            }
-        }
 
-        foreach (HitsoundLayer layer in layers) layer.Times.Sort();
+        foreach (var layer in layers) layer.Times.Sort();
         PrefixImportedNames(layers, request.Name);
         return layers.OrderBy(layer => layer.Name).ToArray();
     }
@@ -553,22 +525,22 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         string prefix)
     {
         List<HitsoundLayer> layers = [];
-        foreach (StoryboardSoundSample sound in beatmap.StoryboardSoundSamples)
+        foreach (var sound in beatmap.StoryboardSoundSamples)
         {
             double volume = request.DiscriminateVolumes ? sound.Volume / 100 : 1;
             string source = Path.Combine(mapDirectory, sound.FilePath);
             string filename = Path.GetFileNameWithoutExtension(sound.FilePath);
-            SampleSet sampleSet = HitsoundFilename.GetSampleSet(filename);
-            Hitsound hitsound = HitsoundFilename.GetHitsound(filename);
+            var sampleSet = HitsoundFilename.GetSampleSet(filename);
+            var hitsound = HitsoundFilename.GetHitsound(filename);
             LayerImportArgs import = new(ImportType.Storyboard)
             {
                 Path = path,
                 SamplePath = source,
                 Volume = volume,
                 DiscriminateVolumes = request.DiscriminateVolumes,
-                RemoveDuplicates = request.RemoveDuplicates
+                RemoveDuplicates = request.RemoveDuplicates,
             };
-            HitsoundLayer? layer = layers.FirstOrDefault(candidate => candidate.ImportArgs.Equals(import));
+            var layer = layers.FirstOrDefault(candidate => candidate.ImportArgs.Equals(import));
             if (layer is null)
             {
                 layer = new HitsoundLayer(prefix + filename, sampleSet, hitsound,
@@ -589,7 +561,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         CancellationToken cancellationToken)
     {
         int count = 0;
-        foreach ((string key, List<SampleGeneratingArgs> source) in schema)
+        foreach ((string key, var source) in schema)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (source.Count == 0) continue;
@@ -615,7 +587,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         CancellationToken cancellationToken)
     {
         int count = 0;
-        foreach (IGrouping<string, KeyValuePair<SampleGeneratingArgs, string>> group in named.Names
+        foreach (var group in named.Names
                      .Where(pair => !string.IsNullOrEmpty(pair.Value))
                      .GroupBy(pair => pair.Value, StringComparer.Ordinal))
         {
@@ -642,10 +614,10 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         SampleGeneratingArgsComparer comparer,
         CancellationToken cancellationToken)
     {
-        List<SampleGeneratingArgs> valid = source.Where(IsValidSource).Distinct(comparer).ToList();
+        var valid = source.Where(IsValidSource).Distinct(comparer).ToList();
         if (valid.Count == 0) return string.Empty;
 
-        HitsoundStudioSampleExportFormat format = valid.Count == 1 ? singleFormat : mixedFormat;
+        var format = valid.Count == 1 ? singleFormat : mixedFormat;
         if (format == HitsoundStudioSampleExportFormat.MidiChords)
         {
             await ExportMidiChordsAsync(valid, Path.Combine(exportFolder, name + ".mid"), cancellationToken)
@@ -661,21 +633,21 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         }
 
         List<AudioClip> clips = [];
-        foreach (SampleGeneratingArgs sample in valid.Distinct(comparer))
+        foreach (var sample in valid.Distinct(comparer))
         {
             cancellationToken.ThrowIfCancellationRequested();
             clips.Add(await _generator.GenerateAsync(new AudioGenerationRequest(sample), cancellationToken)
                 .ConfigureAwait(false));
         }
 
-        AudioClip clip = clips.Count == 1
+        var clip = clips.Count == 1
             ? clips[0]
             : await _mixer.MixAsync(clips, cancellationToken).ConfigureAwait(false);
-        AudioExportFormat audioFormat = format switch
+        var audioFormat = format switch
         {
             HitsoundStudioSampleExportFormat.WavePcm => AudioExportFormat.WavePcm,
             HitsoundStudioSampleExportFormat.OggVorbis => AudioExportFormat.OggVorbis,
-            _ => AudioExportFormat.WaveIeeeFloat
+            _ => AudioExportFormat.WaveIeeeFloat,
         };
         string extension = audioFormat == AudioExportFormat.OggVorbis ? ".ogg" : ".wav";
         string path = Path.Combine(exportFolder, name + extension);
@@ -690,7 +662,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         CancellationToken cancellationToken)
     {
         string path = Path.Combine(project.ExportFolder, project.HitsoundDiffName + ".mid");
-        List<MidiNote> notes = packages.SelectMany(package => package.Samples.Select(sample =>
+        var notes = packages.SelectMany(package => package.Samples.Select(sample =>
             ToMidiNote(package.Time, sample.SampleArgs))).ToList();
         await _midi.ExportAsync(new MidiExportRequest(path, new MidiSequence(notes)), cancellationToken)
             .ConfigureAwait(false);
@@ -702,13 +674,11 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         string path,
         CancellationToken cancellationToken)
     {
-        List<MidiNote> notes = samples.Where(sample => sample.Key >= 0)
+        var notes = samples.Where(sample => sample.Key >= 0)
             .Select(sample => ToMidiNote(0, sample)).ToList();
         if (notes.Count > 0)
-        {
             await _midi.ExportAsync(new MidiExportRequest(path, new MidiSequence(notes)), cancellationToken)
                 .ConfigureAwait(false);
-        }
     }
 
     private async Task ExportMidiAsync(
@@ -721,47 +691,45 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         double bpm = beatmap.BeatmapTiming.Redlines.Count > 0
             ? beatmap.BeatmapTiming.Redlines[0].GetBpm()
             : 60;
-        List<MidiNote> notes = packages.SelectMany(package => package.Samples.Select(sample =>
+        var notes = packages.SelectMany(package => package.Samples.Select(sample =>
             ToMidiNote(package.Time, sample.SampleArgs))).ToList();
         List<MidiVolumeChange> volumeChanges = [];
         if (addGreenLineVolume)
-        {
-            foreach (TimingPoint point in beatmap.BeatmapTiming.TimingPoints)
-            {
+            foreach (var point in beatmap.BeatmapTiming.TimingPoints)
                 for (int channel = 1; channel <= 16; channel++)
-                {
                     volumeChanges.Add(new MidiVolumeChange(
                         Math.Max(0, point.Offset),
                         channel,
                         Math.Clamp((int)(point.Volume * 127 / 100), 0, 127)));
-                }
-            }
-        }
 
         await _midi.ExportAsync(
             new MidiExportRequest(path, new MidiSequence(notes, volumeChanges), bpm),
             cancellationToken).ConfigureAwait(false);
     }
 
-    private static MidiNote ToMidiNote(double time, SampleGeneratingArgs sample) =>
-        new(
+    private static MidiNote ToMidiNote(double time, SampleGeneratingArgs sample)
+    {
+        return new MidiNote(
             Math.Max(0, time),
             Math.Max(0, sample.Length < 0 ? 0 : sample.Length),
             Math.Max(0, sample.Bank),
             Math.Clamp(sample.Patch, 0, 127),
             Math.Clamp(sample.Key, 0, 127),
             Math.Clamp(sample.Velocity, 0, 127));
+    }
 
-    private bool IsValidSource(SampleGeneratingArgs sample) =>
-        !string.IsNullOrWhiteSpace(sample.Path) && _files.FileExists(sample.Path);
+    private bool IsValidSource(SampleGeneratingArgs sample)
+    {
+        return !string.IsNullOrWhiteSpace(sample.Path) && _files.FileExists(sample.Path);
+    }
 
     private static bool IsSkinDefaultSample(string path)
     {
         string filename = Path.GetFileName(path);
         string[] sets = ["none", "normal", "soft", "drum"];
         string[] sounds = ["normal", "whistle", "finish", "clap"];
-        return filename.EndsWith("-1.wav", StringComparison.OrdinalIgnoreCase) &&
-                   sets.Any(set => sounds.Any(sound =>
+        return filename.EndsWith("-1.wav", StringComparison.OrdinalIgnoreCase)
+               && sets.Any(set => sounds.Any(sound =>
                    filename.Equals($"{set}-hit{sound}-1.wav", StringComparison.OrdinalIgnoreCase)));
     }
 
@@ -769,7 +737,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
     {
         int count = 0;
         int lastIndex = -1;
-        foreach (HitsoundEvent item in events)
+        foreach (var item in events)
         {
             if (item.CustomIndex == lastIndex) continue;
             lastIndex = item.CustomIndex;
@@ -787,22 +755,20 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         if (project.HitsoundExportModeSetting == HitsoundStudioExportMode.Storyboard)
         {
             beatmap.StoryboardSoundSamples.Clear();
-            foreach (HitsoundEvent item in events.Where(item => !string.IsNullOrEmpty(item.Filename)))
-            {
+            foreach (var item in events.Where(item => !string.IsNullOrEmpty(item.Filename)))
                 beatmap.StoryboardSoundSamples.Add(new StoryboardSoundSample(
                     item.Time,
                     0,
                     item.Filename,
                     item.Volume * 100));
-            }
         }
         else
         {
-            List<TimingPoint> timingPoints = project.HitsoundExportModeSetting == HitsoundStudioExportMode.Standard
+            var timingPoints = project.HitsoundExportModeSetting == HitsoundStudioExportMode.Standard
                 ? _engine.BuildStandardTimingPoints(beatmap.BeatmapTiming, events).ToList()
                 : beatmap.BeatmapTiming.Redlines.Select(point => point.Copy()).ToList();
             beatmap.HitObjects.Clear();
-            foreach (HitsoundEvent item in events)
+            foreach (var item in events)
             {
                 int customIndex = item.CustomIndex;
                 double volume = item.Volume * 100;
@@ -828,23 +794,23 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         }
 
         beatmap.General["StackLeniency"] = new TValue("0.0");
-        beatmap.General["Mode"] = new TValue(((int)project.HitsoundExportGameMode).ToString(System.Globalization.CultureInfo.InvariantCulture));
+        beatmap.General["Mode"] = new TValue(((int)project.HitsoundExportGameMode).ToString(CultureInfo.InvariantCulture));
         beatmap.Metadata["Version"] = new TValue(project.HitsoundDiffName);
         int keys = project.HitsoundExportGameMode == GameMode.Mania
             ? Math.Clamp(events.Select(item => item.Pos.X).Distinct().Count(), 1, 18)
             : 4;
-        beatmap.Difficulty["CircleSize"] = new TValue(keys.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        beatmap.Difficulty["CircleSize"] = new TValue(keys.ToString(CultureInfo.InvariantCulture));
     }
 
     private static void PrefixImportedNames(IEnumerable<HitsoundLayer> layers, string prefix)
     {
         if (string.IsNullOrWhiteSpace(prefix)) return;
-        foreach (HitsoundLayer layer in layers) layer.Name = $"{prefix}: {layer.Name}";
+        foreach (var layer in layers) layer.Name = $"{prefix}: {layer.Name}";
     }
 
     private static void FinishImportedLayers(List<HitsoundLayer> layers, bool removeDuplicates)
     {
-        foreach (HitsoundLayer layer in layers)
+        foreach (var layer in layers)
         {
             if (!removeDuplicates) continue;
             layer.Times.Sort();
@@ -852,28 +818,35 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         }
     }
 
-    private static HitsoundStudioImportRequest ToImportRequest(ImportReloadingArgs args) => new()
+    private static HitsoundStudioImportRequest ToImportRequest(ImportReloadingArgs args)
     {
-        ImportType = args.ImportType,
-        Paths = [args.Path],
-        X = args.X,
-        Y = args.Y,
-        DiscriminateLengths = true,
-        DiscriminateVelocities = true,
-        LengthRoughness = args.LengthRoughness,
-        VelocityRoughness = args.VelocityRoughness,
-        DiscriminateVolumes = args.DiscriminateVolumes,
-        DetectDuplicateSamples = args.DetectDuplicateSamples,
-        RemoveDuplicates = args.RemoveDuplicates,
-        Offset = args.Offset
-    };
+        return new HitsoundStudioImportRequest
+        {
+            ImportType = args.ImportType,
+            Paths = [args.Path],
+            X = args.X,
+            Y = args.Y,
+            DiscriminateLengths = true,
+            DiscriminateVelocities = true,
+            LengthRoughness = args.LengthRoughness,
+            VelocityRoughness = args.VelocityRoughness,
+            DiscriminateVolumes = args.DiscriminateVolumes,
+            DetectDuplicateSamples = args.DetectDuplicateSamples,
+            RemoveDuplicates = args.RemoveDuplicates,
+            Offset = args.Offset,
+        };
+    }
 
-    private static string OnePath(HitsoundStudioImportRequest request) =>
-        request.Paths.FirstOrDefault(path => !string.IsNullOrWhiteSpace(path))
-        ?? throw new InvalidDataException("An import source path is required.");
+    private static string OnePath(HitsoundStudioImportRequest request)
+    {
+        return request.Paths.FirstOrDefault(path => !string.IsNullOrWhiteSpace(path))
+               ?? throw new InvalidDataException("An import source path is required.");
+    }
 
-    private static SampleSet SampleSetOrDefault(SampleSet sampleSet) =>
-        sampleSet == SampleSet.None ? SampleSet.Normal : sampleSet;
+    private static SampleSet SampleSetOrDefault(SampleSet sampleSet)
+    {
+        return sampleSet == SampleSet.None ? SampleSet.Normal : sampleSet;
+    }
 
     private static double RoundVelocity(double velocity, double roughness)
     {
@@ -893,11 +866,11 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         ArgumentException.ThrowIfNullOrWhiteSpace(project.ExportFolder);
         ArgumentException.ThrowIfNullOrWhiteSpace(project.HitsoundDiffName);
         if (project.FirstCustomIndex < 0) throw new ArgumentOutOfRangeException(nameof(project.FirstCustomIndex));
-        if (!double.IsFinite(project.ZipLayersLeniency) || project.ZipLayersLeniency < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(project.ZipLayersLeniency));
-        }
+        if (!double.IsFinite(project.ZipLayersLeniency) || project.ZipLayersLeniency < 0) throw new ArgumentOutOfRangeException(nameof(project.ZipLayersLeniency));
     }
 
-    private static void Report(IProgress<double>? progress, double value) => progress?.Report(value);
+    private static void Report(IProgress<double>? progress, double value)
+    {
+        progress?.Report(value);
+    }
 }

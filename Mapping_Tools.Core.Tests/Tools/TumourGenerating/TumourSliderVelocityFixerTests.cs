@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.TumourGenerating;
@@ -13,14 +12,14 @@ public sealed class TumourSliderVelocityFixerTests
     public void Fix_WithGreenlineVelocity_LeavesObjectTimesAndAddsSelectedVelocityChanges()
     {
         // Arrange
-        (Beatmap beatmap, HitObject selected, HitObject unselected) = CreateBeatmap();
+        var (beatmap, selected, unselected) = CreateBeatmap();
         double selectedTime = selected.Time;
         double unselectedTime = unselected.Time;
         selected.SliderVelocity = -200;
         double selectedVelocity = selected.SliderVelocity;
 
         // Act
-        TumourSliderVelocityFixer.Fix(beatmap, [selected], delegateToBpm: false, removeSliderTicks: false);
+        TumourSliderVelocityFixer.Fix(beatmap, [selected], false, false);
 
         // Assert
         selected.Time.Should().Be(selectedTime);
@@ -33,12 +32,12 @@ public sealed class TumourSliderVelocityFixerTests
     public void Fix_WithBpmDelegation_MovesSelectedSliderAndCreatesBeforeAndAfterRedlines()
     {
         // Arrange
-        (Beatmap beatmap, HitObject selected, _) = CreateBeatmap();
+        var (beatmap, selected, _) = CreateBeatmap();
         double selectedTime = selected.Time;
         selected.SliderVelocity = -200;
 
         // Act
-        TumourSliderVelocityFixer.Fix(beatmap, [selected], delegateToBpm: true, removeSliderTicks: true);
+        TumourSliderVelocityFixer.Fix(beatmap, [selected], true, true);
 
         // Assert
         selected.Time.Should().Be(selectedTime - 1);
@@ -51,18 +50,18 @@ public sealed class TumourSliderVelocityFixerTests
     public void Fix_WhenCancellationIsRequestedBeforeIteration_LeavesBeatmapUnchanged()
     {
         // Arrange
-        (Beatmap beatmap, HitObject selected, _) = CreateBeatmap();
+        var (beatmap, selected, _) = CreateBeatmap();
         int timingPointCount = beatmap.BeatmapTiming.TimingPoints.Count;
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
 
         // Act
-        Action act = () => TumourSliderVelocityFixer.Fix(
+        var act = () => TumourSliderVelocityFixer.Fix(
             beatmap,
             [selected],
-            delegateToBpm: true,
-            removeSliderTicks: true,
-            cancellationToken: cancellation.Token);
+            true,
+            true,
+            cancellation.Token);
 
         // Assert
         act.Should().Throw<OperationCanceledException>();
@@ -79,9 +78,9 @@ public sealed class TumourSliderVelocityFixerTests
             SampleSet.Normal,
             0,
             100,
-            uninherited: true,
-            kiai: false,
-            omitFirstBarLine: false);
+            true,
+            false,
+            false);
         HitObject selected = new("64,64,100,2,0,L|164:64,1,100");
         HitObject unselected = new("64,64,300,2,0,L|164:64,1,100");
         return (new Beatmap([selected, unselected], [redline], redline), selected, unselected);

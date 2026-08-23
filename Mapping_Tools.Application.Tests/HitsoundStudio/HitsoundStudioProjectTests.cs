@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Mapping_Tools.Application.HitsoundStudio;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.HitsoundStuff;
@@ -16,7 +15,7 @@ public sealed class HitsoundStudioProjectTests
         HitsoundLayer layer = new("layer", SampleSet.Normal, Hitsound.Normal,
             new SampleGeneratingArgs("kick.wav"), new LayerImportArgs())
         {
-            Times = [100, 200]
+            Times = [100, 200],
         };
         HitsoundStudioProject project = new()
         {
@@ -24,12 +23,12 @@ public sealed class HitsoundStudioProjectTests
             HitsoundLayers = [layer],
             PreviousSampleSchema = new SampleSchema
             {
-                ["normal-hitnormal"] = [new SampleGeneratingArgs("kick.wav")]
-            }
+                ["normal-hitnormal"] = [new SampleGeneratingArgs("kick.wav")],
+            },
         };
 
         // Act
-        HitsoundStudioProject clone = project.Clone();
+        var clone = project.Clone();
         clone.HitsoundLayers[0].Times.Add(300);
         clone.PreviousSampleSchema!["normal-hitnormal"][0].Path = "other.wav";
 

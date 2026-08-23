@@ -1,6 +1,6 @@
 using Mapping_Tools.Application.Audio;
 using Mapping_Tools.Core.Audio;
-using Mapping_Tools.Core.Spectrum;
+using Mapping_Tools.Core.Classes.HitsoundStuff;
 using Mapping_Tools.Infrastructure.Audio;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NAudio.Midi;
@@ -18,7 +18,7 @@ public sealed class AudioInfrastructureTests
         var decoder = new NaudioAudioDecoder();
 
         // Act
-        AudioClip result = await decoder.DecodeAsync(new AudioDecodeRequest(path));
+        var result = await decoder.DecodeAsync(new AudioDecodeRequest(path));
 
         // Assert
         result.IsEmpty.Should().BeFalse();
@@ -38,11 +38,11 @@ public sealed class AudioInfrastructureTests
             new NaudioSoundFontRenderer(),
             new NaudioAudioEffectService());
         var request = new AudioGenerationRequest(
-            new Mapping_Tools.Core.Classes.HitsoundStuff.SampleGeneratingArgs(path),
-            [Mapping_Tools.Core.Audio.AudioEffect.CreateDelayFadeOut(0, 1)]);
+            new SampleGeneratingArgs(path),
+            [AudioEffect.CreateDelayFadeOut(0, 1)]);
 
         // Act
-        AudioClip result = await generator.GenerateAsync(request);
+        var result = await generator.GenerateAsync(request);
 
         // Assert
         result.IsEmpty.Should().BeFalse();
@@ -54,7 +54,7 @@ public sealed class AudioInfrastructureTests
     {
         // Arrange
         var renderer = new NaudioSoundFontRenderer();
-        var sample = new Mapping_Tools.Core.Classes.HitsoundStuff.SampleGeneratingArgs(
+        var sample = new SampleGeneratingArgs(
             Path.Combine(Path.GetTempPath(), $"missing-mapping-tools-{Guid.NewGuid():N}.sf2"),
             0,
             0,
@@ -81,10 +81,10 @@ public sealed class AudioInfrastructureTests
         var decoder = new NaudioAudioDecoder();
 
         // Act
-        AudioExportResult export = await exporter.ExportAsync(
+        var export = await exporter.ExportAsync(
             source,
             new AudioExportRequest(path, AudioExportFormat.WaveIeeeFloat));
-        AudioClip result = await decoder.DecodeAsync(new AudioDecodeRequest(path));
+        var result = await decoder.DecodeAsync(new AudioDecodeRequest(path));
 
         // Assert
         export.BytesWritten.Should().BeGreaterThan(0);
@@ -103,20 +103,17 @@ public sealed class AudioInfrastructureTests
         var decoder = new NaudioAudioDecoder();
 
         // Act
-        AudioExportResult export = await exporter.ExportAsync(
+        var export = await exporter.ExportAsync(
             source,
             new AudioExportRequest(path, AudioExportFormat.WavePcm));
-        AudioClip result = await decoder.DecodeAsync(new AudioDecodeRequest(path));
+        var result = await decoder.DecodeAsync(new AudioDecodeRequest(path));
 
         // Assert
         export.BytesWritten.Should().BeGreaterThan(0);
         float[] actual = result.CopySamples();
         float[] expected = source.CopySamples();
         actual.Should().HaveSameCount(expected);
-        for (int index = 0; index < expected.Length; index++)
-        {
-            actual[index].Should().BeApproximately(expected[index], 1e-4f);
-        }
+        for (int index = 0; index < expected.Length; index++) actual[index].Should().BeApproximately(expected[index], 1e-4f);
     }
 
     [TestMethod]
@@ -130,10 +127,10 @@ public sealed class AudioInfrastructureTests
         var decoder = new NaudioAudioDecoder();
 
         // Act
-        AudioExportResult export = await exporter.ExportAsync(
+        var export = await exporter.ExportAsync(
             source,
             new AudioExportRequest(path, AudioExportFormat.OggVorbis));
-        AudioClip result = await decoder.DecodeAsync(new AudioDecodeRequest(path));
+        var result = await decoder.DecodeAsync(new AudioDecodeRequest(path));
 
         // Assert
         export.BytesWritten.Should().BeGreaterThan(0);
@@ -150,10 +147,10 @@ public sealed class AudioInfrastructureTests
         var empty = new AudioClip(new AudioFormat(8000, 1), []);
 
         // Act
-        SpectrumFrame result = await calculator.CalculateAsync(
+        var result = await calculator.CalculateAsync(
             impulse,
             new SpectrumCalculationOptions { FftSize = 4 });
-        SpectrumFrame emptyResult = await calculator.CalculateAsync(
+        var emptyResult = await calculator.CalculateAsync(
             empty,
             new SpectrumCalculationOptions { FftSize = 4 });
 
@@ -176,7 +173,7 @@ public sealed class AudioInfrastructureTests
 
         // Act
         await service.ExportAsync(new MidiExportRequest(path, sequence));
-        MidiSequence result = await service.ImportAsync(new MidiImportRequest(path));
+        var result = await service.ImportAsync(new MidiImportRequest(path));
 
         // Assert
         result.Notes.Should().ContainSingle();
@@ -201,7 +198,7 @@ public sealed class AudioInfrastructureTests
         var service = new NaudioMidiService();
 
         // Act
-        MidiSequence result = await service.ImportAsync(new MidiImportRequest(path));
+        var result = await service.ImportAsync(new MidiImportRequest(path));
 
         // Assert
         result.Notes.Should().ContainSingle();
@@ -218,15 +215,15 @@ public sealed class AudioInfrastructureTests
             new ThrowingDecoder(),
             renderer,
             new NaudioAudioEffectService());
-        var sample = new Mapping_Tools.Core.Classes.HitsoundStuff.SampleGeneratingArgs(
+        var sample = new SampleGeneratingArgs(
             "sample.sf2", 0, 0, 0, 60, -1, 127)
         {
             Panning = 0.5,
-            PitchShift = 12
+            PitchShift = 12,
         };
 
         // Act
-        AudioClip result = await generator.GenerateAsync(new AudioGenerationRequest(sample));
+        var result = await generator.GenerateAsync(new AudioGenerationRequest(sample));
 
         // Assert
         result.Format.Should().Be(rendered.Format);
@@ -260,10 +257,7 @@ public sealed class AudioInfrastructureTests
 
         public void Dispose()
         {
-            if (_directory.Exists)
-            {
-                _directory.Delete(recursive: true);
-            }
+            if (_directory.Exists) _directory.Delete(true);
         }
     }
 
@@ -284,7 +278,9 @@ public sealed class AudioInfrastructureTests
     {
         public Task<AudioClip> DecodeAsync(
             AudioDecodeRequest request,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new InvalidOperationException("The SoundFont path must not be sent to the audio decoder.");
+        }
     }
 }

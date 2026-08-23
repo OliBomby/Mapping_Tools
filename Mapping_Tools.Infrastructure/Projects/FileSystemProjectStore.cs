@@ -4,8 +4,8 @@ using Mapping_Tools.Application.Projects;
 namespace Mapping_Tools.Infrastructure.Projects;
 
 /// <summary>
-/// Persists project JSON through a same-directory temporary file so an
-/// interrupted save cannot truncate the previous project.
+///     Persists project JSON through a same-directory temporary file so an
+///     interrupted save cannot truncate the previous project.
 /// </summary>
 public sealed class FileSystemProjectStore : IProjectStore
 {
@@ -13,10 +13,10 @@ public sealed class FileSystemProjectStore : IProjectStore
     private readonly IProjectSerializer _serializer;
 
     /// <summary>
-    /// Creates a filesystem store for the supplied project-document format.
+    ///     Creates a filesystem store for the supplied project-document format.
     /// </summary>
     /// <param name="serializer">
-    /// Encodes and reconstructs project models; production uses the legacy-compatible serializer.
+    ///     Encodes and reconstructs project models; production uses the legacy-compatible serializer.
     /// </param>
     public FileSystemProjectStore(IProjectSerializer serializer)
     {
@@ -24,7 +24,7 @@ public sealed class FileSystemProjectStore : IProjectStore
     }
 
     /// <summary>
-    /// Creates the requested local directory and any absent parents.
+    ///     Creates the requested local directory and any absent parents.
     /// </summary>
     /// <param name="path">The directory required by a picker or project write.</param>
     public void EnsureDirectoryExists(string path)
@@ -34,14 +34,14 @@ public sealed class FileSystemProjectStore : IProjectStore
     }
 
     /// <summary>
-    /// Serializes before touching the destination, writes a unique sibling
-    /// temporary file, then atomically moves the complete document into place.
+    ///     Serializes before touching the destination, writes a unique sibling
+    ///     temporary file, then atomically moves the complete document into place.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model.</typeparam>
     /// <param name="path">The local destination JSON file.</param>
     /// <param name="project">The complete non-null project snapshot.</param>
     /// <param name="cancellationToken">
-    /// Prevents replacement when cancellation is observed before the final move.
+    ///     Prevents replacement when cancellation is observed before the final move.
     /// </param>
     public async Task SaveAsync<TProject>(
         string path,
@@ -57,7 +57,7 @@ public sealed class FileSystemProjectStore : IProjectStore
 
         string fullPath = Path.GetFullPath(path);
         string parent = Path.GetDirectoryName(fullPath)
-            ?? throw new ArgumentException("The project path has no parent directory.", nameof(path));
+                        ?? throw new ArgumentException("The project path has no parent directory.", nameof(path));
         Directory.CreateDirectory(parent);
 
         string temporaryPath = Path.Combine(
@@ -71,20 +71,17 @@ public sealed class FileSystemProjectStore : IProjectStore
                 Utf8WithoutByteOrderMark,
                 cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
-            File.Move(temporaryPath, fullPath, overwrite: true);
+            File.Move(temporaryPath, fullPath, true);
         }
         finally
         {
-            if (File.Exists(temporaryPath))
-            {
-                File.Delete(temporaryPath);
-            }
+            if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
         }
     }
 
     /// <summary>
-    /// Reads the complete UTF-8 document before invoking the serializer, so a
-    /// cancelled read never yields partially reconstructed feature state.
+    ///     Reads the complete UTF-8 document before invoking the serializer, so a
+    ///     cancelled read never yields partially reconstructed feature state.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model expected by the caller.</typeparam>
     /// <param name="path">The existing local project file.</param>

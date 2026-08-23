@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Reflection;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
@@ -10,6 +8,19 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
 public abstract class RelevantObjectsGenerator
 {
     private MethodInfo[]? _generatorMethods;
+
+    /// <summary>Creates a generator with default settings.</summary>
+    protected RelevantObjectsGenerator()
+    {
+        Settings = new GeneratorSettings(this);
+    }
+
+    /// <summary>Creates a generator with supplied settings.</summary>
+    /// <param name="settings">The settings instance to retain.</param>
+    protected RelevantObjectsGenerator(GeneratorSettings settings)
+    {
+        Settings = settings;
+    }
 
     /// <summary>Gets the mutable settings used by this generator.</summary>
     public GeneratorSettings Settings { get; }
@@ -26,30 +37,17 @@ public abstract class RelevantObjectsGenerator
     /// <summary>Gets how generated timestamps are calculated from parent objects.</summary>
     public virtual GeneratorTemporalPositioning TemporalPositioning => GeneratorTemporalPositioning.Average;
 
-    /// <summary>Creates a generator with default settings.</summary>
-    protected RelevantObjectsGenerator() => Settings = new GeneratorSettings(this);
-
-    /// <summary>Creates a generator with supplied settings.</summary>
-    /// <param name="settings">The settings instance to retain.</param>
-    protected RelevantObjectsGenerator(GeneratorSettings settings) => Settings = settings;
-
     /// <summary>Gets methods marked as generator operations in declaration/reflection order.</summary>
     /// <returns>The discovered generator methods.</returns>
     /// <exception cref="InvalidOperationException">Thrown when no operation is marked.</exception>
     public MethodInfo[] GetGeneratorMethods()
     {
-        if (_generatorMethods is not null)
-        {
-            return _generatorMethods;
-        }
+        if (_generatorMethods is not null) return _generatorMethods;
 
         _generatorMethods = GetType().GetMethods()
             .Where(method => method.GetCustomAttribute<RelevantObjectsGeneratorMethodAttribute>() is not null)
             .ToArray();
-        if (_generatorMethods.Length == 0)
-        {
-            throw new InvalidOperationException($"Type {GetType()} does not have any generator method.");
-        }
+        if (_generatorMethods.Length == 0) throw new InvalidOperationException($"Type {GetType()} does not have any generator method.");
 
         return _generatorMethods;
     }
@@ -57,11 +55,16 @@ public abstract class RelevantObjectsGenerator
     /// <summary>Gets the parameter types required by a generator method.</summary>
     /// <param name="generatorMethodInfo">The marked method.</param>
     /// <returns>The method parameter types in invocation order.</returns>
-    public static Type[] GetDependencies(MethodInfo generatorMethodInfo) =>
-        generatorMethodInfo.GetParameters().Select(o => o.ParameterType).ToArray();
+    public static Type[] GetDependencies(MethodInfo generatorMethodInfo)
+    {
+        return generatorMethodInfo.GetParameters().Select(o => o.ParameterType).ToArray();
+    }
 
     /// <summary>Gets the declared return type of a generator method.</summary>
     /// <param name="generatorMethodInfo">The marked method.</param>
     /// <returns>The return type.</returns>
-    public static Type GetReturnType(MethodInfo generatorMethodInfo) => generatorMethodInfo.ReturnType;
+    public static Type GetReturnType(MethodInfo generatorMethodInfo)
+    {
+        return generatorMethodInfo.ReturnType;
+    }
 }

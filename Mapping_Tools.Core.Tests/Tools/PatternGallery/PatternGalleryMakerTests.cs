@@ -15,20 +15,20 @@ public sealed class PatternGalleryMakerTests
         PatternGalleryMaker maker = new();
         List<HitObject> hitObjects =
         [
-            new HitObject("64,96,1000,1,0,0:0:0:0:"),
-            new HitObject("128,96,1250,1,0,0:0:0:0:")
+            new("64,96,1000,1,0,0:0:0:0:"),
+            new("128,96,1250,1,0,0:0:0:0:"),
         ];
         List<TimingPoint> timingPoints =
-        [new TimingPoint(0, 500, 4, SampleSet.Normal, 0, 70, true, false, false)];
+            [new(0, 500, 4, SampleSet.Normal, 0, 70, true, false, false)];
 
         // Act
-        PatternGalleryPattern pattern = maker.FromObjects(
+        var pattern = maker.FromObjects(
             hitObjects,
             timingPoints,
             "Two circles",
             1.4,
             GameMode.Standard,
-            out Beatmap patternBeatmap);
+            out var patternBeatmap);
 
         // Assert
         pattern.Name.Should().Be("Two circles");

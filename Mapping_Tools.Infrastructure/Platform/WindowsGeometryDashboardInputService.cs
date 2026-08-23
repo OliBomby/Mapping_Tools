@@ -5,8 +5,8 @@ using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
 namespace Mapping_Tools.Infrastructure.Platform;
 
 /// <summary>
-/// Reads and moves global Windows input for Geometry Dashboard while keeping
-/// the persisted WPF-compatible hotkey values in the neutral Core model.
+///     Reads and moves global Windows input for Geometry Dashboard while keeping
+///     the persisted WPF-compatible hotkey values in the neutral Core model.
 /// </summary>
 public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInputService
 {
@@ -32,16 +32,13 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
         _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsSupported => _isWindows();
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsHotkeyDown(Hotkey? hotkey)
     {
-        if (!_isWindows() || hotkey is null || hotkey.Key == 0)
-        {
-            return false;
-        }
+        if (!_isWindows() || hotkey is null || hotkey.Key == 0) return false;
 
         int virtualKey;
         try
@@ -54,54 +51,46 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
             return false;
         }
 
-        return IsKeyDown(virtualKey) &&
-               HasModifier(hotkey.Modifiers, 1, VirtualKeyLeftAlt, VirtualKeyRightAlt) &&
-               HasModifier(hotkey.Modifiers, 2, VirtualKeyLeftControl, VirtualKeyRightControl) &&
-               HasModifier(hotkey.Modifiers, 4, VirtualKeyLeftShift, VirtualKeyRightShift) &&
-               HasModifier(hotkey.Modifiers, 8, VirtualKeyLeftWindows, VirtualKeyRightWindows);
+        return IsKeyDown(virtualKey)
+               && HasModifier(hotkey.Modifiers, 1, VirtualKeyLeftAlt, VirtualKeyRightAlt)
+               && HasModifier(hotkey.Modifiers, 2, VirtualKeyLeftControl, VirtualKeyRightControl)
+               && HasModifier(hotkey.Modifiers, 4, VirtualKeyLeftShift, VirtualKeyRightShift)
+               && HasModifier(hotkey.Modifiers, 8, VirtualKeyLeftWindows, VirtualKeyRightWindows);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsMouseButtonDown(GeometryDashboardMouseButton button)
     {
-        if (!_isWindows())
-        {
-            return false;
-        }
+        if (!_isWindows()) return false;
 
         return button switch
         {
             GeometryDashboardMouseButton.Left => IsKeyDown(VirtualKeyLeftButton),
-            _ => throw new ArgumentOutOfRangeException(nameof(button), button, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(button), button, null),
         };
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool TryGetCursorPosition(out Vector2 position)
     {
         position = Vector2.Zero;
-        if (!_isWindows() || !WindowsNativeMethods.GetCursorPos(out WindowsNativeMethods.POINT point))
-        {
-            return false;
-        }
+        if (!_isWindows() || !WindowsNativeMethods.GetCursorPos(out var point)) return false;
 
         position = new Vector2(point.X, point.Y);
         return true;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool TrySetCursorPosition(Vector2 position)
     {
-        if (!_isWindows() ||
-            !double.IsFinite(position.X) ||
-            !double.IsFinite(position.Y) ||
-            position.X < int.MinValue ||
-            position.X > int.MaxValue ||
-            position.Y < int.MinValue ||
-            position.Y > int.MaxValue)
-        {
+        if (!_isWindows()
+            || !double.IsFinite(position.X)
+            || !double.IsFinite(position.Y)
+            || position.X < int.MinValue
+            || position.X > int.MaxValue
+            || position.Y < int.MinValue
+            || position.Y > int.MaxValue)
             return false;
-        }
 
         return WindowsNativeMethods.SetCursorPos(
             Convert.ToInt32(Math.Round(position.X)),
@@ -110,10 +99,11 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
 
     private static bool HasModifier(int modifiers, int flag, int leftKey, int rightKey)
     {
-        return ((modifiers & flag) != 0) ==
-               (IsKeyDown(leftKey) || IsKeyDown(rightKey));
+        return (modifiers & flag) != 0 == (IsKeyDown(leftKey) || IsKeyDown(rightKey));
     }
 
-    private static bool IsKeyDown(int virtualKey) =>
-        (WindowsNativeMethods.GetAsyncKeyState(virtualKey) & short.MinValue) != 0;
+    private static bool IsKeyDown(int virtualKey)
+    {
+        return (WindowsNativeMethods.GetAsyncKeyState(virtualKey) & short.MinValue) != 0;
+    }
 }

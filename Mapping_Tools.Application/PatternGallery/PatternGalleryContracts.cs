@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.PatternGallery;
 
 namespace Mapping_Tools.Application.PatternGallery;
@@ -23,7 +24,7 @@ public interface IPatternGalleryFileService
     /// <param name="paths">The resolved collection paths.</param>
     /// <param name="fileName">The single-file pattern name.</param>
     /// <returns>The absolute path of the pattern file.</returns>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="fileName"/> is not a single relative filename.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="fileName" /> is not a single relative filename.</exception>
     string GetPatternPath(PatternGalleryCollectionPaths paths, string fileName);
 
     /// <summary>Creates the collection and its Pattern Files directory.</summary>
@@ -144,7 +145,7 @@ public interface IPatternGalleryService
         string hitObjectText,
         string timingPointText,
         double globalSv,
-        Mapping_Tools.Core.Classes.BeatmapHelper.Enums.GameMode gameMode,
+        GameMode gameMode,
         PatternGalleryProject project,
         PatternGalleryCollectionPaths paths,
         CancellationToken cancellationToken = default);

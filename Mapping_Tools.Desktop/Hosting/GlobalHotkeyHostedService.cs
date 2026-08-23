@@ -1,6 +1,6 @@
 using Mapping_Tools.Application.Backups;
-using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
 using Microsoft.Extensions.Hosting;
 
@@ -11,10 +11,10 @@ internal sealed class GlobalHotkeyHostedService : IHostedService, IHotkeyBinding
     private const string QuickRunBindingId = "quick-run";
     private const string QuickUndoBindingId = "quick-undo";
     private const string BetterSaveBindingId = "better-save";
+    private readonly IBetterSaveService _betterSave;
     private readonly IGlobalHotkeyService _hotkeys;
     private readonly IQuickRunService _quickRun;
     private readonly IQuickUndoCommandService _quickUndo;
-    private readonly IBetterSaveService _betterSave;
     private readonly ApplicationSettings _settings;
 
     public GlobalHotkeyHostedService(
@@ -47,21 +47,27 @@ internal sealed class GlobalHotkeyHostedService : IHostedService, IHotkeyBinding
         return Task.CompletedTask;
     }
 
-    public void ApplyQuickRun(HotkeySettings? hotkey) =>
+    public void ApplyQuickRun(HotkeySettings? hotkey)
+    {
         _hotkeys.SetBinding(
             QuickRunBindingId,
             hotkey,
             token => _quickRun.RunAsync(token));
+    }
 
-    public void ApplyQuickUndo(HotkeySettings? hotkey) =>
+    public void ApplyQuickUndo(HotkeySettings? hotkey)
+    {
         _hotkeys.SetBinding(
             QuickUndoBindingId,
             hotkey,
             token => _quickUndo.ExecuteAsync(token));
+    }
 
-    public void ApplyBetterSave(HotkeySettings? hotkey) =>
+    public void ApplyBetterSave(HotkeySettings? hotkey)
+    {
         _hotkeys.SetBinding(
             BetterSaveBindingId,
             hotkey,
             token => _betterSave.ExecuteAsync(token));
+    }
 }

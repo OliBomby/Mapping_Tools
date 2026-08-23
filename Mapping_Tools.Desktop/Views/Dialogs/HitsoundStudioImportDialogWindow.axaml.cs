@@ -6,5 +6,8 @@ namespace Mapping_Tools.Desktop.Views.Dialogs;
 public sealed partial class HitsoundStudioImportDialogWindow : Window
 {
     /// <summary>Creates the import window.</summary>
-    public HitsoundStudioImportDialogWindow() => InitializeComponent();
+    public HitsoundStudioImportDialogWindow()
+    {
+        InitializeComponent();
+    }
 }

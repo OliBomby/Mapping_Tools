@@ -1,3 +1,5 @@
+using System.IO.Compression;
+using Mapping_Tools.Application.PatternGallery;
 using Mapping_Tools.Infrastructure.PatternGallery;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -27,7 +29,7 @@ public sealed class PatternGalleryArchiveServiceTests
                 "Collection_01",
                 "project.json",
                 projectJson,
-                [new(patternFileName, patternBytes)]);
+                [new PatternGalleryArchiveFile(patternFileName, patternBytes)]);
             var archive = await service.ReadAsync(archivePath);
 
             // Assert
@@ -40,7 +42,7 @@ public sealed class PatternGalleryArchiveServiceTests
         }
         finally
         {
-            Directory.Delete(root, recursive: true);
+            Directory.Delete(root, true);
         }
     }
 
@@ -51,10 +53,11 @@ public sealed class PatternGalleryArchiveServiceTests
         string root = Path.Combine(Path.GetTempPath(), "MappingToolsPatternGallery", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
         string archivePath = Path.Combine(root, "unsafe.zip");
-        using (var archive = System.IO.Compression.ZipFile.Open(archivePath, System.IO.Compression.ZipArchiveMode.Create))
+        using (var archive = ZipFile.Open(archivePath, ZipArchiveMode.Create))
         {
             archive.CreateEntry("../project.json");
         }
+
         PatternGalleryArchiveService service = new();
 
         try
@@ -68,7 +71,7 @@ public sealed class PatternGalleryArchiveServiceTests
         }
         finally
         {
-            Directory.Delete(root, recursive: true);
+            Directory.Delete(root, true);
         }
     }
 
@@ -79,10 +82,11 @@ public sealed class PatternGalleryArchiveServiceTests
         string root = Path.Combine(Path.GetTempPath(), "MappingToolsPatternGallery", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
         string archivePath = Path.Combine(root, "unsafe-rooted.zip");
-        using (var archive = System.IO.Compression.ZipFile.Open(archivePath, System.IO.Compression.ZipArchiveMode.Create))
+        using (var archive = ZipFile.Open(archivePath, ZipArchiveMode.Create))
         {
             archive.CreateEntry("/project.json");
         }
+
         PatternGalleryArchiveService service = new();
 
         try
@@ -96,7 +100,7 @@ public sealed class PatternGalleryArchiveServiceTests
         }
         finally
         {
-            Directory.Delete(root, recursive: true);
+            Directory.Delete(root, true);
         }
     }
 }

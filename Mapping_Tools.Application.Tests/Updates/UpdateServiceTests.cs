@@ -20,8 +20,8 @@ public sealed class UpdateServiceTests
         using UpdateService service = new(gateway, new ApplicationSettings());
 
         // Act
-        UpdateCheckResult result = await service.CheckForUpdatesAsync(
-            allowSkippedVersion: true);
+        var result = await service.CheckForUpdatesAsync(
+            true);
 
         // Assert
         result.Availability.Should().Be(UpdateAvailability.None);
@@ -44,10 +44,10 @@ public sealed class UpdateServiceTests
         using UpdateService service = new(gateway, settings);
 
         // Act
-        UpdateCheckResult startupResult = await service.CheckForUpdatesAsync(
-            allowSkippedVersion: true);
-        UpdateCheckResult manualResult = await service.CheckForUpdatesAsync(
-            allowSkippedVersion: false);
+        var startupResult = await service.CheckForUpdatesAsync(
+            true);
+        var manualResult = await service.CheckForUpdatesAsync(
+            false);
 
         // Assert
         startupResult.Availability.Should().Be(UpdateAvailability.Skipped);
@@ -67,11 +67,11 @@ public sealed class UpdateServiceTests
         using UpdateService service = new(gateway, new ApplicationSettings());
         List<double> progress = [];
         service.ProgressChanged += (_, args) => progress.Add(args.Progress);
-        await service.CheckForUpdatesAsync(allowSkippedVersion: false);
+        await service.CheckForUpdatesAsync(false);
 
         // Act
         await service.PrepareUpdateAsync();
-        service.StartUpdateProcess(restartAfterUpdate: false);
+        service.StartUpdateProcess(false);
 
         // Assert
         gateway.PreparedVersion.Should().Be(new Version(2, 0));
@@ -93,7 +93,7 @@ public sealed class UpdateServiceTests
         using UpdateService service = new(gateway, new ApplicationSettings());
 
         // Act
-        Func<Task> act = () => service.PrepareUpdateAsync();
+        var act = () => service.PrepareUpdateAsync();
 
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>();
@@ -122,14 +122,14 @@ public sealed class UpdateServiceTests
             return preparation.Task;
         };
         using UpdateService service = new(gateway, new ApplicationSettings());
-        await service.CheckForUpdatesAsync(allowSkippedVersion: false);
-        Task download = service.PrepareUpdateAsync();
+        await service.CheckForUpdatesAsync(false);
+        var download = service.PrepareUpdateAsync();
 
         // Act
         service.AbandonUpdate();
 
         // Assert
-        Func<Task> act = () => download;
+        var act = () => download;
         await act.Should().ThrowAsync<OperationCanceledException>();
         gateway.CancellationRequested.Should().BeTrue();
     }
@@ -147,11 +147,11 @@ public sealed class UpdateServiceTests
         TaskCompletionSource preparation = new(TaskCreationOptions.RunContinuationsAsynchronously);
         gateway.PrepareImplementation = (_, _, _) => preparation.Task;
         UpdateService service = new(gateway, new ApplicationSettings());
-        await service.CheckForUpdatesAsync(allowSkippedVersion: false);
+        await service.CheckForUpdatesAsync(false);
         _ = service.PrepareUpdateAsync();
 
         // Act
-        Task dispose = service.DisposeAsync().AsTask();
+        var dispose = service.DisposeAsync().AsTask();
 
         // Assert
         dispose.IsCompleted.Should().BeFalse();
@@ -179,11 +179,11 @@ public sealed class UpdateServiceTests
             return preparation.Task;
         };
         using UpdateService service = new(gateway, new ApplicationSettings());
-        await service.CheckForUpdatesAsync(allowSkippedVersion: false);
+        await service.CheckForUpdatesAsync(false);
 
         // Act
-        Task first = service.PrepareUpdateAsync();
-        Task second = service.PrepareUpdateAsync();
+        var first = service.PrepareUpdateAsync();
+        var second = service.PrepareUpdateAsync();
         preparation.SetResult();
         await first;
         await second;
@@ -207,19 +207,19 @@ public sealed class UpdateServiceTests
             TaskCreationOptions.RunContinuationsAsynchronously);
         gateway.PrepareImplementation = (_, _, _) => preparation.Task;
         using UpdateService service = new(gateway, new ApplicationSettings());
-        await service.CheckForUpdatesAsync(allowSkippedVersion: false);
-        Task download = service.PrepareUpdateAsync();
+        await service.CheckForUpdatesAsync(false);
+        var download = service.PrepareUpdateAsync();
 
         // Act
-        Task<UpdateCheckResult> check = service.CheckForUpdatesAsync(
-            allowSkippedVersion: false);
+        var check = service.CheckForUpdatesAsync(
+            false);
 
         // Assert
         gateway.CheckCallCount.Should().Be(1);
         check.IsCompleted.Should().BeFalse();
 
         preparation.SetResult();
-        Func<Task> awaitDownload = () => download;
+        var awaitDownload = () => download;
         await awaitDownload.Should().ThrowAsync<OperationCanceledException>();
         await check;
         gateway.CheckCallCount.Should().Be(2);
@@ -246,14 +246,9 @@ public sealed class UpdateServiceTests
         public Func<Version, IProgress<double>, CancellationToken, Task>? PrepareImplementation { get; set; }
 
         public Task<UpdatePackageInfo> CheckForUpdatesAsync(
-            CancellationToken cancellationToken = default) =>
-            CheckAsync(cancellationToken);
-
-        private Task<UpdatePackageInfo> CheckAsync(CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            CheckCallCount++;
-            return Task.FromResult(Result);
+            return CheckAsync(cancellationToken);
         }
 
         public Task PrepareUpdateAsync(
@@ -262,10 +257,7 @@ public sealed class UpdateServiceTests
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (PrepareImplementation is not null)
-            {
-                return PrepareImplementation(version, progress, cancellationToken);
-            }
+            if (PrepareImplementation is not null) return PrepareImplementation(version, progress, cancellationToken);
 
             PreparedVersion = version;
             progress.Report(1d);
@@ -281,6 +273,13 @@ public sealed class UpdateServiceTests
         public void Dispose()
         {
             Disposed = true;
+        }
+
+        private Task<UpdatePackageInfo> CheckAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            CheckCallCount++;
+            return Task.FromResult(Result);
         }
     }
 }

@@ -19,10 +19,7 @@ public static class RhythmGuideGenerator
     {
         ArgumentNullException.ThrowIfNull(sources);
         ArgumentNullException.ThrowIfNull(options);
-        if (sources.Count == 0)
-        {
-            throw new ArgumentException("There must be at least one beatmap.", nameof(sources));
-        }
+        if (sources.Count == 0) throw new ArgumentException("There must be at least one beatmap.", nameof(sources));
 
         // Scuffed beatmap copy
         Beatmap result = new(sources[0].GetLines());
@@ -56,10 +53,10 @@ public static class RhythmGuideGenerator
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(options.BeatDivisors);
 
-        foreach (Beatmap source in sources)
+        foreach (var source in sources)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            foreach (TimelineObject timelineObject in source.GetTimeline().TimelineObjects)
+            foreach (var timelineObject in source.GetTimeline().TimelineObjects)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 // Handle different selection modes
@@ -69,22 +66,16 @@ public static class RhythmGuideGenerator
                         AddHitObject(timelineObject.Time);
                         break;
                     case RhythmGuideSelectionMode.HitsoundEvents:
-                        if (timelineObject.HasHitsound)
-                        {
-                            AddHitObject(timelineObject.Time);
-                        }
+                        if (timelineObject.HasHitsound) AddHitObject(timelineObject.Time);
                         break;
                     case RhythmGuideSelectionMode.AllEventSeparated:
-                        bool active = timelineObject.IsHoldnoteHead ||
-                            timelineObject.IsCircle || timelineObject.IsSliderHead;
+                        bool active = timelineObject.IsHoldnoteHead || timelineObject.IsCircle || timelineObject.IsSliderHead;
                         AddHitObject(
                             timelineObject.Time,
                             active ? new Vector2(0, 192) : new Vector2(512, 192));
                         break;
                     case RhythmGuideSelectionMode.LongNotes:
-                        bool startsObject = timelineObject.IsHoldnoteHead ||
-                            timelineObject.IsCircle || timelineObject.IsSliderHead ||
-                            timelineObject.IsSpinnerHead;
+                        bool startsObject = timelineObject.IsHoldnoteHead || timelineObject.IsCircle || timelineObject.IsSliderHead || timelineObject.IsSpinnerHead;
                         if (startsObject)
                         {
                             AddHitObject(timelineObject.Time);
@@ -92,11 +83,12 @@ public static class RhythmGuideGenerator
                         else if (target.HitObjects.Count > 0)
                         {
                             // Extend last object
-                            HitObject last = target.HitObjects[^1];
+                            var last = target.HitObjects[^1];
                             last.IsCircle = false;
                             last.IsHoldNote = true;
                             last.EndTime = timelineObject.Time;
                         }
+
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(
@@ -113,12 +105,9 @@ public static class RhythmGuideGenerator
             _ = target.BeatmapTiming.Resnap(time, options.BeatDivisors);
             HitObject hitObject = new(time, 0, SampleSet.None, SampleSet.None)
             {
-                NewCombo = options.NcEverything
+                NewCombo = options.NcEverything,
             };
-            if (position.HasValue)
-            {
-                hitObject.Pos = position.Value;
-            }
+            if (position.HasValue) hitObject.Pos = position.Value;
             target.HitObjects.Add(hitObject);
         }
     }

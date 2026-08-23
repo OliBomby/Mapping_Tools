@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
@@ -14,13 +13,13 @@ public sealed class TimingCopierEngineTests
     public void Apply_PreserveBeatSpacing_MovesObjectsAndBookmarksBySourceTempo()
     {
         // Arrange
-        Beatmap source = CreateBeatmap(500);
-        Beatmap target = CreateBeatmap(1000, 1000);
+        var source = CreateBeatmap(500);
+        var target = CreateBeatmap(1000, 1000);
         target.SetBookmarks([1500]);
         TimingCopierOptions options = new()
         {
             ResnapMode = TimingCopierResnapModes.PreserveBeatSpacing,
-            BeatDivisors = [new RationalBeatDivisor(1, 4)]
+            BeatDivisors = [new RationalBeatDivisor(1, 4)],
         };
 
         // Act
@@ -36,13 +35,13 @@ public sealed class TimingCopierEngineTests
     public void Apply_ResnapMode_ResnapsHitObjectsWithoutMovingBookmarks()
     {
         // Arrange
-        Beatmap source = CreateBeatmap(500);
-        Beatmap target = CreateBeatmap(1000, 700);
+        var source = CreateBeatmap(500);
+        var target = CreateBeatmap(1000, 700);
         target.SetBookmarks([700]);
         TimingCopierOptions options = new()
         {
             ResnapMode = TimingCopierResnapModes.Resnap,
-            BeatDivisors = [new RationalBeatDivisor(1, 4)]
+            BeatDivisors = [new RationalBeatDivisor(1, 4)],
         };
 
         // Act
@@ -57,13 +56,13 @@ public sealed class TimingCopierEngineTests
     public void Apply_KeepObjectsFixed_ReplacesTimingWithoutMovingMapContent()
     {
         // Arrange
-        Beatmap source = CreateBeatmap(500);
-        Beatmap target = CreateBeatmap(1000, 700);
+        var source = CreateBeatmap(500);
+        var target = CreateBeatmap(1000, 700);
         target.SetBookmarks([900]);
         TimingCopierOptions options = new()
         {
             ResnapMode = TimingCopierResnapModes.KeepObjectsFixed,
-            BeatDivisors = [new RationalBeatDivisor(1, 4)]
+            BeatDivisors = [new RationalBeatDivisor(1, 4)],
         };
 
         // Act
@@ -79,8 +78,8 @@ public sealed class TimingCopierEngineTests
     public void Apply_KeepObjectsFixed_PreservesTargetGreenlinesWhileReplacingRedlines()
     {
         // Arrange
-        Beatmap source = CreateBeatmap(500);
-        Beatmap target = CreateBeatmap(1000);
+        var source = CreateBeatmap(500);
+        var target = CreateBeatmap(1000);
         TimingPoint targetGreenline = new(
             500,
             -100,
@@ -88,14 +87,14 @@ public sealed class TimingCopierEngineTests
             SampleSet.Normal,
             0,
             100,
-            uninherited: false,
-            kiai: false,
-            omitFirstBarLine: false);
+            false,
+            false,
+            false);
         target.BeatmapTiming.Add(targetGreenline);
         TimingCopierOptions options = new()
         {
             ResnapMode = TimingCopierResnapModes.KeepObjectsFixed,
-            BeatDivisors = [new RationalBeatDivisor(1, 4)]
+            BeatDivisors = [new RationalBeatDivisor(1, 4)],
         };
 
         // Act
@@ -110,18 +109,18 @@ public sealed class TimingCopierEngineTests
     public void Apply_WhenCancelledBeforeMutation_LeavesTargetUnchanged()
     {
         // Arrange
-        Beatmap source = CreateBeatmap(500);
-        Beatmap target = CreateBeatmap(1000, 1000);
+        var source = CreateBeatmap(500);
+        var target = CreateBeatmap(1000, 1000);
         CancellationTokenSource cancellation = new();
         cancellation.Cancel();
         TimingCopierOptions options = new()
         {
             ResnapMode = TimingCopierResnapModes.KeepObjectsFixed,
-            BeatDivisors = [new RationalBeatDivisor(1, 4)]
+            BeatDivisors = [new RationalBeatDivisor(1, 4)],
         };
 
         // Act
-        Action act = () => TimingCopierEngine.Apply(target, source, options, cancellation.Token);
+        var act = () => TimingCopierEngine.Apply(target, source, options, cancellation.Token);
 
         // Assert
         act.Should().Throw<OperationCanceledException>();
@@ -138,10 +137,10 @@ public sealed class TimingCopierEngineTests
             SampleSet.Normal,
             0,
             100,
-            uninherited: true,
-            kiai: false,
-            omitFirstBarLine: false);
-        List<HitObject> hitObjects = objectTimes
+            true,
+            false,
+            false);
+        var hitObjects = objectTimes
             .Select(time => new HitObject(time, 0, SampleSet.None, SampleSet.None))
             .ToList();
         return new Beatmap(hitObjects, [redline], redline);

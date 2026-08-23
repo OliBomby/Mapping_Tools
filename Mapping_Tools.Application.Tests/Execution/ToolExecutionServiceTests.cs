@@ -16,7 +16,7 @@ public sealed class ToolExecutionServiceTests
         List<UserNotification> published = [];
         notifications.Published += (_, args) => published.Add(args.Notification);
         RecordingReloadService reload = new();
-        ToolExecutionService service = CreateService(
+        var service = CreateService(
             notifications,
             reload,
             new ApplicationSettings { AutoReload = true });
@@ -35,11 +35,11 @@ public sealed class ToolExecutionServiceTests
                     new ToolExecutionOutput<int>(
                         42,
                         "Removed 3 greenlines.",
-                        reloadEditor: true));
+                        true));
             });
 
         // Act
-        ToolExecutionResult<int> result = await service.ExecuteAsync(
+        var result = await service.ExecuteAsync(
             request,
             new InlineProgress<ToolExecutionProgress>(progress.Add));
 
@@ -62,7 +62,7 @@ public sealed class ToolExecutionServiceTests
     {
         // Arrange
         RecordingReloadService reload = new();
-        ToolExecutionService service = CreateService(
+        var service = CreateService(
             new UserNotificationService(),
             reload,
             new ApplicationSettings { AutoReload = false });
@@ -75,7 +75,7 @@ public sealed class ToolExecutionServiceTests
                     reloadEditor: true)));
 
         // Act
-        ToolExecutionResult<int> result = await service.ExecuteAsync(request);
+        var result = await service.ExecuteAsync(request);
 
         // Assert
         result.Status.Should().Be(ToolExecutionStatus.Succeeded);
@@ -91,7 +91,7 @@ public sealed class ToolExecutionServiceTests
         UserNotification? published = null;
         notifications.Published += (_, args) => published = args.Notification;
         InvalidDataException failure = new("Invalid timing section.");
-        ToolExecutionService service = CreateService(
+        var service = CreateService(
             notifications,
             new RecordingReloadService(),
             new ApplicationSettings());
@@ -101,7 +101,7 @@ public sealed class ToolExecutionServiceTests
             _ => Task.FromException<ToolExecutionOutput<int>>(failure));
 
         // Act
-        ToolExecutionResult<int> result = await service.ExecuteAsync(request);
+        var result = await service.ExecuteAsync(request);
 
         // Assert
         result.Status.Should().Be(ToolExecutionStatus.Failed);
@@ -118,7 +118,7 @@ public sealed class ToolExecutionServiceTests
         UserNotificationService notifications = new();
         notifications.Published += (_, _) =>
             throw new InvalidOperationException("Presentation failed.");
-        ToolExecutionService service = CreateService(notifications);
+        var service = CreateService(notifications);
         ToolExecutionRequest<int> request = new(
             "cleaner",
             "Map Cleaner",
@@ -128,7 +128,7 @@ public sealed class ToolExecutionServiceTests
                     "Removed four redundant timing points.")));
 
         // Act
-        ToolExecutionResult<int> result = await service.ExecuteAsync(request);
+        var result = await service.ExecuteAsync(request);
 
         // Assert
         result.Status.Should().Be(ToolExecutionStatus.Succeeded);
@@ -139,7 +139,7 @@ public sealed class ToolExecutionServiceTests
     public async Task ExecuteAsync_WithDuplicateOperation_ReturnsBusyWithoutSecondDelegate()
     {
         // Arrange
-        ToolExecutionService service = CreateService();
+        var service = CreateService();
         TaskCompletionSource firstStarted =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
         TaskCompletionSource release =
@@ -154,7 +154,7 @@ public sealed class ToolExecutionServiceTests
                 await release.Task.WaitAsync(context.CancellationToken);
                 return new ToolExecutionOutput<int>(1);
             });
-        Task<ToolExecutionResult<int>> firstTask = service.ExecuteAsync(first);
+        var firstTask = service.ExecuteAsync(first);
         await firstStarted.Task;
         ToolExecutionRequest<int> duplicate = new(
             "sliderator",
@@ -166,10 +166,10 @@ public sealed class ToolExecutionServiceTests
             });
 
         // Act
-        ToolExecutionResult<int> duplicateResult =
+        var duplicateResult =
             await service.ExecuteAsync(duplicate);
         release.SetResult();
-        ToolExecutionResult<int> firstResult = await firstTask;
+        var firstResult = await firstTask;
 
         // Assert
         duplicateResult.Status.Should().Be(ToolExecutionStatus.AlreadyRunning);
@@ -181,7 +181,7 @@ public sealed class ToolExecutionServiceTests
     public async Task Cancel_WithTargetedOperation_CancelsContextAndReturnsCancelled()
     {
         // Arrange
-        ToolExecutionService service = CreateService();
+        var service = CreateService();
         TaskCompletionSource started =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
         ToolExecutionRequest<int> request = new(
@@ -193,12 +193,12 @@ public sealed class ToolExecutionServiceTests
                 await Task.Delay(Timeout.InfiniteTimeSpan, context.CancellationToken);
                 return new ToolExecutionOutput<int>(1);
             });
-        Task<ToolExecutionResult<int>> execution = service.ExecuteAsync(request);
+        var execution = service.ExecuteAsync(request);
         await started.Task;
 
         // Act
         bool cancelled = service.Cancel("picturator");
-        ToolExecutionResult<int> result = await execution;
+        var result = await execution;
 
         // Assert
         cancelled.Should().BeTrue();
@@ -210,7 +210,7 @@ public sealed class ToolExecutionServiceTests
     public async Task ExecuteAsync_WithCallerCancellation_ReturnsCancelled()
     {
         // Arrange
-        ToolExecutionService service = CreateService();
+        var service = CreateService();
         using CancellationTokenSource source = new();
         ToolExecutionRequest<int> request = new(
             "merger",
@@ -223,7 +223,7 @@ public sealed class ToolExecutionServiceTests
             });
 
         // Act
-        ToolExecutionResult<int> result = await service.ExecuteAsync(
+        var result = await service.ExecuteAsync(
             request,
             cancellationToken: source.Token);
 
@@ -235,24 +235,23 @@ public sealed class ToolExecutionServiceTests
     public async Task StopAsync_WithActiveOperations_CancelsAndJoinsAll()
     {
         // Arrange
-        ToolExecutionService service = CreateService();
+        var service = CreateService();
         TaskCompletionSource firstStarted =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
         TaskCompletionSource secondStarted =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
-        Task<ToolExecutionResult<int>> first = service.ExecuteAsync(
+        var first = service.ExecuteAsync(
             BlockingRequest("one", firstStarted));
-        Task<ToolExecutionResult<int>> second = service.ExecuteAsync(
+        var second = service.ExecuteAsync(
             BlockingRequest("two", secondStarted));
         await Task.WhenAll(firstStarted.Task, secondStarted.Task);
 
         // Act
         await service.StopAsync();
-        ToolExecutionResult<int>[] results = await Task.WhenAll(first, second);
+        var results = await Task.WhenAll(first, second);
 
         // Assert
-        results.All(
-            result => result.Status == ToolExecutionStatus.Cancelled).Should().BeTrue();
+        results.All(result => result.Status == ToolExecutionStatus.Cancelled).Should().BeTrue();
         service.IsRunning("one").Should().BeFalse();
         service.IsRunning("two").Should().BeFalse();
     }
@@ -285,12 +284,12 @@ public sealed class ToolExecutionServiceTests
         source.Cancel();
 
         // Act
-        Func<Task> act4 = () => notifications.PublishAsync(
-                new UserNotification(
-                    UserNotificationSeverity.Information,
-                    "Title",
-                    "Message"),
-                source.Token);
+        var act4 = () => notifications.PublishAsync(
+            new UserNotification(
+                UserNotificationSeverity.Information,
+                "Title",
+                "Message"),
+            source.Token);
 
         // Assert
         await act4.Should().ThrowAsync<OperationCanceledException>();

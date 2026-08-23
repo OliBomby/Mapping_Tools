@@ -8,8 +8,8 @@ using Mapping_Tools.Application.Workspace;
 namespace Mapping_Tools.Infrastructure.Settings;
 
 /// <summary>
-/// Reads and atomically replaces the legacy-compatible Mapping Tools JSON
-/// configuration using a frontend-neutral settings model.
+///     Reads and atomically replaces the legacy-compatible Mapping Tools JSON
+///     configuration using a frontend-neutral settings model.
 /// </summary>
 public sealed class JsonSettingsStore : ISettingsStore
 {
@@ -17,7 +17,7 @@ public sealed class JsonSettingsStore : ISettingsStore
     private readonly JsonSerializerOptions _options;
 
     /// <summary>
-    /// Creates a store for the configuration path supplied by the application layout.
+    ///     Creates a store for the configuration path supplied by the application layout.
     /// </summary>
     /// <param name="directories">Provides the configuration path and required parent directories.</param>
     public JsonSettingsStore(IApplicationDirectories directories)
@@ -28,29 +28,29 @@ public sealed class JsonSettingsStore : ISettingsStore
             AllowTrailingCommas = true,
             PropertyNameCaseInsensitive = true,
             WriteIndented = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
         _options.Converters.Add(new WindowBoundsJsonConverter());
         _options.Converters.Add(new RecentBeatmapJsonConverter());
         _options.Converters.Add(new JsonStringEnumConverter<ApplicationTheme>());
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool Exists => File.Exists(_directories.ConfigurationFile);
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     /// <exception cref="JsonException">The file is empty, malformed, or contains invalid legacy bounds.</exception>
     public ApplicationSettings Load()
     {
         string json = File.ReadAllText(_directories.ConfigurationFile);
         return JsonSerializer.Deserialize<ApplicationSettings>(json, _options)
-            ?? throw new JsonException("The settings document contained no JSON value.");
+               ?? throw new JsonException("The settings document contained no JSON value.");
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     /// <remarks>
-    /// Serialization first targets a sibling <c>.tmp</c> file, which is moved
-    /// over the configuration only after the complete JSON has been written.
+    ///     Serialization first targets a sibling <c>.tmp</c> file, which is moved
+    ///     over the configuration only after the complete JSON has been written.
     /// </remarks>
     public void Save(ApplicationSettings settings)
     {
@@ -65,22 +65,19 @@ public sealed class JsonSettingsStore : ISettingsStore
             File.Move(
                 temporaryPath,
                 _directories.ConfigurationFile,
-                overwrite: true);
+                true);
         }
         finally
         {
-            if (File.Exists(temporaryPath))
-            {
-                File.Delete(temporaryPath);
-            }
+            if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
         }
     }
 
     private sealed class WindowBoundsJsonConverter : JsonConverter<WindowBounds>
     {
         /// <summary>
-        /// Parses the comma-separated <c>x,y,width,height</c> representation
-        /// emitted for the legacy WPF <c>Rect</c> property.
+        ///     Parses the comma-separated <c>x,y,width,height</c> representation
+        ///     emitted for the legacy WPF <c>Rect</c> property.
         /// </summary>
         public override WindowBounds Read(
             ref Utf8JsonReader reader,
@@ -88,12 +85,9 @@ public sealed class JsonSettingsStore : ISettingsStore
             JsonSerializerOptions options)
         {
             string value = reader.GetString()
-                ?? throw new JsonException("Window bounds cannot be null.");
+                           ?? throw new JsonException("Window bounds cannot be null.");
             string[] parts = value.Split(',');
-            if (parts.Length != 4)
-            {
-                throw new JsonException($"Invalid legacy window bounds value '{value}'.");
-            }
+            if (parts.Length != 4) throw new JsonException($"Invalid legacy window bounds value '{value}'.");
 
             try
             {
@@ -113,8 +107,8 @@ public sealed class JsonSettingsStore : ISettingsStore
         }
 
         /// <summary>
-        /// Writes bounds in the invariant comma-separated form understood by
-        /// both the old Newtonsoft/WPF model and the new settings model.
+        ///     Writes bounds in the invariant comma-separated form understood by
+        ///     both the old Newtonsoft/WPF model and the new settings model.
         /// </summary>
         public override void Write(
             Utf8JsonWriter writer,
@@ -137,29 +131,21 @@ public sealed class JsonSettingsStore : ISettingsStore
             Type typeToConvert,
             JsonSerializerOptions options)
         {
-            if (reader.TokenType != JsonTokenType.StartArray ||
-                !reader.Read() ||
-                reader.TokenType != JsonTokenType.String)
-            {
+            if (reader.TokenType != JsonTokenType.StartArray || !reader.Read() || reader.TokenType != JsonTokenType.String)
                 throw new JsonException(
                     "A recent beatmap must be a [path, display date] string array.");
-            }
 
             string path = reader.GetString()
-                ?? throw new JsonException("A recent beatmap path cannot be null.");
+                          ?? throw new JsonException("A recent beatmap path cannot be null.");
             if (!reader.Read() || reader.TokenType != JsonTokenType.String)
-            {
                 throw new JsonException(
                     "A recent beatmap must include its display date as the second value.");
-            }
 
             string displayDate = reader.GetString()
-                ?? throw new JsonException("A recent beatmap display date cannot be null.");
+                                 ?? throw new JsonException("A recent beatmap display date cannot be null.");
             if (!reader.Read() || reader.TokenType != JsonTokenType.EndArray)
-            {
                 throw new JsonException(
                     "A recent beatmap must contain exactly two string values.");
-            }
 
             return new RecentBeatmap(path, displayDate);
         }

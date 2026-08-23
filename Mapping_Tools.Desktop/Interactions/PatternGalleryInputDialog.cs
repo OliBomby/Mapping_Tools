@@ -1,3 +1,4 @@
+using System.Globalization;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -13,18 +14,18 @@ public interface IPatternGalleryInputDialog
 {
     /// <summary>Shows the raw-code import form.</summary>
     /// <param name="defaultName">The next suggested pattern name.</param>
-    /// <returns>Submitted values, or <see langword="null"/> when cancelled.</returns>
+    /// <returns>Submitted values, or <see langword="null" /> when cancelled.</returns>
     Task<PatternGalleryCodeInput?> ShowCodeAsync(string defaultName);
 
     /// <summary>Shows the source-file import form.</summary>
     /// <param name="defaultName">The next suggested pattern name.</param>
     /// <param name="defaultPath">The path selected by the file picker.</param>
-    /// <returns>Submitted values, or <see langword="null"/> when cancelled.</returns>
+    /// <returns>Submitted values, or <see langword="null" /> when cancelled.</returns>
     Task<PatternGalleryFileInput?> ShowFileAsync(string defaultName, string defaultPath);
 
     /// <summary>Shows editable pattern details and returns the submitted name.</summary>
     /// <param name="pattern">The metadata displayed by the dialog.</param>
-    /// <returns>The new name, or <see langword="null"/> when cancelled.</returns>
+    /// <returns>The new name, or <see langword="null" /> when cancelled.</returns>
     Task<string?> ShowDetailsAsync(PatternGalleryPattern pattern);
 }
 
@@ -56,27 +57,27 @@ public sealed class PatternGalleryInputDialog : IPatternGalleryInputDialog
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<PatternGalleryCodeInput?> ShowCodeAsync(string defaultName)
     {
-        PatternGalleryInputViewModel viewModel = PatternGalleryInputViewModel.ForCode(defaultName);
+        var viewModel = PatternGalleryInputViewModel.ForCode(defaultName);
         PatternGalleryInputDialogWindow window = new() { DataContext = viewModel };
         viewModel.Close = value => window.Close(value);
         object? result = await window.ShowDialog<object?>(_owner());
         return result is PatternGalleryCodeInput input ? input : null;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<PatternGalleryFileInput?> ShowFileAsync(string defaultName, string defaultPath)
     {
-        PatternGalleryInputViewModel viewModel = PatternGalleryInputViewModel.ForFile(defaultName, defaultPath);
+        var viewModel = PatternGalleryInputViewModel.ForFile(defaultName, defaultPath);
         PatternGalleryInputDialogWindow window = new() { DataContext = viewModel };
         viewModel.Close = value => window.Close(value);
         object? result = await window.ShowDialog<object?>(_owner());
         return result is PatternGalleryFileInput input ? input : null;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<string?> ShowDetailsAsync(PatternGalleryPattern pattern)
     {
         ArgumentNullException.ThrowIfNull(pattern);
@@ -91,7 +92,14 @@ public sealed class PatternGalleryInputDialog : IPatternGalleryInputDialog
 /// <summary>Owns validation and binding state for a Pattern Gallery import form.</summary>
 public sealed partial class PatternGalleryInputViewModel : ObservableValidator
 {
-    private readonly bool _isCode;
+    private PatternGalleryInputViewModel(bool isCode, string defaultName, string? defaultPath)
+    {
+        IsCode = isCode;
+        Name = defaultName;
+        FilePath = defaultPath ?? string.Empty;
+        AcceptCommand = new RelayCommand(Accept);
+        CancelCommand = new RelayCommand(() => Close(null));
+    }
 
     /// <summary>Gets or sets the pattern display name.</summary>
     [ObservableProperty]
@@ -133,10 +141,10 @@ public sealed partial class PatternGalleryInputViewModel : ObservableValidator
     public IReadOnlyList<GameMode> GameModes { get; } = Enum.GetValues<GameMode>();
 
     /// <summary>Gets whether the raw-code fields are visible.</summary>
-    public bool IsCode => _isCode;
+    public bool IsCode { get; }
 
     /// <summary>Gets whether the source-file fields are visible.</summary>
-    public bool IsFile => !_isCode;
+    public bool IsFile => !IsCode;
 
     /// <summary>Gets the latest correction message.</summary>
     [ObservableProperty]
@@ -151,27 +159,22 @@ public sealed partial class PatternGalleryInputViewModel : ObservableValidator
     /// <summary>Gets or sets the window-close callback installed by the adapter.</summary>
     internal Action<object?> Close { get; set; } = _ => { };
 
-    private PatternGalleryInputViewModel(bool isCode, string defaultName, string? defaultPath)
-    {
-        _isCode = isCode;
-        Name = defaultName;
-        FilePath = defaultPath ?? string.Empty;
-        AcceptCommand = new RelayCommand(Accept);
-        CancelCommand = new RelayCommand(() => Close(null));
-    }
-
     /// <summary>Creates a raw-code import form.</summary>
     /// <param name="defaultName">The suggested display name.</param>
     /// <returns>The initialized form state.</returns>
-    public static PatternGalleryInputViewModel ForCode(string defaultName) =>
-        new(true, defaultName, null);
+    public static PatternGalleryInputViewModel ForCode(string defaultName)
+    {
+        return new PatternGalleryInputViewModel(true, defaultName, null);
+    }
 
     /// <summary>Creates a source-file import form.</summary>
     /// <param name="defaultName">The suggested display name.</param>
     /// <param name="defaultPath">The selected source path.</param>
     /// <returns>The initialized form state.</returns>
-    public static PatternGalleryInputViewModel ForFile(string defaultName, string defaultPath) =>
-        new(false, defaultName, defaultPath);
+    public static PatternGalleryInputViewModel ForFile(string defaultName, string defaultPath)
+    {
+        return new PatternGalleryInputViewModel(false, defaultName, defaultPath);
+    }
 
     private void Accept()
     {
@@ -182,10 +185,10 @@ public sealed partial class PatternGalleryInputViewModel : ObservableValidator
             return;
         }
 
-        if (_isCode)
+        if (IsCode)
         {
-            if (!double.TryParse(GlobalSvText, System.Globalization.NumberStyles.Float,
-                    System.Globalization.CultureInfo.InvariantCulture, out double globalSv))
+            if (!double.TryParse(GlobalSvText, NumberStyles.Float,
+                    CultureInfo.InvariantCulture, out double globalSv))
             {
                 Error = "Global SV must be a valid number.";
                 return;
@@ -201,8 +204,7 @@ public sealed partial class PatternGalleryInputViewModel : ObservableValidator
             return;
         }
 
-        if (!TryParseOptionalTime(StartTimeText, out double startTime) ||
-            !TryParseOptionalTime(EndTimeText, out double endTime))
+        if (!TryParseOptionalTime(StartTimeText, out double startTime) || !TryParseOptionalTime(EndTimeText, out double endTime))
         {
             Error = "Start and end time must be valid numbers.";
             return;
@@ -219,11 +221,9 @@ public sealed partial class PatternGalleryInputViewModel : ObservableValidator
             return true;
         }
 
-        if (double.TryParse(value, System.Globalization.NumberStyles.Float,
-                System.Globalization.CultureInfo.InvariantCulture, out result))
-        {
+        if (double.TryParse(value, NumberStyles.Float,
+                CultureInfo.InvariantCulture, out result))
             return true;
-        }
 
         try
         {
@@ -249,10 +249,10 @@ public sealed partial class PatternGalleryDetailsViewModel : ObservableValidator
         Name = pattern.Name;
         CreationTimeText = pattern.CreationTime.ToString("G");
         LastUsedTimeText = pattern.LastUsedTime.ToString("G");
-        UseCountText = pattern.UseCount.ToString(System.Globalization.CultureInfo.InvariantCulture);
-        ObjectCountText = pattern.ObjectCount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        UseCountText = pattern.UseCount.ToString(CultureInfo.InvariantCulture);
+        ObjectCountText = pattern.ObjectCount.ToString(CultureInfo.InvariantCulture);
         DurationText = pattern.Duration.ToString();
-        BeatLengthText = pattern.BeatLength.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
+        BeatLengthText = pattern.BeatLength.ToString("0.###", CultureInfo.InvariantCulture);
         FileName = pattern.FileName;
         AcceptCommand = new RelayCommand(Accept);
         CancelCommand = new RelayCommand(() => Close(null));

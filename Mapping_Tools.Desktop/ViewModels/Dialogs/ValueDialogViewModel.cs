@@ -10,18 +10,12 @@ namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 /// <summary>Owns editable dialog text and validates its converted value through DataAnnotations.</summary>
 public sealed partial class ValueDialogViewModel : ObservableValidator
 {
+    private readonly Action<object?> _accept;
+    private readonly Action _cancel;
     private readonly IValueConverter _converter;
     private readonly Type _targetType;
     private readonly Func<object?, ValidationResult?> _validate;
-    private readonly Action<object?> _accept;
-    private readonly Action _cancel;
     private object? _parsedValue;
-
-    /// <summary>Gets or sets the editable invariant text displayed in the value field.</summary>
-    [ObservableProperty]
-    [NotifyDataErrorInfo]
-    [DialogValue]
-    public partial string ValueText { get; set; }
 
     /// <summary>Creates typed dialog state and validates the formatted initial value.</summary>
     /// <param name="title">The native window title.</param>
@@ -64,10 +58,16 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
         _accept = accept;
         _cancel = cancel;
         ValueText = converter.Convert(initialValue, typeof(string), null, CultureInfo.InvariantCulture)?.ToString()
-            ?? string.Empty;
+                    ?? string.Empty;
         ErrorsChanged += (_, _) => OnPropertyChanged(nameof(IsValid));
         ValidateProperty(ValueText, nameof(ValueText));
     }
+
+    /// <summary>Gets or sets the editable invariant text displayed in the value field.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [DialogValue]
+    public partial string ValueText { get; set; }
 
     /// <summary>Gets the native window title.</summary>
     public string Title { get; }
@@ -104,11 +104,8 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
             return new ValidationResult(exception.Message);
         }
 
-        ValidationResult? result = _validate(converted);
-        if (result == ValidationResult.Success)
-        {
-            _parsedValue = converted;
-        }
+        var result = _validate(converted);
+        if (result == ValidationResult.Success) _parsedValue = converted;
 
         return result;
     }
@@ -118,12 +115,12 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
     {
         ValidateAllProperties();
         OnPropertyChanged(nameof(IsValid));
-        if (!HasErrors)
-        {
-            _accept(_parsedValue);
-        }
+        if (!HasErrors) _accept(_parsedValue);
     }
 
     [RelayCommand]
-    private void Cancel() => _cancel();
+    private void Cancel()
+    {
+        _cancel();
+    }
 }

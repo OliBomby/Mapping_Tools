@@ -1,10 +1,11 @@
-using System.Globalization;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
+using Mapping_Tools.Application.Interactions.Converters;
 using Mapping_Tools.Core.Classes.Graph;
 using Mapping_Tools.Core.Classes.Graph.Interpolation;
 using Mapping_Tools.Core.Classes.Graph.Interpolation.Interpolators;
@@ -29,7 +30,7 @@ public enum GraphPointerGesture
     Tension,
 
     /// <summary>The graph viewport is being panned.</summary>
-    Pan
+    Pan,
 }
 
 /// <summary>Provides the edited state after a graph gesture or menu operation.</summary>
@@ -37,14 +38,17 @@ public sealed class GraphStateChangedEventArgs : EventArgs
 {
     /// <summary>Creates graph change information.</summary>
     /// <param name="state">The cloned state after the edit.</param>
-    public GraphStateChangedEventArgs(CoreGraphState state) => State = state;
+    public GraphStateChangedEventArgs(CoreGraphState state)
+    {
+        State = state;
+    }
 
     /// <summary>Gets the cloned state after the edit.</summary>
     public CoreGraphState State { get; }
 }
 
 /// <summary>
-/// Draws and edits a normalized value graph while keeping graph mathematics in Core.
+///     Draws and edits a normalized value graph while keeping graph mathematics in Core.
 /// </summary>
 public sealed class GraphControl : Control
 {
@@ -52,26 +56,6 @@ public sealed class GraphControl : Control
     private const double AnchorHitRadius = 10;
     private const double TensionHitRadius = 9;
     private const int MaximumCurveSamples = 1000;
-
-    private double viewMinX;
-    private double viewMinY;
-    private double viewMaxX = 1;
-    private double viewMaxY = 1;
-    private bool viewInitialized;
-    private bool committingState;
-    private bool drawAnchors;
-    private IPointer? capturedPointer;
-    private GraphPointerGesture gesture;
-    private int gestureAnchorIndex = -1;
-    private Point lastPointerPosition;
-    private Point gestureStartPosition;
-    private double gestureStartTension;
-    private int? contextAnchorIndex;
-    private int? selectedAnchorIndex;
-    private ContextMenu? contextMenu;
-
-    /// <summary>Suppresses state-change notifications while a host batches anchor updates.</summary>
-    public bool IgnoreAnchorUpdates { get; set; }
 
     /// <summary>Identifies the graph state edited by the control.</summary>
     public static readonly StyledProperty<CoreGraphState?> GraphStateProperty =
@@ -197,6 +181,22 @@ public sealed class GraphControl : Control
     public static readonly StyledProperty<IBrush?> MarkerBrushProperty =
         AvaloniaProperty.Register<GraphControl, IBrush?>(nameof(MarkerBrush));
 
+    private IPointer? capturedPointer;
+    private bool committingState;
+    private int? contextAnchorIndex;
+    private ContextMenu? contextMenu;
+    private bool drawAnchors;
+    private int gestureAnchorIndex = -1;
+    private Point gestureStartPosition;
+    private double gestureStartTension;
+    private Point lastPointerPosition;
+    private bool viewInitialized;
+    private double viewMaxX = 1;
+    private double viewMaxY = 1;
+
+    private double viewMinX;
+    private double viewMinY;
+
     static GraphControl()
     {
         AffectsRender<GraphControl>(
@@ -231,8 +231,8 @@ public sealed class GraphControl : Control
         IsTabStop = true;
     }
 
-    /// <summary>Raised after an edit produces a new cloned graph state.</summary>
-    public event EventHandler<GraphStateChangedEventArgs>? StateChanged;
+    /// <summary>Suppresses state-change notifications while a host batches anchor updates.</summary>
+    public bool IgnoreAnchorUpdates { get; set; }
 
     /// <summary>Gets or sets the graph state edited by the control.</summary>
     public CoreGraphState? GraphState
@@ -440,29 +440,69 @@ public sealed class GraphControl : Control
     /// <summary>Gets or sets the minimum visible graph X value.</summary>
     public double ViewMinX
     {
-        get { EnsureView(); return viewMinX; }
-        set { viewMinX = value; viewInitialized = true; NormalizeView(); InvalidateVisual(); }
+        get
+        {
+            EnsureView();
+            return viewMinX;
+        }
+        set
+        {
+            viewMinX = value;
+            viewInitialized = true;
+            NormalizeView();
+            InvalidateVisual();
+        }
     }
 
     /// <summary>Gets or sets the minimum visible graph Y value.</summary>
     public double ViewMinY
     {
-        get { EnsureView(); return viewMinY; }
-        set { viewMinY = value; viewInitialized = true; NormalizeView(); InvalidateVisual(); }
+        get
+        {
+            EnsureView();
+            return viewMinY;
+        }
+        set
+        {
+            viewMinY = value;
+            viewInitialized = true;
+            NormalizeView();
+            InvalidateVisual();
+        }
     }
 
     /// <summary>Gets or sets the maximum visible graph X value.</summary>
     public double ViewMaxX
     {
-        get { EnsureView(); return viewMaxX; }
-        set { viewMaxX = value; viewInitialized = true; NormalizeView(); InvalidateVisual(); }
+        get
+        {
+            EnsureView();
+            return viewMaxX;
+        }
+        set
+        {
+            viewMaxX = value;
+            viewInitialized = true;
+            NormalizeView();
+            InvalidateVisual();
+        }
     }
 
     /// <summary>Gets or sets the maximum visible graph Y value.</summary>
     public double ViewMaxY
     {
-        get { EnsureView(); return viewMaxY; }
-        set { viewMaxY = value; viewInitialized = true; NormalizeView(); InvalidateVisual(); }
+        get
+        {
+            EnsureView();
+            return viewMaxY;
+        }
+        set
+        {
+            viewMaxY = value;
+            viewInitialized = true;
+            NormalizeView();
+            InvalidateVisual();
+        }
     }
 
     /// <summary>Gets the visible graph width.</summary>
@@ -562,6 +602,19 @@ public sealed class GraphControl : Control
         set => TensionBrush = value;
     }
 
+    /// <summary>Gets the currently selected anchor index, if any.</summary>
+    public int? SelectedAnchorIndex { get; private set; }
+
+    /// <summary>Gets the active pointer gesture.</summary>
+    public GraphPointerGesture ActiveGesture { get; private set; }
+
+    private double ViewWidthInternal => Math.Max(viewMaxX - viewMinX, MinimumViewSize);
+
+    private double ViewHeightInternal => Math.Max(viewMaxY - viewMinY, MinimumViewSize);
+
+    /// <summary>Raised after an edit produces a new cloned graph state.</summary>
+    public event EventHandler<GraphStateChangedEventArgs>? StateChanged;
+
     /// <summary>Applies one brush to the curve, edges, anchors, and tension handles.</summary>
     /// <param name="brush">The brush to apply.</param>
     public void SetBrush(IBrush brush)
@@ -577,20 +630,17 @@ public sealed class GraphControl : Control
         TensionBrush = brush;
     }
 
-    /// <summary>Gets the currently selected anchor index, if any.</summary>
-    public int? SelectedAnchorIndex => selectedAnchorIndex;
-
-    /// <summary>Gets the active pointer gesture.</summary>
-    public GraphPointerGesture ActiveGesture => gesture;
-
     /// <summary>Returns a deep editable copy of the current state, using the legacy default when empty.</summary>
     /// <returns>A graph state safe for independent editing.</returns>
-    public CoreGraphState GetGraphState() => GraphState?.Clone() ?? CoreGraphState.CreateDefault();
+    public CoreGraphState GetGraphState()
+    {
+        return GraphState?.Clone() ?? CoreGraphState.CreateDefault();
+    }
 
     /// <summary>Resets the viewport to the graph bounds.</summary>
     public void ResetView()
     {
-        CoreGraphState state = GetGraphState();
+        var state = GetGraphState();
         viewMinX = state.MinX;
         viewMinY = state.MinY;
         viewMaxX = state.MaxX;
@@ -644,16 +694,13 @@ public sealed class GraphControl : Control
     /// <param name="anchorIndex">The anchor index to move.</param>
     /// <param name="position">The requested graph-space position.</param>
     /// <param name="modifiers">Keyboard modifiers active during the gesture.</param>
-    /// <returns><see langword="true"/> when the state changed.</returns>
+    /// <returns><see langword="true" /> when the state changed.</returns>
     public bool MoveAnchor(int anchorIndex, Vector2 position, KeyModifiers modifiers = KeyModifiers.None)
     {
-        if (!IsEditable || GraphState is null || anchorIndex < 0 || anchorIndex >= GraphState.Anchors.Count)
-        {
-            return false;
-        }
+        if (!IsEditable || GraphState is null || anchorIndex < 0 || anchorIndex >= GraphState.Anchors.Count) return false;
 
-        CoreGraphState state = GraphState.Clone();
-        GraphAnchor anchor = state.Anchors[anchorIndex];
+        var state = GraphState.Clone();
+        var anchor = state.Anchors[anchorIndex];
         bool lockY = modifiers.HasAllFlags(KeyModifiers.Shift);
         bool lockX = modifiers.HasAllFlags(KeyModifiers.Control);
         if (lockY) position.Y = anchor.Pos.Y;
@@ -666,36 +713,22 @@ public sealed class GraphControl : Control
         }
 
         if (anchorIndex == 0 && StartPointLockedX)
-        {
             position.X = anchor.Pos.X;
-        }
         else if (anchorIndex == state.Anchors.Count - 1 && EndPointLockedX)
-        {
             position.X = anchor.Pos.X;
-        }
         else if (anchorIndex > 0 && anchorIndex < state.Anchors.Count - 1)
-        {
             position.X = Math.Clamp(
                 position.X,
                 state.Anchors[anchorIndex - 1].Pos.X,
                 state.Anchors[anchorIndex + 1].Pos.X);
-        }
 
         position.Y = Math.Clamp(position.Y, state.MinY, state.MaxY);
 
         if (anchorIndex == 0 && StartPointLockedY)
-        {
             position.Y = anchor.Pos.Y;
-        }
-        else if (anchorIndex == state.Anchors.Count - 1 && EndPointLockedY)
-        {
-            position.Y = anchor.Pos.Y;
-        }
+        else if (anchorIndex == state.Anchors.Count - 1 && EndPointLockedY) position.Y = anchor.Pos.Y;
 
-        if (Math.Abs(anchor.Pos.X - position.X) <= 1e-9 && Math.Abs(anchor.Pos.Y - position.Y) <= 1e-9)
-        {
-            return false;
-        }
+        if (Math.Abs(anchor.Pos.X - position.X) <= 1e-9 && Math.Abs(anchor.Pos.Y - position.Y) <= 1e-9) return false;
 
         anchor.Pos = position;
         CommitState(state);
@@ -704,19 +737,13 @@ public sealed class GraphControl : Control
 
     /// <summary>Resets a non-edge anchor's interpolation tension to zero.</summary>
     /// <param name="anchorIndex">The anchor whose tension should be reset.</param>
-    /// <returns><see langword="true"/> when the state changed.</returns>
+    /// <returns><see langword="true" /> when the state changed.</returns>
     public bool ResetTension(int anchorIndex)
     {
-        if (!IsEditable || GraphState is null || anchorIndex <= 0 || anchorIndex >= GraphState.Anchors.Count)
-        {
-            return false;
-        }
+        if (!IsEditable || GraphState is null || anchorIndex <= 0 || anchorIndex >= GraphState.Anchors.Count) return false;
 
-        CoreGraphState state = GraphState.Clone();
-        if (Math.Abs(state.Anchors[anchorIndex].Tension) <= 1e-9)
-        {
-            return false;
-        }
+        var state = GraphState.Clone();
+        if (Math.Abs(state.Anchors[anchorIndex].Tension) <= 1e-9) return false;
 
         state.Anchors[anchorIndex].Tension = 0;
         CommitState(state);
@@ -728,40 +755,35 @@ public sealed class GraphControl : Control
     /// <returns>The inserted anchor index.</returns>
     public int AddAnchor(Vector2 position)
     {
-        CoreGraphState state = GetGraphState();
+        var state = GetGraphState();
         position.X = Math.Clamp(position.X, (float)state.MinX, (float)state.MaxX);
         position.Y = Math.Clamp(position.Y, (float)state.MinY, (float)state.MaxY);
         int index = state.Anchors.FindIndex(anchor => anchor.Pos.X >= position.X);
         if (index < 0)
-        {
             index = state.Anchors.Count == 0
                 ? 0
                 : Math.Min(Math.Max(state.Anchors.Count - 1, 1), state.Anchors.Count);
-        }
 
-        Type type = GraphInterpolatorCatalog.GetInterpolatorIndex(LastInterpolationSet) >= 0
+        var type = GraphInterpolatorCatalog.GetInterpolatorIndex(LastInterpolationSet) >= 0
             ? LastInterpolationSet
             : typeof(SingleCurveInterpolator);
         double tension = index < state.Anchors.Count ? state.Anchors[index].Tension : 0;
         state.Anchors.Insert(index, new GraphAnchor(position, GraphInterpolatorCatalog.GetInterpolator(type), tension));
-        selectedAnchorIndex = index;
+        SelectedAnchorIndex = index;
         CommitState(state);
         return index;
     }
 
     /// <summary>Removes a non-edge anchor from the graph.</summary>
     /// <param name="anchorIndex">The anchor index to remove.</param>
-    /// <returns><see langword="true"/> when an anchor was removed.</returns>
+    /// <returns><see langword="true" /> when an anchor was removed.</returns>
     public bool RemoveAnchor(int anchorIndex)
     {
-        if (!IsEditable || GraphState is null || anchorIndex <= 0 || anchorIndex >= GraphState.Anchors.Count - 1)
-        {
-            return false;
-        }
+        if (!IsEditable || GraphState is null || anchorIndex <= 0 || anchorIndex >= GraphState.Anchors.Count - 1) return false;
 
-        CoreGraphState state = GraphState.Clone();
+        var state = GraphState.Clone();
         state.Anchors.RemoveAt(anchorIndex);
-        selectedAnchorIndex = null;
+        SelectedAnchorIndex = null;
         CommitState(state);
         return true;
     }
@@ -769,16 +791,13 @@ public sealed class GraphControl : Control
     /// <summary>Changes one anchor's interpolation type using the persisted catalog order.</summary>
     /// <param name="anchorIndex">The anchor index to update.</param>
     /// <param name="interpolatorType">The parameterless interpolator type.</param>
-    /// <returns><see langword="true"/> when the type was changed.</returns>
+    /// <returns><see langword="true" /> when the type was changed.</returns>
     public bool SetInterpolator(int anchorIndex, Type interpolatorType)
     {
-        if (!IsEditable || GraphState is null || anchorIndex <= 0 || anchorIndex >= GraphState.Anchors.Count)
-        {
-            return false;
-        }
+        if (!IsEditable || GraphState is null || anchorIndex <= 0 || anchorIndex >= GraphState.Anchors.Count) return false;
 
-        CoreGraphState state = GraphState.Clone();
-        GraphAnchor anchor = state.Anchors[anchorIndex];
+        var state = GraphState.Clone();
+        var anchor = state.Anchors[anchorIndex];
         anchor.Interpolator = GraphInterpolatorCatalog.GetInterpolator(interpolatorType);
         LastInterpolationSet = interpolatorType;
         CommitState(state);
@@ -794,7 +813,7 @@ public sealed class GraphControl : Control
         double dx = delta.X / Bounds.Width * ViewWidthInternal;
         double dy = -delta.Y / Bounds.Height * ViewHeightInternal;
 
-        CoreGraphState state = GetGraphState();
+        var state = GetGraphState();
         dx = ClampPanDelta(dx, viewMinX, viewMaxX, state.MinX, state.MaxX);
         dy = ClampPanDelta(dy, viewMinY, viewMaxY, state.MinY, state.MaxY);
         viewMinX += dx;
@@ -813,7 +832,7 @@ public sealed class GraphControl : Control
     {
         EnsureView();
         if (!double.IsFinite(factor) || factor <= 0) return;
-        Vector2 focus = GetGraphPosition(point);
+        var focus = GetGraphPosition(point);
         if (!lockX)
         {
             viewMinX = focus.X - (focus.X - viewMinX) / factor;
@@ -826,7 +845,7 @@ public sealed class GraphControl : Control
             viewMaxY = focus.Y + (viewMaxY - focus.Y) / factor;
         }
 
-        CoreGraphState state = GetGraphState();
+        var state = GetGraphState();
         ConstrainView(ref viewMinX, ref viewMaxX, state.MinX, state.MaxX);
         ConstrainView(ref viewMinY, ref viewMaxY, state.MinY, state.MaxY);
 
@@ -834,20 +853,28 @@ public sealed class GraphControl : Control
     }
 
     /// <summary>Rebuilds generated marker geometry and invalidates the control.</summary>
-    public void RegenerateMarkers() => InvalidateVisual();
+    public void RegenerateMarkers()
+    {
+        InvalidateVisual();
+    }
 
     /// <summary>Returns a graph-space movement for a device-independent pointer delta.</summary>
     /// <param name="delta">The pointer delta in control coordinates.</param>
     /// <returns>The corresponding graph-space delta.</returns>
-    public Vector2 GetValueVector(Point delta) => new(
-        delta.X / Math.Max(Bounds.Width, 1) * ViewWidthInternal,
-        -delta.Y / Math.Max(Bounds.Height, 1) * ViewHeightInternal);
+    public Vector2 GetValueVector(Point delta)
+    {
+        return new Vector2(
+            delta.X / Math.Max(Bounds.Width, 1) * ViewWidthInternal,
+            -delta.Y / Math.Max(Bounds.Height, 1) * ViewHeightInternal);
+    }
 
     /// <summary>Gets whether an anchor index is one of the two graph edges.</summary>
     /// <param name="anchorIndex">The anchor index to inspect.</param>
-    /// <returns><see langword="true"/> for the first or last anchor.</returns>
-    public bool IsEdgeAnchor(int anchorIndex) =>
-        GraphState is not null && (anchorIndex == 0 || anchorIndex == GraphState.Anchors.Count - 1);
+    /// <returns><see langword="true" /> for the first or last anchor.</returns>
+    public bool IsEdgeAnchor(int anchorIndex)
+    {
+        return GraphState is not null && (anchorIndex == 0 || anchorIndex == GraphState.Anchors.Count - 1);
+    }
 
     /// <summary>Replaces the graph with an independent state snapshot.</summary>
     /// <param name="state">The graph state to display and edit.</param>
@@ -857,7 +884,7 @@ public sealed class GraphControl : Control
         SetCurrentValue(GraphStateProperty, state.Clone());
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void Render(DrawingContext context)
     {
         base.Render(context);
@@ -869,18 +896,12 @@ public sealed class GraphControl : Control
         DrawMarkers(context);
         DrawAxes(context);
         DrawCurve(context);
-        if (drawAnchors && IsEditable)
-        {
-            DrawAnchors(context);
-        }
+        if (drawAnchors && IsEditable) DrawAnchors(context);
 
-        if (EdgeBrush is not null)
-        {
-            context.DrawRectangle(null, new Pen(EdgeBrush, 2), bounds);
-        }
+        if (EdgeBrush is not null) context.DrawRectangle(null, new Pen(EdgeBrush, 2), bounds);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void OnPointerEntered(PointerEventArgs eventArgs)
     {
         base.OnPointerEntered(eventArgs);
@@ -888,31 +909,31 @@ public sealed class GraphControl : Control
         InvalidateVisual();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void OnPointerExited(PointerEventArgs eventArgs)
     {
         base.OnPointerExited(eventArgs);
-        if (gesture == GraphPointerGesture.None)
+        if (ActiveGesture == GraphPointerGesture.None)
         {
             drawAnchors = false;
             InvalidateVisual();
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void OnPointerPressed(PointerPressedEventArgs eventArgs)
     {
         base.OnPointerPressed(eventArgs);
         Focus();
-        Point point = eventArgs.GetCurrentPoint(this).Position;
-        PointerPointProperties properties = eventArgs.GetCurrentPoint(this).Properties;
+        var point = eventArgs.GetCurrentPoint(this).Position;
+        var properties = eventArgs.GetCurrentPoint(this).Properties;
 
         if (properties.IsRightButtonPressed && IsEditable)
         {
             int? anchorIndex = HitTestAnchor(point);
             if (anchorIndex is int index)
             {
-                selectedAnchorIndex = index;
+                SelectedAnchorIndex = index;
                 if (eventArgs.KeyModifiers.HasAllFlags(KeyModifiers.Shift) && RemoveAnchor(index))
                 {
                     eventArgs.Handled = true;
@@ -927,7 +948,7 @@ public sealed class GraphControl : Control
             int? rightTensionIndex = HitTestTension(point);
             if (rightTensionIndex is int resetIndex)
             {
-                selectedAnchorIndex = resetIndex;
+                SelectedAnchorIndex = resetIndex;
                 ResetTension(resetIndex);
                 eventArgs.Handled = true;
                 return;
@@ -946,15 +967,12 @@ public sealed class GraphControl : Control
             return;
         }
 
-        if (!properties.IsLeftButtonPressed)
-        {
-            return;
-        }
+        if (!properties.IsLeftButtonPressed) return;
 
         int? hitAnchor = IsEditable ? HitTestAnchor(point) : null;
         if (hitAnchor is int anchor)
         {
-            selectedAnchorIndex = anchor;
+            SelectedAnchorIndex = anchor;
             BeginGesture(eventArgs.Pointer, GraphPointerGesture.Anchor, anchor, point);
             eventArgs.Handled = true;
             return;
@@ -963,8 +981,8 @@ public sealed class GraphControl : Control
         int? tensionAnchor = IsEditable ? HitTestTension(point) : null;
         if (tensionAnchor is int tensionIndex)
         {
-            selectedAnchorIndex = tensionIndex;
-            CoreGraphState state = GetGraphState();
+            SelectedAnchorIndex = tensionIndex;
+            var state = GetGraphState();
             gestureStartTension = state.Anchors[tensionIndex].Tension;
             gestureStartPosition = point;
             BeginGesture(eventArgs.Pointer, GraphPointerGesture.Tension, tensionIndex, point);
@@ -977,17 +995,14 @@ public sealed class GraphControl : Control
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void OnPointerMoved(PointerEventArgs eventArgs)
     {
         base.OnPointerMoved(eventArgs);
-        Point point = eventArgs.GetCurrentPoint(this).Position;
-        if (capturedPointer != eventArgs.Pointer || gesture == GraphPointerGesture.None)
-        {
-            return;
-        }
+        var point = eventArgs.GetCurrentPoint(this).Position;
+        if (capturedPointer != eventArgs.Pointer || ActiveGesture == GraphPointerGesture.None) return;
 
-        switch (gesture)
+        switch (ActiveGesture)
         {
             case GraphPointerGesture.Anchor:
                 MoveAnchor(gestureAnchorIndex, GetGraphPosition(point), eventArgs.KeyModifiers);
@@ -1004,39 +1019,30 @@ public sealed class GraphControl : Control
         eventArgs.Handled = true;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
     {
         base.OnPointerReleased(eventArgs);
-        if (capturedPointer != eventArgs.Pointer)
-        {
-            return;
-        }
+        if (capturedPointer != eventArgs.Pointer) return;
 
         EndGesture(eventArgs.Pointer);
         eventArgs.Handled = true;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs eventArgs)
     {
         base.OnPointerCaptureLost(eventArgs);
-        if (capturedPointer == eventArgs.Pointer)
-        {
-            EndGesture(eventArgs.Pointer);
-        }
+        if (capturedPointer == eventArgs.Pointer) EndGesture(eventArgs.Pointer);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void OnPointerWheelChanged(PointerWheelEventArgs eventArgs)
     {
         base.OnPointerWheelChanged(eventArgs);
-        CoreGraphState state = GetGraphState();
-        Vector2 zoomPoint = GetGraphPosition(eventArgs.GetPosition(this));
-        if (!IsWheelZoomPositionInLegacyBounds(zoomPoint, state))
-        {
-            return;
-        }
+        var state = GetGraphState();
+        var zoomPoint = GetGraphPosition(eventArgs.GetPosition(this));
+        if (!IsWheelZoomPositionInLegacyBounds(zoomPoint, state)) return;
 
         double factor = Math.Pow(2, -eventArgs.Delta.Y / 240d);
         if (double.IsFinite(factor) && factor > 0)
@@ -1050,36 +1056,33 @@ public sealed class GraphControl : Control
         }
     }
 
-    internal static bool IsWheelZoomPositionInLegacyBounds(Vector2 zoomPoint, CoreGraphState state) =>
-        zoomPoint.X >= 0 && zoomPoint.Y >= 0 &&
-        zoomPoint.X <= state.MaxX && zoomPoint.Y <= state.MaxY;
+    internal static bool IsWheelZoomPositionInLegacyBounds(Vector2 zoomPoint, CoreGraphState state)
+    {
+        return zoomPoint.X >= 0 && zoomPoint.Y >= 0 && zoomPoint.X <= state.MaxX && zoomPoint.Y <= state.MaxY;
+    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void OnKeyDown(KeyEventArgs eventArgs)
     {
         base.OnKeyDown(eventArgs);
         if (eventArgs.Key == Key.Escape)
         {
-            selectedAnchorIndex = null;
+            SelectedAnchorIndex = null;
             InvalidateVisual();
             eventArgs.Handled = true;
         }
-        else if ((eventArgs.Key == Key.Delete || eventArgs.Key == Key.Back) && selectedAnchorIndex is int index)
+        else if ((eventArgs.Key == Key.Delete || eventArgs.Key == Key.Back) && SelectedAnchorIndex is int index)
         {
             eventArgs.Handled = RemoveAnchor(index);
         }
     }
-
-    private double ViewWidthInternal => Math.Max(viewMaxX - viewMinX, MinimumViewSize);
-
-    private double ViewHeightInternal => Math.Max(viewMaxY - viewMinY, MinimumViewSize);
 
     private void GraphStateChanged()
     {
         if (!committingState)
         {
             viewInitialized = false;
-            selectedAnchorIndex = null;
+            SelectedAnchorIndex = null;
         }
 
         EnsureView();
@@ -1088,30 +1091,21 @@ public sealed class GraphControl : Control
 
     private void EnsureView()
     {
-        if (!viewInitialized)
-        {
-            ResetView();
-        }
+        if (!viewInitialized) ResetView();
     }
 
     private void NormalizeView()
     {
-        if (!double.IsFinite(viewMinX) || !double.IsFinite(viewMaxX) || viewMaxX - viewMinX < MinimumViewSize)
-        {
-            viewMaxX = viewMinX + 1;
-        }
+        if (!double.IsFinite(viewMinX) || !double.IsFinite(viewMaxX) || viewMaxX - viewMinX < MinimumViewSize) viewMaxX = viewMinX + 1;
 
-        if (!double.IsFinite(viewMinY) || !double.IsFinite(viewMaxY) || viewMaxY - viewMinY < MinimumViewSize)
-        {
-            viewMaxY = viewMinY + 1;
-        }
+        if (!double.IsFinite(viewMinY) || !double.IsFinite(viewMaxY) || viewMaxY - viewMinY < MinimumViewSize) viewMaxY = viewMinY + 1;
     }
 
     private void BeginGesture(IPointer pointer, GraphPointerGesture nextGesture, int anchorIndex, Point point)
     {
         capturedPointer?.Capture(null);
         capturedPointer = pointer;
-        gesture = nextGesture;
+        ActiveGesture = nextGesture;
         gestureAnchorIndex = anchorIndex;
         gestureStartPosition = point;
         lastPointerPosition = point;
@@ -1124,12 +1118,9 @@ public sealed class GraphControl : Control
     {
         pointer.Capture(null);
         capturedPointer = null;
-        gesture = GraphPointerGesture.None;
+        ActiveGesture = GraphPointerGesture.None;
         gestureAnchorIndex = -1;
-        if (!IsPointerOver)
-        {
-            drawAnchors = false;
-        }
+        if (!IsPointerOver) drawAnchors = false;
 
         InvalidateVisual();
     }
@@ -1146,22 +1137,19 @@ public sealed class GraphControl : Control
             committingState = false;
         }
 
-        if (!IgnoreAnchorUpdates)
-        {
-            StateChanged?.Invoke(this, new GraphStateChangedEventArgs(state.Clone()));
-        }
+        if (!IgnoreAnchorUpdates) StateChanged?.Invoke(this, new GraphStateChangedEventArgs(state.Clone()));
         InvalidateVisual();
     }
 
     private double Snap(double value, GraphMarkerOrientation orientation)
     {
-        IEnumerable<GraphMarker> markers = EnumerateMarkers(orientation).Where(marker => marker.Snappable);
+        var markers = EnumerateMarkers(orientation).Where(marker => marker.Snappable);
         double configuredRange = orientation == GraphMarkerOrientation.Vertical
             ? MarkerSnappingRangeHorizontal
             : MarkerSnappingRangeVertical;
         double tolerance = double.IsFinite(configuredRange) ? configuredRange : double.PositiveInfinity;
 
-        GraphMarker? closest = markers
+        var closest = markers
             .OrderBy(marker => Math.Abs(marker.Value - value))
             .FirstOrDefault();
         return closest is not null && Math.Abs(closest.Value - value) <= tolerance ? closest.Value : value;
@@ -1169,7 +1157,7 @@ public sealed class GraphControl : Control
 
     private void UpdateBounds(Action<CoreGraphState> update)
     {
-        CoreGraphState state = GetGraphState();
+        var state = GetGraphState();
         double oldMinX = state.MinX;
         double oldMaxX = state.MaxX;
         double oldMinY = state.MinY;
@@ -1179,8 +1167,7 @@ public sealed class GraphControl : Control
         if (state.MaxY <= state.MinY) state.MaxY = state.MinY + 1;
 
         if (ScaleOnBoundChangeHorizontal || ScaleOnBoundChangeVertical)
-        {
-            foreach (GraphAnchor anchor in state.Anchors)
+            foreach (var anchor in state.Anchors)
             {
                 double x = ScaleOnBoundChangeHorizontal && oldMaxX > oldMinX
                     ? state.MinX + (state.MaxX - state.MinX) * (anchor.Pos.X - oldMinX) / (oldMaxX - oldMinX)
@@ -1190,7 +1177,6 @@ public sealed class GraphControl : Control
                     : anchor.Pos.Y;
                 anchor.Pos = new Vector2((float)x, (float)y);
             }
-        }
 
         viewInitialized = false;
         CommitState(state);
@@ -1200,10 +1186,7 @@ public sealed class GraphControl : Control
     {
         double viewSize = viewMax - viewMin;
         double boundSize = boundMax - boundMin;
-        if (viewSize >= boundSize)
-        {
-            return boundMin - viewMin;
-        }
+        if (viewSize >= boundSize) return boundMin - viewMin;
 
         return Math.Clamp(delta, boundMin - viewMin, boundMax - viewMax);
     }
@@ -1228,95 +1211,72 @@ public sealed class GraphControl : Control
 
     private IEnumerable<GraphMarker> EnumerateMarkers(GraphMarkerOrientation orientation)
     {
-        foreach (GraphMarker marker in Markers ?? Array.Empty<GraphMarker>())
-        {
+        foreach (var marker in Markers ?? Array.Empty<GraphMarker>())
             if (marker.Visible && marker.Orientation == orientation)
-            {
                 yield return marker;
-            }
-        }
 
         double pixelLength = orientation == GraphMarkerOrientation.Vertical ? Bounds.Width : Bounds.Height;
         int count = Math.Max(1, (int)(pixelLength / Math.Max(MinMarkerSpacing, 1)));
-        IGraphMarkerGenerator? generator = orientation == GraphMarkerOrientation.Vertical
+        var generator = orientation == GraphMarkerOrientation.Vertical
             ? HorizontalMarkerGenerator
             : VerticalMarkerGenerator;
-        if (generator is null)
-        {
-            yield break;
-        }
+        if (generator is null) yield break;
 
         double start = orientation == GraphMarkerOrientation.Vertical ? viewMinX : viewMinY;
         double end = orientation == GraphMarkerOrientation.Vertical ? viewMaxX : viewMaxY;
-        foreach (GraphMarker marker in generator.GenerateMarkers(start, end, orientation, count))
-        {
+        foreach (var marker in generator.GenerateMarkers(start, end, orientation, count))
             if (marker.Visible)
-            {
                 yield return marker;
-            }
-        }
     }
 
     private void DrawMarkers(DrawingContext context)
     {
-        foreach (GraphMarker marker in EnumerateMarkers(GraphMarkerOrientation.Vertical))
+        foreach (var marker in EnumerateMarkers(GraphMarkerOrientation.Vertical))
         {
-            if (marker.Value < viewMinX - Precision.DoubleEpsilon || marker.Value > viewMaxX + Precision.DoubleEpsilon)
-            {
-                continue;
-            }
+            if (marker.Value < viewMinX - Precision.DoubleEpsilon || marker.Value > viewMaxX + Precision.DoubleEpsilon) continue;
 
-            Point top = GetControlPosition(new Vector2((float)marker.Value, (float)viewMaxY));
+            var top = GetControlPosition(new Vector2((float)marker.Value, (float)viewMaxY));
             DrawMarker(context, marker, top, true);
         }
 
-        foreach (GraphMarker marker in EnumerateMarkers(GraphMarkerOrientation.Horizontal))
+        foreach (var marker in EnumerateMarkers(GraphMarkerOrientation.Horizontal))
         {
-            if (marker.Value < viewMinY - Precision.DoubleEpsilon || marker.Value > viewMaxY + Precision.DoubleEpsilon)
-            {
-                continue;
-            }
+            if (marker.Value < viewMinY - Precision.DoubleEpsilon || marker.Value > viewMaxY + Precision.DoubleEpsilon) continue;
 
-            Point left = GetControlPosition(new Vector2((float)viewMinX, (float)marker.Value));
+            var left = GetControlPosition(new Vector2((float)viewMinX, (float)marker.Value));
             DrawMarker(context, marker, left, false);
         }
     }
 
     private void DrawMarker(DrawingContext context, GraphMarker marker, Point position, bool vertical)
     {
-        IBrush? markerBrush = EdgeBrush ?? MarkerBrush;
-        IBrush? lineBrush = marker.CustomLineColorArgb is uint customLineColor
+        var markerBrush = EdgeBrush ?? MarkerBrush;
+        var lineBrush = marker.CustomLineColorArgb is uint customLineColor
             ? ToBrush(customLineColor)
             : markerBrush;
         if (lineBrush is null) return;
 
-        IBrush extensionBrush = marker.MarkerColorArgb is uint markerColor
+        var extensionBrush = marker.MarkerColorArgb is uint markerColor
             ? ToBrush(markerColor)
             : markerBrush ?? lineBrush;
         double length = marker.DrawMarker ? Math.Max(marker.MarkerLength, 0) : 0;
-        Point end = vertical
+        var end = vertical
             ? new Point(position.X, position.Y + Math.Max(Bounds.Height, 0))
             : new Point(position.X + Math.Max(Bounds.Width, 0), position.Y);
         if (vertical)
         {
-            context.DrawLine(new Pen(lineBrush, 1), position, end);
-            if (length > 0)
-            {
-                context.DrawLine(new Pen(extensionBrush, 1), end, new Point(end.X, end.Y + length));
-            }
+            context.DrawLine(new Pen(lineBrush), position, end);
+            if (length > 0) context.DrawLine(new Pen(extensionBrush), end, new Point(end.X, end.Y + length));
         }
         else
         {
-            context.DrawLine(new Pen(lineBrush, 1), position, end);
-            if (length > 0)
-            {
-                context.DrawLine(new Pen(extensionBrush, 1), position, new Point(position.X - length, position.Y));
-            }
+            context.DrawLine(new Pen(lineBrush), position, end);
+            if (length > 0) context.DrawLine(new Pen(extensionBrush), position, new Point(position.X - length, position.Y));
         }
 
         if (!string.IsNullOrEmpty(marker.Text))
         {
-            IBrush textBrush = markerBrush ?? lineBrush;
+            var textBrush = markerBrush ?? lineBrush;
             FormattedText text = new(
                 marker.Text,
                 CultureInfo.CurrentCulture,
@@ -1335,38 +1295,32 @@ public sealed class GraphControl : Control
         if (EdgeBrush is null) return;
         if (HorizontalAxisVisible && HorizontalAxis >= viewMinY && HorizontalAxis <= viewMaxY)
         {
-            Point left = GetControlPosition(new Vector2((float)viewMinX, (float)HorizontalAxis));
-            Point right = GetControlPosition(new Vector2((float)viewMaxX, (float)HorizontalAxis));
+            var left = GetControlPosition(new Vector2((float)viewMinX, (float)HorizontalAxis));
+            var right = GetControlPosition(new Vector2((float)viewMaxX, (float)HorizontalAxis));
             context.DrawLine(new Pen(EdgeBrush, 3), left, right);
         }
 
         if (VerticalAxisVisible && VerticalAxis >= viewMinX && VerticalAxis <= viewMaxX)
         {
-            Point top = GetControlPosition(new Vector2((float)VerticalAxis, (float)viewMaxY));
-            Point bottom = GetControlPosition(new Vector2((float)VerticalAxis, (float)viewMinY));
+            var top = GetControlPosition(new Vector2((float)VerticalAxis, (float)viewMaxY));
+            var bottom = GetControlPosition(new Vector2((float)VerticalAxis, (float)viewMinY));
             context.DrawLine(new Pen(EdgeBrush, 3), top, bottom);
         }
     }
 
     private void DrawCurve(DrawingContext context)
     {
-        CoreGraphState state = GetGraphState();
-        if (state.Anchors.Count < 2)
-        {
-            return;
-        }
+        var state = GetGraphState();
+        if (state.Anchors.Count < 2) return;
 
         double start = Math.Max(viewMinX, state.Anchors[0].Pos.X);
         double end = Math.Min(viewMaxX, state.Anchors[^1].Pos.X);
-        if (end < start)
-        {
-            return;
-        }
+        if (end < start) return;
 
         double width = Math.Max(end - start, 0) / ViewWidthInternal * Math.Max(Bounds.Width, 1);
         int samples = Math.Clamp((int)Math.Ceiling(Math.Max(width, 1)), 2, MaximumCurveSamples);
         List<Point> points = new(samples);
-        for (var index = 0; index < samples; index++)
+        for (int index = 0; index < samples; index++)
         {
             double x = start + (end - start) * index / (samples - 1);
             double y = Math.Clamp(state.GetValue(x), viewMinY, viewMaxY);
@@ -1377,11 +1331,11 @@ public sealed class GraphControl : Control
         if (Fill is not null && Fill != Brushes.Transparent)
         {
             StreamGeometry geometry = new();
-            using (StreamGeometryContext geometryContext = geometry.Open())
+            using (var geometryContext = geometry.Open())
             {
                 double baseline = Math.Clamp(VerticalAxis, viewMinY, viewMaxY);
-                geometryContext.BeginFigure(GetControlPosition(new Vector2((float)start, (float)baseline)), true);
-                foreach (Point point in points) geometryContext.LineTo(point);
+                geometryContext.BeginFigure(GetControlPosition(new Vector2((float)start, (float)baseline)));
+                foreach (var point in points) geometryContext.LineTo(point);
                 geometryContext.LineTo(GetControlPosition(new Vector2((float)end, (float)baseline)));
                 geometryContext.EndFigure(true);
             }
@@ -1392,61 +1346,43 @@ public sealed class GraphControl : Control
         if (Stroke is not null)
         {
             Pen pen = new(Stroke, 2);
-            for (var index = 1; index < points.Count; index++)
-            {
-                context.DrawLine(pen, points[index - 1], points[index]);
-            }
+            for (int index = 1; index < points.Count; index++) context.DrawLine(pen, points[index - 1], points[index]);
         }
     }
 
     private void DrawAnchors(DrawingContext context)
     {
-        CoreGraphState state = GetGraphState();
-        for (var index = 1; index < state.Anchors.Count; index++)
+        var state = GetGraphState();
+        for (int index = 1; index < state.Anchors.Count; index++)
         {
-            GraphAnchor previous = state.Anchors[index - 1];
-            GraphAnchor anchor = state.Anchors[index];
+            var previous = state.Anchors[index - 1];
+            var anchor = state.Anchors[index];
             double midpoint = (previous.Pos.X + anchor.Pos.X) / 2;
             Vector2 tensionPosition = new((float)midpoint, (float)state.GetValue(midpoint));
-            if (!IsGraphPositionVisible(tensionPosition))
-            {
-                continue;
-            }
+            if (!IsGraphPositionVisible(tensionPosition)) continue;
 
-            Point curvePoint = GetControlPosition(tensionPosition);
-            if (TensionBrush is not null)
-            {
-                context.DrawEllipse(TensionBrush, AnchorOutlineBrush is null ? null : new Pen(AnchorOutlineBrush, 1), curvePoint, 3.5, 3.5);
-            }
+            var curvePoint = GetControlPosition(tensionPosition);
+            if (TensionBrush is not null) context.DrawEllipse(TensionBrush, AnchorOutlineBrush is null ? null : new Pen(AnchorOutlineBrush), curvePoint, 3.5, 3.5);
         }
 
-        for (var index = 0; index < state.Anchors.Count; index++)
+        for (int index = 0; index < state.Anchors.Count; index++)
         {
-            if (!IsGraphPositionVisible(state.Anchors[index].Pos))
-            {
-                continue;
-            }
+            if (!IsGraphPositionVisible(state.Anchors[index].Pos)) continue;
 
-            Point point = GetControlPosition(state.Anchors[index].Pos);
-            IBrush? outline = index == selectedAnchorIndex ? Stroke : AnchorOutlineBrush;
+            var point = GetControlPosition(state.Anchors[index].Pos);
+            var outline = index == SelectedAnchorIndex ? Stroke : AnchorOutlineBrush;
             context.DrawEllipse(AnchorBrush, outline is null ? null : new Pen(outline, 2), point, 6, 6);
         }
     }
 
     private int? HitTestAnchor(Point point)
     {
-        CoreGraphState state = GetGraphState();
-        for (var index = 0; index < state.Anchors.Count; index++)
+        var state = GetGraphState();
+        for (int index = 0; index < state.Anchors.Count; index++)
         {
-            if (!IsGraphPositionVisible(state.Anchors[index].Pos))
-            {
-                continue;
-            }
+            if (!IsGraphPositionVisible(state.Anchors[index].Pos)) continue;
 
-            if (Distance(point, GetControlPosition(state.Anchors[index].Pos)) <= AnchorHitRadius)
-            {
-                return index;
-            }
+            if (Distance(point, GetControlPosition(state.Anchors[index].Pos)) <= AnchorHitRadius) return index;
         }
 
         return null;
@@ -1454,21 +1390,15 @@ public sealed class GraphControl : Control
 
     private int? HitTestTension(Point point)
     {
-        CoreGraphState state = GetGraphState();
-        for (var index = 1; index < state.Anchors.Count; index++)
+        var state = GetGraphState();
+        for (int index = 1; index < state.Anchors.Count; index++)
         {
             double midpoint = (state.Anchors[index - 1].Pos.X + state.Anchors[index].Pos.X) / 2;
             Vector2 tensionPosition = new((float)midpoint, (float)state.GetValue(midpoint));
-            if (!IsGraphPositionVisible(tensionPosition))
-            {
-                continue;
-            }
+            if (!IsGraphPositionVisible(tensionPosition)) continue;
 
-            Point tensionPoint = GetControlPosition(tensionPosition);
-            if (Distance(point, tensionPoint) <= TensionHitRadius)
-            {
-                return index;
-            }
+            var tensionPoint = GetControlPosition(tensionPosition);
+            if (Distance(point, tensionPoint) <= TensionHitRadius) return index;
         }
 
         return null;
@@ -1476,20 +1406,14 @@ public sealed class GraphControl : Control
 
     private void MoveTension(int anchorIndex, double pointerY, KeyModifiers modifiers)
     {
-        if (!IsEditable || GraphState is null || anchorIndex <= 0 || anchorIndex >= GraphState.Anchors.Count)
-        {
-            return;
-        }
+        if (!IsEditable || GraphState is null || anchorIndex <= 0 || anchorIndex >= GraphState.Anchors.Count) return;
 
         double verticalDrag = pointerY - gestureStartPosition.Y;
         if (modifiers.HasAllFlags(KeyModifiers.Control)) verticalDrag /= 10;
-        CoreGraphState state = GraphState.Clone();
-        GraphAnchor anchor = state.Anchors[anchorIndex];
-        if (anchor.Interpolator.GetType().IsDefined(typeof(VerticalMirrorInterpolatorAttribute), false) &&
-            anchor.Pos.Y < state.Anchors[anchorIndex - 1].Pos.Y)
-        {
+        var state = GraphState.Clone();
+        var anchor = state.Anchors[anchorIndex];
+        if (anchor.Interpolator.GetType().IsDefined(typeof(VerticalMirrorInterpolatorAttribute), false) && anchor.Pos.Y < state.Anchors[anchorIndex - 1].Pos.Y)
             verticalDrag = -verticalDrag;
-        }
 
         double tension = gestureStartTension - verticalDrag / 200;
 
@@ -1517,7 +1441,7 @@ public sealed class GraphControl : Control
         menu.Items.Add(delete);
         menu.Items.Add(new Separator());
 
-        foreach (Type type in GraphInterpolatorCatalog.GetInterpolators())
+        foreach (var type in GraphInterpolatorCatalog.GetInterpolators())
         {
             MenuItem item = new()
             {
@@ -1526,10 +1450,7 @@ public sealed class GraphControl : Control
             };
             item.Click += (_, _) =>
             {
-                if (contextAnchorIndex is int index && item.Tag is Type interpolatorType)
-                {
-                    SetInterpolator(index, interpolatorType);
-                }
+                if (contextAnchorIndex is int index && item.Tag is Type interpolatorType) SetInterpolator(index, interpolatorType);
             };
             menu.Items.Add(item);
         }
@@ -1544,35 +1465,27 @@ public sealed class GraphControl : Control
     private void UpdateContextMenu()
     {
         if (contextMenu is null || contextAnchorIndex is not int index || GraphState is null) return;
-        if (contextMenu.Items[0] is MenuItem delete)
-        {
-            delete.IsEnabled = index > 0 && index < GraphState.Anchors.Count - 1;
-        }
+        if (contextMenu.Items[0] is MenuItem delete) delete.IsEnabled = index > 0 && index < GraphState.Anchors.Count - 1;
 
-        for (var itemIndex = 2; itemIndex < contextMenu.Items.Count; itemIndex++)
-        {
+        for (int itemIndex = 2; itemIndex < contextMenu.Items.Count; itemIndex++)
             if (contextMenu.Items[itemIndex] is MenuItem item && item.Tag is Type type)
             {
                 item.IsEnabled = index > 0;
                 item.IsChecked = GraphState.Anchors[index].Interpolator.GetType() == type;
             }
-        }
     }
 
     private async void TypeInValueAsync()
     {
-        if (contextAnchorIndex is not int index || GraphState is null || TopLevel.GetTopLevel(this) is not Window owner)
-        {
-            return;
-        }
+        if (contextAnchorIndex is not int index || GraphState is null || TopLevel.GetTopLevel(this) is not Window owner) return;
 
-        GraphAnchor anchor = GraphState.Anchors[index];
+        var anchor = GraphState.Anchors[index];
         ValueDialogWindow dialog = new();
         ValueDialogViewModel viewModel = new(
             "Graph value",
             "Value",
             anchor.Pos.Y,
-            new Mapping_Tools.Application.Interactions.Converters.InvariantDoubleConverter(),
+            new InvariantDoubleConverter(),
             typeof(double),
             "OK",
             "CANCEL",
@@ -1581,7 +1494,7 @@ public sealed class GraphControl : Control
             {
                 if (value is double number)
                 {
-                    CoreGraphState state = GraphState.Clone();
+                    var state = GraphState.Clone();
                     state.Anchors[index].Pos = new Vector2(state.Anchors[index].Pos.X, (float)number);
                     CommitState(state);
                 }
@@ -1600,11 +1513,13 @@ public sealed class GraphControl : Control
         return Math.Sqrt(x * x + y * y);
     }
 
-    private bool IsGraphPositionVisible(Vector2 position) =>
-        position.X >= viewMinX - Precision.DoubleEpsilon &&
-        position.X <= viewMaxX + Precision.DoubleEpsilon &&
-        position.Y >= viewMinY - Precision.DoubleEpsilon &&
-        position.Y <= viewMaxY + Precision.DoubleEpsilon;
+    private bool IsGraphPositionVisible(Vector2 position)
+    {
+        return position.X >= viewMinX - Precision.DoubleEpsilon
+               && position.X <= viewMaxX + Precision.DoubleEpsilon
+               && position.Y >= viewMinY - Precision.DoubleEpsilon
+               && position.Y <= viewMaxY + Precision.DoubleEpsilon;
+    }
 
     private static IBrush ToBrush(uint argb)
     {
@@ -1618,5 +1533,8 @@ public sealed class GraphControl : Control
 
 internal static class GraphKeyModifiersExtensions
 {
-    public static bool HasAllFlags(this KeyModifiers value, KeyModifiers flags) => (value & flags) == flags;
+    public static bool HasAllFlags(this KeyModifiers value, KeyModifiers flags)
+    {
+        return (value & flags) == flags;
+    }
 }

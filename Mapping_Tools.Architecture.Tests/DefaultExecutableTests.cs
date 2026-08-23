@@ -46,10 +46,11 @@ public sealed class DefaultExecutableTests
             "dotnet publish Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj",
             StringComparison.Ordinal);
         bool legacyWorkflowIsRemoved = workflow.Contains(
-            "legacy WPF fallback",
-            StringComparison.Ordinal) || workflow.Contains(
-            "dotnet publish Mapping_Tools/Mapping_Tools.csproj",
-            StringComparison.Ordinal);
+                                           "legacy WPF fallback",
+                                           StringComparison.Ordinal)
+                                       || workflow.Contains(
+                                           "dotnet publish Mapping_Tools/Mapping_Tools.csproj",
+                                           StringComparison.Ordinal);
 
         // Assert
         primaryWorkflowIsAvalonia.Should().BeTrue();
@@ -110,13 +111,10 @@ public sealed class DefaultExecutableTests
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);
-        while (directory is not null &&
-               !File.Exists(Path.Combine(directory.FullName, "Mapping_Tools.sln")))
-        {
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Mapping_Tools.sln")))
             directory = directory.Parent;
-        }
 
         return directory?.FullName
-            ?? throw new DirectoryNotFoundException("Could not find Mapping_Tools.sln.");
+               ?? throw new DirectoryNotFoundException("Could not find Mapping_Tools.sln.");
     }
 }

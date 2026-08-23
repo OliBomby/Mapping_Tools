@@ -1,5 +1,5 @@
-using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.Workspace;
@@ -19,7 +19,7 @@ public sealed class SlideratorViewModelTests
     {
         // Arrange
         RecordingSliderator service = new();
-        SlideratorViewModel viewModel = Create(
+        var viewModel = Create(
             service,
             new RecordingCurrentBeatmapLocator("current.osu"));
         viewModel.BeatSnapDivisor = 8;
@@ -44,7 +44,7 @@ public sealed class SlideratorViewModelTests
     {
         // Arrange
         RecordingSliderator service = new();
-        SlideratorViewModel viewModel = Create(
+        var viewModel = Create(
             service,
             new RecordingCurrentBeatmapLocator("current.osu"));
         viewModel.LoadedHitObjects.Add(new HitObject("64,64,0,2,0,L|164:64,1,100"));
@@ -61,13 +61,13 @@ public sealed class SlideratorViewModelTests
     public async Task MoveRightAsync_WhenFastPlacementFails_DoesNotAdvance()
     {
         // Arrange
-        SlideratorViewModel viewModel = Create(new RecordingSliderator());
+        var viewModel = Create(new RecordingSliderator());
         viewModel.LoadedHitObjects.Add(new HitObject("64,64,0,2,0,L|164:64,1,100"));
         viewModel.LoadedHitObjects.Add(new HitObject("164,64,1000,2,0,L|264:64,1,100"));
         viewModel.Interaction = new FailedSlideratorInteraction();
 
         // Act
-        await viewModel.MoveRightAsync(fast: true);
+        await viewModel.MoveRightAsync(true);
 
         // Assert
         viewModel.VisibleHitObjectIndex.Should().Be(0);
@@ -78,7 +78,7 @@ public sealed class SlideratorViewModelTests
     {
         // Arrange
         RecordingSliderator service = new() { ReturnEmptyImport = true };
-        SlideratorViewModel viewModel = Create(
+        var viewModel = Create(
             service,
             new RecordingCurrentBeatmapLocator("current.osu"));
         HitObject slider = new("64,64,0,2,0,L|164:64,1,100");
@@ -96,7 +96,7 @@ public sealed class SlideratorViewModelTests
     {
         // Arrange
         RecordingSliderator service = new() { ReturnEmptyImport = true };
-        SlideratorViewModel viewModel = Create(
+        var viewModel = Create(
             service,
             new RecordingCurrentBeatmapLocator("current.osu"));
         viewModel.LoadedHitObjects.Add(new HitObject("64,64,0,2,0,L|164:64,1,100"));
@@ -112,7 +112,7 @@ public sealed class SlideratorViewModelTests
     public void EvaluatePreviewProgress_DuringHoldHidesBallAndRepeatsAfterHold()
     {
         // Arrange
-        SlideratorViewModel viewModel = Create(new RecordingSliderator());
+        var viewModel = Create(new RecordingSliderator());
         double duration = viewModel.GraphDuration;
 
         // Act
@@ -188,18 +188,25 @@ public sealed class SlideratorViewModelTests
 
     private sealed class RecordingCurrentBeatmapLocator(string? path) : ICurrentBeatmapLocator
     {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(path);
+        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(path);
+        }
     }
 
     private sealed class RecordingReloadService : IEditorReloadService
     {
-        public Task ReloadAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task ReloadAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class FailedSlideratorInteraction : ISlideratorInteraction
     {
-        public Task<bool> RunFastAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(false);
+        public Task<bool> RunFastAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(false);
+        }
     }
 }

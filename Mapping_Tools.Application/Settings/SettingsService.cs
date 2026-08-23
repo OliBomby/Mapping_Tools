@@ -1,16 +1,16 @@
 namespace Mapping_Tools.Application.Settings;
 
 /// <summary>
-/// Implements startup settings orchestration without coupling callers to JSON,
-/// the registry, or the filesystem.
+///     Implements startup settings orchestration without coupling callers to JSON,
+///     the registry, or the filesystem.
 /// </summary>
 public sealed class SettingsService : ISettingsService
 {
-    private readonly ISettingsStore _store;
     private readonly ISettingsPathService _paths;
+    private readonly ISettingsStore _store;
 
     /// <summary>
-    /// Creates a settings coordinator.
+    ///     Creates a settings coordinator.
     /// </summary>
     /// <param name="store">Persistence for the portable settings document.</param>
     /// <param name="paths">The service that completes machine-dependent paths.</param>
@@ -21,23 +21,20 @@ public sealed class SettingsService : ISettingsService
     }
 
     /// <summary>
-    /// Loads persisted settings, or saves clean defaults before applying
-    /// machine-specific paths on first run.
+    ///     Loads persisted settings, or saves clean defaults before applying
+    ///     machine-specific paths on first run.
     /// </summary>
     /// <returns>The initialized settings plus first-run and fallback status.</returns>
     public SettingsLoadResult LoadOrCreate()
     {
         bool wasCreated = !_store.Exists;
-        ApplicationSettings settings = wasCreated
+        var settings = wasCreated
             ? new ApplicationSettings()
             : _store.Load();
 
-        if (wasCreated)
-        {
-            _store.Save(settings);
-        }
+        if (wasCreated) _store.Save(settings);
 
-        SettingsPathResult pathResult = _paths.ApplyDefaults(settings);
+        var pathResult = _paths.ApplyDefaults(settings);
         return new SettingsLoadResult(
             settings,
             wasCreated,
@@ -45,7 +42,7 @@ public sealed class SettingsService : ISettingsService
     }
 
     /// <summary>
-    /// Persists the supplied settings without altering its path values.
+    ///     Persists the supplied settings without altering its path values.
     /// </summary>
     /// <param name="settings">The complete settings snapshot to persist.</param>
     public void Save(ApplicationSettings settings)

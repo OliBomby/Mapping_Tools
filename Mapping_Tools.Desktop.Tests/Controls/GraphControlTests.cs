@@ -19,7 +19,7 @@ public sealed class GraphControlTests
         GraphControl control = new();
 
         // Act
-        GraphState state = control.GetGraphState();
+        var state = control.GetGraphState();
 
         // Assert
         state.Anchors.Should().HaveCount(2);
@@ -33,11 +33,11 @@ public sealed class GraphControlTests
     {
         // Arrange
         GraphState state = new(
-            [
-                new GraphAnchor(new Vector2(0, 0)),
-                new GraphAnchor(new Vector2(0.4, 0.2), new SingleCurveInterpolator()),
-                new GraphAnchor(new Vector2(1, 1))
-            ], 0, 0, 1, 1);
+        [
+            new GraphAnchor(new Vector2(0, 0)),
+            new GraphAnchor(new Vector2(0.4, 0.2), new SingleCurveInterpolator()),
+            new GraphAnchor(new Vector2(1, 1)),
+        ], 0, 0, 1, 1);
         GraphControl control = new() { GraphState = state };
         GraphState? changedState = null;
         control.StateChanged += (_, args) => changedState = args.State;
@@ -57,16 +57,16 @@ public sealed class GraphControlTests
     {
         // Arrange
         GraphState state = new(
-            [
-                new GraphAnchor(new Vector2(0, 0)),
-                new GraphAnchor(new Vector2(0.5, 0.5), new SingleCurveInterpolator()),
-                new GraphAnchor(new Vector2(1, 1))
-            ], 0, 0, 1, 1);
+        [
+            new GraphAnchor(new Vector2(0, 0)),
+            new GraphAnchor(new Vector2(0.5, 0.5), new SingleCurveInterpolator()),
+            new GraphAnchor(new Vector2(1, 1)),
+        ], 0, 0, 1, 1);
         GraphControl control = new()
         {
             GraphState = state,
             SnapX = true,
-            Markers = [new GraphMarker { Orientation = GraphMarkerOrientation.Vertical, Value = 0.5, Snappable = true }]
+            Markers = [new GraphMarker { Orientation = GraphMarkerOrientation.Vertical, Value = 0.5, Snappable = true }],
         };
 
         // Act
@@ -84,16 +84,16 @@ public sealed class GraphControlTests
     {
         // Arrange
         GraphState state = new(
-            [
-                new GraphAnchor(new Vector2(0, 0)),
-                new GraphAnchor(new Vector2(0.1, 0.5), new SingleCurveInterpolator()),
-                new GraphAnchor(new Vector2(1, 1))
-            ], 0, 0, 1, 1);
+        [
+            new GraphAnchor(new Vector2(0, 0)),
+            new GraphAnchor(new Vector2(0.1, 0.5), new SingleCurveInterpolator()),
+            new GraphAnchor(new Vector2(1, 1)),
+        ], 0, 0, 1, 1);
         GraphControl control = new()
         {
             GraphState = state,
             SnapX = true,
-            Markers = [new GraphMarker { Orientation = GraphMarkerOrientation.Vertical, Value = 0.9, Snappable = true }]
+            Markers = [new GraphMarker { Orientation = GraphMarkerOrientation.Vertical, Value = 0.9, Snappable = true }],
         };
 
         // Act
@@ -108,10 +108,10 @@ public sealed class GraphControlTests
     {
         // Arrange
         GraphState state = new(
-            [
-                new GraphAnchor(new Vector2(0.2, 0.1)),
-                new GraphAnchor(new Vector2(0.8, 0.9))
-            ], 0, 0, 1, 1);
+        [
+            new GraphAnchor(new Vector2(0.2, 0.1)),
+            new GraphAnchor(new Vector2(0.8, 0.9)),
+        ], 0, 0, 1, 1);
         GraphControl control = new() { GraphState = state };
 
         // Act
@@ -126,10 +126,10 @@ public sealed class GraphControlTests
     {
         // Arrange
         GraphState state = new(
-            [
-                new GraphAnchor(new Vector2(0, 0)),
-                new GraphAnchor(new Vector2(1, 1), new SingleCurveInterpolator(), 0.75)
-            ], 0, 0, 1, 1);
+        [
+            new GraphAnchor(new Vector2(0, 0)),
+            new GraphAnchor(new Vector2(1, 1), new SingleCurveInterpolator(), 0.75),
+        ], 0, 0, 1, 1);
         GraphControl control = new() { GraphState = state };
 
         // Act
@@ -188,7 +188,7 @@ public sealed class GraphControlTests
         GraphControl control = new() { GraphState = GraphState.CreateDefault() };
         control.Arrange(new Rect(0, 0, 400, 200));
         Point focus = new(120, 80);
-        Vector2 before = control.GetGraphPosition(focus);
+        var before = control.GetGraphPosition(focus);
 
         // Act
         control.ZoomAt(focus, 2);

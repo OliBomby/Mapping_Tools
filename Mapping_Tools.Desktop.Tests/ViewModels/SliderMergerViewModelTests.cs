@@ -1,4 +1,3 @@
-using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Settings;
@@ -21,14 +20,14 @@ public sealed class SliderMergerViewModelTests
         RecordingMerger service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["one.osu", "two.osu"]);
-        SliderMergerViewModel viewModel = Create(service, workspace);
+        var viewModel = Create(service, workspace);
         viewModel.ImportModeSetting = SliderMergerImportMode.Everything;
         viewModel.ConnectionModeSetting = SliderMergerConnectionMode.Bezier;
         viewModel.Leniency = 512;
         viewModel.MergeOnSliderEnd = false;
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         service.Paths.Should().Equal("one.osu", "two.osu");
@@ -45,7 +44,7 @@ public sealed class SliderMergerViewModelTests
     {
         // Arrange
         RecordingMerger service = new();
-        SliderMergerViewModel viewModel = Create(
+        var viewModel = Create(
             service,
             new TestBeatmapWorkspace(),
             new RecordingCurrentBeatmapLocator("current.osu"));
@@ -65,7 +64,7 @@ public sealed class SliderMergerViewModelTests
         RecordingMerger service = new();
         RecordingReloadService reload = new();
         ApplicationSettings settings = new() { AutoReload = true };
-        SliderMergerViewModel viewModel = Create(
+        var viewModel = Create(
             service,
             currentBeatmap: new RecordingCurrentBeatmapLocator("current.osu"),
             settings: settings,
@@ -82,7 +81,7 @@ public sealed class SliderMergerViewModelTests
     public void TimeCodeVisibility_WhenTimeModeIsSelectedIsVisible()
     {
         // Arrange
-        SliderMergerViewModel viewModel = Create(new RecordingMerger());
+        var viewModel = Create(new RecordingMerger());
 
         // Act
         viewModel.ImportModeSetting = SliderMergerImportMode.Time;
@@ -99,12 +98,12 @@ public sealed class SliderMergerViewModelTests
         RecordingMerger service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
-        SliderMergerViewModel viewModel = Create(service, workspace);
+        var viewModel = Create(service, workspace);
         viewModel.ImportModeSetting = SliderMergerImportMode.Everything;
         viewModel.Leniency = -1;
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         service.Paths.Should().BeNull();
@@ -119,7 +118,7 @@ public sealed class SliderMergerViewModelTests
         ApplicationSettings? settings = null,
         RecordingReloadService? reload = null)
     {
-        ApplicationSettings effectiveSettings = settings ?? new ApplicationSettings();
+        var effectiveSettings = settings ?? new ApplicationSettings();
         return new SliderMergerViewModel(
             service,
             new ToolExecutionService(
@@ -153,8 +152,10 @@ public sealed class SliderMergerViewModelTests
 
     private sealed class RecordingCurrentBeatmapLocator(string? path) : ICurrentBeatmapLocator
     {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(path);
+        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(path);
+        }
     }
 
     private sealed class RecordingReloadService : IEditorReloadService

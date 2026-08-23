@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Views;

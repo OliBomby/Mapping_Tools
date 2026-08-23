@@ -3,7 +3,7 @@ using Mapping_Tools.Core.Tools.TimingHelper;
 namespace Mapping_Tools.Application.TimingHelper;
 
 /// <summary>
-/// Represents the complete Timing Helper project persisted by the shell.
+///     Represents the complete Timing Helper project persisted by the shell.
 /// </summary>
 public sealed class TimingHelperProject : TimingHelperOptions
 {
@@ -21,13 +21,13 @@ public sealed record TimingHelperResult(
 }
 
 /// <summary>
-/// Loads beatmaps, applies Timing Helper, and persists every result through the
-/// shared backup-safe editing gateway.
+///     Loads beatmaps, applies Timing Helper, and persists every result through the
+///     shared backup-safe editing gateway.
 /// </summary>
 public interface ITimingHelperService
 {
     /// <summary>
-    /// Adjusts the supplied beatmaps using the configured marker sources.
+    ///     Adjusts the supplied beatmaps using the configured marker sources.
     /// </summary>
     /// <param name="paths">The beatmaps to process.</param>
     /// <param name="options">The marker sources and timing rules.</param>

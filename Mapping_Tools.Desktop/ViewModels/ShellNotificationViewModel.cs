@@ -5,7 +5,7 @@ using Mapping_Tools.Application.Execution;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Presents one independently dismissible shell notification.
+///     Presents one independently dismissible shell notification.
 /// </summary>
 public sealed partial class ShellNotificationViewModel : ObservableObject
 {
@@ -35,6 +35,8 @@ public sealed partial class ShellNotificationViewModel : ObservableObject
     public string DisplayText => $"{Title}: {Message}";
 
     [RelayCommand]
-    private void Dismiss() =>
+    private void Dismiss()
+    {
         _dismiss(this);
+    }
 }

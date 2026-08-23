@@ -3,8 +3,8 @@ using Mapping_Tools.Core.Tools.MapsetMerger;
 namespace Mapping_Tools.Application.MapsetMerger;
 
 /// <summary>
-/// The serializable Mapset Merger project state, retaining the former WPF
-/// property names for automatic recovery and project compatibility.
+///     The serializable Mapset Merger project state, retaining the former WPF
+///     property names for automatic recovery and project compatibility.
 /// </summary>
 public sealed class MapsetMergerProject : MapsetMergerOptions
 {
@@ -37,13 +37,13 @@ public sealed record MapsetMergerResult(
     int AssetsCopied);
 
 /// <summary>
-/// Runs Mapset Merger against disk-only source documents and an export transaction.
+///     Runs Mapset Merger against disk-only source documents and an export transaction.
 /// </summary>
 public interface IMapsetMergerService
 {
     /// <summary>
-    /// Reads all requested source mapsets, rewrites document references, stages
-    /// every output, and commits only after the complete export succeeds.
+    ///     Reads all requested source mapsets, rewrites document references, stages
+    ///     every output, and commits only after the complete export succeeds.
     /// </summary>
     /// <param name="project">The validated merge project.</param>
     /// <param name="progress">Optional aggregate percentage reporting.</param>
@@ -56,7 +56,7 @@ public interface IMapsetMergerService
 }
 
 /// <summary>
-/// Abstracts directory enumeration and transactional binary output for Mapset Merger.
+///     Abstracts directory enumeration and transactional binary output for Mapset Merger.
 /// </summary>
 public interface IMapsetFileSystem
 {

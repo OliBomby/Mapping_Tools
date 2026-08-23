@@ -17,15 +17,18 @@ public sealed class ScaleRotateGeneratorSettings : GeneratorSettings
     /// <summary>Gets or sets the predicate for transformed objects.</summary>
     public SelectionPredicateCollection OtherInputPredicate { get; set; } = new();
 
-    /// <inheritdoc/>
-    public override object Clone() => new ScaleRotateGeneratorSettings
+    /// <inheritdoc />
+    public override object Clone()
     {
-        Generator = Generator, IsActive = IsActive, IsSequential = IsSequential, IsDeep = IsDeep,
-        RelevancyRatio = RelevancyRatio, GeneratesInheritable = GeneratesInheritable,
-        InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone(), Angle = Angle, Scalar = Scalar,
-        OriginInputPredicate = (SelectionPredicateCollection)OriginInputPredicate.Clone(),
-        OtherInputPredicate = (SelectionPredicateCollection)OtherInputPredicate.Clone()
-    };
+        return new ScaleRotateGeneratorSettings
+        {
+            Generator = Generator, IsActive = IsActive, IsSequential = IsSequential, IsDeep = IsDeep,
+            RelevancyRatio = RelevancyRatio, GeneratesInheritable = GeneratesInheritable,
+            InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone(), Angle = Angle, Scalar = Scalar,
+            OriginInputPredicate = (SelectionPredicateCollection)OriginInputPredicate.Clone(),
+            OtherInputPredicate = (SelectionPredicateCollection)OtherInputPredicate.Clone(),
+        };
+    }
 }
 
 /// <summary>Settings for a circle generated from one point.</summary>
@@ -34,13 +37,16 @@ public sealed class SinglePointCircleGeneratorSettings : GeneratorSettings
     /// <summary>Gets or sets the circle radius in editor pixels.</summary>
     public double Radius { get; set; }
 
-    /// <inheritdoc/>
-    public override object Clone() => new SinglePointCircleGeneratorSettings
+    /// <inheritdoc />
+    public override object Clone()
     {
-        Generator = Generator, IsActive = IsActive, IsSequential = IsSequential, IsDeep = IsDeep,
-        RelevancyRatio = RelevancyRatio, GeneratesInheritable = GeneratesInheritable,
-        InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone(), Radius = Radius
-    };
+        return new SinglePointCircleGeneratorSettings
+        {
+            Generator = Generator, IsActive = IsActive, IsSequential = IsSequential, IsDeep = IsDeep,
+            RelevancyRatio = RelevancyRatio, GeneratesInheritable = GeneratesInheritable,
+            InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone(), Radius = Radius,
+        };
+    }
 }
 
 /// <summary>Settings for slider-path point sampling.</summary>
@@ -49,13 +55,16 @@ public sealed class SliderPathGeneratorSettings : GeneratorSettings
     /// <summary>Gets or sets the number of generated points per path pixel.</summary>
     public double PointDensity { get; set; }
 
-    /// <inheritdoc/>
-    public override object Clone() => new SliderPathGeneratorSettings
+    /// <inheritdoc />
+    public override object Clone()
     {
-        Generator = Generator, IsActive = IsActive, IsSequential = IsSequential, IsDeep = IsDeep,
-        RelevancyRatio = RelevancyRatio, GeneratesInheritable = GeneratesInheritable,
-        InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone(), PointDensity = PointDensity
-    };
+        return new SliderPathGeneratorSettings
+        {
+            Generator = Generator, IsActive = IsActive, IsSequential = IsSequential, IsDeep = IsDeep,
+            RelevancyRatio = RelevancyRatio, GeneratesInheritable = GeneratesInheritable,
+            InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone(), PointDensity = PointDensity,
+        };
+    }
 }
 
 /// <summary>Settings for reflection across a selected axis.</summary>
@@ -67,13 +76,16 @@ public sealed class SymmetryGeneratorSettings : GeneratorSettings
     /// <summary>Gets or sets the predicate for objects to reflect.</summary>
     public SelectionPredicateCollection OtherInputPredicate { get; set; } = new();
 
-    /// <inheritdoc/>
-    public override object Clone() => new SymmetryGeneratorSettings
+    /// <inheritdoc />
+    public override object Clone()
     {
-        Generator = Generator, IsActive = IsActive, IsSequential = IsSequential, IsDeep = IsDeep,
-        RelevancyRatio = RelevancyRatio, GeneratesInheritable = GeneratesInheritable,
-        InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone(),
-        AxisInputPredicate = (SelectionPredicateCollection)AxisInputPredicate.Clone(),
-        OtherInputPredicate = (SelectionPredicateCollection)OtherInputPredicate.Clone()
-    };
+        return new SymmetryGeneratorSettings
+        {
+            Generator = Generator, IsActive = IsActive, IsSequential = IsSequential, IsDeep = IsDeep,
+            RelevancyRatio = RelevancyRatio, GeneratesInheritable = GeneratesInheritable,
+            InputPredicate = (SelectionPredicateCollection)InputPredicate.Clone(),
+            AxisInputPredicate = (SelectionPredicateCollection)AxisInputPredicate.Clone(),
+            OtherInputPredicate = (SelectionPredicateCollection)OtherInputPredicate.Clone(),
+        };
+    }
 }

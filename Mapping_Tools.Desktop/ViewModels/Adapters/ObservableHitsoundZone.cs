@@ -5,13 +5,11 @@ using Mapping_Tools.Core.Classes.HitsoundStuff;
 namespace Mapping_Tools.Desktop.ViewModels.Adapters;
 
 /// <summary>
-/// Adds Desktop change notification and transient list selection to a plain
-/// <see cref="HitsoundZone"/> persistence model.
+///     Adds Desktop change notification and transient list selection to a plain
+///     <see cref="HitsoundZone" /> persistence model.
 /// </summary>
 public sealed partial class ObservableHitsoundZone : ObservableObject
 {
-    private readonly HitsoundZone model;
-
     /// <summary>Creates an adapter around a new wildcard zone.</summary>
     public ObservableHitsoundZone()
         : this(new HitsoundZone())
@@ -22,7 +20,7 @@ public sealed partial class ObservableHitsoundZone : ObservableObject
     /// <param name="model">The domain snapshot to edit through this adapter.</param>
     public ObservableHitsoundZone(HitsoundZone model)
     {
-        this.model = model ?? throw new ArgumentNullException(nameof(model));
+        this.Model = model ?? throw new ArgumentNullException(nameof(model));
         Name = model.Name;
         Filename = model.Filename;
         XPos = model.XPos;
@@ -34,7 +32,7 @@ public sealed partial class ObservableHitsoundZone : ObservableObject
     }
 
     /// <summary>Gets the plain model currently edited by the adapter.</summary>
-    public HitsoundZone Model => model;
+    public HitsoundZone Model { get; }
 
     /// <summary>Gets or sets transient list selection state.</summary>
     [ObservableProperty]
@@ -74,14 +72,48 @@ public sealed partial class ObservableHitsoundZone : ObservableObject
 
     /// <summary>Creates a plain snapshot without transient selection state.</summary>
     /// <returns>An independently mutable zone suitable for an Application service.</returns>
-    public HitsoundZone Snapshot() => model.Copy();
+    public HitsoundZone Snapshot()
+    {
+        return Model.Copy();
+    }
 
-    partial void OnNameChanged(string value) => model.Name = value;
-    partial void OnFilenameChanged(string value) => model.Filename = value;
-    partial void OnXPosChanged(double value) => model.XPos = value;
-    partial void OnYPosChanged(double value) => model.YPos = value;
-    partial void OnHitsoundChanged(Hitsound value) => model.Hitsound = value;
-    partial void OnSampleSetChanged(SampleSet value) => model.SampleSet = value;
-    partial void OnAdditionsSetChanged(SampleSet value) => model.AdditionsSet = value;
-    partial void OnCustomIndexChanged(int value) => model.CustomIndex = value;
+    partial void OnNameChanged(string value)
+    {
+        Model.Name = value;
+    }
+
+    partial void OnFilenameChanged(string value)
+    {
+        Model.Filename = value;
+    }
+
+    partial void OnXPosChanged(double value)
+    {
+        Model.XPos = value;
+    }
+
+    partial void OnYPosChanged(double value)
+    {
+        Model.YPos = value;
+    }
+
+    partial void OnHitsoundChanged(Hitsound value)
+    {
+        Model.Hitsound = value;
+    }
+
+    partial void OnSampleSetChanged(SampleSet value)
+    {
+        Model.SampleSet = value;
+    }
+
+    partial void OnAdditionsSetChanged(SampleSet value)
+    {
+        Model.AdditionsSet = value;
+    }
+
+    partial void OnCustomIndexChanged(int value)
+    {
+        Model.CustomIndex = value;
+    }
 }

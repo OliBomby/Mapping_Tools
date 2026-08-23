@@ -4,7 +4,7 @@ using Mapping_Tools.Application.Workspace;
 namespace Mapping_Tools.Application.BeatmapEditing;
 
 /// <summary>
-/// Distinguishes a completed BetterSave from missing editor state and a captured failure.
+///     Distinguishes a completed BetterSave from missing editor state and a captured failure.
 /// </summary>
 public enum BetterSaveStatus
 {
@@ -15,11 +15,11 @@ public enum BetterSaveStatus
     NoCurrentBeatmap,
 
     /// <summary>Opening live state, creating the backup, or saving failed.</summary>
-    Failed
+    Failed,
 }
 
 /// <summary>
-/// Reports a BetterSave attempt without requiring hotkey or watcher callbacks to present UI.
+///     Reports a BetterSave attempt without requiring hotkey or watcher callbacks to present UI.
 /// </summary>
 /// <param name="Status">Whether the document was saved or why it was not.</param>
 /// <param name="Path">The current beatmap path when lookup succeeded.</param>
@@ -30,12 +30,12 @@ public sealed record BetterSaveResult(
     Exception? Exception = null);
 
 /// <summary>
-/// Saves the exact live osu! editor state through the mandatory backup gateway.
+///     Saves the exact live osu! editor state through the mandatory backup gateway.
 /// </summary>
 public interface IBetterSaveService
 {
     /// <summary>
-    /// Locates the current beatmap, requires matching live editor state, and saves it safely.
+    ///     Locates the current beatmap, requires matching live editor state, and saves it safely.
     /// </summary>
     /// <param name="cancellationToken">Cancels lookup, live reading, backup, or persistence.</param>
     /// <returns>A typed outcome; ordinary integration and persistence failures are captured.</returns>
@@ -43,12 +43,12 @@ public interface IBetterSaveService
 }
 
 /// <summary>
-/// Controls the platform watcher that replaces focused osu! saves with BetterSave output.
+///     Controls the platform watcher that replaces focused osu! saves with BetterSave output.
 /// </summary>
 public interface IBetterSaveOverrideService
 {
     /// <summary>
-    /// Reconfigures recursive beatmap observation after a path or enabled preference changes.
+    ///     Reconfigures recursive beatmap observation after a path or enabled preference changes.
     /// </summary>
     /// <param name="songsPath">The osu! beatmap-library root to observe.</param>
     /// <param name="enabled">Whether matching saves should invoke BetterSave.</param>
@@ -59,7 +59,7 @@ public interface IBetterSaveOverrideService
 }
 
 /// <summary>
-/// Coordinates current-map lookup, live-state loading, mandatory backup, and user notification.
+///     Coordinates current-map lookup, live-state loading, mandatory backup, and user notification.
 /// </summary>
 public sealed class BetterSaveService : IBetterSaveService
 {
@@ -68,7 +68,7 @@ public sealed class BetterSaveService : IBetterSaveService
     private readonly IUserNotificationService _notifications;
 
     /// <summary>
-    /// Creates BetterSave over the shared current-map, editing, and notification boundaries.
+    ///     Creates BetterSave over the shared current-map, editing, and notification boundaries.
     /// </summary>
     /// <param name="currentBeatmapLocator">Finds the beatmap currently open in osu!.</param>
     /// <param name="editingGateway">Requires live state and enforces backup-before-save.</param>
@@ -79,14 +79,14 @@ public sealed class BetterSaveService : IBetterSaveService
         IUserNotificationService notifications)
     {
         _currentBeatmapLocator = currentBeatmapLocator
-            ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+                                 ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
         _editingGateway = editingGateway
-            ?? throw new ArgumentNullException(nameof(editingGateway));
+                          ?? throw new ArgumentNullException(nameof(editingGateway));
         _notifications = notifications
-            ?? throw new ArgumentNullException(nameof(notifications));
+                         ?? throw new ArgumentNullException(nameof(notifications));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<BetterSaveResult> ExecuteAsync(
         CancellationToken cancellationToken = default)
     {
@@ -105,7 +105,7 @@ public sealed class BetterSaveService : IBetterSaveService
                 return new BetterSaveResult(BetterSaveStatus.NoCurrentBeatmap);
             }
 
-            BeatmapEditingSession session = await _editingGateway
+            var session = await _editingGateway
                 .OpenBeatmapAsync(
                     path,
                     LiveBeatmapPreference.RequireLive,

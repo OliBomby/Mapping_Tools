@@ -10,7 +10,7 @@ public enum RhythmGuideExportMode
     NewMap,
 
     /// <summary>Adds generated guide objects to an existing target beatmap.</summary>
-    AddToMap
+    AddToMap,
 }
 
 /// <summary>Determines which expanded timeline events become guide objects.</summary>
@@ -26,7 +26,7 @@ public enum RhythmGuideSelectionMode
     AllEventSeparated,
 
     /// <summary>Creates long-note guide objects where the source rhythm permits them.</summary>
-    LongNotes
+    LongNotes,
 }
 
 /// <summary>Contains the framework-neutral transformation options persisted by Rhythm Guide projects.</summary>

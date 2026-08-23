@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
-using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
@@ -14,31 +13,62 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Owns Timing Copier form state, native file selection, project persistence, and execution.
+///     Owns Timing Copier form state, native file selection, project persistence, and execution.
 /// </summary>
 public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     IShellProjectFeature
 {
     internal const string OperationId = "timing-copier";
-
-    private readonly ITimingCopierService _timingCopier;
-    private readonly IFilePicker _filePicker;
     private readonly ICurrentBeatmapLocator _currentBeatmapLocator;
-    private readonly IUserNotificationService _notifications;
-    private readonly IBeatmapWorkspace _workspace;
-    private readonly ApplicationSettings _settings;
+
     private readonly ProjectDefinition<TimingCopierProject> _definition = new(
         "timingcopierproject.json",
         "Timing Copier Projects",
         () => new TimingCopierProject(),
         "timing-copier-project.json");
 
+    private readonly IFilePicker _filePicker;
+    private readonly IUserNotificationService _notifications;
+    private readonly ApplicationSettings _settings;
+
+    private readonly ITimingCopierService _timingCopier;
+    private readonly IBeatmapWorkspace _workspace;
+
+    /// <summary>
+    ///     Creates a Timing Copier presentation model.
+    /// </summary>
+    /// <param name="timingCopier">Runs the framework-independent timing transformation.</param>
+    /// <param name="execution">Coordinates background execution, cancellation, and notifications.</param>
+    /// <param name="filePicker">Presents native beatmap file dialogs.</param>
+    /// <param name="currentBeatmapLocator">Finds the beatmap currently open in osu!.</param>
+    /// <param name="notifications">Publishes picker and current-map failures.</param>
+    /// <param name="workspace">Supplies the current shell map selection for picker locations.</param>
+    /// <param name="settings">Supplies the legacy picker-folder preference and Songs fallback.</param>
+    public TimingCopierViewModel(
+        ITimingCopierService timingCopier,
+        IToolExecutionService execution,
+        IFilePicker filePicker,
+        ICurrentBeatmapLocator currentBeatmapLocator,
+        IUserNotificationService notifications,
+        IBeatmapWorkspace workspace,
+        ApplicationSettings settings)
+        : base(execution, OperationId)
+    {
+        _timingCopier = timingCopier ?? throw new ArgumentNullException(nameof(timingCopier));
+        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
+        _currentBeatmapLocator = currentBeatmapLocator
+                                 ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
+        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
+        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+    }
+
     /// <summary>Gets the three legacy object-placement choices in display order.</summary>
     public IReadOnlyList<string> ResnapModes { get; } =
     [
         TimingCopierResnapModes.PreserveBeatSpacing,
         TimingCopierResnapModes.Resnap,
-        TimingCopierResnapModes.KeepObjectsFixed
+        TimingCopierResnapModes.KeepObjectsFixed,
     ];
 
     /// <summary>Gets or sets the source beatmap path.</summary>
@@ -71,33 +101,16 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         }
     }
 
-    /// <summary>
-    /// Creates a Timing Copier presentation model.
-    /// </summary>
-    /// <param name="timingCopier">Runs the framework-independent timing transformation.</param>
-    /// <param name="execution">Coordinates background execution, cancellation, and notifications.</param>
-    /// <param name="filePicker">Presents native beatmap file dialogs.</param>
-    /// <param name="currentBeatmapLocator">Finds the beatmap currently open in osu!.</param>
-    /// <param name="notifications">Publishes picker and current-map failures.</param>
-    /// <param name="workspace">Supplies the current shell map selection for picker locations.</param>
-    /// <param name="settings">Supplies the legacy picker-folder preference and Songs fallback.</param>
-    public TimingCopierViewModel(
-        ITimingCopierService timingCopier,
-        IToolExecutionService execution,
-        IFilePicker filePicker,
-        ICurrentBeatmapLocator currentBeatmapLocator,
-        IUserNotificationService notifications,
-        IBeatmapWorkspace workspace,
-        ApplicationSettings settings)
-        : base(execution, OperationId)
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+
+    object IShellProjectFeature.Snapshot()
     {
-        _timingCopier = timingCopier ?? throw new ArgumentNullException(nameof(timingCopier));
-        _filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
-        _currentBeatmapLocator = currentBeatmapLocator
-            ?? throw new ArgumentNullException(nameof(currentBeatmapLocator));
-        _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        return Snapshot();
+    }
+
+    void IShellProjectFeature.Install(object project)
+    {
+        Install((TimingCopierProject)project);
     }
 
     /// <summary>Fetches the current osu! beatmap into the source field.</summary>
@@ -107,10 +120,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         try
         {
             string? path = await _currentBeatmapLocator.FindCurrentBeatmapAsync();
-            if (!string.IsNullOrWhiteSpace(path))
-            {
-                ImportPath = path;
-            }
+            if (!string.IsNullOrWhiteSpace(path)) ImportPath = path;
         }
         catch (OperationCanceledException)
         {
@@ -131,7 +141,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         await PickBeatmapsAsync(
             "Copy timing from",
             GetCurrentPickerStartLocation(),
-            allowMultiple: false,
+            false,
             paths => ImportPath = paths[0]);
     }
 
@@ -142,10 +152,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         try
         {
             string? path = await _currentBeatmapLocator.FindCurrentBeatmapAsync();
-            if (!string.IsNullOrWhiteSpace(path))
-            {
-                ExportPath = path;
-            }
+            if (!string.IsNullOrWhiteSpace(path)) ExportPath = path;
         }
         catch (OperationCanceledException)
         {
@@ -164,19 +171,16 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     private async Task ExportBrowseAsync()
     {
         string? suggestedStartLocation = Path.GetDirectoryName(ImportPath);
-        if (string.IsNullOrWhiteSpace(suggestedStartLocation))
-        {
-            suggestedStartLocation = _settings.SongsPath;
-        }
+        if (string.IsNullOrWhiteSpace(suggestedStartLocation)) suggestedStartLocation = _settings.SongsPath;
 
         await PickBeatmapsAsync(
             "Copy timing to",
             suggestedStartLocation,
-            allowMultiple: true,
+            true,
             paths => ExportPath = string.Join('|', paths));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
         TimingCopierOptions options = Snapshot();
@@ -186,47 +190,40 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
                     "Timing Copier",
                     async context =>
                     {
-                        TimingCopierResult result = await _timingCopier.CopyAsync(
+                        var result = await _timingCopier.CopyAsync(
                             options,
                             new Progress<double>(value =>
                                 context.ReportProgress(value, "Copying timing")),
                             context.CancellationToken);
                         return new ToolExecutionOutput<TimingCopierResult>(
                             result,
-                            $"Successfully copied timing to {result.ProcessedCount} " +
-                            $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!");
+                            $"Successfully copied timing to {result.ProcessedCount} " + $"{(result.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!");
                     }),
                 CreateProgress())
             .ConfigureAwait(false);
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
-
-    object IShellProjectFeature.Snapshot() => Snapshot();
-
-    void IShellProjectFeature.Install(object project) =>
-        Install((TimingCopierProject)project);
-
-    private TimingCopierProject Snapshot() => new()
+    private TimingCopierProject Snapshot()
     {
-        ImportPath = ImportPath,
-        ExportPath = ExportPath,
-        ResnapMode = ResnapMode,
-        BeatDivisors = BeatDivisors.ToArray()
-    };
+        return new TimingCopierProject
+        {
+            ImportPath = ImportPath,
+            ExportPath = ExportPath,
+            ResnapMode = ResnapMode,
+            BeatDivisors = BeatDivisors.ToArray(),
+        };
+    }
 
     private void Install(TimingCopierProject project)
     {
         ArgumentNullException.ThrowIfNull(project);
-        if (project.BeatDivisors is null ||
-            project.BeatDivisors.Length == 0 ||
-            project.BeatDivisors.Any(divisor => divisor is null) ||
-            project.ResnapMode is not TimingCopierResnapModes.PreserveBeatSpacing and
-            not TimingCopierResnapModes.Resnap and
-            not TimingCopierResnapModes.KeepObjectsFixed)
-        {
+        if (project.BeatDivisors is null
+            || project.BeatDivisors.Length == 0
+            || project.BeatDivisors.Any(divisor => divisor is null)
+            || project.ResnapMode is not TimingCopierResnapModes.PreserveBeatSpacing and
+                not TimingCopierResnapModes.Resnap and
+                not TimingCopierResnapModes.KeepObjectsFixed)
             throw new InvalidDataException("Timing Copier project is incomplete.");
-        }
 
         ImportPath = project.ImportPath;
         ExportPath = project.ExportPath;
@@ -242,18 +239,15 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     {
         try
         {
-            IReadOnlyList<string> paths = await _filePicker.PickOpenFilesAsync(
+            var paths = await _filePicker.PickOpenFilesAsync(
                 new OpenFilePickerRequest
                 {
                     Title = title,
                     SuggestedStartLocation = suggestedStartLocation,
                     AllowMultiple = allowMultiple,
-                    Filters = [CommonFilePickerFilters.BeatmapsAndStoryboards]
+                    Filters = [CommonFilePickerFilters.BeatmapsAndStoryboards],
                 });
-            if (paths.Count > 0)
-            {
-                apply(paths);
-            }
+            if (paths.Count > 0) apply(paths);
         }
         catch (OperationCanceledException)
         {
@@ -269,20 +263,19 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
 
     private string? GetCurrentPickerStartLocation()
     {
-        if (!_settings.CurrentBeatmapDefaultFolder)
-        {
-            return null;
-        }
+        if (!_settings.CurrentBeatmapDefaultFolder) return null;
 
         string? currentPath = _workspace.SelectedPaths.FirstOrDefault();
         string? directory = Path.GetDirectoryName(currentPath);
         return string.IsNullOrWhiteSpace(directory) ? _settings.SongsPath : directory;
     }
 
-    private Task PublishFailureAsync(string title, string message, Exception exception) =>
-        _notifications.PublishAsync(new UserNotification(
+    private Task PublishFailureAsync(string title, string message, Exception exception)
+    {
+        return _notifications.PublishAsync(new UserNotification(
             UserNotificationSeverity.Error,
             title,
             message,
             exception));
+    }
 }

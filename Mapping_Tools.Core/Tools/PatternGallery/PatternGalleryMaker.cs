@@ -6,7 +6,7 @@ using Mapping_Tools.Core.Classes.MathUtil;
 namespace Mapping_Tools.Core.Tools.PatternGallery;
 
 /// <summary>
-/// Extracts indexed patterns from beatmaps without performing filesystem I/O.
+///     Extracts indexed patterns from beatmaps without performing filesystem I/O.
 /// </summary>
 public sealed class PatternGalleryMaker
 {
@@ -14,7 +14,7 @@ public sealed class PatternGalleryMaker
     public double Padding { get; set; } = 5;
 
     /// <summary>
-    /// Creates a pattern from an explicit editor selection snapshot.
+    ///     Creates a pattern from an explicit editor selection snapshot.
     /// </summary>
     /// <param name="beatmap">The source map; it is deep-copied before filtering.</param>
     /// <param name="selectedHitObjects">The selected objects from the editor session.</param>
@@ -30,16 +30,13 @@ public sealed class PatternGalleryMaker
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(selectedHitObjects);
-        HashSet<HitObject> selectedSet = selectedHitObjects.ToHashSet();
+        var selectedSet = selectedHitObjects.ToHashSet();
         int[] selectedIndices = beatmap.HitObjects
             .Select((item, index) => selectedSet.Contains(item) ? index : -1)
             .Where(index => index >= 0)
             .ToArray();
         // Check if it has selected objects
-        if (selectedIndices.Length == 0)
-        {
-            throw new InvalidOperationException("No selected hit objects found.");
-        }
+        if (selectedIndices.Length == 0) throw new InvalidOperationException("No selected hit objects found.");
 
         // Copy it so the changes dont affect the given beatmap object
         patternBeatmap = beatmap.DeepCopy();
@@ -78,19 +75,10 @@ public sealed class PatternGalleryMaker
             ? patternBeatmap.HitObjects
             : patternBeatmap.QueryTimeCode(filter).ToList();
 
-        if (startTime != -1)
-        {
-            objects.RemoveAll(item => item.EndTime < startTime);
-        }
-        if (endTime != -1)
-        {
-            objects.RemoveAll(item => item.Time > endTime);
-        }
+        if (startTime != -1) objects.RemoveAll(item => item.EndTime < startTime);
+        if (endTime != -1) objects.RemoveAll(item => item.Time > endTime);
 
-        if (objects.Count == 0)
-        {
-            throw new InvalidOperationException("At least one valid hit object is required.");
-        }
+        if (objects.Count == 0) throw new InvalidOperationException("At least one valid hit object is required.");
 
         RemoveEverythingThatIsNotTheseHitObjects(patternBeatmap, objects);
         return FromBeatmap(patternBeatmap, name);
@@ -99,18 +87,15 @@ public sealed class PatternGalleryMaker
     /// <summary>Creates metadata for a complete parsed pattern map.</summary>
     /// <param name="beatmap">The parsed pattern map.</param>
     /// <param name="name">The display name to index.</param>
-    /// <param name="filename">An existing filename to retain, or <see langword="null"/> to generate one.</param>
+    /// <param name="filename">An existing filename to retain, or <see langword="null" /> to generate one.</param>
     /// <returns>The metadata record.</returns>
     public PatternGalleryPattern FromBeatmap(Beatmap beatmap, string name, string? filename = null)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        if (beatmap.HitObjects.Count == 0)
-        {
-            throw new InvalidOperationException("A pattern must contain at least one hit object.");
-        }
+        if (beatmap.HitObjects.Count == 0) throw new InvalidOperationException("A pattern must contain at least one hit object.");
 
-        DateTime now = DateTime.Now;
+        var now = DateTime.Now;
         double startTime = beatmap.GetHitObjectStartTime();
         double endTime = beatmap.GetHitObjectEndTime();
         return new PatternGalleryPattern
@@ -121,7 +106,7 @@ public sealed class PatternGalleryMaker
             FileName = filename ?? GenerateUniquePatternFileName(name, now),
             ObjectCount = beatmap.HitObjects.Count,
             Duration = TimeSpan.FromMilliseconds(endTime - startTime),
-            BeatLength = beatmap.BeatmapTiming.GetBeatLength(startTime, endTime, true)
+            BeatLength = beatmap.BeatmapTiming.GetBeatLength(startTime, endTime, true),
         };
     }
 
@@ -143,19 +128,16 @@ public sealed class PatternGalleryMaker
     {
         ArgumentNullException.ThrowIfNull(hitObjects);
         ArgumentNullException.ThrowIfNull(timingPoints);
-        if (hitObjects.Count == 0)
-        {
-            throw new InvalidOperationException("At least one valid hit object is required.");
-        }
+        if (hitObjects.Count == 0) throw new InvalidOperationException("At least one valid hit object is required.");
 
         patternBeatmap = new Beatmap(
             hitObjects.ToList(),
             timingPoints.ToList(),
-            firstUnInheritedTimingPoint: null,
-            globalSv: globalSv,
-            gameMode: gameMode)
+            null,
+            globalSv,
+            gameMode)
         {
-            Metadata = { ["Version"] = new TValue(name) }
+            Metadata = { ["Version"] = new TValue(name) },
         };
         return FromBeatmap(patternBeatmap, name);
     }
@@ -163,10 +145,7 @@ public sealed class PatternGalleryMaker
     private static string GenerateUniquePatternFileName(string name, DateTime time)
     {
         string fileName = $"{time:yyyy-MM-dd HH-mm-ss}_{RNG.RandomString(8)}__{name}";
-        if (!fileName.EndsWith(".osu", StringComparison.OrdinalIgnoreCase))
-        {
-            fileName += ".osu";
-        }
+        if (!fileName.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)) fileName += ".osu";
 
         // Remove invalid characters
         string invalidCharacters = new(Path.GetInvalidFileNameChars());
@@ -191,15 +170,9 @@ public sealed class PatternGalleryMaker
         beatmap.BeatmapTiming.RemoveAll(point => point.Offset < startTime || point.Offset > endTime);
 
         // Add some earlier timing points if necessary
-        TimingPoint firstUninherited = beatmap.HitObjects[0].UnInheritedTimingPoint;
-        TimingPoint firstNormal = beatmap.HitObjects[0].TimingPoint;
-        if (!beatmap.BeatmapTiming.Contains(firstUninherited))
-        {
-            beatmap.BeatmapTiming.Add(firstUninherited);
-        }
-        if (!beatmap.BeatmapTiming.Contains(firstNormal))
-        {
-            beatmap.BeatmapTiming.Add(firstNormal);
-        }
+        var firstUninherited = beatmap.HitObjects[0].UnInheritedTimingPoint;
+        var firstNormal = beatmap.HitObjects[0].TimingPoint;
+        if (!beatmap.BeatmapTiming.Contains(firstUninherited)) beatmap.BeatmapTiming.Add(firstUninherited);
+        if (!beatmap.BeatmapTiming.Contains(firstNormal)) beatmap.BeatmapTiming.Add(firstNormal);
     }
 }

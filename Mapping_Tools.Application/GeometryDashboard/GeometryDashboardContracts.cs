@@ -7,8 +7,8 @@ namespace Mapping_Tools.Application.GeometryDashboard;
 public static class GeometryDashboardProjectDefinition
 {
     /// <summary>
-    /// Gets a project definition using the legacy autosave name and the current
-    /// application project-picker conventions.
+    ///     Gets a project definition using the legacy autosave name and the current
+    ///     application project-picker conventions.
     /// </summary>
     public static ProjectDefinition<SnappingToolsProject> Definition { get; } = new(
         "geometrydashboardproject.json",

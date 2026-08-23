@@ -5,35 +5,39 @@ using ApplicationInvariantDoubleConverter = Mapping_Tools.Application.Interactio
 namespace Mapping_Tools.Desktop.Converters;
 
 /// <summary>
-/// Converts double-precision values to and from invariant round-trip editable text.
+///     Converts double-precision values to and from invariant round-trip editable text.
 /// </summary>
 public sealed class InvariantDoubleConverter : IValueConverter
 {
     private static readonly ApplicationInvariantDoubleConverter Converter = new();
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public object Convert(
         object? value,
         Type targetType,
         object? parameter,
-        CultureInfo culture) =>
-        ValueConverterHelper.Convert(
+        CultureInfo culture)
+    {
+        return ValueConverterHelper.Convert(
             value,
             targetType,
             parameter,
             culture,
             Converter);
+    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public object ConvertBack(
         object? value,
         Type targetType,
         object? parameter,
-        CultureInfo culture) =>
-        ValueConverterHelper.ConvertBack(
+        CultureInfo culture)
+    {
+        return ValueConverterHelper.ConvertBack(
             value,
             targetType,
             parameter,
             culture,
             Converter);
+    }
 }

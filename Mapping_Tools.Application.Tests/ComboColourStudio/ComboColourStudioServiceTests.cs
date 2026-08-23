@@ -1,9 +1,7 @@
 using Mapping_Tools.Application.Abstractions;
-using FluentAssertions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.ComboColourStudio;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -28,7 +26,7 @@ public sealed class ComboColourStudioServiceTests
         ComboColourStudioService service = new(gateway);
 
         // Act
-        ComboColourStudioRunResult result = await service.ApplyAsync(
+        var result = await service.ApplyAsync(
             [editor.Path],
             project,
             new Progress<double>(progress.Add));
@@ -82,7 +80,10 @@ public sealed class ComboColourStudioServiceTests
 
         public Task<StoryboardEditor2> OpenStoryboardAsync(
             string path,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+            CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
 
         public Task SaveAsync(
             Editor2 value,
@@ -97,16 +98,30 @@ public sealed class ComboColourStudioServiceTests
         public Task SaveAsync(
             BeatmapEditingSession session,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
-            SaveAsync(session.Editor, reloadEditor, cancellationToken);
+            CancellationToken cancellationToken = default)
+        {
+            return SaveAsync(session.Editor, reloadEditor, cancellationToken);
+        }
     }
 
     private sealed class MemoryStore : ITextFileStore
     {
-        public IReadOnlyList<string> ReadAllLines(string path) => throw new NotSupportedException();
+        public IReadOnlyList<string> ReadAllLines(string path)
+        {
+            throw new NotSupportedException();
+        }
+
         public void WriteAllLines(string path, IEnumerable<string> lines) { }
         public void Delete(string path) { }
-        public string GetParentFolder(string path) => @"C:\set";
-        public string CombinePath(string parent, string child) => Path.Combine(parent, child);
+
+        public string GetParentFolder(string path)
+        {
+            return @"C:\set";
+        }
+
+        public string CombinePath(string parent, string child)
+        {
+            return Path.Combine(parent, child);
+        }
     }
 }

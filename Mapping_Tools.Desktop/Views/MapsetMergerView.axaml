@@ -63,16 +63,16 @@
                                 HorizontalAlignment="Right"
                                 Orientation="Horizontal">
                         <materialDesign:FloatingButton Classes="mini light"
-                                                        Margin="5"
-                                                        Command="{Binding AddMapsetCommand}"
-                                                        PointerPressed="AddMapsetButtonPointerPressed"
-                                                        ToolTip.Tip="Add a mapset. Hold shift to get current beatmap from osu! client.">
+                                                       Margin="5"
+                                                       Command="{Binding AddMapsetCommand}"
+                                                       PointerPressed="AddMapsetButtonPointerPressed"
+                                                       ToolTip.Tip="Add a mapset. Hold shift to get current beatmap from osu! client.">
                             <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
                         </materialDesign:FloatingButton>
                         <materialDesign:FloatingButton Classes="mini light"
-                                                        Margin="5"
-                                                        Command="{Binding RemoveMapsetCommand}"
-                                                        ToolTip.Tip="Remove selected mapsets or last mapset.">
+                                                       Margin="5"
+                                                       Command="{Binding RemoveMapsetCommand}"
+                                                       ToolTip.Tip="Remove selected mapsets or last mapset.">
                             <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
                         </materialDesign:FloatingButton>
                     </StackPanel>

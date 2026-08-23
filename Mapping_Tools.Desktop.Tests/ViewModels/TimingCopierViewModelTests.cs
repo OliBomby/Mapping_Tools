@@ -1,7 +1,5 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
-using Mapping_Tools.Application.Interactions;
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.Workspace;
@@ -19,7 +17,7 @@ public sealed class TimingCopierViewModelTests
     public void ExportPath_WithMultipleTargets_ReportsLegacyMapCount()
     {
         // Arrange
-        TimingCopierViewModel viewModel = Create();
+        var viewModel = Create();
 
         // Act
         viewModel.ExportPath = "first.osu|second.osu";
@@ -33,7 +31,7 @@ public sealed class TimingCopierViewModelTests
     {
         // Arrange
         TestFilePicker picker = new() { OpenFiles = ["first.osu", "second.osu"] };
-        TimingCopierViewModel viewModel = Create(filePicker: picker);
+        var viewModel = Create(filePicker: picker);
         viewModel.ImportPath = @"C:\maps\source.osu";
 
         // Act
@@ -51,7 +49,7 @@ public sealed class TimingCopierViewModelTests
     {
         // Arrange
         RecordingTimingCopier service = new();
-        TimingCopierViewModel viewModel = Create(service: service);
+        var viewModel = Create(service);
         viewModel.ImportPath = "source.osu";
         viewModel.ExportPath = "first.osu|second.osu";
         viewModel.ResnapMode = TimingCopierResnapModes.Resnap;
@@ -106,13 +104,17 @@ public sealed class TimingCopierViewModelTests
     private sealed class StubCurrentBeatmapLocator : ICurrentBeatmapLocator
     {
         public Task<string?> FindCurrentBeatmapAsync(
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult<string?>(null);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<string?>(null);
+        }
     }
 
     private sealed class StubReloadService : IEditorReloadService
     {
-        public Task ReloadAsync(CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
+        public Task ReloadAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

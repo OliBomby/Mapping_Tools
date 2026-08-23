@@ -13,11 +13,11 @@ public sealed class SettingsServiceTests
     public void Load_WithLegacyDocument_PreservesData()
     {
         // Arrange
-        using TestDirectory test = TestDirectory.FromFixture("legacy-config.json");
+        using var test = TestDirectory.FromFixture("legacy-config.json");
         JsonSettingsStore store = new(test.Directories);
 
         // Act
-        ApplicationSettings settings = store.Load();
+        var settings = store.Load();
 
         // Assert
         settings.RecentMaps.Count.Should().Be(20);
@@ -37,28 +37,28 @@ public sealed class SettingsServiceTests
     public void SaveAndLoad_LegacySettings_PreservesJsonShapes()
     {
         // Arrange
-        using TestDirectory test = TestDirectory.FromFixture("legacy-config.json");
+        using var test = TestDirectory.FromFixture("legacy-config.json");
         JsonSettingsStore store = new(test.Directories);
-        ApplicationSettings settings = store.Load();
+        var settings = store.Load();
         settings.Theme = ApplicationTheme.Light;
 
         // Act
         store.Save(settings);
-        ApplicationSettings reloaded = store.Load();
+        var reloaded = store.Load();
 
         // Assert
         reloaded.MainWindowRestoreBounds.Should().Be(settings.MainWindowRestoreBounds);
         reloaded.QuickUndoHotkey.Should().Be(settings.QuickUndoHotkey);
         reloaded.Theme.Should().Be(ApplicationTheme.Light);
 
-        using JsonDocument document = JsonDocument.Parse(
+        using var document = JsonDocument.Parse(
             File.ReadAllText(test.Directories.ConfigurationFile));
-        JsonElement root = document.RootElement;
+        var root = document.RootElement;
         root.GetProperty("MainWindowRestoreBounds").GetString().Should().Be("440,256,1407,855");
         root.GetProperty("QuickRunHotkey").GetProperty("Key").ValueKind.Should().Be(JsonValueKind.Number);
         root.GetProperty("PeriodicBackupInterval").GetString().Should().Be("00:10:00");
         root.GetProperty("Theme").GetString().Should().Be("Light");
-        JsonElement firstRecent = root.GetProperty("RecentMaps")[0];
+        var firstRecent = root.GetProperty("RecentMaps")[0];
         firstRecent.ValueKind.Should().Be(JsonValueKind.Array);
         firstRecent.GetArrayLength().Should().Be(2);
         firstRecent[1].GetString().Should().Be(settings.RecentMaps[0].DisplayDate);
@@ -68,7 +68,7 @@ public sealed class SettingsServiceTests
     public void Load_WithCorruptDocument_ThrowsJsonException()
     {
         // Arrange
-        using TestDirectory test = TestDirectory.FromFixture("corrupt.json");
+        using var test = TestDirectory.FromFixture("corrupt.json");
         JsonSettingsStore store = new(test.Directories);
 
         // Act
@@ -82,14 +82,14 @@ public sealed class SettingsServiceTests
     public void LoadOrCreate_WithoutFile_PersistsDefaultsBeforeMachinePaths()
     {
         // Arrange
-        using TestDirectory test = TestDirectory.Empty();
+        using var test = TestDirectory.Empty();
         FakeSettingsPathEnvironment environment = new();
         SettingsPathService paths = new(test.Directories, environment);
         JsonSettingsStore store = new(test.Directories);
         SettingsService service = new(store, paths);
 
         // Act
-        SettingsLoadResult result = service.LoadOrCreate();
+        var result = service.LoadOrCreate();
 
         // Assert
         result.WasCreated.Should().BeTrue();
@@ -99,20 +99,25 @@ public sealed class SettingsServiceTests
         result.Settings.SongsPath.Should().Be(Path.Combine(result.Settings.OsuPath, "Custom Songs"));
         environment.CreatedDirectories.Contains(result.Settings.BackupsPath).Should().BeTrue();
 
-        ApplicationSettings persistedDefaults = store.Load();
+        var persistedDefaults = store.Load();
         persistedDefaults.OsuPath.Should().Be("");
         persistedDefaults.BackupsPath.Should().Be("");
     }
 
     private sealed class FakeSettingsPathEnvironment : ISettingsPathEnvironment
     {
+        public HashSet<string> CreatedDirectories { get; } = [];
         public string UserName => "FixtureUser";
 
-        public HashSet<string> CreatedDirectories { get; } = [];
+        public string? FindOsuInstallation()
+        {
+            return null;
+        }
 
-        public string? FindOsuInstallation() => null;
-
-        public string GetBeatmapDirectory(string configPath) => "Custom Songs";
+        public string GetBeatmapDirectory(string configPath)
+        {
+            return "Custom Songs";
+        }
 
         public void EnsureDirectoryExists(string path)
         {
@@ -136,7 +141,15 @@ public sealed class SettingsServiceTests
 
         public ApplicationDirectories Directories { get; }
 
-        public static TestDirectory Empty() => new();
+        public void Dispose()
+        {
+            if (Directory.Exists(Root)) Directory.Delete(Root, true);
+        }
+
+        public static TestDirectory Empty()
+        {
+            return new TestDirectory();
+        }
 
         public static TestDirectory FromFixture(string fixtureName)
         {
@@ -146,14 +159,6 @@ public sealed class SettingsServiceTests
                 Path.Combine(AppContext.BaseDirectory, "Fixtures", "Settings", fixtureName),
                 test.Directories.ConfigurationFile);
             return test;
-        }
-
-        public void Dispose()
-        {
-            if (Directory.Exists(Root))
-            {
-                Directory.Delete(Root, recursive: true);
-            }
         }
     }
 }

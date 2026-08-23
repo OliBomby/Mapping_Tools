@@ -23,17 +23,12 @@ public sealed partial class HitsoundStudioView : UserControl
     private void LayersSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (DataContext is HitsoundStudioViewModel viewModel && sender is MaterialGridListView grid)
-        {
             viewModel.SetSelection(grid.SelectedItems?.OfType<ObservableHitsoundLayer>() ?? []);
-        }
     }
 
     private void LayersDoubleTapped(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is HitsoundStudioViewModel viewModel)
-        {
-            viewModel.PreviewCommand.Execute(null);
-        }
+        if (DataContext is HitsoundStudioViewModel viewModel) viewModel.PreviewCommand.Execute(null);
     }
 
     private void RaiseLayers(object? sender, PointerEventArgs e)
@@ -60,10 +55,7 @@ public sealed partial class HitsoundStudioView : UserControl
 
     private void MoveLayersFromKeyboard(int direction, KeyEventArgs e)
     {
-        if (e.Key is not (Key.Space or Key.Enter))
-        {
-            return;
-        }
+        if (e.Key is not (Key.Space or Key.Enter)) return;
 
         MoveLayers(direction, e.KeyModifiers);
         e.Handled = true;
@@ -71,9 +63,6 @@ public sealed partial class HitsoundStudioView : UserControl
 
     private void MoveLayers(int direction, KeyModifiers modifiers)
     {
-        if (DataContext is HitsoundStudioViewModel viewModel)
-        {
-            viewModel.MoveSelectedLayers(direction, (modifiers & KeyModifiers.Shift) != 0);
-        }
+        if (DataContext is HitsoundStudioViewModel viewModel) viewModel.MoveSelectedLayers(direction, (modifiers & KeyModifiers.Shift) != 0);
     }
 }

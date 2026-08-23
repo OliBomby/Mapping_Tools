@@ -6,5 +6,8 @@ namespace Mapping_Tools.Desktop.Views;
 public sealed partial class SliderPicturatorView : UserControl
 {
     /// <summary>Creates the Slider Picturator view.</summary>
-    public SliderPicturatorView() => InitializeComponent();
+    public SliderPicturatorView()
+    {
+        InitializeComponent();
+    }
 }

@@ -8,7 +8,7 @@ namespace Mapping_Tools.Infrastructure.Audio;
 /// <summary>Encodes owned clips as WAV or Ogg Vorbis files using NAudio-compatible providers.</summary>
 public sealed class NaudioAudioExporter : IAudioExporter
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task<AudioExportResult> ExportAsync(
         AudioClip clip,
         AudioExportRequest request,
@@ -24,18 +24,15 @@ public sealed class NaudioAudioExporter : IAudioExporter
         AudioExportRequest request,
         CancellationToken cancellationToken)
     {
-        AudioClip exportClip = request.Format == AudioExportFormat.WaveIeeeFloat
+        var exportClip = request.Format == AudioExportFormat.WaveIeeeFloat
             ? clip
             : AudioEffectEngine.Apply(
                 clip,
                 [AudioEffect.CreateSoftLimiter()],
                 cancellationToken);
 
-        string? directory = System.IO.Path.GetDirectoryName(request.Path);
-        if (!string.IsNullOrEmpty(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
+        string? directory = Path.GetDirectoryName(request.Path);
+        if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
 
         switch (request.Format)
         {
@@ -63,10 +60,7 @@ public sealed class NaudioAudioExporter : IAudioExporter
         {
             cancellationToken.ThrowIfCancellationRequested();
             int read = source.Read(buffer, 0, buffer.Length);
-            if (read == 0)
-            {
-                return;
-            }
+            if (read == 0) return;
 
             writer.Write(buffer, 0, read);
         }
@@ -76,22 +70,16 @@ public sealed class NaudioAudioExporter : IAudioExporter
     {
         int sampleRate = OggVorbisFileWriter.GetSupportedSampleRate(clip.Format.SampleRate);
         ISampleProvider sampleProvider = new ClipSampleProvider(clip);
-        if (sampleProvider.WaveFormat.SampleRate != sampleRate)
-        {
-            sampleProvider = new WdlResamplingSampleProvider(sampleProvider, sampleRate);
-        }
+        if (sampleProvider.WaveFormat.SampleRate != sampleRate) sampleProvider = new WdlResamplingSampleProvider(sampleProvider, sampleRate);
 
-        IWaveProvider source = sampleProvider.ToWaveProvider();
+        var source = sampleProvider.ToWaveProvider();
         using var writer = new OggVorbisFileWriter(path, sampleRate, clip.Format.Channels, quality);
         byte[] buffer = new byte[Math.Max(source.WaveFormat.AverageBytesPerSecond * 4, 4096)];
         while (true)
         {
             cancellationToken.ThrowIfCancellationRequested();
             int read = source.Read(buffer, 0, buffer.Length);
-            if (read == 0)
-            {
-                return;
-            }
+            if (read == 0) return;
 
             writer.WriteWaveData(buffer, read, source.WaveFormat);
         }
@@ -113,15 +101,9 @@ public sealed class NaudioAudioExporter : IAudioExporter
         public int Read(float[] buffer, int offset, int count)
         {
             int read = Math.Min(count, _samples.Length - _position);
-            if (read <= 0)
-            {
-                return 0;
-            }
+            if (read <= 0) return 0;
 
-            for (int index = 0; index < read; index++)
-            {
-                buffer[offset + index] = _samples[_position + index];
-            }
+            for (int index = 0; index < read; index++) buffer[offset + index] = _samples[_position + index];
             _position += read;
             return read;
         }

@@ -1,26 +1,25 @@
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
 
 namespace Mapping_Tools.Application.GeometryDashboard;
 
 /// <summary>
-/// Identifies a desktop window without exposing the operating system's native
-/// handle representation to Application or Core.
+///     Identifies a desktop window without exposing the operating system's native
+///     handle representation to Application or Core.
 /// </summary>
 /// <param name="Value">The opaque window identifier supplied by Infrastructure.</param>
 public readonly record struct PlatformWindowId(long Value)
 {
     /// <summary>
-    /// Gets whether the identifier does not refer to a usable native window.
+    ///     Gets whether the identifier does not refer to a usable native window.
     /// </summary>
     public bool IsEmpty => Value == 0;
 }
 
 /// <summary>
-/// Describes the stable osu! process selected by the Windows process adapter.
+///     Describes the stable osu! process selected by the Windows process adapter.
 /// </summary>
 /// <param name="ProcessId">The operating-system process identifier.</param>
 /// <param name="MainWindow">The process's main top-level window identifier.</param>
@@ -31,7 +30,7 @@ public sealed record GeometryDashboardProcess(
     string MainWindowTitle);
 
 /// <summary>
-/// Describes a top-level window in physical desktop pixels.
+///     Describes a top-level window in physical desktop pixels.
 /// </summary>
 /// <param name="Id">The opaque native window identifier.</param>
 /// <param name="ProcessId">The owning process identifier, when it was available.</param>
@@ -52,7 +51,7 @@ public sealed record GeometryDashboardWindow(
     bool DpiSourceAvailable);
 
 /// <summary>
-/// Describes one monitor using physical desktop pixels and its effective DPI.
+///     Describes one monitor using physical desktop pixels and its effective DPI.
 /// </summary>
 /// <param name="Id">The opaque monitor identifier.</param>
 /// <param name="Bounds">The complete monitor rectangle, including negative virtual-screen coordinates.</param>
@@ -69,13 +68,13 @@ public sealed record GeometryDashboardScreen(
     bool DpiSourceAvailable);
 
 /// <summary>
-/// Carries the validated editor state needed by Geometry Dashboard without
-/// exposing Editor Reader's vendor-specific memory model.
+///     Carries the validated editor state needed by Geometry Dashboard without
+///     exposing Editor Reader's vendor-specific memory model.
 /// </summary>
 public sealed class GeometryDashboardEditorSnapshot
 {
     /// <summary>
-    /// Creates a snapshot of one successful editor-memory read.
+    ///     Creates a snapshot of one successful editor-memory read.
     /// </summary>
     /// <param name="path">The full path reconstructed from the configured Songs directory.</param>
     /// <param name="approachRate">The live osu! approach-rate value.</param>
@@ -122,36 +121,36 @@ public sealed class GeometryDashboardEditorSnapshot
 }
 
 /// <summary>
-/// Finds the stable osu! process used by Geometry Dashboard.
+///     Finds the stable osu! process used by Geometry Dashboard.
 /// </summary>
 public interface IGeometryDashboardProcessDiscovery
 {
     /// <summary>
-    /// Gets whether the adapter can inspect native processes on this platform.
+    ///     Gets whether the adapter can inspect native processes on this platform.
     /// </summary>
     bool IsSupported { get; }
 
     /// <summary>
-    /// Finds the first process whose executable and product identity match osu! stable.
+    ///     Finds the first process whose executable and product identity match osu! stable.
     /// </summary>
     /// <param name="cancellationToken">Cancels before process enumeration begins.</param>
-    /// <returns>The matching process snapshot, or <see langword="null"/> when unavailable.</returns>
+    /// <returns>The matching process snapshot, or <see langword="null" /> when unavailable.</returns>
     Task<GeometryDashboardProcess?> FindAsync(CancellationToken cancellationToken = default);
 }
 
 /// <summary>
-/// Reads the selected osu! editor state needed by Geometry Dashboard.
+///     Reads the selected osu! editor state needed by Geometry Dashboard.
 /// </summary>
 public interface IGeometryDashboardEditorReader
 {
     /// <summary>
-    /// Captures a validated memory snapshot from the active osu! editor.
+    ///     Captures a validated memory snapshot from the active osu! editor.
     /// </summary>
     /// <param name="process">The process snapshot selected for this read.</param>
     /// <param name="cancellationToken">Cancels before or during the memory read.</param>
     /// <returns>
-    /// A snapshot when osu! is running with an open editor, or <see langword="null"/>
-    /// when the process/editor is unavailable.
+    ///     A snapshot when osu! is running with an open editor, or <see langword="null" />
+    ///     when the process/editor is unavailable.
     /// </returns>
     Task<GeometryDashboardEditorSnapshot?> ReadGeometryDashboardAsync(
         GeometryDashboardProcess process,
@@ -159,16 +158,16 @@ public interface IGeometryDashboardEditorReader
 }
 
 /// <summary>
-/// Identifies the pointer buttons that Geometry Dashboard can inspect.
+///     Identifies the pointer buttons that Geometry Dashboard can inspect.
 /// </summary>
 public enum GeometryDashboardMouseButton
 {
     /// <summary>The primary/left pointer button.</summary>
-    Left
+    Left,
 }
 
 /// <summary>
-/// Provides global keyboard, mouse-button, and absolute-cursor state.
+///     Provides global keyboard, mouse-button, and absolute-cursor state.
 /// </summary>
 public interface IGeometryDashboardInputService
 {
@@ -176,36 +175,36 @@ public interface IGeometryDashboardInputService
     bool IsSupported { get; }
 
     /// <summary>
-    /// Tests a persisted activation or editing hotkey using exact modifier-state matching.
+    ///     Tests a persisted activation or editing hotkey using exact modifier-state matching.
     /// </summary>
     /// <param name="hotkey">The legacy-compatible key and modifier values.</param>
-    /// <returns><see langword="true"/> only while the complete combination is held.</returns>
+    /// <returns><see langword="true" /> only while the complete combination is held.</returns>
     bool IsHotkeyDown(Hotkey? hotkey);
 
     /// <summary>
-    /// Tests whether a pointer button is currently held.
+    ///     Tests whether a pointer button is currently held.
     /// </summary>
     /// <param name="button">The button to inspect.</param>
-    /// <returns><see langword="true"/> while the button is held.</returns>
+    /// <returns><see langword="true" /> while the button is held.</returns>
     bool IsMouseButtonDown(GeometryDashboardMouseButton button);
 
     /// <summary>
-    /// Attempts to read the absolute cursor position in physical desktop pixels.
+    ///     Attempts to read the absolute cursor position in physical desktop pixels.
     /// </summary>
     /// <param name="position">Receives the cursor position when the read succeeds.</param>
-    /// <returns><see langword="true"/> when Windows supplied a position.</returns>
+    /// <returns><see langword="true" /> when Windows supplied a position.</returns>
     bool TryGetCursorPosition(out Vector2 position);
 
     /// <summary>
-    /// Attempts to move the absolute cursor in physical desktop pixels.
+    ///     Attempts to move the absolute cursor in physical desktop pixels.
     /// </summary>
     /// <param name="position">The destination; fractional values are rounded like the legacy adapter.</param>
-    /// <returns><see langword="true"/> when Windows accepted the move.</returns>
+    /// <returns><see langword="true" /> when Windows accepted the move.</returns>
     bool TrySetCursorPosition(Vector2 position);
 }
 
 /// <summary>
-/// Enumerates monitors and supplies their physical bounds and effective DPI.
+///     Enumerates monitors and supplies their physical bounds and effective DPI.
 /// </summary>
 public interface IGeometryDashboardScreenService
 {
@@ -215,19 +214,19 @@ public interface IGeometryDashboardScreenService
     /// <summary>Gets all monitors in the current virtual desktop.</summary>
     IReadOnlyList<GeometryDashboardScreen> GetScreens();
 
-    /// <summary>Gets the primary monitor, or <see langword="null"/> when unavailable.</summary>
+    /// <summary>Gets the primary monitor, or <see langword="null" /> when unavailable.</summary>
     GeometryDashboardScreen? GetPrimaryScreen();
 
     /// <summary>
-    /// Gets the monitor containing a window's nearest monitor area.
+    ///     Gets the monitor containing a window's nearest monitor area.
     /// </summary>
     /// <param name="window">The window whose monitor should be selected.</param>
-    /// <returns>The containing monitor, or <see langword="null"/> when unavailable.</returns>
+    /// <returns>The containing monitor, or <see langword="null" /> when unavailable.</returns>
     GeometryDashboardScreen? GetScreenForWindow(PlatformWindowId window);
 }
 
 /// <summary>
-/// Tracks top-level windows without leaking native window handles.
+///     Tracks top-level windows without leaking native window handles.
 /// </summary>
 public interface IGeometryDashboardWindowService
 {
@@ -236,12 +235,12 @@ public interface IGeometryDashboardWindowService
 
     /// <summary>Gets a current snapshot for a window identifier.</summary>
     /// <param name="window">The window identifier.</param>
-    /// <returns>The current window, or <see langword="null"/> when it no longer exists.</returns>
+    /// <returns>The current window, or <see langword="null" /> when it no longer exists.</returns>
     GeometryDashboardWindow? GetWindow(PlatformWindowId window);
 
     /// <summary>Gets the current main window for a discovered process.</summary>
     /// <param name="process">The process snapshot whose window should be tracked.</param>
-    /// <returns>The current main window, or <see langword="null"/> when unavailable.</returns>
+    /// <returns>The current main window, or <see langword="null" /> when unavailable.</returns>
     GeometryDashboardWindow? GetMainWindow(GeometryDashboardProcess process);
 
     /// <summary>Enumerates current top-level windows in native enumeration order.</summary>
@@ -250,7 +249,7 @@ public interface IGeometryDashboardWindowService
 }
 
 /// <summary>
-/// Owns the target-bound overlay window lifecycle used by Geometry Dashboard.
+///     Owns the target-bound overlay window lifecycle used by Geometry Dashboard.
 /// </summary>
 public interface IGeometryDashboardOverlayHost : IDisposable
 {
@@ -264,7 +263,7 @@ public interface IGeometryDashboardOverlayHost : IDisposable
     PlatformWindowId? TargetWindow { get; }
 
     /// <summary>
-    /// Creates or retargets the transparent overlay to a top-level window.
+    ///     Creates or retargets the transparent overlay to a top-level window.
     /// </summary>
     /// <param name="targetWindow">The window whose activation controls visibility.</param>
     void Initialize(PlatformWindowId targetWindow);
@@ -276,12 +275,12 @@ public interface IGeometryDashboardOverlayHost : IDisposable
     void Disable();
 
     /// <summary>
-    /// Updates the overlay bounds from physical screen pixels while preserving
-    /// the legacy DPI conversion and no-source fallback.
+    ///     Updates the overlay bounds from physical screen pixels while preserving
+    ///     the legacy DPI conversion and no-source fallback.
     /// </summary>
     /// <param name="physicalBounds">The editor rectangle in physical screen pixels.</param>
     /// <param name="dpiMultiplier">The device-to-logical scale used by the host window.</param>
-    /// <param name="dpiSourceAvailable">Whether <paramref name="dpiMultiplier"/> came from a live window DPI source.</param>
+    /// <param name="dpiSourceAvailable">Whether <paramref name="dpiMultiplier" /> came from a live window DPI source.</param>
     void Update(Box2 physicalBounds, Vector2 dpiMultiplier, bool dpiSourceAvailable);
 
     /// <summary>Changes the legacy debug border state.</summary>
@@ -289,9 +288,9 @@ public interface IGeometryDashboardOverlayHost : IDisposable
     void SetBorder(bool enabled);
 
     /// <summary>
-    /// Replaces the geometry frame drawn by the click-through overlay.
-    /// Coordinates in the frame are physical screen pixels. The host subtracts
-    /// the bounds most recently supplied to <see cref="Update"/> before drawing.
+    ///     Replaces the geometry frame drawn by the click-through overlay.
+    ///     Coordinates in the frame are physical screen pixels. The host subtracts
+    ///     the bounds most recently supplied to <see cref="Update" /> before drawing.
     /// </summary>
     /// <param name="frame">The neutral geometry frame to draw.</param>
     void SetFrame(GeometryDashboardOverlayFrame frame);
@@ -311,12 +310,14 @@ public sealed record GeometryDashboardOverlayFrame(
 /// <summary>Identifies the primitive represented by one overlay shape.</summary>
 public enum GeometryDashboardOverlayShapeKind
 {
-    /// <summary>An outline circle centered at <see cref="GeometryDashboardOverlayShape.Start"/>.</summary>
+    /// <summary>An outline circle centered at <see cref="GeometryDashboardOverlayShape.Start" />.</summary>
     Point,
-    /// <summary>A clipped line from <see cref="GeometryDashboardOverlayShape.Start"/> to End.</summary>
+
+    /// <summary>A clipped line from <see cref="GeometryDashboardOverlayShape.Start" /> to End.</summary>
     Line,
+
     /// <summary>An outline circle centered at Start with Radius.</summary>
-    Circle
+    Circle,
 }
 
 /// <summary>Contains one physical-pixel overlay primitive and its appearance.</summary>
@@ -334,6 +335,6 @@ public sealed record GeometryDashboardOverlayShape(
 public interface IGeometryDashboardOverlayHostFactory
 {
     /// <summary>Creates a disposable overlay host, including an unavailable-platform no-op host.</summary>
-    /// <returns>A host whose <see cref="IGeometryDashboardOverlayHost.IsSupported"/> reports platform availability.</returns>
+    /// <returns>A host whose <see cref="IGeometryDashboardOverlayHost.IsSupported" /> reports platform availability.</returns>
     IGeometryDashboardOverlayHost Create();
 }

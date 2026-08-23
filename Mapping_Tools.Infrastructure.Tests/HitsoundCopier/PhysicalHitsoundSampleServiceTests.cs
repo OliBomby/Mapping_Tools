@@ -1,10 +1,8 @@
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.HitsoundStuff;
 using Mapping_Tools.Infrastructure.Files;
-using FluentAssertions;
-using Mapping_Tools.Application.HitsoundCopier;
-using Mapping_Tools.Core.Tools.HitsoundCopier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Infrastructure.Tests.HitsoundCopier;
@@ -27,24 +25,24 @@ public sealed class PhysicalHitsoundSampleServiceTests
         IReadOnlyDictionary<string, string> firstSamples = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             [Path.Combine(directory.Root, "samples", "kick")] = firstPath,
-            [Path.Combine(directory.Root, "samples", "snare")] = secondPath
+            [Path.Combine(directory.Root, "samples", "snare")] = secondPath,
         };
 
         // Act
-        HitsoundSampleAssignment? first = service.TryCreateAssignment(
+        var first = service.TryCreateAssignment(
             directory.Root,
             ["samples/kick.wav"],
             firstSamples,
             "slidertick",
-            Mapping_Tools.Core.Classes.BeatmapHelper.Enums.SampleSet.Normal,
+            SampleSet.Normal,
             100,
             schema);
-        HitsoundSampleAssignment? second = service.TryCreateAssignment(
+        var second = service.TryCreateAssignment(
             directory.Root,
             ["samples/snare.wav"],
             firstSamples,
             "slidertick",
-            Mapping_Tools.Core.Classes.BeatmapHelper.Enums.SampleSet.Normal,
+            SampleSet.Normal,
             100,
             schema);
 
@@ -64,15 +62,20 @@ public sealed class PhysicalHitsoundSampleServiceTests
         public Task<IReadOnlyDictionary<string, string>> AnalyzeAsync(
             string directory,
             bool detectDuplicates,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult<IReadOnlyDictionary<string, string>>(
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IReadOnlyDictionary<string, string>>(
                 new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+        }
 
         public Task<int> MoveUnusedToRecoveryAsync(
             string directory,
             string currentBeatmapPath,
             Beatmap currentBeatmap,
-            CancellationToken cancellationToken = default) => Task.FromResult(0);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(0);
+        }
     }
 
     private sealed class TestDirectory : IDisposable
@@ -87,10 +90,7 @@ public sealed class PhysicalHitsoundSampleServiceTests
 
         public void Dispose()
         {
-            if (Directory.Exists(Root))
-            {
-                Directory.Delete(Root, recursive: true);
-            }
+            if (Directory.Exists(Root)) Directory.Delete(Root, true);
         }
     }
 }

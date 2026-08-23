@@ -7,14 +7,14 @@ namespace Mapping_Tools.Infrastructure.Audio;
 /// <summary>Adapts NAudio MIDI import/export to neutral timestamped note models.</summary>
 public sealed class NaudioMidiService : IMidiService
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task<MidiSequence> ImportAsync(MidiImportRequest request, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
         return Task.Run(() => Import(request.Path, cancellationToken), cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task ExportAsync(MidiExportRequest request, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -24,93 +24,83 @@ public sealed class NaudioMidiService : IMidiService
     private static MidiSequence Import(string path, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (!File.Exists(path))
-        {
-            throw new FileNotFoundException("The MIDI source does not exist.", path);
-        }
+        if (!File.Exists(path)) throw new FileNotFoundException("The MIDI source does not exist.", path);
 
-        MidiFile file = new(path, strictChecking: false);
-        List<TempoEvent> tempos = file.Events
+        MidiFile file = new(path, false);
+        var tempos = file.Events
             .SelectMany(track => track.OfType<TempoEvent>())
             .OrderBy(tempo => tempo.AbsoluteTime)
             .ToList();
-        List<double> cumulativeTimes = CalculateCumulativeTimes(tempos, file.DeltaTicksPerQuarterNote);
+        var cumulativeTimes = CalculateCumulativeTimes(tempos, file.DeltaTicksPerQuarterNote);
         Dictionary<int, int> banks = new() { [10] = 128 };
         Dictionary<int, int> patches = [];
         List<MidiNote> notes = [];
         List<MidiVolumeChange> volumes = [];
 
         foreach (IList<MidiEvent> track in file.Events)
+        foreach (var midiEvent in track)
         {
-            foreach (MidiEvent midiEvent in track)
+            cancellationToken.ThrowIfCancellationRequested();
+            switch (midiEvent)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                switch (midiEvent)
-                {
-                    case PatchChangeEvent patchChange:
-                        patches[patchChange.Channel] = patchChange.Patch;
-                        break;
-                    case ControlChangeEvent control when control.Controller == MidiController.BankSelect:
-                        banks[control.Channel] = (control.ControllerValue << 7) |
-                            (banks.TryGetValue(control.Channel, out int currentBank) ? currentBank & 0x7f : 0);
-                        break;
-                    case ControlChangeEvent control when control.Controller == MidiController.BankSelectLsb:
-                        banks[control.Channel] = (control.ControllerValue & 0x7f) |
-                            (banks.TryGetValue(control.Channel, out int currentBankForLsb) ? (currentBankForLsb >> 7) << 7 : 0);
-                        break;
-                    case ControlChangeEvent control when control.Controller == MidiController.MainVolume:
-                        volumes.Add(new MidiVolumeChange(
-                            CalculateTime(control.AbsoluteTime, tempos, cumulativeTimes, file.DeltaTicksPerQuarterNote),
-                            control.Channel,
-                            control.ControllerValue));
-                        break;
-                    default:
-                        if (!MidiEvent.IsNoteOn(midiEvent) || midiEvent is not NoteOnEvent noteOn)
-                        {
-                            break;
-                        }
+                case PatchChangeEvent patchChange:
+                    patches[patchChange.Channel] = patchChange.Patch;
+                    break;
+                case ControlChangeEvent control when control.Controller == MidiController.BankSelect:
+                    banks[control.Channel] = control.ControllerValue << 7 | (banks.TryGetValue(control.Channel, out int currentBank) ? currentBank & 0x7f : 0);
+                    break;
+                case ControlChangeEvent control when control.Controller == MidiController.BankSelectLsb:
+                    banks[control.Channel] = control.ControllerValue & 0x7f | (banks.TryGetValue(control.Channel, out int currentBankForLsb) ? currentBankForLsb >> 7 << 7 : 0);
+                    break;
+                case ControlChangeEvent control when control.Controller == MidiController.MainVolume:
+                    volumes.Add(new MidiVolumeChange(
+                        CalculateTime(control.AbsoluteTime, tempos, cumulativeTimes, file.DeltaTicksPerQuarterNote),
+                        control.Channel,
+                        control.ControllerValue));
+                    break;
+                default:
+                    if (!MidiEvent.IsNoteOn(midiEvent) || midiEvent is not NoteOnEvent noteOn) break;
 
-                        double start = CalculateTime(noteOn.AbsoluteTime, tempos, cumulativeTimes, file.DeltaTicksPerQuarterNote);
-                        double duration = noteOn.OffEvent is null
-                            ? 0
-                            : CalculateTime(noteOn.OffEvent.AbsoluteTime, tempos, cumulativeTimes, file.DeltaTicksPerQuarterNote) - start;
-                        int noteBank = banks.TryGetValue(noteOn.Channel, out int importedBank) ? importedBank : 0;
-                        int notePatch = patches.TryGetValue(noteOn.Channel, out int importedPatch) ? importedPatch : 0;
-                        string instrumentName = noteBank == 128
-                            ? "Percussion"
-                            : notePatch is >= 0 and < 128
-                                ? PatchChangeEvent.GetPatchName(notePatch)
-                                : "Undefined";
-                        int channel = noteOn.Channel;
-                        string keyName;
-                        if (noteBank == 128)
-                        {
-                            noteOn.Channel = 10;
-                            keyName = noteOn.NoteName;
-                        }
-                        else if (channel == 10)
-                        {
-                            noteOn.Channel = 1;
-                            keyName = noteOn.NoteName;
-                        }
-                        else
-                        {
-                            keyName = noteOn.NoteName;
-                        }
+                    double start = CalculateTime(noteOn.AbsoluteTime, tempos, cumulativeTimes, file.DeltaTicksPerQuarterNote);
+                    double duration = noteOn.OffEvent is null
+                        ? 0
+                        : CalculateTime(noteOn.OffEvent.AbsoluteTime, tempos, cumulativeTimes, file.DeltaTicksPerQuarterNote) - start;
+                    int noteBank = banks.TryGetValue(noteOn.Channel, out int importedBank) ? importedBank : 0;
+                    int notePatch = patches.TryGetValue(noteOn.Channel, out int importedPatch) ? importedPatch : 0;
+                    string instrumentName = noteBank == 128
+                        ? "Percussion"
+                        : notePatch is >= 0 and < 128
+                            ? PatchChangeEvent.GetPatchName(notePatch)
+                            : "Undefined";
+                    int channel = noteOn.Channel;
+                    string keyName;
+                    if (noteBank == 128)
+                    {
+                        noteOn.Channel = 10;
+                        keyName = noteOn.NoteName;
+                    }
+                    else if (channel == 10)
+                    {
+                        noteOn.Channel = 1;
+                        keyName = noteOn.NoteName;
+                    }
+                    else
+                    {
+                        keyName = noteOn.NoteName;
+                    }
 
-                        noteOn.Channel = channel;
-                        notes.Add(new MidiNote(
-                            start,
-                            Math.Max(0, duration),
-                            noteBank,
-                            notePatch,
-                            noteOn.NoteNumber,
-                            noteOn.Velocity,
-                            channel,
-                            instrumentName,
-                            keyName));
-                        break;
-                }
+                    noteOn.Channel = channel;
+                    notes.Add(new MidiNote(
+                        start,
+                        Math.Max(0, duration),
+                        noteBank,
+                        notePatch,
+                        noteOn.NoteNumber,
+                        noteOn.Velocity,
+                        channel,
+                        instrumentName,
+                        keyName));
+                    break;
             }
         }
 
@@ -126,7 +116,7 @@ public sealed class NaudioMidiService : IMidiService
         collection.AddEvent(new TempoEvent(microsecondsPerQuarter, 0), 0);
         List<(int Bank, int Patch)> channels = [];
 
-        foreach (MidiNote note in request.Sequence.Notes.OrderBy(note => note.StartMilliseconds))
+        foreach (var note in request.Sequence.Notes.OrderBy(note => note.StartMilliseconds))
         {
             cancellationToken.ThrowIfCancellationRequested();
             int bank = Math.Clamp(note.Bank, 0, 16_383);
@@ -136,10 +126,7 @@ public sealed class NaudioMidiService : IMidiService
             int channel = FindChannel(channels, bank, patch);
             if (channel == -1)
             {
-                if (channels.Count >= 15)
-                {
-                    throw new InvalidOperationException("A MIDI file can address at most 15 distinct melodic bank/patch pairs.");
-                }
+                if (channels.Count >= 15) throw new InvalidOperationException("A MIDI file can address at most 15 distinct melodic bank/patch pairs.");
 
                 channels.Add((bank, patch));
                 channel = channels.Count >= 10 ? channels.Count + 1 : channels.Count;
@@ -156,7 +143,7 @@ public sealed class NaudioMidiService : IMidiService
             collection.AddEvent(new NoteEvent(tick + duration, channel, MidiCommandCode.NoteOff, key, 0), 0);
         }
 
-        foreach (MidiVolumeChange volume in request.Sequence.VolumeChanges)
+        foreach (var volume in request.Sequence.VolumeChanges)
         {
             cancellationToken.ThrowIfCancellationRequested();
             collection.AddEvent(new ControlChangeEvent(
@@ -167,35 +154,27 @@ public sealed class NaudioMidiService : IMidiService
         }
 
         collection.PrepareForExport();
-        string? directory = System.IO.Path.GetDirectoryName(request.Path);
-        if (!string.IsNullOrEmpty(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
+        string? directory = Path.GetDirectoryName(request.Path);
+        if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
 
         MidiFile.Export(request.Path, collection);
     }
 
     private static int FindChannel(IReadOnlyList<(int Bank, int Patch)> channels, int bank, int patch)
     {
-        if (bank == 128)
-        {
-            return 10;
-        }
+        if (bank == 128) return 10;
 
         for (int index = 0; index < channels.Count; index++)
-        {
             if (channels[index] == (bank, patch))
-            {
                 return index >= 9 ? index + 2 : index + 1;
-            }
-        }
 
         return -1;
     }
 
-    private static long ToTicks(double milliseconds, int microsecondsPerQuarter, int ticksPerQuarter) =>
-        (long)(milliseconds * 1000 / microsecondsPerQuarter * ticksPerQuarter);
+    private static long ToTicks(double milliseconds, int microsecondsPerQuarter, int ticksPerQuarter)
+    {
+        return (long)(milliseconds * 1000 / microsecondsPerQuarter * ticksPerQuarter);
+    }
 
     private static double CalculateTime(
         long absoluteTime,
@@ -206,22 +185,15 @@ public sealed class NaudioMidiService : IMidiService
         int index = -1;
         for (int tempoIndex = 0; tempoIndex < tempos.Count; tempoIndex++)
         {
-            if (tempos[tempoIndex].AbsoluteTime > absoluteTime)
-            {
-                break;
-            }
+            if (tempos[tempoIndex].AbsoluteTime > absoluteTime) break;
 
             index = tempoIndex;
         }
 
-        if (index < 0)
-        {
-            return 500d * absoluteTime / ticksPerQuarter;
-        }
+        if (index < 0) return 500d * absoluteTime / ticksPerQuarter;
 
-        TempoEvent tempo = tempos[index];
-        return cumulativeTimes[index] + tempo.MicrosecondsPerQuarterNote / 1000d *
-            (absoluteTime - tempo.AbsoluteTime) / ticksPerQuarter;
+        var tempo = tempos[index];
+        return cumulativeTimes[index] + tempo.MicrosecondsPerQuarterNote / 1000d * (absoluteTime - tempo.AbsoluteTime) / ticksPerQuarter;
     }
 
     private static List<double> CalculateCumulativeTimes(IReadOnlyList<TempoEvent> tempos, int ticksPerQuarter)
@@ -230,11 +202,10 @@ public sealed class NaudioMidiService : IMidiService
         long previousTick = 0;
         double previousMicrosecondsPerQuarter = 500_000;
         double elapsedMilliseconds = 0;
-        foreach (TempoEvent tempo in tempos)
+        foreach (var tempo in tempos)
         {
             long tempoTick = Math.Max(previousTick, tempo.AbsoluteTime);
-            elapsedMilliseconds += previousMicrosecondsPerQuarter / 1000d *
-                (tempoTick - previousTick) / ticksPerQuarter;
+            elapsedMilliseconds += previousMicrosecondsPerQuarter / 1000d * (tempoTick - previousTick) / ticksPerQuarter;
             result.Add(elapsedMilliseconds);
             previousTick = tempoTick;
             previousMicrosecondsPerQuarter = tempo.MicrosecondsPerQuarterNote;

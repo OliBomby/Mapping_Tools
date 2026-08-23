@@ -1,3 +1,4 @@
+using System.Globalization;
 using Avalonia.Data;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Converters;
@@ -15,7 +16,7 @@ public sealed class ToolControlTests
         ToolProgressBar progressBar = new()
         {
             Maximum = 100,
-            Value = 100
+            Value = 100,
         };
 
         // Act
@@ -42,7 +43,7 @@ public sealed class ToolControlTests
             notification,
             typeof(string),
             null,
-            System.Globalization.CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture);
 
         // Assert
         message.Should().Be("Enter a valid number.");
@@ -54,16 +55,16 @@ public sealed class ToolControlTests
         // Arrange
         ValidationErrorMessageConverter converter = new();
         InvalidCastException error = new(
-            "Could not convert '{DataValidationError: System.FormatException: " +
-            "Beat divisor 'nope' is not a valid fraction or number., Fallback: (do nothing)}' " +
-            "(Avalonia.Data.BindingNotification) to IBeatDivisor[].");
+            "Could not convert '{DataValidationError: System.FormatException: "
+            + "Beat divisor 'nope' is not a valid fraction or number., Fallback: (do nothing)}' "
+            + "(Avalonia.Data.BindingNotification) to IBeatDivisor[].");
 
         // Act
         object message = converter.Convert(
             error,
             typeof(string),
             null,
-            System.Globalization.CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture);
 
         // Assert
         message.Should().Be("Beat divisor 'nope' is not a valid fraction or number.");
@@ -75,18 +76,18 @@ public sealed class ToolControlTests
         // Arrange
         ValidationErrorMessageConverter converter = new();
         InvalidCastException error = new(
-            "Could not convert '{DataValidationError: System.FormatException: " +
-            "Enter a whole number or arithmetic expression.\r\n" +
-            "   at Mapping_Tools.Application.Interactions.Converters.InvariantInt32Converter.ConvertBack()\r\n" +
-            "   at Mapping_Tools.Desktop.Converters.ValueConverterHelper.ConvertBack()\r\n" +
-            "}' (Avalonia.Data.BindingNotification) to System.Int32.");
+            "Could not convert '{DataValidationError: System.FormatException: "
+            + "Enter a whole number or arithmetic expression.\r\n"
+            + "   at Mapping_Tools.Application.Interactions.Converters.InvariantInt32Converter.ConvertBack()\r\n"
+            + "   at Mapping_Tools.Desktop.Converters.ValueConverterHelper.ConvertBack()\r\n"
+            + "}' (Avalonia.Data.BindingNotification) to System.Int32.");
 
         // Act
         object message = converter.Convert(
             error,
             typeof(string),
             null,
-            System.Globalization.CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture);
 
         // Assert
         message.Should().Be("Enter a whole number or arithmetic expression.");

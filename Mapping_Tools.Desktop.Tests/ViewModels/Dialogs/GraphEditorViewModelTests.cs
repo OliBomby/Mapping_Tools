@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Mapping_Tools.Core.Classes.Graph;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -12,9 +11,9 @@ public sealed class GraphEditorViewModelTests
     public void GraphState_SetFromGraphControl_PreservesThePublishedSnapshot()
     {
         // Arrange
-        GraphState initial = GraphState.CreateDefault();
+        var initial = GraphState.CreateDefault();
         GraphEditorViewModel viewModel = new(initial);
-        GraphState published = initial.Clone();
+        var published = initial.Clone();
 
         // Act
         viewModel.GraphState = published;

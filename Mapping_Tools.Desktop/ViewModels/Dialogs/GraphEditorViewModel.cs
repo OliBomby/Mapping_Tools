@@ -18,12 +18,6 @@ public sealed class GraphEditorViewModel : ObservableObject
         CancelCommand = new RelayCommand(Cancel);
     }
 
-    /// <summary>Raised when the user accepts the current graph.</summary>
-    public event EventHandler? Accepted;
-
-    /// <summary>Raised when the user cancels graph editing.</summary>
-    public event EventHandler? Canceled;
-
     /// <summary>Gets or sets the graph snapshot edited by the window.</summary>
     public GraphState GraphState
     {
@@ -37,7 +31,19 @@ public sealed class GraphEditorViewModel : ObservableObject
     /// <summary>Gets the command that discards graph edits.</summary>
     public IRelayCommand CancelCommand { get; }
 
-    private void Accept() => Accepted?.Invoke(this, EventArgs.Empty);
+    /// <summary>Raised when the user accepts the current graph.</summary>
+    public event EventHandler? Accepted;
 
-    private void Cancel() => Canceled?.Invoke(this, EventArgs.Empty);
+    /// <summary>Raised when the user cancels graph editing.</summary>
+    public event EventHandler? Canceled;
+
+    private void Accept()
+    {
+        Accepted?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void Cancel()
+    {
+        Canceled?.Invoke(this, EventArgs.Empty);
+    }
 }

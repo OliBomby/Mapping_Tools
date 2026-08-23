@@ -10,35 +10,62 @@
         <TextBlock FontSize="24" FontWeight="Bold" Text="Import Hitsound Layer" />
         <ScrollViewer Grid.Row="1">
             <StackPanel Spacing="10">
-                <TextBox Text="{Binding Name, Mode=TwoWay}" PlaceholderText="Layer name" ToolTip.Tip="The convenient name shown in the layer list." />
-                <ComboBox ItemsSource="{Binding ImportTypes}" SelectedItem="{Binding ImportType, Mode=TwoWay}" ToolTip.Tip="Choose a simple layer, stack, hitsound, MIDI, or storyboard import." />
-                <ComboBox IsVisible="{Binding IsSimpleOrStackImport}" ItemsSource="{Binding SampleSets}" SelectedItem="{Binding SampleSet, Mode=TwoWay}" ToolTip.Tip="Sample set used by a simple or stack layer." />
-                <ComboBox IsVisible="{Binding IsSimpleOrStackImport}" ItemsSource="{Binding Hitsounds}" SelectedItem="{Binding Hitsound, Mode=TwoWay}" ToolTip.Tip="Hitsound used by a simple or stack layer." />
+                <TextBox Text="{Binding Name, Mode=TwoWay}" PlaceholderText="Layer name"
+                         ToolTip.Tip="The convenient name shown in the layer list." />
+                <ComboBox ItemsSource="{Binding ImportTypes}" SelectedItem="{Binding ImportType, Mode=TwoWay}"
+                          ToolTip.Tip="Choose a simple layer, stack, hitsound, MIDI, or storyboard import." />
+                <ComboBox IsVisible="{Binding IsSimpleOrStackImport}" ItemsSource="{Binding SampleSets}"
+                          SelectedItem="{Binding SampleSet, Mode=TwoWay}"
+                          ToolTip.Tip="Sample set used by a simple or stack layer." />
+                <ComboBox IsVisible="{Binding IsSimpleOrStackImport}" ItemsSource="{Binding Hitsounds}"
+                          SelectedItem="{Binding Hitsound, Mode=TwoWay}"
+                          ToolTip.Tip="Hitsound used by a simple or stack layer." />
                 <Grid IsVisible="{Binding IsSimpleOrStackImport}" ColumnDefinitions="*,Auto" ColumnSpacing="6">
-                <TextBox Text="{Binding SamplePath, Mode=TwoWay}" PlaceholderText="Sample or SoundFont path" ToolTip.Tip="Audio file or SoundFont used by a simple layer or SoundFont note." />
-                    <Button Grid.Column="1" Content="…" Command="{Binding PickSampleCommand}" ToolTip.Tip="Choose a sample or SoundFont." />
+                    <TextBox Text="{Binding SamplePath, Mode=TwoWay}" PlaceholderText="Sample or SoundFont path"
+                             ToolTip.Tip="Audio file or SoundFont used by a simple layer or SoundFont note." />
+                    <Button Grid.Column="1" Content="…" Command="{Binding PickSampleCommand}"
+                            ToolTip.Tip="Choose a sample or SoundFont." />
                 </Grid>
                 <Grid IsVisible="{Binding HasImportSource}" ColumnDefinitions="*,Auto" ColumnSpacing="6">
-                <TextBox Text="{Binding SourcePaths, Mode=TwoWay}" AcceptsReturn="True" Height="90" PlaceholderText="Source path(s), one per line" ToolTip.Tip="Beatmap, MIDI, or storyboard source paths. Multiple paths are supported for hitsound/storyboard imports." />
-                    <Button Grid.Column="1" Content="…" Command="{Binding PickSourceCommand}" ToolTip.Tip="Choose one or more import sources." />
+                    <TextBox Text="{Binding SourcePaths, Mode=TwoWay}" AcceptsReturn="True" Height="90"
+                             PlaceholderText="Source path(s), one per line"
+                             ToolTip.Tip="Beatmap, MIDI, or storyboard source paths. Multiple paths are supported for hitsound/storyboard imports." />
+                    <Button Grid.Column="1" Content="…" Command="{Binding PickSourceCommand}"
+                            ToolTip.Tip="Choose one or more import sources." />
                 </Grid>
                 <Grid IsVisible="{Binding IsStackImport}" ColumnDefinitions="*,*" ColumnSpacing="10">
-                <TextBox Text="{Binding XText, Mode=TwoWay}" PlaceholderText="Stack X (-1 = any)" />
-                <TextBox Grid.Column="1" Text="{Binding YText, Mode=TwoWay}" PlaceholderText="Stack Y (-1 = any)" />
+                    <TextBox Text="{Binding XText, Mode=TwoWay}" PlaceholderText="Stack X (-1 = any)" />
+                    <TextBox Grid.Column="1" Text="{Binding YText, Mode=TwoWay}" PlaceholderText="Stack Y (-1 = any)" />
                 </Grid>
-                <TextBox IsVisible="{Binding IsMidiImport}" Text="{Binding OffsetText, Mode=TwoWay}" PlaceholderText="MIDI offset (ms)" />
+                <TextBox IsVisible="{Binding IsMidiImport}" Text="{Binding OffsetText, Mode=TwoWay}"
+                         PlaceholderText="MIDI offset (ms)" />
                 <Grid IsVisible="{Binding IsMidiImport}" ColumnDefinitions="*,*" ColumnSpacing="10">
-                    <TextBox IsVisible="{Binding IsLengthSettingsVisible}" Text="{Binding LengthRoughnessText, Mode=TwoWay}" PlaceholderText="MIDI length roughness" />
-                    <TextBox Grid.Column="1" IsVisible="{Binding IsVelocitySettingsVisible}" Text="{Binding VelocityRoughnessText, Mode=TwoWay}" PlaceholderText="MIDI velocity roughness" />
+                    <TextBox IsVisible="{Binding IsLengthSettingsVisible}"
+                             Text="{Binding LengthRoughnessText, Mode=TwoWay}" PlaceholderText="MIDI length roughness" />
+                    <TextBox Grid.Column="1" IsVisible="{Binding IsVelocitySettingsVisible}"
+                             Text="{Binding VelocityRoughnessText, Mode=TwoWay}"
+                             PlaceholderText="MIDI velocity roughness" />
                 </Grid>
-                <CheckBox IsVisible="{Binding IsSampleImport}" Content="Discriminate volumes" IsChecked="{Binding DiscriminateVolumes, Mode=TwoWay}" ToolTip.Tip="Keep source volume differences as separate layers." />
-                <CheckBox IsVisible="{Binding IsHitsoundsImport}" Content="Detect duplicate samples" IsChecked="{Binding DetectDuplicateSamples, Mode=TwoWay}" ToolTip.Tip="Canonicalize identical audio files in the source mapset." />
-                <CheckBox IsVisible="{Binding IsSampleImport}" Content="Remove duplicate events" IsChecked="{Binding RemoveDuplicates, Mode=TwoWay}" ToolTip.Tip="Remove repeated events at the same millisecond." />
-                <CheckBox IsVisible="{Binding IsHitsoundsImport}" Content="Include storyboard sounds" IsChecked="{Binding IncludeStoryboard, Mode=TwoWay}" ToolTip.Tip="Include storyboard samples during hitsound import." />
-                <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI instruments" IsChecked="{Binding DiscriminateInstruments, Mode=TwoWay}" />
-                <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI keys" IsChecked="{Binding DiscriminateKeys, Mode=TwoWay}" />
-                <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI lengths" IsChecked="{Binding DiscriminateLengths, Mode=TwoWay}" />
-                <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI velocities" IsChecked="{Binding DiscriminateVelocities, Mode=TwoWay}" />
+                <CheckBox IsVisible="{Binding IsSampleImport}" Content="Discriminate volumes"
+                          IsChecked="{Binding DiscriminateVolumes, Mode=TwoWay}"
+                          ToolTip.Tip="Keep source volume differences as separate layers." />
+                <CheckBox IsVisible="{Binding IsHitsoundsImport}" Content="Detect duplicate samples"
+                          IsChecked="{Binding DetectDuplicateSamples, Mode=TwoWay}"
+                          ToolTip.Tip="Canonicalize identical audio files in the source mapset." />
+                <CheckBox IsVisible="{Binding IsSampleImport}" Content="Remove duplicate events"
+                          IsChecked="{Binding RemoveDuplicates, Mode=TwoWay}"
+                          ToolTip.Tip="Remove repeated events at the same millisecond." />
+                <CheckBox IsVisible="{Binding IsHitsoundsImport}" Content="Include storyboard sounds"
+                          IsChecked="{Binding IncludeStoryboard, Mode=TwoWay}"
+                          ToolTip.Tip="Include storyboard samples during hitsound import." />
+                <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI instruments"
+                          IsChecked="{Binding DiscriminateInstruments, Mode=TwoWay}" />
+                <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI keys"
+                          IsChecked="{Binding DiscriminateKeys, Mode=TwoWay}" />
+                <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI lengths"
+                          IsChecked="{Binding DiscriminateLengths, Mode=TwoWay}" />
+                <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI velocities"
+                          IsChecked="{Binding DiscriminateVelocities, Mode=TwoWay}" />
             </StackPanel>
         </ScrollViewer>
         <TextBlock Grid.Row="2" Foreground="OrangeRed" Text="{Binding Error}" TextWrapping="Wrap" />

@@ -10,7 +10,7 @@ public enum ExportTimeMode
     Custom,
 
     /// <summary>Places the first object at the active editor playhead.</summary>
-    Current
+    Current,
 }
 
 /// <summary>Chooses which target objects are removed before placement.</summary>
@@ -23,7 +23,7 @@ public enum PatternOverwriteMode
     PartitionedOverwrite,
 
     /// <summary>Removes existing objects throughout the pattern's time span.</summary>
-    CompleteOverwrite
+    CompleteOverwrite,
 }
 
 /// <summary>Chooses which timing information is retained inside a placed pattern.</summary>
@@ -39,5 +39,5 @@ public enum TimingOverwriteMode
     InPatternAbsoluteTiming,
 
     /// <summary>Keeps the pattern's timing information inside each placed part.</summary>
-    PatternTimingOnly
+    PatternTimingOnly,
 }

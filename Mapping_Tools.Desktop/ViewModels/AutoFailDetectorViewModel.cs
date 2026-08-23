@@ -17,11 +17,37 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
 {
     internal const string OperationId = "auto-fail-detector";
     private readonly IAutoFailService _autoFail;
-    private readonly IBeatmapWorkspace _workspace;
     private readonly ICurrentBeatmapLocator _currentBeatmap;
-    private readonly ApplicationSettings _settings;
     private readonly IDialogService _dialogs;
     private readonly IPlatformLauncher _launcher;
+    private readonly ApplicationSettings _settings;
+    private readonly IBeatmapWorkspace _workspace;
+
+    /// <summary>Creates an Auto-fail Detector presentation model.</summary>
+    /// <param name="autoFail">Analyzes beatmaps and applies repairs.</param>
+    /// <param name="execution">Coordinates cancellation, backup, and notifications.</param>
+    /// <param name="workspace">Supplies the shell's selected beatmap.</param>
+    /// <param name="currentBeatmap">Finds the beatmap open in osu! for QuickRun.</param>
+    /// <param name="settings">Supplies QuickRun behavior preferences.</param>
+    /// <param name="dialogs">Presents repair choices.</param>
+    /// <param name="launcher">Navigates osu! to selected timeline markers.</param>
+    public AutoFailDetectorViewModel(
+        IAutoFailService autoFail,
+        IToolExecutionService execution,
+        IBeatmapWorkspace workspace,
+        ICurrentBeatmapLocator currentBeatmap,
+        ApplicationSettings settings,
+        IDialogService dialogs,
+        IPlatformLauncher launcher)
+        : base(execution, OperationId)
+    {
+        _autoFail = autoFail ?? throw new ArgumentNullException(nameof(autoFail));
+        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
+        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
+    }
 
     /// <summary>Gets or sets whether confirmed unloading objects appear on the timeline.</summary>
     [ObservableProperty]
@@ -72,41 +98,6 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     public partial string ResultSummary { get; private set; } =
         "Run the detector to inspect this beatmap.";
 
-    /// <summary>Creates an Auto-fail Detector presentation model.</summary>
-    /// <param name="autoFail">Analyzes beatmaps and applies repairs.</param>
-    /// <param name="execution">Coordinates cancellation, backup, and notifications.</param>
-    /// <param name="workspace">Supplies the shell's selected beatmap.</param>
-    /// <param name="currentBeatmap">Finds the beatmap open in osu! for QuickRun.</param>
-    /// <param name="settings">Supplies QuickRun behavior preferences.</param>
-    /// <param name="dialogs">Presents repair choices.</param>
-    /// <param name="launcher">Navigates osu! to selected timeline markers.</param>
-    public AutoFailDetectorViewModel(
-        IAutoFailService autoFail,
-        IToolExecutionService execution,
-        IBeatmapWorkspace workspace,
-        ICurrentBeatmapLocator currentBeatmap,
-        ApplicationSettings settings,
-        IDialogService dialogs,
-        IPlatformLauncher launcher)
-        : base(execution, OperationId)
-    {
-        _autoFail = autoFail ?? throw new ArgumentNullException(nameof(autoFail));
-        _workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
-        _currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
-        _launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
-    }
-
-    /// <inheritdoc/>
-    protected override async Task RunCoreAsync()
-    {
-        string? path = _settings.AlwaysQuickRun
-            ? await _currentBeatmap.FindCurrentBeatmapAsync()
-            : _workspace.SelectedPaths.FirstOrDefault();
-        await RunPathAsync(path, CancellationToken.None);
-    }
-
     /// <summary>Analyzes the beatmap currently open in osu! through the QuickRun path.</summary>
     /// <param name="cancellationToken">Cancels beatmap discovery or analysis.</param>
     /// <returns>A task that completes after QuickRun finishes.</returns>
@@ -118,9 +109,21 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
 
     string IQuickRun.OperationId => OperationId;
 
+    /// <inheritdoc />
+    protected override async Task RunCoreAsync()
+    {
+        string? path = _settings.AlwaysQuickRun
+            ? await _currentBeatmap.FindCurrentBeatmapAsync()
+            : _workspace.SelectedPaths.FirstOrDefault();
+        await RunPathAsync(path, CancellationToken.None);
+    }
+
     [RelayCommand]
-    private Task NavigateAsync(double time) => _launcher.OpenUriAsync(
-        new Uri($"osu://edit/{Math.Round(time)}"));
+    private Task NavigateAsync(double time)
+    {
+        return _launcher.OpenUriAsync(
+            new Uri($"osu://edit/{Math.Round(time)}"));
+    }
 
     private async Task RunPathAsync(string? path, CancellationToken cancellationToken)
     {
@@ -130,14 +133,14 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
             return;
         }
 
-        ToolExecutionResult<AutoFailRun> result = await Execution.ExecuteAsync(
+        var result = await Execution.ExecuteAsync(
             new ToolExecutionRequest<AutoFailRun>(
                 OperationId,
                 "Auto-fail Detector",
                 async context =>
                 {
                     context.ReportProgress(33, "Loading beatmap");
-                    AutoFailRun run = await _autoFail.AnalyzeAsync(
+                    var run = await _autoFail.AnalyzeAsync(
                         new AutoFailOptions(
                             path,
                             ApproachRateOverride,
@@ -150,16 +153,10 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
                 }),
             CreateProgress(),
             cancellationToken);
-        if (result.Status != ToolExecutionStatus.Succeeded || result.Value is null)
-        {
-            return;
-        }
+        if (result.Status != ToolExecutionStatus.Succeeded || result.Value is null) return;
 
         InstallResult(result.Value);
-        if (GetAutoFailFix)
-        {
-            await OfferFixesAsync(result.Value, cancellationToken);
-        }
+        if (GetAutoFailFix) await OfferFixesAsync(result.Value, cancellationToken);
     }
 
     private void InstallResult(AutoFailRun run)
@@ -169,72 +166,68 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         EndTime = run.MapEndTime;
         List<TimelineMarker> markers = [];
         if (ShowPotentialUnloadingObjects)
-        {
             markers.AddRange(run.Analysis.PotentialUnloadingObjects.Select(time =>
                 new TimelineMarker(time, TimelineMarkerKind.Added, "Potential unloading object")));
-        }
         if (ShowPotentialDisruptors)
-        {
             markers.AddRange(run.Analysis.Disruptors.Select(time =>
                 new TimelineMarker(time, TimelineMarkerKind.Accent, "Potential disruptor")));
-        }
         if (ShowUnloadingObjects)
-        {
             markers.AddRange(run.Analysis.UnloadingObjects.Select(time =>
                 new TimelineMarker(time, TimelineMarkerKind.Removed, "Unloading object")));
-        }
         Markers = markers.OrderBy(marker => marker.Time).ToArray();
     }
 
     private async Task OfferFixesAsync(AutoFailRun run, CancellationToken cancellationToken)
     {
-        foreach (AutoFailFixPlan plan in _autoFail.GetFixPlans(run, cancellationToken))
+        foreach (var plan in _autoFail.GetFixPlans(run, cancellationToken))
         {
-            FixChoice choice = await _dialogs.ShowMessageAsync(
+            var choice = await _dialogs.ShowMessageAsync(
                 new MessageDialogRequest<FixChoice>(
                     "Auto-fail fix",
                     plan.Guide,
                     AutoPlaceFix
-                        ? [
-                            new DialogChoice<FixChoice>("Apply", FixChoice.Apply, IsDefault: true),
+                        ?
+                        [
+                            new DialogChoice<FixChoice>("Apply", FixChoice.Apply, true),
                             new DialogChoice<FixChoice>("Next solution", FixChoice.Next),
-                            new DialogChoice<FixChoice>("Cancel", FixChoice.Cancel, IsCancel: true)]
-                        : [
-                            new DialogChoice<FixChoice>("Done", FixChoice.Done, IsDefault: true),
+                            new DialogChoice<FixChoice>("Cancel", FixChoice.Cancel, IsCancel: true),
+                        ]
+                        :
+                        [
+                            new DialogChoice<FixChoice>("Done", FixChoice.Done, true),
                             new DialogChoice<FixChoice>("Next solution", FixChoice.Next),
-                            new DialogChoice<FixChoice>("Cancel", FixChoice.Cancel, IsCancel: true)],
+                            new DialogChoice<FixChoice>("Cancel", FixChoice.Cancel, IsCancel: true),
+                        ],
                     FixChoice.Cancel),
                 cancellationToken);
-            if (choice == FixChoice.Next)
-            {
-                continue;
-            }
+            if (choice == FixChoice.Next) continue;
             if (choice == FixChoice.Apply)
             {
-                ToolExecutionResult<bool> applied = await Execution.ExecuteAsync(
+                var applied = await Execution.ExecuteAsync(
                     new ToolExecutionRequest<bool>(
                         OperationId + "-fix",
                         "Auto-fail Fix",
                         async context =>
                         {
                             await _autoFail.ApplyFixAsync(run, plan, context.CancellationToken);
-                            return new ToolExecutionOutput<bool>(true, "Applied the auto-fail fix.", reloadEditor: true);
+                            return new ToolExecutionOutput<bool>(true, "Applied the auto-fail fix.", true);
                         }),
                     cancellationToken: cancellationToken);
-                if (applied.Status == ToolExecutionStatus.Succeeded)
-                {
-                    ResultSummary += " Fix applied.";
-                }
+                if (applied.Status == ToolExecutionStatus.Succeeded) ResultSummary += " Fix applied.";
             }
+
             return;
         }
     }
 
-    private static string Summarize(AutoFailAnalysis analysis) => analysis.HasAutoFail
-        ? $"{analysis.UnloadingObjects.Count} unloading objects detected and {analysis.PotentialUnloadingObjects.Count} potential unloading objects detected!"
-        : analysis.PotentialUnloadingObjects.Count > 0
-            ? $"No auto-fail, but {analysis.PotentialUnloadingObjects.Count} potential unloading objects detected."
-            : "No auto-fail detected.";
+    private static string Summarize(AutoFailAnalysis analysis)
+    {
+        return analysis.HasAutoFail
+            ? $"{analysis.UnloadingObjects.Count} unloading objects detected and {analysis.PotentialUnloadingObjects.Count} potential unloading objects detected!"
+            : analysis.PotentialUnloadingObjects.Count > 0
+                ? $"No auto-fail, but {analysis.PotentialUnloadingObjects.Count} potential unloading objects detected."
+                : "No auto-fail detected.";
+    }
 
     private enum FixChoice { Apply, Next, Done, Cancel }
 }

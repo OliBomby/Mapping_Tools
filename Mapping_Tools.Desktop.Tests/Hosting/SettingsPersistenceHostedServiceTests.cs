@@ -13,7 +13,7 @@ public sealed class SettingsPersistenceHostedServiceTests
         // Arrange
         ApplicationSettings settings = new()
         {
-            SongsPath = @"D:\osu!\Songs"
+            SongsPath = @"D:\osu!\Songs",
         };
         RecordingSettingsService settingsService = new();
         SettingsPersistenceHostedService service = new(settings, settingsService);
@@ -47,8 +47,10 @@ public sealed class SettingsPersistenceHostedServiceTests
 
         public ApplicationSettings? LastSaved { get; private set; }
 
-        public SettingsLoadResult LoadOrCreate() =>
-            new(new ApplicationSettings(), false, false);
+        public SettingsLoadResult LoadOrCreate()
+        {
+            return new SettingsLoadResult(new ApplicationSettings(), false, false);
+        }
 
         public void Save(ApplicationSettings settings)
         {

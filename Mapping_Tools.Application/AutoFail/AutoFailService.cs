@@ -11,20 +11,22 @@ public sealed class AutoFailService : IAutoFailService
 
     /// <summary>Creates a service that opens and saves beatmaps through the shared editing gateway.</summary>
     /// <param name="editingGateway">The live-aware, backup-before-write beatmap gateway.</param>
-    public AutoFailService(IBeatmapEditingGateway editingGateway) =>
+    public AutoFailService(IBeatmapEditingGateway editingGateway)
+    {
         _editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
+    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<AutoFailRun> AnalyzeAsync(
         AutoFailOptions options,
         CancellationToken cancellationToken = default)
     {
         Validate(options);
-        BeatmapEditingSession session = await _editingGateway.OpenBeatmapAsync(
+        var session = await _editingGateway.OpenBeatmapAsync(
             options.Path,
             LiveBeatmapPreference.PreferLive,
             cancellationToken).ConfigureAwait(false);
-        Beatmap beatmap = session.Editor.Beatmap;
+        var beatmap = session.Editor.Beatmap;
         double approachRate = options.ApproachRateOverride < 0
             ? beatmap.Difficulty["ApproachRate"].DoubleValue
             : options.ApproachRateOverride;
@@ -41,11 +43,11 @@ public sealed class AutoFailService : IAutoFailService
             (int)Math.Ceiling(200 - 10 * overallDifficulty),
             options.PhysicsUpdateLeniency);
         // Detect auto-fail
-        AutoFailAnalysis analysis = detector.Analyze(cancellationToken);
+        var analysis = detector.Analyze(cancellationToken);
         return new AutoFailRun(analysis, beatmap.GetMapEndTime(), session, detector);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IEnumerable<AutoFailFixPlan> GetFixPlans(
         AutoFailRun run,
         CancellationToken cancellationToken = default)
@@ -55,7 +57,7 @@ public sealed class AutoFailService : IAutoFailService
             .GetFixPlans(cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task ApplyFixAsync(
         AutoFailRun run,
         AutoFailFixPlan plan,
@@ -64,10 +66,8 @@ public sealed class AutoFailService : IAutoFailService
         ArgumentNullException.ThrowIfNull(run);
         ArgumentNullException.ThrowIfNull(plan);
         cancellationToken.ThrowIfCancellationRequested();
-        AutoFailDetectorEngine detector = run.Detector ??
-            throw new InvalidOperationException("This analysis has no fix-planning session.");
-        BeatmapEditingSession session = run.Session ??
-            throw new InvalidOperationException("This analysis has no editing session.");
+        var detector = run.Detector ?? throw new InvalidOperationException("This analysis has no fix-planning session.");
+        var session = run.Session ?? throw new InvalidOperationException("This analysis has no editing session.");
         // Fix auto-fail
         detector.ApplyFix(plan);
         await _editingGateway.SaveAsync(
@@ -81,17 +81,11 @@ public sealed class AutoFailService : IAutoFailService
         ArgumentException.ThrowIfNullOrWhiteSpace(options.Path);
         ValidateDifficulty(options.ApproachRateOverride, nameof(options.ApproachRateOverride));
         ValidateDifficulty(options.OverallDifficultyOverride, nameof(options.OverallDifficultyOverride));
-        if (options.PhysicsUpdateLeniency < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(options.PhysicsUpdateLeniency));
-        }
+        if (options.PhysicsUpdateLeniency < 0) throw new ArgumentOutOfRangeException(nameof(options.PhysicsUpdateLeniency));
     }
 
     private static void ValidateDifficulty(double value, string parameterName)
     {
-        if (!double.IsFinite(value) || value < -1 || value > 10)
-        {
-            throw new ArgumentOutOfRangeException(parameterName);
-        }
+        if (!double.IsFinite(value) || value < -1 || value > 10) throw new ArgumentOutOfRangeException(parameterName);
     }
 }

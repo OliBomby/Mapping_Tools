@@ -6,5 +6,8 @@ namespace Mapping_Tools.Desktop.Views;
 public sealed partial class SliderMergerView : UserControl
 {
     /// <summary>Creates the Slider Merger view.</summary>
-    public SliderMergerView() => InitializeComponent();
+    public SliderMergerView()
+    {
+        InitializeComponent();
+    }
 }

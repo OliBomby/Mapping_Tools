@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.GeometryDashboard;
+using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Infrastructure.Editor;
@@ -18,7 +19,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
         WindowsOsuProcessDiscovery sut = new(() => false);
 
         // Act
-        GeometryDashboardProcess? result = await sut.FindAsync();
+        var result = await sut.FindAsync();
 
         // Assert
         sut.IsSupported.Should().BeFalse();
@@ -30,12 +31,12 @@ public sealed class GeometryDashboardWindowsAdapterTests
     {
         // Arrange
         WindowsEditorReaderAdapter sut = new(
-            new Mapping_Tools.Application.Settings.ApplicationSettings(),
+            new ApplicationSettings(),
             new ApplicationDirectories(Path.Combine(Path.GetTempPath(), "Mapping Tools Tests")),
             () => false);
 
         // Act
-        GeometryDashboardEditorSnapshot? result =
+        var result =
             await sut.ReadGeometryDashboardAsync(
                 new GeometryDashboardProcess(7, new PlatformWindowId(42), "map.osu"));
 
@@ -49,12 +50,12 @@ public sealed class GeometryDashboardWindowsAdapterTests
     {
         // Arrange
         WindowsGeometryDashboardInputService sut = new(() => false);
-        Hotkey hotkey = new(56, 0);
+        Hotkey hotkey = new(56);
 
         // Act
         bool hotkeyDown = sut.IsHotkeyDown(hotkey);
         bool mouseDown = sut.IsMouseButtonDown(GeometryDashboardMouseButton.Left);
-        bool cursorRead = sut.TryGetCursorPosition(out Vector2 position);
+        bool cursorRead = sut.TryGetCursorPosition(out var position);
         bool cursorWrite = sut.TrySetCursorPosition(new Vector2(10, 20));
 
         // Assert
@@ -73,9 +74,9 @@ public sealed class GeometryDashboardWindowsAdapterTests
         WindowsGeometryDashboardScreenService sut = new(() => false);
 
         // Act
-        IReadOnlyList<GeometryDashboardScreen> screens = sut.GetScreens();
-        GeometryDashboardScreen? primary = sut.GetPrimaryScreen();
-        GeometryDashboardScreen? forWindow = sut.GetScreenForWindow(new PlatformWindowId(1));
+        var screens = sut.GetScreens();
+        var primary = sut.GetPrimaryScreen();
+        var forWindow = sut.GetScreenForWindow(new PlatformWindowId(1));
 
         // Assert
         sut.IsSupported.Should().BeFalse();
@@ -91,8 +92,8 @@ public sealed class GeometryDashboardWindowsAdapterTests
         WindowsGeometryDashboardWindowService sut = new(() => false);
 
         // Act
-        GeometryDashboardWindow? result = sut.GetWindow(new PlatformWindowId(1));
-        IReadOnlyList<GeometryDashboardWindow> windows = sut.GetTopLevelWindows();
+        var result = sut.GetWindow(new PlatformWindowId(1));
+        var windows = sut.GetTopLevelWindows();
 
         // Assert
         sut.IsSupported.Should().BeFalse();
@@ -108,8 +109,8 @@ public sealed class GeometryDashboardWindowsAdapterTests
         WindowsGeometryDashboardOverlayHostFactory factory = new(windows, () => false);
 
         // Act
-        using IGeometryDashboardOverlayHost host = factory.Create();
-        Action act = () =>
+        using var host = factory.Create();
+        var act = () =>
         {
             host.Initialize(new PlatformWindowId(1));
             host.Enable();
@@ -131,13 +132,13 @@ public sealed class GeometryDashboardWindowsAdapterTests
     {
         // Arrange
         WindowsGeometryDashboardWindowService windows = new(() => false);
-        using IGeometryDashboardOverlayHost host =
+        using var host =
             new WindowsGeometryDashboardOverlayHostFactory(windows, () => false).Create();
 
         // Act
         host.Dispose();
         host.Dispose();
-        Action setBorder = () => host.SetBorder(true);
+        var setBorder = () => host.SetBorder(true);
 
         // Assert
         setBorder.Should().NotThrow();
@@ -154,7 +155,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
             physicalBounds,
             new Vector2(2, 2),
             true,
-            out WindowsGeometryDashboardOverlayHost.NativeBounds nativeBounds);
+            out var nativeBounds);
 
         // Assert
         converted.Should().BeTrue();
@@ -173,7 +174,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
             physicalBounds,
             Vector2.Zero,
             false,
-            out WindowsGeometryDashboardOverlayHost.NativeBounds nativeBounds);
+            out var nativeBounds);
 
         // Assert
         converted.Should().BeTrue();
@@ -211,11 +212,11 @@ public sealed class GeometryDashboardWindowsAdapterTests
         WindowsGlobalHotkeyService sut = new(() => false);
         sut.SetBinding(
             "geometry",
-            new Mapping_Tools.Application.Settings.HotkeySettings(56, 0),
+            new HotkeySettings(56, 0),
             _ => Task.CompletedTask);
 
         // Act
-        Action act = () =>
+        var act = () =>
         {
             sut.Start();
             sut.Stop();

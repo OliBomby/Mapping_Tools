@@ -33,7 +33,7 @@ public sealed class AvaloniaClipboardServiceTests
         cancellation.Cancel();
 
         // Act
-        Func<Task> act2 = () => clipboard.ClearAsync(cancellation.Token);
+        var act2 = () => clipboard.ClearAsync(cancellation.Token);
 
         // Assert
         await act2.Should().ThrowAsync<OperationCanceledException>();

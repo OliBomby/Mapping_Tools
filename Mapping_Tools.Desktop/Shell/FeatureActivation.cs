@@ -1,7 +1,7 @@
 namespace Mapping_Tools.Desktop.Shell;
 
 /// <summary>
-/// Receives desktop feature lifecycle transitions without depending on a view.
+///     Receives desktop feature lifecycle transitions without depending on a view.
 /// </summary>
 public interface IShellFeatureActivation
 {

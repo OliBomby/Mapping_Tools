@@ -43,6 +43,7 @@ public sealed class AutoFailRun
 
     /// <summary>Gets the final beatmap timeline position in milliseconds.</summary>
     public double MapEndTime { get; }
+
     internal BeatmapEditingSession? Session { get; }
     internal AutoFailDetectorEngine? Detector { get; }
 }

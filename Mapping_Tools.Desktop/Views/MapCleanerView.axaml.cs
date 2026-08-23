@@ -6,5 +6,8 @@ namespace Mapping_Tools.Desktop.Views;
 public sealed partial class MapCleanerView : UserControl
 {
     /// <summary>Creates the Map Cleaner view.</summary>
-    public MapCleanerView() => InitializeComponent();
+    public MapCleanerView()
+    {
+        InitializeComponent();
+    }
 }

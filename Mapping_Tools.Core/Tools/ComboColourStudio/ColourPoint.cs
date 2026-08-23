@@ -3,7 +3,7 @@ using Mapping_Tools.Core.Classes.BeatmapHelper;
 namespace Mapping_Tools.Core.Tools.ComboColourStudio;
 
 /// <summary>
-/// Associates a beatmap offset with an ordered combo-colour sequence.
+///     Associates a beatmap offset with an ordered combo-colour sequence.
 /// </summary>
 public sealed class ColourPoint : ICloneable
 {
@@ -38,8 +38,11 @@ public sealed class ColourPoint : ICloneable
 
     /// <summary>Creates an independent point copy, including sequence entries.</summary>
     /// <returns>A detached copy with equivalent persisted values.</returns>
-    public object Clone() => new ColourPoint(
-        Time,
-        ColourSequence.Select(colour => (SpecialColour)colour.Clone()),
-        Mode);
+    public object Clone()
+    {
+        return new ColourPoint(
+            Time,
+            ColourSequence.Select(colour => (SpecialColour)colour.Clone()),
+            Mode);
+    }
 }

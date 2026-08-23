@@ -4,7 +4,7 @@ using Avalonia.Controls;
 namespace Mapping_Tools.Desktop.Controls;
 
 /// <summary>
-/// Presents the consistent title, help affordance, and optional QuickRun badge used by mapping tools.
+///     Presents the consistent title, help affordance, and optional QuickRun badge used by mapping tools.
 /// </summary>
 public sealed partial class ToolViewHeader : UserControl
 {

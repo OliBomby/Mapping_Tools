@@ -56,9 +56,11 @@ internal static class ValueConverterHelper
 
     public static BindingNotification TypeError(
         Type sourceType,
-        Type targetType) =>
-        new(
+        Type targetType)
+    {
+        return new BindingNotification(
             new InvalidCastException(
                 $"Cannot convert {sourceType.Name} to {targetType.Name}."),
             BindingErrorType.Error);
+    }
 }

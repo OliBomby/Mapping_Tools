@@ -1,12 +1,11 @@
-using System;
 using Mapping_Tools.Core.Classes.MathUtil;
 
 namespace Mapping_Tools.Core.Classes.Tools.SnappingTools;
 
 /// <summary>Converts between screen, editor-grid, and relative playfield coordinates.</summary>
 /// <remarks>
-/// This class contains only the legacy geometry formulas. Screen discovery, osu! configuration,
-/// DPI queries, and process/window access are supplied by the later platform adapter.
+///     This class contains only the legacy geometry formulas. Screen discovery, osu! configuration,
+///     DPI queries, and process/window access are supplied by the later platform adapter.
 /// </remarks>
 public sealed class CoordinateConverter
 {
@@ -38,7 +37,7 @@ public sealed class CoordinateConverter
     public Vector2 DpiMultiplier { get; set; } = Vector2.One;
 
     /// <summary>Gets or sets whether a platform DPI source was available for the last query.</summary>
-    /// <remarks>When false, <see cref="ToDpi"/> preserves the legacy no-window fallback.</remarks>
+    /// <remarks>When false, <see cref="ToDpi" /> preserves the legacy no-window fallback.</remarks>
     public bool DpiSourceAvailable { get; set; }
 
     /// <summary>Gets the editor client dimensions after the file bar.</summary>
@@ -50,21 +49,27 @@ public sealed class CoordinateConverter
     private double FilebarHeight => 24 * DpiMultiplier.Y;
     private double WindowChromeHeight => 24 * DpiMultiplier.Y;
 
+    private bool OsuFillsScreen => Fullscreen || Letterboxing || OsuResolution == new Vector2(ScreenBox.Right, ScreenBox.Bottom);
+
     /// <summary>Gets the configured screen bounds.</summary>
     /// <returns>The screen bounds provided by the platform boundary.</returns>
-    public Box2 GetScreenBox() => ScreenBox;
+    public Box2 GetScreenBox()
+    {
+        return ScreenBox;
+    }
 
     /// <summary>Gets the platform DPI scale supplied to this converter.</summary>
     /// <returns>The current horizontal and vertical DPI multipliers.</returns>
-    public Vector2 GetDpiMultiplier() => DpiMultiplier;
-
-    private bool OsuFillsScreen => Fullscreen || Letterboxing || OsuResolution == new Vector2(ScreenBox.Right, ScreenBox.Bottom);
+    public Vector2 GetDpiMultiplier()
+    {
+        return DpiMultiplier;
+    }
 
     /// <summary>Gets the screen rectangle containing the complete osu! window.</summary>
     /// <returns>The window rectangle including any non-fullscreen chrome.</returns>
     public Box2 GetOsuWindowBox()
     {
-        Vector2 chromeAddition = OsuFillsScreen ? Vector2.Zero : new Vector2(2, 2 + WindowChromeHeight);
+        var chromeAddition = OsuFillsScreen ? Vector2.Zero : new Vector2(2, 2 + WindowChromeHeight);
         return Letterboxing ? ScreenBox :
             OsuFillsScreen ? new Box2(Vector2.Zero, OsuResolution) :
             new Box2(OsuWindowPosition, OsuWindowPosition + OsuResolution + chromeAddition);
@@ -74,7 +79,7 @@ public sealed class CoordinateConverter
     /// <returns>The content window rectangle.</returns>
     public Box2 GetOsuWindowBoxWithoutChrome()
     {
-        Box2 osuWindow = GetOsuWindowBox();
+        var osuWindow = GetOsuWindowBox();
         if (OsuFillsScreen) return osuWindow;
         osuWindow.Top += 1 + WindowChromeHeight;
         osuWindow.Left += 1;
@@ -87,14 +92,14 @@ public sealed class CoordinateConverter
     /// <returns>The editor content rectangle.</returns>
     public Box2 GetEditorBox()
     {
-        Box2 osuWindow = GetOsuWindowBoxWithoutChrome();
+        var osuWindow = GetOsuWindowBoxWithoutChrome();
         osuWindow.Top += FilebarHeight;
         if (!Letterboxing) return AddBox2(osuWindow, EditorBoxOffset);
 
-        Vector2 letterboxMultiplier = LetterboxingPosition / 200 + new Vector2(0.5, 0.5);
-        Vector2 blackSpaceSize = new Vector2(osuWindow.Width, osuWindow.Height) - EditorResolution;
-        Vector2 letterboxOffset = letterboxMultiplier * blackSpaceSize;
-        Vector2 letterboxOffset2 = (Vector2.One - letterboxMultiplier) * blackSpaceSize;
+        var letterboxMultiplier = LetterboxingPosition / 200 + new Vector2(0.5, 0.5);
+        var blackSpaceSize = new Vector2(osuWindow.Width, osuWindow.Height) - EditorResolution;
+        var letterboxOffset = letterboxMultiplier * blackSpaceSize;
+        var letterboxOffset2 = (Vector2.One - letterboxMultiplier) * blackSpaceSize;
         osuWindow.Left += letterboxOffset.X;
         osuWindow.Top += letterboxOffset.Y;
         osuWindow.Right -= letterboxOffset2.X;
@@ -106,11 +111,11 @@ public sealed class CoordinateConverter
     /// <returns>The grid rectangle from (0,0) to (512,384).</returns>
     public Box2 GetEditorGridBox()
     {
-        Box2 editor = GetEditorBox();
+        var editor = GetEditorBox();
         // Screen pixels per osu pixel
         double ratio = editor.Height / 480;
-        Vector2 gridDimensions = EditorGridResolution * ratio;
-        Vector2 emptySpace = new Vector2(editor.Width, editor.Height) - gridDimensions;
+        var gridDimensions = EditorGridResolution * ratio;
+        var emptySpace = new Vector2(editor.Width, editor.Height) - gridDimensions;
         Vector2 gridOffset = new(emptySpace.X / 2, emptySpace.Y / 4 * 3);
         editor.Left += gridOffset.X;
         editor.Top += gridOffset.Y;
@@ -124,7 +129,7 @@ public sealed class CoordinateConverter
     /// <returns>The editor coordinate.</returns>
     public Vector2 ScreenToEditorCoordinate(Vector2 coord)
     {
-        Box2 editorGridBox = GetEditorGridBox();
+        var editorGridBox = GetEditorGridBox();
         double ratioX = editorGridBox.Width / EditorGridResolution.X;
         double ratioY = editorGridBox.Height / EditorGridResolution.Y;
         return new Vector2((coord.X - PositionSnapOffset.X - editorGridBox.Left) / ratioX, (coord.Y - PositionSnapOffset.Y - editorGridBox.Top) / ratioY);
@@ -135,7 +140,7 @@ public sealed class CoordinateConverter
     /// <returns>The screen coordinate.</returns>
     public Vector2 EditorToScreenCoordinate(Vector2 coord)
     {
-        Box2 editorGridBox = GetEditorGridBox();
+        var editorGridBox = GetEditorGridBox();
         double ratioX = editorGridBox.Width / EditorGridResolution.X;
         double ratioY = editorGridBox.Height / EditorGridResolution.Y;
         return new Vector2(coord.X * ratioX + editorGridBox.Left, coord.Y * ratioY + editorGridBox.Top) + PositionSnapOffset;
@@ -146,13 +151,13 @@ public sealed class CoordinateConverter
     /// <returns>The editor-relative screen offset.</returns>
     public Vector2 EditorToRelativeCoordinate(Vector2 coord)
     {
-        Box2 editor = GetEditorBox();
+        var editor = GetEditorBox();
         // Screen pixels per osu pixel
         double ratio = editor.Height / 480;
-        Vector2 gridDimensions = EditorGridResolution * ratio;
-        Vector2 emptySpace = new Vector2(editor.Width, editor.Height) - gridDimensions;
+        var gridDimensions = EditorGridResolution * ratio;
+        var emptySpace = new Vector2(editor.Width, editor.Height) - gridDimensions;
         Vector2 gridOffset = new(emptySpace.X / 2, emptySpace.Y / 4 * 3);
-        Box2 editorGridBox = GetEditorGridBox();
+        var editorGridBox = GetEditorGridBox();
         double ratioX = editorGridBox.Width / EditorGridResolution.X;
         double ratioY = editorGridBox.Height / EditorGridResolution.Y;
         return new Vector2(coord.X * ratioX, coord.Y * ratioY) + gridOffset;
@@ -163,19 +168,28 @@ public sealed class CoordinateConverter
     /// <returns>The screen-scaled vector.</returns>
     public Vector2 ScaleByRatio(Vector2 thing)
     {
-        Box2 editorGridBox = GetEditorGridBox();
+        var editorGridBox = GetEditorGridBox();
         return new Vector2(thing.X * editorGridBox.Width / EditorGridResolution.X, thing.Y * editorGridBox.Height / EditorGridResolution.Y);
     }
 
     /// <summary>Converts a physical coordinate using the supplied DPI multiplier and legacy offset.</summary>
     /// <param name="coord">The physical coordinate.</param>
     /// <returns>The logical coordinate with the legacy one-tenth adjustment.</returns>
-    public Vector2 ToDpi(Vector2 coord) => !DpiSourceAvailable
-        ? coord
-        : new Vector2(coord.X / DpiMultiplier.X, coord.Y / DpiMultiplier.Y) + new Vector2(0.1, 0.1);
+    public Vector2 ToDpi(Vector2 coord)
+    {
+        return !DpiSourceAvailable
+            ? coord
+            : new Vector2(coord.X / DpiMultiplier.X, coord.Y / DpiMultiplier.Y) + new Vector2(0.1, 0.1);
+    }
 
-    /// <inheritdoc/>
-    public override string ToString() => $"{ScreenBox}, {OsuWindowPosition}, {OsuResolution}, {Fullscreen}, {Letterboxing}, {LetterboxingPosition}";
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return $"{ScreenBox}, {OsuWindowPosition}, {OsuResolution}, {Fullscreen}, {Letterboxing}, {LetterboxingPosition}";
+    }
 
-    private static Box2 AddBox2(Box2 thisBox2, Box2 otherBox2) => new(thisBox2.Left + otherBox2.Left, thisBox2.Top + otherBox2.Top, thisBox2.Right + otherBox2.Right, thisBox2.Bottom + otherBox2.Bottom);
+    private static Box2 AddBox2(Box2 thisBox2, Box2 otherBox2)
+    {
+        return new Box2(thisBox2.Left + otherBox2.Left, thisBox2.Top + otherBox2.Top, thisBox2.Right + otherBox2.Right, thisBox2.Bottom + otherBox2.Bottom);
+    }
 }

@@ -1,4 +1,3 @@
-using Mapping_Tools.Core.Audio;
 using Mapping_Tools.Core.Spectrum;
 
 namespace Mapping_Tools.Application.Audio;
@@ -28,6 +27,16 @@ public sealed class AudioPreviewService : ISpectrumService
         _spectrum = spectrum ?? throw new ArgumentNullException(nameof(spectrum));
     }
 
+    /// <inheritdoc />
+    public async Task<SpectrumFrame> CalculateFileAsync(
+        AudioDecodeRequest request,
+        SpectrumCalculationOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        var clip = await _decoder.DecodeAsync(request, cancellationToken).ConfigureAwait(false);
+        return await _spectrum.CalculateAsync(clip, options, cancellationToken).ConfigureAwait(false);
+    }
+
     /// <summary>Decodes a source file and starts playback owned by the returned session.</summary>
     /// <param name="request">The source file request.</param>
     /// <param name="options">Playback settings.</param>
@@ -38,7 +47,7 @@ public sealed class AudioPreviewService : ISpectrumService
         AudioPlaybackOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        AudioClip clip = await _decoder.DecodeAsync(request, cancellationToken).ConfigureAwait(false);
+        var clip = await _decoder.DecodeAsync(request, cancellationToken).ConfigureAwait(false);
         return await _playback.PlayAsync(clip, options, cancellationToken).ConfigureAwait(false);
     }
 
@@ -52,26 +61,16 @@ public sealed class AudioPreviewService : ISpectrumService
         AudioPlaybackOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        AudioClip clip = await _generator.GenerateAsync(request, cancellationToken).ConfigureAwait(false);
+        var clip = await _generator.GenerateAsync(request, cancellationToken).ConfigureAwait(false);
         return await _playback.PlayAsync(clip, options, cancellationToken).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc/>
-    public async Task<SpectrumFrame> CalculateFileAsync(
-        AudioDecodeRequest request,
-        SpectrumCalculationOptions? options = null,
-        CancellationToken cancellationToken = default)
-    {
-        AudioClip clip = await _decoder.DecodeAsync(request, cancellationToken).ConfigureAwait(false);
-        return await _spectrum.CalculateAsync(clip, options, cancellationToken).ConfigureAwait(false);
     }
 }
 
 /// <summary>Coordinates sample generation with output encoding.</summary>
 public sealed class AudioExportService
 {
-    private readonly IAudioGenerator _generator;
     private readonly IAudioExporter _exporter;
+    private readonly IAudioGenerator _generator;
 
     /// <summary>Creates the generated-sample export service.</summary>
     /// <param name="generator">The sample-generation port.</param>
@@ -92,7 +91,7 @@ public sealed class AudioExportService
         AudioExportRequest export,
         CancellationToken cancellationToken = default)
     {
-        AudioClip clip = await _generator.GenerateAsync(generation, cancellationToken).ConfigureAwait(false);
+        var clip = await _generator.GenerateAsync(generation, cancellationToken).ConfigureAwait(false);
         return await _exporter.ExportAsync(clip, export, cancellationToken).ConfigureAwait(false);
     }
 }

@@ -14,42 +14,53 @@
 
         <Grid Grid.Row="1" Margin="0,10,0,0" ColumnDefinitions="470,*">
             <StackPanel>
-                <GroupBox Header="Timing points" Margin="0,10,0,0" Padding="5" MaxWidth="600" HorizontalAlignment="Left">
+                <GroupBox Header="Timing points" Margin="0,10,0,0" Padding="5" MaxWidth="600"
+                          HorizontalAlignment="Left">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Offset" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding TimingpointOffsetMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding TimingpointOffsetMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding TimingpointOffsetOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding TimingpointOffsetOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="BPM" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding TimingpointBpmMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding TimingpointBpmMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding TimingpointBpmOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding TimingpointBpmOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Slider Velocity" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding TimingpointSvMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding TimingpointSvMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding TimingpointSvOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding TimingpointSvOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Custom index" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding TimingpointIndexMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding TimingpointIndexMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding TimingpointIndexOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding TimingpointIndexOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Volume" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding TimingpointVolumeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding TimingpointVolumeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding TimingpointVolumeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding TimingpointVolumeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
@@ -59,23 +70,29 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Event time" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding SbEventTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding SbEventTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding SbEventTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding SbEventTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Sample time" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding SbSampleTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding SbSampleTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding SbSampleTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding SbSampleTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Sample volume" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding SbSampleVolumeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding SbSampleVolumeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding SbSampleVolumeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding SbSampleVolumeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
@@ -85,44 +102,56 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Hitobject time" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding HitObjectTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding HitObjectTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding HitObjectTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding HitObjectTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Hitobject volume" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding HitObjectVolumeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding HitObjectVolumeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding HitObjectVolumeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding HitObjectVolumeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Bookmark time" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding BookmarkTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding BookmarkTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding BookmarkTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding BookmarkTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Break time" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding BreakTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding BreakTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding BreakTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding BreakTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Video time" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding VideoTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding VideoTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding VideoTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding VideoTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Preview time" Width="150" />
                             <TextBlock Text="x " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding PreviewTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding PreviewTimeMultiplier, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                             <TextBlock Text=" + " />
-                            <TextBox Classes="compact" Width="120" Text="{Binding PreviewTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
+                            <TextBox Classes="compact" Width="120"
+                                     Text="{Binding PreviewTimeOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}" />
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
@@ -133,8 +162,8 @@
                     <TextBlock Text="Synchronize time fields" VerticalAlignment="Center" Margin="5,0,0,0"
                                ToolTip.Tip="Enable this to synchronize the fields of all time-related elements." />
                     <materialDesign:FloatingButton Classes="mini light" Margin="200,0,0,0"
-                                                    Command="{Binding ResetCommand}"
-                                                    ToolTip.Tip="Reset all multipliers and offsets.">
+                                                   Command="{Binding ResetCommand}"
+                                                   ToolTip.Tip="Reset all multipliers and offsets.">
                         <materialIcons:MaterialIcon Kind="Rocket" Height="24" Width="24" />
                     </materialDesign:FloatingButton>
                 </StackPanel>

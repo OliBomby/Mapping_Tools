@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.Audio;
+using Mapping_Tools.Core.Spectrum;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Audio;
@@ -33,10 +34,7 @@ public sealed class AudioBoundaryTests
         double[] roundTrips = volumes.Select(volume => AudioVolume.FromAmplitude(AudioVolume.ToAmplitude(volume))).ToArray();
 
         // Assert
-        for (int index = 0; index < volumes.Length; index++)
-        {
-            roundTrips[index].Should().BeApproximately(volumes[index], 1e-12);
-        }
+        for (int index = 0; index < volumes.Length; index++) roundTrips[index].Should().BeApproximately(volumes[index], 1e-12);
     }
 
     [TestMethod]
@@ -44,10 +42,10 @@ public sealed class AudioBoundaryTests
     {
         // Arrange
         var source = new AudioClip(new AudioFormat(1000, 1), Enumerable.Repeat(1f, 6));
-        AudioEffect effect = AudioEffect.CreateDelayFadeOut(2, 2);
+        var effect = AudioEffect.CreateDelayFadeOut(2, 2);
 
         // Act
-        AudioClip result = AudioEffectEngine.Apply(source, [effect]);
+        var result = AudioEffectEngine.Apply(source, [effect]);
 
         // Assert
         result.CopySamples().Should().Equal(1f, 1f, 1f, 0.5f, 0f, 0f);
@@ -61,9 +59,9 @@ public sealed class AudioBoundaryTests
         var source = new AudioClip(new AudioFormat(44100, 1), [0f, 0.25f, 1f, -2f]);
 
         // Act
-        AudioClip result = AudioEffectEngine.Apply(
+        var result = AudioEffectEngine.Apply(
             source,
-            [AudioEffect.CreateSoftLimiter(boostDecibels: 6, brickwallDecibels: -0.1)]);
+            [AudioEffect.CreateSoftLimiter(6)]);
 
         // Assert
         result.CopySamples().Should().AllSatisfy(sample => float.IsFinite(sample).Should().BeTrue());
@@ -93,7 +91,7 @@ public sealed class AudioBoundaryTests
     {
         // Arrange
         double[] magnitudes = [1, 2];
-        var frame = new Mapping_Tools.Core.Spectrum.SpectrumFrame(44100, 4, magnitudes);
+        var frame = new SpectrumFrame(44100, 4, magnitudes);
 
         // Act
         magnitudes[0] = 99;

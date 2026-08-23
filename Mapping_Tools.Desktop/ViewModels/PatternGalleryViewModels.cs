@@ -26,10 +26,7 @@ public sealed partial class PatternGalleryItemViewModel : ObservableObject
     public bool IsSelected
     {
         get => isSelected;
-        set
-        {
-            SetProperty(ref isSelected, value);
-        }
+        set => SetProperty(ref isSelected, value);
     }
 
     /// <summary>Gets the loaded thumbnail beatmap, when it is available.</summary>
@@ -37,14 +34,23 @@ public sealed partial class PatternGalleryItemViewModel : ObservableObject
     public partial Beatmap? ThumbnailBeatmap { get; private set; }
 
     /// <summary>Publishes a newly loaded thumbnail beatmap.</summary>
-    /// <param name="beatmap">The beatmap loaded from the stored pattern, or <see langword="null"/> on failure.</param>
-    internal void SetThumbnail(Beatmap? beatmap) => ThumbnailBeatmap = beatmap;
+    /// <param name="beatmap">The beatmap loaded from the stored pattern, or <see langword="null" /> on failure.</param>
+    internal void SetThumbnail(Beatmap? beatmap)
+    {
+        ThumbnailBeatmap = beatmap;
+    }
 
     /// <summary>Refreshes bindings after persisted metadata changes.</summary>
-    internal void RefreshMetadata() => OnPropertyChanged(nameof(Name));
+    internal void RefreshMetadata()
+    {
+        OnPropertyChanged(nameof(Name));
+    }
 
     /// <summary>Refreshes the selection binding after a bulk selection operation.</summary>
-    internal void RefreshSelection() => OnPropertyChanged(nameof(IsSelected));
+    internal void RefreshSelection()
+    {
+        OnPropertyChanged(nameof(IsSelected));
+    }
 }
 
 /// <summary>Groups visible Pattern Gallery items by their persisted group name.</summary>

@@ -4,25 +4,36 @@ using Mapping_Tools.Application.Backups;
 namespace Mapping_Tools.Infrastructure.Backups;
 
 /// <summary>
-/// Persists backup copies with sibling temporary files so cancellation or an
-/// interrupted write cannot leave a partially replaced beatmap.
+///     Persists backup copies with sibling temporary files so cancellation or an
+///     interrupted write cannot leave a partially replaced beatmap.
 /// </summary>
 public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
 {
-    /// <inheritdoc/>
-    public bool FileExists(string path) => File.Exists(path);
+    /// <inheritdoc />
+    public bool FileExists(string path)
+    {
+        return File.Exists(path);
+    }
 
-    /// <inheritdoc/>
-    public bool DirectoryExists(string path) => Directory.Exists(path);
+    /// <inheritdoc />
+    public bool DirectoryExists(string path)
+    {
+        return Directory.Exists(path);
+    }
 
-    /// <inheritdoc/>
-    public string GetFileName(string path) => Path.GetFileName(path);
+    /// <inheritdoc />
+    public string GetFileName(string path)
+    {
+        return Path.GetFileName(path);
+    }
 
-    /// <inheritdoc/>
-    public string Combine(string directory, string fileName) =>
-        Path.Combine(directory, fileName);
+    /// <inheritdoc />
+    public string Combine(string directory, string fileName)
+    {
+        return Path.Combine(directory, fileName);
+    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task CopyAsync(
         string sourcePath,
         string destinationPath,
@@ -39,16 +50,14 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
                              FileAccess.Read,
                              FileShare.Read,
                              81920,
-                             FileOptions.Asynchronous |
-                             FileOptions.SequentialScan))
+                             FileOptions.Asynchronous | FileOptions.SequentialScan))
             await using (FileStream destination = new(
                              temporaryPath,
                              FileMode.CreateNew,
                              FileAccess.Write,
                              FileShare.None,
                              81920,
-                             FileOptions.Asynchronous |
-                             FileOptions.WriteThrough))
+                             FileOptions.Asynchronous | FileOptions.WriteThrough))
             {
                 await source.CopyToAsync(destination, cancellationToken)
                     .ConfigureAwait(false);
@@ -57,7 +66,7 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            File.Move(temporaryPath, destinationPath, overwrite: true);
+            File.Move(temporaryPath, destinationPath, true);
         }
         finally
         {
@@ -65,7 +74,7 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task WriteLinesAsync(
         string destinationPath,
         IReadOnlyList<string> lines,
@@ -82,11 +91,10 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
                              FileAccess.Write,
                              FileShare.None,
                              81920,
-                             FileOptions.Asynchronous |
-                             FileOptions.WriteThrough))
+                             FileOptions.Asynchronous | FileOptions.WriteThrough))
             await using (StreamWriter writer = new(
                              stream,
-                             new UTF8Encoding(encoderShouldEmitUTF8Identifier: false)))
+                             new UTF8Encoding(false)))
             {
                 writer.NewLine = "\r\n";
 
@@ -104,7 +112,7 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            File.Move(temporaryPath, destinationPath, overwrite: true);
+            File.Move(temporaryPath, destinationPath, true);
         }
         finally
         {
@@ -112,7 +120,7 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task<IReadOnlyList<StoredBeatmapBackup>> ListAsync(
         string directory,
         CancellationToken cancellationToken = default)
@@ -130,7 +138,7 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
         return Task.FromResult(backups);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task DeleteAsync(
         string path,
         CancellationToken cancellationToken = default)
@@ -143,8 +151,8 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
     private static string CreateTemporarySibling(string destinationPath)
     {
         string directory = Path.GetDirectoryName(destinationPath)
-            ?? throw new DirectoryNotFoundException(
-                $"Path '{destinationPath}' does not have a parent directory.");
+                           ?? throw new DirectoryNotFoundException(
+                               $"Path '{destinationPath}' does not have a parent directory.");
         string fileName = Path.GetFileName(destinationPath);
         return Path.Combine(
             directory,

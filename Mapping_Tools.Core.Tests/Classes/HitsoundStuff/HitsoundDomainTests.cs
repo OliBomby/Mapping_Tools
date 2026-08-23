@@ -6,9 +6,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Core.Tests.Classes.HitsoundStuff;
 
 [TestClass]
-public class HitsoundDomainTests {
+public class HitsoundDomainTests
+{
     [TestMethod]
-    public void HitsoundFilename_ParsesStandardSampleName() {
+    public void HitsoundFilename_ParsesStandardSampleName()
+    {
         // Arrange
         // Act
         const string filename = "drum-hitclap12";
@@ -20,21 +22,22 @@ public class HitsoundDomainTests {
     }
 
     [TestMethod]
-    public void SampleGeneratingArgs_CopyPreservesGenerationSettings() {
+    public void SampleGeneratingArgs_CopyPreservesGenerationSettings()
+    {
         // Arrange
         var source = new SampleGeneratingArgs(
             "samples/piano.sf2",
-            volume: 0.75,
-            panning: -0.2,
-            pitchShift: 0.1,
-            bank: 2,
-            patch: 3,
-            instrument: 4,
-            key: 60,
-            length: 500);
+            0.75,
+            -0.2,
+            0.1,
+            2,
+            3,
+            4,
+            60,
+            500);
 
         // Act
-        SampleGeneratingArgs copy = source.Copy();
+        var copy = source.Copy();
 
         // Assert
         copy.Should().Be(source);
@@ -44,18 +47,19 @@ public class HitsoundDomainTests {
     }
 
     [TestMethod]
-    public void HitsoundZone_DistanceHonoursWildcardAxesAndCopyIsIndependent() {
+    public void HitsoundZone_DistanceHonoursWildcardAxesAndCopyIsIndependent()
+    {
         // Arrange
         // Act
         var zone = new HitsoundZone(
             "centre line", "normal-hitnormal.wav",
-            xPos: -1, yPos: 100,
+            -1, 100,
             Hitsound.Normal, SampleSet.Normal, SampleSet.None, 1);
 
         // Assert
         zone.Distance(new Vector2(400, 80)).Should().BeApproximately(20, 0.0001);
 
-        HitsoundZone copy = zone.Copy();
+        var copy = zone.Copy();
         copy.YPos = 120;
 
         zone.YPos.Should().Be(100);
@@ -63,18 +67,21 @@ public class HitsoundDomainTests {
     }
 
     [TestMethod]
-    public void LayerImportArgs_ExposesImportAndReloadRules() {
+    public void LayerImportArgs_ExposesImportAndReloadRules()
+    {
         // Arrange
         // Act
-        var stack = new LayerImportArgs(ImportType.Stack) {
+        var stack = new LayerImportArgs(ImportType.Stack)
+        {
             Path = "map.osu",
             X = -1,
-            Y = 192
+            Y = 192,
         };
-        var matchingStack = new LayerImportArgs(ImportType.Stack) {
+        var matchingStack = new LayerImportArgs(ImportType.Stack)
+        {
             Path = "map.osu",
             X = 256,
-            Y = 192
+            Y = 192,
         };
 
         // Assert
@@ -83,10 +90,12 @@ public class HitsoundDomainTests {
     }
 
     [TestMethod]
-    public void HitsoundLayer_RemoveDuplicatesUsesDomainPrecision() {
+    public void HitsoundLayer_RemoveDuplicatesUsesDomainPrecision()
+    {
         // Arrange
-        var layer = new HitsoundLayer {
-            Times = new List<double> { 1000, 1000, 1250, 1250 }
+        var layer = new HitsoundLayer
+        {
+            Times = new List<double> { 1000, 1000, 1250, 1250 },
         };
 
         // Act
@@ -97,15 +106,17 @@ public class HitsoundDomainTests {
     }
 
     [TestMethod]
-    public void SampleSchema_RoundTripsCustomIndexAssignments() {
+    public void SampleSchema_RoundTripsCustomIndexAssignments()
+    {
         // Arrange
         var sample = new SampleGeneratingArgs("kick.wav");
-        var schema = new SampleSchema {
-            ["normal-hitnormal3"] = new List<SampleGeneratingArgs> { sample }
+        var schema = new SampleSchema
+        {
+            ["normal-hitnormal3"] = new List<SampleGeneratingArgs> { sample },
         };
 
         // Act
-        List<CustomIndex> indices = schema.GetCustomIndices();
+        var indices = schema.GetCustomIndices();
         var restored = new SampleSchema(indices);
 
         // Assert
@@ -116,7 +127,8 @@ public class HitsoundDomainTests {
     }
 
     [TestMethod]
-    public void CustomIndex_CleanInvalidsUsesCallerValidationPolicy() {
+    public void CustomIndex_CleanInvalidsUsesCallerValidationPolicy()
+    {
         // Arrange
         var valid = new SampleGeneratingArgs("valid.wav");
         var invalid = new SampleGeneratingArgs("invalid.wav");
@@ -132,12 +144,13 @@ public class HitsoundDomainTests {
     }
 
     [TestMethod]
-    public void HitsoundEvent_EncodesWhistleFinishAndClapBits() {
+    public void HitsoundEvent_EncodesWhistleFinishAndClapBits()
+    {
         // Arrange
         // Act
         var hitsound = new HitsoundEvent(
             1000, 1, SampleSet.Normal, SampleSet.Drum, 2,
-            whistle: true, finish: false, clap: true);
+            true, false, true);
 
         // Assert
         hitsound.GetHitsounds().Should().Be(10);

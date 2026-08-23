@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using Mapping_Tools.Core.Classes.MathUtil;
-using Mapping_Tools.Core.Classes.Graph.Interpolation;
 
 namespace Mapping_Tools.Core.Classes.Graph.Interpolation.Interpolators;
 
@@ -15,10 +14,16 @@ public sealed class LinearInterpolator : CustomInterpolator, IDerivableInterpola
     }
 
     /// <inheritdoc />
-    public double GetDerivative(double t) => 1;
+    public double GetDerivative(double t)
+    {
+        return 1;
+    }
 
     /// <inheritdoc />
-    public double GetIntegral(double t1, double t2) => 0.5 * t2 * t2 - 0.5 * t1 * t1;
+    public double GetIntegral(double t1, double t2)
+    {
+        return 0.5 * t2 * t2 - 0.5 * t1 * t1;
+    }
 }
 
 /// <summary>Interpolates a parameterized parabola.</summary>
@@ -27,7 +32,22 @@ public sealed class LinearInterpolator : CustomInterpolator, IDerivableInterpola
 public sealed class ParabolaInterpolator : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator
 {
     /// <summary>Creates a parabola interpolator.</summary>
-    public ParabolaInterpolator() => InterpolationFunction = Function;
+    public ParabolaInterpolator()
+    {
+        InterpolationFunction = Function;
+    }
+
+    /// <inheritdoc />
+    public double GetDerivative(double t)
+    {
+        return -2 * MathHelper.Clamp(P, -1, 1) * t + MathHelper.Clamp(P, -1, 1) + 1;
+    }
+
+    /// <inheritdoc />
+    public double GetIntegral(double t1, double t2)
+    {
+        return Primitive(t2) - Primitive(t1);
+    }
 
     /// <summary>Evaluates the parameterized parabola.</summary>
     /// <param name="t">The normalized position.</param>
@@ -37,12 +57,6 @@ public sealed class ParabolaInterpolator : CustomInterpolator, IDerivableInterpo
         double p = MathHelper.Clamp(P, -1, 1);
         return -p * Math.Pow(t, 2) + (p + 1) * t;
     }
-
-    /// <inheritdoc />
-    public double GetDerivative(double t) => -2 * MathHelper.Clamp(P, -1, 1) * t + MathHelper.Clamp(P, -1, 1) + 1;
-
-    /// <inheritdoc />
-    public double GetIntegral(double t1, double t2) => Primitive(t2) - Primitive(t1);
 
     private double Primitive(double t)
     {
@@ -59,40 +73,15 @@ public sealed class HalfSineInterpolator : CustomInterpolator, IDerivableInterpo
     private readonly LinearInterpolator linearDegenerate = new();
 
     /// <summary>Creates a half-sine interpolator.</summary>
-    public HalfSineInterpolator() => InterpolationFunction = Function;
-
-    private double Function(double t)
+    public HalfSineInterpolator()
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon)
-        {
-            return linearDegenerate.GetInterpolation(t);
-        }
-
-        double p = MathHelper.Clamp(P, -1, 1);
-        double b = 2 * Math.Acos(1 / (Math.Sqrt(2) * Math.Abs(p) - Math.Abs(p) + 1));
-        return p < 0 ? 1 - F(1 - t, b) : F(t, b);
-    }
-
-    private static double F(double t, double k) => Math.Sin(t * k) / Math.Sin(k);
-
-    private static double Derivative(double t, double k) =>
-        -(2 * k * Math.Sin(k) * Math.Cos(k * t)) / (Math.Cos(2 * k) - 1);
-
-    private static double Primitive(double t, double p)
-    {
-        double b = 2 * Math.Acos(1 / (Math.Sqrt(2) * Math.Abs(p) - Math.Abs(p) + 1));
-        return p > 0
-            ? -(MathHelper.Cosec(b) * (Math.Cos(b * t) - 1)) / b
-            : MathHelper.Cosec(b) * (Math.Cos(b) - Math.Cos(b - b * t)) / b + t;
+        InterpolationFunction = Function;
     }
 
     /// <inheritdoc />
     public double GetDerivative(double t)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon)
-        {
-            return linearDegenerate.GetDerivative(t);
-        }
+        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetDerivative(t);
 
         double p = MathHelper.Clamp(P, -1, 1);
         double b = 2 * Math.Acos(1 / (Math.Sqrt(2) * Math.Abs(p) - Math.Abs(p) + 1));
@@ -102,13 +91,37 @@ public sealed class HalfSineInterpolator : CustomInterpolator, IDerivableInterpo
     /// <inheritdoc />
     public double GetIntegral(double t1, double t2)
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon)
-        {
-            return linearDegenerate.GetIntegral(t1, t2);
-        }
+        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetIntegral(t1, t2);
 
         double p = MathHelper.Clamp(P, -1, 1);
         return Primitive(t2, p) - Primitive(t1, p);
+    }
+
+    private double Function(double t)
+    {
+        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+
+        double p = MathHelper.Clamp(P, -1, 1);
+        double b = 2 * Math.Acos(1 / (Math.Sqrt(2) * Math.Abs(p) - Math.Abs(p) + 1));
+        return p < 0 ? 1 - F(1 - t, b) : F(t, b);
+    }
+
+    private static double F(double t, double k)
+    {
+        return Math.Sin(t * k) / Math.Sin(k);
+    }
+
+    private static double Derivative(double t, double k)
+    {
+        return -(2 * k * Math.Sin(k) * Math.Cos(k * t)) / (Math.Cos(2 * k) - 1);
+    }
+
+    private static double Primitive(double t, double p)
+    {
+        double b = 2 * Math.Acos(1 / (Math.Sqrt(2) * Math.Abs(p) - Math.Abs(p) + 1));
+        return p > 0
+            ? -(MathHelper.Cosec(b) * (Math.Cos(b * t) - 1)) / b
+            : MathHelper.Cosec(b) * (Math.Cos(b) - Math.Cos(b - b * t)) / b + t;
     }
 }
 
@@ -118,45 +131,9 @@ public sealed class HalfSineInterpolator : CustomInterpolator, IDerivableInterpo
 public sealed class WaveInterpolator : CustomInterpolator, IDerivableInterpolator, IIntegrableInterpolator, IInvertibleInterpolator
 {
     /// <summary>Creates a wave interpolator.</summary>
-    public WaveInterpolator() => InterpolationFunction = Function;
-
-    /// <summary>Evaluates the wave selected by the sign of <see cref="IGraphInterpolator.P"/>.</summary>
-    /// <param name="t">The normalized position.</param>
-    /// <returns>The wave value.</returns>
-    public double Function(double t)
+    public WaveInterpolator()
     {
-        double cycles = Math.Round((1 - Math.Abs(MathHelper.Clamp(P, -1, 1))) * 50) + 0.5;
-        return P < 0 ? TriangleWave(t, 1 / cycles) : SineWave(t * cycles * 2 * Math.PI);
-    }
-
-    private static double SineWave(double t) => (-Math.Cos(t) + 1) / 2;
-    private static double SineWaveDerivative(double t) => Math.Sin(t) / 2;
-    private static double SineWavePrimitive(double t, double c) => t / 2 - Math.Sin(2 * Math.PI * c * t) / (4 * Math.PI * c);
-    private static double TriangleWave(double t, double period)
-    {
-        double mod = t % period;
-        return mod < period / 2 ? 2 * mod / period : 2 - 2 * mod / period;
-    }
-
-    private static double TriangleWaveDerivative(double t, double period) => t % period < period / 2 ? 2 / period : -2 / period;
-
-    private static double TriangleWaveIntegral(double t, double period)
-    {
-        double mod = t % period;
-        double cycles = Math.Floor(t / period);
-        double integral = mod < period / 2
-            ? Math.Pow(mod, 2) / period
-            : 2 * mod - Math.Pow(mod, 2) / period - period / 2;
-        return cycles * period * 0.5 + integral;
-    }
-
-    /// <inheritdoc />
-    public double GetIntegral(double t1, double t2)
-    {
-        double cycles = Math.Round((1 - Math.Abs(MathHelper.Clamp(P, -1, 1))) * 50) + 0.5;
-        return P < 0
-            ? TriangleWaveIntegral(t2, 1 / cycles) - TriangleWaveIntegral(t1, 1 / cycles)
-            : SineWavePrimitive(t2, cycles) - SineWavePrimitive(t1, cycles);
+        InterpolationFunction = Function;
     }
 
     /// <inheritdoc />
@@ -169,10 +146,64 @@ public sealed class WaveInterpolator : CustomInterpolator, IDerivableInterpolato
     }
 
     /// <inheritdoc />
+    public double GetIntegral(double t1, double t2)
+    {
+        double cycles = Math.Round((1 - Math.Abs(MathHelper.Clamp(P, -1, 1))) * 50) + 0.5;
+        return P < 0
+            ? TriangleWaveIntegral(t2, 1 / cycles) - TriangleWaveIntegral(t1, 1 / cycles)
+            : SineWavePrimitive(t2, cycles) - SineWavePrimitive(t1, cycles);
+    }
+
+    /// <inheritdoc />
     public IEnumerable<double> GetInverse(double y)
     {
         double cycles = Math.Round((1 - Math.Abs(MathHelper.Clamp(P, -1, 1))) * 50) + 0.5;
         return P < 0 ? TriangleWaveInverse(y, 1 / cycles) : SineWaveInverse(y, 1 / cycles);
+    }
+
+    /// <summary>Evaluates the wave selected by the sign of <see cref="IGraphInterpolator.P" />.</summary>
+    /// <param name="t">The normalized position.</param>
+    /// <returns>The wave value.</returns>
+    public double Function(double t)
+    {
+        double cycles = Math.Round((1 - Math.Abs(MathHelper.Clamp(P, -1, 1))) * 50) + 0.5;
+        return P < 0 ? TriangleWave(t, 1 / cycles) : SineWave(t * cycles * 2 * Math.PI);
+    }
+
+    private static double SineWave(double t)
+    {
+        return (-Math.Cos(t) + 1) / 2;
+    }
+
+    private static double SineWaveDerivative(double t)
+    {
+        return Math.Sin(t) / 2;
+    }
+
+    private static double SineWavePrimitive(double t, double c)
+    {
+        return t / 2 - Math.Sin(2 * Math.PI * c * t) / (4 * Math.PI * c);
+    }
+
+    private static double TriangleWave(double t, double period)
+    {
+        double mod = t % period;
+        return mod < period / 2 ? 2 * mod / period : 2 - 2 * mod / period;
+    }
+
+    private static double TriangleWaveDerivative(double t, double period)
+    {
+        return t % period < period / 2 ? 2 / period : -2 / period;
+    }
+
+    private static double TriangleWaveIntegral(double t, double period)
+    {
+        double mod = t % period;
+        double cycles = Math.Floor(t / period);
+        double integral = mod < period / 2
+            ? Math.Pow(mod, 2) / period
+            : 2 * mod - Math.Pow(mod, 2) / period - period / 2;
+        return cycles * period * 0.5 + integral;
     }
 
     private static IEnumerable<double> SineWaveInverse(double y, double period)
@@ -181,7 +212,7 @@ public sealed class WaveInterpolator : CustomInterpolator, IDerivableInterpolato
         double x2 = period * Math.Acos(2 * y - 1) / (2 * Math.PI) + period / 2;
         yield return x1;
         yield return x2;
-        for (var i = 0; i < 1000; i++)
+        for (int i = 0; i < 1000; i++)
         {
             x1 += period;
             if (x1 > 1) yield break;
@@ -198,7 +229,7 @@ public sealed class WaveInterpolator : CustomInterpolator, IDerivableInterpolato
         double x2 = period * (2 - y) / 2;
         yield return x1;
         yield return x2;
-        for (var i = 0; i < 1000; i++)
+        for (int i = 0; i < 1000; i++)
         {
             x1 += period;
             if (x1 > 1) yield break;
@@ -218,16 +249,9 @@ public sealed class SingleCurveInterpolator : CustomInterpolator, IDerivableInte
     private readonly LinearInterpolator linearDegenerate = new();
 
     /// <summary>Creates a single-curve interpolator.</summary>
-    public SingleCurveInterpolator() => InterpolationFunction = Function;
-
-    /// <summary>Evaluates the curve.</summary>
-    /// <param name="t">The normalized position.</param>
-    /// <returns>The normalized value.</returns>
-    public double Function(double t)
+    public SingleCurveInterpolator()
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
-        double p = -MathHelper.Clamp(P, -1, 1) * 10;
-        return (Math.Exp(p * t) - 1) / (Math.Exp(p) - 1);
+        InterpolationFunction = Function;
     }
 
     /// <inheritdoc />
@@ -246,7 +270,20 @@ public sealed class SingleCurveInterpolator : CustomInterpolator, IDerivableInte
         return Primitive(t2, p) - Primitive(t1, p);
     }
 
-    private static double Primitive(double t, double p) => (Math.Exp(p * t) / p - t) / (Math.Exp(p) - 1);
+    /// <summary>Evaluates the curve.</summary>
+    /// <param name="t">The normalized position.</param>
+    /// <returns>The normalized value.</returns>
+    public double Function(double t)
+    {
+        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+        double p = -MathHelper.Clamp(P, -1, 1) * 10;
+        return (Math.Exp(p * t) - 1) / (Math.Exp(p) - 1);
+    }
+
+    private static double Primitive(double t, double p)
+    {
+        return (Math.Exp(p * t) / p - t) / (Math.Exp(p) - 1);
+    }
 }
 
 /// <summary>Provides a base-two exponential single-curve interpolation.</summary>
@@ -257,16 +294,9 @@ public sealed class SingleCurveInterpolator2 : CustomInterpolator, IDerivableInt
     private readonly LinearInterpolator linearDegenerate = new();
 
     /// <summary>Creates a second single-curve interpolator.</summary>
-    public SingleCurveInterpolator2() => InterpolationFunction = Function;
-
-    /// <summary>Evaluates the curve.</summary>
-    /// <param name="t">The normalized position.</param>
-    /// <returns>The normalized value.</returns>
-    public double Function(double t)
+    public SingleCurveInterpolator2()
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
-        double p = -MathHelper.Clamp(P, -1, 1) * 10;
-        return (Math.Pow(2, p * t) - 1) / (Math.Pow(2, p) - 1);
+        InterpolationFunction = Function;
     }
 
     /// <inheritdoc />
@@ -285,7 +315,20 @@ public sealed class SingleCurveInterpolator2 : CustomInterpolator, IDerivableInt
         return Primitive(t2, p) - Primitive(t1, p);
     }
 
-    private static double Primitive(double t, double p) => (Math.Pow(2, p * t) / (p * Math.Log(2)) - t) / (Math.Pow(2, p) - 1);
+    /// <summary>Evaluates the curve.</summary>
+    /// <param name="t">The normalized position.</param>
+    /// <returns>The normalized value.</returns>
+    public double Function(double t)
+    {
+        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+        double p = -MathHelper.Clamp(P, -1, 1) * 10;
+        return (Math.Pow(2, p * t) - 1) / (Math.Pow(2, p) - 1);
+    }
+
+    private static double Primitive(double t, double p)
+    {
+        return (Math.Pow(2, p * t) / (p * Math.Log(2)) - t) / (Math.Pow(2, p) - 1);
+    }
 }
 
 /// <summary>Provides a rational single-curve interpolation.</summary>
@@ -296,16 +339,9 @@ public sealed class SingleCurveInterpolator3 : CustomInterpolator, IDerivableInt
     private readonly LinearInterpolator linearDegenerate = new();
 
     /// <summary>Creates a third single-curve interpolator.</summary>
-    public SingleCurveInterpolator3() => InterpolationFunction = Function;
-
-    /// <summary>Evaluates the curve.</summary>
-    /// <param name="t">The normalized position.</param>
-    /// <returns>The normalized value.</returns>
-    public double Function(double t)
+    public SingleCurveInterpolator3()
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
-        double p = MathHelper.Clamp(P, -1, 1) * 7;
-        return Math.Exp(p) * t / ((Math.Exp(p) - 1) * t + 1);
+        InterpolationFunction = Function;
     }
 
     /// <inheritdoc />
@@ -324,7 +360,20 @@ public sealed class SingleCurveInterpolator3 : CustomInterpolator, IDerivableInt
         return Primitive(t2, p) - Primitive(t1, p);
     }
 
-    private static double Primitive(double t, double p) => (Math.Exp(p * t) / p - t) / (Math.Exp(p) - 1);
+    /// <summary>Evaluates the curve.</summary>
+    /// <param name="t">The normalized position.</param>
+    /// <returns>The normalized value.</returns>
+    public double Function(double t)
+    {
+        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+        double p = MathHelper.Clamp(P, -1, 1) * 7;
+        return Math.Exp(p) * t / ((Math.Exp(p) - 1) * t + 1);
+    }
+
+    private static double Primitive(double t, double p)
+    {
+        return (Math.Exp(p * t) / p - t) / (Math.Exp(p) - 1);
+    }
 }
 
 /// <summary>Provides two opposing exponential curves joined at the midpoint.</summary>
@@ -336,24 +385,10 @@ public sealed class DoubleCurveInterpolator : CustomInterpolator, IDerivableInte
     private readonly LinearInterpolator linearDegenerate = new();
 
     /// <summary>Creates a double-curve interpolator.</summary>
-    public DoubleCurveInterpolator() => InterpolationFunction = Function;
-
-    /// <summary>Evaluates the curve.</summary>
-    /// <param name="t">The normalized position.</param>
-    /// <returns>The normalized value.</returns>
-    public double Function(double t)
+    public DoubleCurveInterpolator()
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
-        double p = -MathHelper.Clamp(P, -1, 1) * 10;
-        return t < 0.5 ? 0.5 * F(t * 2, p) : 0.5 + 0.5 * F(t * 2 - 1, -p);
+        InterpolationFunction = Function;
     }
-
-    private static double F(double t, double p) => (Math.Exp(p * t) - 1) / (Math.Exp(p) - 1);
-    private static double Derivative(double t, double p) => Math.Exp(p * t) * p / (Math.Exp(p) - 1);
-    private static double Primitive(double t, double p) => t < 0.5
-        ? (2 * p * t - Math.Exp(2 * p * t)) / (4 * p - 4 * Math.Exp(p) * p)
-        : (2 * p * ((2 * Math.Exp(p) - 1) * t - Math.Exp(p)) + Math.Exp(p * (2 - 2 * t))) /
-          (4 * (Math.Exp(p) - 1) * p);
 
     /// <inheritdoc />
     public double GetDerivative(double t)
@@ -369,6 +404,33 @@ public sealed class DoubleCurveInterpolator : CustomInterpolator, IDerivableInte
         if (Math.Abs(P) < Precision.DoubleEpsilon) return 0.5 * (t2 * t2 - t1 * t1);
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return Primitive(t2, p) - Primitive(t1, p);
+    }
+
+    /// <summary>Evaluates the curve.</summary>
+    /// <param name="t">The normalized position.</param>
+    /// <returns>The normalized value.</returns>
+    public double Function(double t)
+    {
+        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+        double p = -MathHelper.Clamp(P, -1, 1) * 10;
+        return t < 0.5 ? 0.5 * F(t * 2, p) : 0.5 + 0.5 * F(t * 2 - 1, -p);
+    }
+
+    private static double F(double t, double p)
+    {
+        return (Math.Exp(p * t) - 1) / (Math.Exp(p) - 1);
+    }
+
+    private static double Derivative(double t, double p)
+    {
+        return Math.Exp(p * t) * p / (Math.Exp(p) - 1);
+    }
+
+    private static double Primitive(double t, double p)
+    {
+        return t < 0.5
+            ? (2 * p * t - Math.Exp(2 * p * t)) / (4 * p - 4 * Math.Exp(p) * p)
+            : (2 * p * ((2 * Math.Exp(p) - 1) * t - Math.Exp(p)) + Math.Exp(p * (2 - 2 * t))) / (4 * (Math.Exp(p) - 1) * p);
     }
 }
 
@@ -381,24 +443,10 @@ public sealed class DoubleCurveInterpolator2 : CustomInterpolator, IDerivableInt
     private readonly LinearInterpolator linearDegenerate = new();
 
     /// <summary>Creates a second double-curve interpolator.</summary>
-    public DoubleCurveInterpolator2() => InterpolationFunction = Function;
-
-    /// <summary>Evaluates the curve.</summary>
-    /// <param name="t">The normalized position.</param>
-    /// <returns>The normalized value.</returns>
-    public double Function(double t)
+    public DoubleCurveInterpolator2()
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
-        double p = -MathHelper.Clamp(P, -1, 1) * 10;
-        return t < 0.5 ? 0.5 * F(t * 2, p) : 0.5 + 0.5 * F(t * 2 - 1, -p);
+        InterpolationFunction = Function;
     }
-
-    private static double F(double t, double p) => (Math.Pow(2, p * t) - 1) / (Math.Pow(2, p) - 1);
-    private static double Derivative(double t, double p) => p * Math.Log(2) * Math.Pow(2, p * t) / (Math.Pow(2, p) - 1);
-    private static double Primitive(double t, double p) => t < 0.5
-        ? (Math.Pow(4, p * t) / (p * Math.Log(4)) - t) / (2 * (Math.Pow(2, p) - 1))
-        : ((Math.Pow(2, p + 2) - 2) * t + Math.Pow(2, p) * (Math.Pow(2, p - 2 * p * t) - p * Math.Log(4)) /
-          (p * Math.Log(2))) / (4 * (Math.Pow(2, p) - 1));
 
     /// <inheritdoc />
     public double GetDerivative(double t)
@@ -414,6 +462,33 @@ public sealed class DoubleCurveInterpolator2 : CustomInterpolator, IDerivableInt
         if (Math.Abs(P) < Precision.DoubleEpsilon) return 0.5 * (t2 * t2 - t1 * t1);
         double p = -MathHelper.Clamp(P, -1, 1) * 10;
         return Primitive(t2, p) - Primitive(t1, p);
+    }
+
+    /// <summary>Evaluates the curve.</summary>
+    /// <param name="t">The normalized position.</param>
+    /// <returns>The normalized value.</returns>
+    public double Function(double t)
+    {
+        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+        double p = -MathHelper.Clamp(P, -1, 1) * 10;
+        return t < 0.5 ? 0.5 * F(t * 2, p) : 0.5 + 0.5 * F(t * 2 - 1, -p);
+    }
+
+    private static double F(double t, double p)
+    {
+        return (Math.Pow(2, p * t) - 1) / (Math.Pow(2, p) - 1);
+    }
+
+    private static double Derivative(double t, double p)
+    {
+        return p * Math.Log(2) * Math.Pow(2, p * t) / (Math.Pow(2, p) - 1);
+    }
+
+    private static double Primitive(double t, double p)
+    {
+        return t < 0.5
+            ? (Math.Pow(4, p * t) / (p * Math.Log(4)) - t) / (2 * (Math.Pow(2, p) - 1))
+            : ((Math.Pow(2, p + 2) - 2) * t + Math.Pow(2, p) * (Math.Pow(2, p - 2 * p * t) - p * Math.Log(4)) / (p * Math.Log(2))) / (4 * (Math.Pow(2, p) - 1));
     }
 }
 
@@ -426,27 +501,10 @@ public sealed class DoubleCurveInterpolator3 : CustomInterpolator, IDerivableInt
     private readonly LinearInterpolator linearDegenerate = new();
 
     /// <summary>Creates a third double-curve interpolator.</summary>
-    public DoubleCurveInterpolator3() => InterpolationFunction = Function;
-
-    /// <summary>Evaluates the curve.</summary>
-    /// <param name="t">The normalized position.</param>
-    /// <returns>The normalized value.</returns>
-    public double Function(double t)
+    public DoubleCurveInterpolator3()
     {
-        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
-        double p = MathHelper.Clamp(P, -1, 1) * 7;
-        return t < 0.5 ? 0.5 * F(t * 2, p) : 0.5 + 0.5 * F(t * 2 - 1, -p);
+        InterpolationFunction = Function;
     }
-
-    private static double F(double t, double p) => Math.Exp(p) * t / ((Math.Exp(p) - 1) * t + 1);
-    private static double Derivative(double t, double p) => Math.Exp(p) / Math.Pow(t * (Math.Exp(p) - 1) + 1, 2);
-    private static double Primitive(double t, double p) => t < 0.5
-        ? -(Math.Exp(p) * (Math.Log(2 * t * (Math.Exp(p) - 1) + 1) - 2 * t * (Math.Exp(p) - 1))) /
-          (4 * Math.Pow(Math.Exp(p) - 1, 2))
-        : (2 * t * (Math.Exp(p) - 2) * (Math.Exp(p) - 1) -
-           Math.Exp(p) * (Math.Log(-Math.Exp(-p) * (2 * t * Math.Exp(p) - 2 * Math.Exp(p) - 2 * t + 1)) -
-                           Math.Exp(p) - 2) - Math.Exp(2 * p) - Math.Exp(p) * Math.Log(Math.Exp(p)) - 2) /
-          (4 * Math.Pow(Math.Exp(p) - 1, 2));
 
     /// <inheritdoc />
     public double GetDerivative(double t)
@@ -462,5 +520,37 @@ public sealed class DoubleCurveInterpolator3 : CustomInterpolator, IDerivableInt
         if (Math.Abs(P) < Precision.DoubleEpsilon) return 0.5 * (t2 * t2 - t1 * t1);
         double p = MathHelper.Clamp(P, -1, 1) * 7;
         return Primitive(t2, p) - Primitive(t1, p);
+    }
+
+    /// <summary>Evaluates the curve.</summary>
+    /// <param name="t">The normalized position.</param>
+    /// <returns>The normalized value.</returns>
+    public double Function(double t)
+    {
+        if (Math.Abs(P) < Precision.DoubleEpsilon) return linearDegenerate.GetInterpolation(t);
+        double p = MathHelper.Clamp(P, -1, 1) * 7;
+        return t < 0.5 ? 0.5 * F(t * 2, p) : 0.5 + 0.5 * F(t * 2 - 1, -p);
+    }
+
+    private static double F(double t, double p)
+    {
+        return Math.Exp(p) * t / ((Math.Exp(p) - 1) * t + 1);
+    }
+
+    private static double Derivative(double t, double p)
+    {
+        return Math.Exp(p) / Math.Pow(t * (Math.Exp(p) - 1) + 1, 2);
+    }
+
+    private static double Primitive(double t, double p)
+    {
+        return t < 0.5
+            ? -(Math.Exp(p) * (Math.Log(2 * t * (Math.Exp(p) - 1) + 1) - 2 * t * (Math.Exp(p) - 1))) / (4 * Math.Pow(Math.Exp(p) - 1, 2))
+            : (2 * t * (Math.Exp(p) - 2) * (Math.Exp(p) - 1)
+               - Math.Exp(p) * (Math.Log(-Math.Exp(-p) * (2 * t * Math.Exp(p) - 2 * Math.Exp(p) - 2 * t + 1)) - Math.Exp(p) - 2)
+               - Math.Exp(2 * p)
+               - Math.Exp(p) * Math.Log(Math.Exp(p))
+               - 2)
+              / (4 * Math.Pow(Math.Exp(p) - 1, 2));
     }
 }

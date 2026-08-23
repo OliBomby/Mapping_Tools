@@ -21,7 +21,7 @@ public sealed class BeatmapWorkspaceViewModelTests
             "today"));
 
         // Act
-        using BeatmapWorkspaceViewModel viewModel = CreateViewModel(workspace);
+        using var viewModel = CreateViewModel(workspace);
 
         // Assert
         workspace.LastSelectionSource.Should().Be(BeatmapSelectionSource.Startup);
@@ -36,7 +36,7 @@ public sealed class BeatmapWorkspaceViewModelTests
     {
         // Arrange
         TestBeatmapWorkspace workspace = new();
-        using BeatmapWorkspaceViewModel viewModel = CreateViewModel(workspace);
+        using var viewModel = CreateViewModel(workspace);
 
         // Act
         viewModel.SetDroppedPaths([@"C:\one.osu", @"C:\two.osu"]);
@@ -58,7 +58,7 @@ public sealed class BeatmapWorkspaceViewModelTests
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
         notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
-        using BeatmapWorkspaceViewModel viewModel = CreateViewModel(
+        using var viewModel = CreateViewModel(
             workspace,
             backups,
             notifications: notifications);
@@ -72,8 +72,7 @@ public sealed class BeatmapWorkspaceViewModelTests
         backups.CreateRequests[0].Reason.Should().Be(BeatmapBackupReason.User);
         backups.CreateRequests[0].Force.Should().BeTrue();
         published.Should().ContainSingle(notification =>
-            notification.Severity == UserNotificationSeverity.Success &&
-            notification.Title == "Backup created");
+            notification.Severity == UserNotificationSeverity.Success && notification.Title == "Backup created");
     }
 
     [TestMethod]
@@ -84,14 +83,14 @@ public sealed class BeatmapWorkspaceViewModelTests
         workspace.SetSelection([@"C:\current.osu"]);
         TestBeatmapBackupService backups = new()
         {
-            RejectFirstRestoreAsIncompatible = true
+            RejectFirstRestoreAsIncompatible = true,
         };
         TestFilePicker picker = new()
         {
-            OpenFiles = [@"C:\Backups\chosen.osu"]
+            OpenFiles = [@"C:\Backups\chosen.osu"],
         };
         TestDialogService dialogs = new() { BooleanResult = true };
-        using BeatmapWorkspaceViewModel viewModel = CreateViewModel(
+        using var viewModel = CreateViewModel(
             workspace,
             backups,
             picker,
@@ -106,8 +105,7 @@ public sealed class BeatmapWorkspaceViewModelTests
         backups.RestoreRequests.Select(request => request.AllowDifferentFilename)
             .Should().Equal(false, true);
         backups.RestoreRequests.Should().OnlyContain(request =>
-            request.Backup == @"C:\Backups\chosen.osu" &&
-            request.Destination == @"C:\current.osu");
+            request.Backup == @"C:\Backups\chosen.osu" && request.Destination == @"C:\current.osu");
     }
 
     [TestMethod]
@@ -118,7 +116,7 @@ public sealed class BeatmapWorkspaceViewModelTests
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
         notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
-        using BeatmapWorkspaceViewModel viewModel = CreateViewModel(
+        using var viewModel = CreateViewModel(
             workspace,
             notifications: notifications);
 
@@ -140,7 +138,7 @@ public sealed class BeatmapWorkspaceViewModelTests
     {
         ApplicationSettings settings = new()
         {
-            BackupsPath = @"C:\Backups"
+            BackupsPath = @"C:\Backups",
         };
         return new BeatmapWorkspaceViewModel(
             workspace,

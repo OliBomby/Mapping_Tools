@@ -9,7 +9,7 @@ public static class SliderInvisiblator
     public static int Snaptol => 96;
 
     /// <summary>
-    /// Generates control points that reproduce one rounded sliderball position per millisecond.
+    ///     Generates control points that reproduce one rounded sliderball position per millisecond.
     /// </summary>
     /// <param name="duration">The slider duration in milliseconds.</param>
     /// <param name="sliderballPositions">The desired position at each millisecond.</param>
@@ -24,26 +24,20 @@ public static class SliderInvisiblator
     {
         ArgumentNullException.ThrowIfNull(sliderballPositions);
         if (duration < 1 || sliderballPositions.Length < duration + 1)
-        {
             throw new ArgumentException(
                 "Invisible slider output requires one sliderball position per millisecond.",
                 nameof(sliderballPositions));
-        }
 
         // Before rounding sbPositions, calculate starting coordinate for each ms' final segment to make the sliderball rotate appropriately
-        Vector2[] finalSegmentStarts = new Vector2[duration + 1];
+        var finalSegmentStarts = new Vector2[duration + 1];
         double savedAngle = 0;
         // We don't care about msLastSegStart[0] so we'll leave it at 0. Technically we could save one Vector2's worth of space here but it would make indexing harder to read than necessary.
         // Find the first angle - we can't calculate the angle between points that are the same, but the sliderball's rotation should be the same as it was before.
         for (int index = 1; index <= duration; index++)
-        {
             if (sliderballPositions[0] != sliderballPositions[index])
-            {
                 savedAngle = Math.Atan2(
                     sliderballPositions[index - 1].Y - sliderballPositions[index].Y,
                     sliderballPositions[index - 1].X - sliderballPositions[index].X);
-            }
-        }
 
         for (int index = 1; index <= duration; index++)
         {
@@ -62,19 +56,19 @@ public static class SliderInvisiblator
         for (int index = 0; index < sliderballPositions.Length; index++)
         {
             sliderballPositions[index].Round();
-            sliderballPositions[index] = new(
+            sliderballPositions[index] = new Vector2(
                 (float)sliderballPositions[index].X,
                 (float)sliderballPositions[index].Y);
         }
 
-        Vector2[] controlPoints = new Vector2[8 + 4 * (duration - 1)];
+        var controlPoints = new Vector2[8 + 4 * (duration - 1)];
         Vector2 maxXY = new(768, 412);
         List<Vector2> currentPath = [];
         // First ms travel adds SNAPTOL
         currentPath.Add(sliderballPositions[0]);
-        currentPath.Add(new(67141632 + maxXY.X, sliderballPositions[0].Y));
-        currentPath.Add(new(67141632 + maxXY.X, 33587200 - Snaptol / 6f + maxXY.Y));
-        currentPath.Add(new(67141632 + maxXY.X, finalSegmentStarts[1].Y));
+        currentPath.Add(new Vector2(67141632 + maxXY.X, sliderballPositions[0].Y));
+        currentPath.Add(new Vector2(67141632 + maxXY.X, 33587200 - Snaptol / 6f + maxXY.Y));
+        currentPath.Add(new Vector2(67141632 + maxXY.X, finalSegmentStarts[1].Y));
         currentPath.Add(finalSegmentStarts[1]);
         currentPath.Add(sliderballPositions[1]);
 
@@ -94,19 +88,19 @@ public static class SliderInvisiblator
             // The first point on this path is the last point of the previous path
             currentPath.Add(sliderballPositions[index - 1]);
             // verticalTravel tells us how far down we need to go before going over and back up
-            double verticalTravel = correction + frameDistance -
-                                    (Math.Abs(sliderballPositions[index - 1].X - finalSegmentStarts[index].X) +
-                                     sliderballPositions[index - 1].Y - finalSegmentStarts[index].Y +
-                                     Snaptol);
-            currentPath.Add(new(
+            double verticalTravel = correction
+                                    + frameDistance
+                                    - (Math.Abs(sliderballPositions[index - 1].X - finalSegmentStarts[index].X)
+                                        + sliderballPositions[index - 1].Y
+                                        - finalSegmentStarts[index].Y
+                                        + Snaptol);
+            currentPath.Add(new Vector2(
                 sliderballPositions[index - 1].X,
                 (float)(sliderballPositions[index - 1].Y + verticalTravel / 2)));
             if (sliderballPositions[index - 1].X != finalSegmentStarts[index].X)
-            {
-                currentPath.Add(new(
+                currentPath.Add(new Vector2(
                     finalSegmentStarts[index].X,
                     (float)(sliderballPositions[index - 1].Y + verticalTravel / 2)));
-            }
 
             currentPath.Add(finalSegmentStarts[index]);
             currentPath.Add(sliderballPositions[index]);
@@ -118,10 +112,10 @@ public static class SliderInvisiblator
             controlPointIndex += currentPath.Count - 1;
         }
 
-        Vector2[] output = new Vector2[controlPointIndex + 2];
+        var output = new Vector2[controlPointIndex + 2];
         Array.Copy(controlPoints, output, controlPointIndex);
         // Add extra segment of length 0 to end for sliderend snapping abuse
-        Vector2 lastPoint = sliderballPositions[duration];
+        var lastPoint = sliderballPositions[duration];
         output[controlPointIndex] = lastPoint;
         output[controlPointIndex + 1] = lastPoint;
         return (output, frameDistance);
@@ -132,8 +126,8 @@ public static class SliderInvisiblator
         double length = 0;
         for (int index = 1; index < controlPoints.Count; index++)
         {
-            Vector2 previous = controlPoints[index - 1];
-            Vector2 current = controlPoints[index];
+            var previous = controlPoints[index - 1];
+            var current = controlPoints[index];
             float x = (float)Math.Round(previous.X) - (float)Math.Round(current.X);
             float y = (float)Math.Round(previous.Y) - (float)Math.Round(current.Y);
             length += (float)Math.Sqrt(x * x + y * y);

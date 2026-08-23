@@ -38,7 +38,13 @@ public partial class GraphEditorWindow : Window
     /// <summary>Gets the graph control hosted by this dialog.</summary>
     public GraphControl GraphControl => GraphControlElement;
 
-    private void OnAccepted(object? sender, EventArgs eventArgs) => Close(true);
+    private void OnAccepted(object? sender, EventArgs eventArgs)
+    {
+        Close(true);
+    }
 
-    private void OnCanceled(object? sender, EventArgs eventArgs) => Close(false);
+    private void OnCanceled(object? sender, EventArgs eventArgs)
+    {
+        Close(false);
+    }
 }

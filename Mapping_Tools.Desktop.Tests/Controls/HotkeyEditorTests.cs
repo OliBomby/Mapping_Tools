@@ -58,7 +58,7 @@ public sealed class HotkeyEditorTests
         // Arrange
         HotkeyEditor editor = new()
         {
-            Hotkey = new HotkeySettings(56, 2)
+            Hotkey = new HotkeySettings(56, 2),
         };
 
         // Act

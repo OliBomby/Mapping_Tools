@@ -6,12 +6,12 @@ using Mapping_Tools.Core.Classes.ToolHelpers.Sliders;
 namespace Mapping_Tools.Core.Tools.SliderMerger;
 
 /// <summary>
-/// Merges selected circles and sliders into one Bézier-compatible slider path.
+///     Merges selected circles and sliders into one Bézier-compatible slider path.
 /// </summary>
 public static class SliderMergerEngine
 {
     /// <summary>
-    /// Merges adjacent supported objects in their supplied order.
+    ///     Merges adjacent supported objects in their supplied order.
     /// </summary>
     /// <param name="beatmap">The mutable beatmap whose hit-object list is changed.</param>
     /// <param name="markedObjects">The selected, bookmarked, time-filtered, or complete object sequence.</param>
@@ -32,7 +32,7 @@ public static class SliderMergerEngine
         ArgumentNullException.ThrowIfNull(options);
         Validate(options);
 
-        List<HitObject> objects = markedObjects.ToList();
+        var objects = markedObjects.ToList();
         int mergedObjects = 0;
         bool mergedWithPrevious = false;
 
@@ -41,41 +41,36 @@ public static class SliderMergerEngine
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report(objects.Count == 0 ? 100 : (double)index / objects.Count * 100);
 
-            HitObject first = objects[index];
-            HitObject second = objects[index + 1];
-            Vector2 firstConnection = first.IsSlider
+            var first = objects[index];
+            var second = objects[index + 1];
+            var firstConnection = first.IsSlider
                 ? options.MergeOnSliderEnd
                     ? first.GetSliderPath().PositionAt(1)
                     : first.CurvePoints.Last()
                 : first.Pos;
             double distance = Vector2.Distance(firstConnection, second.Pos);
 
-            if (distance > options.Leniency ||
-                !(first.IsSlider || first.IsCircle) ||
-                !(second.IsSlider || second.IsCircle))
+            if (distance > options.Leniency || !(first.IsSlider || first.IsCircle) || !(second.IsSlider || second.IsCircle))
             {
                 mergedWithPrevious = false;
                 continue;
             }
 
-            HitObject survivor = (first.IsSlider, second.IsSlider) switch
+            var survivor = (first.IsSlider, second.IsSlider) switch
             {
                 (true, true) => MergeSliders(first, second, options),
                 (true, false) => MergeSliderAndCircle(first, second, options),
                 (false, true) => MergeCircleAndSlider(first, second, options),
-                _ => MergeCircles(first, second, options)
+                _ => MergeCircles(first, second, options),
             };
 
-            HitObject removed = ReferenceEquals(survivor, first) ? second : first;
+            var removed = ReferenceEquals(survivor, first) ? second : first;
             beatmap.HitObjects.Remove(removed);
             objects.Remove(removed);
             index--;
 
             mergedObjects++;
-            if (!mergedWithPrevious)
-            {
-                mergedObjects++;
-            }
+            if (!mergedWithPrevious) mergedObjects++;
 
             mergedWithPrevious = true;
 
@@ -93,20 +88,16 @@ public static class SliderMergerEngine
     }
 
     /// <summary>
-    /// Determines whether a Bézier control polygon encodes only straight segments.
+    ///     Determines whether a Bézier control polygon encodes only straight segments.
     /// </summary>
     /// <param name="points">The complete Bézier control polygon.</param>
-    /// <returns><see langword="true"/> when every interior point is a duplicated segment endpoint.</returns>
+    /// <returns><see langword="true" /> when every interior point is a duplicated segment endpoint.</returns>
     public static bool IsLinearBezier(IReadOnlyList<Vector2> points)
     {
         // Every point at not the endpoints must have an anchor before or after it at the same position
         for (int index = 1; index < points.Count - 1; index++)
-        {
             if (points[index] != points[index - 1] && points[index] != points[index + 1])
-            {
                 return false;
-            }
-        }
 
         return true;
     }
@@ -116,10 +107,7 @@ public static class SliderMergerEngine
     /// <param name="delta">The translation in osu! playfield pixels.</param>
     public static void Move(IList<Vector2> points, Vector2 delta)
     {
-        for (int index = 0; index < points.Count; index++)
-        {
-            points[index] += delta;
-        }
+        for (int index = 0; index < points.Count; index++) points[index] += delta;
     }
 
     private static HitObject MergeSliders(
@@ -135,13 +123,13 @@ public static class SliderMergerEngine
                 first.GetAllCurvePoints(),
                 first.SliderType,
                 first.PixelLength,
-                out PathType pathType));
+                out var pathType));
             first.SliderType = pathType;
         }
 
-        List<Vector2> firstPath = BezierConverter.ConvertToBezierAnchors(
+        var firstPath = BezierConverter.ConvertToBezierAnchors(
             first.GetAllCurvePoints(), first.SliderType);
-        List<Vector2> secondPath = BezierConverter.ConvertToBezierAnchors(
+        var secondPath = BezierConverter.ConvertToBezierAnchors(
             second.GetAllCurvePoints(), second.SliderType);
         double extraLength = 0;
 
@@ -162,16 +150,10 @@ public static class SliderMergerEngine
                 throw new ArgumentException("Unexpected slider connection mode.", nameof(options));
         }
 
-        List<Vector2> mergedPath = firstPath.Concat(secondPath).ToList();
+        var mergedPath = firstPath.Concat(secondPath).ToList();
         mergedPath.Round();
-        bool linear = options.ConnectionModeSetting != SliderMergerConnectionMode.Bezier &&
-                      options.LinearOnLinear &&
-                      IsLinearBezier(firstPath) &&
-                      IsLinearBezier(secondPath);
-        if (linear)
-        {
-            RemoveDuplicateAnchors(mergedPath);
-        }
+        bool linear = options.ConnectionModeSetting != SliderMergerConnectionMode.Bezier && options.LinearOnLinear && IsLinearBezier(firstPath) && IsLinearBezier(secondPath);
+        if (linear) RemoveDuplicateAnchors(mergedPath);
 
         first.SetAllCurvePoints(mergedPath);
         first.SliderType = linear ? PathType.Linear : PathType.Bezier;
@@ -185,17 +167,14 @@ public static class SliderMergerEngine
         HitObject second,
         SliderMergerOptions options)
     {
-        List<Vector2> path = BezierConverter.ConvertToBezierAnchors(
+        var path = BezierConverter.ConvertToBezierAnchors(
             first.GetAllCurvePoints(), first.SliderType);
         path.Add(path.Last());
         path.Add(second.Pos);
         double extraLength = (first.CurvePoints.Last() - second.Pos).Length;
         path.Round();
         bool linear = options.LinearOnLinear && IsLinearBezier(path);
-        if (linear)
-        {
-            RemoveDuplicateAnchors(path);
-        }
+        if (linear) RemoveDuplicateAnchors(path);
 
         first.SetAllCurvePoints(path);
         first.SliderType = linear ? PathType.Linear : PathType.Bezier;
@@ -209,17 +188,14 @@ public static class SliderMergerEngine
         HitObject second,
         SliderMergerOptions options)
     {
-        List<Vector2> path = BezierConverter.ConvertToBezierAnchors(
+        var path = BezierConverter.ConvertToBezierAnchors(
             second.GetAllCurvePoints(), second.SliderType);
         path.Insert(0, path.First());
         path.Insert(0, first.Pos);
         double extraLength = (first.Pos - second.Pos).Length;
         path.Round();
         bool linear = options.LinearOnLinear && IsLinearBezier(path);
-        if (linear)
-        {
-            RemoveDuplicateAnchors(path);
-        }
+        if (linear) RemoveDuplicateAnchors(path);
 
         second.SetAllCurvePoints(path);
         second.SliderType = linear ? PathType.Linear : PathType.Bezier;
@@ -257,25 +233,26 @@ public static class SliderMergerEngine
         slider.EdgeAdditionSets = [head.AdditionSet, tail.AdditionSet];
     }
 
-    private static EdgeData GetHeadEdges(HitObject hitObject) => GetEdge(hitObject, 0);
+    private static EdgeData GetHeadEdges(HitObject hitObject)
+    {
+        return GetEdge(hitObject, 0);
+    }
 
-    private static EdgeData GetTailEdges(HitObject hitObject) =>
-        hitObject.IsSlider && hitObject.EdgeHitsounds is { Count: > 0 }
+    private static EdgeData GetTailEdges(HitObject hitObject)
+    {
+        return hitObject.IsSlider && hitObject.EdgeHitsounds is { Count: > 0 }
             ? GetEdge(hitObject, hitObject.EdgeHitsounds.Count - 1)
             : GetEdge(hitObject, 0);
+    }
 
     private static EdgeData GetEdge(HitObject hitObject, int index)
     {
-        if (hitObject.IsSlider &&
-            hitObject.EdgeHitsounds is { Count: > 0 } edgeHitsounds &&
-            index < edgeHitsounds.Count)
+        if (hitObject.IsSlider && hitObject.EdgeHitsounds is { Count: > 0 } edgeHitsounds && index < edgeHitsounds.Count)
         {
-            SampleSet sampleSet = hitObject.EdgeSampleSets is { Count: > 0 } edgeSampleSets &&
-                                  index < edgeSampleSets.Count
+            var sampleSet = hitObject.EdgeSampleSets is { Count: > 0 } edgeSampleSets && index < edgeSampleSets.Count
                 ? edgeSampleSets[index]
                 : SampleSet.None;
-            SampleSet additionSet = hitObject.EdgeAdditionSets is { Count: > 0 } edgeAdditionSets &&
-                                    index < edgeAdditionSets.Count
+            var additionSet = hitObject.EdgeAdditionSets is { Count: > 0 } edgeAdditionSets && index < edgeAdditionSets.Count
                 ? edgeAdditionSets[index]
                 : SampleSet.None;
             return new EdgeData(edgeHitsounds[index], sampleSet, additionSet);
@@ -287,29 +264,22 @@ public static class SliderMergerEngine
     private static void RemoveDuplicateAnchors(List<Vector2> points)
     {
         for (int index = 0; index < points.Count - 1; index++)
-        {
             if (points[index] == points[index + 1])
             {
                 points.RemoveAt(index);
                 index--;
             }
-        }
     }
 
     private static void Validate(SliderMergerOptions options)
     {
-        if (!Enum.IsDefined(options.ImportModeSetting) ||
-            !Enum.IsDefined(options.ConnectionModeSetting))
-        {
+        if (!Enum.IsDefined(options.ImportModeSetting) || !Enum.IsDefined(options.ConnectionModeSetting))
             throw new ArgumentException("Slider Merger contains an unknown mode.", nameof(options));
-        }
 
         if (!double.IsFinite(options.Leniency) || options.Leniency < 0)
-        {
             throw new ArgumentException(
                 "Slider Merger leniency must be a finite non-negative number.",
                 nameof(options));
-        }
     }
 
     private static List<Vector2> MakePenis(List<Vector2> points, double sliderLength)
@@ -319,18 +289,16 @@ public static class SliderMergerEngine
         [
             new(0, 0), new(40, -40), new(0, -70), new(-40, -40), new(0, 0), new(0, 0),
             new(96, 24), new(168, 0), new(168, 0), new(96, -24), new(0, 0), new(0, 0),
-            new(-40, 40), new(0, 70), new(40, 40), new(0, 0)
+            new(-40, 40), new(0, 70), new(40, 40), new(0, 0),
         ];
 
         double sizeMultiplier = sliderLength / 591 * 2; // 591 is the size of the dick
         double normalAngle = -(points.Last() - points.First()).Theta;
-        Matrix2 matrix = Matrix2.CreateRotation(normalAngle);
+        var matrix = Matrix2.CreateRotation(normalAngle);
         matrix *= sizeMultiplier;
         for (int index = 0; index < newPoints.Count; index++)
-        {
             // transform to slider
             newPoints[index] = points.First() + Matrix2.Mult(matrix, newPoints[index]);
-        }
 
         return newPoints;
     }

@@ -6,13 +6,11 @@ namespace Mapping_Tools.Desktop.ViewModels.Adapters;
 /// <summary>Provides Desktop change notification for sample-generation fields.</summary>
 public sealed partial class ObservableSampleGeneratingArgs : ObservableObject
 {
-    private readonly SampleGeneratingArgs model;
-
     /// <summary>Creates an adapter around the supplied sample-generation settings.</summary>
     /// <param name="model">The plain settings edited by this adapter.</param>
     public ObservableSampleGeneratingArgs(SampleGeneratingArgs model)
     {
-        this.model = model ?? throw new ArgumentNullException(nameof(model));
+        this.Model = model ?? throw new ArgumentNullException(nameof(model));
         Path = model.Path;
         Volume = model.Volume;
         Panning = model.Panning;
@@ -26,7 +24,7 @@ public sealed partial class ObservableSampleGeneratingArgs : ObservableObject
     }
 
     /// <summary>Gets the plain settings represented by this adapter.</summary>
-    public SampleGeneratingArgs Model => model;
+    public SampleGeneratingArgs Model { get; }
 
     /// <summary>Gets or sets the source audio or SoundFont path.</summary>
     [ObservableProperty]
@@ -71,27 +69,72 @@ public sealed partial class ObservableSampleGeneratingArgs : ObservableObject
     public partial int Velocity { get; set; }
 
     /// <summary>Gets whether the source is a SoundFont.</summary>
-    public bool UsesSoundFont => model.UsesSoundFont;
+    public bool UsesSoundFont => Model.UsesSoundFont;
 
     /// <summary>Gets whether this configuration supports copy and paste.</summary>
-    public bool CanCopyPaste => model.CanCopyPaste;
+    public bool CanCopyPaste => Model.CanCopyPaste;
 
     /// <summary>Gets the source-file extension.</summary>
     /// <returns>The extension including its leading period, or an empty string.</returns>
-    public string GetExtension() => model.GetExtension();
+    public string GetExtension()
+    {
+        return Model.GetExtension();
+    }
 
     /// <summary>Creates an independent plain snapshot of the settings.</summary>
     /// <returns>A detached sample-generation snapshot.</returns>
-    public SampleGeneratingArgs Snapshot() => model.Copy();
+    public SampleGeneratingArgs Snapshot()
+    {
+        return Model.Copy();
+    }
 
-    partial void OnPathChanged(string value) => model.Path = value;
-    partial void OnVolumeChanged(double value) => model.Volume = value;
-    partial void OnPanningChanged(double value) => model.Panning = value;
-    partial void OnPitchShiftChanged(double value) => model.PitchShift = value;
-    partial void OnBankChanged(int value) => model.Bank = value;
-    partial void OnPatchChanged(int value) => model.Patch = value;
-    partial void OnInstrumentChanged(int value) => model.Instrument = value;
-    partial void OnKeyChanged(int value) => model.Key = value;
-    partial void OnLengthChanged(double value) => model.Length = value;
-    partial void OnVelocityChanged(int value) => model.Velocity = value;
+    partial void OnPathChanged(string value)
+    {
+        Model.Path = value;
+    }
+
+    partial void OnVolumeChanged(double value)
+    {
+        Model.Volume = value;
+    }
+
+    partial void OnPanningChanged(double value)
+    {
+        Model.Panning = value;
+    }
+
+    partial void OnPitchShiftChanged(double value)
+    {
+        Model.PitchShift = value;
+    }
+
+    partial void OnBankChanged(int value)
+    {
+        Model.Bank = value;
+    }
+
+    partial void OnPatchChanged(int value)
+    {
+        Model.Patch = value;
+    }
+
+    partial void OnInstrumentChanged(int value)
+    {
+        Model.Instrument = value;
+    }
+
+    partial void OnKeyChanged(int value)
+    {
+        Model.Key = value;
+    }
+
+    partial void OnLengthChanged(double value)
+    {
+        Model.Length = value;
+    }
+
+    partial void OnVelocityChanged(int value)
+    {
+        Model.Velocity = value;
+    }
 }

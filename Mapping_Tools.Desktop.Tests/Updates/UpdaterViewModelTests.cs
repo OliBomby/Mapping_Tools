@@ -39,20 +39,27 @@ public sealed class UpdaterViewModelTests
 
     private sealed class ImmediateDispatcher : IUiDispatcher
     {
-        public void Post(Action action) => action();
+        public void Post(Action action)
+        {
+            action();
+        }
     }
 
     private sealed class NoOpDialogService : IDialogService
     {
         public Task<TResult> ShowMessageAsync<TResult>(
             MessageDialogRequest<TResult> request,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(request.Choices.First().Result);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(request.Choices.First().Result);
+        }
 
         public Task<ValueDialogResult<TResult>> ShowValueAsync<TResult>(
             ValueDialogRequest<TResult> request,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(new ValueDialogResult<TResult>(false, default));
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new ValueDialogResult<TResult>(false, default));
+        }
     }
 
     private sealed class FakeUpdateService : IUpdateService
@@ -65,11 +72,15 @@ public sealed class UpdaterViewModelTests
 
         public Task<UpdateCheckResult> CheckForUpdatesAsync(
             bool allowSkippedVersion,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
-        public Task PrepareUpdateAsync(CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
+        public Task PrepareUpdateAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
 
         public void SkipCurrentVersion()
         {
@@ -83,13 +94,15 @@ public sealed class UpdaterViewModelTests
         {
         }
 
-        public void ReportProgress(double progress) =>
+        public void Dispose()
+        {
+        }
+
+        public void ReportProgress(double progress)
+        {
             ProgressChanged?.Invoke(
                 this,
                 new UpdateProgressChangedEventArgs(progress));
-
-        public void Dispose()
-        {
         }
     }
 }

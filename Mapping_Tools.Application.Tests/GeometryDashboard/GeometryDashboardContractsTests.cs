@@ -1,6 +1,4 @@
-using FluentAssertions;
 using Mapping_Tools.Application.GeometryDashboard;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.GeometryDashboard;
@@ -15,7 +13,7 @@ public sealed class GeometryDashboardContractsTests
         var definition = GeometryDashboardProjectDefinition.Definition;
 
         // Act
-        SnappingToolsProject project = definition.CreateProject();
+        var project = definition.CreateProject();
 
         // Assert
         definition.AutoSaveFileName.Should().Be("geometrydashboardproject.json");

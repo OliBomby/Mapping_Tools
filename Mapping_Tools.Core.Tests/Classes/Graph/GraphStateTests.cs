@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Mapping_Tools.Core.Classes.Graph;
 using Mapping_Tools.Core.Classes.Graph.Interpolation;
 using Mapping_Tools.Core.Classes.Graph.Interpolation.Interpolators;
@@ -16,10 +15,10 @@ public sealed class GraphStateTests
     {
         // Arrange
         GraphState state = new(
-            [
-                new GraphAnchor(new Vector2(0, 0), new LinearInterpolator()),
-                new GraphAnchor(new Vector2(1, 10), new SingleCurveInterpolator(), 0.5)
-            ], 0, 0, 1, 10);
+        [
+            new GraphAnchor(new Vector2(0, 0), new LinearInterpolator()),
+            new GraphAnchor(new Vector2(1, 10), new SingleCurveInterpolator(), 0.5),
+        ], 0, 0, 1, 10);
 
         // Act
         double value = state.GetValue(0.5);
@@ -33,10 +32,10 @@ public sealed class GraphStateTests
     {
         // Arrange
         GraphState state = new(
-            [
-                new GraphAnchor(new Vector2(0, 0), new LinearInterpolator()),
-                new GraphAnchor(new Vector2(1, 10), new LinearInterpolator())
-            ], 0, 0, 1, 10);
+        [
+            new GraphAnchor(new Vector2(0, 0), new LinearInterpolator()),
+            new GraphAnchor(new Vector2(1, 10), new LinearInterpolator()),
+        ], 0, 0, 1, 10);
 
         // Act
         double integral = state.GetIntegral(0, 1);
@@ -51,10 +50,10 @@ public sealed class GraphStateTests
     {
         // Arrange
         GraphState state = new(
-            [
-                new GraphAnchor(new Vector2(0, -1), new LinearInterpolator()),
-                new GraphAnchor(new Vector2(1, 1), new LinearInterpolator())
-            ], 0, -1, 1, 1);
+        [
+            new GraphAnchor(new Vector2(0, -1), new LinearInterpolator()),
+            new GraphAnchor(new Vector2(1, 1), new LinearInterpolator()),
+        ], 0, -1, 1, 1);
 
         // Act
         double minimum = state.GetMinIntegral();
@@ -89,19 +88,19 @@ public sealed class GraphStateTests
     public void TextCodec_RoundTripsConstantAndCurveRepresentations()
     {
         // Arrange
-        GraphState constant = GraphStateTextCodec.CreateConstant(12.5);
+        var constant = GraphStateTextCodec.CreateConstant(12.5);
         GraphState curve = new(
-            [
-                new GraphAnchor(new Vector2(0, 0), new LinearInterpolator()),
-                new GraphAnchor(new Vector2(0.5, 2), new ParabolaInterpolator(), -0.25),
-                new GraphAnchor(new Vector2(1, 1), new SingleCurveInterpolator(), 0.3)
-            ], 0, 0, 1, 2);
+        [
+            new GraphAnchor(new Vector2(0, 0), new LinearInterpolator()),
+            new GraphAnchor(new Vector2(0.5, 2), new ParabolaInterpolator(), -0.25),
+            new GraphAnchor(new Vector2(1, 1), new SingleCurveInterpolator(), 0.3),
+        ], 0, 0, 1, 2);
 
         // Act
         string constantText = GraphStateTextCodec.Format(constant);
         string curveText = GraphStateTextCodec.Format(curve);
-        bool constantParsed = GraphStateTextCodec.TryParse(constantText, out GraphState parsedConstant);
-        bool curveParsed = GraphStateTextCodec.TryParse(curveText, out GraphState parsedCurve);
+        bool constantParsed = GraphStateTextCodec.TryParse(constantText, out var parsedConstant);
+        bool curveParsed = GraphStateTextCodec.TryParse(curveText, out var parsedCurve);
 
         // Assert
         constantText.Should().Be("12.5");
@@ -120,7 +119,7 @@ public sealed class GraphStateTests
         const string text = "0:0:0|broken";
 
         // Act
-        bool parsed = GraphStateTextCodec.TryParse(text, out GraphState state);
+        bool parsed = GraphStateTextCodec.TryParse(text, out var state);
 
         // Assert
         parsed.Should().BeFalse();
@@ -132,7 +131,7 @@ public sealed class GraphStateTests
     public void InterpolatorCatalog_PreservesLegacySelectionOrder()
     {
         // Arrange
-        IReadOnlyList<Type> types = GraphInterpolatorCatalog.GetInterpolators();
+        var types = GraphInterpolatorCatalog.GetInterpolators();
 
         // Act
         string[] names = types.Select(GraphInterpolatorCatalog.GetName).ToArray();
@@ -149,13 +148,13 @@ public sealed class GraphStateTests
     {
         // Arrange
         GraphState state = new(
-            [
-                new GraphAnchor(new Vector2(0, 0)),
-                new GraphAnchor(new Vector2(1, 1), new ParabolaInterpolator(), -0.4)
-            ], 0, 0, 1, 1);
+        [
+            new GraphAnchor(new Vector2(0, 0)),
+            new GraphAnchor(new Vector2(1, 1), new ParabolaInterpolator(), -0.4),
+        ], 0, 0, 1, 1);
 
         // Act
-        GraphState clone = state.Clone();
+        var clone = state.Clone();
 
         // Assert
         clone.Anchors[1].Interpolator.Should().BeOfType<ParabolaInterpolator>();
@@ -184,7 +183,7 @@ public sealed class GraphStateTests
         DoubleMarkerGenerator generator = new(0, 0.25, string.Empty, true);
 
         // Act
-        GraphMarker[] markers = generator.GenerateMarkers(0, 4, GraphMarkerOrientation.Vertical, 4).ToArray();
+        var markers = generator.GenerateMarkers(0, 4, GraphMarkerOrientation.Vertical, 4).ToArray();
 
         // Assert
         markers.Should().HaveCountLessThanOrEqualTo(5);

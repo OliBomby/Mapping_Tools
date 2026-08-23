@@ -1,13 +1,13 @@
 namespace Mapping_Tools.Application.Platform;
 
 /// <summary>
-/// Describes one portable native-file-dialog filter using the metadata formats
-/// required by Windows/Linux patterns, MIME-aware platforms, and macOS.
+///     Describes one portable native-file-dialog filter using the metadata formats
+///     required by Windows/Linux patterns, MIME-aware platforms, and macOS.
 /// </summary>
 public sealed class FilePickerFilter
 {
     /// <summary>
-    /// Creates a normalized, case-insensitive file filter.
+    ///     Creates a normalized, case-insensitive file filter.
     /// </summary>
     /// <param name="name">The label shown by the native picker.</param>
     /// <param name="patterns">Filename patterns such as <c>*.osu</c>.</param>
@@ -24,10 +24,7 @@ public sealed class FilePickerFilter
         ArgumentNullException.ThrowIfNull(patterns);
 
         string[] patternArray = CleanValues(patterns);
-        if (patternArray.Length == 0)
-        {
-            throw new ArgumentException("At least one file pattern is required.", nameof(patterns));
-        }
+        if (patternArray.Length == 0) throw new ArgumentException("At least one file pattern is required.", nameof(patterns));
 
         Name = name.Trim();
         Patterns = patternArray;
@@ -36,22 +33,22 @@ public sealed class FilePickerFilter
     }
 
     /// <summary>
-    /// Gets the trimmed display label.
+    ///     Gets the trimmed display label.
     /// </summary>
     public string Name { get; }
 
     /// <summary>
-    /// Gets distinct, trimmed filename patterns.
+    ///     Gets distinct, trimmed filename patterns.
     /// </summary>
     public IReadOnlyList<string> Patterns { get; }
 
     /// <summary>
-    /// Gets distinct, trimmed MIME types.
+    ///     Gets distinct, trimmed MIME types.
     /// </summary>
     public IReadOnlyList<string> MimeTypes { get; }
 
     /// <summary>
-    /// Gets distinct, trimmed Apple uniform type identifiers.
+    ///     Gets distinct, trimmed Apple uniform type identifiers.
     /// </summary>
     public IReadOnlyList<string> AppleUniformTypeIdentifiers { get; }
 

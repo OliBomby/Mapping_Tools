@@ -1,6 +1,5 @@
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.Images;
-using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.SliderPicturator;
 
 namespace Mapping_Tools.Application.SliderPicturator;
@@ -49,6 +48,6 @@ public interface ISliderPicturatorService
     /// <summary>Returns the first selected slider from the current live editor state, if any.</summary>
     /// <param name="path">The beatmap path.</param>
     /// <param name="cancellationToken">Cancels the read.</param>
-    /// <returns>A selected slider, or <see langword="null"/> when none is selected.</returns>
+    /// <returns>A selected slider, or <see langword="null" /> when none is selected.</returns>
     Task<HitObject?> GetSelectedSliderAsync(string path, CancellationToken cancellationToken = default);
 }

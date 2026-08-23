@@ -3,9 +3,9 @@ using Mapping_Tools.Core.Classes.BeatmapHelper;
 namespace Mapping_Tools.Core.Tools.MetadataManager;
 
 /// <summary>
-/// Stores the metadata, preview, and colour choices applied by Metadata Manager.
-/// File paths are retained here as part of the legacy project contract; the
-/// application service interprets them only when it executes an operation.
+///     Stores the metadata, preview, and colour choices applied by Metadata Manager.
+///     File paths are retained here as part of the legacy project contract; the
+///     application service interprets them only when it executes an operation.
 /// </summary>
 public class MetadataManagerOptions
 {

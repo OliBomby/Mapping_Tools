@@ -22,7 +22,7 @@ public sealed class HitsoundPreviewHelperEngineTests
         List<HitsoundZone> zones =
         [
             new("first", "kick.wav", 64, 96, Hitsound.Clap, SampleSet.Drum, SampleSet.Normal, 3),
-            new("second", "snare.wav", 400, 96, Hitsound.Finish, SampleSet.Normal, SampleSet.Drum, 4)
+            new("second", "snare.wav", 400, 96, Hitsound.Finish, SampleSet.Normal, SampleSet.Drum, 4),
         ];
 
         // Act

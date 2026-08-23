@@ -20,7 +20,7 @@ public sealed class RhythmGuideViewModelTests
     {
         // Arrange
         TestFilePicker picker = new() { OpenFiles = ["first.osu", "second.osu"] };
-        RhythmGuideViewModel viewModel = CreateViewModel(filePicker: picker);
+        var viewModel = CreateViewModel(filePicker: picker);
 
         // Act
         await ExecuteAsync(viewModel.BrowseSourcesCommand);
@@ -36,7 +36,7 @@ public sealed class RhythmGuideViewModelTests
     {
         // Arrange
         RecordingRhythmGuideService rhythmGuide = new();
-        RhythmGuideViewModel viewModel = CreateViewModel(rhythmGuide: rhythmGuide);
+        var viewModel = CreateViewModel(rhythmGuide);
         viewModel.SourcePaths = ["source.osu"];
         viewModel.ExportPath = "guide.osu";
 
@@ -55,7 +55,7 @@ public sealed class RhythmGuideViewModelTests
     {
         // Arrange
         TestFilePicker picker = new() { OpenFiles = ["target.osu"] };
-        RhythmGuideViewModel viewModel = CreateViewModel(filePicker: picker);
+        var viewModel = CreateViewModel(filePicker: picker);
         viewModel.ExportMode = RhythmGuideExportMode.NewMap;
 
         // Act
@@ -75,7 +75,7 @@ public sealed class RhythmGuideViewModelTests
         List<UserNotification> published = [];
         RecordingReload reload = new();
         notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
-        RhythmGuideViewModel viewModel = CreateViewModel(
+        var viewModel = CreateViewModel(
             notifications: notifications,
             reload: reload);
         viewModel.SourcePaths = ["source.osu"];
@@ -111,7 +111,10 @@ public sealed class RhythmGuideViewModelTests
             new TestApplicationDirectories());
     }
 
-    private static Task ExecuteAsync(IAsyncRelayCommand command) => command.ExecuteAsync(null);
+    private static Task ExecuteAsync(IAsyncRelayCommand command)
+    {
+        return command.ExecuteAsync(null);
+    }
 
     private sealed class RecordingRhythmGuideService : IRhythmGuideService
     {
@@ -132,14 +135,18 @@ public sealed class RhythmGuideViewModelTests
     private sealed class StubCurrentBeatmapLocator : ICurrentBeatmapLocator
     {
         public Task<string?> FindCurrentBeatmapAsync(
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult<string?>(null);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<string?>(null);
+        }
     }
 
     private sealed class StubReloadService : IEditorReloadService
     {
-        public Task ReloadAsync(CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
+        public Task ReloadAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class RecordingReload : IEditorReloadService
@@ -159,5 +166,4 @@ public sealed class RhythmGuideViewModelTests
         {
         }
     }
-
 }

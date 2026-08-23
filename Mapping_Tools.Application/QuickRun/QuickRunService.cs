@@ -5,20 +5,20 @@ using Mapping_Tools.Application.Settings;
 namespace Mapping_Tools.Application.QuickRun;
 
 /// <summary>
-/// Reproduces legacy Smart QuickRun routing while returning explicit outcomes
-/// instead of reaching through the WPF dispatcher and active view.
+///     Reproduces legacy Smart QuickRun routing while returning explicit outcomes
+///     instead of reaching through the WPF dispatcher and active view.
 /// </summary>
 public sealed class QuickRunService : IQuickRunService
 {
     private const string CurrentToolSentinel = "<Current Tool>";
-    private readonly QuickRunCommandRegistry _registry;
     private readonly ILiveBeatmapReader _liveReader;
-    private readonly ApplicationSettings _settings;
     private readonly IUserNotificationService _notifications;
+    private readonly QuickRunCommandRegistry _registry;
+    private readonly ApplicationSettings _settings;
 
     /// <summary>
-    /// Creates the resolver over the shared command catalog, live editor
-    /// boundary, settings instance, and frontend-neutral notification stream.
+    ///     Creates the resolver over the shared command catalog, live editor
+    ///     boundary, settings instance, and frontend-neutral notification stream.
     /// </summary>
     /// <param name="registry">Supplies current and named commands without view reflection.</param>
     /// <param name="liveReader">Reports selected hit objects when smart routing is enabled.</param>
@@ -34,10 +34,10 @@ public sealed class QuickRunService : IQuickRunService
         _liveReader = liveReader ?? throw new ArgumentNullException(nameof(liveReader));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _notifications = notifications
-            ?? throw new ArgumentNullException(nameof(notifications));
+                         ?? throw new ArgumentNullException(nameof(notifications));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<QuickRunResult> RunAsync(
         CancellationToken cancellationToken = default)
     {
@@ -47,14 +47,11 @@ public sealed class QuickRunService : IQuickRunService
             if (!_settings.SmartQuickRunEnabled)
             {
                 command = _registry.FindCurrent();
-                if (command is null)
-                {
-                    return new QuickRunResult(QuickRunStatus.NoCurrentCommand);
-                }
+                if (command is null) return new QuickRunResult(QuickRunStatus.NoCurrentCommand);
             }
             else
             {
-                LiveBeatmapSnapshot? snapshot = await _liveReader
+                var snapshot = await _liveReader
                     .ReadAsync(cancellationToken)
                     .ConfigureAwait(false);
                 if (snapshot is null)
@@ -77,7 +74,7 @@ public sealed class QuickRunService : IQuickRunService
                     : _registry.FindByDisplayName(configuredName);
                 if (command is null)
                 {
-                    QuickRunStatus status = string.Equals(
+                    var status = string.Equals(
                         configuredName,
                         CurrentToolSentinel,
                         StringComparison.Ordinal)
@@ -118,10 +115,7 @@ public sealed class QuickRunService : IQuickRunService
 
     private string GetConfiguredName(int selectedHitObjectCount)
     {
-        if (selectedHitObjectCount <= 0)
-        {
-            return _settings.NoneQuickRunTool;
-        }
+        if (selectedHitObjectCount <= 0) return _settings.NoneQuickRunTool;
 
         return selectedHitObjectCount == 1
             ? _settings.SingleQuickRunTool

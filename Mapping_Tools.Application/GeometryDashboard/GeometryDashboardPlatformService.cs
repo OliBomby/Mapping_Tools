@@ -1,13 +1,13 @@
 namespace Mapping_Tools.Application.GeometryDashboard;
 
 /// <summary>
-/// Combines the Windows support ports into one dashboard-ready runtime snapshot.
+///     Combines the Windows support ports into one dashboard-ready runtime snapshot.
 /// </summary>
 public sealed class GeometryDashboardRuntimeSnapshot
 {
     /// <summary>
-    /// Creates a snapshot after process, window, and editor availability have
-    /// been established by <see cref="GeometryDashboardRuntimeService"/>.
+    ///     Creates a snapshot after process, window, and editor availability have
+    ///     been established by <see cref="GeometryDashboardRuntimeService" />.
     /// </summary>
     /// <param name="process">The discovered stable osu! process.</param>
     /// <param name="window">The process main window at read time.</param>
@@ -39,36 +39,36 @@ public sealed class GeometryDashboardRuntimeSnapshot
 }
 
 /// <summary>
-/// Reads the external state required before the Geometry Dashboard engine can
-/// update geometry or start an overlay.
+///     Reads the external state required before the Geometry Dashboard engine can
+///     update geometry or start an overlay.
 /// </summary>
 public interface IGeometryDashboardRuntime
 {
     /// <summary>
-    /// Attempts to read a complete runtime snapshot in legacy dependency order.
+    ///     Attempts to read a complete runtime snapshot in legacy dependency order.
     /// </summary>
     /// <param name="cancellationToken">Cancels process discovery or editor memory access.</param>
     /// <returns>
-    /// A complete snapshot, or <see langword="null"/> when osu!, its main window,
-    /// or its editor is unavailable. Reader validation exceptions are preserved.
+    ///     A complete snapshot, or <see langword="null" /> when osu!, its main window,
+    ///     or its editor is unavailable. Reader validation exceptions are preserved.
     /// </returns>
     Task<GeometryDashboardRuntimeSnapshot?> ReadAsync(
         CancellationToken cancellationToken = default);
 }
 
 /// <summary>
-/// Implements the Geometry Dashboard external-state read sequence without
-/// depending on a view, timer, dispatcher, or native handle type.
+///     Implements the Geometry Dashboard external-state read sequence without
+///     depending on a view, timer, dispatcher, or native handle type.
 /// </summary>
 public sealed class GeometryDashboardRuntimeService : IGeometryDashboardRuntime
 {
-    private readonly IGeometryDashboardProcessDiscovery _processes;
     private readonly IGeometryDashboardEditorReader _editor;
-    private readonly IGeometryDashboardWindowService _windows;
+    private readonly IGeometryDashboardProcessDiscovery _processes;
     private readonly IGeometryDashboardScreenService _screens;
+    private readonly IGeometryDashboardWindowService _windows;
 
     /// <summary>
-    /// Creates a runtime service from the independent platform ports.
+    ///     Creates a runtime service from the independent platform ports.
     /// </summary>
     /// <param name="processes">Discovers the stable osu! process.</param>
     /// <param name="editor">Reads validated editor memory.</param>
@@ -86,37 +86,25 @@ public sealed class GeometryDashboardRuntimeService : IGeometryDashboardRuntime
         _screens = screens ?? throw new ArgumentNullException(nameof(screens));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<GeometryDashboardRuntimeSnapshot?> ReadAsync(
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        GeometryDashboardProcess? process = await _processes
+        var process = await _processes
             .FindAsync(cancellationToken)
             .ConfigureAwait(false);
-        if (process is null)
-        {
-            return null;
-        }
+        if (process is null) return null;
 
-        GeometryDashboardWindow? window = _windows.GetMainWindow(process);
-        if (window is null)
-        {
-            return null;
-        }
+        var window = _windows.GetMainWindow(process);
+        if (window is null) return null;
 
-        if (!window.Title.EndsWith(".osu", StringComparison.Ordinal))
-        {
-            return null;
-        }
+        if (!window.Title.EndsWith(".osu", StringComparison.Ordinal)) return null;
 
-        GeometryDashboardEditorSnapshot? editor = await _editor
+        var editor = await _editor
             .ReadGeometryDashboardAsync(process, cancellationToken)
             .ConfigureAwait(false);
-        if (editor is null)
-        {
-            return null;
-        }
+        if (editor is null) return null;
 
         return new GeometryDashboardRuntimeSnapshot(
             process,

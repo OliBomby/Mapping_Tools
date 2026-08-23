@@ -19,7 +19,7 @@ public sealed class MetadataManagerViewModelTests
     {
         // Arrange
         TestFilePicker picker = new() { OpenFiles = ["first.osu", "second.osu"] };
-        MetadataManagerViewModel viewModel = CreateViewModel(filePicker: picker);
+        var viewModel = CreateViewModel(filePicker: picker);
 
         // Act
         await ExecuteAsync(viewModel.BrowseExportCommand);
@@ -35,7 +35,7 @@ public sealed class MetadataManagerViewModelTests
     public async Task ImportCommand_WithExistingExportPath_PreservesExportPath()
     {
         // Arrange
-        MetadataManagerViewModel viewModel = CreateViewModel();
+        var viewModel = CreateViewModel();
         viewModel.ImportPath = "source.osu";
         viewModel.ExportPath = "existing-target.osu";
 
@@ -52,7 +52,7 @@ public sealed class MetadataManagerViewModelTests
     {
         // Arrange
         RecordingMetadataManagerService metadataManager = new();
-        MetadataManagerViewModel viewModel = CreateViewModel(metadataManager: metadataManager);
+        var viewModel = CreateViewModel(metadataManager);
         viewModel.ExportPath = "first.osu|second.osu";
         viewModel.Artist = "Wave Artist";
         viewModel.RomanisedArtist = "Wave Artist";
@@ -90,7 +90,10 @@ public sealed class MetadataManagerViewModelTests
             new TestApplicationDirectories());
     }
 
-    private static Task ExecuteAsync(IAsyncRelayCommand command) => command.ExecuteAsync(null);
+    private static Task ExecuteAsync(IAsyncRelayCommand command)
+    {
+        return command.ExecuteAsync(null);
+    }
 
     private sealed class RecordingMetadataManagerService : IMetadataManagerService
     {
@@ -98,8 +101,10 @@ public sealed class MetadataManagerViewModelTests
 
         public Task<MetadataManagerOptions> ImportAsync(
             string path,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(new MetadataManagerOptions { ImportPath = path });
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new MetadataManagerOptions { ImportPath = path });
+        }
 
         public Task<MetadataManagerResult> ExportAsync(
             MetadataManagerOptions options,
@@ -116,14 +121,17 @@ public sealed class MetadataManagerViewModelTests
     private sealed class StubCurrentBeatmapLocator : ICurrentBeatmapLocator
     {
         public Task<string?> FindCurrentBeatmapAsync(
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult<string?>(null);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<string?>(null);
+        }
     }
 
     private sealed class StubReloadService : IEditorReloadService
     {
-        public Task ReloadAsync(CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
+        public Task ReloadAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
-
 }

@@ -98,17 +98,16 @@ public sealed class DependencyInjectionTests
             typeof(IBeatmapWorkspace),
             typeof(IProjectSerializer),
             typeof(IProjectStore),
-            typeof(IProjectService)
+            typeof(IProjectService),
         ];
 
         // Act
         services.AddMappingToolsDesktop();
 
         // Assert
-        foreach (Type serviceType in expectedSingletons)
+        foreach (var serviceType in expectedSingletons)
         {
-            ServiceDescriptor? registration = services.SingleOrDefault(
-                descriptor => descriptor.ServiceType == serviceType);
+            var registration = services.SingleOrDefault(descriptor => descriptor.ServiceType == serviceType);
 
             registration.Should().NotBeNull($"{serviceType.Name} is not registered.");
             registration.Lifetime.Should().Be(ServiceLifetime.Singleton, $"{serviceType.Name} has the wrong lifetime.");
@@ -123,11 +122,11 @@ public sealed class DependencyInjectionTests
         services.AddMappingToolsDesktop();
 
         // Act
-        using ServiceProvider provider = services.BuildServiceProvider(
+        using var provider = services.BuildServiceProvider(
             new ServiceProviderOptions
             {
                 ValidateOnBuild = true,
-                ValidateScopes = true
+                ValidateScopes = true,
             });
 
         // Assert
@@ -144,13 +143,13 @@ public sealed class DependencyInjectionTests
         services.AddMappingToolsHostedServices();
 
         // Act
-        Action act = () =>
+        var act = () =>
         {
-            using ServiceProvider provider = services.BuildServiceProvider(
+            using var provider = services.BuildServiceProvider(
                 new ServiceProviderOptions
                 {
                     ValidateOnBuild = true,
-                    ValidateScopes = true
+                    ValidateScopes = true,
                 });
         };
 
@@ -167,13 +166,12 @@ public sealed class DependencyInjectionTests
         services.AddMappingToolsHostedServices();
 
         // Act
-        ServiceDescriptor[] hosted = services
+        var hosted = services
             .Where(descriptor => descriptor.ServiceType == typeof(IHostedService))
             .ToArray();
         // Assert
         hosted.Length.Should().Be(4);
-        hosted.All(
-            descriptor => descriptor.Lifetime == ServiceLifetime.Singleton).Should().BeTrue();
+        hosted.All(descriptor => descriptor.Lifetime == ServiceLifetime.Singleton).Should().BeTrue();
     }
 
     [TestMethod]
@@ -181,10 +179,10 @@ public sealed class DependencyInjectionTests
     {
         // Arrange
         RecordingToolExecutionService execution = new();
-        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        var builder = Host.CreateApplicationBuilder();
         builder.Services.AddSingleton<IToolExecutionService>(execution);
         builder.Services.AddHostedService<ToolExecutionHostedService>();
-        using IHost host = builder.Build();
+        using var host = builder.Build();
 
         // Act
         await host.StartAsync();
@@ -202,7 +200,7 @@ public sealed class DependencyInjectionTests
         ApplicationSettings settings = new()
         {
             SongsPath = @"C:\osu!\Songs",
-            OverrideOsuSave = true
+            OverrideOsuSave = true,
         };
         BetterSaveOverrideHostedService service = new(betterSaveOverride, settings);
 
@@ -225,7 +223,7 @@ public sealed class DependencyInjectionTests
         {
             QuickRunHotkey = new HotkeySettings(56, 2),
             QuickUndoHotkey = new HotkeySettings(69, 6),
-            BetterSaveHotkey = new HotkeySettings(31, 2)
+            BetterSaveHotkey = new HotkeySettings(31, 2),
         };
         RecordingQuickUndoCommandService quickUndo = new();
         TestBetterSaveService betterSave = new();
@@ -284,9 +282,15 @@ public sealed class DependencyInjectionTests
                 "The host lifecycle test does not execute tool requests.");
         }
 
-        public bool Cancel(string operationId) => false;
+        public bool Cancel(string operationId)
+        {
+            return false;
+        }
 
-        public bool IsRunning(string operationId) => false;
+        public bool IsRunning(string operationId)
+        {
+            return false;
+        }
 
         public Task StopAsync(CancellationToken cancellationToken = default)
         {
@@ -331,8 +335,14 @@ public sealed class DependencyInjectionTests
             Callbacks[id] = callback;
         }
 
-        public void Start() => Started = true;
+        public void Start()
+        {
+            Started = true;
+        }
 
-        public void Stop() => Stopped = true;
+        public void Stop()
+        {
+            Stopped = true;
+        }
     }
 }

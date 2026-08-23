@@ -1,11 +1,12 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using Mapping_Tools.Application.GeometryDashboard;
 
 namespace Mapping_Tools.Infrastructure.Platform;
 
 /// <summary>
-/// Discovers the first osu! stable process whose executable and product name
-/// match the legacy adapter's exact checks.
+///     Discovers the first osu! stable process whose executable and product name
+///     match the legacy adapter's exact checks.
 /// </summary>
 public sealed class WindowsOsuProcessDiscovery : IGeometryDashboardProcessDiscovery
 {
@@ -22,24 +23,18 @@ public sealed class WindowsOsuProcessDiscovery : IGeometryDashboardProcessDiscov
         _isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsSupported => _isWindows();
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task<GeometryDashboardProcess?> FindAsync(
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (!_isWindows())
-        {
-            return Task.FromResult<GeometryDashboardProcess?>(null);
-        }
+        if (!_isWindows()) return Task.FromResult<GeometryDashboardProcess?>(null);
 
-        using Process? process = OsuProcessDiscovery.FindStableProcess();
-        if (process is null)
-        {
-            return Task.FromResult<GeometryDashboardProcess?>(null);
-        }
+        using var process = OsuProcessDiscovery.FindStableProcess();
+        if (process is null) return Task.FromResult<GeometryDashboardProcess?>(null);
 
         try
         {
@@ -52,7 +47,7 @@ public sealed class WindowsOsuProcessDiscovery : IGeometryDashboardProcessDiscov
         {
             return Task.FromResult<GeometryDashboardProcess?>(null);
         }
-        catch (System.ComponentModel.Win32Exception)
+        catch (Win32Exception)
         {
             return Task.FromResult<GeometryDashboardProcess?>(null);
         }
@@ -61,50 +56,44 @@ public sealed class WindowsOsuProcessDiscovery : IGeometryDashboardProcessDiscov
 
 internal static class OsuProcessDiscovery
 {
-    internal static Process? FindStableProcess() => FindStableProcess(null);
+    internal static Process? FindStableProcess()
+    {
+        return FindStableProcess(null);
+    }
 
     internal static Process? FindStableProcess(long? expectedProcessId)
     {
-        if (!OperatingSystem.IsWindows())
-        {
-            return null;
-        }
+        if (!OperatingSystem.IsWindows()) return null;
 
-        if (expectedProcessId is <= 0)
-        {
-            return null;
-        }
+        if (expectedProcessId is <= 0) return null;
 
-        foreach (Process process in Process.GetProcessesByName("osu!"))
+        foreach (var process in Process.GetProcessesByName("osu!"))
         {
             bool matches = false;
             try
             {
                 if (expectedProcessId is null || process.Id == expectedProcessId.Value)
                 {
-                    ProcessModule? mainModule = process.MainModule;
-                    matches = mainModule is not null &&
-                        string.Equals(
-                            mainModule.ModuleName,
-                            "osu!.exe",
-                            StringComparison.Ordinal) &&
-                        string.Equals(
-                            mainModule.FileVersionInfo.ProductName,
-                            "osu!",
-                            StringComparison.Ordinal);
+                    var mainModule = process.MainModule;
+                    matches = mainModule is not null
+                              && string.Equals(
+                                  mainModule.ModuleName,
+                                  "osu!.exe",
+                                  StringComparison.Ordinal)
+                              && string.Equals(
+                                  mainModule.FileVersionInfo.ProductName,
+                                  "osu!",
+                                  StringComparison.Ordinal);
                 }
             }
             catch (InvalidOperationException)
             {
             }
-            catch (System.ComponentModel.Win32Exception)
+            catch (Win32Exception)
             {
             }
 
-            if (matches)
-            {
-                return process;
-            }
+            if (matches) return process;
 
             process.Dispose();
         }

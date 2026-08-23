@@ -1,10 +1,8 @@
-using System;
-
 namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
 
 /// <summary>
-/// Stores a keyboard key and modifier bit mask without depending on a frontend
-/// input library. The numeric values intentionally match WPF's legacy values.
+///     Stores a keyboard key and modifier bit mask without depending on a frontend
+///     input library. The numeric values intentionally match WPF's legacy values.
 /// </summary>
 public sealed class Hotkey : ICloneable, IEquatable<Hotkey>
 {
@@ -23,15 +21,27 @@ public sealed class Hotkey : ICloneable, IEquatable<Hotkey>
     /// <summary>Gets or sets the WPF-compatible modifier bit mask.</summary>
     public int Modifiers { get; set; }
 
-    /// <inheritdoc/>
-    public object Clone() => new Hotkey(Key, Modifiers);
+    /// <inheritdoc />
+    public object Clone()
+    {
+        return new Hotkey(Key, Modifiers);
+    }
 
-    /// <inheritdoc/>
-    public bool Equals(Hotkey? other) => other is not null && Key == other.Key && Modifiers == other.Modifiers;
+    /// <inheritdoc />
+    public bool Equals(Hotkey? other)
+    {
+        return other is not null && Key == other.Key && Modifiers == other.Modifiers;
+    }
 
-    /// <inheritdoc/>
-    public override bool Equals(object? obj) => obj is Hotkey other && Equals(other);
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        return obj is Hotkey other && Equals(other);
+    }
 
-    /// <inheritdoc/>
-    public override int GetHashCode() => unchecked(Key * 397 ^ Modifiers);
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return unchecked(Key * 397 ^ Modifiers);
+    }
 }

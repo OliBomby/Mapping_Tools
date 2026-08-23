@@ -7,7 +7,7 @@ namespace Mapping_Tools.Infrastructure.Audio;
 /// <summary>Uses the host's WASAPI output while keeping the player lifetime behind an Application session.</summary>
 public sealed class NaudioAudioPlaybackService : IAudioPlaybackService
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task<IAudioPlaybackSession> PlayAsync(
         AudioClip clip,
         AudioPlaybackOptions? options = null,
@@ -15,10 +15,7 @@ public sealed class NaudioAudioPlaybackService : IAudioPlaybackService
     {
         ArgumentNullException.ThrowIfNull(clip);
         cancellationToken.ThrowIfCancellationRequested();
-        if (clip.IsEmpty)
-        {
-            throw new ArgumentException("An empty clip cannot be played.", nameof(clip));
-        }
+        if (clip.IsEmpty) throw new ArgumentException("An empty clip cannot be played.", nameof(clip));
 
         var session = new NaudioPlaybackSession(clip, options?.Loop == true);
         try
@@ -36,22 +33,22 @@ public sealed class NaudioAudioPlaybackService : IAudioPlaybackService
 
     private sealed class NaudioPlaybackSession : IAudioPlaybackSession
     {
+        private readonly TaskCompletionSource<object?> _completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
         private readonly object _gate = new();
         private readonly bool _loop;
         private readonly IWavePlayer _player;
         private readonly RawSourceWaveStream _stream;
-        private readonly TaskCompletionSource<object?> _completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
-        private bool _stopping;
         private bool _disposed;
         private TimeSpan _lastPosition;
         private AudioPlaybackState _state = AudioPlaybackState.Stopped;
+        private bool _stopping;
 
         public NaudioPlaybackSession(AudioClip clip, bool loop)
         {
             _loop = loop;
             byte[] bytes = new byte[clip.Samples.Length * sizeof(float)];
             Buffer.BlockCopy(clip.CopySamples(), 0, bytes, 0, bytes.Length);
-            WaveFormat format = WaveFormat.CreateIeeeFloatWaveFormat(clip.Format.SampleRate, clip.Format.Channels);
+            var format = WaveFormat.CreateIeeeFloatWaveFormat(clip.Format.SampleRate, clip.Format.Channels);
             _stream = new RawSourceWaveStream(bytes, 0, bytes.Length, format);
             _player = new WasapiOut();
             try
@@ -92,6 +89,40 @@ public sealed class NaudioAudioPlaybackService : IAudioPlaybackService
 
         public Task Completion => _completion.Task;
 
+        public void Pause()
+        {
+            lock (_gate)
+            {
+                if (_disposed || _state != AudioPlaybackState.Playing) return;
+
+                _player.Pause();
+                _state = AudioPlaybackState.Paused;
+            }
+        }
+
+        public void Resume()
+        {
+            lock (_gate)
+            {
+                if (_disposed || _state != AudioPlaybackState.Paused) return;
+
+                _player.Play();
+                _state = AudioPlaybackState.Playing;
+            }
+        }
+
+        public ValueTask StopAsync()
+        {
+            Stop();
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            Stop();
+            return ValueTask.CompletedTask;
+        }
+
         public void Start()
         {
             lock (_gate)
@@ -111,54 +142,11 @@ public sealed class NaudioAudioPlaybackService : IAudioPlaybackService
             }
         }
 
-        public void Pause()
-        {
-            lock (_gate)
-            {
-                if (_disposed || _state != AudioPlaybackState.Playing)
-                {
-                    return;
-                }
-
-                _player.Pause();
-                _state = AudioPlaybackState.Paused;
-            }
-        }
-
-        public void Resume()
-        {
-            lock (_gate)
-            {
-                if (_disposed || _state != AudioPlaybackState.Paused)
-                {
-                    return;
-                }
-
-                _player.Play();
-                _state = AudioPlaybackState.Playing;
-            }
-        }
-
-        public ValueTask StopAsync()
-        {
-            Stop();
-            return ValueTask.CompletedTask;
-        }
-
-        public ValueTask DisposeAsync()
-        {
-            Stop();
-            return ValueTask.CompletedTask;
-        }
-
         private void Stop()
         {
             lock (_gate)
             {
-                if (_disposed)
-                {
-                    return;
-                }
+                if (_disposed) return;
 
                 _stopping = true;
                 _state = AudioPlaybackState.Stopped;
@@ -182,10 +170,7 @@ public sealed class NaudioAudioPlaybackService : IAudioPlaybackService
         {
             lock (_gate)
             {
-                if (_disposed || _stopping)
-                {
-                    return;
-                }
+                if (_disposed || _stopping) return;
 
                 if (eventArgs.Exception is not null)
                 {

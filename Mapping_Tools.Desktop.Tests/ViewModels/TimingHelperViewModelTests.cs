@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.Input;
+using System.Globalization;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.QuickRun;
@@ -24,13 +24,13 @@ public sealed class TimingHelperViewModelTests
         RecordingTimingHelper service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
-        TimingHelperViewModel viewModel = Create(service, workspace);
+        var viewModel = Create(service, workspace);
         viewModel.Objects = false;
         viewModel.Leniency = 10;
         viewModel.BeatsBetween = 1;
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         service.Paths.Should().Equal("selected.osu");
@@ -49,7 +49,7 @@ public sealed class TimingHelperViewModelTests
         RecordingTimingHelper service = new();
         RecordingCurrentBeatmapLocator currentBeatmap = new("current.osu");
         RecordingReloadService reload = new();
-        TimingHelperViewModel viewModel = Create(
+        var viewModel = Create(
             service,
             new TestBeatmapWorkspace(),
             currentBeatmap,
@@ -70,11 +70,11 @@ public sealed class TimingHelperViewModelTests
         RecordingTimingHelper service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
-        TimingHelperViewModel viewModel = Create(service, workspace);
+        var viewModel = Create(service, workspace);
         viewModel.Leniency = -1;
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         service.Paths.Should().BeNull();
@@ -89,11 +89,11 @@ public sealed class TimingHelperViewModelTests
         RecordingTimingHelper service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
-        TimingHelperViewModel viewModel = Create(service, workspace);
+        var viewModel = Create(service, workspace);
         viewModel.Leniency = double.PositiveInfinity;
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         service.Paths.Should().BeNull();
@@ -107,7 +107,7 @@ public sealed class TimingHelperViewModelTests
         // Arrange
         RecordingTimingHelper service = new();
         QuickRunCommandRegistry registry = new();
-        TimingHelperViewModel viewModel = Create(
+        var viewModel = Create(
             service,
             new TestBeatmapWorkspace(),
             new RecordingCurrentBeatmapLocator("current.osu"));
@@ -123,7 +123,7 @@ public sealed class TimingHelperViewModelTests
 
         // Act
         await hosted.StartAsync(CancellationToken.None);
-        QuickRunCommand command = registry.Commands.Single();
+        var command = registry.Commands.Single();
         await command.Execute(CancellationToken.None);
 
         // Assert
@@ -143,7 +143,7 @@ public sealed class TimingHelperViewModelTests
             727d,
             typeof(string),
             null,
-            System.Globalization.CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture);
 
         // Assert
         converted.Should().Be("727 WYSI");
@@ -160,7 +160,7 @@ public sealed class TimingHelperViewModelTests
             "0.5",
             typeof(double),
             -1,
-            System.Globalization.CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture);
 
         // Assert
         converted.Should().Be(0.5d);
@@ -177,7 +177,7 @@ public sealed class TimingHelperViewModelTests
             "not a number",
             typeof(double),
             -1,
-            System.Globalization.CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture);
 
         // Assert
         converted.Should().Be(-1d);
@@ -223,8 +223,10 @@ public sealed class TimingHelperViewModelTests
 
     private sealed class RecordingCurrentBeatmapLocator(string? path) : ICurrentBeatmapLocator
     {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(path);
+        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(path);
+        }
     }
 
     private sealed class RecordingReloadService : IEditorReloadService

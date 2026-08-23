@@ -10,5 +10,5 @@ public enum GeneratorType
     Intermediate,
 
     /// <summary>Advanced multi-step or configurable geometry.</summary>
-    Advanced
+    Advanced,
 }

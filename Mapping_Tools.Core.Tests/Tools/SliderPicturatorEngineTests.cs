@@ -16,7 +16,7 @@ public sealed class SliderPicturatorEngineTests
         RgbaImage image = new(2, 2, [255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 0, 0, 0, 0]);
 
         // Act
-        (RgbaImage recoloured, long segments) = SliderPicturatorEngine.Recolor(
+        (var recoloured, long segments) = SliderPicturatorEngine.Recolor(
             image,
             RgbaColour.FromRgb(0, 128, 255),
             RgbaColour.White,
@@ -37,7 +37,7 @@ public sealed class SliderPicturatorEngineTests
         RgbaImage image = new(2, 1, [255, 255, 255, 255, 0, 0, 0, 255]);
 
         // Act
-        (List<Vector2> path, double frameDistance) = SliderPicturatorEngine.Picturate(
+        (var path, double frameDistance) = SliderPicturatorEngine.Picturate(
             image,
             RgbaColour.FromRgb(0, 128, 255),
             RgbaColour.White,
@@ -60,7 +60,7 @@ public sealed class SliderPicturatorEngineTests
         SliderPicturatorOptions options = new() { PictureFile = "image.png", Quality = 102 };
 
         // Act
-        Action act = options.Validate;
+        var act = options.Validate;
 
         // Assert
         act.Should().Throw<ArgumentException>();
@@ -71,7 +71,7 @@ public sealed class SliderPicturatorEngineTests
     {
         // Arrange
         RgbaImage image = new(1, 1, [10, 20, 30, 40]);
-        RgbaColour replacement = RgbaColour.FromArgb(200, 100, 110, 120);
+        var replacement = RgbaColour.FromArgb(200, 100, 110, 120);
 
         // Act
         image.SetPixel(0, 0, replacement);
@@ -85,10 +85,10 @@ public sealed class SliderPicturatorEngineTests
     {
         // Arrange
         RgbaImage image = new(1, 1, [0, 0, 0, 255]);
-        RgbaColour border = RgbaColour.FromArgb(32, 12, 34, 56);
+        var border = RgbaColour.FromArgb(32, 12, 34, 56);
 
         // Act
-        (RgbaImage recoloured, _) = SliderPicturatorEngine.Recolor(
+        var (recoloured, _) = SliderPicturatorEngine.Recolor(
             image,
             RgbaColour.FromRgb(255, 255, 255),
             border,

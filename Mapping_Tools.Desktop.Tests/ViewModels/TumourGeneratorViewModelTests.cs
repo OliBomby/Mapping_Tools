@@ -1,5 +1,3 @@
-using CommunityToolkit.Mvvm.Input;
-using FluentAssertions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
@@ -25,11 +23,11 @@ public sealed class TumourGeneratorViewModelTests
         // Arrange
         RecordingGenerator service = new();
         RecordingReload reload = new();
-        TumourGeneratorViewModel viewModel = Create(
+        var viewModel = Create(
             service,
             new RecordingCurrentBeatmapLocator("current.osu"),
             reload,
-            autoReload: true);
+            true);
 
         // Act
         await viewModel.RunQuickAsync(CancellationToken.None);
@@ -49,14 +47,14 @@ public sealed class TumourGeneratorViewModelTests
         // Arrange
         RecordingGenerator service = new() { ReturnEmptyImport = true };
         TestDialogService dialogs = new();
-        TumourGeneratorViewModel viewModel = Create(
+        var viewModel = Create(
             service,
             new RecordingCurrentBeatmapLocator("current.osu"),
             dialogs: dialogs);
-        HitObject original = viewModel.PreviewHitObject;
+        var original = viewModel.PreviewHitObject;
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.ImportCommand).ExecuteAsync(null);
+        await viewModel.ImportCommand.ExecuteAsync(null);
 
         // Assert
         dialogs.MessageCount.Should().BeGreaterThan(0);
@@ -71,13 +69,13 @@ public sealed class TumourGeneratorViewModelTests
         // Arrange
         RecordingGenerator service = new() { ImportException = new IOException("import failed") };
         TestDialogService dialogs = new();
-        TumourGeneratorViewModel viewModel = Create(
+        var viewModel = Create(
             service,
             new RecordingCurrentBeatmapLocator("current.osu"),
             dialogs: dialogs);
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.ImportCommand).ExecuteAsync(null);
+        await viewModel.ImportCommand.ExecuteAsync(null);
 
         // Assert
         dialogs.MessageCount.Should().BeGreaterThan(0);
@@ -90,7 +88,7 @@ public sealed class TumourGeneratorViewModelTests
     {
         // Arrange
         TestDialogService dialogs = new();
-        TumourGeneratorViewModel viewModel = Create(
+        var viewModel = Create(
             new RecordingGenerator(),
             new RecordingCurrentBeatmapLocator(null),
             dialogs: dialogs);
@@ -108,14 +106,14 @@ public sealed class TumourGeneratorViewModelTests
     {
         // Arrange
         RecordingGenerator service = new();
-        TumourGeneratorViewModel viewModel = Create(service);
+        var viewModel = Create(service);
         viewModel.TumourLayers.Clear();
         viewModel.TumourLayers.Should().BeEmpty();
         viewModel.RunCommand.CanExecute(null).Should().BeTrue();
         viewModel.ValidateSettings().Should().BeFalse();
 
         // Act
-        await ((IAsyncRelayCommand)viewModel.RunCommand).ExecuteAsync(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
 
         // Assert
         service.RunCalled.Should().BeFalse();
@@ -126,7 +124,7 @@ public sealed class TumourGeneratorViewModelTests
     public void ValidateSettings_WithNonFiniteGraphAnchorRejectsTheProject()
     {
         // Arrange
-        TumourGeneratorViewModel viewModel = Create(new RecordingGenerator());
+        var viewModel = Create(new RecordingGenerator());
         viewModel.CurrentLayer!.TumourScale.Anchors[0].Pos = new Vector2(double.NaN, 0);
 
         // Act
@@ -141,7 +139,7 @@ public sealed class TumourGeneratorViewModelTests
     public void ShellProjectFeature_SnapshotAndInstall_PreserveLayersGraphsAndPreview()
     {
         // Arrange
-        TumourGeneratorViewModel viewModel = Create(new RecordingGenerator());
+        var viewModel = Create(new RecordingGenerator());
         viewModel.CurrentLayer!.TumourTemplateEnum = TumourTemplate.Square;
         viewModel.CurrentLayer.TumourParameter = TumourLayer.GetGraphState(12);
         viewModel.CurrentLayer.Name = "Custom";
@@ -149,7 +147,7 @@ public sealed class TumourGeneratorViewModelTests
         IShellProjectFeature feature = viewModel;
 
         // Act
-        TumourGeneratorProject snapshot = (TumourGeneratorProject)feature.Snapshot();
+        var snapshot = (TumourGeneratorProject)feature.Snapshot();
         viewModel.CurrentLayer.Name = "Changed";
         feature.Install(snapshot);
 
@@ -165,7 +163,7 @@ public sealed class TumourGeneratorViewModelTests
     public void LayerCommands_AddCopyRemoveAndReorder_PreserveSelectionRules()
     {
         // Arrange
-        TumourGeneratorViewModel viewModel = Create(new RecordingGenerator());
+        var viewModel = Create(new RecordingGenerator());
 
         // Act
         viewModel.AddCommand.Execute(null);
@@ -184,14 +182,11 @@ public sealed class TumourGeneratorViewModelTests
     {
         // Arrange
         RecordingGenerator service = new();
-        TumourGeneratorViewModel viewModel = Create(service);
+        var viewModel = Create(service);
         viewModel.PreviewHitObject = new HitObject("32,64,100,2,0,L|200:64,1,168");
 
         // Act
-        for (var attempt = 0; attempt < 50 && viewModel.TumouredPreviewHitObject is null; attempt++)
-        {
-            await Task.Delay(10);
-        }
+        for (int attempt = 0; attempt < 50 && viewModel.TumouredPreviewHitObject is null; attempt++) await Task.Delay(10);
 
         // Assert
         service.PreviewCalled.Should().BeGreaterThan(0);
@@ -204,11 +199,8 @@ public sealed class TumourGeneratorViewModelTests
     {
         // Arrange
         RecordingGenerator service = new();
-        TumourGeneratorViewModel viewModel = Create(service);
-        for (var attempt = 0; attempt < 50 && service.PreviewCalled == 0; attempt++)
-        {
-            await Task.Delay(10);
-        }
+        var viewModel = Create(service);
+        for (int attempt = 0; attempt < 50 && service.PreviewCalled == 0; attempt++) await Task.Delay(10);
 
         int previewCallsBeforeDispose = service.PreviewCalled;
 
@@ -264,13 +256,15 @@ public sealed class TumourGeneratorViewModelTests
             string path,
             TumourImportMode mode,
             string? timeCode,
-            CancellationToken cancellationToken = default) =>
-            ImportException is not null
+            CancellationToken cancellationToken = default)
+        {
+            return ImportException is not null
                 ? Task.FromException<TumourImportResult>(ImportException)
                 : Task.FromResult(new TumourImportResult(
-                ReturnEmptyImport ? [] : [new HitObject("64,64,0,2,0,L|164:64,1,100")],
-                4,
-                true));
+                    ReturnEmptyImport ? [] : [new HitObject("64,64,0,2,0,L|164:64,1,100")],
+                    4,
+                    true));
+        }
 
         public Task<TumourPreviewResult> PreviewAsync(
             HitObject previewHitObject,
@@ -301,8 +295,10 @@ public sealed class TumourGeneratorViewModelTests
 
     private sealed class RecordingCurrentBeatmapLocator(string? path) : ICurrentBeatmapLocator
     {
-        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(path);
+        public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(path);
+        }
     }
 
     private sealed class RecordingReload : IEditorReloadService

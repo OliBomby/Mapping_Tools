@@ -17,7 +17,7 @@ public sealed class AutoFailServiceTests
         AutoFailService service = new(gateway);
 
         // Act
-        AutoFailRun run = await service.AnalyzeAsync(new AutoFailOptions("accepted.osu"));
+        var run = await service.AnalyzeAsync(new AutoFailOptions("accepted.osu"));
 
         // Assert
         gateway.OpenPreference.Should().Be(LiveBeatmapPreference.PreferLive);
@@ -31,7 +31,7 @@ public sealed class AutoFailServiceTests
         // Arrange
         RecordingGateway gateway = new(CreateEditor());
         AutoFailService service = new(gateway);
-        AutoFailRun run = await service.AnalyzeAsync(new AutoFailOptions("accepted.osu"));
+        var run = await service.AnalyzeAsync(new AutoFailOptions("accepted.osu"));
         AutoFailFixPlan plan = new(
             Enumerable.Repeat(0, run.Analysis.PotentialUnloadingObjects.Count + 1).ToArray(),
             "No-op persistence-boundary probe");
@@ -48,16 +48,19 @@ public sealed class AutoFailServiceTests
         string path = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-autofail-2b.osu");
         return new BeatmapEditor2(File.ReadAllLines(path).ToList(), new MemoryStore())
         {
-            Path = "accepted.osu"
+            Path = "accepted.osu",
         };
     }
 
     private sealed class RecordingGateway : IBeatmapEditingGateway
     {
-        public RecordingGateway(BeatmapEditor2 editor) => Session = new(
-            editor,
-            BeatmapEditingSource.Disk,
-            []);
+        public RecordingGateway(BeatmapEditor2 editor)
+        {
+            Session = new BeatmapEditingSession(
+                editor,
+                BeatmapEditingSource.Disk,
+                []);
+        }
 
         public BeatmapEditingSession Session { get; }
         public LiveBeatmapPreference? OpenPreference { get; private set; }
@@ -74,8 +77,10 @@ public sealed class AutoFailServiceTests
 
         public Task<StoryboardEditor2> OpenStoryboardAsync(
             string path,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
         public Task SaveAsync(
             Editor2 editor,
@@ -89,16 +94,30 @@ public sealed class AutoFailServiceTests
         public Task SaveAsync(
             BeatmapEditingSession session,
             bool reloadEditor = false,
-            CancellationToken cancellationToken = default) =>
-            SaveAsync(session.Editor, reloadEditor, cancellationToken);
+            CancellationToken cancellationToken = default)
+        {
+            return SaveAsync(session.Editor, reloadEditor, cancellationToken);
+        }
     }
 
     private sealed class MemoryStore : ITextFileStore
     {
-        public IReadOnlyList<string> ReadAllLines(string path) => throw new NotSupportedException();
+        public IReadOnlyList<string> ReadAllLines(string path)
+        {
+            throw new NotSupportedException();
+        }
+
         public void WriteAllLines(string path, IEnumerable<string> lines) { }
         public void Delete(string path) { }
-        public string GetParentFolder(string path) => string.Empty;
-        public string CombinePath(string parent, string child) => child;
+
+        public string GetParentFolder(string path)
+        {
+            return string.Empty;
+        }
+
+        public string CombinePath(string parent, string child)
+        {
+            return child;
+        }
     }
 }

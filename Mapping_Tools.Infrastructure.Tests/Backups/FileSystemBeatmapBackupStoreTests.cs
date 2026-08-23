@@ -1,5 +1,4 @@
 using System.Text;
-using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Infrastructure.Backups;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -27,10 +26,10 @@ public sealed class FileSystemBeatmapBackupStoreTests
             // Act
             await store.CopyAsync(source, destination);
             // Assert
-            (await File.ReadAllLinesAsync(destination)).Should().Equal(new[] { "source" });
+            (await File.ReadAllLinesAsync(destination)).Should().Equal("source");
 
             await store.WriteLinesAsync(destination, ["snapshot", "complete"]);
-            (await File.ReadAllLinesAsync(destination)).Should().Equal(new[] { "snapshot", "complete" });
+            (await File.ReadAllLinesAsync(destination)).Should().Equal("snapshot", "complete");
             File.ReadAllBytes(destination).Should().Equal(
                 Encoding.UTF8.GetBytes("snapshot\r\ncomplete\r\n"));
             Directory.EnumerateFiles(directory)
@@ -39,7 +38,7 @@ public sealed class FileSystemBeatmapBackupStoreTests
         }
         finally
         {
-            Directory.Delete(directory, recursive: true);
+            Directory.Delete(directory, true);
         }
     }
 
@@ -58,19 +57,19 @@ public sealed class FileSystemBeatmapBackupStoreTests
             FileSystemBeatmapBackupStore store = new();
 
             // Act
-            Func<Task> act1 = () => store.CopyAsync(
-                    Path.Combine(directory, "missing.osu"),
-                    destination);
+            var act1 = () => store.CopyAsync(
+                Path.Combine(directory, "missing.osu"),
+                destination);
 
             // Assert
             await act1.Should().ThrowAsync<FileNotFoundException>();
 
-            (await File.ReadAllLinesAsync(destination)).Should().Equal(new[] { "previous" });
+            (await File.ReadAllLinesAsync(destination)).Should().Equal("previous");
             Directory.EnumerateFiles(directory).Count().Should().Be(1);
         }
         finally
         {
-            Directory.Delete(directory, recursive: true);
+            Directory.Delete(directory, true);
         }
     }
 
@@ -93,7 +92,7 @@ public sealed class FileSystemBeatmapBackupStoreTests
             FileSystemBeatmapBackupStore store = new();
 
             // Act
-            IReadOnlyList<StoredBeatmapBackup> files =
+            var files =
                 await store.ListAsync(directory);
             await store.DeleteAsync(older);
 
@@ -104,7 +103,7 @@ public sealed class FileSystemBeatmapBackupStoreTests
         }
         finally
         {
-            Directory.Delete(directory, recursive: true);
+            Directory.Delete(directory, true);
         }
     }
 }

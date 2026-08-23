@@ -1,5 +1,3 @@
-using FluentAssertions;
-using Mapping_Tools.Application.MapsetMerger;
 using Mapping_Tools.Infrastructure.MapsetMerger;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -12,11 +10,22 @@ public sealed class PhysicalMapsetFileSystemTests : IDisposable
         Path.GetTempPath(),
         "mapping-tools-mapset-transaction-" + Guid.NewGuid().ToString("N"));
 
+    public void Dispose()
+    {
+        if (Directory.Exists(_root)) Directory.Delete(_root, true);
+    }
+
     [TestInitialize]
-    public void Initialize() => Directory.CreateDirectory(_root);
+    public void Initialize()
+    {
+        Directory.CreateDirectory(_root);
+    }
 
     [TestCleanup]
-    public void Cleanup() => Dispose();
+    public void Cleanup()
+    {
+        Dispose();
+    }
 
     [TestMethod]
     public async Task CommitAsync_WhenReplacementFails_RestoresOriginalDuplicateTarget()
@@ -31,7 +40,7 @@ public sealed class PhysicalMapsetFileSystemTests : IDisposable
         File.WriteAllText(firstSource, "first");
         File.WriteAllText(secondSource, "second");
 
-        using IMapsetFileTransaction transaction =
+        using var transaction =
             new PhysicalMapsetFileSystem().BeginTransaction(export);
         transaction.CopyToStaging(firstSource, "same.txt");
         transaction.CopyToStaging(secondSource, "same.txt");
@@ -40,7 +49,7 @@ public sealed class PhysicalMapsetFileSystemTests : IDisposable
         transaction.CopyToStaging(firstSource, "failure.txt");
 
         // Act
-        Func<Task> act = () => transaction.CommitAsync();
+        var act = () => transaction.CommitAsync();
 
         // Assert
         await act.Should().ThrowAsync<IOException>();
@@ -49,13 +58,5 @@ public sealed class PhysicalMapsetFileSystemTests : IDisposable
         Directory.Exists(Path.Combine(export, "failure.txt")).Should().BeTrue();
         Directory.GetDirectories(_root, ".export.mapset-merger-*", SearchOption.TopDirectoryOnly)
             .Should().BeEmpty();
-    }
-
-    public void Dispose()
-    {
-        if (Directory.Exists(_root))
-        {
-            Directory.Delete(_root, recursive: true);
-        }
     }
 }

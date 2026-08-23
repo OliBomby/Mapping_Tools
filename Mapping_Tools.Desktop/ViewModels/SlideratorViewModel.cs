@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
@@ -18,24 +18,60 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Owns Sliderator's graph, source selection, preview inputs, persistence, and
-/// ordinary/QuickRun execution without retaining a reference to a view.
+///     Owns Sliderator's graph, source selection, preview inputs, persistence, and
+///     ordinary/QuickRun execution without retaining a reference to a view.
 /// </summary>
 public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     IQuickRun,
     IShellProjectFeature
 {
     internal const string OperationId = "sliderator";
-
-    private readonly ISlideratorService sliderator;
     private readonly ICurrentBeatmapLocator currentBeatmap;
-    private readonly ApplicationSettings settings;
-    private readonly IDialogService dialogs;
+
     private readonly ProjectDefinition<SlideratorProject> definition = new(
         "slideratorproject.json",
         "Sliderator Projects",
         static () => new SlideratorProject(),
         "sliderator-project.json");
+
+    private readonly IDialogService dialogs;
+    private readonly ApplicationSettings settings;
+
+    private readonly ISlideratorService sliderator;
+
+    /// <summary>
+    ///     Creates a Sliderator presentation model.
+    /// </summary>
+    /// <param name="sliderator">Runs the Core engine through Application ports.</param>
+    /// <param name="execution">Coordinates background work, cancellation, and notifications.</param>
+    /// <param name="currentBeatmap">Finds the map currently open in osu!.</param>
+    /// <param name="settings">Supplies the AlwaysQuickRun preference.</param>
+    /// <param name="dialogs">Presents validation, confirmation, and scaling dialogs.</param>
+    public SlideratorViewModel(
+        ISlideratorService sliderator,
+        IToolExecutionService execution,
+        ICurrentBeatmapLocator currentBeatmap,
+        ApplicationSettings settings,
+        IDialogService dialogs)
+        : base(execution, OperationId)
+    {
+        this.sliderator = sliderator ?? throw new ArgumentNullException(nameof(sliderator));
+        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        ImportCommand = new AsyncRelayCommand(ImportAsync);
+        MoveLeftCommand = new AsyncRelayCommand(() => MoveLeftAsync(false));
+        MoveRightCommand = new AsyncRelayCommand(() => MoveRightAsync(false));
+        GraphToggleCommand = new RelayCommand(ToggleGraphMode);
+        ClearGraphCommand = new AsyncRelayCommand(ClearGraphAsync);
+        ScaleCompleteCommand = new AsyncRelayCommand(ScaleCompleteAsync);
+        LoadedHitObjects.CollectionChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(VisibleHitObject));
+            OnPropertyChanged(nameof(ExpectedSegments));
+        };
+        UpdateGraphDerivedValues();
+    }
 
     /// <summary>Gets the source import modes in legacy display order.</summary>
     public IReadOnlyList<SlideratorImportMode> ImportModes { get; } =
@@ -214,18 +250,11 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     {
         get
         {
-            if (ExportAsStream)
-            {
-                return (long)(GraphBeats * BeatSnapDivisor) + 1;
-            }
+            if (ExportAsStream) return (long)(GraphBeats * BeatSnapDivisor) + 1;
 
-            if (ExportAsInvisibleSlider)
-            {
-                return 16 + 7 * ((long)GraphDuration - 1);
-            }
+            if (ExportAsInvisibleSlider) return 16 + 7 * ((long)GraphDuration - 1);
 
-            return (long)((NewVelocity * 100 * GlobalSv * GraphBeats - DistanceTraveled) /
-                           MinDendrite * 2 + DistanceTraveled / 10);
+            return (long)((NewVelocity * 100 * GlobalSv * GraphBeats - DistanceTraveled) / MinDendrite * 2 + DistanceTraveled / 10);
         }
     }
 
@@ -256,76 +285,47 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets the graph scaling command.</summary>
     public IAsyncRelayCommand ScaleCompleteCommand { get; }
 
-    /// <summary>
-    /// Creates a Sliderator presentation model.
-    /// </summary>
-    /// <param name="sliderator">Runs the Core engine through Application ports.</param>
-    /// <param name="execution">Coordinates background work, cancellation, and notifications.</param>
-    /// <param name="currentBeatmap">Finds the map currently open in osu!.</param>
-    /// <param name="settings">Supplies the AlwaysQuickRun preference.</param>
-    /// <param name="dialogs">Presents validation, confirmation, and scaling dialogs.</param>
-    public SlideratorViewModel(
-        ISlideratorService sliderator,
-        IToolExecutionService execution,
-        ICurrentBeatmapLocator currentBeatmap,
-        ApplicationSettings settings,
-        IDialogService dialogs)
-        : base(execution, OperationId)
-    {
-        this.sliderator = sliderator ?? throw new ArgumentNullException(nameof(sliderator));
-        this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
-        this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
-        ImportCommand = new AsyncRelayCommand(ImportAsync);
-        MoveLeftCommand = new AsyncRelayCommand(() => MoveLeftAsync(false));
-        MoveRightCommand = new AsyncRelayCommand(() => MoveRightAsync(false));
-        GraphToggleCommand = new RelayCommand(ToggleGraphMode);
-        ClearGraphCommand = new AsyncRelayCommand(ClearGraphAsync);
-        ScaleCompleteCommand = new AsyncRelayCommand(ScaleCompleteAsync);
-        LoadedHitObjects.CollectionChanged += (_, _) =>
-        {
-            OnPropertyChanged(nameof(VisibleHitObject));
-            OnPropertyChanged(nameof(ExpectedSegments));
-        };
-        UpdateGraphDerivedValues();
-    }
-
     /// <summary>Runs the current editor map through the QuickRun import/export path.</summary>
     /// <param name="cancellationToken">Cancels editor discovery or generation.</param>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
         string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            return;
-        }
+        if (string.IsNullOrWhiteSpace(path)) return;
 
         await RunWithStateAsync(async () =>
         {
-            if (!await ImportForPathAsync(path, SlideratorImportMode.Selected, cancellationToken))
-            {
-                return;
-            }
+            if (!await ImportForPathAsync(path, SlideratorImportMode.Selected, cancellationToken)) return;
 
-            await RunPathAsync(path, quick: true, reloadEditor: true, cancellationToken);
+            await RunPathAsync(path, true, true, cancellationToken);
         });
+    }
+
+    string IQuickRun.OperationId => OperationId;
+
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+
+    object IShellProjectFeature.Snapshot()
+    {
+        return Snapshot();
+    }
+
+    void IShellProjectFeature.Install(object project)
+    {
+        Install((SlideratorProject)project);
     }
 
     /// <summary>Places the currently visible slider for Shift navigation without reloading the editor.</summary>
     /// <param name="cancellationToken">Cancels map discovery or placement.</param>
-    /// <returns><see langword="true"/> when the placement completed successfully.</returns>
+    /// <returns><see langword="true" /> when the placement completed successfully.</returns>
     public async Task<bool> RunFastPlacementAsync(CancellationToken cancellationToken = default)
     {
         string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
-        if (string.IsNullOrWhiteSpace(path) || VisibleHitObject is null)
-        {
-            return false;
-        }
+        if (string.IsNullOrWhiteSpace(path) || VisibleHitObject is null) return false;
 
         bool succeeded = false;
         await RunWithStateAsync(async () =>
         {
-            succeeded = await RunPathAsync(path, quick: true, reloadEditor: false, cancellationToken);
+            succeeded = await RunPathAsync(path, true, false, cancellationToken);
         });
         return succeeded;
     }
@@ -337,12 +337,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     public async Task MoveAsync(bool forward, bool fast)
     {
         if (fast && Interaction is not null)
-        {
             if (!await Interaction.RunFastAsync().ConfigureAwait(true))
-            {
                 return;
-            }
-        }
 
         int next = VisibleHitObjectIndex + (forward ? 1 : -1);
         if (next < 0 || next >= LoadedHitObjects.Count)
@@ -353,7 +349,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                     forward
                         ? "You've reached the end of the slider list."
                         : "You've reached the start of the slider list.",
-                    [new DialogChoice<bool>("OK", true, IsDefault: true, IsCancel: true)],
+                    [new DialogChoice<bool>("OK", true, true, true)],
                     false));
             return;
         }
@@ -364,11 +360,17 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     /// <summary>Runs a non-fast previous-slider navigation request.</summary>
     /// <param name="fast">Whether to place the current slider before navigating.</param>
-    public Task MoveLeftAsync(bool fast) => MoveAsync(false, fast);
+    public Task MoveLeftAsync(bool fast)
+    {
+        return MoveAsync(false, fast);
+    }
 
     /// <summary>Runs a non-fast next-slider navigation request.</summary>
     /// <param name="fast">Whether to place the current slider before navigating.</param>
-    public Task MoveRightAsync(bool fast) => MoveAsync(true, fast);
+    public Task MoveRightAsync(bool fast)
+    {
+        return MoveAsync(true, fast);
+    }
 
     /// <summary>Refreshes the preview geometry after the graph control changes state.</summary>
     /// <param name="state">The state emitted by the shared graph control.</param>
@@ -381,26 +383,23 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     /// <summary>Checks whether a graph state stays within the configured normal-slider SV limit.</summary>
     /// <param name="state">The candidate graph state produced by the graph editor.</param>
-    /// <returns><see langword="true"/> when the graph can be used for normal-slider export.</returns>
+    /// <returns><see langword="true" /> when the graph can be used for normal-slider export.</returns>
     public bool IsGraphWithinVelocityLimit(GraphState state)
     {
         ArgumentNullException.ThrowIfNull(state);
-        if (!ExportAsNormal)
-        {
-            return true;
-        }
+        if (!ExportAsNormal) return true;
 
         SlideratorOptions options = new()
         {
             GlobalSv = GlobalSv,
             PixelLength = PixelLength,
             GraphModeSetting = GraphModeSetting,
-            GraphState = state
+            GraphState = state,
         };
         return SlideratorEngine.GetMaximumVelocity(options) <= VelocityLimit + Precision.DoubleEpsilon;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
         string? path = await currentBeatmap.FindCurrentBeatmapAsync();
@@ -411,26 +410,18 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         }
 
         await RunPathAsync(
-                path,
-                settings.AlwaysQuickRun,
-                reloadEditor: settings.AlwaysQuickRun,
-                CancellationToken.None);
+            path,
+            settings.AlwaysQuickRun,
+            settings.AlwaysQuickRun,
+            CancellationToken.None);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override bool PrepareRun()
     {
         ValidateAllProperties();
         return !HasErrors && LoadedHitObjects.Count > 0 && VisibleHitObject is not null;
     }
-
-    string IQuickRun.OperationId => OperationId;
-
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
-
-    object IShellProjectFeature.Snapshot() => Snapshot();
-
-    void IShellProjectFeature.Install(object project) => Install((SlideratorProject)project);
 
     private async Task ImportAsync()
     {
@@ -451,18 +442,12 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     {
         try
         {
-            SlideratorImportResult result = await sliderator
+            var result = await sliderator
                 .ImportAsync(path, mode, TimeCode, cancellationToken);
-            if (result.Sliders.Count == 0)
-            {
-                return false;
-            }
+            if (result.Sliders.Count == 0) return false;
 
             LoadedHitObjects.Clear();
-            foreach (HitObject hitObject in result.Sliders)
-            {
-                LoadedHitObjects.Add(hitObject);
-            }
+            foreach (var hitObject in result.Sliders) LoadedHitObjects.Add(hitObject);
 
             GlobalSv = result.GlobalSv;
             DoEditorRead = result.PreferLiveEditor;
@@ -487,36 +472,33 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         bool reloadEditor,
         CancellationToken cancellationToken)
     {
-        HitObject? sourceSlider = VisibleHitObject;
-        if (sourceSlider is null)
-        {
-            return false;
-        }
+        var sourceSlider = VisibleHitObject;
+        if (sourceSlider is null) return false;
 
-        SlideratorProject project = Snapshot();
+        var project = Snapshot();
         bool preferLiveEditor = DoEditorRead;
         DoEditorRead = false;
-        ToolExecutionResult<SlideratorResult> execution = await Execution.ExecuteAsync(
-                new ToolExecutionRequest<SlideratorResult>(
-                    OperationId,
-                    "Sliderator",
-                    async context =>
-                    {
-                        SlideratorResult result = await sliderator.RunAsync(
-                            path,
-                            project,
-                            sourceSlider,
-                            reloadEditor,
-                            new Progress<double>(value => context.ReportProgress(value, "Sliderating")),
-                            context.CancellationToken,
-                            preferLiveEditor);
-                        return new ToolExecutionOutput<SlideratorResult>(
-                            result,
-                            quick ? null : "Done!",
-                            reloadEditor);
-                    }),
-                CreateProgress(),
-                cancellationToken);
+        var execution = await Execution.ExecuteAsync(
+            new ToolExecutionRequest<SlideratorResult>(
+                OperationId,
+                "Sliderator",
+                async context =>
+                {
+                    var result = await sliderator.RunAsync(
+                        path,
+                        project,
+                        sourceSlider,
+                        reloadEditor,
+                        new Progress<double>(value => context.ReportProgress(value, "Sliderating")),
+                        context.CancellationToken,
+                        preferLiveEditor);
+                    return new ToolExecutionOutput<SlideratorResult>(
+                        result,
+                        quick ? null : "Done!",
+                        reloadEditor);
+                }),
+            CreateProgress(),
+            cancellationToken);
         return execution.Status == ToolExecutionStatus.Succeeded && execution.Value is not null;
     }
 
@@ -553,19 +535,17 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     private void Install(SlideratorProject project)
     {
         ArgumentNullException.ThrowIfNull(project);
-        if (!Enum.IsDefined(project.ImportModeSetting) ||
-            !Enum.IsDefined(project.ExportModeSetting) ||
-            !Enum.IsDefined(project.GraphModeSetting) ||
-            !double.IsFinite(project.GlobalSv) ||
-            !double.IsFinite(project.GraphBeats) ||
-            !double.IsFinite(project.BeatsPerMinute) ||
-            !double.IsFinite(project.VelocityLimit) ||
-            !double.IsFinite(project.NewVelocity) ||
-            !double.IsFinite(project.MinDendrite) ||
-            project.GraphState is null)
-        {
+        if (!Enum.IsDefined(project.ImportModeSetting)
+            || !Enum.IsDefined(project.ExportModeSetting)
+            || !Enum.IsDefined(project.GraphModeSetting)
+            || !double.IsFinite(project.GlobalSv)
+            || !double.IsFinite(project.GraphBeats)
+            || !double.IsFinite(project.BeatsPerMinute)
+            || !double.IsFinite(project.VelocityLimit)
+            || !double.IsFinite(project.NewVelocity)
+            || !double.IsFinite(project.MinDendrite)
+            || project.GraphState is null)
             throw new InvalidDataException("Sliderator project is incomplete.");
-        }
 
         ImportModeSetting = project.ImportModeSetting;
         TimeCode = project.TimeCode ?? string.Empty;
@@ -597,7 +577,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private void UpdateVisibleHitObject()
     {
-        HitObject? visible = VisibleHitObject;
+        var visible = VisibleHitObject;
         if (visible is not null)
         {
             PixelLength = visible.PixelLength;
@@ -613,14 +593,15 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         OnPropertyChanged(nameof(VisibleHitObject));
     }
 
-    partial void OnVisibleHitObjectIndexChanged(int value) => UpdateVisibleHitObject();
+    partial void OnVisibleHitObjectIndexChanged(int value)
+    {
+        UpdateVisibleHitObject();
+    }
 
     partial void OnGraphBeatsChanged(double value)
     {
         if (VisibleHitObject is not null && double.IsFinite(value) && double.IsFinite(BeatsPerMinute) && BeatsPerMinute > 0)
-        {
             VisibleHitObject.TemporalLength = value / BeatsPerMinute * 60000;
-        }
 
         OnPropertyChanged(nameof(GraphDuration));
         UpdateGraphDerivedValues();
@@ -638,8 +619,16 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         UpdateGraphDerivedValues();
     }
 
-    partial void OnGlobalSvChanged(double value) => UpdateGraphDerivedValues();
-    partial void OnVelocityLimitChanged(double value) => UpdateGraphDerivedValues();
+    partial void OnGlobalSvChanged(double value)
+    {
+        UpdateGraphDerivedValues();
+    }
+
+    partial void OnVelocityLimitChanged(double value)
+    {
+        UpdateGraphDerivedValues();
+    }
+
     partial void OnGraphModeSettingChanged(SlideratorGraphMode value)
     {
         OnPropertyChanged(nameof(GraphModeText));
@@ -650,7 +639,11 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         OnPropertyChanged(nameof(GraphMaxY));
         UpdateGraphDerivedValues();
     }
-    partial void OnGraphStateChanged(GraphState value) => UpdateGraphDerivedValues();
+
+    partial void OnGraphStateChanged(GraphState value)
+    {
+        UpdateGraphDerivedValues();
+    }
 
     private void UpdateGraphDerivedValues()
     {
@@ -661,15 +654,12 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             BeatsPerMinute = BeatsPerMinute,
             PixelLength = PixelLength,
             GraphModeSetting = GraphModeSetting,
-            GraphState = GraphState
+            GraphState = GraphState,
         };
         DistanceTraveled = GraphModeSetting == SlideratorGraphMode.Velocity
             ? GraphState.GetIntegral(0, GraphBeats) * SvGraphMultiplier * PixelLength
             : GraphMath.GetDistanceTraveled(GraphState.Anchors) * PixelLength;
-        if (!ManualVelocity)
-        {
-            NewVelocity = SlideratorEngine.GetMaximumVelocity(options);
-        }
+        if (!ManualVelocity) NewVelocity = SlideratorEngine.GetMaximumVelocity(options);
 
         OnPropertyChanged(nameof(DistanceTraveled));
         OnPropertyChanged(nameof(SvGraphMultiplier));
@@ -683,17 +673,11 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     public double EvaluatePreviewProgress(double elapsedMilliseconds)
     {
         double duration = GraphDuration;
-        if (!double.IsFinite(duration) || duration <= 0 || elapsedMilliseconds < 0)
-        {
-            return 0;
-        }
+        if (!double.IsFinite(duration) || duration <= 0 || elapsedMilliseconds < 0) return 0;
 
         double cycleDuration = duration + 1000;
         double cycleMilliseconds = elapsedMilliseconds % cycleDuration;
-        if (cycleMilliseconds >= duration)
-        {
-            return -1;
-        }
+        if (cycleMilliseconds >= duration) return -1;
 
         double graphMilliseconds = cycleMilliseconds;
         double graphValue = GraphModeSetting == SlideratorGraphMode.Velocity
@@ -704,7 +688,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             GlobalSv = GlobalSv,
             PixelLength = PixelLength,
             GraphModeSetting = GraphModeSetting,
-            GraphState = GraphState
+            GraphState = GraphState,
         });
         return maximum <= Precision.DoubleEpsilon
             ? 0
@@ -721,7 +705,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private void UpdatePreview()
     {
-        HitObject? visible = VisibleHitObject;
+        var visible = VisibleHitObject;
         if (visible is null)
         {
             PreviewPixelLength = null;
@@ -734,7 +718,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             GlobalSv = GlobalSv,
             PixelLength = PixelLength,
             GraphModeSetting = GraphModeSetting,
-            GraphState = GraphState
+            GraphState = GraphState,
         };
         double customLength = SlideratorEngine.GetMaxCompletion(options) * PixelLength;
         PreviewPixelLength = double.IsFinite(customLength) && customLength >= 0 ? customLength : null;
@@ -749,10 +733,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         GraphState = GraphState.Clone();
         GraphState.MinY = GraphModeSetting == SlideratorGraphMode.Position ? 0 : -VelocityLimit;
         GraphState.MaxY = GraphModeSetting == SlideratorGraphMode.Position ? 1 : VelocityLimit;
-        if (GraphModeSetting == SlideratorGraphMode.Position && GraphState.Anchors.Count > 0)
-        {
-            GraphState.Anchors[0].Pos = new Vector2(GraphState.Anchors[0].Pos.X, 0);
-        }
+        if (GraphModeSetting == SlideratorGraphMode.Position && GraphState.Anchors.Count > 0) GraphState.Anchors[0].Pos = new Vector2(GraphState.Anchors[0].Pos.X, 0);
 
         UpdateGraphDerivedValues();
     }
@@ -764,14 +745,11 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                 "Confirm deletion",
                 "Clear the graph?",
                 [
-                    new DialogChoice<bool>("Delete", true, IsDefault: true),
-                    new DialogChoice<bool>("Cancel", false, IsCancel: true)
+                    new DialogChoice<bool>("Delete", true, true),
+                    new DialogChoice<bool>("Cancel", false, IsCancel: true),
                 ],
                 false));
-        if (!confirmed)
-        {
-            return;
-        }
+        if (!confirmed) return;
 
         GraphState = SlideratorOptions.CreatePositionGraph(GraphBeats);
         if (GraphModeSetting == SlideratorGraphMode.Velocity)
@@ -783,7 +761,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             GraphState = new GraphState(
                 [
                     new GraphAnchor(new Vector2(0, (float)velocity)),
-                    new GraphAnchor(new Vector2((float)GraphBeats, (float)velocity))
+                    new GraphAnchor(new Vector2((float)GraphBeats, (float)velocity)),
                 ],
                 0,
                 -VelocityLimit,
@@ -799,29 +777,20 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         double maximum = GraphModeSetting == SlideratorGraphMode.Velocity
             ? GraphState.GetMaxIntegral()
             : GraphState.GetMaxValue();
-        if (Math.Abs(maximum) < Precision.DoubleEpsilon)
-        {
-            return;
-        }
+        if (Math.Abs(maximum) < Precision.DoubleEpsilon) return;
 
-        ValueDialogResult<double> result = await dialogs.ShowValueAsync(
+        var result = await dialogs.ShowValueAsync(
             new ValueDialogRequest<double>(
                 "Scale graph",
                 "Scale graph maximum to:",
                 1,
                 new InvariantDoubleConverter()));
-        if (!result.Accepted || !double.IsFinite(result.Value))
-        {
-            return;
-        }
+        if (!result.Accepted || !double.IsFinite(result.Value)) return;
 
         double target = result.Value;
 
         GraphState = GraphState.Clone();
-        foreach (GraphAnchor anchor in GraphState.Anchors)
-        {
-            anchor.Pos = new Vector2(anchor.Pos.X, (float)(anchor.Pos.Y * target / maximum));
-        }
+        foreach (var anchor in GraphState.Anchors) anchor.Pos = new Vector2(anchor.Pos.X, (float)(anchor.Pos.Y * target / maximum));
 
         UpdateGraphDerivedValues();
     }
@@ -832,7 +801,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             new MessageDialogRequest<bool>(
                 "Sliderator",
                 message,
-                [new DialogChoice<bool>("OK", true, IsDefault: true, IsCancel: true)],
+                [new DialogChoice<bool>("OK", true, true, true)],
                 false));
     }
 }

@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution;
@@ -13,40 +13,25 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-/// Owns Mapset Merger's multi-mapset form, safe export execution, and legacy
-/// project persistence. The feature intentionally has no QuickRun target
-/// because its input is a collection of source directories.
+///     Owns Mapset Merger's multi-mapset form, safe export execution, and legacy
+///     project persistence. The feature intentionally has no QuickRun target
+///     because its input is a collection of source directories.
 /// </summary>
 public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShellProjectFeature
 {
     internal const string OperationId = "mapset-merger";
-
-    private readonly IMapsetMergerService _merger;
-    private readonly IFilePicker _filePicker;
-    private readonly IBeatmapWorkspace _workspace;
     private readonly ICurrentBeatmapLocator _currentBeatmap;
+
     private readonly ProjectDefinition<MapsetMergerProject> _definition = new(
         "mapsetmergerproject.json",
         "Mapset Merger Projects",
         static () => new MapsetMergerProject(),
         "mapset-merger-project.json");
 
-    /// <summary>Gets the editable source mapset rows in merge order.</summary>
-    public ObservableCollection<MapsetMergerItemViewModel> Mapsets { get; } = [];
+    private readonly IFilePicker _filePicker;
 
-    /// <summary>Gets or sets the export directory.</summary>
-    [ObservableProperty]
-    [NotifyDataErrorInfo]
-    [Required(ErrorMessage = "Select an export directory.")]
-    public partial string ExportPath { get; set; } = string.Empty;
-
-    /// <summary>Gets or sets whether the first storyboard is embedded in beatmaps.</summary>
-    [ObservableProperty]
-    public partial bool MoveSbToBeatmap { get; set; }
-
-    /// <summary>Gets the latest success or validation summary.</summary>
-    [ObservableProperty]
-    public partial string ResultSummary { get; private set; } = string.Empty;
+    private readonly IMapsetMergerService _merger;
+    private readonly IBeatmapWorkspace _workspace;
 
     /// <summary>Creates the Mapset Merger presentation model.</summary>
     /// <param name="merger">Stages and commits the merger operation.</param>
@@ -72,11 +57,52 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         ExportPath = directories.Exports;
     }
 
+    /// <summary>Gets the editable source mapset rows in merge order.</summary>
+    public ObservableCollection<MapsetMergerItemViewModel> Mapsets { get; } = [];
+
+    /// <summary>Gets or sets the export directory.</summary>
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "Select an export directory.")]
+    public partial string ExportPath { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets whether the first storyboard is embedded in beatmaps.</summary>
+    [ObservableProperty]
+    public partial bool MoveSbToBeatmap { get; set; }
+
+    /// <summary>Gets the latest success or validation summary.</summary>
+    [ObservableProperty]
+    public partial string ResultSummary { get; private set; } = string.Empty;
+
+    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
+
+    object IShellProjectFeature.Snapshot()
+    {
+        return Snapshot();
+    }
+
+    void IShellProjectFeature.Install(object project)
+    {
+        if (project is not MapsetMergerProject typed) throw new InvalidDataException("Mapset Merger project is incomplete.");
+
+        ExportPath = typed.ExportPath ?? string.Empty;
+        MoveSbToBeatmap = typed.MoveSbToBeatmap;
+        Mapsets.Clear();
+        foreach (var item in typed.Mapsets ?? [])
+            Mapsets.Add(new MapsetMergerItemViewModel(
+                _filePicker,
+                item.Name ?? string.Empty,
+                item.Path ?? string.Empty));
+    }
+
     /// <summary>Adds the directory containing the current osu! beatmap.</summary>
     [RelayCommand]
-    private Task AddMapsetAsync() => AddMapsetFromPathAsync(
-        _workspace.SelectedPaths.FirstOrDefault(),
-        "Select a beatmap in the shell or hold Shift to fetch the current osu! beatmap.");
+    private Task AddMapsetAsync()
+    {
+        return AddMapsetFromPathAsync(
+            _workspace.SelectedPaths.FirstOrDefault(),
+            "Select a beatmap in the shell or hold Shift to fetch the current osu! beatmap.");
+    }
 
     /// <summary>Adds the mapset containing the beatmap currently open in osu!.</summary>
     [RelayCommand]
@@ -98,7 +124,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     {
         string? directory = string.IsNullOrWhiteSpace(beatmapPath)
             ? null
-            : System.IO.Path.GetDirectoryName(beatmapPath);
+            : Path.GetDirectoryName(beatmapPath);
         if (string.IsNullOrWhiteSpace(directory))
         {
             ResultSummary = unavailableMessage;
@@ -117,21 +143,15 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     [RelayCommand]
     private void RemoveMapset()
     {
-        List<MapsetMergerItemViewModel> selected = Mapsets.Where(item => item.IsSelected).ToList();
+        var selected = Mapsets.Where(item => item.IsSelected).ToList();
         if (selected.Count > 0)
         {
-            foreach (MapsetMergerItemViewModel item in selected)
-            {
-                Mapsets.Remove(item);
-            }
+            foreach (var item in selected) Mapsets.Remove(item);
 
             return;
         }
 
-        if (Mapsets.Count > 0)
-        {
-            Mapsets.RemoveAt(Mapsets.Count - 1);
-        }
+        if (Mapsets.Count > 0) Mapsets.RemoveAt(Mapsets.Count - 1);
     }
 
     /// <summary>Chooses the final export directory.</summary>
@@ -140,17 +160,14 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     {
         try
         {
-            IReadOnlyList<string> paths = await _filePicker.PickFoldersAsync(new OpenFolderPickerRequest
+            var paths = await _filePicker.PickFoldersAsync(new OpenFolderPickerRequest
             {
                 Title = "Select export path",
                 SuggestedStartLocation = Directory.Exists(ExportPath) ? ExportPath : null,
-                AllowMultiple = false
+                AllowMultiple = false,
             });
             string? path = paths.FirstOrDefault();
-            if (!string.IsNullOrWhiteSpace(path))
-            {
-                ExportPath = path;
-            }
+            if (!string.IsNullOrWhiteSpace(path)) ExportPath = path;
         }
         catch (Exception exception)
         {
@@ -158,7 +175,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override bool PrepareRun()
     {
         ValidateAllProperties();
@@ -180,7 +197,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
             return false;
         }
 
-        foreach (MapsetMergerItemViewModel item in Mapsets)
+        foreach (var item in Mapsets)
         {
             try
             {
@@ -202,73 +219,44 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         return true;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        MapsetMergerProject project = Snapshot();
-        ToolExecutionResult<MapsetMergerResult> result = await Execution.ExecuteAsync(
+        var project = Snapshot();
+        var result = await Execution.ExecuteAsync(
             new ToolExecutionRequest<MapsetMergerResult>(
                 OperationId,
                 "Mapset Merger",
                 async context =>
                 {
-                    MapsetMergerResult merged = await _merger.MergeAsync(
+                    var merged = await _merger.MergeAsync(
                         project,
                         new Progress<double>(value => context.ReportProgress(value, "Merging mapsets")),
                         context.CancellationToken);
                     return new ToolExecutionOutput<MapsetMergerResult>(
                         merged,
-                        $"Successfully merged {merged.MapsetsMerged} " +
-                        $"{(merged.MapsetsMerged == 1 ? "mapset" : "mapsets")}!");
+                        $"Successfully merged {merged.MapsetsMerged} " + $"{(merged.MapsetsMerged == 1 ? "mapset" : "mapsets")}!");
                 }),
             CreateProgress());
 
         if (result.Status == ToolExecutionStatus.Succeeded && result.Value is not null)
-        {
-            ResultSummary = $"Successfully merged {result.Value.MapsetsMerged} " +
-                            $"{(result.Value.MapsetsMerged == 1 ? "mapset" : "mapsets")}!";
-        }
+            ResultSummary = $"Successfully merged {result.Value.MapsetsMerged} " + $"{(result.Value.MapsetsMerged == 1 ? "mapset" : "mapsets")}!";
         else if (result.Status == ToolExecutionStatus.Cancelled)
-        {
             ResultSummary = "Mapset Merger was cancelled.";
-        }
-        else if (result.Status == ToolExecutionStatus.Failed)
-        {
-            ResultSummary = result.Exception?.Message ?? "Mapset Merger failed.";
-        }
+        else if (result.Status == ToolExecutionStatus.Failed) ResultSummary = result.Exception?.Message ?? "Mapset Merger failed.";
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => _definition;
-
-    object IShellProjectFeature.Snapshot() => Snapshot();
-
-    void IShellProjectFeature.Install(object project)
+    private MapsetMergerProject Snapshot()
     {
-        if (project is not MapsetMergerProject typed)
+        return new MapsetMergerProject
         {
-            throw new InvalidDataException("Mapset Merger project is incomplete.");
-        }
-
-        ExportPath = typed.ExportPath ?? string.Empty;
-        MoveSbToBeatmap = typed.MoveSbToBeatmap;
-        Mapsets.Clear();
-        foreach (MapsetMergerProject.MapsetItem item in typed.Mapsets ?? [])
-        {
-            Mapsets.Add(new MapsetMergerItemViewModel(
-                _filePicker,
-                item.Name ?? string.Empty,
-                item.Path ?? string.Empty));
-        }
+            ExportPath = ExportPath,
+            MoveSbToBeatmap = MoveSbToBeatmap,
+            Mapsets = Mapsets.Select(item => new MapsetMergerProject.MapsetItem
+            {
+                Name = item.Name,
+                Path = item.Path,
+            }).ToList(),
+        };
     }
-
-    private MapsetMergerProject Snapshot() => new()
-    {
-        ExportPath = ExportPath,
-        MoveSbToBeatmap = MoveSbToBeatmap,
-        Mapsets = Mapsets.Select(item => new MapsetMergerProject.MapsetItem
-        {
-            Name = item.Name,
-            Path = item.Path
-        }).ToList()
-    };
 }

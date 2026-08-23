@@ -11,11 +11,11 @@ public sealed class AutoFailDetectorEngineTests
     public void Analyze_WithAcceptedPositiveFixture_ReproducesLegacyCounts()
     {
         // Arrange
-        Beatmap beatmap = Load("standard-autofail-2b.osu");
-        AutoFailDetectorEngine detector = CreateDetector(beatmap);
+        var beatmap = Load("standard-autofail-2b.osu");
+        var detector = CreateDetector(beatmap);
 
         // Act
-        AutoFailAnalysis result = detector.Analyze();
+        var result = detector.Analyze();
 
         // Assert
         result.HasAutoFail.Should().BeTrue();
@@ -27,11 +27,11 @@ public sealed class AutoFailDetectorEngineTests
     public void Analyze_WithAcceptedNegativeFixture_ReturnsNoAutoFail()
     {
         // Arrange
-        Beatmap beatmap = Load("ComplicatedTestMap.osu");
-        AutoFailDetectorEngine detector = CreateDetector(beatmap);
+        var beatmap = Load("ComplicatedTestMap.osu");
+        var detector = CreateDetector(beatmap);
 
         // Act
-        AutoFailAnalysis result = detector.Analyze();
+        var result = detector.Analyze();
 
         // Assert
         result.HasAutoFail.Should().BeFalse();
@@ -53,9 +53,12 @@ public sealed class AutoFailDetectorEngineTests
             9);
     }
 
-    private static Beatmap Load(string fileName) => new(
-        File.ReadAllLines(Path.Combine(
-            AppContext.BaseDirectory,
-            "Resources",
-            fileName)).ToList());
+    private static Beatmap Load(string fileName)
+    {
+        return new Beatmap(
+            File.ReadAllLines(Path.Combine(
+                AppContext.BaseDirectory,
+                "Resources",
+                fileName)).ToList());
+    }
 }

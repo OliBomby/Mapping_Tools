@@ -3,7 +3,7 @@ using Mapping_Tools.Core.Tools.PropertyTransformer;
 namespace Mapping_Tools.Application.PropertyTransformer;
 
 /// <summary>
-/// Represents the complete Property Transformer project persisted by the shell.
+///     Represents the complete Property Transformer project persisted by the shell.
 /// </summary>
 public sealed class PropertyTransformerProject : PropertyTransformerOptions
 {
@@ -18,12 +18,12 @@ public sealed record PropertyTransformerResult(IReadOnlyList<string> ProcessedPa
 }
 
 /// <summary>
-/// Runs Property Transformer over selected beatmaps and storyboards.
+///     Runs Property Transformer over selected beatmaps and storyboards.
 /// </summary>
 public interface IPropertyTransformerService
 {
     /// <summary>
-    /// Applies the configured transformations and saves every selected document.
+    ///     Applies the configured transformations and saves every selected document.
     /// </summary>
     /// <param name="paths">The beatmap or storyboard paths in selection order.</param>
     /// <param name="options">The multipliers, offsets, clipping, and filters to apply.</param>

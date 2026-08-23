@@ -6,12 +6,12 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.Classes.Tools.SnappingTools;
+using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 
@@ -24,9 +24,12 @@ public sealed class GeometryDashboardDialogService : IGeometryDashboardDialogSer
 
     /// <summary>Creates a dialog service owned by the shell window.</summary>
     /// <param name="owner">Returns the current shell window.</param>
-    public GeometryDashboardDialogService(Func<Window> owner) => _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+    public GeometryDashboardDialogService(Func<Window> owner)
+    {
+        _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<SnappingToolsPreferences?> ShowPreferencesAsync(SnappingToolsPreferences preferences)
     {
         GeometryDashboardPreferencesDialogViewModel viewModel = new(preferences);
@@ -35,7 +38,7 @@ public sealed class GeometryDashboardDialogService : IGeometryDashboardDialogSer
         return await window.ShowDialog<SnappingToolsPreferences?>(_owner());
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task ShowProjectSlotsAsync(
         SnappingToolsProject project,
         Action<SnappingToolsSaveSlot> loadSlot,
@@ -48,7 +51,7 @@ public sealed class GeometryDashboardDialogService : IGeometryDashboardDialogSer
         await Task.CompletedTask;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<bool> ShowGeneratorSettingsAsync(GeneratorSettings settings)
     {
         GeometryDashboardGeneratorSettingsDialogViewModel viewModel = new(settings);
@@ -87,12 +90,16 @@ public sealed partial class GeometryDashboardPreferencesDialogViewModel : Observ
 
     /// <summary>Gets or sets the complete graph while the snap key is down.</summary>
     public bool KeyDownEverything { get => Preferences.KeyDownViewMode.HasFlag(ViewMode.Everything); set => SetViewFlag(ViewMode.Everything, value); }
+
     /// <summary>Gets or sets the parent graph while the snap key is down.</summary>
     public bool KeyDownParents { get => Preferences.KeyDownViewMode.HasFlag(ViewMode.Parents); set => SetViewFlag(ViewMode.Parents, value); }
+
     /// <summary>Gets or sets direct parents while the snap key is down.</summary>
     public bool KeyDownDirectParents { get => Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectParents); set => SetViewFlag(ViewMode.DirectParents, value); }
+
     /// <summary>Gets or sets the child graph while the snap key is down.</summary>
     public bool KeyDownChildren { get => Preferences.KeyDownViewMode.HasFlag(ViewMode.Children); set => SetViewFlag(ViewMode.Children, value); }
+
     /// <summary>Gets or sets direct children while the snap key is down.</summary>
     public bool KeyDownDirectChildren { get => Preferences.KeyDownViewMode.HasFlag(ViewMode.DirectChildren); set => SetViewFlag(ViewMode.DirectChildren, value); }
 
@@ -107,56 +114,80 @@ public sealed partial class GeometryDashboardPreferencesDialogViewModel : Observ
     public bool KeyUpNothing
     {
         get => Preferences.KeyUpViewMode == ViewMode.Nothing;
-        set { if (value) SetKeyUpMode(ViewMode.Nothing); }
+        set
+        {
+            if (value) SetKeyUpMode(ViewMode.Nothing);
+        }
     }
 
     /// <summary>Gets or sets whether all hit objects are always shown.</summary>
     public bool SelectedAllVisible
     {
         get => Preferences.SelectedHitObjectMode == SelectedHitObjectMode.AllwaysAllVisible;
-        set { if (value) SetSelectedMode(SelectedHitObjectMode.AllwaysAllVisible); }
+        set
+        {
+            if (value) SetSelectedMode(SelectedHitObjectMode.AllwaysAllVisible);
+        }
     }
 
     /// <summary>Gets or sets whether visible objects or selected objects are shown.</summary>
     public bool SelectedVisibleOrSelected
     {
         get => Preferences.SelectedHitObjectMode == SelectedHitObjectMode.VisibleOrSelected;
-        set { if (value) SetSelectedMode(SelectedHitObjectMode.VisibleOrSelected); }
+        set
+        {
+            if (value) SetSelectedMode(SelectedHitObjectMode.VisibleOrSelected);
+        }
     }
 
     /// <summary>Gets or sets whether only selected hit objects are shown.</summary>
     public bool SelectedOnly
     {
         get => Preferences.SelectedHitObjectMode == SelectedHitObjectMode.OnlySelected;
-        set { if (value) SetSelectedMode(SelectedHitObjectMode.OnlySelected); }
+        set
+        {
+            if (value) SetSelectedMode(SelectedHitObjectMode.OnlySelected);
+        }
     }
 
     /// <summary>Gets or sets whether every editor change refreshes the graph.</summary>
     public bool UpdatingAnyChange
     {
         get => Preferences.UpdateMode == UpdateMode.AnyChange;
-        set { if (value) SetUpdateMode(UpdateMode.AnyChange); }
+        set
+        {
+            if (value) SetUpdateMode(UpdateMode.AnyChange);
+        }
     }
 
     /// <summary>Gets or sets whether editor time changes refresh the graph.</summary>
     public bool UpdatingTimeChange
     {
         get => Preferences.UpdateMode == UpdateMode.TimeChange;
-        set { if (value) SetUpdateMode(UpdateMode.TimeChange); }
+        set
+        {
+            if (value) SetUpdateMode(UpdateMode.TimeChange);
+        }
     }
 
     /// <summary>Gets or sets whether the refresh hotkey refreshes the graph.</summary>
     public bool UpdatingHotkeyDown
     {
         get => Preferences.UpdateMode == UpdateMode.HotkeyDown;
-        set { if (value) SetUpdateMode(UpdateMode.HotkeyDown); }
+        set
+        {
+            if (value) SetUpdateMode(UpdateMode.HotkeyDown);
+        }
     }
 
     /// <summary>Gets or sets whether activating osu! refreshes the graph.</summary>
     public bool UpdatingOsuActivated
     {
         get => Preferences.UpdateMode == UpdateMode.OsuActivated;
-        set { if (value) SetUpdateMode(UpdateMode.OsuActivated); }
+        set
+        {
+            if (value) SetUpdateMode(UpdateMode.OsuActivated);
+        }
     }
 
     /// <summary>Receives the window close callback.</summary>
@@ -164,11 +195,17 @@ public sealed partial class GeometryDashboardPreferencesDialogViewModel : Observ
 
     /// <summary>Applies the clone to the caller.</summary>
     [RelayCommand]
-    private void Apply() => Close?.Invoke(Preferences);
+    private void Apply()
+    {
+        Close?.Invoke(Preferences);
+    }
 
     /// <summary>Discards the clone.</summary>
     [RelayCommand]
-    private void Cancel() => Close?.Invoke(null);
+    private void Cancel()
+    {
+        Close?.Invoke(null);
+    }
 
     private void SetViewFlag(ViewMode flag, bool enabled)
     {
@@ -212,14 +249,20 @@ public sealed partial class GeometryDashboardPreferencesDialogViewModel : Observ
 /// <summary>Edits one neutral geometry appearance group.</summary>
 public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
 {
-    private string? _colorTextError;
     private string? _pendingColorText;
+
     /// <summary>Creates a row over one cloned appearance group.</summary>
-    public GeometryDashboardPreferenceRowViewModel(RelevantObjectPreferences preference) => Preference = preference;
+    public GeometryDashboardPreferenceRowViewModel(RelevantObjectPreferences preference)
+    {
+        Preference = preference;
+    }
+
     /// <summary>Gets the stable preference-group label.</summary>
     public string Name => Preference.Name;
+
     /// <summary>Gets the Core appearance settings.</summary>
     public RelevantObjectPreferences Preference { get; }
+
     /// <summary>Gets or sets the color using Avalonia's color-picker type.</summary>
     public Color Color
     {
@@ -227,13 +270,14 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
         set
         {
             Preference.Color = RgbaColour.FromArgb(value.A, value.R, value.G, value.B);
-            _colorTextError = null;
+            ColorTextError = null;
             _pendingColorText = null;
             OnPropertyChanged();
             OnPropertyChanged(nameof(ColorText));
             OnPropertyChanged(nameof(ColorTextError));
         }
     }
+
     /// <summary>Gets or sets the serialized color text.</summary>
     public string ColorText
     {
@@ -242,39 +286,78 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
         {
             string hex = (value ?? string.Empty).TrimStart('#');
             if (hex.Length == 6) hex = "FF" + hex;
-            if (hex.Length == 8 && byte.TryParse(hex[..2], System.Globalization.NumberStyles.HexNumber, null, out byte a) &&
-                byte.TryParse(hex[2..4], System.Globalization.NumberStyles.HexNumber, null, out byte r) &&
-                byte.TryParse(hex[4..6], System.Globalization.NumberStyles.HexNumber, null, out byte g) &&
-                byte.TryParse(hex[6..8], System.Globalization.NumberStyles.HexNumber, null, out byte b))
+            if (hex.Length == 8
+                && byte.TryParse(hex[..2], NumberStyles.HexNumber, null, out byte a)
+                && byte.TryParse(hex[2..4], NumberStyles.HexNumber, null, out byte r)
+                && byte.TryParse(hex[4..6], NumberStyles.HexNumber, null, out byte g)
+                && byte.TryParse(hex[6..8], NumberStyles.HexNumber, null, out byte b))
             {
                 Preference.Color = RgbaColour.FromArgb(a, r, g, b);
-                _colorTextError = null;
+                ColorTextError = null;
                 _pendingColorText = null;
             }
             else
             {
-                _colorTextError = "Color format error.";
+                ColorTextError = "Color format error.";
                 _pendingColorText = value;
             }
 
             OnPropertyChanged(nameof(Color));
-            OnPropertyChanged(nameof(ColorText));
+            OnPropertyChanged();
             OnPropertyChanged(nameof(ColorTextError));
         }
     }
 
     /// <summary>Gets the validation message for invalid hexadecimal colour text.</summary>
-    public string? ColorTextError => _colorTextError;
+    public string? ColorTextError { get; private set; }
+
     /// <summary>Gets or sets the opacity multiplier.</summary>
-    public double Opacity { get => Preference.Opacity; set { Preference.Opacity = value; OnPropertyChanged(); } }
+    public double Opacity
+    {
+        get => Preference.Opacity;
+        set
+        {
+            Preference.Opacity = value;
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>Gets or sets the stroke thickness.</summary>
-    public double Thickness { get => Preference.Thickness; set { Preference.Thickness = value; OnPropertyChanged(); } }
+    public double Thickness
+    {
+        get => Preference.Thickness;
+        set
+        {
+            Preference.Thickness = value;
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>Gets or sets the point size where supported.</summary>
-    public double Size { get => Preference.Size; set { Preference.Size = value; OnPropertyChanged(); } }
+    public double Size
+    {
+        get => Preference.Size;
+        set
+        {
+            Preference.Size = value;
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>Gets whether point size applies to this group.</summary>
     public bool HasSizeOption => Preference.HasSizeOption;
+
     /// <summary>Gets or sets the dash pattern.</summary>
-    public DashStylesEnum DashStyle { get => Preference.Dashstyle; set { Preference.Dashstyle = value; OnPropertyChanged(); } }
+    public DashStylesEnum DashStyle
+    {
+        get => Preference.Dashstyle;
+        set
+        {
+            Preference.Dashstyle = value;
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>Gets all available dash patterns.</summary>
     public IReadOnlyList<DashStylesEnum> DashStyles { get; } = Enum.GetValues<DashStylesEnum>();
 }
@@ -314,7 +397,7 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
     public void SetSelectedSlots(IEnumerable<SnappingToolsSaveSlot> slots)
     {
         SelectedSlots.Clear();
-        foreach (SnappingToolsSaveSlot slot in slots) SelectedSlots.Add(slot);
+        foreach (var slot in slots) SelectedSlots.Add(slot);
         SelectedSlot = SelectedSlots.LastOrDefault();
     }
 
@@ -325,10 +408,11 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
         SnappingToolsSaveSlot slot;
         lock (Project)
         {
-            slot = new() { Name = $"Save {Project.SaveSlots.Count + 1}" };
+            slot = new SnappingToolsSaveSlot { Name = $"Save {Project.SaveSlots.Count + 1}" };
             Project.SaveToSlot(slot);
             Project.SaveSlots.Add(slot);
         }
+
         SelectedSlot = slot;
     }
 
@@ -336,31 +420,39 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
     [RelayCommand]
     private void Remove()
     {
-        SnappingToolsSaveSlot[] slots = SelectedSlots.Count > 0
+        var slots = SelectedSlots.Count > 0
             ? SelectedSlots.ToArray()
-            : SelectedSlot is not null ? [SelectedSlot] : [];
+            : SelectedSlot is not null
+                ? [SelectedSlot]
+                : [];
         if (slots.Length == 0 && Project.SaveSlots.Count > 0) slots = [Project.SaveSlots[^1]];
         lock (Project)
         {
-            foreach (SnappingToolsSaveSlot slot in slots) Project.SaveSlots.Remove(slot);
+            foreach (var slot in slots) Project.SaveSlots.Remove(slot);
         }
+
         SelectedSlots.Clear();
-        lock (Project) SelectedSlot = Project.SaveSlots.LastOrDefault();
+        lock (Project)
+        {
+            SelectedSlot = Project.SaveSlots.LastOrDefault();
+        }
     }
 
     /// <summary>Duplicates the selected slot using the legacy copy suffix.</summary>
     [RelayCommand]
     private void Duplicate()
     {
-        SnappingToolsSaveSlot[] slots = SelectedSlots.Count > 0
+        var slots = SelectedSlots.Count > 0
             ? SelectedSlots.ToArray()
-            : SelectedSlot is not null ? [SelectedSlot] : [];
+            : SelectedSlot is not null
+                ? [SelectedSlot]
+                : [];
         SnappingToolsSaveSlot? lastCopy = null;
         lock (Project)
         {
-            foreach (SnappingToolsSaveSlot slot in slots)
+            foreach (var slot in slots)
             {
-                SnappingToolsSaveSlot copy = (SnappingToolsSaveSlot)slot.Clone();
+                var copy = (SnappingToolsSaveSlot)slot.Clone();
                 copy.Name += " - Copy";
                 Project.SaveSlots.Insert(Project.SaveSlots.IndexOf(slot) + 1, copy);
                 lastCopy = copy;
@@ -391,7 +483,10 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
 
     /// <summary>Re-registers all save-slot hotkeys after editing their definitions.</summary>
     [RelayCommand]
-    private void RefreshHotkeys() => _refreshHotkeys();
+    private void RefreshHotkeys()
+    {
+        _refreshHotkeys();
+    }
 }
 
 /// <summary>Reflects typed generator settings into a compact dialog row model.</summary>
@@ -407,10 +502,13 @@ public sealed partial class GeometryDashboardGeneratorSettingsDialogViewModel : 
 
     /// <summary>Gets the live settings instance being updated on Apply.</summary>
     public GeneratorSettings OriginalSettings { get; }
+
     /// <summary>Gets the independent settings copy.</summary>
     public GeneratorSettings Settings { get; }
+
     /// <summary>Gets reflected editable properties.</summary>
     public ObservableCollection<GeometryDashboardGeneratorSettingRowViewModel> Rows { get; }
+
     /// <summary>Gets the OR-combined input predicate collection.</summary>
     public SelectionPredicateCollection InputPredicates => Settings.InputPredicate;
 
@@ -421,37 +519,50 @@ public sealed partial class GeometryDashboardGeneratorSettingsDialogViewModel : 
     /// <summary>Gets the extended predicate selection used by duplicate/remove actions.</summary>
     public ObservableCollection<SelectionPredicate> SelectedPredicates { get; } = [];
 
+    /// <summary>Receives the window close callback.</summary>
+    public Action<bool>? Close { get; set; }
+
     /// <summary>Replaces the selected input predicates from the list control.</summary>
     /// <param name="predicates">The selected predicates.</param>
     public void SetSelectedPredicates(IEnumerable<SelectionPredicate> predicates)
     {
         SelectedPredicates.Clear();
-        foreach (SelectionPredicate predicate in predicates) SelectedPredicates.Add(predicate);
+        foreach (var predicate in predicates) SelectedPredicates.Add(predicate);
         SelectedPredicate = SelectedPredicates.LastOrDefault();
     }
-    /// <summary>Receives the window close callback.</summary>
-    public Action<bool>? Close { get; set; }
 
     /// <summary>Copies accepted values to the live generator.</summary>
     [RelayCommand]
-    private void Apply() { Settings.CopyTo(OriginalSettings); Close?.Invoke(true); }
+    private void Apply()
+    {
+        Settings.CopyTo(OriginalSettings);
+        Close?.Invoke(true);
+    }
 
     /// <summary>Discards the independent settings copy.</summary>
     [RelayCommand]
-    private void Cancel() => Close?.Invoke(false);
+    private void Cancel()
+    {
+        Close?.Invoke(false);
+    }
 
     /// <summary>Adds an empty predicate.</summary>
     [RelayCommand]
-    private void AddPredicate() => InputPredicates.Predicates.Add(new SelectionPredicate());
+    private void AddPredicate()
+    {
+        InputPredicates.Predicates.Add(new SelectionPredicate());
+    }
 
     /// <summary>Duplicates the selected predicate.</summary>
     [RelayCommand]
     private void DuplicatePredicate()
     {
-        SelectionPredicate[] predicates = SelectedPredicates.Count > 0
+        var predicates = SelectedPredicates.Count > 0
             ? SelectedPredicates.ToArray()
-            : SelectedPredicate is not null ? [SelectedPredicate] : [];
-        foreach (SelectionPredicate predicate in predicates)
+            : SelectedPredicate is not null
+                ? [SelectedPredicate]
+                : [];
+        foreach (var predicate in predicates)
         {
             int index = InputPredicates.Predicates.IndexOf(predicate);
             InputPredicates.Predicates.Insert(index + 1, (SelectionPredicate)predicate.Clone());
@@ -462,28 +573,27 @@ public sealed partial class GeometryDashboardGeneratorSettingsDialogViewModel : 
     [RelayCommand]
     private void RemovePredicate()
     {
-        SelectionPredicate[] predicates = SelectedPredicates.Count > 0
+        var predicates = SelectedPredicates.Count > 0
             ? SelectedPredicates.ToArray()
-            : SelectedPredicate is not null ? [SelectedPredicate] : [];
+            : SelectedPredicate is not null
+                ? [SelectedPredicate]
+                : [];
         if (predicates.Length == 0 && InputPredicates.Predicates.Count > 0)
             predicates = [InputPredicates.Predicates[^1]];
-        foreach (SelectionPredicate predicate in predicates) InputPredicates.Predicates.Remove(predicate);
+        foreach (var predicate in predicates) InputPredicates.Predicates.Remove(predicate);
         SelectedPredicates.Clear();
         SelectedPredicate = null;
     }
 
     private static IEnumerable<GeometryDashboardGeneratorSettingRowViewModel> CreateRows(GeneratorSettings settings)
     {
-        foreach (PropertyInfo property in settings.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+        foreach (var property in settings.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
         {
-            if (!property.CanRead || !property.CanWrite ||
-                property.Name == nameof(GeneratorSettings.Generator) ||
-                property.PropertyType != typeof(bool) &&
-                property.PropertyType != typeof(double) &&
-                property.PropertyType != typeof(string))
-            {
+            if (!property.CanRead
+                || !property.CanWrite
+                || property.Name == nameof(GeneratorSettings.Generator)
+                || property.PropertyType != typeof(bool) && property.PropertyType != typeof(double) && property.PropertyType != typeof(string))
                 continue;
-            }
 
             yield return new GeometryDashboardGeneratorSettingRowViewModel(settings, property);
         }
@@ -493,10 +603,9 @@ public sealed partial class GeometryDashboardGeneratorSettingsDialogViewModel : 
 /// <summary>Provides a reflected generator property to Avalonia bindings.</summary>
 public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableObject
 {
-    private readonly GeneratorSettings _settings;
     private readonly PropertyInfo _property;
+    private readonly GeneratorSettings _settings;
     private string? _pendingValueText;
-    private string? _valueTextError;
 
     /// <summary>Creates one reflected property row.</summary>
     public GeometryDashboardGeneratorSettingRowViewModel(GeneratorSettings settings, PropertyInfo property)
@@ -507,8 +616,10 @@ public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableOb
 
     /// <summary>Gets the property display name.</summary>
     public string Name => _property.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? _property.Name;
+
     /// <summary>Gets the explanatory tooltip declared by the Core setting.</summary>
     public string? Description => _property.GetCustomAttribute<DescriptionAttribute>()?.Description;
+
     /// <summary>Gets the underlying property value.</summary>
     public object? Value
     {
@@ -517,7 +628,7 @@ public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableOb
         {
             _property.SetValue(_settings, value);
             _pendingValueText = null;
-            _valueTextError = null;
+            ValueTextError = null;
             OnPropertyChanged();
             OnPropertyChanged(nameof(ValueText));
             OnPropertyChanged(nameof(ValueTextError));
@@ -541,37 +652,40 @@ public sealed class GeometryDashboardGeneratorSettingRowViewModel : ObservableOb
             catch (FormatException)
             {
                 _pendingValueText = value;
-                _valueTextError = "Number format error.";
+                ValueTextError = "Number format error.";
                 OnPropertyChanged(nameof(ValueTextError));
             }
             catch (OverflowException)
             {
                 _pendingValueText = value;
-                _valueTextError = "Number format error.";
+                ValueTextError = "Number format error.";
                 OnPropertyChanged(nameof(ValueTextError));
             }
             catch (InvalidCastException)
             {
                 _pendingValueText = value;
-                _valueTextError = "Number format error.";
+                ValueTextError = "Number format error.";
                 OnPropertyChanged(nameof(ValueTextError));
             }
         }
     }
 
     /// <summary>Gets the validation message for an invalid typed setting value.</summary>
-    public string? ValueTextError => _valueTextError;
+    public string? ValueTextError { get; private set; }
 
     /// <summary>Gets whether the reflected value has a simple text editor.</summary>
     public bool IsTextEditable => _property.PropertyType != typeof(bool);
+
     /// <summary>Gets whether this row represents a Boolean setting.</summary>
     public bool IsBoolean => _property.PropertyType == typeof(bool);
+
     /// <summary>Gets or sets the Boolean setting value.</summary>
     public bool BooleanValue
     {
         get => (bool)(Value ?? false);
         set => Value = value;
     }
+
     /// <summary>Gets the reflected property type.</summary>
     public Type ValueType => _property.PropertyType;
 }

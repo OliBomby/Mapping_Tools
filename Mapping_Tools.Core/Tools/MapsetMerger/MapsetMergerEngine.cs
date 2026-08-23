@@ -6,16 +6,16 @@ using Mapping_Tools.Core.Classes.BeatmapHelper.Events;
 namespace Mapping_Tools.Core.Tools.MapsetMerger;
 
 /// <summary>
-/// Applies Mapset Merger's document-only reference and conflict rules without
-/// reading or writing files.
+///     Applies Mapset Merger's document-only reference and conflict rules without
+///     reading or writing files.
 /// </summary>
 public static partial class MapsetMergerEngine
 {
     private static readonly StringComparer NameComparer = StringComparer.OrdinalIgnoreCase;
 
     /// <summary>
-    /// Renames repeated mapset names by appending the first available positive
-    /// integer, preserving the order in which inputs were supplied.
+    ///     Renames repeated mapset names by appending the first available positive
+    ///     integer, preserving the order in which inputs were supplied.
     /// </summary>
     /// <param name="mapsets">The mutable inputs to normalize.</param>
     /// <exception cref="ArgumentNullException">An input collection or item is null.</exception>
@@ -25,23 +25,20 @@ public static partial class MapsetMergerEngine
         ArgumentNullException.ThrowIfNull(mapsets);
         HashSet<string> used = new(NameComparer);
 
-        foreach (MapsetMergerInput mapset in mapsets)
+        foreach (var mapset in mapsets)
         {
             ArgumentNullException.ThrowIfNull(mapset);
             string original = RequireName(mapset.Name, nameof(mapsets));
             string candidate = original;
             int suffix = 0;
-            while (!used.Add(candidate))
-            {
-                candidate = original + ++suffix;
-            }
+            while (!used.Add(candidate)) candidate = original + ++suffix;
 
             mapset.Name = candidate;
         }
     }
 
     /// <summary>
-    /// Selects a unique difficulty name and records it in the supplied set.
+    ///     Selects a unique difficulty name and records it in the supplied set.
     /// </summary>
     /// <param name="requestedName">The metadata version from the source beatmap.</param>
     /// <param name="prefix">The mapset prefix used for conflicts.</param>
@@ -67,15 +64,14 @@ public static partial class MapsetMergerEngine
         do
         {
             candidate = prefix + requestedName + ++suffix;
-        }
-        while (!usedNames.Add(candidate));
+        } while (!usedNames.Add(candidate));
 
         return candidate;
     }
 
     /// <summary>
-    /// Rewrites all beatmap-owned references and remaps explicit custom sample
-    /// indices for one source mapset.
+    ///     Rewrites all beatmap-owned references and remaps explicit custom sample
+    ///     indices for one source mapset.
     /// </summary>
     /// <param name="beatmap">The mutable beatmap to rewrite.</param>
     /// <param name="mapsetName">The output folder name for this source.</param>
@@ -91,10 +87,7 @@ public static partial class MapsetMergerEngine
         ArgumentNullException.ThrowIfNull(beatmap);
         ValidateMapsetName(mapsetName);
         ArgumentNullException.ThrowIfNull(sampleIndices);
-        if (nextSampleIndex < 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(nextSampleIndex));
-        }
+        if (nextSampleIndex < 1) throw new ArgumentOutOfRangeException(nameof(nextSampleIndex));
 
         MapsetMergerReferences references = new();
         string audioFilename = beatmap.General["AudioFilename"].Value.Trim();
@@ -106,53 +99,41 @@ public static partial class MapsetMergerEngine
 
         double sliderTickRate = beatmap.Difficulty["SliderTickRate"].DoubleValue;
         // All hitsound files with custom indices
-        foreach (HitObject hitObject in beatmap.HitObjects)
-        {
+        foreach (var hitObject in beatmap.HitObjects)
             references.HitSoundFiles.UnionWith(
-                hitObject.GetPlayingBodyFilenames(sliderTickRate, includeDefaults: false));
-        }
+                hitObject.GetPlayingBodyFilenames(sliderTickRate, false));
 
-        GameMode mode = (GameMode)beatmap.General["Mode"].IntValue;
-        Timeline timeline = beatmap.GetTimeline();
+        var mode = (GameMode)beatmap.General["Mode"].IntValue;
+        var timeline = beatmap.GetTimeline();
         // All explicitly referenced audio files like filename hs, SB samples
-        foreach (TimelineObject timelineObject in timeline.TimelineObjects)
-        {
-            foreach (string filename in timelineObject.GetPlayingFilenames(mode, includeDefaults: false))
+        foreach (var timelineObject in timeline.TimelineObjects)
+        foreach (string filename in timelineObject.GetPlayingFilenames(mode, false))
+            if (!string.IsNullOrEmpty(filename) && string.Equals(filename, timelineObject.Filename, StringComparison.Ordinal))
             {
-                if (!string.IsNullOrEmpty(filename) &&
-                    string.Equals(filename, timelineObject.Filename, StringComparison.Ordinal))
-                {
-                    references.OtherAudioFiles.Add(filename);
-                    timelineObject.Filename = CombineReference(mapsetName, filename);
-                    timelineObject.HitsoundsToOrigin();
-                }
-                else if (!string.IsNullOrEmpty(filename))
-                {
-                    references.HitSoundFiles.Add(filename);
-                }
+                references.OtherAudioFiles.Add(filename);
+                timelineObject.Filename = CombineReference(mapsetName, filename);
+                timelineObject.HitsoundsToOrigin();
             }
-        }
+            else if (!string.IsNullOrEmpty(filename))
+            {
+                references.HitSoundFiles.Add(filename);
+            }
 
         // All hitsound indices in the beatmaps. Old index to new index
         // Adjust the remaining custom indices
-        foreach (HitObject hitObject in beatmap.HitObjects)
-        {
-            hitObject.CustomIndex = RemapIndex(hitObject.CustomIndex, sampleIndices, ref nextSampleIndex);
-        }
+        foreach (var hitObject in beatmap.HitObjects) hitObject.CustomIndex = RemapIndex(hitObject.CustomIndex, sampleIndices, ref nextSampleIndex);
 
-        foreach (TimingPoint timingPoint in beatmap.BeatmapTiming.TimingPoints)
-        {
+        foreach (var timingPoint in beatmap.BeatmapTiming.TimingPoints)
             timingPoint.SampleIndex = RemapIndex(
                 timingPoint.SampleIndex,
                 sampleIndices,
                 ref nextSampleIndex);
-        }
 
         return references;
     }
 
     /// <summary>
-    /// Rewrites storyboard event references recursively and returns their asset set.
+    ///     Rewrites storyboard event references recursively and returns their asset set.
     /// </summary>
     /// <param name="storyboard">The storyboard to rewrite.</param>
     /// <param name="mapsetName">The output folder name for this source.</param>
@@ -184,10 +165,8 @@ public static partial class MapsetMergerEngine
     {
         ValidateMapsetName(mapsetName);
         ArgumentException.ThrowIfNullOrWhiteSpace(reference);
-        if (Path.IsPathRooted(reference) || reference.Split(['/', '\\']).Any(part => part is ".."))
-        {
+        if (Path.IsPathRooted(reference) || reference.Split('/', '\\').Any(part => part is ".."))
             throw new InvalidDataException($"The asset reference '{reference}' is not relative.");
-        }
 
         return Path.Combine(mapsetName, reference);
     }
@@ -197,14 +176,10 @@ public static partial class MapsetMergerEngine
     public static void ValidateMapsetName(string name)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        if (name is "." or ".." ||
-            name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
-            name.IndexOfAny([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar]) >= 0)
-        {
+        if (name is "." or ".." || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || name.IndexOfAny([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar]) >= 0)
             throw new ArgumentException(
                 "Mapset names must be one safe filesystem path segment.",
                 nameof(name));
-        }
     }
 
     private static int RemapIndex(
@@ -212,10 +187,7 @@ public static partial class MapsetMergerEngine
         IDictionary<int, int> sampleIndices,
         ref int nextSampleIndex)
     {
-        if (index == 0)
-        {
-            return 0;
-        }
+        if (index == 0) return 0;
 
         if (!sampleIndices.TryGetValue(index, out int mapped))
         {
@@ -231,7 +203,7 @@ public static partial class MapsetMergerEngine
         string mapsetName,
         MapsetMergerReferences references)
     {
-        foreach (Event @event in events)
+        foreach (var @event in events)
         {
             switch (@event)
             {
@@ -243,10 +215,8 @@ public static partial class MapsetMergerEngine
                     string animationDirectory = Path.GetDirectoryName(animation.FilePath) ?? string.Empty;
                     string animationStem = Path.GetFileNameWithoutExtension(animation.FilePath);
                     for (int index = 0; index < animation.FrameCount; index++)
-                    {
                         references.ImageFiles.Add(
                             Path.Combine(animationDirectory, animationStem + index));
-                    }
 
                     animation.FilePath = CombineReference(mapsetName, animation.FilePath);
                     break;
@@ -264,10 +234,7 @@ public static partial class MapsetMergerEngine
                     break;
             }
 
-            if (@event.ChildEvents.Count > 0)
-            {
-                RewriteEvents(@event.ChildEvents, mapsetName, references);
-            }
+            if (@event.ChildEvents.Count > 0) RewriteEvents(@event.ChildEvents, mapsetName, references);
         }
     }
 
@@ -281,8 +248,8 @@ public static partial class MapsetMergerEngine
     private static partial Regex HitsoundSampleFilenameRegex();
 
     /// <summary>
-    /// Converts a source custom sample filename into its output filename while
-    /// retaining the legacy index-one/no-suffix convention.
+    ///     Converts a source custom sample filename into its output filename while
+    ///     retaining the legacy index-one/no-suffix convention.
     /// </summary>
     /// <param name="filename">The source filename without or with an extension.</param>
     /// <param name="mappedIndex">The remapped custom index.</param>
@@ -290,18 +257,12 @@ public static partial class MapsetMergerEngine
     public static string GetRemappedHitsoundFilename(string filename, int mappedIndex)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(filename);
-        if (mappedIndex < 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(mappedIndex));
-        }
+        if (mappedIndex < 1) throw new ArgumentOutOfRangeException(nameof(mappedIndex));
 
         string extension = Path.GetExtension(filename);
         string extensionless = Path.GetFileNameWithoutExtension(filename);
-        Match match = HitsoundSampleFilenameRegex().Match(extensionless);
-        if (!match.Success)
-        {
-            return Path.GetFileName(filename);
-        }
+        var match = HitsoundSampleFilenameRegex().Match(extensionless);
+        if (!match.Success) return Path.GetFileName(filename);
 
         string suffix = mappedIndex == 1 ? string.Empty : mappedIndex.ToString();
         return match.Value + suffix + extension;

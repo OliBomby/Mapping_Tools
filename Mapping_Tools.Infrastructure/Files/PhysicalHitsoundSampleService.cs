@@ -1,13 +1,14 @@
 using Mapping_Tools.Application.HitsoundCopier;
 using Mapping_Tools.Application.MapCleaner;
+using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.HitsoundStuff;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
 
 namespace Mapping_Tools.Infrastructure.Files;
 
 /// <summary>
-/// Supplies physical sample paths for Hitsound Copier while leaving audio decoding and
-/// generation behind the Application port for the later audio wave.
+///     Supplies physical sample paths for Hitsound Copier while leaving audio decoding and
+///     generation behind the Application port for the later audio wave.
 /// </summary>
 public sealed class PhysicalHitsoundSampleService : IHitsoundSampleService
 {
@@ -20,19 +21,21 @@ public sealed class PhysicalHitsoundSampleService : IHitsoundSampleService
         _sampleAnalyzer = sampleAnalyzer ?? throw new ArgumentNullException(nameof(sampleAnalyzer));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task<IReadOnlyDictionary<string, string>> AnalyzeAsync(
         string directory,
-        CancellationToken cancellationToken = default) =>
-        _sampleAnalyzer.AnalyzeAsync(directory, detectDuplicates: true, cancellationToken);
+        CancellationToken cancellationToken = default)
+    {
+        return _sampleAnalyzer.AnalyzeAsync(directory, true, cancellationToken);
+    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public HitsoundSampleAssignment? TryCreateAssignment(
         string directory,
         IReadOnlyList<string> sourceFilenames,
         IReadOnlyDictionary<string, string> firstSamples,
         string role,
-        Mapping_Tools.Core.Classes.BeatmapHelper.Enums.SampleSet sampleSet,
+        SampleSet sampleSet,
         int startIndex,
         SampleSchema existingSchema)
     {
@@ -50,40 +53,29 @@ public sealed class PhysicalHitsoundSampleService : IHitsoundSampleService
                 Path.GetDirectoryName(path) ?? directory,
                 Path.GetFileNameWithoutExtension(path));
             if (firstSamples.TryGetValue(extensionless, out string? canonical))
-            {
                 source.Add(new SampleGeneratingArgs(canonical));
-            }
-            else if (File.Exists(path))
-            {
-                source.Add(new SampleGeneratingArgs(path));
-            }
-        }
-        if (source.Count == 0)
-        {
-            return null;
+            else if (File.Exists(path)) source.Add(new SampleGeneratingArgs(path));
         }
 
-        HashSet<string> existingKeys = existingSchema.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        if (source.Count == 0) return null;
+
+        var existingKeys = existingSchema.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
         bool added = existingSchema.AddHitsound(
             source,
             role,
             sampleSet,
             out int index,
-            out Mapping_Tools.Core.Classes.BeatmapHelper.Enums.SampleSet assignedSet,
+            out var assignedSet,
             startIndex);
         SampleSchema addedSchema = new();
         if (added)
-        {
             foreach (string key in existingSchema.Keys.Where(key => !existingKeys.Contains(key)))
-            {
                 addedSchema.Add(key, existingSchema[key]);
-            }
-        }
 
         return new HitsoundSampleAssignment(index, assignedSet, addedSchema);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(schema);

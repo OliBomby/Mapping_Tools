@@ -36,32 +36,40 @@ internal sealed class TestBeatmapBackupService : IBeatmapBackupService
         CreateRequests.Add(([session.Editor.Path], reason, force));
         return Task.FromResult(
             new BeatmapBackupResult(
-                [new BeatmapBackupArtifact(
-                    session.Editor.Path + ".backup",
-                    session.Editor.Path,
-                    reason,
-                    session.Source == BeatmapEditingSource.LiveEditor,
-                    DateTimeOffset.UnixEpoch)],
+                [
+                    new BeatmapBackupArtifact(
+                        session.Editor.Path + ".backup",
+                        session.Editor.Path,
+                        reason,
+                        session.Source == BeatmapEditingSource.LiveEditor,
+                        DateTimeOffset.UnixEpoch),
+                ],
                 false));
     }
 
     public Task<BeatmapBackupArtifact?> CreatePeriodicIfChangedAsync(
         BeatmapEditingSession session,
-        CancellationToken cancellationToken = default) =>
+        CancellationToken cancellationToken = default)
+    {
         throw new NotSupportedException();
+    }
 
     public Task<BeatmapRestoreResult> RestoreAsync(
         string backupPath,
         string destinationPath,
         bool allowDifferentFilename = false,
         bool reloadEditor = false,
-        CancellationToken cancellationToken = default) =>
+        CancellationToken cancellationToken = default)
+    {
         throw new NotSupportedException();
+    }
 
     public Task<BeatmapRestoreResult?> QuickUndoAsync(
         string destinationPath,
         bool allowDifferentFilename = false,
         bool reloadEditor = false,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult<BeatmapRestoreResult?>(null);
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult<BeatmapRestoreResult?>(null);
+    }
 }

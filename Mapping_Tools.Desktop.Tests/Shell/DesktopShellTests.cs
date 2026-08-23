@@ -25,8 +25,8 @@ public sealed class DesktopShellTests
     public void ShellFeatureRegistry_DuplicateIdentifier_Throws()
     {
         // Arrange
-        ShellFeatureRegistration first = Registration("same", "First", () => new StubFeatureViewModel());
-        ShellFeatureRegistration second = Registration("SAME", "Second", () => new StubFeatureViewModel());
+        var first = Registration("same", "First", () => new StubFeatureViewModel());
+        var second = Registration("SAME", "Second", () => new StubFeatureViewModel());
 
         // Act
         Action act = () => _ = new ShellFeatureRegistry([first, second]);
@@ -40,7 +40,7 @@ public sealed class DesktopShellTests
     public void MainViewModel_SearchPartialExactAndClear_FiltersRegisteredFeatures()
     {
         // Arrange
-        using MainViewModel viewModel = CreateMainViewModel(
+        using var viewModel = CreateMainViewModel(
             [Registration("get-started", "Get started"), Registration("timing", "Timing copier")]);
 
         // Act
@@ -66,7 +66,7 @@ public sealed class DesktopShellTests
     public void MainViewModel_SearchExcludesHighlightedItem_HighlightsFirstVisibleFeature()
     {
         // Arrange
-        using MainViewModel viewModel = CreateMainViewModel(
+        using var viewModel = CreateMainViewModel(
             [Registration("get-started", "Get started"), Registration("timing", "Timing copier")]);
 
         // Act
@@ -80,9 +80,9 @@ public sealed class DesktopShellTests
     public void MoveHighlightedFeature_WithKeyboardOffsets_ChangesOnlyHighlightedItem()
     {
         // Arrange
-        using MainViewModel viewModel = CreateMainViewModel(
+        using var viewModel = CreateMainViewModel(
             [Registration("first", "First"), Registration("second", "Second")]);
-        ShellFeatureItemViewModel initiallyActive = viewModel.SelectedFeature!;
+        var initiallyActive = viewModel.SelectedFeature!;
 
         // Act
         viewModel.MoveHighlightedFeature(1);
@@ -96,7 +96,7 @@ public sealed class DesktopShellTests
     public void ActivateHighlightedFeature_WithKeyboardSelection_OpensHighlightedPage()
     {
         // Arrange
-        using MainViewModel viewModel = CreateMainViewModel(
+        using var viewModel = CreateMainViewModel(
             [Registration("first", "First"), Registration("second", "Second")]);
         viewModel.MoveHighlightedFeature(1);
 
@@ -113,10 +113,10 @@ public sealed class DesktopShellTests
     {
         // Arrange
         ApplicationSettings settings = new();
-        using MainViewModel viewModel = CreateMainViewModel(
+        using var viewModel = CreateMainViewModel(
             [Registration("alpha", "Alpha"), Registration("zulu", "Zulu")],
             settings);
-        ShellFeatureItemViewModel zulu = viewModel.FeatureItems.Single(item => item.Id == "zulu");
+        var zulu = viewModel.FeatureItems.Single(item => item.Id == "zulu");
 
         // Act
         zulu.ToggleFavoriteCommand.Execute(null);
@@ -133,14 +133,14 @@ public sealed class DesktopShellTests
         // Arrange
         ApplicationSettings settings = new()
         {
-            FavoriteTools = ["favorite"]
+            FavoriteTools = ["favorite"],
         };
-        using MainViewModel viewModel = CreateMainViewModel(
+        using var viewModel = CreateMainViewModel(
         [
             Registration("get-started", "Get started", category: "General"),
             Registration("preferences", "Preferences", category: "General"),
             Registration("ordinary", "Ordinary"),
-            Registration("favorite", "Favorite tool")
+            Registration("favorite", "Favorite tool"),
         ], settings);
 
         // Act
@@ -165,7 +165,7 @@ public sealed class DesktopShellTests
     public void Prepare_WithFeature_AssignsTooltipAndContextMenuToListBoxItem()
     {
         // Arrange
-        ShellFeatureRegistration registration = Registration("feature", "Feature");
+        var registration = Registration("feature", "Feature");
         ShellFeatureItemViewModel feature = new(
             registration,
             0,
@@ -175,12 +175,12 @@ public sealed class DesktopShellTests
         NavigationListBoxItem container = new();
 
         // Act
-        container.Prepare(feature, icon: null);
+        container.Prepare(feature, null);
 
         // Assert
         ToolTip.GetTip(container).Should().Be(feature.Description);
         container.ContextMenu.Should().NotBeNull();
-        MenuItem menuItem = container.ContextMenu!.Items.Single().Should().BeOfType<MenuItem>().Subject;
+        var menuItem = container.ContextMenu!.Items.Single().Should().BeOfType<MenuItem>().Subject;
         menuItem.Header.Should().Be("Favorite");
         menuItem.Command.Should().BeSameAs(feature.ToggleFavoriteCommand);
     }
@@ -191,13 +191,13 @@ public sealed class DesktopShellTests
         // Arrange
         StubFeatureViewModel first = new();
         StubFeatureViewModel second = new();
-        using MainViewModel viewModel = CreateMainViewModel(
+        using var viewModel = CreateMainViewModel(
         [
             Registration("first", "First", () => first),
-            Registration("second", "Second", () => second)
+            Registration("second", "Second", () => second),
         ]);
-        ShellFeatureItemViewModel secondItem = viewModel.FeatureItems.Single(item => item.Id == "second");
-        ShellFeatureItemViewModel firstItem = viewModel.FeatureItems.Single(item => item.Id == "first");
+        var secondItem = viewModel.FeatureItems.Single(item => item.Id == "second");
+        var firstItem = viewModel.FeatureItems.Single(item => item.Id == "first");
 
         // Act
         secondItem.ActivateCommand.Execute(null);
@@ -222,14 +222,14 @@ public sealed class DesktopShellTests
             QuickRunTargets.Always,
             _ => Task.CompletedTask));
         StubQuickRunFeatureViewModel quickTool = new();
-        using MainViewModel viewModel = CreateMainViewModel(
+        using var viewModel = CreateMainViewModel(
             [
                 Registration("ordinary", "Ordinary"),
-                Registration("quick", "Quick", () => quickTool)
+                Registration("quick", "Quick", () => quickTool),
             ],
             quickRunRegistry: quickRunRegistry);
-        ShellFeatureItemViewModel quickItem = viewModel.FeatureItems.Single(item => item.Id == "quick");
-        ShellFeatureItemViewModel ordinaryItem = viewModel.FeatureItems.Single(item => item.Id == "ordinary");
+        var quickItem = viewModel.FeatureItems.Single(item => item.Id == "quick");
+        var ordinaryItem = viewModel.FeatureItems.Single(item => item.Id == "ordinary");
 
         // Act
         quickItem.ActivateCommand.Execute(null);
@@ -248,16 +248,16 @@ public sealed class DesktopShellTests
     public void MainViewModel_ActivateFeature_AppliesShellOwnedScrollContract()
     {
         // Arrange
-        using MainViewModel viewModel = CreateMainViewModel(
+        using var viewModel = CreateMainViewModel(
         [
             Registration("first", "First"),
             Registration(
                 "second",
                 "Second",
                 horizontalScrollBarVisibility: ScrollBarVisibility.Auto,
-                verticalScrollBarVisibility: ScrollBarVisibility.Visible)
+                verticalScrollBarVisibility: ScrollBarVisibility.Visible),
         ]);
-        ShellFeatureItemViewModel second = viewModel.FeatureItems.Single(item => item.Id == "second");
+        var second = viewModel.FeatureItems.Single(item => item.Id == "second");
 
         // Act
         second.ActivateCommand.Execute(null);
@@ -272,7 +272,7 @@ public sealed class DesktopShellTests
     {
         // Arrange
         UserNotificationService notifications = new();
-        using MainViewModel viewModel = CreateMainViewModel(notifications: notifications);
+        using var viewModel = CreateMainViewModel(notifications: notifications);
         UserNotification repeated = new(
             UserNotificationSeverity.Warning,
             "Check map",
@@ -298,7 +298,7 @@ public sealed class DesktopShellTests
     {
         // Arrange
         RecordingLauncher launcher = new();
-        using MainViewModel viewModel = CreateMainViewModel(launcher: launcher);
+        using var viewModel = CreateMainViewModel(launcher: launcher);
 
         // Act
         await ExecuteAsync(viewModel.OpenWebsiteCommand);
@@ -317,7 +317,7 @@ public sealed class DesktopShellTests
         List<UserNotification> published = [];
         notifications.Published += (_, eventArgs) =>
             published.Add(eventArgs.Notification);
-        using MainViewModel viewModel = CreateMainViewModel(
+        using var viewModel = CreateMainViewModel(
             notifications: notifications,
             launcher: launcher);
 
@@ -337,7 +337,7 @@ public sealed class DesktopShellTests
     {
         // Arrange
         RecordingLauncher launcher = new();
-        using MainViewModel viewModel = CreateMainViewModel(launcher: launcher);
+        using var viewModel = CreateMainViewModel(launcher: launcher);
 
         // Act
         await ExecuteAsync(viewModel.OpenDonateCommand);
@@ -352,7 +352,7 @@ public sealed class DesktopShellTests
     {
         // Arrange
         TestDialogService dialogs = new();
-        using MainViewModel viewModel = CreateMainViewModel(dialogs: dialogs);
+        using var viewModel = CreateMainViewModel(dialogs: dialogs);
 
         // Act
         await ExecuteAsync(viewModel.OpenAboutCommand);
@@ -368,7 +368,7 @@ public sealed class DesktopShellTests
     {
         // Arrange
         TestBetterSaveService betterSave = new();
-        using MainViewModel viewModel = CreateMainViewModel(betterSave: betterSave);
+        using var viewModel = CreateMainViewModel(betterSave: betterSave);
 
         // Act
         await ExecuteAsync(viewModel.BetterSaveCommand);
@@ -384,14 +384,14 @@ public sealed class DesktopShellTests
         StubProjectFeatureViewModel project = new();
         RecordingProjectService projectService = new();
         TestDialogService dialogs = new() { BooleanResult = true };
-        using MainViewModel viewModel = CreateMainViewModel(
+        using var viewModel = CreateMainViewModel(
             [
                 Registration("home", "Home"),
-                Registration("project", "Project", () => project)
+                Registration("project", "Project", () => project),
             ],
             dialogs: dialogs,
             projectService: projectService);
-        ShellFeatureItemViewModel projectItem = viewModel.FeatureItems
+        var projectItem = viewModel.FeatureItems
             .Single(item => item.Id == "project");
 
         // Act
@@ -413,7 +413,7 @@ public sealed class DesktopShellTests
         // Arrange
         StubProjectFeatureViewModel project = new();
         TestDialogService dialogs = new() { BooleanResult = false };
-        using MainViewModel viewModel = CreateMainViewModel(
+        using var viewModel = CreateMainViewModel(
             [Registration("project", "Project", () => project)],
             dialogs: dialogs);
 
@@ -423,7 +423,7 @@ public sealed class DesktopShellTests
         // Assert
         project.InstallCount.Should().Be(0);
         dialogs.MessageCount.Should().Be(1);
-        MessageDialogRequest<bool> request = dialogs.LastMessageRequest.Should()
+        var request = dialogs.LastMessageRequest.Should()
             .BeOfType<MessageDialogRequest<bool>>().Subject;
         request.Title.Should().Be("Confirm new project");
         request.Message.Should().Be(
@@ -440,7 +440,7 @@ public sealed class DesktopShellTests
         DesktopWorkingArea primary = new(0, 0, 1920, 1040, true);
 
         // Act
-        WindowBounds restored = WindowPlacementCalculator.Restore(
+        var restored = WindowPlacementCalculator.Restore(
             disconnected,
             [primary],
             new WindowBounds(80, 60, 1100, 720));
@@ -458,7 +458,7 @@ public sealed class DesktopShellTests
         DesktopWorkingArea primary = new(0, 0, 1024, 700, true);
 
         // Act
-        WindowBounds restored = WindowPlacementCalculator.Restore(
+        var restored = WindowPlacementCalculator.Restore(
             oversized,
             [primary],
             fallback);
@@ -477,11 +477,10 @@ public sealed class DesktopShellTests
         IQuickRunCommandRegistry? quickRunRegistry = null,
         RecordingProjectService? projectService = null)
     {
-        ApplicationSettings resolvedSettings = settings ?? new ApplicationSettings();
-        IUserNotificationService resolvedNotifications = notifications ?? new UserNotificationService();
-        TestDialogService resolvedDialogs = dialogs ?? new TestDialogService();
-        IQuickRunCommandRegistry resolvedQuickRunRegistry = quickRunRegistry ??
-            new QuickRunCommandRegistry();
+        var resolvedSettings = settings ?? new ApplicationSettings();
+        var resolvedNotifications = notifications ?? new UserNotificationService();
+        var resolvedDialogs = dialogs ?? new TestDialogService();
+        var resolvedQuickRunRegistry = quickRunRegistry ?? new QuickRunCommandRegistry();
         projectService ??= new RecordingProjectService();
         ImmediateDispatcher dispatcher = new();
         BeatmapWorkspaceViewModel workspace = new(
@@ -496,8 +495,7 @@ public sealed class DesktopShellTests
             resolvedNotifications,
             dispatcher);
         return new MainViewModel(
-            new ShellFeatureRegistry(registrations ??
-                [Registration("get-started", "Get started")]),
+            new ShellFeatureRegistry(registrations ?? [Registration("get-started", "Get started")]),
             resolvedQuickRunRegistry,
             resolvedSettings,
             resolvedNotifications,
@@ -509,8 +507,7 @@ public sealed class DesktopShellTests
             new ProjectAutosaveCoordinator(
                 projectService,
                 resolvedDialogs,
-                resolvedNotifications),
-            updaterInteraction: null);
+                resolvedNotifications));
     }
 
     private static ShellFeatureRegistration Registration(
@@ -519,8 +516,9 @@ public sealed class DesktopShellTests
         Func<ObservableObject>? factory = null,
         string category = "Tools",
         ScrollBarVisibility horizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-        ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled) =>
-        new(
+        ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled)
+    {
+        return new ShellFeatureRegistration(
             id,
             displayName,
             category,
@@ -529,6 +527,12 @@ public sealed class DesktopShellTests
             factory ?? (() => new StubFeatureViewModel()),
             horizontalScrollBarVisibility: horizontalScrollBarVisibility,
             verticalScrollBarVisibility: verticalScrollBarVisibility);
+    }
+
+    private static Task ExecuteAsync(IAsyncRelayCommand command)
+    {
+        return command.ExecuteAsync(null);
+    }
 
     private sealed class StubFeatureViewModel : ObservableObject, IShellFeatureActivation
     {
@@ -536,16 +540,25 @@ public sealed class DesktopShellTests
 
         public int DeactivationCount { get; private set; }
 
-        public void Activate() => ActivationCount++;
+        public void Activate()
+        {
+            ActivationCount++;
+        }
 
-        public void Deactivate() => DeactivationCount++;
+        public void Deactivate()
+        {
+            DeactivationCount++;
+        }
     }
 
     private sealed class StubQuickRunFeatureViewModel : ObservableObject, IQuickRun
     {
         public string OperationId => "quick-tool";
 
-        public Task RunQuickAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task RunQuickAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class StubProjectFeatureViewModel : ObservableObject, IShellProjectFeature
@@ -555,11 +568,14 @@ public sealed class DesktopShellTests
             "Stub Projects",
             static () => new StubProject());
 
-        public IProjectDefinition ProjectDefinition => Definition;
-
         public int InstallCount { get; private set; }
 
-        public object Snapshot() => new StubProject();
+        public IProjectDefinition ProjectDefinition => Definition;
+
+        public object Snapshot()
+        {
+            return new StubProject();
+        }
 
         public void Install(object project)
         {
@@ -577,16 +593,25 @@ public sealed class DesktopShellTests
 
         public int CreateNewCount { get; private set; }
 
-        public string GetAutoSavePath(IProjectDefinition definition) =>
-            Path.Combine(Path.GetTempPath(), definition.AutoSaveFileName);
+        public string GetAutoSavePath(IProjectDefinition definition)
+        {
+            return Path.Combine(Path.GetTempPath(), definition.AutoSaveFileName);
+        }
 
-        public string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition) =>
-            Path.Combine(Path.GetTempPath(), definition.AutoSaveFileName);
+        public string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition)
+        {
+            return Path.Combine(Path.GetTempPath(), definition.AutoSaveFileName);
+        }
 
-        public string GetProjectFolder(IProjectDefinition definition) => Path.GetTempPath();
+        public string GetProjectFolder(IProjectDefinition definition)
+        {
+            return Path.GetTempPath();
+        }
 
-        public string GetProjectFolder<TProject>(ProjectDefinition<TProject> definition) =>
-            Path.GetTempPath();
+        public string GetProjectFolder<TProject>(ProjectDefinition<TProject> definition)
+        {
+            return Path.GetTempPath();
+        }
 
         public object CreateNew(IProjectDefinition definition)
         {
@@ -594,46 +619,60 @@ public sealed class DesktopShellTests
             return definition.CreateProject();
         }
 
-        public TProject CreateNew<TProject>(ProjectDefinition<TProject> definition) =>
-            definition.CreateProject();
+        public TProject CreateNew<TProject>(ProjectDefinition<TProject> definition)
+        {
+            return definition.CreateProject();
+        }
 
         public Task SaveAsync<TProject>(
             string path,
             TProject project,
-            CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
+            CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
 
         public Task<TProject> LoadAsync<TProject>(
             string path,
-            CancellationToken cancellationToken = default) =>
-            Task.FromException<TProject>(new FileNotFoundException());
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromException<TProject>(new FileNotFoundException());
+        }
 
         public Task<object> LoadAsync(
             IProjectDefinition definition,
             string path,
-            CancellationToken cancellationToken = default) =>
-            Task.FromException<object>(new FileNotFoundException());
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromException<object>(new FileNotFoundException());
+        }
 
         public Task AutoSaveAsync<TProject>(
             ProjectDefinition<TProject> definition,
             TProject project,
             IEnumerable<string>? additionalPaths = null,
-            CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
+            CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
 
         public Task AutoSaveAsync(
             IProjectDefinition definition,
             object project,
             IEnumerable<string>? additionalPaths = null,
-            CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
+            CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
 
         public Task<string?> SaveAsAsync<TProject>(
             ProjectDefinition<TProject> definition,
             TProject project,
             string? suggestedFileName = null,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult<string?>(null);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<string?>(null);
+        }
 
         public Task<string?> SaveAsAsync(
             IProjectDefinition definition,
@@ -646,8 +685,10 @@ public sealed class DesktopShellTests
 
         public Task<ProjectOpenResult<TProject>?> OpenAsync<TProject>(
             ProjectDefinition<TProject> definition,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult<ProjectOpenResult<TProject>?>(null);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<ProjectOpenResult<TProject>?>(null);
+        }
 
         public Task<ProjectOpenResult?> OpenAsync(
             IProjectDefinition definition,
@@ -661,11 +702,11 @@ public sealed class DesktopShellTests
 
     private sealed class ImmediateDispatcher : IUiDispatcher
     {
-        public void Post(Action action) => action();
+        public void Post(Action action)
+        {
+            action();
+        }
     }
-
-    private static Task ExecuteAsync(IAsyncRelayCommand command) =>
-        command.ExecuteAsync(null);
 
     private sealed class RecordingLauncher : IPlatformLauncher
     {
@@ -683,13 +724,16 @@ public sealed class DesktopShellTests
 
         public Task<bool> OpenFileAsync(
             string path,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(false);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(false);
+        }
 
         public Task<bool> OpenFolderAsync(
             string path,
-            CancellationToken cancellationToken = default) =>
-            Task.FromResult(false);
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(false);
+        }
     }
-
 }

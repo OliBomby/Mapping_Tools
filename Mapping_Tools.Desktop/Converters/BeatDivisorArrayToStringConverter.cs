@@ -7,8 +7,8 @@ using Mapping_Tools.Core.Classes.SystemTools;
 namespace Mapping_Tools.Desktop.Converters;
 
 /// <summary>
-/// Edits beat-divisor arrays using the legacy comma-separated rational or positive-number format.
-/// Invalid text remains in the field and is reported through Avalonia binding validation.
+///     Edits beat-divisor arrays using the legacy comma-separated rational or positive-number format.
+///     Invalid text remains in the field and is reported through Avalonia binding validation.
 /// </summary>
 public sealed class BeatDivisorArrayToStringConverter : IValueConverter
 {
@@ -22,21 +22,23 @@ public sealed class BeatDivisorArrayToStringConverter : IValueConverter
         object? value,
         Type targetType,
         object? parameter,
-        CultureInfo culture) =>
-        value is IBeatDivisor[] beatDivisors
+        CultureInfo culture)
+    {
+        return value is IBeatDivisor[] beatDivisors
             ? string.Join(", ", beatDivisors.Select(Format))
             : string.Empty;
+    }
 
     /// <summary>
-    /// Parses comma-separated positive fractions or invariant numeric expressions into divisors.
+    ///     Parses comma-separated positive fractions or invariant numeric expressions into divisors.
     /// </summary>
     /// <param name="value">The edited field text.</param>
     /// <param name="targetType">The binding source type, which must accept a divisor array.</param>
     /// <param name="parameter">Unused converter configuration.</param>
     /// <param name="culture">Unused UI culture; the legacy input format is invariant.</param>
     /// <returns>
-    /// A divisor array when every entry is valid; otherwise a data-validation notification that
-    /// preserves the invalid edit in the field.
+    ///     A divisor array when every entry is valid; otherwise a data-validation notification that
+    ///     preserves the invalid edit in the field.
     /// </returns>
     public object ConvertBack(
         object? value,
@@ -44,35 +46,27 @@ public sealed class BeatDivisorArrayToStringConverter : IValueConverter
         object? parameter,
         CultureInfo culture)
     {
-        if (value is not string text || string.IsNullOrWhiteSpace(text))
-        {
-            return Invalid("Enter at least one beat divisor.");
-        }
+        if (value is not string text || string.IsNullOrWhiteSpace(text)) return Invalid("Enter at least one beat divisor.");
 
         string[] entries = text.Split(',', StringSplitOptions.TrimEntries);
-        IBeatDivisor[] divisors = new IBeatDivisor[entries.Length];
+        var divisors = new IBeatDivisor[entries.Length];
         for (int index = 0; index < entries.Length; index++)
         {
             string entry = entries[index];
             string[] fraction = entry.Split('/', StringSplitOptions.TrimEntries);
-            if (fraction.Length == 2 &&
-                int.TryParse(fraction[0], NumberStyles.None, CultureInfo.InvariantCulture, out int numerator) &&
-                int.TryParse(fraction[1], NumberStyles.None, CultureInfo.InvariantCulture, out int denominator) &&
-                numerator > 0 && denominator > 0)
+            if (fraction.Length == 2
+                && int.TryParse(fraction[0], NumberStyles.None, CultureInfo.InvariantCulture, out int numerator)
+                && int.TryParse(fraction[1], NumberStyles.None, CultureInfo.InvariantCulture, out int denominator)
+                && numerator > 0
+                && denominator > 0)
             {
                 divisors[index] = new RationalBeatDivisor(numerator, denominator);
                 continue;
             }
 
-            if (!TypeConverters.TryParseDouble(entry, out double number))
-            {
-                return Invalid($"Beat divisor '{entry}' is not a valid fraction or number.");
-            }
+            if (!TypeConverters.TryParseDouble(entry, out double number)) return Invalid($"Beat divisor '{entry}' is not a valid fraction or number.");
 
-            if (!double.IsFinite(number) || number <= 0)
-            {
-                return Invalid("Beat divisor must be greater than zero.");
-            }
+            if (!double.IsFinite(number) || number <= 0) return Invalid("Beat divisor must be greater than zero.");
 
             divisors[index] = new IrrationalBeatDivisor(number);
         }
@@ -80,15 +74,21 @@ public sealed class BeatDivisorArrayToStringConverter : IValueConverter
         return divisors;
     }
 
-    private static string Format(IBeatDivisor divisor) => divisor switch
+    private static string Format(IBeatDivisor divisor)
     {
-        RationalBeatDivisor rational => FormattableString.Invariant(
-            $"{rational.Numerator}/{rational.Denominator}"),
-        IrrationalBeatDivisor irrational => irrational.GetValue().ToString(CultureInfo.InvariantCulture),
-        _ => divisor.ToString() ?? string.Empty
-    };
+        return divisor switch
+        {
+            RationalBeatDivisor rational => FormattableString.Invariant(
+                $"{rational.Numerator}/{rational.Denominator}"),
+            IrrationalBeatDivisor irrational => irrational.GetValue().ToString(CultureInfo.InvariantCulture),
+            _ => divisor.ToString() ?? string.Empty,
+        };
+    }
 
-    private static BindingNotification Invalid(string message) => new(
-        new FormatException(message),
-        BindingErrorType.DataValidationError);
+    private static BindingNotification Invalid(string message)
+    {
+        return new BindingNotification(
+            new FormatException(message),
+            BindingErrorType.DataValidationError);
+    }
 }

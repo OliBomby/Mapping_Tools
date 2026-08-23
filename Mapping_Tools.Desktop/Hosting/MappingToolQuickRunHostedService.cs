@@ -12,9 +12,9 @@ internal sealed record MappingToolQuickRunRegistration(
 
 internal sealed class MappingToolQuickRunHostedService : IHostedService
 {
+    private readonly IUiDispatcher _dispatcher;
     private readonly IQuickRunCommandRegistry _registry;
     private readonly IReadOnlyList<MappingToolQuickRunRegistration> _tools;
-    private readonly IUiDispatcher _dispatcher;
 
     public MappingToolQuickRunHostedService(
         IQuickRunCommandRegistry registry,
@@ -28,10 +28,8 @@ internal sealed class MappingToolQuickRunHostedService : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        foreach (MappingToolQuickRunRegistration tool in _tools)
-        {
+        foreach (var tool in _tools)
             if (_registry.Commands.All(command => command.Id != tool.Id))
-            {
                 _registry.Register(new QuickRunCommand(
                     tool.Id,
                     tool.DisplayName,
@@ -39,18 +37,13 @@ internal sealed class MappingToolQuickRunHostedService : IHostedService
                     cancellationToken => ExecuteOnUiThreadAsync(
                         tool.Execute,
                         cancellationToken)));
-            }
-        }
 
         return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        foreach (MappingToolQuickRunRegistration tool in _tools)
-        {
-            _registry.Remove(tool.Id);
-        }
+        foreach (var tool in _tools) _registry.Remove(tool.Id);
 
         return Task.CompletedTask;
     }

@@ -2,7 +2,6 @@ using System.ComponentModel;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
 using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Classes.HitsoundStuff;
-using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Desktop.ViewModels.Adapters;
@@ -25,7 +24,7 @@ public sealed class AdapterTests
         adapter.Name = "Whistle zone";
         adapter.XPos = 128;
         adapter.IsSelected = true;
-        HitsoundZone snapshot = adapter.Snapshot();
+        var snapshot = adapter.Snapshot();
 
         // Assert
         changedProperties.Should().Contain(nameof(ObservableHitsoundZone.Name));
@@ -47,7 +46,7 @@ public sealed class AdapterTests
         adapter.Time = 24;
         adapter.Mode = ColourPointMode.Burst;
         adapter.ColourSequence.Add(new ObservableSpecialColour(colour));
-        ColourPoint snapshot = adapter.Snapshot();
+        var snapshot = adapter.Snapshot();
 
         // Assert
         snapshot.Time.Should().Be(24);
@@ -66,7 +65,7 @@ public sealed class AdapterTests
         // Act
         adapter.Name = "Outer";
         adapter.TumourCount = 3;
-        TumourLayer snapshot = adapter.Snapshot();
+        var snapshot = adapter.Snapshot();
 
         // Assert
         lastChange!.PropertyName.Should().Be(nameof(ObservableTumourLayer.TumourCount));
@@ -85,7 +84,7 @@ public sealed class AdapterTests
 
         // Act
         adapter.Velocity = 64;
-        SampleGeneratingArgs snapshot = adapter.Snapshot();
+        var snapshot = adapter.Snapshot();
 
         // Assert
         changedProperties.Should().Contain(nameof(ObservableSampleGeneratingArgs.Velocity));
@@ -106,7 +105,7 @@ public sealed class AdapterTests
         adapter.Name = "Edited layer";
         adapter.SampleArgs.Path = "edited.wav";
         adapter.Times = [12, 24];
-        HitsoundLayer snapshot = adapter.Snapshot();
+        var snapshot = adapter.Snapshot();
 
         // Assert
         snapshot.Name.Should().Be("Edited layer");

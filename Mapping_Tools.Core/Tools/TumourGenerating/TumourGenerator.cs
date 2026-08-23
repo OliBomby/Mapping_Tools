@@ -7,13 +7,13 @@ using Mapping_Tools.Core.Classes.ToolHelpers.Sliders.Newgen;
 namespace Mapping_Tools.Core.Tools.TumourGenerating;
 
 /// <summary>
-/// Applies layered geometric tumours to slider paths and reconstructs the
-/// resulting paths into osu! slider anchors.
+///     Applies layered geometric tumours to slider paths and reconstructs the
+///     resulting paths into osu! slider anchors.
 /// </summary>
 /// <remarks>
-/// Simple tumours retain reconstruction hints, while wrapped or rotated
-/// tumours are represented by sampled path points and red anchors. The
-/// generator deliberately keeps the legacy ordering and overlap rules.
+///     Simple tumours retain reconstruction hints, while wrapped or rotated
+///     tumours are represented by sampled path points and red anchors. The
+///     generator deliberately keeps the legacy ordering and overlap rules.
 /// </remarks>
 public sealed class TumourGenerator
 {
@@ -42,11 +42,11 @@ public sealed class TumourGenerator
     public IReadOnlyList<double> LayerLengths => layerLengths;
 
     /// <summary>
-    /// Applies all active layers to one slider and updates its path and velocity.
+    ///     Applies all active layers to one slider and updates its path and velocity.
     /// </summary>
     /// <param name="hitObject">The slider to mutate.</param>
     /// <param name="cancellationToken">Cancels between expensive generation stages.</param>
-    /// <returns><see langword="true"/> when a new slider path was written.</returns>
+    /// <returns><see langword="true" /> when a new slider path was written.</returns>
     public bool TumourGenerate(HitObject hitObject, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(hitObject);
@@ -55,7 +55,7 @@ public sealed class TumourGenerator
         double oldPixelLength = hitObject.PixelLength;
 
         // Create path
-        PathWithHints pathWithHints = PathHelper.CreatePathWithHints(hitObject.GetSliderPath());
+        var pathWithHints = PathHelper.CreatePathWithHints(hitObject.GetSliderPath());
         if (pathWithHints.Path.Count == 0) return false;
 
         double totalLength = pathWithHints.Path.Last!.Value.CumulativeLength;
@@ -63,10 +63,10 @@ public sealed class TumourGenerator
 
         // Reset the layer lengths
         layerLengths.Clear();
-        var layer = 0;
+        int layer = 0;
 
         // Add tumours
-        foreach (TumourLayer tumourLayer in TumourLayers)
+        foreach (var tumourLayer in TumourLayers)
         {
             cancellationToken.ThrowIfCancellationRequested();
             // Skip inactive layers
@@ -93,15 +93,15 @@ public sealed class TumourGenerator
             }
 
             // Find the start of the tumours
-            LinkedListNode<PathPoint>? current = pathWithHints.Path.First;
+            var current = pathWithHints.Path.First;
             double nextDistance = tumourStart;
             bool side = tumourLayer.TumourSidedness == TumourSidedness.AlternatingLeft;
-            var index = 0;
-            Random random = tumourLayer.RandomSeed != 0 ? new Random(tumourLayer.RandomSeed) : Random;
+            int index = 0;
+            var random = tumourLayer.RandomSeed != 0 ? new Random(tumourLayer.RandomSeed) : Random;
 
-            while (nextDistance <= Math.Min(totalLength, tumourEnd) + Precision.DoubleEpsilon &&
-                   current is not null &&
-                   (tumourLayer.TumourCount == 0 || index++ < tumourLayer.TumourCount))
+            while (nextDistance <= Math.Min(totalLength, tumourEnd) + Precision.DoubleEpsilon
+                   && current is not null
+                   && (tumourLayer.TumourCount == 0 || index++ < tumourLayer.TumourCount))
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 double progress = ToProgress(nextDistance, tumourStart, tumourEnd, totalLength);
@@ -117,14 +117,14 @@ public sealed class TumourGenerator
                     TumourSidedness.AlternatingLeft => !side,
                     TumourSidedness.AlternatingRight => !side,
                     TumourSidedness.Random => random.NextDouble() < 0.5,
-                    _ => false
+                    _ => false,
                 };
 
                 if (endDistance >= 0)
                 {
                     double epsilon = MathHelper.Clamp(length / 2, Precision.DoubleEpsilon, 0.9);
-                    LinkedListNode<PathPoint> start = PathHelper.FindFirstOccurrenceExact(current, nextDistance, epsilon: epsilon);
-                    LinkedListNode<PathPoint> end = PathHelper.FindLastOccurrenceExact(start, endDistance, epsilon: epsilon);
+                    var start = PathHelper.FindFirstOccurrenceExact(current, nextDistance, epsilon: epsilon);
+                    var end = PathHelper.FindLastOccurrenceExact(start, endDistance, epsilon: epsilon);
                     // Calculate the T start/end for the tumour template
                     double startT = 0;
                     double endT = 1;
@@ -162,7 +162,7 @@ public sealed class TumourGenerator
         PathHelper.Recalculate(pathWithHints.Path);
         if (pathWithHints.Path.Count == 0 || double.IsNaN(pathWithHints.Path.Last.Value.CumulativeLength)) return false;
 
-        (List<Vector2> anchors, PathType pathType) = JustMiddleAnchors
+        var (anchors, pathType) = JustMiddleAnchors
             ? ReconstructOnlyMiddle(pathWithHints)
             : Reconstructor.Reconstruct(pathWithHints);
         if (anchors is null || anchors.Count < 2) return false;
@@ -177,7 +177,7 @@ public sealed class TumourGenerator
     }
 
     /// <summary>
-    /// Places one tumour on an already prepared path interval.
+    ///     Places one tumour on an already prepared path interval.
     /// </summary>
     /// <param name="pathWithHints">The mutable sampled path.</param>
     /// <param name="tumourLayer">The layer supplying shape and placement values.</param>
@@ -207,12 +207,12 @@ public sealed class TumourGenerator
         ArgumentNullException.ThrowIfNull(tumourLayer);
         ArgumentNullException.ThrowIfNull(start);
         ArgumentNullException.ThrowIfNull(end);
-        LinkedList<PathPoint> path = pathWithHints.Path;
+        var path = pathWithHints.Path;
         if (start.List != path) throw new ArgumentException("Start node has to be part of the provided path.", nameof(start));
         if (end.List != path) throw new ArgumentException("End node has to be part of the provided path.", nameof(end));
 
-        PathPoint startPoint = start.Value;
-        PathPoint endPoint = end.Value;
+        var startPoint = start.Value;
+        var endPoint = end.Value;
         if (ReferenceEquals(start, end))
         {
             // Ensure that there is a copy of the start point at the end point if we add in-between points
@@ -227,18 +227,19 @@ public sealed class TumourGenerator
             // If T is defined, then 0 should be on the first occurance of this dist and 1 on the last occurance of this dist
 
             // Initialize T properly
-            LinkedListNode<PathPoint> firstOccurrence = PathHelper.FindFirstOccurrence(start, start.Value.CumulativeLength);
-            LinkedListNode<PathPoint> lastOccurrence = PathHelper.FindLastOccurrence(end, end.Value.CumulativeLength);
+            var firstOccurrence = PathHelper.FindFirstOccurrence(start, start.Value.CumulativeLength);
+            var lastOccurrence = PathHelper.FindLastOccurrence(end, end.Value.CumulativeLength);
             int pointsBetween = PathHelper.CountPointsBetween(firstOccurrence, lastOccurrence);
             double delta = 1d / (pointsBetween + 1);
             double value = 0;
-            LinkedListNode<PathPoint>? point = firstOccurrence;
+            var point = firstOccurrence;
             while (point != lastOccurrence && point is not null)
             {
                 point.Value = point.Value.SetT(value);
                 value += delta;
                 point = point.Next;
             }
+
             lastOccurrence.Value = lastOccurrence.Value.SetT(1);
 
             // T is initialized
@@ -259,15 +260,15 @@ public sealed class TumourGenerator
             ? (endPoint.OgPos - startPoint.OgPos).Theta
             : MathHelper.LerpAngle(startPoint.AvgAngle, endPoint.AvgAngle, 0.5);
         double templateRange = endTemplateT - startTemplateT;
-        LinkedListNode<PathPoint> hintStart = start;
-        LinkedListNode<PathPoint> hintEnd = end;
+        var hintStart = start;
+        var hintEnd = end;
         double length = Vector2.Distance(start.Value.OgPos, end.Value.OgPos);
         double scale = tumourLayer.TumourScale.GetValue(startProgress) * Scalar;
         if (!tumourLayer.UseAbsoluteRange) scale *= initialLength / RelativePropertyScale;
         double rotation = MathHelper.DegreesToRadians(tumourLayer.TumourRotation.GetValue(startProgress));
 
         // Setup tumour template with the correct shape
-        ITumourTemplate tumourTemplate = tumourLayer.TumourTemplate;
+        var tumourTemplate = tumourLayer.TumourTemplate;
         tumourTemplate.Width = otherSide ? -scale : scale;
         tumourTemplate.Length = Precision.AlmostEquals(templateRange, 0) ? length : length / templateRange;
         tumourTemplate.Parameter = tumourTemplate.NeedsParameter ? tumourLayer.TumourParameter.GetValue(startProgress) : 0;
@@ -284,7 +285,7 @@ public sealed class TumourGenerator
             startTemplateT,
             endTemplateT,
             tumourTemplate.GetCriticalPoints(),
-            out LinkedList<LinkedListNode<PathPoint>> ensuredPoints);
+            out var ensuredPoints);
         if (pointsBetweenStartEnd < wantedPointsBetween)
             pointsBetweenStartEnd += path.Subdivide(start, end, wantedPointsBetween);
         // Make sure the curvature is maintained by making sure there is at least one point between each critical point
@@ -292,11 +293,11 @@ public sealed class TumourGenerator
         pointsBetweenStartEnd += path.EnsureLocalCurvature(start, end, ensuredPoints);
 
         double startDistance = startPoint.CumulativeLength;
-        LinkedListNode<PathPoint>? current = start;
+        var current = start;
         // Add tumour offsets
         while (current is not null && current.Previous != end)
         {
-            PathPoint point = current.Value;
+            var point = current.Value;
             // Scale to template T
             double t = Precision.AlmostEquals(distance, 0)
                 ? (point.T - startT) / distanceT
@@ -311,34 +312,34 @@ public sealed class TumourGenerator
             }
 
             // Get the offset, original pos, and direction
-            PathPoint interpolatedPoint = PathPoint.Lerp(startPoint, endPoint, t);
-            Vector2 position = tumourLayer.WrappingMode switch
+            var interpolatedPoint = PathPoint.Lerp(startPoint, endPoint, t);
+            var position = tumourLayer.WrappingMode switch
             {
                 WrappingMode.Simple => interpolatedPoint.OgPos,
-                _ => point.OgPos
+                _ => point.OgPos,
             };
             (double preAngle, double postAngle) = tumourLayer.WrappingMode switch
             {
                 WrappingMode.Simple => (betweenAngle, betweenAngle),
                 WrappingMode.Wrap => (point.PreAngle, point.PostAngle),
-                _ => (0, 0)
+                _ => (0, 0),
             };
             bool isOffsetInThisLayer = Vector2.DistanceSquared(point.OgPos, position) < Precision.DoubleEpsilon;
             bool red = tumourLayer.WrappingMode switch
             {
                 WrappingMode.Simple => isCritical || point.Red && isOffsetInThisLayer,
-                _ => isCritical || point.Red
+                _ => isCritical || point.Red,
             };
             // Make sure the start and end points are red
             red |= current == start || current == end;
             // Get the tumour offset
-            Vector2 offset = tumourTemplate.GetOffset(templateT);
+            var offset = tumourTemplate.GetOffset(templateT);
 
             // Modify the path
             if (current == start && start.Previous is not null && offset.LengthSquared > Precision.DoubleEpsilon)
             {
                 // Copy point and leave one side at 0 offset
-                Vector2 newPosition = CalculateNewPos(point, position, offset, postAngle + rotation);
+                var newPosition = CalculateNewPos(point, position, offset, postAngle + rotation);
                 current.List.AddBefore(current, new PathPoint(point.Pos, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, -1, true));
                 current.Value = new PathPoint(newPosition, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, 0, true);
                 start = current.Previous;
@@ -347,17 +348,16 @@ public sealed class TumourGenerator
             else if (current == end && end.Next is not null && offset.LengthSquared > Precision.DoubleEpsilon)
             {
                 // Copy point and leave one side at 0 offset
-                Vector2 newPosition = CalculateNewPos(point, position, offset, preAngle + rotation);
+                var newPosition = CalculateNewPos(point, position, offset, preAngle + rotation);
                 current.List.AddBefore(current, new PathPoint(newPosition, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, 1, true));
                 current.Value = new PathPoint(point.Pos, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, 2, true);
                 hintEnd = current.Previous;
             }
-            else if (red && !double.IsNaN(preAngle) && !double.IsNaN(postAngle) &&
-                     !Precision.AlmostEquals(preAngle, postAngle) && offset.LengthSquared > Precision.DoubleEpsilon)
+            else if (red && !double.IsNaN(preAngle) && !double.IsNaN(postAngle) && !Precision.AlmostEquals(preAngle, postAngle) && offset.LengthSquared > Precision.DoubleEpsilon)
             {
                 // Copy point and offset it by both angles
-                Vector2 newPosition = CalculateNewPos(point, position, offset, preAngle + rotation);
-                Vector2 newPosition2 = CalculateNewPos(point, position, offset, postAngle + rotation);
+                var newPosition = CalculateNewPos(point, position, offset, preAngle + rotation);
+                var newPosition2 = CalculateNewPos(point, position, offset, postAngle + rotation);
                 current.List.AddBefore(current, new PathPoint(newPosition, point.OgPos, point.PreAngle, point.PostAngle, point.CumulativeLength, point.T, red));
                 current.Value = new PathPoint(newPosition2, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, point.T, red);
             }
@@ -378,8 +378,7 @@ public sealed class TumourGenerator
             current = current.Next;
         }
 
-        if (tumourLayer.WrappingMode == WrappingMode.Simple &&
-            Precision.AlmostEquals(MathHelper.AngleDifference(rotation, 0), 0, 1E-6D))
+        if (tumourLayer.WrappingMode == WrappingMode.Simple && Precision.AlmostEquals(MathHelper.AngleDifference(rotation, 0), 0, 1E-6D))
         {
             // Maybe add a hint
             pathWithHints.AddReconstructionHint(new ReconstructionHint(
@@ -390,7 +389,7 @@ public sealed class TumourGenerator
                 tumourTemplate.GetReconstructionHintPathType(),
                 startTemplateT,
                 endTemplateT,
-                distFunc: tumourTemplate.GetDistanceRelation()));
+                tumourTemplate.GetDistanceRelation()));
             if (start != hintStart) pathWithHints.AddReconstructionHint(new ReconstructionHint(start, hintStart, layer, null));
             if (end != hintEnd) pathWithHints.AddReconstructionHint(new ReconstructionHint(hintEnd, end, layer, null));
         }
@@ -409,8 +408,8 @@ public sealed class TumourGenerator
 
     private static Vector2 CalculateNewPos(PathPoint point, Vector2 position, Vector2 offset, double angle)
     {
-        Vector2 rotatedOffset = Vector2.Rotate(offset, angle);
-        Vector2 actualOffset = position + rotatedOffset - point.OgPos;
+        var rotatedOffset = Vector2.Rotate(offset, angle);
+        var actualOffset = position + rotatedOffset - point.OgPos;
         return point.Pos + actualOffset;
     }
 
@@ -418,10 +417,10 @@ public sealed class TumourGenerator
     {
         if (pathWithHints.Path.Count == 0) return ([], PathType.Linear);
         List<Vector2> anchors = [];
-        IReadOnlyList<ReconstructionHint> hints = pathWithHints.ReconstructionHints;
-        LinkedListNode<PathPoint>? current = pathWithHints.Path.First;
+        var hints = pathWithHints.ReconstructionHints;
+        var current = pathWithHints.Path.First;
         ReconstructionHint? currentHint = null;
-        var nextHint = 0;
+        int nextHint = 0;
         while (current is not null)
         {
             while (nextHint < hints.Count && current == hints[nextHint].End)
@@ -429,15 +428,15 @@ public sealed class TumourGenerator
                 nextHint++;
                 currentHint = null;
             }
+
             if (nextHint < hints.Count && current == hints[nextHint].Start) currentHint = hints[nextHint];
-            if (currentHint is { Anchors: not null, Layer: >= 0 } && current.Value.Red &&
-                current != currentHint.Value.Start && current != currentHint.Value.End ||
-                current == pathWithHints.Path.First || current == pathWithHints.Path.Last)
-            {
+            if (currentHint is { Anchors: not null, Layer: >= 0 } && current.Value.Red && current != currentHint.Value.Start && current != currentHint.Value.End
+                || current == pathWithHints.Path.First
+                || current == pathWithHints.Path.Last)
                 anchors.Add(current.Value.Pos);
-            }
             current = current.Next;
         }
+
         return (anchors, PathType.Linear);
     }
 }

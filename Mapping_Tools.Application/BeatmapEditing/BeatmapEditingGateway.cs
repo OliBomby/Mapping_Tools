@@ -7,24 +7,24 @@ using Mapping_Tools.Core.Classes.BeatmapHelper;
 namespace Mapping_Tools.Application.BeatmapEditing;
 
 /// <summary>
-/// Builds editable documents from disk and deliberately overlays live state
-/// only when Editor Reader identifies the exact same beatmap.
+///     Builds editable documents from disk and deliberately overlays live state
+///     only when Editor Reader identifies the exact same beatmap.
 /// </summary>
 public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
 {
-    private readonly ITextFileStore _fileStore;
     private readonly IBeatmapBackupService _backupService;
+    private readonly ITextFileStore _fileStore;
     private readonly ILiveBeatmapReader _liveReader;
     private readonly IEditorReloadService _reloadService;
     private readonly ApplicationSettings _settings;
 
     /// <summary>
-    /// Creates the application service that arbitrates between durable files
-    /// and the newer, potentially unsaved state held by osu!.
+    ///     Creates the application service that arbitrates between durable files
+    ///     and the newer, potentially unsaved state held by osu!.
     /// </summary>
     /// <param name="fileStore">Persistence used by every returned document editor.</param>
     /// <param name="backupService">
-    /// Creates the durable pre-save snapshot that must succeed before an existing document is overwritten.
+    ///     Creates the durable pre-save snapshot that must succeed before an existing document is overwritten.
     /// </param>
     /// <param name="liveReader">The platform adapter that reads osu!'s editor memory.</param>
     /// <param name="reloadService">The platform adapter that refreshes osu! after a save.</param>
@@ -43,7 +43,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<BeatmapEditingSession> OpenBeatmapAsync(
         string path,
         LiveBeatmapPreference livePreference = LiveBeatmapPreference.PreferLive,
@@ -53,42 +53,33 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         cancellationToken.ThrowIfCancellationRequested();
 
         BeatmapEditor2 diskEditor = new(path, _fileStore);
-        if (livePreference == LiveBeatmapPreference.DiskOnly)
-        {
-            return DiskSession(diskEditor);
-        }
+        if (livePreference == LiveBeatmapPreference.DiskOnly) return DiskSession(diskEditor);
 
         if (!_settings.UseEditorReader)
-        {
             return livePreference == LiveBeatmapPreference.RequireLive
                 ? throw new LiveBeatmapUnavailableException(
                     "Live editor state is disabled in Mapping Tools settings.")
                 : DiskSession(diskEditor);
-        }
 
         try
         {
-            LiveBeatmapSnapshot? snapshot = await _liveReader
+            var snapshot = await _liveReader
                 .ReadAsync(cancellationToken)
                 .ConfigureAwait(false);
 
             if (snapshot is null)
-            {
                 return livePreference == LiveBeatmapPreference.RequireLive
                     ? throw new LiveBeatmapUnavailableException(
                         "No active osu! beatmap editor could be read.")
                     : DiskSession(diskEditor);
-            }
 
             if (!string.Equals(snapshot.Path, path, StringComparison.Ordinal))
-            {
                 return livePreference == LiveBeatmapPreference.RequireLive
                     ? throw new LiveBeatmapUnavailableException(
                         $"osu! is editing '{snapshot.Path}', not the requested beatmap '{path}'.")
                     : DiskSession(diskEditor);
-            }
 
-            IReadOnlyList<HitObject> selected = ApplyLiveState(diskEditor.Beatmap, snapshot);
+            var selected = ApplyLiveState(diskEditor.Beatmap, snapshot);
             return new BeatmapEditingSession(
                 diskEditor,
                 BeatmapEditingSource.LiveEditor,
@@ -115,7 +106,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Task<StoryboardEditor2> OpenStoryboardAsync(
         string path,
         CancellationToken cancellationToken = default)
@@ -125,7 +116,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         return Task.FromResult(new StoryboardEditor2(path, _fileStore));
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task SaveAsync(
         Editor2 editor,
         bool reloadEditor = false,
@@ -136,7 +127,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
             .ConfigureAwait(false);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task SaveAsync(
         BeatmapEditingSession session,
         bool reloadEditor = false,
@@ -155,23 +146,19 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (session is null)
-        {
             await _backupService.CreateAsync(
                     [editor.Path],
                     BeatmapBackupReason.Automatic,
-                    force: true,
+                    true,
                     cancellationToken)
                 .ConfigureAwait(false);
-        }
         else
-        {
             await _backupService.CreateAsync(
                     session,
                     BeatmapBackupReason.Automatic,
-                    force: true,
+                    true,
                     cancellationToken)
                 .ConfigureAwait(false);
-        }
 
         cancellationToken.ThrowIfCancellationRequested();
         editor.SaveFile();
@@ -215,7 +202,7 @@ public sealed class BeatmapEditingGateway : IBeatmapEditingGateway
         beatmap.CalculateSliderEndTimes();
         beatmap.GiveObjectsGreenlines();
 
-        HashSet<HitObject> selected = snapshot.SelectedHitObjects.ToHashSet();
+        var selected = snapshot.SelectedHitObjects.ToHashSet();
         return beatmap.HitObjects.Where(selected.Contains).ToList();
     }
 }

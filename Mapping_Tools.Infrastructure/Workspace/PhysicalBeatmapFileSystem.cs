@@ -3,19 +3,19 @@ using Mapping_Tools.Application.Workspace;
 namespace Mapping_Tools.Infrastructure.Workspace;
 
 /// <summary>
-/// Checks selected beatmap paths against the local filesystem and derives
-/// their containing directories for native picker start locations.
+///     Checks selected beatmap paths against the local filesystem and derives
+///     their containing directories for native picker start locations.
 /// </summary>
 public sealed class PhysicalBeatmapFileSystem : IBeatmapFileSystem
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool FileExists(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         return File.Exists(path);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public string? GetParentDirectory(string filePath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);

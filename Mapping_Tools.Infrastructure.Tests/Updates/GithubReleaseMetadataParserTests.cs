@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Mapping_Tools.Infrastructure.Updates;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -13,7 +14,7 @@ public sealed class GithubReleaseMetadataParserTests
         const string json = "{\"name\":\"Mapping Tools 2.0\",\"body\":\"Bug fixes\"}";
 
         // Act
-        UpdateReleaseNotes notes = GithubReleaseMetadataParser.Parse(json);
+        var notes = GithubReleaseMetadataParser.Parse(json);
 
         // Assert
         notes.Title.Should().Be("Mapping Tools 2.0");
@@ -27,7 +28,7 @@ public sealed class GithubReleaseMetadataParserTests
         const string json = "null";
 
         // Act
-        UpdateReleaseNotes notes = GithubReleaseMetadataParser.Parse(json);
+        var notes = GithubReleaseMetadataParser.Parse(json);
 
         // Assert
         notes.Title.Should().BeNull();
@@ -44,7 +45,7 @@ public sealed class GithubReleaseMetadataParserTests
         Action act = () => GithubReleaseMetadataParser.Parse(json);
 
         // Assert
-        act.Should().Throw<System.Text.Json.JsonException>();
+        act.Should().Throw<JsonException>();
     }
 
     [TestMethod]
@@ -57,7 +58,7 @@ public sealed class GithubReleaseMetadataParserTests
         Action act = () => GithubReleaseMetadataParser.Parse(json);
 
         // Assert
-        act.Should().Throw<System.Text.Json.JsonException>();
+        act.Should().Throw<JsonException>();
     }
 
     [TestMethod]
@@ -70,6 +71,6 @@ public sealed class GithubReleaseMetadataParserTests
         Action act = () => GithubReleaseMetadataParser.Parse(json);
 
         // Assert
-        act.Should().Throw<System.Text.Json.JsonException>();
+        act.Should().Throw<JsonException>();
     }
 }

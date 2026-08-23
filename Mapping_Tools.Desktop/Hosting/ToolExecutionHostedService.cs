@@ -12,9 +12,13 @@ internal sealed class ToolExecutionHostedService : IHostedService
         _execution = execution ?? throw new ArgumentNullException(nameof(execution));
     }
 
-    public Task StartAsync(CancellationToken cancellationToken) =>
-        Task.CompletedTask;
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 
-    public Task StopAsync(CancellationToken cancellationToken) =>
-        _execution.StopAsync(cancellationToken);
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return _execution.StopAsync(cancellationToken);
+    }
 }

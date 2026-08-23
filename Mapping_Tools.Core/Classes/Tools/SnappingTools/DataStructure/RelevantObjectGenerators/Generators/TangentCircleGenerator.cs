@@ -1,4 +1,3 @@
-using System;
 using Mapping_Tools.Core.Classes.MathUtil;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
@@ -10,13 +9,6 @@ namespace Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantO
 /// <summary>Generates circles tangent to a source circle and passing through two points.</summary>
 public sealed class TangentCircleGenerator : RelevantObjectsGenerator
 {
-    /// <inheritdoc/>
-    public override string Name => "Tangent Circles on Circle";
-    /// <inheritdoc/>
-    public override string Tooltip => "Takes a virtual circle and two points and generates virtual circles which intersect the circle in exactly one point.";
-    /// <inheritdoc/>
-    public override GeneratorType GeneratorType => GeneratorType.Intermediate;
-
     /// <summary>Creates the active non-deep tangent-circle generator.</summary>
     public TangentCircleGenerator()
     {
@@ -26,13 +18,22 @@ public sealed class TangentCircleGenerator : RelevantObjectsGenerator
         Settings.InputPredicate.Predicates.Add(new SelectionPredicate { NeedSelected = true, MinRelevancy = 0.8 });
     }
 
+    /// <inheritdoc />
+    public override string Name => "Tangent Circles on Circle";
+
+    /// <inheritdoc />
+    public override string Tooltip => "Takes a virtual circle and two points and generates virtual circles which intersect the circle in exactly one point.";
+
+    /// <inheritdoc />
+    public override GeneratorType GeneratorType => GeneratorType.Intermediate;
+
     /// <summary>Generates all stable tangent-circle solutions.</summary>
     [RelevantObjectsGeneratorMethod]
     public RelevantCircle[] GetRelevantObjects(RelevantCircle circle, RelevantPoint point1, RelevantPoint point2)
     {
-        Vector2 p1 = point1.Child;
-        Vector2 p2 = point2.Child;
-        Vector2 centre = circle.Child.Centre;
+        var p1 = point1.Child;
+        var p2 = point2.Child;
+        var centre = circle.Child.Centre;
         double radius = circle.Child.Radius;
         // If the points are too close to each other abort
         if (Precision.AlmostEquals(Vector2.DistanceSquared(p1, p2), 0)) return Array.Empty<RelevantCircle>();
@@ -58,18 +59,18 @@ public sealed class TangentCircleGenerator : RelevantObjectsGenerator
             if (Precision.AlmostEquals(radius, distance2, 0.5)) (p1, p2) = (p2, p1);
             // For simplicity make point1 the point on the circle
             Line2 bisector = new((p1 + p2) / 2, (p2 - p1).PerpendicularLeft);
-            Line2 connectingLine = Line2.FromPoints(centre, p1);
-            Vector2 solutionCentre = Line2.Intersection(bisector, connectingLine);
+            var connectingLine = Line2.FromPoints(centre, p1);
+            var solutionCentre = Line2.Intersection(bisector, connectingLine);
             return [new RelevantCircle(new Circle(solutionCentre, p1))];
         }
 
         // Transform all coordinates such that c and p1 are on the x-axis and (0,0) is in the middle of them
-        Vector2 middle = (centre + p1) / 2;
-        Vector2 xAxis = (p1 - centre).Normalized();
-        Vector2 yAxis = xAxis.PerpendicularLeft;
+        var middle = (centre + p1) / 2;
+        var xAxis = (p1 - centre).Normalized();
+        var yAxis = xAxis.PerpendicularLeft;
         Matrix2 transform = new(xAxis, yAxis);
-        Vector2 p1Transformed = Matrix2.Mult(transform, p1 - middle);
-        Vector2 p2Transformed = Matrix2.Mult(transform, p2 - middle);
+        var p1Transformed = Matrix2.Mult(transform, p1 - middle);
+        var p2Transformed = Matrix2.Mult(transform, p2 - middle);
         Line2 bisectorTransformed = new((p1Transformed + p2Transformed) / 2, (p2Transformed - p1Transformed).PerpendicularLeft);
         double halfDistance = distance1 / 2;
         double halfRadius = radius / 2;
@@ -101,12 +102,22 @@ public sealed class TangentCircleGenerator : RelevantObjectsGenerator
         double c2 = 2 * (b * b * x1 * dx + a * a * y1 * dy);
         double c3 = b * b * x1 * x1 + a * a * y1 * y1 - a * a * b * b;
         // Calculate intersection points of the bisector and ellipsis (x/a)^2 + (y/b)^2 = 1
-        if (!SolveQuadratic(c1, c2, c3, out double t1, out double t2)) { p1 = p2 = Vector2.NaN; return false; }
+        if (!SolveQuadratic(c1, c2, c3, out double t1, out double t2))
+        {
+            p1 = p2 = Vector2.NaN;
+            return false;
+        }
+
         p1 = line.PositionVector + t1 * line.DirectionVector;
         p2 = line.PositionVector + t2 * line.DirectionVector;
         // Filter out far out solutions because they are unstable
         if (Math.Abs(t2) > 100) p2 = Vector2.NaN;
-        if (Math.Abs(t1) > 100) { p1 = p2; p2 = Vector2.NaN; }
+        if (Math.Abs(t1) > 100)
+        {
+            p1 = p2;
+            p2 = Vector2.NaN;
+        }
+
         return true;
     }
 
@@ -117,12 +128,22 @@ public sealed class TangentCircleGenerator : RelevantObjectsGenerator
         double c2 = 2 * (b * b * x1 * dx - a * a * y1 * dy);
         double c3 = b * b * x1 * x1 - a * a * y1 * y1 - a * a * b * b;
         // Calculate intersection points of the bisector and hyperbola (x/a)^2 - (y/b)^2 = 1
-        if (!SolveQuadratic(c1, c2, c3, out double t1, out double t2)) { p1 = p2 = Vector2.NaN; return false; }
+        if (!SolveQuadratic(c1, c2, c3, out double t1, out double t2))
+        {
+            p1 = p2 = Vector2.NaN;
+            return false;
+        }
+
         p1 = line.PositionVector + t1 * line.DirectionVector;
         p2 = line.PositionVector + t2 * line.DirectionVector;
         // Filter out far out solutions because they are unstable
         if (Math.Abs(t2) > 100) p2 = Vector2.NaN;
-        if (Math.Abs(t1) > 100) { p1 = p2; p2 = Vector2.NaN; }
+        if (Math.Abs(t1) > 100)
+        {
+            p1 = p2;
+            p2 = Vector2.NaN;
+        }
+
         return true;
     }
 
@@ -132,12 +153,22 @@ public sealed class TangentCircleGenerator : RelevantObjectsGenerator
         if (Precision.AlmostEquals(a, 0))
         {
             t2 = double.NaN;
-            if (Precision.AlmostEquals(b, 0)) { t1 = double.NaN; return false; }
+            if (Precision.AlmostEquals(b, 0))
+            {
+                t1 = double.NaN;
+                return false;
+            }
+
             t1 = -c / b;
             return true;
         }
 
-        if (4 * a * c > b * b) { t1 = t2 = double.NaN; return false; }
+        if (4 * a * c > b * b)
+        {
+            t1 = t2 = double.NaN;
+            return false;
+        }
+
         double s = Math.Sqrt(b * b - 4 * a * c);
         t1 = (-b + s) / (2 * a);
         t2 = (-b - s) / (2 * a);

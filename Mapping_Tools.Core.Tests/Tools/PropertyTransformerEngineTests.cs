@@ -11,11 +11,11 @@ public sealed class PropertyTransformerEngineTests
     public void Apply_WithBookmarkOffset_TransformsAllBookmarksAndReportsCompletion()
     {
         // Arrange
-        Beatmap beatmap = Load("standard-feature-rich.osu");
+        var beatmap = Load("standard-feature-rich.osu");
         double[] originalBookmarks = beatmap.GetBookmarks().ToArray();
         PropertyTransformerOptions options = new()
         {
-            BookmarkTimeOffset = 5
+            BookmarkTimeOffset = 5,
         };
         RecordingProgress progress = new();
 
@@ -31,7 +31,7 @@ public sealed class PropertyTransformerEngineTests
     public void Apply_WithFiltersAndClipping_UsesLegacyBoundsAndInclusiveTimeRange()
     {
         // Arrange
-        Beatmap beatmap = Load("standard-feature-rich.osu");
+        var beatmap = Load("standard-feature-rich.osu");
         double[] originalBookmarks = beatmap.GetBookmarks().ToArray();
         PropertyTransformerOptions options = new()
         {
@@ -42,7 +42,7 @@ public sealed class PropertyTransformerEngineTests
             MinTimeFilter = originalBookmarks[0],
             MaxTimeFilter = originalBookmarks[0],
             ClipProperties = true,
-            TimingpointBpmMultiplier = 1000
+            TimingpointBpmMultiplier = 1000,
         };
 
         // Act
@@ -57,13 +57,19 @@ public sealed class PropertyTransformerEngineTests
             .Should().OnlyContain(bpm => bpm <= 10000);
     }
 
-    private static Beatmap Load(string fileName) => new(
-        File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", fileName)).ToList());
+    private static Beatmap Load(string fileName)
+    {
+        return new Beatmap(
+            File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "Resources", fileName)).ToList());
+    }
 
     private sealed class RecordingProgress : IProgress<double>
     {
         public List<double> Values { get; } = [];
 
-        public void Report(double value) => Values.Add(value);
+        public void Report(double value)
+        {
+            Values.Add(value);
+        }
     }
 }

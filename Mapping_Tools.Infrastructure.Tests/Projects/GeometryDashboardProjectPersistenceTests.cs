@@ -1,7 +1,4 @@
-using FluentAssertions;
 using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
 using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
@@ -22,7 +19,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        SnappingToolsProject project = serializer.Deserialize<SnappingToolsProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<SnappingToolsProject>(File.ReadAllText(fixture));
         string json = serializer.Serialize(project);
 
         // Assert
@@ -74,7 +71,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        SnappingToolsProject project = serializer.Deserialize<SnappingToolsProject>(versionedJson);
+        var project = serializer.Deserialize<SnappingToolsProject>(versionedJson);
 
         // Assert
         project.CurrentPreferences.RelevantObjectPreferences.Should().ContainKey(RelevantPoint.PreferencesNameStatic);
@@ -92,7 +89,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        SnappingToolsProject project = serializer.Deserialize<SnappingToolsProject>(intermediateJson);
+        var project = serializer.Deserialize<SnappingToolsProject>(intermediateJson);
 
         // Assert
         project.CurrentPreferences.GeneratorSettings.Should().ContainKey(typeof(SymmetryGenerator));
@@ -111,7 +108,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        SnappingToolsProject project = serializer.Deserialize<SnappingToolsProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<SnappingToolsProject>(File.ReadAllText(fixture));
 
         // Assert
         project.CurrentPreferences.InceptionLevel.Should().Be(5);

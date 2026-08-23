@@ -13,5 +13,5 @@ public enum GeneratorTemporalPositioning
     After,
 
     /// <summary>Let the generated object supply a custom time.</summary>
-    Custom
+    Custom,
 }

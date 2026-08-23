@@ -192,7 +192,8 @@
     <Style Selector="TextBox#PART_HexTextBox">
         <Setter Property="Theme" Value="{StaticResource ColorViewTextBoxTheme}" />
     </Style>
-    <Style Selector="NumericUpDown#Component1NumericUpDown,
+    <Style
+        Selector="NumericUpDown#Component1NumericUpDown,
                      NumericUpDown#Component2NumericUpDown,
                      NumericUpDown#Component3NumericUpDown,
                      NumericUpDown#AlphaComponentNumericUpDown">
@@ -206,17 +207,20 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialTextBoxBorderBrush}" />
     </Style>
-    <Style Selector="RadioButton#RgbRadioButton /template/ ContentPresenter#PART_ContentPresenter,
+    <Style
+        Selector="RadioButton#RgbRadioButton /template/ ContentPresenter#PART_ContentPresenter,
                      RadioButton#HsvRadioButton /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="TextBlock.Foreground" Value="{DynamicResource MaterialBodyBrush}" />
     </Style>
-    <Style Selector="RadioButton#RgbRadioButton:checked /template/ ContentPresenter#PART_ContentPresenter,
+    <Style
+        Selector="RadioButton#RgbRadioButton:checked /template/ ContentPresenter#PART_ContentPresenter,
                      RadioButton#HsvRadioButton:checked /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource MaterialSelectionBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
     </Style>
-    <Style Selector="RadioButton#RgbRadioButton:pointerover /template/ ContentPresenter#PART_ContentPresenter,
+    <Style
+        Selector="RadioButton#RgbRadioButton:pointerover /template/ ContentPresenter#PART_ContentPresenter,
                      RadioButton#HsvRadioButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource MaterialFlatButtonClickBrush}" />
     </Style>

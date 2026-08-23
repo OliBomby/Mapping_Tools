@@ -1,7 +1,7 @@
 namespace Mapping_Tools.Core.Tools.SliderCompletionator;
 
 /// <summary>
-/// Identifies the beatmap objects supplied to Slider Completionator.
+///     Identifies the beatmap objects supplied to Slider Completionator.
 /// </summary>
 public enum SliderCompletionatorImportMode
 {
@@ -11,15 +11,15 @@ public enum SliderCompletionatorImportMode
     /// <summary>Uses objects covered by editor bookmarks.</summary>
     Bookmarked,
 
-    /// <summary>Uses objects matched by <see cref="SliderCompletionatorOptions.TimeCode"/>.</summary>
+    /// <summary>Uses objects matched by <see cref="SliderCompletionatorOptions.TimeCode" />.</summary>
     Time,
 
     /// <summary>Uses every hit object in each input beatmap.</summary>
-    Everything
+    Everything,
 }
 
 /// <summary>
-/// Identifies the slider value calculated from the other requested values.
+///     Identifies the slider value calculated from the other requested values.
 /// </summary>
 public enum SliderCompletionatorFreeVariable
 {
@@ -30,12 +30,12 @@ public enum SliderCompletionatorFreeVariable
     Length,
 
     /// <summary>Calculates slider duration.</summary>
-    Duration
+    Duration,
 }
 
 /// <summary>
-/// Stores Slider Completionator's persisted settings and transformation inputs.
-/// A numeric value of <c>-1</c> means that the corresponding value is preserved.
+///     Stores Slider Completionator's persisted settings and transformation inputs.
+///     A numeric value of <c>-1</c> means that the corresponding value is preserved.
 /// </summary>
 public class SliderCompletionatorOptions
 {
@@ -65,7 +65,7 @@ public class SliderCompletionatorOptions
     /// <summary>Gets or sets whether all slider anchors are moved to the new path length.</summary>
     public bool MoveAnchors { get; set; }
 
-    /// <summary>Gets or sets whether <see cref="EndTime"/> replaces duration input.</summary>
+    /// <summary>Gets or sets whether <see cref="EndTime" /> replaces duration input.</summary>
     public bool UseEndTime { get; set; }
 
     /// <summary>Gets or sets whether the live editor time supplies the end time.</summary>
