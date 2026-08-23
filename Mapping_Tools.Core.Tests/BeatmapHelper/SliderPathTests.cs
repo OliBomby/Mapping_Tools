@@ -3,7 +3,7 @@ using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Core.Tests.Classes.BeatmapHelper;
+namespace Mapping_Tools.Core.Tests.BeatmapHelper;
 
 [TestClass]
 public class SliderPathTests

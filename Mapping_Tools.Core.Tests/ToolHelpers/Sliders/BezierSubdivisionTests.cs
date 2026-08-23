@@ -4,7 +4,7 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Core.Tests.Classes.ToolHelpers.Sliders;
+namespace Mapping_Tools.Core.Tests.ToolHelpers.Sliders;
 
 [TestClass]
 public class BezierSubdivisionTests

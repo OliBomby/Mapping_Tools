@@ -2,7 +2,7 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
-namespace Mapping_Tools.Core.Tests.Classes.BeatmapHelper;
+namespace Mapping_Tools.Core.Tests.BeatmapHelper;
 
 [TestClass]
 public class ComboColourTests

@@ -3,7 +3,7 @@ using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.MathUtil;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Core.Tests.Classes.HitsoundStuff;
+namespace Mapping_Tools.Core.Tests.HitsoundStuff;
 
 [TestClass]
 public class HitsoundDomainTests

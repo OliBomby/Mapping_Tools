@@ -1,7 +1,7 @@
 ﻿using Mapping_Tools.Core.SystemTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Core.Tests.Classes.SystemTools;
+namespace Mapping_Tools.Core.Tests.SystemTools;
 
 [TestClass]
 public class TypeConvertersTests

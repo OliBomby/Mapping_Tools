@@ -3,7 +3,7 @@ using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Core.Tests.Classes.BeatmapHelper;
+namespace Mapping_Tools.Core.Tests.BeatmapHelper;
 
 [TestClass]
 public class TimingTests

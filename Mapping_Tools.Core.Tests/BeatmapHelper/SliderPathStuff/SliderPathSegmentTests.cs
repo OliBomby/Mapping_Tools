@@ -1,7 +1,7 @@
 ﻿using Mapping_Tools.Core.BeatmapHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Core.Tests.Classes.BeatmapHelper.SliderPathStuff;
+namespace Mapping_Tools.Core.Tests.BeatmapHelper.SliderPathStuff;
 
 [TestClass]
 public class SliderPathTests

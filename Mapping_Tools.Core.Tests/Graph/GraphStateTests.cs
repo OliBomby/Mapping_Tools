@@ -5,7 +5,7 @@ using Mapping_Tools.Core.Graph.Markers;
 using Mapping_Tools.Core.MathUtil;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Core.Tests.Classes.Graph;
+namespace Mapping_Tools.Core.Tests.Graph;
 
 [TestClass]
 public sealed class GraphStateTests

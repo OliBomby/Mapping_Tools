@@ -1,7 +1,7 @@
 ﻿using Mapping_Tools.Core.MathUtil;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Core.Tests.Classes.MathUtil;
+namespace Mapping_Tools.Core.Tests.MathUtil;
 
 [TestClass]
 public class GradientDescentUtilTests

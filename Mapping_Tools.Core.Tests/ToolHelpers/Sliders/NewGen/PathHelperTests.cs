@@ -4,7 +4,7 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Core.Tests.Classes.ToolHelpers.Sliders.NewGen;
+namespace Mapping_Tools.Core.Tests.ToolHelpers.Sliders.NewGen;
 
 [TestClass]
 public class PathHelperTests

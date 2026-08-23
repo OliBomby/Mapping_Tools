@@ -10,7 +10,7 @@ using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerat
 using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Core.Tests.Classes.Tools.SnappingTools;
+namespace Mapping_Tools.Core.Tests.Tools.SnappingTools;
 
 [TestClass]
 public sealed class GeometryDashboardDomainTests
