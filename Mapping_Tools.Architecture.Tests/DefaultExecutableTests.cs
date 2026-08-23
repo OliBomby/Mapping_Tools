@@ -72,7 +72,8 @@ public sealed class DefaultExecutableTests
         installer.Should().Contain("Mapping_Tools.Desktop\\bin\\Release\\net10.0\\win-x64\\publish");
         installer.Should().Contain("#define MyAppExeName \"Mapping Tools.exe\"");
         updater.Should().Contain("AssemblyMetadata.FromAssembly(entryAssembly, publishedExecutablePath)");
-        updater.Should().Contain("PublishedExecutableName = \"Mapping Tools.exe\"");
+        updater.Should().Contain(
+            "private const string published_executable_name = \"Mapping Tools.exe\"");
         workflow.Should().Contain("-ExpectedVersion \"${env:VERSION}\"");
         workflow.Should().Contain("mapping_tools_installer_x86.exe");
         workflow.Should().Contain("mapping_tools_installer_x64.exe");

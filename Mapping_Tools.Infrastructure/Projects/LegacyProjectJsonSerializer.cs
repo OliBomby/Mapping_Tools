@@ -212,8 +212,15 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string legacy_assembly_name = "Mapping Tools";
         private const string legacy_hotkey = "Mapping_Tools.Classes.SystemTools.Hotkey";
         private const string intermediate_core_hotkey = "Mapping_Tools.Core.Classes.SystemTools.Hotkey";
-        private const string legacy_namespace_prefix = "Mapping_Tools.";
         private const string current_namespace_prefix = "Mapping_Tools.Core.";
+        private const string legacy_relevant_objects_prefix =
+            "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.";
+        private const string intermediate_relevant_objects_prefix =
+            "Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.";
+        private const string current_relevant_objects_prefix =
+            "Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.";
+        private const string current_relevant_object_prefix =
+            "Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject.";
         private const string legacy_rhythm_guide_project = "Mapping_Tools.Viewmodels.RhythmGuideVm";
 
         private const string legacy_hitsound_preview_helper_project =
@@ -334,9 +341,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
                 // Accept both the former namespace and documents emitted by
                 // an intermediate migration build that already used Core names.
-                var migratedType = migratedCoreMarker.Assembly.GetType(typeName)
-                                   ?? migratedCoreMarker.Assembly.GetType(ToCurrentTypeName(typeName))
-                                   ?? migratedCoreMarker.Assembly.GetType(ToCurrentGraphTypeName(typeName));
+                var migratedType = ResolveMigratedType(typeName);
                 if (migratedType is not null) return migratedType;
             }
 
@@ -563,26 +568,59 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 StringComparison.Ordinal);
         }
 
-        private static string ToCurrentTypeName(string typeName)
+        private static Type? ResolveMigratedType(string typeName)
         {
-            return typeName.StartsWith(legacy_namespace_prefix, StringComparison.Ordinal)
-                ? current_namespace_prefix + typeName[legacy_namespace_prefix.Length..]
-                : typeName;
+            foreach (string candidate in GetCurrentTypeNameCandidates(typeName))
+            {
+                Type? migratedType = migratedCoreMarker.Assembly.GetType(candidate);
+                if (migratedType is not null) return migratedType;
+            }
+
+            return null;
         }
 
-        private static string ToCurrentGraphTypeName(string typeName)
+        private static IEnumerable<string> GetCurrentTypeNameCandidates(string typeName)
         {
-            return typeName.StartsWith("Mapping_Tools.Components.Graph", StringComparison.Ordinal)
-                ? "Mapping_Tools.Core.Classes.Graph" + typeName["Mapping_Tools.Components.Graph".Length..]
-                : typeName;
+            yield return typeName;
+
+            if (typeName.StartsWith(legacy_relevant_objects_prefix, StringComparison.Ordinal))
+                yield return current_relevant_object_prefix
+                             + typeName[legacy_relevant_objects_prefix.Length..];
+
+            if (typeName.StartsWith(intermediate_relevant_objects_prefix, StringComparison.Ordinal))
+                yield return current_relevant_object_prefix
+                             + typeName[intermediate_relevant_objects_prefix.Length..];
+
+            if (typeName.StartsWith(current_relevant_objects_prefix, StringComparison.Ordinal))
+                yield return current_relevant_object_prefix
+                             + typeName[current_relevant_objects_prefix.Length..];
+
+            if (typeName.StartsWith("Mapping_Tools.Core.Classes.", StringComparison.Ordinal))
+                yield return "Mapping_Tools.Core." + typeName["Mapping_Tools.Core.Classes.".Length..];
+
+            if (typeName.StartsWith("Mapping_Tools.Core.Components.Graph.", StringComparison.Ordinal))
+                yield return "Mapping_Tools.Core.Graph" + typeName["Mapping_Tools.Core.Components.Graph".Length..];
+
+            if (typeName.StartsWith("Mapping_Tools.Classes.", StringComparison.Ordinal))
+                yield return "Mapping_Tools.Core." + typeName["Mapping_Tools.Classes.".Length..];
+
+            if (typeName.StartsWith("Mapping_Tools.Components.Graph.", StringComparison.Ordinal))
+                yield return "Mapping_Tools.Core.Graph" + typeName["Mapping_Tools.Components.Graph".Length..];
         }
 
-        private static string? ToLegacyTypeName(string? typeName)
+        internal static string? ToLegacyTypeName(string? typeName)
         {
-            return typeName?.StartsWith("Mapping_Tools.Core.Classes.Graph", StringComparison.Ordinal) == true
-                ? "Mapping_Tools.Components.Graph" + typeName["Mapping_Tools.Core.Classes.Graph".Length..]
+            if (typeName?.StartsWith(current_relevant_object_prefix, StringComparison.Ordinal) == true
+                && (typeName.EndsWith("RelevantPoint", StringComparison.Ordinal)
+                    || typeName.EndsWith("RelevantCircle", StringComparison.Ordinal)
+                    || typeName.EndsWith("RelevantHitObject", StringComparison.Ordinal)))
+                return legacy_relevant_objects_prefix
+                       + typeName[current_relevant_object_prefix.Length..];
+
+            return typeName?.StartsWith("Mapping_Tools.Core.Graph.", StringComparison.Ordinal) == true
+                ? "Mapping_Tools.Components.Graph" + typeName["Mapping_Tools.Core.Graph".Length..]
                 : typeName?.StartsWith(current_namespace_prefix, StringComparison.Ordinal) == true
-                    ? legacy_namespace_prefix + typeName[current_namespace_prefix.Length..]
+                    ? "Mapping_Tools.Classes." + typeName[current_namespace_prefix.Length..]
                     : typeName;
         }
     }
@@ -741,9 +779,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
         private static string ToLegacyGeneratorTypeKey(Type type)
         {
-            string typeName = type.FullName?.StartsWith("Mapping_Tools.Core.", StringComparison.Ordinal) == true
-                ? "Mapping_Tools." + type.FullName["Mapping_Tools.Core.".Length..]
-                : type.FullName ?? throw new JsonSerializationException("A generator type had no full name.");
+            string typeName = LegacyProjectTypeBinder.ToLegacyTypeName(type.FullName)
+                              ?? throw new JsonSerializationException("A generator type had no full name.");
             return $"{typeName}, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null";
         }
     }
@@ -794,9 +831,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
         private static string ToLegacyObjectTypeKey(Type type)
         {
-            string typeName = type.FullName?.StartsWith("Mapping_Tools.Core.", StringComparison.Ordinal) == true
-                ? "Mapping_Tools." + type.FullName["Mapping_Tools.Core.".Length..]
-                : type.FullName ?? throw new JsonSerializationException("A relevant object type had no full name.");
+            string typeName = LegacyProjectTypeBinder.ToLegacyTypeName(type.FullName)
+                              ?? throw new JsonSerializationException("A relevant object type had no full name.");
             return $"{typeName}, Mapping Tools, Version=1.12.30.0, Culture=neutral, PublicKeyToken=null";
         }
     }

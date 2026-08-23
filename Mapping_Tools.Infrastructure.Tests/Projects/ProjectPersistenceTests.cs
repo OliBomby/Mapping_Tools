@@ -146,7 +146,7 @@ public sealed class ProjectPersistenceTests
         foreach ((object value, (string json, object roundTrip)) in results)
         {
             string legacyTypeName = value.GetType().FullName!
-                .Replace("Mapping_Tools.Core.", "Mapping_Tools.", StringComparison.Ordinal);
+                .Replace("Mapping_Tools.Core.", "Mapping_Tools.Classes.", StringComparison.Ordinal);
 
             json.Should().Contain($"\"$type\": \"{legacyTypeName}, Mapping Tools\"");
             roundTrip.Should().BeOfType(value.GetType());
