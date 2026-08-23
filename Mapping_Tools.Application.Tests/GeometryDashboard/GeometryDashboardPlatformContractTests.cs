@@ -1,6 +1,6 @@
 using Mapping_Tools.Application.GeometryDashboard;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.MathUtil;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.GeometryDashboard;

@@ -1,13 +1,13 @@
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.MathUtil;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Tools.SnappingTools;
+using Mapping_Tools.Core.Tools.SnappingTools.DataStructure;
+using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
+using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators;
+using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
+using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Classes.Tools.SnappingTools;

@@ -1,5 +1,5 @@
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.MapCleaner;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

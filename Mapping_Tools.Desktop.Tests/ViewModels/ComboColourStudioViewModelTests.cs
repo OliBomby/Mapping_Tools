@@ -4,7 +4,7 @@ using Mapping_Tools.Application.ComboColourStudio;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;

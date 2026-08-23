@@ -6,7 +6,7 @@ using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.TimingCopier;
 using Mapping_Tools.Application.Workspace;
-using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.TimingCopier;
 using Mapping_Tools.Desktop.Shell;
 

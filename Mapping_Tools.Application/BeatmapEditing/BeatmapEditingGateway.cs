@@ -2,7 +2,7 @@ using System.Globalization;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.Settings;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper;
 
 namespace Mapping_Tools.Application.BeatmapEditing;
 

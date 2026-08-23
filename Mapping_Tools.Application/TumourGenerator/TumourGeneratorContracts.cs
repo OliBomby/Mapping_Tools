@@ -1,4 +1,4 @@
-using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 
 namespace Mapping_Tools.Application.TumourGenerator;

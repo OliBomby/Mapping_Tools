@@ -1,5 +1,5 @@
-using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 
 namespace Mapping_Tools.Core.Tools.RhythmGuide;
 

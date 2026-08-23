@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Settings;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
 
 namespace Mapping_Tools.Application.HitsoundCopier;

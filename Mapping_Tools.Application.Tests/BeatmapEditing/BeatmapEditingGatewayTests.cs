@@ -2,9 +2,9 @@ using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Settings;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.MathUtil;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.BeatmapEditing;

@@ -8,7 +8,7 @@ using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Workspace;
-using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Hosting;

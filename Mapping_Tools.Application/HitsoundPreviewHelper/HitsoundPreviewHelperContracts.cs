@@ -1,4 +1,4 @@
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
 
 namespace Mapping_Tools.Application.HitsoundPreviewHelper;

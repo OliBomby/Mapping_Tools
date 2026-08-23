@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 
 namespace Mapping_Tools.Desktop.Controls;
 

@@ -1,0 +1,300 @@
+using System.Globalization;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools.Core.MathUtil;
+
+namespace Mapping_Tools.Core.ToolHelpers.Sliders;
+
+/// <summary>
+///     Converts slider segments of all types to bezier type.
+/// </summary>
+public static class BezierConverter
+{
+    private static readonly List<CircleBezierPreset> circlePresets = new()
+    {
+        new CircleBezierPreset(0.4993379862754501,
+            GetPoints("1.0:0.0|1.0:0.2549893626632736|0.8778997558480327:0.47884446188920726")),
+        new CircleBezierPreset(1.7579419829169447,
+            GetPoints("1.0:0.0|1.0:0.6263026|0.42931178:1.0990661|-0.18605515:0.9825393")),
+        new CircleBezierPreset(3.1385246920140215,
+            GetPoints("1.0:0.0|1.0:0.87084764|0.002304826:1.5033062|-0.9973236:0.8739115|-0.9999953:0.0030679568")),
+        new CircleBezierPreset(5.69720464620727,
+            GetPoints(
+                "1.0:0.0|1.0:1.4137783|-1.4305235:2.0779421|-2.3410065:-0.94017583|0.05132711:-1.7309346|0.8331702:-0.5530167")),
+        new CircleBezierPreset(2 * Math.PI,
+            GetPoints(
+                "1.0:0.0|1.0:1.2447058|-0.8526471:2.118367|-2.6211002:7.854936e-06|-0.8526448:-2.118357|1.0:-1.2447058|1.0:-2.4492937e-16")),
+    };
+
+    private static List<Vector2> GetPoints(string str)
+    {
+        string[] strPoints = str.Split('|');
+        var points = new List<Vector2>(strPoints.Length);
+        foreach (string strPoint in strPoints)
+        {
+            string[] strCoords = strPoint.Split(':');
+            points.Add(new Vector2(float.Parse(strCoords[0], CultureInfo.InvariantCulture),
+                float.Parse(strCoords[1], CultureInfo.InvariantCulture)));
+        }
+
+        return points;
+    }
+
+    /// <summary>
+    ///     Converts sliderpath to a bezier sliderpath with the same shape.
+    /// </summary>
+    /// <param name="sliderPath"></param>
+    /// <returns></returns>
+    public static SliderPath ConvertToBezier(SliderPath sliderPath)
+    {
+        return sliderPath.Type switch
+        {
+            PathType.Linear => ConvertLinearToBezier(sliderPath),
+            PathType.PerfectCurve => ConvertCircleToBezier(sliderPath),
+            PathType.Catmull => ConvertCatmullToBezier(sliderPath),
+            PathType.Bezier => sliderPath,
+            _ => throw new ArgumentOutOfRangeException(),
+        };
+    }
+
+    /// <summary>
+    ///     Converts anchors to a bezier representation of the anchors.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public static List<Vector2> ConvertToBezierAnchors(List<Vector2> anchors, PathType type)
+    {
+        return type switch
+        {
+            PathType.Linear => ConvertLinearToBezierAnchors(anchors),
+            PathType.PerfectCurve => ConvertCircleToBezierAnchors(anchors),
+            PathType.Catmull => ConvertCatmullToBezierAnchors(anchors),
+            PathType.Bezier => anchors,
+            _ => throw new ArgumentOutOfRangeException(),
+        };
+    }
+
+    /// <summary>
+    ///     Converts a perfect-curve path to Bézier segments; non-perfect paths are returned unchanged.
+    /// </summary>
+    /// <param name="perfectPath"></param>
+    /// <returns></returns>
+    public static SliderPath ConvertCircleToBezier(SliderPath perfectPath)
+    {
+        if (perfectPath.Type != PathType.PerfectCurve) return perfectPath;
+
+        var newAnchors = ConvertCircleToBezierAnchors(perfectPath.ControlPoints).ToArray();
+
+        var newPath = new SliderPath(PathType.Bezier, newAnchors, perfectPath.ExpectedDistance);
+        return newPath;
+    }
+
+    /// <summary>
+    ///     Approximates a stable circular arc with one or more preset Bézier segments.
+    /// </summary>
+    /// <param name="ca"></param>
+    /// <returns></returns>
+    public static SliderPath ConvertCircleToBezier(CircleArc ca)
+    {
+        var newAnchors = ConvertCircleToBezierAnchors(ca).ToArray();
+
+        var newPath = new SliderPath(PathType.Bezier, newAnchors);
+        return newPath;
+    }
+
+    /// <summary>
+    ///     Creates a Bézier path from three perfect-curve anchors.
+    /// </summary>
+    /// <param name="perfectAnchors"></param>
+    /// <returns></returns>
+    public static SliderPath ConvertCircleToBezier(List<Vector2> perfectAnchors)
+    {
+        var newAnchors = ConvertCircleToBezierAnchors(perfectAnchors).ToArray();
+
+        var newPath = new SliderPath(PathType.Bezier, newAnchors);
+        return newPath;
+    }
+
+    /// <summary>
+    ///     Converts three perfect-curve anchors into Bézier control points, preserving unstable input unchanged.
+    /// </summary>
+    /// <param name="perfectAnchors"></param>
+    /// <returns></returns>
+    public static List<Vector2> ConvertCircleToBezierAnchors(List<Vector2> perfectAnchors)
+    {
+        var cs = new CircleArc(perfectAnchors);
+        if (!cs.Stable)
+            return perfectAnchors;
+        return ConvertCircleToBezierAnchors(cs);
+    }
+
+    /// <summary>
+    ///     Maps a stable circle arc onto the smallest preset whose angular tolerance covers its sweep.
+    /// </summary>
+    /// <param name="cs"></param>
+    /// <returns></returns>
+    public static List<Vector2> ConvertCircleToBezierAnchors(CircleArc cs)
+    {
+        var preset = circlePresets.Last();
+        foreach (var CBP in circlePresets)
+            if (CBP.MaxAngle >= cs.ThetaRange)
+            {
+                preset = CBP;
+                break;
+            }
+
+        var arc = preset.Points.Copy();
+        double arcLength = preset.MaxAngle;
+
+        // Converge on arcLength of thetaRange
+        int n = arc.Count - 1;
+        double tf = cs.ThetaRange / arcLength;
+        while (Math.Abs(tf - 1) > 0.0000001)
+        {
+            for (int j = 0; j < n; j++)
+            for (int i = n; i > j; i--)
+                arc[i] = arc[i] * tf + arc[i - 1] * (1 - tf);
+
+            arcLength = Math.Atan2(arc.Last()[1], arc.Last()[0]);
+            if (arcLength < 0) arcLength += 2 * Math.PI;
+
+            tf = cs.ThetaRange / arcLength;
+        }
+
+        // Adjust rotation, radius, and position
+        var rotator = cs.Rotator;
+        for (int i = 0; i < arc.Count; i++) arc[i] = Matrix2.Mult(rotator, arc[i]) + cs.Centre;
+
+        return arc;
+    }
+
+    /// <summary>
+    ///     Converts a Catmull path to joined cubic Bézier segments; other path types are returned unchanged.
+    /// </summary>
+    /// <param name="catmullPath"></param>
+    /// <returns></returns>
+    public static SliderPath ConvertCatmullToBezier(SliderPath catmullPath)
+    {
+        if (catmullPath.Type != PathType.Catmull) return catmullPath;
+
+        var newAnchors = ConvertCatmullToBezierAnchors(catmullPath.ControlPoints).ToArray();
+
+        var newPath = new SliderPath(PathType.Bezier, newAnchors, catmullPath.ExpectedDistance);
+        return newPath;
+    }
+
+    /// <summary>
+    ///     Creates a Bézier path from Catmull control points.
+    /// </summary>
+    /// <param name="catmullAnchors"></param>
+    /// <returns></returns>
+    public static SliderPath ConvertCatmullToBezier(List<Vector2> catmullAnchors)
+    {
+        var newAnchors = ConvertCatmullToBezierAnchors(catmullAnchors).ToArray();
+
+        var newPath = new SliderPath(PathType.Bezier, newAnchors);
+        return newPath;
+    }
+
+    /// <summary>
+    ///     Converts each Catmull span into its equivalent cubic Bézier control polygon.
+    /// </summary>
+    /// <param name="pts"></param>
+    /// <returns></returns>
+    public static List<Vector2> ConvertCatmullToBezierAnchors(List<Vector2> pts)
+    {
+        var cubics = new List<Vector2>
+        {
+            pts[0],
+        };
+        int iLen = pts.Count;
+        for (int i = 0; i < iLen - 1; i++)
+        {
+            var v1 = i > 0 ? pts[i - 1] : pts[i];
+            var v2 = pts[i];
+            var v3 = i < pts.Length() - 1 ? pts[i + 1] : v2 + v2 - v1;
+            var v4 = i < pts.Length() - 2 ? pts[i + 2] : v3 + v3 - v2;
+
+            cubics.Add((-v1 + 6 * v2 + v3) / 6);
+            cubics.Add((-v4 + 6 * v3 + v2) / 6);
+            cubics.Add(v3);
+            cubics.Add(v3);
+        }
+
+        cubics.RemoveAt(cubics.Count - 1);
+        return cubics;
+    }
+
+    /// <summary>
+    ///     Converts a linear path to first-order Bézier segments; other path types are returned unchanged.
+    /// </summary>
+    /// <param name="linearPath"></param>
+    /// <returns></returns>
+    public static SliderPath ConvertLinearToBezier(SliderPath linearPath)
+    {
+        if (linearPath.Type != PathType.Linear) return linearPath;
+
+        var newAnchors = ConvertLinearToBezierAnchors(linearPath.ControlPoints).ToArray();
+
+        var newPath = new SliderPath(PathType.Bezier, newAnchors, linearPath.ExpectedDistance);
+        return newPath;
+    }
+
+    /// <summary>
+    ///     Creates a Bézier path from polyline anchors.
+    /// </summary>
+    /// <param name="linearAnchors"></param>
+    /// <returns></returns>
+    public static SliderPath ConvertLinearToBezier(List<Vector2> linearAnchors)
+    {
+        var newAnchors = ConvertLinearToBezierAnchors(linearAnchors).ToArray();
+
+        var newPath = new SliderPath(PathType.Bezier, newAnchors);
+        return newPath;
+    }
+
+    /// <summary>
+    ///     Separates consecutive line segments with duplicated red anchors in Bézier serialization form.
+    /// </summary>
+    /// <param name="pts"></param>
+    /// <returns></returns>
+    public static List<Vector2> ConvertLinearToBezierAnchors(List<Vector2> pts)
+    {
+        var bezier = new List<Vector2>
+        {
+            pts[0],
+        };
+        int iLen = pts.Count;
+        for (int i = 1; i < iLen; i++)
+        {
+            bezier.Add(pts[i]);
+            bezier.Add(pts[i]);
+        }
+
+        bezier.RemoveAt(bezier.Count - 1);
+        return bezier;
+    }
+
+    private struct CircleBezierPreset
+    {
+        /// <summary>
+        ///     The largest circle-arc sweep for which this preset meets the approximation tolerance.
+        /// </summary>
+        public readonly double MaxAngle;
+
+        /// <summary>
+        ///     Unit-circle Bézier control points transformed onto the requested arc.
+        /// </summary>
+        public readonly List<Vector2> Points;
+
+        /// <summary>
+        ///     Associates an angular threshold with a unit-circle control polygon.
+        /// </summary>
+        /// <param name="maxAngle">The max angle.</param>
+        /// <param name="points">Unit-circle Bézier control points for the preset arc.</param>
+        public CircleBezierPreset(double maxAngle, List<Vector2> points)
+        {
+            MaxAngle = maxAngle;
+            Points = points;
+        }
+    }
+}

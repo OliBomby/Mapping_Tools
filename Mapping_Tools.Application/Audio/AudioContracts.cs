@@ -1,5 +1,5 @@
 using Mapping_Tools.Core.Audio;
-using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.HitsoundStuff;
 
 namespace Mapping_Tools.Application.Audio;
 

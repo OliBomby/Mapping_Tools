@@ -1,4 +1,4 @@
-using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.Sliderator;
 
 namespace Mapping_Tools.Application.Sliderator;

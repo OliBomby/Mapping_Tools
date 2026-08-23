@@ -1,5 +1,5 @@
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.Images;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.Images;
 using Mapping_Tools.Core.Tools.SliderPicturator;
 
 namespace Mapping_Tools.Application.SliderPicturator;

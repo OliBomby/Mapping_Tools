@@ -1,4 +1,4 @@
-using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 
 namespace Mapping_Tools.Core.Tools.TimingCopier;
 

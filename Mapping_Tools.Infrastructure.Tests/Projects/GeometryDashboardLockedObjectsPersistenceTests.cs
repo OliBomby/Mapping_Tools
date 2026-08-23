@@ -1,6 +1,6 @@
-using Mapping_Tools.Core.Classes.MathUtil;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectCollection;
+using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectCollection;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

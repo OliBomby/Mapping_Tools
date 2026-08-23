@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Core.Classes.MathUtil;
+﻿using Mapping_Tools.Core.MathUtil;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Classes.MathUtil;

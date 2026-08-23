@@ -1,6 +1,6 @@
 using Mapping_Tools.Application.GeometryDashboard;
-using Mapping_Tools.Core.Classes.MathUtil;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 
 namespace Mapping_Tools.Infrastructure.Platform;
 

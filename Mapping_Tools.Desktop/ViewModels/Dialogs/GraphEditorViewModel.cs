@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Core.Classes.Graph;
+using Mapping_Tools.Core.Graph;
 
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 

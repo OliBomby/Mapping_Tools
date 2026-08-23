@@ -1,5 +1,5 @@
 using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.AutoFail;
 
 namespace Mapping_Tools.Application.AutoFail;

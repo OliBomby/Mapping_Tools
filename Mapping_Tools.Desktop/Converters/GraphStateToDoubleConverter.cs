@@ -1,6 +1,6 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
-using Mapping_Tools.Core.Classes.Graph;
+using Mapping_Tools.Core.Graph;
 
 namespace Mapping_Tools.Desktop.Converters;
 

@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using Mapping_Tools.Core.Classes.Images;
+using Mapping_Tools.Core.Images;
 
 namespace Mapping_Tools.Desktop.Utilities;
 

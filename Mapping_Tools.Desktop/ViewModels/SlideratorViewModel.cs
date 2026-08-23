@@ -9,9 +9,9 @@ using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.Workspace;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.Graph;
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Desktop.Shell;
 

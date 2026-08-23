@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.PatternGallery;
 
 namespace Mapping_Tools.Desktop.ViewModels;

@@ -1,4 +1,4 @@
-using Mapping_Tools.Core.Classes.Graph;
+using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

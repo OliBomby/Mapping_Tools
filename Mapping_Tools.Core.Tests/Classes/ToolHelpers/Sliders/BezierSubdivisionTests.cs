@@ -1,7 +1,7 @@
-﻿using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools.Core.Classes.MathUtil;
-using Mapping_Tools.Core.Classes.ToolHelpers.Sliders;
+﻿using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Classes.ToolHelpers.Sliders;

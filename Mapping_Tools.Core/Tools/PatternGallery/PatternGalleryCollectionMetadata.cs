@@ -1,4 +1,4 @@
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.MathUtil;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Core.Tools.PatternGallery;

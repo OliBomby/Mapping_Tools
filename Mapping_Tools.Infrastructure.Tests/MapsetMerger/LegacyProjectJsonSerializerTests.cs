@@ -2,7 +2,7 @@ using Mapping_Tools.Application.HitsoundStudio;
 using Mapping_Tools.Application.MapsetMerger;
 using Mapping_Tools.Application.Sliderator;
 using Mapping_Tools.Application.TumourGenerator;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

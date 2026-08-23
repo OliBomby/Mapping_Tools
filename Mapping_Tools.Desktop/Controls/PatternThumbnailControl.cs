@@ -2,9 +2,9 @@ using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.BeatmapHelper.SliderPathStuff;
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Desktop.Controls;
 

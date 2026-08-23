@@ -1,8 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
+using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Desktop.Interactions;
 
 namespace Mapping_Tools.Desktop.Views;

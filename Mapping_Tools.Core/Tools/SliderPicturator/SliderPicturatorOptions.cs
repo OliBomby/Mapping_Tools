@@ -1,4 +1,4 @@
-using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Core.Tools.SliderPicturator;

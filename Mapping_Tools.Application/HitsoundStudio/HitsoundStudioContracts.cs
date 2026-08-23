@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.Audio;
 using Mapping_Tools.Core.Audio;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.HitsoundStuff;
 
 namespace Mapping_Tools.Application.HitsoundStudio;
 

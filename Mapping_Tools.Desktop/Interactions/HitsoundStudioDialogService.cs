@@ -4,8 +4,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.HitsoundStudio;
 using Mapping_Tools.Application.Platform;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Desktop.Views.Dialogs;
 
 namespace Mapping_Tools.Desktop.Interactions;

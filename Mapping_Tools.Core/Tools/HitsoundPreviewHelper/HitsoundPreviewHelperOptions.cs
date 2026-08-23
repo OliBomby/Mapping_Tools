@@ -1,4 +1,4 @@
-using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.HitsoundStuff;
 
 namespace Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
 

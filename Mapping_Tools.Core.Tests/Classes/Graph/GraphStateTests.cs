@@ -1,8 +1,8 @@
-using Mapping_Tools.Core.Classes.Graph;
-using Mapping_Tools.Core.Classes.Graph.Interpolation;
-using Mapping_Tools.Core.Classes.Graph.Interpolation.Interpolators;
-using Mapping_Tools.Core.Classes.Graph.Markers;
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.Graph.Interpolation;
+using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
+using Mapping_Tools.Core.Graph.Markers;
+using Mapping_Tools.Core.MathUtil;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Classes.Graph;

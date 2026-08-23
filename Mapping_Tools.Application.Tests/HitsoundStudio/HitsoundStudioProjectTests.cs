@@ -1,6 +1,6 @@
 using Mapping_Tools.Application.HitsoundStudio;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.HitsoundStuff;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.HitsoundStudio;

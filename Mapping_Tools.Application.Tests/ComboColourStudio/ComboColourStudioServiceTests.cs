@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.ComboColourStudio;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

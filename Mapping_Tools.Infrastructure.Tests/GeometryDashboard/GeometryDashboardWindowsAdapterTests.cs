@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.GeometryDashboard;
 using Mapping_Tools.Application.Settings;
-using Mapping_Tools.Core.Classes.MathUtil;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Infrastructure.Editor;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Platform;

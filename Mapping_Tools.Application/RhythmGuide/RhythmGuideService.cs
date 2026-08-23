@@ -2,7 +2,7 @@ using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Workspace;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.RhythmGuide;
 
 namespace Mapping_Tools.Application.RhythmGuide;

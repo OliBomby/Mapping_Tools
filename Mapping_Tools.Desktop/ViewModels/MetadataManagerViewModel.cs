@@ -8,7 +8,7 @@ using Mapping_Tools.Application.MetadataManager;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Workspace;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.MetadataManager;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels.Adapters;

@@ -7,8 +7,8 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
-using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
 using Mapping_Tools.Desktop.Shell;
 

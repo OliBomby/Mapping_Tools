@@ -4,10 +4,10 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.MapCleaner;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Core.Audio;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Events;
-using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.BeatmapHelper.Events;
+using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Tools.HitsoundStudio;
 
 namespace Mapping_Tools.Application.HitsoundStudio;

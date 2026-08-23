@@ -1,5 +1,5 @@
 using Mapping_Tools.Application.Projects;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 
 namespace Mapping_Tools.Application.GeometryDashboard;
 

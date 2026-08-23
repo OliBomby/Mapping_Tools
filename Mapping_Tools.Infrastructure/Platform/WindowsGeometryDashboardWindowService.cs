@@ -1,6 +1,6 @@
 using System.Text;
 using Mapping_Tools.Application.GeometryDashboard;
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Infrastructure.Platform;
 

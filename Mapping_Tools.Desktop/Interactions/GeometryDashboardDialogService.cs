@@ -6,12 +6,12 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
-using Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.Tools.SnappingTools;
+using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject;
+using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
+using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
+using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 

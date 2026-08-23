@@ -1,5 +1,5 @@
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Events;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Events;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

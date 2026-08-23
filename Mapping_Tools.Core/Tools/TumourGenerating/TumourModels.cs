@@ -1,7 +1,7 @@
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.Graph;
-using Mapping_Tools.Core.Classes.Graph.Interpolation.Interpolators;
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
+using Mapping_Tools.Core.MathUtil;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Core.Tools.TumourGenerating;

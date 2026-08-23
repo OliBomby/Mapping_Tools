@@ -1,6 +1,6 @@
 using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SliderPicturator;
 
 namespace Mapping_Tools.Application.SliderPicturator;

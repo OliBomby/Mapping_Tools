@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.MapCleaner;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

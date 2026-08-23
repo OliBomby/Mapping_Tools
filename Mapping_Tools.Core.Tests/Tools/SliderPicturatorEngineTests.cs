@@ -1,6 +1,6 @@
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.Images;
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.Images;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SliderPicturator;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

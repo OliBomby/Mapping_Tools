@@ -1,7 +1,7 @@
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.MathUtil;
-using Mapping_Tools.Core.Classes.ToolHelpers.Sliders.Newgen;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

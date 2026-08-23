@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Mapping_Tools.Core.Classes.SystemTools;
+using Mapping_Tools.Core.SystemTools;
 
 namespace Mapping_Tools.Application.Interactions.Validation;
 

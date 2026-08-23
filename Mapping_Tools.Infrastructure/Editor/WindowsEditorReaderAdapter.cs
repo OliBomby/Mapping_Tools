@@ -6,11 +6,11 @@ using Mapping_Tools.Application.GeometryDashboard;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Workspace;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Infrastructure.Platform;
-using DomainHitObject = Mapping_Tools.Core.Classes.BeatmapHelper.HitObject;
+using DomainHitObject = Mapping_Tools.Core.BeatmapHelper.HitObject;
 using ReaderHitObject = Editor_Reader.HitObject;
 
 namespace Mapping_Tools.Infrastructure.Editor;

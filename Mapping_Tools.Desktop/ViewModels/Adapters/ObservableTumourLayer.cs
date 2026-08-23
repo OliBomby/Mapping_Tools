@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mapping_Tools.Core.Classes.Graph;
+using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 
 namespace Mapping_Tools.Desktop.ViewModels.Adapters;

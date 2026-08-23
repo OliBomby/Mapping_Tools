@@ -1,0 +1,481 @@
+﻿using Mapping_Tools.Core.MathUtil;
+
+namespace Mapping_Tools.Core.ToolHelpers.Sliders;
+
+/// <summary>
+///     This class can generate bezier anchors which approximate arbitrary paths
+/// </summary>
+public class PathGenerator
+{
+    /// <summary>
+    ///     Defines values for approximation mode.
+    /// </summary>
+    public enum ApproximationMode
+    {
+        /// <summary>
+        ///     Construct each segment from the intersection of its endpoint tangents.
+        /// </summary>
+        TangentIntersection,
+
+        /// <summary>
+        ///     Use a two-curve construction meeting near the segment midpoint.
+        /// </summary>
+        DoubleMiddle,
+
+        /// <summary>
+        ///     Select the lower-loss construction for each segment.
+        /// </summary>
+        Best,
+    }
+
+    private List<double> angle; // path segment angles
+    private List<Vector2> diff; // path segments
+    private List<double> diffL; // length of segments
+    private List<Vector2> path; // input path
+    private List<double> pathL; // cumulative length
+
+    /// <summary>
+    ///     Builds cached segment, angle, and cumulative-distance data from a sampled path.
+    /// </summary>
+    /// <param name="path">Ordered samples of the curve to approximate.</param>
+    public PathGenerator(List<Vector2> path)
+    {
+        SetPath(path);
+    }
+
+    /// <summary>
+    ///     Reuses precomputed path-analysis arrays when reconstructing a generator.
+    /// </summary>
+    /// <param name="path">Ordered samples of the curve to approximate.</param>
+    /// <param name="diff">The diff.</param>
+    /// <param name="angle">The angle.</param>
+    /// <param name="diffL">The diff l.</param>
+    /// <param name="pathL">The path l.</param>
+    public PathGenerator(List<Vector2> path, List<Vector2> diff, List<double> angle, List<double> diffL, List<double> pathL)
+    {
+        this.path = path;
+        this.diff = diff;
+        this.angle = angle;
+        this.diffL = diffL;
+        this.pathL = pathL;
+    }
+
+    /// <summary>
+    ///     Replaces the sampled path and rebuilds all derived segment data, removing consecutive duplicate points.
+    /// </summary>
+    /// <param name="pathPoints">The path points.</param>
+    public void SetPath(List<Vector2> pathPoints)
+    {
+        path = new List<Vector2> { pathPoints.First() };
+        diff = new List<Vector2>();
+        angle = new List<double>();
+        diffL = new List<double>();
+        double sum = 0;
+        pathL = new List<double> { sum };
+
+        foreach (var point in pathPoints.Skip(1))
+        {
+            var diff = point - path.Last();
+            double dist = diff.Length;
+
+            if (dist < Precision.DOUBLE_EPSILON) continue;
+
+            path.Add(point);
+            this.diff.Add(diff);
+            angle.Add(diff.Theta);
+            diffL.Add(dist);
+            sum += dist;
+            pathL.Add(sum);
+        }
+
+        // Add last member again so these lists have the same number of elements as path
+        diff.Add(diff.Last());
+        angle.Add(angle.Last());
+        diffL.Add(diffL.Last());
+    }
+
+    /// <summary>
+    ///     Generates anchors which approximate the entire path
+    /// </summary>
+    /// <param name="maxAngle"></param>
+    /// <returns></returns>
+    public IEnumerable<Vector2> GeneratePath(double maxAngle = Math.PI * 1 / 4)
+    {
+        return GeneratePath(0, path.Count - 1, maxAngle);
+    }
+
+    /// <summary>
+    ///     Generates anchors which approximate the path between the given indices
+    /// </summary>
+    /// <param name="startIndex"></param>
+    /// <param name="endIndex"></param>
+    /// <param name="maxAngle"></param>
+    /// <param name="approximationMode"></param>
+    /// <returns></returns>
+    public IEnumerable<Vector2> GeneratePath(double startIndex, double endIndex,
+        double maxAngle = Math.PI * 1 / 4, ApproximationMode approximationMode = ApproximationMode.Best)
+    {
+        var segments = GetNonInflectionSegments(startIndex, endIndex, maxAngle);
+
+        foreach (var segment in segments)
+        {
+            var p1 = GetContinuousPosition(segment.Item1);
+            var p2 = GetContinuousPosition(segment.Item2);
+
+            yield return p1;
+
+            Vector2? middle;
+            switch (approximationMode)
+            {
+                case ApproximationMode.TangentIntersection:
+                    middle = TangentIntersectionApproximation(segment.Item1, segment.Item2);
+                    break;
+                case ApproximationMode.DoubleMiddle:
+                    middle = DoubleMiddleApproximation(segment.Item1, segment.Item2);
+                    break;
+                case ApproximationMode.Best:
+                    middle = BestApproximation(segment.Item1, segment.Item2);
+                    break;
+                default:
+                    middle = null;
+                    break;
+            }
+
+            if (middle.HasValue) yield return middle.Value;
+
+            yield return p2;
+        }
+    }
+
+    private Vector2? BestApproximation(double startIndex, double endIndex)
+    {
+        // Make sure start index is before end index
+        // The results will be the same for flipped indices
+        if (startIndex > endIndex)
+        {
+            double tempEndIndex = endIndex;
+            endIndex = startIndex;
+            startIndex = tempEndIndex;
+        }
+
+        var p1 = GetContinuousPosition(startIndex);
+        var p2 = GetContinuousPosition(endIndex);
+
+        const int num_test_points = 100;
+        var labels = path.GetRange((int)startIndex, (int)Math.Ceiling(endIndex) - (int)startIndex + 1);
+
+        Vector2?[] middles =
+        {
+            TangentIntersectionApproximation(startIndex, endIndex),
+            DoubleMiddleApproximation(startIndex, endIndex),
+        };
+
+        Vector2? bestMiddle = null;
+        double bestLoss = double.PositiveInfinity;
+
+        foreach (var middle in middles)
+        {
+            var bezier = new BezierCurveQuadric(p1, p2, middle ?? (p2 - p1) / 2);
+
+            var interpolatedPoints = new Vector2[num_test_points];
+            for (int i = 0; i < num_test_points; i++)
+            {
+                double t = (double)i / (num_test_points - 1);
+                interpolatedPoints[i] = bezier.CalculatePoint(t);
+            }
+
+            double loss = SliderPathUtil.CalculateLoss(interpolatedPoints, labels);
+
+            if (loss < bestLoss)
+            {
+                bestLoss = loss;
+                bestMiddle = middle;
+            }
+        }
+
+        return bestMiddle;
+    }
+
+    private Vector2? TangentIntersectionApproximation(double startIndex, double endIndex)
+    {
+        var p1 = GetContinuousPosition(startIndex);
+        var p2 = GetContinuousPosition(endIndex);
+
+        double a1 = GetContinuousAngle(startIndex);
+        double a2 = GetContinuousAngle(endIndex - 2 * Precision.DOUBLE_EPSILON);
+
+        if (Math.Abs(GetSmallestAngle(a1, a2)) > 0.1)
+        {
+            var t1 = new Line2(p1, a1);
+            var t2 = new Line2(p2, a2);
+
+            var middleAnchor = Line2.Intersection(t1, t2);
+            if (middleAnchor != Vector2.NaN && Vector2.DistanceSquared(p1, middleAnchor) > 0.5 && Vector2.DistanceSquared(p2, middleAnchor) > 0.5)
+                return middleAnchor;
+        }
+
+        return null;
+    }
+
+    private Vector2? DoubleMiddleApproximation(double startIndex, double endIndex)
+    {
+        var p1 = GetContinuousPosition(startIndex);
+        var p2 = GetContinuousPosition(endIndex);
+
+        double d1 = GetContinuousDistance(startIndex);
+        double d2 = GetContinuousDistance(endIndex);
+        double middleIndex = GetIndexAtDistance((d1 + d2) / 2);
+
+        var averagePoint = (p1 + p2) / 2;
+        var middlePoint = GetContinuousPosition(middleIndex);
+
+        if (Vector2.DistanceSquared(averagePoint, middlePoint) < 0.1) return null;
+
+        var doubleMiddlePoint = averagePoint + (middlePoint - averagePoint) * 2;
+
+        return doubleMiddlePoint;
+    }
+
+    /// <summary>
+    ///     Calculates the indices of sub-ranges such that the sub-ranges have no inflection points or sharp curves inside.
+    /// </summary>
+    /// <param name="startIndex"></param>
+    /// <param name="endIndex"></param>
+    /// <param name="maxAngle"></param>
+    /// <returns></returns>
+    public List<Tuple<double, double>> GetNonInflectionSegments(double startIndex, double endIndex, double maxAngle = Math.PI * 1 / 4)
+    {
+        int dir = Math.Sign(endIndex - startIndex);
+
+        if (dir == 0) return new List<Tuple<double, double>> { new(startIndex, endIndex) };
+
+        // If the direction is reversed, just swap the start and end index and then reverse the result at the end
+        if (dir == -1)
+        {
+            double temp = endIndex;
+            endIndex = startIndex;
+            startIndex = temp;
+        }
+
+        endIndex = MathHelper.Clamp(endIndex, 0, angle.Count - 1);
+
+        int startIndexInt = (int)Math.Ceiling(startIndex);
+        int endIndexInt = (int)Math.Floor(endIndex);
+
+        double lastAngleChange = 0;
+        double lastAngle = GetContinuousAngle(startIndex);
+
+        double startSubRange = startIndex;
+        double subRangeAngleChange = 0;
+        var subRanges = new List<Tuple<double, double, double>>();
+        // Loop through the whole path and divide it into sub-ranges at every inflection point
+        //Console.WriteLine($"Iterating from {startIndexInt} to {endIndexInt}");
+        for (int i = startIndexInt; i <= endIndexInt; i++)
+        {
+            var pos = path[i];
+            double angle = this.angle[i];
+            double angleChange = GetSmallestAngle(angle, lastAngle);
+            //Console.WriteLine("Angle change: " + angleChange);
+
+            // Check for inflection point or red anchors
+            if (angleChange * lastAngleChange < -Precision.DOUBLE_EPSILON && Math.Abs(startSubRange - i) > 1
+                || (pos - pos.Rounded()).LengthSquared < Precision.DOUBLE_EPSILON && Math.Abs(angleChange) > Precision.DOUBLE_EPSILON)
+            {
+                subRanges.Add(new Tuple<double, double, double>(startSubRange, i, subRangeAngleChange));
+
+                //Console.WriteLine($"Adding segment for inflection point or red: {startSubRange} to {i}");
+                //Console.WriteLine($"Found inflection point or red anchor: {angleChange}, {lastAngleChange}, {pos}, {angleChange * lastAngleChange}");
+
+                startSubRange = i;
+                subRangeAngleChange = -Math.Abs(angleChange); // Negate the angle change because this point invalidates the angle
+            }
+            else if (angleChange == 0 && lastAngleChange != 0)
+            {
+                subRanges.Add(new Tuple<double, double, double>(startSubRange, i, subRangeAngleChange));
+
+                //Console.WriteLine($"Adding segment for start zero angle change: {startSubRange} to {i}");
+                //Console.WriteLine($"start of zero angle change: {angleChange}, {lastAngleChange}, {pos}, {angleChange * lastAngleChange}");
+
+                startSubRange = i;
+                subRangeAngleChange = -Math.Abs(angleChange); // Negate the angle change because this point invalidates the angle
+            }
+            else if (angleChange != 0 && lastAngleChange == 0 && i - 1 >= startSubRange)
+            {
+                // Extra check to prevent subranges going backwards with i - 1
+                // Place on the previous index for symmetry with the part going into the zero chain
+                subRanges.Add(new Tuple<double, double, double>(startSubRange, i - 1, 0));
+
+                //Console.WriteLine($"Adding segment for end zero angle change: {startSubRange} to {i}");
+                //Console.WriteLine($"end of zero angle change: {angleChange}, {lastAngleChange}, {pos}, {angleChange * lastAngleChange}");
+
+                startSubRange = i - 1;
+            }
+
+            subRangeAngleChange += Math.Abs(angleChange);
+
+            lastAngle = angle;
+            lastAngleChange = angleChange;
+        }
+
+        if (Math.Abs(startSubRange - endIndex) > Precision.DOUBLE_EPSILON) subRanges.Add(new Tuple<double, double, double>(startSubRange, endIndex, subRangeAngleChange));
+
+        // Remove all sub-ranges which start and end on the same index or start at a later index
+        subRanges.RemoveAll(s => s.Item1 >= s.Item2);
+
+        var segments = new List<Tuple<double, double>>();
+        // Divide each sub-range into evenly spaced segments which have an aggregate angle change less than the max
+        foreach (var subRange in subRanges)
+        {
+            int numSegments = (int)Math.Floor(subRange.Item3 / maxAngle) + 1;
+            //Console.WriteLine("Num segments: " + numSegments);
+            //Console.WriteLine("sub-range angle: " + subRange.Item3);
+            double maxSegmentAngle = subRange.Item3 / numSegments;
+
+            int segmentStartIndexInt = (int)Math.Ceiling(subRange.Item1);
+            int segmentEndIndexInt = (int)Math.Floor(subRange.Item2);
+
+            lastAngle = GetContinuousAngle(subRange.Item1);
+
+            double startSegment = subRange.Item1;
+            double segmentAngleChange = 0;
+            // Loop through the sub-range and count the angle change to make even divisions of the angle
+            //Console.WriteLine($"Iterating subrange from {segmentStartIndexInt} to {segmentEndIndexInt}");
+            for (int i = segmentStartIndexInt; i <= segmentEndIndexInt; i++)
+            {
+                double angle = this.angle[i];
+                double angleChange = GetSmallestAngle(angle, lastAngle);
+
+                segmentAngleChange += Math.Abs(angleChange);
+
+                if (segmentAngleChange > maxSegmentAngle + Precision.DOUBLE_EPSILON)
+                {
+                    segments.Add(new Tuple<double, double>(startSegment, i));
+                    //Console.WriteLine($"Adding segment for angle: {startSegment} to {i}");
+
+                    startSegment = i;
+                    segmentAngleChange -= maxSegmentAngle;
+                }
+
+                lastAngle = angle;
+            }
+
+            if (Math.Abs(startSegment - subRange.Item2) > Precision.DOUBLE_EPSILON) segments.Add(new Tuple<double, double>(startSegment, subRange.Item2));
+            //Console.WriteLine($"Adding segment at the end: {startSegment}, {subRange.Item2}");
+        }
+
+        // Reverse the result
+        if (dir == -1)
+        {
+            var reversedSegments = new List<Tuple<double, double>>(segments.Count);
+
+            for (int i = segments.Count - 1; i >= 0; i--)
+            {
+                var s = segments[i];
+                reversedSegments.Add(new Tuple<double, double>(s.Item2, s.Item1));
+            }
+
+            return reversedSegments;
+        }
+
+        return segments;
+    }
+
+    /// <summary>
+    ///     Interpolates a position at a fractional sample index.
+    /// </summary>
+    /// <param name="index">A fractional sample index, clamped at path endpoints.</param>
+    /// <returns>The linear interpolation between the surrounding samples.</returns>
+    public Vector2 GetContinuousPosition(double index)
+    {
+        int segmentIndex = (int)Math.Floor(index);
+        double segmentProgression = index - segmentIndex;
+
+        return Math.Abs(segmentProgression) < Precision.DOUBLE_EPSILON ? path[segmentIndex] :
+            Math.Abs(segmentProgression - 1) < Precision.DOUBLE_EPSILON ? path[segmentIndex + 1] :
+            Vector2.Lerp(path[segmentIndex], path[segmentIndex + 1], segmentProgression);
+    }
+
+    /// <summary>
+    ///     Reads the segment direction associated with a fractional sample index.
+    /// </summary>
+    /// <param name="index">A fractional sample index.</param>
+    /// <returns>The clamped segment angle in radians.</returns>
+    public double GetContinuousAngle(double index)
+    {
+        int segmentIndex = MathHelper.Clamp((int)Math.Floor(index + Precision.DOUBLE_EPSILON), 0, angle.Count - 1);
+
+        return angle[segmentIndex];
+    }
+
+    /// <summary>
+    ///     Converts a fractional sample index to cumulative polyline distance.
+    /// </summary>
+    /// <param name="index">A fractional sample index.</param>
+    /// <returns>The interpolated distance from the first path sample.</returns>
+    public double GetContinuousDistance(double index)
+    {
+        int segmentIndex = (int)Math.Floor(index);
+        double segmentProgression = index - segmentIndex;
+
+        return Math.Abs(segmentProgression) < Precision.DOUBLE_EPSILON ? pathL[segmentIndex] :
+            Math.Abs(segmentProgression - 1) < Precision.DOUBLE_EPSILON ? pathL[segmentIndex + 1] :
+            (1 - segmentProgression) * pathL[segmentIndex] + segmentProgression * pathL[segmentIndex + 1];
+    }
+
+    /// <summary>
+    ///     Converts cumulative polyline distance back to a fractional sample index.
+    /// </summary>
+    /// <param name="distance">The distance.</param>
+    /// <returns>An exact vertex index or an interpolation between the surrounding vertices.</returns>
+    public double GetIndexAtDistance(double distance)
+    {
+        int index = pathL.BinarySearch(distance);
+        if (index >= 0) return index;
+
+        int i2 = ~index;
+        int i1 = i2 - 1;
+        double d1 = pathL[i1];
+        double d2 = pathL[i2];
+
+        return (distance - d1) / (d2 - d1) + i1;
+    }
+
+    private static double Modulo(double a, double n)
+    {
+        return a - Math.Floor(a / n) * n;
+    }
+
+    private static double GetSmallestAngle(double a1, double a2)
+    {
+        return Modulo(a2 - a1 + Math.PI, 2 * Math.PI) - Math.PI;
+    }
+
+    /// <summary>
+    ///     Measures a polyline by summing consecutive anchor distances.
+    /// </summary>
+    /// <param name="anchors">Polyline vertices in traversal order.</param>
+    /// <returns>The total Euclidean length.</returns>
+    public static double CalculatePathLength(List<Vector2> anchors)
+    {
+        double length = 0;
+
+        int start = 0;
+        int end = 0;
+
+        for (int i = 0; i < anchors.Length(); ++i)
+        {
+            end++;
+
+            if (i == anchors.Length() - 1 || anchors[i] == anchors[i + 1])
+            {
+                var cpSpan = anchors.GetRange(start, end - start);
+
+                length += new BezierSubdivision(cpSpan).SubdividedApproximationLength();
+
+                start = end;
+            }
+        }
+
+        return length;
+    }
+}

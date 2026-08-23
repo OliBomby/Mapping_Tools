@@ -2,8 +2,8 @@ using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.HitsoundCopier;
 using Mapping_Tools.Application.Settings;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

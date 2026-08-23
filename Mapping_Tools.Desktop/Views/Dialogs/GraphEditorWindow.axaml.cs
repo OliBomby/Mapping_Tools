@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Media;
-using Mapping_Tools.Core.Classes.Graph;
-using Mapping_Tools.Core.Classes.Graph.Markers;
+using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.Graph.Markers;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 

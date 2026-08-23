@@ -1,5 +1,5 @@
-using Mapping_Tools.Core.Classes.Graph;
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

@@ -1,4 +1,4 @@
-﻿using Mapping_Tools.Core.Classes.BeatmapHelper;
+﻿using Mapping_Tools.Core.BeatmapHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Classes.BeatmapHelper.SliderPathStuff;

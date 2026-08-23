@@ -2,8 +2,8 @@ using System.Globalization;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.SystemTools;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.SystemTools;
 using Mapping_Tools.Core.Tools.PatternGallery;
 using Mapping_Tools.Desktop.Views.Dialogs;
 

@@ -1,6 +1,6 @@
 using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
-using Mapping_Tools.Core.Classes.ToolHelpers.Sliders.Newgen;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using CoreTumourGenerator = Mapping_Tools.Core.Tools.TumourGenerating.TumourGenerator;
 

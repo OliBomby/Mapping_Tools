@@ -2,7 +2,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using Mapping_Tools.Application.SliderPicturator;
-using Mapping_Tools.Core.Classes.Images;
+using Mapping_Tools.Core.Images;
 
 namespace Mapping_Tools.Infrastructure.Images;
 

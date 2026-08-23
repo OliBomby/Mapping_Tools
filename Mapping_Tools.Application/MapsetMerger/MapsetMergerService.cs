@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Core.Classes.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.MapsetMerger;
 
 namespace Mapping_Tools.Application.MapsetMerger;

@@ -1,8 +1,8 @@
 using System.Globalization;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
-using Mapping_Tools.Core.Classes.BeatmapHelper.BeatDivisors;
-using Mapping_Tools.Core.Classes.SystemTools;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
+using Mapping_Tools.Core.SystemTools;
 
 namespace Mapping_Tools.Desktop.Converters;
 

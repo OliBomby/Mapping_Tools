@@ -1,9 +1,9 @@
 using Avalonia;
 using Avalonia.Input;
-using Mapping_Tools.Core.Classes.Graph;
-using Mapping_Tools.Core.Classes.Graph.Interpolation.Interpolators;
-using Mapping_Tools.Core.Classes.Graph.Markers;
-using Mapping_Tools.Core.Classes.MathUtil;
+using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
+using Mapping_Tools.Core.Graph.Markers;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Desktop.Controls;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

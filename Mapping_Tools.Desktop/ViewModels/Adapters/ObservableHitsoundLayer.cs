@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mapping_Tools.Core.Classes.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Classes.HitsoundStuff;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.HitsoundStuff;
 
 namespace Mapping_Tools.Desktop.ViewModels.Adapters;
 
