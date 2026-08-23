@@ -230,8 +230,8 @@ public sealed class LayerBoundaryTests
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
 
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Mapping_Tools.sln"))) directory = directory.Parent;
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Mapping_Tools.slnx"))) directory = directory.Parent;
 
-        return directory?.FullName ?? throw new DirectoryNotFoundException("Could not find Mapping_Tools.sln.");
+        return directory?.FullName ?? throw new DirectoryNotFoundException("Could not find Mapping_Tools.slnx.");
     }
 }

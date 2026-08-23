@@ -1,3 +1,4 @@
+using System.Xml.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Architecture.Tests;
@@ -11,19 +12,25 @@ public sealed class DefaultExecutableTests
     public void Solution_ContainsOnlyAvaloniaFrontend()
     {
         // Arrange
-        string solution = File.ReadAllText(Path.Combine(repositoryRoot, "Mapping_Tools.sln"));
+        string solution = File.ReadAllText(Path.Combine(repositoryRoot, "Mapping_Tools.slnx"));
+        string[] projectPaths = XDocument.Parse(solution)
+            .Descendants("Project")
+            .Select(element => element.Attribute("Path")?.Value)
+            .Where(path => path is not null)
+            .Select(path => path!)
+            .ToArray();
 
         // Act
-        int avaloniaIndex = solution.IndexOf(
-            "= \"Mapping_Tools.Desktop\",",
-            StringComparison.Ordinal);
-        int legacyProjectIndex = solution.IndexOf(
-            "= \"Mapping_Tools\",",
-            StringComparison.Ordinal);
+        bool containsAvaloniaFrontend = projectPaths.Contains(
+            "Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj",
+            StringComparer.Ordinal);
+        bool containsLegacyFrontend = projectPaths.Contains(
+            "Mapping_Tools/Mapping_Tools.csproj",
+            StringComparer.Ordinal);
 
         // Assert
-        avaloniaIndex.Should().BeGreaterThanOrEqualTo(0);
-        legacyProjectIndex.Should().Be(-1);
+        containsAvaloniaFrontend.Should().BeTrue();
+        containsLegacyFrontend.Should().BeFalse();
         solution.Should().NotContain("Mapping_Tools_Tests");
     }
 
@@ -111,10 +118,10 @@ public sealed class DefaultExecutableTests
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Mapping_Tools.sln")))
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "Mapping_Tools.slnx")))
             directory = directory.Parent;
 
         return directory?.FullName
-               ?? throw new DirectoryNotFoundException("Could not find Mapping_Tools.sln.");
+               ?? throw new DirectoryNotFoundException("Could not find Mapping_Tools.slnx.");
     }
 }

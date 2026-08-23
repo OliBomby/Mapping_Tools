@@ -1,0 +1,19 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="Mapping_Tools.Application.Tests/Mapping_Tools.Application.Tests.csproj" />
+  <Project Path="Mapping_Tools.Application/Mapping_Tools.Application.csproj" />
+  <Project Path="Mapping_Tools.Architecture.Tests/Mapping_Tools.Architecture.Tests.csproj" />
+  <Project Path="Mapping_Tools.Core.Tests/Mapping_Tools.Core.Tests.csproj" />
+  <Project Path="Mapping_Tools.Core/Mapping_Tools.Core.csproj" />
+  <Project Path="Mapping_Tools.Desktop.Tests/Mapping_Tools.Desktop.Tests.csproj" />
+  <Project Path="Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj" />
+  <Project Path="Mapping_Tools.Infrastructure.Tests/Mapping_Tools.Infrastructure.Tests.csproj" />
+  <Project Path="Mapping_Tools.Infrastructure/Mapping_Tools.Infrastructure.csproj" />
+</Solution>
