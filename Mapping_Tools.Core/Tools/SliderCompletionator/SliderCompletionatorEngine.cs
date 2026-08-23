@@ -35,7 +35,7 @@ public static class SliderCompletionatorEngine
         ArgumentNullException.ThrowIfNull(markedObjects);
         ArgumentNullException.ThrowIfNull(options);
 
-        if (currentEditorTime is double time && !double.IsFinite(time))
+        if (currentEditorTime is { } time && !double.IsFinite(time))
             throw new ArgumentException(
                 "Current editor time must be a finite number.",
                 nameof(currentEditorTime));

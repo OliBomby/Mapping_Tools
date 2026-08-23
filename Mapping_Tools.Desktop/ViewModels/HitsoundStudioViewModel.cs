@@ -1045,7 +1045,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     private async Task RunExportAsync(IReadOnlyList<string> selectedPaths, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(BaseBeatmap)
-            && selectedPaths.FirstOrDefault(path => path.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)) is string selected) BaseBeatmap = selected;
+            && selectedPaths.FirstOrDefault(path => path.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)) is { } selected) BaseBeatmap = selected;
 
         var chosen = await dialogs.ShowExportAsync(ToProject());
         if (chosen is null) return;

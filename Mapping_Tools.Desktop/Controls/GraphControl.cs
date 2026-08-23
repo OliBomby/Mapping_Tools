@@ -931,7 +931,7 @@ public sealed class GraphControl : Control
         if (properties.IsRightButtonPressed && IsEditable)
         {
             int? anchorIndex = HitTestAnchor(point);
-            if (anchorIndex is int index)
+            if (anchorIndex is { } index)
             {
                 SelectedAnchorIndex = index;
                 if (eventArgs.KeyModifiers.HasAllFlags(KeyModifiers.Shift) && RemoveAnchor(index))
@@ -946,7 +946,7 @@ public sealed class GraphControl : Control
             }
 
             int? rightTensionIndex = HitTestTension(point);
-            if (rightTensionIndex is int resetIndex)
+            if (rightTensionIndex is { } resetIndex)
             {
                 SelectedAnchorIndex = resetIndex;
                 ResetTension(resetIndex);
@@ -970,7 +970,7 @@ public sealed class GraphControl : Control
         if (!properties.IsLeftButtonPressed) return;
 
         int? hitAnchor = IsEditable ? HitTestAnchor(point) : null;
-        if (hitAnchor is int anchor)
+        if (hitAnchor is { } anchor)
         {
             SelectedAnchorIndex = anchor;
             BeginGesture(eventArgs.Pointer, GraphPointerGesture.Anchor, anchor, point);
@@ -979,7 +979,7 @@ public sealed class GraphControl : Control
         }
 
         int? tensionAnchor = IsEditable ? HitTestTension(point) : null;
-        if (tensionAnchor is int tensionIndex)
+        if (tensionAnchor is { } tensionIndex)
         {
             SelectedAnchorIndex = tensionIndex;
             var state = GetGraphState();
@@ -1071,7 +1071,7 @@ public sealed class GraphControl : Control
             InvalidateVisual();
             eventArgs.Handled = true;
         }
-        else if ((eventArgs.Key == Key.Delete || eventArgs.Key == Key.Back) && SelectedAnchorIndex is int index)
+        else if ((eventArgs.Key == Key.Delete || eventArgs.Key == Key.Back) && SelectedAnchorIndex is { } index)
         {
             eventArgs.Handled = RemoveAnchor(index);
         }
@@ -1251,12 +1251,12 @@ public sealed class GraphControl : Control
     private void DrawMarker(DrawingContext context, GraphMarker marker, Point position, bool vertical)
     {
         var markerBrush = EdgeBrush ?? MarkerBrush;
-        var lineBrush = marker.CustomLineColorArgb is uint customLineColor
+        var lineBrush = marker.CustomLineColorArgb is { } customLineColor
             ? ToBrush(customLineColor)
             : markerBrush;
         if (lineBrush is null) return;
 
-        var extensionBrush = marker.MarkerColorArgb is uint markerColor
+        var extensionBrush = marker.MarkerColorArgb is { } markerColor
             ? ToBrush(markerColor)
             : markerBrush ?? lineBrush;
         double length = marker.DrawMarker ? Math.Max(marker.MarkerLength, 0) : 0;
@@ -1436,7 +1436,7 @@ public sealed class GraphControl : Control
         MenuItem delete = new() { Header = "Delete" };
         delete.Click += (_, _) =>
         {
-            if (contextAnchorIndex is int index) RemoveAnchor(index);
+            if (contextAnchorIndex is { } index) RemoveAnchor(index);
         };
         menu.Items.Add(delete);
         menu.Items.Add(new Separator());
@@ -1450,7 +1450,7 @@ public sealed class GraphControl : Control
             };
             item.Click += (_, _) =>
             {
-                if (contextAnchorIndex is int index && item.Tag is Type interpolatorType) SetInterpolator(index, interpolatorType);
+                if (contextAnchorIndex is { } index && item.Tag is Type interpolatorType) SetInterpolator(index, interpolatorType);
             };
             menu.Items.Add(item);
         }
@@ -1464,7 +1464,7 @@ public sealed class GraphControl : Control
 
     private void UpdateContextMenu()
     {
-        if (contextMenu is null || contextAnchorIndex is not int index || GraphState is null) return;
+        if (contextMenu is null || contextAnchorIndex is not { } index || GraphState is null) return;
         if (contextMenu.Items[0] is MenuItem delete) delete.IsEnabled = index > 0 && index < GraphState.Anchors.Count - 1;
 
         for (int itemIndex = 2; itemIndex < contextMenu.Items.Count; itemIndex++)
@@ -1477,7 +1477,7 @@ public sealed class GraphControl : Control
 
     private async void TypeInValueAsync()
     {
-        if (contextAnchorIndex is not int index || GraphState is null || TopLevel.GetTopLevel(this) is not Window owner) return;
+        if (contextAnchorIndex is not { } index || GraphState is null || TopLevel.GetTopLevel(this) is not Window owner) return;
 
         var anchor = GraphState.Anchors[index];
         ValueDialogWindow dialog = new();

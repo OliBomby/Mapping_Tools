@@ -165,7 +165,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         try
         {
             var snapshot = await liveReader.ReadAsync();
-            if (snapshot?.EditorTime is double editorTime) time = editorTime;
+            if (snapshot?.EditorTime is { } editorTime) time = editorTime;
         }
         catch
         {

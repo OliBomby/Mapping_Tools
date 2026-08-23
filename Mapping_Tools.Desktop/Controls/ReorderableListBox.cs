@@ -132,7 +132,7 @@ public sealed class ReorderableListBox : ListBox
     {
         for (int index = 0; index < ItemCount; index++)
         {
-            if (ContainerFromIndex(index) is not Control container) continue;
+            if (ContainerFromIndex(index) is not { } container) continue;
 
             if (point.Y < container.Bounds.Center.Y) return index;
         }
