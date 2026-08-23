@@ -1,7 +1,7 @@
-using Mapping_Tools.Application.HitsoundStudio;
-using Mapping_Tools.Application.MapsetMerger;
-using Mapping_Tools.Application.Sliderator;
-using Mapping_Tools.Application.TumourGenerator;
+using Mapping_Tools.Application.Tools.HitsoundStudio;
+using Mapping_Tools.Application.Tools.MapsetMerger;
+using Mapping_Tools.Application.Tools.Sliderator;
+using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Infrastructure.Projects;

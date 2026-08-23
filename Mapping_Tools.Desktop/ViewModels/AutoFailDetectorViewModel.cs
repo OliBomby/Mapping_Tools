@@ -1,12 +1,12 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.AutoFail;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Tools;
+using Mapping_Tools.Application.Tools.AutoFail;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.AutoFail;
 using Mapping_Tools.Desktop.Shell;

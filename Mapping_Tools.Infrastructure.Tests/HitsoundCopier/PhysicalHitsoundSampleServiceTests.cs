@@ -1,4 +1,4 @@
-using Mapping_Tools.Application.MapCleaner;
+using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;

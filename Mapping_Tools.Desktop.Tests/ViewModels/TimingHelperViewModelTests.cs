@@ -4,7 +4,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Tools;
-using Mapping_Tools.Application.TimingHelper;
+using Mapping_Tools.Application.Tools.TimingHelper;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.TimingHelper;
 using Mapping_Tools.Desktop.Converters;

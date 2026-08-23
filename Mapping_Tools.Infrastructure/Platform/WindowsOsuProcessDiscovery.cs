@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
-using Mapping_Tools.Application.GeometryDashboard;
+using Mapping_Tools.Application.Tools.GeometryDashboard;
 
 namespace Mapping_Tools.Infrastructure.Platform;
 

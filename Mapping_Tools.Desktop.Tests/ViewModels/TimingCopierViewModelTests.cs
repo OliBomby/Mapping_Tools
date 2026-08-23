@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Settings;
-using Mapping_Tools.Application.TimingCopier;
+using Mapping_Tools.Application.Tools.TimingCopier;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.TimingCopier;
 using Mapping_Tools.Desktop.Tests.TestDoubles;

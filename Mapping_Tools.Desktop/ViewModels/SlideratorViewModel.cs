@@ -8,7 +8,7 @@ using Mapping_Tools.Application.Interactions.Converters;
 using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Tools;
-using Mapping_Tools.Application.Sliderator;
+using Mapping_Tools.Application.Tools.Sliderator;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Graph;

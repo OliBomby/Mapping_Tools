@@ -1,5 +1,5 @@
-using Mapping_Tools.Application.HitsoundCopier;
-using Mapping_Tools.Application.MapCleaner;
+using Mapping_Tools.Application.Tools.HitsoundCopier;
+using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Tools.HitsoundCopier;

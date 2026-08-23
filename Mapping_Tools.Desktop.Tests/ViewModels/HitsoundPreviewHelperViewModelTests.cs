@@ -1,8 +1,8 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
-using Mapping_Tools.Application.HitsoundPreviewHelper;
-using Mapping_Tools.Application.RhythmGuide;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
+using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;

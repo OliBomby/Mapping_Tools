@@ -1,7 +1,7 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
-using Mapping_Tools.Application.GeometryDashboard;
+using Mapping_Tools.Application.Tools.GeometryDashboard;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SnappingTools;

@@ -2,7 +2,7 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Settings;
-using Mapping_Tools.Application.TumourGenerator;
+using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;

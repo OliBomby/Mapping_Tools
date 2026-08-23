@@ -1,6 +1,6 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
-using Mapping_Tools.Application.HitsoundStudio;
+using Mapping_Tools.Application.Tools.HitsoundStudio;
 
 namespace Mapping_Tools.Desktop.Converters;
 

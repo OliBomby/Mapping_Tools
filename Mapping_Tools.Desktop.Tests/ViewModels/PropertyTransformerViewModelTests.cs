@@ -1,8 +1,8 @@
 using System.Globalization;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
-using Mapping_Tools.Application.PropertyTransformer;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tools.PropertyTransformer;
 using Mapping_Tools.Core.Tools.PropertyTransformer;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Tests.TestDoubles;

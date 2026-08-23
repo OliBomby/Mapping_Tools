@@ -1,5 +1,5 @@
-using Mapping_Tools.Application.GeometryDashboard;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Tools.GeometryDashboard;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Infrastructure.Editor;
