@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.Interactions"
+        xmlns:model="using:Mapping_Tools.Core.Classes.Tools.SnappingTools.Serialization"
         xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -31,17 +32,17 @@
                 </ContextMenu>
             </ListBox.ContextMenu>
             <ListBox.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="model:SnappingToolsSaveSlot">
                     <Grid ColumnDefinitions="150,130,Auto,Auto" Margin="0,2">
                         <TextBox Text="{Binding Name, Mode=TwoWay}" />
                         <controls:GeometryHotkeyEditor Grid.Column="1" Hotkey="{Binding ProjectHotkey, Mode=TwoWay}"
                                                        Margin="8,0" />
                         <Button Grid.Column="2" Content="Save"
-                                Command="{Binding $parent[ListBox].DataContext.SaveCommand}"
+                                Command="{Binding $parent[ListBox].((vm:GeometryDashboardProjectSlotsViewModel)DataContext).SaveCommand}"
                                 CommandParameter="{Binding}" Margin="0,0,4,0"
                                 ToolTip.Tip="Save current settings to this slot." />
                         <Button Grid.Column="3" Content="Load"
-                                Command="{Binding $parent[ListBox].DataContext.LoadCommand}"
+                                Command="{Binding $parent[ListBox].((vm:GeometryDashboardProjectSlotsViewModel)DataContext).LoadCommand}"
                                 CommandParameter="{Binding}" ToolTip.Tip="Load settings from this slot." />
                     </Grid>
                 </DataTemplate>
