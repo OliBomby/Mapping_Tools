@@ -27,7 +27,14 @@ public sealed class MapCleanerServiceTests
         RecordingBeatmapEditingGateway gateway = new(
             new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
         RecordingSamples samples = new();
-        MapCleanerService service = new(gateway, new StubFileSystem(), samples);
+        MapCleanerService service = new(
+            gateway,
+            new RecordingBeatmapFileSystem
+            {
+                FileExistsResolver = _ => true,
+                ParentDirectoryResolver = _ => @"C:\set",
+            },
+            samples);
         MapCleanerOptions options = new()
         {
             SampleSetSliders = false,
@@ -60,19 +67,6 @@ public sealed class MapCleanerServiceTests
         public Task<int> MoveUnusedToRecoveryAsync(string directory, string currentBeatmapPath, Beatmap currentBeatmap, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(0);
-        }
-    }
-
-    private sealed class StubFileSystem : IBeatmapFileSystem
-    {
-        public bool FileExists(string path)
-        {
-            return true;
-        }
-
-        public string? GetParentDirectory(string filePath)
-        {
-            return @"C:\set";
         }
     }
 

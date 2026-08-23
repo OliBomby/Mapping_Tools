@@ -297,7 +297,7 @@ public sealed class DesktopShellTests
     public async Task MainViewModel_OpenWebsiteCommand_WhenExecuted_OpensWebsite()
     {
         // Arrange
-        RecordingLauncher launcher = new();
+        RecordingPlatformLauncher launcher = new();
         using var viewModel = CreateMainViewModel(launcher: launcher);
 
         // Act
@@ -312,7 +312,7 @@ public sealed class DesktopShellTests
     public async Task MainViewModel_OpenGitHubCommand_WhenPlatformRejects_PublishesWarning()
     {
         // Arrange
-        RecordingLauncher launcher = new() { AcceptUris = false };
+        RecordingPlatformLauncher launcher = new() { AcceptUris = false };
         UserNotificationService notifications = new();
         List<UserNotification> published = [];
         notifications.Published += (_, eventArgs) =>
@@ -336,7 +336,7 @@ public sealed class DesktopShellTests
     public async Task MainViewModel_OpenDonateCommand_WhenExecuted_OpensLegacyDonationPage()
     {
         // Arrange
-        RecordingLauncher launcher = new();
+        RecordingPlatformLauncher launcher = new();
         using var viewModel = CreateMainViewModel(launcher: launcher);
 
         // Act
@@ -482,7 +482,7 @@ public sealed class DesktopShellTests
         var resolvedDialogs = dialogs ?? new TestDialogService();
         var resolvedQuickRunRegistry = quickRunRegistry ?? new QuickRunCommandRegistry();
         projectService ??= new RecordingProjectService();
-        ImmediateDispatcher dispatcher = new();
+        ImmediateTestDispatcher dispatcher = new();
         BeatmapWorkspaceViewModel workspace = new(
             new TestBeatmapWorkspace(),
             new TestBeatmapBackupService(),
@@ -499,7 +499,7 @@ public sealed class DesktopShellTests
             resolvedQuickRunRegistry,
             resolvedSettings,
             resolvedNotifications,
-            launcher ?? new RecordingLauncher(),
+            launcher ?? new RecordingPlatformLauncher(),
             dispatcher,
             workspace,
             betterSave ?? new TestBetterSaveService(),
@@ -698,40 +698,4 @@ public sealed class DesktopShellTests
         }
     }
 
-    private sealed class ImmediateDispatcher : IUiDispatcher
-    {
-        public void Post(Action action)
-        {
-            action();
-        }
-    }
-
-    private sealed class RecordingLauncher : IPlatformLauncher
-    {
-        public bool AcceptUris { get; init; } = true;
-
-        public List<Uri> OpenedUris { get; } = [];
-
-        public Task<bool> OpenUriAsync(
-            Uri uri,
-            CancellationToken cancellationToken = default)
-        {
-            OpenedUris.Add(uri);
-            return Task.FromResult(AcceptUris);
-        }
-
-        public Task<bool> OpenFileAsync(
-            string path,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(false);
-        }
-
-        public Task<bool> OpenFolderAsync(
-            string path,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(false);
-        }
-    }
 }

@@ -105,7 +105,7 @@ public sealed class AutoFailDetectorViewModelTests
             new RecordingCurrentBeatmapLocator(currentPath),
             new ApplicationSettings(),
             new TestDialogService(),
-            new StubLauncher());
+            new RecordingPlatformLauncher());
     }
 
     private sealed class RecordingAutoFailService : IAutoFailService
@@ -144,21 +144,4 @@ public sealed class AutoFailDetectorViewModelTests
         }
     }
 
-    private sealed class StubLauncher : IPlatformLauncher
-    {
-        public Task<bool> OpenUriAsync(Uri uri, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(true);
-        }
-
-        public Task<bool> OpenFileAsync(string path, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(true);
-        }
-
-        public Task<bool> OpenFolderAsync(string path, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(true);
-        }
-    }
 }

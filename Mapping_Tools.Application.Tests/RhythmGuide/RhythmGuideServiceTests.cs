@@ -22,7 +22,7 @@ public sealed class RhythmGuideServiceTests
         TestBeatmapBackupService backups = new();
         sessions["source.osu"] = CreateSession(CreateEditor("source.osu", files, true));
         sessions["target.osu"] = CreateSession(CreateEditor("target.osu", files, false));
-        RhythmGuideService service = new(gateway, backups, new StubBeatmapFileSystem(), files);
+        RhythmGuideService service = new(gateway, backups, new RecordingBeatmapFileSystem(), files);
         RhythmGuideOptions options = new()
         {
             Paths = ["source.osu"],
@@ -58,7 +58,7 @@ public sealed class RhythmGuideServiceTests
         RhythmGuideService service = new(
             gateway,
             new TestBeatmapBackupService(),
-            new StubBeatmapFileSystem(),
+            new RecordingBeatmapFileSystem(),
             files);
         RhythmGuideOptions options = new()
         {
@@ -88,7 +88,10 @@ public sealed class RhythmGuideServiceTests
         RhythmGuideService service = new(
             gateway,
             new TestBeatmapBackupService(),
-            new StubBeatmapFileSystem { Existing = ["existing.osu"] },
+            new RecordingBeatmapFileSystem
+            {
+                ExistingPaths = { "existing.osu" },
+            },
             files);
         RhythmGuideOptions options = new()
         {
@@ -151,21 +154,6 @@ public sealed class RhythmGuideServiceTests
         {
             OpenBeatmapFactory = (path, _) => sessions[path],
         };
-    }
-
-    private sealed class StubBeatmapFileSystem : IBeatmapFileSystem
-    {
-        public HashSet<string> Existing { get; init; } = [];
-
-        public bool FileExists(string path)
-        {
-            return Existing.Contains(path);
-        }
-
-        public string? GetParentDirectory(string filePath)
-        {
-            return null;
-        }
     }
 
 }

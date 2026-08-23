@@ -28,7 +28,7 @@ public sealed class TimingHelperServiceTests
             Greenlines = false,
             Redlines = false,
         };
-        RecordingProgress progress = new();
+        RecordingProgress<double> progress = new();
 
         // Act
         var result = await service.AdjustAsync(
@@ -62,16 +62,6 @@ public sealed class TimingHelperServiceTests
                 return new BeatmapEditingSession(editor, BeatmapEditingSource.Disk, []);
             },
         };
-    }
-
-    private sealed class RecordingProgress : IProgress<double>
-    {
-        public List<double> Values { get; } = [];
-
-        public void Report(double value)
-        {
-            Values.Add(value);
-        }
     }
 
 }

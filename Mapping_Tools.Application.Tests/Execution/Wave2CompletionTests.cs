@@ -39,8 +39,17 @@ public sealed class Wave2CompletionTests
             settings);
         BeatmapWorkspace workspace = new(
             settings,
-            new UnusedFilePicker(),
-            new ExistingMapFileSystem(),
+            new RecordingFilePicker
+            {
+                CanOpenFiles = false,
+                CanSaveFiles = false,
+                CanPickFolders = false,
+            },
+            new RecordingBeatmapFileSystem
+            {
+                FileExistsResolver = path => string.Equals(path, map_path, StringComparison.Ordinal),
+                ParentDirectoryResolver = Path.GetDirectoryName,
+            },
             new RecordingCurrentBeatmapLocator(map_path),
             TimeProvider.System);
         var selection =
@@ -188,46 +197,4 @@ public sealed class Wave2CompletionTests
         }
     }
 
-    private sealed class ExistingMapFileSystem : IBeatmapFileSystem
-    {
-        public bool FileExists(string path)
-        {
-            return string.Equals(path, map_path, StringComparison.Ordinal);
-        }
-
-        public string? GetParentDirectory(string filePath)
-        {
-            return Path.GetDirectoryName(filePath);
-        }
-    }
-
-    private sealed class UnusedFilePicker : IFilePicker
-    {
-        public bool CanOpenFiles => false;
-
-        public bool CanSaveFiles => false;
-
-        public bool CanPickFolders => false;
-
-        public Task<IReadOnlyList<string>> PickOpenFilesAsync(
-            OpenFilePickerRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task<string?> PickSaveFileAsync(
-            SaveFilePickerRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task<IReadOnlyList<string>> PickFoldersAsync(
-            OpenFolderPickerRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            throw new NotSupportedException();
-        }
-    }
 }

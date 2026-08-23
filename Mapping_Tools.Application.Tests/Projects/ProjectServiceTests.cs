@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.Tests.TestDoubles;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Projects;
@@ -27,7 +28,7 @@ public sealed class ProjectServiceTests
         // Arrange
         // Act
         TestDirectories directories = new(@"C:\MappingToolsData");
-        ProjectService service = new(directories, new FakeFilePicker(), new FakeProjectStore());
+        ProjectService service = new(directories, new RecordingFilePicker(), new FakeProjectStore());
         var definition = CreateDefinition();
 
         // Assert
@@ -39,7 +40,7 @@ public sealed class ProjectServiceTests
     public void CreateNew_DefaultDefinition_UsesFeatureFactory()
     {
         // Arrange
-        var service = CreateService(new FakeFilePicker(), new FakeProjectStore());
+        var service = CreateService(new RecordingFilePicker(), new FakeProjectStore());
         var definition = CreateDefinition();
 
         // Act
@@ -55,7 +56,7 @@ public sealed class ProjectServiceTests
         // Arrange
         FakeProjectStore store = new();
         TestDirectories directories = new(Path.GetTempPath());
-        ProjectService service = new(directories, new FakeFilePicker(), store);
+        ProjectService service = new(directories, new RecordingFilePicker(), store);
         var definition = CreateDefinition();
         string primary = service.GetAutoSavePath(definition);
         string collection = Path.Combine(directories.ApplicationData, "Collection", "project.json");
@@ -76,7 +77,7 @@ public sealed class ProjectServiceTests
     {
         // Arrange
         FakeProjectStore store = new();
-        var service = CreateService(new FakeFilePicker(), store);
+        var service = CreateService(new RecordingFilePicker(), store);
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
 
@@ -96,7 +97,7 @@ public sealed class ProjectServiceTests
     public async Task SaveAsAsync_WhenPickerCancelled_DoesNotWrite()
     {
         // Arrange
-        FakeFilePicker picker = new() { SavePath = null };
+        RecordingFilePicker picker = new() { SavePath = null };
         FakeProjectStore store = new();
         var service = CreateService(picker, store);
 
@@ -119,7 +120,7 @@ public sealed class ProjectServiceTests
     {
         // Arrange
         string selectedPath = Path.Combine(Path.GetTempPath(), "chosen.json");
-        FakeFilePicker picker = new() { SavePath = selectedPath };
+        RecordingFilePicker picker = new() { SavePath = selectedPath };
         FakeProjectStore store = new();
         var service = CreateService(picker, store);
 
@@ -137,7 +138,7 @@ public sealed class ProjectServiceTests
     public async Task OpenAsync_WhenPickerCancelled_DoesNotRead()
     {
         // Arrange
-        FakeFilePicker picker = new() { OpenPaths = [] };
+        RecordingFilePicker picker = new() { OpenFiles = [] };
         FakeProjectStore store = new();
         var service = CreateService(picker, store);
 
@@ -155,7 +156,7 @@ public sealed class ProjectServiceTests
     {
         // Arrange
         string selectedPath = Path.Combine(Path.GetTempPath(), "opened.json");
-        FakeFilePicker picker = new() { OpenPaths = [selectedPath] };
+        RecordingFilePicker picker = new() { OpenFiles = [selectedPath] };
         FakeProjectStore store = new()
         {
             ProjectToLoad = new TestProject("loaded"),
@@ -183,7 +184,7 @@ public sealed class ProjectServiceTests
     }
 
     private static ProjectService CreateService(
-        FakeFilePicker picker,
+        RecordingFilePicker picker,
         FakeProjectStore store)
     {
         return new ProjectService(
@@ -248,44 +249,4 @@ public sealed class ProjectServiceTests
         }
     }
 
-    private sealed class FakeFilePicker : IFilePicker
-    {
-        public string? SavePath { get; init; }
-
-        public IReadOnlyList<string> OpenPaths { get; init; } = [];
-
-        public SaveFilePickerRequest? LastSaveRequest { get; private set; }
-
-        public OpenFilePickerRequest? LastOpenRequest { get; private set; }
-        public bool CanOpenFiles => true;
-
-        public bool CanSaveFiles => true;
-
-        public bool CanPickFolders => true;
-
-        public Task<IReadOnlyList<string>> PickOpenFilesAsync(
-            OpenFilePickerRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            LastOpenRequest = request;
-            return Task.FromResult(OpenPaths);
-        }
-
-        public Task<string?> PickSaveFileAsync(
-            SaveFilePickerRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            LastSaveRequest = request;
-            return Task.FromResult(SavePath);
-        }
-
-        public Task<IReadOnlyList<string>> PickFoldersAsync(
-            OpenFolderPickerRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            throw new NotSupportedException();
-        }
-    }
 }

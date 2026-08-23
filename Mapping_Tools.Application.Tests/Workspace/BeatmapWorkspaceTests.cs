@@ -101,7 +101,7 @@ public sealed class BeatmapWorkspaceTests
     public async Task PickBeatmapsAsync_WhenCancelled_LeavesSelectionAndHistoryUnchanged()
     {
         // Arrange
-        FakeFilePicker picker = new() { OpenPaths = [] };
+        RecordingFilePicker picker = new() { OpenFiles = [] };
         ApplicationSettings settings = new() { SongsPath = @"C:\osu!\Songs" };
         var workspace = CreateWorkspace(settings, picker);
         workspace.SetSelection([@"C:\Maps\selected.osu"]);
@@ -123,7 +123,7 @@ public sealed class BeatmapWorkspaceTests
     public async Task PickBeatmapsAsync_WithSelection_UsesPickerSourceAndSongsFallback()
     {
         // Arrange
-        FakeFilePicker picker = new() { OpenPaths = [@"D:\Songs\picked.osu"] };
+        RecordingFilePicker picker = new() { OpenFiles = [@"D:\Songs\picked.osu"] };
         ApplicationSettings settings = new() { SongsPath = @"D:\Songs" };
         var workspace = CreateWorkspace(settings, picker);
         BeatmapSelectionChangedEventArgs? notification = null;
@@ -143,7 +143,7 @@ public sealed class BeatmapWorkspaceTests
     public async Task PickBeatmapsAsync_WithCurrentFolderDisabled_OmitsStartLocation()
     {
         // Arrange
-        FakeFilePicker picker = new() { OpenPaths = [] };
+        RecordingFilePicker picker = new() { OpenFiles = [] };
         ApplicationSettings settings = new()
         {
             SongsPath = @"D:\Songs",
@@ -163,7 +163,7 @@ public sealed class BeatmapWorkspaceTests
     public void GetMissingSelectedPaths_WithMissingFiles_ReportsWithoutRemoval()
     {
         // Arrange
-        FakeBeatmapFileSystem fileSystem = new();
+        RecordingBeatmapFileSystem fileSystem = new();
         fileSystem.ExistingPaths.Add("present.osu");
         var workspace = CreateWorkspace(
             new ApplicationSettings(),
@@ -182,7 +182,7 @@ public sealed class BeatmapWorkspaceTests
     public async Task SelectCurrentBeatmapAsync_WithLiveStatuses_DistinguishesOutcomes()
     {
         // Arrange
-        FakeBeatmapFileSystem fileSystem = new();
+        RecordingBeatmapFileSystem fileSystem = new();
         RecordingCurrentBeatmapLocator locator = new();
         var workspace = CreateWorkspace(
             new ApplicationSettings(),
@@ -227,14 +227,14 @@ public sealed class BeatmapWorkspaceTests
 
     private static BeatmapWorkspace CreateWorkspace(
         ApplicationSettings settings,
-        FakeFilePicker? picker = null,
-        FakeBeatmapFileSystem? fileSystem = null,
+        RecordingFilePicker? picker = null,
+        RecordingBeatmapFileSystem? fileSystem = null,
         RecordingCurrentBeatmapLocator? locator = null)
     {
         return new BeatmapWorkspace(
             settings,
-            picker ?? new FakeFilePicker(),
-            fileSystem ?? new FakeBeatmapFileSystem(),
+            picker ?? new RecordingFilePicker(),
+            fileSystem ?? new RecordingBeatmapFileSystem(),
             locator ?? new RecordingCurrentBeatmapLocator(),
             new FixedTimeProvider(fixedNow));
     }
@@ -249,54 +249,4 @@ public sealed class BeatmapWorkspaceTests
         }
     }
 
-    private sealed class FakeBeatmapFileSystem : IBeatmapFileSystem
-    {
-        public HashSet<string> ExistingPaths { get; } = [];
-
-        public bool FileExists(string path)
-        {
-            return ExistingPaths.Contains(path);
-        }
-
-        public string? GetParentDirectory(string filePath)
-        {
-            int separator = filePath.LastIndexOf('\\');
-            return separator < 0 ? null : filePath[..separator];
-        }
-    }
-
-    private sealed class FakeFilePicker : IFilePicker
-    {
-        public IReadOnlyList<string> OpenPaths { get; init; } = [];
-
-        public OpenFilePickerRequest? LastOpenRequest { get; private set; }
-        public bool CanOpenFiles => true;
-
-        public bool CanSaveFiles => false;
-
-        public bool CanPickFolders => false;
-
-        public Task<IReadOnlyList<string>> PickOpenFilesAsync(
-            OpenFilePickerRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            LastOpenRequest = request;
-            return Task.FromResult(OpenPaths);
-        }
-
-        public Task<string?> PickSaveFileAsync(
-            SaveFilePickerRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task<IReadOnlyList<string>> PickFoldersAsync(
-            OpenFolderPickerRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            throw new NotSupportedException();
-        }
-    }
 }

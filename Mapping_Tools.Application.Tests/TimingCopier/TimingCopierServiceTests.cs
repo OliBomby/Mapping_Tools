@@ -27,7 +27,7 @@ public sealed class TimingCopierServiceTests
             ExportPath = "first.osu|second.osu",
             ResnapMode = TimingCopierResnapMode.KeepObjectsFixed,
         };
-        RecordingProgress progress = new();
+        RecordingProgress<double> progress = new();
 
         // Act
         var result = await service.CopyAsync(options, progress);
@@ -142,16 +142,6 @@ public sealed class TimingCopierServiceTests
                 return new BeatmapEditingSession(editor, BeatmapEditingSource.Disk, []);
             },
         };
-    }
-
-    private sealed class RecordingProgress : IProgress<double>
-    {
-        public List<double> Values { get; } = [];
-
-        public void Report(double value)
-        {
-            Values.Add(value);
-        }
     }
 
 }

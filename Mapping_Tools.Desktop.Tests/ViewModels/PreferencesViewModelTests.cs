@@ -307,9 +307,9 @@ public sealed class PreferencesViewModelTests
     {
         // Arrange
         var settings = CreateSettings();
-        StubFilePicker picker = new()
+        TestFilePicker picker = new()
         {
-            FolderResults = [@"D:\Mapping Tools Backups"],
+            Folders = [@"D:\Mapping Tools Backups"],
         };
         var viewModel = CreateViewModel(
             settings,
@@ -329,7 +329,7 @@ public sealed class PreferencesViewModelTests
     {
         // Arrange
         var settings = CreateSettings();
-        StubFilePicker picker = new();
+        TestFilePicker picker = new();
         var viewModel = CreateViewModel(
             settings,
             picker);
@@ -338,8 +338,8 @@ public sealed class PreferencesViewModelTests
         await ExecuteAsync(viewModel.BrowseOsuConfigPathCommand);
 
         // Assert
-        picker.LastOpenFileRequest.Should().NotBeNull();
-        picker.LastOpenFileRequest!.Filters.Single().Patterns.Should().Equal("osu!.*.cfg");
+        picker.LastOpenRequest.Should().NotBeNull();
+        picker.LastOpenRequest!.Filters.Single().Patterns.Should().Equal("osu!.*.cfg");
         settings.OsuConfigPath.Should().Be(@"C:\osu!\osu!.Fixture.cfg");
     }
 
@@ -348,7 +348,7 @@ public sealed class PreferencesViewModelTests
     {
         // Arrange
         var settings = CreateSettings();
-        StubFilePicker picker = new()
+        TestFilePicker picker = new()
         {
             ExceptionToThrow = new IOException("Picker unavailable."),
         };
@@ -388,7 +388,7 @@ public sealed class PreferencesViewModelTests
 
     private static PreferencesViewModel CreateViewModel(
         ApplicationSettings settings,
-        StubFilePicker? filePicker = null,
+        TestFilePicker? filePicker = null,
         RecordingThemeService? themeService = null,
         IUserNotificationService? notifications = null,
         IQuickRunCommandRegistry? quickRunRegistry = null,
@@ -397,7 +397,7 @@ public sealed class PreferencesViewModelTests
     {
         return new PreferencesViewModel(
             settings,
-            filePicker ?? new StubFilePicker(),
+            filePicker ?? new TestFilePicker(),
             themeService ?? new RecordingThemeService(),
             notifications ?? new UserNotificationService(),
             quickRunRegistry ?? new QuickRunCommandRegistry(),
@@ -420,48 +420,4 @@ public sealed class PreferencesViewModelTests
         }
     }
 
-    private sealed class StubFilePicker : IFilePicker
-    {
-        public IReadOnlyList<string> OpenFileResults { get; } = [];
-
-        public IReadOnlyList<string> FolderResults { get; init; } = [];
-
-        public Exception? ExceptionToThrow { get; init; }
-
-        public OpenFilePickerRequest? LastOpenFileRequest { get; private set; }
-
-        public OpenFolderPickerRequest? LastFolderRequest { get; private set; }
-        public bool CanOpenFiles => true;
-
-        public bool CanSaveFiles => true;
-
-        public bool CanPickFolders => true;
-
-        public Task<IReadOnlyList<string>> PickOpenFilesAsync(
-            OpenFilePickerRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            if (ExceptionToThrow is not null) throw ExceptionToThrow;
-
-            LastOpenFileRequest = request;
-            return Task.FromResult(OpenFileResults);
-        }
-
-        public Task<string?> PickSaveFileAsync(
-            SaveFilePickerRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<string?>(null);
-        }
-
-        public Task<IReadOnlyList<string>> PickFoldersAsync(
-            OpenFolderPickerRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            if (ExceptionToThrow is not null) throw ExceptionToThrow;
-
-            LastFolderRequest = request;
-            return Task.FromResult(FolderResults);
-        }
-    }
 }

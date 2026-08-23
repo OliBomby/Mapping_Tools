@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Updates;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Updates;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -27,7 +28,7 @@ public sealed class UpdaterViewModelTests
             check,
             new UserNotificationService(),
             new NoOpDialogService(),
-            new ImmediateDispatcher());
+            new ImmediateTestDispatcher());
 
         // Act
         updates.ReportProgress(0.5);
@@ -35,14 +36,6 @@ public sealed class UpdaterViewModelTests
         // Assert
         viewModel.DownloadProgress.Should().Be(0.5);
         viewModel.ReleaseTitle.Should().Be("Release");
-    }
-
-    private sealed class ImmediateDispatcher : IUiDispatcher
-    {
-        public void Post(Action action)
-        {
-            action();
-        }
     }
 
     private sealed class NoOpDialogService : IDialogService

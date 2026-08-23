@@ -33,7 +33,7 @@ public sealed class PropertyTransformerServiceTests
             BookmarkTimeOffset = 5,
         };
         double[] originalBookmarks = editor.Beatmap.GetBookmarks().ToArray();
-        RecordingProgress progress = new();
+        RecordingProgress<double> progress = new();
 
         // Act
         var result = await service.TransformAsync(
@@ -50,13 +50,4 @@ public sealed class PropertyTransformerServiceTests
         progress.Values.Last().Should().Be(100);
     }
 
-    private sealed class RecordingProgress : IProgress<double>
-    {
-        public List<double> Values { get; } = [];
-
-        public void Report(double value)
-        {
-            Values.Add(value);
-        }
-    }
 }

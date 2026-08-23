@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Workspace;
 
 namespace Mapping_Tools.Desktop.Tests.TestDoubles;
@@ -65,5 +66,47 @@ internal sealed class RecordingLiveBeatmapReader : ILiveBeatmapReader
         return Failure is null
             ? Task.FromResult(Snapshot)
             : Task.FromException<LiveBeatmapSnapshot?>(Failure);
+    }
+}
+
+internal sealed class RecordingPlatformLauncher : IPlatformLauncher
+{
+    public bool AcceptUris { get; init; } = true;
+
+    public bool AcceptFiles { get; init; } = true;
+
+    public bool AcceptFolders { get; init; } = true;
+
+    public List<Uri> OpenedUris { get; } = [];
+
+    public List<string> OpenedFiles { get; } = [];
+
+    public List<string> OpenedFolders { get; } = [];
+
+    public Task<bool> OpenUriAsync(
+        Uri uri,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        OpenedUris.Add(uri);
+        return Task.FromResult(AcceptUris);
+    }
+
+    public Task<bool> OpenFileAsync(
+        string path,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        OpenedFiles.Add(path);
+        return Task.FromResult(AcceptFiles);
+    }
+
+    public Task<bool> OpenFolderAsync(
+        string path,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        OpenedFolders.Add(path);
+        return Task.FromResult(AcceptFolders);
     }
 }

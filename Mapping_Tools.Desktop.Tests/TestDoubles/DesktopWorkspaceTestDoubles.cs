@@ -238,17 +238,31 @@ internal sealed class TestFilePicker : IFilePicker
 {
     public IReadOnlyList<string> OpenFiles { get; set; } = [];
 
+    public string? SavePath { get; set; }
+
+    public IReadOnlyList<string> Folders { get; set; } = [];
+
+    public Exception? ExceptionToThrow { get; init; }
+
     public OpenFilePickerRequest? LastOpenRequest { get; private set; }
-    public bool CanOpenFiles => true;
 
-    public bool CanSaveFiles => true;
+    public SaveFilePickerRequest? LastSaveRequest { get; private set; }
 
-    public bool CanPickFolders => true;
+    public OpenFolderPickerRequest? LastFolderRequest { get; private set; }
+
+    public bool CanOpenFiles { get; init; } = true;
+
+    public bool CanSaveFiles { get; init; } = true;
+
+    public bool CanPickFolders { get; init; } = true;
 
     public Task<IReadOnlyList<string>> PickOpenFilesAsync(
         OpenFilePickerRequest request,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (ExceptionToThrow is not null) throw ExceptionToThrow;
+
         LastOpenRequest = request;
         return Task.FromResult(OpenFiles);
     }
@@ -257,14 +271,22 @@ internal sealed class TestFilePicker : IFilePicker
         SaveFilePickerRequest request,
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult<string?>(null);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (ExceptionToThrow is not null) throw ExceptionToThrow;
+
+        LastSaveRequest = request;
+        return Task.FromResult(SavePath);
     }
 
     public Task<IReadOnlyList<string>> PickFoldersAsync(
         OpenFolderPickerRequest request,
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult<IReadOnlyList<string>>([]);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (ExceptionToThrow is not null) throw ExceptionToThrow;
+
+        LastFolderRequest = request;
+        return Task.FromResult(Folders);
     }
 }
 
@@ -323,8 +345,11 @@ internal sealed class TestDialogService : IDialogService
 
 internal sealed class ImmediateTestDispatcher : IUiDispatcher
 {
+    public int PostCount { get; private set; }
+
     public void Post(Action action)
     {
+        PostCount++;
         action();
     }
 }

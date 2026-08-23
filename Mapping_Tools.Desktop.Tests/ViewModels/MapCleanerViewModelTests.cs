@@ -197,7 +197,7 @@ public sealed class MapCleanerViewModelTests
         MappingToolQuickRunRegistration registration = new(
             MappingToolDefinitions.MapCleaner,
             viewModel.RunQuickAsync);
-        RecordingDispatcher dispatcher = new();
+        ImmediateTestDispatcher dispatcher = new();
         MappingToolQuickRunHostedService hosted = new(
             registry,
             [registration],
@@ -230,7 +230,7 @@ public sealed class MapCleanerViewModelTests
             workspace ?? new TestBeatmapWorkspace(),
             new RecordingCurrentBeatmapLocator(currentPath),
             settings,
-            new StubLauncher());
+            new RecordingPlatformLauncher());
     }
 
     private sealed class RecordingCleaner : IMapCleanerService
@@ -246,32 +246,4 @@ public sealed class MapCleanerViewModelTests
         }
     }
 
-    private sealed class RecordingDispatcher : IUiDispatcher
-    {
-        public int PostCount { get; private set; }
-
-        public void Post(Action action)
-        {
-            PostCount++;
-            action();
-        }
-    }
-
-    private sealed class StubLauncher : IPlatformLauncher
-    {
-        public Task<bool> OpenUriAsync(Uri uri, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(true);
-        }
-
-        public Task<bool> OpenFileAsync(string path, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(true);
-        }
-
-        public Task<bool> OpenFolderAsync(string path, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(true);
-        }
-    }
 }

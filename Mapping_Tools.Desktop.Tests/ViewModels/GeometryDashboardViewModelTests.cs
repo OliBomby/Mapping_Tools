@@ -10,6 +10,7 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -100,11 +101,16 @@ public sealed class GeometryDashboardViewModelTests
             new InputStub(inputSupported),
             new OverlayFactoryStub(),
             new SerializerStub(),
-            new FilePickerStub(),
+            new TestFilePicker
+            {
+                CanOpenFiles = false,
+                CanSaveFiles = false,
+                CanPickFolders = false,
+            },
             new TextFileStoreStub(),
             new NotificationStub(),
             new DialogStub(),
-            new DispatcherStub());
+            new ImmediateTestDispatcher());
     }
 
     private static GeometryDashboardRuntimeSnapshot CreateRuntimeSnapshot(
@@ -205,28 +211,6 @@ public sealed class GeometryDashboardViewModelTests
         }
     }
 
-    private sealed class FilePickerStub : IFilePicker
-    {
-        public bool CanOpenFiles => false;
-        public bool CanSaveFiles => false;
-        public bool CanPickFolders => false;
-
-        public Task<IReadOnlyList<string>> PickOpenFilesAsync(OpenFilePickerRequest request, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<IReadOnlyList<string>>([]);
-        }
-
-        public Task<string?> PickSaveFileAsync(SaveFilePickerRequest request, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<string?>(null);
-        }
-
-        public Task<IReadOnlyList<string>> PickFoldersAsync(OpenFolderPickerRequest request, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<IReadOnlyList<string>>([]);
-        }
-    }
-
     private sealed class TextFileStoreStub : ITextFileStore
     {
         public IReadOnlyList<string> ReadAllLines(string path)
@@ -279,11 +263,4 @@ public sealed class GeometryDashboardViewModelTests
         }
     }
 
-    private sealed class DispatcherStub : IUiDispatcher
-    {
-        public void Post(Action action)
-        {
-            action();
-        }
-    }
 }
