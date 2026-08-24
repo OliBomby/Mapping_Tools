@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Tools;
