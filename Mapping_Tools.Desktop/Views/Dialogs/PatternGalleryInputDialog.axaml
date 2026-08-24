@@ -1,13 +1,13 @@
-<Window xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.Interactions"
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Interactions.PatternGallery"
-        x:Class="Mapping_Tools.Desktop.Views.Dialogs.PatternGalleryInputDialogWindow"
+        x:Class="Mapping_Tools.Desktop.Views.Dialogs.PatternGalleryInputDialog"
         x:DataType="patternGallery:PatternGalleryInputViewModel"
         Width="620" Height="560"
-        CanResize="True"
-        Title="Pattern Gallery import">
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center">
     <Grid Margin="20" RowDefinitions="*,Auto">
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
             <StackPanel Spacing="10">
@@ -45,4 +45,4 @@
             <Button Content="ACCEPT" Command="{Binding AcceptCommand}" IsDefault="True" />
         </StackPanel>
     </Grid>
-</Window>
+</UserControl>

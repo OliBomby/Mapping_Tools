@@ -1,24 +1,21 @@
-<Window xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.ViewModels.Dialogs"
-        x:Class="Mapping_Tools.Desktop.Views.Dialogs.MessageDialogWindow"
+        x:Class="Mapping_Tools.Desktop.Views.Dialogs.MessageDialog"
         x:DataType="vm:MessageDialogViewModel"
-        Title="{Binding Title}"
         Width="460"
         MinWidth="360"
         MaxWidth="720"
-        SizeToContent="Height"
-        CanResize="False"
-        ShowInTaskbar="False"
-        WindowStartupLocation="CenterOwner">
-    <Window.Styles>
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center">
+    <UserControl.Styles>
         <Style Selector="Button.dialog-action">
             <Setter Property="Padding" Value="8,6" />
         </Style>
         <Style Selector="TextBlock">
             <Setter Property="FontWeight" Value="Medium" />
         </Style>
-    </Window.Styles>
+    </UserControl.Styles>
     <Grid Width="363"
           MaxWidth="363"
           Margin="0"
@@ -63,4 +60,4 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
     </Grid>
-</Window>
+</UserControl>

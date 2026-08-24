@@ -1,22 +1,20 @@
-using Avalonia.Controls;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
+using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Views.Dialogs;
 
 namespace Mapping_Tools.Desktop.Interactions.HitsoundStudio;
 
-/// <summary>Shows the Hitsound Studio import and export forms as owner-modal windows.</summary>
+/// <summary>Shows the Hitsound Studio forms in the shell DialogHost.</summary>
 public sealed class HitsoundStudioDialogService : IHitsoundStudioDialogService
 {
     private readonly IFilePicker filePicker;
-    private readonly Func<Window> owner;
 
     /// <summary>Creates the dialog adapter.</summary>
-    /// <param name="owner">Returns the active shell window.</param>
-    public HitsoundStudioDialogService(Func<Window> owner, IFilePicker filePicker)
+    /// <param name="filePicker">Presents the native file and folder pickers used by the forms.</param>
+    public HitsoundStudioDialogService(IFilePicker filePicker)
     {
-        this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
     }
 
@@ -26,9 +24,14 @@ public sealed class HitsoundStudioDialogService : IHitsoundStudioDialogService
         CancellationToken cancellationToken = default)
     {
         HitsoundStudioImportDialogViewModel viewModel = new(defaultName, filePicker);
-        HitsoundStudioImportDialogWindow window = new() { DataContext = viewModel };
-        viewModel.Close = value => window.Close(value);
-        object? result = await window.ShowDialog<object?>(owner()).WaitAsync(cancellationToken).ConfigureAwait(false);
+        HitsoundStudioImportDialog dialog = new() { DataContext = viewModel };
+        viewModel.Close = value => DialogHostInteraction.Close(
+            DialogHostInteraction.RootIdentifier,
+            value);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier,
+            cancellationToken).ConfigureAwait(false);
         return result as HitsoundStudioImportRequest;
     }
 
@@ -39,10 +42,14 @@ public sealed class HitsoundStudioDialogService : IHitsoundStudioDialogService
     {
         ArgumentNullException.ThrowIfNull(project);
         HitsoundStudioExportDialogViewModel viewModel = new(project, filePicker);
-        HitsoundStudioExportDialogWindow window = new() { DataContext = viewModel };
-        viewModel.Close = value => window.Close(value);
-        object? result = await window.ShowDialog<object?>(owner()).WaitAsync(cancellationToken).ConfigureAwait(false);
+        HitsoundStudioExportDialog dialog = new() { DataContext = viewModel };
+        viewModel.Close = value => DialogHostInteraction.Close(
+            DialogHostInteraction.RootIdentifier,
+            value);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier,
+            cancellationToken).ConfigureAwait(false);
         return result as HitsoundStudioProject;
     }
 }
-

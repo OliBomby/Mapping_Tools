@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Graph.Markers;
 using Mapping_Tools.Desktop.Controls;
@@ -9,16 +10,16 @@ using Mapping_Tools.Desktop.ViewModels.Dialogs;
 namespace Mapping_Tools.Desktop.Views.Dialogs;
 
 /// <summary>Hosts the reusable graph control in a modal, clone-on-accept editor.</summary>
-public partial class GraphEditorWindow : Window
+public partial class GraphEditorDialog : UserControl
 {
     /// <summary>Creates the default graph editor instance required by compiled AXAML.</summary>
-    public GraphEditorWindow() : this(new GraphEditorViewModel(GraphState.CreateDefault()))
+    public GraphEditorDialog() : this(new GraphEditorViewModel(GraphState.CreateDefault()))
     {
     }
 
     /// <summary>Creates a graph editor for the supplied independent view-model snapshot.</summary>
     /// <param name="viewModel">The graph editor state and commands.</param>
-    public GraphEditorWindow(GraphEditorViewModel viewModel)
+    public GraphEditorDialog(GraphEditorViewModel viewModel)
     {
         InitializeComponent();
         DataContext = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
@@ -28,8 +29,8 @@ public partial class GraphEditorWindow : Window
         GraphControl.VerticalMarkerGenerator = new DoubleMarkerGenerator(0, 0.25);
         viewModel.Accepted += OnAccepted;
         viewModel.Canceled += OnCanceled;
-        Opened += (_, _) => GraphControl.Focus();
-        Closed += (_, _) =>
+        AttachedToVisualTree += (_, _) => GraphControl.Focus();
+        DetachedFromVisualTree += (_, _) =>
         {
             viewModel.Accepted -= OnAccepted;
             viewModel.Canceled -= OnCanceled;
@@ -38,6 +39,9 @@ public partial class GraphEditorWindow : Window
 
     /// <summary>Gets the graph control hosted by this dialog.</summary>
     public GraphControl GraphControl => GraphControlElement;
+
+    /// <summary>Gets or sets the callback used to close the enclosing DialogHost session.</summary>
+    internal Action<object?> Close { get; set; } = _ => { };
 
     private void OnAccepted(object? sender, EventArgs eventArgs)
     {

@@ -1,28 +1,29 @@
-using Avalonia.Controls;
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
+using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Views.Dialogs;
+using PatternGalleryInputDialogView = Mapping_Tools.Desktop.Views.Dialogs.PatternGalleryInputDialog;
 
 namespace Mapping_Tools.Desktop.Interactions.PatternGallery;
 
-/// <summary>Displays the typed Pattern Gallery import forms as owner-modal Avalonia windows.</summary>
+/// <summary>Displays the typed Pattern Gallery forms in the shell DialogHost.</summary>
 public sealed class PatternGalleryInputDialog : IPatternGalleryInputDialog
 {
-    private readonly Func<Window> owner;
-
     /// <summary>Creates the dialog adapter.</summary>
-    /// <param name="owner">Returns the initialized shell window.</param>
-    public PatternGalleryInputDialog(Func<Window> owner)
+    public PatternGalleryInputDialog()
     {
-        this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
     }
 
     /// <inheritdoc />
     public async Task<PatternGalleryCodeInput?> ShowCodeAsync(string defaultName)
     {
         var viewModel = PatternGalleryInputViewModel.ForCode(defaultName);
-        PatternGalleryInputDialogWindow window = new() { DataContext = viewModel };
-        viewModel.Close = value => window.Close(value);
-        object? result = await window.ShowDialog<object?>(owner());
+        PatternGalleryInputDialogView dialog = new() { DataContext = viewModel };
+        viewModel.Close = value => DialogHostInteraction.Close(
+            DialogHostInteraction.RootIdentifier,
+            value);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier);
         return result is PatternGalleryCodeInput input ? input : null;
     }
 
@@ -30,9 +31,13 @@ public sealed class PatternGalleryInputDialog : IPatternGalleryInputDialog
     public async Task<PatternGalleryFileInput?> ShowFileAsync(string defaultName, string defaultPath)
     {
         var viewModel = PatternGalleryInputViewModel.ForFile(defaultName, defaultPath);
-        PatternGalleryInputDialogWindow window = new() { DataContext = viewModel };
-        viewModel.Close = value => window.Close(value);
-        object? result = await window.ShowDialog<object?>(owner());
+        PatternGalleryInputDialogView dialog = new() { DataContext = viewModel };
+        viewModel.Close = value => DialogHostInteraction.Close(
+            DialogHostInteraction.RootIdentifier,
+            value);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier);
         return result is PatternGalleryFileInput input ? input : null;
     }
 
@@ -41,10 +46,13 @@ public sealed class PatternGalleryInputDialog : IPatternGalleryInputDialog
     {
         ArgumentNullException.ThrowIfNull(pattern);
         PatternGalleryDetailsViewModel viewModel = new(pattern);
-        PatternGalleryDetailsDialogWindow window = new() { DataContext = viewModel };
-        viewModel.Close = value => window.Close(value);
-        object? result = await window.ShowDialog<object?>(owner());
+        PatternGalleryDetailsDialog dialog = new() { DataContext = viewModel };
+        viewModel.Close = value => DialogHostInteraction.Close(
+            DialogHostInteraction.RootIdentifier,
+            value);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier);
         return result as string;
     }
 }
-

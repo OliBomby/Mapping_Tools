@@ -3,6 +3,7 @@
              xmlns:material="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:materialDataGrid="clr-namespace:Material.Avalonia.DataGrid;assembly=Material.Avalonia.DataGrid"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:converters="using:Mapping_Tools.Desktop.Converters"
              xmlns:local="using:Mapping_Tools.Desktop"
              x:Class="Mapping_Tools.Desktop.App"
@@ -41,6 +42,7 @@
         <material:MaterialTheme BaseTheme="Dark"
                                 PrimaryColor="Blue"
                                 SecondaryColor="Lime" />
+        <dialogHost:DialogHostStyles />
         <materialDataGrid:MaterialDataGridStyles />
         <materialIcons:MaterialIconStyles />
         <!-- <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" /> -->

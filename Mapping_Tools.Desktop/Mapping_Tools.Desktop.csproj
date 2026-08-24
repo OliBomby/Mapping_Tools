@@ -15,7 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
@@ -32,6 +31,7 @@
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="DialogHost.Avalonia" Version="0.12.3" />
     <PackageReference Include="Material.Avalonia" Version="3.17.0" />
     <PackageReference Include="Material.Avalonia.DataGrid" Version="3.17.0" />
     <PackageReference Include="Material.Icons.Avalonia" Version="3.0.2" />

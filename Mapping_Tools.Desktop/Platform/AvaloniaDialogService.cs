@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Avalonia.Controls;
 using Avalonia.Threading;
 using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Interactions.Dialogs;
@@ -9,20 +8,15 @@ using Mapping_Tools.Desktop.Views.Dialogs;
 namespace Mapping_Tools.Desktop.Platform;
 
 /// <summary>
-///     Presents application dialog contracts as Avalonia 12.1 owner-modal windows.
+///     Presents application dialog contracts in the shell's Material-styled DialogHost.
 /// </summary>
 public sealed class AvaloniaDialogService : IDialogService
 {
-    private readonly Func<Window> owner;
-
     /// <summary>
-    ///     Creates a service whose dialogs are always owned by the current shell window.
+    ///     Creates a service that uses the shell's root DialogHost.
     /// </summary>
-    /// <param name="owner">Returns the initialized window disabled during each modal interaction.</param>
-    public AvaloniaDialogService(Func<Window> owner)
+    public AvaloniaDialogService()
     {
-        ArgumentNullException.ThrowIfNull(owner);
-        this.owner = owner;
     }
 
     /// <inheritdoc />
@@ -49,25 +43,26 @@ public sealed class AvaloniaDialogService : IDialogService
         MessageDialogRequest<TResult> request,
         CancellationToken cancellationToken)
     {
-        MessageDialogWindow window = new();
+        MessageDialog dialog = new();
         var choices = request.Choices
             .Select(choice => new DialogChoiceViewModel(
                 choice.Label,
                 choice.IsDefault,
                 choice.IsCancel,
-                () => window.Close(new ResultBox<TResult>(choice.Result))))
+                () => DialogHostInteraction.Close(
+                    DialogHostInteraction.RootIdentifier,
+                    new ResultBox<TResult>(choice.Result))))
             .ToList();
-        window.DataContext = new MessageDialogViewModel(
+        dialog.DataContext = new MessageDialogViewModel(
             request.Title,
             request.Message,
             request.Details,
             choices);
 
-        var lifetime = window.ShowDialog<object?>(owner());
-        using var registration =
-            RegisterCancellation(window, cancellationToken);
-        object? result = await lifetime;
-        cancellationToken.ThrowIfCancellationRequested();
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier,
+            cancellationToken);
         return result is ResultBox<TResult> box
             ? box.Value
             : request.DismissResult;
@@ -77,7 +72,7 @@ public sealed class AvaloniaDialogService : IDialogService
         ValueDialogRequest<TValue> request,
         CancellationToken cancellationToken)
     {
-        ValueDialogWindow window = new();
+        ValueDialog dialog = new();
         ValueDialogViewModel viewModel = new(
             request.Title,
             request.Prompt,
@@ -87,15 +82,16 @@ public sealed class AvaloniaDialogService : IDialogService
             request.AcceptLabel,
             request.CancelLabel,
             value => Validate(value, request),
-            value => window.Close(new ResultBox<TValue>((TValue)value!)),
-            () => window.Close());
-        window.DataContext = viewModel;
+            value => DialogHostInteraction.Close(
+                DialogHostInteraction.RootIdentifier,
+                new ResultBox<TValue>((TValue)value!)),
+            () => DialogHostInteraction.Close(DialogHostInteraction.RootIdentifier));
+        dialog.DataContext = viewModel;
 
-        var lifetime = window.ShowDialog<object?>(owner());
-        using var registration =
-            RegisterCancellation(window, cancellationToken);
-        object? result = await lifetime;
-        cancellationToken.ThrowIfCancellationRequested();
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier,
+            cancellationToken);
         return result is ResultBox<TValue> box
             ? new ValueDialogResult<TValue>(true, box.Value)
             : new ValueDialogResult<TValue>(false, default);
@@ -129,17 +125,6 @@ public sealed class AvaloniaDialogService : IDialogService
         }
 
         return ValidationResult.Success;
-    }
-
-    private static CancellationTokenRegistration RegisterCancellation(
-        Window window,
-        CancellationToken cancellationToken)
-    {
-        return cancellationToken.Register(() =>
-            window.Dispatcher.Post(() =>
-            {
-                if (window.IsVisible) window.Close();
-            }));
     }
 
     private static async Task<TResult> InvokeOnUiThreadAsync<TResult>(

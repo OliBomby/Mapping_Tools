@@ -103,16 +103,10 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<BeatmapWorkspaceViewModel>();
         services.AddDesktopFeatures();
         services.AddSingleton<MainViewModel>();
-        services.AddSingleton<IDialogService>(provider =>
-        {
-            var window = provider.GetRequiredService<MainWindow>();
-            return new AvaloniaDialogService(() => window);
-        });
-        services.AddSingleton<IPatternGalleryInputDialog>(provider =>
-            new PatternGalleryInputDialog(() => provider.GetRequiredService<MainWindow>()));
+        services.AddSingleton<IDialogService, AvaloniaDialogService>();
+        services.AddSingleton<IPatternGalleryInputDialog, PatternGalleryInputDialog>();
         services.AddSingleton<IHitsoundStudioDialogService>(provider =>
             new HitsoundStudioDialogService(
-                () => provider.GetRequiredService<MainWindow>(),
                 provider.GetRequiredService<IFilePicker>()));
         services.AddSingleton<IGeometryDashboardDialogService>(provider =>
             new GeometryDashboardDialogService(() => provider.GetRequiredService<MainWindow>()));

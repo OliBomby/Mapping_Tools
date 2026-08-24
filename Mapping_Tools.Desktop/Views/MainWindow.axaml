@@ -6,6 +6,7 @@
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="clr-namespace:Mapping_Tools.Desktop.Shell.Models"
@@ -156,7 +157,10 @@
         </Style>
     </Window.Styles>
 
-    <Grid x:Name="RootGrid">
+    <dialogHost:DialogHost Identifier="RootDialog"
+                           CloseOnClickAway="True"
+                           OverlayBackground="{DynamicResource MappingToolsDialogOverlayBrush}">
+        <Grid x:Name="RootGrid">
         <Grid RowDefinitions="35,*">
             <materialControls:ColorZone Grid.Row="0"
                                         Height="35"
@@ -512,5 +516,6 @@
                 BorderBrush="{DynamicResource MaterialPrimaryDarkBrush}"
                 BorderThickness="1"
                 IsHitTestVisible="False" />
-    </Grid>
+        </Grid>
+    </dialogHost:DialogHost>
 </Window>

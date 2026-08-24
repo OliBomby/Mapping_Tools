@@ -11,6 +11,7 @@ using Mapping_Tools.Core.Graph.Interpolation;
 using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 using Mapping_Tools.Core.Graph.Markers;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Mapping_Tools.Desktop.Views.Dialogs;
 using CoreGraphState = Mapping_Tools.Core.Graph.GraphState;
@@ -1447,10 +1448,10 @@ public sealed class GraphControl : Control
 
     private async void TypeInValueAsync()
     {
-        if (contextAnchorIndex is not { } index || GraphState is null || TopLevel.GetTopLevel(this) is not Window owner) return;
+        if (contextAnchorIndex is not { } index || GraphState is null) return;
 
         var anchor = GraphState.Anchors[index];
-        ValueDialogWindow dialog = new();
+        ValueDialog dialog = new();
         ValueDialogViewModel viewModel = new(
             "Graph value",
             "Value",
@@ -1469,11 +1470,13 @@ public sealed class GraphControl : Control
                     CommitState(state);
                 }
 
-                dialog.Close();
+                DialogHostInteraction.Close(DialogHostInteraction.GraphIdentifier);
             },
-            dialog.Close);
+            () => DialogHostInteraction.Close(DialogHostInteraction.GraphIdentifier));
         dialog.DataContext = viewModel;
-        await dialog.ShowDialog(owner);
+        await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.GraphIdentifier);
     }
 
     private static double Distance(Point first, Point second)
@@ -1500,4 +1503,3 @@ public sealed class GraphControl : Control
             (byte)argb));
     }
 }
-

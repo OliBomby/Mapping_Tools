@@ -4,6 +4,7 @@ using Avalonia.Data;
 using Avalonia.Interactivity;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Mapping_Tools.Desktop.Views.Dialogs;
 using CoreGraphState = Mapping_Tools.Core.Graph.GraphState;
@@ -35,12 +36,17 @@ public partial class ValueOrGraphControl : UserControl
 
     private async void OpenGraphEditor(object? sender, RoutedEventArgs eventArgs)
     {
-        if (TopLevel.GetTopLevel(this) is not Window owner) return;
+        if (TopLevel.GetTopLevel(this) is null) return;
 
         GraphEditorViewModel viewModel = new(GraphState?.Clone() ?? CreateDefaultValueGraphState());
-        GraphEditorWindow dialog = new(viewModel);
-        bool accepted = await dialog.ShowDialog<bool>(owner);
-        if (accepted) SetCurrentValue(GraphStateProperty, viewModel.GraphState.Clone());
+        GraphEditorDialog dialog = new(viewModel);
+        dialog.Close = result => DialogHostInteraction.Close(
+            DialogHostInteraction.RootIdentifier,
+            result);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier);
+        if (result is true) SetCurrentValue(GraphStateProperty, viewModel.GraphState.Clone());
 
         eventArgs.Handled = true;
     }

@@ -1,12 +1,12 @@
-<Window xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.Interactions"
         xmlns:hitsoundStudio="clr-namespace:Mapping_Tools.Desktop.Interactions.HitsoundStudio"
-        x:Class="Mapping_Tools.Desktop.Views.Dialogs.HitsoundStudioImportDialogWindow"
+        x:Class="Mapping_Tools.Desktop.Views.Dialogs.HitsoundStudioImportDialog"
         x:DataType="hitsoundStudio:HitsoundStudioImportDialogViewModel"
-        Title="Import Hitsound Layer"
         Width="620" Height="650"
-        WindowStartupLocation="CenterOwner">
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center">
     <Grid Margin="24" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="12">
         <TextBlock FontSize="24" FontWeight="Bold" Text="Import Hitsound Layer" />
         <ScrollViewer Grid.Row="1">
@@ -75,4 +75,4 @@
             <Button Content="Accept" Command="{Binding AcceptCommand}" IsDefault="True" />
         </StackPanel>
     </Grid>
-</Window>
+</UserControl>

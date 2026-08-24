@@ -1,16 +1,16 @@
-<Window xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.Interactions"
         xmlns:converters="using:Mapping_Tools.Desktop.Converters"
         xmlns:hitsoundStudio="clr-namespace:Mapping_Tools.Desktop.Interactions.HitsoundStudio"
-        x:Class="Mapping_Tools.Desktop.Views.Dialogs.HitsoundStudioExportDialogWindow"
+        x:Class="Mapping_Tools.Desktop.Views.Dialogs.HitsoundStudioExportDialog"
         x:DataType="hitsoundStudio:HitsoundStudioExportDialogViewModel"
-        Title="Export Hitsound Studio"
         Width="650" Height="650"
-        WindowStartupLocation="CenterOwner">
-    <Window.Resources>
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center">
+    <UserControl.Resources>
         <converters:HitsoundStudioSampleFormatDisplayConverter x:Key="HitsoundStudioSampleFormatDisplayConverter" />
-    </Window.Resources>
+    </UserControl.Resources>
     <Grid Margin="24" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="12">
         <TextBlock FontSize="24" FontWeight="Bold" Text="Export Hitsound Studio" />
         <ScrollViewer Grid.Row="1">
@@ -87,4 +87,4 @@
             <Button Content="Accept" Command="{Binding AcceptCommand}" IsDefault="True" />
         </StackPanel>
     </Grid>
-</Window>
+</UserControl>

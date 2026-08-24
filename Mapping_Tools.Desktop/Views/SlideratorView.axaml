@@ -5,6 +5,7 @@
              xmlns:materialIcons="using:Material.Icons.Avalonia"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:graph="clr-namespace:Mapping_Tools.Desktop.Controls.Graph"
+             xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              x:Class="Mapping_Tools.Desktop.Views.SlideratorView"
              x:DataType="vm:SlideratorViewModel"
              x:CompileBindings="True">
@@ -21,22 +22,26 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="90" />
             </Grid.ColumnDefinitions>
-            <graph:GraphControl x:Name="GraphControlElement"
-                                   Grid.Row="0"
+            <dialogHost:DialogHost Grid.Row="0"
                                    Grid.Column="1"
                                    Grid.ColumnSpan="3"
                                    Margin="43,0,0,43"
-                                   MinMarkerSpacing="20"
-                                   GraphState="{Binding GraphState, Mode=TwoWay}"
-                                   HorizontalAxisVisible="{Binding HorizontalAxisVisible}"
-                                   VerticalAxisVisible="{Binding VerticalAxisVisible}"
-                                   StartPointLockedY="{Binding StartPointLockedY}"
-                                   IsEditable="True"
-                                   MarkerSnappingHorizontal="True"
-                                   MarkerSnappingVertical="True"
-                                   MarkerSnappingRangeVertical="0.01"
-                                   Stroke="Cyan"
-                                   ToolTip.Tip="Edit the position/velocity graph with pointer gestures and the context menu." />
+                                   Identifier="GraphDialog"
+                                   CloseOnClickAway="True"
+                                   OverlayBackground="{DynamicResource MappingToolsDialogOverlayBrush}">
+                <graph:GraphControl x:Name="GraphControlElement"
+                                       MinMarkerSpacing="20"
+                                       GraphState="{Binding GraphState, Mode=TwoWay}"
+                                       HorizontalAxisVisible="{Binding HorizontalAxisVisible}"
+                                       VerticalAxisVisible="{Binding VerticalAxisVisible}"
+                                       StartPointLockedY="{Binding StartPointLockedY}"
+                                       IsEditable="True"
+                                       MarkerSnappingHorizontal="True"
+                                       MarkerSnappingVertical="True"
+                                       MarkerSnappingRangeVertical="0.01"
+                                       Stroke="Cyan"
+                                       ToolTip.Tip="Edit the position/velocity graph with pointer gestures and the context menu." />
+            </dialogHost:DialogHost>
 
             <Border Grid.Row="1"
                     Grid.Column="2"

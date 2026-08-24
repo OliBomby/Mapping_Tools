@@ -6,6 +6,8 @@
                      Color="#26000000" />
     <SolidColorBrush x:Key="MappingToolsChromePressedBrush"
                      Color="#40000000" />
+    <SolidColorBrush x:Key="MappingToolsDialogOverlayBrush"
+                     Color="#99000000" />
     <SolidColorBrush x:Key="MappingToolsScrollbarThumbBrush"
                      Color="#C1C1C1" />
     <SolidColorBrush x:Key="MappingToolsHelpBadgeBrush" Color="#B2FF00" />

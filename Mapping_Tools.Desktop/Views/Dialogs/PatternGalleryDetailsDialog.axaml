@@ -1,14 +1,12 @@
-<Window xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.Interactions"
         xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Interactions.PatternGallery"
-        x:Class="Mapping_Tools.Desktop.Views.Dialogs.PatternGalleryDetailsDialogWindow"
+        x:Class="Mapping_Tools.Desktop.Views.Dialogs.PatternGalleryDetailsDialog"
         x:DataType="patternGallery:PatternGalleryDetailsViewModel"
-        Title="Pattern details"
         Width="440"
-        SizeToContent="Height"
-        CanResize="False"
-        WindowStartupLocation="CenterOwner">
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center">
     <Grid RowDefinitions="*,Auto" Margin="24">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Spacing="8">
@@ -36,4 +34,4 @@
             <Button Content="OK" Command="{Binding AcceptCommand}" IsDefault="True" />
         </StackPanel>
     </Grid>
-</Window>
+</UserControl>
