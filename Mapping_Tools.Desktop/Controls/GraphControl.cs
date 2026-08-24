@@ -17,36 +17,6 @@ using CoreGraphState = Mapping_Tools.Core.Graph.GraphState;
 
 namespace Mapping_Tools.Desktop.Controls;
 
-/// <summary>Identifies the active pointer gesture in a graph editor.</summary>
-public enum GraphPointerGesture
-{
-    /// <summary>No graph gesture is active.</summary>
-    None,
-
-    /// <summary>An anchor is being moved.</summary>
-    Anchor,
-
-    /// <summary>An interpolation tension handle is being moved.</summary>
-    Tension,
-
-    /// <summary>The graph viewport is being panned.</summary>
-    Pan,
-}
-
-/// <summary>Provides the edited state after a graph gesture or menu operation.</summary>
-public sealed class GraphStateChangedEventArgs : EventArgs
-{
-    /// <summary>Creates graph change information.</summary>
-    /// <param name="state">The cloned state after the edit.</param>
-    public GraphStateChangedEventArgs(CoreGraphState state)
-    {
-        State = state;
-    }
-
-    /// <summary>Gets the cloned state after the edit.</summary>
-    public CoreGraphState State { get; }
-}
-
 /// <summary>
 ///     Draws and edits a normalized value graph while keeping graph mathematics in Core.
 /// </summary>
@@ -1531,10 +1501,3 @@ public sealed class GraphControl : Control
     }
 }
 
-internal static class GraphKeyModifiersExtensions
-{
-    public static bool HasAllFlags(this KeyModifiers value, KeyModifiers flags)
-    {
-        return (value & flags) == flags;
-    }
-}

@@ -4,61 +4,6 @@ using Mapping_Tools.Application.Workspace;
 namespace Mapping_Tools.Application.BeatmapEditing;
 
 /// <summary>
-///     Distinguishes a completed BetterSave from missing editor state and a captured failure.
-/// </summary>
-public enum BetterSaveStatus
-{
-    /// <summary>The current live editor document was backed up and saved.</summary>
-    Saved,
-
-    /// <summary>osu! did not expose a current beatmap path.</summary>
-    NoCurrentBeatmap,
-
-    /// <summary>Opening live state, creating the backup, or saving failed.</summary>
-    Failed,
-}
-
-/// <summary>
-///     Reports a BetterSave attempt without requiring hotkey or watcher callbacks to present UI.
-/// </summary>
-/// <param name="Status">Whether the document was saved or why it was not.</param>
-/// <param name="Path">The current beatmap path when lookup succeeded.</param>
-/// <param name="Exception">The captured failure retained for diagnostics.</param>
-public sealed record BetterSaveResult(
-    BetterSaveStatus Status,
-    string? Path = null,
-    Exception? Exception = null);
-
-/// <summary>
-///     Saves the exact live osu! editor state through the mandatory backup gateway.
-/// </summary>
-public interface IBetterSaveService
-{
-    /// <summary>
-    ///     Locates the current beatmap, requires matching live editor state, and saves it safely.
-    /// </summary>
-    /// <param name="cancellationToken">Cancels lookup, live reading, backup, or persistence.</param>
-    /// <returns>A typed outcome; ordinary integration and persistence failures are captured.</returns>
-    Task<BetterSaveResult> ExecuteAsync(CancellationToken cancellationToken = default);
-}
-
-/// <summary>
-///     Controls the platform watcher that replaces focused osu! saves with BetterSave output.
-/// </summary>
-public interface IBetterSaveOverrideService
-{
-    /// <summary>
-    ///     Reconfigures recursive beatmap observation after a path or enabled preference changes.
-    /// </summary>
-    /// <param name="songsPath">The osu! beatmap-library root to observe.</param>
-    /// <param name="enabled">Whether matching saves should invoke BetterSave.</param>
-    void Configure(string songsPath, bool enabled);
-
-    /// <summary>Stops observation and releases platform watcher resources.</summary>
-    void Stop();
-}
-
-/// <summary>
 ///     Coordinates current-map lookup, live-state loading, mandatory backup, and user notification.
 /// </summary>
 public sealed class BetterSaveService : IBetterSaveService

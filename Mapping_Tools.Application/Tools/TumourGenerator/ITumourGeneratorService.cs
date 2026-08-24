@@ -1,0 +1,44 @@
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.Tools.TumourGenerating;
+
+namespace Mapping_Tools.Application.Tools.TumourGenerator;
+
+/// <summary>Coordinates Tumour Generator 2 import, preview, and destructive runs.</summary>
+public interface ITumourGeneratorService
+{
+    /// <summary>Imports sliders through the shared disk/live beatmap gateway.</summary>
+    /// <param name="path">The beatmap path to inspect.</param>
+    /// <param name="mode">The import source.</param>
+    /// <param name="timeCode">The time query when <paramref name="mode" /> is time-based.</param>
+    /// <param name="cancellationToken">Cancels the read.</param>
+    /// <returns>The imported sliders and preview difficulty value.</returns>
+    Task<TumourImportResult> ImportAsync(
+        string path,
+        TumourImportMode mode,
+        string? timeCode,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Generates an independent preview without persistence or editor access.</summary>
+    /// <param name="previewHitObject">The preview slider to copy and transform.</param>
+    /// <param name="options">The framework-neutral tumour settings.</param>
+    /// <param name="cancellationToken">Cancels the generation.</param>
+    /// <returns>The generated slider and layer-length metadata.</returns>
+    Task<TumourPreviewResult> PreviewAsync(
+        HitObject previewHitObject,
+        TumourGeneratorOptions options,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Runs, backs up, saves, and optionally reloads the requested maps.</summary>
+    /// <param name="paths">The beatmaps to transform.</param>
+    /// <param name="project">The complete settings snapshot.</param>
+    /// <param name="reloadEditor">Whether a live source editor should be reloaded.</param>
+    /// <param name="progress">Optional percentage progress receiver.</param>
+    /// <param name="cancellationToken">Cancels between objects and save stages.</param>
+    /// <returns>The transformed paths and slider count.</returns>
+    Task<TumourRunResult> RunAsync(
+        IReadOnlyList<string> paths,
+        TumourGeneratorProject project,
+        bool reloadEditor,
+        IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default);
+}

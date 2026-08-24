@@ -3,24 +3,6 @@ using Mapping_Tools.Core.HitsoundStuff;
 namespace Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
 
 /// <summary>
-///     Identifies which beatmap objects supply hitsound-preview events.
-/// </summary>
-public enum HitsoundPreviewHelperImportMode
-{
-    /// <summary>Uses hit objects selected in the live editor.</summary>
-    Selected,
-
-    /// <summary>Uses objects covered by editor bookmarks.</summary>
-    Bookmarked,
-
-    /// <summary>Uses objects matched by <see cref="HitsoundPreviewHelperOptions.TimeCode" />.</summary>
-    Time,
-
-    /// <summary>Uses every hit object in each input beatmap.</summary>
-    Everything,
-}
-
-/// <summary>
 ///     Stores the framework-independent settings for positional hitsound preview.
 /// </summary>
 public class HitsoundPreviewHelperOptions

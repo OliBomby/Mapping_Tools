@@ -5,60 +5,6 @@ using Mapping_Tools.Application.Workspace;
 namespace Mapping_Tools.Application.Backups;
 
 /// <summary>
-///     Distinguishes a completed one-key restore from missing editor state,
-///     exhausted backup history, and a captured restore failure.
-/// </summary>
-public enum QuickUndoCommandStatus
-{
-    /// <summary>
-    ///     The newest compatible backup replaced the current beatmap.
-    /// </summary>
-    Restored,
-
-    /// <summary>
-    ///     osu! did not expose a current beatmap path to restore.
-    /// </summary>
-    NoCurrentBeatmap,
-
-    /// <summary>
-    ///     The backup store contained no snapshot eligible for QuickUndo.
-    /// </summary>
-    NoBackup,
-
-    /// <summary>
-    ///     Current-map discovery or restore failed and its exception was reported.
-    /// </summary>
-    Failed,
-}
-
-/// <summary>
-///     Reports a QuickUndo attempt without requiring a hotkey callback to show a
-///     dialog or inspect backup storage.
-/// </summary>
-/// <param name="Status">Whether a map was restored or why no replacement occurred.</param>
-/// <param name="Restore">The completed restore metadata when a backup was applied.</param>
-/// <param name="Exception">The captured lookup or restore failure retained for diagnostics.</param>
-public sealed record QuickUndoCommandResult(
-    QuickUndoCommandStatus Status,
-    BeatmapRestoreResult? Restore = null,
-    Exception? Exception = null);
-
-/// <summary>
-///     Resolves osu!'s current beatmap and applies the newest retained backup using
-///     the same operation from both in-app actions and global shortcuts.
-/// </summary>
-public interface IQuickUndoCommandService
-{
-    /// <summary>
-    ///     Attempts one restore and publishes a frontend-neutral outcome message.
-    /// </summary>
-    /// <param name="cancellationToken">Cancels current-map lookup, backup replacement, or editor reload.</param>
-    /// <returns>A typed outcome; ordinary lookup and restore failures are captured.</returns>
-    Task<QuickUndoCommandResult> ExecuteAsync(
-        CancellationToken cancellationToken = default);
-}
-
-/// <summary>
 ///     Coordinates current-map discovery, newest-backup restore, optional editor
 ///     reload, and user notification independently of its invocation surface.
 /// </summary>

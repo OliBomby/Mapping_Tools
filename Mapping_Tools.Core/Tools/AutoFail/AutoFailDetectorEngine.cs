@@ -4,22 +4,6 @@ using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Core.Tools.AutoFail;
 
-/// <summary>Contains one immutable auto-fail analysis result.</summary>
-/// <param name="HasAutoFail">Whether at least one object unloads incorrectly.</param>
-/// <param name="UnloadingObjects">The timestamps of confirmed unloading objects.</param>
-/// <param name="PotentialUnloadingObjects">The timestamps of objects that may unload.</param>
-/// <param name="Disruptors">The timestamps of objects that disrupt loading.</param>
-public sealed record AutoFailAnalysis(
-    bool HasAutoFail,
-    IReadOnlyList<double> UnloadingObjects,
-    IReadOnlyList<double> PotentialUnloadingObjects,
-    IReadOnlyList<double> Disruptors);
-
-/// <summary>Describes one candidate distribution of padding objects and its human-readable guide.</summary>
-/// <param name="Padding">The number of objects inserted around each problem area.</param>
-/// <param name="Guide">The mapper-facing instructions for reproducing the repair.</param>
-public sealed record AutoFailFixPlan(IReadOnlyList<int> Padding, string Guide);
-
 /// <summary>Reproduces osu!'s object-loading search and plans optional padding without UI dependencies.</summary>
 public sealed class AutoFailDetectorEngine
 {

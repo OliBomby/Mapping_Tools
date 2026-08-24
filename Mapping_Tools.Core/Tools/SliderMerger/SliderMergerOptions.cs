@@ -1,39 +1,6 @@
 namespace Mapping_Tools.Core.Tools.SliderMerger;
 
 /// <summary>
-///     Identifies the beatmap objects supplied to Slider Merger.
-/// </summary>
-public enum SliderMergerImportMode
-{
-    /// <summary>Uses hit objects selected in the live editor.</summary>
-    Selected,
-
-    /// <summary>Uses objects covered by editor bookmarks.</summary>
-    Bookmarked,
-
-    /// <summary>Uses objects matched by <see cref="SliderMergerOptions.TimeCode" />.</summary>
-    Time,
-
-    /// <summary>Uses every hit object in each input beatmap.</summary>
-    Everything,
-}
-
-/// <summary>
-///     Describes how two converted slider paths are joined.
-/// </summary>
-public enum SliderMergerConnectionMode
-{
-    /// <summary>Moves the next path so its start meets the previous path's end.</summary>
-    Move,
-
-    /// <summary>Adds a straight Bézier-encoded gap between the two paths.</summary>
-    Linear,
-
-    /// <summary>Leaves the converted control polygons to form a Bézier bridge.</summary>
-    Bezier,
-}
-
-/// <summary>
 ///     Stores Slider Merger's persisted settings and transformation inputs.
 /// </summary>
 public class SliderMergerOptions

@@ -6,37 +6,6 @@ using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Core.Tools.HitsoundCopier;
 
-/// <summary>Describes one unmatched hitsound that may become a generated sample.</summary>
-/// <param name="SourceFilenames">Canonical source audio paths played by the event.</param>
-/// <param name="Role">The generated sample role, such as <c>slidertick</c>.</param>
-/// <param name="SampleSet">The source sample family.</param>
-/// <param name="StartIndex">The first custom index to consider.</param>
-public sealed record HitsoundSampleAssignmentRequest(
-    IReadOnlyList<string> SourceFilenames,
-    string Role,
-    SampleSet SampleSet,
-    int StartIndex);
-
-/// <summary>Describes the custom index and schema entry assigned to an unmatched hitsound.</summary>
-/// <param name="Index">The custom sample index assigned to the event.</param>
-/// <param name="SampleSet">The sample family used by the assignment.</param>
-/// <param name="Schema">Only the newly added sample entries, if any.</param>
-public sealed record HitsoundSampleAssignment(
-    int Index,
-    SampleSet SampleSet,
-    SampleSchema Schema);
-
-/// <summary>Reports the deterministic changes made by one target-map copy.</summary>
-/// <param name="MatchedHitsoundCount">The number of source events matched to target events.</param>
-/// <param name="GeneratedSampleCount">The number of new sample entries created for unmatched events.</param>
-/// <param name="MutedEdgeCount">The number of target edge events muted by the filter.</param>
-/// <param name="SampleSchema">The newly added sample requirements.</param>
-public sealed record HitsoundCopierApplyResult(
-    int MatchedHitsoundCount,
-    int GeneratedSampleCount,
-    int MutedEdgeCount,
-    SampleSchema SampleSchema);
-
 /// <summary>
 ///     Applies Hitsound Copier's timeline transformation without reading or writing audio files.
 /// </summary>

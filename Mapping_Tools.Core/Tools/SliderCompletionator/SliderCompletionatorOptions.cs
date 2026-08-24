@@ -1,39 +1,6 @@
 namespace Mapping_Tools.Core.Tools.SliderCompletionator;
 
 /// <summary>
-///     Identifies the beatmap objects supplied to Slider Completionator.
-/// </summary>
-public enum SliderCompletionatorImportMode
-{
-    /// <summary>Uses hit objects selected in the live editor.</summary>
-    Selected,
-
-    /// <summary>Uses objects covered by editor bookmarks.</summary>
-    Bookmarked,
-
-    /// <summary>Uses objects matched by <see cref="SliderCompletionatorOptions.TimeCode" />.</summary>
-    Time,
-
-    /// <summary>Uses every hit object in each input beatmap.</summary>
-    Everything,
-}
-
-/// <summary>
-///     Identifies the slider value calculated from the other requested values.
-/// </summary>
-public enum SliderCompletionatorFreeVariable
-{
-    /// <summary>Calculates inherited slider velocity.</summary>
-    Velocity,
-
-    /// <summary>Calculates slider pixel length.</summary>
-    Length,
-
-    /// <summary>Calculates slider duration.</summary>
-    Duration,
-}
-
-/// <summary>
 ///     Stores Slider Completionator's persisted settings and transformation inputs.
 ///     A numeric value of <c>-1</c> means that the corresponding value is preserved.
 /// </summary>

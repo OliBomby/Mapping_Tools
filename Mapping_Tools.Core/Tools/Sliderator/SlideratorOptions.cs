@@ -4,39 +4,6 @@ using Newtonsoft.Json;
 
 namespace Mapping_Tools.Core.Tools.Sliderator;
 
-/// <summary>Chooses the source objects imported into Sliderator.</summary>
-public enum SlideratorImportMode
-{
-    /// <summary>Uses the objects selected in the live editor.</summary>
-    Selected,
-
-    /// <summary>Uses objects covered by editor bookmarks.</summary>
-    Bookmarked,
-
-    /// <summary>Uses objects matched by the time-code expression.</summary>
-    Time,
-}
-
-/// <summary>Chooses how the generated object is written at the export time.</summary>
-public enum SlideratorExportMode
-{
-    /// <summary>Adds the generated object beside any object already at the time.</summary>
-    Add,
-
-    /// <summary>Replaces the object already at the time.</summary>
-    Override,
-}
-
-/// <summary>Chooses whether graph values represent position or velocity.</summary>
-public enum SlideratorGraphMode
-{
-    /// <summary>Interprets graph values as normalized slider position.</summary>
-    Position,
-
-    /// <summary>Interprets graph values as slider velocity in SV units.</summary>
-    Velocity,
-}
-
 /// <summary>
 ///     Contains the framework-neutral Sliderator inputs used by the Core engine.
 ///     UI-only selection, progress, and editor state remain outside this assembly.
