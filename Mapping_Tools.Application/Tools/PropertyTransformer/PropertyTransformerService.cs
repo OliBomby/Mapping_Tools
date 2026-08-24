@@ -41,10 +41,11 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
         {
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
+            int progressIndex = index;
             var documentProgress = progress is null
                 ? null
                 : new Progress<double>(value =>
-                    progress.Report((index * 100 + value) / paths.Count));
+                    progress.Report((progressIndex * 100 + value) / paths.Count));
 
             if (Path.GetExtension(path).Equals(
                     ".osb",
