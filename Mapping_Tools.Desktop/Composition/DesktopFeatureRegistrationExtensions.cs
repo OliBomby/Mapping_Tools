@@ -5,6 +5,9 @@ using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using GeometryDashboardViewModel = Mapping_Tools.Desktop.ViewModels.GeometryDashboard.GeometryDashboardViewModel;
+using GetStartedViewModel = Mapping_Tools.Desktop.ViewModels.GetStarted.GetStartedViewModel;
+using PatternGalleryViewModel = Mapping_Tools.Desktop.ViewModels.PatternGallery.PatternGalleryViewModel;
 
 namespace Mapping_Tools.Desktop.Composition;
 

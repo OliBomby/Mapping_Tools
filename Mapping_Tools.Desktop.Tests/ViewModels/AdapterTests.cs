@@ -3,7 +3,9 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
+using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Core.Tools.TumourGenerating;
+using Mapping_Tools.Core.Tools.TumourGenerating.Models;
 using Mapping_Tools.Desktop.ViewModels.Adapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

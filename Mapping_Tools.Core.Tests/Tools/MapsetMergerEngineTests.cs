@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.Tools.MapsetMerger;
+using Mapping_Tools.Core.Tools.MapsetMerger.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Tools;

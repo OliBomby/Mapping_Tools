@@ -1,4 +1,6 @@
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Shell.Models;
 
 namespace Mapping_Tools.Desktop.Shell;
 

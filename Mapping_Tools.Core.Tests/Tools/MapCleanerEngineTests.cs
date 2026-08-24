@@ -1,6 +1,7 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.MapCleaner;
+using Mapping_Tools.Core.Tools.MapCleaner.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Tools;

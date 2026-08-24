@@ -1,5 +1,7 @@
 using Mapping_Tools.Application.QuickRun;
+using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Models;
 using NonInvasiveKeyboardHookLibrary;
 using HookModifierKeys = NonInvasiveKeyboardHookLibrary.ModifierKeys;
 

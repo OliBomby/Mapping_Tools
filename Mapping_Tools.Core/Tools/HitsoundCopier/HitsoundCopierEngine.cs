@@ -3,6 +3,7 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.Events;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 
 namespace Mapping_Tools.Core.Tools.HitsoundCopier;
 

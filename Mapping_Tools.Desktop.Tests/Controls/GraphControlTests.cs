@@ -5,6 +5,7 @@ using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 using Mapping_Tools.Core.Graph.Markers;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Desktop.Controls;
+using Mapping_Tools.Desktop.Controls.Graph;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Controls;

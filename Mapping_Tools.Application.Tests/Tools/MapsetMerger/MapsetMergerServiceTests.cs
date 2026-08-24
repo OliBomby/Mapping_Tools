@@ -1,5 +1,8 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tools.MapsetMerger;
+using Mapping_Tools.Application.Tools.MapsetMerger.Models;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.MapsetMerger;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

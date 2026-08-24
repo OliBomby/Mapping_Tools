@@ -1,5 +1,9 @@
 using Mapping_Tools.Application.Backups;
+using Mapping_Tools.Application.Backups.Contracts;
+using Mapping_Tools.Application.Backups.Models;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.Tools.MetadataManager;
 
 namespace Mapping_Tools.Application.Tools.MetadataManager;

@@ -5,8 +5,9 @@
         xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:model="clr-namespace:Mapping_Tools.Core.Tools.SnappingTools.Serialization;assembly=Mapping_Tools.Core"
-        x:Class="Mapping_Tools.Desktop.Views.GeometryDashboardProjectWindow"
-        x:DataType="vm:GeometryDashboardProjectSlotsViewModel"
+        xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Interactions.GeometryDashboard"
+        x:Class="Mapping_Tools.Desktop.Views.GeometryDashboard.GeometryDashboardProjectWindow"
+        x:DataType="geometryDashboard:GeometryDashboardProjectSlotsViewModel"
         Title="Geometry Dashboard Projects" Width="575" Height="500" MinWidth="575" MinHeight="360"
         CanResize="True" WindowStartupLocation="CenterOwner" WindowDecorations="None"
         Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}">
@@ -38,11 +39,11 @@
                         <controls:GeometryHotkeyEditor Grid.Column="1" Hotkey="{Binding ProjectHotkey, Mode=TwoWay}"
                                                        Margin="8,0" />
                         <Button Grid.Column="2" Content="Save"
-                                Command="{Binding $parent[ListBox].((vm:GeometryDashboardProjectSlotsViewModel)DataContext).SaveCommand}"
+                                Command="{Binding $parent[ListBox].((geometryDashboard:GeometryDashboardProjectSlotsViewModel)DataContext).SaveCommand}"
                                 CommandParameter="{Binding}" Margin="0,0,4,0"
                                 ToolTip.Tip="Save current settings to this slot." />
                         <Button Grid.Column="3" Content="Load"
-                                Command="{Binding $parent[ListBox].((vm:GeometryDashboardProjectSlotsViewModel)DataContext).LoadCommand}"
+                                Command="{Binding $parent[ListBox].((geometryDashboard:GeometryDashboardProjectSlotsViewModel)DataContext).LoadCommand}"
                                 CommandParameter="{Binding}" ToolTip.Tip="Load settings from this slot." />
                     </Grid>
                 </DataTemplate>

@@ -1,10 +1,13 @@
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.GeometryDashboard;
+using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Infrastructure.Editor;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Platform;
+using Mapping_Tools.Infrastructure.Platform.GeometryDashboard;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Infrastructure.Tests.GeometryDashboard;

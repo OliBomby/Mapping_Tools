@@ -1,4 +1,6 @@
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Contracts;
+using Mapping_Tools.Application.Settings.Models;
 using Microsoft.Extensions.Hosting;
 
 namespace Mapping_Tools.Desktop.Hosting;

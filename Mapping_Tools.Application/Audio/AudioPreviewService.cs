@@ -1,3 +1,5 @@
+using Mapping_Tools.Application.Audio.Contracts;
+using Mapping_Tools.Application.Audio.Models;
 using Mapping_Tools.Core.Spectrum;
 
 namespace Mapping_Tools.Application.Audio;

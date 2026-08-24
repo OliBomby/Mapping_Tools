@@ -1,5 +1,6 @@
 using Avalonia.Styling;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Models;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
 

@@ -1,9 +1,12 @@
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Backups;
+using Mapping_Tools.Application.Backups.Models;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.RhythmGuide;
+using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.RhythmGuide;

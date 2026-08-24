@@ -1,7 +1,9 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.AutoFail;
 using Mapping_Tools.Core.Tools.AutoFail;
+using Mapping_Tools.Core.Tools.AutoFail.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.AutoFail;

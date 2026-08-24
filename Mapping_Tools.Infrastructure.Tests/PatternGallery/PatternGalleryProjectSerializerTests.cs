@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.Tools.PatternGallery;
+using Mapping_Tools.Core.Tools.PatternGallery.Models;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

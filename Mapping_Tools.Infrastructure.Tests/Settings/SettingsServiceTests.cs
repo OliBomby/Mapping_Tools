@@ -1,5 +1,7 @@
 using System.Text.Json;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Contracts;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Settings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

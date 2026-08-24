@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.RhythmGuide;
+using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Tools;

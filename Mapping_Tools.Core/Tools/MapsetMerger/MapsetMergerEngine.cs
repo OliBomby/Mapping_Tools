@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.Events;
+using Mapping_Tools.Core.Tools.MapsetMerger.Models;
 
 namespace Mapping_Tools.Core.Tools.MapsetMerger;
 

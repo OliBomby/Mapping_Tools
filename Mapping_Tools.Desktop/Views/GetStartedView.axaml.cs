@@ -4,6 +4,8 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mapping_Tools.Desktop.ViewModels;
+using Mapping_Tools.Desktop.ViewModels.GetStarted;
+using GetStartedViewModel = Mapping_Tools.Desktop.ViewModels.GetStarted.GetStartedViewModel;
 
 namespace Mapping_Tools.Desktop.Views;
 

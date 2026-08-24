@@ -1,7 +1,10 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.Sliderator;
+using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Core.Tools.Sliderator;
+using Mapping_Tools.Core.Tools.Sliderator.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.Sliderator;

@@ -1,5 +1,7 @@
 using Mapping_Tools.Application.Audio;
+using Mapping_Tools.Application.Audio.Contracts;
 using Mapping_Tools.Core.Audio;
+using Mapping_Tools.Core.Audio.Effects;
 
 namespace Mapping_Tools.Infrastructure.Audio;
 

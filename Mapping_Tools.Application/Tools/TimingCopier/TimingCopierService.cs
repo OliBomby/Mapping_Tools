@@ -1,5 +1,8 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.Tools.TimingCopier;
+using Mapping_Tools.Core.Tools.TimingCopier.Models;
 
 namespace Mapping_Tools.Application.Tools.TimingCopier;
 

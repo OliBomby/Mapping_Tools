@@ -1,6 +1,9 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.AutoFail;
+using Mapping_Tools.Core.Tools.AutoFail.Models;
 
 namespace Mapping_Tools.Application.Tools.AutoFail;
 

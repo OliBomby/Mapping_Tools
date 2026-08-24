@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.Audio;
+using Mapping_Tools.Core.Audio.Effects;
 using Mapping_Tools.Core.Spectrum;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

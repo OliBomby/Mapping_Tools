@@ -1,5 +1,8 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Application.Workspace.Contracts;
 
 namespace Mapping_Tools.Application.Tests.TestDoubles;
 

@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 
 namespace Mapping_Tools.Core.Tools.ComboColourStudio;
 

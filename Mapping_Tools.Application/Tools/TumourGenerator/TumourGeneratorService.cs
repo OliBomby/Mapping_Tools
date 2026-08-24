@@ -1,7 +1,11 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Core.Tools.TumourGenerating;
+using Mapping_Tools.Core.Tools.TumourGenerating.Models;
 using CoreTumourGenerator = Mapping_Tools.Core.Tools.TumourGenerating.TumourGenerator;
 
 namespace Mapping_Tools.Application.Tools.TumourGenerator;

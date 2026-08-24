@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.MapCleaner;
+using Mapping_Tools.Core.Tools.MapCleaner.Models;
 
 namespace Mapping_Tools.Application.Tools.MapCleaner;
 

@@ -1,6 +1,7 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
 using Mapping_Tools.Core.Tools.TimingCopier;
+using Mapping_Tools.Core.Tools.TimingCopier.Models;
 
 namespace Mapping_Tools.Desktop.Converters;
 

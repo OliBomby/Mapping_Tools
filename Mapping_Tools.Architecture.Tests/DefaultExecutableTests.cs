@@ -46,6 +46,7 @@ public sealed class DefaultExecutableTests
             repositoryRoot,
             "Mapping_Tools.Infrastructure",
             "Updates",
+            "Onova",
             "OnovaUpdateGateway.cs"));
 
         // Act

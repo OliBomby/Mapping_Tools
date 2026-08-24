@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Application.Workspace.Contracts;
 
 namespace Mapping_Tools.Infrastructure.Workspace;
 

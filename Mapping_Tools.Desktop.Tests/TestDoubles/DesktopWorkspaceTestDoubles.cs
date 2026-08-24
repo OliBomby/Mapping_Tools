@@ -1,10 +1,20 @@
 using Mapping_Tools.Application.Backups;
+using Mapping_Tools.Application.Backups.Contracts;
+using Mapping_Tools.Application.Backups.Models;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Interactions;
+using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.QuickRun;
+using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Application.Workspace.Models;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.Tests.TestDoubles;

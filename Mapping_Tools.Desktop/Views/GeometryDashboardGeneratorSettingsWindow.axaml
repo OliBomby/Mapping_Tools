@@ -3,8 +3,9 @@
         xmlns:vm="using:Mapping_Tools.Desktop.Interactions"
         xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-        x:Class="Mapping_Tools.Desktop.Views.GeometryDashboardGeneratorSettingsWindow"
-        x:DataType="vm:GeometryDashboardGeneratorSettingsDialogViewModel"
+        xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Interactions.GeometryDashboard"
+        x:Class="Mapping_Tools.Desktop.Views.GeometryDashboard.GeometryDashboardGeneratorSettingsWindow"
+        x:DataType="geometryDashboard:GeometryDashboardGeneratorSettingsDialogViewModel"
         Title="Generator Settings" Width="575" Height="500" MinWidth="575" MinHeight="360"
         CanResize="True" WindowStartupLocation="CenterOwner" WindowDecorations="None"
         Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}">

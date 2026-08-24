@@ -1,4 +1,6 @@
 using Mapping_Tools.Application.Tools.GeometryDashboard;
+using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
+using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

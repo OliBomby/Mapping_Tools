@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.Projects.Contracts;
 
 namespace Mapping_Tools.Desktop.Shell;
 

@@ -1,5 +1,7 @@
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

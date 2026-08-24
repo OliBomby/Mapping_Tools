@@ -2,6 +2,7 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SliderMerger;
+using Mapping_Tools.Core.Tools.SliderMerger.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Tools;

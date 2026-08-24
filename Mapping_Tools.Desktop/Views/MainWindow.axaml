@@ -8,6 +8,7 @@
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:Mapping_Tools.Desktop.Shell.Models"
         mc:Ignorable="d"
         d:DesignWidth="1280"
         d:DesignHeight="800"
@@ -84,7 +85,7 @@
     </Window.Resources>
 
     <Window.DataTemplates>
-        <DataTemplate x:DataType="shell:ShellProjectMenuItem">
+        <DataTemplate x:DataType="models:ShellProjectMenuItem">
             <MenuItem Header="{Binding Header}" Command="{Binding Command}" ToolTip.Tip="{Binding ToolTip}">
                 <MenuItem.Icon>
                     <materialIcons:MaterialIcon Kind="{Binding Icon}" />

@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.QuickRun;
+using Mapping_Tools.Application.QuickRun.Models;
 
 namespace Mapping_Tools.Application.Tools;
 
@@ -37,7 +38,7 @@ public sealed class ToolDefinition
 
         if (quickRunTargets is 0
             || quickRunTargets is not null
-            && (quickRunTargets.Value & ~Mapping_Tools.Application.QuickRun.QuickRunTargets.Always) != 0)
+            && (quickRunTargets.Value & ~QuickRun.Models.QuickRunTargets.Always) != 0)
             throw new ArgumentException(
                 "QuickRun targets must contain at least one known selection size.",
                 nameof(quickRunTargets));

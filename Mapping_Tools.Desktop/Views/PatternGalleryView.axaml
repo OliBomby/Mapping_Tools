@@ -5,9 +5,10 @@
              xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.ViewModels.PatternGallery"
              x:Class="Mapping_Tools.Desktop.Views.PatternGalleryView"
              x:Name="Root"
-             x:DataType="vm:PatternGalleryViewModel">
+             x:DataType="patternGallery:PatternGalleryViewModel">
     <Grid RowDefinitions="*,Auto">
         <Grid Margin="0,0,0,10" RowDefinitions="Auto,*,Auto">
             <Grid ColumnDefinitions="*,Auto">
@@ -29,7 +30,7 @@
                     <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding Groups}">
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:PatternGalleryGroupViewModel">
+                                <DataTemplate x:DataType="patternGallery:PatternGalleryGroupViewModel">
                                     <Expander IsExpanded="True" Margin="0,0,0,10">
                                         <Expander.Header>
                                             <StackPanel Orientation="Horizontal" Spacing="8">
@@ -46,7 +47,7 @@
                                                  SelectionChanged="PatternSelectionChanged">
                                             <ListBox.ItemContainerTheme>
                                                 <ControlTheme TargetType="ListBoxItem"
-                                                              x:DataType="vm:PatternGalleryItemViewModel">
+                                                              x:DataType="patternGallery:PatternGalleryItemViewModel">
                                                     <Setter Property="IsSelected"
                                                             Value="{Binding IsSelected, Mode=TwoWay}" />
                                                 </ControlTheme>
@@ -57,7 +58,7 @@
                                                 </ItemsPanelTemplate>
                                             </ListBox.ItemsPanel>
                                             <ListBox.ItemTemplate>
-                                                <DataTemplate x:DataType="vm:PatternGalleryItemViewModel">
+                                                <DataTemplate x:DataType="patternGallery:PatternGalleryItemViewModel">
                                                     <materialControls:Card Width="150" Height="150" Margin="4"
                                                                            Padding="0">
                                                         <Border PointerPressed="PatternPointerPressed"

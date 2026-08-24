@@ -1,9 +1,13 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Execution.ToolExecution;
+using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.SliderMerger;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.SliderMerger;
+using Mapping_Tools.Core.Tools.SliderMerger.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

@@ -1,3 +1,6 @@
+using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
+using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
+
 namespace Mapping_Tools.Application.Tools.GeometryDashboard;
 
 /// <summary>

@@ -3,6 +3,7 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.Sliderator;
+using Mapping_Tools.Core.Tools.Sliderator.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Tools;

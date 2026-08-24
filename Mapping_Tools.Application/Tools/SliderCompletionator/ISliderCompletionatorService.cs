@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.Tools.SliderCompletionator;
+using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 
 namespace Mapping_Tools.Application.Tools.SliderCompletionator;
 

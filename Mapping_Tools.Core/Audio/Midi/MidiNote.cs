@@ -1,0 +1,69 @@
+namespace Mapping_Tools.Core.Audio.Midi;
+
+/// <summary>Represents one MIDI note with time values expressed in milliseconds.</summary>
+public sealed class MidiNote
+{
+    /// <summary>Creates a MIDI note description.</summary>
+    /// <param name="startMilliseconds">Note start time in milliseconds.</param>
+    /// <param name="durationMilliseconds">Note duration in milliseconds.</param>
+    /// <param name="bank">MIDI bank number.</param>
+    /// <param name="patch">MIDI program number.</param>
+    /// <param name="key">MIDI key number.</param>
+    /// <param name="velocity">MIDI velocity.</param>
+    /// <param name="channel">Source MIDI channel, or <c>-1</c> when unspecified.</param>
+    /// <param name="instrumentName">Optional source-format instrument name for display.</param>
+    /// <param name="keyName">Optional source-format note name for display.</param>
+    public MidiNote(
+        double startMilliseconds,
+        double durationMilliseconds,
+        int bank,
+        int patch,
+        int key,
+        int velocity,
+        int channel = -1,
+        string? instrumentName = null,
+        string? keyName = null)
+    {
+        if (!double.IsFinite(startMilliseconds) || startMilliseconds < 0) throw new ArgumentOutOfRangeException(nameof(startMilliseconds));
+
+        if (!double.IsFinite(durationMilliseconds) || durationMilliseconds < 0) throw new ArgumentOutOfRangeException(nameof(durationMilliseconds));
+
+        StartMilliseconds = startMilliseconds;
+        DurationMilliseconds = durationMilliseconds;
+        Bank = bank;
+        Patch = patch;
+        Key = key;
+        Velocity = velocity;
+        Channel = channel;
+        InstrumentName = instrumentName;
+        KeyName = keyName;
+    }
+
+    /// <summary>Gets the note start in milliseconds.</summary>
+    public double StartMilliseconds { get; }
+
+    /// <summary>Gets the note duration in milliseconds.</summary>
+    public double DurationMilliseconds { get; }
+
+    /// <summary>Gets the bank number.</summary>
+    public int Bank { get; }
+
+    /// <summary>Gets the program/patch number.</summary>
+    public int Patch { get; }
+
+    /// <summary>Gets the MIDI key number.</summary>
+    public int Key { get; }
+
+    /// <summary>Gets the MIDI velocity.</summary>
+    public int Velocity { get; }
+
+    /// <summary>Gets the source MIDI channel, or <c>-1</c> when unspecified.</summary>
+    public int Channel { get; }
+
+    /// <summary>Gets the optional source-format instrument name.</summary>
+    public string? InstrumentName { get; }
+
+    /// <summary>Gets the optional source-format note name.</summary>
+    public string? KeyName { get; }
+}
+

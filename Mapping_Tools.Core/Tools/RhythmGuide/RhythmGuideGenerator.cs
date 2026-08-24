@@ -1,6 +1,7 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 
 namespace Mapping_Tools.Core.Tools.RhythmGuide;
 

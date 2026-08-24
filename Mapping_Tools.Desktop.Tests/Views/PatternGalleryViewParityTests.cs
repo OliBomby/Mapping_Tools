@@ -10,7 +10,7 @@ public sealed class PatternGalleryViewParityTests
     {
         // Arrange
         string axaml = TestSourceReader.Read("Mapping_Tools.Desktop/Views/PatternGalleryView.axaml");
-        string viewModel = TestSourceReader.Read("Mapping_Tools.Desktop/ViewModels/PatternGalleryViewModel.cs");
+        string viewModel = TestSourceReader.Read("Mapping_Tools.Desktop/ViewModels/PatternGallery/PatternGalleryViewModel.cs");
 
         // Assert
         axaml.Should().Contain("<ListBox ItemsSource=\"{Binding Patterns}\"");

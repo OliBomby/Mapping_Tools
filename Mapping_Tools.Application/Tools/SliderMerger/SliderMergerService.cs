@@ -1,5 +1,8 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.Tools.SliderMerger;
+using Mapping_Tools.Core.Tools.SliderMerger.Models;
 
 namespace Mapping_Tools.Application.Tools.SliderMerger;
 

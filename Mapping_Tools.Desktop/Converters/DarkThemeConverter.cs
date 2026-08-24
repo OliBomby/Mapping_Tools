@@ -1,6 +1,7 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Models;
 
 namespace Mapping_Tools.Desktop.Converters;
 

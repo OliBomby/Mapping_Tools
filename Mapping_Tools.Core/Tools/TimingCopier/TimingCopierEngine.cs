@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Tools.TimingCopier.Models;
 
 namespace Mapping_Tools.Core.Tools.TimingCopier;
 

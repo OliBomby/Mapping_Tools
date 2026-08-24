@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using Mapping_Tools.Application.Interactions;
+using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Mapping_Tools.Desktop.Views.Dialogs;
 

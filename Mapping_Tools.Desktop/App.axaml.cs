@@ -7,6 +7,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels;

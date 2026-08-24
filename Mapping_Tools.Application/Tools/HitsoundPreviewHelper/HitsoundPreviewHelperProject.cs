@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
+using Mapping_Tools.Core.Tools.HitsoundPreviewHelper.Models;
 
 namespace Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 

@@ -6,11 +6,14 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Mapping_Tools.Application.Tools.Sliderator;
+using Mapping_Tools.Application.Tools.Sliderator.Contracts;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Graph.Markers;
 using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Mapping_Tools.Core.Tools.Sliderator;
+using Mapping_Tools.Core.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.Controls;
+using Mapping_Tools.Desktop.Controls.Graph;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Views;

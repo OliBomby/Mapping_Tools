@@ -1,10 +1,13 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
+using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.HitsoundCopier;

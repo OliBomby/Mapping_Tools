@@ -1,5 +1,6 @@
 using Avalonia.Input;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Desktop.Controls;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

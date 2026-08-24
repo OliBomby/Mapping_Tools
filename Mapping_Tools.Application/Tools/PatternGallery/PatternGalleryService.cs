@@ -1,9 +1,14 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Application.Tools.PatternGallery.Contracts;
+using Mapping_Tools.Application.Tools.PatternGallery.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.PatternGallery;
+using Mapping_Tools.Core.Tools.PatternGallery.Models;
 
 namespace Mapping_Tools.Application.Tools.PatternGallery;
 

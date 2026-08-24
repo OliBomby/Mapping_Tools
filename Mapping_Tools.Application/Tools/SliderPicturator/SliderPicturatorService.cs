@@ -1,4 +1,6 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SliderPicturator;

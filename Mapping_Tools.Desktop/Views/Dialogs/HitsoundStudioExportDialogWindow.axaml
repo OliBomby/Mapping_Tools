@@ -2,8 +2,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.Interactions"
         xmlns:converters="using:Mapping_Tools.Desktop.Converters"
+        xmlns:hitsoundStudio="clr-namespace:Mapping_Tools.Desktop.Interactions.HitsoundStudio"
         x:Class="Mapping_Tools.Desktop.Views.Dialogs.HitsoundStudioExportDialogWindow"
-        x:DataType="vm:HitsoundStudioExportDialogViewModel"
+        x:DataType="hitsoundStudio:HitsoundStudioExportDialogViewModel"
         Title="Export Hitsound Studio"
         Width="650" Height="650"
         WindowStartupLocation="CenterOwner">

@@ -1,4 +1,7 @@
 using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Platform.FilePicker;
+using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Application.Projects.Models;
 
 namespace Mapping_Tools.Application.Projects;
 

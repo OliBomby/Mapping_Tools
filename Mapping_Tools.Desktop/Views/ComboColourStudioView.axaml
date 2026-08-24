@@ -7,6 +7,7 @@
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
+             xmlns:models="clr-namespace:Mapping_Tools.Core.Tools.ComboColourStudio.Models;assembly=Mapping_Tools.Core"
              x:Class="Mapping_Tools.Desktop.Views.ComboColourStudioView"
              x:Name="Root"
              x:DataType="vm:ComboColourStudioViewModel">
@@ -120,7 +121,7 @@
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="combo:ComboColourPreviewEntry">
+                                        <DataTemplate x:DataType="models:ComboColourPreviewEntry">
                                             <Border Width="24" Height="24" CornerRadius="12" Margin="2"
                                                     Background="{Binding Colour, Converter={StaticResource RgbaColourToAvaloniaBrushConverter}}"
                                                     ToolTip.Tip="{Binding ColourName}" />

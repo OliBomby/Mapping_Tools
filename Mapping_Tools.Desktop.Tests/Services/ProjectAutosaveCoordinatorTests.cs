@@ -1,5 +1,8 @@
 using Mapping_Tools.Application.Execution;
+using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Projects;
+using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;

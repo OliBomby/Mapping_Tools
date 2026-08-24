@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Models;
 
 namespace Mapping_Tools.Desktop.Platform;
 

@@ -3,6 +3,8 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
+using Mapping_Tools.Core.Tools.TumourGenerating.Models;
+using Mapping_Tools.Core.Tools.TumourGenerating.Templates;
 
 namespace Mapping_Tools.Core.Tools.TumourGenerating;
 

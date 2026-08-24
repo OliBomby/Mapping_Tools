@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.Tools.SliderMerger;
+using Mapping_Tools.Core.Tools.SliderMerger.Models;
 
 namespace Mapping_Tools.Application.Tools.SliderMerger;
 

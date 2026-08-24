@@ -3,6 +3,7 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Core.Tools.TumourGenerating;
+using Mapping_Tools.Core.Tools.TumourGenerating.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Tools.TumourGenerating;

@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Tools.MapsetMerger;
+using Mapping_Tools.Application.Tools.MapsetMerger.Contracts;
 
 namespace Mapping_Tools.Infrastructure.MapsetMerger;
 

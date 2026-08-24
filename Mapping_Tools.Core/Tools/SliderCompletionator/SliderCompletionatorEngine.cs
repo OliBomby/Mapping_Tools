@@ -1,6 +1,7 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.ToolHelpers.Sliders;
+using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 
 namespace Mapping_Tools.Core.Tools.SliderCompletionator;
 

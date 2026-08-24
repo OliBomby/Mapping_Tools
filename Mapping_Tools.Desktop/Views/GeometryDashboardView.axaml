@@ -4,8 +4,9 @@
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.ViewModels.GeometryDashboard"
              x:Class="Mapping_Tools.Desktop.Views.GeometryDashboardView"
-             x:DataType="vm:GeometryDashboardViewModel"
+             x:DataType="geometryDashboard:GeometryDashboardViewModel"
              x:CompileBindings="True">
     <Grid RowDefinitions="Auto,*,Auto">
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
@@ -58,7 +59,7 @@
                           PointerWheelChanged="GeneratorsPointerWheelChanged">
                 <ItemsControl ItemsSource="{Binding GeneratorGroups}">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:GeometryDashboardGeneratorGroupViewModel">
+                        <DataTemplate x:DataType="geometryDashboard:GeometryDashboardGeneratorGroupViewModel">
                             <Expander IsExpanded="True">
                                 <Expander.Header>
                                     <StackPanel Orientation="Horizontal">
@@ -73,7 +74,7 @@
                                 </Expander.Header>
                                 <ItemsControl ItemsSource="{Binding Generators}">
                                     <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:GeometryDashboardGeneratorViewModel">
+                                        <DataTemplate x:DataType="geometryDashboard:GeometryDashboardGeneratorViewModel">
                                             <Grid ColumnDefinitions="55,90,500,90,50" Margin="0,2">
                                                 <ToggleSwitch IsChecked="{Binding Settings.IsActive, Mode=TwoWay}"
                                                               Cursor="Hand" />

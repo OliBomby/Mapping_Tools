@@ -1,6 +1,7 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
 using Mapping_Tools.Core.Tools.TumourGenerating;
+using Mapping_Tools.Core.Tools.TumourGenerating.Templates;
 using Material.Icons;
 
 namespace Mapping_Tools.Desktop.Converters;

@@ -1,3 +1,5 @@
+using Mapping_Tools.Core.Audio.Effects;
+
 namespace Mapping_Tools.Core.Audio;
 
 /// <summary>Applies framework-neutral effects to an owned audio clip.</summary>

@@ -4,11 +4,12 @@
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:getStarted="clr-namespace:Mapping_Tools.Desktop.ViewModels.GetStarted"
              mc:Ignorable="d"
              d:DesignWidth="1040"
              d:DesignHeight="725"
              x:Class="Mapping_Tools.Desktop.Views.GetStartedView"
-             x:DataType="vm:GetStartedViewModel"
+             x:DataType="getStarted:GetStartedViewModel"
              Foreground="{DynamicResource MaterialBodyBrush}"
              FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto">
     <Grid RowDefinitions="5*,21,3*"
@@ -61,7 +62,7 @@
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="vm:ChangelogEntryViewModel">
+                    <DataTemplate x:DataType="getStarted:ChangelogEntryViewModel">
                         <StackPanel>
                             <TextBlock Text="{Binding Title}"
                                        FontSize="18"

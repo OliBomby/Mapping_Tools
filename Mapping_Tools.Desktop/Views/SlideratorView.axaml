@@ -4,6 +4,7 @@
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:graph="clr-namespace:Mapping_Tools.Desktop.Controls.Graph"
              x:Class="Mapping_Tools.Desktop.Views.SlideratorView"
              x:DataType="vm:SlideratorViewModel"
              x:CompileBindings="True">
@@ -20,7 +21,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="90" />
             </Grid.ColumnDefinitions>
-            <controls:GraphControl x:Name="GraphControlElement"
+            <graph:GraphControl x:Name="GraphControlElement"
                                    Grid.Row="0"
                                    Grid.Column="1"
                                    Grid.ColumnSpan="3"

@@ -4,8 +4,9 @@
         xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-        x:Class="Mapping_Tools.Desktop.Views.GeometryDashboardPreferencesWindow"
-        x:DataType="vm:GeometryDashboardPreferencesDialogViewModel"
+        xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Interactions.GeometryDashboard"
+        x:Class="Mapping_Tools.Desktop.Views.GeometryDashboard.GeometryDashboardPreferencesWindow"
+        x:DataType="geometryDashboard:GeometryDashboardPreferencesDialogViewModel"
         Title="Snapping Tools Preferences" Width="575" Height="500" MinWidth="575" MinHeight="360"
         CanResize="True" WindowStartupLocation="CenterOwner" WindowDecorations="None"
         Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}">

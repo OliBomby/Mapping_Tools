@@ -1,6 +1,8 @@
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.TumourGenerating;
+using Mapping_Tools.Core.Tools.TumourGenerating.Models;
+using Mapping_Tools.Core.Tools.TumourGenerating.Templates;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Tools.TumourGenerating;

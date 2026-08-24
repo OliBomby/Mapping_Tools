@@ -1,6 +1,7 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderCompletionator;
+using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Tools;

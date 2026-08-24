@@ -1,8 +1,12 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
+using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 
 namespace Mapping_Tools.Application.Tools.HitsoundCopier;
 

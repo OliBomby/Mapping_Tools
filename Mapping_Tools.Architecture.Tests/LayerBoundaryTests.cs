@@ -118,6 +118,7 @@ public sealed class LayerBoundaryTests
         string geometryDirectory = Path.Combine(
             repositoryRoot,
             "Mapping_Tools.Application",
+            "Tools",
             "GeometryDashboard");
         string[] forbiddenTokens =
         [

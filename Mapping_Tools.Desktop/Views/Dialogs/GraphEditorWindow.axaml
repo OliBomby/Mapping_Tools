@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:vm="using:Mapping_Tools.Desktop.ViewModels.Dialogs"
+        xmlns:graph="clr-namespace:Mapping_Tools.Desktop.Controls.Graph"
         x:Class="Mapping_Tools.Desktop.Views.Dialogs.GraphEditorWindow"
         x:DataType="vm:GraphEditorViewModel"
         x:CompileBindings="True"
@@ -14,7 +15,7 @@
         ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner">
     <Grid RowDefinitions="*,Auto" Margin="12">
-        <controls:GraphControl x:Name="GraphControlElement"
+        <graph:GraphControl x:Name="GraphControlElement"
                                GraphState="{Binding GraphState, Mode=TwoWay}"
                                Margin="54,36,12,24" />
         <StackPanel Grid.Row="1"

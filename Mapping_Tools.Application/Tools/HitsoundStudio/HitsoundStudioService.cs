@@ -1,14 +1,22 @@
 using System.Globalization;
 using Mapping_Tools.Application.Audio;
+using Mapping_Tools.Application.Audio.Contracts;
+using Mapping_Tools.Application.Audio.Models;
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
+using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.Audio;
+using Mapping_Tools.Core.Audio.Midi;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.Events;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Tools.HitsoundStudio;
+using Mapping_Tools.Core.Tools.HitsoundStudio.Models;
 
 namespace Mapping_Tools.Application.Tools.HitsoundStudio;
 

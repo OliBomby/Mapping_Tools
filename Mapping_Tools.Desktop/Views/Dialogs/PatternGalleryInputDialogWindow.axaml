@@ -2,8 +2,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.Interactions"
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+        xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Interactions.PatternGallery"
         x:Class="Mapping_Tools.Desktop.Views.Dialogs.PatternGalleryInputDialogWindow"
-        x:DataType="vm:PatternGalleryInputViewModel"
+        x:DataType="patternGallery:PatternGalleryInputViewModel"
         Width="620" Height="560"
         CanResize="True"
         Title="Pattern Gallery import">

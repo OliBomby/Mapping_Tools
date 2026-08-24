@@ -1,5 +1,8 @@
 using Mapping_Tools.Application.Audio;
+using Mapping_Tools.Application.Audio.Contracts;
+using Mapping_Tools.Application.Audio.Models;
 using Mapping_Tools.Core.Audio;
+using Mapping_Tools.Core.Audio.Effects;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 

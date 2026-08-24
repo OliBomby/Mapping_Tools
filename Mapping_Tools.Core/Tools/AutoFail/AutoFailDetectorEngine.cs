@@ -1,6 +1,7 @@
 using System.Text;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Tools.AutoFail.Models;
 
 namespace Mapping_Tools.Core.Tools.AutoFail;
 

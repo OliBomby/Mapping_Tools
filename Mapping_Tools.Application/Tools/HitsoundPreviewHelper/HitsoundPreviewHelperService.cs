@@ -1,6 +1,9 @@
 using Mapping_Tools.Application.BeatmapEditing;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
+using Mapping_Tools.Core.Tools.HitsoundPreviewHelper.Models;
 
 namespace Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 
