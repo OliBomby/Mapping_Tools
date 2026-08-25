@@ -2,14 +2,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.ViewModels"
         xmlns:controls="using:Mapping_Tools.Desktop.Controls"
-        xmlns:shell="using:Mapping_Tools.Desktop.Shell"
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:models="clr-namespace:Mapping_Tools.Desktop.Shell.Models"
         mc:Ignorable="d"
         d:DesignWidth="1280"
         d:DesignHeight="800"
@@ -84,16 +82,6 @@
             </Style>
         </ControlTheme>
     </Window.Resources>
-
-    <Window.DataTemplates>
-        <DataTemplate x:DataType="models:ShellProjectMenuItem">
-            <MenuItem Header="{Binding Header}" Command="{Binding Command}" ToolTip.Tip="{Binding ToolTip}">
-                <MenuItem.Icon>
-                    <materialIcons:MaterialIcon Kind="{Binding Icon}" />
-                </MenuItem.Icon>
-            </MenuItem>
-        </DataTemplate>
-    </Window.DataTemplates>
 
     <Window.Styles>
         <Style Selector="Menu.top-menu">
@@ -290,7 +278,19 @@
                                       MinWidth="67"
                                       Height="35"
                                       IsVisible="{Binding HasProjectMenu}"
-                                      ItemsSource="{Binding ProjectMenuItems}" />
+                                      IsEnabled="{Binding HasProjectMenu}"
+                                      ItemsSource="{Binding ProjectMenuItems}">
+                                <MenuItem.ItemContainerTheme>
+                                    <ControlTheme TargetType="MenuItem"
+                                                  BasedOn="{StaticResource {x:Type MenuItem}}">
+                                        <Setter Property="Header" Value="{ReflectionBinding Header}" />
+                                        <Setter Property="Command" Value="{ReflectionBinding Command}" />
+                                        <Setter Property="ToolTip.Tip" Value="{ReflectionBinding ToolTip}" />
+                                        <Setter Property="Icon"
+                                                Value="{ReflectionBinding Icon, Converter={StaticResource MaterialIconConverter}}" />
+                                    </ControlTheme>
+                                </MenuItem.ItemContainerTheme>
+                            </MenuItem>
                         </Menu>
                     </StackPanel>
 

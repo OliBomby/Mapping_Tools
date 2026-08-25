@@ -35,6 +35,7 @@
             <converters:StringArrayToStringConverter x:Key="StringArrayToStringConverter" />
             <converters:RgbaColourToAvaloniaColorConverter x:Key="RgbaColourToAvaloniaColorConverter" />
             <converters:RgbaColourToAvaloniaBrushConverter x:Key="RgbaColourToAvaloniaBrushConverter" />
+            <converters:MaterialIconConverter x:Key="MaterialIconConverter" />
         </ResourceDictionary>
     </Application.Resources>
 
