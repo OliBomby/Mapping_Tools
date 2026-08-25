@@ -4,7 +4,7 @@ using Mapping_Tools.Core.HitsoundStuff;
 namespace Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 
 /// <summary>Contains the complete persisted Hitsound Studio project state.</summary>
-public sealed class HitsoundStudioProject
+public class HitsoundStudioProject
 {
     /// <summary>Creates defaults matching the former WPF view model.</summary>
     public HitsoundStudioProject()
@@ -46,9 +46,6 @@ public sealed class HitsoundStudioProject
 
     /// <summary>Gets or sets whether the destination is cleared before export.</summary>
     public bool DeleteAllInExportFirst { get; set; }
-
-    /// <summary>Gets or sets whether a completion summary is shown.</summary>
-    public bool ShowResults { get; set; }
 
     /// <summary>Gets or sets whether the previous schema is the standard-mode schema.</summary>
     public bool UsePreviousSampleSchema { get; set; }
@@ -102,7 +99,6 @@ public sealed class HitsoundStudioProject
             ExportMap = ExportMap,
             ExportSamples = ExportSamples,
             DeleteAllInExportFirst = DeleteAllInExportFirst,
-            ShowResults = ShowResults,
             UsePreviousSampleSchema = UsePreviousSampleSchema,
             AllowGrowthPreviousSampleSchema = AllowGrowthPreviousSampleSchema,
             AddCoincidingRegularHitsounds = AddCoincidingRegularHitsounds,
@@ -162,4 +158,3 @@ public sealed class HitsoundStudioProject
         return copy;
     }
 }
-

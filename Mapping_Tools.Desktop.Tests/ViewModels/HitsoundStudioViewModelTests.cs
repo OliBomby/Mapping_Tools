@@ -9,6 +9,8 @@ using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Interactions.HitsoundStudio;
+using DesktopHitsoundStudioProject = Mapping_Tools.Desktop.Models.HitsoundStudioProject;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.ViewModels.Adapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -181,11 +183,11 @@ public sealed class HitsoundStudioViewModelTests
             return Task.FromResult<HitsoundStudioImportRequest?>(null);
         }
 
-        public Task<HitsoundStudioProject?> ShowExportAsync(
-            HitsoundStudioProject project,
+        public Task<DesktopHitsoundStudioProject?> ShowExportAsync(
+            DesktopHitsoundStudioProject project,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<HitsoundStudioProject?>(null);
+            return Task.FromResult<DesktopHitsoundStudioProject?>(null);
         }
     }
 

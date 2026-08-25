@@ -18,6 +18,7 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Images;
 using Mapping_Tools.Core.Tools.SliderPicturator;
 using Mapping_Tools.Desktop.Shell;
+using SliderPicturatorProject = Mapping_Tools.Desktop.Models.SliderPicturatorProject;
 using Mapping_Tools.Desktop.Utilities;
 
 namespace Mapping_Tools.Desktop.ViewModels;

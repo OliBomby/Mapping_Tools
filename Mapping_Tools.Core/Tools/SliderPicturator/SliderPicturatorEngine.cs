@@ -379,9 +379,9 @@ public static class SliderPicturatorEngine
     /// <param name="sliderColor">The selected track colour.</param>
     /// <param name="borderColor">The selected border colour.</param>
     /// <param name="setBeatmapColors">Whether special slider colours are written.</param>
-    /// <param name="useMapComboColors">Whether the map palette supplied the track colour.</param>
+    /// <param name="setTrackColorOverride">Whether the track colour is written as a beatmap override.</param>
     public static void ApplyToBeatmap(Beatmap beatmap, IReadOnlyList<Vector2> path, double frameDistance, double duration,
-        double time, RgbaColour sliderColor, RgbaColour borderColor, bool setBeatmapColors, bool useMapComboColors)
+        double time, RgbaColour sliderColor, RgbaColour borderColor, bool setBeatmapColors, bool setTrackColorOverride)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(path);
@@ -424,7 +424,7 @@ public static class SliderPicturatorEngine
         TimingPointChange.Apply(timing, changes);
         if (setBeatmapColors)
         {
-            if (!useMapComboColors) beatmap.SpecialColours["SliderTrackOverride"] = new ComboColour(sliderColor.R, sliderColor.G, sliderColor.B);
+            if (setTrackColorOverride) beatmap.SpecialColours["SliderTrackOverride"] = new ComboColour(sliderColor.R, sliderColor.G, sliderColor.B);
             beatmap.SpecialColours["SliderBorder"] = new ComboColour(borderColor.R, borderColor.G, borderColor.B);
         }
     }

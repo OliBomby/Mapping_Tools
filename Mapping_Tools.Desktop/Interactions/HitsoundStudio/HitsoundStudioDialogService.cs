@@ -1,8 +1,8 @@
 using Mapping_Tools.Application.Platform.FilePicker;
-using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Views.Dialogs;
+using DesktopHitsoundStudioProject = Mapping_Tools.Desktop.Models.HitsoundStudioProject;
 
 namespace Mapping_Tools.Desktop.Interactions.HitsoundStudio;
 
@@ -36,8 +36,8 @@ public sealed class HitsoundStudioDialogService : IHitsoundStudioDialogService
     }
 
     /// <inheritdoc />
-    public async Task<HitsoundStudioProject?> ShowExportAsync(
-        HitsoundStudioProject project,
+    public async Task<DesktopHitsoundStudioProject?> ShowExportAsync(
+        DesktopHitsoundStudioProject project,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(project);
@@ -50,6 +50,6 @@ public sealed class HitsoundStudioDialogService : IHitsoundStudioDialogService
             dialog,
             DialogHostInteraction.RootIdentifier,
             cancellationToken).ConfigureAwait(false);
-        return result as HitsoundStudioProject;
+        return result as DesktopHitsoundStudioProject;
     }
 }

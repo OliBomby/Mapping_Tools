@@ -18,7 +18,9 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Interactions.HitsoundStudio;
 using Mapping_Tools.Desktop.Shell.Models;
+using HitsoundStudioProject = Mapping_Tools.Desktop.Models.HitsoundStudioProject;
 using Mapping_Tools.Desktop.ViewModels.Adapters;
 using Material.Icons;
 

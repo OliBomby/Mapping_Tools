@@ -20,6 +20,7 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.Shell;
+using SlideratorProject = Mapping_Tools.Desktop.Models.SlideratorProject;
 
 namespace Mapping_Tools.Desktop.ViewModels;
 

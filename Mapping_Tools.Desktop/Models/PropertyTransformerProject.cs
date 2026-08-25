@@ -1,0 +1,10 @@
+using ApplicationPropertyTransformerProject = Mapping_Tools.Application.Tools.PropertyTransformer.PropertyTransformerProject;
+
+namespace Mapping_Tools.Desktop.Models;
+
+/// <summary>Stores Property Transformer presentation preferences alongside transformation inputs.</summary>
+public sealed class PropertyTransformerProject : ApplicationPropertyTransformerProject
+{
+    /// <summary>Gets or sets whether related time fields are edited as a synchronized group.</summary>
+    public bool SyncTimeFields { get; set; }
+}

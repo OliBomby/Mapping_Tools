@@ -35,7 +35,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
         var session = await editingGateway.OpenBeatmapAsync(path, LiveBeatmapPreference.PreferLive, cancellationToken).ConfigureAwait(false);
         var beatmap = session.Editor.Beatmap;
         double circleSize = beatmap.Difficulty["CircleSize"].DoubleValue;
-        var sliderColour = options.UseMapComboColors ? options.ComboColor : options.CurrentTrackColor;
+        var sliderColour = options.CurrentTrackColor;
         double duration = options.SelectedSlider?.TemporalLength ?? options.Duration;
         var backgroundColour = RgbaColour.FromRgb(0, 0, 0);
         (var pathPoints, double frameDistance) = SliderPicturatorEngine.Picturate(
@@ -46,13 +46,13 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
         cancellationToken.ThrowIfCancellationRequested();
         // Set the beatmap slider colors
         SliderPicturatorEngine.ApplyToBeatmap(beatmap, pathPoints, frameDistance, duration, options.TimeCode,
-            sliderColour, options.BorderColor, options.SetBeatmapColors, options.UseMapComboColors);
-        options.SegmentCount = SliderPicturatorEngine.Recolor(image, sliderColour, options.BorderColor,
+            sliderColour, options.BorderColor, options.SetBeatmapColors, options.SetTrackColorOverride);
+        long segmentCount = SliderPicturatorEngine.Recolor(image, sliderColour, options.BorderColor,
             backgroundColour, options.SelectedSlider, !options.BlackOn, !options.BorderOn,
             !options.AlphaOn, options.RedOn, options.GreenOn, options.BlueOn, options.Quality).SegmentCount;
         await editingGateway.SaveAsync(session, cancellationToken: cancellationToken).ConfigureAwait(false);
         progress?.Report(1);
-        return new SliderPicturatorResult(path, options.SegmentCount);
+        return new SliderPicturatorResult(path, segmentCount);
     }
 
     /// <inheritdoc />

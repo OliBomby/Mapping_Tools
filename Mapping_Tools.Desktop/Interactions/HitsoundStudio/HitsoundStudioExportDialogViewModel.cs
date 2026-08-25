@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
+using HitsoundStudioProject = Mapping_Tools.Desktop.Models.HitsoundStudioProject;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 
 namespace Mapping_Tools.Desktop.Interactions.HitsoundStudio;

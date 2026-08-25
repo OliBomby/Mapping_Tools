@@ -215,6 +215,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
     private sealed class LegacyProjectTypeBinder : ISerializationBinder
     {
         private const string legacy_assembly_name = "Mapping Tools";
+        private const string desktop_assembly_name = "Mapping_Tools.Desktop";
         private const string legacy_hotkey = "Mapping_Tools.Classes.SystemTools.Hotkey";
         private const string intermediate_core_hotkey = "Mapping_Tools.Core.Classes.SystemTools.Hotkey";
         private const string current_namespace_prefix = "Mapping_Tools.Core.";
@@ -347,14 +348,28 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 return elementType.MakeArrayType();
             }
 
+            if (IsCurrentApplicationAssembly(assemblyName))
+            {
+                if (typeName == typeof(HitsoundStudioProject).FullName)
+                    return ResolveDesktopProject("HitsoundStudioProject", typeof(HitsoundStudioProject));
+                if (typeName == typeof(PropertyTransformerProject).FullName)
+                    return ResolveDesktopProject("PropertyTransformerProject", typeof(PropertyTransformerProject));
+                if (typeName == typeof(SlideratorProject).FullName)
+                    return ResolveDesktopProject("SlideratorProject", typeof(SlideratorProject));
+                if (typeName == typeof(SliderPicturatorProject).FullName)
+                    return ResolveDesktopProject("SliderPicturatorProject", typeof(SliderPicturatorProject));
+            }
+
             if (IsLegacyAssembly(assemblyName) || IsCurrentCoreAssembly(assemblyName))
             {
                 if (typeName == legacy_rhythm_guide_project) return typeof(RhythmGuideProject);
                 if (typeName == legacy_hitsound_preview_helper_project) return typeof(HitsoundPreviewHelperProject);
                 if (typeName == legacy_hitsound_preview_helper_project_uppercase) return typeof(HitsoundPreviewHelperProject);
                 if (typeName == legacy_hitsound_copier_project) return typeof(HitsoundCopierProject);
-                if (typeName == legacy_hitsound_studio_project) return typeof(HitsoundStudioProject);
-                if (typeName == legacy_hitsound_studio_project_uppercase) return typeof(HitsoundStudioProject);
+                if (typeName == legacy_hitsound_studio_project)
+                    return ResolveDesktopProject("HitsoundStudioProject", typeof(HitsoundStudioProject));
+                if (typeName == legacy_hitsound_studio_project_uppercase)
+                    return ResolveDesktopProject("HitsoundStudioProject", typeof(HitsoundStudioProject));
                 if (typeName == legacy_rhythm_guide_options
                     || typeName == typeof(RhythmGuideOptions).FullName)
                     return typeof(RhythmGuideProject.RhythmGuideProjectOptions);
@@ -364,14 +379,18 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                     || typeName == typeof(MapCleanerOptions).FullName)
                     return typeof(MapCleanerProject.MapCleanerProjectOptions);
                 if (typeName == legacy_metadata_manager_project) return typeof(MetadataManagerProject);
-                if (typeName == legacy_property_transformer_project) return typeof(PropertyTransformerProject);
-                if (typeName == legacy_property_transformer_project_uppercase) return typeof(PropertyTransformerProject);
+                if (typeName == legacy_property_transformer_project)
+                    return ResolveDesktopProject("PropertyTransformerProject", typeof(PropertyTransformerProject));
+                if (typeName == legacy_property_transformer_project_uppercase)
+                    return ResolveDesktopProject("PropertyTransformerProject", typeof(PropertyTransformerProject));
                 if (typeName == legacy_timing_copier_project) return typeof(TimingCopierProject);
                 if (typeName == legacy_timing_helper_project) return typeof(TimingHelperProject);
                 if (typeName == legacy_slider_completionator_project) return typeof(SliderCompletionatorProject);
                 if (typeName == legacy_slider_merger_project) return typeof(SliderMergerProject);
-                if (typeName == legacy_slider_picturator_project) return typeof(SliderPicturatorProject);
-                if (typeName == legacy_sliderator_project) return typeof(SlideratorProject);
+                if (typeName == legacy_slider_picturator_project)
+                    return ResolveDesktopProject("SliderPicturatorProject", typeof(SliderPicturatorProject));
+                if (typeName == legacy_sliderator_project)
+                    return ResolveDesktopProject("SlideratorProject", typeof(SlideratorProject));
                 if (typeName == legacy_tumour_generator_project) return typeof(TumourGeneratorProject);
                 if (typeName == legacy_tumour_layer) return typeof(TumourLayer);
                 if (typeName == legacy_graph_state) return typeof(GraphState);
@@ -403,6 +422,34 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             out string? assemblyName,
             out string? typeName)
         {
+            if (serializedType.FullName == "Mapping_Tools.Desktop.Models.HitsoundStudioProject")
+            {
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_hitsound_studio_project;
+                return;
+            }
+
+            if (serializedType.FullName == "Mapping_Tools.Desktop.Models.PropertyTransformerProject")
+            {
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_property_transformer_project;
+                return;
+            }
+
+            if (serializedType.FullName == "Mapping_Tools.Desktop.Models.SliderPicturatorProject")
+            {
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_slider_picturator_project;
+                return;
+            }
+
+            if (serializedType.FullName == "Mapping_Tools.Desktop.Models.SlideratorProject")
+            {
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_sliderator_project;
+                return;
+            }
+
             if (serializedType == typeof(RhythmGuideProject))
             {
                 assemblyName = legacy_assembly_name;
@@ -630,6 +677,22 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 assemblyName?.Split(',', 2)[0].Trim(),
                 migratedCoreMarker.Assembly.GetName().Name,
                 StringComparison.Ordinal);
+        }
+
+        private static bool IsCurrentApplicationAssembly(string? assemblyName)
+        {
+            return string.Equals(
+                assemblyName?.Split(',', 2)[0].Trim(),
+                "Mapping_Tools.Application",
+                StringComparison.Ordinal);
+        }
+
+        private static Type ResolveDesktopProject(string typeName, Type fallbackType)
+        {
+            return Type.GetType(
+                       $"Mapping_Tools.Desktop.Models.{typeName}, {desktop_assembly_name}",
+                       throwOnError: false)
+                   ?? fallbackType;
         }
 
         private bool TryResolveLegacyGenericType(string typeName, out Type resolvedType)

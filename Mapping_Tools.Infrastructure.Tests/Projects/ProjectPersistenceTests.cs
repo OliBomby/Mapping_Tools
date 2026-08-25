@@ -41,7 +41,6 @@ public sealed class ProjectPersistenceTests
 
         // Assert
         project.ViewportSize.Should().Be(32768);
-        project.ComboColor.Should().Be(RgbaColour.FromRgb(0, 128, 255));
         project.CurrentTrackColor.Should().Be(RgbaColour.FromRgb(0, 128, 255));
         json.Should().Contain("\"$type\": \"Mapping_Tools.Viewmodels.SliderPicturatorVm, Mapping Tools\"");
     }
@@ -330,7 +329,6 @@ public sealed class ProjectPersistenceTests
         project.TimingpointBpmMultiplier.Should().Be(0.5);
         project.MatchFilter.Length.Should().Be(1);
         project.MatchFilter[0].Should().Be(0);
-        project.SyncTimeFields.Should().BeTrue();
         json.Should().Contain(
             "\"$type\": \"Mapping_Tools.Viewmodels.PropertyTransformerVm, Mapping Tools\"");
     }

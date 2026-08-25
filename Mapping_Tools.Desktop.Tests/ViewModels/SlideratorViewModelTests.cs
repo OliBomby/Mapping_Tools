@@ -34,7 +34,7 @@ public sealed class SlideratorViewModelTests
         service.ImportPath.Should().Be("current.osu");
         service.Project.Should().NotBeNull();
         service.Project!.BeatSnapDivisor.Should().Be(8);
-        service.Project.ManualVelocity.Should().BeTrue();
+        viewModel.ManualVelocity.Should().BeTrue();
         service.ReloadEditor.Should().BeTrue();
         viewModel.DoEditorRead.Should().BeFalse();
         viewModel.IsRunning.Should().BeFalse();

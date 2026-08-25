@@ -357,7 +357,7 @@ public sealed class TransformationFixtureTests
         project.BeatsPerMinute = beatsPerMinute > 0 ? beatsPerMinute : 180;
         project.GraphBeats = project.BeatsPerMinute * temporalLength / 60000;
         project.PixelLength = sourceSlider.PixelLength;
-        if (!project.ManualVelocity) project.NewVelocity = SlideratorEngine.GetMaximumVelocity(project);
+        project.NewVelocity = SlideratorEngine.GetMaximumVelocity(project);
     }
 
     private static void StageMapsetMergerSources(

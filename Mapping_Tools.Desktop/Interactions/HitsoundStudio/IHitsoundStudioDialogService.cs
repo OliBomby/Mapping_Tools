@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
+using HitsoundStudioProject = Mapping_Tools.Desktop.Models.HitsoundStudioProject;
 
-namespace Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
+namespace Mapping_Tools.Desktop.Interactions.HitsoundStudio;
 
 /// <summary>Owns the feature-specific import and export forms.</summary>
 public interface IHitsoundStudioDialogService
@@ -19,4 +20,3 @@ public interface IHitsoundStudioDialogService
         HitsoundStudioProject project,
         CancellationToken cancellationToken = default);
 }
-

@@ -64,7 +64,6 @@ public sealed class LegacyProjectJsonSerializerTests
         var project = serializer.Deserialize<HitsoundStudioProject>(json);
 
         // Assert
-        project.ShowResults.Should().BeTrue();
         project.DeleteAllInExportFirst.Should().BeTrue();
         project.DefaultSample.SampleSet.Should().Be(SampleSet.Soft);
         project.PreviousSampleSchema.Should().ContainKey("normal-hitnormal2");

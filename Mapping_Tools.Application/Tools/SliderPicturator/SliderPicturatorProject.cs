@@ -4,16 +4,13 @@ using Newtonsoft.Json;
 namespace Mapping_Tools.Application.Tools.SliderPicturator;
 
 /// <summary>Represents the complete persisted Slider Picturator project.</summary>
-public sealed class SliderPicturatorProject
+public class SliderPicturatorProject
 {
     /// <summary>Gets or sets the GPU viewport-size choice.</summary>
     public long ViewportSize { get; set; } = 32768;
 
     /// <summary>Gets or sets the preview quality from one through 101.</summary>
     public int Quality { get; set; } = 1;
-
-    /// <summary>Gets or sets the approximate preview segment count.</summary>
-    public long SegmentCount { get; set; }
 
     /// <summary>Gets or sets the image's vertical resolution.</summary>
     public double YResolution { get; set; } = 1080;
@@ -30,17 +27,8 @@ public sealed class SliderPicturatorProject
     /// <summary>Gets or sets the image's top-left Y position.</summary>
     public double ImageStartY { get; set; }
 
-    /// <summary>Gets or sets whether the map palette supplies the track colour.</summary>
-    public bool UseMapComboColors { get; set; }
-
-    /// <summary>Gets or sets the selected map palette colour.</summary>
-    public RgbaColour ComboColor { get; set; } = RgbaColour.FromRgb(0, 0, 0);
-
     /// <summary>Gets or sets the effective track colour used by the project.</summary>
     public RgbaColour CurrentTrackColor { get; set; } = RgbaColour.White;
-
-    /// <summary>Gets or sets the manually selected track colour.</summary>
-    public RgbaColour TrackColorPickerColor { get; set; } = RgbaColour.White;
 
     /// <summary>Gets or sets the slider border colour.</summary>
     public RgbaColour BorderColor { get; set; } = RgbaColour.White;
@@ -74,6 +62,9 @@ public sealed class SliderPicturatorProject
 
     /// <summary>Gets or sets whether generated colours are written to the beatmap.</summary>
     public bool SetBeatmapColors { get; set; } = true;
+
+    /// <summary>Gets or sets whether the generated track colour is written as a beatmap override.</summary>
+    public bool SetTrackColorOverride { get; set; } = true;
 
     /// <summary>Gets or sets the transient selected slider used for sliderball motion.</summary>
     [JsonIgnore]
