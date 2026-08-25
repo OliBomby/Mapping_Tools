@@ -10,6 +10,7 @@ using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Core.Tools.TumourGenerating.Models;
@@ -42,7 +43,7 @@ public sealed class TumourGeneratorViewModelTests
         // Assert
         service.RunPaths.Should().Equal("current.osu");
         service.Project.Should().NotBeNull();
-        service.Project!.ImportModeSetting.Should().Be(TumourImportMode.Selected);
+        service.Project!.ImportModeSetting.Should().Be(HitObjectSelectionMode.Selected);
         service.ReloadEditor.Should().BeTrue();
         reload.ReloadCount.Should().Be(1);
         viewModel.IsRunning.Should().BeFalse();
@@ -261,7 +262,7 @@ public sealed class TumourGeneratorViewModelTests
 
         public Task<TumourImportResult> ImportAsync(
             string path,
-            TumourImportMode mode,
+            HitObjectSelectionMode mode,
             string? timeCode,
             CancellationToken cancellationToken = default)
         {

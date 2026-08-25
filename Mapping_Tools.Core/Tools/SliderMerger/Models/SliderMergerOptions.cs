@@ -1,3 +1,5 @@
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+
 namespace Mapping_Tools.Core.Tools.SliderMerger.Models;
 
 /// <summary>
@@ -6,7 +8,7 @@ namespace Mapping_Tools.Core.Tools.SliderMerger.Models;
 public class SliderMergerOptions
 {
     /// <summary>Gets or sets how hit objects are selected for merging.</summary>
-    public SliderMergerImportMode ImportModeSetting { get; set; } = SliderMergerImportMode.Selected;
+    public HitObjectSelectionMode ImportModeSetting { get; set; } = HitObjectSelectionMode.Selected;
 
     /// <summary>Gets or sets the legacy time-code query used by Time mode.</summary>
     public string TimeCode { get; set; } = string.Empty;

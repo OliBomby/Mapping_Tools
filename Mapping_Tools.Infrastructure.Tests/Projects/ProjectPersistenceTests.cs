@@ -430,7 +430,7 @@ public sealed class ProjectPersistenceTests
         string json = serializer.Serialize(project);
 
         // Assert
-        project.ImportModeSetting.Should().Be(SliderMergerImportMode.Selected);
+        project.ImportModeSetting.Should().Be(HitObjectSelectionMode.Selected);
         project.Leniency.Should().Be(999999);
         project.MergeOnSliderEnd.Should().BeTrue();
         json.Should().Contain(

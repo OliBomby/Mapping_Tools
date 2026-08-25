@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.SliderMerger;
 using Mapping_Tools.Core.Tools.SliderMerger.Models;
@@ -40,7 +41,7 @@ public sealed class SliderMergerService : ISliderMergerService
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
             // Get the current beatmap if the selection mode is 'Selected' because otherwise the selection would always fail
-            var preference = options.ImportModeSetting == SliderMergerImportMode.Selected
+            var preference = options.ImportModeSetting == HitObjectSelectionMode.Selected
                 ? LiveBeatmapPreference.RequireLive
                 : LiveBeatmapPreference.PreferLive;
             var session = await editingGateway
@@ -49,10 +50,6 @@ public sealed class SliderMergerService : ISliderMergerService
             var markedObjects = BeatmapObjectSelection.Select(
                 session,
                 options.ImportModeSetting,
-                SliderMergerImportMode.Selected,
-                SliderMergerImportMode.Bookmarked,
-                SliderMergerImportMode.Time,
-                SliderMergerImportMode.Everything,
                 options.TimeCode);
             var mapProgress = progress?.MapTo(index, paths.Count);
             objectsMerged += SliderMergerEngine.Merge(

@@ -4,6 +4,7 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tools.Sliderator.Contracts;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
 
@@ -27,26 +28,20 @@ public sealed class SlideratorService : ISlideratorService
     /// <inheritdoc />
     public async Task<SlideratorImportResult> ImportAsync(
         string path,
-        SlideratorImportMode mode,
+        HitObjectSelectionMode mode,
         string? timeCode,
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         if (!Enum.IsDefined(mode)) throw new ArgumentException("Sliderator contains an unknown import mode.", nameof(mode));
 
-        var preference = mode == SlideratorImportMode.Selected
+        var preference = mode == HitObjectSelectionMode.Selected
             ? LiveBeatmapPreference.RequireLive
             : LiveBeatmapPreference.DiskOnly;
         var session = await editingGateway
             .OpenBeatmapAsync(path, preference, cancellationToken)
             .ConfigureAwait(false);
-        var selected = mode switch
-        {
-            SlideratorImportMode.Selected => session.SelectedHitObjects,
-            SlideratorImportMode.Bookmarked => session.Editor.Beatmap.GetBookmarkedObjects(),
-            SlideratorImportMode.Time => session.Editor.Beatmap.QueryTimeCode(timeCode ?? string.Empty).ToList(),
-            _ => throw new ArgumentException("Sliderator contains an unknown import mode.", nameof(mode)),
-        };
+        var selected = BeatmapObjectSelection.Select(session, mode, timeCode);
         return new SlideratorImportResult(
             selected.Where(hitObject => hitObject.IsSlider).ToArray(),
             session.Editor.Beatmap.Difficulty["SliderMultiplier"].DoubleValue,

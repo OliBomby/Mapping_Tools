@@ -4,6 +4,7 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
@@ -44,7 +45,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
         BeatmapEditingSession? sourceSession = null;
         if (!string.IsNullOrWhiteSpace(options.PathFrom))
         {
-            var preference = options.SourceSelectionMode == HitsoundCopierSelectionMode.Selected
+            var preference = options.SourceSelectionMode == HitObjectSelectionMode.Selected
                 ? LiveBeatmapPreference.RequireLive
                 : LiveBeatmapPreference.PreferLive;
             sourceSession = await editingGateway.OpenBeatmapAsync(
@@ -126,10 +127,6 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
         return BeatmapObjectSelection.Select(
             session,
             options.SourceSelectionMode,
-            HitsoundCopierSelectionMode.Selected,
-            HitsoundCopierSelectionMode.Bookmarked,
-            HitsoundCopierSelectionMode.Time,
-            HitsoundCopierSelectionMode.Everything,
             options.TimeCode);
     }
 
@@ -158,7 +155,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
             throw new ArgumentException("Select at least one target beatmap.", nameof(options));
         if (options.CopyMode is not 0 and not 1) throw new ArgumentException("Hitsound Copier received an unknown copy mode.", nameof(options));
         if (!Enum.IsDefined(options.SourceSelectionMode)) throw new ArgumentException("Hitsound Copier received an unknown source selection mode.", nameof(options));
-        if (options.SourceSelectionMode == HitsoundCopierSelectionMode.Time && string.IsNullOrWhiteSpace(options.TimeCode))
+        if (options.SourceSelectionMode == HitObjectSelectionMode.Time && string.IsNullOrWhiteSpace(options.TimeCode))
             throw new ArgumentException("A time code is required for Time mode.", nameof(options));
         if (options.TemporalLeniency < 0
             || !double.IsFinite(options.TemporalLeniency)

@@ -41,7 +41,7 @@ public sealed class SliderMergerServiceTests
         SliderMergerService service = new(gateway);
         SliderMergerOptions options = new()
         {
-            ImportModeSetting = SliderMergerImportMode.Everything,
+            ImportModeSetting = HitObjectSelectionMode.Everything,
         };
 
         // Act
@@ -66,7 +66,7 @@ public sealed class SliderMergerServiceTests
         SliderMergerService service = new(gateway);
         SliderMergerOptions options = new()
         {
-            ImportModeSetting = SliderMergerImportMode.Bookmarked,
+            ImportModeSetting = HitObjectSelectionMode.Bookmarked,
             Leniency = 100,
         };
 
@@ -87,7 +87,7 @@ public sealed class SliderMergerServiceTests
         SliderMergerService service = new(gateway);
         SliderMergerOptions options = new()
         {
-            ImportModeSetting = SliderMergerImportMode.Time,
+            ImportModeSetting = HitObjectSelectionMode.Time,
             TimeCode = "00:00:000 (1,2)",
             Leniency = 100,
         };

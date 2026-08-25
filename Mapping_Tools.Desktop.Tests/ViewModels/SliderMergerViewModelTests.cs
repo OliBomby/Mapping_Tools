@@ -6,6 +6,7 @@ using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.SliderMerger;
 using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderMerger;
 using Mapping_Tools.Core.Tools.SliderMerger.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
@@ -25,7 +26,7 @@ public sealed class SliderMergerViewModelTests
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["one.osu", "two.osu"]);
         var viewModel = Create(service, workspace);
-        viewModel.ImportModeSetting = SliderMergerImportMode.Everything;
+        viewModel.ImportModeSetting = HitObjectSelectionMode.Everything;
         viewModel.ConnectionModeSetting = SliderMergerConnectionMode.Bezier;
         viewModel.Leniency = 512;
         viewModel.MergeOnSliderEnd = false;
@@ -36,7 +37,7 @@ public sealed class SliderMergerViewModelTests
         // Assert
         service.Paths.Should().Equal("one.osu", "two.osu");
         service.Options.Should().NotBeNull();
-        service.Options!.ImportModeSetting.Should().Be(SliderMergerImportMode.Everything);
+        service.Options!.ImportModeSetting.Should().Be(HitObjectSelectionMode.Everything);
         service.Options.ConnectionModeSetting.Should().Be(SliderMergerConnectionMode.Bezier);
         service.Options.Leniency.Should().Be(512);
         service.Options.MergeOnSliderEnd.Should().BeFalse();
@@ -58,7 +59,7 @@ public sealed class SliderMergerViewModelTests
 
         // Assert
         service.Paths.Should().Equal("current.osu");
-        service.Options!.ImportModeSetting.Should().Be(SliderMergerImportMode.Selected);
+        service.Options!.ImportModeSetting.Should().Be(HitObjectSelectionMode.Selected);
     }
 
     [TestMethod]
@@ -88,7 +89,7 @@ public sealed class SliderMergerViewModelTests
         var viewModel = Create(new RecordingMerger());
 
         // Act
-        viewModel.ImportModeSetting = SliderMergerImportMode.Time;
+        viewModel.ImportModeSetting = HitObjectSelectionMode.Time;
 
         // Assert
         viewModel.TimeCodeVisible.Should().BeTrue();
@@ -103,7 +104,7 @@ public sealed class SliderMergerViewModelTests
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["selected.osu"]);
         var viewModel = Create(service, workspace);
-        viewModel.ImportModeSetting = SliderMergerImportMode.Everything;
+        viewModel.ImportModeSetting = HitObjectSelectionMode.Everything;
         viewModel.Leniency = -1;
 
         // Act

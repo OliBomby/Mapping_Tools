@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Newtonsoft.Json;
 
 namespace Mapping_Tools.Core.Tools.Sliderator.Models;
@@ -11,7 +12,7 @@ namespace Mapping_Tools.Core.Tools.Sliderator.Models;
 public class SlideratorOptions
 {
     /// <summary>Gets or sets the imported object selection mode.</summary>
-    public SlideratorImportMode ImportModeSetting { get; set; } = SlideratorImportMode.Selected;
+    public HitObjectSelectionMode ImportModeSetting { get; set; } = HitObjectSelectionMode.Selected;
 
     /// <summary>Gets or sets the time-code expression used by time selection.</summary>
     public string TimeCode { get; set; } = string.Empty;

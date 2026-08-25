@@ -7,6 +7,7 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper.Models;
@@ -59,7 +60,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
         preview.Options.Should().NotBeNull();
         preview.Paths.Should().Equal("first.osu", "second.osu");
         preview.Options!.ImportModeSetting.Should().Be(
-            HitsoundPreviewHelperImportMode.Everything);
+            HitObjectSelectionMode.Everything);
         viewModel.ResultSummary.Should().Be("Done!");
         viewModel.Progress.Should().Be(0);
         viewModel.IsRunning.Should().BeFalse();

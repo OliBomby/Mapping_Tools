@@ -3,6 +3,7 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.Sliderator;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,7 +23,7 @@ public sealed class SlideratorServiceTests
         // Act
         var result = await service.ImportAsync(
             "map.osu",
-            SlideratorImportMode.Selected,
+            HitObjectSelectionMode.Selected,
             null);
 
         // Assert
@@ -32,7 +33,7 @@ public sealed class SlideratorServiceTests
     }
 
     [TestMethod]
-    public async Task ImportAsync_WithBookmarkedAndTimeModesReadsDiskObjects()
+    public async Task ImportAsync_WithBookmarkedTimeAndEverythingModesReadsDiskObjects()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
@@ -42,17 +43,22 @@ public sealed class SlideratorServiceTests
         // Act
         var bookmarked = await service.ImportAsync(
             "map.osu",
-            SlideratorImportMode.Bookmarked,
+            HitObjectSelectionMode.Bookmarked,
             null);
         var timed = await service.ImportAsync(
             "map.osu",
-            SlideratorImportMode.Time,
+            HitObjectSelectionMode.Time,
             "00:00:000");
+        var everything = await service.ImportAsync(
+            "map.osu",
+            HitObjectSelectionMode.Everything,
+            null);
 
         // Assert
         gateway.OpenRequests[^1].Preference.Should().Be(LiveBeatmapPreference.DiskOnly);
         bookmarked.Sliders.Should().ContainSingle(item => item.IsSlider);
         timed.Sliders.Should().ContainSingle(item => item.IsSlider);
+        everything.Sliders.Should().ContainSingle(item => item.IsSlider);
     }
 
     [TestMethod]

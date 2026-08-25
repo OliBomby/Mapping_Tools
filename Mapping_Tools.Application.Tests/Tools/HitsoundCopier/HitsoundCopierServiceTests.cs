@@ -27,7 +27,7 @@ public sealed class HitsoundCopierServiceTests
         {
             PathFrom = "source.osu",
             PathTo = "first.osu|second.osu",
-            SourceSelectionMode = HitsoundCopierSelectionMode.Everything,
+            SourceSelectionMode = HitObjectSelectionMode.Everything,
         };
 
         // Act
@@ -51,7 +51,7 @@ public sealed class HitsoundCopierServiceTests
         HitsoundCopierOptions options = new()
         {
             PathTo = "target.osu",
-            SourceSelectionMode = HitsoundCopierSelectionMode.Time,
+            SourceSelectionMode = HitObjectSelectionMode.Time,
         };
 
         // Act

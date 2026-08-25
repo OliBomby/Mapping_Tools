@@ -22,7 +22,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         HitsoundPreviewHelperService service = new(gateway);
         HitsoundPreviewHelperOptions options = new()
         {
-            ImportModeSetting = HitsoundPreviewHelperImportMode.Selected,
+            ImportModeSetting = HitObjectSelectionMode.Selected,
             Items = [new HitsoundZone { Hitsound = Hitsound.Clap, CustomIndex = 2 }],
         };
 
@@ -50,7 +50,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         HitsoundPreviewHelperService service = new(gateway);
         HitsoundPreviewHelperOptions options = new()
         {
-            ImportModeSetting = HitsoundPreviewHelperImportMode.Time,
+            ImportModeSetting = HitObjectSelectionMode.Time,
             TimeCode = "00:02:000",
             Items = [new HitsoundZone { Hitsound = Hitsound.Finish }],
         };
@@ -78,7 +78,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         HitsoundPreviewHelperService service = new(gateway);
         HitsoundPreviewHelperOptions options = new()
         {
-            ImportModeSetting = HitsoundPreviewHelperImportMode.Bookmarked,
+            ImportModeSetting = HitObjectSelectionMode.Bookmarked,
             Items = [new HitsoundZone { Hitsound = Hitsound.Clap }],
         };
 
@@ -101,7 +101,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         HitsoundPreviewHelperService service = new(gateway);
         HitsoundPreviewHelperOptions options = new()
         {
-            ImportModeSetting = HitsoundPreviewHelperImportMode.Everything,
+            ImportModeSetting = HitObjectSelectionMode.Everything,
             Items = [new HitsoundZone { Hitsound = Hitsound.Whistle }],
         };
 
@@ -128,7 +128,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         HitsoundPreviewHelperService service = new(gateway);
         HitsoundPreviewHelperOptions options = new()
         {
-            ImportModeSetting = HitsoundPreviewHelperImportMode.Time,
+            ImportModeSetting = HitObjectSelectionMode.Time,
             Items = [new HitsoundZone()],
         };
 

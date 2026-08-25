@@ -3,6 +3,7 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Core.Tools.TumourGenerating;
@@ -29,7 +30,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
     /// <inheritdoc />
     public async Task<TumourImportResult> ImportAsync(
         string path,
-        TumourImportMode mode,
+        HitObjectSelectionMode mode,
         string? timeCode,
         CancellationToken cancellationToken = default)
     {
@@ -38,10 +39,10 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
 
         var session = await editingGateway.OpenBeatmapAsync(
                 path,
-                mode == TumourImportMode.Selected ? LiveBeatmapPreference.RequireLive : LiveBeatmapPreference.DiskOnly,
+                mode == HitObjectSelectionMode.Selected ? LiveBeatmapPreference.RequireLive : LiveBeatmapPreference.DiskOnly,
                 cancellationToken)
             .ConfigureAwait(false);
-        var markedObjects = SelectObjects(session, mode, timeCode);
+        var markedObjects = BeatmapObjectSelection.Select(session, mode, timeCode);
         double circleSize = session.Editor.Beatmap.Difficulty["CircleSize"].DoubleValue;
         return new TumourImportResult(
             markedObjects.Where(hitObject => hitObject.IsSlider).ToArray(),
@@ -91,13 +92,16 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
             ArgumentException.ThrowIfNullOrWhiteSpace(path);
             var session = await editingGateway.OpenBeatmapAsync(
                     path,
-                    project.ImportModeSetting == TumourImportMode.Selected
+                    project.ImportModeSetting == HitObjectSelectionMode.Selected
                         ? LiveBeatmapPreference.RequireLive
                         : LiveBeatmapPreference.DiskOnly,
                     cancellationToken)
                 .ConfigureAwait(false);
             // Load sliders from the selector
-            var markedObjects = SelectObjects(session, project.ImportModeSetting, project.TimeCode);
+            var markedObjects = BeatmapObjectSelection.Select(
+                session,
+                project.ImportModeSetting,
+                project.TimeCode);
             for (int objectIndex = 0; objectIndex < markedObjects.Count; objectIndex++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -138,18 +142,4 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
         };
     }
 
-    private static IReadOnlyList<HitObject> SelectObjects(
-        BeatmapEditingSession session,
-        TumourImportMode mode,
-        string? timeCode)
-    {
-        return mode switch
-        {
-            TumourImportMode.Selected => session.SelectedHitObjects,
-            TumourImportMode.Bookmarked => session.Editor.Beatmap.GetBookmarkedObjects(),
-            TumourImportMode.Time => session.Editor.Beatmap.QueryTimeCode(timeCode ?? string.Empty).ToList(),
-            TumourImportMode.Everything => session.Editor.Beatmap.HitObjects,
-            _ => throw new ArgumentException("Tumour Generator contains an unknown import mode.", nameof(mode)),
-        };
-    }
 }

@@ -20,6 +20,7 @@ using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.Sliderator;
@@ -84,8 +85,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     }
 
     /// <summary>Gets the source import modes in legacy display order.</summary>
-    public IReadOnlyList<SlideratorImportMode> ImportModes { get; } =
-        Enum.GetValues<SlideratorImportMode>();
+    public IReadOnlyList<HitObjectSelectionMode> ImportModes { get; } =
+        Enum.GetValues<HitObjectSelectionMode>();
 
     /// <summary>Gets the export modes in legacy display order.</summary>
     public IReadOnlyList<SlideratorExportMode> ExportModes { get; } =
@@ -98,7 +99,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets the selection source used by Import.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TimeCodeVisible))]
-    public partial SlideratorImportMode ImportModeSetting { get; set; } = SlideratorImportMode.Selected;
+    public partial HitObjectSelectionMode ImportModeSetting { get; set; } = HitObjectSelectionMode.Selected;
 
     /// <summary>Gets or sets the time-code selection expression.</summary>
     [ObservableProperty]
@@ -253,7 +254,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     public double SvGraphMultiplier => 100 * GlobalSv / PixelLength;
 
     /// <summary>Gets whether the time-code input is relevant for the selected mode.</summary>
-    public bool TimeCodeVisible => ImportModeSetting == SlideratorImportMode.Time;
+    public bool TimeCodeVisible => ImportModeSetting == HitObjectSelectionMode.Time;
 
     /// <summary>Gets the estimated output segment/object count.</summary>
     public long ExpectedSegments
@@ -304,7 +305,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
         await RunWithStateAsync(async () =>
         {
-            if (!await ImportForPathAsync(path, SlideratorImportMode.Selected, cancellationToken)) return;
+            if (!await ImportForPathAsync(path, HitObjectSelectionMode.Selected, cancellationToken)) return;
 
             await RunPathAsync(path, true, true, cancellationToken);
         });
@@ -445,7 +446,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private async Task<bool> ImportForPathAsync(
         string path,
-        SlideratorImportMode mode,
+        HitObjectSelectionMode mode,
         CancellationToken cancellationToken)
     {
         try

@@ -1,3 +1,5 @@
+using Mapping_Tools.Core.BeatmapHelper.Enums;
+
 namespace Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 
 /// <summary>
@@ -7,8 +9,8 @@ namespace Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 public class SliderCompletionatorOptions
 {
     /// <summary>Gets or sets how hit objects are selected for completion.</summary>
-    public SliderCompletionatorImportMode ImportModeSetting { get; set; } =
-        SliderCompletionatorImportMode.Selected;
+    public HitObjectSelectionMode ImportModeSetting { get; set; } =
+        HitObjectSelectionMode.Selected;
 
     /// <summary>Gets or sets the value calculated by the transformation.</summary>
     public SliderCompletionatorFreeVariable FreeVariableSetting { get; set; } =

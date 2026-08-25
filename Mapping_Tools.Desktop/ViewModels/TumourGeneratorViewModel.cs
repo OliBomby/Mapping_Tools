@@ -19,6 +19,7 @@ using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Core.Tools.TumourGenerating.Models;
@@ -89,8 +90,8 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     }
 
     /// <summary>Gets the object-selection modes in the legacy display order.</summary>
-    public IReadOnlyList<TumourImportMode> ImportModes { get; } =
-        Enum.GetValues<TumourImportMode>();
+    public IReadOnlyList<HitObjectSelectionMode> ImportModes { get; } =
+        Enum.GetValues<HitObjectSelectionMode>();
 
     /// <summary>Gets the geometric templates in the legacy display order.</summary>
     public IReadOnlyList<TumourTemplate> TumourTemplates { get; } =
@@ -110,7 +111,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets the source used when importing or running.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TimeCodeVisible))]
-    public partial TumourImportMode ImportModeSetting { get; set; } = TumourImportMode.Selected;
+    public partial HitObjectSelectionMode ImportModeSetting { get; set; } = HitObjectSelectionMode.Selected;
 
     /// <summary>Gets or sets the time query used by time-based selection.</summary>
     [ObservableProperty]
@@ -153,7 +154,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     public partial bool DebugConstruction { get; set; }
 
     /// <summary>Gets whether the time-code field applies to the current import mode.</summary>
-    public bool TimeCodeVisible => ImportModeSetting == TumourImportMode.Time;
+    public bool TimeCodeVisible => ImportModeSetting == HitObjectSelectionMode.Time;
 
     /// <summary>Gets whether the parameter graph is shown for the current template.</summary>
     public bool TumourParameterGraphVisible => AdvancedOptions || CurrentLayer?.TumourTemplate.NeedsParameter == true;

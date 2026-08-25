@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.SliderCompletionator;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
@@ -50,7 +51,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
             string path = paths[index];
             // Get the current beatmap if the selection mode is 'Selected' because otherwise the selection would always fail
             var livePreference =
-                options.ImportModeSetting == SliderCompletionatorImportMode.Selected
+                options.ImportModeSetting == HitObjectSelectionMode.Selected
                     ? LiveBeatmapPreference.RequireLive
                     : LiveBeatmapPreference.PreferLive;
             var session = await editingGateway
@@ -70,15 +71,10 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
             cancellationToken.ThrowIfCancellationRequested();
             (string path, var session) = sessions[index];
 
-            var markedObjects =
-                BeatmapObjectSelection.Select(
-                    session,
-                    options.ImportModeSetting,
-                    SliderCompletionatorImportMode.Selected,
-                    SliderCompletionatorImportMode.Bookmarked,
-                    SliderCompletionatorImportMode.Time,
-                    SliderCompletionatorImportMode.Everything,
-                    options.TimeCode);
+            var markedObjects = BeatmapObjectSelection.Select(
+                session,
+                options.ImportModeSetting,
+                options.TimeCode);
 
             int completed = SliderCompletionatorEngine.Apply(
                 session.Editor.Beatmap,

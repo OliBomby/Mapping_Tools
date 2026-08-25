@@ -19,8 +19,8 @@ public class HitsoundCopierOptions
     public double TemporalLeniency { get; set; } = 5;
 
     /// <summary>Gets or sets the source object selection mode.</summary>
-    public HitsoundCopierSelectionMode SourceSelectionMode { get; set; } =
-        HitsoundCopierSelectionMode.Everything;
+    public HitObjectSelectionMode SourceSelectionMode { get; set; } =
+        HitObjectSelectionMode.Everything;
 
     /// <summary>Gets or sets the legacy time-code query used by Time mode.</summary>
     public string TimeCode { get; set; } = string.Empty;

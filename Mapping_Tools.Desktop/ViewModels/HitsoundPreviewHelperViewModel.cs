@@ -93,8 +93,8 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     /// <summary>Gets or sets which beatmap objects receive preview hitsounds.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TimeCodeVisible))]
-    public partial HitsoundPreviewHelperImportMode ImportModeSetting { get; set; } =
-        HitsoundPreviewHelperImportMode.Everything;
+    public partial HitObjectSelectionMode ImportModeSetting { get; set; } =
+        HitObjectSelectionMode.Everything;
 
     /// <summary>Gets or sets the legacy osu! time-code query used by Time mode.</summary>
     [ObservableProperty]
@@ -106,8 +106,8 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         "Add hitsound zones, then run the helper.";
 
     /// <summary>Gets every supported object-selection mode.</summary>
-    public IReadOnlyList<HitsoundPreviewHelperImportMode> ImportModes { get; } =
-        Enum.GetValues<HitsoundPreviewHelperImportMode>();
+    public IReadOnlyList<HitObjectSelectionMode> ImportModes { get; } =
+        Enum.GetValues<HitObjectSelectionMode>();
 
     /// <summary>Gets every supported hitsound layer.</summary>
     public IReadOnlyList<Hitsound> Hitsounds { get; } = Enum.GetValues<Hitsound>();
@@ -116,7 +116,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     public IReadOnlyList<SampleSet> SampleSets { get; } = Enum.GetValues<SampleSet>();
 
     /// <summary>Gets whether the time-code field applies to the current mode.</summary>
-    public bool TimeCodeVisible => ImportModeSetting == HitsoundPreviewHelperImportMode.Time;
+    public bool TimeCodeVisible => ImportModeSetting == HitObjectSelectionMode.Time;
 
     /// <summary>Gets or sets the tri-state select-all value used by the zone list.</summary>
     public bool? IsAllItemsSelected
@@ -174,9 +174,9 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     protected override async Task RunCoreAsync()
     {
         string? currentPath = null;
-        if (ImportModeSetting == HitsoundPreviewHelperImportMode.Selected) currentPath = await currentBeatmap.FindCurrentBeatmapAsync();
+        if (ImportModeSetting == HitObjectSelectionMode.Selected) currentPath = await currentBeatmap.FindCurrentBeatmapAsync();
 
-        var paths = ImportModeSetting == HitsoundPreviewHelperImportMode.Selected
+        var paths = ImportModeSetting == HitObjectSelectionMode.Selected
             ? string.IsNullOrWhiteSpace(currentPath) ? [] : [currentPath]
             : workspace.SelectedPaths;
         if (settings.AlwaysQuickRun)
@@ -197,7 +197,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
             return false;
         }
 
-        if (ImportModeSetting == HitsoundPreviewHelperImportMode.Time && string.IsNullOrWhiteSpace(TimeCode))
+        if (ImportModeSetting == HitObjectSelectionMode.Time && string.IsNullOrWhiteSpace(TimeCode))
         {
             ResultSummary = "Enter a time code before using Time mode.";
             return false;

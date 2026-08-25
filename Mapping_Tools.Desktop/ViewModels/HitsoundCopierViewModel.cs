@@ -88,8 +88,8 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets the source object selection mode.</summary>
     [ObservableProperty]
-    public partial HitsoundCopierSelectionMode SourceSelectionMode { get; set; } =
-        HitsoundCopierSelectionMode.Everything;
+    public partial HitObjectSelectionMode SourceSelectionMode { get; set; } =
+        HitObjectSelectionMode.Everything;
 
     /// <summary>Gets or sets the legacy time-code query for Time mode.</summary>
     [ObservableProperty]
@@ -175,8 +175,8 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     public partial SampleSet MutedSampleSet { get; set; } = SampleSet.None;
 
     /// <summary>Gets the displayable source selection choices.</summary>
-    public IReadOnlyList<HitsoundCopierSelectionMode> SourceSelectionModes { get; } =
-        Enum.GetValues<HitsoundCopierSelectionMode>();
+    public IReadOnlyList<HitObjectSelectionMode> SourceSelectionModes { get; } =
+        Enum.GetValues<HitObjectSelectionMode>();
 
     /// <summary>Gets the displayable copy-mode labels.</summary>
     public IReadOnlyList<string> CopyModes { get; } = ["Overwrite everything", "Overwrite only defined"];
@@ -271,7 +271,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     {
         ValidateAllProperties();
         if (HasErrors || string.IsNullOrWhiteSpace(PathTo)) return false;
-        if (SourceSelectionMode == HitsoundCopierSelectionMode.Time && string.IsNullOrWhiteSpace(TimeCode))
+        if (SourceSelectionMode == HitObjectSelectionMode.Time && string.IsNullOrWhiteSpace(TimeCode))
         {
             ResultSummary = "Enter a time code before using Time mode.";
             return false;

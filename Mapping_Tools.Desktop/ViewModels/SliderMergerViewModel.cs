@@ -12,6 +12,7 @@ using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.SliderMerger;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderMerger;
 using Mapping_Tools.Core.Tools.SliderMerger.Models;
 using Mapping_Tools.Desktop.Shell;
@@ -61,8 +62,8 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     }
 
     /// <summary>Gets the import modes in their legacy display order.</summary>
-    public IReadOnlyList<SliderMergerImportMode> ImportModes { get; } =
-        Enum.GetValues<SliderMergerImportMode>();
+    public IReadOnlyList<HitObjectSelectionMode> ImportModes { get; } =
+        Enum.GetValues<HitObjectSelectionMode>();
 
     /// <summary>Gets the path connection modes in display order.</summary>
     public IReadOnlyList<SliderMergerConnectionMode> ConnectionModes { get; } =
@@ -71,7 +72,7 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets the source-object import mode.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TimeCodeVisible))]
-    public partial SliderMergerImportMode ImportModeSetting { get; set; } = SliderMergerImportMode.Selected;
+    public partial HitObjectSelectionMode ImportModeSetting { get; set; } = HitObjectSelectionMode.Selected;
 
     /// <summary>Gets or sets the legacy time-code query.</summary>
     [ObservableProperty]
@@ -97,7 +98,7 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     public partial bool MergeOnSliderEnd { get; set; } = true;
 
     /// <summary>Gets whether the time-code field is visible for Time import mode.</summary>
-    public bool TimeCodeVisible => ImportModeSetting == SliderMergerImportMode.Time;
+    public bool TimeCodeVisible => ImportModeSetting == HitObjectSelectionMode.Time;
 
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
@@ -127,9 +128,9 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     protected override async Task RunCoreAsync()
     {
         string? currentPath = null;
-        if (ImportModeSetting == SliderMergerImportMode.Selected) currentPath = await currentBeatmap.FindCurrentBeatmapAsync();
+        if (ImportModeSetting == HitObjectSelectionMode.Selected) currentPath = await currentBeatmap.FindCurrentBeatmapAsync();
 
-        var paths = ImportModeSetting == SliderMergerImportMode.Selected
+        var paths = ImportModeSetting == HitObjectSelectionMode.Selected
             ? string.IsNullOrWhiteSpace(currentPath) ? [] : [currentPath]
             : workspace.SelectedPaths;
         await RunPathsAsync(paths, settings.AlwaysQuickRun, CancellationToken.None);

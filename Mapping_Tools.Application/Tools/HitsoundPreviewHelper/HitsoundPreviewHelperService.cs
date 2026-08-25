@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
@@ -41,7 +42,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
 
         if (options.Items is null || options.Items.Count == 0) throw new ArgumentException("There are no zones!", nameof(options));
 
-        if (options.ImportModeSetting == HitsoundPreviewHelperImportMode.Time && string.IsNullOrWhiteSpace(options.TimeCode))
+        if (options.ImportModeSetting == HitObjectSelectionMode.Time && string.IsNullOrWhiteSpace(options.TimeCode))
             throw new ArgumentException(
                 "A time code is required for Time mode.",
                 nameof(options));
@@ -58,22 +59,17 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
         {
             cancellationToken.ThrowIfCancellationRequested();
             var livePreference =
-                options.ImportModeSetting == HitsoundPreviewHelperImportMode.Selected
+                options.ImportModeSetting == HitObjectSelectionMode.Selected
                     ? LiveBeatmapPreference.RequireLive
                     : LiveBeatmapPreference.PreferLive;
             var session = await editingGateway
                 .OpenBeatmapAsync(paths[index], livePreference, cancellationToken)
                 .ConfigureAwait(false);
 
-            var markedObjects =
-                BeatmapObjectSelection.Select(
-                    session,
-                    options.ImportModeSetting,
-                    HitsoundPreviewHelperImportMode.Selected,
-                    HitsoundPreviewHelperImportMode.Bookmarked,
-                    HitsoundPreviewHelperImportMode.Time,
-                    HitsoundPreviewHelperImportMode.Everything,
-                    options.TimeCode);
+            var markedObjects = BeatmapObjectSelection.Select(
+                session,
+                options.ImportModeSetting,
+                options.TimeCode);
             int updated = HitsoundPreviewHelperEngine.Apply(
                 session.Editor.Beatmap,
                 markedObjects,

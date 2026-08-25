@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.TumourGenerator;
@@ -21,7 +22,7 @@ public sealed class TumourGeneratorServiceTests
         // Act
         var result = await service.ImportAsync(
             "map.osu",
-            TumourImportMode.Selected,
+            HitObjectSelectionMode.Selected,
             null);
 
         // Assert
@@ -40,7 +41,7 @@ public sealed class TumourGeneratorServiceTests
         // Act
         var result = await service.ImportAsync(
             "map.osu",
-            TumourImportMode.Selected,
+            HitObjectSelectionMode.Selected,
             null);
 
         // Assert

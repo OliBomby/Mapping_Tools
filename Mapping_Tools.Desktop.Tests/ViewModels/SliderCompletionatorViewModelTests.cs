@@ -6,6 +6,7 @@ using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
 using Mapping_Tools.Application.Workspace;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderCompletionator;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
@@ -25,7 +26,7 @@ public sealed class SliderCompletionatorViewModelTests
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["one.osu", "two.osu"]);
         var viewModel = Create(service, workspace);
-        viewModel.ImportModeSetting = SliderCompletionatorImportMode.Everything;
+        viewModel.ImportModeSetting = HitObjectSelectionMode.Everything;
         viewModel.FreeVariableSetting = SliderCompletionatorFreeVariable.Length;
         viewModel.Duration = 1.5;
         viewModel.MoveAnchors = true;
@@ -36,7 +37,7 @@ public sealed class SliderCompletionatorViewModelTests
         // Assert
         service.Paths.Should().Equal("one.osu", "two.osu");
         service.Options.Should().NotBeNull();
-        service.Options!.ImportModeSetting.Should().Be(SliderCompletionatorImportMode.Everything);
+        service.Options!.ImportModeSetting.Should().Be(HitObjectSelectionMode.Everything);
         service.Options.FreeVariableSetting.Should().Be(SliderCompletionatorFreeVariable.Length);
         service.Options.Duration.Should().Be(1.5);
         service.Options.MoveAnchors.Should().BeTrue();
@@ -59,7 +60,7 @@ public sealed class SliderCompletionatorViewModelTests
 
         // Assert
         service.Paths.Should().Equal("current.osu");
-        service.Options!.ImportModeSetting.Should().Be(SliderCompletionatorImportMode.Selected);
+        service.Options!.ImportModeSetting.Should().Be(HitObjectSelectionMode.Selected);
     }
 
     [TestMethod]
@@ -74,7 +75,7 @@ public sealed class SliderCompletionatorViewModelTests
             service,
             workspace,
             settings: settings);
-        viewModel.ImportModeSetting = SliderCompletionatorImportMode.Everything;
+        viewModel.ImportModeSetting = HitObjectSelectionMode.Everything;
 
         // Act
         await viewModel.RunCommand.ExecuteAsync(null);

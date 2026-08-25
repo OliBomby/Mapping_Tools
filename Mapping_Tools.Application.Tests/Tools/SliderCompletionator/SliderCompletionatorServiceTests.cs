@@ -2,6 +2,7 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderCompletionator;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -50,7 +51,7 @@ public sealed class SliderCompletionatorServiceTests
         SliderCompletionatorService service = new(gateway);
         SliderCompletionatorOptions options = new()
         {
-            ImportModeSetting = SliderCompletionatorImportMode.Everything,
+            ImportModeSetting = HitObjectSelectionMode.Everything,
         };
 
         // Act
@@ -80,7 +81,7 @@ public sealed class SliderCompletionatorServiceTests
         SliderCompletionatorService service = new(gateway);
         SliderCompletionatorOptions options = new()
         {
-            ImportModeSetting = SliderCompletionatorImportMode.Everything,
+            ImportModeSetting = HitObjectSelectionMode.Everything,
             UseEndTime = true,
             UseCurrentEditorTime = true,
         };

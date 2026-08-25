@@ -12,6 +12,7 @@ using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderCompletionator;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 using Mapping_Tools.Desktop.Shell;
@@ -62,8 +63,8 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     }
 
     /// <summary>Gets the import modes in their legacy display order.</summary>
-    public IReadOnlyList<SliderCompletionatorImportMode> ImportModes { get; } =
-        Enum.GetValues<SliderCompletionatorImportMode>();
+    public IReadOnlyList<HitObjectSelectionMode> ImportModes { get; } =
+        Enum.GetValues<HitObjectSelectionMode>();
 
     /// <summary>Gets the calculated-value choices in their legacy display order.</summary>
     public IReadOnlyList<SliderCompletionatorFreeVariable> FreeVariables { get; } =
@@ -72,8 +73,8 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     /// <summary>Gets or sets the source-object import mode.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TimeCodeVisible))]
-    public partial SliderCompletionatorImportMode ImportModeSetting { get; set; } =
-        SliderCompletionatorImportMode.Selected;
+    public partial HitObjectSelectionMode ImportModeSetting { get; set; } =
+        HitObjectSelectionMode.Selected;
 
     /// <summary>Gets or sets the value calculated from the other slider inputs.</summary>
     [ObservableProperty]
@@ -136,7 +137,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     public partial bool RemoveSliderTicks { get; set; }
 
     /// <summary>Gets whether the time-code field is visible for the selected import mode.</summary>
-    public bool TimeCodeVisible => ImportModeSetting == SliderCompletionatorImportMode.Time;
+    public bool TimeCodeVisible => ImportModeSetting == HitObjectSelectionMode.Time;
 
     /// <summary>Gets whether the duration field is visible for the selected free variable.</summary>
     public bool DurationVisible =>
@@ -180,9 +181,9 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     protected override async Task RunCoreAsync()
     {
         string? currentPath = null;
-        if (ImportModeSetting == SliderCompletionatorImportMode.Selected) currentPath = await currentBeatmap.FindCurrentBeatmapAsync();
+        if (ImportModeSetting == HitObjectSelectionMode.Selected) currentPath = await currentBeatmap.FindCurrentBeatmapAsync();
 
-        var paths = ImportModeSetting == SliderCompletionatorImportMode.Selected
+        var paths = ImportModeSetting == HitObjectSelectionMode.Selected
             ? string.IsNullOrWhiteSpace(currentPath) ? [] : [currentPath]
             : workspace.SelectedPaths;
         await RunPathsAsync(paths, settings.AlwaysQuickRun, CancellationToken.None);
