@@ -24,7 +24,7 @@ public sealed class PropertyTransformerEngineTests
 
         // Assert
         beatmap.GetBookmarks().Should().Equal(originalBookmarks.Select(bookmark => bookmark + 5));
-        progress.Values.Should().ContainInOrder(20, 25, 30, 40, 50, 55, 60, 70, 80, 90, 100);
+        progress.Values.Should().ContainInOrder(0.2, 0.25, 0.3, 0.4, 0.5, 0.55, 0.6, 0.7, 0.8, 0.9, 1);
     }
 
     [TestMethod]

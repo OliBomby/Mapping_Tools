@@ -35,8 +35,8 @@ public sealed class ToolExecutionServiceTests
             context =>
             {
                 operationThread = Environment.CurrentManagedThreadId;
-                context.ReportProgress(25, "Loading maps");
-                context.ReportProgress(100, "Saved");
+                context.ReportProgress(0.25, "Loading maps");
+                context.ReportProgress(1, "Saved");
                 return Task.FromResult(
                     new ToolExecutionOutput<int>(
                         42,
@@ -54,7 +54,7 @@ public sealed class ToolExecutionServiceTests
         result.Value.Should().Be(42);
         operationThread.Should().NotBe(callerThread);
         progress.Count.Should().Be(2);
-        progress[1].Percent.Should().Be(100);
+        progress[1].Progress.Should().Be(1);
         reload.ReloadCount.Should().Be(1);
         result.EditorReloaded.Should().BeTrue();
         published.Count.Should().Be(1);
@@ -274,7 +274,7 @@ public sealed class ToolExecutionServiceTests
         Action act2 = () => new ToolExecutionProgress(-0.01);
 
         act2.Should().Throw<ArgumentOutOfRangeException>();
-        Action act3 = () => new ToolExecutionProgress(100.01);
+        Action act3 = () => new ToolExecutionProgress(1.01);
 
         act3.Should().Throw<ArgumentOutOfRangeException>();
     }

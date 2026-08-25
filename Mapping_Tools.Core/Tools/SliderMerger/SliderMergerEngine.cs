@@ -1,6 +1,7 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Mapping_Tools.Core.Tools.SliderMerger.Models;
 
@@ -17,7 +18,7 @@ public static class SliderMergerEngine
     /// <param name="beatmap">The mutable beatmap whose hit-object list is changed.</param>
     /// <param name="markedObjects">The selected, bookmarked, time-filtered, or complete object sequence.</param>
     /// <param name="options">The connection and geometry settings.</param>
-    /// <param name="progress">Optional progress receiver, reported as a percentage.</param>
+    /// <param name="progress">Optional normalized progress receiver.</param>
     /// <param name="cancellationToken">Cancels between object-pair evaluations.</param>
     /// <returns>The number of source objects incorporated into merged sliders.</returns>
     /// <exception cref="ArgumentException">The leniency or connection mode is invalid.</exception>
@@ -40,7 +41,7 @@ public static class SliderMergerEngine
         for (int index = 0; index < objects.Count - 1; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            progress?.Report(objects.Count == 0 ? 100 : (double)index / objects.Count * 100);
+            progress?.Report(index, objects.Count);
 
             var first = objects[index];
             var second = objects[index + 1];
@@ -84,7 +85,7 @@ public static class SliderMergerEngine
             }
         }
 
-        progress?.Report(100);
+        progress?.Report(1);
         return mergedObjects;
     }
 

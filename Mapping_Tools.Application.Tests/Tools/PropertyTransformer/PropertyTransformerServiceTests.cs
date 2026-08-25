@@ -48,7 +48,7 @@ public sealed class PropertyTransformerServiceTests
         gateway.SessionSaveRequests.Single().Session.Editor.Should().BeSameAs(editor);
         editor.Beatmap.GetBookmarks().Should().Equal(
             originalBookmarks.Select(bookmark => bookmark + 5));
-        progress.Values.Last().Should().Be(100);
+        progress.Values.Last().Should().Be(1);
     }
 
 }

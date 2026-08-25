@@ -51,7 +51,7 @@ public abstract class SingleRunToolViewModel : ObservableValidator
         }
     }
 
-    /// <summary>Gets the current ordinary-run completion percentage.</summary>
+    /// <summary>Gets the current ordinary-run completion as a percentage for the legacy progress-bar binding.</summary>
     public double Progress
     {
         get => progress;
@@ -110,7 +110,7 @@ public abstract class SingleRunToolViewModel : ObservableValidator
         long runGeneration = Volatile.Read(ref this.runGeneration);
         return new Progress<ToolExecutionProgress>(value =>
         {
-            if (IsRunning && Volatile.Read(ref this.runGeneration) == runGeneration) Progress = value.Percent;
+            if (IsRunning && Volatile.Read(ref this.runGeneration) == runGeneration) Progress = value.Progress * 100;
         });
     }
 

@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Backups.Models;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.MetadataManager;
 
 namespace Mapping_Tools.Application.Tools.MetadataManager;
@@ -78,7 +79,7 @@ public sealed class MetadataManagerService : IMetadataManagerService
             // Save the file with name update because we updated the metadata
             session.Editor.SaveFileWithNameUpdate();
             processedPaths.Add(session.Editor.Path);
-            progress?.Report((index + 1) * 100d / paths.Length);
+            progress?.Report(index + 1, paths.Length);
         }
 
         return new MetadataManagerResult(processedPaths);

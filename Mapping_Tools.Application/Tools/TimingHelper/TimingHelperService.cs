@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.TimingHelper;
 
 namespace Mapping_Tools.Application.Tools.TimingHelper;
@@ -48,8 +49,7 @@ public sealed class TimingHelperService : ITimingHelperService
                     cancellationToken)
                 .ConfigureAwait(false);
 
-            Progress<double> mapProgress = new(value =>
-                progress?.Report((pathIndex * 100d + value) / paths.Count));
+            var mapProgress = progress?.MapTo(pathIndex, paths.Count);
             redlinesAdded += TimingHelperEngine.Apply(
                 session.Editor.Beatmap,
                 options,
@@ -59,7 +59,7 @@ public sealed class TimingHelperService : ITimingHelperService
                 .SaveAsync(session, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
             processedPaths.Add(path);
-            progress?.Report((index + 1) * 100d / paths.Count);
+            progress?.Report(index + 1, paths.Count);
         }
 
         return new TimingHelperResult(processedPaths, redlinesAdded);

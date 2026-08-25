@@ -3,6 +3,7 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Core.Tools.TumourGenerating.Models;
@@ -102,7 +103,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
                 cancellationToken.ThrowIfCancellationRequested();
                 // Generate copious amounts of tumours on each slider
                 if (generator.TumourGenerate(markedObjects[objectIndex], cancellationToken)) generatedCount++;
-                progress?.Report(100d * (pathIndex + (objectIndex + 1d) / Math.Max(markedObjects.Count, 1)) / paths.Count);
+                progress?.Report((pathIndex + (objectIndex + 1d) / Math.Max(markedObjects.Count, 1)) / paths.Count);
             }
 
             if (project.FixSv)
@@ -119,10 +120,10 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
             await editingGateway.SaveAsync(session, shouldReload, cancellationToken).ConfigureAwait(false);
             editorReloaded |= shouldReload;
             completedPaths.Add(path);
-            progress?.Report(100d * (pathIndex + 1d) / paths.Count);
+            progress?.Report(pathIndex + 1, paths.Count);
         }
 
-        progress?.Report(100);
+        progress?.Report(1);
         return new TumourRunResult(completedPaths, generatedCount, editorReloaded);
     }
 

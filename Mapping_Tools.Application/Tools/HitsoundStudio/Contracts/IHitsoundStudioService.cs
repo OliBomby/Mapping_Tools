@@ -37,11 +37,10 @@ public interface IHitsoundStudioService
 
     /// <summary>Builds and writes the requested map/package with cooperative cancellation.</summary>
     /// <param name="project">An independent export snapshot and its output options.</param>
-    /// <param name="progress">Receives monotonically increasing major-phase percentages.</param>
+    /// <param name="progress">Receives monotonically increasing normalized major-phase progress.</param>
     /// <param name="cancellationToken">Stops generation, encoding, or writing at the next safe boundary.</param>
     Task<HitsoundStudioExportResult> ExportAsync(
         HitsoundStudioProject project,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }
-

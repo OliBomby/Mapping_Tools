@@ -44,7 +44,7 @@ public sealed class ComboColourStudioServiceTests
         gateway.SessionSaveRequests.Single().Session.Editor.Should().BeSameAs(editor);
         gateway.SessionSaveRequests.Single().ReloadEditor.Should().BeFalse();
         editor.Beatmap.ComboColours.Single().Color.Should().Be(RgbaColour.FromRgb(10, 20, 30));
-        progress.Should().Equal(100);
+        progress.Should().Equal(1);
     }
 
     [TestMethod]

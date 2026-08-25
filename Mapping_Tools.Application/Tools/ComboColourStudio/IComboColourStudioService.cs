@@ -27,7 +27,7 @@ public interface IComboColourStudioService
     /// <summary>Applies a project to each target map with progress reporting.</summary>
     /// <param name="paths">The target beatmap paths.</param>
     /// <param name="project">The project snapshot to apply.</param>
-    /// <param name="progress">Receives a percentage from zero through one hundred.</param>
+    /// <param name="progress">Receives normalized progress from zero through one.</param>
     /// <param name="cancellationToken">Cancels before the next map is opened or saved.</param>
     /// <returns>The number of successfully saved maps.</returns>
     Task<ComboColourStudioRunResult> ApplyAsync(

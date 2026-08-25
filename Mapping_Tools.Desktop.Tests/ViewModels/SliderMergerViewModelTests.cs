@@ -149,7 +149,7 @@ public sealed class SliderMergerViewModelTests
         {
             Paths = paths.ToArray();
             Options = options;
-            progress?.Report(100);
+            progress?.Report(1);
             return Task.FromResult(new SliderMergerResult(paths, 2));
         }
     }

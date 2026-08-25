@@ -22,7 +22,7 @@ public interface IMetadataManagerService
     ///     its resulting metadata-derived filename.
     /// </summary>
     /// <param name="options">The metadata values and vertical-bar-separated targets.</param>
-    /// <param name="progress">Receives completion percentages after each target.</param>
+    /// <param name="progress">Receives normalized completion after each target.</param>
     /// <param name="cancellationToken">Cancels before the next target or destructive write.</param>
     /// <returns>The paths written by the operation.</returns>
     Task<MetadataManagerResult> ExportAsync(

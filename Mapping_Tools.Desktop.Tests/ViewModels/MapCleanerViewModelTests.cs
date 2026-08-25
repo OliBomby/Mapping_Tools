@@ -246,7 +246,7 @@ public sealed class MapCleanerViewModelTests
             CancellationToken cancellationToken = default)
         {
             Paths = paths;
-            progress?.Report(100);
+            progress?.Report(1);
             return Task.FromResult(new MapCleanerResult(20, 0, 16, [1000], [2000], [3000], 5000));
         }
     }

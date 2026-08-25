@@ -24,12 +24,11 @@ public sealed class ToolExecutionContext
     /// <summary>
     ///     Sends one validated progress observation to the caller-supplied progress channel.
     /// </summary>
-    /// <param name="percent">Completion from zero through one hundred, inclusive.</param>
+    /// <param name="progress">Completion from zero through one, inclusive.</param>
     /// <param name="stage">Optional phase text such as "Loading maps" or "Saving results".</param>
-    public void ReportProgress(double percent, string? stage = null)
+    public void ReportProgress(double progress, string? stage = null)
     {
         CancellationToken.ThrowIfCancellationRequested();
-        progress?.Report(new ToolExecutionProgress(percent, stage));
+        this.progress?.Report(new ToolExecutionProgress(progress, stage));
     }
 }
-

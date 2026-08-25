@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.SliderMerger;
 using Mapping_Tools.Core.Tools.SliderMerger.Models;
 
@@ -53,9 +54,7 @@ public sealed class SliderMergerService : ISliderMergerService
                 SliderMergerImportMode.Time,
                 SliderMergerImportMode.Everything,
                 options.TimeCode);
-            var mapProgress = progress is null
-                ? null
-                : new Progress<double>(value => progress.Report((index * 100 + value) / paths.Count));
+            var mapProgress = progress?.MapTo(index, paths.Count);
             objectsMerged += SliderMergerEngine.Merge(
                 session.Editor.Beatmap,
                 markedObjects,
@@ -69,7 +68,7 @@ public sealed class SliderMergerService : ISliderMergerService
             processedPaths.Add(path);
         }
 
-        progress?.Report(100);
+        progress?.Report(1);
         return new SliderMergerResult(processedPaths, objectsMerged);
     }
 }

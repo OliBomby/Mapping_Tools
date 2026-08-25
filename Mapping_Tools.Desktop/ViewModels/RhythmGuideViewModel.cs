@@ -171,11 +171,11 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
                 Tool.DisplayName,
                 async context =>
                 {
-                    context.ReportProgress(10, "Loading beatmaps");
+                    context.ReportProgress(0.1, "Loading beatmaps");
                     var generated = await rhythmGuide.GenerateAsync(
                         options,
                         context.CancellationToken);
-                    context.ReportProgress(100, "Complete");
+                    context.ReportProgress(1, "Complete");
                     return new ToolExecutionOutput<RhythmGuideResult>(
                         generated,
                         generated.ExportMode == RhythmGuideExportMode.AddToMap ? "Done!" : null);

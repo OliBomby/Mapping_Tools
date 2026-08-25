@@ -6,6 +6,7 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tools.MapsetMerger.Contracts;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.MapsetMerger;
 using Mapping_Tools.Core.Tools.MapsetMerger.Models;
 
@@ -156,7 +157,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 references,
                 sampleIndices,
                 cancellationToken);
-            progress?.Report((mapsetIndex + 1) * 100d / inputs.Count);
+            progress?.Report(mapsetIndex + 1, inputs.Count);
         }
 
         await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);

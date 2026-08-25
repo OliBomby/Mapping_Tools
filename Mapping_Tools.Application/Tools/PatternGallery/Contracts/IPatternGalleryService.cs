@@ -74,7 +74,7 @@ public interface IPatternGalleryService
     /// <param name="project">The complete placement option snapshot.</param>
     /// <param name="paths">The resolved collection paths.</param>
     /// <param name="quick">Whether editor reload is requested after saving.</param>
-    /// <param name="progress">Receives zero-to-one-hundred progress.</param>
+    /// <param name="progress">Receives normalized progress from zero through one.</param>
     /// <param name="cancellationToken">Cancels before or between placements.</param>
     /// <returns>The successful placement count and legacy completion message.</returns>
     Task<PatternGalleryRunResult> ExportAsync(

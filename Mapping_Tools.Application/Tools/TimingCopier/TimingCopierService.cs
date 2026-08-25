@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.TimingCopier;
 using Mapping_Tools.Core.Tools.TimingCopier.Models;
 
@@ -78,7 +79,7 @@ public sealed class TimingCopierService : ITimingCopierService
                 .SaveAsync(target, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
             processedPaths.Add(targetPath);
-            progress?.Report((index + 1) * 100d / targetPaths.Length);
+            progress?.Report(index + 1, targetPaths.Length);
         }
 
         return new TimingCopierResult(processedPaths);

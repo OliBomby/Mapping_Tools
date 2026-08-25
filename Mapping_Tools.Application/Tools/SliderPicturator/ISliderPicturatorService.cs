@@ -10,7 +10,7 @@ public interface ISliderPicturatorService
     /// <summary>Loads, transforms, backs up, saves, and optionally reloads one beatmap.</summary>
     /// <param name="path">The selected beatmap path.</param>
     /// <param name="options">The persisted settings and transient selected slider.</param>
-    /// <param name="progress">Optional completion percentage reporting.</param>
+    /// <param name="progress">Optional normalized completion reporting.</param>
     /// <param name="cancellationToken">Cancels loading, generation, or saving.</param>
     /// <returns>The written path and generated segment estimate.</returns>
     Task<SliderPicturatorResult> PicturateAsync(

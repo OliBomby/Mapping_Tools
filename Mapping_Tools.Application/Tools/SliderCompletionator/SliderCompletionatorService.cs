@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.SliderCompletionator;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 
@@ -84,8 +85,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
                 markedObjects,
                 options,
                 editorTime,
-                new Progress<double>(value => progress?.Report(
-                    (index + value / 100) / paths.Count * 100)),
+                progress?.MapTo(index, paths.Count),
                 cancellationToken);
             // Save the file
             await editingGateway
@@ -97,7 +97,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
             slidersCompleted += completed;
         }
 
-        progress?.Report(100);
+        progress?.Report(1);
         return new SliderCompletionatorResult(processedPaths, slidersCompleted);
     }
 }

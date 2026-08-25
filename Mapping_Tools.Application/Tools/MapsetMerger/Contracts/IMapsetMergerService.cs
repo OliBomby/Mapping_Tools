@@ -12,7 +12,7 @@ public interface IMapsetMergerService
     ///     every output, and commits only after the complete export succeeds.
     /// </summary>
     /// <param name="project">The validated merge project.</param>
-    /// <param name="progress">Optional aggregate percentage reporting.</param>
+    /// <param name="progress">Optional aggregate normalized progress reporting.</param>
     /// <param name="cancellationToken">Cancels parsing, staging, or commit.</param>
     /// <returns>Counts for the committed output.</returns>
     Task<MapsetMergerResult> MergeAsync(
@@ -20,4 +20,3 @@ public interface IMapsetMergerService
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }
-

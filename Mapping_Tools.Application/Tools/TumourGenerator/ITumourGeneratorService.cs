@@ -34,7 +34,7 @@ public interface ITumourGeneratorService
     /// <param name="paths">The beatmaps to transform.</param>
     /// <param name="project">The complete settings snapshot.</param>
     /// <param name="reloadEditor">Whether a live source editor should be reloaded.</param>
-    /// <param name="progress">Optional percentage progress receiver.</param>
+    /// <param name="progress">Optional normalized progress receiver.</param>
     /// <param name="cancellationToken">Cancels between objects and save stages.</param>
     /// <returns>The transformed paths and slider count.</returns>
     Task<TumourRunResult> RunAsync(

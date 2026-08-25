@@ -114,7 +114,7 @@ public sealed class TimingCopierViewModelTests
             CancellationToken cancellationToken = default)
         {
             Options = options;
-            progress?.Report(100);
+            progress?.Report(1);
             return Task.FromResult(
                 new TimingCopierResult(
                     options.ExportPath.Split('|', StringSplitOptions.RemoveEmptyEntries)));

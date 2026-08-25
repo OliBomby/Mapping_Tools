@@ -2,6 +2,7 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper.Models;
 
@@ -77,8 +78,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
                 session.Editor.Beatmap,
                 markedObjects,
                 options.Items,
-                new Progress<double>(value => progress?.Report(
-                    (index + value / 100) / paths.Count * 100)),
+                progress?.MapTo(index, paths.Count),
                 cancellationToken);
 
             // Save the file
@@ -89,7 +89,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
             updatedEventCount += updated;
         }
 
-        progress?.Report(100);
+        progress?.Report(1);
         return new HitsoundPreviewHelperResult(processedPaths, updatedEventCount);
     }
 

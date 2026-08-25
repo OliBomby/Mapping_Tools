@@ -171,7 +171,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             ? project.ExportMap
             : project.ExportMap || project.ExportSamples;
 
-        Report(progress, 5);
+        Report(progress, 0.05);
         bool validateSampleFile = project.SingleSampleExportFormat != HitsoundStudioSampleExportFormat.MidiChords
                                   && project.MixedSampleExportFormat != HitsoundStudioSampleExportFormat.MidiChords;
         SampleGeneratingArgsComparer comparer = new(validateSampleFile);
@@ -185,7 +185,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             project.DefaultSample,
             mode == HitsoundStudioExportMode.Standard ? project.ZipLayersLeniency : 0,
             mode == HitsoundStudioExportMode.Standard && validateSampleFile).ToList();
-        Report(progress, mode == HitsoundStudioExportMode.Midi ? 20 : 10);
+        Report(progress, mode == HitsoundStudioExportMode.Midi ? 0.2 : 0.1);
 
         // Balance the volume between greenlines and samples
         engine.BalanceVolumes(
@@ -194,12 +194,12 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             false,
             mode is HitsoundStudioExportMode.Coinciding or
                 HitsoundStudioExportMode.Storyboard);
-        Report(progress, 20);
+        Report(progress, 0.2);
         Report(progress, mode == HitsoundStudioExportMode.Standard
-            ? 30
+            ? 0.3
             : mode == HitsoundStudioExportMode.Midi
-                ? 20
-                : 50);
+                ? 0.2
+                : 0.5);
 
         HitsoundStudioStandardResult? standard = null;
         HitsoundStudioNamedResult? named = null;
@@ -241,19 +241,19 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         }
 
         Report(progress, mode == HitsoundStudioExportMode.Midi
-            ? 40
+            ? 0.4
             : mode == HitsoundStudioExportMode.Standard
-                ? 60
-                : 50);
+                ? 0.6
+                : 0.5);
         if (project.DeleteAllInExportFirst && writesFiles)
             // Delete all files in the export folder before filling it again
             files.DeleteFiles(project.ExportFolder);
 
         Report(progress, mode == HitsoundStudioExportMode.Midi
-            ? 40
+            ? 0.4
             : mode == HitsoundStudioExportMode.Standard
-                ? 70
-                : 60);
+                ? 0.7
+                : 0.6);
 
         // Count the number of samples
         int sampleCount = 0;
@@ -269,7 +269,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
             ApplyExport(session.Editor.Beatmap, events, project);
             mapPath = Path.Combine(project.ExportFolder, session.Editor.Beatmap.GetFileName());
             session.Editor.SaveFile(mapPath);
-            Report(progress, mode == HitsoundStudioExportMode.Standard ? 80 : 70);
+            Report(progress, mode == HitsoundStudioExportMode.Standard ? 0.8 : 0.7);
         }
         else if (mode == HitsoundStudioExportMode.Midi)
         {
@@ -294,11 +294,11 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
                 : await ExportNamedSamplesAsync(named!, project, comparer, cancellationToken)
                     .ConfigureAwait(false);
 
-        Report(progress, mode == HitsoundStudioExportMode.Midi ? 100 : 99);
+        Report(progress, mode == HitsoundStudioExportMode.Midi ? 1 : 0.99);
 
         if (writesFiles) await reveal.RevealAsync(project.ExportFolder, cancellationToken).ConfigureAwait(false);
 
-        Report(progress, 100);
+        Report(progress, 1);
         // Count the number of changes of custom index
         string detailedSummary = mode switch
         {

@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.PropertyTransformer;
 
 namespace Mapping_Tools.Application.Tools.PropertyTransformer;
@@ -41,11 +42,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
         {
             cancellationToken.ThrowIfCancellationRequested();
             string path = paths[index];
-            int progressIndex = index;
-            var documentProgress = progress is null
-                ? null
-                : new Progress<double>(value =>
-                    progress.Report((progressIndex * 100 + value) / paths.Count));
+            var documentProgress = progress?.MapTo(index, paths.Count);
 
             if (Path.GetExtension(path).Equals(
                     ".osb",
@@ -88,7 +85,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
             processedPaths.Add(path);
         }
 
-        progress?.Report(100);
+        progress?.Report(1);
         return new PropertyTransformerResult(processedPaths);
     }
 }

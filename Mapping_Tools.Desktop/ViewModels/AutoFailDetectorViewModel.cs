@@ -143,7 +143,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
                 Tool.DisplayName,
                 async context =>
                 {
-                    context.ReportProgress(33, "Loading beatmap");
+                    context.ReportProgress(0.33, "Loading beatmap");
                     var run = await autoFail.AnalyzeAsync(
                         new AutoFailOptions(
                             path,
@@ -151,8 +151,8 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
                             OverallDifficultyOverride,
                             PhysicsUpdateLeniency),
                         context.CancellationToken);
-                    context.ReportProgress(67, "Planning fixes");
-                    context.ReportProgress(100, "Analysis complete");
+                    context.ReportProgress(0.67, "Planning fixes");
+                    context.ReportProgress(1, "Analysis complete");
                     return new ToolExecutionOutput<AutoFailRun>(run, Summarize(run.Analysis));
                 }),
             CreateProgress(),

@@ -41,7 +41,7 @@ public sealed class TimingCopierServiceTests
             .Should().OnlyContain(preference => preference == LiveBeatmapPreference.PreferLive);
         gateway.SessionSaveRequests.Select(request => request.Session.Editor.Path)
             .Should().Equal("first.osu", "second.osu");
-        progress.Values.Last().Should().Be(100);
+        progress.Values.Last().Should().Be(1);
     }
 
     [TestMethod]

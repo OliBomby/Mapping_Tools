@@ -5,6 +5,7 @@ using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.HitsoundStuff;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
 using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 
@@ -111,7 +112,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
             generated += result.GeneratedSampleCount;
             muted += result.MutedEdgeCount;
             schema.MergeWith(result.SampleSchema);
-            progress?.Report((index + 1) * 100d / targetPaths.Length);
+            progress?.Report(index + 1, targetPaths.Length);
         }
 
         if (schema.Count > 0) await samples.ExportAsync(schema, cancellationToken).ConfigureAwait(false);

@@ -11,7 +11,7 @@ properties, completion handlers, and message windows:
 - `ToolExecutionRequest<T>` gives every invocation a stable concurrency and
   cancellation key, a user-facing name, and a typed asynchronous operation;
 - `ToolExecutionContext` supplies cooperative cancellation and validated
-  zero-to-one-hundred progress with optional stage text;
+  normalized zero-to-one progress with optional stage text;
 - `ToolExecutionOutput<T>` carries a typed value, optional success summary,
   and an explicit editor-reload request;
 - `ToolExecutionResult<T>` represents success, cancellation, failure, and

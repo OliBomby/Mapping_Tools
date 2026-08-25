@@ -86,7 +86,7 @@ public sealed class SlideratorService : ISlideratorService
         await editingGateway
             .SaveAsync(session, shouldReload, cancellationToken)
             .ConfigureAwait(false);
-        progress?.Report(100);
+        progress?.Report(1);
         return new SlideratorResult(path, applied, shouldReload);
     }
 }

@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.HitsoundStuff;
+using Mapping_Tools.Core.Progress;
 
 namespace Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
 
@@ -15,7 +16,7 @@ public static class HitsoundPreviewHelperEngine
     /// <param name="beatmap">The mutable beatmap receiving the preview hitsounds.</param>
     /// <param name="selectedObjects">The hit objects whose timeline events are eligible.</param>
     /// <param name="zones">The non-empty positional rules to apply.</param>
-    /// <param name="progress">Optional percentage progress for the selected events.</param>
+    /// <param name="progress">Optional normalized progress for the selected events.</param>
     /// <param name="cancellationToken">Cancels before or during timeline mutation.</param>
     /// <returns>The number of timeline events updated.</returns>
     /// <exception cref="ArgumentException">No zone is supplied.</exception>
@@ -58,12 +59,10 @@ public static class HitsoundPreviewHelperEngine
             timelineObject.SampleVolume = 0;
             timelineObject.SetHitsound(closest.Hitsound);
             timelineObject.HitsoundsToOrigin();
-            progress?.Report(timelineObjects.Count == 0
-                ? 100
-                : (index + 1) * 100d / timelineObjects.Count);
+            progress?.Report(index + 1, timelineObjects.Count);
         }
 
-        progress?.Report(100);
+        progress?.Report(1);
         return timelineObjects.Count;
     }
 }

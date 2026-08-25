@@ -14,7 +14,7 @@ public static class TimingHelperEngine
     /// </summary>
     /// <param name="beatmap">The mutable beatmap to modify.</param>
     /// <param name="options">The marker sources and timing rules.</param>
-    /// <param name="progress">Optional progress receiver for the legacy 20/40/100 stages and marker loop.</param>
+    /// <param name="progress">Optional normalized progress receiver for the 0.2/0.4/1 stages and marker loop.</param>
     /// <param name="cancellationToken">Cancels before and between timing mutations.</param>
     /// <returns>The number of redlines inserted into the beatmap.</returns>
     /// <exception cref="ArgumentNullException">A required argument is null.</exception>
@@ -52,7 +52,7 @@ public static class TimingHelperEngine
                 .Select(timingPoint => new Marker(timingPoint.Offset)));
 
         // Update progressbar
-        progress?.Report(20);
+        progress?.Report(0.2);
         cancellationToken.ThrowIfCancellationRequested();
 
         // Sort the markers
@@ -118,7 +118,7 @@ public static class TimingHelperEngine
         }
 
         // Update progressbar
-        progress?.Report(40);
+        progress?.Report(0.4);
         // Loop through all the markers
         for (int index = 0; index < markers.Count; index++)
         {
@@ -178,10 +178,10 @@ public static class TimingHelperEngine
                 redlinesAdded++;
             }
 
-            progress?.Report(index * 60d / markers.Count + 40);
+            progress?.Report(index * 0.6d / markers.Count + 0.4);
         }
 
-        progress?.Report(100);
+        progress?.Report(1);
         return redlinesAdded;
     }
 

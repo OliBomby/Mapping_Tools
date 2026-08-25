@@ -183,7 +183,7 @@ public sealed class SlideratorViewModelTests
             RunCalled = true;
             Project = project;
             ReloadEditor = reloadEditor;
-            progress?.Report(100);
+            progress?.Report(1);
             return Task.FromResult(
                 new SlideratorResult(
                     path,

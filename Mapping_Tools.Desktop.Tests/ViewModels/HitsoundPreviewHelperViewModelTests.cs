@@ -166,7 +166,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
         {
             Paths = paths.ToArray();
             Options = options;
-            progress?.Report(100);
+            progress?.Report(1);
             return Task.FromResult(new HitsoundPreviewHelperResult(
                 paths,
                 options.Items.Count));

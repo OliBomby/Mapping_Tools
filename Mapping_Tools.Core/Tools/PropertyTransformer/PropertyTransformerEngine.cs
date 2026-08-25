@@ -14,7 +14,7 @@ public static class PropertyTransformerEngine
     /// </summary>
     /// <param name="beatmap">The mutable beatmap to transform.</param>
     /// <param name="options">The multipliers, offsets, clipping, and filters to apply.</param>
-    /// <param name="progress">Optional progress reporting for the feature stages.</param>
+    /// <param name="progress">Optional normalized progress reporting for the feature stages.</param>
     /// <param name="cancellationToken">Cancels between transformation stages and items.</param>
     public static void Apply(
         Beatmap beatmap,
@@ -93,7 +93,7 @@ public static class PropertyTransformerEngine
                 true);
         }
 
-        Report(progress, 20);
+        Report(progress, 0.2);
 
         if (options.HitObjectTimeMultiplier != 1 || options.HitObjectTimeOffset != 0)
             // Hitobject time
@@ -123,7 +123,7 @@ public static class PropertyTransformerEngine
                         round: beatmap.Version < 128);
             }
 
-        Report(progress, 25);
+        Report(progress, 0.25);
 
         if (options.HitObjectVolumeMultiplier != 1 || options.HitObjectVolumeOffset != 0)
             // Hitobject volume
@@ -142,7 +142,7 @@ public static class PropertyTransformerEngine
                     true);
             }
 
-        Report(progress, 30);
+        Report(progress, 0.3);
 
         if (options.BookmarkTimeMultiplier != 1 || options.BookmarkTimeOffset != 0)
             // Bookmark time
@@ -154,7 +154,7 @@ public static class PropertyTransformerEngine
                     : bookmark)
                 .ToList());
 
-        Report(progress, 40);
+        Report(progress, 0.4);
 
         IEnumerable<Event> beatmapEvents = beatmap.StoryboardLayerBackground
             .Concat(beatmap.StoryboardLayerFail)
@@ -174,7 +174,7 @@ public static class PropertyTransformerEngine
                     options.SbEventTimeOffset);
             }
 
-        Report(progress, 50);
+        Report(progress, 0.5);
 
         if (options.SbSampleTimeMultiplier != 1 || options.SbSampleTimeOffset != 0)
             // Storyboarded sample time
@@ -191,7 +191,7 @@ public static class PropertyTransformerEngine
                     round: beatmap.Version < 128);
             }
 
-        Report(progress, 55);
+        Report(progress, 0.55);
 
         if (options.SbSampleVolumeMultiplier != 1 || options.SbSampleVolumeOffset != 0)
             // Storyboarded sample volume
@@ -210,7 +210,7 @@ public static class PropertyTransformerEngine
                     true);
             }
 
-        Report(progress, 60);
+        Report(progress, 0.6);
 
         if (options.BreakTimeMultiplier != 1 || options.BreakTimeOffset != 0)
             // Break time
@@ -235,7 +235,7 @@ public static class PropertyTransformerEngine
                     round: beatmap.Version < 128);
             }
 
-        Report(progress, 70);
+        Report(progress, 0.7);
 
         if (options.VideoTimeMultiplier != 1 || options.VideoTimeOffset != 0)
             // Video start time
@@ -254,7 +254,7 @@ public static class PropertyTransformerEngine
                     round: beatmap.Version < 128);
             }
 
-        Report(progress, 80);
+        Report(progress, 0.8);
 
         if (options.PreviewTimeMultiplier != 1 || options.PreviewTimeOffset != 0)
             if (beatmap.General.ContainsKey("PreviewTime") && beatmap.General["PreviewTime"].IntValue != -1)
@@ -271,9 +271,9 @@ public static class PropertyTransformerEngine
                     round: beatmap.Version < 128);
             }
 
-        Report(progress, 90);
+        Report(progress, 0.9);
         TimingPointChange.Apply(beatmap.BeatmapTiming, timingPointChanges);
-        Report(progress, 100);
+        Report(progress, 1);
     }
 
     /// <summary>
@@ -281,7 +281,7 @@ public static class PropertyTransformerEngine
     /// </summary>
     /// <param name="storyboard">The mutable storyboard to transform.</param>
     /// <param name="options">The multipliers, offsets, clipping, and filters to apply.</param>
-    /// <param name="progress">Optional progress reporting for the feature stages.</param>
+    /// <param name="progress">Optional normalized progress reporting for the feature stages.</param>
     /// <param name="cancellationToken">Cancels between transformation stages and items.</param>
     public static void Apply(
         StoryBoard storyboard,
@@ -310,7 +310,7 @@ public static class PropertyTransformerEngine
                     options.SbEventTimeOffset);
             }
 
-        Report(progress, 50);
+        Report(progress, 0.5);
 
         if (options.SbSampleTimeMultiplier != 1 || options.SbSampleTimeOffset != 0)
             // Storyboarded sample time
@@ -327,7 +327,7 @@ public static class PropertyTransformerEngine
                     round: true);
             }
 
-        Report(progress, 60);
+        Report(progress, 0.6);
 
         if (options.SbSampleVolumeMultiplier != 1 || options.SbSampleVolumeOffset != 0)
             // Storyboarded sample volume
@@ -346,7 +346,7 @@ public static class PropertyTransformerEngine
                     true);
             }
 
-        Report(progress, 70);
+        Report(progress, 0.7);
 
         if (options.VideoTimeMultiplier != 1 || options.VideoTimeOffset != 0)
             // Video start time
@@ -365,8 +365,8 @@ public static class PropertyTransformerEngine
                     round: true);
             }
 
-        Report(progress, 90);
-        Report(progress, 100);
+        Report(progress, 0.9);
+        Report(progress, 1);
     }
 
     private static bool PassesFilter(

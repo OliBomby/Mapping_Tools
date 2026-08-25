@@ -7,6 +7,7 @@ using Mapping_Tools.Application.Tools.PatternGallery.Contracts;
 using Mapping_Tools.Application.Tools.PatternGallery.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.PatternGallery;
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
 
@@ -191,7 +192,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
             // Increase pattern use count and time
             pattern.UseCount++;
             pattern.LastUsedTime = DateTime.Now;
-            progress?.Report((index + 1) * 100d / patterns.Count);
+            progress?.Report(index + 1, patterns.Count);
         }
 
         await editing.SaveAsync(target, quick, cancellationToken)

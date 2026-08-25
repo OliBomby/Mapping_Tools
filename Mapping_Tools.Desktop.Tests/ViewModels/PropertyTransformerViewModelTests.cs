@@ -138,7 +138,7 @@ public sealed class PropertyTransformerViewModelTests
         {
             Paths = paths;
             Options = options;
-            progress?.Report(100);
+            progress?.Report(1);
             return Task.FromResult(new PropertyTransformerResult(paths));
         }
     }

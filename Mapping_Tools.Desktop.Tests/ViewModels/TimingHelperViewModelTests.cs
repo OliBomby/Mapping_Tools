@@ -219,7 +219,7 @@ public sealed class TimingHelperViewModelTests
         {
             Paths = paths.ToArray();
             Options = options;
-            progress?.Report(100);
+            progress?.Report(1);
             return Task.FromResult(new TimingHelperResult(paths, 2));
         }
     }

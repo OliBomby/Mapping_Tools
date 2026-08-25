@@ -165,7 +165,7 @@ public sealed class SliderCompletionatorViewModelTests
         {
             Paths = paths.ToArray();
             Options = options;
-            progress?.Report(100);
+            progress?.Report(1);
             return Task.FromResult(new SliderCompletionatorResult(paths, 2));
         }
     }

@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 
@@ -78,7 +79,7 @@ public sealed class ComboColourStudioService : IComboColourStudioService
                 .ConfigureAwait(false);
 
             processed++;
-            progress?.Report(processed * 100d / paths.Count);
+            progress?.Report(processed, paths.Count);
         }
 
         return new ComboColourStudioRunResult(processed);

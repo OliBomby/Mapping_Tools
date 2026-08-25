@@ -3,6 +3,7 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
 
@@ -54,10 +55,7 @@ public sealed class MapCleanerService : IMapCleanerService
                 directory,
                 options.AnalyzeSamples,
                 cancellationToken).ConfigureAwait(false);
-            var mapProgress = progress is null
-                ? null
-                : new Progress<double>(value =>
-                    progress.Report((index * 100 + value) / paths.Count));
+            var mapProgress = progress?.MapTo(index, paths.Count);
             var result = MapCleanerEngine.Clean(
                 session.Editor.Beatmap,
                 options,

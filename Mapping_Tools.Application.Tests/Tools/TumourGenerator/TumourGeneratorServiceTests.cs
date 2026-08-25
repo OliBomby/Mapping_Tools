@@ -90,7 +90,7 @@ public sealed class TumourGeneratorServiceTests
         result.EditorReloaded.Should().BeTrue();
         gateway.SessionSaveRequests.Select(request => request.ReloadEditor)
             .Should().ContainSingle().Which.Should().BeTrue();
-        progress.Should().Contain(100);
+        progress.Should().Contain(1);
     }
 
     [TestMethod]

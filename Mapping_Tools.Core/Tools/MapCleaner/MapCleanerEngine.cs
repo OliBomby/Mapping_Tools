@@ -13,7 +13,7 @@ public static class MapCleanerEngine
     /// <param name="options">The cleanup and resnapping choices.</param>
     /// <param name="mapDirectory">The mapset directory used to resolve samples.</param>
     /// <param name="firstSamples">The canonical sample paths discovered for the mapset.</param>
-    /// <param name="progress">Optional cleanup completion reporting.</param>
+    /// <param name="progress">Optional normalized cleanup completion reporting.</param>
     /// <param name="cancellationToken">Cancels cleanup.</param>
     /// <returns>The cleanup counts and timing-point timeline markers.</returns>
     public static MapCleanerResult Clean(
@@ -65,7 +65,7 @@ public static class MapCleanerEngine
                 lastSv = point.MpB;
             }
         }
-        Report(progress, 9);
+        Report(progress, 0.09);
 
         if (options.ResnapObjects)
         {
@@ -93,7 +93,7 @@ public static class MapCleanerEngine
             {
                 point.ResnapSelf(timing, options.BeatDivisors);
             }
-            Report(progress, 36);
+            Report(progress, 0.36);
         }
 
         if (options.ResnapBookmarks)
@@ -104,7 +104,7 @@ public static class MapCleanerEngine
                 .Distinct()
                 .ToList());
         }
-        Report(progress, 45);
+        Report(progress, 0.45);
 
         // Make new timingpoints
         List<TimingPointChange> changes = [];
@@ -185,7 +185,7 @@ public static class MapCleanerEngine
                 changes.Add(new TimingPointChange(point, sampleSet: true));
             }
         }
-        Report(progress, 75);
+        Report(progress, 0.75);
 
         if (!options.RemoveHitsounds)
         {
@@ -250,7 +250,7 @@ public static class MapCleanerEngine
                 changes.Add(new TimingPointChange(point, volume: volume, index: index));
             }
         }
-        Report(progress, 85);
+        Report(progress, 0.85);
 
         // Replace the old timingpoints
         timing.Clear();
@@ -259,7 +259,7 @@ public static class MapCleanerEngine
 
         // Fix this extremely specific thing
         Fix2BDoubleTaps(beatmap);
-        Report(progress, 100);
+        Report(progress, 1);
         return Compare(original, timing.TimingPoints, objectsResnapped);
     }
 

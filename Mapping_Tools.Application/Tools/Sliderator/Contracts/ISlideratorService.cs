@@ -24,7 +24,7 @@ public interface ISlideratorService
     /// <param name="project">The complete run settings.</param>
     /// <param name="sourceSlider">The selected source slider geometry.</param>
     /// <param name="reloadEditor">Whether a live editor should be refreshed after saving.</param>
-    /// <param name="progress">Optional percentage progress receiver.</param>
+    /// <param name="progress">Optional normalized progress receiver.</param>
     /// <param name="cancellationToken">Cancels generation or persistence.</param>
     /// <param name="preferLiveEditor">Whether the application should prefer unsaved editor state for this run.</param>
     /// <returns>The written path and Core output result.</returns>
@@ -37,4 +37,3 @@ public interface ISlideratorService
         CancellationToken cancellationToken = default,
         bool preferLiveEditor = true);
 }
-

@@ -31,7 +31,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
         options.Validate();
         cancellationToken.ThrowIfCancellationRequested();
         var image = await images.LoadAsync(options.PictureFile, cancellationToken).ConfigureAwait(false);
-        progress?.Report(10);
+        progress?.Report(0.1);
         // Get the latest version of the beatmap
         var session = await editingGateway.OpenBeatmapAsync(path, LiveBeatmapPreference.PreferLive, cancellationToken).ConfigureAwait(false);
         var beatmap = session.Editor.Beatmap;
@@ -52,7 +52,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
             backgroundColour, options.SelectedSlider, !options.BlackOn, !options.BorderOn,
             !options.AlphaOn, options.RedOn, options.GreenOn, options.BlueOn, options.Quality).SegmentCount;
         await editingGateway.SaveAsync(session, cancellationToken: cancellationToken).ConfigureAwait(false);
-        progress?.Report(100);
+        progress?.Report(1);
         return new SliderPicturatorResult(path, options.SegmentCount);
     }
 

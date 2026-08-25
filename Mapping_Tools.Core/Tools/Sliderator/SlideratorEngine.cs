@@ -19,7 +19,7 @@ public static class SlideratorEngine
     /// <param name="beatmap">The mutable target beatmap.</param>
     /// <param name="sourceSlider">The imported slider whose path is previewed and transformed.</param>
     /// <param name="options">The complete graph and export settings.</param>
-    /// <param name="progress">Optional percentage progress receiver.</param>
+    /// <param name="progress">Optional normalized progress receiver.</param>
     /// <param name="cancellationToken">Cancels before expensive generation steps and writes.</param>
     /// <returns>Output dimensions and whether source geometry was reused.</returns>
     /// <exception cref="ArgumentException">A setting or generated value is invalid.</exception>
@@ -76,7 +76,7 @@ public static class SlideratorEngine
         double deltaT = 60000 / options.BeatsPerMinute / options.BeatSnapDivisor;
         bool delegateToBpm = options.DelegateToBpm || options.ExportAsInvisibleSlider;
         bool removeSliderTicks = options.RemoveSliderTicks || options.ExportAsInvisibleSlider;
-        progress?.Report(10);
+        progress?.Report(0.1);
         cancellationToken.ThrowIfCancellationRequested();
 
         List<Vector2> generated = [];
@@ -96,7 +96,7 @@ public static class SlideratorEngine
                 GetMaxCompletion(options) * options.PixelLength);
             List<Vector2> path = [];
             sourcePath.GetPathToProgress(path, 0, 1);
-            progress?.Report(20);
+            progress?.Report(0.2);
             cancellationToken.ThrowIfCancellationRequested();
             sliderator.SetPath(path);
 
@@ -136,7 +136,7 @@ public static class SlideratorEngine
                     "Encountered NaN coordinates. Please check your input.");
         }
 
-        progress?.Report(60);
+        progress?.Report(0.6);
         cancellationToken.ThrowIfCancellationRequested();
         var timing = beatmap.BeatmapTiming;
         // Get hit object that might be present at the export time or make a new one
@@ -151,7 +151,7 @@ public static class SlideratorEngine
             IsSlider = !options.ExportAsStream,
         };
 
-        progress?.Report(70);
+        progress?.Report(0.7);
         cancellationToken.ThrowIfCancellationRequested();
         int objectCount;
         if (!options.ExportAsStream)
@@ -257,9 +257,9 @@ public static class SlideratorEngine
             }
         }
 
-        progress?.Report(80);
+        progress?.Report(0.8);
         beatmap.SortHitObjects();
-        progress?.Report(100);
+        progress?.Report(1);
         return new SlideratorApplyResult(newLength, newVelocity, simplifyShape, objectCount);
     }
 

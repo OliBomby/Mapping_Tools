@@ -295,7 +295,7 @@ public sealed class TumourGeneratorViewModelTests
             RunPaths = paths;
             Project = project;
             ReloadEditor = reloadEditor;
-            progress?.Report(100);
+            progress?.Report(1);
             return Task.FromResult(new TumourRunResult(paths, 1, reloadEditor));
         }
     }

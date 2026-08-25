@@ -115,7 +115,7 @@ public sealed class MetadataManagerViewModelTests
             CancellationToken cancellationToken = default)
         {
             Options = options;
-            progress?.Report(100);
+            progress?.Report(1);
             string[] paths = options.ExportPath.Split('|', StringSplitOptions.RemoveEmptyEntries);
             return Task.FromResult(new MetadataManagerResult(paths));
         }

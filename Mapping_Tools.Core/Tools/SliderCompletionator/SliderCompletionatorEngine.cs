@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 
@@ -20,7 +21,7 @@ public static class SliderCompletionatorEngine
     /// <param name="currentEditorTime">
     ///     The editor timestamp in milliseconds when current-editor-time mode is active.
     /// </param>
-    /// <param name="progress">Optional progress receiver, reported as a percentage.</param>
+    /// <param name="progress">Optional normalized progress receiver.</param>
     /// <param name="cancellationToken">Cancels between objects and before timing reconstruction.</param>
     /// <returns>The number of sliders changed.</returns>
     /// <exception cref="ArgumentException">The selected settings produce an invalid slider duration.</exception>
@@ -130,7 +131,7 @@ public static class SliderCompletionatorEngine
                 slidersCompleted++;
             }
 
-            progress?.Report(markedObjects.Count == 0 ? 100 : (double)i / markedObjects.Count * 100);
+            progress?.Report(i, markedObjects.Count);
         }
 
         cancellationToken.ThrowIfCancellationRequested();
@@ -184,7 +185,7 @@ public static class SliderCompletionatorEngine
 
         // Add the new SliderVelocity changes
         TimingPointChange.Apply(timing, changes);
-        progress?.Report(100);
+        progress?.Report(1);
         return slidersCompleted;
     }
 
