@@ -2,12 +2,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
-using Avalonia.VisualTree;
-using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.ViewModels.GetStarted;
 using GetStartedViewModel = Mapping_Tools.Desktop.ViewModels.GetStarted.GetStartedViewModel;
+using VisualExtensions = Avalonia.VisualTree.VisualExtensions;
 
-namespace Mapping_Tools.Desktop.Views;
+namespace Mapping_Tools.Desktop.Views.GetStarted;
 
 /// <summary>
 ///     Renders the offline Get started landing page inside the main shell.
@@ -44,7 +43,7 @@ public partial class GetStartedView : UserControl
         RecentPathColumn.Width = new GridLength(width);
         RecentMapsTable.InvalidateMeasure();
 
-        foreach (var descendant in RecentMapsTable.GetVisualDescendants().OfType<Control>()) descendant.InvalidateMeasure();
+        foreach (var descendant in VisualExtensions.GetVisualDescendants(RecentMapsTable).OfType<Control>()) descendant.InvalidateMeasure();
     }
 
     private void SelectRecentMaps(object? sender, TappedEventArgs eventArgs)

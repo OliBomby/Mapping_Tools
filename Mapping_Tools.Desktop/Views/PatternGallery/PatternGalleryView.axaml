@@ -6,7 +6,7 @@
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
              xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.ViewModels.PatternGallery"
-             x:Class="Mapping_Tools.Desktop.Views.PatternGalleryView"
+             x:Class="Mapping_Tools.Desktop.Views.PatternGallery.PatternGalleryView"
              x:Name="Root"
              x:DataType="patternGallery:PatternGalleryViewModel">
     <Grid RowDefinitions="*,Auto">

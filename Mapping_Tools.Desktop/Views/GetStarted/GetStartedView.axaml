@@ -8,7 +8,7 @@
              mc:Ignorable="d"
              d:DesignWidth="1040"
              d:DesignHeight="725"
-             x:Class="Mapping_Tools.Desktop.Views.GetStartedView"
+             x:Class="Mapping_Tools.Desktop.Views.GetStarted.GetStartedView"
              x:DataType="getStarted:GetStartedViewModel"
              Foreground="{DynamicResource MaterialBodyBrush}"
              FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto">

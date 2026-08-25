@@ -5,7 +5,7 @@
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.ViewModels.GeometryDashboard"
-             x:Class="Mapping_Tools.Desktop.Views.GeometryDashboardView"
+             x:Class="Mapping_Tools.Desktop.Views.GeometryDashboard.GeometryDashboardView"
              x:DataType="geometryDashboard:GeometryDashboardViewModel"
              x:CompileBindings="True">
     <Grid RowDefinitions="Auto,*,Auto">
