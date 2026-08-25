@@ -21,7 +21,7 @@ public static class TimingCopierEngine
     public static void Apply(
         Beatmap target,
         Beatmap source,
-        TimingCopierOptions options,
+        TimingCopierEngineOptions options,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(target);

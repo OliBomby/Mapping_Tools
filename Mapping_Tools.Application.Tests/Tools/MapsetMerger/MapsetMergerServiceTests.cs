@@ -26,13 +26,13 @@ public sealed class MapsetMergerServiceTests : IDisposable
         string first = fixture.CreateMapset("first");
         string second = fixture.CreateMapset("second");
         string exportPath = Path.Combine(fixture.Root, "export");
-        MapsetMergerProject project = new()
+        MapsetMergerServiceOptions project = new()
         {
             ExportPath = exportPath,
             Mapsets =
             [
-                new MapsetMergerProject.MapsetItem { Name = "Pack", Path = first },
-                new MapsetMergerProject.MapsetItem { Name = "Pack", Path = second },
+                new MapsetMergerServiceOptions.MapsetItem { Name = "Pack", Path = first },
+                new MapsetMergerServiceOptions.MapsetItem { Name = "Pack", Path = second },
             ],
         };
         MapsetMergerService service = new(
@@ -65,10 +65,10 @@ public sealed class MapsetMergerServiceTests : IDisposable
         Directory.CreateDirectory(exportPath);
         string existing = Path.Combine(exportPath, "keep.txt");
         File.WriteAllText(existing, "keep");
-        MapsetMergerProject project = new()
+        MapsetMergerServiceOptions project = new()
         {
             ExportPath = exportPath,
-            Mapsets = [new MapsetMergerProject.MapsetItem { Name = "Cancelled", Path = source }],
+            Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Cancelled", Path = source }],
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),
@@ -94,10 +94,10 @@ public sealed class MapsetMergerServiceTests : IDisposable
         // Arrange
         string source = fixture.CreateMapset("nested");
         string exportPath = Path.Combine(fixture.Root, "export");
-        MapsetMergerProject project = new()
+        MapsetMergerServiceOptions project = new()
         {
             ExportPath = exportPath,
-            Mapsets = [new MapsetMergerProject.MapsetItem { Name = "Nested", Path = source }],
+            Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Nested", Path = source }],
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),
@@ -129,10 +129,10 @@ public sealed class MapsetMergerServiceTests : IDisposable
         // Arrange
         string source = fixture.CreateMapset("overlap");
         string exportPath = Path.Combine(source, "export");
-        MapsetMergerProject project = new()
+        MapsetMergerServiceOptions project = new()
         {
             ExportPath = exportPath,
-            Mapsets = [new MapsetMergerProject.MapsetItem { Name = "Overlap", Path = source }],
+            Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Overlap", Path = source }],
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),
@@ -154,11 +154,11 @@ public sealed class MapsetMergerServiceTests : IDisposable
         // Arrange
         string source = fixture.CreateMapset("embedded");
         string exportPath = Path.Combine(fixture.Root, "export");
-        MapsetMergerProject project = new()
+        MapsetMergerServiceOptions project = new()
         {
             ExportPath = exportPath,
             MoveSbToBeatmap = true,
-            Mapsets = [new MapsetMergerProject.MapsetItem { Name = "Embedded", Path = source }],
+            Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Embedded", Path = source }],
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),

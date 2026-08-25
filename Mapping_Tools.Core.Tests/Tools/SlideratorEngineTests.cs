@@ -19,7 +19,7 @@ public sealed class SlideratorEngineTests
         var options = CreateOptions();
         options.ExportTime = 1000;
         options.NewVelocity = 1 / 4.2;
-        options.GraphState = SlideratorOptions.CreatePositionGraph(options.GraphBeats);
+        options.GraphState = SlideratorEngineOptions.CreatePositionGraph(options.GraphBeats);
 
         // Act
         var result = SlideratorEngine.Apply(beatmap, source, options);
@@ -92,7 +92,7 @@ public sealed class SlideratorEngineTests
         options.BeatsPerMinute = 600;
         options.ExportAsNormal = false;
         options.ExportAsInvisibleSlider = true;
-        options.GraphState = SlideratorOptions.CreatePositionGraph(options.GraphBeats);
+        options.GraphState = SlideratorEngineOptions.CreatePositionGraph(options.GraphBeats);
 
         // Act
         var result = SlideratorEngine.Apply(beatmap, source, options);
@@ -120,9 +120,9 @@ public sealed class SlideratorEngineTests
         beatmap.HitObjects.Should().ContainSingle();
     }
 
-    private static SlideratorOptions CreateOptions()
+    private static SlideratorEngineOptions CreateOptions()
     {
-        return new SlideratorOptions
+        return new SlideratorEngineOptions
         {
             GlobalSv = 1.4,
             GraphBeats = 3,

@@ -57,7 +57,7 @@ public sealed class ComboColourStudioViewModelTests
     {
         public Task ImportComboColoursAsync(
             string path,
-            ComboColourProject project,
+            ComboColourServiceOptions project,
             CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
@@ -65,7 +65,7 @@ public sealed class ComboColourStudioViewModelTests
 
         public Task ImportColourHaxAsync(
             string path,
-            ComboColourProject project,
+            ComboColourServiceOptions project,
             CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
@@ -73,7 +73,7 @@ public sealed class ComboColourStudioViewModelTests
 
         public Task<ComboColourStudioRunResult> ApplyAsync(
             IReadOnlyList<string> paths,
-            ComboColourProject project,
+            ComboColourServiceOptions project,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

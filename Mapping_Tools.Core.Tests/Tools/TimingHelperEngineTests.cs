@@ -14,7 +14,7 @@ public sealed class TimingHelperEngineTests
     {
         // Arrange
         var beatmap = CreateBeatmap(500, 500, 1300);
-        TimingHelperOptions options = new()
+        TimingHelperEngineOptions options = new()
         {
             Bookmarks = false,
             Greenlines = false,
@@ -38,7 +38,7 @@ public sealed class TimingHelperEngineTests
         // Arrange
         var beatmap = CreateBeatmap(500, 500);
         beatmap.BeatmapTiming.Add(CreateTimingPoint(1000, 500));
-        TimingHelperOptions options = new()
+        TimingHelperEngineOptions options = new()
         {
             Objects = false,
             Bookmarks = false,
@@ -60,7 +60,7 @@ public sealed class TimingHelperEngineTests
     {
         // Arrange
         var beatmap = CreateBeatmap(500, 500);
-        TimingHelperOptions options = new()
+        TimingHelperEngineOptions options = new()
         {
             Leniency = -1,
             BeatDivisors = [new RationalBeatDivisor(1, 4)],

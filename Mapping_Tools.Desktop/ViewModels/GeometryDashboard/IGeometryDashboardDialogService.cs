@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Desktop.Models;
 
 namespace Mapping_Tools.Desktop.ViewModels.GeometryDashboard;
 

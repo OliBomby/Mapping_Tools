@@ -14,7 +14,7 @@ public sealed class ComboColourStudioEngineTests
     public void AddColourPoint_AfterPaletteEdit_UpdatesSequenceReference()
     {
         // Arrange
-        ComboColourProject project = new();
+        ComboColourEngineOptions project = new();
         project.AddComboColour();
         project.AddComboColour();
         var point = project.AddColourPoint(
@@ -33,7 +33,7 @@ public sealed class ComboColourStudioEngineTests
     public void Apply_WithSequencePoint_SetsPaletteAndLegacyComboSkipBits()
     {
         // Arrange
-        ComboColourProject project = new();
+        ComboColourEngineOptions project = new();
         project.AddComboColour();
         project.AddComboColour();
         project.ComboColours[0].Color = RgbaColour.FromRgb(10, 20, 30);
@@ -58,7 +58,7 @@ public sealed class ComboColourStudioEngineTests
     public void Apply_WithReorderedPalette_UsesCollectionOrderForComboIndices()
     {
         // Arrange
-        ComboColourProject project = new();
+        ComboColourEngineOptions project = new();
         project.AddComboColour();
         project.AddComboColour();
         var firstColour = project.ComboColours[0];
@@ -82,7 +82,7 @@ public sealed class ComboColourStudioEngineTests
     public void Apply_WithTransparentPaletteColour_PreservesAlphaWhenSerialized()
     {
         // Arrange
-        ComboColourProject project = new();
+        ComboColourEngineOptions project = new();
         project.AddComboColour();
         project.ComboColours[0].Color = RgbaColour.FromArgb(128, 10, 20, 30);
 
@@ -99,7 +99,7 @@ public sealed class ComboColourStudioEngineTests
     public void ValidateForExport_WithMissingPaletteReference_ReportsValidationError()
     {
         // Arrange
-        ComboColourProject project = new();
+        ComboColourEngineOptions project = new();
         project.AddComboColour();
         project.AddColourPoint(5, [new SpecialColour(RgbaColour.White, "Combo2")]);
 
@@ -115,7 +115,7 @@ public sealed class ComboColourStudioEngineTests
     public void ValidateForExport_WithDuplicatePaletteNames_ReportsValidationError()
     {
         // Arrange
-        ComboColourProject project = new();
+        ComboColourEngineOptions project = new();
         project.AddComboColour();
         project.AddComboColour();
         project.ComboColours[1].Name = project.ComboColours[0].Name;

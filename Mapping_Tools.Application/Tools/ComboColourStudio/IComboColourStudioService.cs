@@ -11,7 +11,7 @@ public interface IComboColourStudioService
     /// <param name="cancellationToken">Cancels the read.</param>
     Task ImportComboColoursAsync(
         string path,
-        ComboColourProject project,
+        ComboColourServiceOptions project,
         CancellationToken cancellationToken = default);
 
     /// <summary>Infers palette, normal points, and burst points from a source beatmap.</summary>
@@ -20,7 +20,7 @@ public interface IComboColourStudioService
     /// <param name="cancellationToken">Cancels the read.</param>
     Task ImportColourHaxAsync(
         string path,
-        ComboColourProject project,
+        ComboColourServiceOptions project,
         CancellationToken cancellationToken = default);
 
     /// <summary>Applies a project to each target map with progress reporting.</summary>
@@ -31,7 +31,7 @@ public interface IComboColourStudioService
     /// <returns>The number of successfully saved maps.</returns>
     Task<ComboColourStudioRunResult> ApplyAsync(
         IReadOnlyList<string> paths,
-        ComboColourProject project,
+        ComboColourServiceOptions project,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

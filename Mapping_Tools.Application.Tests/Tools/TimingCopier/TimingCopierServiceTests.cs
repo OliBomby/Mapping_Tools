@@ -21,7 +21,7 @@ public sealed class TimingCopierServiceTests
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         TimingCopierService service = new(gateway);
-        TimingCopierProject options = new()
+        TimingCopierServiceOptions options = new()
         {
             ImportPath = "source.osu",
             ExportPath = "first.osu|second.osu",
@@ -59,7 +59,7 @@ public sealed class TimingCopierServiceTests
                 throw new IOException("The test target could not be written.");
         };
         TimingCopierService service = new(gateway);
-        TimingCopierProject options = new()
+        TimingCopierServiceOptions options = new()
         {
             ImportPath = "source.osu",
             ExportPath = "first.osu|second.osu",
@@ -86,7 +86,7 @@ public sealed class TimingCopierServiceTests
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         TimingCopierService service = new(gateway);
-        TimingCopierProject options = new()
+        TimingCopierServiceOptions options = new()
         {
             ImportPath = "source.osu",
             ExportPath = "target.osu",
@@ -112,7 +112,7 @@ public sealed class TimingCopierServiceTests
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         TimingCopierService service = new(gateway);
-        TimingCopierProject options = new()
+        TimingCopierServiceOptions options = new()
         {
             ImportPath = "source.osu",
             ExportPath = "target.osu",

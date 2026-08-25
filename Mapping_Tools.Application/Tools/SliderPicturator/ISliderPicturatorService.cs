@@ -13,7 +13,7 @@ public interface ISliderPicturatorService
     /// <returns>The written path and generated segment estimate.</returns>
     Task<SliderPicturatorResult> PicturateAsync(
         string path,
-        SliderPicturatorProject options,
+        SliderPicturatorServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 

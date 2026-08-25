@@ -38,7 +38,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
 
     /// <inheritdoc />
     public async Task<RhythmGuideResult> GenerateAsync(
-        RhythmGuideProject.RhythmGuideProjectOptions options,
+        RhythmGuideServiceOptions.RhythmGuideRunOptions options,
         CancellationToken cancellationToken = default)
     {
         Validate(options);
@@ -105,7 +105,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
             options.ExportMode);
     }
 
-    private static void Validate(RhythmGuideProject.RhythmGuideProjectOptions options)
+    private static void Validate(RhythmGuideServiceOptions.RhythmGuideRunOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
         if (options.Paths is null || options.Paths.Length == 0) throw new ArgumentException("Select at least one source beatmap.", nameof(options));

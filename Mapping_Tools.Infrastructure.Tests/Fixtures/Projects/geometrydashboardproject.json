@@ -1,5 +1,5 @@
 {
-  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsProject, Mapping Tools",
+  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsEngineOptions, Mapping Tools",
   "CurrentPreferences": {
     "$type": "Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsPreferences, Mapping Tools",
     "RelevantObjectPreferences": {

@@ -149,7 +149,7 @@ public sealed class TumourGeneratorViewModelTests
         IShellProjectFeature feature = viewModel;
 
         // Act
-        var snapshot = (TumourGeneratorProject)feature.Snapshot();
+        var snapshot = (TumourGeneratorServiceOptions)feature.Snapshot();
         viewModel.CurrentLayer.Name = "Changed";
         feature.Install(snapshot);
 
@@ -252,7 +252,7 @@ public sealed class TumourGeneratorViewModelTests
 
         public IReadOnlyList<string>? RunPaths { get; private set; }
 
-        public TumourGeneratorProject? Project { get; private set; }
+        public TumourGeneratorServiceOptions? Project { get; private set; }
 
         public Task<TumourImportResult> ImportAsync(
             string path,
@@ -270,7 +270,7 @@ public sealed class TumourGeneratorViewModelTests
 
         public Task<TumourPreviewResult> PreviewAsync(
             HitObject previewHitObject,
-            TumourGeneratorOptions options,
+            TumourGeneratorEngineOptions options,
             CancellationToken cancellationToken = default)
         {
             PreviewCalled++;
@@ -281,7 +281,7 @@ public sealed class TumourGeneratorViewModelTests
 
         public Task<TumourRunResult> RunAsync(
             IReadOnlyList<string> paths,
-            TumourGeneratorProject project,
+            TumourGeneratorServiceOptions project,
             bool reloadEditor,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)

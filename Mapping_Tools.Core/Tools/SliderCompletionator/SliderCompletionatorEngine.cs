@@ -28,7 +28,7 @@ public static class SliderCompletionatorEngine
     public static int Apply(
         Beatmap beatmap,
         IReadOnlyList<HitObject> markedObjects,
-        SliderCompletionatorOptions options,
+        SliderCompletionatorEngineOptions options,
         double? currentEditorTime = null,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
@@ -189,7 +189,7 @@ public static class SliderCompletionatorEngine
         return slidersCompleted;
     }
 
-    private static void ValidateFiniteInputs(SliderCompletionatorOptions options)
+    private static void ValidateFiniteInputs(SliderCompletionatorEngineOptions options)
     {
         if (!double.IsFinite(options.Duration) || !double.IsFinite(options.EndTime) || !double.IsFinite(options.Length) || !double.IsFinite(options.SliderVelocity))
             throw new ArgumentException(

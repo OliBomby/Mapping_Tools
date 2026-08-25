@@ -13,7 +13,7 @@ public interface ISliderCompletionatorService
     /// <returns>A result containing processed paths and the total slider count.</returns>
     Task<SliderCompletionatorResult> CompleteAsync(
         IReadOnlyList<string> paths,
-        SliderCompletionatorProject options,
+        SliderCompletionatorServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

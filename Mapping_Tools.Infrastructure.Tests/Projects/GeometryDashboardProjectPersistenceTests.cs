@@ -19,7 +19,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<SnappingToolsProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<SnappingToolsEngineOptions>(File.ReadAllText(fixture));
         string json = serializer.Serialize(project);
 
         // Assert
@@ -33,7 +33,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
         project.CurrentPreferences.RelevantObjectPreferences["Virtual point preferences"].Color
             .Should().Be(RgbaColour.FromArgb(255, 0, 255, 255));
         project.SaveSlots.Should().ContainSingle(slot => slot.Name == "Save 1");
-        json.Should().Contain("Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsProject, Mapping Tools");
+        json.Should().Contain("Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsEngineOptions, Mapping Tools");
         json.Should().Contain("Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AnchorPointGenerator, Mapping Tools");
         json.Should().Contain("Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SymmetryGeneratorSettings, Mapping Tools");
         json.Should().Contain("\"Color\": \"#FF00FFFF\"");
@@ -43,7 +43,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
     public void SnappingToolsProject_SaveAndLoadSlot_UsesIndependentPreferencesSnapshot()
     {
         // Arrange
-        SnappingToolsProject project = new();
+        SnappingToolsEngineOptions project = new();
         SnappingToolsSaveSlot slot = new() { Name = "Test" };
         project.SaveSlots.Add(slot);
         project.CurrentPreferences.AcceptableDifference = 70.1;
@@ -71,7 +71,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<SnappingToolsProject>(versionedJson);
+        var project = serializer.Deserialize<SnappingToolsEngineOptions>(versionedJson);
 
         // Assert
         project.CurrentPreferences.RelevantObjectPreferences.Should().ContainKey(RelevantPoint.PreferencesNameStatic);
@@ -89,7 +89,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<SnappingToolsProject>(intermediateJson);
+        var project = serializer.Deserialize<SnappingToolsEngineOptions>(intermediateJson);
 
         // Assert
         project.CurrentPreferences.GeneratorSettings.Should().ContainKey(typeof(SymmetryGenerator));
@@ -108,7 +108,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<SnappingToolsProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<SnappingToolsEngineOptions>(File.ReadAllText(fixture));
 
         // Assert
         project.CurrentPreferences.InceptionLevel.Should().Be(5);

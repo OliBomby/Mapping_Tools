@@ -235,7 +235,7 @@ public sealed class MapCleanerViewModelTests
     {
         public IReadOnlyList<string>? Paths { get; private set; }
 
-        public Task<MapCleanerResult> CleanAsync(IReadOnlyList<string> paths, MapCleanerProject.MapCleanerProjectOptions options, IProgress<double>? progress = null,
+        public Task<MapCleanerResult> CleanAsync(IReadOnlyList<string> paths, MapCleanerServiceOptions.MapCleanerCleanupOptions options, IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {
             Paths = paths;

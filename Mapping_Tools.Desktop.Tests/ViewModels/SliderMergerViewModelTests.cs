@@ -135,11 +135,11 @@ public sealed class SliderMergerViewModelTests
     {
         public IReadOnlyList<string>? Paths { get; private set; }
 
-        public SliderMergerProject? Options { get; private set; }
+        public SliderMergerServiceOptions? Options { get; private set; }
 
         public Task<SliderMergerResult> MergeAsync(
             IReadOnlyList<string> paths,
-            SliderMergerProject options,
+            SliderMergerServiceOptions options,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

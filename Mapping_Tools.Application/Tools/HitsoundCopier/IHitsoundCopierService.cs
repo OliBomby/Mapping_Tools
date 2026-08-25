@@ -9,7 +9,7 @@ public interface IHitsoundCopierService
     /// <param name="cancellationToken">Cancels loading, transformation, backup, or saving.</param>
     /// <returns>The target paths and change summary.</returns>
     Task<HitsoundCopierResult> CopyAsync(
-        HitsoundCopierProject options,
+        HitsoundCopierServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

@@ -30,7 +30,7 @@ public sealed class MetadataManagerService : IMetadataManagerService
     }
 
     /// <inheritdoc />
-    public async Task<MetadataManagerOptions> ImportAsync(
+    public async Task<MetadataManagerEngineOptions> ImportAsync(
         string path,
         CancellationToken cancellationToken = default)
     {
@@ -43,7 +43,7 @@ public sealed class MetadataManagerService : IMetadataManagerService
 
     /// <inheritdoc />
     public async Task<MetadataManagerResult> ExportAsync(
-        MetadataManagerProject options,
+        MetadataManagerServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

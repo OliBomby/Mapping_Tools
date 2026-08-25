@@ -21,7 +21,7 @@ public sealed class TimingHelperServiceTests
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         TimingHelperService service = new(gateway);
-        TimingHelperOptions options = new()
+        TimingHelperServiceOptions options = new()
         {
             Objects = false,
             Bookmarks = false,

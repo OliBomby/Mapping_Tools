@@ -16,7 +16,7 @@ public interface IMapsetMergerService
     /// <param name="cancellationToken">Cancels parsing, staging, or commit.</param>
     /// <returns>Counts for the committed output.</returns>
     Task<MapsetMergerResult> MergeAsync(
-        MapsetMergerProject project,
+        MapsetMergerServiceOptions project,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

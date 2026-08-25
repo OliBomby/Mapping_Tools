@@ -33,7 +33,7 @@ public sealed class MapCleanerServiceTests
                 ParentDirectoryResolver = _ => @"C:\set",
             },
             samples);
-        MapCleanerProject.MapCleanerProjectOptions options = new()
+        MapCleanerServiceOptions.MapCleanerCleanupOptions options = new()
         {
             SampleSetSliders = false,
             ResnapBookmarks = true,

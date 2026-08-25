@@ -24,7 +24,7 @@ public sealed class ComboColourStudioService : IComboColourStudioService
     /// <inheritdoc />
     public async Task ImportComboColoursAsync(
         string path,
-        ComboColourProject project,
+        ComboColourServiceOptions project,
         CancellationToken cancellationToken = default)
     {
         var session = await editing.OpenBeatmapAsync(
@@ -38,7 +38,7 @@ public sealed class ComboColourStudioService : IComboColourStudioService
     /// <inheritdoc />
     public async Task ImportColourHaxAsync(
         string path,
-        ComboColourProject project,
+        ComboColourServiceOptions project,
         CancellationToken cancellationToken = default)
     {
         var session = await editing.OpenBeatmapAsync(
@@ -52,7 +52,7 @@ public sealed class ComboColourStudioService : IComboColourStudioService
     /// <inheritdoc />
     public async Task<ComboColourStudioRunResult> ApplyAsync(
         IReadOnlyList<string> paths,
-        ComboColourProject project,
+        ComboColourServiceOptions project,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

@@ -30,7 +30,7 @@ public interface ISlideratorService
     /// <returns>The written path and Core output result.</returns>
     Task<SlideratorResult> RunAsync(
         string path,
-        SlideratorProject project,
+        SlideratorServiceOptions project,
         HitObject sourceSlider,
         bool reloadEditor,
         IProgress<double>? progress = null,

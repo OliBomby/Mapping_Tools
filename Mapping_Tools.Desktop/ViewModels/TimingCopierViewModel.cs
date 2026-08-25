@@ -13,6 +13,7 @@ using Mapping_Tools.Application.Tools.TimingCopier;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.TimingCopier.Models;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;

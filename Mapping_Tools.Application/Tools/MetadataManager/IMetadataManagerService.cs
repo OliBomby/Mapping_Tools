@@ -13,7 +13,7 @@ public interface IMetadataManagerService
     /// <param name="path">The source beatmap path.</param>
     /// <param name="cancellationToken">Cancels before or during the read.</param>
     /// <returns>Editable metadata and colour values.</returns>
-    Task<MetadataManagerOptions> ImportAsync(
+    Task<MetadataManagerEngineOptions> ImportAsync(
         string path,
         CancellationToken cancellationToken = default);
 
@@ -26,7 +26,7 @@ public interface IMetadataManagerService
     /// <param name="cancellationToken">Cancels before the next target or destructive write.</param>
     /// <returns>The paths written by the operation.</returns>
     Task<MetadataManagerResult> ExportAsync(
-        MetadataManagerProject options,
+        MetadataManagerServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

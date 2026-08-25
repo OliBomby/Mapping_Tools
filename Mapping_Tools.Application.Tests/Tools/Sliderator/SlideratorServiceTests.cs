@@ -67,7 +67,7 @@ public sealed class SlideratorServiceTests
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
         SlideratorService service = new(gateway);
         var source = gateway.Session!.SelectedHitObjects[0];
-        SlideratorProject project = new()
+        SlideratorServiceOptions project = new()
         {
             GlobalSv = 1.4,
             GraphBeats = 3,
@@ -75,7 +75,7 @@ public sealed class SlideratorServiceTests
             PixelLength = 100,
             ExportTime = 1000,
             NewVelocity = 1 / 4.2,
-            GraphState = SlideratorOptions.CreatePositionGraph(3),
+            GraphState = SlideratorEngineOptions.CreatePositionGraph(3),
         };
 
         // Act

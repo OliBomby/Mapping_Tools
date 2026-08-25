@@ -136,7 +136,7 @@ public sealed class HitsoundStudioViewModelTests
         }
 
         public Task<HitsoundStudioExportResult> ExportAsync(
-            HitsoundStudioProject project,
+            HitsoundStudioServiceOptions project,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

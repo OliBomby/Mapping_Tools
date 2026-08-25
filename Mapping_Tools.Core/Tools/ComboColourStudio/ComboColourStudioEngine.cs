@@ -12,7 +12,7 @@ public static class ComboColourStudioEngine
     /// <summary>Applies palette colours and combo skips to a mutable beatmap.</summary>
     /// <param name="beatmap">The beatmap to mutate.</param>
     /// <param name="project">The validated project to apply.</param>
-    public static void Apply(Beatmap beatmap, ComboColourProject project)
+    public static void Apply(Beatmap beatmap, ComboColourEngineOptions project)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(project);
@@ -82,7 +82,7 @@ public static class ComboColourStudioEngine
     /// <summary>Imports the combo palette from a beatmap, using the legacy names.</summary>
     /// <param name="beatmap">The source beatmap.</param>
     /// <param name="project">The project to update.</param>
-    public static void ImportComboColours(Beatmap beatmap, ComboColourProject project)
+    public static void ImportComboColours(Beatmap beatmap, ComboColourEngineOptions project)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(project);
@@ -97,7 +97,7 @@ public static class ComboColourStudioEngine
     /// <summary>Infers normal and burst points from the map's existing combo skips.</summary>
     /// <param name="beatmap">The source beatmap.</param>
     /// <param name="project">The project to replace.</param>
-    public static void ImportColourHax(Beatmap beatmap, ComboColourProject project)
+    public static void ImportColourHax(Beatmap beatmap, ComboColourEngineOptions project)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(project);
@@ -163,7 +163,7 @@ public static class ComboColourStudioEngine
     /// <returns>Preview entries in map order.</returns>
     public static IReadOnlyList<ComboColourPreviewEntry> BuildPreview(
         Beatmap beatmap,
-        ComboColourProject project,
+        ComboColourEngineOptions project,
         int maximumItems = 256)
     {
         ArgumentNullException.ThrowIfNull(beatmap);

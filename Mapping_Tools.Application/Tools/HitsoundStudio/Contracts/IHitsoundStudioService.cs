@@ -40,7 +40,7 @@ public interface IHitsoundStudioService
     /// <param name="progress">Receives monotonically increasing normalized major-phase progress.</param>
     /// <param name="cancellationToken">Stops generation, encoding, or writing at the next safe boundary.</param>
     Task<HitsoundStudioExportResult> ExportAsync(
-        HitsoundStudioProject project,
+        HitsoundStudioServiceOptions project,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

@@ -34,7 +34,7 @@ public interface IPatternGalleryService
         string timingPointText,
         double globalSv,
         GameMode gameMode,
-        PatternGalleryProject project,
+        PatternGalleryServiceOptions project,
         PatternGalleryCollectionPaths paths,
         CancellationToken cancellationToken = default);
 
@@ -80,7 +80,7 @@ public interface IPatternGalleryService
     Task<PatternGalleryRunResult> ExportAsync(
         string targetPath,
         IReadOnlyList<PatternGalleryPattern> patterns,
-        PatternGalleryProject project,
+        PatternGalleryServiceOptions project,
         PatternGalleryCollectionPaths paths,
         bool quick,
         IProgress<double>? progress = null,
@@ -101,7 +101,7 @@ public interface IPatternGalleryService
     /// <param name="cancellationToken">Cancels between pattern reads.</param>
     /// <returns>The number of removed and newly indexed files.</returns>
     Task<PatternGalleryRestoreResult> RestoreAsync(
-        PatternGalleryProject project,
+        PatternGalleryServiceOptions project,
         PatternGalleryCollectionPaths paths,
         CancellationToken cancellationToken = default);
 }

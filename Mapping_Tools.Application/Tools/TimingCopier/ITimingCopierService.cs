@@ -13,7 +13,7 @@ public interface ITimingCopierService
     /// <param name="cancellationToken">Cancels loading, transformation, backup, or saving.</param>
     /// <returns>The target paths successfully processed before completion.</returns>
     Task<TimingCopierResult> CopyAsync(
-        TimingCopierProject options,
+        TimingCopierServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

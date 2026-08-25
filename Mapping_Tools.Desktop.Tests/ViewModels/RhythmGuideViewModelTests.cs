@@ -119,10 +119,10 @@ public sealed class RhythmGuideViewModelTests
 
     private sealed class RecordingRhythmGuideService : IRhythmGuideService
     {
-        public RhythmGuideProject.RhythmGuideProjectOptions? Options { get; private set; }
+        public RhythmGuideServiceOptions.RhythmGuideRunOptions? Options { get; private set; }
 
         public Task<RhythmGuideResult> GenerateAsync(
-            RhythmGuideProject.RhythmGuideProjectOptions options,
+            RhythmGuideServiceOptions.RhythmGuideRunOptions options,
             CancellationToken cancellationToken = default)
         {
             Options = options;

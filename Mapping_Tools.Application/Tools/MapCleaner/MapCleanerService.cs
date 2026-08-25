@@ -31,7 +31,7 @@ public sealed class MapCleanerService : IMapCleanerService
     /// <inheritdoc />
     public async Task<MapCleanerResult> CleanAsync(
         IReadOnlyList<string> paths,
-        MapCleanerProject.MapCleanerProjectOptions options,
+        MapCleanerServiceOptions.MapCleanerCleanupOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

@@ -25,7 +25,7 @@ public static class SliderMergerEngine
     public static int Merge(
         Beatmap beatmap,
         IReadOnlyList<HitObject> markedObjects,
-        SliderMergerOptions options,
+        SliderMergerEngineOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -115,7 +115,7 @@ public static class SliderMergerEngine
     private static HitObject MergeSliders(
         HitObject first,
         HitObject second,
-        SliderMergerOptions options)
+        SliderMergerEngineOptions options)
     {
         if (options.MergeOnSliderEnd)
         {
@@ -167,7 +167,7 @@ public static class SliderMergerEngine
     private static HitObject MergeSliderAndCircle(
         HitObject first,
         HitObject second,
-        SliderMergerOptions options)
+        SliderMergerEngineOptions options)
     {
         var path = BezierConverter.ConvertToBezierAnchors(
             first.GetAllCurvePoints(), first.SliderType);
@@ -188,7 +188,7 @@ public static class SliderMergerEngine
     private static HitObject MergeCircleAndSlider(
         HitObject first,
         HitObject second,
-        SliderMergerOptions options)
+        SliderMergerEngineOptions options)
     {
         var path = BezierConverter.ConvertToBezierAnchors(
             second.GetAllCurvePoints(), second.SliderType);
@@ -209,7 +209,7 @@ public static class SliderMergerEngine
     private static HitObject MergeCircles(
         HitObject first,
         HitObject second,
-        SliderMergerOptions options)
+        SliderMergerEngineOptions options)
     {
         if (Precision.DefinitelyBigger(Vector2.Distance(first.Pos, second.Pos), 0))
         {
@@ -273,7 +273,7 @@ public static class SliderMergerEngine
             }
     }
 
-    private static void Validate(SliderMergerOptions options)
+    private static void Validate(SliderMergerEngineOptions options)
     {
         if (!Enum.IsDefined(options.ConnectionModeSetting))
             throw new ArgumentException("Slider Merger contains an unknown mode.", nameof(options));

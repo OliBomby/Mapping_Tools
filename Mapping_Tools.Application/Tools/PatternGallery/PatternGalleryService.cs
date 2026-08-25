@@ -55,7 +55,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         string timingPointText,
         double globalSv,
         GameMode gameMode,
-        PatternGalleryProject project,
+        PatternGalleryServiceOptions project,
         PatternGalleryCollectionPaths paths,
         CancellationToken cancellationToken = default)
     {
@@ -142,7 +142,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
     public async Task<PatternGalleryRunResult> ExportAsync(
         string targetPath,
         IReadOnlyList<PatternGalleryPattern> patterns,
-        PatternGalleryProject project,
+        PatternGalleryServiceOptions project,
         PatternGalleryCollectionPaths paths,
         bool quick,
         IProgress<double>? progress = null,
@@ -217,7 +217,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
 
     /// <inheritdoc />
     public async Task<PatternGalleryRestoreResult> RestoreAsync(
-        PatternGalleryProject project,
+        PatternGalleryServiceOptions project,
         PatternGalleryCollectionPaths paths,
         CancellationToken cancellationToken = default)
     {

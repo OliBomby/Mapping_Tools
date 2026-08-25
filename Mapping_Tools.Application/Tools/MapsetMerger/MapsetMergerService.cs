@@ -41,7 +41,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
 
     /// <inheritdoc />
     public async Task<MapsetMergerResult> MergeAsync(
-        MapsetMergerProject project,
+        MapsetMergerServiceOptions project,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -329,7 +329,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         return candidate;
     }
 
-    private static void Validate(MapsetMergerProject project)
+    private static void Validate(MapsetMergerServiceOptions project)
     {
         ArgumentNullException.ThrowIfNull(project);
         ArgumentException.ThrowIfNullOrWhiteSpace(project.ExportPath);

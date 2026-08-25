@@ -16,6 +16,7 @@ using Mapping_Tools.Application.Tools.MetadataManager;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.MetadataManager;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels.Adapters;
 

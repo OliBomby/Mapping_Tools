@@ -16,7 +16,7 @@ public interface IHitsoundPreviewHelperService
     /// <returns>The processed paths and total updated event count.</returns>
     Task<HitsoundPreviewHelperResult> ApplyAsync(
         IReadOnlyList<string> paths,
-        HitsoundPreviewHelperProject options,
+        HitsoundPreviewHelperServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 

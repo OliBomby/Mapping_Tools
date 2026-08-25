@@ -32,7 +32,7 @@ public sealed class PatternGalleryProjectSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<PatternGalleryProject>(json);
+        var project = serializer.Deserialize<PatternGalleryEngineOptions>(json);
 
         // Assert
         project.CollectionName.Should().Be("Legacy collection");
@@ -46,7 +46,7 @@ public sealed class PatternGalleryProjectSerializerTests
     public void Serialize_WithPatternGalleryProject_UsesLegacyTypeNames()
     {
         // Arrange
-        PatternGalleryProject project = new();
+        PatternGalleryEngineOptions project = new();
         project.Patterns.Add(new PatternGalleryPattern { Name = "Pattern", FileName = "pattern.osu" });
         LegacyProjectJsonSerializer serializer = new();
 
@@ -71,7 +71,7 @@ public sealed class PatternGalleryProjectSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<PatternGalleryProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<PatternGalleryEngineOptions>(File.ReadAllText(fixture));
 
         // Assert
         project.CollectionName.Should().Be("My Pattern Collection");
@@ -92,7 +92,7 @@ public sealed class PatternGalleryProjectSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<PatternGalleryProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<PatternGalleryEngineOptions>(File.ReadAllText(fixture));
 
         // Assert
         project.CollectionName.Should().Be("My Pattern Collection");

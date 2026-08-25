@@ -55,7 +55,7 @@ public sealed class TumourGeneratorServiceTests
         TumourGeneratorService service = new(new RecordingBeatmapEditingGateway(CreateSession(BeatmapEditingSource.Disk)));
         HitObject input = new("0,0,0,2,0,L|256:0,1,256");
         string original = input.Line;
-        TumourGeneratorProject project = new();
+        TumourGeneratorServiceOptions project = new();
         project.TumourLayers[0].TumourCount = 1;
 
         // Act
@@ -74,7 +74,7 @@ public sealed class TumourGeneratorServiceTests
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
         TumourGeneratorService service = new(gateway);
-        TumourGeneratorProject project = new();
+        TumourGeneratorServiceOptions project = new();
         project.TumourLayers[0].TumourCount = 1;
         List<double> progress = [];
 
@@ -104,7 +104,7 @@ public sealed class TumourGeneratorServiceTests
         // Act
         var result = await service.RunAsync(
             ["map.osu"],
-            new TumourGeneratorProject(),
+            new TumourGeneratorServiceOptions(),
             true);
 
         // Assert
@@ -125,7 +125,7 @@ public sealed class TumourGeneratorServiceTests
         // Act
         Func<Task> act = () => service.RunAsync(
             ["map.osu"],
-            new TumourGeneratorProject(),
+            new TumourGeneratorServiceOptions(),
             false,
             cancellationToken: cancellation.Token);
 
@@ -145,7 +145,7 @@ public sealed class TumourGeneratorServiceTests
         // Act
         Func<Task> act = () => service.PreviewAsync(
             new HitObject("0,0,0,2,0,L|256:0,1,256"),
-            new TumourGeneratorProject(),
+            new TumourGeneratorServiceOptions(),
             cancellation.Token);
 
         // Assert

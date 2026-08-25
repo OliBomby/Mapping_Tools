@@ -8,6 +8,6 @@ public interface IRhythmGuideService
     /// <param name="cancellationToken">Cancels loading, generation, or saving.</param>
     /// <returns>The destination and number of added guide objects.</returns>
     Task<RhythmGuideResult> GenerateAsync(
-        RhythmGuideProject.RhythmGuideProjectOptions options,
+        RhythmGuideServiceOptions.RhythmGuideRunOptions options,
         CancellationToken cancellationToken = default);
 }

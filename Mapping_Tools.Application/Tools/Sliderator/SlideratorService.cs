@@ -51,7 +51,7 @@ public sealed class SlideratorService : ISlideratorService
     /// <inheritdoc />
     public async Task<SlideratorResult> RunAsync(
         string path,
-        SlideratorProject project,
+        SlideratorServiceOptions project,
         HitObject sourceSlider,
         bool reloadEditor,
         IProgress<double>? progress = null,

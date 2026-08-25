@@ -10,6 +10,7 @@ using Mapping_Tools.Application.Tools.SliderMerger;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderMerger.Models;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;

@@ -10,6 +10,7 @@ using Mapping_Tools.Application.Tools.TimingHelper;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.TimingHelper;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;
@@ -150,7 +151,7 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     {
         if (paths.Count == 0) return;
 
-        TimingHelperOptions options = Snapshot();
+        TimingHelperProject options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<TimingHelperResult>(
                 Tool.Id,

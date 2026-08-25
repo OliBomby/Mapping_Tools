@@ -21,7 +21,7 @@ public sealed class SliderCompletionatorServiceTests
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         SliderCompletionatorService service = new(gateway);
-        SliderCompletionatorProject options = new();
+        SliderCompletionatorServiceOptions options = new();
 
         // Act
         var result = await service.CompleteAsync(
@@ -47,7 +47,7 @@ public sealed class SliderCompletionatorServiceTests
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         SliderCompletionatorService service = new(gateway);
-        SliderCompletionatorProject options = new()
+        SliderCompletionatorServiceOptions options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Everything,
         };
@@ -77,7 +77,7 @@ public sealed class SliderCompletionatorServiceTests
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture, 1_000_000);
         SliderCompletionatorService service = new(gateway);
-        SliderCompletionatorProject options = new()
+        SliderCompletionatorServiceOptions options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Everything,
             UseEndTime = true,
@@ -109,7 +109,7 @@ public sealed class SliderCompletionatorServiceTests
         SliderCompletionatorService service = new(gateway);
 
         // Act
-        Func<Task> act = () => service.CompleteAsync([], new SliderCompletionatorProject());
+        Func<Task> act = () => service.CompleteAsync([], new SliderCompletionatorServiceOptions());
 
         // Assert
         await act.Should().ThrowAsync<ArgumentException>();

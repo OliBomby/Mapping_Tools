@@ -201,7 +201,7 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        PropertyTransformerOptions options = Snapshot();
+        PropertyTransformerProject options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<PropertyTransformerResult>(
                 Tool.Id,

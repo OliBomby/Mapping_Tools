@@ -24,7 +24,7 @@ public sealed class ComboColourStudioServiceTests
             }) { Path = @"C:\set\map.osu" };
         RecordingBeatmapEditingGateway gateway = new(
             new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
-        ComboColourProject project = new();
+        ComboColourServiceOptions project = new();
         project.ComboColours.Clear();
         project.ComboColours.Add(new SpecialColour(RgbaColour.FromRgb(10, 20, 30), "Combo1"));
         project.AddColourPoint(0, [project.ComboColours[0]]);
@@ -63,7 +63,7 @@ public sealed class ComboColourStudioServiceTests
             });
         RecordingBeatmapEditingGateway gateway = new(
             new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
-        ComboColourProject project = new();
+        ComboColourServiceOptions project = new();
         project.AddComboColour();
         ComboColourStudioService service = new(gateway);
 

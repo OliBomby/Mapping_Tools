@@ -149,11 +149,11 @@ public sealed class HitsoundPreviewHelperViewModelTests
 
         public IReadOnlyList<string>? Paths { get; private set; }
 
-        public HitsoundPreviewHelperProject? Options { get; private set; }
+        public HitsoundPreviewHelperServiceOptions? Options { get; private set; }
 
         public Task<HitsoundPreviewHelperResult> ApplyAsync(
             IReadOnlyList<string> paths,
-            HitsoundPreviewHelperProject options,
+            HitsoundPreviewHelperServiceOptions options,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {
@@ -176,7 +176,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
     private sealed class StubRhythmGuideService : IRhythmGuideService
     {
         public Task<RhythmGuideResult> GenerateAsync(
-            RhythmGuideProject.RhythmGuideProjectOptions options,
+            RhythmGuideServiceOptions.RhythmGuideRunOptions options,
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new RhythmGuideResult(

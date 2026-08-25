@@ -20,7 +20,7 @@ public sealed class AutoFailService : IAutoFailService
 
     /// <inheritdoc />
     public async Task<AutoFailRun> AnalyzeAsync(
-        AutoFailOptions options,
+        AutoFailServiceOptions options,
         CancellationToken cancellationToken = default)
     {
         Validate(options);
@@ -77,7 +77,7 @@ public sealed class AutoFailService : IAutoFailService
             cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
-    private static void Validate(AutoFailOptions options)
+    private static void Validate(AutoFailServiceOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.Path);

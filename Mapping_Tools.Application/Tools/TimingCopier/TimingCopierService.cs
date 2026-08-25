@@ -24,7 +24,7 @@ public sealed class TimingCopierService : ITimingCopierService
 
     /// <inheritdoc />
     public async Task<TimingCopierResult> CopyAsync(
-        TimingCopierProject options,
+        TimingCopierServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

@@ -10,6 +10,7 @@ using Mapping_Tools.Application.Tools.SliderCompletionator;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;

@@ -14,7 +14,7 @@ public sealed class MetadataManagerEngineTests
         var beatmap = Load("standard-feature-rich.osu");
         int timingPointCount = beatmap.BeatmapTiming.TimingPoints.Count;
         int hitObjectCount = beatmap.HitObjects.Count;
-        MetadataManagerOptions options = new()
+        MetadataManagerEngineOptions options = new()
         {
             Artist = "Wave Zero Artist",
             RomanisedArtist = "Wave Zero Artist",

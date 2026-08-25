@@ -14,7 +14,7 @@ public sealed class MapCleanerEngineTests
     {
         // Arrange
         var beatmap = Load("standard-feature-rich.osu");
-        MapCleanerOptions options = new()
+        MapCleanerEngineOptions options = new()
         {
             VolumeSliders = true,
             SampleSetSliders = false,

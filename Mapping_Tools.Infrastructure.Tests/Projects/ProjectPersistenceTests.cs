@@ -36,7 +36,7 @@ public sealed class ProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<SliderPicturatorProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<SliderPicturatorServiceOptions>(File.ReadAllText(fixture));
         string json = serializer.Serialize(project);
 
         // Assert
@@ -57,7 +57,7 @@ public sealed class ProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<SlideratorProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<SlideratorServiceOptions>(File.ReadAllText(fixture));
         string json = serializer.Serialize(project);
 
         // Assert
@@ -163,7 +163,7 @@ public sealed class ProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<RhythmGuideProject>(
+        var project = serializer.Deserialize<RhythmGuideServiceOptions>(
             File.ReadAllText(fixture));
         string json = serializer.Serialize(project);
 
@@ -190,7 +190,7 @@ public sealed class ProjectPersistenceTests
 
         // Act
         var project = serializer
-            .Deserialize<HitsoundPreviewHelperProject>(json);
+            .Deserialize<HitsoundPreviewHelperServiceOptions>(json);
         string roundTrip = serializer.Serialize(project);
 
         // Assert
@@ -215,7 +215,7 @@ public sealed class ProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<HitsoundPreviewHelperProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<HitsoundPreviewHelperServiceOptions>(File.ReadAllText(fixture));
 
         // Assert
         project.Items.Should().HaveCount(18);
@@ -232,7 +232,7 @@ public sealed class ProjectPersistenceTests
             "{\"$type\":\"Mapping_Tools.Viewmodels.HitsoundCopierVm, Mapping Tools\",\"PathFrom\":\"source.osu\",\"PathTo\":\"target.osu\",\"CopyMode\":1,\"TemporalLeniency\":12,\"CopyStoryboardedSamples\":true}";
 
         // Act
-        var project = serializer.Deserialize<HitsoundCopierProject>(json);
+        var project = serializer.Deserialize<HitsoundCopierServiceOptions>(json);
         string roundTrip = serializer.Serialize(project);
 
         // Assert
@@ -257,7 +257,7 @@ public sealed class ProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<HitsoundCopierProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<HitsoundCopierServiceOptions>(File.ReadAllText(fixture));
 
         // Assert
         project.PathFrom.Should().Contain("Hitsounds");
@@ -275,7 +275,7 @@ public sealed class ProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<MapCleanerProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<MapCleanerServiceOptions>(File.ReadAllText(fixture));
         string json = serializer.Serialize(project);
 
         // Assert
@@ -297,7 +297,7 @@ public sealed class ProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<MetadataManagerProject>(
+        var project = serializer.Deserialize<MetadataManagerServiceOptions>(
             File.ReadAllText(fixture));
         string json = serializer.Serialize(project);
 
@@ -321,7 +321,7 @@ public sealed class ProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<PropertyTransformerProject>(
+        var project = serializer.Deserialize<PropertyTransformerServiceOptions>(
             File.ReadAllText(fixture));
         string json = serializer.Serialize(project);
 
@@ -345,7 +345,7 @@ public sealed class ProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<TimingCopierProject>(
+        var project = serializer.Deserialize<TimingCopierServiceOptions>(
             File.ReadAllText(fixture));
         string json = serializer.Serialize(project);
 
@@ -369,7 +369,7 @@ public sealed class ProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<TimingHelperProject>(
+        var project = serializer.Deserialize<TimingHelperServiceOptions>(
             File.ReadAllText(fixture));
         string json = serializer.Serialize(project);
 
@@ -393,7 +393,7 @@ public sealed class ProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<SliderCompletionatorProject>(
+        var project = serializer.Deserialize<SliderCompletionatorServiceOptions>(
             File.ReadAllText(fixture));
         string json = serializer.Serialize(project);
 
@@ -417,7 +417,7 @@ public sealed class ProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<SliderMergerProject>(
+        var project = serializer.Deserialize<SliderMergerServiceOptions>(
             File.ReadAllText(fixture));
         string json = serializer.Serialize(project);
 
@@ -507,7 +507,7 @@ public sealed class ProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        Action act = () => serializer.Deserialize<MapCleanerProject>(File.ReadAllText(fixture));
+        Action act = () => serializer.Deserialize<MapCleanerServiceOptions>(File.ReadAllText(fixture));
 
         // Assert
         act.Should().Throw<JsonSerializationException>();

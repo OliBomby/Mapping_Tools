@@ -13,7 +13,7 @@ public interface IMapCleanerService
     /// <returns>The combined cleanup counts and timeline markers.</returns>
     Task<MapCleanerResult> CleanAsync(
         IReadOnlyList<string> paths,
-        MapCleanerProject.MapCleanerProjectOptions options,
+        MapCleanerServiceOptions.MapCleanerCleanupOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

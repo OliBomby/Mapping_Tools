@@ -30,7 +30,7 @@ public sealed class LegacyProjectCompatibilityTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        MapCleanerProject project = serializer.Deserialize<MapCleanerProject>(json);
+        MapCleanerServiceOptions project = serializer.Deserialize<MapCleanerServiceOptions>(json);
 
         // Assert
         project.MapCleanerArgs.ResnapObjects.Should().BeFalse();
@@ -49,7 +49,7 @@ public sealed class LegacyProjectCompatibilityTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundPreviewHelperProject project = serializer.Deserialize<HitsoundPreviewHelperProject>(json);
+        HitsoundPreviewHelperServiceOptions project = serializer.Deserialize<HitsoundPreviewHelperServiceOptions>(json);
 
         // Assert
         project.Items.Should().BeEmpty();
@@ -68,7 +68,7 @@ public sealed class LegacyProjectCompatibilityTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundStudioProject project = serializer.Deserialize<HitsoundStudioProject>(json);
+        HitsoundStudioServiceOptions project = serializer.Deserialize<HitsoundStudioServiceOptions>(json);
 
         // Assert
         project.HitsoundLayers.Should().BeEmpty();
@@ -87,7 +87,7 @@ public sealed class LegacyProjectCompatibilityTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        PropertyTransformerProject project = serializer.Deserialize<PropertyTransformerProject>(json);
+        PropertyTransformerServiceOptions project = serializer.Deserialize<PropertyTransformerServiceOptions>(json);
 
         // Assert
         project.MatchFilter.Should().Equal(10d);
@@ -115,7 +115,7 @@ public sealed class LegacyProjectCompatibilityTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundPreviewHelperProject project = serializer.Deserialize<HitsoundPreviewHelperProject>(json);
+        HitsoundPreviewHelperServiceOptions project = serializer.Deserialize<HitsoundPreviewHelperServiceOptions>(json);
 
         // Assert
         project.Items.Should().ContainSingle();
@@ -147,7 +147,7 @@ public sealed class LegacyProjectCompatibilityTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundStudioProject project = serializer.Deserialize<HitsoundStudioProject>(json);
+        HitsoundStudioServiceOptions project = serializer.Deserialize<HitsoundStudioServiceOptions>(json);
 
         // Assert
         project.PreviousSampleSchema.Should().NotBeNull();
@@ -203,7 +203,7 @@ public sealed class LegacyProjectCompatibilityTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        HitsoundStudioProject project = serializer.Deserialize<HitsoundStudioProject>(json);
+        HitsoundStudioServiceOptions project = serializer.Deserialize<HitsoundStudioServiceOptions>(json);
 
         // Assert
         project.DefaultSample.SampleArgs.Path.Should().Be("default.wav");
@@ -220,7 +220,7 @@ public sealed class LegacyProjectCompatibilityTests
         // Arrange
         const string json = """
                            {
-                             "$type": "Mapping_Tools.Classes.ComboColourStudio.ComboColourProject, Mapping Tools",
+                             "$type": "Mapping_Tools.Classes.ComboColourStudio.ComboColourEngineOptions, Mapping Tools",
                              "ComboColours": {
                                "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Mapping_Tools.Classes.BeatmapHelper.SpecialColour, Mapping Tools]], System",
                                "$values": [
@@ -235,7 +235,7 @@ public sealed class LegacyProjectCompatibilityTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        ComboColourProject project = serializer.Deserialize<ComboColourProject>(json);
+        ComboColourEngineOptions project = serializer.Deserialize<ComboColourEngineOptions>(json);
 
         // Assert
         project.ComboColours.Should().ContainSingle();

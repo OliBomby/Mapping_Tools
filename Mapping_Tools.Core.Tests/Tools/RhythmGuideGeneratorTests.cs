@@ -14,7 +14,7 @@ public sealed class RhythmGuideGeneratorTests
         // Arrange
         var source = Load("standard-feature-rich.osu");
         var target = Load("ComplicatedTestMap.osu");
-        RhythmGuideOptions options = new()
+        RhythmGuideEngineOptions options = new()
         {
             SelectionMode = RhythmGuideSelectionMode.HitsoundEvents,
             NcEverything = true,
@@ -35,7 +35,7 @@ public sealed class RhythmGuideGeneratorTests
     {
         // Arrange
         var source = Load("standard-feature-rich.osu");
-        RhythmGuideOptions options = new()
+        RhythmGuideEngineOptions options = new()
         {
             OutputName = "Guide",
             SelectionMode = RhythmGuideSelectionMode.HitsoundEvents,

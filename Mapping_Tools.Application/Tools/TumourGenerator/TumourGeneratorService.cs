@@ -53,7 +53,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
     /// <inheritdoc />
     public Task<TumourPreviewResult> PreviewAsync(
         HitObject previewHitObject,
-        TumourGeneratorOptions options,
+        TumourGeneratorEngineOptions options,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(previewHitObject);
@@ -71,7 +71,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
     /// <inheritdoc />
     public async Task<TumourRunResult> RunAsync(
         IReadOnlyList<string> paths,
-        TumourGeneratorProject project,
+        TumourGeneratorServiceOptions project,
         bool reloadEditor,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
@@ -131,7 +131,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
         return new TumourRunResult(completedPaths, generatedCount, editorReloaded);
     }
 
-    private static CoreTumourGenerator CreateGenerator(TumourGeneratorOptions options)
+    private static CoreTumourGenerator CreateGenerator(TumourGeneratorEngineOptions options)
     {
         return new CoreTumourGenerator
         {

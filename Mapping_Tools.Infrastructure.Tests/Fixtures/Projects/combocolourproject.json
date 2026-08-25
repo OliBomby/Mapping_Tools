@@ -1,5 +1,5 @@
 {
-  "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourProject, Mapping Tools",
+  "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourEngineOptions, Mapping Tools",
   "ColourPoints": [
     {
       "$type": "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint, Mapping Tools",

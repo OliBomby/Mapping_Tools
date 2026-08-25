@@ -26,7 +26,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
     /// <inheritdoc />
     public async Task<HitsoundPreviewHelperResult> ApplyAsync(
         IReadOnlyList<string> paths,
-        HitsoundPreviewHelperProject options,
+        HitsoundPreviewHelperServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

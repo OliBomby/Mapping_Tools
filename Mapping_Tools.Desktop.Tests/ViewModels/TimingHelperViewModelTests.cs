@@ -205,11 +205,11 @@ public sealed class TimingHelperViewModelTests
     {
         public IReadOnlyList<string>? Paths { get; private set; }
 
-        public TimingHelperOptions? Options { get; private set; }
+        public TimingHelperServiceOptions? Options { get; private set; }
 
         public Task<TimingHelperResult> AdjustAsync(
             IReadOnlyList<string> paths,
-            TimingHelperOptions options,
+            TimingHelperServiceOptions options,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

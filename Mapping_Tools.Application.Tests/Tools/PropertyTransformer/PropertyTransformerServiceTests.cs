@@ -29,7 +29,7 @@ public sealed class PropertyTransformerServiceTests
         RecordingBeatmapEditingGateway gateway = new(
             new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
         PropertyTransformerService service = new(gateway);
-        PropertyTransformerOptions options = new()
+        PropertyTransformerServiceOptions options = new()
         {
             BookmarkTimeOffset = 5,
         };

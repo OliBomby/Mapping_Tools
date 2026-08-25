@@ -12,6 +12,7 @@ using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels.Adapters;
 

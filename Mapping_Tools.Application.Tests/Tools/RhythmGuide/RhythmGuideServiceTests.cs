@@ -23,7 +23,7 @@ public sealed class RhythmGuideServiceTests
         sessions["source.osu"] = CreateSession(CreateEditor("source.osu", files, true));
         sessions["target.osu"] = CreateSession(CreateEditor("target.osu", files, false));
         RhythmGuideService service = new(gateway, backups, new RecordingBeatmapFileSystem(), files);
-        RhythmGuideProject.RhythmGuideProjectOptions options = new()
+        RhythmGuideServiceOptions.RhythmGuideRunOptions options = new()
         {
             Paths = ["source.osu"],
             ExportPath = "target.osu",
@@ -60,7 +60,7 @@ public sealed class RhythmGuideServiceTests
             new TestBeatmapBackupService(),
             new RecordingBeatmapFileSystem(),
             files);
-        RhythmGuideProject.RhythmGuideProjectOptions options = new()
+        RhythmGuideServiceOptions.RhythmGuideRunOptions options = new()
         {
             Paths = ["source.osu"],
             ExportPath = "new.osu",
@@ -93,7 +93,7 @@ public sealed class RhythmGuideServiceTests
                 ExistingPaths = { "existing.osu" },
             },
             files);
-        RhythmGuideProject.RhythmGuideProjectOptions options = new()
+        RhythmGuideServiceOptions.RhythmGuideRunOptions options = new()
         {
             Paths = ["source.osu"],
             ExportPath = "existing.osu",

@@ -17,6 +17,7 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
 using Mapping_Tools.Desktop.Interactions.PatternGallery;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Shell.Models;
 using Material.Icons;

@@ -14,7 +14,7 @@ public sealed class SliderCompletionatorEngineTests
     {
         // Arrange
         var (beatmap, slider) = CreateSliderBeatmap();
-        SliderCompletionatorOptions options = new()
+        SliderCompletionatorEngineOptions options = new()
         {
             Duration = 1,
             Length = -1,
@@ -38,7 +38,7 @@ public sealed class SliderCompletionatorEngineTests
     {
         // Arrange
         var (beatmap, slider) = CreateSliderBeatmap();
-        SliderCompletionatorOptions options = new()
+        SliderCompletionatorEngineOptions options = new()
         {
             Duration = -1,
             Length = 0.5,
@@ -60,7 +60,7 @@ public sealed class SliderCompletionatorEngineTests
     {
         // Arrange
         var (beatmap, slider) = CreateSliderBeatmap();
-        SliderCompletionatorOptions options = new()
+        SliderCompletionatorEngineOptions options = new()
         {
             UseEndTime = true,
             UseCurrentEditorTime = true,
@@ -82,7 +82,7 @@ public sealed class SliderCompletionatorEngineTests
     {
         // Arrange
         var (beatmap, slider) = CreateSliderBeatmap();
-        SliderCompletionatorOptions options = new()
+        SliderCompletionatorEngineOptions options = new()
         {
             Duration = 1,
             Length = -1,
@@ -103,7 +103,7 @@ public sealed class SliderCompletionatorEngineTests
     {
         // Arrange
         var (beatmap, slider) = CreateSliderBeatmap();
-        SliderCompletionatorOptions options = new() { Length = double.NaN };
+        SliderCompletionatorEngineOptions options = new() { Length = double.NaN };
 
         // Act
         Action act = () => SliderCompletionatorEngine.Apply(beatmap, [slider], options);
@@ -118,7 +118,7 @@ public sealed class SliderCompletionatorEngineTests
     {
         // Arrange
         var (beatmap, slider) = CreateSliderBeatmap();
-        SliderCompletionatorOptions options = new()
+        SliderCompletionatorEngineOptions options = new()
         {
             Length = 0,
             FreeVariableSetting = SliderCompletionatorFreeVariable.Velocity,

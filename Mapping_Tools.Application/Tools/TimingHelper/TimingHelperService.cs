@@ -26,7 +26,7 @@ public sealed class TimingHelperService : ITimingHelperService
     /// <inheritdoc />
     public async Task<TimingHelperResult> AdjustAsync(
         IReadOnlyList<string> paths,
-        TimingHelperOptions options,
+        TimingHelperServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

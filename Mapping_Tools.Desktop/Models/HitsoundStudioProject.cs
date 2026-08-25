@@ -1,9 +1,9 @@
-using ApplicationHitsoundStudioProject = Mapping_Tools.Application.Tools.HitsoundStudio.Models.HitsoundStudioProject;
+using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 
 namespace Mapping_Tools.Desktop.Models;
 
 /// <summary>Stores Hitsound Studio presentation preferences alongside service inputs.</summary>
-public sealed class HitsoundStudioProject : ApplicationHitsoundStudioProject
+public sealed class HitsoundStudioProject : HitsoundStudioServiceOptions
 {
     /// <summary>Gets or sets whether the detailed export summary is shown after completion.</summary>
     public bool ShowResults { get; set; }
@@ -12,7 +12,7 @@ public sealed class HitsoundStudioProject : ApplicationHitsoundStudioProject
     /// <returns>A project whose mutable application data is not shared with this instance.</returns>
     public new HitsoundStudioProject Clone()
     {
-        ApplicationHitsoundStudioProject copy = base.Clone();
+        HitsoundStudioServiceOptions copy = base.Clone();
         return new HitsoundStudioProject
         {
             BaseBeatmap = copy.BaseBeatmap,

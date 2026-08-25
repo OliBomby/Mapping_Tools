@@ -17,7 +17,7 @@ public sealed class HitsoundStudioProjectTests
         {
             Times = [100, 200],
         };
-        HitsoundStudioProject project = new()
+        HitsoundStudioServiceOptions project = new()
         {
             BaseBeatmap = "base.osu",
             HitsoundLayers = [layer],

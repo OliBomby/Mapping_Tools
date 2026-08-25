@@ -232,7 +232,7 @@ public sealed partial class SlideratorView : UserControl
             return;
         }
 
-        SlideratorOptions options = new()
+        SlideratorEngineOptions options = new()
         {
             GlobalSv = viewModel.GlobalSv,
             PixelLength = viewModel.PixelLength,

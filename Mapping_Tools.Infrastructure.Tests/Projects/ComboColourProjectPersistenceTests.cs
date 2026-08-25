@@ -19,7 +19,7 @@ public sealed class ComboColourProjectPersistenceTests
 
         LegacyProjectJsonSerializer serializer = new();
         // Act
-        var project = serializer.Deserialize<ComboColourProject>(json);
+        var project = serializer.Deserialize<ComboColourEngineOptions>(json);
 
         // Assert
         project.ComboColours.Should().HaveCount(4);
@@ -33,7 +33,7 @@ public sealed class ComboColourProjectPersistenceTests
     public void Serialize_ComboColourProject_UsesLegacyTypeNames()
     {
         // Arrange
-        ComboColourProject project = new();
+        ComboColourEngineOptions project = new();
         project.AddComboColour();
         project.AddColourPoint(20, [project.ComboColours[0]], ColourPointMode.Burst);
 
@@ -41,7 +41,7 @@ public sealed class ComboColourProjectPersistenceTests
         string json = new LegacyProjectJsonSerializer().Serialize(project);
 
         // Assert
-        json.Should().Contain("Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourProject");
+        json.Should().Contain("Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourEngineOptions");
         json.Should().Contain("Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint");
     }
 }

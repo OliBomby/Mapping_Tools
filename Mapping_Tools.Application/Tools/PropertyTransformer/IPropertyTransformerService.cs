@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.Tools.PropertyTransformer;
-
 namespace Mapping_Tools.Application.Tools.PropertyTransformer;
 
 /// <summary>
@@ -17,7 +15,7 @@ public interface IPropertyTransformerService
     /// <returns>The paths processed by the operation.</returns>
     Task<PropertyTransformerResult> TransformAsync(
         IReadOnlyList<string> paths,
-        PropertyTransformerOptions options,
+        PropertyTransformerServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

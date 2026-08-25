@@ -216,7 +216,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets the shared Core graph state.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
-    public partial GraphState GraphState { get; set; } = SlideratorOptions.CreatePositionGraph(3);
+    public partial GraphState GraphState { get; set; } = SlideratorEngineOptions.CreatePositionGraph(3);
 
     /// <summary>Gets the graph's display label.</summary>
     public string GraphModeText => GraphModeSetting == SlideratorGraphMode.Position ? "X" : "V";
@@ -393,7 +393,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         ArgumentNullException.ThrowIfNull(state);
         if (!ExportAsNormal) return true;
 
-        SlideratorOptions options = new()
+        SlideratorEngineOptions options = new()
         {
             GlobalSv = GlobalSv,
             PixelLength = PixelLength,
@@ -651,7 +651,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private void UpdateGraphDerivedValues()
     {
-        SlideratorOptions options = new()
+        SlideratorEngineOptions options = new()
         {
             GlobalSv = GlobalSv,
             GraphBeats = GraphBeats,
@@ -687,7 +687,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         double graphValue = GraphModeSetting == SlideratorGraphMode.Velocity
             ? GraphState.GetIntegral(0, graphMilliseconds * BeatsPerMinute / 60000) * SvGraphMultiplier
             : GraphState.GetValue(graphMilliseconds * BeatsPerMinute / 60000);
-        double maximum = SlideratorEngine.GetMaxCompletion(new SlideratorOptions
+        double maximum = SlideratorEngine.GetMaxCompletion(new SlideratorEngineOptions
         {
             GlobalSv = GlobalSv,
             PixelLength = PixelLength,
@@ -717,7 +717,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             return;
         }
 
-        SlideratorOptions options = new()
+        SlideratorEngineOptions options = new()
         {
             GlobalSv = GlobalSv,
             PixelLength = PixelLength,
@@ -755,7 +755,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                 false));
         if (!confirmed) return;
 
-        GraphState = SlideratorOptions.CreatePositionGraph(GraphBeats);
+        GraphState = SlideratorEngineOptions.CreatePositionGraph(GraphBeats);
         if (GraphModeSetting == SlideratorGraphMode.Velocity)
         {
             double velocity = MathHelper.Clamp(

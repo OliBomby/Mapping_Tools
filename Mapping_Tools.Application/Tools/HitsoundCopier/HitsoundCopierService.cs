@@ -33,7 +33,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
 
     /// <inheritdoc />
     public async Task<HitsoundCopierResult> CopyAsync(
-        HitsoundCopierProject options,
+        HitsoundCopierServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -120,7 +120,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
 
     private static IReadOnlyList<HitObject> SelectSourceObjects(
         BeatmapEditingSession session,
-        HitsoundCopierProject options)
+        HitsoundCopierServiceOptions options)
     {
         return BeatmapObjectSelection.Select(
             session,
@@ -145,7 +145,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
             : directory;
     }
 
-    private static void Validate(HitsoundCopierProject options)
+    private static void Validate(HitsoundCopierServiceOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.PathTo);

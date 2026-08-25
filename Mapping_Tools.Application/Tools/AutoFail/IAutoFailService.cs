@@ -10,7 +10,7 @@ public interface IAutoFailService
     /// <param name="cancellationToken">Cancels opening or analysis.</param>
     /// <returns>The analysis plus state required by a later repair.</returns>
     Task<AutoFailRun> AnalyzeAsync(
-        AutoFailOptions options,
+        AutoFailServiceOptions options,
         CancellationToken cancellationToken = default);
 
     /// <summary>Builds repair choices for a completed analysis.</summary>

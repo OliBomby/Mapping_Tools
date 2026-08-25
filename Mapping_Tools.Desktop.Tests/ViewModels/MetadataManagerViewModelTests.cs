@@ -96,17 +96,17 @@ public sealed class MetadataManagerViewModelTests
 
     private sealed class RecordingMetadataManagerService : IMetadataManagerService
     {
-        public MetadataManagerProject? Options { get; private set; }
+        public MetadataManagerServiceOptions? Options { get; private set; }
 
-        public Task<MetadataManagerOptions> ImportAsync(
+        public Task<MetadataManagerEngineOptions> ImportAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new MetadataManagerOptions());
+            return Task.FromResult(new MetadataManagerEngineOptions());
         }
 
         public Task<MetadataManagerResult> ExportAsync(
-            MetadataManagerProject options,
+            MetadataManagerServiceOptions options,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

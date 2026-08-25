@@ -22,7 +22,7 @@ public sealed class SliderMergerService : ISliderMergerService
     /// <inheritdoc />
     public async Task<SliderMergerResult> MergeAsync(
         IReadOnlyList<string> paths,
-        SliderMergerProject options,
+        SliderMergerServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

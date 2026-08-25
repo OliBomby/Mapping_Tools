@@ -15,7 +15,7 @@ public static class RhythmGuideGenerator
     /// <returns>A new beatmap containing generated guide objects.</returns>
     public static Beatmap CreateNewMap(
         IReadOnlyList<Beatmap> sources,
-        RhythmGuideOptions options,
+        RhythmGuideEngineOptions options,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(sources);
@@ -46,7 +46,7 @@ public static class RhythmGuideGenerator
     public static void Append(
         Beatmap target,
         IEnumerable<Beatmap> sources,
-        RhythmGuideOptions options,
+        RhythmGuideEngineOptions options,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(target);

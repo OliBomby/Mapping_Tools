@@ -19,7 +19,7 @@ public sealed class AutoFailServiceTests
         AutoFailService service = new(gateway);
 
         // Act
-        var run = await service.AnalyzeAsync(new AutoFailOptions("accepted.osu"));
+        var run = await service.AnalyzeAsync(new AutoFailServiceOptions("accepted.osu"));
 
         // Assert
         gateway.OpenRequests.Single().Preference.Should().Be(LiveBeatmapPreference.PreferLive);
@@ -34,7 +34,7 @@ public sealed class AutoFailServiceTests
         RecordingBeatmapEditingGateway gateway = new(
             new BeatmapEditingSession(CreateEditor(), BeatmapEditingSource.Disk, []));
         AutoFailService service = new(gateway);
-        var run = await service.AnalyzeAsync(new AutoFailOptions("accepted.osu"));
+        var run = await service.AnalyzeAsync(new AutoFailServiceOptions("accepted.osu"));
         AutoFailFixPlan plan = new(
             Enumerable.Repeat(0, run.Analysis.PotentialUnloadingObjects.Count + 1).ToArray(),
             "No-op persistence-boundary probe");

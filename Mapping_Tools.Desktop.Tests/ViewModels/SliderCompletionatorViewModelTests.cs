@@ -151,11 +151,11 @@ public sealed class SliderCompletionatorViewModelTests
     {
         public IReadOnlyList<string>? Paths { get; private set; }
 
-        public SliderCompletionatorProject? Options { get; private set; }
+        public SliderCompletionatorServiceOptions? Options { get; private set; }
 
         public Task<SliderCompletionatorResult> CompleteAsync(
             IReadOnlyList<string> paths,
-            SliderCompletionatorProject options,
+            SliderCompletionatorServiceOptions options,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

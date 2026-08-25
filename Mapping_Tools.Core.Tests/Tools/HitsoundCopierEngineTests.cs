@@ -17,7 +17,7 @@ public sealed class HitsoundCopierEngineTests
         Beatmap target = new(source.GetLines());
         var selected = source.HitObjects[0];
         int selectedHitsounds = selected.Hitsounds;
-        HitsoundCopierOptions options = new() { CopyMode = 0 };
+        HitsoundCopierEngineOptions options = new() { CopyMode = 0 };
 
         // Act
         var result = HitsoundCopierEngine.Apply(
@@ -42,7 +42,7 @@ public sealed class HitsoundCopierEngineTests
         source.StoryboardSoundSamples.Add(new StoryboardSoundSample(100, StoryboardLayer.Foreground, "sample.wav", 80));
         Beatmap target = new(source.GetLines());
         double original = source.StoryboardSoundSamples[0].StartTime;
-        HitsoundCopierOptions options = new()
+        HitsoundCopierEngineOptions options = new()
         {
             CopyHitsounds = false,
             CopyStoryboardedSamples = true,

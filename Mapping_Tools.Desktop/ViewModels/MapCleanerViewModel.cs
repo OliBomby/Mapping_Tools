@@ -12,6 +12,7 @@ using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;
@@ -211,7 +212,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     {
         return new MapCleanerProject
         {
-            MapCleanerArgs = new MapCleanerProject.MapCleanerProjectOptions
+            MapCleanerArgs = new MapCleanerProject.MapCleanerCleanupOptions
             {
                 VolumeSliders = VolumeSliders,
                 SampleSetSliders = SampleSetSliders,
@@ -263,7 +264,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
             .ToArray();
     }
 
-    private static string Summarize(MapCleanerResult result, MapCleanerProject.MapCleanerProjectOptions options)
+    private static string Summarize(MapCleanerResult result, MapCleanerProject.MapCleanerCleanupOptions options)
     {
         return $"Successfully {(result.TimingPointsRemoved < 0 ? "added" : "removed")} "
                + $"{Math.Abs(result.TimingPointsRemoved)} "

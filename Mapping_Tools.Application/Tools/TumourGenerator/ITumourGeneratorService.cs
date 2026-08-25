@@ -27,7 +27,7 @@ public interface ITumourGeneratorService
     /// <returns>The generated slider and layer-length metadata.</returns>
     Task<TumourPreviewResult> PreviewAsync(
         HitObject previewHitObject,
-        TumourGeneratorOptions options,
+        TumourGeneratorEngineOptions options,
         CancellationToken cancellationToken = default);
 
     /// <summary>Runs, backs up, saves, and optionally reloads the requested maps.</summary>
@@ -39,7 +39,7 @@ public interface ITumourGeneratorService
     /// <returns>The transformed paths and slider count.</returns>
     Task<TumourRunResult> RunAsync(
         IReadOnlyList<string> paths,
-        TumourGeneratorProject project,
+        TumourGeneratorServiceOptions project,
         bool reloadEditor,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);

@@ -22,7 +22,7 @@ public static class TimingHelperEngine
     /// <exception cref="OperationCanceledException">The operation was cancelled.</exception>
     public static int Apply(
         Beatmap beatmap,
-        TimingHelperOptions options,
+        TimingHelperEngineOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -189,7 +189,7 @@ public static class TimingHelperEngine
         double mpbNew,
         IEnumerable<Marker> markers,
         TimingPoint redline,
-        TimingHelperOptions options)
+        TimingHelperEngineOptions options)
     {
         // For each their beatsFromRedline must stay the same AND their time must be within leniency of their resnapped time
         // If any of these times becomes incompatible, place a new anchor on the last time and not change the previous redline
@@ -220,7 +220,7 @@ public static class TimingHelperEngine
         double mpb,
         IReadOnlyCollection<Marker> markers,
         TimingPoint redline,
-        TimingHelperOptions options)
+        TimingHelperEngineOptions options)
     {
         double bpm = 60000 / mpb;
 

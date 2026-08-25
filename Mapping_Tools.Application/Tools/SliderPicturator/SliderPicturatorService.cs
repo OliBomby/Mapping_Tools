@@ -22,7 +22,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
     }
 
     /// <inheritdoc />
-    public async Task<SliderPicturatorResult> PicturateAsync(string path, SliderPicturatorProject options,
+    public async Task<SliderPicturatorResult> PicturateAsync(string path, SliderPicturatorServiceOptions options,
         IProgress<double>? progress = null, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);

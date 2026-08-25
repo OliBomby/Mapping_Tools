@@ -22,6 +22,7 @@ using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerat
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Shell.Models;
 using Material.Icons;
@@ -45,8 +46,11 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     private readonly ApplicationSettings applicationSettings;
     private readonly CoordinateConverter converter = new();
 
-    private readonly ProjectDefinition<SnappingToolsProject> definition =
-        GeometryDashboardProjectDefinition.Definition;
+    private readonly ProjectDefinition<SnappingToolsProject> definition = new(
+        "geometrydashboardproject.json",
+        "Geometry Dashboard Projects",
+        static () => new SnappingToolsProject(),
+        "geometry-dashboard-project.json");
 
     private readonly IGeometryDashboardDialogService dialogs;
     private readonly IUiDispatcher dispatcher;
@@ -1033,4 +1037,3 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         return RgbaColour.FromArgb(alpha, (byte)Math.Clamp((r + m) * 255, 0, 255), (byte)Math.Clamp((g + m) * 255, 0, 255), (byte)Math.Clamp((b + m) * 255, 0, 255));
     }
 }
-

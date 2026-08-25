@@ -31,7 +31,7 @@ public sealed class MetadataManagerServiceTests
         MetadataManagerService service = new(
             new TestEditingGateway(fileStore),
             backup);
-        MetadataManagerProject options = new()
+        MetadataManagerServiceOptions options = new()
         {
             ExportPath = target,
             Artist = "Wave Zero Artist",

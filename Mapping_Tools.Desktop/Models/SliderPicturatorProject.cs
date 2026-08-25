@@ -1,10 +1,10 @@
+using Mapping_Tools.Application.Tools.SliderPicturator;
 using Mapping_Tools.Core.BeatmapHelper;
-using ApplicationSliderPicturatorProject = Mapping_Tools.Application.Tools.SliderPicturator.SliderPicturatorProject;
 
 namespace Mapping_Tools.Desktop.Models;
 
 /// <summary>Stores Slider Picturator preview state alongside the service inputs.</summary>
-public sealed class SliderPicturatorProject : ApplicationSliderPicturatorProject
+public sealed class SliderPicturatorProject : SliderPicturatorServiceOptions
 {
     /// <summary>Gets or sets the approximate preview segment count.</summary>
     public long SegmentCount { get; set; }

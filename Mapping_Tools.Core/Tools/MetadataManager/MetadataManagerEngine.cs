@@ -12,11 +12,11 @@ public static class MetadataManagerEngine
     /// </summary>
     /// <param name="beatmap">The beatmap to inspect.</param>
     /// <returns>A new options object containing independent editable colour instances.</returns>
-    public static MetadataManagerOptions Read(Beatmap beatmap)
+    public static MetadataManagerEngineOptions Read(Beatmap beatmap)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
 
-        MetadataManagerOptions options = new()
+        MetadataManagerEngineOptions options = new()
         {
             Artist = GetText(beatmap.Metadata, "ArtistUnicode"),
             RomanisedArtist = GetText(beatmap.Metadata, "Artist"),
@@ -45,7 +45,7 @@ public static class MetadataManagerEngine
     /// </summary>
     /// <param name="beatmap">The mutable target beatmap.</param>
     /// <param name="options">The values to write.</param>
-    public static void Apply(Beatmap beatmap, MetadataManagerOptions options)
+    public static void Apply(Beatmap beatmap, MetadataManagerEngineOptions options)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(options);

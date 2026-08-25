@@ -22,7 +22,7 @@ public sealed class SliderMergerEngineTests
         int merged = SliderMergerEngine.Merge(
             beatmap,
             beatmap.HitObjects,
-            new SliderMergerOptions { Leniency = 100 });
+            new SliderMergerEngineOptions { Leniency = 100 });
 
         // Assert
         merged.Should().Be(2);
@@ -42,7 +42,7 @@ public sealed class SliderMergerEngineTests
         HitObject first = new("64,64,0,2,0,L|164:64,1,100");
         HitObject second = new("200,64,100,2,0,L|300:64,1,100");
         var beatmap = CreateBeatmap(first, second);
-        SliderMergerOptions options = new()
+        SliderMergerEngineOptions options = new()
         {
             Leniency = 50,
             MergeOnSliderEnd = false,
@@ -66,7 +66,7 @@ public sealed class SliderMergerEngineTests
         HitObject first = new("64,64,0,2,0,L|164:64,1,100");
         HitObject second = new("200,100,100,2,0,L|300:100,1,100");
         var beatmap = CreateBeatmap(first, second);
-        SliderMergerOptions options = new()
+        SliderMergerEngineOptions options = new()
         {
             Leniency = 100,
             MergeOnSliderEnd = false,
@@ -99,7 +99,7 @@ public sealed class SliderMergerEngineTests
         SliderMergerEngine.Merge(
             beatmap,
             beatmap.HitObjects,
-            new SliderMergerOptions { Leniency = 50, MergeOnSliderEnd = false });
+            new SliderMergerEngineOptions { Leniency = 50, MergeOnSliderEnd = false });
 
         // Assert
         var slider = beatmap.HitObjects.Should().ContainSingle().Subject;
@@ -125,7 +125,7 @@ public sealed class SliderMergerEngineTests
         SliderMergerEngine.Merge(
             beatmap,
             beatmap.HitObjects,
-            new SliderMergerOptions { Leniency = 50 });
+            new SliderMergerEngineOptions { Leniency = 50 });
 
         // Assert
         var slider = beatmap.HitObjects.Should().ContainSingle().Subject;
@@ -154,7 +154,7 @@ public sealed class SliderMergerEngineTests
         SliderMergerEngine.Merge(
             beatmap,
             beatmap.HitObjects,
-            new SliderMergerOptions { Leniency = 100 });
+            new SliderMergerEngineOptions { Leniency = 100 });
 
         // Assert
         var slider = beatmap.HitObjects.Should().ContainSingle().Subject;
@@ -177,7 +177,7 @@ public sealed class SliderMergerEngineTests
         int merged = SliderMergerEngine.Merge(
             beatmap,
             beatmap.HitObjects,
-            new SliderMergerOptions { Leniency = 100 });
+            new SliderMergerEngineOptions { Leniency = 100 });
 
         // Assert
         merged.Should().Be(3);
@@ -193,7 +193,7 @@ public sealed class SliderMergerEngineTests
         HitObject first = new("64,64,0,2,0,L|264:64,1,100");
         HitObject second = new("164,64,100,1,0");
         var beatmap = CreateBeatmap(first, second);
-        SliderMergerOptions options = new() { Leniency = 0, MergeOnSliderEnd = true };
+        SliderMergerEngineOptions options = new() { Leniency = 0, MergeOnSliderEnd = true };
 
         // Act
         SliderMergerEngine.Merge(beatmap, beatmap.HitObjects, options);
@@ -214,7 +214,7 @@ public sealed class SliderMergerEngineTests
         Action act = () => SliderMergerEngine.Merge(
             beatmap,
             beatmap.HitObjects,
-            new SliderMergerOptions { Leniency = -1 });
+            new SliderMergerEngineOptions { Leniency = -1 });
 
         // Assert
         act.Should().Throw<ArgumentException>();

@@ -3,10 +3,13 @@ using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
+using Mapping_Tools.Application.Tools.ComboColourStudio;
+using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
 using Mapping_Tools.Application.Tools.MetadataManager;
 using Mapping_Tools.Application.Tools.PropertyTransformer;
+using Mapping_Tools.Application.Tools.PatternGallery.Models;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
@@ -303,11 +306,20 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string legacy_mapset_merger_item =
             "Mapping_Tools.Viewmodels.MapsetMergerVm+MapsetItem";
 
+        private const string legacy_snapping_tools_project =
+            "Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsEngineOptions";
+
         private const string legacy_combo_colour_project =
-            "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourProject";
+            "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourEngineOptions";
 
         private const string legacy_combo_colour_project_without_tools =
-            "Mapping_Tools.Classes.ComboColourStudio.ComboColourProject";
+            "Mapping_Tools.Classes.ComboColourStudio.ComboColourEngineOptions";
+
+        private const string migrated_combo_colour_project =
+            "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourProject";
+
+        private const string migrated_snapping_tools_project =
+            "Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsProject";
 
         private const string legacy_combo_colour_point =
             "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint";
@@ -350,59 +362,138 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
             if (IsCurrentApplicationAssembly(assemblyName))
             {
-                if (typeName == typeof(HitsoundStudioProject).FullName)
-                    return ResolveDesktopProject("HitsoundStudioProject", typeof(HitsoundStudioProject));
-                if (typeName == typeof(PropertyTransformerProject).FullName)
-                    return ResolveDesktopProject("PropertyTransformerProject", typeof(PropertyTransformerProject));
-                if (typeName == typeof(SlideratorProject).FullName)
-                    return ResolveDesktopProject("SlideratorProject", typeof(SlideratorProject));
-                if (typeName == typeof(SliderPicturatorProject).FullName)
-                    return ResolveDesktopProject("SliderPicturatorProject", typeof(SliderPicturatorProject));
+                if (typeName == typeof(ComboColourServiceOptions).FullName)
+                    return ResolveDesktopProject("ComboColourProject", typeof(ComboColourServiceOptions));
+                if (typeName == typeof(HitsoundCopierServiceOptions).FullName)
+                    return ResolveDesktopProject("HitsoundCopierProject", typeof(HitsoundCopierServiceOptions));
+                if (typeName == typeof(HitsoundPreviewHelperServiceOptions).FullName)
+                    return ResolveDesktopProject("HitsoundPreviewHelperProject", typeof(HitsoundPreviewHelperServiceOptions));
+                if (typeName == typeof(MapCleanerServiceOptions).FullName)
+                    return ResolveDesktopProject("MapCleanerProject", typeof(MapCleanerServiceOptions));
+                if (typeName == typeof(MapsetMergerServiceOptions).FullName)
+                    return ResolveDesktopProject("MapsetMergerProject", typeof(MapsetMergerServiceOptions));
+                if (typeName == typeof(MetadataManagerServiceOptions).FullName)
+                    return ResolveDesktopProject("MetadataManagerProject", typeof(MetadataManagerServiceOptions));
+                if (typeName == typeof(HitsoundStudioServiceOptions).FullName)
+                    return ResolveDesktopProject("HitsoundStudioProject", typeof(HitsoundStudioServiceOptions));
+                if (typeName == typeof(PatternGalleryServiceOptions).FullName)
+                    return ResolveDesktopProject("PatternGalleryProject", typeof(PatternGalleryServiceOptions));
+                if (typeName == typeof(PropertyTransformerServiceOptions).FullName)
+                    return ResolveDesktopProject("PropertyTransformerProject", typeof(PropertyTransformerServiceOptions));
+                if (typeName == typeof(RhythmGuideServiceOptions).FullName)
+                    return ResolveDesktopProject("RhythmGuideProject", typeof(RhythmGuideServiceOptions));
+                if (typeName == typeof(SliderCompletionatorServiceOptions).FullName)
+                    return ResolveDesktopProject("SliderCompletionatorProject", typeof(SliderCompletionatorServiceOptions));
+                if (typeName == typeof(SliderMergerServiceOptions).FullName)
+                    return ResolveDesktopProject("SliderMergerProject", typeof(SliderMergerServiceOptions));
+                if (typeName == typeof(SlideratorServiceOptions).FullName)
+                    return ResolveDesktopProject("SlideratorProject", typeof(SlideratorServiceOptions));
+                if (typeName == typeof(SliderPicturatorServiceOptions).FullName)
+                    return ResolveDesktopProject("SliderPicturatorProject", typeof(SliderPicturatorServiceOptions));
+                if (typeName == typeof(SnappingToolsServiceOptions).FullName)
+                    return ResolveDesktopProject("SnappingToolsProject", typeof(SnappingToolsServiceOptions));
+                if (typeName == typeof(TimingCopierServiceOptions).FullName)
+                    return ResolveDesktopProject("TimingCopierProject", typeof(TimingCopierServiceOptions));
+                if (typeName == typeof(TimingHelperServiceOptions).FullName)
+                    return ResolveDesktopProject("TimingHelperProject", typeof(TimingHelperServiceOptions));
+                if (typeName == typeof(TumourGeneratorServiceOptions).FullName)
+                    return ResolveDesktopProject("TumourGeneratorProject", typeof(TumourGeneratorServiceOptions));
+
+                // Accept the application model names written by the previous
+                // migration before the ServiceOptions naming was introduced.
+                if (typeName.EndsWith(".ComboColourProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("ComboColourProject", typeof(ComboColourServiceOptions));
+                if (typeName.EndsWith(".HitsoundCopierProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("HitsoundCopierProject", typeof(HitsoundCopierServiceOptions));
+                if (typeName.EndsWith(".HitsoundPreviewHelperProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("HitsoundPreviewHelperProject", typeof(HitsoundPreviewHelperServiceOptions));
+                if (typeName.EndsWith(".HitsoundStudioProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("HitsoundStudioProject", typeof(HitsoundStudioServiceOptions));
+                if (typeName.EndsWith(".MapCleanerProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("MapCleanerProject", typeof(MapCleanerServiceOptions));
+                if (typeName.EndsWith(".MapsetMergerProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("MapsetMergerProject", typeof(MapsetMergerServiceOptions));
+                if (typeName.EndsWith(".MetadataManagerProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("MetadataManagerProject", typeof(MetadataManagerServiceOptions));
+                if (typeName.EndsWith(".PatternGalleryProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("PatternGalleryProject", typeof(PatternGalleryServiceOptions));
+                if (typeName.EndsWith(".PropertyTransformerProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("PropertyTransformerProject", typeof(PropertyTransformerServiceOptions));
+                if (typeName.EndsWith(".RhythmGuideProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("RhythmGuideProject", typeof(RhythmGuideServiceOptions));
+                if (typeName.EndsWith(".SliderCompletionatorProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("SliderCompletionatorProject", typeof(SliderCompletionatorServiceOptions));
+                if (typeName.EndsWith(".SliderMergerProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("SliderMergerProject", typeof(SliderMergerServiceOptions));
+                if (typeName.EndsWith(".SliderPicturatorProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("SliderPicturatorProject", typeof(SliderPicturatorServiceOptions));
+                if (typeName.EndsWith(".SlideratorProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("SlideratorProject", typeof(SlideratorServiceOptions));
+                if (typeName.EndsWith(".SnappingToolsProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("SnappingToolsProject", typeof(SnappingToolsServiceOptions));
+                if (typeName.EndsWith(".TimingCopierProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("TimingCopierProject", typeof(TimingCopierServiceOptions));
+                if (typeName.EndsWith(".TimingHelperProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("TimingHelperProject", typeof(TimingHelperServiceOptions));
+                if (typeName.EndsWith(".TumourGeneratorProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("TumourGeneratorProject", typeof(TumourGeneratorServiceOptions));
             }
 
             if (IsLegacyAssembly(assemblyName) || IsCurrentCoreAssembly(assemblyName))
             {
-                if (typeName == legacy_rhythm_guide_project) return typeof(RhythmGuideProject);
-                if (typeName == legacy_hitsound_preview_helper_project) return typeof(HitsoundPreviewHelperProject);
-                if (typeName == legacy_hitsound_preview_helper_project_uppercase) return typeof(HitsoundPreviewHelperProject);
-                if (typeName == legacy_hitsound_copier_project) return typeof(HitsoundCopierProject);
+                if (typeName == typeof(ComboColourEngineOptions).FullName)
+                    return ResolveDesktopProject("ComboColourProject", typeof(ComboColourServiceOptions));
+                if (typeName == typeof(PatternGalleryEngineOptions).FullName)
+                    return ResolveDesktopProject("PatternGalleryProject", typeof(PatternGalleryServiceOptions));
+                if (typeName == typeof(SnappingToolsEngineOptions).FullName)
+                    return ResolveDesktopProject("SnappingToolsProject", typeof(SnappingToolsServiceOptions));
+
+                if (typeName == legacy_rhythm_guide_project) return ResolveDesktopProject("RhythmGuideProject", typeof(RhythmGuideServiceOptions));
+                if (typeName == legacy_hitsound_preview_helper_project) return ResolveDesktopProject("HitsoundPreviewHelperProject", typeof(HitsoundPreviewHelperServiceOptions));
+                if (typeName == legacy_hitsound_preview_helper_project_uppercase) return ResolveDesktopProject("HitsoundPreviewHelperProject", typeof(HitsoundPreviewHelperServiceOptions));
+                if (typeName == legacy_hitsound_copier_project) return ResolveDesktopProject("HitsoundCopierProject", typeof(HitsoundCopierServiceOptions));
                 if (typeName == legacy_hitsound_studio_project)
-                    return ResolveDesktopProject("HitsoundStudioProject", typeof(HitsoundStudioProject));
+                    return ResolveDesktopProject("HitsoundStudioProject", typeof(HitsoundStudioServiceOptions));
                 if (typeName == legacy_hitsound_studio_project_uppercase)
-                    return ResolveDesktopProject("HitsoundStudioProject", typeof(HitsoundStudioProject));
+                    return ResolveDesktopProject("HitsoundStudioProject", typeof(HitsoundStudioServiceOptions));
                 if (typeName == legacy_rhythm_guide_options
-                    || typeName == typeof(RhythmGuideOptions).FullName)
-                    return typeof(RhythmGuideProject.RhythmGuideProjectOptions);
-                if (typeName == legacy_map_cleaner_project) return typeof(MapCleanerProject);
+                    || typeName == typeof(RhythmGuideEngineOptions).FullName)
+                    return typeof(RhythmGuideServiceOptions.RhythmGuideRunOptions);
+                if (typeName == legacy_map_cleaner_project) return ResolveDesktopProject("MapCleanerProject", typeof(MapCleanerServiceOptions));
                 if (typeName == legacy_map_cleaner_options
                     || typeName == legacy_map_cleaner_options_without_folder
-                    || typeName == typeof(MapCleanerOptions).FullName)
-                    return typeof(MapCleanerProject.MapCleanerProjectOptions);
-                if (typeName == legacy_metadata_manager_project) return typeof(MetadataManagerProject);
+                    || typeName == typeof(MapCleanerEngineOptions).FullName)
+                    return typeof(MapCleanerServiceOptions.MapCleanerCleanupOptions);
+                if (typeName == legacy_metadata_manager_project) return ResolveDesktopProject("MetadataManagerProject", typeof(MetadataManagerServiceOptions));
                 if (typeName == legacy_property_transformer_project)
-                    return ResolveDesktopProject("PropertyTransformerProject", typeof(PropertyTransformerProject));
+                    return ResolveDesktopProject("PropertyTransformerProject", typeof(PropertyTransformerServiceOptions));
                 if (typeName == legacy_property_transformer_project_uppercase)
-                    return ResolveDesktopProject("PropertyTransformerProject", typeof(PropertyTransformerProject));
-                if (typeName == legacy_timing_copier_project) return typeof(TimingCopierProject);
-                if (typeName == legacy_timing_helper_project) return typeof(TimingHelperProject);
-                if (typeName == legacy_slider_completionator_project) return typeof(SliderCompletionatorProject);
-                if (typeName == legacy_slider_merger_project) return typeof(SliderMergerProject);
+                    return ResolveDesktopProject("PropertyTransformerProject", typeof(PropertyTransformerServiceOptions));
+                if (typeName == legacy_timing_copier_project) return ResolveDesktopProject("TimingCopierProject", typeof(TimingCopierServiceOptions));
+                if (typeName == legacy_timing_helper_project) return ResolveDesktopProject("TimingHelperProject", typeof(TimingHelperServiceOptions));
+                if (typeName == legacy_slider_completionator_project) return ResolveDesktopProject("SliderCompletionatorProject", typeof(SliderCompletionatorServiceOptions));
+                if (typeName == legacy_slider_merger_project) return ResolveDesktopProject("SliderMergerProject", typeof(SliderMergerServiceOptions));
                 if (typeName == legacy_slider_picturator_project)
-                    return ResolveDesktopProject("SliderPicturatorProject", typeof(SliderPicturatorProject));
+                    return ResolveDesktopProject("SliderPicturatorProject", typeof(SliderPicturatorServiceOptions));
                 if (typeName == legacy_sliderator_project)
-                    return ResolveDesktopProject("SlideratorProject", typeof(SlideratorProject));
-                if (typeName == legacy_tumour_generator_project) return typeof(TumourGeneratorProject);
+                    return ResolveDesktopProject("SlideratorProject", typeof(SlideratorServiceOptions));
+                if (typeName == legacy_tumour_generator_project) return ResolveDesktopProject("TumourGeneratorProject", typeof(TumourGeneratorServiceOptions));
                 if (typeName == legacy_tumour_layer) return typeof(TumourLayer);
                 if (typeName == legacy_graph_state) return typeof(GraphState);
                 if (typeName == legacy_graph_anchor) return typeof(GraphAnchor);
-                if (typeName == legacy_mapset_merger_project) return typeof(MapsetMergerProject);
-                if (typeName == legacy_mapset_merger_item) return typeof(MapsetMergerProject.MapsetItem);
-                if (typeName == legacy_combo_colour_project) return typeof(ComboColourProject);
-                if (typeName == legacy_combo_colour_project_without_tools) return typeof(ComboColourProject);
+                if (typeName == legacy_mapset_merger_project) return ResolveDesktopProject("MapsetMergerProject", typeof(MapsetMergerServiceOptions));
+                if (typeName == legacy_mapset_merger_item) return typeof(MapsetMergerServiceOptions.MapsetItem);
+                if (typeName == legacy_combo_colour_project
+                    || typeName == legacy_combo_colour_project_without_tools
+                    || typeName == migrated_combo_colour_project)
+                    return ResolveDesktopProject("ComboColourProject", typeof(ComboColourServiceOptions));
                 if (typeName == legacy_combo_colour_point) return typeof(ColourPoint);
                 if (typeName == legacy_combo_colour_point_without_tools) return typeof(ColourPoint);
                 if (typeName == legacy_hitsound_sample_export_format) return typeof(HitsoundStudioSampleExportFormat);
-                if (typeName == legacy_pattern_gallery_project) return typeof(PatternGalleryProject);
+                if (typeName == legacy_pattern_gallery_project) return ResolveDesktopProject("PatternGalleryProject", typeof(PatternGalleryServiceOptions));
+                if (typeName == legacy_snapping_tools_project
+                    || typeName == migrated_snapping_tools_project)
+                    return ResolveDesktopProject("SnappingToolsProject", typeof(SnappingToolsServiceOptions));
                 if (typeName == legacy_pattern_gallery_pattern) return typeof(PatternGalleryPattern);
                 if (typeName == legacy_pattern_gallery_handler) return typeof(PatternGalleryCollectionMetadata);
                 if (typeName == legacy_hotkey) return typeof(Hotkey);
@@ -422,6 +513,37 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             out string? assemblyName,
             out string? typeName)
         {
+            if (serializedType.Namespace == "Mapping_Tools.Desktop.Models")
+            {
+                typeName = serializedType.Name switch
+                {
+                    "ComboColourProject" => legacy_combo_colour_project,
+                    "HitsoundCopierProject" => legacy_hitsound_copier_project,
+                    "HitsoundPreviewHelperProject" => legacy_hitsound_preview_helper_project,
+                    "HitsoundStudioProject" => legacy_hitsound_studio_project,
+                    "MapCleanerProject" => legacy_map_cleaner_project,
+                    "MapsetMergerProject" => legacy_mapset_merger_project,
+                    "MetadataManagerProject" => legacy_metadata_manager_project,
+                    "PatternGalleryProject" => legacy_pattern_gallery_project,
+                    "PropertyTransformerProject" => legacy_property_transformer_project,
+                    "RhythmGuideProject" => legacy_rhythm_guide_project,
+                    "SliderCompletionatorProject" => legacy_slider_completionator_project,
+                    "SliderMergerProject" => legacy_slider_merger_project,
+                    "SliderPicturatorProject" => legacy_slider_picturator_project,
+                    "SlideratorProject" => legacy_sliderator_project,
+                    "SnappingToolsProject" => legacy_snapping_tools_project,
+                    "TimingCopierProject" => legacy_timing_copier_project,
+                    "TimingHelperProject" => legacy_timing_helper_project,
+                    "TumourGeneratorProject" => legacy_tumour_generator_project,
+                    _ => null,
+                };
+                if (typeName is not null)
+                {
+                    assemblyName = legacy_assembly_name;
+                    return;
+                }
+            }
+
             if (serializedType.FullName == "Mapping_Tools.Desktop.Models.HitsoundStudioProject")
             {
                 assemblyName = legacy_assembly_name;
@@ -450,126 +572,154 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 return;
             }
 
-            if (serializedType == typeof(RhythmGuideProject))
+            if (serializedType == typeof(RhythmGuideServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_rhythm_guide_project;
                 return;
             }
 
-            if (serializedType == typeof(HitsoundPreviewHelperProject))
+            if (serializedType == typeof(HitsoundPreviewHelperServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_hitsound_preview_helper_project;
                 return;
             }
 
-            if (serializedType == typeof(HitsoundCopierProject))
+            if (serializedType == typeof(HitsoundCopierServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_hitsound_copier_project;
                 return;
             }
 
-            if (serializedType == typeof(HitsoundStudioProject))
+            if (serializedType == typeof(ComboColourServiceOptions))
+            {
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_combo_colour_project;
+                return;
+            }
+
+            if (serializedType == typeof(MapsetMergerServiceOptions))
+            {
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_mapset_merger_project;
+                return;
+            }
+
+            if (serializedType == typeof(PatternGalleryServiceOptions))
+            {
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_pattern_gallery_project;
+                return;
+            }
+
+            if (serializedType == typeof(SnappingToolsServiceOptions))
+            {
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_snapping_tools_project;
+                return;
+            }
+
+            if (serializedType == typeof(HitsoundStudioServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_hitsound_studio_project;
                 return;
             }
 
-            if (serializedType == typeof(RhythmGuideOptions))
+            if (serializedType == typeof(RhythmGuideEngineOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_rhythm_guide_options;
                 return;
             }
 
-            if (serializedType == typeof(RhythmGuideProject.RhythmGuideProjectOptions))
+            if (serializedType == typeof(RhythmGuideServiceOptions.RhythmGuideRunOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_rhythm_guide_options;
                 return;
             }
 
-            if (serializedType == typeof(MapCleanerProject))
+            if (serializedType == typeof(MapCleanerServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_map_cleaner_project;
                 return;
             }
 
-            if (serializedType == typeof(MapCleanerOptions))
+            if (serializedType == typeof(MapCleanerEngineOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_map_cleaner_options;
                 return;
             }
 
-            if (serializedType == typeof(MapCleanerProject.MapCleanerProjectOptions))
+            if (serializedType == typeof(MapCleanerServiceOptions.MapCleanerCleanupOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_map_cleaner_options;
                 return;
             }
 
-            if (serializedType == typeof(MetadataManagerProject))
+            if (serializedType == typeof(MetadataManagerServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_metadata_manager_project;
                 return;
             }
 
-            if (serializedType == typeof(PropertyTransformerProject))
+            if (serializedType == typeof(PropertyTransformerServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_property_transformer_project;
                 return;
             }
 
-            if (serializedType == typeof(TimingCopierProject))
+            if (serializedType == typeof(TimingCopierServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_timing_copier_project;
                 return;
             }
 
-            if (serializedType == typeof(TimingHelperProject))
+            if (serializedType == typeof(TimingHelperServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_timing_helper_project;
                 return;
             }
 
-            if (serializedType == typeof(SliderCompletionatorProject))
+            if (serializedType == typeof(SliderCompletionatorServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_slider_completionator_project;
                 return;
             }
 
-            if (serializedType == typeof(SliderMergerProject))
+            if (serializedType == typeof(SliderMergerServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_slider_merger_project;
                 return;
             }
 
-            if (serializedType == typeof(SliderPicturatorProject))
+            if (serializedType == typeof(SliderPicturatorServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_slider_picturator_project;
                 return;
             }
 
-            if (serializedType == typeof(SlideratorProject))
+            if (serializedType == typeof(SlideratorServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_sliderator_project;
                 return;
             }
 
-            if (serializedType == typeof(TumourGeneratorProject))
+            if (serializedType == typeof(TumourGeneratorServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_tumour_generator_project;
@@ -597,21 +747,21 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 return;
             }
 
-            if (serializedType == typeof(MapsetMergerProject))
+            if (serializedType == typeof(MapsetMergerServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_mapset_merger_project;
                 return;
             }
 
-            if (serializedType == typeof(MapsetMergerProject.MapsetItem))
+            if (serializedType == typeof(MapsetMergerServiceOptions.MapsetItem))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_mapset_merger_item;
                 return;
             }
 
-            if (serializedType == typeof(ComboColourProject))
+            if (serializedType == typeof(ComboColourEngineOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_combo_colour_project;
@@ -625,7 +775,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 return;
             }
 
-            if (serializedType == typeof(PatternGalleryProject))
+            if (serializedType == typeof(PatternGalleryEngineOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_pattern_gallery_project;

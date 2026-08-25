@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.ViewModels.GeometryDashboard;
 using GeometryDashboardGeneratorSettingsWindow = Mapping_Tools.Desktop.Views.GeometryDashboard.GeometryDashboardGeneratorSettingsWindow;
 using GeometryDashboardPreferencesWindow = Mapping_Tools.Desktop.Views.GeometryDashboard.GeometryDashboardPreferencesWindow;

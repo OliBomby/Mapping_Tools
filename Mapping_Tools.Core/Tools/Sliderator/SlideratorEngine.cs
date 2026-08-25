@@ -27,7 +27,7 @@ public static class SlideratorEngine
     public static SlideratorApplyResult Apply(
         Beatmap beatmap,
         HitObject sourceSlider,
-        SlideratorOptions options,
+        SlideratorEngineOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -266,7 +266,7 @@ public static class SlideratorEngine
     /// <summary>Calculates the normalized graph-to-slider conversion multiplier.</summary>
     /// <param name="options">The graph and map settings.</param>
     /// <returns>Multiplier from graph completion units to slider pixels.</returns>
-    public static double GetSvGraphMultiplier(SlideratorOptions options)
+    public static double GetSvGraphMultiplier(SlideratorEngineOptions options)
     {
         return 100 * options.GlobalSv / options.PixelLength;
     }
@@ -274,7 +274,7 @@ public static class SlideratorEngine
     /// <summary>Calculates the maximum preview completion represented by the graph.</summary>
     /// <param name="options">The graph and map settings.</param>
     /// <returns>The largest graph completion value.</returns>
-    public static double GetMaxCompletion(SlideratorOptions options)
+    public static double GetMaxCompletion(SlideratorEngineOptions options)
     {
         return options.GraphModeSetting == SlideratorGraphMode.Velocity
             ? options.GraphState.GetMaxIntegral() * GetSvGraphMultiplier(options)
@@ -284,7 +284,7 @@ public static class SlideratorEngine
     /// <summary>Calculates the minimum preview completion represented by the graph.</summary>
     /// <param name="options">The graph and map settings.</param>
     /// <returns>The smallest graph completion value.</returns>
-    public static double GetMinCompletion(SlideratorOptions options)
+    public static double GetMinCompletion(SlideratorEngineOptions options)
     {
         return options.GraphModeSetting == SlideratorGraphMode.Velocity
             ? options.GraphState.GetMinIntegral() * GetSvGraphMultiplier(options)
@@ -294,7 +294,7 @@ public static class SlideratorEngine
     /// <summary>Calculates the maximum absolute SV represented by the graph.</summary>
     /// <param name="options">The graph and map settings.</param>
     /// <returns>The largest absolute SV value.</returns>
-    public static double GetMaximumVelocity(SlideratorOptions options)
+    public static double GetMaximumVelocity(SlideratorEngineOptions options)
     {
         return options.GraphModeSetting == SlideratorGraphMode.Velocity
             ? Math.Max(Math.Abs(options.GraphState.GetMaxValue()), Math.Abs(options.GraphState.GetMinValue()))
@@ -306,7 +306,7 @@ public static class SlideratorEngine
     /// <param name="sourceSlider">The imported source object.</param>
     /// <exception cref="ArgumentException">A setting is outside the legacy contract.</exception>
     /// <exception cref="InvalidOperationException">The source is not a slider.</exception>
-    public static void Validate(SlideratorOptions options, HitObject sourceSlider)
+    public static void Validate(SlideratorEngineOptions options, HitObject sourceSlider)
     {
         if (!sourceSlider.IsSlider) throw new InvalidOperationException("Sliderator requires a slider source object.");
 

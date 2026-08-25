@@ -25,7 +25,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
     /// <inheritdoc />
     public async Task<PropertyTransformerResult> TransformAsync(
         IReadOnlyList<string> paths,
-        PropertyTransformerOptions options,
+        PropertyTransformerServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

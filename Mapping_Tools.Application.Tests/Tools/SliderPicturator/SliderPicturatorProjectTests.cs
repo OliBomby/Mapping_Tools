@@ -10,7 +10,7 @@ public sealed class SliderPicturatorProjectTests
     public void Validate_QualityOutsideLegacySliderRange_ThrowsBeforeRun()
     {
         // Arrange
-        SliderPicturatorProject project = new() { PictureFile = "image.png", Quality = 102 };
+        SliderPicturatorServiceOptions project = new() { PictureFile = "image.png", Quality = 102 };
 
         // Act
         var act = project.Validate;

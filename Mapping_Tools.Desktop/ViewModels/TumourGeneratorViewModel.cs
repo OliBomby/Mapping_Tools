@@ -18,6 +18,7 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Tools.TumourGenerating.Models;
 using Mapping_Tools.Core.Tools.TumourGenerating.Templates;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels.Adapters;
 
@@ -647,9 +648,9 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         return project;
     }
 
-    private TumourGeneratorOptions SnapshotOptions()
+    private TumourGeneratorEngineOptions SnapshotOptions()
     {
-        return new TumourGeneratorOptions
+        return new TumourGeneratorEngineOptions
         {
             TumourLayers = TumourLayers.Select(layer => layer.Snapshot()).ToList(),
             JustMiddleAnchors = JustMiddleAnchors,

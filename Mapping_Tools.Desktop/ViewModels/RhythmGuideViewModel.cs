@@ -13,6 +13,7 @@ using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Mapping_Tools.Desktop.Interactions;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;
@@ -193,9 +194,9 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         };
     }
 
-    private RhythmGuideProject.RhythmGuideProjectOptions CreateOptions()
+    private RhythmGuideProject.RhythmGuideRunOptions CreateOptions()
     {
-        return new RhythmGuideProject.RhythmGuideProjectOptions
+        return new RhythmGuideProject.RhythmGuideRunOptions
         {
             Paths = SourcePaths.ToArray(),
             ExportPath = ExportPath,
@@ -231,7 +232,7 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     {
         return new RhythmGuideProject
         {
-            GuideGeneratorArgs = new RhythmGuideProject.RhythmGuideProjectOptions { ExportPath = exportPath },
+            GuideGeneratorArgs = new RhythmGuideProject.RhythmGuideRunOptions { ExportPath = exportPath },
         };
     }
 

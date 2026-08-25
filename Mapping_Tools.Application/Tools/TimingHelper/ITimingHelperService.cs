@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.Tools.TimingHelper;
-
 namespace Mapping_Tools.Application.Tools.TimingHelper;
 
 /// <summary>
@@ -18,7 +16,7 @@ public interface ITimingHelperService
     /// <returns>The processed paths and total inserted redlines.</returns>
     Task<TimingHelperResult> AdjustAsync(
         IReadOnlyList<string> paths,
-        TimingHelperOptions options,
+        TimingHelperServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

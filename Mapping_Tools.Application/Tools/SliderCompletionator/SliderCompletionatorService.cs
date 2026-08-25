@@ -27,7 +27,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
     /// <inheritdoc />
     public async Task<SliderCompletionatorResult> CompleteAsync(
         IReadOnlyList<string> paths,
-        SliderCompletionatorProject options,
+        SliderCompletionatorServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

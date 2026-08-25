@@ -125,11 +125,11 @@ public sealed class PropertyTransformerViewModelTests
     {
         public IReadOnlyList<string>? Paths { get; private set; }
 
-        public PropertyTransformerOptions? Options { get; private set; }
+        public PropertyTransformerEngineOptions? Options { get; private set; }
 
         public Task<PropertyTransformerResult> TransformAsync(
             IReadOnlyList<string> paths,
-            PropertyTransformerOptions options,
+            PropertyTransformerServiceOptions options,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

@@ -13,7 +13,7 @@ public sealed class PropertyTransformerEngineTests
         // Arrange
         var beatmap = Load("standard-feature-rich.osu");
         double[] originalBookmarks = beatmap.GetBookmarks().ToArray();
-        PropertyTransformerOptions options = new()
+        PropertyTransformerEngineOptions options = new()
         {
             BookmarkTimeOffset = 5,
         };
@@ -33,7 +33,7 @@ public sealed class PropertyTransformerEngineTests
         // Arrange
         var beatmap = Load("standard-feature-rich.osu");
         double[] originalBookmarks = beatmap.GetBookmarks().ToArray();
-        PropertyTransformerOptions options = new()
+        PropertyTransformerEngineOptions options = new()
         {
             BookmarkTimeMultiplier = 2,
             BookmarkTimeOffset = 100,

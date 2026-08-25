@@ -109,7 +109,7 @@ public sealed class AutoFailDetectorViewModelTests
 
     private sealed class RecordingAutoFailService : IAutoFailService
     {
-        public AutoFailOptions? Options { get; private set; }
+        public AutoFailServiceOptions? Options { get; private set; }
 
         public AutoFailAnalysis Analysis { get; init; } =
             new(true, [1000], [1000, 2000], [1500]);
@@ -117,7 +117,7 @@ public sealed class AutoFailDetectorViewModelTests
         public int FixPlanRequestCount { get; private set; }
 
         public Task<AutoFailRun> AnalyzeAsync(
-            AutoFailOptions options,
+            AutoFailServiceOptions options,
             CancellationToken cancellationToken = default)
         {
             Options = options;

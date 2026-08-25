@@ -101,10 +101,10 @@ public sealed class TimingCopierViewModelTests
 
     private sealed class RecordingTimingCopier : ITimingCopierService
     {
-        public TimingCopierProject? Options { get; private set; }
+        public TimingCopierServiceOptions? Options { get; private set; }
 
         public Task<TimingCopierResult> CopyAsync(
-            TimingCopierProject options,
+            TimingCopierServiceOptions options,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

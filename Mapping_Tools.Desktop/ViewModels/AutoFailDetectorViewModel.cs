@@ -140,7 +140,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
                 {
                     context.ReportProgress(0.33, "Loading beatmap");
                     var run = await autoFail.AnalyzeAsync(
-                        new AutoFailOptions(
+                        new AutoFailServiceOptions(
                             path,
                             ApproachRateOverride,
                             OverallDifficultyOverride,

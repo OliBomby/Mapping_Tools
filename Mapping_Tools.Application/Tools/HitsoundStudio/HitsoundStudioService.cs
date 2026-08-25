@@ -159,7 +159,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
 
     /// <inheritdoc />
     public async Task<HitsoundStudioExportResult> ExportAsync(
-        HitsoundStudioProject project,
+        HitsoundStudioServiceOptions project,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -563,7 +563,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
 
     private async Task<int> ExportStandardSamplesAsync(
         SampleSchema schema,
-        HitsoundStudioProject project,
+        HitsoundStudioServiceOptions project,
         SampleGeneratingArgsComparer comparer,
         CancellationToken cancellationToken)
     {
@@ -589,7 +589,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
 
     private async Task<int> ExportNamedSamplesAsync(
         HitsoundStudioNamedResult named,
-        HitsoundStudioProject project,
+        HitsoundStudioServiceOptions project,
         SampleGeneratingArgsComparer comparer,
         CancellationToken cancellationToken)
     {
@@ -665,7 +665,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
 
     private async Task<int> ExportMidiChordsAsync(
         IReadOnlyList<SamplePackage> packages,
-        HitsoundStudioProject project,
+        HitsoundStudioServiceOptions project,
         CancellationToken cancellationToken)
     {
         string path = Path.Combine(project.ExportFolder, project.HitsoundDiffName + ".mid");
@@ -757,7 +757,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
     private void ApplyExport(
         Beatmap beatmap,
         IReadOnlyList<HitsoundEvent> events,
-        HitsoundStudioProject project)
+        HitsoundStudioServiceOptions project)
     {
         if (project.HitsoundExportModeSetting == HitsoundStudioExportMode.Storyboard)
         {
@@ -867,7 +867,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         return Math.Pow(Math.Ceiling(Math.Pow(length, 1 / roughness)), roughness);
     }
 
-    private static void ValidateProject(HitsoundStudioProject project)
+    private static void ValidateProject(HitsoundStudioServiceOptions project)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(project.BaseBeatmap);
         ArgumentException.ThrowIfNullOrWhiteSpace(project.ExportFolder);

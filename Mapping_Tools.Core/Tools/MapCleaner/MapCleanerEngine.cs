@@ -18,7 +18,7 @@ public static class MapCleanerEngine
     /// <returns>The cleanup counts and timing-point timeline markers.</returns>
     public static MapCleanerResult Clean(
         Beatmap beatmap,
-        MapCleanerOptions options,
+        MapCleanerEngineOptions options,
         string mapDirectory = "",
         IReadOnlyDictionary<string, string>? firstSamples = null,
         IProgress<double>? progress = null,

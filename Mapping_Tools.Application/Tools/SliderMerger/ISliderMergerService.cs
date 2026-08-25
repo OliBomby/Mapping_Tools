@@ -11,7 +11,7 @@ public interface ISliderMergerService
     /// <returns>The processed paths and merged-object count.</returns>
     Task<SliderMergerResult> MergeAsync(
         IReadOnlyList<string> paths,
-        SliderMergerProject options,
+        SliderMergerServiceOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

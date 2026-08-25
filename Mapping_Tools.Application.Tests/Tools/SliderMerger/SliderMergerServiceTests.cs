@@ -21,7 +21,7 @@ public sealed class SliderMergerServiceTests
         // Act
         var result = await service.MergeAsync(
             ["selected.osu"],
-            new SliderMergerProject());
+            new SliderMergerServiceOptions());
 
         // Assert
         result.ProcessedPaths.Should().Equal("selected.osu");
@@ -37,7 +37,7 @@ public sealed class SliderMergerServiceTests
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway();
         SliderMergerService service = new(gateway);
-        SliderMergerProject options = new()
+        SliderMergerServiceOptions options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Everything,
         };
@@ -62,7 +62,7 @@ public sealed class SliderMergerServiceTests
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway();
         SliderMergerService service = new(gateway);
-        SliderMergerProject options = new()
+        SliderMergerServiceOptions options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Bookmarked,
             Leniency = 100,
@@ -83,7 +83,7 @@ public sealed class SliderMergerServiceTests
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway();
         SliderMergerService service = new(gateway);
-        SliderMergerProject options = new()
+        SliderMergerServiceOptions options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Time,
             TimeCode = "00:00:000 (1,2)",
@@ -107,7 +107,7 @@ public sealed class SliderMergerServiceTests
         SliderMergerService service = new(gateway);
 
         // Act
-        Func<Task> act = () => service.MergeAsync([], new SliderMergerProject());
+        Func<Task> act = () => service.MergeAsync([], new SliderMergerServiceOptions());
 
         // Assert
         await act.Should().ThrowAsync<ArgumentException>();

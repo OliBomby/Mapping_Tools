@@ -32,7 +32,7 @@ public static class HitsoundCopierEngine
         Beatmap target,
         Beatmap source,
         IReadOnlyCollection<HitObject> sourceObjects,
-        HitsoundCopierOptions options,
+        HitsoundCopierEngineOptions options,
         string mapDirectory,
         IReadOnlyDictionary<string, string>? firstSamples = null,
         string? sourceMapDirectory = null,
@@ -269,7 +269,7 @@ public static class HitsoundCopierEngine
     }
 
     private static int CopyMatchingHitsounds(
-        HitsoundCopierOptions options,
+        HitsoundCopierEngineOptions options,
         Timeline source,
         Timeline target)
     {
@@ -294,7 +294,7 @@ public static class HitsoundCopierEngine
         Beatmap targetBeatmap,
         Timeline source,
         Timeline target,
-        HitsoundCopierOptions options,
+        HitsoundCopierEngineOptions options,
         double firstTime,
         GameMode mode,
         string mapDirectory,
@@ -475,7 +475,7 @@ public static class HitsoundCopierEngine
         GameMode mode,
         string sourceMapDirectory,
         IReadOnlyDictionary<string, string> sourceSamples,
-        HitsoundCopierOptions options,
+        HitsoundCopierEngineOptions options,
         Func<HitsoundSampleAssignmentRequest, HitsoundSampleAssignment?>? assignSample)
     {
         if (assignSample is null) return null;
@@ -497,7 +497,7 @@ public static class HitsoundCopierEngine
         TimelineObject source,
         double targetTime,
         HitsoundSampleAssignment assignment,
-        HitsoundCopierOptions options)
+        HitsoundCopierEngineOptions options)
     {
         var point = source.HitsoundTimingPoint.Copy();
         point.Offset = targetTime;
@@ -532,7 +532,7 @@ public static class HitsoundCopierEngine
     }
 
     private static void CopyHitsounds(
-        HitsoundCopierOptions options,
+        HitsoundCopierEngineOptions options,
         TimelineObject source,
         TimelineObject target)
     {
@@ -602,7 +602,7 @@ public static class HitsoundCopierEngine
         TimingPointChange.Apply(beatmap.BeatmapTiming, changes);
     }
 
-    private static bool FilterMute(TimelineObject item, Beatmap beatmap, HitsoundCopierOptions options)
+    private static bool FilterMute(TimelineObject item, Beatmap beatmap, HitsoundCopierEngineOptions options)
     {
         // Check whether it's defined
         if (!item.CanCopy

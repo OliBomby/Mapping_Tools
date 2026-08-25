@@ -141,7 +141,7 @@ public sealed class TransformationFixtureTests
         {
             case "auto-fail-detector":
             {
-                AutoFailOptions autoFailOptions = new(
+                AutoFailServiceOptions autoFailOptions = new(
                     target,
                     NumberProperty(options, "ApproachRateOverride"),
                     NumberProperty(options, "OverallDifficultyOverride"),
@@ -164,7 +164,7 @@ public sealed class TransformationFixtureTests
             case "combo-colour-studio":
                 await new ComboColourStudioService(gateway).ApplyAsync(
                     [target],
-                    ReadTransformationProject<ComboColourProject>(fixtureRoot, fixtureName),
+                    ReadTransformationProject<ComboColourServiceOptions>(fixtureRoot, fixtureName),
                     cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "hitsound-copier":
@@ -173,18 +173,18 @@ public sealed class TransformationFixtureTests
                         new EmptyHitsoundSampleService(),
                         new ApplicationSettings { AutoReload = false })
                     .CopyAsync(
-                        ReadTransformationProject<HitsoundCopierProject>(fixtureRoot, fixtureName),
+                        ReadTransformationProject<HitsoundCopierServiceOptions>(fixtureRoot, fixtureName),
                         cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "hitsound-preview":
                 await new HitsoundPreviewHelperService(gateway).ApplyAsync(
                     [target],
-                    ReadTransformationProject<HitsoundPreviewHelperProject>(fixtureRoot, fixtureName),
+                    ReadTransformationProject<HitsoundPreviewHelperServiceOptions>(fixtureRoot, fixtureName),
                     cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "hitsound-studio":
             {
-                var project = ReadTransformationProject<HitsoundStudioProject>(
+                var project = ReadTransformationProject<HitsoundStudioServiceOptions>(
                     fixtureRoot,
                     fixtureName);
                 project.ExportFolder = Path.Combine(Path.GetDirectoryName(target)!, "hitsound-studio-export");
@@ -194,7 +194,7 @@ public sealed class TransformationFixtureTests
             }
             case "map-cleaner":
             {
-                var project = ReadTransformationProject<MapCleanerProject>(fixtureRoot, fixtureName);
+                var project = ReadTransformationProject<MapCleanerServiceOptions>(fixtureRoot, fixtureName);
                 await new MapCleanerService(
                         gateway, new PhysicalBeatmapFileSystem(), new EmptyMapCleanerSampleService())
                     .CleanAsync([target], project.MapCleanerArgs, cancellationToken: cancellationToken);
@@ -202,7 +202,7 @@ public sealed class TransformationFixtureTests
             }
             case "mapset-merger":
             {
-                var project = ReadTransformationProject<MapsetMergerProject>(
+                var project = ReadTransformationProject<MapsetMergerServiceOptions>(
                     fixtureRoot,
                     fixtureName);
                 StageMapsetMergerSources(options, fixtureRoot, project);
@@ -218,13 +218,13 @@ public sealed class TransformationFixtureTests
                 var result = await new MetadataManagerService(
                         gateway, new TestBeatmapBackupService())
                     .ExportAsync(
-                        ReadTransformationProject<MetadataManagerProject>(fixtureRoot, fixtureName),
+                        ReadTransformationProject<MetadataManagerServiceOptions>(fixtureRoot, fixtureName),
                         cancellationToken: cancellationToken);
                 return new FixtureExecutionResult(result.ProcessedPaths);
             }
             case "pattern-gallery":
             {
-                var project = ReadTransformationProject<PatternGalleryProject>(
+                var project = ReadTransformationProject<PatternGalleryServiceOptions>(
                     fixtureRoot,
                     fixtureName);
                 var paths = ReadPatternGalleryPaths(options, fixtureRoot);
@@ -237,12 +237,12 @@ public sealed class TransformationFixtureTests
             case "property-transformer":
                 await new PropertyTransformerService(gateway).TransformAsync(
                     [target],
-                    ReadTransformationProject<PropertyTransformerProject>(fixtureRoot, fixtureName),
+                    ReadTransformationProject<PropertyTransformerServiceOptions>(fixtureRoot, fixtureName),
                     cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "rhythm-guide":
             {
-                var rhythmOptions = ReadTransformationProject<RhythmGuideProject>(
+                var rhythmOptions = ReadTransformationProject<RhythmGuideServiceOptions>(
                     fixtureRoot,
                     fixtureName).GuideGeneratorArgs;
                 await new RhythmGuideService(
@@ -254,25 +254,25 @@ public sealed class TransformationFixtureTests
             case "slider-completionator":
                 await new SliderCompletionatorService(gateway).CompleteAsync(
                     [target],
-                    ReadTransformationProject<SliderCompletionatorProject>(fixtureRoot, fixtureName),
+                    ReadTransformationProject<SliderCompletionatorServiceOptions>(fixtureRoot, fixtureName),
                     cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "slider-merger":
                 await new SliderMergerService(gateway).MergeAsync(
                     [target],
-                    ReadTransformationProject<SliderMergerProject>(fixtureRoot, fixtureName),
+                    ReadTransformationProject<SliderMergerServiceOptions>(fixtureRoot, fixtureName),
                     cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "slider-picturator":
                 await new SliderPicturatorService(gateway, new SystemDrawingImageFileService())
                     .PicturateAsync(
                         target,
-                        ReadTransformationProject<SliderPicturatorProject>(fixtureRoot, fixtureName),
+                        ReadTransformationProject<SliderPicturatorServiceOptions>(fixtureRoot, fixtureName),
                         cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "sliderator":
             {
-                var project = ReadTransformationProject<SlideratorProject>(fixtureRoot, fixtureName);
+                var project = ReadTransformationProject<SlideratorServiceOptions>(fixtureRoot, fixtureName);
                 var sourceSlider = ReadLegacySlider(fixtureRoot, fixtureName);
                 ApplySlideratorTransientState(project, sourceSlider);
                 await new SlideratorService(gateway).RunAsync(
@@ -281,18 +281,18 @@ public sealed class TransformationFixtureTests
             }
             case "timing-copier":
                 await new TimingCopierService(gateway).CopyAsync(
-                    ReadTransformationProject<TimingCopierProject>(fixtureRoot, fixtureName),
+                    ReadTransformationProject<TimingCopierServiceOptions>(fixtureRoot, fixtureName),
                     cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "timing-helper":
                 await new TimingHelperService(gateway).AdjustAsync(
                     [target],
-                    ReadTransformationProject<TimingHelperProject>(fixtureRoot, fixtureName),
+                    ReadTransformationProject<TimingHelperServiceOptions>(fixtureRoot, fixtureName),
                     cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "tumour-generator":
             {
-                var project = ReadTransformationProject<TumourGeneratorProject>(
+                var project = ReadTransformationProject<TumourGeneratorServiceOptions>(
                     fixtureRoot,
                     fixtureName);
                 project.TumourLayers = project.TumourLayers
@@ -348,7 +348,7 @@ public sealed class TransformationFixtureTests
         return projectJson.Deserialize<HitObject>(sliderJson);
     }
 
-    private static void ApplySlideratorTransientState(SlideratorProject project, HitObject sourceSlider)
+    private static void ApplySlideratorTransientState(SlideratorServiceOptions project, HitObject sourceSlider)
     {
         // These values are JsonIgnore in the legacy project format. The desktop
         // view model derives them when it installs the loaded source slider.
@@ -363,7 +363,7 @@ public sealed class TransformationFixtureTests
     private static void StageMapsetMergerSources(
         JsonElement options,
         string fixtureRoot,
-        MapsetMergerProject project)
+        MapsetMergerServiceOptions project)
     {
         string sourceRoot = ResolveFixturePath(fixtureRoot, "../Mapsets/multi-difficulty");
         foreach (var mapsetOptions in options.GetProperty("Mapsets").EnumerateArray())

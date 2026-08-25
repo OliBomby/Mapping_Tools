@@ -11,6 +11,7 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.ViewModels.GeometryDashboard;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GeometryDashboardViewModel = Mapping_Tools.Desktop.ViewModels.GeometryDashboard.GeometryDashboardViewModel;

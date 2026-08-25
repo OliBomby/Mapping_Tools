@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Desktop.Models;
 
 namespace Mapping_Tools.Desktop.Interactions.GeometryDashboard;
 

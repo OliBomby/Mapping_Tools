@@ -31,7 +31,7 @@ public sealed class LegacyProjectJsonSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<HitsoundStudioProject>(json);
+        var project = serializer.Deserialize<HitsoundStudioServiceOptions>(json);
 
         // Assert
         project.BaseBeatmap.Should().Be("C:\\Maps\\base.osu");
@@ -46,7 +46,7 @@ public sealed class LegacyProjectJsonSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        string json = serializer.Serialize(new HitsoundStudioProject());
+        string json = serializer.Serialize(new HitsoundStudioServiceOptions());
 
         // Assert
         json.Should().Contain("Mapping_Tools.Viewmodels.HitsoundStudioVm, Mapping Tools");
@@ -61,7 +61,7 @@ public sealed class LegacyProjectJsonSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<HitsoundStudioProject>(json);
+        var project = serializer.Deserialize<HitsoundStudioServiceOptions>(json);
 
         // Assert
         project.DeleteAllInExportFirst.Should().BeTrue();
@@ -91,7 +91,7 @@ public sealed class LegacyProjectJsonSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<MapsetMergerProject>(json);
+        var project = serializer.Deserialize<MapsetMergerServiceOptions>(json);
 
         // Assert
         project.ExportPath.Should().Be("C:\\Export");
@@ -113,7 +113,7 @@ public sealed class LegacyProjectJsonSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<MapsetMergerProject>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<MapsetMergerServiceOptions>(File.ReadAllText(fixture));
 
         // Assert
         project.ExportPath.Should().Contain("Mapping Tools");
@@ -128,10 +128,10 @@ public sealed class LegacyProjectJsonSerializerTests
     public void Serialize_WithMapsetMergerProject_UsesLegacyTypeNames()
     {
         // Arrange
-        MapsetMergerProject project = new()
+        MapsetMergerServiceOptions project = new()
         {
             ExportPath = "C:\\Export",
-            Mapsets = [new MapsetMergerProject.MapsetItem { Name = "Pack", Path = "C:\\Pack" }],
+            Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Pack", Path = "C:\\Pack" }],
         };
         LegacyProjectJsonSerializer serializer = new();
 
@@ -156,7 +156,7 @@ public sealed class LegacyProjectJsonSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<TumourGeneratorProject>(json);
+        var project = serializer.Deserialize<TumourGeneratorServiceOptions>(json);
 
         // Assert
         project.TumourLayers.Should().ContainSingle();
@@ -179,7 +179,7 @@ public sealed class LegacyProjectJsonSerializerTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<SlideratorProject>(json);
+        var project = serializer.Deserialize<SlideratorServiceOptions>(json);
 
         // Assert
         project.GraphState.Anchors.Should().HaveCount(3);
@@ -190,7 +190,7 @@ public sealed class LegacyProjectJsonSerializerTests
     public void Serialize_WithTumourGeneratorProject_UsesLegacyRootAndLayerNames()
     {
         // Arrange
-        TumourGeneratorProject project = new();
+        TumourGeneratorServiceOptions project = new();
         LegacyProjectJsonSerializer serializer = new();
 
         // Act

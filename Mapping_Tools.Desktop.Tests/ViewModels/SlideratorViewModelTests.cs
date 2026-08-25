@@ -145,7 +145,7 @@ public sealed class SlideratorViewModelTests
     {
         public string? ImportPath { get; private set; }
 
-        public SlideratorProject? Project { get; private set; }
+        public SlideratorServiceOptions? Project { get; private set; }
 
         public bool ReloadEditor { get; private set; }
 
@@ -168,7 +168,7 @@ public sealed class SlideratorViewModelTests
 
         public Task<SlideratorResult> RunAsync(
             string path,
-            SlideratorProject project,
+            SlideratorServiceOptions project,
             HitObject sourceSlider,
             bool reloadEditor,
             IProgress<double>? progress = null,

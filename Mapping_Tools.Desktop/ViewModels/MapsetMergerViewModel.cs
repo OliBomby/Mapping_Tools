@@ -13,6 +13,7 @@ using Mapping_Tools.Application.Tools.MapsetMerger.Contracts;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Tools.MapsetMerger;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;

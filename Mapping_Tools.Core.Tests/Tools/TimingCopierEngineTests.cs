@@ -17,7 +17,7 @@ public sealed class TimingCopierEngineTests
         var source = CreateBeatmap(500);
         var target = CreateBeatmap(1000, 1000);
         target.SetBookmarks([1500]);
-        TimingCopierOptions options = new()
+        TimingCopierEngineOptions options = new()
         {
             ResnapMode = TimingCopierResnapMode.PreserveBeatSpacing,
             BeatDivisors = [new RationalBeatDivisor(1, 4)],
@@ -39,7 +39,7 @@ public sealed class TimingCopierEngineTests
         var source = CreateBeatmap(500);
         var target = CreateBeatmap(1000, 700);
         target.SetBookmarks([700]);
-        TimingCopierOptions options = new()
+        TimingCopierEngineOptions options = new()
         {
             ResnapMode = TimingCopierResnapMode.Resnap,
             BeatDivisors = [new RationalBeatDivisor(1, 4)],
@@ -60,7 +60,7 @@ public sealed class TimingCopierEngineTests
         var source = CreateBeatmap(500);
         var target = CreateBeatmap(1000, 700);
         target.SetBookmarks([900]);
-        TimingCopierOptions options = new()
+        TimingCopierEngineOptions options = new()
         {
             ResnapMode = TimingCopierResnapMode.KeepObjectsFixed,
             BeatDivisors = [new RationalBeatDivisor(1, 4)],
@@ -92,7 +92,7 @@ public sealed class TimingCopierEngineTests
             false,
             false);
         target.BeatmapTiming.Add(targetGreenline);
-        TimingCopierOptions options = new()
+        TimingCopierEngineOptions options = new()
         {
             ResnapMode = TimingCopierResnapMode.KeepObjectsFixed,
             BeatDivisors = [new RationalBeatDivisor(1, 4)],
@@ -114,7 +114,7 @@ public sealed class TimingCopierEngineTests
         var target = CreateBeatmap(1000, 1000);
         CancellationTokenSource cancellation = new();
         cancellation.Cancel();
-        TimingCopierOptions options = new()
+        TimingCopierEngineOptions options = new()
         {
             ResnapMode = TimingCopierResnapMode.KeepObjectsFixed,
             BeatDivisors = [new RationalBeatDivisor(1, 4)],

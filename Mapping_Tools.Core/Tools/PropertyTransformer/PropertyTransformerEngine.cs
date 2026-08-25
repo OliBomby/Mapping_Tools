@@ -18,7 +18,7 @@ public static class PropertyTransformerEngine
     /// <param name="cancellationToken">Cancels between transformation stages and items.</param>
     public static void Apply(
         Beatmap beatmap,
-        PropertyTransformerOptions options,
+        PropertyTransformerEngineOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -285,7 +285,7 @@ public static class PropertyTransformerEngine
     /// <param name="cancellationToken">Cancels between transformation stages and items.</param>
     public static void Apply(
         StoryBoard storyboard,
-        PropertyTransformerOptions options,
+        PropertyTransformerEngineOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -370,7 +370,7 @@ public static class PropertyTransformerEngine
     }
 
     private static bool PassesFilter(
-        PropertyTransformerOptions options,
+        PropertyTransformerEngineOptions options,
         double value,
         double time)
     {
@@ -390,7 +390,7 @@ public static class PropertyTransformerEngine
     }
 
     private static void TransformProperty(
-        PropertyTransformerOptions options,
+        PropertyTransformerEngineOptions options,
         double multiplier,
         double offset,
         Func<double> getter,
@@ -419,7 +419,7 @@ public static class PropertyTransformerEngine
     }
 
     private static void TransformEventTime(
-        PropertyTransformerOptions options,
+        PropertyTransformerEngineOptions options,
         Beatmap? sourceBeatmap,
         Event current,
         double multiplier,
