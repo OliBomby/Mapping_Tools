@@ -84,6 +84,28 @@ public sealed class SliderMergerEngineTests
         slider.EdgeHitsounds.Should().Equal(0, 0);
     }
 
+    [DataTestMethod]
+    [DataRow(PathType.PerfectCurve)]
+    [DataRow(PathType.Catmull)]
+    public void Merge_PerfectCurveOrCatmullSliderWithCircle_ConvertsResultToBezier(PathType pathType)
+    {
+        // Arrange
+        string pathToken = pathType == PathType.PerfectCurve ? "P" : "C";
+        HitObject first = new($"64,64,0,2,0,{pathToken}|114:164|164:64,1,100");
+        HitObject second = new("200,64,100,1,0");
+        var beatmap = CreateBeatmap(first, second);
+
+        // Act
+        SliderMergerEngine.Merge(
+            beatmap,
+            beatmap.HitObjects,
+            new SliderMergerOptions { Leniency = 50, MergeOnSliderEnd = false });
+
+        // Assert
+        var slider = beatmap.HitObjects.Should().ContainSingle().Subject;
+        slider.SliderType.Should().Be(PathType.Bezier);
+    }
+
     [TestMethod]
     public void Merge_SliderAndCircle_RetainsExistingEdgeSamplesAndNormalizesRepeat()
     {
