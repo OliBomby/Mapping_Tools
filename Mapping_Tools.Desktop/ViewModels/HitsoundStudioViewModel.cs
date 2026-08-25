@@ -53,6 +53,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     private readonly IHitsoundStudioService service;
     private readonly ApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
+    private readonly SemaphoreSlim previewGate = new(1, 1);
+    private CancellationTokenSource? previewCancellation;
     private IAudioPlaybackSession? previewSession;
     private bool syncingEditor;
 
@@ -531,8 +533,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         }
     }
 
-    /// <summary>Previews the selected layer and disposes the previous session first.</summary>
-    [RelayCommand]
+    /// <summary>Previews the selected layer and cancels any older preview request.</summary>
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task PreviewAsync()
     {
         if (SelectedLayer is null)
@@ -541,29 +543,64 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             return;
         }
 
-        await StopPreviewAsync();
+        var cancellation = new CancellationTokenSource();
+        var previousCancellation = Interlocked.Exchange(ref previewCancellation, cancellation);
+        previousCancellation?.Cancel();
+        bool gateEntered = false;
+
         try
         {
-            previewSession = await service.PreviewAsync(SelectedLayer.SampleArgs.Snapshot());
+            await previewGate.WaitAsync(cancellation.Token);
+            gateEntered = true;
+            await StopPreviewSessionAsync();
+            cancellation.Token.ThrowIfCancellationRequested();
+            var session = await service.PreviewAsync(
+                SelectedLayer.SampleArgs.Snapshot(),
+                cancellation.Token);
+            if (cancellation.IsCancellationRequested)
+            {
+                await session.StopAsync();
+                return;
+            }
+
+            var previousSession = Interlocked.Exchange(ref previewSession, session);
+            if (previousSession is not null) await previousSession.StopAsync();
             ResultSummary = "Playing selected layer.";
+        }
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+        {
         }
         catch (FileNotFoundException)
         {
-            ResultSummary = "Could not find the specified sample.";
+            if (!cancellation.IsCancellationRequested) ResultSummary = "Could not find the specified sample.";
         }
         catch (DirectoryNotFoundException)
         {
-            ResultSummary = "Could not find the specified sample's directory.";
+            if (!cancellation.IsCancellationRequested)
+                ResultSummary = "Could not find the specified sample's directory.";
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
-            ResultSummary = $"Could not load the specified sample: {exception.Message}";
+            if (!cancellation.IsCancellationRequested)
+                ResultSummary = $"Could not load the specified sample: {exception.Message}";
+        }
+        finally
+        {
+            if (gateEntered) previewGate.Release();
+            Interlocked.CompareExchange(ref previewCancellation, null, cancellation);
+            cancellation.Dispose();
         }
     }
 
     /// <summary>Stops and disposes the current audio preview session.</summary>
     [RelayCommand]
     private Task StopPreviewAsync()
+    {
+        Interlocked.Exchange(ref previewCancellation, null)?.Cancel();
+        return StopPreviewSessionAsync();
+    }
+
+    private Task StopPreviewSessionAsync()
     {
         var session = Interlocked.Exchange(ref previewSession, null);
         return session is null ? Task.CompletedTask : session.StopAsync().AsTask();

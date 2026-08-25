@@ -152,19 +152,22 @@ public sealed class NaudioAudioPlaybackService : IAudioPlaybackService
 
                 stopping = true;
                 state = AudioPlaybackState.Stopped;
-                try
-                {
-                    lastPosition = stream.CurrentTime;
-                    player.Stop();
-                }
-                finally
-                {
-                    player.PlaybackStopped -= OnPlaybackStopped;
-                    player.Dispose();
-                    stream.Dispose();
-                    disposed = true;
-                    completion.TrySetResult(null);
-                }
+                lastPosition = stream.CurrentTime;
+                disposed = true;
+                player.PlaybackStopped -= OnPlaybackStopped;
+            }
+
+            // WasapiOut.Stop can synchronously wait for PlaybackStopped. Do not hold
+            // gate here because the callback also takes that lock.
+            try
+            {
+                player.Stop();
+            }
+            finally
+            {
+                player.Dispose();
+                stream.Dispose();
+                completion.TrySetResult(null);
             }
         }
 
