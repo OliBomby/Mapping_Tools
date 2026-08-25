@@ -1,7 +1,5 @@
-using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.MapCleaner;
@@ -33,7 +31,7 @@ public sealed class MapCleanerService : IMapCleanerService
     /// <inheritdoc />
     public async Task<MapCleanerResult> CleanAsync(
         IReadOnlyList<string> paths,
-        MapCleanerOptions options,
+        MapCleanerProject.MapCleanerProjectOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

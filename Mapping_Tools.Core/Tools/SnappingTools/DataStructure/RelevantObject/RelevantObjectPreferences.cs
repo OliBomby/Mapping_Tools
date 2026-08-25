@@ -1,9 +1,4 @@
 using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Core.MathUtil;
-using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.Layers;
-using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
-using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
-using Newtonsoft.Json;
 
 namespace Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject;
 

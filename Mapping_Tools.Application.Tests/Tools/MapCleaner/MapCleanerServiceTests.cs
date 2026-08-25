@@ -4,8 +4,6 @@ using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
-using Mapping_Tools.Core.Tools.MapCleaner;
-using Mapping_Tools.Core.Tools.MapCleaner.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.MapCleaner;
@@ -35,7 +33,7 @@ public sealed class MapCleanerServiceTests
                 ParentDirectoryResolver = _ => @"C:\set",
             },
             samples);
-        MapCleanerOptions options = new()
+        MapCleanerProject.MapCleanerProjectOptions options = new()
         {
             SampleSetSliders = false,
             ResnapBookmarks = true,

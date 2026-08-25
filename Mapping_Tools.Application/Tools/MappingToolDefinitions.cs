@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Models;
 
 namespace Mapping_Tools.Application.Tools;

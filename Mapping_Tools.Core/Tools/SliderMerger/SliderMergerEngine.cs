@@ -275,7 +275,7 @@ public static class SliderMergerEngine
 
     private static void Validate(SliderMergerOptions options)
     {
-        if (!Enum.IsDefined(options.ImportModeSetting) || !Enum.IsDefined(options.ConnectionModeSetting))
+        if (!Enum.IsDefined(options.ConnectionModeSetting))
             throw new ArgumentException("Slider Merger contains an unknown mode.", nameof(options));
 
         if (!double.IsFinite(options.Leniency) || options.Leniency < 0)

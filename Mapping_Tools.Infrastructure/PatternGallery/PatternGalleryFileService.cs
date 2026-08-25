@@ -1,7 +1,5 @@
-using Mapping_Tools.Application.Tools.PatternGallery;
 using Mapping_Tools.Application.Tools.PatternGallery.Contracts;
 using Mapping_Tools.Application.Tools.PatternGallery.Models;
-using Mapping_Tools.Core.Tools.PatternGallery;
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
 
 namespace Mapping_Tools.Infrastructure.PatternGallery;

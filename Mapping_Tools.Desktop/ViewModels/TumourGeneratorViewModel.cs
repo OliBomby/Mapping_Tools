@@ -3,25 +3,19 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
-using Mapping_Tools.Application.Interactions;
 using Mapping_Tools.Application.Interactions.Dialogs;
-using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
-using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Core.Tools.TumourGenerating.Models;
 using Mapping_Tools.Core.Tools.TumourGenerating.Templates;
 using Mapping_Tools.Desktop.Shell;
@@ -661,9 +655,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             JustMiddleAnchors = JustMiddleAnchors,
             Scale = Scale,
             DebugConstruction = DebugConstruction,
-            FixSv = FixSv,
-            DelegateToBpm = DelegateToBpm,
-            RemoveSliderTicks = RemoveSliderTicks,
         };
     }
 

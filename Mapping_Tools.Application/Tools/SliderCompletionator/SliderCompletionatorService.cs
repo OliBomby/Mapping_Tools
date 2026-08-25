@@ -4,7 +4,6 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.SliderCompletionator;
-using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 
 namespace Mapping_Tools.Application.Tools.SliderCompletionator;
 
@@ -28,7 +27,7 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
     /// <inheritdoc />
     public async Task<SliderCompletionatorResult> CompleteAsync(
         IReadOnlyList<string> paths,
-        SliderCompletionatorOptions options,
+        SliderCompletionatorProject options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

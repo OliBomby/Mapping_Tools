@@ -7,12 +7,6 @@ namespace Mapping_Tools.Core.Tools.TimingCopier.Models;
 /// </summary>
 public class TimingCopierOptions
 {
-    /// <summary>Gets or sets the beatmap whose timing is copied.</summary>
-    public string ImportPath { get; set; } = string.Empty;
-
-    /// <summary>Gets or sets vertical-bar-separated beatmap targets.</summary>
-    public string ExportPath { get; set; } = string.Empty;
-
     /// <summary>
     ///     Gets or sets how target markers are positioned after timing is copied.
     /// </summary>

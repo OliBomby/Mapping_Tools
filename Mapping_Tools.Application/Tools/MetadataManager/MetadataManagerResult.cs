@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.Tools.MetadataManager;
-
 namespace Mapping_Tools.Application.Tools.MetadataManager;
 
 /// <summary>Reports the final paths written by one Metadata Manager run.</summary>

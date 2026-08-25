@@ -2,21 +2,16 @@ using System.Collections.ObjectModel;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
-using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.SliderPicturator;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Application.Workspace.Models;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -476,7 +471,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         IsProcessingPreview = true;
         try
         {
-            SliderPicturatorOptions options = Snapshot();
+            SliderPicturatorProject options = Snapshot();
             var sourceImage = this.sourceImage
                               ?? throw new InvalidOperationException("The preview source image was cleared.");
             (RgbaImage image, long segments) result = await Task.Run(() => SliderPicturatorEngine.Recolor(

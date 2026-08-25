@@ -1,5 +1,4 @@
 using Avalonia.Platform.Storage;
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
 
 namespace Mapping_Tools.Desktop.Platform;

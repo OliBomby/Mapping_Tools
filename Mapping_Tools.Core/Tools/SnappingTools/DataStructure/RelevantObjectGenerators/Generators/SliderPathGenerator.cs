@@ -1,8 +1,5 @@
-using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Allocation;
-using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 

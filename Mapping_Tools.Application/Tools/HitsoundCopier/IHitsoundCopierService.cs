@@ -1,8 +1,3 @@
-using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.HitsoundStuff;
-using Mapping_Tools.Core.Tools.HitsoundCopier;
-using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
-
 namespace Mapping_Tools.Application.Tools.HitsoundCopier;
 
 /// <summary>Copies hitsounds through the shared editing gateway.</summary>
@@ -14,7 +9,7 @@ public interface IHitsoundCopierService
     /// <param name="cancellationToken">Cancels loading, transformation, backup, or saving.</param>
     /// <returns>The target paths and change summary.</returns>
     Task<HitsoundCopierResult> CopyAsync(
-        HitsoundCopierOptions options,
+        HitsoundCopierProject options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

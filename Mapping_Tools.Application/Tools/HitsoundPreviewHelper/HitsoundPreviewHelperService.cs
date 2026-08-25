@@ -5,7 +5,6 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
-using Mapping_Tools.Core.Tools.HitsoundPreviewHelper.Models;
 
 namespace Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 
@@ -27,7 +26,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
     /// <inheritdoc />
     public async Task<HitsoundPreviewHelperResult> ApplyAsync(
         IReadOnlyList<string> paths,
-        HitsoundPreviewHelperOptions options,
+        HitsoundPreviewHelperProject options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

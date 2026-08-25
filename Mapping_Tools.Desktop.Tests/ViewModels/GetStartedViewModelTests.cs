@@ -1,7 +1,5 @@
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
-using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.ViewModels.GetStarted;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GetStartedViewModel = Mapping_Tools.Desktop.ViewModels.GetStarted.GetStartedViewModel;

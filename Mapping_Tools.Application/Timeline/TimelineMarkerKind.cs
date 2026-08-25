@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace Mapping_Tools.Application.Timeline;
 
 /// <summary>Identifies a theme-resolved semantic marker style.</summary>

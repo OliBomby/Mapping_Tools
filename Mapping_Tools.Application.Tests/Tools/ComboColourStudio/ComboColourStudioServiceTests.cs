@@ -3,7 +3,6 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

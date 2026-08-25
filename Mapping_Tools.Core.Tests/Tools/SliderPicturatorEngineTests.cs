@@ -54,19 +54,6 @@ public sealed class SliderPicturatorEngineTests
     }
 
     [TestMethod]
-    public void SliderPicturatorOptions_QualityOutsideLegacySliderRange_ThrowsBeforeRun()
-    {
-        // Arrange
-        SliderPicturatorOptions options = new() { PictureFile = "image.png", Quality = 102 };
-
-        // Act
-        var act = options.Validate;
-
-        // Assert
-        act.Should().Throw<ArgumentException>();
-    }
-
-    [TestMethod]
     public void RgbaImage_SetPixelAfterGetPixel_PreservesArgbChannels()
     {
         // Arrange

@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.MathUtil;
-
 namespace Mapping_Tools.Core.Graph.Markers;
 
 /// <summary>Describes marker geometry and snapping semantics without a UI brush type.</summary>

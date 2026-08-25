@@ -2,7 +2,6 @@ using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
-using Mapping_Tools.Core.Tools.HitsoundCopier;
 using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 
 namespace Mapping_Tools.Infrastructure.Files;

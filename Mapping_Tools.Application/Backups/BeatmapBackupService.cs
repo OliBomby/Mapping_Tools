@@ -6,7 +6,6 @@ using Mapping_Tools.Application.Backups.Models;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 
 namespace Mapping_Tools.Application.Backups;

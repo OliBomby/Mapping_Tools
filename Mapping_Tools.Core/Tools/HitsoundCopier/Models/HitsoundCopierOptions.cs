@@ -6,24 +6,11 @@ namespace Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 /// <summary>Stores the source, target, matching, and hitsound-copy settings.</summary>
 public class HitsoundCopierOptions
 {
-    /// <summary>Gets or sets the optional source beatmap path.</summary>
-    public string PathFrom { get; set; } = string.Empty;
-
-    /// <summary>Gets or sets vertical-bar-separated target beatmap paths.</summary>
-    public string PathTo { get; set; } = string.Empty;
-
     /// <summary>Gets or sets zero for overwrite-all or one for defined-only mode.</summary>
     public int CopyMode { get; set; }
 
     /// <summary>Gets or sets the maximum rounded millisecond matching distance.</summary>
     public double TemporalLeniency { get; set; } = 5;
-
-    /// <summary>Gets or sets the source object selection mode.</summary>
-    public HitObjectSelectionMode SourceSelectionMode { get; set; } =
-        HitObjectSelectionMode.Everything;
-
-    /// <summary>Gets or sets the legacy time-code query used by Time mode.</summary>
-    public string TimeCode { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the millisecond shift applied to source events before matching.</summary>
     public double TimingOffset { get; set; }

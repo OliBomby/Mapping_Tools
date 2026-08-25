@@ -1,6 +1,3 @@
-using Mapping_Tools.Core.Tools.RhythmGuide;
-using Mapping_Tools.Core.Tools.RhythmGuide.Models;
-
 namespace Mapping_Tools.Application.Tools.RhythmGuide;
 
 /// <summary>Loads source state, applies the pure generator, and persists through safety boundaries.</summary>
@@ -11,6 +8,6 @@ public interface IRhythmGuideService
     /// <param name="cancellationToken">Cancels loading, generation, or saving.</param>
     /// <returns>The destination and number of added guide objects.</returns>
     Task<RhythmGuideResult> GenerateAsync(
-        RhythmGuideOptions options,
+        RhythmGuideProject.RhythmGuideProjectOptions options,
         CancellationToken cancellationToken = default);
 }

@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 
 namespace Mapping_Tools.Desktop.Controls;

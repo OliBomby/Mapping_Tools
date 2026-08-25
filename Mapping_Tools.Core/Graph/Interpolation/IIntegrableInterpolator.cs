@@ -1,6 +1,3 @@
-using System.ComponentModel;
-using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
-
 namespace Mapping_Tools.Core.Graph.Interpolation;
 
 /// <summary>Extends an interpolator with an analytic definite integral.</summary>

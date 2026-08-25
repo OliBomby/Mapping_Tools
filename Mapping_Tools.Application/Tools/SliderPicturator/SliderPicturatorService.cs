@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -23,7 +22,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
     }
 
     /// <inheritdoc />
-    public async Task<SliderPicturatorResult> PicturateAsync(string path, SliderPicturatorOptions options,
+    public async Task<SliderPicturatorResult> PicturateAsync(string path, SliderPicturatorProject options,
         IProgress<double>? progress = null, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);

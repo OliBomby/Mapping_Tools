@@ -1,6 +1,3 @@
-using Mapping_Tools.Core.Tools.SliderMerger;
-using Mapping_Tools.Core.Tools.SliderMerger.Models;
-
 namespace Mapping_Tools.Application.Tools.SliderMerger;
 
 /// <summary>Runs Slider Merger through the shared live-aware editor gateway.</summary>
@@ -14,7 +11,7 @@ public interface ISliderMergerService
     /// <returns>The processed paths and merged-object count.</returns>
     Task<SliderMergerResult> MergeAsync(
         IReadOnlyList<string> paths,
-        SliderMergerOptions options,
+        SliderMergerProject options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

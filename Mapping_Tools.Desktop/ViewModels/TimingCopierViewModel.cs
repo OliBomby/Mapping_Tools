@@ -1,23 +1,17 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
-using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.TimingCopier;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
-using Mapping_Tools.Core.Tools.TimingCopier;
 using Mapping_Tools.Core.Tools.TimingCopier.Models;
 using Mapping_Tools.Desktop.Shell;
 
@@ -189,7 +183,7 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        TimingCopierOptions options = Snapshot();
+        TimingCopierProject options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<TimingCopierResult>(
                 Tool.Id,

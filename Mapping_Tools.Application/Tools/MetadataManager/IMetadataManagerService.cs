@@ -26,7 +26,7 @@ public interface IMetadataManagerService
     /// <param name="cancellationToken">Cancels before the next target or destructive write.</param>
     /// <returns>The paths written by the operation.</returns>
     Task<MetadataManagerResult> ExportAsync(
-        MetadataManagerOptions options,
+        MetadataManagerProject options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

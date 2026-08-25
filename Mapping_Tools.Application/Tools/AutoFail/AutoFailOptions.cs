@@ -1,6 +1,3 @@
-using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Core.Tools.AutoFail;
-
 namespace Mapping_Tools.Application.Tools.AutoFail;
 
 /// <summary>Defines the beatmap and difficulty values used for one auto-fail analysis.</summary>

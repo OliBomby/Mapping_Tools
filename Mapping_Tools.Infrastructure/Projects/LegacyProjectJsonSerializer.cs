@@ -1,44 +1,33 @@
 using System.Reflection;
-using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
-using Mapping_Tools.Application.Tools.HitsoundStudio;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Application.Tools.MapCleaner;
-using Mapping_Tools.Application.Tools.MapsetMerger;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
 using Mapping_Tools.Application.Tools.MetadataManager;
 using Mapping_Tools.Application.Tools.PropertyTransformer;
 using Mapping_Tools.Application.Tools.RhythmGuide;
-using Mapping_Tools.Application.Tools.Sliderator;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
 using Mapping_Tools.Application.Tools.SliderMerger;
 using Mapping_Tools.Application.Tools.SliderPicturator;
 using Mapping_Tools.Application.Tools.TimingCopier;
 using Mapping_Tools.Application.Tools.TimingHelper;
-using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.MathUtil;
-using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
-using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
-using Mapping_Tools.Core.Tools.PatternGallery;
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
-using Mapping_Tools.Core.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
-using Mapping_Tools.Core.Tools.TimingCopier;
 using Mapping_Tools.Core.Tools.TimingCopier.Models;
-using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Core.Tools.TumourGenerating.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -366,10 +355,14 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 if (typeName == legacy_hitsound_copier_project) return typeof(HitsoundCopierProject);
                 if (typeName == legacy_hitsound_studio_project) return typeof(HitsoundStudioProject);
                 if (typeName == legacy_hitsound_studio_project_uppercase) return typeof(HitsoundStudioProject);
-                if (typeName == legacy_rhythm_guide_options) return typeof(RhythmGuideOptions);
+                if (typeName == legacy_rhythm_guide_options
+                    || typeName == typeof(RhythmGuideOptions).FullName)
+                    return typeof(RhythmGuideProject.RhythmGuideProjectOptions);
                 if (typeName == legacy_map_cleaner_project) return typeof(MapCleanerProject);
-                if (typeName == legacy_map_cleaner_options) return typeof(MapCleanerOptions);
-                if (typeName == legacy_map_cleaner_options_without_folder) return typeof(MapCleanerOptions);
+                if (typeName == legacy_map_cleaner_options
+                    || typeName == legacy_map_cleaner_options_without_folder
+                    || typeName == typeof(MapCleanerOptions).FullName)
+                    return typeof(MapCleanerProject.MapCleanerProjectOptions);
                 if (typeName == legacy_metadata_manager_project) return typeof(MetadataManagerProject);
                 if (typeName == legacy_property_transformer_project) return typeof(PropertyTransformerProject);
                 if (typeName == legacy_property_transformer_project_uppercase) return typeof(PropertyTransformerProject);
@@ -445,6 +438,13 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 return;
             }
 
+            if (serializedType == typeof(RhythmGuideProject.RhythmGuideProjectOptions))
+            {
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_rhythm_guide_options;
+                return;
+            }
+
             if (serializedType == typeof(MapCleanerProject))
             {
                 assemblyName = legacy_assembly_name;
@@ -453,6 +453,13 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             }
 
             if (serializedType == typeof(MapCleanerOptions))
+            {
+                assemblyName = legacy_assembly_name;
+                typeName = legacy_map_cleaner_options;
+                return;
+            }
+
+            if (serializedType == typeof(MapCleanerProject.MapCleanerProjectOptions))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_map_cleaner_options;

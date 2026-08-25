@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace Mapping_Tools.Application.Timeline;
 
 /// <summary>Describes one navigable timestamp without retaining a control or brush.</summary>

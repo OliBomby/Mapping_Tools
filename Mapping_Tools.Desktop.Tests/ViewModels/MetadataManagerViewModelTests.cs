@@ -1,12 +1,8 @@
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.MetadataManager;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.Tools.MetadataManager;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
@@ -100,17 +96,17 @@ public sealed class MetadataManagerViewModelTests
 
     private sealed class RecordingMetadataManagerService : IMetadataManagerService
     {
-        public MetadataManagerOptions? Options { get; private set; }
+        public MetadataManagerProject? Options { get; private set; }
 
         public Task<MetadataManagerOptions> ImportAsync(
             string path,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new MetadataManagerOptions { ImportPath = path });
+            return Task.FromResult(new MetadataManagerOptions());
         }
 
         public Task<MetadataManagerResult> ExportAsync(
-            MetadataManagerOptions options,
+            MetadataManagerProject options,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

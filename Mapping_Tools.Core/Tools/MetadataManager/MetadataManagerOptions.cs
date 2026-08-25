@@ -4,17 +4,9 @@ namespace Mapping_Tools.Core.Tools.MetadataManager;
 
 /// <summary>
 ///     Stores the metadata, preview, and colour choices applied by Metadata Manager.
-///     File paths are retained here as part of the legacy project contract; the
-///     application service interprets them only when it executes an operation.
 /// </summary>
 public class MetadataManagerOptions
 {
-    /// <summary>Gets or sets the optional beatmap used to import metadata.</summary>
-    public string ImportPath { get; set; } = string.Empty;
-
-    /// <summary>Gets or sets the vertical-bar-separated target beatmap paths.</summary>
-    public string ExportPath { get; set; } = string.Empty;
-
     /// <summary>Gets or sets the Unicode artist name.</summary>
     public string Artist { get; set; } = string.Empty;
 

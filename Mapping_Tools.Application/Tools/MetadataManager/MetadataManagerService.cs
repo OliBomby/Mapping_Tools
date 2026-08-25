@@ -1,7 +1,5 @@
-using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.Backups.Contracts;
 using Mapping_Tools.Application.Backups.Models;
-using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.Progress;
@@ -45,7 +43,7 @@ public sealed class MetadataManagerService : IMetadataManagerService
 
     /// <inheritdoc />
     public async Task<MetadataManagerResult> ExportAsync(
-        MetadataManagerOptions options,
+        MetadataManagerProject options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

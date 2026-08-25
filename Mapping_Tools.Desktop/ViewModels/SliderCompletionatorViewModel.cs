@@ -1,19 +1,14 @@
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
-using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Tools.SliderCompletionator;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 using Mapping_Tools.Desktop.Shell;
 
@@ -203,7 +198,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     {
         if (paths.Count == 0) return;
 
-        SliderCompletionatorOptions options = Snapshot();
+        SliderCompletionatorProject options = Snapshot();
         await Execution.ExecuteAsync(
                 new ToolExecutionRequest<SliderCompletionatorResult>(
                 Tool.Id,

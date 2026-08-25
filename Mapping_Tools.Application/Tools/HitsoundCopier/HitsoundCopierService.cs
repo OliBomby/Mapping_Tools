@@ -1,14 +1,12 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
-using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 
 namespace Mapping_Tools.Application.Tools.HitsoundCopier;
 
@@ -35,7 +33,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
 
     /// <inheritdoc />
     public async Task<HitsoundCopierResult> CopyAsync(
-        HitsoundCopierOptions options,
+        HitsoundCopierProject options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -122,7 +120,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
 
     private static IReadOnlyList<HitObject> SelectSourceObjects(
         BeatmapEditingSession session,
-        HitsoundCopierOptions options)
+        HitsoundCopierProject options)
     {
         return BeatmapObjectSelection.Select(
             session,
@@ -147,7 +145,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
             : directory;
     }
 
-    private static void Validate(HitsoundCopierOptions options)
+    private static void Validate(HitsoundCopierProject options)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.PathTo);

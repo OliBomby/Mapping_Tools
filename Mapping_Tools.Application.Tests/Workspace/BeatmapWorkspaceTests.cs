@@ -1,5 +1,3 @@
-using Mapping_Tools.Application.Platform;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Workspace;

@@ -5,8 +5,6 @@ using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
-using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
-using Mapping_Tools.Core.Tools.HitsoundPreviewHelper.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.HitsoundPreviewHelper;
@@ -20,7 +18,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway(1);
         HitsoundPreviewHelperService service = new(gateway);
-        HitsoundPreviewHelperOptions options = new()
+        HitsoundPreviewHelperProject options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Selected,
             Items = [new HitsoundZone { Hitsound = Hitsound.Clap, CustomIndex = 2 }],
@@ -48,7 +46,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway(0);
         HitsoundPreviewHelperService service = new(gateway);
-        HitsoundPreviewHelperOptions options = new()
+        HitsoundPreviewHelperProject options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Time,
             TimeCode = "00:02:000",
@@ -76,7 +74,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway(0, true);
         HitsoundPreviewHelperService service = new(gateway);
-        HitsoundPreviewHelperOptions options = new()
+        HitsoundPreviewHelperProject options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Bookmarked,
             Items = [new HitsoundZone { Hitsound = Hitsound.Clap }],
@@ -99,7 +97,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway(0);
         HitsoundPreviewHelperService service = new(gateway);
-        HitsoundPreviewHelperOptions options = new()
+        HitsoundPreviewHelperProject options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Everything,
             Items = [new HitsoundZone { Hitsound = Hitsound.Whistle }],
@@ -126,7 +124,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway(0);
         HitsoundPreviewHelperService service = new(gateway);
-        HitsoundPreviewHelperOptions options = new()
+        HitsoundPreviewHelperProject options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Time,
             Items = [new HitsoundZone()],
@@ -151,7 +149,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         // Act
         Func<Task> act = () => service.ApplyAsync(
             ["map.osu"],
-            new HitsoundPreviewHelperOptions());
+            new HitsoundPreviewHelperProject());
 
         // Assert
         await act.Should().ThrowAsync<ArgumentException>()

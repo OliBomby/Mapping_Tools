@@ -1,6 +1,3 @@
-using Mapping_Tools.Core.Tools.SliderCompletionator;
-using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
-
 namespace Mapping_Tools.Application.Tools.SliderCompletionator;
 
 /// <summary>Runs Slider Completionator through the shared editor gateway.</summary>
@@ -16,7 +13,7 @@ public interface ISliderCompletionatorService
     /// <returns>A result containing processed paths and the total slider count.</returns>
     Task<SliderCompletionatorResult> CompleteAsync(
         IReadOnlyList<string> paths,
-        SliderCompletionatorOptions options,
+        SliderCompletionatorProject options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

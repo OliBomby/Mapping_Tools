@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.Tools.AutoFail;
 using Mapping_Tools.Core.Tools.AutoFail.Models;

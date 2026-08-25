@@ -1,6 +1,4 @@
 using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Core.Images;
-using Mapping_Tools.Core.Tools.SliderPicturator;
 
 namespace Mapping_Tools.Application.Tools.SliderPicturator;
 
@@ -15,7 +13,7 @@ public interface ISliderPicturatorService
     /// <returns>The written path and generated segment estimate.</returns>
     Task<SliderPicturatorResult> PicturateAsync(
         string path,
-        SliderPicturatorOptions options,
+        SliderPicturatorProject options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 

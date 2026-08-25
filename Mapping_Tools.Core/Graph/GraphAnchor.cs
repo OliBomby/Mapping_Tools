@@ -1,8 +1,6 @@
-using System.Globalization;
 using Mapping_Tools.Core.Graph.Interpolation;
 using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 using Mapping_Tools.Core.MathUtil;
-using Mapping_Tools.Core.SystemTools;
 
 namespace Mapping_Tools.Core.Graph;
 

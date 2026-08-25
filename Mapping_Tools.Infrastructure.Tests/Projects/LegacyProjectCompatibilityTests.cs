@@ -2,7 +2,6 @@ using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Application.Tools.PropertyTransformer;
-using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject;

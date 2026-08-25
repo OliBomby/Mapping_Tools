@@ -1,11 +1,9 @@
 using Mapping_Tools.Application.Abstractions;
-using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.Backups.Models;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.RhythmGuide;
-using Mapping_Tools.Core.Tools.RhythmGuide;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -25,7 +23,7 @@ public sealed class RhythmGuideServiceTests
         sessions["source.osu"] = CreateSession(CreateEditor("source.osu", files, true));
         sessions["target.osu"] = CreateSession(CreateEditor("target.osu", files, false));
         RhythmGuideService service = new(gateway, backups, new RecordingBeatmapFileSystem(), files);
-        RhythmGuideOptions options = new()
+        RhythmGuideProject.RhythmGuideProjectOptions options = new()
         {
             Paths = ["source.osu"],
             ExportPath = "target.osu",
@@ -62,7 +60,7 @@ public sealed class RhythmGuideServiceTests
             new TestBeatmapBackupService(),
             new RecordingBeatmapFileSystem(),
             files);
-        RhythmGuideOptions options = new()
+        RhythmGuideProject.RhythmGuideProjectOptions options = new()
         {
             Paths = ["source.osu"],
             ExportPath = "new.osu",
@@ -95,7 +93,7 @@ public sealed class RhythmGuideServiceTests
                 ExistingPaths = { "existing.osu" },
             },
             files);
-        RhythmGuideOptions options = new()
+        RhythmGuideProject.RhythmGuideProjectOptions options = new()
         {
             Paths = ["source.osu"],
             ExportPath = "existing.osu",

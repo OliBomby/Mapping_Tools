@@ -1,6 +1,5 @@
 using System.IO.Compression;
 using System.Text;
-using Mapping_Tools.Application.Tools.PatternGallery;
 using Mapping_Tools.Application.Tools.PatternGallery.Contracts;
 using Mapping_Tools.Application.Tools.PatternGallery.Models;
 

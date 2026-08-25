@@ -1,5 +1,4 @@
 using System.Runtime.Versioning;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Contracts;
 using Microsoft.Win32;
 

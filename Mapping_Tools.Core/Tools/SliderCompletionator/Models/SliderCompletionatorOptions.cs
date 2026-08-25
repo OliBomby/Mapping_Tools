@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.BeatmapHelper.Enums;
-
 namespace Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 
 /// <summary>
@@ -8,16 +6,9 @@ namespace Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 /// </summary>
 public class SliderCompletionatorOptions
 {
-    /// <summary>Gets or sets how hit objects are selected for completion.</summary>
-    public HitObjectSelectionMode ImportModeSetting { get; set; } =
-        HitObjectSelectionMode.Selected;
-
     /// <summary>Gets or sets the value calculated by the transformation.</summary>
     public SliderCompletionatorFreeVariable FreeVariableSetting { get; set; } =
         SliderCompletionatorFreeVariable.Velocity;
-
-    /// <summary>Gets or sets the legacy time-code query used by Time mode.</summary>
-    public string TimeCode { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the requested slider duration in beats, or <c>-1</c> to preserve it.</summary>
     public double Duration { get; set; } = -1;

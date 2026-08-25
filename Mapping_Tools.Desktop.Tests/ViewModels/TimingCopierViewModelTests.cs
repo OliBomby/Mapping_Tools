@@ -1,12 +1,7 @@
-using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.TimingCopier;
-using Mapping_Tools.Application.Workspace;
-using Mapping_Tools.Core.Tools.TimingCopier;
 using Mapping_Tools.Core.Tools.TimingCopier.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
@@ -106,10 +101,10 @@ public sealed class TimingCopierViewModelTests
 
     private sealed class RecordingTimingCopier : ITimingCopierService
     {
-        public TimingCopierOptions? Options { get; private set; }
+        public TimingCopierProject? Options { get; private set; }
 
         public Task<TimingCopierResult> CopyAsync(
-            TimingCopierOptions options,
+            TimingCopierProject options,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

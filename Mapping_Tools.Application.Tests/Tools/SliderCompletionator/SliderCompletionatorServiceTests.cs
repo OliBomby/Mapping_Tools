@@ -3,8 +3,6 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Tools.SliderCompletionator;
-using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.SliderCompletionator;
@@ -23,7 +21,7 @@ public sealed class SliderCompletionatorServiceTests
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         SliderCompletionatorService service = new(gateway);
-        SliderCompletionatorOptions options = new();
+        SliderCompletionatorProject options = new();
 
         // Act
         var result = await service.CompleteAsync(
@@ -49,7 +47,7 @@ public sealed class SliderCompletionatorServiceTests
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         SliderCompletionatorService service = new(gateway);
-        SliderCompletionatorOptions options = new()
+        SliderCompletionatorProject options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Everything,
         };
@@ -79,7 +77,7 @@ public sealed class SliderCompletionatorServiceTests
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture, 1_000_000);
         SliderCompletionatorService service = new(gateway);
-        SliderCompletionatorOptions options = new()
+        SliderCompletionatorProject options = new()
         {
             ImportModeSetting = HitObjectSelectionMode.Everything,
             UseEndTime = true,
@@ -111,7 +109,7 @@ public sealed class SliderCompletionatorServiceTests
         SliderCompletionatorService service = new(gateway);
 
         // Act
-        Func<Task> act = () => service.CompleteAsync([], new SliderCompletionatorOptions());
+        Func<Task> act = () => service.CompleteAsync([], new SliderCompletionatorProject());
 
         // Assert
         await act.Should().ThrowAsync<ArgumentException>();

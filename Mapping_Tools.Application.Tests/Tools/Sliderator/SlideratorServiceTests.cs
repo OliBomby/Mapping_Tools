@@ -4,7 +4,6 @@ using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.Sliderator;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

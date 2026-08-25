@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Core.Graph;
-using Mapping_Tools.Core.Tools.TumourGenerating;
 using Mapping_Tools.Core.Tools.TumourGenerating.Models;
 using Mapping_Tools.Core.Tools.TumourGenerating.Templates;
 

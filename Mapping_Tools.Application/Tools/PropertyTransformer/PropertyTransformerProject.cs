@@ -7,5 +7,7 @@ namespace Mapping_Tools.Application.Tools.PropertyTransformer;
 /// </summary>
 public sealed class PropertyTransformerProject : PropertyTransformerOptions
 {
-}
+    /// <summary>Gets or sets whether all time-related fields stay synchronized in the editor.</summary>
+    public bool SyncTimeFields { get; set; }
 
+}

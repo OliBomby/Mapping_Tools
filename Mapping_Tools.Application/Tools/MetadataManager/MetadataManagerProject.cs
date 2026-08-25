@@ -11,5 +11,10 @@ namespace Mapping_Tools.Application.Tools.MetadataManager;
 /// </remarks>
 public sealed class MetadataManagerProject : MetadataManagerOptions
 {
-}
+    /// <summary>Gets or sets the optional beatmap used to import metadata.</summary>
+    public string ImportPath { get; set; } = string.Empty;
 
+    /// <summary>Gets or sets the vertical-bar-separated target beatmap paths.</summary>
+    public string ExportPath { get; set; } = string.Empty;
+
+}

@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
@@ -10,12 +9,10 @@ using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Interactions.Validation;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
-using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.MetadataManager;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.MetadataManager;
@@ -204,10 +201,25 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         try
         {
             string exportPath = ExportPath;
-            var options = await metadataManager.ImportAsync(ImportPath);
-            options.ImportPath = ImportPath;
-            options.ExportPath = exportPath;
-            Install(options);
+            var imported = await metadataManager.ImportAsync(ImportPath);
+            Install(new MetadataManagerProject
+            {
+                ImportPath = ImportPath,
+                ExportPath = exportPath,
+                Artist = imported.Artist,
+                RomanisedArtist = imported.RomanisedArtist,
+                Title = imported.Title,
+                RomanisedTitle = imported.RomanisedTitle,
+                BeatmapCreator = imported.BeatmapCreator,
+                Source = imported.Source,
+                Tags = imported.Tags,
+                DoRemoveDuplicateTags = imported.DoRemoveDuplicateTags,
+                ResetIds = imported.ResetIds,
+                PreviewTime = imported.PreviewTime,
+                UseComboColours = imported.UseComboColours,
+                ComboColours = imported.ComboColours,
+                SpecialColours = imported.SpecialColours,
+            });
         }
         catch (OperationCanceledException)
         {
@@ -280,7 +292,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        MetadataManagerOptions options = Snapshot();
+        MetadataManagerProject options = Snapshot();
         await Execution.ExecuteAsync(
             new ToolExecutionRequest<MetadataManagerResult>(
                 Tool.Id,
@@ -337,7 +349,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         };
     }
 
-    private void Install(MetadataManagerOptions options)
+    private void Install(MetadataManagerProject options)
     {
         ValidateProject(options);
         ImportPath = options.ImportPath;
@@ -416,7 +428,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         };
     }
 
-    private static void ValidateProject(MetadataManagerOptions options)
+    private static void ValidateProject(MetadataManagerProject options)
     {
         if (options is null
             || options.ComboColours is null

@@ -1,26 +1,19 @@
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
-using Mapping_Tools.Application.Projects;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Tools.HitsoundCopier;
-using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;
@@ -208,7 +201,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
             return;
         }
 
-        HitsoundCopierOptions options = Snapshot();
+        HitsoundCopierProject options = Snapshot();
         options.PathTo = path;
         await RunWithStateAsync(() => RunOptionsAsync(options, true));
     }
@@ -352,7 +345,7 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         MutedSampleSet = project.MutedSampleSet;
     }
 
-    private async Task RunOptionsAsync(HitsoundCopierOptions options, bool quick)
+    private async Task RunOptionsAsync(HitsoundCopierProject options, bool quick)
     {
         await Execution.ExecuteAsync(
             new ToolExecutionRequest<HitsoundCopierResult>(

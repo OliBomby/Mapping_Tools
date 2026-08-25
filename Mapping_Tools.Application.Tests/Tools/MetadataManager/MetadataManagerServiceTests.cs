@@ -1,5 +1,4 @@
 using Mapping_Tools.Application.Abstractions;
-using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.Backups.Models;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
@@ -7,7 +6,6 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.MetadataManager;
 using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Core.Tools.MetadataManager;
 using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -33,7 +31,7 @@ public sealed class MetadataManagerServiceTests
         MetadataManagerService service = new(
             new TestEditingGateway(fileStore),
             backup);
-        MetadataManagerOptions options = new()
+        MetadataManagerProject options = new()
         {
             ExportPath = target,
             Artist = "Wave Zero Artist",

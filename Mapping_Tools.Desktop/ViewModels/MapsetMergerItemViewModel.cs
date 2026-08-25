@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
 
 namespace Mapping_Tools.Desktop.ViewModels;

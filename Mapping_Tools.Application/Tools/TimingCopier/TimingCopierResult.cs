@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.Tools.TimingCopier;
-
 namespace Mapping_Tools.Application.Tools.TimingCopier;
 
 /// <summary>Reports the target paths written by one Timing Copier run.</summary>

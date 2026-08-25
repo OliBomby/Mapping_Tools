@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.MathUtil;
-
 namespace Mapping_Tools.Core.Graph.Markers;
 
 /// <summary>Combines multiple graph marker generators in display order.</summary>

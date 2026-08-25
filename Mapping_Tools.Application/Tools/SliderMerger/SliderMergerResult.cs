@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.Tools.SliderMerger;
-
 namespace Mapping_Tools.Application.Tools.SliderMerger;
 
 /// <summary>Reports processed maps and source objects incorporated into merged sliders.</summary>

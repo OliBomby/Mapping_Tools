@@ -1,9 +1,7 @@
-using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.TimingCopier;
-using Mapping_Tools.Core.Tools.TimingCopier.Models;
 
 namespace Mapping_Tools.Application.Tools.TimingCopier;
 
@@ -26,7 +24,7 @@ public sealed class TimingCopierService : ITimingCopierService
 
     /// <inheritdoc />
     public async Task<TimingCopierResult> CopyAsync(
-        TimingCopierOptions options,
+        TimingCopierProject options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

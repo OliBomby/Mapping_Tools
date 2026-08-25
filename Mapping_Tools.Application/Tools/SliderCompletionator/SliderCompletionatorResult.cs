@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.Tools.SliderCompletionator;
-
 namespace Mapping_Tools.Application.Tools.SliderCompletionator;
 
 /// <summary>Reports Slider Completionator's completed maps and slider count.</summary>

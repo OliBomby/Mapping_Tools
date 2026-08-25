@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
 
 namespace Mapping_Tools.Application.Tools.MapCleaner;
@@ -8,6 +6,13 @@ namespace Mapping_Tools.Application.Tools.MapCleaner;
 public sealed class MapCleanerProject
 {
     /// <summary>Gets or sets the cleanup options stored by the project.</summary>
-    public MapCleanerOptions MapCleanerArgs { get; set; } = new();
-}
+    public MapCleanerProjectOptions MapCleanerArgs { get; set; } = new();
 
+    /// <summary>Contains Core cleanup inputs and application-owned sample deletion state.</summary>
+    public sealed class MapCleanerProjectOptions : MapCleanerOptions
+    {
+        /// <summary>Gets or sets whether unused samples are moved to recoverable storage.</summary>
+        public bool RemoveUnusedSamples { get; set; }
+
+    }
+}

@@ -3,7 +3,7 @@ using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 namespace Mapping_Tools.Core.Tools.MapCleaner.Models;
 
 /// <summary>Defines the framework-independent cleanup operations performed by Map Cleaner.</summary>
-public sealed class MapCleanerOptions
+public class MapCleanerOptions
 {
     /// <summary>Gets or sets whether slider volume changes must be preserved.</summary>
     public bool VolumeSliders { get; set; } = true;
@@ -23,9 +23,6 @@ public sealed class MapCleanerOptions
     /// <summary>Gets or sets whether mapset samples are inspected before rebuilding timing points.</summary>
     public bool AnalyzeSamples { get; set; } = true;
 
-    /// <summary>Gets or sets whether unused samples are moved to recoverable storage.</summary>
-    public bool RemoveUnusedSamples { get; set; }
-
     /// <summary>Gets or sets whether every object hitsound is cleared.</summary>
     public bool RemoveHitsounds { get; set; }
 
@@ -38,4 +35,3 @@ public sealed class MapCleanerOptions
     /// <summary>Gets or sets the beat divisors accepted while resnapping.</summary>
     public IBeatDivisor[] BeatDivisors { get; set; } = RationalBeatDivisor.GetDefaultBeatDivisors();
 }
-

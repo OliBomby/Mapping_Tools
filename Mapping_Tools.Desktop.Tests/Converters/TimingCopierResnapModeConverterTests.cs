@@ -1,5 +1,4 @@
 using System.Globalization;
-using Mapping_Tools.Core.Tools.TimingCopier;
 using Mapping_Tools.Core.Tools.TimingCopier.Models;
 using Mapping_Tools.Desktop.Converters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

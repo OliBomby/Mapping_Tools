@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.MathUtil;
-
 namespace Mapping_Tools.Core.Graph.Markers;
 
 /// <summary>Identifies the graph axis to which a marker is perpendicular.</summary>

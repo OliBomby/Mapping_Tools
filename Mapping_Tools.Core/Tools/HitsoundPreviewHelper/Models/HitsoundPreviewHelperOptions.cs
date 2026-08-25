@@ -1,5 +1,4 @@
 using Mapping_Tools.Core.HitsoundStuff;
-using Mapping_Tools.Core.BeatmapHelper.Enums;
 
 namespace Mapping_Tools.Core.Tools.HitsoundPreviewHelper.Models;
 
@@ -8,15 +7,6 @@ namespace Mapping_Tools.Core.Tools.HitsoundPreviewHelper.Models;
 /// </summary>
 public class HitsoundPreviewHelperOptions
 {
-    /// <summary>Gets or sets how hit objects are selected for preview.</summary>
-    public HitObjectSelectionMode ImportModeSetting { get; set; } =
-        HitObjectSelectionMode.Everything;
-
-    /// <summary>
-    ///     Gets or sets the legacy osu! time-code query used by Time mode.
-    /// </summary>
-    public string TimeCode { get; set; } = string.Empty;
-
     /// <summary>
     ///     Gets or sets the positional rules applied to each selected timeline event.
     /// </summary>

@@ -4,7 +4,6 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.SliderMerger;
-using Mapping_Tools.Core.Tools.SliderMerger.Models;
 
 namespace Mapping_Tools.Application.Tools.SliderMerger;
 
@@ -23,7 +22,7 @@ public sealed class SliderMergerService : ISliderMergerService
     /// <inheritdoc />
     public async Task<SliderMergerResult> MergeAsync(
         IReadOnlyList<string> paths,
-        SliderMergerOptions options,
+        SliderMergerProject options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {

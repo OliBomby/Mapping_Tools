@@ -107,6 +107,4 @@ public class PropertyTransformerOptions
     /// <summary>Gets or sets the inclusive upper time filter, or <c>-1</c> for no upper bound.</summary>
     public double MaxTimeFilter { get; set; } = -1;
 
-    /// <summary>Gets or sets whether all time-related multiplier fields stay synchronized.</summary>
-    public bool SyncTimeFields { get; set; }
 }

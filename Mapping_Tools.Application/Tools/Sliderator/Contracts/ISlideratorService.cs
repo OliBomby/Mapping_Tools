@@ -1,7 +1,6 @@
 using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Tools.Sliderator.Models;
 
 namespace Mapping_Tools.Application.Tools.Sliderator.Contracts;
 

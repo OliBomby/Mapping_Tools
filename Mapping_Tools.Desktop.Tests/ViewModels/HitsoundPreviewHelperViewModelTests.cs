@@ -1,18 +1,10 @@
-using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Tools.RhythmGuide;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
-using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
-using Mapping_Tools.Core.Tools.HitsoundPreviewHelper.Models;
-using Mapping_Tools.Core.Tools.RhythmGuide;
-using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Mapping_Tools.Desktop.Interactions;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
@@ -157,11 +149,11 @@ public sealed class HitsoundPreviewHelperViewModelTests
 
         public IReadOnlyList<string>? Paths { get; private set; }
 
-        public HitsoundPreviewHelperOptions? Options { get; private set; }
+        public HitsoundPreviewHelperProject? Options { get; private set; }
 
         public Task<HitsoundPreviewHelperResult> ApplyAsync(
             IReadOnlyList<string> paths,
-            HitsoundPreviewHelperOptions options,
+            HitsoundPreviewHelperProject options,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {
@@ -184,7 +176,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
     private sealed class StubRhythmGuideService : IRhythmGuideService
     {
         public Task<RhythmGuideResult> GenerateAsync(
-            RhythmGuideOptions options,
+            RhythmGuideProject.RhythmGuideProjectOptions options,
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new RhythmGuideResult(

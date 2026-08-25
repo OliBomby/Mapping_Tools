@@ -18,4 +18,14 @@ public sealed class TumourGeneratorProject : TumourGeneratorOptions
 
     /// <summary>Gets or sets the time-code expression used in time mode.</summary>
     public string TimeCode { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets whether slider velocity is corrected after generation.</summary>
+    public bool FixSv { get; set; } = true;
+
+    /// <summary>Gets or sets whether corrected velocity is delegated to BPM redlines.</summary>
+    public bool DelegateToBpm { get; set; }
+
+    /// <summary>Gets or sets whether delegated velocity removes slider ticks.</summary>
+    public bool RemoveSliderTicks { get; set; }
+
 }

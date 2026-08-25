@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.MathUtil;
-
 namespace Mapping_Tools.Core.Graph.Markers;
 
 /// <summary>Generates visible graph markers for a value interval.</summary>

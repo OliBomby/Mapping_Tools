@@ -1,12 +1,10 @@
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
-using Mapping_Tools.Core.Tools.HitsoundCopier;
 using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -23,7 +21,7 @@ public sealed class HitsoundCopierServiceTests
             AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         HitsoundCopierService service = new(gateway, new StubSampleService(), new ApplicationSettings());
-        HitsoundCopierOptions options = new()
+        HitsoundCopierProject options = new()
         {
             PathFrom = "source.osu",
             PathTo = "first.osu|second.osu",
@@ -48,7 +46,7 @@ public sealed class HitsoundCopierServiceTests
         RecordingBeatmapEditingGateway gateway = CreateGateway(Path.Combine(
             AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu"));
         HitsoundCopierService service = new(gateway, new StubSampleService(), new ApplicationSettings());
-        HitsoundCopierOptions options = new()
+        HitsoundCopierProject options = new()
         {
             PathTo = "target.osu",
             SourceSelectionMode = HitObjectSelectionMode.Time,

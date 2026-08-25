@@ -1,6 +1,4 @@
-using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
-using Mapping_Tools.Core.Tools.HitsoundCopier;
 
 namespace Mapping_Tools.Application.Tools.HitsoundCopier;
 

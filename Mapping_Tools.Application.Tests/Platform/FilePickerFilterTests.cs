@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

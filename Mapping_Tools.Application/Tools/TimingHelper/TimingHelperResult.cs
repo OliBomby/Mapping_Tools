@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.Tools.TimingHelper;
-
 namespace Mapping_Tools.Application.Tools.TimingHelper;
 
 /// <summary>Reports the redlines added to each processed beatmap.</summary>

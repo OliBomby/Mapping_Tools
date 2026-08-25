@@ -1,11 +1,9 @@
 using Mapping_Tools.Application.Abstractions;
-using Mapping_Tools.Application.Backups;
 using Mapping_Tools.Application.Backups.Contracts;
 using Mapping_Tools.Application.Backups.Models;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.RhythmGuide;
@@ -40,7 +38,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
 
     /// <inheritdoc />
     public async Task<RhythmGuideResult> GenerateAsync(
-        RhythmGuideOptions options,
+        RhythmGuideProject.RhythmGuideProjectOptions options,
         CancellationToken cancellationToken = default)
     {
         Validate(options);
@@ -107,7 +105,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
             options.ExportMode);
     }
 
-    private static void Validate(RhythmGuideOptions options)
+    private static void Validate(RhythmGuideProject.RhythmGuideProjectOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
         if (options.Paths is null || options.Paths.Length == 0) throw new ArgumentException("Select at least one source beatmap.", nameof(options));

@@ -1,13 +1,8 @@
-using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.SliderMerger;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Tools.SliderMerger;
 using Mapping_Tools.Core.Tools.SliderMerger.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
@@ -140,11 +135,11 @@ public sealed class SliderMergerViewModelTests
     {
         public IReadOnlyList<string>? Paths { get; private set; }
 
-        public SliderMergerOptions? Options { get; private set; }
+        public SliderMergerProject? Options { get; private set; }
 
         public Task<SliderMergerResult> MergeAsync(
             IReadOnlyList<string> paths,
-            SliderMergerOptions options,
+            SliderMergerProject options,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {

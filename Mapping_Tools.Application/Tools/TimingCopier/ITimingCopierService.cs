@@ -1,6 +1,3 @@
-using Mapping_Tools.Core.Tools.TimingCopier;
-using Mapping_Tools.Core.Tools.TimingCopier.Models;
-
 namespace Mapping_Tools.Application.Tools.TimingCopier;
 
 /// <summary>
@@ -16,7 +13,7 @@ public interface ITimingCopierService
     /// <param name="cancellationToken">Cancels loading, transformation, backup, or saving.</param>
     /// <returns>The target paths successfully processed before completion.</returns>
     Task<TimingCopierResult> CopyAsync(
-        TimingCopierOptions options,
+        TimingCopierProject options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }

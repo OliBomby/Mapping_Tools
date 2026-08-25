@@ -2,7 +2,6 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tests.TestDoubles;
 using Mapping_Tools.Application.Tools.TimingCopier;
-using Mapping_Tools.Core.Tools.TimingCopier;
 using Mapping_Tools.Core.Tools.TimingCopier.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -22,7 +21,7 @@ public sealed class TimingCopierServiceTests
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         TimingCopierService service = new(gateway);
-        TimingCopierOptions options = new()
+        TimingCopierProject options = new()
         {
             ImportPath = "source.osu",
             ExportPath = "first.osu|second.osu",
@@ -60,7 +59,7 @@ public sealed class TimingCopierServiceTests
                 throw new IOException("The test target could not be written.");
         };
         TimingCopierService service = new(gateway);
-        TimingCopierOptions options = new()
+        TimingCopierProject options = new()
         {
             ImportPath = "source.osu",
             ExportPath = "first.osu|second.osu",
@@ -87,7 +86,7 @@ public sealed class TimingCopierServiceTests
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         TimingCopierService service = new(gateway);
-        TimingCopierOptions options = new()
+        TimingCopierProject options = new()
         {
             ImportPath = "source.osu",
             ExportPath = "target.osu",
@@ -113,7 +112,7 @@ public sealed class TimingCopierServiceTests
             "standard-feature-rich.osu");
         RecordingBeatmapEditingGateway gateway = CreateGateway(fixture);
         TimingCopierService service = new(gateway);
-        TimingCopierOptions options = new()
+        TimingCopierProject options = new()
         {
             ImportPath = "source.osu",
             ExportPath = "target.osu",

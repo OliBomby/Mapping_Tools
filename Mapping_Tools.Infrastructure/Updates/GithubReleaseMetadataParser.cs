@@ -1,9 +1,4 @@
-using System.Reflection;
 using System.Text.Json;
-using Mapping_Tools.Application.Updates;
-using Onova;
-using Onova.Models;
-using Onova.Services;
 
 namespace Mapping_Tools.Infrastructure.Updates;
 

@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 
 namespace Mapping_Tools.Core.Graph.Interpolation;
 

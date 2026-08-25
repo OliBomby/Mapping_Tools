@@ -4,11 +4,8 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 namespace Mapping_Tools.Core.Tools.RhythmGuide.Models;
 
 /// <summary>Contains the framework-neutral transformation options persisted by Rhythm Guide projects.</summary>
-public sealed class RhythmGuideOptions
+public class RhythmGuideOptions
 {
-    /// <summary>Gets or sets the source beatmap paths whose rhythm is copied.</summary>
-    public string[] Paths { get; set; } = [];
-
     /// <summary>Gets or sets the game mode assigned to newly generated beatmaps.</summary>
     public GameMode OutputGameMode { get; set; } = GameMode.Standard;
 
@@ -21,12 +18,6 @@ public sealed class RhythmGuideOptions
     /// <summary>Gets or sets which source rhythm events become guide objects.</summary>
     public RhythmGuideSelectionMode SelectionMode { get; set; } =
         RhythmGuideSelectionMode.HitsoundEvents;
-
-    /// <summary>Gets or sets whether generation creates a map or appends to a target.</summary>
-    public RhythmGuideExportMode ExportMode { get; set; } = RhythmGuideExportMode.NewMap;
-
-    /// <summary>Gets or sets the destination beatmap path.</summary>
-    public string ExportPath { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the snapping divisors used while expanding source rhythms.</summary>
     public IBeatDivisor[] BeatDivisors { get; set; } =

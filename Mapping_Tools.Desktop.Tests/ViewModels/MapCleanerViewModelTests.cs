@@ -1,24 +1,17 @@
 using System.Globalization;
 using Avalonia.Data;
-using Mapping_Tools.Application.BeatmapEditing;
-using Mapping_Tools.Application.Execution;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Models;
-using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Tools.MapCleaner;
-using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
-using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Hosting;
-using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -242,7 +235,7 @@ public sealed class MapCleanerViewModelTests
     {
         public IReadOnlyList<string>? Paths { get; private set; }
 
-        public Task<MapCleanerResult> CleanAsync(IReadOnlyList<string> paths, MapCleanerOptions options, IProgress<double>? progress = null,
+        public Task<MapCleanerResult> CleanAsync(IReadOnlyList<string> paths, MapCleanerProject.MapCleanerProjectOptions options, IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {
             Paths = paths;

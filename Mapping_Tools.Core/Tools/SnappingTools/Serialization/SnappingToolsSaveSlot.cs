@@ -1,8 +1,3 @@
-using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Core.MathUtil;
-using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject;
-using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
-
 namespace Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 
 /// <summary>A named saved snapshot of Geometry Dashboard preferences.</summary>

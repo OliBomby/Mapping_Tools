@@ -1,5 +1,3 @@
-using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Core.Tools.MapCleaner;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
 
 namespace Mapping_Tools.Application.Tools.MapCleaner;
@@ -15,7 +13,7 @@ public interface IMapCleanerService
     /// <returns>The combined cleanup counts and timeline markers.</returns>
     Task<MapCleanerResult> CleanAsync(
         IReadOnlyList<string> paths,
-        MapCleanerOptions options,
+        MapCleanerProject.MapCleanerProjectOptions options,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default);
 }
