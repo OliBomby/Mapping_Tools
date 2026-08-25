@@ -21,7 +21,9 @@ using Mapping_Tools.Application.Tools.TimingHelper;
 using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
@@ -105,6 +107,9 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 new GeometryGeneratorSettingsDictionaryConverter(),
                 new GeometryRelevantObjectCollectionConverter(),
                 new TimingCopierResnapModeConverter(),
+                new FlexibleDoubleArrayConverter(),
+                new LegacySampleConverter(),
+                new LegacyHitsoundLayerConverter(),
             ],
         };
     }
@@ -232,16 +237,25 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             "Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.";
         private const string current_relevant_object_prefix =
             "Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject.";
+
+        private const string legacy_relevant_objects_prefix_without_tools =
+            "Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects.";
         private const string legacy_rhythm_guide_project = "Mapping_Tools.Viewmodels.RhythmGuideVm";
 
         private const string legacy_hitsound_preview_helper_project =
             "Mapping_Tools.Viewmodels.HitsoundPreviewHelperVm";
+
+        private const string legacy_hitsound_preview_helper_project_uppercase =
+            "Mapping_Tools.Viewmodels.HitsoundPreviewHelperVM";
 
         private const string legacy_hitsound_copier_project =
             "Mapping_Tools.Viewmodels.HitsoundCopierVm";
 
         private const string legacy_hitsound_studio_project =
             "Mapping_Tools.Viewmodels.HitsoundStudioVm";
+
+        private const string legacy_hitsound_studio_project_uppercase =
+            "Mapping_Tools.Viewmodels.HitsoundStudioVM";
 
         private const string legacy_rhythm_guide_options =
             "Mapping_Tools.Classes.Tools.RhythmGuide+RhythmGuideGeneratorArgs";
@@ -251,11 +265,17 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string legacy_map_cleaner_options =
             "Mapping_Tools.Classes.Tools.MapCleanerStuff.MapCleanerArgs";
 
+        private const string legacy_map_cleaner_options_without_folder =
+            "Mapping_Tools.Classes.Tools.MapCleanerArgs";
+
         private const string legacy_metadata_manager_project =
             "Mapping_Tools.Viewmodels.MetadataManagerVm";
 
         private const string legacy_property_transformer_project =
             "Mapping_Tools.Viewmodels.PropertyTransformerVm";
+
+        private const string legacy_property_transformer_project_uppercase =
+            "Mapping_Tools.Viewmodels.PropertyTransformerVM";
 
         private const string legacy_timing_copier_project =
             "Mapping_Tools.Viewmodels.TimingCopierVm";
@@ -296,8 +316,17 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string legacy_combo_colour_project =
             "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourProject";
 
+        private const string legacy_combo_colour_project_without_tools =
+            "Mapping_Tools.Classes.ComboColourStudio.ComboColourProject";
+
         private const string legacy_combo_colour_point =
             "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint";
+
+        private const string legacy_combo_colour_point_without_tools =
+            "Mapping_Tools.Classes.ComboColourStudio.ColourPoint";
+
+        private const string legacy_hitsound_sample_export_format =
+            "Mapping_Tools.Classes.HitsoundStuff.HitsoundExporter+SampleExportFormat";
 
         private const string legacy_pattern_gallery_project =
             "Mapping_Tools.Viewmodels.PatternGalleryVm";
@@ -319,17 +348,31 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             if (typeName.StartsWith("System.Collections.Generic.Dictionary`2", StringComparison.Ordinal) && typeName.Contains("GeneratorSettings", StringComparison.Ordinal))
                 return typeof(Dictionary<Type, GeneratorSettings>);
 
+            if (TryResolveLegacyGenericType(typeName, out Type genericType))
+                return genericType;
+
+            if (typeName.EndsWith("[]", StringComparison.Ordinal)
+                && (IsLegacyAssembly(assemblyName) || IsCurrentCoreAssembly(assemblyName)))
+            {
+                Type elementType = BindToType(assemblyName, typeName[..^2]);
+                return elementType.MakeArrayType();
+            }
+
             if (IsLegacyAssembly(assemblyName) || IsCurrentCoreAssembly(assemblyName))
             {
                 if (typeName == legacy_rhythm_guide_project) return typeof(RhythmGuideProject);
                 if (typeName == legacy_hitsound_preview_helper_project) return typeof(HitsoundPreviewHelperProject);
+                if (typeName == legacy_hitsound_preview_helper_project_uppercase) return typeof(HitsoundPreviewHelperProject);
                 if (typeName == legacy_hitsound_copier_project) return typeof(HitsoundCopierProject);
                 if (typeName == legacy_hitsound_studio_project) return typeof(HitsoundStudioProject);
+                if (typeName == legacy_hitsound_studio_project_uppercase) return typeof(HitsoundStudioProject);
                 if (typeName == legacy_rhythm_guide_options) return typeof(RhythmGuideOptions);
                 if (typeName == legacy_map_cleaner_project) return typeof(MapCleanerProject);
                 if (typeName == legacy_map_cleaner_options) return typeof(MapCleanerOptions);
+                if (typeName == legacy_map_cleaner_options_without_folder) return typeof(MapCleanerOptions);
                 if (typeName == legacy_metadata_manager_project) return typeof(MetadataManagerProject);
                 if (typeName == legacy_property_transformer_project) return typeof(PropertyTransformerProject);
+                if (typeName == legacy_property_transformer_project_uppercase) return typeof(PropertyTransformerProject);
                 if (typeName == legacy_timing_copier_project) return typeof(TimingCopierProject);
                 if (typeName == legacy_timing_helper_project) return typeof(TimingHelperProject);
                 if (typeName == legacy_slider_completionator_project) return typeof(SliderCompletionatorProject);
@@ -343,7 +386,10 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 if (typeName == legacy_mapset_merger_project) return typeof(MapsetMergerProject);
                 if (typeName == legacy_mapset_merger_item) return typeof(MapsetMergerProject.MapsetItem);
                 if (typeName == legacy_combo_colour_project) return typeof(ComboColourProject);
+                if (typeName == legacy_combo_colour_project_without_tools) return typeof(ComboColourProject);
                 if (typeName == legacy_combo_colour_point) return typeof(ColourPoint);
+                if (typeName == legacy_combo_colour_point_without_tools) return typeof(ColourPoint);
+                if (typeName == legacy_hitsound_sample_export_format) return typeof(HitsoundStudioSampleExportFormat);
                 if (typeName == legacy_pattern_gallery_project) return typeof(PatternGalleryProject);
                 if (typeName == legacy_pattern_gallery_pattern) return typeof(PatternGalleryPattern);
                 if (typeName == legacy_pattern_gallery_handler) return typeof(PatternGalleryCollectionMetadata);
@@ -579,6 +625,75 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 StringComparison.Ordinal);
         }
 
+        private bool TryResolveLegacyGenericType(string typeName, out Type resolvedType)
+        {
+            Type? genericDefinition = typeName.StartsWith(
+                                          "System.Collections.Generic.List`1",
+                                          StringComparison.Ordinal)
+                ? typeof(List<>)
+                : typeName.StartsWith(
+                    "System.Collections.ObjectModel.ObservableCollection`1",
+                    StringComparison.Ordinal)
+                    ? typeof(List<>)
+                    : typeName.StartsWith(
+                        "System.Collections.Generic.Dictionary`2",
+                        StringComparison.Ordinal)
+                        ? typeof(Dictionary<,>)
+                        : null;
+            if (genericDefinition is null)
+            {
+                resolvedType = null!;
+                return false;
+            }
+
+            int argumentsStart = typeName.IndexOf("[[", StringComparison.Ordinal);
+            int argumentsEnd = typeName.LastIndexOf("]]", StringComparison.Ordinal);
+            if (argumentsStart < 0 || argumentsEnd <= argumentsStart + 2)
+            {
+                resolvedType = null!;
+                return false;
+            }
+
+            string argumentsText = typeName.Substring(
+                argumentsStart + 2,
+                argumentsEnd - argumentsStart - 2);
+            string[] arguments = argumentsText.Split(
+                "],[",
+                StringSplitOptions.None);
+            Type[] argumentTypes = arguments.Select(ResolveLegacyGenericArgument).ToArray();
+            resolvedType = genericDefinition.MakeGenericType(argumentTypes);
+            return true;
+
+            Type ResolveLegacyGenericArgument(string argument)
+            {
+                int separator = FindAssemblySeparator(argument);
+                string nestedTypeName = separator < 0 ? argument.Trim() : argument[..separator].Trim();
+                string? nestedAssemblyName = separator < 0 ? null : argument[(separator + 1)..].Trim();
+                return BindToType(nestedAssemblyName, nestedTypeName);
+            }
+        }
+
+        private static int FindAssemblySeparator(string typeName)
+        {
+            int bracketDepth = 0;
+            for (int index = 0; index < typeName.Length; index++)
+            {
+                switch (typeName[index])
+                {
+                    case '[':
+                        bracketDepth++;
+                        break;
+                    case ']':
+                        bracketDepth--;
+                        break;
+                    case ',' when bracketDepth == 0:
+                        return index;
+                }
+            }
+
+            return -1;
+        }
+
         private static Type? ResolveMigratedType(string typeName)
         {
             foreach (string candidate in GetCurrentTypeNameCandidates(typeName))
@@ -594,9 +709,17 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         {
             yield return typeName;
 
+            if (typeName.StartsWith("Mapping_Tools.Classes.SnappingTools.", StringComparison.Ordinal))
+                yield return "Mapping_Tools.Core.Tools.SnappingTools."
+                             + typeName["Mapping_Tools.Classes.SnappingTools.".Length..];
+
             if (typeName.StartsWith(legacy_relevant_objects_prefix, StringComparison.Ordinal))
                 yield return current_relevant_object_prefix
                              + typeName[legacy_relevant_objects_prefix.Length..];
+
+            if (typeName.StartsWith(legacy_relevant_objects_prefix_without_tools, StringComparison.Ordinal))
+                yield return current_relevant_object_prefix
+                             + typeName[legacy_relevant_objects_prefix_without_tools.Length..];
 
             if (typeName.StartsWith(intermediate_relevant_objects_prefix, StringComparison.Ordinal))
                 yield return current_relevant_object_prefix
@@ -708,6 +831,170 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
             return new Vector2(x, y);
         }
+    }
+
+    private sealed class FlexibleDoubleArrayConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(double[]);
+        }
+
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+        {
+            if (value is not double[] values)
+                throw new JsonSerializationException("A legacy double array value was invalid.");
+
+            writer.WriteStartArray();
+            foreach (double item in values) writer.WriteValue(item);
+            writer.WriteEndArray();
+        }
+
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object? existingValue,
+            JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return Array.Empty<double>();
+
+            if (reader.TokenType is JsonToken.Integer or JsonToken.Float)
+                return new[] { Convert.ToDouble(reader.Value, System.Globalization.CultureInfo.InvariantCulture) };
+
+            if (reader.TokenType != JsonToken.StartArray)
+                throw new JsonSerializationException("A legacy double array must contain a number or an array.");
+
+            var array = JArray.Load(reader);
+            return array.Select(token => token.ToObject<double>()).ToArray();
+        }
+    }
+
+    private sealed class LegacySampleConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(Sample);
+        }
+
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+        {
+            if (value is not Sample sample)
+                throw new JsonSerializationException("A Hitsound Studio sample value was invalid.");
+
+            writer.WriteStartObject();
+            writer.WritePropertyName("$type");
+            writer.WriteValue("Mapping_Tools.Classes.HitsoundStuff.Sample, Mapping Tools");
+            writer.WritePropertyName("SampleArgs");
+            serializer.Serialize(writer, sample.SampleArgs);
+            writer.WritePropertyName("Priority");
+            writer.WriteValue(sample.Priority);
+            writer.WritePropertyName("OutsideVolume");
+            writer.WriteValue(sample.OutsideVolume);
+            writer.WritePropertyName("SampleSet");
+            writer.WriteValue(sample.SampleSet);
+            writer.WritePropertyName("Hitsound");
+            writer.WriteValue(sample.Hitsound);
+            writer.WriteEndObject();
+        }
+
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object? existingValue,
+            JsonSerializer serializer)
+        {
+            JObject json = JObject.Load(reader);
+            Sample sample = new()
+            {
+                Priority = ReadValue(json, "Priority", serializer, 0),
+                OutsideVolume = ReadValue(json, "OutsideVolume", serializer, 1d),
+                SampleSet = ReadValue(json, "SampleSet", serializer, SampleSet.Normal),
+                Hitsound = ReadValue(json, "Hitsound", serializer, Hitsound.Normal),
+            };
+
+            sample.SampleArgs = json["SampleArgs"]?.ToObject<SampleGeneratingArgs>(serializer)
+                                ?? new SampleGeneratingArgs(
+                                    ReadValue(json, "SamplePath", serializer, string.Empty));
+            return sample;
+        }
+    }
+
+    private sealed class LegacyHitsoundLayerConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(HitsoundLayer);
+        }
+
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+        {
+            if (value is not HitsoundLayer layer)
+                throw new JsonSerializationException("A Hitsound Studio layer value was invalid.");
+
+            writer.WriteStartObject();
+            writer.WritePropertyName("$type");
+            writer.WriteValue("Mapping_Tools.Classes.HitsoundStuff.HitsoundLayer, Mapping Tools");
+            writer.WritePropertyName("Name");
+            writer.WriteValue(layer.Name);
+            writer.WritePropertyName("SampleSet");
+            writer.WriteValue(layer.SampleSet);
+            writer.WritePropertyName("Hitsound");
+            writer.WriteValue(layer.Hitsound);
+            writer.WritePropertyName("Priority");
+            writer.WriteValue(layer.Priority);
+            writer.WritePropertyName("ImportArgs");
+            serializer.Serialize(writer, layer.ImportArgs);
+            writer.WritePropertyName("SampleArgs");
+            serializer.Serialize(writer, layer.SampleArgs);
+            writer.WritePropertyName("Times");
+            serializer.Serialize(writer, layer.Times);
+            writer.WriteEndObject();
+        }
+
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object? existingValue,
+            JsonSerializer serializer)
+        {
+            JObject json = JObject.Load(reader);
+            HitsoundLayer layer = new()
+            {
+                Name = ReadValue(json, "Name", serializer, string.Empty),
+                SampleSet = ReadValue(json, "SampleSet", serializer, SampleSet.Normal),
+                Hitsound = ReadValue(json, "Hitsound", serializer, Hitsound.Normal),
+                Priority = ReadValue(json, "Priority", serializer, int.MaxValue),
+                Times = json["Times"]?.ToObject<List<double>>(serializer) ?? [],
+            };
+
+            layer.ImportArgs = json["ImportArgs"]?.ToObject<LayerImportArgs>(serializer)
+                                ?? new LayerImportArgs
+                                {
+                                    ImportType = ReadValue(json, "ImportType", serializer, ImportType.None),
+                                    Path = ReadValue(json, "Path", serializer, string.Empty),
+                                    X = ReadValue(json, "X", serializer, -1d),
+                                    Y = ReadValue(json, "Y", serializer, -1d),
+                                    SamplePath = ReadValue(json, "SamplePath", serializer, string.Empty),
+                                };
+            layer.SampleArgs = json["SampleArgs"]?.ToObject<SampleGeneratingArgs>(serializer)
+                               ?? new SampleGeneratingArgs();
+            if (string.IsNullOrEmpty(layer.SampleArgs.Path))
+                layer.SampleArgs.Path = ReadValue(json, "SamplePath", serializer, string.Empty);
+
+            return layer;
+        }
+    }
+
+    private static T ReadValue<T>(
+        JObject json,
+        string propertyName,
+        JsonSerializer serializer,
+        T fallback)
+    {
+        JToken? token = json[propertyName];
+        return token is null || token.Type == JTokenType.Null
+            ? fallback
+            : token.ToObject<T>(serializer)!;
     }
 
     private sealed class GeometryGeneratorSettingsDictionaryConverter : JsonConverter
