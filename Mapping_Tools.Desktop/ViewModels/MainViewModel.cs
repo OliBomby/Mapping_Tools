@@ -21,7 +21,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
 ///     Coordinates explicit feature discovery, navigation, favorites, activation,
-///     and the shell notification queue.
+///     and shell-level commands.
 /// </summary>
 public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
@@ -30,7 +30,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private static readonly Uri donateUri = new("https://ko-fi.com/olibomby");
     private readonly IBetterSaveService betterSave;
     private readonly IDialogService dialogs;
-    private readonly IUiDispatcher dispatcher;
 
     private readonly Dictionary<string, ObservableObject> featureViewModels =
         new(StringComparer.OrdinalIgnoreCase);
@@ -53,7 +52,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <param name="settings">Owns persisted favorites and other shared preferences.</param>
     /// <param name="notifications">Supplies the process-lifetime user notification stream.</param>
     /// <param name="launcher">Opens support links through the operating system.</param>
-    /// <param name="dispatcher">Marshals notification changes to the UI thread.</param>
     /// <param name="workspace">Presents current-map and safety-copy actions in shell chrome.</param>
     /// <param name="betterSave">Saves the current live editor state through the shared safety gateway.</param>
     /// <param name="dialogs">Presents shell-owned information dialogs.</param>
@@ -68,7 +66,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         ApplicationSettings settings,
         IUserNotificationService notifications,
         IPlatformLauncher launcher,
-        IUiDispatcher dispatcher,
         BeatmapWorkspaceViewModel workspace,
         IBetterSaveService betterSave,
         IDialogService dialogs,
@@ -80,7 +77,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
         this.launcher = launcher ?? throw new ArgumentNullException(nameof(launcher));
-        this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         Workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.betterSave = betterSave ?? throw new ArgumentNullException(nameof(betterSave));
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
@@ -97,8 +93,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             .ToArray();
         VisibleFeatures = [];
         NavigationEntries = [];
-        NotificationQueue = [];
-        this.notifications.Published += OnNotificationPublished;
         RefreshVisibleFeatures();
         SelectedFeature = FeatureItems[0];
     }
@@ -123,9 +117,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// <summary>Gets or sets the navigation item currently targeted by keyboard input.</summary>
     [ObservableProperty]
     public partial ShellFeatureItemViewModel? HighlightedFeature { get; set; }
-
-    /// <summary>Gets queued notifications in publication order.</summary>
-    public ObservableCollection<ShellNotificationViewModel> NotificationQueue { get; }
 
     /// <summary>Gets current-map and backup actions shared by every shell feature.</summary>
     public BeatmapWorkspaceViewModel Workspace { get; }
@@ -179,7 +170,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         if (disposed) return;
 
         disposed = true;
-        notifications.Published -= OnNotificationPublished;
         if (CurrentFeature is IShellProjectFeature projectFeature) projectCoordinator.Deactivate(projectFeature);
         if (CurrentFeature is IQuickRun) DeactivateQuickRun();
         if (CurrentFeature is IShellFeatureActivation activation) activation.Deactivate();
@@ -436,21 +426,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         if (includeDivider) NavigationEntries.Add(new NavigationDividerViewModel());
 
         foreach (var item in items) NavigationEntries.Add(item);
-    }
-
-    private void OnNotificationPublished(
-        object? sender,
-        UserNotificationPublishedEventArgs eventArgs)
-    {
-        dispatcher.Post(() =>
-            NotificationQueue.Add(new ShellNotificationViewModel(
-                eventArgs.Notification,
-                RemoveNotification)));
-    }
-
-    private void RemoveNotification(ShellNotificationViewModel notification)
-    {
-        NotificationQueue.Remove(notification);
     }
 
     private async Task OpenUriAsync(Uri uri, string destination)

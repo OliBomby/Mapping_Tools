@@ -148,6 +148,9 @@
     <dialogHost:DialogHost Identifier="RootDialog"
                            CloseOnClickAway="True"
                            OverlayBackground="{DynamicResource MappingToolsDialogOverlayBrush}">
+        <materialControls:SnackbarHost HostName="Root"
+                                       SnackbarHorizontalAlignment="Center"
+                                       SnackbarVerticalAlignment="Bottom">
         <Grid x:Name="RootGrid">
         <Grid RowDefinitions="35,*">
             <materialControls:ColorZone Grid.Row="0"
@@ -481,34 +484,6 @@
                                         VerticalContentAlignment="Stretch" />
                     </ScrollViewer>
 
-                    <ItemsControl ItemsSource="{Binding NotificationQueue}"
-                                  HorizontalAlignment="Center"
-                                  VerticalAlignment="Bottom"
-                                  Margin="16"
-                                  MaxWidth="620">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:ShellNotificationViewModel">
-                                <Border Margin="0,4"
-                                        Padding="16,10"
-                                        MinWidth="360"
-                                        Background="{DynamicResource MaterialSnackbarBackgroundBrush}"
-                                        materialAssists:ShadowAssist.ShadowDepth="Depth2">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <TextBlock Text="{Binding DisplayText}"
-                                                   Foreground="{DynamicResource MaterialBackgroundBrush}"
-                                                   VerticalAlignment="Center"
-                                                   TextWrapping="Wrap" />
-                                        <Button Grid.Column="1"
-                                                Margin="18,0,0,0"
-                                                Command="{Binding DismissCommand}"
-                                                Content="DISMISS"
-                                                Foreground="{DynamicResource MaterialPrimaryMidBrush}"
-                                                Background="Transparent" />
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
                 </Grid>
             </SplitView>
         </Grid>
@@ -517,5 +492,6 @@
                 BorderThickness="1"
                 IsHitTestVisible="False" />
         </Grid>
+        </materialControls:SnackbarHost>
     </dialogHost:DialogHost>
 </Window>

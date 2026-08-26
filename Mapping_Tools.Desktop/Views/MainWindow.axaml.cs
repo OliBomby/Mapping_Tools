@@ -5,6 +5,8 @@ using Avalonia.Interactivity;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Shell;
@@ -12,6 +14,8 @@ using Mapping_Tools.Desktop.Shell.Models;
 using Mapping_Tools.Desktop.Updates;
 using Mapping_Tools.Desktop.ViewModels;
 using Material.Icons;
+using Material.Styles.Controls;
+using Material.Styles.Models;
 
 namespace Mapping_Tools.Desktop.Views;
 
@@ -21,7 +25,9 @@ namespace Mapping_Tools.Desktop.Views;
 public partial class MainWindow : Window
 {
     private static readonly WindowBounds defaultBounds = new(80, 60, 1500, 800);
+    private static readonly TimeSpan snackbarDuration = TimeSpan.FromSeconds(5);
     private readonly ApplicationSettings settings;
+    private readonly IUserNotificationService? notifications;
     private readonly SettingsPersistenceHostedService? settingsPersistence;
     private readonly IUpdaterInteractionService? updaterInteraction;
     private WindowBounds normalBounds = defaultBounds;
@@ -68,11 +74,29 @@ public partial class MainWindow : Window
         ApplicationSettings settings,
         SettingsPersistenceHostedService? settingsPersistence,
         IUpdaterInteractionService? updaterInteraction)
+        : this(settings, settingsPersistence, updaterInteraction, null)
+    {
+    }
+
+    /// <summary>
+    ///     Loads the compiled shell with persisted placement, updater shutdown, and snackbar notification coordination.
+    /// </summary>
+    /// <param name="settings">The process-lifetime settings document.</param>
+    /// <param name="settingsPersistence">The orderly-shutdown boundary used by Exit without saving.</param>
+    /// <param name="updaterInteraction">The updater interaction owned by runtime composition.</param>
+    /// <param name="notifications">The process-lifetime stream displayed through the material snackbar host.</param>
+    public MainWindow(
+        ApplicationSettings settings,
+        SettingsPersistenceHostedService? settingsPersistence,
+        IUpdaterInteractionService? updaterInteraction,
+        IUserNotificationService? notifications)
     {
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.settingsPersistence = settingsPersistence;
         this.updaterInteraction = updaterInteraction;
+        this.notifications = notifications;
         InitializeComponent();
+        if (notifications is not null) notifications.Published += OnNotificationPublished;
         AddHandler(KeyDownEvent, HandleWindowKeyDown, RoutingStrategies.Tunnel);
         PositionChanged += (_, _) => CaptureNormalBounds();
         Resized += (_, _) => CaptureNormalBounds();
@@ -89,6 +113,13 @@ public partial class MainWindow : Window
         base.OnOpened(eventArgs);
         RestoreWindowPlacement();
         if (DataContext is MainViewModel viewModel) _ = viewModel.CheckForUpdatesOnStartupAsync();
+    }
+
+    /// <inheritdoc />
+    protected override void OnClosed(EventArgs eventArgs)
+    {
+        if (notifications is not null) notifications.Published -= OnNotificationPublished;
+        base.OnClosed(eventArgs);
     }
 
     /// <inheritdoc />
@@ -211,6 +242,19 @@ public partial class MainWindow : Window
         RootGrid.Margin = maximized ? new Thickness(7) : new Thickness(0);
         WindowBorder.BorderThickness = maximized ? new Thickness(0) : new Thickness(1);
         MaximizeIcon.Kind = maximized ? MaterialIconKind.WindowRestore : MaterialIconKind.WindowMaximize;
+    }
+
+    private void OnNotificationPublished(
+        object? sender,
+        UserNotificationPublishedEventArgs eventArgs)
+    {
+        UserNotification notification = eventArgs.Notification;
+        Dispatcher.UIThread.Post(
+            () => SnackbarHost.Post(
+                new SnackbarModel($"{notification.Title}: {notification.Message}", snackbarDuration),
+                "Root",
+                DispatcherPriority.Normal),
+            DispatcherPriority.Normal);
     }
 
     private void HandleWindowKeyDown(object? sender, KeyEventArgs eventArgs)

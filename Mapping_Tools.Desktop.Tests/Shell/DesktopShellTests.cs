@@ -273,32 +273,6 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
-    public async Task MainViewModel_RepeatedNotifications_QueuesInOrderAndDismissesIndependently()
-    {
-        // Arrange
-        UserNotificationService notifications = new();
-        using var viewModel = CreateMainViewModel(notifications: notifications);
-        UserNotification repeated = new(
-            UserNotificationSeverity.Warning,
-            "Check map",
-            "The same warning can occur more than once.");
-
-        // Act
-        await notifications.PublishAsync(repeated);
-        await notifications.PublishAsync(repeated);
-
-        // Assert
-        viewModel.NotificationQueue.Should().HaveCount(2);
-        viewModel.NotificationQueue.Select(item => item.Title).Should().Equal("Check map", "Check map");
-
-        // Act
-        viewModel.NotificationQueue[0].DismissCommand.Execute(null);
-
-        // Assert
-        viewModel.NotificationQueue.Should().ContainSingle();
-    }
-
-    [TestMethod]
     public async Task MainViewModel_OpenWebsiteCommand_WhenExecuted_OpensWebsite()
     {
         // Arrange
@@ -505,7 +479,6 @@ public sealed class DesktopShellTests
             resolvedSettings,
             resolvedNotifications,
             launcher ?? new RecordingPlatformLauncher(),
-            dispatcher,
             workspace,
             betterSave ?? new TestBetterSaveService(),
             resolvedDialogs,
