@@ -1,0 +1,87 @@
+using Mapping_Tools.Application.Execution.ToolExecution;
+using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tools.SliderPicturator;
+using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.Images;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.ViewModels;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Mapping_Tools.Desktop.Tests.ViewModels;
+
+[TestClass]
+public sealed class SliderPicturatorViewModelTests
+{
+    [TestMethod]
+    public async Task RunQuickAsync_WhenServiceReturnsSegmentCount_UpdatesSegmentCountFromResult()
+    {
+        // Arrange
+        RecordingPicturator service = new() { ResultSegmentCount = 42 };
+        var viewModel = Create(service, new RecordingCurrentBeatmapLocator("current.osu"));
+        viewModel.SegmentCount = 3;
+
+        // Act
+        await viewModel.RunQuickAsync(CancellationToken.None);
+
+        // Assert
+        viewModel.SegmentCount.Should().Be(42);
+    }
+
+    private static SliderPicturatorViewModel Create(
+        RecordingPicturator service,
+        RecordingCurrentBeatmapLocator currentBeatmap)
+    {
+        UserNotificationService notifications = new();
+        ApplicationSettings settings = new();
+        return new SliderPicturatorViewModel(
+            service,
+            new StubImageFileService(),
+            new TestFilePicker(),
+            new ToolExecutionService(
+                notifications,
+                new RecordingEditorReloadService(),
+                settings,
+                TimeProvider.System),
+            currentBeatmap,
+            new TestBeatmapWorkspace(),
+            settings,
+            notifications);
+    }
+
+    private sealed class RecordingPicturator : ISliderPicturatorService
+    {
+        public long ResultSegmentCount { get; init; }
+
+        public Task<SliderPicturatorResult> PicturateAsync(
+            string path,
+            SliderPicturatorServiceOptions options,
+            IProgress<double>? progress = null,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new SliderPicturatorResult(path, ResultSegmentCount));
+        }
+
+        public Task<IReadOnlyList<RgbaColour>> GetAvailableColorsAsync(
+            string path,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IReadOnlyList<RgbaColour>>([]);
+        }
+
+        public Task<HitObject?> GetSelectedSliderAsync(
+            string path,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<HitObject?>(null);
+        }
+    }
+
+    private sealed class StubImageFileService : IImageFileService
+    {
+        public Task<RgbaImage> LoadAsync(string path, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+    }
+}

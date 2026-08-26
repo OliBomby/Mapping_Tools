@@ -403,7 +403,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     {
         if (string.IsNullOrWhiteSpace(path)) return;
         var options = Snapshot();
-        await Execution.ExecuteAsync(new ToolExecutionRequest<SliderPicturatorResult>(Tool.Id, Tool.DisplayName,
+        var execution = await Execution.ExecuteAsync(new ToolExecutionRequest<SliderPicturatorResult>(Tool.Id, Tool.DisplayName,
             async context =>
             {
                 var result = await picturator.PicturateAsync(path, options,
@@ -414,7 +414,8 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
                     quick ? null : "Done!",
                     quick);
             }), CreateProgress(), cancellationToken);
-        SegmentCount = options.SegmentCount;
+        if (execution.Status == ToolExecutionStatus.Succeeded && execution.Value is { } result)
+            SegmentCount = result.SegmentCount;
     }
 
     private async Task LoadPreviewAsync(string path)
