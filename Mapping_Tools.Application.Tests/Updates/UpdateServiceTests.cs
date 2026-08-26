@@ -103,7 +103,7 @@ public sealed class UpdateServiceTests
     }
 
     [TestMethod]
-    public async Task AbandonUpdate_CancelsInFlightPreparation()
+    public async Task AbandonUpdate_WithInFlightPreparation_CancelsPreparation()
     {
         // Arrange
         FakeUpdateGateway gateway = new(new UpdatePackageInfo(
@@ -137,7 +137,7 @@ public sealed class UpdateServiceTests
     }
 
     [TestMethod]
-    public async Task DisposeAsync_WaitsForInFlightPreparationBeforeDisposingGateway()
+    public async Task DisposeAsync_WithInFlightPreparation_WaitsBeforeDisposingGateway()
     {
         // Arrange
         FakeUpdateGateway gateway = new(new UpdatePackageInfo(

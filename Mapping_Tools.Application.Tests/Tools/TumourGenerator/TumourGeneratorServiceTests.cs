@@ -13,7 +13,7 @@ namespace Mapping_Tools.Application.Tests.Tools.TumourGenerator;
 public sealed class TumourGeneratorServiceTests
 {
     [TestMethod]
-    public async Task ImportAsync_SelectedModeRequiresLiveEditorAndReturnsSelectedSliders()
+    public async Task ImportAsync_WithSelectedMode_RequiresLiveEditorAndReturnsSelectedSliders()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
@@ -69,7 +69,7 @@ public sealed class TumourGeneratorServiceTests
     }
 
     [TestMethod]
-    public async Task RunAsync_WithLiveSessionSavesAndRequestsEditorReloadWithProgress()
+    public async Task RunAsync_WithLiveSession_SavesAndRequestsEditorReloadWithProgress()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
@@ -95,7 +95,7 @@ public sealed class TumourGeneratorServiceTests
     }
 
     [TestMethod]
-    public async Task RunAsync_WithDiskSessionSavesWithoutEditorReload()
+    public async Task RunAsync_WithDiskSession_SavesWithoutEditorReload()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));

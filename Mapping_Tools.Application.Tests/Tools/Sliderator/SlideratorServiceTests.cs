@@ -13,7 +13,7 @@ namespace Mapping_Tools.Application.Tests.Tools.Sliderator;
 public sealed class SlideratorServiceTests
 {
     [TestMethod]
-    public async Task ImportAsync_WithSelectedModeRequiresLiveEditorAndFiltersCircles()
+    public async Task ImportAsync_WithSelectedMode_RequiresLiveEditorAndFiltersCircles()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));
@@ -32,7 +32,7 @@ public sealed class SlideratorServiceTests
     }
 
     [TestMethod]
-    public async Task ImportAsync_WithBookmarkedTimeAndEverythingModesReadsDiskObjects()
+    public async Task ImportAsync_WithBookmarkedTimeAndEverythingModes_ReadsDiskObjects()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.Disk));
@@ -61,7 +61,7 @@ public sealed class SlideratorServiceTests
     }
 
     [TestMethod]
-    public async Task RunAsync_WithLiveSessionSavesAndRequestsReload()
+    public async Task RunAsync_WithLiveSession_SavesAndRequestsReload()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = new(CreateSession(BeatmapEditingSource.LiveEditor));

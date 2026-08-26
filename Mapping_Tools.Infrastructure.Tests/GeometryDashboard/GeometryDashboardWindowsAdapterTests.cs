@@ -165,7 +165,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
     }
 
     [TestMethod]
-    public void OverlayBounds_WithUnavailableDpiSourceUsesPhysicalCoordinates()
+    public void OverlayBounds_WithUnavailableDpiSource_UsesPhysicalCoordinates()
     {
         // Arrange
         Box2 physicalBounds = new(-1920, 100, 0, 1100);
@@ -184,7 +184,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
     }
 
     [TestMethod]
-    public void OverlayBounds_WithInvalidDpiOrCoordinatesIsRejected()
+    public void OverlayBounds_WithInvalidDpiOrCoordinates_IsRejected()
     {
         // Arrange
         Box2 validBounds = new(0, 0, 100, 100);
@@ -244,7 +244,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
     }
 
     [TestMethod]
-    public void ConvertLegacyKeyToVirtualKey_WithUnsupportedPersistedValueThrows()
+    public void ConvertLegacyKeyToVirtualKey_WithUnsupportedPersistedValue_Throws()
     {
         // Arrange
         Action act = () => WindowsGlobalHotkeyService.ConvertLegacyKeyToVirtualKey(156);

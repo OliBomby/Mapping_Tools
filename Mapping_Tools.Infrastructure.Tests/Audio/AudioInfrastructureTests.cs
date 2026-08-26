@@ -53,7 +53,7 @@ public sealed class AudioInfrastructureTests
     }
 
     [TestMethod]
-    public async Task NaudioSoundFontRenderer_MissingSourceReportsAUsefulFailure()
+    public async Task NaudioSoundFontRenderer_WithMissingSource_ReportsAUsefulFailure()
     {
         // Arrange
         var renderer = new NaudioSoundFontRenderer();
@@ -187,7 +187,7 @@ public sealed class AudioInfrastructureTests
     }
 
     [TestMethod]
-    public async Task NaudioMidiService_ImportsTempoEventsUsingElapsedTimeBeforeTheFirstTempo()
+    public async Task NaudioMidiService_WithNoteBeforeFirstTempo_ImportsUsingElapsedTime()
     {
         // Arrange
         using var directory = new TemporaryDirectory();

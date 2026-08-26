@@ -16,7 +16,7 @@ namespace Mapping_Tools.Desktop.Tests.ViewModels;
 public sealed class SlideratorViewModelTests
 {
     [TestMethod]
-    public async Task RunQuickAsync_WithImportedSliderPassesPersistedGraphSettingsToService()
+    public async Task RunQuickAsync_WithImportedSlider_PassesPersistedGraphSettingsToService()
     {
         // Arrange
         RecordingSliderator service = new();
@@ -110,7 +110,7 @@ public sealed class SlideratorViewModelTests
     }
 
     [TestMethod]
-    public void EvaluatePreviewProgress_DuringHoldHidesBallAndRepeatsAfterHold()
+    public void EvaluatePreviewProgress_DuringHold_HidesBallAndRepeatsAfterHold()
     {
         // Arrange
         var viewModel = Create(new RecordingSliderator());

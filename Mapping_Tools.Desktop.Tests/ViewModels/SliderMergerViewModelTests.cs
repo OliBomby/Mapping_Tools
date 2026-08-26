@@ -14,7 +14,7 @@ namespace Mapping_Tools.Desktop.Tests.ViewModels;
 public sealed class SliderMergerViewModelTests
 {
     [TestMethod]
-    public async Task RunCommand_WithEverythingAndBezierModePassesProjectValuesAndWorkspacePaths()
+    public async Task RunCommand_WithEverythingAndBezierMode_PassesProjectValuesAndWorkspacePaths()
     {
         // Arrange
         RecordingMerger service = new();
@@ -40,7 +40,7 @@ public sealed class SliderMergerViewModelTests
     }
 
     [TestMethod]
-    public async Task RunQuickAsync_WithCurrentBeatmapUsesCurrentPath()
+    public async Task RunQuickAsync_WithCurrentBeatmap_UsesCurrentPath()
     {
         // Arrange
         RecordingMerger service = new();
@@ -78,7 +78,7 @@ public sealed class SliderMergerViewModelTests
     }
 
     [TestMethod]
-    public void TimeCodeVisibility_WhenTimeModeIsSelectedIsVisible()
+    public void TimeCodeVisibility_WhenTimeModeIsSelected_IsVisible()
     {
         // Arrange
         var viewModel = Create(new RecordingMerger());
@@ -92,7 +92,7 @@ public sealed class SliderMergerViewModelTests
     }
 
     [TestMethod]
-    public async Task RunCommand_WithNegativeLeniencyDoesNotInvokeService()
+    public async Task RunCommand_WithNegativeLeniency_DoesNotInvokeService()
     {
         // Arrange
         RecordingMerger service = new();

@@ -12,7 +12,7 @@ namespace Mapping_Tools.Application.Tests.Tools.SliderMerger;
 public sealed class SliderMergerServiceTests
 {
     [TestMethod]
-    public async Task MergeAsync_WithSelectedModeRequiresLiveStateAndSavesChanges()
+    public async Task MergeAsync_WithSelectedMode_RequiresLiveStateAndSavesChanges()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway();
@@ -32,7 +32,7 @@ public sealed class SliderMergerServiceTests
     }
 
     [TestMethod]
-    public async Task MergeAsync_WithEverythingModeUsesPreferLiveForEachPath()
+    public async Task MergeAsync_WithEverythingMode_UsesPreferLiveForEachPath()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway();
@@ -57,7 +57,7 @@ public sealed class SliderMergerServiceTests
     }
 
     [TestMethod]
-    public async Task MergeAsync_WithBookmarkedModeUsesBookmarkedObjects()
+    public async Task MergeAsync_WithBookmarkedMode_UsesBookmarkedObjects()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway();
@@ -78,7 +78,7 @@ public sealed class SliderMergerServiceTests
     }
 
     [TestMethod]
-    public async Task MergeAsync_WithTimeModeUsesTimeCodeObjects()
+    public async Task MergeAsync_WithTimeMode_UsesTimeCodeObjects()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway();
@@ -100,7 +100,7 @@ public sealed class SliderMergerServiceTests
     }
 
     [TestMethod]
-    public async Task MergeAsync_WithoutPathsThrowsBeforeOpeningBeatmaps()
+    public async Task MergeAsync_WithoutPaths_ThrowsBeforeOpeningBeatmaps()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway();

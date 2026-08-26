@@ -20,7 +20,7 @@ namespace Mapping_Tools.Desktop.Tests.ViewModels;
 public sealed class TumourGeneratorViewModelTests
 {
     [TestMethod]
-    public async Task RunQuickAsync_WithCurrentBeatmapUsesSelectedSlidersAndReloadsEditor()
+    public async Task RunQuickAsync_WithCurrentBeatmap_UsesSelectedSlidersAndReloadsEditor()
     {
         // Arrange
         RecordingGenerator service = new();
@@ -44,7 +44,7 @@ public sealed class TumourGeneratorViewModelTests
     }
 
     [TestMethod]
-    public async Task ImportCommand_WhenNoSlidersReturnsEmptyStateMessageWithoutReplacingPreview()
+    public async Task ImportCommand_WhenNoSliders_ReturnsEmptyStateMessageWithoutReplacingPreview()
     {
         // Arrange
         RecordingGenerator service = new() { ReturnEmptyImport = true };
@@ -104,7 +104,7 @@ public sealed class TumourGeneratorViewModelTests
     }
 
     [TestMethod]
-    public async Task RunCommand_WithInvalidProjectStopsBeforeServiceAndReportsValidation()
+    public async Task RunCommand_WithInvalidProject_StopsBeforeServiceAndReportsValidation()
     {
         // Arrange
         RecordingGenerator service = new();
@@ -123,7 +123,7 @@ public sealed class TumourGeneratorViewModelTests
     }
 
     [TestMethod]
-    public void ValidateSettings_WithNonFiniteGraphAnchorRejectsTheProject()
+    public void ValidateSettings_WithNonFiniteGraphAnchor_RejectsTheProject()
     {
         // Arrange
         var viewModel = Create(new RecordingGenerator());

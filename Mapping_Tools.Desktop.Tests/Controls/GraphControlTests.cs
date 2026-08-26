@@ -80,7 +80,7 @@ public sealed class GraphControlTests
     }
 
     [TestMethod]
-    public void MoveAnchor_WithInfiniteMarkerRangeSnapsToTheNearestMarker()
+    public void MoveAnchor_WithInfiniteMarkerRange_SnapsToTheNearestMarker()
     {
         // Arrange
         GraphState state = new(
@@ -104,7 +104,7 @@ public sealed class GraphControlTests
     }
 
     [TestMethod]
-    public void MoveAnchor_WithLockedEdgeRetainsItsExistingCoordinate()
+    public void MoveAnchor_WithLockedEdge_RetainsItsExistingCoordinate()
     {
         // Arrange
         GraphState state = new(
@@ -141,7 +141,7 @@ public sealed class GraphControlTests
     }
 
     [TestMethod]
-    public void PanBy_WithZoomedViewportStaysInsideGraphBounds()
+    public void PanBy_WithZoomedViewport_StaysInsideGraphBounds()
     {
         // Arrange
         GraphControl control = new() { GraphState = GraphState.CreateDefault() };
@@ -198,7 +198,7 @@ public sealed class GraphControlTests
     }
 
     [TestMethod]
-    public void WheelZoomPosition_UsesLegacyZeroLowerBoundsEvenWhenGraphMinimumIsNegative()
+    public void WheelZoomPosition_WithNegativeGraphMinimum_UsesLegacyZeroLowerBounds()
     {
         // Arrange
         GraphState state = new(

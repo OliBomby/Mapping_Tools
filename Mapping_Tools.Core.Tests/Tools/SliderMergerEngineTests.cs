@@ -187,7 +187,7 @@ public sealed class SliderMergerEngineTests
     }
 
     [TestMethod]
-    public void Merge_WithPlayableEndMatchingUsesSliderGeometry()
+    public void Merge_WithPlayableEndMatching_UsesSliderGeometry()
     {
         // Arrange
         HitObject first = new("64,64,0,2,0,L|264:64,1,100");
