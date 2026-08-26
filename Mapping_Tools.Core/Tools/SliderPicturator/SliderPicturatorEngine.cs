@@ -24,13 +24,17 @@ public static class SliderPicturatorEngine
         SliderPicturatorEngineOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
+
         ValidateImageAndQuality(image, options.Quality);
 
         double[,] pixelDistances = CalculatePixelDistances(image, options);
+
         var result = image.Clone();
+
         var inner = GetOpaqueColor(
             GetOpaqueGradientColour(options.CurrentTrackColor, true),
             options.BackgroundColor);
+
         var outer = GetOpaqueColor(
             GetOpaqueGradientColour(options.CurrentTrackColor, false),
             options.BackgroundColor);
@@ -48,9 +52,11 @@ public static class SliderPicturatorEngine
             Vector3 innerVector = new(inner.R, inner.G, inner.B);
             Vector3 outerVector = new(outer.R, outer.G, outer.B);
             Vector3 borderVector = new(options.BorderColor.R, options.BorderColor.G, options.BorderColor.B);
+
             double projectionLength = (innerVector - outerVector).Length;
             double gradientDistance = (colour - ClosestGradient(colour, outerVector, innerVector, projectionLength)).LengthSquared;
             double borderDistance = (colour - borderVector).LengthSquared;
+
             bool useBorder = options.BorderOn && gradientDistance >= borderDistance;
             bool useBlack = options.BlackOn && colour.LengthSquared < (useBorder ? borderDistance : gradientDistance);
             if (useBlack)
@@ -69,6 +75,7 @@ public static class SliderPicturatorEngine
             }
 
             var used = innerVector - pixelDistances[x, y] * (innerVector - outerVector);
+
             result.SetPixel(x, y, RgbaColour.FromRgb(
                 (byte)Math.Clamp(Math.Round(used.X), 0, 255),
                 (byte)Math.Clamp(Math.Round(used.Y), 0, 255),
@@ -76,16 +83,20 @@ public static class SliderPicturatorEngine
         }
 
         long segments = CountSegments(pixelDistances, image.Width, image.Height);
+
         if (options.SelectedSlider is { IsSlider: true })
         {
             int duration = (int)Math.Floor(options.SelectedSlider.TemporalLength);
+
             const double circle_size = 10;
             const double object_radius = 1.00041 * (54.4 - 4.48 * circle_size);
             const double gpu = 65536;
+
             Vector2 topLeft = new(-104, -52);
             Vector2 start = new((float)Math.Ceiling(object_radius * 1.15) + topLeft.X, (float)Math.Ceiling(object_radius * 1.15) + topLeft.Y);
             Vector2 bottomRight = new((float)Math.Floor(osupx_between_rows * gpu - 1.15 * object_radius) + topLeft.X,
                 (float)Math.Floor(osupx_between_rows * gpu - 1.15 * object_radius) + topLeft.Y);
+
             List<Vector2> perimeter =
             [
                 start, new(start.X, start.Y), new(bottomRight.X, start.Y), bottomRight,
@@ -93,6 +104,7 @@ public static class SliderPicturatorEngine
             ];
             double frameDistance = 2 * StableDistance(perimeter);
             double availableDistance = 2 * (bottomRight.X - 700);
+
             segments += 2L * ((int)Math.Floor(frameDistance / availableDistance) + 1) * duration + duration;
         }
 
@@ -110,32 +122,40 @@ public static class SliderPicturatorEngine
         SliderPicturatorEngineOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
+
         ValidateImageAndQuality(image, options.Quality);
 
         // startPos, startPosPic are in osupx
         var start = new Vector2(options.SliderStartX, options.SliderStartY);
         var picturePosition = new Vector2(options.ImageStartX, options.ImageStartY);
+
         start.Round();
         picturePosition.Round();
+
         double radius = 1.00041 * (54.4 - 4.48 * circleSize);
         double[,] pixelDistances = CalculatePixelDistances(image, options);
+
         Vector2 imageTopLeft = new(-104, -52);
         Vector2 sliderTopLeft = new(Math.Ceiling(radius * 1.15) + imageTopLeft.X, Math.Ceiling(radius * 1.15) + imageTopLeft.Y);
         Vector2 sliderBottomRight = new(
             Math.Floor(osupx_between_rows * options.ViewportSize - 1.15 * radius) + imageTopLeft.X,
             Math.Floor(osupx_between_rows * options.ViewportSize - 1.15 * radius) + imageTopLeft.Y);
+
         picturePosition -= imageTopLeft;
         picturePosition *= (options.YResolution - 16) / 480;
         picturePosition.Round();
+
         var imageStart = imageTopLeft + osupx_between_rows * picturePosition;
 
         Vector2[]? sliderBallPositions = null;
         Vector2[]? lastSegmentStarts = null;
         int duration = 0;
+
         // Handle sliderball control calculations
         if (options.SelectedSlider is { IsSlider: true })
         {
             duration = (int)Math.Floor(options.SelectedSlider.TemporalLength);
+
             sliderBallPositions = new Vector2[duration + 1];
             for (int i = 0; i <= duration; i++)
                 sliderBallPositions[i] = options.SelectedSlider.SliderPath.SliderballPositionAt(i, duration);
@@ -145,14 +165,19 @@ public static class SliderPicturatorEngine
             // We don't care about msLastSegStart[0] so we'll leave it at 0. Technically we could save one Vector2's worth of space here but it would make indexing harder to read than necessary.
             // Find the first angle - we can't calculate the angle between points that are the same, but the sliderball's rotation should be the same as it was before.
             double savedAngle = 0;
+
             for (int i = 1; i <= duration; i++)
+            {
                 if (sliderBallPositions[0] != sliderBallPositions[i])
                     savedAngle = Math.Atan2(sliderBallPositions[i - 1].Y - sliderBallPositions[i].Y, sliderBallPositions[i - 1].X - sliderBallPositions[i].X);
+            }
+
             for (int i = 1; i <= duration; i++)
             {
                 double angle = sliderBallPositions[i - 1] == sliderBallPositions[i]
                     ? savedAngle
                     : Math.Atan2(sliderBallPositions[i - 1].Y - sliderBallPositions[i].Y, sliderBallPositions[i - 1].X - sliderBallPositions[i].X);
+
                 savedAngle = angle;
                 lastSegmentStarts[i] = new Vector2((float)(Snaptol * Math.Cos(angle) + sliderBallPositions[i].Rounded().X),
                     (float)(Snaptol * Math.Sin(angle) + sliderBallPositions[i].Rounded().Y));
@@ -163,6 +188,7 @@ public static class SliderPicturatorEngine
             {
                 sliderBallPositions[i].Round();
                 sliderBallPositions[i] = new Vector2((float)sliderBallPositions[i].X, (float)sliderBallPositions[i].Y);
+
                 lastSegmentStarts[i].Round();
                 lastSegmentStarts[i] = lastSegmentStarts[i].X < sliderTopLeft.X || lastSegmentStarts[i].Y < sliderTopLeft.Y
                     ? new Vector2((float)(sliderBallPositions[i].Rounded().X + 60), (float)sliderBallPositions[i].Rounded().Y)
@@ -173,6 +199,7 @@ public static class SliderPicturatorEngine
         int direction = -1;
         List<Vector2> path = [];
         List<List<Vector2>> paths = [];
+
         List<Vector2> current =
         [
             start, new(start.X, sliderTopLeft.Y), new(sliderBottomRight.X, sliderTopLeft.Y), sliderBottomRight,
@@ -199,6 +226,7 @@ public static class SliderPicturatorEngine
                 {
                     gradient = pixelDistances[x + direction, y] - pixelDistances[x, y];
                     offset = direction;
+
                     while (x + offset + direction >= 0
                            && x + offset + direction < image.Width
                            && Math.Abs(pixelDistances[x + offset + direction, y] - pixelDistances[x + offset, y] - gradient) <= 0.001) offset += direction;
@@ -211,10 +239,13 @@ public static class SliderPicturatorEngine
                 int relativeY = (int)(segmentSlope * relativeX
                                       + Math.Pow(1 + segmentSlope * segmentSlope, 0.5) * radius * (pixelDistances[x, y] + gradient * (offset + 1) / 2)
                                       - segmentSlope * osupx_between_rows * (offset + 1) / 2);
+
                 lastStartX = (int)(relativeX + osupx_between_rows * (x + 0.5) + imageStart.X);
                 lastStartY = (int)(relativeY + osupx_between_rows * (y + 0.5) + imageStart.Y);
+
                 lastOffset = offset;
                 lastGradient = gradient;
+
                 current.Add(new Vector2(lastStartX, lastStartY));
                 current.Add(new Vector2(lastStartX + (offset + direction * 0.5) * osupx_between_rows,
                     Math.Round(lastStartY + gradient * offset)));
@@ -223,6 +254,7 @@ public static class SliderPicturatorEngine
 
             current.Add(new Vector2(lastStartX + (lastOffset + 0.5) * osupx_between_rows,
                 lastStartY + lastGradient * lastOffset + osupx_between_rows));
+
             if (direction == 1)
             {
                 paths.Add([.. current]);
@@ -233,11 +265,14 @@ public static class SliderPicturatorEngine
         paths.Add([.. current]);
 
         List<Vector2> totalPath = [];
+
         foreach (var item in paths) totalPath.AddRange(item);
+
         if (duration == 0) return (totalPath, 0);
 
         double totalDistance = StableDistance(totalPath);
         double frameDistance = 0;
+
         while (duration * frameDistance < totalDistance)
         {
             if (frameDistance > 0) path.RemoveRange(path.Count - 2, 2);
@@ -245,6 +280,7 @@ public static class SliderPicturatorEngine
             path.AddRange(paths[0]);
             path.Add(lastSegmentStarts![1]);
             path.Add(sliderBallPositions![1]);
+
             frameDistance = StableDistance(path) - Snaptol / 2d;
         }
 
@@ -252,6 +288,7 @@ public static class SliderPicturatorEngine
         double correction = 0;
         int currentMillisecond = 2;
         List<Vector2> currentPath = [path[^1]];
+
         for (int i = 1; i < paths.Count && currentMillisecond < duration; i++)
         {
             current.Clear();
@@ -259,6 +296,7 @@ public static class SliderPicturatorEngine
             current.AddRange(paths[i]);
             double currentPathDistance = StableDistance(current);
             var difference = current[^1] - lastSegmentStarts![currentMillisecond];
+
             if (currentDistance + currentPathDistance + Math.Abs(difference.X) + Math.Abs(difference.Y) + Snaptol > frameDistance)
             {
                 difference = currentPath[^1] - lastSegmentStarts[currentMillisecond];
@@ -266,8 +304,10 @@ public static class SliderPicturatorEngine
                 currentPath.Add(new Vector2(currentPath[^1].X, lastSegmentStarts[currentMillisecond].Y));
                 currentPath.Add(lastSegmentStarts[currentMillisecond]);
                 currentDistance += Snaptol;
+
                 double available = 2 * (sliderBottomRight.X - lastSegmentStarts[currentMillisecond].X);
                 int repeats = (int)Math.Floor((frameDistance - currentDistance) / available);
+
                 for (int j = 0; j < repeats; j++)
                 {
                     currentPath.Add(new Vector2(sliderBottomRight.X, lastSegmentStarts[currentMillisecond].Y));
@@ -279,6 +319,7 @@ public static class SliderPicturatorEngine
                     lastSegmentStarts[currentMillisecond].Y));
                 currentPath.Add(lastSegmentStarts[currentMillisecond]);
                 currentPath.Add(sliderBallPositions![currentMillisecond]);
+
                 currentMillisecond++;
                 correction += frameDistance - StableDistance(currentPath);
                 currentPath.RemoveAt(0);
@@ -300,11 +341,14 @@ public static class SliderPicturatorEngine
         {
             var difference = currentPath[^1] - lastSegmentStarts![currentMillisecond];
             currentDistance += Math.Abs(difference.X) + Math.Abs(difference.Y);
+
             currentPath.Add(new Vector2(currentPath[^1].X, lastSegmentStarts[currentMillisecond].Y));
             currentPath.Add(lastSegmentStarts[currentMillisecond]);
             currentDistance += Snaptol;
+
             double available = 2 * (sliderBottomRight.X - lastSegmentStarts[currentMillisecond].X);
             int repeats = (int)Math.Floor((frameDistance - currentDistance) / available);
+
             for (int j = 0; j < repeats; j++)
             {
                 currentPath.Add(new Vector2(sliderBottomRight.X, lastSegmentStarts[currentMillisecond].Y));
@@ -316,6 +360,7 @@ public static class SliderPicturatorEngine
                 lastSegmentStarts[currentMillisecond].Y));
             currentPath.Add(lastSegmentStarts[currentMillisecond]);
             currentPath.Add(sliderBallPositions![currentMillisecond]);
+
             currentMillisecond++;
             correction += frameDistance - StableDistance(currentPath);
             currentPath.RemoveAt(0);
@@ -328,6 +373,7 @@ public static class SliderPicturatorEngine
                 difference = currentPath[0] - lastSegmentStarts[currentMillisecond];
                 double generousLength = Math.Abs(difference.X) + Math.Abs(difference.Y);
                 available = 2 * (sliderBottomRight.X - lastSegmentStarts[currentMillisecond].X);
+
                 // We are assuming all slider positions are in the top left quadrant of the box centered on
                 // the top left sample point, so adding segments like this does not interfere with the picture.
                 for (int j = 0; j < Math.Floor((frameDistance - Snaptol - generousLength) / available); j++)
@@ -366,48 +412,62 @@ public static class SliderPicturatorEngine
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(path);
         ArgumentNullException.ThrowIfNull(options);
+
         if (path.Count < 2) throw new ArgumentException("A generated slider needs at least two anchors.", nameof(path));
 
         double duration = options.SelectedSlider?.TemporalLength ?? options.Duration;
+
         HitObject hitObject = new(options.TimeCode, 0, SampleSet.None, SampleSet.None)
         {
             IsCircle = false, IsSpinner = false, IsHoldNote = false, IsSlider = true,
             SliderVelocity = double.NaN,
         };
+
         int currentColourIndex = 0;
         int index = beatmap.HitObjects.Select(item => item.Time).ToList().BinarySearch(options.TimeCode);
+
         if (index < 0) index = ~index - 1;
+
         if (index >= 0) currentColourIndex = beatmap.HitObjects[index].ColourIndex;
+
         int foundColourIndex = beatmap.ComboColours.FindIndex(colour =>
             colour.Color.R == options.CurrentTrackColor.R
             && colour.Color.G == options.CurrentTrackColor.G
             && colour.Color.B == options.CurrentTrackColor.B);
+
         if (foundColourIndex < 0) foundColourIndex = 0;
+
         hitObject.ComboSkip = foundColourIndex - currentColourIndex - 1;
         hitObject.SetAllCurvePoints(path.ToList());
         hitObject.SliderType = PathType.Linear;
         hitObject.PixelLength = StableDistance(path);
+
         beatmap.HitObjects.Add(hitObject);
         beatmap.SortHitObjects();
 
         var timing = beatmap.BeatmapTiming;
         var after = timing.GetRedlineAtTime(hitObject.Time).Copy();
         var on = after.Copy();
+
         after.Offset = hitObject.Time;
         on.Offset = hitObject.Time - 1;
         after.OmitFirstBarLine = true;
         on.OmitFirstBarLine = true;
+
         on.MpB = frameDistance == 0
             ? 100 * timing.SliderMultiplier * duration / hitObject.PixelLength
             : 100 * timing.SliderMultiplier / frameDistance;
+
         List<TimingPointChange> changes =
         [
             new(on, true, uninherited: true, omitFirstBarLine: true, fuzziness: Precision.DOUBLE_EPSILON),
             new(after, true, uninherited: true, omitFirstBarLine: true, fuzziness: Precision.DOUBLE_EPSILON),
         ];
+
         hitObject.Time -= 1;
         changes.AddRange(beatmap.HitObjects.Select(item => CreateVelocityChange(item, hitObject, timing)));
         TimingPointChange.Apply(timing, changes);
+
         if (options.SetBeatmapColors)
         {
             if (options.SetTrackColorOverride)
@@ -425,8 +485,10 @@ public static class SliderPicturatorEngine
     private static TimingPointChange CreateVelocityChange(HitObject item, HitObject generated, Timing timing)
     {
         var point = timing.GetTimingPointAtTime(item.Time).Copy();
+
         point.MpB = item == generated ? item.SliderVelocity : timing.GetSvAtTime(item.Time);
         point.Offset = item.Time;
+
         return new TimingPointChange(point, true, fuzziness: Precision.DOUBLE_EPSILON);
     }
 
@@ -436,6 +498,7 @@ public static class SliderPicturatorEngine
         double topOpacity = top.A / 255d;
         double bottomOpacity = bottom.A / 255d;
         double totalOpacity = topOpacity + bottomOpacity * (1 - topOpacity);
+
         if (totalOpacity == 0) return RgbaColour.FromRgb(0, 0, 0);
 
         byte mix(byte topChannel, byte bottomChannel) => (byte)Math.Round(Math.Pow(
@@ -461,15 +524,19 @@ public static class SliderPicturatorEngine
         var inner = GetOpaqueColor(
             GetOpaqueGradientColour(options.CurrentTrackColor, true),
             options.BackgroundColor);
+
         var outer = GetOpaqueColor(
             GetOpaqueGradientColour(options.CurrentTrackColor, false),
             options.BackgroundColor);
+
         Vector3 innerVector = new(inner.R, inner.G, inner.B);
         Vector3 outerVector = new(outer.R, outer.G, outer.B);
         Vector3 borderVector = new(options.BorderColor.R, options.BorderColor.G, options.BorderColor.B);
+
         var projectionVector = innerVector - outerVector;
         double projectionLength = projectionVector.Length;
         double[,] distances = new double[image.Width, image.Height];
+
         for (int x = 0; x < image.Width; x++)
         for (int y = 0; y < image.Height; y++)
         {
@@ -479,10 +546,12 @@ public static class SliderPicturatorEngine
                 options.RedOn ? source.R : 0,
                 options.GreenOn ? source.G : 0,
                 options.BlueOn ? source.B : 0);
+
             var closest = ClosestGradient(colour, outerVector, innerVector, projectionLength);
             double gradientDistance = (colour - closest).LengthSquared;
             double borderDistance = (colour - borderVector).LengthSquared;
             double blackDistance = colour.LengthSquared;
+
             // Test if border color would be better
             if (!options.BorderOn || gradientDistance < borderDistance)
                 // Test if black would be better
@@ -503,7 +572,9 @@ public static class SliderPicturatorEngine
     private static Vector3 ClosestGradient(Vector3 colour, Vector3 outer, Vector3 inner, double length)
     {
         var direction = inner - outer;
+
         var projection = Vector3.Dot(colour - outer, direction) / Vector3.Dot(direction, direction) * direction + outer;
+
         if (projection.X < outer.X) return outer;
         if (projection.X > inner.X) return inner;
         return projection;
@@ -514,6 +585,7 @@ public static class SliderPicturatorEngine
         // Count segments
         long count = 0;
         int direction = -1;
+
         // In the below loop, gradientDist means something completely different from what it means in the above loop. Here, it is being used to mean the distance in the gradient between two or more points that are evenly distributed along the slider body
         for (int y = 0; y < height; y++)
         {
@@ -528,6 +600,7 @@ public static class SliderPicturatorEngine
                 {
                     gradient = distances[x + direction, y] - distances[x, y];
                     offset = direction;
+
                     while (x + offset + direction >= 0
                            && x + offset + direction < width
                            && Math.Abs(distances[x + offset + direction, y] - distances[x + offset, y] - gradient) <= 0.001) offset += direction;
@@ -546,11 +619,13 @@ public static class SliderPicturatorEngine
     private static double StableDistance(IReadOnlyList<Vector2> points)
     {
         double length = 0;
+
         for (int i = 1; i < points.Count; i++)
         {
             float x = (float)Math.Round(points[i - 1].X) - (float)Math.Round(points[i].X);
             float y = (float)Math.Round(points[i - 1].Y) - (float)Math.Round(points[i].Y);
             float squared = x * x + y * y;
+
             length += (float)Math.Sqrt(squared);
         }
 
@@ -560,6 +635,7 @@ public static class SliderPicturatorEngine
     private static void ValidateImageAndQuality(RgbaImage image, int quality)
     {
         ArgumentNullException.ThrowIfNull(image);
+
         if (quality is < 1 or > 101) throw new ArgumentOutOfRangeException(nameof(quality));
     }
 }
