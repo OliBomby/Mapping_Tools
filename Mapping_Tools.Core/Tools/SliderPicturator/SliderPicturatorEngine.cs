@@ -2,6 +2,7 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Images;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Tools.SliderPicturator.Models;
 
 namespace Mapping_Tools.Core.Tools.SliderPicturator;
 
@@ -16,52 +17,42 @@ public static class SliderPicturatorEngine
 
     /// <summary>Recolours an image and estimates the slider segments required to reproduce it.</summary>
     /// <param name="image">The source image.</param>
-    /// <param name="sliderColor">The slider track colour.</param>
-    /// <param name="sliderBorder">The slider border colour.</param>
-    /// <param name="backgroundColor">The colour composited below transparent pixels.</param>
-    /// <param name="slider">Optional selected slider used to include sliderball motion in the estimate.</param>
-    /// <param name="blackOff">Whether black pixels are excluded from matching.</param>
-    /// <param name="borderOff">Whether the border colour is excluded from matching.</param>
-    /// <param name="opaqueOff">Whether source alpha is ignored.</param>
-    /// <param name="r">Whether red participates in matching.</param>
-    /// <param name="g">Whether green participates in matching.</param>
-    /// <param name="b">Whether blue participates in matching.</param>
-    /// <param name="quality">The integer gradient quantization quality.</param>
+    /// <param name="options">The colours, matching settings, and optional sliderball source.</param>
     /// <returns>A recoloured image and the estimated segment count.</returns>
     public static (RgbaImage Image, long SegmentCount) Recolor(
         RgbaImage image,
-        RgbaColour sliderColor,
-        RgbaColour sliderBorder,
-        RgbaColour backgroundColor,
-        HitObject? slider = null,
-        bool blackOff = false,
-        bool borderOff = false,
-        bool opaqueOff = false,
-        bool r = true,
-        bool g = true,
-        bool b = true,
-        int quality = 101)
+        SliderPicturatorEngineOptions options)
     {
-        ValidateImageAndQuality(image, quality);
-        double[,] pixelDistances = CalculatePixelDistances(
-            image, sliderColor, sliderBorder, backgroundColor, blackOff, borderOff, opaqueOff, r, g, b, quality);
+        ArgumentNullException.ThrowIfNull(options);
+        ValidateImageAndQuality(image, options.Quality);
+
+        double[,] pixelDistances = CalculatePixelDistances(image, options);
         var result = image.Clone();
-        var inner = GetOpaqueColor(GetOpaqueGradientColour(sliderColor, true), backgroundColor);
-        var outer = GetOpaqueColor(GetOpaqueGradientColour(sliderColor, false), backgroundColor);
+        var inner = GetOpaqueColor(
+            GetOpaqueGradientColour(options.CurrentTrackColor, true),
+            options.BackgroundColor);
+        var outer = GetOpaqueColor(
+            GetOpaqueGradientColour(options.CurrentTrackColor, false),
+            options.BackgroundColor);
+
         for (int y = 0; y < image.Height; y++)
         for (int x = 0; x < image.Width; x++)
         {
             var source = image.GetPixel(x, y);
-            if (!opaqueOff) source = GetOpaqueColor(source, backgroundColor);
-            Vector3 colour = new(r ? source.R : 0, g ? source.G : 0, b ? source.B : 0);
+            if (!options.AlphaOn) source = GetOpaqueColor(source, options.BackgroundColor);
+
+            Vector3 colour = new(
+                options.RedOn ? source.R : 0,
+                options.GreenOn ? source.G : 0,
+                options.BlueOn ? source.B : 0);
             Vector3 innerVector = new(inner.R, inner.G, inner.B);
             Vector3 outerVector = new(outer.R, outer.G, outer.B);
-            Vector3 borderVector = new(sliderBorder.R, sliderBorder.G, sliderBorder.B);
+            Vector3 borderVector = new(options.BorderColor.R, options.BorderColor.G, options.BorderColor.B);
             double projectionLength = (innerVector - outerVector).Length;
             double gradientDistance = (colour - ClosestGradient(colour, outerVector, innerVector, projectionLength)).LengthSquared;
             double borderDistance = (colour - borderVector).LengthSquared;
-            bool useBorder = !borderOff && gradientDistance >= borderDistance;
-            bool useBlack = !blackOff && colour.LengthSquared < (useBorder ? borderDistance : gradientDistance);
+            bool useBorder = options.BorderOn && gradientDistance >= borderDistance;
+            bool useBlack = options.BlackOn && colour.LengthSquared < (useBorder ? borderDistance : gradientDistance);
             if (useBlack)
             {
                 result.SetPixel(x, y, RgbaColour.FromRgb(0, 0, 0));
@@ -70,7 +61,10 @@ public static class SliderPicturatorEngine
 
             if (useBorder)
             {
-                result.SetPixel(x, y, RgbaColour.FromRgb(sliderBorder.R, sliderBorder.G, sliderBorder.B));
+                result.SetPixel(x, y, RgbaColour.FromRgb(
+                    options.BorderColor.R,
+                    options.BorderColor.G,
+                    options.BorderColor.B));
                 continue;
             }
 
@@ -82,9 +76,9 @@ public static class SliderPicturatorEngine
         }
 
         long segments = CountSegments(pixelDistances, image.Width, image.Height);
-        if (slider is { IsSlider: true })
+        if (options.SelectedSlider is { IsSlider: true })
         {
-            int duration = (int)Math.Floor(slider.TemporalLength);
+            int duration = (int)Math.Floor(options.SelectedSlider.TemporalLength);
             const double circle_size = 10;
             const double object_radius = 1.00041 * (54.4 - 4.48 * circle_size);
             const double gpu = 65536;
@@ -107,44 +101,31 @@ public static class SliderPicturatorEngine
 
     /// <summary>Converts an image into the linear slider path used by the legacy tool.</summary>
     /// <param name="image">The source image.</param>
-    /// <param name="sliderColor">The slider track colour.</param>
-    /// <param name="sliderBorder">The slider border colour.</param>
-    /// <param name="backgroundColor">The colour composited below transparent pixels.</param>
     /// <param name="circleSize">The beatmap circle size.</param>
-    /// <param name="startPosition">The generated slider start position.</param>
-    /// <param name="imagePosition">The image top-left position.</param>
-    /// <param name="slider">Optional selected slider for sliderball motion.</param>
-    /// <param name="resolutionY">The osu! window height used for image scaling.</param>
-    /// <param name="gpuViewport">The selected GPU viewport size.</param>
-    /// <param name="blackOff">Whether black pixels are excluded from matching.</param>
-    /// <param name="borderOff">Whether the border colour is excluded from matching.</param>
-    /// <param name="opaqueOff">Whether source alpha is ignored.</param>
-    /// <param name="r">Whether red participates in matching.</param>
-    /// <param name="g">Whether green participates in matching.</param>
-    /// <param name="b">Whether blue participates in matching.</param>
-    /// <param name="quality">The integer gradient quantization quality.</param>
+    /// <param name="options">The colours, geometry, matching settings, and optional sliderball source.</param>
     /// <returns>The generated linear anchors and distance travelled per millisecond.</returns>
     public static (List<Vector2> Path, double FrameDistance) Picturate(
-        RgbaImage image, RgbaColour sliderColor, RgbaColour sliderBorder, RgbaColour backgroundColor,
-        double circleSize, Vector2 startPosition, Vector2 imagePosition, HitObject? slider = null,
-        double resolutionY = 1080, long gpuViewport = 16384, bool blackOff = false, bool borderOff = false,
-        bool opaqueOff = false, bool r = true, bool g = true, bool b = true, int quality = 101)
+        RgbaImage image,
+        double circleSize,
+        SliderPicturatorEngineOptions options)
     {
-        ValidateImageAndQuality(image, quality);
+        ArgumentNullException.ThrowIfNull(options);
+        ValidateImageAndQuality(image, options.Quality);
+
         // startPos, startPosPic are in osupx
-        var start = startPosition;
-        var picturePosition = imagePosition;
+        var start = new Vector2(options.SliderStartX, options.SliderStartY);
+        var picturePosition = new Vector2(options.ImageStartX, options.ImageStartY);
         start.Round();
         picturePosition.Round();
         double radius = 1.00041 * (54.4 - 4.48 * circleSize);
-        double[,] pixelDistances = CalculatePixelDistances(
-            image, sliderColor, sliderBorder, backgroundColor, blackOff, borderOff, opaqueOff, r, g, b, quality);
+        double[,] pixelDistances = CalculatePixelDistances(image, options);
         Vector2 imageTopLeft = new(-104, -52);
         Vector2 sliderTopLeft = new(Math.Ceiling(radius * 1.15) + imageTopLeft.X, Math.Ceiling(radius * 1.15) + imageTopLeft.Y);
-        Vector2 sliderBottomRight = new(Math.Floor(osupx_between_rows * gpuViewport - 1.15 * radius) + imageTopLeft.X,
-            Math.Floor(osupx_between_rows * gpuViewport - 1.15 * radius) + imageTopLeft.Y);
+        Vector2 sliderBottomRight = new(
+            Math.Floor(osupx_between_rows * options.ViewportSize - 1.15 * radius) + imageTopLeft.X,
+            Math.Floor(osupx_between_rows * options.ViewportSize - 1.15 * radius) + imageTopLeft.Y);
         picturePosition -= imageTopLeft;
-        picturePosition *= (resolutionY - 16) / 480;
+        picturePosition *= (options.YResolution - 16) / 480;
         picturePosition.Round();
         var imageStart = imageTopLeft + osupx_between_rows * picturePosition;
 
@@ -152,11 +133,12 @@ public static class SliderPicturatorEngine
         Vector2[]? lastSegmentStarts = null;
         int duration = 0;
         // Handle sliderball control calculations
-        if (slider is { IsSlider: true })
+        if (options.SelectedSlider is { IsSlider: true })
         {
-            duration = (int)Math.Floor(slider.TemporalLength);
+            duration = (int)Math.Floor(options.SelectedSlider.TemporalLength);
             sliderBallPositions = new Vector2[duration + 1];
-            for (int i = 0; i <= duration; i++) sliderBallPositions[i] = slider.SliderPath.SliderballPositionAt(i, duration);
+            for (int i = 0; i <= duration; i++)
+                sliderBallPositions[i] = options.SelectedSlider.SliderPath.SliderballPositionAt(i, duration);
 
             // Before rounding sbPositions, calculate starting coordinate for each ms' final segment to make the sliderball rotate appropriately
             lastSegmentStarts = new Vector2[duration + 1];
@@ -374,28 +356,32 @@ public static class SliderPicturatorEngine
     /// <param name="beatmap">The mutable beatmap to update.</param>
     /// <param name="path">The generated linear slider anchors.</param>
     /// <param name="frameDistance">The target distance travelled per millisecond.</param>
-    /// <param name="duration">The requested slider duration in milliseconds.</param>
-    /// <param name="time">The requested start time in milliseconds.</param>
-    /// <param name="sliderColor">The selected track colour.</param>
-    /// <param name="borderColor">The selected border colour.</param>
-    /// <param name="setBeatmapColors">Whether special slider colours are written.</param>
-    /// <param name="setTrackColorOverride">Whether the track colour is written as a beatmap override.</param>
-    public static void ApplyToBeatmap(Beatmap beatmap, IReadOnlyList<Vector2> path, double frameDistance, double duration,
-        double time, RgbaColour sliderColor, RgbaColour borderColor, bool setBeatmapColors, bool setTrackColorOverride)
+    /// <param name="options">The timing, colour, and beatmap-output settings.</param>
+    public static void ApplyToBeatmap(
+        Beatmap beatmap,
+        IReadOnlyList<Vector2> path,
+        double frameDistance,
+        SliderPicturatorEngineOptions options)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(path);
+        ArgumentNullException.ThrowIfNull(options);
         if (path.Count < 2) throw new ArgumentException("A generated slider needs at least two anchors.", nameof(path));
-        HitObject hitObject = new(time, 0, SampleSet.None, SampleSet.None)
+
+        double duration = options.SelectedSlider?.TemporalLength ?? options.Duration;
+        HitObject hitObject = new(options.TimeCode, 0, SampleSet.None, SampleSet.None)
         {
             IsCircle = false, IsSpinner = false, IsHoldNote = false, IsSlider = true,
             SliderVelocity = double.NaN,
         };
         int currentColourIndex = 0;
-        int index = beatmap.HitObjects.Select(item => item.Time).ToList().BinarySearch(time);
+        int index = beatmap.HitObjects.Select(item => item.Time).ToList().BinarySearch(options.TimeCode);
         if (index < 0) index = ~index - 1;
         if (index >= 0) currentColourIndex = beatmap.HitObjects[index].ColourIndex;
-        int foundColourIndex = beatmap.ComboColours.FindIndex(colour => colour.Color.R == sliderColor.R && colour.Color.G == sliderColor.G && colour.Color.B == sliderColor.B);
+        int foundColourIndex = beatmap.ComboColours.FindIndex(colour =>
+            colour.Color.R == options.CurrentTrackColor.R
+            && colour.Color.G == options.CurrentTrackColor.G
+            && colour.Color.B == options.CurrentTrackColor.B);
         if (foundColourIndex < 0) foundColourIndex = 0;
         hitObject.ComboSkip = foundColourIndex - currentColourIndex - 1;
         hitObject.SetAllCurvePoints(path.ToList());
@@ -422,10 +408,17 @@ public static class SliderPicturatorEngine
         hitObject.Time -= 1;
         changes.AddRange(beatmap.HitObjects.Select(item => CreateVelocityChange(item, hitObject, timing)));
         TimingPointChange.Apply(timing, changes);
-        if (setBeatmapColors)
+        if (options.SetBeatmapColors)
         {
-            if (setTrackColorOverride) beatmap.SpecialColours["SliderTrackOverride"] = new ComboColour(sliderColor.R, sliderColor.G, sliderColor.B);
-            beatmap.SpecialColours["SliderBorder"] = new ComboColour(borderColor.R, borderColor.G, borderColor.B);
+            if (options.SetTrackColorOverride)
+                beatmap.SpecialColours["SliderTrackOverride"] = new ComboColour(
+                    options.CurrentTrackColor.R,
+                    options.CurrentTrackColor.G,
+                    options.CurrentTrackColor.B);
+            beatmap.SpecialColours["SliderBorder"] = new ComboColour(
+                options.BorderColor.R,
+                options.BorderColor.G,
+                options.BorderColor.B);
         }
     }
 
@@ -461,14 +454,19 @@ public static class SliderPicturatorEngine
             (byte)Math.Min(255, inner ? slider.B * (1 + 0.5 * lighten_amount) + 255 * lighten_amount : slider.B / (1 + darken_amount)));
     }
 
-    private static double[,] CalculatePixelDistances(RgbaImage image, RgbaColour sliderColor, RgbaColour border,
-        RgbaColour background, bool blackOff, bool borderOff, bool opaqueOff, bool r, bool g, bool b, int quality)
+    private static double[,] CalculatePixelDistances(
+        RgbaImage image,
+        SliderPicturatorEngineOptions options)
     {
-        var inner = GetOpaqueColor(GetOpaqueGradientColour(sliderColor, true), background);
-        var outer = GetOpaqueColor(GetOpaqueGradientColour(sliderColor, false), background);
+        var inner = GetOpaqueColor(
+            GetOpaqueGradientColour(options.CurrentTrackColor, true),
+            options.BackgroundColor);
+        var outer = GetOpaqueColor(
+            GetOpaqueGradientColour(options.CurrentTrackColor, false),
+            options.BackgroundColor);
         Vector3 innerVector = new(inner.R, inner.G, inner.B);
         Vector3 outerVector = new(outer.R, outer.G, outer.B);
-        Vector3 borderVector = new(border.R, border.G, border.B);
+        Vector3 borderVector = new(options.BorderColor.R, options.BorderColor.G, options.BorderColor.B);
         var projectionVector = innerVector - outerVector;
         double projectionLength = projectionVector.Length;
         double[,] distances = new double[image.Width, image.Height];
@@ -476,21 +474,25 @@ public static class SliderPicturatorEngine
         for (int y = 0; y < image.Height; y++)
         {
             var source = image.GetPixel(x, y);
-            if (!opaqueOff) source = GetOpaqueColor(source, background);
-            Vector3 colour = new(r ? source.R : 0, g ? source.G : 0, b ? source.B : 0);
+            if (!options.AlphaOn) source = GetOpaqueColor(source, options.BackgroundColor);
+            Vector3 colour = new(
+                options.RedOn ? source.R : 0,
+                options.GreenOn ? source.G : 0,
+                options.BlueOn ? source.B : 0);
             var closest = ClosestGradient(colour, outerVector, innerVector, projectionLength);
             double gradientDistance = (colour - closest).LengthSquared;
             double borderDistance = (colour - borderVector).LengthSquared;
             double blackDistance = colour.LengthSquared;
             // Test if border color would be better
-            if (borderOff || gradientDistance < borderDistance)
+            if (!options.BorderOn || gradientDistance < borderDistance)
                 // Test if black would be better
-                distances[x, y] = !blackOff && blackDistance < gradientDistance
+                distances[x, y] = options.BlackOn && blackDistance < gradientDistance
                     ? 1.2
-                    : Math.Round(quality * Math.Clamp(1 - (closest - outerVector).Length / projectionLength, 0, 1)) * (101d / quality) / 128;
+                    : Math.Round(options.Quality * Math.Clamp(1 - (closest - outerVector).Length / projectionLength, 0, 1))
+                      * (101d / options.Quality) / 128;
             else
                 // Test if black would be better
-                distances[x, y] = !blackOff && blackDistance < borderDistance
+                distances[x, y] = options.BlackOn && blackDistance < borderDistance
                     ? 1.2
                     : 111d / 128;
         }

@@ -2,6 +2,7 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Images;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SliderPicturator;
+using Mapping_Tools.Core.Tools.SliderPicturator.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Tools;
@@ -18,10 +19,13 @@ public sealed class SliderPicturatorEngineTests
         // Act
         (var recoloured, long segments) = SliderPicturatorEngine.Recolor(
             image,
-            RgbaColour.FromRgb(0, 128, 255),
-            RgbaColour.White,
-            RgbaColour.FromArgb(0, 0, 0, 0),
-            quality: 1);
+            new SliderPicturatorEngineOptions
+            {
+                CurrentTrackColor = RgbaColour.FromRgb(0, 128, 255),
+                BorderColor = RgbaColour.White,
+                BackgroundColor = RgbaColour.FromArgb(0, 0, 0, 0),
+                Quality = 1,
+            });
 
         // Assert
         recoloured.Width.Should().Be(2);
@@ -39,13 +43,14 @@ public sealed class SliderPicturatorEngineTests
         // Act
         (var path, double frameDistance) = SliderPicturatorEngine.Picturate(
             image,
-            RgbaColour.FromRgb(0, 128, 255),
-            RgbaColour.White,
-            RgbaColour.FromArgb(0, 0, 0, 0),
             4,
-            new Vector2(256, 192),
-            Vector2.Zero,
-            quality: 1);
+            new SliderPicturatorEngineOptions
+            {
+                CurrentTrackColor = RgbaColour.FromRgb(0, 128, 255),
+                BorderColor = RgbaColour.White,
+                BackgroundColor = RgbaColour.FromArgb(0, 0, 0, 0),
+                Quality = 1,
+            });
 
         // Assert
         path.Should().HaveCountGreaterThan(2);
@@ -77,12 +82,15 @@ public sealed class SliderPicturatorEngineTests
         // Act
         var (recoloured, _) = SliderPicturatorEngine.Recolor(
             image,
-            RgbaColour.FromRgb(255, 255, 255),
-            border,
-            RgbaColour.FromArgb(0, 0, 0, 0),
-            blackOff: true,
-            borderOff: false,
-            quality: 1);
+            new SliderPicturatorEngineOptions
+            {
+                CurrentTrackColor = RgbaColour.FromRgb(255, 255, 255),
+                BorderColor = border,
+                BackgroundColor = RgbaColour.FromArgb(0, 0, 0, 0),
+                BlackOn = false,
+                BorderOn = true,
+                Quality = 1,
+            });
 
         // Assert
         recoloured.GetPixel(0, 0).A.Should().Be(255);

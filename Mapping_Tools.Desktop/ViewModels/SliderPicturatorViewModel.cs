@@ -473,12 +473,12 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         try
         {
             SliderPicturatorProject options = Snapshot();
+            options.BackgroundColor = RgbaColour.FromArgb(0, 0, 0, 0);
             var sourceImage = this.sourceImage
                               ?? throw new InvalidOperationException("The preview source image was cleared.");
-            (RgbaImage image, long segments) result = await Task.Run(() => SliderPicturatorEngine.Recolor(
-                sourceImage, options.CurrentTrackColor, options.BorderColor, RgbaColour.FromArgb(0, 0, 0, 0),
-                options.SelectedSlider, !options.BlackOn, !options.BorderOn, !options.AlphaOn,
-                options.RedOn, options.GreenOn, options.BlueOn, options.Quality), token);
+            (RgbaImage image, long segments) result = await Task.Run(
+                () => SliderPicturatorEngine.Recolor(sourceImage, options),
+                token);
             token.ThrowIfCancellationRequested();
             PreviewImage = RgbaImageBitmapFactory.Create(result.image);
             SegmentCount = result.segments;
