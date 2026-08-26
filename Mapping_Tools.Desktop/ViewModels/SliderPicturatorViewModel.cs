@@ -542,6 +542,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         BlueOn = project.BlueOn;
         AlphaOn = project.AlphaOn;
         SetBeatmapColors = project.SetBeatmapColors;
+        SelectedSlider = project.SelectedSlider;
     }
 
     private Task PublishFailureAsync(string title, string message, Exception exception)

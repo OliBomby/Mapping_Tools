@@ -4,6 +4,8 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.SliderPicturator;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Images;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,6 +28,23 @@ public sealed class SliderPicturatorViewModelTests
 
         // Assert
         viewModel.SegmentCount.Should().Be(42);
+    }
+
+    [TestMethod]
+    public void Install_WithPersistedSelectedSlider_RestoresSelectedSlider()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingPicturator(), new RecordingCurrentBeatmapLocator("current.osu"));
+        HitObject selectedSlider = new("32,64,100,2,0,L|200:64,1,168");
+        SliderPicturatorProject project = new() { SelectedSlider = selectedSlider };
+        IShellProjectFeature feature = viewModel;
+
+        // Act
+        feature.Install(project);
+
+        // Assert
+        viewModel.SelectedSlider.Should().NotBeNull();
+        viewModel.SelectedSlider!.Line.Should().Be(selectedSlider.Line);
     }
 
     private static SliderPicturatorViewModel Create(

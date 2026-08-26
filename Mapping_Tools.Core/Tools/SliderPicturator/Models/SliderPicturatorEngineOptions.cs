@@ -75,8 +75,9 @@ public class SliderPicturatorEngineOptions
 
     /// <summary>
     ///     Gets or sets the optional selected slider whose sliderball motion is
-    ///     included in generation and segment estimation.
+    ///     included in generation and segment estimation. When this object is
+    ///     persisted as part of a Picturator project, its osu! hit-object line is
+    ///     stored so the selection can be restored without retaining an editor reference.
     /// </summary>
-    [JsonIgnore]
     public HitObject? SelectedSlider { get; set; }
 }

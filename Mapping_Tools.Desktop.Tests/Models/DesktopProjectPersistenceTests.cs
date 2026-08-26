@@ -82,7 +82,11 @@ public sealed class DesktopProjectPersistenceTests
                               "SegmentCount": 42,
                               "UseMapComboColors": true,
                               "ComboColor": "0, 128, 255",
-                              "TrackColorPickerColor": "#FFFFFFFF"
+                              "TrackColorPickerColor": "#FFFFFFFF",
+                              "SelectedSlider": {
+                                "$type": "Mapping_Tools.Classes.BeatmapHelper.HitObject, Mapping Tools",
+                                "Line": "32,64,100,2,0,L|200:64,1,168"
+                              }
                             }
                             """;
         LegacyProjectJsonSerializer serializer = new();
@@ -96,6 +100,8 @@ public sealed class DesktopProjectPersistenceTests
         project.ComboColor.Should().Be(new RgbaColour(255, 0, 128, 255));
         project.TrackColorPickerColor.Should().Be(new RgbaColour(255, 255, 255, 255));
         project.SetTrackColorOverride.Should().BeFalse();
+        project.SelectedSlider.Should().NotBeNull();
+        project.SelectedSlider!.Line.Should().Be("32,64,100,2,0,L|200:64,1,168");
     }
 
     [TestMethod]
@@ -114,5 +120,30 @@ public sealed class DesktopProjectPersistenceTests
         restored.UseMapComboColors.Should().BeTrue();
         restored.SetTrackColorOverride.Should().BeFalse();
         restored.SegmentCount.Should().Be(42);
+    }
+
+    [TestMethod]
+    public void SerializeAndDeserialize_SliderPicturatorProject_WithSelectedSlider_PreservesSliderAndOmitsBackgroundColor()
+    {
+        // Arrange
+        HitObject selectedSlider = new("32,64,100,2,0,L|200:64,1,168");
+        SliderPicturatorProject project = new()
+        {
+            SelectedSlider = selectedSlider,
+            BackgroundColor = RgbaColour.FromArgb(77, 1, 2, 3),
+        };
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        string json = serializer.Serialize(project);
+        SliderPicturatorProject restored = serializer.Deserialize<SliderPicturatorProject>(json);
+
+        // Assert
+        json.Should().Contain("\"SelectedSlider\"");
+        json.Should().Contain($"\"Line\": \"{selectedSlider.Line}\"");
+        json.Should().NotContain("BackgroundColor");
+        restored.SelectedSlider.Should().NotBeNull();
+        restored.SelectedSlider!.Line.Should().Be(selectedSlider.Line);
+        restored.BackgroundColor.Should().Be(RgbaColour.FromRgb(0, 0, 0));
     }
 }
