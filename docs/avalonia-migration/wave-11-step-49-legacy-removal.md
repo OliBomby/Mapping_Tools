@@ -20,7 +20,7 @@ Step 49 was executed with explicit approval to complete the remaining migration.
 - `LegacyProjectJsonSerializer` and its `Mapping Tools` / `Mapping_Tools.*` type aliases remain active so existing feature project JSON continues to load and round-trip.
 - Existing settings paths, project JSON, pattern collections, `.osu`/`.osb` files, backups, exports, crash logs, and user data under `%LOCALAPPDATA%\Mapping Tools` remain supported.
 - Onova update discovery, published executable metadata, command-line handoff, restart behavior, archive names, installer layout, and rollback to the previous Avalonia release remain unchanged.
-- Live Infrastructure dependencies such as `System.Drawing.Common`, NAudio, Overlay.NET, and Onova remain because they serve retained framework-neutral or Windows integration contracts; only WPF-only project dependencies were removed.
+- Live Infrastructure dependencies such as SkiaSharp, NAudio, Overlay.NET, and Onova remain because they serve retained framework-neutral or platform integration contracts; only WPF-only project dependencies were removed.
 
 ## Validation record
 

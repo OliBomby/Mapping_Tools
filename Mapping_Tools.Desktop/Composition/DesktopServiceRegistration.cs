@@ -212,7 +212,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IPatternGalleryFileService, PatternGalleryFileService>();
         services.AddSingleton<IPatternGalleryArchiveService, PatternGalleryArchiveService>();
         services.AddSingleton<IMapsetFileSystem, PhysicalMapsetFileSystem>();
-        services.AddSingleton<IImageFileService, SystemDrawingImageFileService>();
+        services.AddSingleton<IImageFileService, SkiaSharpImageFileService>();
         services.AddSingleton<IMapCleanerSampleService, PhysicalMapCleanerSampleService>();
         services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();
         services.AddSingleton<IBeatmapFileSystem, PhysicalBeatmapFileSystem>();

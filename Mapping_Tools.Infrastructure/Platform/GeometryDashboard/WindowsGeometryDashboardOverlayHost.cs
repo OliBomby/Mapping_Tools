@@ -1,11 +1,10 @@
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SnappingTools;
+using SkiaSharp;
 
 namespace Mapping_Tools.Infrastructure.Platform.GeometryDashboard;
 
@@ -19,7 +18,7 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
     private const uint extended_style_transparent = 0x00000020;
     private const uint extended_style_no_activate = 0x08000000;
     private const uint window_style_popup = 0x80000000;
-    private const uint green_yellow = 0x002FFFAD;
+    private static readonly SKColor green_yellow = new(173, 255, 47);
     private const int border_thickness = 3;
     private static readonly object classGate = new();
     private static readonly Dictionary<nint, bool> borderStates = [];
@@ -340,30 +339,18 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
             nint deviceContext = WindowsNativeMethods.BeginPaint(window, out paint);
             lock (classGate)
             {
-                if (paintStates.TryGetValue(window, out var paintState)) DrawFrame(deviceContext, paintState);
-
-                if (borderStates.TryGetValue(window, out bool drawBorder)
-                    && drawBorder
-                    && WindowsNativeMethods.GetClientRect(
-                        window,
-                        out var rectangle))
+                paintStates.TryGetValue(window, out var paintState);
+                bool drawBorder = borderStates.TryGetValue(window, out bool border) && border;
+                if (paintState is not null || drawBorder)
                 {
-                    nint brush = WindowsNativeMethods.CreateSolidBrush(green_yellow);
-                    if (brush != 0)
+                    if (WindowsNativeMethods.GetClientRect(window, out var rectangle))
                     {
-                        for (int index = 0; index < border_thickness; index++)
-                        {
-                            WindowsNativeMethods.FrameRect(
-                                deviceContext,
-                                ref rectangle,
-                                brush);
-                            rectangle.Left++;
-                            rectangle.Top++;
-                            rectangle.Right--;
-                            rectangle.Bottom--;
-                        }
-
-                        WindowsNativeMethods.DeleteObject(brush);
+                        DrawOverlay(
+                            deviceContext,
+                            rectangle.Right - rectangle.Left,
+                            rectangle.Bottom - rectangle.Top,
+                            paintState,
+                            drawBorder);
                     }
                 }
             }
@@ -418,60 +405,162 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         ObjectDisposedException.ThrowIf(disposed, this);
     }
 
-    private static void DrawFrame(nint deviceContext, OverlayPaintState state)
+    private static void DrawOverlay(
+        nint deviceContext,
+        int width,
+        int height,
+        OverlayPaintState? state,
+        bool drawBorder)
     {
-        using var graphics = Graphics.FromHdc(deviceContext);
-        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        if (width <= 0 || height <= 0) return;
 
+        nint memoryDeviceContext = WindowsNativeMethods.CreateCompatibleDC(deviceContext);
+        if (memoryDeviceContext == 0)
+            throw new InvalidOperationException("Windows could not create the Geometry Dashboard overlay buffer.");
+
+        nint bitmap = 0;
+        nint previousBitmap = 0;
+        try
+        {
+            WindowsNativeMethods.BitmapInfoHeader bitmapInfo = new()
+            {
+                Size = (uint)Marshal.SizeOf<WindowsNativeMethods.BitmapInfoHeader>(),
+                Width = width,
+                Height = -height,
+                Planes = 1,
+                BitCount = 32,
+                Compression = WindowsNativeMethods.BI_RGB,
+            };
+            bitmap = WindowsNativeMethods.CreateDibSection(
+                deviceContext,
+                ref bitmapInfo,
+                WindowsNativeMethods.DIB_RGB_COLORS,
+                out nint pixels,
+                0,
+                0);
+            if (bitmap == 0 || pixels == 0)
+                throw new InvalidOperationException("Windows could not allocate the Geometry Dashboard overlay buffer.");
+
+            previousBitmap = WindowsNativeMethods.SelectObject(memoryDeviceContext, bitmap);
+            if (previousBitmap == 0)
+                throw new InvalidOperationException("Windows could not select the Geometry Dashboard overlay buffer.");
+
+            SKImageInfo imageInfo = new(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
+            using (SKSurface surface = SKSurface.Create(imageInfo, pixels, checked(width * 4))
+                                       ?? throw new InvalidOperationException("SkiaSharp could not create the overlay surface."))
+            {
+                SKCanvas canvas = surface.Canvas;
+                canvas.Clear(SKColors.Transparent);
+                if (state is not null) DrawFrame(canvas, state);
+                if (drawBorder) DrawBorder(canvas, width, height);
+                surface.Flush();
+            }
+
+            WindowsNativeMethods.BlendFunction blend = new()
+            {
+                BlendOp = WindowsNativeMethods.AC_SRC_OVER,
+                SourceConstantAlpha = byte.MaxValue,
+                AlphaFormat = WindowsNativeMethods.AC_SRC_ALPHA,
+            };
+            if (!WindowsNativeMethods.AlphaBlend(
+                    deviceContext,
+                    0,
+                    0,
+                    width,
+                    height,
+                    memoryDeviceContext,
+                    0,
+                    0,
+                    width,
+                    height,
+                    blend))
+            {
+                throw new InvalidOperationException("Windows could not copy the Geometry Dashboard overlay buffer.");
+            }
+        }
+        finally
+        {
+            if (previousBitmap != 0) WindowsNativeMethods.SelectObject(memoryDeviceContext, previousBitmap);
+            if (bitmap != 0) WindowsNativeMethods.DeleteObject(bitmap);
+            WindowsNativeMethods.DeleteDC(memoryDeviceContext);
+        }
+    }
+
+    private static void DrawFrame(SKCanvas canvas, OverlayPaintState state)
+    {
         foreach (var shape in state.Frame.Shapes)
         {
-            using Pen pen = new(
-                ToDrawingColor(shape.Color, shape.Opacity),
-                (float)Math.Max(0.1, shape.Thickness));
-            pen.DashStyle = ToDashStyle(shape.DashStyle);
-            var start = ToClientPoint(shape.Start, state);
+            using SKPathEffect? pathEffect = ToPathEffect(shape.DashStyle);
+            using SKPaint paint = new()
+            {
+                Color = ToSkiaColor(shape.Color, shape.Opacity),
+                IsAntialias = true,
+                Style = SKPaintStyle.Stroke,
+                StrokeWidth = (float)Math.Max(0.1, shape.Thickness),
+                PathEffect = pathEffect,
+            };
+
+            SKPoint start = ToClientPoint(shape.Start, state);
             switch (shape.Kind)
             {
                 case GeometryDashboardOverlayShapeKind.Point:
                 case GeometryDashboardOverlayShapeKind.Circle:
-                    graphics.DrawEllipse(
-                        pen,
-                        start.X - (float)shape.Radius,
-                        start.Y - (float)shape.Radius,
-                        (float)shape.Radius * 2,
-                        (float)shape.Radius * 2);
+                    canvas.DrawOval(
+                        new SKRect(
+                            start.X - (float)shape.Radius,
+                            start.Y - (float)shape.Radius,
+                            start.X + (float)shape.Radius,
+                            start.Y + (float)shape.Radius),
+                        paint);
                     break;
                 case GeometryDashboardOverlayShapeKind.Line:
-                    graphics.DrawLine(pen, start, ToClientPoint(shape.End, state));
+                    canvas.DrawLine(start, ToClientPoint(shape.End, state), paint);
                     break;
             }
         }
     }
 
-    private static PointF ToClientPoint(Vector2 point, OverlayPaintState state)
+    private static void DrawBorder(SKCanvas canvas, int width, int height)
+    {
+        using SKPaint paint = new()
+        {
+            Color = green_yellow,
+            IsAntialias = false,
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 1,
+        };
+
+        for (int index = 0; index < border_thickness; index++)
+        {
+            float inset = index + 0.5f;
+            canvas.DrawRect(new SKRect(inset, inset, width - inset, height - inset), paint);
+        }
+    }
+
+    private static SKPoint ToClientPoint(Vector2 point, OverlayPaintState state)
     {
         Vector2 relative = new(
             point.X - state.PhysicalBounds.Left,
             point.Y - state.PhysicalBounds.Top);
         var logical = ToDpi(relative, state.DpiMultiplier, state.DpiSourceAvailable);
-        return new PointF((float)logical.X, (float)logical.Y);
+        return new SKPoint((float)logical.X, (float)logical.Y);
     }
 
-    private static Color ToDrawingColor(RgbaColour colour, double opacity)
+    private static SKColor ToSkiaColor(RgbaColour colour, double opacity)
     {
         int alpha = Convert.ToInt32(Math.Clamp(colour.A * opacity, 0, 255));
-        return Color.FromArgb(alpha, colour.R, colour.G, colour.B);
+        return new SKColor(colour.R, colour.G, colour.B, (byte)alpha);
     }
 
-    private static DashStyle ToDashStyle(DashStylesEnum dashStyle)
+    private static SKPathEffect? ToPathEffect(DashStylesEnum dashStyle)
     {
         return dashStyle switch
         {
-            DashStylesEnum.Dash => DashStyle.Dash,
-            DashStylesEnum.Dot => DashStyle.Dot,
-            DashStylesEnum.DashSingleDot => DashStyle.DashDot,
-            DashStylesEnum.DashDoubleDot => DashStyle.DashDotDot,
-            _ => DashStyle.Solid,
+            DashStylesEnum.Dash => SKPathEffect.CreateDash([3, 1], 0),
+            DashStylesEnum.Dot => SKPathEffect.CreateDash([1, 1], 0),
+            DashStylesEnum.DashSingleDot => SKPathEffect.CreateDash([3, 1, 1, 1], 0),
+            DashStylesEnum.DashDoubleDot => SKPathEffect.CreateDash([3, 1, 1, 1, 1, 1], 0),
+            _ => null,
         };
     }
 

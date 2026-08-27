@@ -264,7 +264,7 @@ public sealed class TransformationFixtureTests
                     cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             case "slider-picturator":
-                await new SliderPicturatorService(gateway, new SystemDrawingImageFileService())
+                await new SliderPicturatorService(gateway, new SkiaSharpImageFileService())
                     .PicturateAsync(
                         target,
                         ReadTransformationProject<SliderPicturatorServiceOptions>(fixtureRoot, fixtureName),

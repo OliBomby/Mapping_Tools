@@ -17,6 +17,10 @@ internal static class WindowsNativeMethods
     internal const uint WINDOW_MESSAGE_NC_DESTROY = 0x0082;
     internal const uint WINDOW_MESSAGE_NC_HIT_TEST = 0x0084;
     internal const nint HIT_TEST_TRANSPARENT = -1;
+    internal const uint DIB_RGB_COLORS = 0;
+    internal const uint BI_RGB = 0;
+    internal const byte AC_SRC_OVER = 0;
+    internal const byte AC_SRC_ALPHA = 1;
     internal const uint INPUT_KEYBOARD = 1;
     internal const uint KEYBOARD_KEY_UP = 0x0002;
 
@@ -179,16 +183,43 @@ internal static class WindowsNativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool GetClientRect(nint window, out Rect rectangle);
 
-    [DllImport("gdi32.dll")]
-    internal static extern nint CreateSolidBrush(uint color);
+    [DllImport("gdi32.dll", SetLastError = true)]
+    internal static extern nint CreateCompatibleDC(nint deviceContext);
 
-    [DllImport("gdi32.dll")]
+    [DllImport("gdi32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool DeleteDC(nint deviceContext);
+
+    [DllImport("gdi32.dll", SetLastError = true)]
+    internal static extern nint CreateDibSection(
+        nint deviceContext,
+        ref BitmapInfoHeader bitmapInfo,
+        uint usage,
+        out nint pixels,
+        nint section,
+        uint offset);
+
+    [DllImport("gdi32.dll", SetLastError = true)]
+    internal static extern nint SelectObject(nint deviceContext, nint graphicObject);
+
+    [DllImport("gdi32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool DeleteObject(nint objectHandle);
 
-    [DllImport("user32.dll")]
+    [DllImport("msimg32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool FrameRect(nint deviceContext, ref Rect rectangle, nint brush);
+    internal static extern bool AlphaBlend(
+        nint destination,
+        int destinationX,
+        int destinationY,
+        int destinationWidth,
+        int destinationHeight,
+        nint source,
+        int sourceX,
+        int sourceY,
+        int sourceWidth,
+        int sourceHeight,
+        BlendFunction blendFunction);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
     internal delegate bool EnumWindowsCallback(nint window, nint data);
@@ -213,6 +244,31 @@ internal static class WindowsNativeMethods
         internal int Top;
         internal int Right;
         internal int Bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct BitmapInfoHeader
+    {
+        internal uint Size;
+        internal int Width;
+        internal int Height;
+        internal ushort Planes;
+        internal ushort BitCount;
+        internal uint Compression;
+        internal uint SizeImage;
+        internal int XPelsPerMeter;
+        internal int YPelsPerMeter;
+        internal uint ClrUsed;
+        internal uint ClrImportant;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct BlendFunction
+    {
+        internal byte BlendOp;
+        internal byte BlendFlags;
+        internal byte SourceConstantAlpha;
+        internal byte AlphaFormat;
     }
 
     [StructLayout(LayoutKind.Sequential)]
