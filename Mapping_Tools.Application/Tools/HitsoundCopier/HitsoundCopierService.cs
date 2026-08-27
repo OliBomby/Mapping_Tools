@@ -5,6 +5,7 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
+using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 
 namespace Mapping_Tools.Application.Tools.HitsoundCopier;
 
@@ -67,7 +68,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
                 ? Directory.GetCurrentDirectory()
                 : targetDirectory;
 
-            bool inspectTargetSamples = options.CopyMode == 1
+            bool inspectTargetSamples = options.CopyMode == HitsoundCopierCopyMode.OverwriteOnlyDefined
                                          || options.CopyStoryboardedSamples && options.IgnoreHitsoundSatisfiedSamples;
             var firstSamples = inspectTargetSamples
                 ? await samples.AnalyzeAsync(mapDirectory, cancellationToken).ConfigureAwait(false)
@@ -76,7 +77,7 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
                 ? mapDirectory
                 : GetDirectory(options.PathFrom);
             var sourceSamples = sourceSession is not null
-                                && options.CopyMode == 1
+                                && options.CopyMode == HitsoundCopierCopyMode.OverwriteOnlyDefined
                                 && (options.CopyToSliderTicks || options.CopyToSliderSlides)
                 ? await samples.AnalyzeAsync(sourceDirectory, cancellationToken).ConfigureAwait(false)
                 : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);

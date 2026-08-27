@@ -17,6 +17,7 @@ using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 using Mapping_Tools.Core.Tools.RhythmGuide.Models;
 using Mapping_Tools.Core.Tools.TimingCopier.Models;
 using Mapping_Tools.Infrastructure.Projects;
@@ -238,9 +239,10 @@ public sealed class ProjectPersistenceTests
         // Assert
         project.PathFrom.Should().Be("source.osu");
         project.PathTo.Should().Be("target.osu");
-        project.CopyMode.Should().Be(1);
+        project.CopyMode.Should().Be(HitsoundCopierCopyMode.OverwriteOnlyDefined);
         project.TemporalLeniency.Should().Be(12);
         project.CopyStoryboardedSamples.Should().BeTrue();
+        roundTrip.Should().Contain("\"CopyMode\": 1");
         roundTrip.Should().Contain(
             "\"$type\": \"Mapping_Tools.Viewmodels.HitsoundCopierVm, Mapping Tools\"");
     }

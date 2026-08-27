@@ -25,6 +25,7 @@
             <converters:BooleanNotConverter x:Key="BooleanNotConverter" />
             <converters:EnumEqualsConverter x:Key="EnumEqualsConverter" />
             <converters:TimingCopierResnapModeConverter x:Key="TimingCopierResnapModeConverter" />
+            <converters:HitsoundCopierCopyModeConverter x:Key="HitsoundCopierCopyModeConverter" />
             <converters:TumourTemplateIconConverter x:Key="TumourTemplateIconConverter" />
             <converters:CircleSizeToThicknessConverter x:Key="CircleSizeToThicknessConverter" />
             <converters:TimeToStringConverter x:Key="TimeToStringConverter" />

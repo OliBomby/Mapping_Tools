@@ -6,8 +6,8 @@ namespace Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 /// <summary>Stores the source, target, matching, and hitsound-copy settings.</summary>
 public class HitsoundCopierEngineOptions
 {
-    /// <summary>Gets or sets zero for overwrite-all or one for defined-only mode.</summary>
-    public int CopyMode { get; set; }
+    /// <summary>Gets or sets which target values are replaced during copying.</summary>
+    public HitsoundCopierCopyMode CopyMode { get; set; } = HitsoundCopierCopyMode.OverwriteEverything;
 
     /// <summary>Gets or sets the maximum rounded millisecond matching distance.</summary>
     public double TemporalLeniency { get; set; } = 5;

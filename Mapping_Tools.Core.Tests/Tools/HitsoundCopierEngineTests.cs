@@ -15,7 +15,10 @@ public sealed class HitsoundCopierEngineTests
         // Arrange
         var source = LoadFixture();
         Beatmap target = new(source.GetLines());
-        HitsoundCopierEngineOptions options = new() { CopyMode = 0 };
+        HitsoundCopierEngineOptions options = new()
+        {
+            CopyMode = HitsoundCopierCopyMode.OverwriteEverything,
+        };
 
         // Act
         var result = HitsoundCopierEngine.Apply(
@@ -28,6 +31,22 @@ public sealed class HitsoundCopierEngineTests
         result.MatchedHitsoundCount.Should().BeGreaterThan(0);
         target.HitObjects.Select(item => item.Hitsounds)
             .Should().BeEquivalentTo(source.HitObjects.Select(item => item.Hitsounds));
+    }
+
+    [TestMethod]
+    public void Validate_WithUndefinedCopyMode_ThrowsArgumentException()
+    {
+        // Arrange
+        HitsoundCopierEngineOptions options = new()
+        {
+            CopyMode = (HitsoundCopierCopyMode)2,
+        };
+
+        // Act
+        Action act = () => HitsoundCopierEngine.Validate(options);
+
+        // Assert
+        act.Should().Throw<ArgumentException>();
     }
 
     [TestMethod]

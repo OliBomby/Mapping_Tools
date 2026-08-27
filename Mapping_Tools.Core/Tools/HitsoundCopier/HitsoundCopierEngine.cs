@@ -93,7 +93,7 @@ public static class HitsoundCopierEngine
                 .ToList()
             : null;
 
-        if (options.CopyMode == 0)
+        if (options.CopyMode == HitsoundCopierCopyMode.OverwriteEverything)
         {
             // Every defined hitsound and sampleset on hitsound gets copied to their copyTo destination
             // Timelines
@@ -197,7 +197,7 @@ public static class HitsoundCopierEngine
         if (options.CopyStoryboardedSamples)
         {
             targetTimeline.GiveTimingPoints(target.BeatmapTiming);
-            if (options.CopyMode == 0)
+            if (options.CopyMode == HitsoundCopierCopyMode.OverwriteEverything)
             {
                 target.StoryboardSoundSamples.Clear();
             }
@@ -289,7 +289,7 @@ public static class HitsoundCopierEngine
     public static void Validate(HitsoundCopierEngineOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-        if (options.CopyMode is not 0 and not 1)
+        if (!Enum.IsDefined(options.CopyMode))
             throw new ArgumentException(
                 "Hitsound Copier received an unknown copy mode.",
                 nameof(options));

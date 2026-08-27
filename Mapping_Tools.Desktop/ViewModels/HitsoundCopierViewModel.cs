@@ -14,6 +14,7 @@ using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Tools.HitsoundCopier.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 
@@ -66,13 +67,11 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
     /// <summary>Gets or sets zero for overwrite-all or one for defined-only mode.</summary>
     [ObservableProperty]
-    [NotifyDataErrorInfo]
-    [Range(0, 1)]
     [NotifyPropertyChangedFor(nameof(SmartCopyModeSelected))]
-    public partial int CopyMode { get; set; }
+    public partial HitsoundCopierCopyMode CopyMode { get; set; }
 
     /// <summary>Gets whether defined-only mode is selected.</summary>
-    public bool SmartCopyModeSelected => CopyMode == 1;
+    public bool SmartCopyModeSelected => CopyMode == HitsoundCopierCopyMode.OverwriteOnlyDefined;
 
     /// <summary>Gets or sets the rounded millisecond matching leniency.</summary>
     [ObservableProperty]
@@ -155,8 +154,9 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     [ObservableProperty]
     public partial SampleSet MutedSampleSet { get; set; } = SampleSet.None;
 
-    /// <summary>Gets the displayable copy-mode labels.</summary>
-    public IReadOnlyList<string> CopyModes { get; } = ["Overwrite everything", "Overwrite only defined"];
+    /// <summary>Gets the copy modes in display order.</summary>
+    public IReadOnlyList<HitsoundCopierCopyMode> CopyModes { get; } =
+        Enum.GetValues<HitsoundCopierCopyMode>();
 
     /// <summary>Gets every sample family accepted by the legacy form.</summary>
     public IReadOnlyList<SampleSet> MutedSampleSets { get; } = Enum.GetValues<SampleSet>();
