@@ -19,7 +19,7 @@ The workspace provides:
 - removal and promotion of typed recent-map entries.
 
 `BeatmapWorkspace` is independent of a Window, UserControl, WPF, Avalonia,
-process APIs, and the physical filesystem. `IBeatmapFileSystem` owns existence
+process APIs, and the physical filesystem. `IBeatmapsetFileSystem` owns existence
 checks and parent-folder resolution. A `TimeProvider` supplies recent timestamps
 so behavior is deterministic in tests.
 

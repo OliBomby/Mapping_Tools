@@ -90,7 +90,7 @@ public sealed class DependencyInjectionTests
             typeof(ILiveBeatmapReader),
             typeof(IEditorReloadService),
             typeof(IBeatmapEditingGateway),
-            typeof(IBeatmapFileSystem),
+            typeof(IBeatmapsetFileSystem),
             typeof(ICurrentBeatmapLocator),
             typeof(IBetterSaveService),
             typeof(IRhythmGuideService),

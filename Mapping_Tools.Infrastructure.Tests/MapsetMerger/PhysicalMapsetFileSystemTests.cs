@@ -1,10 +1,10 @@
-using Mapping_Tools.Infrastructure.MapsetMerger;
+using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Infrastructure.Tests.MapsetMerger;
 
 [TestClass]
-public sealed class PhysicalMapsetFileSystemTests : IDisposable
+public sealed class PhysicalBeatmapsetFileSystemTests : IDisposable
 {
     private readonly string root = Path.Combine(
         Path.GetTempPath(),
@@ -28,6 +28,33 @@ public sealed class PhysicalMapsetFileSystemTests : IDisposable
     }
 
     [TestMethod]
+    public void ComponentOperations_ReadWriteCopyMoveDeleteAndEnsureDirectories()
+    {
+        // Arrange
+        PhysicalBeatmapsetFileSystem fileSystem = new();
+        string components = Path.Combine(root, "components");
+        string source = Path.Combine(components, "source.bin");
+        string copy = Path.Combine(components, "copies", "copy.bin");
+        string moved = Path.Combine(components, "moved.bin");
+
+        // Act
+        fileSystem.EnsureDirectoryExists(components);
+        fileSystem.WriteAllBytes(source, [1, 2, 3]);
+        fileSystem.CopyFile(source, copy);
+        fileSystem.MoveFile(copy, moved);
+        byte[] contents = fileSystem.ReadAllBytes(moved);
+        fileSystem.Delete(moved);
+
+        // Assert
+        contents.Should().Equal(1, 2, 3);
+        fileSystem.FileExists(moved).Should().BeFalse();
+        fileSystem.DirectoryExists(Path.Combine(components, "copies")).Should().BeTrue();
+        fileSystem.EnumerateFiles(root, "*.bin", SearchOption.AllDirectories)
+            .Select(Path.GetFileName)
+            .Should().Equal("source.bin");
+    }
+
+    [TestMethod]
     public async Task CommitAsync_WhenReplacementFails_RestoresOriginalDuplicateTarget()
     {
         // Arrange
@@ -41,7 +68,7 @@ public sealed class PhysicalMapsetFileSystemTests : IDisposable
         File.WriteAllText(secondSource, "second");
 
         using var transaction =
-            new PhysicalMapsetFileSystem().BeginTransaction(export);
+            new PhysicalBeatmapsetFileSystem().BeginTransaction(export);
         transaction.CopyToStaging(firstSource, "same.txt");
         transaction.CopyToStaging(secondSource, "same.txt");
         transaction.CopyToStaging(firstSource, "new-directory/new.txt");

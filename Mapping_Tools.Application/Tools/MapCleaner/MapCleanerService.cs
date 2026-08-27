@@ -1,3 +1,4 @@
+using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
@@ -11,7 +12,7 @@ namespace Mapping_Tools.Application.Tools.MapCleaner;
 public sealed class MapCleanerService : IMapCleanerService
 {
     private readonly IBeatmapEditingGateway editingGateway;
-    private readonly IBeatmapFileSystem fileSystem;
+    private readonly IBeatmapsetFileSystem fileSystem;
     private readonly IMapCleanerSampleService samples;
 
     /// <summary>Creates a service that cleans beatmaps and their mapset samples.</summary>
@@ -20,7 +21,7 @@ public sealed class MapCleanerService : IMapCleanerService
     /// <param name="samples">Analyzes and recoverably removes mapset samples.</param>
     public MapCleanerService(
         IBeatmapEditingGateway editingGateway,
-        IBeatmapFileSystem fileSystem,
+        IBeatmapsetFileSystem fileSystem,
         IMapCleanerSampleService samples)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));

@@ -1,5 +1,6 @@
 using System.Text;
 using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Infrastructure.Files;
 
 namespace Mapping_Tools.Infrastructure.Projects;
 
@@ -60,23 +61,13 @@ public sealed class FileSystemProjectStore : IProjectStore
                         ?? throw new ArgumentException("The project path has no parent directory.", nameof(path));
         Directory.CreateDirectory(parent);
 
-        string temporaryPath = Path.Combine(
-            parent,
-            $".{Path.GetFileName(fullPath)}.{Guid.NewGuid():N}.tmp");
-        try
-        {
-            await File.WriteAllTextAsync(
-                temporaryPath,
+        await PhysicalAtomicFileWriter
+            .WriteTextAsync(
+                fullPath,
                 json,
                 utf8WithoutByteOrderMark,
-                cancellationToken);
-            cancellationToken.ThrowIfCancellationRequested();
-            File.Move(temporaryPath, fullPath, true);
-        }
-        finally
-        {
-            if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
-        }
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <summary>

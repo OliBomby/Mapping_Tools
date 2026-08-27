@@ -22,21 +22,17 @@ public sealed class MapsetMergerService : IMapsetMergerService
     private static readonly string[] videoExtensions = [".mp4", ".avi"];
 
     private readonly IBeatmapEditingGateway editingGateway;
-    private readonly IMapsetFileSystem fileSystem;
-    private readonly ITextFileStore textFileStore;
+    private readonly IBeatmapsetFileSystem fileSystem;
 
     /// <summary>Creates the export service.</summary>
     /// <param name="editingGateway">Loads disk-only beatmaps and storyboards.</param>
-    /// <param name="fileSystem">Enumerates sources and owns staged output mutation.</param>
-    /// <param name="textFileStore">Reads and writes the staged editor documents.</param>
+    /// <param name="fileSystem">Reads and writes mapset components and owns staged output mutation.</param>
     public MapsetMergerService(
         IBeatmapEditingGateway editingGateway,
-        IMapsetFileSystem fileSystem,
-        ITextFileStore textFileStore)
+        IBeatmapsetFileSystem fileSystem)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-        this.textFileStore = textFileStore ?? throw new ArgumentNullException(nameof(textFileStore));
     }
 
     /// <inheritdoc />
@@ -68,8 +64,14 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 throw new DirectoryNotFoundException(
                     $"Mapset directory '{input.Path}' was not found.");
 
-            var beatmapPaths = fileSystem.EnumerateFiles(input.Path, "*.osu");
-            var storyboardPaths = fileSystem.EnumerateFiles(input.Path, "*.osb");
+            var beatmapPaths = fileSystem.EnumerateFiles(
+                input.Path,
+                "*.osu",
+                SearchOption.AllDirectories);
+            var storyboardPaths = fileSystem.EnumerateFiles(
+                input.Path,
+                "*.osb",
+                SearchOption.AllDirectories);
             ValidateSourceFileCounts(input, beatmapPaths, storyboardPaths);
 
             List<(string Path, Beatmap Beatmap)> beatmaps = [];
@@ -168,7 +170,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
     }
 
     private int CopyReferences(
-        IMapsetFileTransaction transaction,
+        IBeatmapsetFileTransaction transaction,
         MapsetMergerInput input,
         MapsetMergerReferences references,
         IReadOnlyDictionary<int, int> sampleIndices,
@@ -225,7 +227,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
     }
 
     private int CopyAsset(
-        IMapsetFileTransaction transaction,
+        IBeatmapsetFileTransaction transaction,
         string filename,
         MapsetMergerInput input,
         string outputFolder,
@@ -290,23 +292,23 @@ public sealed class MapsetMergerService : IMapsetMergerService
     }
 
     private void WriteBeatmap(
-        IMapsetFileTransaction transaction,
+        IBeatmapsetFileTransaction transaction,
         string relativePath,
         Beatmap beatmap)
     {
         // Save beatmap in new location with unique diffname
         Editor.SaveFile(
-            textFileStore,
+            fileSystem,
             transaction.GetStagedPath(relativePath),
             beatmap.GetLines());
     }
 
     private void WriteStoryboard(
-        IMapsetFileTransaction transaction,
+        IBeatmapsetFileTransaction transaction,
         string relativePath,
         StoryBoard storyboard)
     {
-        StoryboardEditor editor = new(storyboard.GetLines(), textFileStore);
+        StoryboardEditor editor = new(storyboard.GetLines(), fileSystem);
         editor.SaveFile(transaction.GetStagedPath(relativePath));
     }
 

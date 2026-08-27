@@ -26,7 +26,7 @@ public sealed class MetadataManagerServiceTests
             "standard-feature-rich.osu");
         string target = Path.Combine(directory.Path, "original.osu");
         File.Copy(fixture, target);
-        FileSystemFileStore fileStore = new();
+        PhysicalBeatmapsetFileSystem fileStore = new();
         TestBeatmapBackupService backup = new();
         MetadataManagerService service = new(
             new TestEditingGateway(fileStore),

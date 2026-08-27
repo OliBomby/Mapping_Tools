@@ -1,48 +1,8 @@
-using Mapping_Tools.Application.Tools.MapsetMerger.Contracts;
+using Mapping_Tools.Application.Abstractions;
 
 namespace Mapping_Tools.Infrastructure.MapsetMerger;
 
-/// <summary>
-///     Implements Mapset Merger's recursive source discovery and staged export on
-///     the local filesystem.
-/// </summary>
-public sealed class PhysicalMapsetFileSystem : IMapsetFileSystem
-{
-    /// <inheritdoc />
-    public bool DirectoryExists(string path)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        return Directory.Exists(path);
-    }
-
-    /// <inheritdoc />
-    public bool FileExists(string path)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        return File.Exists(path);
-    }
-
-    /// <inheritdoc />
-    public IReadOnlyList<string> EnumerateFiles(string directory, string searchPattern)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(directory);
-        ArgumentException.ThrowIfNullOrWhiteSpace(searchPattern);
-        return Directory
-            .EnumerateFiles(directory, searchPattern, SearchOption.AllDirectories)
-            .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(path => path, StringComparer.Ordinal)
-            .ToArray();
-    }
-
-    /// <inheritdoc />
-    public IMapsetFileTransaction BeginTransaction(string targetDirectory)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(targetDirectory);
-        return new PhysicalMapsetFileTransaction(targetDirectory);
-    }
-}
-
-internal sealed class PhysicalMapsetFileTransaction : IMapsetFileTransaction
+internal sealed class PhysicalMapsetFileTransaction : IBeatmapsetFileTransaction
 {
     private readonly Dictionary<string, string> backups = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> createdDirectories = new(StringComparer.OrdinalIgnoreCase);

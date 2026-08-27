@@ -1,4 +1,5 @@
 using System.Globalization;
+using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
@@ -15,7 +16,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
     private const int recent_map_limit = 20;
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
     private readonly IFilePicker filePicker;
-    private readonly IBeatmapFileSystem fileSystem;
+    private readonly IBeatmapsetFileSystem fileSystem;
 
     private readonly ApplicationSettings settings;
     private readonly TimeProvider timeProvider;
@@ -36,7 +37,7 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
     public BeatmapWorkspace(
         ApplicationSettings settings,
         IFilePicker filePicker,
-        IBeatmapFileSystem fileSystem,
+        IBeatmapsetFileSystem fileSystem,
         ICurrentBeatmapLocator currentBeatmapLocator,
         TimeProvider timeProvider)
     {

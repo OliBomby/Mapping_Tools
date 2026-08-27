@@ -62,14 +62,12 @@ using Mapping_Tools.Infrastructure.Backups;
 using Mapping_Tools.Infrastructure.Editor;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Images;
-using Mapping_Tools.Infrastructure.MapsetMerger;
 using Mapping_Tools.Infrastructure.PatternGallery;
 using Mapping_Tools.Infrastructure.Platform;
 using Mapping_Tools.Infrastructure.Platform.GeometryDashboard;
 using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Settings;
 using Mapping_Tools.Infrastructure.Updates;
-using Mapping_Tools.Infrastructure.Workspace;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop.Composition;
@@ -141,7 +139,11 @@ internal static class DesktopServiceRegistration
             provider.GetRequiredService<SettingsPersistenceHostedService>());
         services.AddHostedService<MappingToolQuickRunHostedService>();
         services.AddSingleton(TimeProvider.System);
-        services.AddSingleton<ITextFileStore, FileSystemFileStore>();
+        services.AddSingleton<PhysicalBeatmapsetFileSystem>();
+        services.AddSingleton<IBeatmapsetFileSystem>(provider =>
+            provider.GetRequiredService<PhysicalBeatmapsetFileSystem>());
+        services.AddSingleton<ITextFileStore>(provider =>
+            provider.GetRequiredService<PhysicalBeatmapsetFileSystem>());
         services.AddSingleton<IUserNotificationService, UserNotificationService>();
         services.AddSingleton<ToolExecutionService>();
         services.AddSingleton<IToolExecutionService>(provider =>
@@ -181,7 +183,6 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IHitsoundPreviewHelperService, HitsoundPreviewHelperService>();
         services.AddSingleton<HitsoundStudioEngine>();
         services.AddSingleton<IAudioClipMixer, NaudioAudioClipMixer>();
-        services.AddSingleton<IHitsoundStudioFileSystem, PhysicalHitsoundStudioFileSystem>();
         services.AddSingleton<IHitsoundStudioService, HitsoundStudioService>();
         services.AddSingleton<IHitsoundCopierService, HitsoundCopierService>();
         services.AddSingleton<IHitsoundSampleService, PhysicalHitsoundSampleService>();
@@ -211,11 +212,9 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IPatternGalleryService, PatternGalleryService>();
         services.AddSingleton<IPatternGalleryFileService, PatternGalleryFileService>();
         services.AddSingleton<IPatternGalleryArchiveService, PatternGalleryArchiveService>();
-        services.AddSingleton<IMapsetFileSystem, PhysicalMapsetFileSystem>();
         services.AddSingleton<IImageFileService, SkiaSharpImageFileService>();
         services.AddSingleton<IMapCleanerSampleService, PhysicalMapCleanerSampleService>();
         services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();
-        services.AddSingleton<IBeatmapFileSystem, PhysicalBeatmapFileSystem>();
         services.AddSingleton<IBeatmapWorkspace, BeatmapWorkspace>();
         services.AddSingleton<IProjectSerializer, LegacyProjectJsonSerializer>();
         services.AddSingleton<IProjectStore, FileSystemProjectStore>();

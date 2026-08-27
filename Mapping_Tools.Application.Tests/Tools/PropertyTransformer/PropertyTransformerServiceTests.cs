@@ -22,7 +22,7 @@ public sealed class PropertyTransformerServiceTests
             "standard-feature-rich.osu");
         BeatmapEditor editor = new(
             File.ReadAllLines(fixture).ToList(),
-            new FileSystemFileStore())
+            new PhysicalBeatmapsetFileSystem())
         {
             Path = fixture,
         };

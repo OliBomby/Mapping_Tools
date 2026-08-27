@@ -1,5 +1,5 @@
+using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Platform.FilePicker;
-using Mapping_Tools.Application.Workspace.Contracts;
 
 namespace Mapping_Tools.Application.Tests.TestDoubles;
 
@@ -13,7 +13,7 @@ internal sealed class RecordingProgress<T> : IProgress<T>
     }
 }
 
-internal sealed class RecordingBeatmapFileSystem : IBeatmapFileSystem
+internal sealed class RecordingBeatmapFileSystem : IBeatmapsetFileSystem
 {
     public HashSet<string> ExistingPaths { get; } = new(StringComparer.Ordinal);
 
@@ -30,6 +30,68 @@ internal sealed class RecordingBeatmapFileSystem : IBeatmapFileSystem
     {
         return ParentDirectoryResolver?.Invoke(filePath)
             ?? Path.GetDirectoryName(filePath);
+    }
+
+    public IReadOnlyList<string> ReadAllLines(string path)
+    {
+        return [];
+    }
+
+    public void WriteAllLines(string path, IEnumerable<string> lines)
+    {
+    }
+
+    public void Delete(string path)
+    {
+    }
+
+    public string GetParentFolder(string path)
+    {
+        return GetParentDirectory(path) ?? throw new DirectoryNotFoundException();
+    }
+
+    public string CombinePath(string parent, string child)
+    {
+        return Path.Combine(parent, child);
+    }
+
+    public bool DirectoryExists(string path)
+    {
+        return false;
+    }
+
+    public IReadOnlyList<string> EnumerateFiles(
+        string directory,
+        string searchPattern,
+        SearchOption searchOption = SearchOption.TopDirectoryOnly)
+    {
+        return [];
+    }
+
+    public void EnsureDirectoryExists(string path)
+    {
+    }
+
+    public byte[] ReadAllBytes(string path)
+    {
+        return [];
+    }
+
+    public void WriteAllBytes(string path, ReadOnlySpan<byte> bytes, bool overwrite = false)
+    {
+    }
+
+    public void CopyFile(string sourcePath, string destinationPath, bool overwrite = false)
+    {
+    }
+
+    public void MoveFile(string sourcePath, string destinationPath, bool overwrite = false)
+    {
+    }
+
+    public IBeatmapsetFileTransaction BeginTransaction(string targetDirectory)
+    {
+        throw new NotSupportedException();
     }
 }
 

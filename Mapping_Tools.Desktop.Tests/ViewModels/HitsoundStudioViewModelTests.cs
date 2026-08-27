@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Audio.Contracts;
+using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Audio.Models;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
@@ -191,22 +192,54 @@ public sealed class HitsoundStudioViewModelTests
         }
     }
 
-    private sealed class StubHitsoundStudioFileSystem : IHitsoundStudioFileSystem
+    private sealed class StubHitsoundStudioFileSystem : IBeatmapsetFileSystem
     {
         public bool FileExists(string path) => false;
 
         public bool DirectoryExists(string path) => false;
 
-        public void CreateDirectory(string path)
+        public IReadOnlyList<string> ReadAllLines(string path) => [];
+
+        public void WriteAllLines(string path, IEnumerable<string> lines)
         {
         }
 
-        public void DeleteFiles(string path)
+        public void Delete(string path)
         {
         }
 
-        public void CopyFile(string sourcePath, string destinationPath)
+        public string GetParentFolder(string path) => Path.GetDirectoryName(path) ?? string.Empty;
+
+        public string CombinePath(string parent, string child) => Path.Combine(parent, child);
+
+        public string? GetParentDirectory(string filePath) => Path.GetDirectoryName(filePath);
+
+        public IReadOnlyList<string> EnumerateFiles(
+            string directory,
+            string searchPattern,
+            SearchOption searchOption = SearchOption.TopDirectoryOnly) => [];
+
+        public void EnsureDirectoryExists(string path)
         {
+        }
+
+        public byte[] ReadAllBytes(string path) => [];
+
+        public void WriteAllBytes(string path, ReadOnlySpan<byte> bytes, bool overwrite = false)
+        {
+        }
+
+        public void CopyFile(string sourcePath, string destinationPath, bool overwrite = false)
+        {
+        }
+
+        public void MoveFile(string sourcePath, string destinationPath, bool overwrite = false)
+        {
+        }
+
+        public IBeatmapsetFileTransaction BeginTransaction(string targetDirectory)
+        {
+            throw new NotSupportedException();
         }
     }
 

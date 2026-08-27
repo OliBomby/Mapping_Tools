@@ -1,10 +1,10 @@
-using Mapping_Tools.Infrastructure.MapsetMerger;
+using Mapping_Tools.Infrastructure.Files;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Infrastructure.Tests.MapsetMerger;
 
 [TestClass]
-public sealed class PhysicalMapsetFileSystemEnumerationTests : IDisposable
+public sealed class PhysicalBeatmapsetFileSystemEnumerationTests : IDisposable
 {
     private readonly string root = Path.Combine(
         Path.GetTempPath(),
@@ -38,8 +38,8 @@ public sealed class PhysicalMapsetFileSystemEnumerationTests : IDisposable
         File.WriteAllText(Path.Combine(nested, "c.osu"), string.Empty);
 
         // Act
-        var files = new PhysicalMapsetFileSystem()
-            .EnumerateFiles(root, "*.osu");
+        var files = new PhysicalBeatmapsetFileSystem()
+            .EnumerateFiles(root, "*.osu", SearchOption.AllDirectories);
 
         // Assert
         files.Select(Path.GetFileName).Should().Equal("A.osu", "b.osu", "c.osu");

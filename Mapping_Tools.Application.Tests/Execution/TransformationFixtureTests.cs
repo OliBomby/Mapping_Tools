@@ -44,10 +44,8 @@ using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Infrastructure.Audio;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Images;
-using Mapping_Tools.Infrastructure.MapsetMerger;
 using Mapping_Tools.Infrastructure.PatternGallery;
 using Mapping_Tools.Infrastructure.Projects;
-using Mapping_Tools.Infrastructure.Workspace;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using TextJsonSerializer = System.Text.Json.JsonSerializer;
@@ -196,7 +194,7 @@ public sealed class TransformationFixtureTests
             {
                 var project = ReadTransformationProject<MapCleanerServiceOptions>(fixtureRoot, fixtureName);
                 await new MapCleanerService(
-                        gateway, new PhysicalBeatmapFileSystem(), new EmptyMapCleanerSampleService())
+                        gateway, new PhysicalBeatmapsetFileSystem(), new EmptyMapCleanerSampleService())
                     .CleanAsync([target], project.MapCleanerArgs, cancellationToken: cancellationToken);
                 return new FixtureExecutionResult([target]);
             }
@@ -207,7 +205,7 @@ public sealed class TransformationFixtureTests
                     fixtureName);
                 StageMapsetMergerSources(options, fixtureRoot, project);
                 await new MapsetMergerService(
-                        gateway, new PhysicalMapsetFileSystem(), new FileSystemFileStore())
+                        gateway, new PhysicalBeatmapsetFileSystem())
                     .MergeAsync(
                         project,
                         cancellationToken: cancellationToken);
@@ -247,7 +245,7 @@ public sealed class TransformationFixtureTests
                     fixtureName).GuideGeneratorArgs;
                 await new RhythmGuideService(
                         gateway, new TestBeatmapBackupService(),
-                        new PhysicalBeatmapFileSystem(), new FileSystemFileStore())
+                        new PhysicalBeatmapsetFileSystem(), new PhysicalBeatmapsetFileSystem())
                     .GenerateAsync(rhythmOptions, cancellationToken);
                 return new FixtureExecutionResult([rhythmOptions.ExportPath]);
             }
@@ -325,7 +323,7 @@ public sealed class TransformationFixtureTests
         return new HitsoundStudioService(
             gateway, new EmptyMapCleanerSampleService(), generator, preview,
             new NaudioAudioExporter(), new NaudioAudioClipMixer(), new NaudioMidiService(),
-            new PhysicalHitsoundStudioFileSystem(), new NoopFileRevealService(), new HitsoundStudioEngine());
+            new PhysicalBeatmapsetFileSystem(), new NoopFileRevealService(), new HitsoundStudioEngine());
     }
 
     private static T ReadTransformationProject<T>(string fixtureRoot, string fixtureName)
@@ -516,7 +514,7 @@ public sealed class TransformationFixtureTests
 
     private sealed class FileBackedEditingGateway : IBeatmapEditingGateway
     {
-        private readonly FileSystemFileStore files = new();
+        private readonly PhysicalBeatmapsetFileSystem files = new();
 
         public Task<BeatmapEditingSession> OpenBeatmapAsync(
             string path,

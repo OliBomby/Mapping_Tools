@@ -4,7 +4,6 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tools.MapsetMerger;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
 using Mapping_Tools.Infrastructure.Files;
-using Mapping_Tools.Infrastructure.MapsetMerger;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.MapsetMerger;
@@ -37,8 +36,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),
-            new PhysicalMapsetFileSystem(),
-            new FileSystemFileStore());
+            new PhysicalBeatmapsetFileSystem());
 
         // Act
         var result = await service.MergeAsync(project);
@@ -72,8 +70,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),
-            new PhysicalMapsetFileSystem(),
-            new FileSystemFileStore());
+            new PhysicalBeatmapsetFileSystem());
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
 
@@ -101,8 +98,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),
-            new PhysicalMapsetFileSystem(),
-            new FileSystemFileStore());
+            new PhysicalBeatmapsetFileSystem());
 
         // Act
         await service.MergeAsync(project);
@@ -136,8 +132,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),
-            new PhysicalMapsetFileSystem(),
-            new FileSystemFileStore());
+            new PhysicalBeatmapsetFileSystem());
 
         // Act
         Func<Task> act = () => service.MergeAsync(project);
@@ -162,8 +157,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
         };
         MapsetMergerService service = new(
             new FixtureEditingGateway(),
-            new PhysicalMapsetFileSystem(),
-            new FileSystemFileStore());
+            new PhysicalBeatmapsetFileSystem());
 
         // Act
         var result = await service.MergeAsync(project);
@@ -183,7 +177,7 @@ public sealed class MapsetMergerServiceTests : IDisposable
 
     private sealed class FixtureEditingGateway : IBeatmapEditingGateway
     {
-        private static readonly FileSystemFileStore files = new();
+        private static readonly PhysicalBeatmapsetFileSystem files = new();
 
         public Task<BeatmapEditingSession> OpenBeatmapAsync(
             string path,

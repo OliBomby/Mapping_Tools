@@ -1,4 +1,5 @@
 using System.Globalization;
+using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Audio;
 using Mapping_Tools.Application.Audio.Contracts;
 using Mapping_Tools.Application.Audio.Models;
@@ -28,7 +29,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
     private readonly IAudioExporter audioExporter;
     private readonly IBeatmapEditingGateway beatmaps;
     private readonly HitsoundStudioEngine engine;
-    private readonly IHitsoundStudioFileSystem files;
+    private readonly IBeatmapsetFileSystem files;
     private readonly IAudioGenerator generator;
     private readonly IMidiService midi;
     private readonly IAudioClipMixer mixer;
@@ -55,7 +56,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         IAudioExporter audioExporter,
         IAudioClipMixer mixer,
         IMidiService midi,
-        IHitsoundStudioFileSystem files,
+        IBeatmapsetFileSystem files,
         IFileRevealService reveal,
         HitsoundStudioEngine engine)
     {
@@ -165,7 +166,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
     {
         ArgumentNullException.ThrowIfNull(project);
         Validate(project);
-        files.CreateDirectory(project.ExportFolder);
+        files.EnsureDirectoryExists(project.ExportFolder);
         bool writesFiles = project.HitsoundExportModeSetting == HitsoundStudioExportMode.Midi
             ? project.ExportMap
             : project.ExportMap || project.ExportSamples;
@@ -245,8 +246,17 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
                 ? 0.6
                 : 0.5);
         if (project.DeleteAllInExportFirst && writesFiles)
-            // Delete all files in the export folder before filling it again
-            files.DeleteFiles(project.ExportFolder);
+        {
+            // Delete all files in the export folder before filling it again.
+            foreach (string path in files.EnumerateFiles(
+                         project.ExportFolder,
+                         "*",
+                         SearchOption.TopDirectoryOnly))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                files.Delete(path);
+            }
+        }
 
         Report(progress, mode == HitsoundStudioExportMode.Midi
             ? 0.4
@@ -635,7 +645,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         if (valid.Count == 1 && format == HitsoundStudioSampleExportFormat.Default && valid[0].CanCopyPaste)
         {
             string destination = Path.Combine(exportFolder, name + valid[0].GetExtension());
-            files.CopyFile(valid[0].Path, destination);
+            files.CopyFile(valid[0].Path, destination, true);
             return Path.GetFileName(destination);
         }
 

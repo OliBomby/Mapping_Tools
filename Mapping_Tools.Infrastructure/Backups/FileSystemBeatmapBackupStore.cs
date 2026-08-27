@@ -1,6 +1,6 @@
-using System.Text;
 using Mapping_Tools.Application.Backups.Contracts;
 using Mapping_Tools.Application.Backups.Models;
+using Mapping_Tools.Infrastructure.Files;
 
 namespace Mapping_Tools.Infrastructure.Backups;
 
@@ -42,37 +42,9 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourcePath);
         ArgumentException.ThrowIfNullOrWhiteSpace(destinationPath);
-        string temporaryPath = CreateTemporarySibling(destinationPath);
-        try
-        {
-            await using (FileStream source = new(
-                             sourcePath,
-                             FileMode.Open,
-                             FileAccess.Read,
-                             FileShare.Read,
-                             81920,
-                             FileOptions.Asynchronous | FileOptions.SequentialScan))
-            await using (FileStream destination = new(
-                             temporaryPath,
-                             FileMode.CreateNew,
-                             FileAccess.Write,
-                             FileShare.None,
-                             81920,
-                             FileOptions.Asynchronous | FileOptions.WriteThrough))
-            {
-                await source.CopyToAsync(destination, cancellationToken)
-                    .ConfigureAwait(false);
-                await destination.FlushAsync(cancellationToken)
-                    .ConfigureAwait(false);
-            }
-
-            cancellationToken.ThrowIfCancellationRequested();
-            File.Move(temporaryPath, destinationPath, true);
-        }
-        finally
-        {
-            File.Delete(temporaryPath);
-        }
+        await PhysicalAtomicFileWriter
+            .CopyAsync(sourcePath, destinationPath, cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -83,42 +55,14 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(destinationPath);
         ArgumentNullException.ThrowIfNull(lines);
-        string temporaryPath = CreateTemporarySibling(destinationPath);
-        try
-        {
-            await using (FileStream stream = new(
-                             temporaryPath,
-                             FileMode.CreateNew,
-                             FileAccess.Write,
-                             FileShare.None,
-                             81920,
-                             FileOptions.Asynchronous | FileOptions.WriteThrough))
-            await using (StreamWriter writer = new(
-                             stream,
-                             new UTF8Encoding(false)))
-            {
-                writer.NewLine = "\r\n";
-
-                foreach (string line in lines)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    await writer.WriteLineAsync(
-                            line.AsMemory(),
-                            cancellationToken)
-                        .ConfigureAwait(false);
-                }
-
-                await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
-                await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
-            }
-
-            cancellationToken.ThrowIfCancellationRequested();
-            File.Move(temporaryPath, destinationPath, true);
-        }
-        finally
-        {
-            File.Delete(temporaryPath);
-        }
+        await PhysicalAtomicFileWriter
+            .WriteLinesAsync(
+                destinationPath,
+                lines,
+                PhysicalAtomicFileWriter.Utf8WithoutBom,
+                "\r\n",
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -149,14 +93,4 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
         return Task.CompletedTask;
     }
 
-    private static string CreateTemporarySibling(string destinationPath)
-    {
-        string directory = Path.GetDirectoryName(destinationPath)
-                           ?? throw new DirectoryNotFoundException(
-                               $"Path '{destinationPath}' does not have a parent directory.");
-        string fileName = Path.GetFileName(destinationPath);
-        return Path.Combine(
-            directory,
-            $".mapping-tools-{fileName}-{Guid.NewGuid():N}.tmp");
-    }
 }

@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Mapping_Tools.Infrastructure.Tests.Files;
 
 [TestClass]
-public sealed class FileSystemFileStoreTests
+public sealed class PhysicalBeatmapsetFileSystemTextTests
 {
     [TestMethod]
     public void WriteAllLines_WithOsuPath_UsesCrLfLineEndings()
@@ -16,7 +16,7 @@ public sealed class FileSystemFileStoreTests
             $"MappingToolsFileStore-{Guid.NewGuid():N}");
         Directory.CreateDirectory(directory);
         string path = Path.Combine(directory, "map.osu");
-        FileSystemFileStore store = new();
+        PhysicalBeatmapsetFileSystem store = new();
 
         try
         {

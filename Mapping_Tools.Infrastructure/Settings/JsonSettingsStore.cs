@@ -5,6 +5,7 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Workspace.Models;
+using Mapping_Tools.Infrastructure.Files;
 
 namespace Mapping_Tools.Infrastructure.Settings;
 
@@ -59,19 +60,10 @@ public sealed class JsonSettingsStore : ISettingsStore
         directories.EnsureCreated();
 
         string json = JsonSerializer.Serialize(settings, options);
-        string temporaryPath = directories.ConfigurationFile + ".tmp";
-        try
-        {
-            File.WriteAllText(temporaryPath, json);
-            File.Move(
-                temporaryPath,
-                directories.ConfigurationFile,
-                true);
-        }
-        finally
-        {
-            if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
-        }
+        PhysicalAtomicFileWriter.WriteText(
+            directories.ConfigurationFile,
+            json,
+            PhysicalAtomicFileWriter.Utf8WithoutBom);
     }
 
     private sealed class WindowBoundsJsonConverter : JsonConverter<WindowBounds>

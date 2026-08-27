@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Audio.Contracts;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
@@ -41,7 +42,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     private readonly ProjectDefinition<HitsoundStudioProject> definition;
     private readonly IHitsoundStudioDialogService dialogs;
     private readonly IFilePicker filePicker;
-    private readonly IHitsoundStudioFileSystem files;
+    private readonly IBeatmapsetFileSystem files;
     private readonly IDialogService messageDialogs;
     private readonly IProjectStore projectStore;
 
@@ -76,7 +77,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
         IFilePicker filePicker,
-        IHitsoundStudioFileSystem files,
+        IBeatmapsetFileSystem files,
         IProjectStore projectStore,
         ApplicationSettings settings,
         IApplicationDirectories directories)

@@ -16,7 +16,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
 {
     private readonly IBeatmapBackupService backupService;
     private readonly IBeatmapEditingGateway editingGateway;
-    private readonly IBeatmapFileSystem fileSystem;
+    private readonly IBeatmapsetFileSystem fileSystem;
     private readonly ITextFileStore textFileStore;
 
     /// <summary>Creates a service that loads source maps and safely persists guide output.</summary>
@@ -27,7 +27,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
     public RhythmGuideService(
         IBeatmapEditingGateway editingGateway,
         IBeatmapBackupService backupService,
-        IBeatmapFileSystem fileSystem,
+        IBeatmapsetFileSystem fileSystem,
         ITextFileStore textFileStore)
     {
         this.editingGateway = editingGateway ?? throw new ArgumentNullException(nameof(editingGateway));
