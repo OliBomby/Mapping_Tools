@@ -96,7 +96,7 @@ public sealed class ComboColourStudioEngineTests
     }
 
     [TestMethod]
-    public void ValidateForExport_WithMissingPaletteReference_ReportsValidationError()
+    public void Validate_WithMissingPaletteReference_ThrowsValidationException()
     {
         // Arrange
         ComboColourEngineOptions project = new();
@@ -104,15 +104,15 @@ public sealed class ComboColourStudioEngineTests
         project.AddColourPoint(5, [new SpecialColour(RgbaColour.White, "Combo2")]);
 
         // Act
-        var errors = project.ValidateForExport();
+        Action act = () => ComboColourStudioEngine.Validate(project);
 
         // Assert
-        errors.Should().ContainSingle()
-            .Which.Should().Contain("missing colour");
+        act.Should().Throw<ArgumentException>()
+            .Which.Message.Should().Contain("missing colour");
     }
 
     [TestMethod]
-    public void ValidateForExport_WithDuplicatePaletteNames_ReportsValidationError()
+    public void Validate_WithDuplicatePaletteNames_ThrowsValidationException()
     {
         // Arrange
         ComboColourEngineOptions project = new();
@@ -121,10 +121,11 @@ public sealed class ComboColourStudioEngineTests
         project.ComboColours[1].Name = project.ComboColours[0].Name;
 
         // Act
-        var errors = project.ValidateForExport();
+        Action act = () => ComboColourStudioEngine.Validate(project);
 
         // Assert
-        errors.Should().ContainSingle().Which.Should().Contain("unique");
+        act.Should().Throw<ArgumentException>()
+            .Which.Message.Should().Contain("unique");
     }
 
     [TestMethod]

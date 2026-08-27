@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.Events;
 using Mapping_Tools.Core.HitsoundStuff;
@@ -46,9 +47,7 @@ public static class HitsoundCopierEngine
         ArgumentNullException.ThrowIfNull(sourceObjects);
         ArgumentNullException.ThrowIfNull(options);
         ArgumentException.ThrowIfNullOrWhiteSpace(mapDirectory);
-        if (options.CopyMode is not 0 and not 1) throw new ArgumentException("Hitsound Copier received an unknown copy mode.", nameof(options));
-        if (options.TemporalLeniency < 0 || !double.IsFinite(options.TemporalLeniency))
-            throw new ArgumentOutOfRangeException(nameof(options), "Temporal leniency must be finite and non-negative.");
+        Validate(options);
 
         Dictionary<string, string> samples = firstSamples is null
             ? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -266,6 +265,46 @@ public static class HitsoundCopierEngine
         }
 
         return new HitsoundCopierApplyResult(matchedCount, generatedCount, mutedCount, generatedSamples);
+    }
+
+    /// <summary>Validates the copy mode, timing values, and beat-divisor filters.</summary>
+    /// <param name="options">The Hitsound Copier settings to validate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">A mode, timing value, or beat-divisor filter is invalid.</exception>
+    public static void Validate(HitsoundCopierEngineOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        if (options.CopyMode is not 0 and not 1)
+            throw new ArgumentException(
+                "Hitsound Copier received an unknown copy mode.",
+                nameof(options));
+        if (!double.IsFinite(options.TemporalLeniency) || options.TemporalLeniency < 0)
+            throw new ArgumentOutOfRangeException(
+                nameof(options.TemporalLeniency),
+                options.TemporalLeniency,
+                "Temporal leniency must be finite and non-negative.");
+        if (!double.IsFinite(options.TimingOffset))
+            throw new ArgumentOutOfRangeException(
+                nameof(options.TimingOffset),
+                options.TimingOffset,
+                "Timing offset must be finite.");
+        if (!double.IsFinite(options.MinLength) || options.MinLength < 0)
+            throw new ArgumentOutOfRangeException(
+                nameof(options.MinLength),
+                options.MinLength,
+                "Minimum length must be finite and non-negative.");
+        ValidateBeatDivisors(options.BeatDivisors, nameof(options.BeatDivisors));
+        ValidateBeatDivisors(options.MutedDivisors, nameof(options.MutedDivisors));
+    }
+
+    private static void ValidateBeatDivisors(
+        IBeatDivisor[]? divisors,
+        string parameterName)
+    {
+        if (divisors is null || divisors.Length == 0 || divisors.Any(divisor => divisor is null))
+            throw new ArgumentException(
+                "Hitsound Copier requires beat divisors for its filter.",
+                parameterName);
     }
 
     private static int CopyMatchingHitsounds(

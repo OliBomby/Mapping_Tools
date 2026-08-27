@@ -261,12 +261,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <param name="cancellationToken">Cancels lookup, generation, or saving.</param>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        if (!ValidateProject(out string error))
-        {
-            ResultSummary = error;
-            return;
-        }
-
         string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
         await RunWithStateAsync(() => RunPathsAsync(
             string.IsNullOrWhiteSpace(path) ? [] : [path],
@@ -414,29 +408,9 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         if (CurrentLayer is not null) CurrentLayer.RandomSeed = Random.Shared.Next();
     }
 
-    /// <summary>Validates the current project and stores a user-facing correction message.</summary>
-    /// <returns><see langword="true" /> when all required project state is valid.</returns>
-    public bool ValidateSettings()
-    {
-        if (!ValidateProject(out string error))
-        {
-            ResultSummary = error;
-            return false;
-        }
-
-        ResultSummary = string.Empty;
-        return true;
-    }
-
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        if (!ValidateProject(out string error))
-        {
-            ResultSummary = error;
-            return;
-        }
-
         if (settings.AlwaysQuickRun)
         {
             string? path = await currentBeatmap.FindCurrentBeatmapAsync();
@@ -453,14 +427,13 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override bool PrepareRun()
     {
-        ValidateAllProperties();
-        if (HasErrors)
+        if (!base.PrepareRun())
         {
             ResultSummary = "Correct the invalid Tumour Generator settings before running.";
             return false;
         }
 
-        return ValidateSettings();
+        return true;
     }
 
     partial void OnScaleChanged(double value)
@@ -661,8 +634,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
 
     private void Install(TumourGeneratorProject project)
     {
-        if (!ValidateProject(project, out string error)) throw new InvalidDataException(error);
-
         ImportModeSetting = project.ImportModeSetting;
         TimeCode = project.TimeCode ?? string.Empty;
         JustMiddleAnchors = project.JustMiddleAnchors;
@@ -673,83 +644,10 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         RemoveSliderTicks = project.RemoveSliderTicks;
 
         TumourLayers.Clear();
-        foreach (var layer in project.TumourLayers) TumourLayers.Add(new ObservableTumourLayer(layer.Copy()));
+        foreach (var layer in project.TumourLayers ?? []) TumourLayers.Add(new ObservableTumourLayer(layer.Copy()));
 
         CurrentLayerIndex = 0;
         QueuePreview();
-    }
-
-    private bool ValidateProject(out string error)
-    {
-        return ValidateProject(Snapshot(), out error);
-    }
-
-    private static bool ValidateProject(TumourGeneratorProject? project, out string error)
-    {
-        if (project is null
-            || project.TumourLayers is null
-            || project.TumourLayers.Count == 0
-            || !Enum.IsDefined(project.ImportModeSetting)
-            || !double.IsFinite(project.Scale)
-            || project.Scale < 0)
-        {
-            error = "Tumour Generator project is incomplete or contains invalid values.";
-            return false;
-        }
-
-        foreach (var layer in project.TumourLayers)
-            if (!Enum.IsDefined(layer.TumourTemplateEnum)
-                || !Enum.IsDefined(layer.WrappingMode)
-                || !Enum.IsDefined(layer.TumourSidedness)
-                || layer.TumourCount < 0
-                || !double.IsFinite(layer.TumourStart)
-                || !double.IsFinite(layer.TumourEnd)
-                || layer.TumourLength is null
-                || layer.TumourScale is null
-                || layer.TumourRotation is null
-                || layer.TumourParameter is null
-                || layer.TumourDistance is null
-                || !IsValidGraph(layer.TumourLength)
-                || !IsValidGraph(layer.TumourScale)
-                || !IsValidGraph(layer.TumourRotation)
-                || !IsValidGraph(layer.TumourParameter)
-                || !IsValidGraph(layer.TumourDistance))
-            {
-                error = "Tumour Generator project contains an invalid layer.";
-                return false;
-            }
-
-        error = string.Empty;
-        return true;
-    }
-
-    private static bool IsValidGraph(GraphState graph)
-    {
-        if (!double.IsFinite(graph.MinX)
-            || !double.IsFinite(graph.MinY)
-            || !double.IsFinite(graph.MaxX)
-            || !double.IsFinite(graph.MaxY)
-            || graph.MinX > graph.MaxX
-            || graph.MinY > graph.MaxY
-            || graph.Anchors is null)
-            return false;
-
-        double previousX = double.NegativeInfinity;
-        foreach (var anchor in graph.Anchors)
-        {
-            if (anchor is null
-                || !double.IsFinite(anchor.Pos.X)
-                || !double.IsFinite(anchor.Pos.Y)
-                || !double.IsFinite(anchor.Tension)
-                || anchor.Interpolator is null
-                || !double.IsFinite(anchor.Interpolator.P)
-                || anchor.Pos.X < previousX)
-                return false;
-
-            previousX = anchor.Pos.X;
-        }
-
-        return true;
     }
 
     private async Task ShowMessageAsync(string message)

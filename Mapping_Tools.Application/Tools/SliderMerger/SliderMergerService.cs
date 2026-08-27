@@ -27,11 +27,8 @@ public sealed class SliderMergerService : ISliderMergerService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(paths);
-        ArgumentNullException.ThrowIfNull(options);
+        Validate(options);
         if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
-
-        if (!Enum.IsDefined(options.ImportModeSetting) || !Enum.IsDefined(options.ConnectionModeSetting) || !double.IsFinite(options.Leniency) || options.Leniency < 0)
-            throw new ArgumentException("Slider Merger contains invalid settings.", nameof(options));
 
         List<string> processedPaths = [];
         int objectsMerged = 0;
@@ -66,5 +63,13 @@ public sealed class SliderMergerService : ISliderMergerService
 
         progress?.Report(1);
         return new SliderMergerResult(processedPaths, objectsMerged);
+    }
+
+    private static void Validate(SliderMergerServiceOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        if (!Enum.IsDefined(options.ImportModeSetting))
+            throw new ArgumentException("Slider Merger contains an unknown import mode.", nameof(options));
+        SliderMergerEngine.Validate(options);
     }
 }

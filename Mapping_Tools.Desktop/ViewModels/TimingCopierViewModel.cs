@@ -217,17 +217,10 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
 
     private void Install(TimingCopierProject project)
     {
-        ArgumentNullException.ThrowIfNull(project);
-        if (project.BeatDivisors is null
-            || project.BeatDivisors.Length == 0
-            || project.BeatDivisors.Any(divisor => divisor is null)
-            || !Enum.IsDefined(project.ResnapMode))
-            throw new InvalidDataException("Timing Copier project is incomplete.");
-
         ImportPath = project.ImportPath;
         ExportPath = project.ExportPath;
         ResnapMode = project.ResnapMode;
-        BeatDivisors = project.BeatDivisors.ToArray();
+        BeatDivisors = project.BeatDivisors?.ToArray() ?? [];
     }
 
     private async Task PickBeatmapsAsync(

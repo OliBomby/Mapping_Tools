@@ -263,11 +263,9 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override bool PrepareRun()
     {
-        ValidateAllProperties();
-        if (HasErrors || string.IsNullOrWhiteSpace(PathTo)) return false;
-        if (SourceSelectionMode == HitObjectSelectionMode.Time && string.IsNullOrWhiteSpace(TimeCode))
+        if (!base.PrepareRun())
         {
-            ResultSummary = "Enter a time code before using Time mode.";
+            ResultSummary = "Correct the invalid Hitsound Copier settings before running.";
             return false;
         }
 
@@ -313,13 +311,6 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
 
     private void Install(HitsoundCopierProject project)
     {
-        if (!Enum.IsDefined(project.SourceSelectionMode)
-            || project.BeatDivisors is null
-            || project.BeatDivisors.Length == 0
-            || project.MutedDivisors is null
-            || project.MutedDivisors.Length == 0
-            || project.CopyMode is not 0 and not 1)
-            throw new InvalidDataException("Hitsound Copier project is incomplete.");
         PathFrom = project.PathFrom ?? string.Empty;
         PathTo = project.PathTo ?? string.Empty;
         CopyMode = project.CopyMode;
@@ -339,8 +330,8 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         CopyToSliderSlides = project.CopyToSliderSlides;
         StartIndex = project.StartIndex;
         MuteSliderends = project.MuteSliderends;
-        BeatDivisors = project.BeatDivisors.ToArray();
-        MutedDivisors = project.MutedDivisors.ToArray();
+        BeatDivisors = project.BeatDivisors?.ToArray() ?? [];
+        MutedDivisors = project.MutedDivisors?.ToArray() ?? [];
         MinLength = project.MinLength;
         MutedIndex = project.MutedIndex;
         MutedSampleSet = project.MutedSampleSet;

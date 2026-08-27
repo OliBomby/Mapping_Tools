@@ -15,9 +15,7 @@ public static class ComboColourStudioEngine
     public static void Apply(Beatmap beatmap, ComboColourEngineOptions project)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
-        ArgumentNullException.ThrowIfNull(project);
-        var errors = project.ValidateForExport();
-        if (errors.Count > 0) throw new ArgumentException(string.Join(" ", errors), nameof(project));
+        Validate(project);
 
         var colourPoints = project.ColourPoints.OrderBy(point => point.Time).ToList();
         // Collection order is the osu! palette order. Names are stable
@@ -76,6 +74,56 @@ public static class ComboColourStudioEngine
             lastColourPointColourIndex = colourPointColourIndex;
             lastColourPoint = colourPoint;
             lastColourIndex = colourIndex;
+        }
+    }
+
+    /// <summary>Validates a Combo Colour Studio project before beatmap mutation.</summary>
+    /// <param name="project">The project settings to validate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="project" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">
+    ///     A palette is empty, contains an invalid or duplicate name, a colour
+    ///     point has a non-finite offset, or a point references a missing colour.
+    /// </exception>
+    public static void Validate(ComboColourEngineOptions project)
+    {
+        ArgumentNullException.ThrowIfNull(project);
+        if (project.MaxBurstLength < 0)
+            throw new ArgumentOutOfRangeException(
+                nameof(project.MaxBurstLength),
+                project.MaxBurstLength,
+                "Max burst length cannot be negative.");
+
+        if (project.ComboColours.Count == 0)
+            throw new ArgumentException(
+                "Add at least one combo colour before running the tool.",
+                nameof(project.ComboColours));
+
+        string?[] names = project.ComboColours.Select(colour => colour.Name).ToArray();
+        if (names.Any(string.IsNullOrWhiteSpace))
+            throw new ArgumentException(
+                "Every combo colour must have a name.",
+                nameof(project.ComboColours));
+
+        if (names.Where(name => !string.IsNullOrWhiteSpace(name))
+            .GroupBy(name => name, StringComparer.Ordinal)
+            .Any(group => group.Count() > 1))
+            throw new ArgumentException(
+                "Combo colour names must be unique.",
+                nameof(project.ComboColours));
+
+        HashSet<string?> nameSet = new(names, StringComparer.Ordinal);
+        foreach (var point in project.ColourPoints)
+        {
+            if (!double.IsFinite(point.Time))
+                throw new ArgumentException(
+                    "Every colour point offset must be a finite number.",
+                    nameof(project.ColourPoints));
+
+            foreach (var colour in point.ColourSequence)
+                if (!nameSet.Contains(colour.Name))
+                    throw new ArgumentException(
+                        $"Colour point at offset {point.Time} references missing colour '{colour.Name}'.",
+                        nameof(project.ColourPoints));
         }
     }
 
@@ -362,4 +410,3 @@ public static class ComboColourStudioEngine
                ?? points.Except(exceptions).FirstOrDefault(point => point.Mode != ColourPointMode.Burst) ?? points[0];
     }
 }
-

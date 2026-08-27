@@ -28,18 +28,7 @@ public sealed class TimingCopierService : ITimingCopierService
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(options);
-        ArgumentException.ThrowIfNullOrWhiteSpace(options.ImportPath);
-        ArgumentException.ThrowIfNullOrWhiteSpace(options.ExportPath);
-        if (options.BeatDivisors is null || options.BeatDivisors.Length == 0 || options.BeatDivisors.Any(divisor => divisor is null))
-            throw new ArgumentException(
-                "Timing Copier requires at least one beat divisor.",
-                nameof(options));
-
-        if (!Enum.IsDefined(options.ResnapMode))
-            throw new ArgumentException(
-                "Timing Copier received an unknown resnapping mode.",
-                nameof(options));
+        Validate(options);
 
         string[] targetPaths = options.ExportPath
             .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
@@ -81,5 +70,13 @@ public sealed class TimingCopierService : ITimingCopierService
         }
 
         return new TimingCopierResult(processedPaths);
+    }
+
+    private static void Validate(TimingCopierServiceOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentException.ThrowIfNullOrWhiteSpace(options.ImportPath);
+        ArgumentException.ThrowIfNullOrWhiteSpace(options.ExportPath);
+        TimingCopierEngine.Validate(options);
     }
 }

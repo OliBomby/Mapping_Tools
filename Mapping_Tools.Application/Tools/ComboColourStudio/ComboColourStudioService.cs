@@ -59,9 +59,7 @@ public sealed class ComboColourStudioService : IComboColourStudioService
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(project);
         if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
-
-        var errors = project.ValidateForExport();
-        if (errors.Count > 0) throw new ArgumentException(string.Join(" ", errors), nameof(project));
+        ComboColourStudioEngine.Validate(project);
 
         int processed = 0;
         foreach (string path in paths)

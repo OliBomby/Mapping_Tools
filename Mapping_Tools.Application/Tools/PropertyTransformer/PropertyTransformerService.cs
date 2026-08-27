@@ -35,6 +35,7 @@ public sealed class PropertyTransformerService : IPropertyTransformerService
             throw new ArgumentException(
                 "Select at least one beatmap or storyboard.",
                 nameof(paths));
+        PropertyTransformerEngine.Validate(options);
 
         List<string> processedPaths = [];
         for (int index = 0; index < paths.Count; index++)

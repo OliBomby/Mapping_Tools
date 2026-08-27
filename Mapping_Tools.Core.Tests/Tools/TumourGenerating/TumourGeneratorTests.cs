@@ -158,4 +158,50 @@ public sealed class TumourGeneratorTests
         generated.Should().OnlyContain(hitObject =>
             hitObject.IsSlider && double.IsFinite(hitObject.PixelLength) && hitObject.GetSliderPath().Distance > 0);
     }
+
+    [TestMethod]
+    public void Validate_WithMissingLayers_ThrowsValidationException()
+    {
+        // Arrange
+        TumourGeneratorEngineOptions options = new();
+
+        // Act
+        Action act = () => TumourGenerator.Validate(options);
+
+        // Assert
+        act.Should().Throw<ArgumentException>()
+            .WithMessage("*at least one layer*");
+    }
+
+    [TestMethod]
+    public void Validate_WithNonFiniteGraphAnchor_ThrowsValidationException()
+    {
+        // Arrange
+        var layer = TumourLayer.GetDefaultLayer();
+        layer.TumourScale.Anchors[0].Pos = new Vector2(double.NaN, 0);
+        TumourGeneratorEngineOptions options = new() { TumourLayers = [layer] };
+
+        // Act
+        Action act = () => TumourGenerator.Validate(options);
+
+        // Assert
+        act.Should().Throw<ArgumentException>()
+            .WithMessage("*graph anchor*");
+    }
+
+    [TestMethod]
+    public void Validate_WithDefaultOptions_DoesNotThrow()
+    {
+        // Arrange
+        TumourGeneratorEngineOptions options = new()
+        {
+            TumourLayers = [TumourLayer.GetDefaultLayer()],
+        };
+
+        // Act
+        Action act = () => TumourGenerator.Validate(options);
+
+        // Assert
+        act.Should().NotThrow();
+    }
 }

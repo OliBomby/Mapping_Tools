@@ -48,7 +48,7 @@ public static class MetadataManagerEngine
     public static void Apply(Beatmap beatmap, MetadataManagerEngineOptions options)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
-        ArgumentNullException.ThrowIfNull(options);
+        Validate(options);
 
         beatmap.Metadata["ArtistUnicode"] = new StringValue(options.Artist);
         beatmap.Metadata["Artist"] = new StringValue(options.RomanisedArtist);
@@ -72,11 +72,6 @@ public static class MetadataManagerEngine
             beatmap.SpecialColours.Clear();
             foreach (var specialColour in options.SpecialColours)
             {
-                if (string.IsNullOrWhiteSpace(specialColour.Name))
-                    throw new ArgumentException(
-                        "Every special colour must have a name.",
-                        nameof(options));
-
                 beatmap.SpecialColours.Add(
                     specialColour.Name,
                     new ComboColour(specialColour.Color));
@@ -88,6 +83,34 @@ public static class MetadataManagerEngine
             beatmap.Metadata["BeatmapID"] = new StringValue("0");
             beatmap.Metadata["BeatmapSetID"] = new StringValue("-1");
         }
+    }
+
+    /// <summary>Validates metadata text, preview timing, and optional colour collections.</summary>
+    /// <param name="options">The Metadata Manager settings to validate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options" /> or a required collection value is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">A required value, colour entry, special-colour name, or preview time is invalid.</exception>
+    public static void Validate(MetadataManagerEngineOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(options.Artist);
+        ArgumentNullException.ThrowIfNull(options.RomanisedArtist);
+        ArgumentNullException.ThrowIfNull(options.Title);
+        ArgumentNullException.ThrowIfNull(options.RomanisedTitle);
+        ArgumentNullException.ThrowIfNull(options.BeatmapCreator);
+        ArgumentNullException.ThrowIfNull(options.Source);
+        ArgumentNullException.ThrowIfNull(options.Tags);
+        ArgumentNullException.ThrowIfNull(options.ComboColours);
+        ArgumentNullException.ThrowIfNull(options.SpecialColours);
+        if (!double.IsFinite(options.PreviewTime))
+            throw new ArgumentException("Metadata Manager preview time must be finite.", nameof(options));
+        if (options.ComboColours.Any(colour => colour is null)
+            || options.SpecialColours.Any(colour => colour is null))
+            throw new ArgumentException("Metadata Manager contains a null colour entry.", nameof(options));
+        if (options.UseComboColours
+            && options.SpecialColours.Any(colour => string.IsNullOrWhiteSpace(colour.Name)))
+            throw new ArgumentException(
+                "Every special colour must have a name.",
+                nameof(options));
     }
 
     /// <summary>

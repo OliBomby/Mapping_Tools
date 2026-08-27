@@ -21,6 +21,7 @@ public static class RhythmGuideGenerator
         ArgumentNullException.ThrowIfNull(sources);
         ArgumentNullException.ThrowIfNull(options);
         if (sources.Count == 0) throw new ArgumentException("There must be at least one beatmap.", nameof(sources));
+        Validate(options);
 
         // Scuffed beatmap copy
         Beatmap result = new(sources[0].GetLines());
@@ -52,7 +53,7 @@ public static class RhythmGuideGenerator
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(sources);
         ArgumentNullException.ThrowIfNull(options);
-        ArgumentNullException.ThrowIfNull(options.BeatDivisors);
+        Validate(options);
 
         foreach (var source in sources)
         {
@@ -111,5 +112,31 @@ public static class RhythmGuideGenerator
             if (position.HasValue) hitObject.Pos = position.Value;
             target.HitObjects.Add(hitObject);
         }
+    }
+
+    /// <summary>Validates the framework-independent Rhythm Guide settings.</summary>
+    /// <param name="options">The output mode, name, selection, and snapping choices.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">A mode, output name, or beat-divisor set is invalid.</exception>
+    public static void Validate(RhythmGuideEngineOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        if (!Enum.IsDefined(options.OutputGameMode))
+            throw new ArgumentException(
+                "Rhythm Guide received an unknown output game mode.",
+                nameof(options));
+        ArgumentException.ThrowIfNullOrWhiteSpace(options.OutputName);
+        if (!Enum.IsDefined(options.SelectionMode))
+            throw new ArgumentException(
+                "Rhythm Guide received an unknown selection mode.",
+                nameof(options));
+        if (options.BeatDivisors is null || options.BeatDivisors.Length == 0)
+            throw new ArgumentException(
+                "Rhythm Guide requires at least one beat divisor.",
+                nameof(options));
+        if (options.BeatDivisors.Any(divisor => divisor is null))
+            throw new ArgumentException(
+                "Rhythm Guide beat divisors cannot contain null values.",
+                nameof(options));
     }
 }

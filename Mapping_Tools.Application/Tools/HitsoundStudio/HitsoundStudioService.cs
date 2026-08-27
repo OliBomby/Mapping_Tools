@@ -164,7 +164,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(project);
-        ValidateProject(project);
+        Validate(project);
         files.CreateDirectory(project.ExportFolder);
         bool writesFiles = project.HitsoundExportModeSetting == HitsoundStudioExportMode.Midi
             ? project.ExportMap
@@ -867,13 +867,20 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         return Math.Pow(Math.Ceiling(Math.Pow(length, 1 / roughness)), roughness);
     }
 
-    private static void ValidateProject(HitsoundStudioServiceOptions project)
+    private static void Validate(HitsoundStudioServiceOptions project)
     {
+        ArgumentNullException.ThrowIfNull(project);
         ArgumentException.ThrowIfNullOrWhiteSpace(project.BaseBeatmap);
         ArgumentException.ThrowIfNullOrWhiteSpace(project.ExportFolder);
         ArgumentException.ThrowIfNullOrWhiteSpace(project.HitsoundDiffName);
-        if (project.FirstCustomIndex < 0) throw new ArgumentOutOfRangeException(nameof(project.FirstCustomIndex));
-        if (!double.IsFinite(project.ZipLayersLeniency) || project.ZipLayersLeniency < 0) throw new ArgumentOutOfRangeException(nameof(project.ZipLayersLeniency));
+        ArgumentNullException.ThrowIfNull(project.DefaultSample);
+        if (project.HitsoundLayers is null || project.HitsoundLayers.Count == 0)
+            throw new ArgumentException("There are no hitsound layers.", nameof(project));
+        if (!Enum.IsDefined(project.HitsoundExportModeSetting)
+            || !Enum.IsDefined(project.HitsoundExportGameMode)
+            || !Enum.IsDefined(project.SingleSampleExportFormat)
+            || !Enum.IsDefined(project.MixedSampleExportFormat))
+            throw new ArgumentException("Hitsound Studio contains an unknown export setting.", nameof(project));
     }
 
     private static void Report(IProgress<double>? progress, double value)

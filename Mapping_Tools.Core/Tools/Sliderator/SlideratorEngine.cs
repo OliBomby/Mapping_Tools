@@ -308,6 +308,8 @@ public static class SlideratorEngine
     /// <exception cref="InvalidOperationException">The source is not a slider.</exception>
     public static void Validate(SlideratorEngineOptions options, HitObject sourceSlider)
     {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(sourceSlider);
         if (!sourceSlider.IsSlider) throw new InvalidOperationException("Sliderator requires a slider source object.");
 
         if (!Enum.IsDefined(options.ExportModeSetting) || !Enum.IsDefined(options.GraphModeSetting))

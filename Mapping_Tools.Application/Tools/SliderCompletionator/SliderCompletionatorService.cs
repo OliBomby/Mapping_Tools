@@ -32,13 +32,8 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(paths);
-        ArgumentNullException.ThrowIfNull(options);
+        Validate(options);
         if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
-
-        if (!Enum.IsDefined(options.ImportModeSetting) || !Enum.IsDefined(options.FreeVariableSetting))
-            throw new ArgumentException(
-                "Slider Completionator contains an unknown selection or free-variable mode.",
-                nameof(options));
 
         List<string> processedPaths = [];
         int slidersCompleted = 0;
@@ -94,5 +89,15 @@ public sealed class SliderCompletionatorService : ISliderCompletionatorService
 
         progress?.Report(1);
         return new SliderCompletionatorResult(processedPaths, slidersCompleted);
+    }
+
+    private static void Validate(SliderCompletionatorServiceOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        if (!Enum.IsDefined(options.ImportModeSetting))
+            throw new ArgumentException(
+                "Slider Completionator contains an unknown selection mode.",
+                nameof(options));
+        SliderCompletionatorEngine.Validate(options);
     }
 }

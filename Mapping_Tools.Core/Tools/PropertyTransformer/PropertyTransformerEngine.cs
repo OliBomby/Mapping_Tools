@@ -24,6 +24,7 @@ public static class PropertyTransformerEngine
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(options);
+        Validate(options);
 
         List<TimingPointChange> timingPointChanges = [];
 
@@ -291,6 +292,7 @@ public static class PropertyTransformerEngine
     {
         ArgumentNullException.ThrowIfNull(storyboard);
         ArgumentNullException.ThrowIfNull(options);
+        Validate(options);
 
         IEnumerable<Event> events = storyboard.StoryboardLayerBackground
             .Concat(storyboard.StoryboardLayerFail)
@@ -367,6 +369,60 @@ public static class PropertyTransformerEngine
 
         Report(progress, 0.9);
         Report(progress, 1);
+    }
+
+    /// <summary>
+    ///     Validates the numeric transformation settings and filter collections used by Property Transformer.
+    /// </summary>
+    /// <param name="options">The Property Transformer settings to validate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options" />, a filter collection, or a filter value is null.</exception>
+    /// <exception cref="ArgumentException">A numeric setting or filter value is not finite.</exception>
+    public static void Validate(PropertyTransformerEngineOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(options.MatchFilter);
+        ArgumentNullException.ThrowIfNull(options.UnmatchFilter);
+
+        double[] values =
+        [
+            options.TimingpointOffsetMultiplier,
+            options.TimingpointOffsetOffset,
+            options.TimingpointBpmMultiplier,
+            options.TimingpointBpmOffset,
+            options.TimingpointSvMultiplier,
+            options.TimingpointSvOffset,
+            options.TimingpointIndexMultiplier,
+            options.TimingpointIndexOffset,
+            options.TimingpointVolumeMultiplier,
+            options.TimingpointVolumeOffset,
+            options.HitObjectTimeMultiplier,
+            options.HitObjectTimeOffset,
+            options.HitObjectVolumeMultiplier,
+            options.HitObjectVolumeOffset,
+            options.BookmarkTimeMultiplier,
+            options.BookmarkTimeOffset,
+            options.SbEventTimeMultiplier,
+            options.SbEventTimeOffset,
+            options.SbSampleTimeMultiplier,
+            options.SbSampleTimeOffset,
+            options.SbSampleVolumeMultiplier,
+            options.SbSampleVolumeOffset,
+            options.BreakTimeMultiplier,
+            options.BreakTimeOffset,
+            options.VideoTimeMultiplier,
+            options.VideoTimeOffset,
+            options.PreviewTimeMultiplier,
+            options.PreviewTimeOffset,
+            options.MinTimeFilter,
+            options.MaxTimeFilter,
+        ];
+
+        if (values.Any(value => !double.IsFinite(value))
+            || options.MatchFilter.Any(value => !double.IsFinite(value))
+            || options.UnmatchFilter.Any(value => !double.IsFinite(value)))
+            throw new ArgumentException(
+                "Property Transformer settings must contain only finite numbers.",
+                nameof(options));
     }
 
     private static bool PassesFilter(

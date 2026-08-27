@@ -156,13 +156,13 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
 
     void IShellProjectFeature.Install(object project)
     {
-        if (project is not HitsoundPreviewHelperProject typed || typed.Items is null || !Enum.IsDefined(typed.ImportModeSetting))
+        if (project is not HitsoundPreviewHelperProject typed)
             throw new InvalidDataException("Hitsound Preview Helper project is incomplete.");
 
         ImportModeSetting = typed.ImportModeSetting;
         TimeCode = typed.TimeCode ?? string.Empty;
         Items = new ObservableCollection<ObservableHitsoundZone>(
-            typed.Items.Select(item => new ObservableHitsoundZone(item.Copy())));
+            (typed.Items ?? []).Select(item => new ObservableHitsoundZone(item.Copy())));
     }
 
     /// <inheritdoc />
@@ -181,24 +181,6 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         }
 
         await RunPathsAsync(paths, settings.AlwaysQuickRun, CancellationToken.None);
-    }
-
-    /// <inheritdoc />
-    protected override bool PrepareRun()
-    {
-        if (Items.Count == 0)
-        {
-            ResultSummary = "There are no zones!";
-            return false;
-        }
-
-        if (ImportModeSetting == HitObjectSelectionMode.Time && string.IsNullOrWhiteSpace(TimeCode))
-        {
-            ResultSummary = "Enter a time code before using Time mode.";
-            return false;
-        }
-
-        return true;
     }
 
     /// <summary>Adds a new wildcard zone.</summary>

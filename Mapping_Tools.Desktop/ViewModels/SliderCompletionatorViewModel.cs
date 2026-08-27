@@ -185,13 +185,6 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
         await RunPathsAsync(paths, settings.AlwaysQuickRun, CancellationToken.None);
     }
 
-    /// <inheritdoc />
-    protected override bool PrepareRun()
-    {
-        ValidateAllProperties();
-        return !HasErrors;
-    }
-
     private async Task RunPathsAsync(
         IReadOnlyList<string> paths,
         bool quick,
@@ -245,15 +238,6 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
 
     private void Install(SliderCompletionatorProject project)
     {
-        ArgumentNullException.ThrowIfNull(project);
-        if (!Enum.IsDefined(project.ImportModeSetting)
-            || !Enum.IsDefined(project.FreeVariableSetting)
-            || !double.IsFinite(project.Duration)
-            || !double.IsFinite(project.EndTime)
-            || !double.IsFinite(project.Length)
-            || !double.IsFinite(project.SliderVelocity))
-            throw new InvalidDataException("Slider Completionator project is incomplete.");
-
         ImportModeSetting = project.ImportModeSetting;
         FreeVariableSetting = project.FreeVariableSetting;
         TimeCode = project.TimeCode ?? string.Empty;

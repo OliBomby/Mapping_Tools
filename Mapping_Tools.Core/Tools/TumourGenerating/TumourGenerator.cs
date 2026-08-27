@@ -1,6 +1,7 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.BeatmapHelper.SliderPathStuff;
+using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Core.Tools.TumourGenerating.Models;
@@ -33,6 +34,71 @@ public sealed class TumourGenerator
 
     /// <summary>Gets or sets the ordered layers applied to each slider.</summary>
     public IReadOnlyList<TumourLayer> TumourLayers { get; set; } = [];
+
+    /// <summary>
+    ///     Validates the framework-independent Tumour Generator settings,
+    ///     including every layer graph and its ordered anchors.
+    /// </summary>
+    /// <param name="options">The Tumour Generator settings to validate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">
+    ///     The layer collection, layer enums, scalar values, graph bounds, or graph anchors are invalid.
+    /// </exception>
+    public static void Validate(TumourGeneratorEngineOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        if (options.TumourLayers is null || options.TumourLayers.Count == 0)
+            throw new ArgumentException("Tumour Generator requires at least one layer.", nameof(options));
+        if (!double.IsFinite(options.Scale) || options.Scale < 0)
+            throw new ArgumentException("Tumour Generator scale must be finite and non-negative.", nameof(options));
+
+        foreach (var layer in options.TumourLayers)
+        {
+            ArgumentNullException.ThrowIfNull(layer);
+            if (!Enum.IsDefined(layer.TumourTemplateEnum)
+                || !Enum.IsDefined(layer.WrappingMode)
+                || !Enum.IsDefined(layer.TumourSidedness))
+                throw new ArgumentException("Tumour Generator contains an unknown layer mode.", nameof(options));
+            if (layer.TumourCount < 0
+                || !double.IsFinite(layer.TumourStart)
+                || !double.IsFinite(layer.TumourEnd))
+                throw new ArgumentException("Tumour Generator contains an invalid layer range.", nameof(options));
+
+            ValidateGraph(layer.TumourLength, nameof(layer.TumourLength));
+            ValidateGraph(layer.TumourScale, nameof(layer.TumourScale));
+            ValidateGraph(layer.TumourRotation, nameof(layer.TumourRotation));
+            ValidateGraph(layer.TumourParameter, nameof(layer.TumourParameter));
+            ValidateGraph(layer.TumourDistance, nameof(layer.TumourDistance));
+        }
+    }
+
+    private static void ValidateGraph(GraphState graph, string parameterName)
+    {
+        ArgumentNullException.ThrowIfNull(graph, parameterName);
+        if (!double.IsFinite(graph.MinX)
+            || !double.IsFinite(graph.MinY)
+            || !double.IsFinite(graph.MaxX)
+            || !double.IsFinite(graph.MaxY)
+            || graph.MinX > graph.MaxX
+            || graph.MinY > graph.MaxY
+            || graph.Anchors is null)
+            throw new ArgumentException("Tumour Generator contains an invalid graph.", parameterName);
+
+        double previousX = double.NegativeInfinity;
+        foreach (var anchor in graph.Anchors)
+        {
+            ArgumentNullException.ThrowIfNull(anchor, parameterName);
+            if (!double.IsFinite(anchor.Pos.X)
+                || !double.IsFinite(anchor.Pos.Y)
+                || !double.IsFinite(anchor.Tension)
+                || anchor.Interpolator is null
+                || !double.IsFinite(anchor.Interpolator.P)
+                || anchor.Pos.X < previousX)
+                throw new ArgumentException("Tumour Generator contains an invalid graph anchor.", parameterName);
+
+            previousX = anchor.Pos.X;
+        }
+    }
 
     /// <summary>Gets the reconstruction strategy used after path edits.</summary>
     public Reconstructor Reconstructor { get; init; } = new();

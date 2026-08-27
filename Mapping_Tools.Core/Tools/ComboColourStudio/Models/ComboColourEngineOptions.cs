@@ -103,34 +103,4 @@ public class ComboColourEngineOptions
         copy.MatchComboColourReferences();
         return copy;
     }
-
-    /// <summary>Validates the state before it is applied to a beatmap.</summary>
-    /// <returns>Human-readable validation failures, in deterministic order.</returns>
-    public IReadOnlyList<string> ValidateForExport()
-    {
-        List<string> errors = [];
-        if (MaxBurstLength < 0) errors.Add("Max burst length cannot be negative.");
-
-        if (ComboColours.Count == 0) errors.Add("Add at least one combo colour before running the tool.");
-
-        string?[] names = ComboColours.Select(colour => colour.Name).ToArray();
-        if (names.Any(string.IsNullOrWhiteSpace)) errors.Add("Every combo colour must have a name.");
-
-        if (names.Where(name => !string.IsNullOrWhiteSpace(name))
-            .GroupBy(name => name, StringComparer.Ordinal)
-            .Any(group => group.Count() > 1))
-            errors.Add("Combo colour names must be unique.");
-
-        HashSet<string?> nameSet = new(names, StringComparer.Ordinal);
-        foreach (var point in ColourPoints)
-        {
-            if (!double.IsFinite(point.Time)) errors.Add("Every colour point offset must be a finite number.");
-
-            foreach (var colour in point.ColourSequence)
-                if (!nameSet.Contains(colour.Name))
-                    errors.Add($"Colour point at offset {point.Time} references missing colour '{colour.Name}'.");
-        }
-
-        return errors;
-    }
 }

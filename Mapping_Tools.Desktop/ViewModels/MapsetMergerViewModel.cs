@@ -12,7 +12,6 @@ using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.MapsetMerger.Contracts;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
-using Mapping_Tools.Core.Tools.MapsetMerger;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 
@@ -183,42 +182,10 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     /// <inheritdoc />
     protected override bool PrepareRun()
     {
-        ValidateAllProperties();
-        if (HasErrors)
+        if (!base.PrepareRun())
         {
             ResultSummary = "Select an export directory.";
             return false;
-        }
-
-        if (Mapsets.Count == 0)
-        {
-            ResultSummary = "Add at least one mapset.";
-            return false;
-        }
-
-        if (Mapsets.Any(item => string.IsNullOrWhiteSpace(item.Name) || string.IsNullOrWhiteSpace(item.Path)))
-        {
-            ResultSummary = "Every mapset needs a name and source directory.";
-            return false;
-        }
-
-        foreach (var item in Mapsets)
-        {
-            try
-            {
-                MapsetMergerEngine.ValidateMapsetName(item.Name);
-            }
-            catch (ArgumentException)
-            {
-                ResultSummary = $"Mapset name '{item.Name}' is not a safe folder name.";
-                return false;
-            }
-
-            if (!Directory.Exists(item.Path))
-            {
-                ResultSummary = $"Mapset directory '{item.Path}' was not found.";
-                return false;
-            }
         }
 
         return true;

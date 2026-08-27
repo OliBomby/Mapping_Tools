@@ -74,6 +74,72 @@ public class PatternGalleryPlacer
     /// </summary>
     public TimingOverwriteMode TimingOverwriteMode = TimingOverwriteMode.OriginalTimingOnly;
 
+    /// <summary>Validates the framework-independent Pattern Gallery settings.</summary>
+    /// <param name="options">The Pattern Gallery settings to validate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">A mode, numeric setting, or required beat-divisor set is invalid.</exception>
+    public static void Validate(PatternGalleryEngineOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        if (!Enum.IsDefined(options.ExportTimeMode)
+            || !double.IsFinite(options.CustomExportTime))
+            throw new ArgumentException("Pattern Gallery contains an invalid export-time setting.", nameof(options));
+        ValidatePlacementSettings(
+            options.Padding,
+            options.PartingDistance,
+            options.PatternOverwriteMode,
+            options.TimingOverwriteMode,
+            options.BeatDivisors,
+            options.CustomScale,
+            options.CustomRotate,
+            options.SnapToNewTiming,
+            nameof(options));
+    }
+
+    /// <summary>Validates the mutable placement settings held by this engine.</summary>
+    /// <exception cref="ArgumentException">A mode, numeric setting, or required beat-divisor set is invalid.</exception>
+    public void Validate()
+    {
+        ValidatePlacementSettings(
+            Padding,
+            PartingDistance,
+            PatternOverwriteMode,
+            TimingOverwriteMode,
+            BeatDivisors,
+            CustomScale,
+            CustomRotate,
+            SnapToNewTiming,
+            nameof(PatternGalleryPlacer));
+    }
+
+    private static void ValidatePlacementSettings(
+        double padding,
+        double partingDistance,
+        PatternOverwriteMode patternOverwriteMode,
+        TimingOverwriteMode timingOverwriteMode,
+        IBeatDivisor[]? beatDivisors,
+        double customScale,
+        double customRotate,
+        bool snapToNewTiming,
+        string parameterName)
+    {
+        if (!Enum.IsDefined(patternOverwriteMode)
+            || !Enum.IsDefined(timingOverwriteMode))
+            throw new ArgumentException("Pattern Gallery contains an unknown overwrite mode.", parameterName);
+        if (!double.IsFinite(padding)
+            || padding < 0
+            || !double.IsFinite(partingDistance)
+            || partingDistance < 0
+            || !double.IsFinite(customScale)
+            || !double.IsFinite(customRotate))
+            throw new ArgumentException("Pattern Gallery contains an invalid numeric setting.", parameterName);
+        if (snapToNewTiming
+            && (beatDivisors is null
+                || beatDivisors.Length == 0
+                || beatDivisors.Any(divisor => divisor is null)))
+            throw new ArgumentException("Pattern Gallery requires at least one beat divisor.", parameterName);
+    }
+
     /// <summary>
     ///     Places each hit object of the pattern beatmap into the other beatmap and applies timingpoint changes to copy
     ///     timingpoint stuff aswell.
@@ -106,6 +172,9 @@ public class PatternGalleryPlacer
     /// </param>
     public void PlaceOsuPattern(Beatmap patternBeatmap, Beatmap beatmap, double offset = 0, bool protectBeatmapPattern = true)
     {
+        ArgumentNullException.ThrowIfNull(patternBeatmap);
+        ArgumentNullException.ThrowIfNull(beatmap);
+        Validate();
         if (protectBeatmapPattern)
             // Copy so the original pattern doesnt get changed
             patternBeatmap = patternBeatmap.DeepCopy();

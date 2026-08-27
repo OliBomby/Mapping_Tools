@@ -64,12 +64,14 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     public IRelayCommand CancelCommand { get; }
 
     /// <summary>
-    ///     Performs feature-specific validation before the run state is entered.
+    ///     Validates data-annotation attributes before the run state is entered.
+    ///     Derived view models may add presentation-specific preflight behavior.
     /// </summary>
     /// <returns><see langword="true" /> when the ordinary run may start.</returns>
     protected virtual bool PrepareRun()
     {
-        return true;
+        ValidateAllProperties();
+        return !HasErrors;
     }
 
     /// <summary>Executes the feature-specific ordinary run.</summary>

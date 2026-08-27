@@ -25,11 +25,7 @@ public static class MapCleanerEngine
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
-        ArgumentNullException.ThrowIfNull(options);
-        if (options.BeatDivisors is null || options.BeatDivisors.Length == 0)
-        {
-            throw new ArgumentException("Select at least one beat divisor.", nameof(options));
-        }
+        Validate(options);
 
         firstSamples ??= new Dictionary<string, string>();
         Timing timing = beatmap.BeatmapTiming;
@@ -261,6 +257,19 @@ public static class MapCleanerEngine
         Fix2BDoubleTaps(beatmap);
         Report(progress, 1);
         return Compare(original, timing.TimingPoints, objectsResnapped);
+    }
+
+    /// <summary>Validates the beat-divisor settings used by Map Cleaner.</summary>
+    /// <param name="options">The Map Cleaner settings to validate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">No valid beat divisor is supplied.</exception>
+    public static void Validate(MapCleanerEngineOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        if (options.BeatDivisors is null
+            || options.BeatDivisors.Length == 0
+            || options.BeatDivisors.Any(divisor => divisor is null))
+            throw new ArgumentException("Select at least one beat divisor.", nameof(options));
     }
 
     private static void RewriteObjectHitsound(TimelineObject item, GameMode mode)

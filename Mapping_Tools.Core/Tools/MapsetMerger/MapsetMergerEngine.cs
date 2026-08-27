@@ -20,7 +20,7 @@ public static partial class MapsetMergerEngine
     /// </summary>
     /// <param name="mapsets">The mutable inputs to normalize.</param>
     /// <exception cref="ArgumentNullException">An input collection or item is null.</exception>
-    /// <exception cref="ArgumentException">A name is blank.</exception>
+    /// <exception cref="ArgumentException">A mapset name is blank or unsafe as a path segment.</exception>
     public static void ResolveDuplicateMapsetNames(IList<MapsetMergerInput> mapsets)
     {
         ArgumentNullException.ThrowIfNull(mapsets);
@@ -29,12 +29,32 @@ public static partial class MapsetMergerEngine
         foreach (var mapset in mapsets)
         {
             ArgumentNullException.ThrowIfNull(mapset);
-            string original = RequireName(mapset.Name, nameof(mapsets));
+            RequireSafeMapsetName(mapset.Name);
+            string original = mapset.Name;
             string candidate = original;
             int suffix = 0;
             while (!used.Add(candidate)) candidate = original + ++suffix;
 
             mapset.Name = candidate;
+        }
+    }
+
+    /// <summary>
+    ///     Validates the source mapset inputs before they are used to build output paths.
+    /// </summary>
+    /// <param name="mapsets">The source mapsets in their requested merge order.</param>
+    /// <exception cref="ArgumentNullException">The collection or an input item is null.</exception>
+    /// <exception cref="ArgumentException">A mapset name or source path is blank or unsafe.</exception>
+    public static void Validate(IReadOnlyList<MapsetMergerInput> mapsets)
+    {
+        ArgumentNullException.ThrowIfNull(mapsets);
+        if (mapsets.Count == 0) throw new ArgumentException("Add at least one mapset.", nameof(mapsets));
+
+        foreach (var mapset in mapsets)
+        {
+            ArgumentNullException.ThrowIfNull(mapset);
+            RequireSafeMapsetName(mapset.Name);
+            ArgumentException.ThrowIfNullOrWhiteSpace(mapset.Path);
         }
     }
 
@@ -86,7 +106,7 @@ public static partial class MapsetMergerEngine
         IDictionary<int, int> sampleIndices)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
-        ValidateMapsetName(mapsetName);
+        RequireSafeMapsetName(mapsetName);
         ArgumentNullException.ThrowIfNull(sampleIndices);
         if (nextSampleIndex < 1) throw new ArgumentOutOfRangeException(nameof(nextSampleIndex));
 
@@ -144,7 +164,7 @@ public static partial class MapsetMergerEngine
         string mapsetName)
     {
         ArgumentNullException.ThrowIfNull(storyboard);
-        ValidateMapsetName(mapsetName);
+        RequireSafeMapsetName(mapsetName);
         MapsetMergerReferences references = new();
 
         IEnumerable<Event> events = storyboard.BackgroundAndVideoEvents
@@ -164,7 +184,7 @@ public static partial class MapsetMergerEngine
     /// <returns>The combined reference using platform path semantics.</returns>
     public static string CombineReference(string mapsetName, string reference)
     {
-        ValidateMapsetName(mapsetName);
+        RequireSafeMapsetName(mapsetName);
         ArgumentException.ThrowIfNullOrWhiteSpace(reference);
         if (Path.IsPathRooted(reference) || reference.Split('/', '\\').Any(part => part is ".."))
             throw new InvalidDataException($"The asset reference '{reference}' is not relative.");
@@ -172,9 +192,7 @@ public static partial class MapsetMergerEngine
         return Path.Combine(mapsetName, reference);
     }
 
-    /// <summary>Validates a name before it becomes a directory or file prefix.</summary>
-    /// <param name="name">The candidate mapset name.</param>
-    public static void ValidateMapsetName(string name)
+    private static void RequireSafeMapsetName(string name)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         if (name is "." or ".." || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || name.IndexOfAny([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar]) >= 0)
@@ -237,12 +255,6 @@ public static partial class MapsetMergerEngine
 
             if (@event.ChildEvents.Count > 0) RewriteEvents(@event.ChildEvents, mapsetName, references);
         }
-    }
-
-    private static string RequireName(string value, string parameterName)
-    {
-        ValidateMapsetName(value);
-        return value;
     }
 
     [GeneratedRegex("^(normal|soft|drum)-(hit(normal|whistle|finish|clap)|slidertick|sliderslide|sliderwhistle)", RegexOptions.IgnoreCase)]

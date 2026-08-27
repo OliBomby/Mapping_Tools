@@ -356,7 +356,6 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
     private void Install(PropertyTransformerProject project)
     {
         ArgumentNullException.ThrowIfNull(project);
-        if (project.MatchFilter is null || project.UnmatchFilter is null) throw new InvalidDataException("Property Transformer project is incomplete.");
 
         SyncTimeFields = false;
         TimingpointOffsetMultiplier = project.TimingpointOffsetMultiplier;
@@ -389,8 +388,8 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
         PreviewTimeOffset = project.PreviewTimeOffset;
         ClipProperties = project.ClipProperties;
         EnableFilters = project.EnableFilters;
-        MatchFilter = project.MatchFilter.ToArray();
-        UnmatchFilter = project.UnmatchFilter.ToArray();
+        MatchFilter = project.MatchFilter?.ToArray() ?? [];
+        UnmatchFilter = project.UnmatchFilter?.ToArray() ?? [];
         MinTimeFilter = project.MinTimeFilter;
         MaxTimeFilter = project.MaxTimeFilter;
         SyncTimeFields = project.SyncTimeFields;

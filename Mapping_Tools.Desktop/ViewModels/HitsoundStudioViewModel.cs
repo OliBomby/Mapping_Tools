@@ -427,24 +427,6 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         await RunExportAsync(paths, CancellationToken.None);
     }
 
-    /// <inheritdoc />
-    protected override bool PrepareRun()
-    {
-        if (Layers.Count == 0)
-        {
-            ResultSummary = "There are no hitsound layers.";
-            return false;
-        }
-
-        if (string.IsNullOrWhiteSpace(BaseBeatmap))
-        {
-            ResultSummary = "Choose a base beatmap before exporting.";
-            return false;
-        }
-
-        return true;
-    }
-
     /// <summary>Opens the complete layer import form and appends its layers.</summary>
     [RelayCommand]
     private async Task AddAsync()

@@ -28,9 +28,7 @@ public static class TimingHelperEngine
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(options);
-        if (options.Leniency < 0 || !double.IsFinite(options.Leniency)) throw new ArgumentException("Timing Helper leniency must be a finite non-negative value.", nameof(options));
-        if (options.BeatDivisors is null || options.BeatDivisors.Length == 0 || options.BeatDivisors.Any(divisor => divisor is null))
-            throw new ArgumentException("Timing Helper requires at least one beat divisor.", nameof(options));
+        Validate(options);
 
         // Count
         int redlinesAdded = 0;
@@ -234,6 +232,25 @@ public static class TimingHelperEngine
         }
 
         return mpb;
+    }
+
+    /// <summary>Validates Timing Helper's leniency and beat-divisor settings.</summary>
+    /// <param name="options">The Timing Helper settings to validate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">The leniency or beat-divisor set is invalid.</exception>
+    public static void Validate(TimingHelperEngineOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        if (options.Leniency < 0 || !double.IsFinite(options.Leniency))
+            throw new ArgumentException(
+                "Timing Helper leniency must be a finite non-negative value.",
+                nameof(options));
+        if (options.BeatDivisors is null
+            || options.BeatDivisors.Length == 0
+            || options.BeatDivisors.Any(divisor => divisor is null))
+            throw new ArgumentException(
+                "Timing Helper requires at least one beat divisor.",
+                nameof(options));
     }
 
     private static double GetMpB(double timeFromRedline, double beatsFromRedline, double leniency)

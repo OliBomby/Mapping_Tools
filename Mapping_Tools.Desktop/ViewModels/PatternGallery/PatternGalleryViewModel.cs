@@ -728,22 +728,9 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override bool PrepareRun()
     {
-        ValidateAllProperties();
-        if (HasErrors)
+        if (!base.PrepareRun())
         {
             ResultSummary = "Correct the invalid Pattern Gallery options before running.";
-            return false;
-        }
-
-        if (!SelectedPatterns.Any())
-        {
-            ResultSummary = "Select at least one pattern before running Pattern Gallery.";
-            return false;
-        }
-
-        if (ExportTimeMode != ExportTimeMode.Current && workspace.SelectedPaths.Count == 0)
-        {
-            ResultSummary = "Select at least one target beatmap before running Pattern Gallery.";
             return false;
         }
 

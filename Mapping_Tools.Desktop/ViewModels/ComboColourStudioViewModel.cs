@@ -11,6 +11,7 @@ using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
@@ -261,25 +262,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     {
         string? path = await currentBeatmap.FindCurrentBeatmapAsync();
         if (!string.IsNullOrWhiteSpace(path)) ImportPath = path;
-    }
-
-    /// <inheritdoc />
-    protected override bool PrepareRun()
-    {
-        var errors = Project.ValidateForExport();
-        if (errors.Count > 0)
-        {
-            ResultSummary = string.Join(" ", errors);
-            return false;
-        }
-
-        if (workspace.SelectedPaths.Count == 0)
-        {
-            ResultSummary = "Select at least one beatmap or open one in osu! before running Combo Colour Studio.";
-            return false;
-        }
-
-        return true;
     }
 
     /// <inheritdoc />

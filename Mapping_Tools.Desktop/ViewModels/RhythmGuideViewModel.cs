@@ -211,16 +211,16 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
 
     private void Install(RhythmGuideProject project)
     {
-        ValidateProject(project);
-        var options = project.GuideGeneratorArgs;
-        SourcePaths = options.Paths.ToArray();
-        ExportPath = options.ExportPath;
+        var options = project?.GuideGeneratorArgs
+            ?? throw new InvalidDataException("The Rhythm Guide project is incomplete.");
+        SourcePaths = options.Paths?.ToArray() ?? [];
+        ExportPath = options.ExportPath ?? string.Empty;
         ExportMode = options.ExportMode;
         OutputGameMode = options.OutputGameMode;
-        OutputName = options.OutputName;
+        OutputName = options.OutputName ?? string.Empty;
         NcEverything = options.NcEverything;
         SelectionMode = options.SelectionMode;
-        beatDivisors = options.BeatDivisors.ToArray();
+        beatDivisors = options.BeatDivisors?.ToArray() ?? [];
     }
 
     private string? FirstPathOrNull()
@@ -241,17 +241,4 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
         return [new RationalBeatDivisor(16), new RationalBeatDivisor(12)];
     }
 
-    private static void ValidateProject(RhythmGuideProject project)
-    {
-        if (project?.GuideGeneratorArgs is null
-            || project.GuideGeneratorArgs.Paths is null
-            || project.GuideGeneratorArgs.BeatDivisors is null
-            || project.GuideGeneratorArgs.BeatDivisors.Length == 0
-            || string.IsNullOrWhiteSpace(project.GuideGeneratorArgs.OutputName)
-            || string.IsNullOrWhiteSpace(project.GuideGeneratorArgs.ExportPath)
-            || !Enum.IsDefined(project.GuideGeneratorArgs.ExportMode)
-            || !Enum.IsDefined(project.GuideGeneratorArgs.SelectionMode)
-            || !Enum.IsDefined(project.GuideGeneratorArgs.OutputGameMode))
-            throw new InvalidDataException("The Rhythm Guide project is incomplete.");
-    }
 }

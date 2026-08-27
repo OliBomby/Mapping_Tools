@@ -27,6 +27,7 @@ public static class TimingCopierEngine
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(options);
+        Validate(options);
 
         var timingTo = target.BeatmapTiming;
         var timingFrom = source.BeatmapTiming;
@@ -178,6 +179,25 @@ public static class TimingCopierEngine
                     firstTp: redlines.FirstOrDefault());
             }
         }
+    }
+
+    /// <summary>Validates the resnapping mode and beat-divisor set.</summary>
+    /// <param name="options">The Timing Copier settings to validate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">The resnapping mode or beat-divisor set is invalid.</exception>
+    public static void Validate(TimingCopierEngineOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        if (!Enum.IsDefined(options.ResnapMode))
+            throw new ArgumentException(
+                "Timing Copier received an unknown resnapping mode.",
+                nameof(options));
+        if (options.BeatDivisors is null
+            || options.BeatDivisors.Length == 0
+            || options.BeatDivisors.Any(divisor => divisor is null))
+            throw new ArgumentException(
+                "Timing Copier requires at least one beat divisor.",
+                nameof(options));
     }
 
     private static List<Marker> GetMarkers(Beatmap beatmap, Timing timing)

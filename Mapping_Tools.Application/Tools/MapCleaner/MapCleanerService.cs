@@ -38,6 +38,7 @@ public sealed class MapCleanerService : IMapCleanerService
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(options);
         if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
+        MapCleanerEngine.Validate(options);
 
         MapCleanerResult total = new(0, 0, 0, [], [], [], 20);
         for (int index = 0; index < paths.Count; index++)

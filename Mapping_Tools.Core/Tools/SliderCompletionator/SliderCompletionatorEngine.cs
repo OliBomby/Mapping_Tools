@@ -36,6 +36,7 @@ public static class SliderCompletionatorEngine
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(markedObjects);
         ArgumentNullException.ThrowIfNull(options);
+        Validate(options);
 
         if (currentEditorTime is { } time && !double.IsFinite(time))
             throw new ArgumentException(
@@ -46,8 +47,6 @@ public static class SliderCompletionatorEngine
             throw new ArgumentException(
                 "Current editor time is required when current-editor-time mode is enabled.",
                 nameof(currentEditorTime));
-
-        ValidateFiniteInputs(options);
 
         int slidersCompleted = 0;
         double endTime = options.UseCurrentEditorTime && options.UseEndTime
@@ -189,8 +188,17 @@ public static class SliderCompletionatorEngine
         return slidersCompleted;
     }
 
-    private static void ValidateFiniteInputs(SliderCompletionatorEngineOptions options)
+    /// <summary>Validates the free-variable mode and persisted numeric inputs.</summary>
+    /// <param name="options">The Slider Completionator settings to validate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">The free-variable mode is undefined or an input is non-finite.</exception>
+    public static void Validate(SliderCompletionatorEngineOptions options)
     {
+        ArgumentNullException.ThrowIfNull(options);
+        if (!Enum.IsDefined(options.FreeVariableSetting))
+            throw new ArgumentException(
+                "Slider Completionator contains an unknown free-variable mode.",
+                nameof(options));
         if (!double.IsFinite(options.Duration) || !double.IsFinite(options.EndTime) || !double.IsFinite(options.Length) || !double.IsFinite(options.SliderVelocity))
             throw new ArgumentException(
                 "Slider Completionator values must be finite numbers.",

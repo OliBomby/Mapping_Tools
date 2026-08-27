@@ -47,7 +47,7 @@ public sealed class MetadataManagerService : IMetadataManagerService
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(options);
+        Validate(options);
         string[] paths = options.ExportPath
             .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (paths.Length == 0)
@@ -81,5 +81,12 @@ public sealed class MetadataManagerService : IMetadataManagerService
         }
 
         return new MetadataManagerResult(processedPaths);
+    }
+
+    private static void Validate(MetadataManagerServiceOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        MetadataManagerEngine.Validate(options);
+        ArgumentException.ThrowIfNullOrWhiteSpace(options.ExportPath);
     }
 }

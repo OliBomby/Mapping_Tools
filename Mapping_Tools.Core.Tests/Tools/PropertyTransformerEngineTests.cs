@@ -57,6 +57,23 @@ public sealed class PropertyTransformerEngineTests
             .Should().OnlyContain(bpm => bpm <= 10000);
     }
 
+    [TestMethod]
+    public void Validate_WithNonFiniteMultiplier_ThrowsValidationException()
+    {
+        // Arrange
+        PropertyTransformerEngineOptions options = new()
+        {
+            HitObjectTimeMultiplier = double.NaN,
+        };
+
+        // Act
+        Action act = () => PropertyTransformerEngine.Validate(options);
+
+        // Assert
+        act.Should().Throw<ArgumentException>()
+            .WithMessage("*finite*");
+    }
+
     private static Beatmap Load(string fileName)
     {
         return new Beatmap(

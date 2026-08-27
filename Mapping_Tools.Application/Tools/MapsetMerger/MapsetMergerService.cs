@@ -45,10 +45,9 @@ public sealed class MapsetMergerService : IMapsetMergerService
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        Validate(project);
-        var inputs = project.Mapsets
-            .Select(item => new MapsetMergerInput(item.Name, item.Path))
-            .ToList();
+        ArgumentNullException.ThrowIfNull(project);
+        var inputs = CreateInputs(project);
+        Validate(project, inputs);
         MapsetMergerEngine.ResolveDuplicateMapsetNames(inputs);
         ValidateExportPathDoesNotOverlapSources(project.ExportPath, inputs);
 
@@ -329,18 +328,27 @@ public sealed class MapsetMergerService : IMapsetMergerService
         return candidate;
     }
 
-    private static void Validate(MapsetMergerServiceOptions project)
+    private static List<MapsetMergerInput> CreateInputs(MapsetMergerServiceOptions project)
     {
-        ArgumentNullException.ThrowIfNull(project);
-        ArgumentException.ThrowIfNullOrWhiteSpace(project.ExportPath);
-        if (project.Mapsets is null || project.Mapsets.Count == 0) throw new ArgumentException("Add at least one mapset.", nameof(project));
+        if (project.Mapsets is null)
+            throw new ArgumentNullException(nameof(project.Mapsets));
 
+        List<MapsetMergerInput> inputs = [];
         foreach (var item in project.Mapsets)
         {
             ArgumentNullException.ThrowIfNull(item);
-            MapsetMergerEngine.ValidateMapsetName(item.Name);
-            ArgumentException.ThrowIfNullOrWhiteSpace(item.Path);
+            inputs.Add(new MapsetMergerInput(item.Name, item.Path));
         }
+
+        return inputs;
+    }
+
+    private static void Validate(
+        MapsetMergerServiceOptions project,
+        IReadOnlyList<MapsetMergerInput> inputs)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(project.ExportPath);
+        MapsetMergerEngine.Validate(inputs);
     }
 
     private static void ValidateExportPathDoesNotOverlapSources(

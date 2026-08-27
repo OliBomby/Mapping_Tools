@@ -29,8 +29,7 @@ public static class HitsoundPreviewHelperEngine
     {
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(selectedObjects);
-        ArgumentNullException.ThrowIfNull(zones);
-        if (zones.Count == 0) throw new ArgumentException("There are no zones!", nameof(zones));
+        Validate(zones);
 
         var selected = selectedObjects.ToHashSet();
         List<TimelineObject> timelineObjects = beatmap.GetTimeline().TimelineObjects
@@ -64,5 +63,26 @@ public static class HitsoundPreviewHelperEngine
 
         progress?.Report(1);
         return timelineObjects.Count;
+    }
+
+    /// <summary>Validates the configured positional hitsound rules.</summary>
+    /// <param name="zones">The positional rules to validate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="zones" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">No zones exist, or a zone contains an undefined enum value.</exception>
+    public static void Validate(IReadOnlyList<HitsoundZone> zones)
+    {
+        ArgumentNullException.ThrowIfNull(zones);
+        if (zones.Count == 0) throw new ArgumentException("There are no zones!", nameof(zones));
+
+        foreach (var zone in zones)
+        {
+            ArgumentNullException.ThrowIfNull(zone);
+            if (!Enum.IsDefined(zone.Hitsound)
+                || !Enum.IsDefined(zone.SampleSet)
+                || !Enum.IsDefined(zone.AdditionsSet))
+                throw new ArgumentException(
+                    "Hitsound Preview Helper contains an unknown hitsound or sample-set value.",
+                    nameof(zones));
+        }
     }
 }

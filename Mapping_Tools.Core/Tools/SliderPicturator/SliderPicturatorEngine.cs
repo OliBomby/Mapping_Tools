@@ -25,7 +25,7 @@ public static class SliderPicturatorEngine
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        ValidateImageAndQuality(image, options.Quality);
+        ValidateImageAndQuality(image, options);
 
         double[,] pixelDistances = CalculatePixelDistances(image, options);
 
@@ -123,7 +123,7 @@ public static class SliderPicturatorEngine
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        ValidateImageAndQuality(image, options.Quality);
+        ValidateImageAndQuality(image, options);
 
         // startPos, startPosPic are in osupx
         var start = new Vector2(options.SliderStartX, options.SliderStartY);
@@ -412,6 +412,7 @@ public static class SliderPicturatorEngine
         ArgumentNullException.ThrowIfNull(beatmap);
         ArgumentNullException.ThrowIfNull(path);
         ArgumentNullException.ThrowIfNull(options);
+        Validate(options);
 
         if (path.Count < 2) throw new ArgumentException("A generated slider needs at least two anchors.", nameof(path));
 
@@ -632,10 +633,45 @@ public static class SliderPicturatorEngine
         return length;
     }
 
-    private static void ValidateImageAndQuality(RgbaImage image, int quality)
+    /// <summary>Validates the framework-independent Slider Picturator settings.</summary>
+    /// <param name="options">The Slider Picturator settings to validate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">A geometry, resolution, viewport, or quality setting is invalid.</exception>
+    public static void Validate(SliderPicturatorEngineOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        if (options.ViewportSize <= 0)
+            throw new ArgumentOutOfRangeException(
+                nameof(options.ViewportSize),
+                options.ViewportSize,
+                "GPU viewport size must be positive.");
+        if (options.Quality is < 1 or > 101)
+            throw new ArgumentOutOfRangeException(
+                nameof(options.Quality),
+                options.Quality,
+                "Image quality must be from 1 through 101.");
+        if (!double.IsFinite(options.YResolution) || options.YResolution <= 0)
+            throw new ArgumentOutOfRangeException(
+                nameof(options.YResolution),
+                options.YResolution,
+                "Y resolution must be positive.");
+        if (!double.IsFinite(options.SliderStartX) || options.SliderStartX < 0
+            || !double.IsFinite(options.SliderStartY) || options.SliderStartY < 0)
+            throw new ArgumentOutOfRangeException(
+                nameof(options.SliderStartX),
+                "Slider position must be finite and non-negative.");
+        if (!double.IsFinite(options.ImageStartX) || options.ImageStartX < 0
+            || !double.IsFinite(options.ImageStartY) || options.ImageStartY < 0)
+            throw new ArgumentOutOfRangeException(
+                nameof(options.ImageStartX),
+                "Image position must be finite and non-negative.");
+    }
+
+    private static void ValidateImageAndQuality(
+        RgbaImage image,
+        SliderPicturatorEngineOptions options)
     {
         ArgumentNullException.ThrowIfNull(image);
-
-        if (quality is < 1 or > 101) throw new ArgumentOutOfRangeException(nameof(quality));
+        Validate(options);
     }
 }

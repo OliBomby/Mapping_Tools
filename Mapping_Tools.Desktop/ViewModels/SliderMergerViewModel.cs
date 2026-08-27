@@ -132,13 +132,6 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
         await RunPathsAsync(paths, settings.AlwaysQuickRun, CancellationToken.None);
     }
 
-    /// <inheritdoc />
-    protected override bool PrepareRun()
-    {
-        ValidateAllProperties();
-        return !HasErrors;
-    }
-
     private async Task RunPathsAsync(
         IReadOnlyList<string> paths,
         bool quick,
@@ -187,9 +180,6 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     private void Install(SliderMergerProject project)
     {
         ArgumentNullException.ThrowIfNull(project);
-        if (!Enum.IsDefined(project.ImportModeSetting) || !Enum.IsDefined(project.ConnectionModeSetting) || !double.IsFinite(project.Leniency) || project.Leniency < 0)
-            throw new InvalidDataException("Slider Merger project is incomplete.");
-
         ImportModeSetting = project.ImportModeSetting;
         TimeCode = project.TimeCode ?? string.Empty;
         ConnectionModeSetting = project.ConnectionModeSetting;

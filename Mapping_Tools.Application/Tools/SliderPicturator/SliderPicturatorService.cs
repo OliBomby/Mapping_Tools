@@ -28,8 +28,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        ArgumentNullException.ThrowIfNull(options);
-        options.Validate();
+        Validate(options);
         cancellationToken.ThrowIfCancellationRequested();
 
         var image = await images.LoadAsync(options.PictureFile, cancellationToken).ConfigureAwait(false);
@@ -53,6 +52,13 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
         await editingGateway.SaveAsync(session, cancellationToken: cancellationToken).ConfigureAwait(false);
         progress?.Report(1);
         return new SliderPicturatorResult(path, segmentCount);
+    }
+
+    private static void Validate(SliderPicturatorServiceOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        SliderPicturatorEngine.Validate(options);
+        ArgumentException.ThrowIfNullOrWhiteSpace(options.PictureFile);
     }
 
     /// <inheritdoc />

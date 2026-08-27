@@ -33,6 +33,7 @@ public sealed class TimingHelperService : ITimingHelperService
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(options);
         if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
+        TimingHelperEngine.Validate(options);
 
         List<string> processedPaths = [];
         int redlinesAdded = 0;

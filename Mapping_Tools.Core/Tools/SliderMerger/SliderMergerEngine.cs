@@ -273,8 +273,13 @@ public static class SliderMergerEngine
             }
     }
 
-    private static void Validate(SliderMergerEngineOptions options)
+    /// <summary>Validates the connection mode and distance tolerance.</summary>
+    /// <param name="options">The Slider Merger settings to validate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">A mode is undefined or leniency is non-finite or negative.</exception>
+    public static void Validate(SliderMergerEngineOptions options)
     {
+        ArgumentNullException.ThrowIfNull(options);
         if (!Enum.IsDefined(options.ConnectionModeSetting))
             throw new ArgumentException("Slider Merger contains an unknown mode.", nameof(options));
 

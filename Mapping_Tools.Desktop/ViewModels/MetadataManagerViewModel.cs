@@ -284,13 +284,6 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     }
 
     /// <inheritdoc />
-    protected override bool PrepareRun()
-    {
-        ValidateAllProperties();
-        return !HasErrors;
-    }
-
-    /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
         MetadataManagerProject options = Snapshot();
@@ -352,7 +345,7 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
 
     private void Install(MetadataManagerProject options)
     {
-        ValidateProject(options);
+        ArgumentNullException.ThrowIfNull(options);
         ImportPath = options.ImportPath;
         ExportPath = options.ExportPath;
         Artist = options.Artist;
@@ -368,10 +361,12 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         UseComboColours = options.UseComboColours;
 
         ComboColours.Clear();
-        foreach (var colour in options.ComboColours) ComboColours.Add(new ObservableComboColour(new ComboColour(colour.Color)));
+        foreach (var colour in options.ComboColours ?? [])
+            ComboColours.Add(new ObservableComboColour(new ComboColour(colour.Color)));
 
         SpecialColours.Clear();
-        foreach (var colour in options.SpecialColours) SpecialColours.Add(new ObservableSpecialColour(new SpecialColour(colour.Color, colour.Name ?? string.Empty)));
+        foreach (var colour in options.SpecialColours ?? [])
+            SpecialColours.Add(new ObservableSpecialColour(new SpecialColour(colour.Color, colour.Name ?? string.Empty)));
     }
 
     private async Task PickBeatmapsAsync(
@@ -429,15 +424,4 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
         };
     }
 
-    private static void ValidateProject(MetadataManagerProject options)
-    {
-        if (options is null
-            || options.ComboColours is null
-            || options.SpecialColours is null
-            || options.ComboColours.Any(colour => colour is null)
-            || options.SpecialColours.Any(colour => colour is null)
-            || options.SpecialColours.Any(colour => string.IsNullOrWhiteSpace(colour.Name))
-            || !double.IsFinite(options.PreviewTime))
-            throw new InvalidDataException("The Metadata Manager project is incomplete.");
-    }
 }

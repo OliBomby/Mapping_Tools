@@ -58,6 +58,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
     {
         ArgumentNullException.ThrowIfNull(previewHitObject);
         ArgumentNullException.ThrowIfNull(options);
+        CoreTumourGenerator.Validate(options);
         return Task.Run(() =>
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -79,6 +80,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(project);
         if (paths.Count == 0) throw new ArgumentException("At least one beatmap path is required.", nameof(paths));
+        Validate(project);
 
         int generatedCount = 0;
         bool editorReloaded = false;
@@ -140,6 +142,14 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
             Scalar = options.Scale,
             Reconstructor = new Reconstructor { DebugConstruction = options.DebugConstruction },
         };
+    }
+
+    private static void Validate(TumourGeneratorServiceOptions project)
+    {
+        ArgumentNullException.ThrowIfNull(project);
+        if (!Enum.IsDefined(project.ImportModeSetting))
+            throw new ArgumentException("Tumour Generator contains an unknown import mode.", nameof(project));
+        CoreTumourGenerator.Validate(project);
     }
 
 }

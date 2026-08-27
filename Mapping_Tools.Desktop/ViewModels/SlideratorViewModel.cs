@@ -420,13 +420,6 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             CancellationToken.None);
     }
 
-    /// <inheritdoc />
-    protected override bool PrepareRun()
-    {
-        ValidateAllProperties();
-        return !HasErrors && LoadedHitObjects.Count > 0 && VisibleHitObject is not null;
-    }
-
     private async Task ImportAsync()
     {
         string? path = await currentBeatmap.FindCurrentBeatmapAsync();
@@ -538,19 +531,6 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private void Install(SlideratorProject project)
     {
-        ArgumentNullException.ThrowIfNull(project);
-        if (!Enum.IsDefined(project.ImportModeSetting)
-            || !Enum.IsDefined(project.ExportModeSetting)
-            || !Enum.IsDefined(project.GraphModeSetting)
-            || !double.IsFinite(project.GlobalSv)
-            || !double.IsFinite(project.GraphBeats)
-            || !double.IsFinite(project.BeatsPerMinute)
-            || !double.IsFinite(project.VelocityLimit)
-            || !double.IsFinite(project.NewVelocity)
-            || !double.IsFinite(project.MinDendrite)
-            || project.GraphState is null)
-            throw new InvalidDataException("Sliderator project is incomplete.");
-
         ImportModeSetting = project.ImportModeSetting;
         TimeCode = project.TimeCode ?? string.Empty;
         GlobalSv = project.GlobalSv;
@@ -571,7 +551,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         ExportAsNormal = project.ExportAsNormal;
         ExportAsStream = project.ExportAsStream;
         ExportAsInvisibleSlider = project.ExportAsInvisibleSlider;
-        GraphState = project.GraphState.Clone();
+        GraphState = project.GraphState?.Clone() ?? new GraphState();
         LoadedHitObjects.Clear();
         VisibleHitObjectIndex = 0;
         DoEditorRead = false;

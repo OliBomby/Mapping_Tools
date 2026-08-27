@@ -442,4 +442,3 @@ public sealed class HitsoundStudioEngine
         return Math.Abs(left - right) < 1e-9;
     }
 }
-

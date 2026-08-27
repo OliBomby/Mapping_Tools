@@ -61,6 +61,7 @@ public sealed class SlideratorService : ISlideratorService
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentNullException.ThrowIfNull(project);
         ArgumentNullException.ThrowIfNull(sourceSlider);
+        SlideratorEngine.Validate(project, sourceSlider);
 
         var session = await editingGateway
             .OpenBeatmapAsync(

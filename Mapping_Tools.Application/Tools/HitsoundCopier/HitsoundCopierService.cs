@@ -151,17 +151,9 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
         ArgumentException.ThrowIfNullOrWhiteSpace(options.PathTo);
         if (options.PathTo.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Length == 0)
             throw new ArgumentException("Select at least one target beatmap.", nameof(options));
-        if (options.CopyMode is not 0 and not 1) throw new ArgumentException("Hitsound Copier received an unknown copy mode.", nameof(options));
         if (!Enum.IsDefined(options.SourceSelectionMode)) throw new ArgumentException("Hitsound Copier received an unknown source selection mode.", nameof(options));
         if (options.SourceSelectionMode == HitObjectSelectionMode.Time && string.IsNullOrWhiteSpace(options.TimeCode))
             throw new ArgumentException("A time code is required for Time mode.", nameof(options));
-        if (options.TemporalLeniency < 0
-            || !double.IsFinite(options.TemporalLeniency)
-            || !double.IsFinite(options.TimingOffset)
-            || !double.IsFinite(options.MinLength)
-            || options.MinLength < 0)
-            throw new ArgumentException("Hitsound Copier timing and filter values are invalid.", nameof(options));
-        if (options.BeatDivisors is null || options.BeatDivisors.Length == 0 || options.MutedDivisors is null || options.MutedDivisors.Length == 0)
-            throw new ArgumentException("Hitsound Copier requires beat divisors for its filter.", nameof(options));
+        HitsoundCopierEngine.Validate(options);
     }
 }

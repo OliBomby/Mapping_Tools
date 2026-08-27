@@ -303,21 +303,6 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     }
 
     /// <inheritdoc />
-    protected override bool PrepareRun()
-    {
-        try
-        {
-            Snapshot().Validate();
-            return true;
-        }
-        catch (Exception exception)
-        {
-            _ = PublishFailureAsync("Slider Picturator cannot run", exception.Message, exception);
-            return false;
-        }
-    }
-
-    /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
         string? path = await currentBeatmap.FindCurrentBeatmapAsync();

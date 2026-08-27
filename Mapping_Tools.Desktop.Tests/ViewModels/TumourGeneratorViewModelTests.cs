@@ -6,7 +6,6 @@ using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.TumourGenerating.Models;
 using Mapping_Tools.Core.Tools.TumourGenerating.Templates;
 using Mapping_Tools.Desktop.Shell;
@@ -101,40 +100,6 @@ public sealed class TumourGeneratorViewModelTests
         // Assert
         ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!).Message
             .Should().Contain("Select at least one beatmap");
-    }
-
-    [TestMethod]
-    public async Task RunCommand_WithInvalidProject_StopsBeforeServiceAndReportsValidation()
-    {
-        // Arrange
-        RecordingGenerator service = new();
-        var viewModel = Create(service);
-        viewModel.TumourLayers.Clear();
-        viewModel.TumourLayers.Should().BeEmpty();
-        viewModel.RunCommand.CanExecute(null).Should().BeTrue();
-        viewModel.ValidateSettings().Should().BeFalse();
-
-        // Act
-        await viewModel.RunCommand.ExecuteAsync(null);
-
-        // Assert
-        service.RunCalled.Should().BeFalse();
-        viewModel.ResultSummary.Should().Contain("invalid");
-    }
-
-    [TestMethod]
-    public void ValidateSettings_WithNonFiniteGraphAnchor_RejectsTheProject()
-    {
-        // Arrange
-        var viewModel = Create(new RecordingGenerator());
-        viewModel.CurrentLayer!.TumourScale.Anchors[0].Pos = new Vector2(double.NaN, 0);
-
-        // Act
-        bool valid = viewModel.ValidateSettings();
-
-        // Assert
-        valid.Should().BeFalse();
-        viewModel.ResultSummary.Should().Contain("invalid");
     }
 
     [TestMethod]

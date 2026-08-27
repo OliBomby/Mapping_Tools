@@ -137,13 +137,6 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
         await RunPathsAsync(workspace.SelectedPaths, false, CancellationToken.None);
     }
 
-    /// <inheritdoc />
-    protected override bool PrepareRun()
-    {
-        ValidateAllProperties();
-        return !HasErrors;
-    }
-
     private async Task RunPathsAsync(
         IReadOnlyList<string> paths,
         bool quick,
@@ -192,14 +185,6 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
 
     private void Install(TimingHelperProject project)
     {
-        ArgumentNullException.ThrowIfNull(project);
-        if (!double.IsFinite(project.Leniency)
-            || project.Leniency < 0
-            || project.BeatDivisors is null
-            || project.BeatDivisors.Length == 0
-            || project.BeatDivisors.Any(divisor => divisor is null))
-            throw new InvalidDataException("Timing Helper project is incomplete.");
-
         Objects = project.Objects;
         Bookmarks = project.Bookmarks;
         Greenlines = project.Greenlines;
@@ -207,6 +192,6 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
         OmitBarline = project.OmitBarline;
         Leniency = project.Leniency;
         BeatsBetween = project.BeatsBetween;
-        BeatDivisors = project.BeatDivisors.ToArray();
+        BeatDivisors = project.BeatDivisors?.ToArray() ?? [];
     }
 }

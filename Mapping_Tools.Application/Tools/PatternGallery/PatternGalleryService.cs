@@ -59,8 +59,8 @@ public sealed class PatternGalleryService : IPatternGalleryService
         PatternGalleryCollectionPaths paths,
         CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(project);
+        Validate(project);
         cancellationToken.ThrowIfCancellationRequested();
         var hitObjects = ParseLines(hitObjectText, line => new HitObject(line));
         var timingPoints = ParseLines(timingPointText, line => new TimingPoint(line));
@@ -87,7 +87,6 @@ public sealed class PatternGalleryService : IPatternGalleryService
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourcePath);
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
         var source = await editing.OpenBeatmapAsync(
                 sourcePath,
                 LiveBeatmapPreference.DiskOnly,
@@ -151,6 +150,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         ArgumentException.ThrowIfNullOrWhiteSpace(targetPath);
         ArgumentNullException.ThrowIfNull(patterns);
         ArgumentNullException.ThrowIfNull(project);
+        Validate(project);
         if (patterns.Count == 0) throw new InvalidOperationException("No pattern has been selected to export.");
 
         var preference = project.ExportTimeMode == ExportTimeMode.Current
@@ -222,6 +222,7 @@ public sealed class PatternGalleryService : IPatternGalleryService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(project);
+        Validate(project);
         // Get all the filenames that are currently in the collection
         string[] actual = files.EnumeratePatternFiles(paths).ToArray();
         var actualSet = actual.ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -271,6 +272,12 @@ public sealed class PatternGalleryService : IPatternGalleryService
         files.WritePatternBytes(
             destination,
             Encoding.UTF8.GetBytes(string.Join("\r\n", patternBeatmap.GetLines())));
+    }
+
+    private static void Validate(PatternGalleryServiceOptions project)
+    {
+        ArgumentNullException.ThrowIfNull(project);
+        PatternGalleryPlacer.Validate(project);
     }
 
     private static List<T> ParseLines<T>(string? text, Func<string, T> parse)

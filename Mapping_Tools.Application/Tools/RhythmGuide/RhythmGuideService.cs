@@ -111,7 +111,7 @@ public sealed class RhythmGuideService : IRhythmGuideService
         if (options.Paths is null || options.Paths.Length == 0) throw new ArgumentException("Select at least one source beatmap.", nameof(options));
         if (options.Paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Source beatmap paths cannot be blank.", nameof(options));
         ArgumentException.ThrowIfNullOrWhiteSpace(options.ExportPath);
-        ArgumentException.ThrowIfNullOrWhiteSpace(options.OutputName);
-        if (options.BeatDivisors is null || options.BeatDivisors.Length == 0) throw new ArgumentException("Select at least one beat divisor.", nameof(options));
+        if (!Enum.IsDefined(options.ExportMode)) throw new ArgumentException("Unknown Rhythm Guide export mode.", nameof(options));
+        RhythmGuideGenerator.Validate(options);
     }
 }

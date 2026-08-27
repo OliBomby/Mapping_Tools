@@ -31,26 +31,8 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(paths);
-        ArgumentNullException.ThrowIfNull(options);
+        Validate(options);
         if (paths.Count == 0 || paths.Any(string.IsNullOrWhiteSpace)) throw new ArgumentException("Select at least one beatmap.", nameof(paths));
-
-        if (!Enum.IsDefined(options.ImportModeSetting))
-            throw new ArgumentException(
-                "Hitsound Preview Helper contains an unknown object-selection mode.",
-                nameof(options));
-
-        if (options.Items is null || options.Items.Count == 0) throw new ArgumentException("There are no zones!", nameof(options));
-
-        if (options.ImportModeSetting == HitObjectSelectionMode.Time && string.IsNullOrWhiteSpace(options.TimeCode))
-            throw new ArgumentException(
-                "A time code is required for Time mode.",
-                nameof(options));
-
-        if (options.Items.Any(zone =>
-                !Enum.IsDefined(zone.Hitsound) || !Enum.IsDefined(zone.SampleSet) || !Enum.IsDefined(zone.AdditionsSet)))
-            throw new ArgumentException(
-                "Hitsound Preview Helper contains an unknown hitsound or sample-set value.",
-                nameof(options));
 
         List<string> processedPaths = [];
         int updatedEventCount = 0;
@@ -86,6 +68,22 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
 
         progress?.Report(1);
         return new HitsoundPreviewHelperResult(processedPaths, updatedEventCount);
+    }
+
+    private static void Validate(HitsoundPreviewHelperServiceOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        if (!Enum.IsDefined(options.ImportModeSetting))
+            throw new ArgumentException(
+                "Hitsound Preview Helper contains an unknown object-selection mode.",
+                nameof(options));
+
+        HitsoundPreviewHelperEngine.Validate(options.Items);
+
+        if (options.ImportModeSetting == HitObjectSelectionMode.Time && string.IsNullOrWhiteSpace(options.TimeCode))
+            throw new ArgumentException(
+                "A time code is required for Time mode.",
+                nameof(options));
     }
 
     /// <inheritdoc />

@@ -81,13 +81,9 @@ public sealed class AutoFailService : IAutoFailService
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.Path);
-        ValidateDifficulty(options.ApproachRateOverride, nameof(options.ApproachRateOverride));
-        ValidateDifficulty(options.OverallDifficultyOverride, nameof(options.OverallDifficultyOverride));
-        if (options.PhysicsUpdateLeniency < 0) throw new ArgumentOutOfRangeException(nameof(options.PhysicsUpdateLeniency));
-    }
-
-    private static void ValidateDifficulty(double value, string parameterName)
-    {
-        if (!double.IsFinite(value) || value < -1 || value > 10) throw new ArgumentOutOfRangeException(parameterName);
+        if (!double.IsFinite(options.ApproachRateOverride) || options.ApproachRateOverride < -1 || options.ApproachRateOverride > 10)
+            throw new ArgumentOutOfRangeException(nameof(options.ApproachRateOverride));
+        if (!double.IsFinite(options.OverallDifficultyOverride) || options.OverallDifficultyOverride < -1 || options.OverallDifficultyOverride > 10)
+            throw new ArgumentOutOfRangeException(nameof(options.OverallDifficultyOverride));
     }
 }
