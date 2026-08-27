@@ -1,5 +1,4 @@
 using Mapping_Tools.Core.MathUtil;
-using Newtonsoft.Json;
 
 namespace Mapping_Tools.Core.Tools.PatternGallery.Models;
 
@@ -15,10 +14,4 @@ public sealed class PatternGalleryCollectionMetadata
     /// <summary>Gets or sets the unique directory name for this collection.</summary>
     public string CollectionFolderName { get; set; } = RNG.RandomString(20);
 
-    /// <summary>
-    ///     Gets or sets the configured root used only by compatibility callers;
-    ///     this property is never persisted in a project document.
-    /// </summary>
-    [JsonIgnore]
-    public string BasePath { get; set; } = string.Empty;
 }

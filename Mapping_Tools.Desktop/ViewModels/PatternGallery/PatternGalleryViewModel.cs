@@ -551,7 +551,6 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 CancelThumbnailRefresh();
                 paths = files.RenameCollection(Paths, folder.Value);
                 Project.FileHandler.CollectionFolderName = folder.Value;
-                Project.FileHandler.BasePath = CollectionBasePath;
             }
 
             CollectionName = display.Value;
@@ -812,7 +811,6 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             CollectionName = CollectionName,
             FileHandler = new PatternGalleryCollectionMetadata
             {
-                BasePath = CollectionBasePath,
                 PatternFilesFolderName = Project.FileHandler.PatternFilesFolderName,
                 CollectionFolderName = Project.FileHandler.CollectionFolderName,
             },
@@ -858,7 +856,6 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     {
         Project.Patterns ??= [];
         Project.FileHandler ??= new PatternGalleryCollectionMetadata();
-        Project.FileHandler.BasePath = CollectionBasePath;
         CollectionName = string.IsNullOrWhiteSpace(Project.CollectionName)
             ? "My Pattern Collection"
             : Project.CollectionName;
