@@ -48,8 +48,6 @@ public static partial class MapsetMergerEngine
     public static void Validate(IReadOnlyList<MapsetMergerInput> mapsets)
     {
         ArgumentNullException.ThrowIfNull(mapsets);
-        if (mapsets.Count == 0) throw new ArgumentException("Add at least one mapset.", nameof(mapsets));
-
         foreach (var mapset in mapsets)
         {
             ArgumentNullException.ThrowIfNull(mapset);
@@ -59,12 +57,12 @@ public static partial class MapsetMergerEngine
     }
 
     /// <summary>
-    ///     Selects a unique difficulty name and records it in the supplied set.
+    ///     Selects the legacy difficulty name and records it in the supplied set.
     /// </summary>
     /// <param name="requestedName">The metadata version from the source beatmap.</param>
     /// <param name="prefix">The mapset prefix used for conflicts.</param>
     /// <param name="usedNames">Names already emitted in the merged mapset.</param>
-    /// <returns>A unique metadata version.</returns>
+    /// <returns>The requested version, or the legacy source-prefixed version when it was already used.</returns>
     public static string ResolveDuplicateDifficultyName(
         string requestedName,
         string prefix,
@@ -74,19 +72,10 @@ public static partial class MapsetMergerEngine
         ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
         ArgumentNullException.ThrowIfNull(usedNames);
 
-        string candidate = requestedName;
-        if (!usedNames.Contains(candidate))
-        {
-            usedNames.Add(candidate);
-            return candidate;
-        }
+        if (usedNames.Add(requestedName)) return requestedName;
 
-        int suffix = 0;
-        do
-        {
-            candidate = prefix + requestedName + ++suffix;
-        } while (!usedNames.Add(candidate));
-
+        string candidate = prefix + requestedName;
+        usedNames.Add(candidate);
         return candidate;
     }
 

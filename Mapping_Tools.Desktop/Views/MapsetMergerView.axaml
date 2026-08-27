@@ -8,19 +8,26 @@
              x:Class="Mapping_Tools.Desktop.Views.MapsetMergerView"
              x:DataType="vm:MapsetMergerViewModel">
     <Grid RowDefinitions="*,Auto">
-        <Grid Margin="0,0,0,10" RowDefinitions="Auto,*,Auto">
+        <Grid Grid.Row="0" RowDefinitions="Auto,*,Auto">
             <controls:ToolViewHeader
                 Title="Mapset Merger"
                 HelpText="Combine multiple mapsets into one mapset and automatically resolve file conflicts." />
 
-            <DataGrid Grid.Row="1"
-                      ItemsSource="{Binding Mapsets}"
-                      AutoGenerateColumns="False"
-                      CanUserSortColumns="True"
-                      SelectionMode="Extended"
-                      IsReadOnly="False"
-                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <Grid Grid.Row="1" RowDefinitions="*,Auto">
+                <DataGrid Grid.Row="0"
+                          ItemsSource="{Binding Mapsets}"
+                          AutoGenerateColumns="False"
+                          CanUserSortColumns="True"
+                          SelectionMode="Extended"
+                          IsReadOnly="False"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <DataGrid.Styles>
+                    <Style Selector="DataGridCell">
+                        <Setter Property="Padding" Value="13,8,8,8" />
+                    </Style>
+                    <Style Selector="DataGridColumnHeader">
+                        <Setter Property="Padding" Value="8" />
+                    </Style>
                     <Style Selector="DataGridRow">
                         <Setter Property="IsSelected"
                                 Value="{ReflectionBinding IsSelected, Mode=TwoWay}" />
@@ -29,7 +36,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Name"
                                         Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                    <DataGridTemplateColumn Header="Path" Width="*">
+                    <DataGridTemplateColumn Header="Path" Width="Auto">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate x:DataType="vm:MapsetMergerItemViewModel">
                                 <TextBlock Text="{Binding Path}"
@@ -38,29 +45,32 @@
                         </DataGridTemplateColumn.CellTemplate>
                         <DataGridTemplateColumn.CellEditingTemplate>
                             <DataTemplate x:DataType="vm:MapsetMergerItemViewModel">
-                                <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Orientation="Horizontal">
                                     <TextBox Text="{Binding Path, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                             Classes="compact" />
-                                    <Button Grid.Column="1"
+                                             Classes="compact"
+                                             Width="200" />
+                                    <Button
                                             Classes="flat path-picker"
-                                            Margin="5,0"
+                                            Margin="5,0,5,0"
                                             Command="{Binding BrowseCommand}"
                                             ToolTip.Tip="Browse">
                                         <materialIcons:MaterialIcon Kind="Folder"
-                                                                    Width="22"
-                                                                    Height="22" />
+                                                                    Width="24"
+                                                                    Height="24" />
                                     </Button>
-                                </Grid>
+                                </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
-            </DataGrid>
+                </DataGrid>
+            </Grid>
 
             <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
                 <Grid Grid.Column="0" RowDefinitions="Auto,Auto">
                     <StackPanel Grid.Row="0"
                                 HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
                                 Orientation="Horizontal">
                         <materialDesign:FloatingButton Classes="mini light"
                                                        Margin="5"
@@ -79,7 +89,7 @@
 
                     <materialDesign:Card Grid.Row="1"
                                          Padding="10,5,10,10"
-                                         Margin="0,0,5,5">
+                                         Margin="0,10,5,5">
                         <Grid ColumnDefinitions="*,Auto,Auto">
                             <TextBox Margin="0,0,10,0"
                                      materialAssists:TextFieldAssist.Label="Export path"

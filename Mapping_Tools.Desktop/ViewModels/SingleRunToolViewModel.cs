@@ -1,3 +1,5 @@
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.ToolExecution;
@@ -122,7 +124,14 @@ public abstract class SingleRunToolViewModel : ObservableValidator
 
     private async Task RunAsync()
     {
+        ClearFocusedElement();
         if (PrepareRun()) await RunWithStateAsync(RunCoreAsync);
+    }
+
+    private static void ClearFocusedElement()
+    {
+        if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            desktop.MainWindow?.FocusManager?.Focus(null);
     }
 
     private void Cancel()

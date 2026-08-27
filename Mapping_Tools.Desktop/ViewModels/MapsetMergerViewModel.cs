@@ -12,6 +12,8 @@ using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.MapsetMerger.Contracts;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.Tools.MapsetMerger;
+using Mapping_Tools.Core.Tools.MapsetMerger.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 
@@ -194,6 +196,7 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
+        ResolveDuplicateMapsetNames();
         var project = Snapshot();
         var result = await Execution.ExecuteAsync(
             new ToolExecutionRequest<MapsetMergerResult>(
@@ -230,5 +233,23 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
                 Path = item.Path,
             }).ToList(),
         };
+    }
+
+    private void ResolveDuplicateMapsetNames()
+    {
+        List<MapsetMergerInput> inputs = Mapsets
+            .Select(item => new MapsetMergerInput(item.Name, item.Path))
+            .ToList();
+        try
+        {
+            MapsetMergerEngine.ResolveDuplicateMapsetNames(inputs);
+        }
+        catch (ArgumentException)
+        {
+            // Keep source validation in the execution service so it can report the failure normally.
+            return;
+        }
+
+        for (int index = 0; index < inputs.Count; index++) Mapsets[index].Name = inputs[index].Name;
     }
 }

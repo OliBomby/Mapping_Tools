@@ -52,6 +52,11 @@ public sealed class MapsetMergerServiceTests : IDisposable
         Directory.GetFiles(exportPath, "soft-hitfinish*.wav").Should().HaveCount(2);
         Directory.GetFiles(exportPath, "background.jpg", SearchOption.AllDirectories).Should().HaveCount(2);
         Directory.GetFiles(exportPath, "sb.wav", SearchOption.AllDirectories).Should().HaveCount(2);
+        Directory.GetFiles(exportPath, "*.osu")
+            .Select(path => File.ReadAllLines(path).Single(line => line.StartsWith("Version:")))
+            .Should()
+            .Contain("Version:Normal")
+            .And.Contain("Version:Pack1 - Normal");
     }
 
     [TestMethod]
@@ -167,6 +172,53 @@ public sealed class MapsetMergerServiceTests : IDisposable
         Directory.GetFiles(exportPath, "*.osb").Should().BeEmpty();
         File.ReadAllText(Directory.GetFiles(exportPath, "*.osu").Single())
             .Should().Contain("Embedded\\nested/story.png");
+    }
+
+    [TestMethod]
+    public async Task MergeAsync_WithOnlyStoryboard_PreservesLegacyStoryboardOnlyExport()
+    {
+        // Arrange
+        string source = fixture.CreateMapset("storyboard-only");
+        File.Delete(Path.Combine(source, "map.osu"));
+        string exportPath = Path.Combine(fixture.Root, "export");
+        MapsetMergerServiceOptions project = new()
+        {
+            ExportPath = exportPath,
+            Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Storyboard", Path = source }],
+        };
+        MapsetMergerService service = new(
+            new FixtureEditingGateway(),
+            new PhysicalBeatmapsetFileSystem());
+
+        // Act
+        var result = await service.MergeAsync(project);
+
+        // Assert
+        result.BeatmapsWritten.Should().Be(0);
+        result.StoryboardsWritten.Should().Be(1);
+        Directory.GetFiles(exportPath, "*.osu").Should().BeEmpty();
+        Directory.GetFiles(exportPath, "*.osb").Should().ContainSingle();
+    }
+
+    [TestMethod]
+    public async Task MergeAsync_WithNoMapsets_PreservesLegacyNoOp()
+    {
+        // Arrange
+        string exportPath = Path.Combine(fixture.Root, "export");
+        MapsetMergerServiceOptions project = new()
+        {
+            ExportPath = exportPath,
+        };
+        MapsetMergerService service = new(
+            new FixtureEditingGateway(),
+            new PhysicalBeatmapsetFileSystem());
+
+        // Act
+        var result = await service.MergeAsync(project);
+
+        // Assert
+        result.Should().Be(new MapsetMergerResult(0, 0, 0, 0));
+        Directory.Exists(exportPath).Should().BeFalse();
     }
 
     [TestCleanup]

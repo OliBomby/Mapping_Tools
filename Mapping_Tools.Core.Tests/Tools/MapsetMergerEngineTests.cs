@@ -27,15 +27,15 @@ public sealed class MapsetMergerEngineTests
     }
 
     [TestMethod]
-    public void ResolveDuplicateDifficultyName_WithExistingVersion_UsesUniquePrefixedName()
+    public void ResolveDuplicateDifficultyName_WithExistingVersion_UsesLegacyPrefixedName()
     {
         // Arrange
-        HashSet<string> used = new(StringComparer.OrdinalIgnoreCase) { "Normal", "Pack - Normal" };
+        HashSet<string> used = ["Normal"];
 
         // Act
         string result = MapsetMergerEngine.ResolveDuplicateDifficultyName("Normal", "Pack - ", used);
 
         // Assert
-        result.Should().Be("Pack - Normal1");
+        result.Should().Be("Pack - Normal");
     }
 }

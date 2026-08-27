@@ -48,7 +48,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
         ValidateExportPathDoesNotOverlapSources(project.ExportPath, inputs);
 
         using var transaction = fileSystem.BeginTransaction(project.ExportPath);
-        HashSet<string> usedDifficultyNames = new(StringComparer.OrdinalIgnoreCase);
+        HashSet<string> usedDifficultyNames = new();
         HashSet<string> usedOutputPaths = new(StringComparer.OrdinalIgnoreCase);
         int nextSampleIndex = 1;
         int beatmapsWritten = 0;
@@ -178,7 +178,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
     {
         int copied = 0;
         // Find all used files and change references
-        foreach (string filename in OrderReferences(references.HitSoundFiles))
+        foreach (string filename in references.HitSoundFiles)
         {
             cancellationToken.ThrowIfCancellationRequested();
             string? source = FindAssetFile(filename, input.Path, audioExtensions);
@@ -195,7 +195,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
             copied++;
         }
 
-        foreach (string filename in OrderReferences(references.OtherAudioFiles))
+        foreach (string filename in references.OtherAudioFiles)
             copied += CopyAsset(
                 transaction,
                 filename,
@@ -204,7 +204,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 explicitAudioExtensions,
                 cancellationToken: cancellationToken);
 
-        foreach (string filename in OrderReferences(references.ImageFiles))
+        foreach (string filename in references.ImageFiles)
             copied += CopyAsset(
                 transaction,
                 filename,
@@ -213,7 +213,7 @@ public sealed class MapsetMergerService : IMapsetMergerService
                 imageExtensions,
                 cancellationToken: cancellationToken);
 
-        foreach (string filename in OrderReferences(references.VideoFiles))
+        foreach (string filename in references.VideoFiles)
             copied += CopyAsset(
                 transaction,
                 filename,
@@ -245,13 +245,6 @@ public sealed class MapsetMergerService : IMapsetMergerService
         string relativePath = SafeRelativePath(Path.Combine(outputFolder, extensionless + extension));
         transaction.CopyToStaging(source, relativePath, cancellationToken);
         return 1;
-    }
-
-    private static IEnumerable<string> OrderReferences(IEnumerable<string> references)
-    {
-        return references
-            .OrderBy(reference => reference, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(reference => reference, StringComparer.Ordinal);
     }
 
     private string? FindAssetFile(
@@ -384,7 +377,6 @@ public sealed class MapsetMergerService : IMapsetMergerService
         // Check storyboard count not over the max
         if (storyboards.Count > max_mapset_maps) throw new InvalidDataException("Storyboard limit exceeded in mapset: " + input.Name);
 
-        if (beatmaps.Count == 0) throw new InvalidDataException("No beatmaps were found in mapset: " + input.Name);
     }
 
     private static string SafeRelativePath(string path)
