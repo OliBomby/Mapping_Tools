@@ -10,7 +10,9 @@ using Mapping_Tools.Core.Tools.HitsoundCopier;
 
 namespace Mapping_Tools.Application.Tools.HitsoundCopier;
 
-/// <summary>Coordinates source selection, multi-map transformation, sample ports, and safe saves.</summary>
+/// <summary>
+///     Coordinates source selection, multi-map transformation, sample ports, and safe saves.
+/// </summary>
 public sealed class HitsoundCopierService : IHitsoundCopierService
 {
     private readonly IBeatmapEditingGateway editingGateway;
@@ -73,14 +75,17 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
                 ? Directory.GetCurrentDirectory()
                 : targetDirectory;
 
-            bool inspectTargetSamples = options.CopyMode == 1 || options.CopyStoryboardedSamples && options.IgnoreHitsoundSatisfiedSamples;
+            bool inspectTargetSamples = options.CopyMode == 1
+                                         || options.CopyStoryboardedSamples && options.IgnoreHitsoundSatisfiedSamples;
             var firstSamples = inspectTargetSamples
                 ? await samples.AnalyzeAsync(mapDirectory, cancellationToken).ConfigureAwait(false)
                 : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             string sourceDirectory = sourceSession is null
                 ? mapDirectory
                 : GetDirectory(options.PathFrom);
-            var sourceSamples = sourceSession is not null && options.CopyMode == 1 && (options.CopyToSliderTicks || options.CopyToSliderSlides)
+            var sourceSamples = sourceSession is not null
+                                && options.CopyMode == 1
+                                && (options.CopyToSliderTicks || options.CopyToSliderSlides)
                 ? await samples.AnalyzeAsync(sourceDirectory, cancellationToken).ConfigureAwait(false)
                 : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var result = HitsoundCopierEngine.Apply(
@@ -114,7 +119,11 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
             progress?.Report(index + 1, targetPaths.Length);
         }
 
-        if (schema.Count > 0) await samples.ExportAsync(schema, cancellationToken).ConfigureAwait(false);
+        if (schema.Count > 0)
+        {
+            await samples.ExportAsync(schema, cancellationToken).ConfigureAwait(false);
+        }
+
         return new HitsoundCopierResult(processed, matched, generated, muted, schema);
     }
 
@@ -149,9 +158,20 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.PathTo);
-        if (options.PathTo.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Length == 0)
+        if (options.PathTo
+                .Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .Length == 0)
+        {
             throw new ArgumentException("Select at least one target beatmap.", nameof(options));
-        if (!Enum.IsDefined(options.SourceSelectionMode)) throw new ArgumentException("Hitsound Copier received an unknown source selection mode.", nameof(options));
+        }
+
+        if (!Enum.IsDefined(options.SourceSelectionMode))
+        {
+            throw new ArgumentException(
+                "Hitsound Copier received an unknown source selection mode.",
+                nameof(options));
+        }
+
         if (options.SourceSelectionMode == HitObjectSelectionMode.Time && string.IsNullOrWhiteSpace(options.TimeCode))
             throw new ArgumentException("A time code is required for Time mode.", nameof(options));
         HitsoundCopierEngine.Validate(options);
