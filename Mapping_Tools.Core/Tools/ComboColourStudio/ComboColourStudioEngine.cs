@@ -219,37 +219,6 @@ public static class ComboColourStudioEngine
         return project;
     }
 
-    /// <summary>Builds a bounded preview of the colours selected for map combos without mutating the map.</summary>
-    /// <param name="beatmap">The source beatmap.</param>
-    /// <param name="project">The project to preview.</param>
-    /// <param name="maximumItems">Maximum number of preview entries.</param>
-    /// <returns>Preview entries in map order.</returns>
-    public static IReadOnlyList<ComboColourPreviewEntry> BuildPreview(
-        Beatmap beatmap,
-        ComboColourEngineOptions project,
-        int maximumItems = 256)
-    {
-        ArgumentNullException.ThrowIfNull(beatmap);
-        ArgumentNullException.ThrowIfNull(project);
-        if (maximumItems < 0) throw new ArgumentOutOfRangeException(nameof(maximumItems));
-
-        if (maximumItems == 0) return [];
-
-        List<ComboColourPreviewEntry> result = [];
-        foreach (var point in project.ColourPoints.OrderBy(point => point.Time))
-        foreach (var colour in point.ColourSequence)
-        {
-            result.Add(new ComboColourPreviewEntry(
-                point.Time,
-                point.Mode,
-                colour.Name ?? string.Empty,
-                colour.Color));
-            if (result.Count >= maximumItems) return result;
-        }
-
-        return result;
-    }
-
     /// <summary>Tests whether a sequence is the prefix of a larger sequence.</summary>
     /// <param name="sequence">The candidate prefix.</param>
     /// <param name="biggerSequence">The sequence to inspect.</param>

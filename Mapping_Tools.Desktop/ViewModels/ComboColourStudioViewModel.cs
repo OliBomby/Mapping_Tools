@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
@@ -21,8 +20,8 @@ using Mapping_Tools.Desktop.ViewModels.Adapters;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-///     Owns Combo Colour Studio editing, project persistence, imports, preview,
-///     ordinary execution, and QuickRun routing.
+///     Owns Combo Colour Studio editing, project persistence, imports, ordinary
+///     execution, and QuickRun routing.
 /// </summary>
 public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     IShellProjectFeature,
@@ -65,7 +64,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         this.liveReader = liveReader ?? throw new ArgumentNullException(nameof(liveReader));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         RebuildPresentation();
-        RefreshPreview();
     }
 
     /// <summary>Gets or sets the editable project.</summary>
@@ -100,16 +98,9 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         }
     }
 
-    /// <summary>Gets the selected point's sequence for the editing preview.</summary>
+    /// <summary>Gets the selected point's sequence for the sequence editor.</summary>
     public IReadOnlyList<ObservableSpecialColour> SelectedSequence =>
         SelectedColourPoint?.ColourSequence ?? [];
-
-    /// <summary>Gets the current sequence preview entries in time order.</summary>
-    [ObservableProperty]
-    public partial IReadOnlyList<ComboColourPreviewEntry> PreviewItems { get; private set; } = [];
-
-    /// <summary>Gets whether the configured points contain previewable colours.</summary>
-    public bool HasPreviewItems => PreviewItems.Count > 0;
 
     /// <summary>Gets the latest validation or execution summary.</summary>
     [ObservableProperty]
@@ -146,7 +137,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         Project.MatchComboColourReferences();
         RebuildPresentation();
         SelectedColourPoint = ColourPoints.FirstOrDefault();
-        RefreshPreview();
     }
 
     /// <summary>Adds a new normal point after the selected or last point.</summary>
@@ -157,7 +147,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             ? SelectedColourPoint?.Time ?? ColourPoints[^1].Time
             : 0;
         SelectedColourPoint = AddPresentationPoint(Project.AddColourPoint(time));
-        RefreshPreview();
     }
 
     /// <summary>Adds a point at the current Editor Reader playhead when available.</summary>
@@ -176,7 +165,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         }
 
         SelectedColourPoint = AddPresentationPoint(Project.AddColourPoint(time));
-        RefreshPreview();
     }
 
     /// <summary>Removes selected points or the last point.</summary>
@@ -189,7 +177,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
         SyncProjectFromPresentation();
         SelectedColourPoint = ColourPoints.LastOrDefault();
-        RefreshPreview();
     }
 
     /// <summary>Adds a palette colour while retaining the legacy eight-colour cap.</summary>
@@ -199,7 +186,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         Project.AddComboColour();
         RebuildPalette();
         SelectedSequenceColour ??= ComboColours.LastOrDefault();
-        RefreshPreview();
     }
 
     /// <summary>Removes the last palette colour.</summary>
@@ -209,7 +195,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         Project.RemoveLastComboColour();
         RebuildPalette();
         SelectedSequenceColour = ComboColours.LastOrDefault();
-        RefreshPreview();
     }
 
     /// <summary>Adds the selected palette colour to a point's ordered sequence.</summary>
@@ -222,7 +207,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
         point.ColourSequence.Add(SelectedSequenceColour);
         SyncProjectFromPresentation();
-        RefreshPreview();
         OnPropertyChanged(nameof(SelectedSequence));
     }
 
@@ -239,7 +223,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             SelectedColourPoint.ColourSequence.Remove(colour);
 
         SyncProjectFromPresentation();
-        RefreshPreview();
         OnPropertyChanged(nameof(SelectedSequence));
     }
 
@@ -275,7 +258,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     {
         value.MatchComboColourReferences();
         RebuildPresentation();
-        RefreshPreview();
         OnPropertyChanged(nameof(SelectedSequence));
     }
 
@@ -307,7 +289,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             RebuildPresentation();
             SelectedColourPoint = ColourPoints.FirstOrDefault();
             ResultSummary = colourHax ? "Imported colour hax." : "Imported combo colours.";
-            RefreshPreview();
         }
         catch (Exception exception)
         {
@@ -364,20 +345,6 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             ResultSummary = $"Successfully exported colours to {execution.Value.ProcessedCount} " + $"{(execution.Value.ProcessedCount == 1 ? "beatmap" : "beatmaps")}!";
     }
 
-    private void RefreshPreview()
-    {
-        PreviewItems = ColourPoints
-            .OrderBy(point => point.Time)
-            .SelectMany(point => point.ColourSequence.Select(colour => new ComboColourPreviewEntry(
-                point.Time,
-                point.Mode,
-                colour.Name ?? string.Empty,
-                colour.Color)))
-            .Take(256)
-            .ToArray();
-        OnPropertyChanged(nameof(HasPreviewItems));
-    }
-
     private ObservableColourPoint AddPresentationPoint(ColourPoint point)
     {
         ObservableColourPoint adapter = new(point);
@@ -396,20 +363,12 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
     private void RebuildPalette()
     {
-        foreach (var colour in ComboColours) colour.PropertyChanged -= OnPaletteColourChanged;
-
         ComboColours.Clear();
         foreach (var colour in Project.ComboColours)
         {
             ObservableSpecialColour adapter = new(colour);
-            adapter.PropertyChanged += OnPaletteColourChanged;
             ComboColours.Add(adapter);
         }
-    }
-
-    private void OnPaletteColourChanged(object? sender, PropertyChangedEventArgs eventArgs)
-    {
-        RefreshPreview();
     }
 
     private void SyncProjectFromPresentation()

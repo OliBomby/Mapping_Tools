@@ -16,7 +16,7 @@ namespace Mapping_Tools.Desktop.Tests.ViewModels;
 public sealed class ComboColourStudioViewModelTests
 {
     [TestMethod]
-    public void AddColourPointCommand_AfterAddingPaletteColour_SelectsPointAndBuildsPreview()
+    public void AddColourPointCommand_AfterAddingPaletteColour_SelectsPointAndAddsSequence()
     {
         // Arrange
         var viewModel = CreateViewModel();
@@ -32,10 +32,7 @@ public sealed class ComboColourStudioViewModelTests
         viewModel.Project.ColourPoints.Should().ContainSingle();
         viewModel.SelectedColourPoint.Should().NotBeNull();
         viewModel.SelectedColourPoint!.Model.Time.Should().Be(viewModel.Project.ColourPoints[0].Time);
-        viewModel.PreviewItems.Should().ContainSingle();
-
-        viewModel.ComboColours[0].Color = RgbaColour.FromRgb(1, 2, 3);
-        viewModel.PreviewItems.Single().Colour.Should().Be(RgbaColour.FromRgb(1, 2, 3));
+        viewModel.SelectedColourPoint.ColourSequence.Should().ContainSingle();
     }
 
     private static ComboColourStudioViewModel CreateViewModel()

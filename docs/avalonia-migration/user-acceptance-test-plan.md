@@ -218,7 +218,7 @@ Every row also inherits the common cases in section 9 and all applicable shell c
 |---|---|---|
 | Hitsound Preview Helper | Position/zone mapping; empty and overlapping zones; existing hitsounds; auxiliary Rhythm Guide workflow; QuickRun; missing editor selection. | Hitsound event diff and window evidence. |
 | Hitsound Copier | Overwrite-all and replace-defined modes; normal/whistle/finish/clap; custom indices; storyboard samples; missing source sample; multiple targets. | Hitsound/sample/storyboard semantic diff. |
-| Combo Colour Studio | Add/edit/reorder/delete colours and points; import colours/hax; time-based and single-combo points; preview; project persistence; invalid colour. | Preview renders, colour section diff, project round trip. |
+| Combo Colour Studio | Add/edit/reorder/delete colours and points; import colours/hax; time-based and single-combo points; project persistence; invalid colour. | Colour section diff, project round trip. |
 | Mapset Merger | No conflict and every filename conflict policy; shared media; storyboard; unicode; missing/locked file; cancelled conflict resolution; destination cleanup after failure. | Disposable-directory manifests and merged-map validation. |
 
 ### Wave 8: visual editors and collections

@@ -7,7 +7,6 @@
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
-             xmlns:models="clr-namespace:Mapping_Tools.Core.Tools.ComboColourStudio.Models;assembly=Mapping_Tools.Core"
              x:Class="Mapping_Tools.Desktop.Views.ComboColourStudioView"
              x:Name="Root"
              x:DataType="vm:ComboColourStudioViewModel">
@@ -69,7 +68,7 @@
 
                 <Grid Grid.Column="1" Margin="10,0,0,0" RowDefinitions="Auto,*,Auto">
                     <TextBlock FontSize="16" FontWeight="Bold" Text="Sequence editor" />
-                    <Grid Grid.Row="1" RowDefinitions="Auto,*,Auto">
+                    <Grid Grid.Row="1" RowDefinitions="Auto,*">
                         <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,10,0,10">
                             <ComboBox ItemsSource="{Binding ComboColours}"
                                       SelectedItem="{Binding SelectedSequenceColour, Mode=TwoWay}"
@@ -109,27 +108,6 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </controls:ReorderableListBox>
-                        <Border Grid.Row="2" Margin="0,10,0,0" Padding="8"
-                                Background="{DynamicResource MaterialCardBackgroundBrush}"
-                                IsVisible="{Binding HasPreviewItems}">
-                            <StackPanel>
-                                <TextBlock FontWeight="Bold" Text="Preview" />
-                                <ItemsControl ItemsSource="{Binding PreviewItems}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="models:ComboColourPreviewEntry">
-                                            <Border Width="24" Height="24" CornerRadius="12" Margin="2"
-                                                    Background="{Binding Colour, Converter={StaticResource RgbaColourToAvaloniaBrushConverter}}"
-                                                    ToolTip.Tip="{Binding ColourName}" />
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </Border>
                     </Grid>
                     <TextBlock Grid.Row="2"
                                Text="Select a colour point to edit its ordered sequence. Drag sequence entries to reorder them."
