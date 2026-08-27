@@ -35,9 +35,8 @@ public interface IHitsoundSampleService
         int startIndex,
         SampleSchema existingSchema);
 
-    /// <summary>Publishes generated sample requirements through the platform audio/file adapter.</summary>
-    /// <param name="schema">The generated sample requirements.</param>
-    /// <param name="cancellationToken">Cancels export preparation.</param>
+    /// <summary>Exports generated sample requirements to the application's default Exports directory.</summary>
+    /// <param name="schema">The output names and source transformations to render.</param>
+    /// <param name="cancellationToken">Cancels export preparation or audio rendering.</param>
     Task ExportAsync(SampleSchema schema, CancellationToken cancellationToken = default);
 }
-
