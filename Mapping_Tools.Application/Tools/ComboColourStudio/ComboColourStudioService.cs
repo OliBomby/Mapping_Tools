@@ -22,31 +22,32 @@ public sealed class ComboColourStudioService : IComboColourStudioService
     }
 
     /// <inheritdoc />
-    public async Task ImportComboColoursAsync(
+    public async Task<ComboColourEngineOptions> ImportComboColoursAsync(
         string path,
-        ComboColourServiceOptions project,
         CancellationToken cancellationToken = default)
     {
         var session = await editing.OpenBeatmapAsync(
                 path,
-                LiveBeatmapPreference.DiskOnly,
+                LiveBeatmapPreference.PreferLive,
                 cancellationToken)
             .ConfigureAwait(false);
-        ComboColourStudioEngine.ImportComboColours(session.Editor.Beatmap, project);
+
+        return ComboColourStudioEngine.ImportComboColours(session.Editor.Beatmap);
     }
 
     /// <inheritdoc />
-    public async Task ImportColourHaxAsync(
+    public async Task<ComboColourEngineOptions> ImportColourHaxAsync(
         string path,
-        ComboColourServiceOptions project,
+        int maxBurstLength,
         CancellationToken cancellationToken = default)
     {
         var session = await editing.OpenBeatmapAsync(
                 path,
-                LiveBeatmapPreference.DiskOnly,
+                LiveBeatmapPreference.PreferLive,
                 cancellationToken)
             .ConfigureAwait(false);
-        ComboColourStudioEngine.ImportColourHax(session.Editor.Beatmap, project);
+
+        return ComboColourStudioEngine.ImportColourHax(session.Editor.Beatmap, maxBurstLength);
     }
 
     /// <inheritdoc />

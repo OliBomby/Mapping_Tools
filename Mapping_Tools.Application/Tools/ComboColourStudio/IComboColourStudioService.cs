@@ -5,22 +5,22 @@ namespace Mapping_Tools.Application.Tools.ComboColourStudio;
 /// <summary>Runs Combo Colour Studio imports and beatmap transformations.</summary>
 public interface IComboColourStudioService
 {
-    /// <summary>Imports only the source beatmap's combo palette into a project.</summary>
+    /// <summary>Extracts only the source beatmap's combo palette.</summary>
     /// <param name="path">The beatmap file to read.</param>
-    /// <param name="project">The project to update.</param>
     /// <param name="cancellationToken">Cancels the read.</param>
-    Task ImportComboColoursAsync(
+    /// <returns>A new project containing the extracted palette.</returns>
+    Task<ComboColourEngineOptions> ImportComboColoursAsync(
         string path,
-        ComboColourServiceOptions project,
         CancellationToken cancellationToken = default);
 
-    /// <summary>Infers palette, normal points, and burst points from a source beatmap.</summary>
+    /// <summary>Extracts a palette and infers normal and burst points from a source beatmap.</summary>
     /// <param name="path">The beatmap file to read.</param>
-    /// <param name="project">The project to replace.</param>
+    /// <param name="maxBurstLength">The largest combo eligible for burst points.</param>
     /// <param name="cancellationToken">Cancels the read.</param>
-    Task ImportColourHaxAsync(
+    /// <returns>A new project containing the extracted palette and inferred colour points.</returns>
+    Task<ComboColourEngineOptions> ImportColourHaxAsync(
         string path,
-        ComboColourServiceOptions project,
+        int maxBurstLength,
         CancellationToken cancellationToken = default);
 
     /// <summary>Applies a project to each target map with progress reporting.</summary>

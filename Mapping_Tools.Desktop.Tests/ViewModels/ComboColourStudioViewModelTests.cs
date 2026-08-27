@@ -55,20 +55,17 @@ public sealed class ComboColourStudioViewModelTests
 
     private sealed class StubComboColourStudioService : IComboColourStudioService
     {
-        public Task ImportComboColoursAsync(
+        public Task<ComboColourEngineOptions> ImportComboColoursAsync(
             string path,
-            ComboColourServiceOptions project,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(new ComboColourEngineOptions());
 
-        public Task ImportColourHaxAsync(
+        public Task<ComboColourEngineOptions> ImportColourHaxAsync(
             string path,
-            ComboColourServiceOptions project,
+            int maxBurstLength,
             CancellationToken cancellationToken = default)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(new ComboColourEngineOptions { MaxBurstLength = maxBurstLength });
         }
 
         public Task<ComboColourStudioRunResult> ApplyAsync(

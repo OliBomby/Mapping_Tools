@@ -127,29 +127,42 @@ public static class ComboColourStudioEngine
         }
     }
 
-    /// <summary>Imports the combo palette from a beatmap, using the legacy names.</summary>
+    /// <summary>Extracts the combo palette from a beatmap, using the legacy names.</summary>
     /// <param name="beatmap">The source beatmap.</param>
-    /// <param name="project">The project to update.</param>
-    public static void ImportComboColours(Beatmap beatmap, ComboColourEngineOptions project)
+    /// <returns>A new project containing the extracted palette and no colour points.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="beatmap" /> is <see langword="null" />.</exception>
+    public static ComboColourEngineOptions ImportComboColours(Beatmap beatmap)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
-        ArgumentNullException.ThrowIfNull(project);
+
         // Add default colours if there are no colours
         ComboColour[] colours = beatmap.ComboColours.Count == 0
             ? ComboColour.GetDefaultComboColours()
             : beatmap.ComboColours.ToArray();
-        project.ComboColours.Clear();
-        for (int index = 0; index < colours.Length; index++) project.ComboColours.Add(new SpecialColour(colours[index].Color, $"Combo{index + 1}"));
+
+        ComboColourEngineOptions result = new();
+        for (int index = 0; index < colours.Length; index++)
+            result.ComboColours.Add(new SpecialColour(colours[index].Color, $"Combo{index + 1}"));
+
+        return result;
     }
 
-    /// <summary>Infers normal and burst points from the map's existing combo skips.</summary>
+    /// <summary>Extracts a palette and infers normal and burst points from a beatmap's combo skips.</summary>
     /// <param name="beatmap">The source beatmap.</param>
-    /// <param name="project">The project to replace.</param>
-    public static void ImportColourHax(Beatmap beatmap, ComboColourEngineOptions project)
+    /// <param name="maxBurstLength">The largest combo eligible for burst points.</param>
+    /// <returns>A new project containing the extracted palette and inferred colour points.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="beatmap" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxBurstLength" /> is negative.</exception>
+    public static ComboColourEngineOptions ImportColourHax(Beatmap beatmap, int maxBurstLength)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
-        ArgumentNullException.ThrowIfNull(project);
-        ImportComboColours(beatmap, project);
+
+        if (maxBurstLength < 0)
+            throw new ArgumentOutOfRangeException(nameof(maxBurstLength));
+
+        ComboColourEngineOptions project = ImportComboColours(beatmap);
+        project.MaxBurstLength = maxBurstLength;
+
         // Remove all colour points since those are getting replaced
         project.ColourPoints.Clear();
 
@@ -202,6 +215,8 @@ public static class ComboColourStudioEngine
             sequenceStartIndex += contribution;
             lastNormalSequence = mode == ColourPointMode.Burst ? lastNormalSequence : sequence;
         }
+
+        return project;
     }
 
     /// <summary>Builds a bounded preview of the colours selected for map combos without mutating the map.</summary>

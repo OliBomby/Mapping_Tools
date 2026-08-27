@@ -96,6 +96,41 @@ public sealed class ComboColourStudioEngineTests
     }
 
     [TestMethod]
+    public void ImportComboColours_WithBeatmapColours_ReturnsIndependentPaletteProject()
+    {
+        // Arrange
+        Beatmap beatmap = new();
+        beatmap.ComboColours.Add(new ComboColour(RgbaColour.FromRgb(10, 20, 30)));
+
+        // Act
+        ComboColourEngineOptions result = ComboColourStudioEngine.ImportComboColours(beatmap);
+
+        // Assert
+        result.ComboColours.Select(colour => colour.Name).Should().Equal("Combo1");
+        result.ComboColours.Single().Color.Should().Be(RgbaColour.FromRgb(10, 20, 30));
+        result.ComboColours.Single().Color = RgbaColour.FromRgb(40, 50, 60);
+        beatmap.ComboColours.Single().Color.Should().Be(RgbaColour.FromRgb(10, 20, 30));
+    }
+
+    [TestMethod]
+    public void ImportColourHax_WithBurstLength_ReturnsPaletteAndInferredPoints()
+    {
+        // Arrange
+        Beatmap beatmap = new();
+        beatmap.ComboColours.Add(new ComboColour(RgbaColour.FromRgb(10, 20, 30)));
+        beatmap.HitObjects.Add(CreateCircle(0, true, 0));
+
+        // Act
+        ComboColourEngineOptions result = ComboColourStudioEngine.ImportColourHax(beatmap, 2);
+
+        // Assert
+        result.MaxBurstLength.Should().Be(2);
+        result.ComboColours.Should().ContainSingle();
+        result.ColourPoints.Should().ContainSingle();
+        result.ColourPoints.Single().Mode.Should().Be(ColourPointMode.Burst);
+    }
+
+    [TestMethod]
     public void Validate_WithMissingPaletteReference_ThrowsValidationException()
     {
         // Arrange

@@ -74,4 +74,55 @@ public sealed class ComboColourStudioServiceTests
         await act.Should().ThrowAsync<ArgumentException>();
     }
 
+    [TestMethod]
+    public async Task ImportComboColoursAsync_WithLiveMap_ReturnsPaletteAndUsesPreferLive()
+    {
+        // Arrange
+        BeatmapEditor editor = CreateEditor();
+        RecordingBeatmapEditingGateway gateway = new(
+            new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
+        ComboColourStudioService service = new(gateway);
+
+        // Act
+        ComboColourEngineOptions result = await service.ImportComboColoursAsync(editor.Path);
+
+        // Assert
+        gateway.OpenRequests.Single().Preference.Should().Be(LiveBeatmapPreference.PreferLive);
+        result.ComboColours.Should().NotBeEmpty();
+        result.ComboColours.Should().NotContain(colour => ReferenceEquals(colour, editor.Beatmap.ComboColours.FirstOrDefault()));
+    }
+
+    [TestMethod]
+    public async Task ImportColourHaxAsync_WithLiveMap_ReturnsInferredProjectAndUsesPreferLive()
+    {
+        // Arrange
+        BeatmapEditor editor = CreateEditor();
+        RecordingBeatmapEditingGateway gateway = new(
+            new BeatmapEditingSession(editor, BeatmapEditingSource.LiveEditor, []));
+        ComboColourStudioService service = new(gateway);
+
+        // Act
+        ComboColourEngineOptions result = await service.ImportColourHaxAsync(editor.Path, 2);
+
+        // Assert
+        gateway.OpenRequests.Single().Preference.Should().Be(LiveBeatmapPreference.PreferLive);
+        result.MaxBurstLength.Should().Be(2);
+        result.ComboColours.Should().NotBeEmpty();
+    }
+
+    private static BeatmapEditor CreateEditor()
+    {
+        return new BeatmapEditor(
+            File.ReadAllLines(Path.Combine(
+                AppContext.BaseDirectory,
+                "Fixtures",
+                "Beatmaps",
+                "standard-feature-rich.osu")).ToList(),
+            new NoOpTextFileStore
+            {
+                ParentFolderResolver = _ => @"C:\set",
+                CombinePathResolver = Path.Combine,
+            }) { Path = @"C:\set\map.osu" };
+    }
+
 }

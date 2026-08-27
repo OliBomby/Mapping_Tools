@@ -11,6 +11,7 @@ using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Application.Workspace.Contracts;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Desktop.Models;
@@ -297,10 +298,11 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
 
         try
         {
-            if (colourHax)
-                await studio.ImportColourHaxAsync(path, Project);
-            else
-                await studio.ImportComboColoursAsync(path, Project);
+            ComboColourEngineOptions imported = colourHax
+                ? await studio.ImportColourHaxAsync(path, Project.MaxBurstLength)
+                : await studio.ImportComboColoursAsync(path);
+
+            InstallImportedProject(imported, colourHax);
 
             RebuildPresentation();
             SelectedColourPoint = ColourPoints.FirstOrDefault();
@@ -311,6 +313,26 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         {
             ResultSummary = exception.Message;
         }
+    }
+
+    private void InstallImportedProject(ComboColourEngineOptions imported, bool replaceColourPoints)
+    {
+        ArgumentNullException.ThrowIfNull(imported);
+
+        if (replaceColourPoints)
+        {
+            ComboColourProject replacement = new() { MaxBurstLength = imported.MaxBurstLength };
+            replacement.ComboColours.AddRange(imported.ComboColours.Select(colour => (SpecialColour)colour.Clone()));
+            replacement.ColourPoints.AddRange(imported.ColourPoints.Select(point => (ColourPoint)point.Clone()));
+            replacement.MatchComboColourReferences();
+            Project = replacement;
+            return;
+        }
+
+        Project.ComboColours = imported.ComboColours
+            .Select(colour => (SpecialColour)colour.Clone())
+            .ToList();
+        Project.MatchComboColourReferences();
     }
 
     private async Task RunPathsAsync(
