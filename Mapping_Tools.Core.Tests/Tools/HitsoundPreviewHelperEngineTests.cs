@@ -28,7 +28,6 @@ public sealed class HitsoundPreviewHelperEngineTests
         // Act
         int updated = HitsoundPreviewHelperEngine.Apply(
             beatmap,
-            beatmap.HitObjects,
             zones);
 
         // Assert
@@ -43,33 +42,6 @@ public sealed class HitsoundPreviewHelperEngineTests
     }
 
     [TestMethod]
-    public void Apply_WithSubsetOfObjects_LeavesOtherObjectsUnchanged()
-    {
-        // Arrange
-        HitObject selected = new("64,96,1000,1,0,0:0:0:0:");
-        HitObject unselected = new("400,96,2000,1,0,0:0:0:0:");
-        Beatmap beatmap = new(
-            new List<HitObject> { selected, unselected },
-            [],
-            globalSv: 1.4);
-        HitsoundZone zone = new(
-            "selected", "selected.wav", 64, 96,
-            Hitsound.Whistle, SampleSet.Normal, SampleSet.Drum, 2);
-
-        // Act
-        int updated = HitsoundPreviewHelperEngine.Apply(
-            beatmap,
-            [selected],
-            [zone]);
-
-        // Assert
-        updated.Should().Be(1);
-        selected.Hitsounds.Should().Be(2);
-        unselected.Hitsounds.Should().Be(0);
-        unselected.Filename.Should().BeEmpty();
-    }
-
-    [TestMethod]
     public void Apply_WithoutZones_ThrowsValidationException()
     {
         // Arrange
@@ -81,7 +53,6 @@ public sealed class HitsoundPreviewHelperEngineTests
         // Act
         Action act = () => HitsoundPreviewHelperEngine.Apply(
             beatmap,
-            beatmap.HitObjects,
             []);
 
         // Assert
@@ -90,7 +61,7 @@ public sealed class HitsoundPreviewHelperEngineTests
     }
 
     [TestMethod]
-    public void Apply_WithDuplicateSelectionAndEqualDistance_PreservesInputOrderAndUpdatesOnce()
+    public void Apply_WithEqualDistanceZones_PreservesZoneInputOrder()
     {
         // Arrange
         HitObject selected = new("256,96,1000,1,0,0:0:0:0:");
@@ -108,7 +79,6 @@ public sealed class HitsoundPreviewHelperEngineTests
         // Act
         int updated = HitsoundPreviewHelperEngine.Apply(
             beatmap,
-            [selected, selected],
             [first, second]);
 
         // Assert
@@ -139,7 +109,6 @@ public sealed class HitsoundPreviewHelperEngineTests
         // Act
         int updated = HitsoundPreviewHelperEngine.Apply(
             beatmap,
-            beatmap.HitObjects,
             [zone]);
 
         // Assert
@@ -172,7 +141,6 @@ public sealed class HitsoundPreviewHelperEngineTests
         // Act
         Action act = () => HitsoundPreviewHelperEngine.Apply(
             beatmap,
-            [selected],
             [zone],
             cancellationToken: cancellation.Token);
 

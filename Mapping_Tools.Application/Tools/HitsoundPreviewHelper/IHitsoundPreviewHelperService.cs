@@ -10,7 +10,7 @@ public interface IHitsoundPreviewHelperService
     ///     through the backup-aware editor gateway.
     /// </summary>
     /// <param name="paths">Beatmap paths in the shell's selected order.</param>
-    /// <param name="options">The persisted object-selection and zone settings.</param>
+    /// <param name="options">The persisted positional zone settings.</param>
     /// <param name="progress">Optional normalized progress receiver.</param>
     /// <param name="cancellationToken">Cancels loading, mutation, or persistence.</param>
     /// <returns>The processed paths and total updated event count.</returns>

@@ -11,29 +11,24 @@ public static class HitsoundPreviewHelperEngine
 {
     /// <summary>
     ///     Places the nearest configured zone's hitsound on every timeline event
-    ///     belonging to one of the supplied hit objects.
+    ///     in the beatmap.
     /// </summary>
     /// <param name="beatmap">The mutable beatmap receiving the preview hitsounds.</param>
-    /// <param name="selectedObjects">The hit objects whose timeline events are eligible.</param>
     /// <param name="zones">The non-empty positional rules to apply.</param>
-    /// <param name="progress">Optional normalized progress for the selected events.</param>
+    /// <param name="progress">Optional normalized progress for processed events.</param>
     /// <param name="cancellationToken">Cancels before or during timeline mutation.</param>
     /// <returns>The number of timeline events updated.</returns>
     /// <exception cref="ArgumentException">No zone is supplied.</exception>
     public static int Apply(
         Beatmap beatmap,
-        IReadOnlyCollection<HitObject> selectedObjects,
         IReadOnlyList<HitsoundZone> zones,
         IProgress<double>? progress = null,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(beatmap);
-        ArgumentNullException.ThrowIfNull(selectedObjects);
         Validate(zones);
 
-        var selected = selectedObjects.ToHashSet();
         List<TimelineObject> timelineObjects = beatmap.GetTimeline().TimelineObjects
-            .Where(timelineObject => selected.Contains(timelineObject.Origin))
             .ToList();
         for (int index = 0; index < timelineObjects.Count; index++)
         {

@@ -1,7 +1,5 @@
 {
   "$type": "Mapping_Tools.Viewmodels.HitsoundPreviewHelperVm, Mapping Tools",
-  "ImportModeSetting": 3,
-  "TimeCode": "",
   "Items": [
     {
       "$type": "Mapping_Tools.Classes.HitsoundStuff.HitsoundZone, Mapping Tools",

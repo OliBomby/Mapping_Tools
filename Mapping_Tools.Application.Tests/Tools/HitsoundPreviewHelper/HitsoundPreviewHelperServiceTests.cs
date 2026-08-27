@@ -13,14 +13,13 @@ namespace Mapping_Tools.Application.Tests.Tools.HitsoundPreviewHelper;
 public sealed class HitsoundPreviewHelperServiceTests
 {
     [TestMethod]
-    public async Task ApplyAsync_WithSelectedMode_RequiresLiveStateAndLeavesReloadToExecutionHost()
+    public async Task ApplyAsync_AlwaysProcessesEveryObjectAndLeavesReloadToExecutionHost()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway(1);
         HitsoundPreviewHelperService service = new(gateway);
         HitsoundPreviewHelperServiceOptions options = new()
         {
-            ImportModeSetting = HitObjectSelectionMode.Selected,
             Items = [new HitsoundZone { Hitsound = Hitsound.Clap, CustomIndex = 2 }],
         };
 
@@ -31,75 +30,24 @@ public sealed class HitsoundPreviewHelperServiceTests
 
         // Assert
         result.ProcessedPaths.Should().Equal("selected.osu");
-        result.UpdatedEventCount.Should().Be(1);
-        gateway.OpenRequests.Select(request => request.Preference).Should().ContainSingle()
-            .Which.Should().Be(LiveBeatmapPreference.RequireLive);
-        gateway.SessionSaveRequests.Should().ContainSingle()
-            .Which.ReloadEditor.Should().BeFalse();
-        gateway.LastOpenedSession!.Editor.Beatmap.HitObjects[0].Hitsounds.Should().Be(8);
-        gateway.LastOpenedSession.Editor.Beatmap.HitObjects[0].CustomIndex.Should().Be(2);
-    }
-
-    [TestMethod]
-    public async Task ApplyAsync_WithTimeMode_UsesTimeCodeAndPreferLive()
-    {
-        // Arrange
-        RecordingBeatmapEditingGateway gateway = CreateGateway(0);
-        HitsoundPreviewHelperService service = new(gateway);
-        HitsoundPreviewHelperServiceOptions options = new()
-        {
-            ImportModeSetting = HitObjectSelectionMode.Time,
-            TimeCode = "00:02:000",
-            Items = [new HitsoundZone { Hitsound = Hitsound.Finish }],
-        };
-
-        // Act
-        var result = await service.ApplyAsync(
-            ["time.osu"],
-            options);
-
-        // Assert
-        result.UpdatedEventCount.Should().Be(1);
+        result.UpdatedEventCount.Should().Be(2);
         gateway.OpenRequests.Select(request => request.Preference).Should().ContainSingle()
             .Which.Should().Be(LiveBeatmapPreference.PreferLive);
         gateway.SessionSaveRequests.Should().ContainSingle()
             .Which.ReloadEditor.Should().BeFalse();
-        gateway.LastOpenedSession!.Editor.Beatmap.HitObjects[0].Hitsounds.Should().Be(0);
-        gateway.LastOpenedSession.Editor.Beatmap.HitObjects[1].Hitsounds.Should().Be(4);
-    }
-
-    [TestMethod]
-    public async Task ApplyAsync_WithBookmarkedMode_UsesOnlyBookmarkedObjects()
-    {
-        // Arrange
-        RecordingBeatmapEditingGateway gateway = CreateGateway(0, true);
-        HitsoundPreviewHelperService service = new(gateway);
-        HitsoundPreviewHelperServiceOptions options = new()
-        {
-            ImportModeSetting = HitObjectSelectionMode.Bookmarked,
-            Items = [new HitsoundZone { Hitsound = Hitsound.Clap }],
-        };
-
-        // Act
-        var result = await service.ApplyAsync(
-            ["bookmarked.osu"],
-            options);
-
-        // Assert
-        result.UpdatedEventCount.Should().Be(1);
-        gateway.LastOpenedSession!.Editor.Beatmap.HitObjects[0].Hitsounds.Should().Be(0);
+        gateway.LastOpenedSession!.Editor.Beatmap.HitObjects[0].Hitsounds.Should().Be(8);
+        gateway.LastOpenedSession.Editor.Beatmap.HitObjects[0].CustomIndex.Should().Be(2);
         gateway.LastOpenedSession.Editor.Beatmap.HitObjects[1].Hitsounds.Should().Be(8);
     }
 
     [TestMethod]
-    public async Task ApplyAsync_WithEverythingMode_ProcessesEveryObjectInInputOrder()
+    public async Task ApplyAsync_ProcessesEveryObjectInEveryInputMap()
     {
         // Arrange
         RecordingBeatmapEditingGateway gateway = CreateGateway(0);
         HitsoundPreviewHelperService service = new(gateway);
         HitsoundPreviewHelperServiceOptions options = new()
         {
-            ImportModeSetting = HitObjectSelectionMode.Everything,
             Items = [new HitsoundZone { Hitsound = Hitsound.Whistle }],
         };
 
@@ -116,27 +64,6 @@ public sealed class HitsoundPreviewHelperServiceTests
             LiveBeatmapPreference.PreferLive);
         gateway.SessionSaveRequests.Select(request => request.Session.Editor.Path)
             .Should().Equal("first.osu", "second.osu");
-    }
-
-    [TestMethod]
-    public async Task ApplyAsync_WithTimeModeAndBlankTimeCode_ThrowsBeforeOpeningBeatmaps()
-    {
-        // Arrange
-        RecordingBeatmapEditingGateway gateway = CreateGateway(0);
-        HitsoundPreviewHelperService service = new(gateway);
-        HitsoundPreviewHelperServiceOptions options = new()
-        {
-            ImportModeSetting = HitObjectSelectionMode.Time,
-            Items = [new HitsoundZone()],
-        };
-
-        // Act
-        Func<Task> act = () => service.ApplyAsync(["map.osu"], options);
-
-        // Assert
-        await act.Should().ThrowAsync<ArgumentException>()
-            .WithMessage("*time code*");
-        gateway.OpenRequests.Should().BeEmpty();
     }
 
     [TestMethod]
@@ -157,9 +84,7 @@ public sealed class HitsoundPreviewHelperServiceTests
         gateway.OpenRequests.Should().BeEmpty();
     }
 
-    private static RecordingBeatmapEditingGateway CreateGateway(
-        int selectedObjectCount,
-        bool bookmarkSecondObject = false)
+    private static RecordingBeatmapEditingGateway CreateGateway(int selectedObjectCount)
     {
         Beatmap source = new(
             new List<HitObject>
@@ -169,8 +94,6 @@ public sealed class HitsoundPreviewHelperServiceTests
             },
             [],
             globalSv: 1.4);
-        if (bookmarkSecondObject) source.SetBookmarks([2000]);
-
         return new RecordingBeatmapEditingGateway
         {
             OpenBeatmapFactory = (path, livePreference) =>

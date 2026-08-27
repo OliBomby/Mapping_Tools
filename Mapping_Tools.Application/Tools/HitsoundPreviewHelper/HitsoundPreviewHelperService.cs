@@ -1,7 +1,5 @@
-using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
-using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
@@ -9,8 +7,8 @@ using Mapping_Tools.Core.Tools.HitsoundPreviewHelper;
 namespace Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 
 /// <summary>
-///     Selects eligible objects, invokes the Core hitsound engine, and persists
-///     each changed map through the backup-aware editor gateway.
+///     Invokes the Core hitsound engine for every object and persists each
+///     changed map through the backup-aware editor gateway.
 /// </summary>
 public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
 {
@@ -39,21 +37,15 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
         for (int index = 0; index < paths.Count; index++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var livePreference =
-                options.ImportModeSetting == HitObjectSelectionMode.Selected
-                    ? LiveBeatmapPreference.RequireLive
-                    : LiveBeatmapPreference.PreferLive;
             var session = await editingGateway
-                .OpenBeatmapAsync(paths[index], livePreference, cancellationToken)
+                .OpenBeatmapAsync(
+                    paths[index],
+                    LiveBeatmapPreference.PreferLive,
+                    cancellationToken)
                 .ConfigureAwait(false);
 
-            var markedObjects = BeatmapObjectSelection.Select(
-                session,
-                options.ImportModeSetting,
-                options.TimeCode);
             int updated = HitsoundPreviewHelperEngine.Apply(
                 session.Editor.Beatmap,
-                markedObjects,
                 options.Items,
                 progress?.MapTo(index, paths.Count),
                 cancellationToken);
@@ -73,17 +65,7 @@ public sealed class HitsoundPreviewHelperService : IHitsoundPreviewHelperService
     private static void Validate(HitsoundPreviewHelperServiceOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-        if (!Enum.IsDefined(options.ImportModeSetting))
-            throw new ArgumentException(
-                "Hitsound Preview Helper contains an unknown object-selection mode.",
-                nameof(options));
-
         HitsoundPreviewHelperEngine.Validate(options.Items);
-
-        if (options.ImportModeSetting == HitObjectSelectionMode.Time && string.IsNullOrWhiteSpace(options.TimeCode))
-            throw new ArgumentException(
-                "A time code is required for Time mode.",
-                nameof(options));
     }
 
     /// <inheritdoc />

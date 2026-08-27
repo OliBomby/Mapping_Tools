@@ -6,17 +6,15 @@ Status: implemented, 2026-08-17.
 
 Hitsound Preview Helper now has a shared Core transformation, an Application
 service, and an Avalonia presentation model and view. It places the nearest
-zone's hitsound on timeline events belonging to selected, bookmarked, time
-queried, or all objects. Wildcard coordinates, explicit sample filenames,
+zone's hitsound on every timeline event. Wildcard coordinates, explicit sample filenames,
 sample and addition sets, custom indices, zero preview volume, slider edges,
 spinner ends, and mania selection coordinates retain the legacy behavior.
 
-The application service opens selected-object runs through the live-editor
-gateway, prefers live state for the other modes, and saves through the shared
-backup-aware gateway. The desktop feature retains empty-zone and time-mode
-validation, ordinary runs, QuickRun, project snapshots, autosave metadata,
-and legacy JSON type aliases. The legacy WPF project remains unchanged and
-continues to build.
+The application service prefers live state through the shared gateway and
+saves through the backup-aware gateway. The desktop feature retains
+empty-zone validation, ordinary runs, QuickRun, project snapshots, autosave
+metadata, and legacy JSON type aliases. The legacy WPF project remains
+unchanged and continues to build.
 
 ## Auxiliary-window boundary
 
@@ -33,7 +31,7 @@ styles. Text columns use `PropertyChanged` source updates, the checkbox column
 preserves row selection, and template columns provide the enum editors while
 retaining sorting and column resizing. Shift-click add is handled at the
 Avalonia view boundary and delegates to the view model command; object
-selection and map mutation remain outside the view.
+editor selection and map mutation remain outside the view.
 
 No audio or editor process calls were added to Core or Application. The
 platform-specific live-editor gateway and existing editor reload service

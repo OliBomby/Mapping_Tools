@@ -22,8 +22,8 @@ using Mapping_Tools.Desktop.ViewModels.Adapters;
 namespace Mapping_Tools.Desktop.ViewModels;
 
 /// <summary>
-///     Owns Hitsound Preview Helper zones, object-selection inputs, projects,
-///     ordinary execution, QuickRun, and the shared Rhythm Guide interaction.
+///     Owns Hitsound Preview Helper zones, projects, ordinary execution,
+///     QuickRun, and the shared Rhythm Guide interaction.
 /// </summary>
 public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewModel,
     IQuickRun,
@@ -85,33 +85,16 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     [ObservableProperty]
     public partial ObservableCollection<ObservableHitsoundZone> Items { get; set; } = [];
 
-    /// <summary>Gets or sets which beatmap objects receive preview hitsounds.</summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(TimeCodeVisible))]
-    public partial HitObjectSelectionMode ImportModeSetting { get; set; } =
-        HitObjectSelectionMode.Everything;
-
-    /// <summary>Gets or sets the legacy osu! time-code query used by Time mode.</summary>
-    [ObservableProperty]
-    public partial string TimeCode { get; set; } = string.Empty;
-
     /// <summary>Gets a concise result or validation message for the latest action.</summary>
     [ObservableProperty]
     public partial string ResultSummary { get; private set; } =
         "Add hitsound zones, then run the helper.";
-
-    /// <summary>Gets every supported object-selection mode.</summary>
-    public IReadOnlyList<HitObjectSelectionMode> ImportModes { get; } =
-        Enum.GetValues<HitObjectSelectionMode>();
 
     /// <summary>Gets every supported hitsound layer.</summary>
     public IReadOnlyList<Hitsound> Hitsounds { get; } = Enum.GetValues<Hitsound>();
 
     /// <summary>Gets every supported sample family.</summary>
     public IReadOnlyList<SampleSet> SampleSets { get; } = Enum.GetValues<SampleSet>();
-
-    /// <summary>Gets whether the time-code field applies to the current mode.</summary>
-    public bool TimeCodeVisible => ImportModeSetting == HitObjectSelectionMode.Time;
 
     /// <summary>Gets or sets the tri-state select-all value used by the zone list.</summary>
     public bool? IsAllItemsSelected
@@ -148,8 +131,6 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     {
         return new HitsoundPreviewHelperProject
         {
-            ImportModeSetting = ImportModeSetting,
-            TimeCode = TimeCode,
             Items = Items.Select(item => item.Snapshot()).ToList(),
         };
     }
@@ -159,8 +140,6 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         if (project is not HitsoundPreviewHelperProject typed)
             throw new InvalidDataException("Hitsound Preview Helper project is incomplete.");
 
-        ImportModeSetting = typed.ImportModeSetting;
-        TimeCode = typed.TimeCode ?? string.Empty;
         Items = new ObservableCollection<ObservableHitsoundZone>(
             (typed.Items ?? []).Select(item => new ObservableHitsoundZone(item.Copy())));
     }
@@ -168,12 +147,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        string? currentPath = null;
-        if (ImportModeSetting == HitObjectSelectionMode.Selected) currentPath = await currentBeatmap.FindCurrentBeatmapAsync();
-
-        var paths = ImportModeSetting == HitObjectSelectionMode.Selected
-            ? string.IsNullOrWhiteSpace(currentPath) ? [] : [currentPath]
-            : workspace.SelectedPaths;
+        IReadOnlyList<string> paths = workspace.SelectedPaths;
         if (settings.AlwaysQuickRun)
         {
             string? quickPath = await currentBeatmap.FindCurrentBeatmapAsync();
@@ -265,8 +239,6 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
 
         HitsoundPreviewHelperProject options = new()
         {
-            ImportModeSetting = ImportModeSetting,
-            TimeCode = TimeCode,
             Items = Items.Select(item => item.Snapshot()).ToList(),
         };
         var result = await Execution.ExecuteAsync(

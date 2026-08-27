@@ -3,7 +3,6 @@ using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Tools.RhythmGuide;
-using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Desktop.Interactions;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
@@ -34,7 +33,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
     }
 
     [TestMethod]
-    public async Task RunCommand_WithEverythingMode_UsesSelectedWorkspaceMapsAndPublishesLegacyCompletion()
+    public async Task RunCommand_UsesSelectedWorkspaceMapsAndPublishesLegacyCompletion()
     {
         // Arrange
         TestBeatmapWorkspace workspace = new();
@@ -51,8 +50,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
         // Assert
         preview.Options.Should().NotBeNull();
         preview.Paths.Should().Equal("first.osu", "second.osu");
-        preview.Options!.ImportModeSetting.Should().Be(
-            HitObjectSelectionMode.Everything);
+        preview.Options!.Items.Should().ContainSingle();
         viewModel.ResultSummary.Should().Be("Done!");
         viewModel.Progress.Should().Be(0);
         viewModel.IsRunning.Should().BeFalse();
