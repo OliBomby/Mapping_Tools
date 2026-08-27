@@ -251,7 +251,6 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     private string CollectionBasePath => Path.Combine(directories.ApplicationData, "Pattern Gallery Projects");
 
     /// <inheritdoc />
-    /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
         string? current = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);

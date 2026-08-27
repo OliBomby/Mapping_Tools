@@ -10,16 +10,14 @@ namespace Mapping_Tools.Infrastructure.Settings;
 /// </summary>
 public sealed class WindowsSettingsPathEnvironment : ISettingsPathEnvironment
 {
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public string UserName => Environment.UserName;
 
-    /// <summary>
-    ///     <inheritdoc />
-    ///     <remarks>
-    ///         Searches both 64-bit and WOW6432 uninstall registry locations by display name.
-    ///         Non-Windows platforms return <see langword="null" />.
-    ///     </remarks>
+    /// <inheritdoc />
+    /// <remarks>
+    ///     Searches both 64-bit and WOW6432 uninstall registry locations by display name.
+    ///     Non-Windows platforms return <see langword="null" />.
+    /// </remarks>
     public string? FindOsuInstallation()
     {
         if (!OperatingSystem.IsWindows()) return null;
@@ -34,8 +32,7 @@ public sealed class WindowsSettingsPathEnvironment : ISettingsPathEnvironment
                    "osu!");
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public string GetBeatmapDirectory(string configPath)
     {
         try
@@ -60,8 +57,7 @@ public sealed class WindowsSettingsPathEnvironment : ISettingsPathEnvironment
         return "Songs";
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public void EnsureDirectoryExists(string path)
     {
         Directory.CreateDirectory(path);

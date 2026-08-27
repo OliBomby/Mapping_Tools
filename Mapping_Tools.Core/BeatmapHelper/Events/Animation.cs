@@ -44,24 +44,21 @@ public class Animation : Event, IHasDuration
     /// </summary>
     public LoopType LoopType { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
-    ///     <remarks>This legacy model treats one frame delay as the animation duration.</remarks>
+    /// <inheritdoc />
+    /// <remarks>This legacy model treats one frame delay as the animation duration.</remarks>
     public double Duration
     {
         get => FrameDelay;
         set => FrameDelay = value;
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override string GetLine()
     {
         return $"Animation,{Layer},{Origin},\"{FilePath}\",{Pos.X.ToInvariant()},{Pos.Y.ToInvariant()},{FrameCount.ToInvariant()},{FrameDelay.ToInvariant()},{LoopType}";
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override void SetLine(string line)
     {
         string[] values = line.Split(',');

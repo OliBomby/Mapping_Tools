@@ -24,12 +24,10 @@ public class Video : Event, IHasStartTime
     /// </summary>
     public Vector2 Pos { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public double StartTime { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override string GetLine()
     {
         // Dont write the offset if its 0,0
@@ -38,8 +36,7 @@ public class Video : Event, IHasStartTime
         return $"{EventType},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},\"{Filename}\",{Pos.X.ToInvariant()},{Pos.Y.ToInvariant()}";
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override void SetLine(string line)
     {
         string[] values = line.Split(',');

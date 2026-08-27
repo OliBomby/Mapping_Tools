@@ -21,8 +21,7 @@ public sealed class AvaloniaPlatformLauncher : IPlatformLauncher
                                 ?? throw new ArgumentNullException(nameof(launcherAccessor));
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public async Task<bool> OpenUriAsync(Uri uri, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(uri);
@@ -34,8 +33,7 @@ public sealed class AvaloniaPlatformLauncher : IPlatformLauncher
         return launched;
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public async Task<bool> OpenFileAsync(string path, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
@@ -48,8 +46,7 @@ public sealed class AvaloniaPlatformLauncher : IPlatformLauncher
         return launched;
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public async Task<bool> OpenFolderAsync(string path, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);

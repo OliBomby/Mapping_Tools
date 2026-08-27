@@ -11,15 +11,13 @@ public sealed class FileSystemFileStore : ITextFileStore
 {
     private static readonly Encoding utf8WithoutBom = new UTF8Encoding(false);
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public IReadOnlyList<string> ReadAllLines(string path)
     {
         return File.ReadAllLines(path);
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public void WriteAllLines(string path, IEnumerable<string> lines)
     {
         ArgumentNullException.ThrowIfNull(path);
@@ -38,23 +36,20 @@ public sealed class FileSystemFileStore : ITextFileStore
         foreach (string line in lines) writer.WriteLine(line);
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public void Delete(string path)
     {
         File.Delete(path);
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public string GetParentFolder(string path)
     {
         return Directory.GetParent(path)?.FullName
                ?? throw new DirectoryNotFoundException($"Path '{path}' does not have a parent folder.");
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public string CombinePath(string parent, string child)
     {
         return Path.Combine(parent, child);

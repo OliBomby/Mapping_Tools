@@ -269,7 +269,6 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     }
 
     /// <inheritdoc />
-    /// <inheritdoc />
     public void Activate()
     {
         if (disposed) return;

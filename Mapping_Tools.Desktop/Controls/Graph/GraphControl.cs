@@ -1007,7 +1007,7 @@ public sealed class GraphControl : Control
         if (capturedPointer == eventArgs.Pointer) EndGesture(eventArgs.Pointer);
     }
 
-    /// <inheritdoc />
+        /// <inheritdoc />
     protected override void OnPointerWheelChanged(PointerWheelEventArgs eventArgs)
     {
         base.OnPointerWheelChanged(eventArgs);

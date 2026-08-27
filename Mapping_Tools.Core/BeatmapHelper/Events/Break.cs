@@ -27,24 +27,20 @@ public class Break : Event, IHasStartTime, IHasEndTime
     /// </summary>
     public string EventType { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public double EndTime { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public double StartTime { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override string GetLine()
     {
         return
             $"{EventType},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{(SaveWithFloatPrecision ? EndTime.ToInvariant() : EndTime.ToRoundInvariant())}";
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public sealed override void SetLine(string line)
     {
         string[] values = line.Split(',');

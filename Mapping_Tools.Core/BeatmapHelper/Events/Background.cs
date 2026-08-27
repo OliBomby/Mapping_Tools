@@ -24,20 +24,17 @@ public class Background : Event, IHasStartTime
     /// </summary>
     public Vector2 Pos { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public double StartTime { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override string GetLine()
     {
         // Writing the offset is optional if its 0,0 but we add it anyways because that is what osu! does.
         return $"{EventType},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},\"{Filename}\",{Pos.X.ToInvariant()},{Pos.Y.ToInvariant()}";
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override void SetLine(string line)
     {
         string[] values = line.Split(',');

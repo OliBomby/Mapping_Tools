@@ -26,12 +26,10 @@ public class OtherCommand : Command, IHasEndTime
     /// </summary>
     public string FallbackEventType { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public double EndTime { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override string GetLine()
     {
         var builder = new StringBuilder(8 + Params.Length * 2);
@@ -53,8 +51,7 @@ public class OtherCommand : Command, IHasEndTime
         return builder.ToString();
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override void SetLine(string line)
     {
         string subLine = RemoveIndents(line);

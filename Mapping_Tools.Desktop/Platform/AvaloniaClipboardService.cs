@@ -21,8 +21,7 @@ public sealed class AvaloniaClipboardService : IClipboardService
                                  ?? throw new ArgumentNullException(nameof(clipboardAccessor));
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public async Task<string?> ReadTextAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -31,8 +30,7 @@ public sealed class AvaloniaClipboardService : IClipboardService
         return text;
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public async Task WriteTextAsync(string text, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(text);
@@ -41,8 +39,7 @@ public sealed class AvaloniaClipboardService : IClipboardService
         cancellationToken.ThrowIfCancellationRequested();
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public async Task ClearAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -50,8 +47,7 @@ public sealed class AvaloniaClipboardService : IClipboardService
         cancellationToken.ThrowIfCancellationRequested();
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public async Task FlushAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();

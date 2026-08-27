@@ -108,7 +108,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         await RunWithStateAsync(() => RunPathAsync(path, cancellationToken));
     }
 
-    /// <inheritdoc />
+        /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
         string? path = settings.AlwaysQuickRun

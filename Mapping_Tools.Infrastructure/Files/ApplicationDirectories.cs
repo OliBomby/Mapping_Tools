@@ -47,24 +47,19 @@ public sealed class ApplicationDirectories : IApplicationDirectories
         ConfigurationFile = Path.Combine(ApplicationData, "config.json");
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public string LocalApplicationData { get; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public string ApplicationData { get; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public string Exports { get; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public string ConfigurationFile { get; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public void EnsureCreated()
     {
         Directory.CreateDirectory(ApplicationData);

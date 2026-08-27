@@ -18,15 +18,13 @@ public class StandardLoop : Command
     /// </summary>
     public int LoopCount { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override string GetLine()
     {
         return $"{EventType},{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{LoopCount.ToInvariant()}";
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override void SetLine(string line)
     {
         string subLine = RemoveIndents(line);

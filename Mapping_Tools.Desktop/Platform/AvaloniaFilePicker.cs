@@ -21,20 +21,16 @@ public sealed class AvaloniaFilePicker : IFilePicker
                                        ?? throw new ArgumentNullException(nameof(storageProviderAccessor));
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public bool CanOpenFiles => storageProviderAccessor()?.CanOpen == true;
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public bool CanSaveFiles => storageProviderAccessor()?.CanSave == true;
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public bool CanPickFolders => storageProviderAccessor()?.CanPickFolder == true;
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public async Task<IReadOnlyList<string>> PickOpenFilesAsync(
         OpenFilePickerRequest request,
         CancellationToken cancellationToken = default)
@@ -60,8 +56,7 @@ public sealed class AvaloniaFilePicker : IFilePicker
         return GetLocalPaths(files);
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public async Task<string?> PickSaveFileAsync(
         SaveFilePickerRequest request,
         CancellationToken cancellationToken = default)
@@ -89,8 +84,7 @@ public sealed class AvaloniaFilePicker : IFilePicker
         return file is null ? null : GetLocalPath(file);
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public async Task<IReadOnlyList<string>> PickFoldersAsync(
         OpenFolderPickerRequest request,
         CancellationToken cancellationToken = default)

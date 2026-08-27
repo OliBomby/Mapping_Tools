@@ -78,9 +78,8 @@ public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, I
             other != null && StartTime == other.StartTime && Layer == other.Layer && FilePath == other.FilePath && Volume == other.Volume;
     }
 
-    /// <summary>
-    ///     <inheritdoc />
-    ///     <remarks>A sound sample is instantaneous, so changing its end time also changes its start time.</remarks>
+    /// <inheritdoc />
+    /// <remarks>A sound sample is instantaneous, so changing its end time also changes its start time.</remarks>
     public double EndTime
     {
         get => StartTime;
@@ -92,15 +91,13 @@ public class StoryboardSoundSample : Event, IEquatable<StoryboardSoundSample>, I
     /// </summary>
     public double StartTime { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override string GetLine()
     {
         return $"Sample,{(SaveWithFloatPrecision ? StartTime.ToInvariant() : StartTime.ToRoundInvariant())},{Layer.ToIntInvariant()},\"{FilePath}\",{Volume.ToRoundInvariant()}";
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public sealed override void SetLine(string line)
     {
         string[] values = line.Split(',');

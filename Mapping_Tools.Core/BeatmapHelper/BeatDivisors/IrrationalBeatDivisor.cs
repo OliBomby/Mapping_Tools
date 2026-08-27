@@ -20,9 +20,7 @@ public class IrrationalBeatDivisor : IBeatDivisor
         Value = value;
     }
 
-    /// <summary>
-    ///     <inheritdoc />
-    /// </summary>
+    /// <inheritdoc />
     public double GetValue()
     {
         return Value;

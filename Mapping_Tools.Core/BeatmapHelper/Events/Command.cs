@@ -16,7 +16,6 @@ public abstract class Command : Event, IHasStartTime
     /// </summary>
     public virtual EventType EventType { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public double StartTime { get; set; }
 }

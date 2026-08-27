@@ -41,9 +41,7 @@ public class RationalBeatDivisor : IBeatDivisor
         Denominator = denominator;
     }
 
-    /// <summary>
-    ///     <inheritdoc />
-    /// </summary>
+    /// <inheritdoc />
     public double GetValue()
     {
         return (double)Numerator / Denominator;

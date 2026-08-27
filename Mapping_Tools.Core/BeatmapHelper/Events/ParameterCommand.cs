@@ -26,12 +26,10 @@ public class ParameterCommand : Command, IHasEndTime
     /// </summary>
     public string Parameter { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public double EndTime { get; set; }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override string GetLine()
     {
         var builder = new StringBuilder(9);
@@ -50,8 +48,7 @@ public class ParameterCommand : Command, IHasEndTime
         return builder.ToString();
     }
 
-    /// <summary>
-    ///     <inheritdoc />
+    /// <inheritdoc />
     public override void SetLine(string line)
     {
         string subLine = RemoveIndents(line);

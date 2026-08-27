@@ -9,9 +9,8 @@ namespace Mapping_Tools.Infrastructure.Platform;
 /// </summary>
 public sealed class WindowsFileRevealService : IFileRevealService
 {
-    /// <summary>
-    ///     <inheritdoc />
-    ///     <exception cref="PlatformNotSupportedException">The current platform is not Windows.</exception>
+    /// <inheritdoc />
+    /// <exception cref="PlatformNotSupportedException">The current platform is not Windows.</exception>
     public Task<bool> RevealAsync(string path, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
