@@ -18,8 +18,10 @@ using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
 using Mapping_Tools.Desktop.Interactions.PatternGallery;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Shell.Models;
+using Mapping_Tools.Desktop.Views.Dialogs;
 using Material.Icons;
 
 namespace Mapping_Tools.Desktop.ViewModels.PatternGallery;
@@ -49,7 +51,6 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     private readonly IPatternGalleryFileService files;
 
     private readonly IPatternGalleryService gallery;
-    private readonly IPatternGalleryInputDialog inputDialog;
     private readonly Dictionary<PatternGalleryPattern, PatternGalleryItemViewModel> items = [];
     private readonly IProjectService projects;
     private readonly IFileRevealService reveal;
@@ -73,7 +74,6 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     /// <param name="directories">Provides the application-data collection root.</param>
     /// <param name="dialogs">Presents typed confirmations and value fields.</param>
     /// <param name="settings">Provides the shared QuickRun preference.</param>
-    /// <param name="inputDialog">Presents Pattern Gallery's multi-field forms.</param>
     public PatternGalleryViewModel(
         IPatternGalleryService gallery,
         IPatternGalleryFileService files,
@@ -87,8 +87,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         IProjectSerializer serializer,
         IApplicationDirectories directories,
         IDialogService dialogs,
-        ApplicationSettings settings,
-        IPatternGalleryInputDialog inputDialog)
+        ApplicationSettings settings)
         : base(execution, MappingToolDefinitions.PatternGallery)
     {
         this.gallery = gallery ?? throw new ArgumentNullException(nameof(gallery));
@@ -103,7 +102,6 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         this.directories = directories ?? throw new ArgumentNullException(nameof(directories));
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        this.inputDialog = inputDialog ?? throw new ArgumentNullException(nameof(inputDialog));
         ConfigureProject();
         RebuildGroups();
     }
@@ -313,7 +311,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task AddCodeAsync()
     {
-        var input = await inputDialog.ShowCodeAsync($"Pattern {Project.Patterns.Count + 1}");
+        var input = await ShowCodeDialogAsync($"Pattern {Project.Patterns.Count + 1}");
         if (input is null) return;
 
         try
@@ -351,7 +349,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         string? path = selected.FirstOrDefault();
         if (string.IsNullOrWhiteSpace(path)) return;
 
-        var input = await inputDialog.ShowFileAsync(
+        var input = await ShowFileDialogAsync(
             $"Pattern {Project.Patterns.Count + 1}", path);
         if (input is null) return;
 
@@ -475,13 +473,55 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         var pattern = SelectedPatterns.FirstOrDefault();
         if (pattern is null) return;
 
-        string? name = await inputDialog.ShowDetailsAsync(pattern);
+        string? name = await ShowDetailsDialogAsync(pattern);
         if (!string.IsNullOrWhiteSpace(name))
         {
             pattern.Name = name;
             items.GetValueOrDefault(pattern)?.RefreshMetadata();
             RebuildGroups();
         }
+    }
+
+    private static async Task<PatternGalleryCodeInput?> ShowCodeDialogAsync(string defaultName)
+    {
+        var viewModel = PatternGalleryInputViewModel.ForCode(defaultName);
+        PatternGalleryInputDialog dialog = new() { DataContext = viewModel };
+        viewModel.Close = value => DialogHostInteraction.Close(
+            DialogHostInteraction.RootIdentifier,
+            value);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier);
+        return result is PatternGalleryCodeInput input ? input : null;
+    }
+
+    private static async Task<PatternGalleryFileInput?> ShowFileDialogAsync(
+        string defaultName,
+        string defaultPath)
+    {
+        var viewModel = PatternGalleryInputViewModel.ForFile(defaultName, defaultPath);
+        PatternGalleryInputDialog dialog = new() { DataContext = viewModel };
+        viewModel.Close = value => DialogHostInteraction.Close(
+            DialogHostInteraction.RootIdentifier,
+            value);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier);
+        return result is PatternGalleryFileInput input ? input : null;
+    }
+
+    private static async Task<string?> ShowDetailsDialogAsync(PatternGalleryPattern pattern)
+    {
+        ArgumentNullException.ThrowIfNull(pattern);
+        PatternGalleryDetailsViewModel viewModel = new(pattern);
+        PatternGalleryDetailsDialog dialog = new() { DataContext = viewModel };
+        viewModel.Close = value => DialogHostInteraction.Close(
+            DialogHostInteraction.RootIdentifier,
+            value);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier);
+        return result as string;
     }
 
     /// <summary>Assigns selected patterns to an existing or empty group.</summary>

@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Audio;
 using Mapping_Tools.Application.Audio.Contracts;
@@ -47,9 +48,6 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Tools.HitsoundStudio;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Interactions;
-using Mapping_Tools.Desktop.Interactions.GeometryDashboard;
-using Mapping_Tools.Desktop.Interactions.HitsoundStudio;
-using Mapping_Tools.Desktop.Interactions.PatternGallery;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Shell;
@@ -86,6 +84,7 @@ internal static class DesktopServiceRegistration
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddSingleton<MainWindow>();
+        services.AddSingleton<Func<Window>>(provider => () => provider.GetRequiredService<MainWindow>());
         services.AddSingleton<IUiDispatcher, AvaloniaUiDispatcher>();
         services.AddSingleton<IUpdateGateway, OnovaUpdateGateway>();
         services.AddSingleton<IUpdateService, UpdateService>();
@@ -100,12 +99,6 @@ internal static class DesktopServiceRegistration
         services.AddDesktopFeatures();
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<IDialogService, AvaloniaDialogService>();
-        services.AddSingleton<IPatternGalleryInputDialog, PatternGalleryInputDialog>();
-        services.AddSingleton<IHitsoundStudioDialogService>(provider =>
-            new HitsoundStudioDialogService(
-                provider.GetRequiredService<IFilePicker>()));
-        services.AddSingleton<IGeometryDashboardDialogService>(provider =>
-            new GeometryDashboardDialogService(() => provider.GetRequiredService<MainWindow>()));
 
         services.AddSingleton<IFilePicker>(provider =>
         {

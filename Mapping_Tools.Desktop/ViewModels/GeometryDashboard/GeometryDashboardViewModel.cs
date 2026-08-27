@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using Avalonia.Controls;
 using Avalonia.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -22,7 +23,9 @@ using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerat
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Desktop.Interactions.GeometryDashboard;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Views.GeometryDashboard;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Shell.Models;
 using Material.Icons;
@@ -52,7 +55,6 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         static () => new SnappingToolsProject(),
         "geometry-dashboard-project.json");
 
-    private readonly IGeometryDashboardDialogService dialogs;
     private readonly IUiDispatcher dispatcher;
     private readonly IFilePicker filePicker;
     private readonly ITextFileStore files;
@@ -66,6 +68,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     private readonly IGeometryDashboardRuntime runtime;
     private readonly List<IRelevantDrawable> selectedDrawables = [];
     private readonly IProjectSerializer serializer;
+    private readonly Func<Window> owner;
     private readonly object stateGate = new();
     private bool active;
     private string? configurationStatus;
@@ -91,7 +94,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <param name="filePicker">Presents locked-object import/export pickers.</param>
     /// <param name="files">Reads the osu! configuration file.</param>
     /// <param name="notifications">Publishes user-visible operation outcomes.</param>
-    /// <param name="dialogs">Presents the three dashboard-owned dialogs.</param>
+    /// <param name="owner">Returns the shell window that owns dashboard dialogs.</param>
     /// <param name="dispatcher">Marshals observable state changes to Avalonia's UI thread.</param>
     public GeometryDashboardViewModel(
         ApplicationSettings applicationSettings,
@@ -102,7 +105,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         IFilePicker filePicker,
         ITextFileStore files,
         IUserNotificationService notifications,
-        IGeometryDashboardDialogService dialogs,
+        Func<Window> owner,
         IUiDispatcher dispatcher)
     {
         this.applicationSettings = applicationSettings ?? throw new ArgumentNullException(nameof(applicationSettings));
@@ -113,7 +116,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         this.files = files ?? throw new ArgumentNullException(nameof(files));
         this.notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
-        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
+        this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
         this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
         Project = new SnappingToolsProject();
@@ -284,8 +287,11 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <summary>Shows the preferences dialog and applies an accepted clone.</summary>
     public async Task ShowPreferencesAsync()
     {
-        var preferences = await dialogs.ShowPreferencesAsync(
+        GeometryDashboardPreferencesDialogViewModel viewModel = new(
             (SnappingToolsPreferences)Preferences.Clone());
+        GeometryDashboardPreferencesWindow window = new() { DataContext = viewModel };
+        viewModel.Close = result => window.Close(result);
+        var preferences = await window.ShowDialog<SnappingToolsPreferences?>(owner());
         if (preferences is not null)
         {
             Project.SetCurrentPreferences(preferences);
@@ -296,7 +302,11 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <summary>Shows the modeless save-slot dialog for the current project.</summary>
     public Task ShowProjectSlotsAsync()
     {
-        return dialogs.ShowProjectSlotsAsync(Project, LoadSaveSlot, RefreshSaveSlotHotkeys);
+        GeometryDashboardProjectSlotsViewModel viewModel = new(Project, LoadSaveSlot, RefreshSaveSlotHotkeys);
+        GeometryDashboardProjectWindow window = new() { DataContext = viewModel };
+        viewModel.Close = window.Close;
+        window.Show(owner());
+        return Task.CompletedTask;
     }
 
     /// <summary>Shows a generator's typed settings dialog and regenerates after acceptance.</summary>
@@ -304,7 +314,11 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     public async Task ShowGeneratorSettingsAsync(GeometryDashboardGeneratorViewModel generator)
     {
         ArgumentNullException.ThrowIfNull(generator);
-        if (await dialogs.ShowGeneratorSettingsAsync(generator.Model.Settings)) Regenerate();
+        GeometryDashboardGeneratorSettingsDialogViewModel viewModel = new(generator.Model.Settings);
+        GeometryDashboardGeneratorSettingsWindow window = new() { DataContext = viewModel };
+        viewModel.Close = result => window.Close(result);
+        object? result = await window.ShowDialog<object?>(owner());
+        if (result is true) Regenerate();
     }
 
     /// <summary>Exports detached locked virtual objects using a native save picker.</summary>

@@ -11,7 +11,6 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
-using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.ViewModels.GeometryDashboard;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GeometryDashboardViewModel = Mapping_Tools.Desktop.ViewModels.GeometryDashboard.GeometryDashboardViewModel;
@@ -111,7 +110,7 @@ public sealed class GeometryDashboardViewModelTests
             },
             new TextFileStoreStub(),
             new NotificationStub(),
-            new DialogStub(),
+            static () => null!,
             new ImmediateTestDispatcher());
     }
 
@@ -241,27 +240,6 @@ public sealed class GeometryDashboardViewModelTests
         public Task PublishAsync(UserNotification notification, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
-        }
-    }
-
-    private sealed class DialogStub : IGeometryDashboardDialogService
-    {
-        public Task<SnappingToolsPreferences?> ShowPreferencesAsync(SnappingToolsPreferences preferences)
-        {
-            return Task.FromResult<SnappingToolsPreferences?>(null);
-        }
-
-        public Task ShowProjectSlotsAsync(
-            SnappingToolsProject project,
-            Action<SnappingToolsSaveSlot> loadSlot,
-            Action refreshHotkeys)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task<bool> ShowGeneratorSettingsAsync(GeneratorSettings settings)
-        {
-            return Task.FromResult(false);
         }
     }
 

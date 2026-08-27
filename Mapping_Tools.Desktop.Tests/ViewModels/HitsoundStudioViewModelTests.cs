@@ -10,8 +10,6 @@ using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
-using Mapping_Tools.Desktop.Interactions.HitsoundStudio;
-using DesktopHitsoundStudioProject = Mapping_Tools.Desktop.Models.HitsoundStudioProject;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.ViewModels.Adapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -64,7 +62,6 @@ public sealed class HitsoundStudioViewModelTests
             TimeProvider.System);
         return new HitsoundStudioViewModel(
             service,
-            new StubHitsoundStudioDialogService(),
             new TestDialogService(),
             execution,
             new RecordingCurrentBeatmapLocator(),
@@ -172,23 +169,6 @@ public sealed class HitsoundStudioViewModelTests
         public ValueTask DisposeAsync()
         {
             return StopAsync();
-        }
-    }
-
-    private sealed class StubHitsoundStudioDialogService : IHitsoundStudioDialogService
-    {
-        public Task<HitsoundStudioImportRequest?> ShowImportAsync(
-            string defaultName,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<HitsoundStudioImportRequest?>(null);
-        }
-
-        public Task<DesktopHitsoundStudioProject?> ShowExportAsync(
-            DesktopHitsoundStudioProject project,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<DesktopHitsoundStudioProject?>(null);
         }
     }
 

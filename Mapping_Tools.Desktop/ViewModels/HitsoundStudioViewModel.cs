@@ -18,9 +18,11 @@ using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
-using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Interactions.HitsoundStudio;
+using Mapping_Tools.Desktop.Platform;
+using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Shell.Models;
+using Mapping_Tools.Desktop.Views.Dialogs;
 using HitsoundStudioProject = Mapping_Tools.Desktop.Models.HitsoundStudioProject;
 using Mapping_Tools.Desktop.ViewModels.Adapters;
 using Material.Icons;
@@ -40,7 +42,6 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 {
     private readonly ICurrentBeatmapLocator currentBeatmap;
     private readonly ProjectDefinition<HitsoundStudioProject> definition;
-    private readonly IHitsoundStudioDialogService dialogs;
     private readonly IFilePicker filePicker;
     private readonly IBeatmapsetFileSystem files;
     private readonly IDialogService messageDialogs;
@@ -59,7 +60,6 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     ///     state to the legacy autosave filename.
     /// </summary>
     /// <param name="service">Runs imports, preview, validation, and export.</param>
-    /// <param name="dialogs">Shows feature-specific Avalonia forms.</param>
     /// <param name="messageDialogs">Shows typed confirmations and diagnostics.</param>
     /// <param name="execution">Coordinates keyed cancellation and completion.</param>
     /// <param name="currentBeatmap">Finds the beatmap open in osu!.</param>
@@ -71,7 +71,6 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// <param name="directories">Provides the default application export directory.</param>
     public HitsoundStudioViewModel(
         IHitsoundStudioService service,
-        IHitsoundStudioDialogService dialogs,
         IDialogService messageDialogs,
         IToolExecutionService execution,
         ICurrentBeatmapLocator currentBeatmap,
@@ -84,7 +83,6 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         : base(execution, MappingToolDefinitions.HitsoundStudio)
     {
         this.service = service ?? throw new ArgumentNullException(nameof(service));
-        this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         this.messageDialogs = messageDialogs ?? throw new ArgumentNullException(nameof(messageDialogs));
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
@@ -434,7 +432,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     {
         try
         {
-            var request = await dialogs.ShowImportAsync(
+            var request = await ShowImportDialogAsync(
                 $"Layer {Layers.Count + 1}");
             if (request is null) return;
             var imported = await service.ImportAsync(request);
@@ -1072,7 +1070,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         if (string.IsNullOrWhiteSpace(BaseBeatmap)
             && selectedPaths.FirstOrDefault(path => path.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)) is { } selected) BaseBeatmap = selected;
 
-        var chosen = await dialogs.ShowExportAsync(ToProject());
+        var chosen = await ShowExportDialogAsync(ToProject());
         if (chosen is null) return;
         if (chosen.UsePreviousSampleSchema && chosen.PreviousSampleSchema is null)
         {
@@ -1120,6 +1118,33 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
                 ? result.Value.DetailedSummary
                 : "Hitsound Studio export complete.";
         }
+    }
+
+    private async Task<HitsoundStudioImportRequest?> ShowImportDialogAsync(string defaultName)
+    {
+        HitsoundStudioImportDialogViewModel viewModel = new(defaultName, filePicker);
+        HitsoundStudioImportDialog dialog = new() { DataContext = viewModel };
+        viewModel.Close = value => DialogHostInteraction.Close(
+            DialogHostInteraction.RootIdentifier,
+            value);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier);
+        return result as HitsoundStudioImportRequest;
+    }
+
+    private async Task<HitsoundStudioProject?> ShowExportDialogAsync(HitsoundStudioProject project)
+    {
+        ArgumentNullException.ThrowIfNull(project);
+        HitsoundStudioExportDialogViewModel viewModel = new(project, filePicker);
+        HitsoundStudioExportDialog dialog = new() { DataContext = viewModel };
+        viewModel.Close = value => DialogHostInteraction.Close(
+            DialogHostInteraction.RootIdentifier,
+            value);
+        object? result = await DialogHostInteraction.ShowAsync(
+            dialog,
+            DialogHostInteraction.RootIdentifier);
+        return result as HitsoundStudioProject;
     }
 
     private HitsoundStudioProject ToProject()
