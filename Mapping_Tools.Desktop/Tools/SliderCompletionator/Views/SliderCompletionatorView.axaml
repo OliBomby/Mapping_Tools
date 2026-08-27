@@ -1,0 +1,82 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.Tools.SliderCompletionator.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="Mapping_Tools.Desktop.Tools.SliderCompletionator.Views.SliderCompletionatorView"
+             x:DataType="vm:SliderCompletionatorViewModel">
+    <Grid RowDefinitions="*,Auto">
+        <Grid Margin="0,0,120,10">
+            <StackPanel>
+                <controls:ToolViewHeader
+                    Title="Slider Completionator"
+                    IsQuickRunSupported="True"
+                    HelpText="Change the length and duration of selected sliders and this tool will automatically handle the slider velocity for you.&#x0a;&#x0a;Input a value of -1 anywhere to indicate that you want to keep that variable unchanged.&#x0a;For example, 1 duration and -1 length will change the duration to 1 beat while keeping the length the same.&#x0a;&#x0a;Check the tooltips for more information about extra features." />
+
+                <StackPanel Width="531" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Margin="0,26,0,0" HorizontalAlignment="Left">
+                        <ComboBox Width="258"
+                                  Classes="compact"
+                                  ItemsSource="{Binding ImportModes}"
+                                  SelectedItem="{Binding ImportModeSetting}"
+                                  materialAssists:ComboBoxAssist.Label="Object selection mode"
+                                  ToolTip.Tip="Choose how to select sliders to completionate." />
+                        <TextBox Margin="15,0,0,0" Width="258"
+                                 IsVisible="{Binding TimeCodeVisible}"
+                                 Text="{Binding TimeCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                 materialAssists:TextFieldAssist.Label="Time code"
+                                 ToolTip.Tip="Input a time code here. Example time code: 00:56:823 (1,2,1,2) - " />
+                    </StackPanel>
+
+                    <CheckBox Margin="0,20,0,0" Content="Move anchors to new length"
+                              IsChecked="{Binding MoveAnchors}"
+                              ToolTip.Tip="Move the anchors such that the last anchor is exactly on the slider end. Much like using Ctrl+G twice in the editor, but better." />
+                    <CheckBox Content="Use slider end time" IsChecked="{Binding UseEndTime}"
+                              ToolTip.Tip="Lets you input the slider end time instead of the duration. This will replace the duration field with the end time field." />
+                    <CheckBox Content="Use current editor time" IsEnabled="{Binding UseEndTime}"
+                              IsChecked="{Binding UseCurrentEditorTime}"
+                              ToolTip.Tip="Snap the slider ends to the current editor time." />
+                    <CheckBox Content="Delegate SV to BPM" IsChecked="{Binding DelegateToBpm}"
+                              ToolTip.Tip="Use BPM to determine the velocity of the slider instead of greenline SV." />
+                    <CheckBox Content="Remove slider ticks" IsEnabled="{Binding DelegateToBpm}"
+                              IsChecked="{Binding RemoveSliderTicks}"
+                              ToolTip.Tip="Use a NaN greenline to remove slider ticks from the slider." />
+                    <Separator Margin="0,20" />
+                </StackPanel>
+
+                <StackPanel Width="258" HorizontalAlignment="Left">
+                    <ComboBox Classes="compact"
+                              ItemsSource="{Binding FreeVariables}"
+                              SelectedItem="{Binding FreeVariableSetting}"
+                              materialAssists:ComboBoxAssist.Label="Free variable"
+                              ToolTip.Tip="Choose which variable will be calculated by Slider Completionator." />
+                    <TextBox Margin="0,20,0,0" IsVisible="{Binding DurationVisible}"
+                             Text="{Binding Duration, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
+                             materialAssists:TextFieldAssist.Label="Duration (beats)"
+                             ToolTip.Tip="Wanted duration of the slider in beats. Input -1 for no change." />
+                    <TextBox Margin="0,20,0,0" IsVisible="{Binding EndTimeVisible}"
+                             Text="{Binding EndTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource TimeToStringConverter}, ConverterParameter=-1}"
+                             materialAssists:TextFieldAssist.Label="End time (ms)"
+                             ToolTip.Tip="Wanted slider end time in milliseconds. Input -1 for no change. You can also input osu! timestamps like '00:56:823'." />
+                    <TextBox Margin="0,20,0,0" IsVisible="{Binding LengthVisible}"
+                             Text="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
+                             materialAssists:TextFieldAssist.Label="Length (fraction of full path)"
+                             ToolTip.Tip="Wanted length of the slider. This value represents a fraction of the complete path defined by the anchors, so '1' lets the slider end be exactly on the last anchor." />
+                    <TextBox Margin="0,20,0,0" IsVisible="{Binding VelocityVisible}"
+                             Text="{Binding SliderVelocity, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}, ConverterParameter=-1}"
+                             materialAssists:TextFieldAssist.Label="Slider velocity multiplier"
+                             ToolTip.Tip="Wanted slider velocity multiplier of the inherited timing point. Input -1 for no change." />
+                </StackPanel>
+            </StackPanel>
+
+            <controls:ToolRunButton Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                    RunCommand="{Binding RunCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
+            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0"
+                                      Maximum="100" Value="{Binding Progress}" />
+        </Grid>
+    </Grid>
+</UserControl>

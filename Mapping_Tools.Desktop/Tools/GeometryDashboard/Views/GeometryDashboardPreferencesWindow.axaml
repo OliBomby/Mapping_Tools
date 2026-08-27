@@ -1,0 +1,210 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions"
+        xmlns:controls="using:Mapping_Tools.Desktop.Tools.GeometryDashboard.Controls"
+        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions"
+        x:Class="Mapping_Tools.Desktop.Tools.GeometryDashboard.Views.GeometryDashboardPreferencesWindow"
+        x:DataType="geometryDashboard:GeometryDashboardPreferencesDialogViewModel"
+        Title="Snapping Tools Preferences" Width="575" Height="500" MinWidth="575" MinHeight="360"
+        CanResize="True" WindowStartupLocation="CenterOwner" WindowDecorations="None"
+        Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}">
+    <Grid RowDefinitions="35,*,Auto">
+        <Grid Grid.Row="0">
+            <TextBlock Text="Preferences" Margin="12,0" VerticalAlignment="Center" FontSize="18" FontWeight="Bold"
+                       IsHitTestVisible="False" />
+            <Border Margin="0,0,47,0" Background="Transparent"
+                    PointerPressed="DragWindow" DoubleTapped="ToggleMaximizeWindow" />
+            <Button Width="47" Height="35" Padding="0" HorizontalAlignment="Right" Background="Transparent"
+                    BorderThickness="0" Click="CloseWindow" ToolTip.Tip="Close preferences.">
+                <materialIcons:MaterialIcon Kind="Close" Width="22" Height="22" />
+            </Button>
+        </Grid>
+        <ScrollViewer Grid.Row="1" Padding="10" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Hidden">
+            <StackPanel Spacing="8">
+                <TextBlock Text="Keyboard shortcuts" FontWeight="Bold" />
+                <Grid ColumnDefinitions="180,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                    <TextBlock Text="Snap" VerticalAlignment="Center" />
+                    <controls:GeometryHotkeyEditor Grid.Column="1"
+                                                   Hotkey="{Binding Preferences.SnapHotkey, Mode=TwoWay}"
+                                                   ToolTip.Tip="Press and hold this key to snap your cursor to the closest virtual object." />
+                    <TextBlock Grid.Row="1" Text="Select" VerticalAlignment="Center" />
+                    <controls:GeometryHotkeyEditor Grid.Row="1" Grid.Column="1"
+                                                   Hotkey="{Binding Preferences.SelectHotkey, Mode=TwoWay}"
+                                                   ToolTip.Tip="Press or hold this key to select virtual objects." />
+                    <TextBlock Grid.Row="2" Text="Lock" VerticalAlignment="Center" />
+                    <controls:GeometryHotkeyEditor Grid.Row="2" Grid.Column="1"
+                                                   Hotkey="{Binding Preferences.LockHotkey, Mode=TwoWay}"
+                                                   ToolTip.Tip="Press or hold this key to lock virtual objects." />
+                    <TextBlock Grid.Row="3" Text="Usability" VerticalAlignment="Center" />
+                    <controls:GeometryHotkeyEditor Grid.Row="3" Grid.Column="1"
+                                                   Hotkey="{Binding Preferences.InheritHotkey, Mode=TwoWay}"
+                                                   ToolTip.Tip="Press or hold this key to select which virtual objects can get used by generators." />
+                    <TextBlock Grid.Row="4" Text="Refresh" VerticalAlignment="Center" />
+                    <controls:GeometryHotkeyEditor Grid.Row="4" Grid.Column="1"
+                                                   Hotkey="{Binding Preferences.RefreshHotkey, Mode=TwoWay}"
+                                                   ToolTip.Tip="Press and hold this key to continuously refresh the hit objects in the root layer of the object tree." />
+                </Grid>
+                <TextBlock Text="Overlay offset" FontWeight="Bold" />
+                <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
+                    <TextBox materialAssists:TextFieldAssist.Label="Left"
+                             Text="{Binding Preferences.OffsetLeft, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                             ToolTip.Tip="Offset the left side of the overlay in osu! pixels." />
+                    <TextBox Grid.Column="1" materialAssists:TextFieldAssist.Label="Top"
+                             Text="{Binding Preferences.OffsetTop, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                             ToolTip.Tip="Offset the top side of the overlay in osu! pixels." />
+                    <TextBox Grid.Column="2" materialAssists:TextFieldAssist.Label="Right"
+                             Text="{Binding Preferences.OffsetRight, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                             ToolTip.Tip="Offset the right side of the overlay in osu! pixels." />
+                    <TextBox Grid.Column="3" materialAssists:TextFieldAssist.Label="Bottom"
+                             Text="{Binding Preferences.OffsetBottom, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                             ToolTip.Tip="Offset the bottom side of the overlay in osu! pixels." />
+                </Grid>
+                <Grid ColumnDefinitions="100,*" Margin="10">
+                    <TextBlock Text="Complexity" VerticalAlignment="Bottom"
+                               ToolTip.Tip="Specifies how many layers of virtual objects can be used. More layers means more recursion of generating virtual objects." />
+                    <TextBox Grid.Column="1"
+                             Text="{Binding Preferences.InceptionLevel, Mode=TwoWay, Converter={StaticResource InvariantInt32Converter}}"
+                             ToolTip.Tip="Specifies how many layers of virtual objects can be used. More layers means more recursion of generating virtual objects. It is recommended to use between 2 and 10 layers." />
+                </Grid>
+                <Grid ColumnDefinitions="100,*" Margin="10">
+                    <TextBlock Text="Downkey" VerticalAlignment="Center"
+                               ToolTip.Tip="Customize what gets displayed while the Snap Key is pressed." />
+                    <WrapPanel Grid.Column="1">
+                        <CheckBox Content="Everything" IsChecked="{Binding KeyDownEverything, Mode=TwoWay}"
+                                  Margin="0,0,12,0" ToolTip.Tip="Everything" />
+                        <CheckBox Content="P" IsChecked="{Binding KeyDownParents, Mode=TwoWay}" Margin="0,0,12,0"
+                                  ToolTip.Tip="Parents and parents of parents" />
+                        <CheckBox Content="DP" IsChecked="{Binding KeyDownDirectParents, Mode=TwoWay}"
+                                  Margin="0,0,12,0" ToolTip.Tip="Direct parents" />
+                        <CheckBox Content="C" IsChecked="{Binding KeyDownChildren, Mode=TwoWay}" Margin="0,0,12,0"
+                                  ToolTip.Tip="Children and children of children" />
+                        <CheckBox Content="DC" IsChecked="{Binding KeyDownDirectChildren, Mode=TwoWay}"
+                                  ToolTip.Tip="Direct children" />
+                    </WrapPanel>
+                </Grid>
+                <Grid ColumnDefinitions="100,*" Margin="10">
+                    <TextBlock Text="Upkey" VerticalAlignment="Center"
+                               ToolTip.Tip="Customize what gets displayed while the Snap Key is not pressed." />
+                    <StackPanel Grid.Column="1">
+                        <RadioButton Content="Everything" GroupName="KeyUpView"
+                                     IsChecked="{Binding KeyUpEverything, Mode=TwoWay}"
+                                     ToolTip.Tip="Default behavior. Display all virtual objects even if the Activation Key is not pressed." />
+                        <RadioButton Content="Nothing" GroupName="KeyUpView"
+                                     IsChecked="{Binding KeyUpNothing, Mode=TwoWay}"
+                                     ToolTip.Tip="Do not display anything if the Activation Key is not pressed." />
+                    </StackPanel>
+                </Grid>
+                <Grid ColumnDefinitions="100,*" Margin="10">
+                    <TextBlock Text="Selection" VerticalAlignment="Center"
+                               ToolTip.Tip="Customize which hit objects get used for generating virtual objects." />
+                    <StackPanel Grid.Column="1">
+                        <RadioButton Content="All visible" GroupName="SelectedObjects"
+                                     IsChecked="{Binding SelectedAllVisible, Mode=TwoWay}"
+                                     ToolTip.Tip="Use the visible hit objects regardless of selection." />
+                        <RadioButton Content="Visible or selected" GroupName="SelectedObjects"
+                                     IsChecked="{Binding SelectedVisibleOrSelected, Mode=TwoWay}"
+                                     ToolTip.Tip="Use the visible hit objects, or use the selected hit objects if there are any selected." />
+                        <RadioButton Content="Selected only" GroupName="SelectedObjects"
+                                     IsChecked="{Binding SelectedOnly, Mode=TwoWay}"
+                                     ToolTip.Tip="Exclusively use selected hit objects." />
+                    </StackPanel>
+                </Grid>
+                <Grid ColumnDefinitions="180,*">
+                    <TextBlock Text="Updating" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1">
+                        <RadioButton Content="Any change" GroupName="Updating"
+                                     IsChecked="{Binding UpdatingAnyChange, Mode=TwoWay}" />
+                        <RadioButton Content="Time change" GroupName="Updating"
+                                     IsChecked="{Binding UpdatingTimeChange, Mode=TwoWay}" />
+                        <RadioButton Content="osu! activated" GroupName="Updating"
+                                     IsChecked="{Binding UpdatingOsuActivated, Mode=TwoWay}" />
+                        <RadioButton Content="Hotkey down" GroupName="Updating"
+                                     IsChecked="{Binding UpdatingHotkeyDown, Mode=TwoWay}" />
+                    </StackPanel>
+                </Grid>
+                <Grid ColumnDefinitions="100,*" Margin="10">
+                    <TextBlock Text="Minimal diff" VerticalAlignment="Bottom"
+                               ToolTip.Tip="Similar virtual objects get merged together to reduce clutter. This field sets the minimal difference that two objects must have to not get merged together." />
+                    <TextBox Grid.Column="1"
+                             Text="{Binding Preferences.AcceptableDifference, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                             ToolTip.Tip="Similar virtual objects get merged together to reduce clutter. This field sets the minimal difference that two objects must have to not get merged together." />
+                </Grid>
+                <CheckBox Content="Keep running" IsChecked="{Binding Preferences.KeepRunning, Mode=TwoWay}"
+                          ToolTip.Tip="Keep the tool running when another tool is selected." />
+                <CheckBox Content="See playfield"
+                          IsChecked="{Binding Preferences.VisiblePlayfieldBoundary, Mode=TwoWay}"
+                          ToolTip.Tip="Show the osu! playfield boundary." />
+                <CheckBox Content="Debug" IsChecked="{Binding Preferences.DebugEnabled, Mode=TwoWay}"
+                          ToolTip.Tip="Show the Geometry Dashboard debug border." />
+                <TextBlock Text="Appearance" FontWeight="Bold" />
+                <ItemsControl ItemsSource="{Binding Appearance}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Expander Header="{Binding Name}" IsExpanded="False">
+                                <Grid ColumnDefinitions="180,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="4">
+                                    <TextBlock Text="Color" VerticalAlignment="Center" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <ColorPicker Width="300" Height="100" Color="{Binding Color, Mode=TwoWay}" />
+                                        <TextBox Width="100" Margin="8,0,0,0" Text="{Binding ColorText, Mode=TwoWay}"
+                                                 ToolTip.Tip="{Binding ColorTextError}" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Row="1" Text="Opacity" />
+                                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                                        <Slider Width="300" Minimum="0" Maximum="1" TickFrequency="0.01"
+                                                Value="{Binding Opacity, Mode=TwoWay}" />
+                                        <TextBox Width="40" Margin="8,0,0,0"
+                                                 Text="{Binding Opacity, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Row="2" Text="Thickness" />
+                                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                                        <Slider Width="300" Minimum="1" Maximum="10" TickFrequency="1"
+                                                Value="{Binding Thickness, Mode=TwoWay}" />
+                                        <TextBox Width="40" Margin="8,0,0,0"
+                                                 Text="{Binding Thickness, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Row="3" Text="Dash style" />
+                                    <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding DashStyles}"
+                                              SelectedItem="{Binding DashStyle, Mode=TwoWay}" />
+                                    <TextBlock Grid.Row="4" Text="Size" IsVisible="{Binding HasSizeOption}" />
+                                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal"
+                                                IsVisible="{Binding HasSizeOption}">
+                                        <Slider Width="300" Minimum="1" Maximum="10" TickFrequency="1"
+                                                Value="{Binding Size, Mode=TwoWay}" />
+                                        <TextBox Width="40" Margin="8,0,0,0"
+                                                 Text="{Binding Size, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Expander>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+        <Grid Grid.Row="2" ColumnDefinitions="*,*" Margin="10">
+            <Button Width="200" Content="Apply" Command="{Binding ApplyCommand}" />
+            <Button Grid.Column="1" Width="200" Content="Cancel" Command="{Binding CancelCommand}" />
+        </Grid>
+        <Border Grid.RowSpan="3" BorderThickness="1" BorderBrush="{DynamicResource MaterialPrimaryDarkBrush}"
+                IsHitTestVisible="False" />
+        <Grid Grid.RowSpan="3">
+            <Border Height="5" VerticalAlignment="Top" Cursor="SizeNorthSouth" Tag="North"
+                    PointerPressed="ResizeWindow" />
+            <Border Height="5" VerticalAlignment="Bottom" Cursor="SizeNorthSouth" Tag="South"
+                    PointerPressed="ResizeWindow" />
+            <Border Width="5" HorizontalAlignment="Left" Cursor="SizeWestEast" Tag="West" PointerPressed="ResizeWindow" />
+            <Border Width="5" HorizontalAlignment="Right" Cursor="SizeWestEast" Tag="East"
+                    PointerPressed="ResizeWindow" />
+            <Border Width="8" Height="8" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="TopLeftCorner"
+                    Tag="NorthWest" PointerPressed="ResizeWindow" />
+            <Border Width="8" Height="8" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="TopRightCorner"
+                    Tag="NorthEast" PointerPressed="ResizeWindow" />
+            <Border Width="8" Height="8" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                    Cursor="BottomLeftCorner" Tag="SouthWest" PointerPressed="ResizeWindow" />
+            <Border Width="8" Height="8" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    Cursor="BottomRightCorner" Tag="SouthEast" PointerPressed="ResizeWindow" />
+        </Grid>
+    </Grid>
+</Window>

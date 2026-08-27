@@ -6,9 +6,9 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
-using Mapping_Tools.Core.Tools.TumourGenerating;
-using Mapping_Tools.Core.Tools.TumourGenerating.Models;
-using CoreTumourGenerator = Mapping_Tools.Core.Tools.TumourGenerating.TumourGenerator;
+using Mapping_Tools.Core.Tools.TumourGenerator;
+using Mapping_Tools.Core.Tools.TumourGenerator.Models;
+using CoreTumourGenerator = Mapping_Tools.Core.Tools.TumourGenerator.TumourGenerator;
 
 namespace Mapping_Tools.Application.Tools.TumourGenerator;
 

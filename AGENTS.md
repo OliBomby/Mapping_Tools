@@ -67,6 +67,13 @@ completing a migration.
 ## Coding style
 
 - Insert whitespace between logical blocks of code to improve readability.
+- Test project file structure should always match that of the production project. If the file moves, the test file moves with it.
+
+## Layer boundaries
+
+The project adheres to Domain Driven Design.
+
+- Any code that is used solely for the frontend belongs in the Desktop project. It may not exist in the Application or Core projects.
 
 ## Avalonia migration standard
 

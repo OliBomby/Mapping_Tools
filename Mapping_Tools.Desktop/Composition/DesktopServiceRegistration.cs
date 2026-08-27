@@ -47,26 +47,22 @@ using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Tools.HitsoundStudio;
 using Mapping_Tools.Desktop.Hosting;
-using Mapping_Tools.Desktop.Interactions;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Updates;
 using Mapping_Tools.Desktop.ViewModels;
-using Mapping_Tools.Desktop.ViewModels.GeometryDashboard;
 using Mapping_Tools.Desktop.Views;
 using Mapping_Tools.Infrastructure.Audio;
 using Mapping_Tools.Infrastructure.Backups;
 using Mapping_Tools.Infrastructure.Editor;
 using Mapping_Tools.Infrastructure.Files;
-using Mapping_Tools.Infrastructure.Images;
-using Mapping_Tools.Infrastructure.PatternGallery;
 using Mapping_Tools.Infrastructure.Platform;
-using Mapping_Tools.Infrastructure.Platform.GeometryDashboard;
 using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Settings;
 using Mapping_Tools.Infrastructure.Updates;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace Mapping_Tools.Desktop.Composition;
 
@@ -78,8 +74,11 @@ internal static class DesktopServiceRegistration
     ///     singletons.
     /// </summary>
     /// <param name="services">The collection that owns the desktop composition root.</param>
+    /// <param name="toolAssemblies">The assemblies that contain the tools to be registered.</param>
     /// <returns>The same collection for registration chaining.</returns>
-    public static IServiceCollection AddMappingToolsDesktop(this IServiceCollection services)
+    public static IServiceCollection AddMappingToolsDesktop(
+        this IServiceCollection services,
+        IEnumerable<Assembly>? toolAssemblies = null)
     {
         ArgumentNullException.ThrowIfNull(services);
 
@@ -96,7 +95,8 @@ internal static class DesktopServiceRegistration
                 () => provider.GetRequiredService<IDialogService>(),
                 provider.GetRequiredService<IUiDispatcher>()));
         services.AddSingleton<BeatmapWorkspaceViewModel>();
-        services.AddDesktopFeatures();
+        services.AddDesktopFeatures(
+            toolAssemblies ?? [typeof(DesktopServiceRegistration).Assembly]);
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<IDialogService, AvaloniaDialogService>();
 
@@ -117,9 +117,6 @@ internal static class DesktopServiceRegistration
         });
         services.AddSingleton<IFileRevealService, WindowsFileRevealService>();
         services.AddSingleton<IApplicationThemeService, AvaloniaApplicationThemeService>();
-        services.AddSingleton<IRhythmGuideWindowService>(provider =>
-            new AvaloniaRhythmGuideWindowService(
-                provider.GetRequiredService<MainWindow>));
         services.AddSingleton<IApplicationDirectories, ApplicationDirectories>();
         services.AddSingleton<ISettingsStore, JsonSettingsStore>();
         services.AddSingleton<ISettingsPathEnvironment, WindowsSettingsPathEnvironment>();
@@ -148,14 +145,6 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IQuickRunService>(provider =>
             provider.GetRequiredService<QuickRunService>());
         services.AddSingleton<IGlobalHotkeyService, WindowsGlobalHotkeyService>();
-        services.AddSingleton<IGeometryDashboardProcessDiscovery, WindowsOsuProcessDiscovery>();
-        services.AddSingleton<IGeometryDashboardInputService, WindowsGeometryDashboardInputService>();
-        services.AddSingleton<IGeometryDashboardScreenService, WindowsGeometryDashboardScreenService>();
-        services.AddSingleton<IGeometryDashboardWindowService, WindowsGeometryDashboardWindowService>();
-        services.AddSingleton<IGeometryDashboardRuntime, GeometryDashboardRuntimeService>();
-        services.AddSingleton<IGeometryDashboardOverlayHostFactory>(provider =>
-            new WindowsGeometryDashboardOverlayHostFactory(
-                provider.GetRequiredService<IGeometryDashboardWindowService>()));
         services.AddSingleton<GlobalHotkeyHostedService>();
         services.AddSingleton<IHotkeyBindingCoordinator>(provider =>
             provider.GetRequiredService<GlobalHotkeyHostedService>());
@@ -165,20 +154,12 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<WindowsEditorReaderAdapter>();
         services.AddSingleton<ILiveBeatmapReader>(provider =>
             provider.GetRequiredService<WindowsEditorReaderAdapter>());
-        services.AddSingleton<IGeometryDashboardEditorReader>(provider =>
-            provider.GetRequiredService<WindowsEditorReaderAdapter>());
         services.AddSingleton<ICurrentBeatmapLocator>(provider =>
             provider.GetRequiredService<WindowsEditorReaderAdapter>());
         services.AddSingleton<IEditorReloadService, WindowsOsuEditorReloadService>();
         services.AddSingleton<IBeatmapEditingGateway, BeatmapEditingGateway>();
         services.AddSingleton<IBetterSaveService, BetterSaveService>();
-        services.AddSingleton<IRhythmGuideService, RhythmGuideService>();
-        services.AddSingleton<IHitsoundPreviewHelperService, HitsoundPreviewHelperService>();
-        services.AddSingleton<HitsoundStudioEngine>();
         services.AddSingleton<IAudioClipMixer, NaudioAudioClipMixer>();
-        services.AddSingleton<IHitsoundStudioService, HitsoundStudioService>();
-        services.AddSingleton<IHitsoundCopierService, HitsoundCopierService>();
-        services.AddSingleton<IHitsoundSampleService, PhysicalHitsoundSampleService>();
         services.AddSingleton<IAudioDecoder, NaudioAudioDecoder>();
         services.AddSingleton<IAudioEffectService, NaudioAudioEffectService>();
         services.AddSingleton<ISoundFontRenderer, NaudioSoundFontRenderer>();
@@ -189,24 +170,6 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<ISpectrumCalculator, FastFourierSpectrumCalculator>();
         services.AddSingleton<AudioPreviewService>();
         services.AddSingleton<AudioExportService>();
-        services.AddSingleton<IAutoFailService, AutoFailService>();
-        services.AddSingleton<IMapCleanerService, MapCleanerService>();
-        services.AddSingleton<IMetadataManagerService, MetadataManagerService>();
-        services.AddSingleton<IPropertyTransformerService, PropertyTransformerService>();
-        services.AddSingleton<ITimingCopierService, TimingCopierService>();
-        services.AddSingleton<ITimingHelperService, TimingHelperService>();
-        services.AddSingleton<ISliderCompletionatorService, SliderCompletionatorService>();
-        services.AddSingleton<ISliderMergerService, SliderMergerService>();
-        services.AddSingleton<ISliderPicturatorService, SliderPicturatorService>();
-        services.AddSingleton<ISlideratorService, SlideratorService>();
-        services.AddSingleton<ITumourGeneratorService, TumourGeneratorService>();
-        services.AddSingleton<IComboColourStudioService, ComboColourStudioService>();
-        services.AddSingleton<IMapsetMergerService, MapsetMergerService>();
-        services.AddSingleton<IPatternGalleryService, PatternGalleryService>();
-        services.AddSingleton<IPatternGalleryFileService, PatternGalleryFileService>();
-        services.AddSingleton<IPatternGalleryArchiveService, PatternGalleryArchiveService>();
-        services.AddSingleton<IImageFileService, SkiaSharpImageFileService>();
-        services.AddSingleton<IMapCleanerSampleService, PhysicalMapCleanerSampleService>();
         services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();
         services.AddSingleton<IBeatmapWorkspace, BeatmapWorkspace>();
         services.AddSingleton<IProjectSerializer, LegacyProjectJsonSerializer>();

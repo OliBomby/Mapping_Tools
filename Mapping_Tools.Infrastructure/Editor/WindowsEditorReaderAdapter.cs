@@ -11,7 +11,7 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
-using Mapping_Tools.Infrastructure.Platform.GeometryDashboard;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Platform;
 using DomainHitObject = Mapping_Tools.Core.BeatmapHelper.HitObject;
 using ReaderHitObject = Editor_Reader.HitObject;
 

@@ -1,5 +1,8 @@
 using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Tools.HitsoundStudio.Models;
+using Mapping_Tools.Desktop.Tools.PropertyTransformer.Models;
+using Mapping_Tools.Desktop.Tools.SliderPicturator.Models;
+using Mapping_Tools.Desktop.Tools.Sliderator.Models;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

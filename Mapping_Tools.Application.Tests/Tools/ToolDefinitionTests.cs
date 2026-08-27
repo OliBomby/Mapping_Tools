@@ -1,5 +1,7 @@
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Tools;
+using Mapping_Tools.Application.Tools.MapsetMerger;
+using Mapping_Tools.Application.Tools.TimingHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools;
@@ -8,12 +10,12 @@ namespace Mapping_Tools.Application.Tests.Tools;
 public sealed class ToolDefinitionTests
 {
     [TestMethod]
-    public void MappingToolDefinitions_TimingHelper_ExposesCanonicalMetadata()
+    public void ToolDefinition_TimingHelper_ExposesCanonicalMetadata()
     {
         // Arrange
 
         // Act
-        ToolDefinition definition = MappingToolDefinitions.TimingHelper;
+        ToolDefinition definition = TimingHelperToolDefinition.Definition;
 
         // Assert
         definition.Id.Should().Be("timing-helper");
@@ -30,12 +32,12 @@ public sealed class ToolDefinitionTests
     }
 
     [TestMethod]
-    public void MappingToolDefinitions_MapsetMerger_DeclaresNoQuickRunCommand()
+    public void ToolDefinition_MapsetMerger_DeclaresNoQuickRunCommand()
     {
         // Arrange
 
         // Act
-        ToolDefinition definition = MappingToolDefinitions.MapsetMerger;
+        ToolDefinition definition = MapsetMergerToolDefinition.Definition;
 
         // Assert
         definition.QuickRunTargets.Should().BeNull();
@@ -45,7 +47,7 @@ public sealed class ToolDefinitionTests
     public void QuickRunCommand_FromToolDefinition_UsesCanonicalIdentityAndTargets()
     {
         // Arrange
-        ToolDefinition definition = MappingToolDefinitions.TimingHelper;
+        ToolDefinition definition = TimingHelperToolDefinition.Definition;
 
         // Act
         QuickRunCommand command = new(definition, _ => Task.CompletedTask);

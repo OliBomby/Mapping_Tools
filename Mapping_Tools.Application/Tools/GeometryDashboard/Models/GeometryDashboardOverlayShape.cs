@@ -1,6 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
-using Mapping_Tools.Core.Tools.SnappingTools;
+using Mapping_Tools.Core.Tools.GeometryDashboard;
 
 namespace Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 

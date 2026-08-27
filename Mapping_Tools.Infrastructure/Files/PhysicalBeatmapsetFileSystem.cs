@@ -1,5 +1,5 @@
 using Mapping_Tools.Application.Abstractions;
-using Mapping_Tools.Infrastructure.MapsetMerger;
+using Mapping_Tools.Infrastructure.Tools.MapsetMerger;
 
 namespace Mapping_Tools.Infrastructure.Files;
 

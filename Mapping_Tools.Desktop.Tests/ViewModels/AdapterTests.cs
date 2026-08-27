@@ -3,8 +3,11 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
-using Mapping_Tools.Core.Tools.TumourGenerating.Models;
-using Mapping_Tools.Desktop.ViewModels.Adapters;
+using Mapping_Tools.Core.Tools.TumourGenerator.Models;
+using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
+using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels.Adapters;
+using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels.Adapters;
+using Mapping_Tools.Desktop.Tools.TumourGenerator.Adapters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.ViewModels;

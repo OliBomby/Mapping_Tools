@@ -4,7 +4,7 @@ namespace Mapping_Tools.Application.Tools;
 
 /// <summary>
 ///     Describes one Mapping Tools capability as seen by application-level
-///     catalogs, command routing, and frontend composition.
+///     catalogs and command routing.
 /// </summary>
 public sealed class ToolDefinition
 {
@@ -70,4 +70,5 @@ public sealed class ToolDefinition
     ///     offered as a QuickRun target, or <see langword="null" /> when unsupported.
     /// </summary>
     public QuickRunTargets? QuickRunTargets { get; }
+
 }

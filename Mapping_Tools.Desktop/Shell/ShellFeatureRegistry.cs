@@ -1,7 +1,7 @@
 namespace Mapping_Tools.Desktop.Shell;
 
 /// <summary>
-///     Stores explicitly supplied feature registrations without reflecting over UI types.
+///     Stores validated feature registrations supplied by the composition root.
 /// </summary>
 public sealed class ShellFeatureRegistry : IShellFeatureRegistry
 {

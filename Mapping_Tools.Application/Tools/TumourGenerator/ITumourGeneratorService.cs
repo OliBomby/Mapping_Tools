@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Tools.TumourGenerating.Models;
+using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 
 namespace Mapping_Tools.Application.Tools.TumourGenerator;
 

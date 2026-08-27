@@ -1,4 +1,4 @@
-using Mapping_Tools.Core.Tools.SnappingTools.Serialization;
+using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 
 namespace Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 

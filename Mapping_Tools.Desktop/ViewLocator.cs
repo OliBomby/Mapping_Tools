@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -15,7 +16,8 @@ public class ViewLocator : IDataTemplate
 {
     /// <summary>
     ///     Resolves a view by replacing the runtime view-model type's
-    ///     <c>ViewModel</c> suffix with <c>View</c>.
+    ///     <c>ViewModel</c> suffix with <c>View</c> and searching loaded
+    ///     assemblies, including external tool assemblies.
     /// </summary>
     /// <param name="param">The view model to present.</param>
     /// <returns>
@@ -28,11 +30,26 @@ public class ViewLocator : IDataTemplate
             return null;
 
         string name = param.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal);
-        var type = Type.GetType(name);
+        var type = Type.GetType(name)
+                   ?? AppDomain.CurrentDomain.GetAssemblies()
+                       .Select(assembly => GetType(assembly, name))
+                       .FirstOrDefault(candidate => candidate is not null);
 
         if (type != null) return (Control)Activator.CreateInstance(type)!;
 
         return new TextBlock { Text = "Not Found: " + name };
+
+        static Type? GetType(Assembly assembly, string fullName)
+        {
+            try
+            {
+                return assembly.GetType(fullName, throwOnError: false);
+            }
+            catch (ReflectionTypeLoadException)
+            {
+                return null;
+            }
+        }
     }
 
     /// <summary>

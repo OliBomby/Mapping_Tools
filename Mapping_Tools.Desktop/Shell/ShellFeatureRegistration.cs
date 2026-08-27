@@ -11,7 +11,7 @@ public sealed class ShellFeatureRegistration
     private readonly Func<ObservableObject> createViewModel;
 
     /// <summary>
-    ///     Creates an explicit shell feature registration.
+    ///     Creates a shell feature registration supplied by composition.
     /// </summary>
     /// <param name="id">Stable persistence identifier.</param>
     /// <param name="displayName">User-facing navigation label.</param>

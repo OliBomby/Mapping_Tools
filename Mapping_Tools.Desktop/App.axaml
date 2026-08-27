@@ -21,19 +21,10 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:InvariantInt32Converter x:Key="InvariantInt32Converter" />
             <converters:InvariantDoubleConverter x:Key="InvariantDoubleConverter" />
-            <converters:GraphStateToDoubleConverter x:Key="GraphStateToDoubleConverter" />
-            <converters:BooleanNotConverter x:Key="BooleanNotConverter" />
-            <converters:EnumEqualsConverter x:Key="EnumEqualsConverter" />
-            <converters:TimingCopierResnapModeConverter x:Key="TimingCopierResnapModeConverter" />
-            <converters:HitsoundCopierCopyModeConverter x:Key="HitsoundCopierCopyModeConverter" />
-            <converters:TumourTemplateIconConverter x:Key="TumourTemplateIconConverter" />
-            <converters:CircleSizeToThicknessConverter x:Key="CircleSizeToThicknessConverter" />
             <converters:TimeToStringConverter x:Key="TimeToStringConverter" />
-            <converters:DoubleArrayToStringConverter x:Key="DoubleArrayToStringConverter" />
             <converters:ConstantTimeSpanConverter x:Key="ConstantTimeSpanConverter" />
             <converters:DarkThemeConverter x:Key="DarkThemeConverter" />
             <converters:BeatDivisorArrayToStringConverter x:Key="BeatDivisorArrayToStringConverter" />
-            <converters:StringArrayToStringConverter x:Key="StringArrayToStringConverter" />
             <converters:RgbaColourToAvaloniaColorConverter x:Key="RgbaColourToAvaloniaColorConverter" />
             <converters:RgbaColourToAvaloniaBrushConverter x:Key="RgbaColourToAvaloniaBrushConverter" />
             <converters:MaterialIconConverter x:Key="MaterialIconConverter" />

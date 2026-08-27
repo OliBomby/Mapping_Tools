@@ -1,0 +1,228 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioView"
+             x:DataType="vm:HitsoundStudioViewModel">
+    <Grid RowDefinitions="*,Auto">
+        <Grid Margin="0,0,0,10" ColumnDefinitions="330,Auto,*">
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="8">
+                    <controls:ToolViewHeader Title="Hitsound Studio"
+                                             IsQuickRunSupported="True"
+                                             HelpText="Hitsound Studio is the tool that lets you import data from multiple outside sources and convert them to osu! standard hitsounds in the form of a hitsounding difficulty that you can copy to other beatmaps.&#x0a;&#x0a;It represents hitsounds as a list of layers (hitsound layers). One layer contains a unique sound, the sampleset and hitsound that accompany that sound and a list of times that sound has to be played." />
+                    <StackPanel IsVisible="{Binding HasLayers}" IsEnabled="{Binding HasLayers}" Spacing="8">
+                        <TextBlock FontWeight="Bold" FontSize="16" Text="General" />
+                        <TextBox Text="{Binding EditName, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Name"
+                                 ToolTip.Tip="The name of this hitsound layer." />
+                        <ComboBox ItemsSource="{Binding SampleSets}"
+                                  SelectedItem="{Binding EditSampleSet, Mode=TwoWay}"
+                                  materialAssists:ComboBoxAssist.Label="Sample set"
+                                  ToolTip.Tip="The sampleset that this sample should play on." />
+                        <ComboBox ItemsSource="{Binding Hitsounds}" SelectedItem="{Binding EditHitsound, Mode=TwoWay}"
+                                  materialAssists:ComboBoxAssist.Label="Hitsound"
+                                  ToolTip.Tip="The hitsound that this sample should play on." />
+                        <CheckBox Content="Show times" IsChecked="{Binding ShowTimes, Mode=TwoWay}"
+                                  ToolTip.Tip="Show the times when the sound of this hitsound layer has to be played." />
+                        <StackPanel IsVisible="{Binding ShowTimes}">
+                            <TextBox Text="{Binding EditTimes, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Times"
+                                     ToolTip.Tip="Times in milliseconds, separated by commas." />
+                        </StackPanel>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                            <TextBox Text="{Binding EditSamplePath, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Hitsound sample"
+                                     ToolTip.Tip="Audio or SoundFont source used to generate this layer." />
+                            <Button Grid.Column="1" Content="…" Command="{Binding PickEditSamplePathCommand}"
+                                    ToolTip.Tip="Choose the layer's audio or SoundFont source." />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="6">
+                            <TextBox Text="{Binding EditSampleVolume, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Volume %"
+                                     ToolTip.Tip="The volume at which the sound of this hitsound layer has to play. Ranges from 0 to 100." />
+                            <TextBox Grid.Column="1" Text="{Binding EditSamplePanning, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Panning"
+                                     ToolTip.Tip="Panning of the sound. -1 means all left and 1 means all right." />
+                        </Grid>
+                        <TextBox Text="{Binding EditSamplePitchShift, Mode=TwoWay}"
+                                 materialAssists:TextFieldAssist.Label="Pitch shift"
+                                 ToolTip.Tip="Pitch shift of the sound in keys. 12 is plus one octave. -12 is minus one octave." />
+                        <StackPanel IsVisible="{Binding IsSoundFontSample}" Spacing="8">
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="6">
+                                <TextBox Text="{Binding EditSampleBank, Mode=TwoWay}"
+                                         materialAssists:TextFieldAssist.Label="SF2 bank"
+                                         ToolTip.Tip="The bank number of the sample." />
+                                <TextBox Grid.Column="1" Text="{Binding EditSamplePatch, Mode=TwoWay}"
+                                         materialAssists:TextFieldAssist.Label="SF2 patch"
+                                         ToolTip.Tip="The patch number of the sample." />
+                            </Grid>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="6">
+                                <TextBox Text="{Binding EditSampleInstrument, Mode=TwoWay}"
+                                         materialAssists:TextFieldAssist.Label="Instrument"
+                                         ToolTip.Tip="The layer index in the sound font preset or instrument index." />
+                                <TextBox Grid.Column="1" Text="{Binding EditSampleKey, Mode=TwoWay}"
+                                         materialAssists:TextFieldAssist.Label="MIDI key"
+                                         ToolTip.Tip="The key number of the sample." />
+                            </Grid>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="6">
+                                <TextBox Text="{Binding EditSampleLength, Mode=TwoWay}"
+                                         materialAssists:TextFieldAssist.Label="Length"
+                                         ToolTip.Tip="The length in milliseconds of the sample." />
+                                <TextBox Grid.Column="1" Text="{Binding EditSampleVelocity, Mode=TwoWay}"
+                                         materialAssists:TextFieldAssist.Label="Velocity"
+                                         ToolTip.Tip="The velocity of the sample. Synonymous with the volume field." />
+                            </Grid>
+                        </StackPanel>
+                        <TextBlock FontWeight="Bold" Text="Import info"
+                                   ToolTip.Tip="Holds all the info from importing such that the layer can be re-imported with the same result." />
+                        <ComboBox ItemsSource="{Binding ImportTypes}"
+                                  SelectedItem="{Binding EditImportType, Mode=TwoWay}"
+                                  materialAssists:ComboBoxAssist.Label="Import type"
+                                  ToolTip.Tip="How to import the source of this hitsound layer." />
+                        <Grid IsVisible="{Binding HasImport}" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                            <TextBox Text="{Binding EditImportPath, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Source path"
+                                     ToolTip.Tip="The source of this hitsound layer." />
+                            <Button Grid.Column="1" Content="Current" Command="{Binding LoadEditImportPathCommand}"
+                                    ToolTip.Tip="Fetch the selected beatmap from your osu! client." />
+                            <Button Grid.Column="2" Content="…" Command="{Binding PickEditImportPathCommand}"
+                                    ToolTip.Tip="Select the import source with a file picker." />
+                        </Grid>
+                        <Grid IsVisible="{Binding IsStackImport}" ColumnDefinitions="*,*" ColumnSpacing="6">
+                            <TextBox Text="{Binding EditImportX, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="X coordinate"
+                                     ToolTip.Tip="The X coordinate of the stack in the source beatmap." />
+                            <TextBox Grid.Column="1" Text="{Binding EditImportY, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Y coordinate"
+                                     ToolTip.Tip="The Y coordinate of the stack in the source beatmap." />
+                        </Grid>
+                        <Grid IsVisible="{Binding IsSampleImport}" ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                            <TextBox Text="{Binding EditImportSamplePath, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Imported sample path"
+                                     ToolTip.Tip="Unique sample which this layer imported from the source beatmap." />
+                            <Button Grid.Column="1" Content="…" Command="{Binding PickEditImportSamplePathCommand}"
+                                    ToolTip.Tip="Choose the imported sample file." />
+                        </Grid>
+                        <Grid IsVisible="{Binding IsMidiImport}" ColumnDefinitions="*,*" ColumnSpacing="6">
+                            <TextBox Text="{Binding EditImportBank, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Import bank"
+                                     ToolTip.Tip="SoundFont bank filter, or -1 for any bank." />
+                            <TextBox Grid.Column="1" Text="{Binding EditImportPatch, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Import patch"
+                                     ToolTip.Tip="SoundFont patch filter, or -1 for any patch." />
+                        </Grid>
+                        <Grid IsVisible="{Binding IsMidiImport}" ColumnDefinitions="*,*" ColumnSpacing="6">
+                            <TextBox Text="{Binding EditImportKey, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Import key"
+                                     ToolTip.Tip="MIDI key filter, or -1 for any key." />
+                            <TextBox Grid.Column="1" Text="{Binding EditImportLength, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Import length"
+                                     ToolTip.Tip="MIDI length filter, or -1 for any length." />
+                        </Grid>
+                        <Grid IsVisible="{Binding IsMidiImport}" ColumnDefinitions="*,*" ColumnSpacing="6">
+                            <TextBox Text="{Binding EditImportLengthRoughness, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Length roughness"
+                                     ToolTip.Tip="Quantization used when importing MIDI note lengths." />
+                            <TextBox Grid.Column="1" Text="{Binding EditImportVelocity, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Import velocity"
+                                     ToolTip.Tip="MIDI velocity filter, or -1 for any velocity." />
+                        </Grid>
+                        <Grid IsVisible="{Binding IsMidiImport}" ColumnDefinitions="*,*" ColumnSpacing="6">
+                            <TextBox Text="{Binding EditImportVelocityRoughness, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Velocity roughness"
+                                     ToolTip.Tip="Quantization used when importing MIDI velocities." />
+                            <TextBox Grid.Column="1" Text="{Binding EditImportOffset, Mode=TwoWay}"
+                                     materialAssists:TextFieldAssist.Label="Import offset"
+                                     ToolTip.Tip="Millisecond offset applied to imported events." />
+                        </Grid>
+                        <CheckBox IsVisible="{Binding IsSampleImport}" Content="Discriminate volumes"
+                                  IsChecked="{Binding EditImportDiscriminateVolumes, Mode=TwoWay}"
+                                  ToolTip.Tip="Make separate hitsound layers for different source volumes." />
+                        <CheckBox IsVisible="{Binding IsHitsoundsImport}" Content="Detect duplicate samples"
+                                  IsChecked="{Binding EditImportDetectDuplicates, Mode=TwoWay}"
+                                  ToolTip.Tip="Merge hitsound layers which produce the exact same sound." />
+                        <CheckBox IsVisible="{Binding IsSampleImport}" Content="Remove duplicates"
+                                  IsChecked="{Binding EditImportRemoveDuplicates, Mode=TwoWay}"
+                                  ToolTip.Tip="Remove duplicate values in the Times field." />
+                    </StackPanel>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                        <TextBox Text="{Binding BaseBeatmap, Mode=TwoWay}"
+                                 materialAssists:TextFieldAssist.Label="Base beatmap"
+                                 ToolTip.Tip="Beatmap used as the export baseline and MIDI timing source." />
+                        <Button Grid.Column="1" Content="…" Command="{Binding PickBaseBeatmapCommand}"
+                                ToolTip.Tip="Choose the base beatmap." />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                        <TextBox Text="{Binding DefaultSample.SampleArgs.Path, Mode=TwoWay}"
+                                 materialAssists:TextFieldAssist.Label="Default sample"
+                                 ToolTip.Tip="Normal sample added to packages that contain only additions." />
+                        <Button Grid.Column="1" Content="…" Command="{Binding PickDefaultSampleCommand}"
+                                ToolTip.Tip="Choose the default sample." />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="6">
+                        <TextBox Text="{Binding DefaultSampleVolume, Mode=TwoWay}"
+                                 materialAssists:TextFieldAssist.Label="Volume"
+                                 ToolTip.Tip="Volume % of the default sample. Use -1 for invariant volume." />
+                        <ComboBox Grid.Column="1" ItemsSource="{Binding DefaultSampleSets}"
+                                  SelectedItem="{Binding DefaultSample.SampleSet, Mode=TwoWay}"
+                                  materialAssists:ComboBoxAssist.Label="Default sample set"
+                                  ToolTip.Tip="Sample set of the default normal sample." />
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Button Content="Reload" Command="{Binding ReloadCommand}"
+                                ToolTip.Tip="Reload selected layers from their source." />
+                        <Button Content="Validate samples" Command="{Binding ValidateSamplesCommand}"
+                                ToolTip.Tip="Validate every sample source and report missing or unreadable files." />
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+            <GridSplitter Grid.Column="1" Width="6" HorizontalAlignment="Stretch" ResizeDirection="Columns" />
+            <Grid Grid.Column="2" RowDefinitions="Auto,*,Auto" Margin="12,0,0,0">
+                <TextBlock FontWeight="Bold" FontSize="16" Text="Hitsound layers" />
+                <controls:MaterialGridListView Grid.Row="1" ItemsSource="{Binding Layers}" SelectionMode="Multiple"
+                                               SelectionChanged="LayersSelectionChanged"
+                                               DoubleTapped="LayersDoubleTapped"
+                                               CanUserResizeColumns="True">
+                    <controls:MaterialGridListView.Columns>
+                        <TableViewColumn Width="200" Binding="{Binding Name}">
+                            <TableViewColumn.Header>Name</TableViewColumn.Header>
+                        </TableViewColumn>
+                        <TableViewColumn Width="90" Binding="{Binding Times.Count}">
+                            <TableViewColumn.Header>Amount</TableViewColumn.Header>
+                        </TableViewColumn>
+                        <TableViewColumn Width="100" Binding="{Binding SampleSet}">
+                            <TableViewColumn.Header>SampleSet</TableViewColumn.Header>
+                        </TableViewColumn>
+                        <TableViewColumn Width="100" Binding="{Binding Hitsound}">
+                            <TableViewColumn.Header>Hitsound</TableViewColumn.Header>
+                        </TableViewColumn>
+                        <TableViewColumn Width="*" Binding="{Binding SampleArgs.Path}">
+                            <TableViewColumn.Header>Sample Path</TableViewColumn.Header>
+                        </TableViewColumn>
+                    </controls:MaterialGridListView.Columns>
+                </controls:MaterialGridListView>
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6"
+                            Margin="0,8,0,0">
+                    <Button Content="Preview" Command="{Binding PreviewCommand}"
+                            ToolTip.Tip="Preview the selected layer." />
+                    <Button Content="Add" Command="{Binding AddCommand}" ToolTip.Tip="Add or import a hitsound layer." />
+                    <Button Content="Remove" Command="{Binding RemoveCommand}" ToolTip.Tip="Remove selected layers." />
+                    <Button x:Name="RaiseButton" Content="Raise"
+                            ToolTip.Tip="Raise selected layers in priority. Hold Shift to move ten positions." />
+                    <Button x:Name="LowerButton" Content="Lower"
+                            ToolTip.Tip="Lower selected layers in priority. Hold Shift to move ten positions." />
+                </StackPanel>
+            </Grid>
+            <controls:ToolRunButton Grid.Column="2" Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                    RunCommand="{Binding RunCommand}" />
+        </Grid>
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                <TextBlock Text="{Binding ResultSummary}" TextWrapping="Wrap" />
+                <controls:ToolProgressBar Height="20" Width="220" Maximum="100" Value="{Binding Progress}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

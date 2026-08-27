@@ -1,0 +1,45 @@
+using Mapping_Tools.Application.Tools;
+using Mapping_Tools.Application.Tools.TimingHelper;
+using Mapping_Tools.Desktop.Plugin;
+using Mapping_Tools.Desktop.Tools.TimingHelper.ViewModels;
+using Mapping_Tools.Desktop.Tools.TimingHelper.Views;
+using Microsoft.Extensions.DependencyInjection;
+using ApplicationDefinition = Mapping_Tools.Application.Tools.TimingHelper.TimingHelperToolDefinition;
+
+namespace Mapping_Tools.Desktop.Tools.TimingHelper;
+
+/// <summary>Describes and composes the Timing Helper plugin feature.</summary>
+[MappingToolDefinition]
+public sealed class TimingHelperToolRegistration : IMappingToolDefinition
+{
+    /// <inheritdoc />
+    public string Category => "Tools";
+
+    /// <inheritdoc />
+    public bool StartsSection => false;
+
+    /// <inheritdoc />
+    public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
+
+    /// <inheritdoc />
+    public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Auto;
+
+    /// <inheritdoc />
+    public int Order => 190;
+
+    /// <inheritdoc />
+    public ToolDefinition Definition => ApplicationDefinition.Definition;
+
+    /// <inheritdoc />
+    public Type ViewModelType => typeof(TimingHelperViewModel);
+
+    /// <inheritdoc />
+    public Type ViewType => typeof(TimingHelperView);
+
+    /// <inheritdoc />
+    public void RegisterServices(IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        services.AddSingleton<ITimingHelperService, TimingHelperService>();
+    }
+}

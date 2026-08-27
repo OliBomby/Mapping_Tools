@@ -29,11 +29,11 @@ application layer.
 The temporary greeting window has been replaced by the first production
 Avalonia shell slice:
 
-- `ShellFeatureRegistration` and `IShellFeatureRegistry` provide an ordered,
-  explicit feature list with stable IDs, descriptions, categories, and search
-  terms;
-- registration rejects duplicate IDs and never scans assemblies or reflects
-  over view types;
+- `ShellFeatureRegistration` and `IShellFeatureRegistry` provide an ordered
+  feature list with stable IDs, descriptions, categories, and search terms;
+- attributed per-tool definitions are discovered from the built-in desktop
+  assembly and the adjacent `Plugins` directory; discovery rejects duplicate
+  IDs and delegates each tool's service registrations to its own definition;
 - `MainViewModel` supports case-insensitive partial and exact search, clearing
   the query, favorite-first ordering, immediate favorite persistence, lazy
   feature creation, current-content switching, and lifecycle activation;
