@@ -1,9 +1,7 @@
-using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.Tools.HitsoundCopier;
@@ -11,7 +9,7 @@ using Mapping_Tools.Core.Tools.HitsoundCopier;
 namespace Mapping_Tools.Application.Tools.HitsoundCopier;
 
 /// <summary>
-///     Coordinates source selection, multi-map transformation, sample ports, and safe saves.
+///     Coordinates source and target loading, multi-map transformation, sample ports, and safe saves.
 /// </summary>
 public sealed class HitsoundCopierService : IHitsoundCopierService
 {
@@ -45,12 +43,9 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
         BeatmapEditingSession? sourceSession = null;
         if (!string.IsNullOrWhiteSpace(options.PathFrom))
         {
-            var preference = options.SourceSelectionMode == HitObjectSelectionMode.Selected
-                ? LiveBeatmapPreference.RequireLive
-                : LiveBeatmapPreference.PreferLive;
             sourceSession = await editingGateway.OpenBeatmapAsync(
                 options.PathFrom,
-                preference,
+                LiveBeatmapPreference.PreferLive,
                 cancellationToken).ConfigureAwait(false);
         }
 
@@ -67,9 +62,6 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
                 LiveBeatmapPreference.PreferLive,
                 cancellationToken).ConfigureAwait(false);
             var source = sourceSession?.Editor.Beatmap ?? CreateEmptySource(targetSession.Editor.Beatmap);
-            var sourceObjects = sourceSession is null
-                ? []
-                : SelectSourceObjects(sourceSession, options);
             string? targetDirectory = Path.GetDirectoryName(targetPaths[index]);
             string mapDirectory = string.IsNullOrWhiteSpace(targetDirectory)
                 ? Directory.GetCurrentDirectory()
@@ -91,7 +83,6 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
             var result = HitsoundCopierEngine.Apply(
                 targetSession.Editor.Beatmap,
                 source,
-                sourceObjects,
                 options,
                 mapDirectory,
                 firstSamples,
@@ -127,16 +118,6 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
         return new HitsoundCopierResult(processed, matched, generated, muted, schema);
     }
 
-    private static IReadOnlyList<HitObject> SelectSourceObjects(
-        BeatmapEditingSession session,
-        HitsoundCopierServiceOptions options)
-    {
-        return BeatmapObjectSelection.Select(
-            session,
-            options.SourceSelectionMode,
-            options.TimeCode);
-    }
-
     private static Beatmap CreateEmptySource(Beatmap target)
     {
         var empty = target.DeepCopy();
@@ -165,15 +146,6 @@ public sealed class HitsoundCopierService : IHitsoundCopierService
             throw new ArgumentException("Select at least one target beatmap.", nameof(options));
         }
 
-        if (!Enum.IsDefined(options.SourceSelectionMode))
-        {
-            throw new ArgumentException(
-                "Hitsound Copier received an unknown source selection mode.",
-                nameof(options));
-        }
-
-        if (options.SourceSelectionMode == HitObjectSelectionMode.Time && string.IsNullOrWhiteSpace(options.TimeCode))
-            throw new ArgumentException("A time code is required for Time mode.", nameof(options));
         HitsoundCopierEngine.Validate(options);
     }
 }

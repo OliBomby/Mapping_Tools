@@ -80,19 +80,6 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     [Range(0, double.MaxValue)]
     public partial double TemporalLeniency { get; set; } = 5;
 
-    /// <summary>Gets or sets the source object selection mode.</summary>
-    [ObservableProperty]
-    public partial HitObjectSelectionMode SourceSelectionMode { get; set; } =
-        HitObjectSelectionMode.Everything;
-
-    /// <summary>Gets or sets the legacy time-code query for Time mode.</summary>
-    [ObservableProperty]
-    public partial string TimeCode { get; set; } = string.Empty;
-
-    /// <summary>Gets or sets the millisecond source timing offset.</summary>
-    [ObservableProperty]
-    public partial double TimingOffset { get; set; }
-
     /// <summary>Gets or sets whether object and edge hitsounds are copied.</summary>
     [ObservableProperty]
     public partial bool CopyHitsounds { get; set; } = true;
@@ -167,10 +154,6 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     /// <summary>Gets or sets the muted sample family.</summary>
     [ObservableProperty]
     public partial SampleSet MutedSampleSet { get; set; } = SampleSet.None;
-
-    /// <summary>Gets the displayable source selection choices.</summary>
-    public IReadOnlyList<HitObjectSelectionMode> SourceSelectionModes { get; } =
-        Enum.GetValues<HitObjectSelectionMode>();
 
     /// <summary>Gets the displayable copy-mode labels.</summary>
     public IReadOnlyList<string> CopyModes { get; } = ["Overwrite everything", "Overwrite only defined"];
@@ -286,9 +269,6 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
             PathTo = PathTo,
             CopyMode = CopyMode,
             TemporalLeniency = TemporalLeniency,
-            SourceSelectionMode = SourceSelectionMode,
-            TimeCode = TimeCode,
-            TimingOffset = TimingOffset,
             CopyHitsounds = CopyHitsounds,
             CopyBodyHitsounds = CopyBodyHitsounds,
             CopySampleSets = CopySampleSets,
@@ -315,9 +295,6 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         PathTo = project.PathTo ?? string.Empty;
         CopyMode = project.CopyMode;
         TemporalLeniency = project.TemporalLeniency;
-        SourceSelectionMode = project.SourceSelectionMode;
-        TimeCode = project.TimeCode ?? string.Empty;
-        TimingOffset = project.TimingOffset;
         CopyHitsounds = project.CopyHitsounds;
         CopyBodyHitsounds = project.CopyBodyHitsounds;
         CopySampleSets = project.CopySampleSets;

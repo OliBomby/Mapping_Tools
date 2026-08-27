@@ -14,7 +14,7 @@ namespace Mapping_Tools.Application.Tests.Tools.HitsoundCopier;
 public sealed class HitsoundCopierServiceTests
 {
     [TestMethod]
-    public async Task CopyAsync_WithMultipleTargets_UsesSourceSelectionAndSavesEveryTarget()
+    public async Task CopyAsync_WithMultipleTargets_UsesSourceAndSavesEveryTarget()
     {
         // Arrange
         string fixture = Path.Combine(
@@ -25,7 +25,6 @@ public sealed class HitsoundCopierServiceTests
         {
             PathFrom = "source.osu",
             PathTo = "first.osu|second.osu",
-            SourceSelectionMode = HitObjectSelectionMode.Everything,
         };
 
         // Act
@@ -37,27 +36,6 @@ public sealed class HitsoundCopierServiceTests
             .Should().Equal("source.osu", "first.osu", "second.osu");
         gateway.SessionSaveRequests.Select(request => request.Session.Editor.Path)
             .Should().Equal("first.osu", "second.osu");
-    }
-
-    [TestMethod]
-    public async Task CopyAsync_TimeSelectionWithoutCode_RejectsBeforeOpeningMaps()
-    {
-        // Arrange
-        RecordingBeatmapEditingGateway gateway = CreateGateway(Path.Combine(
-            AppContext.BaseDirectory, "Fixtures", "Beatmaps", "standard-feature-rich.osu"));
-        HitsoundCopierService service = new(gateway, new StubSampleService(), new ApplicationSettings());
-        HitsoundCopierServiceOptions options = new()
-        {
-            PathTo = "target.osu",
-            SourceSelectionMode = HitObjectSelectionMode.Time,
-        };
-
-        // Act
-        Func<Task> act = () => service.CopyAsync(options);
-
-        // Assert
-        await act.Should().ThrowAsync<ArgumentException>();
-        gateway.OpenRequests.Should().BeEmpty();
     }
 
     private sealed class StubSampleService : IHitsoundSampleService

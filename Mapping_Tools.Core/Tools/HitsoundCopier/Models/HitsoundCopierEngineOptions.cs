@@ -12,9 +12,6 @@ public class HitsoundCopierEngineOptions
     /// <summary>Gets or sets the maximum rounded millisecond matching distance.</summary>
     public double TemporalLeniency { get; set; } = 5;
 
-    /// <summary>Gets or sets the millisecond shift applied to source events before matching.</summary>
-    public double TimingOffset { get; set; }
-
     /// <summary>Gets or sets whether object and edge hitsounds are copied.</summary>
     public bool CopyHitsounds { get; set; } = true;
 

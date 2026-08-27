@@ -46,25 +46,10 @@
                 <ComboBox Margin="0,20,0,0" ItemsSource="{Binding CopyModes}" SelectedIndex="{Binding CopyMode}"
                           materialAssists:ComboBoxAssist.Label="Copying mode"
                           ToolTip.Tip="'Overwrite everything' works like traditional hitsound copiers and 'Overwrite only defined' will only copy over hitsounds from the source beatmap and keep all the other hitsounds intact." />
-                <ComboBox Margin="0,10,0,0" ItemsSource="{Binding SourceSelectionModes}"
-                          SelectedItem="{Binding SourceSelectionMode}"
-                          materialAssists:ComboBoxAssist.Label="Source object selection mode"
-                          ToolTip.Tip="Choose selected objects, bookmarked objects, objects in a time code, or everything." />
                 <TextBox Margin="0,10,0,0"
-                         IsVisible="{Binding SourceSelectionMode, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Time}"
-                         materialAssists:TextFieldAssist.Label="Time code"
-                         Text="{Binding TimeCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         ToolTip.Tip="The legacy osu! time code used by Time mode." />
-                <Grid Margin="0,10,0,0" ColumnDefinitions="*,*">
-                    <TextBox Margin="0,0,5,0" Classes="compact"
-                             materialAssists:TextFieldAssist.Label="Temporal leniency"
-                             Text="{Binding TemporalLeniency, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
-                             ToolTip.Tip="Milliseconds two objects may differ while still matching." />
-                    <TextBox Grid.Column="1" Margin="5,0,0,0" Classes="compact"
-                             materialAssists:TextFieldAssist.Label="Timing offset"
-                             Text="{Binding TimingOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
-                             ToolTip.Tip="Milliseconds to add to source events before matching." />
-                </Grid>
+                         materialAssists:TextFieldAssist.Label="Temporal leniency"
+                         Text="{Binding TemporalLeniency, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
+                         ToolTip.Tip="Milliseconds two objects may differ while still matching." />
 
                 <CheckBox Margin="0,10,0,0" IsChecked="{Binding CopyHitsounds}" Content="Copy hitsounds"
                           ToolTip.Tip="Copy hitsounds from circles, slider heads/repeats/ends, spinner ends, and hold note heads." />

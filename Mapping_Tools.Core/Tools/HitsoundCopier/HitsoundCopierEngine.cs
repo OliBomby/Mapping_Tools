@@ -19,7 +19,6 @@ public static class HitsoundCopierEngine
     /// </summary>
     /// <param name="target">The mutable beatmap receiving the changes.</param>
     /// <param name="source">The beatmap supplying timing, storyboard, and source objects.</param>
-    /// <param name="sourceObjects">The source objects selected by the application layer.</param>
     /// <param name="options">The legacy-compatible copy settings.</param>
     /// <param name="mapDirectory">The target mapset directory used to resolve target sample paths.</param>
     /// <param name="firstSamples">Canonical target sample paths discovered by an application adapter.</param>
@@ -32,7 +31,6 @@ public static class HitsoundCopierEngine
     public static HitsoundCopierApplyResult Apply(
         Beatmap target,
         Beatmap source,
-        IReadOnlyCollection<HitObject> sourceObjects,
         HitsoundCopierEngineOptions options,
         string mapDirectory,
         IReadOnlyDictionary<string, string>? firstSamples = null,
@@ -44,7 +42,6 @@ public static class HitsoundCopierEngine
     {
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(sourceObjects);
         ArgumentNullException.ThrowIfNull(options);
         ArgumentException.ThrowIfNullOrWhiteSpace(mapDirectory);
         Validate(options);
@@ -64,13 +61,13 @@ public static class HitsoundCopierEngine
         int mutedCount = 0;
 
         var targetTimeline = target.GetTimeline();
-        Timeline sourceTimeline = new(sourceObjects.ToList(), source.BeatmapTiming);
+        var sourceTimeline = source.GetTimeline();
         targetTimeline.GiveTimingPoints(target.BeatmapTiming);
         sourceTimeline.GiveTimingPoints(source.BeatmapTiming);
         if (options.CopyBodyHitsounds || options.CopyStoryboardedSamples || options.MuteSliderends)
         {
             target.GiveObjectsGreenlines();
-            if (sourceObjects.Count > 0 && source.BeatmapTiming.TimingPoints.Count > 0)
+            if (source.HitObjects.Count > 0 && source.BeatmapTiming.TimingPoints.Count > 0)
             {
                 source.GiveObjectsGreenlines();
             }
@@ -81,7 +78,7 @@ public static class HitsoundCopierEngine
             ? source.BeatmapTiming.TimingPoints[0].Offset
             : double.PositiveInfinity;
         double firstTime = Math.Min(
-            sourceFirstTime + options.TimingOffset,
+            sourceFirstTime,
             target.BeatmapTiming.TimingPoints.Count > 0
                 ? target.BeatmapTiming.TimingPoints[0].Offset
                 : double.PositiveInfinity);
@@ -111,7 +108,7 @@ public static class HitsoundCopierEngine
             // Volumes and samplesets and customindices greenlines get copied with timingpointchanges and allafter enabled
             var changes = source.BeatmapTiming.TimingPoints
                 .Select(point => new TimingPointChange(
-                    ShiftTimingPoint(point, options.TimingOffset),
+                    point.Copy(),
                     sampleSet: options.CopySampleSets,
                     index: options.CopySampleSets,
                     volume: options.CopyVolumes))
@@ -164,11 +161,11 @@ public static class HitsoundCopierEngine
             {
                 // Remove timingpoints in beatmapTo that are in a sliderbody/spinnerbody for both beatmapTo and BeatmapFrom
                 foreach (var point in target.HitObjects
-                             .SelectMany(item => item.BodyHitsounds)
-                             .Where(point =>
-                                 !point.Uninherited
-                                 && sourceObjects.Any(item =>
-                                     IsInsideShiftedSourceObject(item, point.Offset, options.TimingOffset)))
+                              .SelectMany(item => item.BodyHitsounds)
+                              .Where(point =>
+                                  !point.Uninherited
+                                  && source.HitObjects.Any(item =>
+                                      item.Time < point.Offset && item.EndTime > point.Offset))
                              .ToList())
                 {
                     target.BeatmapTiming.Remove(point);
@@ -176,14 +173,14 @@ public static class HitsoundCopierEngine
 
                 // Get timingpointschanges for every timingpoint from beatmapFrom that is in a sliderbody/spinnerbody for both beatmapTo and BeatmapFrom
                 changes.AddRange(
-                    sourceObjects
+                    source.HitObjects
                         .SelectMany(item => item.BodyHitsounds)
                         .Where(point =>
                             target.HitObjects.Any(item =>
-                                item.Time < point.Offset + options.TimingOffset
-                                && item.EndTime > point.Offset + options.TimingOffset))
+                                item.Time < point.Offset
+                                && item.EndTime > point.Offset))
                         .Select(point => new TimingPointChange(
-                            ShiftTimingPoint(point, options.TimingOffset),
+                            point.Copy(),
                             sampleSet: options.CopySampleSets,
                             index: options.CopySampleSets,
                             volume: options.CopyVolumes)));
@@ -210,7 +207,7 @@ public static class HitsoundCopierEngine
             foreach (var sample in source.StoryboardSoundSamples)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                double sampleTime = sample.StartTime + options.TimingOffset;
+                double sampleTime = sample.StartTime;
                 if (options.IgnoreHitsoundSatisfiedSamples)
                 {
                     var playing = targetTimeline.TimelineObjects
@@ -301,11 +298,6 @@ public static class HitsoundCopierEngine
                 nameof(options.TemporalLeniency),
                 options.TemporalLeniency,
                 "Temporal leniency must be finite and non-negative.");
-        if (!double.IsFinite(options.TimingOffset))
-            throw new ArgumentOutOfRangeException(
-                nameof(options.TimingOffset),
-                options.TimingOffset,
-                "Timing offset must be finite.");
         if (!double.IsFinite(options.MinLength) || options.MinLength < 0)
             throw new ArgumentOutOfRangeException(
                 nameof(options.MinLength),
@@ -334,7 +326,7 @@ public static class HitsoundCopierEngine
         foreach (var sourceItem in source.TimelineObjects
                      .Where(item => item.HasHitsound))
         {
-            var targetItem = FindMatch(sourceItem, target, options.TimingOffset, options.TemporalLeniency);
+            var targetItem = FindMatch(sourceItem, target, options.TemporalLeniency);
             if (targetItem is not null)
             {
                 // Copy to this tlo
@@ -372,7 +364,7 @@ public static class HitsoundCopierEngine
                      .Where(item => item.HasHitsound))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var targetItem = FindMatch(sourceItem, target, options.TimingOffset, options.TemporalLeniency);
+            var targetItem = FindMatch(sourceItem, target, options.TemporalLeniency);
             if (targetItem is not null)
             {
                 // Copy to this tlo
@@ -395,8 +387,8 @@ public static class HitsoundCopierEngine
             else if (options.CopyToSliderTicks
                      && FindSliderTickInRange(
                          targetBeatmap,
-                         sourceItem.Time + options.TimingOffset - options.TemporalLeniency,
-                         sourceItem.Time + options.TimingOffset + options.TemporalLeniency,
+                          sourceItem.Time - options.TemporalLeniency,
+                          sourceItem.Time + options.TemporalLeniency,
                          out double tickTime,
                          out var tickSlider)
                      && customSampledTimes.Add((int)tickTime))
@@ -432,8 +424,8 @@ public static class HitsoundCopierEngine
         foreach (var sourceItem in sliderSlides)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (!FindSliderAtTime(targetBeatmap, sourceItem.Time + options.TimingOffset, out var slider)
-                || customSampledTimes.Contains((int)(sourceItem.Time + options.TimingOffset)))
+            if (!FindSliderAtTime(targetBeatmap, sourceItem.Time, out var slider)
+                || customSampledTimes.Contains((int)sourceItem.Time))
                 continue;
 
             var assignment = TryAssign(
@@ -449,7 +441,7 @@ public static class HitsoundCopierEngine
             // Add a new custom sample to this slider slide to represent the hitsounds
             generatedSamples.MergeWith(assignment.Schema);
             // Add timingpointschange
-            AddCustomTimingChanges(changes, sourceItem, sourceItem.Time + options.TimingOffset, assignment, options);
+            AddCustomTimingChanges(changes, sourceItem, sourceItem.Time, assignment, options);
             // Make sure the slider with the slider ticks uses auto sampleset so the customized greenlines control the hitsounds
             slider!.SampleSet = SampleSet.None;
             generatedCount += assignment.Schema.Count;
@@ -524,22 +516,6 @@ public static class HitsoundCopierEngine
         }
     }
 
-    private static bool IsInsideShiftedSourceObject(
-        HitObject source,
-        double targetTime,
-        double timingOffset)
-    {
-        return source.Time + timingOffset < targetTime
-               && source.EndTime + timingOffset > targetTime;
-    }
-
-    private static TimingPoint ShiftTimingPoint(TimingPoint point, double timingOffset)
-    {
-        var shifted = point.Copy();
-        shifted.Offset += timingOffset;
-        return shifted;
-    }
-
     private static HitsoundSampleAssignment? TryAssign(
         TimelineObject source,
         string role,
@@ -593,13 +569,11 @@ public static class HitsoundCopierEngine
     private static TimelineObject? FindMatch(
         TimelineObject source,
         Timeline target,
-        double offset,
         double leniency)
     {
-        double sourceTime = source.Time + offset;
-        var targetItem = target.GetNearestTlo(sourceTime, true);
+        var targetItem = target.GetNearestTlo(source.Time, true);
         return targetItem is not null
-               && Math.Abs(Math.Round(sourceTime) - Math.Round(targetItem.Time)) <= leniency
+               && Math.Abs(Math.Round(source.Time) - Math.Round(targetItem.Time)) <= leniency
             ? targetItem
             : null;
     }

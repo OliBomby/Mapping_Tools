@@ -10,57 +10,51 @@ namespace Mapping_Tools.Core.Tests.Tools;
 public sealed class HitsoundCopierEngineTests
 {
     [TestMethod]
-    public void Apply_OverwriteModeWithSubset_ClearsUnmatchedTargetHitsoundsAndCopiesEdges()
+    public void Apply_OverwriteMode_CopiesAllSourceObjectHitsounds()
     {
         // Arrange
         var source = LoadFixture();
         Beatmap target = new(source.GetLines());
-        var selected = source.HitObjects[0];
-        int selectedHitsounds = selected.Hitsounds;
         HitsoundCopierEngineOptions options = new() { CopyMode = 0 };
 
         // Act
         var result = HitsoundCopierEngine.Apply(
             target,
             source,
-            [selected],
             options,
             @"C:\maps");
 
         // Assert
         result.MatchedHitsoundCount.Should().BeGreaterThan(0);
-        target.HitObjects[0].Hitsounds.Should().Be(selectedHitsounds);
-        target.HitObjects.Skip(1).Should().OnlyContain(item => item.Hitsounds == 0);
+        target.HitObjects.Select(item => item.Hitsounds)
+            .Should().BeEquivalentTo(source.HitObjects.Select(item => item.Hitsounds));
     }
 
     [TestMethod]
-    public void Apply_ShiftedStoryboardSamples_UsesTheConfiguredTimingOffset()
+    public void Apply_StoryboardSamples_PreservesSourceTiming()
     {
         // Arrange
         var source = LoadStoryboardFixture();
         source.StoryboardSoundSamples.Clear();
         source.StoryboardSoundSamples.Add(new StoryboardSoundSample(100, StoryboardLayer.Foreground, "sample.wav", 80));
         Beatmap target = new(source.GetLines());
-        double original = source.StoryboardSoundSamples[0].StartTime;
         HitsoundCopierEngineOptions options = new()
         {
             CopyHitsounds = false,
             CopyStoryboardedSamples = true,
             IgnoreHitsoundSatisfiedSamples = false,
-            TimingOffset = 12,
         };
 
         // Act
         HitsoundCopierEngine.Apply(
             target,
             source,
-            [],
             options,
             @"C:\maps");
 
         // Assert
         target.StoryboardSoundSamples.Should().ContainSingle();
-        target.StoryboardSoundSamples[0].StartTime.Should().Be(original + 12);
+        target.StoryboardSoundSamples[0].StartTime.Should().Be(100);
     }
 
     private static Beatmap LoadFixture()
