@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace Mapping_Tools.Core.Graph.Interpolation;
 
@@ -25,6 +26,7 @@ public class CustomInterpolator : IGraphInterpolator
     }
 
     /// <summary>Gets or sets the function used to evaluate this interpolator.</summary>
+    [JsonIgnore]
     public InterpolationDelegate InterpolationFunction { get; set; }
 
     /// <inheritdoc />
@@ -36,4 +38,3 @@ public class CustomInterpolator : IGraphInterpolator
         return InterpolationFunction(t);
     }
 }
-

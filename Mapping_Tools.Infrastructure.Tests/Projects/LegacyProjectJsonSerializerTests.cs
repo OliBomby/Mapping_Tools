@@ -187,6 +187,21 @@ public sealed class LegacyProjectJsonSerializerTests
     }
 
     [TestMethod]
+    public void Serialize_WithGraphState_DoesNotPersistRuntimeInterpolationDelegate()
+    {
+        // Arrange
+        SlideratorServiceOptions project = new();
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        string json = serializer.Serialize(project);
+
+        // Assert
+        json.Should().NotContain("InterpolationFunction");
+        json.Length.Should().BeLessThan(10_000);
+    }
+
+    [TestMethod]
     public void Serialize_WithTumourGeneratorProject_UsesLegacyRootAndLayerNames()
     {
         // Arrange
