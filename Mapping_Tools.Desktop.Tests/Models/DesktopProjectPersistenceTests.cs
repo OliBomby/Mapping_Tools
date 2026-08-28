@@ -76,6 +76,75 @@ public sealed class DesktopProjectPersistenceTests
     }
 
     [TestMethod]
+    public void SerializeAndDeserialize_SlideratorProject_WithLoadedHitObjects_PreservesImportedState()
+    {
+        // Arrange
+        HitObject firstSlider = new("64,64,0,2,0,L|164:64,1,100");
+        HitObject secondSlider = new("164,64,1000,2,0,L|264:64,1,100");
+        SlideratorProject project = new()
+        {
+            LoadedHitObjects = [firstSlider, secondSlider],
+            VisibleHitObjectIndex = 1,
+            DoEditorRead = true,
+        };
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        string json = serializer.Serialize(project);
+        SlideratorProject restored = serializer.Deserialize<SlideratorProject>(json);
+
+        // Assert
+        json.Should().Contain("\"LoadedHitObjects\"");
+        json.Should().Contain($"\"Line\": \"{firstSlider.Line}\"");
+        restored.LoadedHitObjects.Select(slider => slider.Line).Should().Equal(firstSlider.Line, secondSlider.Line);
+        restored.VisibleHitObjectIndex.Should().Be(1);
+        restored.DoEditorRead.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void Deserialize_WithLegacySlideratorLoadedObjectTimingPoint_RestoresImportedState()
+    {
+        // Arrange
+        const string json = """
+                            {
+                              "$type": "Mapping_Tools.Viewmodels.SlideratorVm, Mapping Tools",
+                              "LoadedHitObjects": {
+                                "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Mapping_Tools.Classes.BeatmapHelper.HitObject, Mapping Tools]], System",
+                                "$values": [
+                                  {
+                                    "$type": "Mapping_Tools.Classes.BeatmapHelper.HitObject, Mapping Tools",
+                                    "Line": "64,64,1000,2,0,L|164:64,1,100",
+                                    "TimingPoint": {
+                                      "$type": "Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools",
+                                      "Meter": {
+                                        "$type": "Mapping_Tools.Classes.ExternalFileUtil.TempoSignature, Mapping Tools",
+                                        "TempoDenominator": 8,
+                                        "TempoNumerator": 7,
+                                        "PartialMeasure": true
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "VisibleHitObjectIndex": 0,
+                              "DoEditorRead": true
+                            }
+                            """;
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        SlideratorProject project = serializer.Deserialize<SlideratorProject>(json);
+
+        // Assert
+        project.LoadedHitObjects.Should().ContainSingle();
+        project.LoadedHitObjects[0].Line.Should().Be("64,64,1000,2,0,L|164:64,1,100");
+        project.LoadedHitObjects[0].TimingPoint.Meter.TempoDenominator.Should().Be(8);
+        project.LoadedHitObjects[0].TimingPoint.Meter.TempoNumerator.Should().Be(7);
+        project.LoadedHitObjects[0].TimingPoint.Meter.PartialMeasure.Should().BeTrue();
+        project.DoEditorRead.Should().BeTrue();
+    }
+
+    [TestMethod]
     public void Deserialize_WithLegacySliderPicturatorProject_RestoresDesktopPresentationState()
     {
         // Arrange

@@ -534,6 +534,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         {
             ImportModeSetting = ImportModeSetting,
             TimeCode = TimeCode,
+            LoadedHitObjects = LoadedHitObjects.ToList(),
+            VisibleHitObjectIndex = VisibleHitObjectIndex,
             GlobalSv = GlobalSv,
             GraphBeats = GraphBeats,
             BeatsPerMinute = BeatsPerMinute,
@@ -555,6 +557,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             ExportAsStream = ExportAsStream,
             ExportAsInvisibleSlider = ExportAsInvisibleSlider,
             GraphState = GraphState.Clone(),
+            DoEditorRead = DoEditorRead,
         };
     }
 
@@ -562,6 +565,9 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     {
         ImportModeSetting = project.ImportModeSetting;
         TimeCode = project.TimeCode ?? string.Empty;
+        LoadedHitObjects.Clear();
+        foreach (HitObject hitObject in project.LoadedHitObjects ?? []) LoadedHitObjects.Add(hitObject);
+        VisibleHitObjectIndex = project.VisibleHitObjectIndex;
         GlobalSv = project.GlobalSv;
         GraphBeats = project.GraphBeats;
         BeatsPerMinute = project.BeatsPerMinute;
@@ -580,13 +586,11 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         ExportAsNormal = project.ExportAsNormal;
         ExportAsStream = project.ExportAsStream;
         ExportAsInvisibleSlider = project.ExportAsInvisibleSlider;
+        DoEditorRead = project.DoEditorRead;
         GraphState state = project.GraphState.Clone();
         state.MinY = GraphMinY;
         state.MaxY = GraphMaxY;
         SetGraphState(state);
-        LoadedHitObjects.Clear();
-        VisibleHitObjectIndex = 0;
-        DoEditorRead = false;
         UpdateVisibleHitObject();
         ExportTime = project.ExportTime;
     }

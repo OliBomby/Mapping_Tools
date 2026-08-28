@@ -161,6 +161,49 @@ public sealed class SlideratorViewModelTests
     }
 
     [TestMethod]
+    public void InstallProject_WithPersistedLoadedSliders_RestoresListSelectionAndEditorReadState()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        HitObject firstSlider = new("64,64,0,2,0,L|164:64,1,100");
+        HitObject secondSlider = new("164,64,1000,2,0,L|264:64,1,100");
+        SlideratorProject project = new()
+        {
+            LoadedHitObjects = [firstSlider, secondSlider],
+            VisibleHitObjectIndex = 1,
+            DoEditorRead = true,
+        };
+
+        // Act
+        ((IShellProjectFeature)viewModel).Install(project);
+
+        // Assert
+        viewModel.LoadedHitObjects.Should().Equal(firstSlider, secondSlider);
+        viewModel.VisibleHitObjectIndex.Should().Be(1);
+        viewModel.VisibleHitObject.Should().BeSameAs(secondSlider);
+        viewModel.DoEditorRead.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void Snapshot_WithLoadedSliders_PreservesImportedListAndSelection()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        HitObject firstSlider = new("64,64,0,2,0,L|164:64,1,100");
+        HitObject secondSlider = new("164,64,1000,2,0,L|264:64,1,100");
+        viewModel.LoadedHitObjects.Add(firstSlider);
+        viewModel.LoadedHitObjects.Add(secondSlider);
+        viewModel.VisibleHitObjectIndex = 1;
+
+        // Act
+        SlideratorProject snapshot = (SlideratorProject)((IShellProjectFeature)viewModel).Snapshot();
+
+        // Assert
+        snapshot.LoadedHitObjects.Should().Equal(firstSlider, secondSlider);
+        snapshot.VisibleHitObjectIndex.Should().Be(1);
+    }
+
+    [TestMethod]
     public async Task ClearGraphCommand_ResetsTheGraphToCurrentModeDefaults()
     {
         // Arrange

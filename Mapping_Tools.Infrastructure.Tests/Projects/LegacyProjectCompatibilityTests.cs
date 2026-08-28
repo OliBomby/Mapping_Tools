@@ -3,6 +3,7 @@ using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Application.Tools.PropertyTransformer;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection;
@@ -174,6 +175,34 @@ public sealed class LegacyProjectCompatibilityTests
         value.Should().BeOfType<Dictionary<HitsoundStudioSampleExportFormat, string>>();
         ((Dictionary<HitsoundStudioSampleExportFormat, string>)value)[HitsoundStudioSampleExportFormat.Default]
             .Should().Be("Default");
+    }
+
+    [TestMethod]
+    public void Deserialize_WithLegacyExternalFileTempoSignature_UsesCurrentTempoSignature()
+    {
+        // Arrange
+        const string json = """
+                           {
+                             "$type": "Mapping_Tools.Classes.BeatmapHelper.TimingPoint, Mapping Tools",
+                             "Offset": 1000.0,
+                             "MpB": 500.0,
+                             "Meter": {
+                               "$type": "Mapping_Tools.Classes.ExternalFileUtil.TempoSignature, Mapping Tools",
+                               "TempoDenominator": 8,
+                               "TempoNumerator": 7,
+                               "PartialMeasure": true
+                             }
+                           }
+                           """;
+        LegacyProjectJsonSerializer serializer = new();
+
+        // Act
+        TimingPoint timingPoint = serializer.Deserialize<TimingPoint>(json);
+
+        // Assert
+        timingPoint.Meter.TempoDenominator.Should().Be(8);
+        timingPoint.Meter.TempoNumerator.Should().Be(7);
+        timingPoint.Meter.PartialMeasure.Should().BeTrue();
     }
 
     [TestMethod]

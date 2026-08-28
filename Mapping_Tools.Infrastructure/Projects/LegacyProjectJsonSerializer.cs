@@ -304,6 +304,9 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string legacy_graph_anchor =
             "Mapping_Tools.Components.Graph.AnchorState";
 
+        private const string legacy_external_file_tempo_signature =
+            "Mapping_Tools.Classes.ExternalFileUtil.TempoSignature";
+
         private const string legacy_mapset_merger_project =
             "Mapping_Tools.Viewmodels.MapsetMergerVm";
 
@@ -507,6 +510,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 if (typeName == legacy_tumour_layer) return typeof(TumourLayer);
                 if (typeName == legacy_graph_state) return typeof(GraphState);
                 if (typeName == legacy_graph_anchor) return typeof(GraphAnchor);
+                if (typeName == legacy_external_file_tempo_signature) return typeof(TempoSignature);
                 if (typeName == legacy_mapset_merger_project) return ResolveDesktopProject("MapsetMergerProject", typeof(MapsetMergerServiceOptions));
                 if (typeName == legacy_mapset_merger_item) return typeof(MapsetMergerServiceOptions.MapsetItem);
                 if (typeName == legacy_combo_colour_project
