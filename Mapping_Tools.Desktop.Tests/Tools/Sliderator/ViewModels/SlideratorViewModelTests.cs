@@ -72,7 +72,7 @@ public sealed class SlideratorViewModelTests
             [
                 new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(0, 0)),
                 new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(1, 0.2f)),
-                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(2, 1)),
+                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(2, 0.9f)),
             ],
             0,
             0,
@@ -87,6 +87,33 @@ public sealed class SlideratorViewModelTests
         // Assert
         viewModel.GraphState.Anchors[1].Pos.Y.Should().BeLessThan(1);
         viewModel.IsGraphWithinVelocityLimit(viewModel.GraphState).Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void GraphState_WhenExistingGraphExceedsVelocityLimit_AllowsEditThatDoesNotIncreaseMaximumSlope()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        viewModel.VelocityLimit = 0.5;
+        viewModel.GraphState = new GraphState(
+            [
+                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(0, 0)),
+                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(1, 0.2f)),
+                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(2, 1)),
+                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(3, 2)),
+            ],
+            0,
+            0,
+            3,
+            2);
+        GraphState candidate = viewModel.GraphState.Clone();
+        candidate.Anchors[2].Pos = new Mapping_Tools.Core.MathUtil.Vector2(2, 1.1f);
+
+        // Act
+        viewModel.GraphState = candidate;
+
+        // Assert
+        viewModel.GraphState.Anchors[2].Pos.Y.Should().BeApproximately(1.1f, 0.0001f);
     }
 
     [TestMethod]

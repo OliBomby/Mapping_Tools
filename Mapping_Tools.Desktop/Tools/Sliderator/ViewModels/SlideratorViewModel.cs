@@ -422,14 +422,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         ArgumentNullException.ThrowIfNull(state);
         if (!ExportAsNormal) return true;
 
-        SlideratorEngineOptions options = new()
-        {
-            GlobalSv = GlobalSv,
-            PixelLength = PixelLength,
-            GraphModeSetting = GraphModeSetting,
-            GraphState = state,
-        };
-        return SlideratorEngine.GetMaximumVelocity(options) <= VelocityLimit + Precision.DOUBLE_EPSILON;
+        return IsVelocityWithinLimit(GetMaximumVelocity(state), VelocityLimit);
     }
 
     /// <inheritdoc />
@@ -718,20 +711,23 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         if (!positionChanged && !tensionChanged && !interpolatorChanged)
             return;
 
-        if (!IsGraphOverSpeedLimit(candidate, anchorIndex)) return;
+        // Keep an over-limit graph editable so the user can reduce its maximum
+        // slope. Until it is valid again, its current maximum is the edit ceiling.
+        double editVelocityLimit = Math.Max(VelocityLimit, GetMaximumVelocity(acceptedGraphState));
+        if (!IsGraphOverSpeedLimit(candidate, anchorIndex, editVelocityLimit)) return;
 
         if (tensionChanged && !positionChanged)
         {
-            ClipAnchorTensionToVelocityLimit(candidate, acceptedGraphState, anchorIndex);
-            if (IsGraphOverSpeedLimit(candidate, anchorIndex)) CopyGraphState(acceptedGraphState, candidate);
+            ClipAnchorTensionToVelocityLimit(candidate, acceptedGraphState, anchorIndex, editVelocityLimit);
+            if (IsGraphOverSpeedLimit(candidate, anchorIndex, editVelocityLimit)) CopyGraphState(acceptedGraphState, candidate);
             return;
         }
 
         if (GraphModeSetting != SlideratorGraphMode.Position) return;
 
         List<(double Min, double Max)> bounds = [];
-        AddPreviousVelocityBounds(candidate, anchorIndex, bounds);
-        AddNextVelocityBounds(candidate, anchorIndex, bounds);
+        AddPreviousVelocityBounds(candidate, anchorIndex, bounds, editVelocityLimit);
+        AddNextVelocityBounds(candidate, anchorIndex, bounds, editVelocityLimit);
         if (bounds.Count == 0) return;
 
         double lowerBound = bounds.Max(bound => bound.Min);
@@ -743,13 +739,17 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         }
         else
         {
-            ClipAnchorAlongMovement(candidate, acceptedGraphState, anchorIndex);
+            ClipAnchorAlongMovement(candidate, acceptedGraphState, anchorIndex, editVelocityLimit);
         }
 
-        if (IsGraphOverSpeedLimit(candidate, anchorIndex)) CopyGraphState(acceptedGraphState, candidate);
+        if (IsGraphOverSpeedLimit(candidate, anchorIndex, editVelocityLimit)) CopyGraphState(acceptedGraphState, candidate);
     }
 
-    private void ClipAnchorTensionToVelocityLimit(GraphState candidate, GraphState accepted, int anchorIndex)
+    private void ClipAnchorTensionToVelocityLimit(
+        GraphState candidate,
+        GraphState accepted,
+        int anchorIndex,
+        double velocityLimit)
     {
         double acceptedTension = Math.Clamp(accepted.Anchors[anchorIndex].Tension, -1, 1);
         double candidateTension = Math.Clamp(candidate.Anchors[anchorIndex].Tension, -1, 1);
@@ -759,7 +759,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         {
             double progress = (lower + upper) / 2;
             candidate.Anchors[anchorIndex].Tension = acceptedTension + (candidateTension - acceptedTension) * progress;
-            if (IsGraphOverSpeedLimit(candidate, anchorIndex)) upper = progress;
+            if (IsGraphOverSpeedLimit(candidate, anchorIndex, velocityLimit)) upper = progress;
             else lower = progress;
         }
 
@@ -769,7 +769,11 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             1);
     }
 
-    private void ClipAnchorAlongMovement(GraphState candidate, GraphState accepted, int anchorIndex)
+    private void ClipAnchorAlongMovement(
+        GraphState candidate,
+        GraphState accepted,
+        int anchorIndex,
+        double velocityLimit)
     {
         var acceptedPosition = accepted.Anchors[anchorIndex].Pos;
         var candidateAnchor = candidate.Anchors[anchorIndex];
@@ -782,7 +786,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             candidateAnchor.Pos = new Vector2(
                 acceptedPosition.X + (candidatePosition.X - acceptedPosition.X) * progress,
                 acceptedPosition.Y + (candidatePosition.Y - acceptedPosition.Y) * progress);
-            if (IsGraphOverSpeedLimit(candidate, anchorIndex)) upper = progress;
+            if (IsGraphOverSpeedLimit(candidate, anchorIndex, velocityLimit)) upper = progress;
             else lower = progress;
         }
 
@@ -806,25 +810,26 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         return -1;
     }
 
-    private bool IsGraphOverSpeedLimit(GraphState state, int anchorIndex)
+    private bool IsGraphOverSpeedLimit(GraphState state, int anchorIndex, double velocityLimit)
     {
-        return IsAnchorOverSpeedLimit(state, anchorIndex) || !IsGraphWithinVelocityLimit(state);
+        return IsAnchorOverSpeedLimit(state, anchorIndex, velocityLimit)
+            || !IsVelocityWithinLimit(GetMaximumVelocity(state), velocityLimit);
     }
 
-    private bool IsAnchorOverSpeedLimit(GraphState state, int anchorIndex)
+    private bool IsAnchorOverSpeedLimit(GraphState state, int anchorIndex, double velocityLimit)
     {
-        return IsPreviousSegmentOverSpeedLimit(state, anchorIndex)
-            || IsNextSegmentOverSpeedLimit(state, anchorIndex);
+        return IsPreviousSegmentOverSpeedLimit(state, anchorIndex, velocityLimit)
+            || IsNextSegmentOverSpeedLimit(state, anchorIndex, velocityLimit);
     }
 
-    private bool IsPreviousSegmentOverSpeedLimit(GraphState state, int anchorIndex)
+    private bool IsPreviousSegmentOverSpeedLimit(GraphState state, int anchorIndex, double velocityLimit)
     {
         if (anchorIndex <= 0) return false;
 
         var anchor = state.Anchors[anchorIndex];
         var previous = state.Anchors[anchorIndex - 1];
         if (GraphModeSetting == SlideratorGraphMode.Velocity)
-            return Math.Abs(GraphInterpolatorCatalog.GetBiggestValue(anchor.Interpolator)) > VelocityLimit;
+            return Math.Abs(GraphInterpolatorCatalog.GetBiggestValue(anchor.Interpolator)) > velocityLimit;
 
         double difference = anchor.Pos.Y - previous.Pos.Y;
         double distance = anchor.Pos.X - previous.Pos.X;
@@ -833,17 +838,17 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
         double maximumDerivative = GraphInterpolatorCatalog.GetBiggestDerivative(anchor.Interpolator);
         double velocity = Math.Abs(maximumDerivative * difference / distance) / SvGraphMultiplier;
-        return !double.IsFinite(velocity) || velocity > VelocityLimit + Precision.DOUBLE_EPSILON;
+        return !double.IsFinite(velocity) || velocity > velocityLimit + Precision.DOUBLE_EPSILON;
     }
 
-    private bool IsNextSegmentOverSpeedLimit(GraphState state, int anchorIndex)
+    private bool IsNextSegmentOverSpeedLimit(GraphState state, int anchorIndex, double velocityLimit)
     {
         if (anchorIndex >= state.Anchors.Count - 1) return false;
 
         var anchor = state.Anchors[anchorIndex];
         var next = state.Anchors[anchorIndex + 1];
         if (GraphModeSetting == SlideratorGraphMode.Velocity)
-            return Math.Abs(GraphInterpolatorCatalog.GetBiggestValue(next.Interpolator)) > VelocityLimit;
+            return Math.Abs(GraphInterpolatorCatalog.GetBiggestValue(next.Interpolator)) > velocityLimit;
 
         double difference = next.Pos.Y - anchor.Pos.Y;
         double distance = next.Pos.X - anchor.Pos.X;
@@ -852,13 +857,14 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
         double maximumDerivative = GraphInterpolatorCatalog.GetBiggestDerivative(next.Interpolator);
         double velocity = Math.Abs(maximumDerivative * difference / distance) / SvGraphMultiplier;
-        return !double.IsFinite(velocity) || velocity > VelocityLimit + Precision.DOUBLE_EPSILON;
+        return !double.IsFinite(velocity) || velocity > velocityLimit + Precision.DOUBLE_EPSILON;
     }
 
     private void AddPreviousVelocityBounds(
         GraphState state,
         int anchorIndex,
-        ICollection<(double Min, double Max)> bounds)
+        ICollection<(double Min, double Max)> bounds,
+        double velocityLimit)
     {
         var anchor = state.Anchors[anchorIndex];
         var previous = state.Anchors[anchorIndex - 1];
@@ -870,7 +876,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             return;
         }
 
-        double allowedDifference = VelocityLimit * SvGraphMultiplier * distance / maximumDerivative;
+        double allowedDifference = velocityLimit * SvGraphMultiplier * distance / maximumDerivative;
         bounds.Add((
             previous.Pos.Y + Precision.DOUBLE_EPSILON - allowedDifference,
             previous.Pos.Y - Precision.DOUBLE_EPSILON + allowedDifference));
@@ -879,7 +885,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     private void AddNextVelocityBounds(
         GraphState state,
         int anchorIndex,
-        ICollection<(double Min, double Max)> bounds)
+        ICollection<(double Min, double Max)> bounds,
+        double velocityLimit)
     {
         if (anchorIndex >= state.Anchors.Count - 1) return;
 
@@ -893,10 +900,27 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             return;
         }
 
-        double allowedDifference = VelocityLimit * SvGraphMultiplier * distance / maximumDerivative;
+        double allowedDifference = velocityLimit * SvGraphMultiplier * distance / maximumDerivative;
         bounds.Add((
             next.Pos.Y + Precision.DOUBLE_EPSILON - allowedDifference,
             next.Pos.Y - Precision.DOUBLE_EPSILON + allowedDifference));
+    }
+
+    private double GetMaximumVelocity(GraphState state)
+    {
+        SlideratorEngineOptions options = new()
+        {
+            GlobalSv = GlobalSv,
+            PixelLength = PixelLength,
+            GraphModeSetting = GraphModeSetting,
+            GraphState = state,
+        };
+        return SlideratorEngine.GetMaximumVelocity(options);
+    }
+
+    private static bool IsVelocityWithinLimit(double velocity, double velocityLimit)
+    {
+        return velocity <= velocityLimit + Precision.DOUBLE_EPSILON;
     }
 
     private static void CopyGraphState(GraphState source, GraphState target)
