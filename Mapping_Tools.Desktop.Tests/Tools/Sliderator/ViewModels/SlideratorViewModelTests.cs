@@ -90,6 +90,57 @@ public sealed class SlideratorViewModelTests
     }
 
     [TestMethod]
+    public void GraphBeats_WhenChanged_UpdatesGraphStateWidthAndScalesAnchors()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        viewModel.GraphState = new GraphState(
+            [
+                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(2, 0)),
+                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(4, 0.5f)),
+                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(7, 1)),
+            ],
+            2,
+            0,
+            7,
+            1);
+
+        // Act
+        viewModel.GraphBeats = 10;
+
+        // Assert
+        viewModel.GraphState.MaxX.Should().Be(12);
+        viewModel.GraphState.MaxX.Should().Be(viewModel.GraphState.MinX + viewModel.GraphBeats);
+        viewModel.GraphState.Anchors.Select(anchor => anchor.Pos).Should().Equal(
+            new Mapping_Tools.Core.MathUtil.Vector2(2, 0),
+            new Mapping_Tools.Core.MathUtil.Vector2(6, 0.5f),
+            new Mapping_Tools.Core.MathUtil.Vector2(12, 1));
+    }
+
+    [TestMethod]
+    public void GraphState_WhenAssignedWithDifferentWidth_UpdatesGraphBeats()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        GraphState state = new(
+            [
+                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(1, 0)),
+                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(6, 1)),
+            ],
+            1,
+            0,
+            6,
+            1);
+
+        // Act
+        viewModel.GraphState = state;
+
+        // Assert
+        viewModel.GraphBeats.Should().Be(5);
+        viewModel.GraphState.MaxX.Should().Be(viewModel.GraphState.MinX + viewModel.GraphBeats);
+    }
+
+    [TestMethod]
     public void InstallProjectWithoutGraph_UsesCurrentModeResetGraph()
     {
         // Arrange

@@ -52,6 +52,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     private GraphState? acceptedGraphState;
     private GraphState graphState = SlideratorEngineOptions.CreatePositionGraph(3);
     private bool settingGraphState;
+    private bool synchronizingGraphBounds;
 
     /// <summary>
     ///     Creates a Sliderator presentation model.
@@ -235,6 +236,20 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
             graphState = value;
             acceptedGraphState = value.Clone();
+            double graphWidth = value.MaxX - value.MinX;
+            if (double.IsFinite(graphWidth) && !Precision.AlmostEquals(GraphBeats, graphWidth))
+            {
+                synchronizingGraphBounds = true;
+                try
+                {
+                    GraphBeats = graphWidth;
+                }
+                finally
+                {
+                    synchronizingGraphBounds = false;
+                }
+            }
+
             OnPropertyChanged(nameof(GraphState));
             OnPropertyChanged(nameof(ExpectedSegments));
             UpdateGraphDerivedValues();
@@ -601,6 +616,24 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     partial void OnGraphBeatsChanged(double value)
     {
+        if (!synchronizingGraphBounds && double.IsFinite(value) && value >= 0)
+        {
+            GraphState state = GraphState.Clone();
+            double oldMinX = state.MinX;
+            double oldWidth = state.MaxX - oldMinX;
+            state.MaxX = oldMinX + value;
+            if (oldWidth > Precision.DOUBLE_EPSILON)
+            {
+                foreach (var anchor in state.Anchors)
+                {
+                    double x = oldMinX + value * (anchor.Pos.X - oldMinX) / oldWidth;
+                    anchor.Pos = new Vector2((float)x, anchor.Pos.Y);
+                }
+            }
+
+            SetGraphState(state);
+        }
+
         if (VisibleHitObject is not null && double.IsFinite(value) && double.IsFinite(BeatsPerMinute) && BeatsPerMinute > 0)
             VisibleHitObject.TemporalLength = value / BeatsPerMinute * 60000;
 
