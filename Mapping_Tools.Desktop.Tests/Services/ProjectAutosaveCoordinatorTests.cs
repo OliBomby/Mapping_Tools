@@ -32,7 +32,7 @@ public sealed class ProjectAutosaveCoordinatorTests
     }
 
     [TestMethod]
-    public async Task Deactivate_AfterAutosaveLoad_SavesCurrentSnapshot()
+    public async Task SaveOnShutdown_AfterAutosaveLoad_SavesCurrentSnapshot()
     {
         // Arrange
         RecordingProjectService projects = new();
@@ -41,7 +41,7 @@ public sealed class ProjectAutosaveCoordinatorTests
         coordinator.Activate(feature);
 
         // Act
-        coordinator.Deactivate(feature);
+        coordinator.SaveOnShutdown(feature);
         await projects.LastAutoSave.Task;
 
         // Assert
@@ -50,7 +50,7 @@ public sealed class ProjectAutosaveCoordinatorTests
     }
 
     [TestMethod]
-    public async Task Deactivate_PassesFeatureAdditionalAutosavePaths()
+    public async Task SaveOnShutdown_PassesFeatureAdditionalAutosavePaths()
     {
         // Arrange
         RecordingProjectService projects = new();
@@ -62,7 +62,7 @@ public sealed class ProjectAutosaveCoordinatorTests
         var coordinator = CreateCoordinator(projects);
 
         // Act
-        coordinator.Deactivate(feature);
+        coordinator.SaveOnShutdown(feature);
         await projects.LastAutoSave.Task;
 
         // Assert

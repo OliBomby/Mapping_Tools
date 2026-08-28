@@ -217,6 +217,51 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    public void MainViewModel_ActivatingDifferentFeature_DoesNotAutoSavePreviousProject()
+    {
+        // Arrange
+        StubProjectFeatureViewModel project = new();
+        RecordingProjectService projectService = new();
+        using var viewModel = CreateMainViewModel(
+        [
+            Registration("home", "Home"),
+            Registration("project", "Project", () => project),
+        ], projectService: projectService);
+        var projectItem = viewModel.FeatureItems.Single(item => item.Id == "project");
+        var homeItem = viewModel.FeatureItems.Single(item => item.Id == "home");
+        projectItem.ActivateCommand.Execute(null);
+
+        // Act
+        homeItem.ActivateCommand.Execute(null);
+
+        // Assert
+        projectService.AutoSaveCount.Should().Be(0);
+    }
+
+    [TestMethod]
+    public void MainViewModel_Dispose_AutoSavesAllActivatedProjectFeatures()
+    {
+        // Arrange
+        StubProjectFeatureViewModel first = new();
+        StubProjectFeatureViewModel second = new();
+        RecordingProjectService projectService = new();
+        var viewModel = CreateMainViewModel(
+        [
+            Registration("home", "Home"),
+            Registration("first", "First project", () => first),
+            Registration("second", "Second project", () => second),
+        ], projectService: projectService);
+        viewModel.FeatureItems.Single(item => item.Id == "first").ActivateCommand.Execute(null);
+        viewModel.FeatureItems.Single(item => item.Id == "second").ActivateCommand.Execute(null);
+
+        // Act
+        viewModel.Dispose();
+
+        // Assert
+        projectService.AutoSaveCount.Should().Be(2);
+    }
+
+    [TestMethod]
     public void MainViewModel_ActivatesQuickRunFeature_UpdatesCurrentRegistryTool()
     {
         // Arrange
@@ -565,6 +610,8 @@ public sealed class DesktopShellTests
     {
         public int SaveAsCount { get; private set; }
 
+        public int AutoSaveCount { get; private set; }
+
         public int OpenCount { get; private set; }
 
         public int CreateNewCount { get; private set; }
@@ -638,6 +685,7 @@ public sealed class DesktopShellTests
             IEnumerable<string>? additionalPaths = null,
             CancellationToken cancellationToken = default)
         {
+            AutoSaveCount++;
             return Task.CompletedTask;
         }
 

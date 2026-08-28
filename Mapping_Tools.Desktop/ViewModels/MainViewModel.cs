@@ -164,13 +164,17 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial bool IsNavigationOpen { get; set; } = true;
 
-    /// <summary>Unsubscribes the process-lifetime notification stream.</summary>
+    /// <summary>
+    ///     Saves recovery snapshots for all instantiated project features and
+    ///     deactivates the current feature during application shutdown.
+    /// </summary>
     public void Dispose()
     {
         if (disposed) return;
 
         disposed = true;
-        if (CurrentFeature is IShellProjectFeature projectFeature) projectCoordinator.Deactivate(projectFeature);
+        foreach (var projectFeature in featureViewModels.Values.OfType<IShellProjectFeature>())
+            projectCoordinator.SaveOnShutdown(projectFeature);
         if (CurrentFeature is IQuickRun) DeactivateQuickRun();
         if (CurrentFeature is IShellFeatureActivation activation) activation.Deactivate();
         ProjectMenuItems = [];
@@ -184,7 +188,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         foreach (var featureItem in FeatureItems) featureItem.IsActive = ReferenceEquals(featureItem, item);
 
         if (CurrentFeature is IShellFeatureActivation previous) previous.Deactivate();
-        if (CurrentFeature is IShellProjectFeature previousProject) projectCoordinator.Deactivate(previousProject);
         if (CurrentFeature is IQuickRun) DeactivateQuickRun();
 
         var registration = registry.Find(item.Id)

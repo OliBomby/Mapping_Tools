@@ -7,7 +7,7 @@ using Mapping_Tools.Desktop.Shell;
 namespace Mapping_Tools.Desktop.Services;
 
 /// <summary>
-///     Coordinates project menus and automatic recovery for the active shell features.
+///     Coordinates project menus and automatic recovery during application shutdown.
 /// </summary>
 public sealed class ProjectAutosaveCoordinator
 {
@@ -45,11 +45,11 @@ public sealed class ProjectAutosaveCoordinator
     }
 
     /// <summary>
-    ///     Saves a feature's current state to its automatic recovery file after any
-    ///     pending restore has completed.
+    ///     Saves a feature's current state to its automatic recovery file during
+    ///     application shutdown, after any pending restore has completed.
     /// </summary>
-    /// <param name="feature">The feature whose state is being deactivated.</param>
-    public void Deactivate(IShellProjectFeature feature)
+    /// <param name="feature">The feature whose state should be saved.</param>
+    public void SaveOnShutdown(IShellProjectFeature feature)
     {
         ArgumentNullException.ThrowIfNull(feature);
         _ = SaveAutosaveAfterLoadAsync(feature);
