@@ -5,6 +5,8 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
+using Material.Icons;
+using Material.Icons.Avalonia;
 using Mapping_Tools.Application.Interactions.Converters;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Graph.Interpolation;
@@ -1516,6 +1518,7 @@ public sealed class GraphControl : Control
             {
                 Header = GraphInterpolatorCatalog.GetName(type),
                 Tag = type,
+                Icon = CreateInterpolatorIcon(isSelected: false),
             };
             item.Click += (_, _) =>
             {
@@ -1540,8 +1543,16 @@ public sealed class GraphControl : Control
             if (contextMenu.Items[itemIndex] is MenuItem item && item.Tag is Type type)
             {
                 item.IsEnabled = index > 0;
-                item.IsChecked = GraphState.Anchors[index].Interpolator.GetType() == type;
+                item.Icon = CreateInterpolatorIcon(GraphState.Anchors[index].Interpolator.GetType() == type);
             }
+    }
+
+    private static MaterialIcon CreateInterpolatorIcon(bool isSelected)
+    {
+        return new MaterialIcon
+        {
+            Kind = isSelected ? MaterialIconKind.RadioboxMarked : MaterialIconKind.RadioboxBlank,
+        };
     }
 
     private async void TypeInValueAsync()
