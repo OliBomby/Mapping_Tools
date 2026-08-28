@@ -161,7 +161,6 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IBetterSaveService, BetterSaveService>();
         services.AddSingleton<IAudioClipMixer, NaudioAudioClipMixer>();
         services.AddSingleton<IAudioDecoder, NaudioAudioDecoder>();
-        services.AddSingleton<IAudioEffectService, NaudioAudioEffectService>();
         services.AddSingleton<ISoundFontRenderer, NaudioSoundFontRenderer>();
         services.AddSingleton<IAudioGenerator, NaudioAudioGenerator>();
         services.AddSingleton<IAudioExporter, NaudioAudioExporter>();

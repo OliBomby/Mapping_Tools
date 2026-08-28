@@ -315,7 +315,7 @@ public sealed class TransformationFixtureTests
     private static HitsoundStudioService CreateHitsoundStudioService(FileBackedEditingGateway gateway)
     {
         NaudioAudioDecoder decoder = new();
-        NaudioAudioGenerator generator = new(decoder, new NaudioSoundFontRenderer(), new NaudioAudioEffectService());
+        NaudioAudioGenerator generator = new(decoder, new NaudioSoundFontRenderer());
         return new HitsoundStudioService(
             gateway, new EmptyMapCleanerSampleService(), generator,
             new NaudioAudioExporter(), new NaudioAudioClipMixer(), new NaudioMidiService(),

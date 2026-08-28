@@ -38,8 +38,7 @@ public sealed class AudioInfrastructureTests
         var decoder = new NaudioAudioDecoder();
         var generator = new NaudioAudioGenerator(
             decoder,
-            new NaudioSoundFontRenderer(),
-            new NaudioAudioEffectService());
+            new NaudioSoundFontRenderer());
         var request = new AudioGenerationRequest(
             new SampleGeneratingArgs(path),
             [new DelayFadeOutEffect(0, 1)]);
@@ -194,8 +193,7 @@ public sealed class AudioInfrastructureTests
         var renderer = new StubSoundFontRenderer(rendered);
         var generator = new NaudioAudioGenerator(
             new ThrowingDecoder(),
-            renderer,
-            new NaudioAudioEffectService());
+            renderer);
         var sample = new SampleGeneratingArgs(
             "sample.sf2", 0, 0, 0, 60, -1, 127)
         {

@@ -11,21 +11,17 @@ namespace Mapping_Tools.Infrastructure.Audio;
 public sealed class NaudioAudioGenerator : IAudioGenerator
 {
     private readonly IAudioDecoder decoder;
-    private readonly IAudioEffectService effects;
     private readonly ISoundFontRenderer soundFontRenderer;
 
     /// <summary>Creates the NAudio-backed sample generator.</summary>
     /// <param name="decoder">The file decoder.</param>
     /// <param name="soundFontRenderer">The SoundFont renderer.</param>
-    /// <param name="effects">The neutral effect adapter.</param>
     public NaudioAudioGenerator(
         IAudioDecoder decoder,
-        ISoundFontRenderer soundFontRenderer,
-        IAudioEffectService effects)
+        ISoundFontRenderer soundFontRenderer)
     {
         this.decoder = decoder ?? throw new ArgumentNullException(nameof(decoder));
         this.soundFontRenderer = soundFontRenderer ?? throw new ArgumentNullException(nameof(soundFontRenderer));
-        this.effects = effects ?? throw new ArgumentNullException(nameof(effects));
     }
 
     /// <inheritdoc />
@@ -47,7 +43,7 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
             : ApplySampleArguments(source, request.Sample, cancellationToken);
         return request.Effects.Count == 0
             ? transformed
-            : effects.Apply(transformed, request.Effects, cancellationToken);
+            : AudioEffectEngine.Apply(transformed, request.Effects, cancellationToken);
     }
 
     private static AudioClip ApplySampleArguments(
