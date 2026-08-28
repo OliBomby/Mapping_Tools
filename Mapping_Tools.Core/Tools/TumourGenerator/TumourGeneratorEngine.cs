@@ -18,7 +18,7 @@ namespace Mapping_Tools.Core.Tools.TumourGenerator;
 ///     tumours are represented by sampled path points and red anchors. The
 ///     generator deliberately keeps the legacy ordering and overlap rules.
 /// </remarks>
-public sealed class TumourGenerator
+public sealed class TumourGeneratorEngine
 {
     private const double relative_property_scale = 256;
     private readonly List<double> layerLengths = [];

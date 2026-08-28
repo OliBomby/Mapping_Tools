@@ -8,7 +8,6 @@ using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Core.Tools.TumourGenerator;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
-using CoreTumourGenerator = Mapping_Tools.Core.Tools.TumourGenerator.TumourGenerator;
 
 namespace Mapping_Tools.Application.Tools.TumourGenerator;
 
@@ -114,9 +113,9 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
         return new TumourRunResult(completedPaths, generatedCount, editorReloaded);
     }
 
-    private static CoreTumourGenerator CreateGenerator(TumourGeneratorEngineOptions options)
+    private static TumourGeneratorEngine CreateGenerator(TumourGeneratorEngineOptions options)
     {
-        return new CoreTumourGenerator
+        return new TumourGeneratorEngine
         {
             TumourLayers = options.TumourLayers,
             JustMiddleAnchors = options.JustMiddleAnchors,
@@ -130,7 +129,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
         ArgumentNullException.ThrowIfNull(project);
         if (!Enum.IsDefined(project.ImportModeSetting))
             throw new ArgumentException("Tumour Generator contains an unknown import mode.", nameof(project));
-        CoreTumourGenerator.Validate(project);
+        TumourGeneratorEngine.Validate(project);
     }
 
 }

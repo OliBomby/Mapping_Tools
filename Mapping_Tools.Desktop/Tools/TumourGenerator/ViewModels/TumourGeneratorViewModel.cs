@@ -18,14 +18,13 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
+using Mapping_Tools.Core.Tools.TumourGenerator;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.Tools.TumourGenerator.Templates;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Adapters;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Models;
 using Mapping_Tools.Desktop.ViewModels;
-
-using CoreTumourGenerator = Mapping_Tools.Core.Tools.TumourGenerator.TumourGenerator;
 
 namespace Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
 
@@ -645,10 +644,10 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         };
     }
 
-    private static CoreTumourGenerator CreateGenerator(TumourGeneratorEngineOptions options)
+    private static TumourGeneratorEngine CreateGenerator(TumourGeneratorEngineOptions options)
     {
-        CoreTumourGenerator.Validate(options);
-        return new CoreTumourGenerator
+        TumourGeneratorEngine.Validate(options);
+        return new TumourGeneratorEngine
         {
             TumourLayers = options.TumourLayers,
             JustMiddleAnchors = options.JustMiddleAnchors,

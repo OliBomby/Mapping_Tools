@@ -2,14 +2,14 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
+using Mapping_Tools.Core.Tools.TumourGenerator;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using CoreTumourGenerator = Mapping_Tools.Core.Tools.TumourGenerator.TumourGenerator;
 
 namespace Mapping_Tools.Core.Tests.Tools.TumourGenerator;
 
 [TestClass]
-public sealed class TumourGeneratorTests
+public sealed class TumourGeneratorEngineTests
 {
     [TestMethod]
     public void PlaceTumour_DefaultTriangleAndOverlap_PreservesHintsAndReconstruction()
@@ -18,7 +18,7 @@ public sealed class TumourGeneratorTests
         const int resolution = 10;
         HitObject hitObject = new("0,0,384,2,0,B|192:0|192:0|192:192,1,384");
         var pathWithHints = PathHelper.CreatePathWithHints(hitObject.GetSliderPath());
-        CoreTumourGenerator generator = new() { Resolution = resolution };
+        TumourGeneratorEngine generator = new() { Resolution = resolution };
         var layer = TumourLayer.GetDefaultLayer();
         layer.TumourLength = TumourLayer.GetGraphState(10);
         layer.TumourScale = TumourLayer.GetGraphState(5);
@@ -97,8 +97,8 @@ public sealed class TumourGeneratorTests
         rightLayer.TumourSidedness = TumourSidedness.Right;
         var leftPath = PathHelper.CreatePathWithHints(leftInput.GetSliderPath());
         var rightPath = PathHelper.CreatePathWithHints(rightInput.GetSliderPath());
-        CoreTumourGenerator leftGenerator = new();
-        CoreTumourGenerator rightGenerator = new();
+        TumourGeneratorEngine leftGenerator = new();
+        TumourGeneratorEngine rightGenerator = new();
 
         // Act
         leftGenerator.PlaceTumour(
@@ -148,7 +148,7 @@ public sealed class TumourGeneratorTests
             layer.TumourCount = 1;
             layer.TumourStart = 0.2;
             layer.TumourEnd = 0.8;
-            new CoreTumourGenerator { TumourLayers = [layer] }
+            new TumourGeneratorEngine { TumourLayers = [layer] }
                 .TumourGenerate(hitObject);
             return hitObject;
         }).ToList();
@@ -166,7 +166,7 @@ public sealed class TumourGeneratorTests
         TumourGeneratorEngineOptions options = new();
 
         // Act
-        Action act = () => CoreTumourGenerator.Validate(options);
+        Action act = () => TumourGeneratorEngine.Validate(options);
 
         // Assert
         act.Should().Throw<ArgumentException>()
@@ -182,7 +182,7 @@ public sealed class TumourGeneratorTests
         TumourGeneratorEngineOptions options = new() { TumourLayers = [layer] };
 
         // Act
-        Action act = () => CoreTumourGenerator.Validate(options);
+        Action act = () => TumourGeneratorEngine.Validate(options);
 
         // Assert
         act.Should().Throw<ArgumentException>()
@@ -199,7 +199,7 @@ public sealed class TumourGeneratorTests
         };
 
         // Act
-        Action act = () => CoreTumourGenerator.Validate(options);
+        Action act = () => TumourGeneratorEngine.Validate(options);
 
         // Assert
         act.Should().NotThrow();
