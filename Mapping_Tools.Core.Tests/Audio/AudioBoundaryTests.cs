@@ -42,7 +42,7 @@ public sealed class AudioBoundaryTests
     {
         // Arrange
         var source = new AudioClip(new AudioFormat(1000, 1), Enumerable.Repeat(1f, 6));
-        var effect = AudioEffect.CreateDelayFadeOut(2, 2);
+        var effect = new DelayFadeOutEffect(2, 2);
 
         // Act
         var result = AudioEffectEngine.Apply(source, [effect]);
@@ -61,7 +61,7 @@ public sealed class AudioBoundaryTests
         // Act
         var result = AudioEffectEngine.Apply(
             source,
-            [AudioEffect.CreateSoftLimiter(6)]);
+            [new SoftLimiterEffect(6)]);
 
         // Assert
         result.CopySamples().Should().AllSatisfy(sample => float.IsFinite(sample).Should().BeTrue());
@@ -79,7 +79,7 @@ public sealed class AudioBoundaryTests
         // Act
         Action act = () => AudioEffectEngine.Apply(
             source,
-            [AudioEffect.CreateSoftLimiter()],
+            [new SoftLimiterEffect()],
             cancellation.Token);
 
         // Assert

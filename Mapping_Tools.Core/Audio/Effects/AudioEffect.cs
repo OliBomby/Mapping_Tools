@@ -1,48 +1,32 @@
+using Mapping_Tools.Core.Audio;
+
 namespace Mapping_Tools.Core.Audio.Effects;
 
-/// <summary>Describes one effect without retaining a framework or audio-library object.</summary>
-public sealed class AudioEffect
+/// <summary>Processes an audio clip without depending on an audio framework.</summary>
+public abstract class AudioEffect
 {
-    private AudioEffect(AudioEffectKind kind, double firstValue, double secondValue)
+    /// <summary>
+    ///     Applies this effect and returns a new clip, leaving <paramref name="source" /> unchanged.
+    /// </summary>
+    /// <param name="source">The clip to process.</param>
+    /// <param name="cancellationToken">Token checked while processing samples.</param>
+    /// <returns>A newly allocated processed clip.</returns>
+    public AudioClip Apply(AudioClip source, CancellationToken cancellationToken = default)
     {
-        Kind = kind;
-        FirstValue = firstValue;
-        SecondValue = secondValue;
+        ArgumentNullException.ThrowIfNull(source);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        float[] samples = source.CopySamples();
+        ApplyCore(samples, source.Format, cancellationToken);
+        return new AudioClip(source.Format, samples);
     }
 
-    /// <summary>Gets the effect kind.</summary>
-    public AudioEffectKind Kind { get; }
-
-    /// <summary>Gets the first effect value, whose units depend on <see cref="Kind" />.</summary>
-    public double FirstValue { get; }
-
-    /// <summary>Gets the second effect value, whose units depend on <see cref="Kind" />.</summary>
-    public double SecondValue { get; }
-
-    /// <summary>Creates a delayed fade-out effect.</summary>
-    /// <param name="delay">Time in milliseconds before fading starts.</param>
-    /// <param name="duration">Fade duration in milliseconds.</param>
-    /// <returns>The effect description.</returns>
-    public static AudioEffect CreateDelayFadeOut(double delay, double duration)
-    {
-        if (!double.IsFinite(delay) || delay < 0) throw new ArgumentOutOfRangeException(nameof(delay));
-
-        if (!double.IsFinite(duration) || duration < 0) throw new ArgumentOutOfRangeException(nameof(duration));
-
-        return new AudioEffect(AudioEffectKind.DelayFadeOut, delay, duration);
-    }
-
-    /// <summary>Creates the legacy soft limiter configuration.</summary>
-    /// <param name="boostDecibels">Input boost in decibels.</param>
-    /// <param name="brickwallDecibels">Output ceiling in decibels.</param>
-    /// <returns>The effect description.</returns>
-    public static AudioEffect CreateSoftLimiter(double boostDecibels = 0, double brickwallDecibels = -0.1)
-    {
-        if (!double.IsFinite(boostDecibels) || boostDecibels is < 0 or > 18) throw new ArgumentOutOfRangeException(nameof(boostDecibels));
-
-        if (!double.IsFinite(brickwallDecibels) || brickwallDecibels is < -3 or > 1) throw new ArgumentOutOfRangeException(nameof(brickwallDecibels));
-
-        return new AudioEffect(AudioEffectKind.SoftLimiter, boostDecibels, brickwallDecibels);
-    }
+    /// <summary>Applies the effect to a mutable copy of the source samples.</summary>
+    /// <param name="samples">The interleaved samples to modify.</param>
+    /// <param name="format">The sample rate and channel layout of <paramref name="samples" />.</param>
+    /// <param name="cancellationToken">Token checked while processing samples.</param>
+    protected abstract void ApplyCore(
+        float[] samples,
+        AudioFormat format,
+        CancellationToken cancellationToken);
 }
-

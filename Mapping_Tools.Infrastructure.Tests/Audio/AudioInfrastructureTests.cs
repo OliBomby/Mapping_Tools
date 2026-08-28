@@ -42,7 +42,7 @@ public sealed class AudioInfrastructureTests
             new NaudioAudioEffectService());
         var request = new AudioGenerationRequest(
             new SampleGeneratingArgs(path),
-            [AudioEffect.CreateDelayFadeOut(0, 1)]);
+            [new DelayFadeOutEffect(0, 1)]);
 
         // Act
         var result = await generator.GenerateAsync(request);

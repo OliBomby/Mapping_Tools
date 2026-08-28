@@ -8,7 +8,7 @@ public interface IAudioEffectService
 {
     /// <summary>Processes a clip without mutating the source.</summary>
     /// <param name="source">The source clip.</param>
-    /// <param name="effects">The ordered effect descriptions.</param>
+    /// <param name="effects">The ordered effect instances.</param>
     /// <param name="cancellationToken">Token checked while processing samples.</param>
     /// <returns>A new processed clip.</returns>
     AudioClip Apply(
@@ -16,4 +16,3 @@ public interface IAudioEffectService
         IEnumerable<AudioEffect> effects,
         CancellationToken cancellationToken = default);
 }
-

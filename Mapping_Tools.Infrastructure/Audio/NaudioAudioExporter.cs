@@ -30,7 +30,7 @@ public sealed class NaudioAudioExporter : IAudioExporter
             ? clip
             : AudioEffectEngine.Apply(
                 clip,
-                [AudioEffect.CreateSoftLimiter()],
+                [new SoftLimiterEffect()],
                 cancellationToken);
 
         string? directory = Path.GetDirectoryName(request.Path);
