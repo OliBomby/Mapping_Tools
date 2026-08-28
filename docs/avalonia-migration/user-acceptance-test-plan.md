@@ -29,7 +29,7 @@ UAT must demonstrate that:
 - Application shell, Get started, navigation, search, favorites, notifications, window state, theme, and shutdown behavior.
 - Settings, file/folder selection, current-map selection, recent maps, drag/drop, backups, QuickUndo, project lifecycle, and QuickRun.
 - Every user-facing tool listed in the feature dependency graph.
-- Auxiliary windows, typed dialogs, common form controls, timeline, object visualizer, graph editor, audio spectrum, overlay, updater, and packaging workflows.
+- Auxiliary windows, typed dialogs, common form controls, timeline, object visualizer, graph editor, overlay, updater, and packaging workflows.
 - Compatibility with existing user settings, feature project JSON, pattern collections, `.osu`/`.osb` files, hitsound schemas, and export layouts.
 - Supported failure, validation, cancellation, cleanup, and recovery paths.
 - Static visual parity at representative sizes and interactive usability in a real desktop session.
@@ -235,7 +235,7 @@ Every row also inherits the common cases in section 9 and all applicable shell c
 
 | Feature | Minimum feature-specific scenarios | Required evidence |
 |---|---|---|
-| Audio services and spectrum | Decode supported formats; unsupported/corrupt file; playback/pause/stop/seek; no device; repeated open/close; spectrum for silence and representative audio. | Audio-service logs, handle cleanup, spectrum renders. |
+| Audio services | Decode supported formats; unsupported/corrupt file; playback/pause/stop/seek; no device; repeated open/close. | Audio-service logs and handle cleanup. |
 | Hitsound Studio | Layer import/reload from beatmap, MIDI, samples and SF2; edit/reorder; preview; effects/generation; schema persistence; export difficulty/package; cancel each stage; missing source; overwrite. | Human listening sign-off, generated-file manifest, schema/project round trip, export diff. |
 
 ### Wave 10: Windows-specialized runtime

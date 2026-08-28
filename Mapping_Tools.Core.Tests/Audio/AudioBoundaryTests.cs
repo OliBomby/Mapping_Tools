@@ -1,6 +1,5 @@
 using Mapping_Tools.Core.Audio;
 using Mapping_Tools.Core.Audio.Effects;
-using Mapping_Tools.Core.Spectrum;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Core.Tests.Audio;
@@ -87,18 +86,4 @@ public sealed class AudioBoundaryTests
         act.Should().Throw<OperationCanceledException>();
     }
 
-    [TestMethod]
-    public void SpectrumFrame_DoesNotExposeMutableMagnitudeStorage()
-    {
-        // Arrange
-        double[] magnitudes = [1, 2];
-        var frame = new SpectrumFrame(44100, 4, magnitudes);
-
-        // Act
-        magnitudes[0] = 99;
-
-        // Assert
-        frame.Magnitudes[0].Should().Be(1);
-        frame.Magnitudes.Should().NotBeAssignableTo<double[]>();
-    }
 }

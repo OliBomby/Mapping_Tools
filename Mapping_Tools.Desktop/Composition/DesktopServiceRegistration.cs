@@ -167,7 +167,6 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IAudioExporter, NaudioAudioExporter>();
         services.AddSingleton<IAudioPlaybackService, NaudioAudioPlaybackService>();
         services.AddSingleton<IMidiService, NaudioMidiService>();
-        services.AddSingleton<ISpectrumCalculator, FastFourierSpectrumCalculator>();
         services.AddSingleton<AudioExportService>();
         services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();
         services.AddSingleton<IBeatmapWorkspace, BeatmapWorkspace>();

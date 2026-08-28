@@ -22,7 +22,7 @@ The documented migration order was followed: layer/model editor, beatmap/sample 
 
 - `Mapping_Tools.Core/Tools/HitsoundStudio/HitsoundStudioEngine.cs` owns timestamp zipping, volume balancing, custom-index optimization, schema reuse/growth/conflict detection, deterministic sample naming, and standard/mania positions. It has no filesystem, audio-library, Avalonia, or WPF dependency.
 - `Mapping_Tools.Application/HitsoundStudio/` owns project/schema-compatible contracts, import/reload workflows, MIDI and beatmap use cases, package/export orchestration, progress/cancellation, audio generation/playback ports, and filesystem/reveal ports.
-- `Mapping_Tools.Infrastructure/Audio/NaudioAudioClipMixer.cs` is the only new audio adapter; file access is provided by the shared `Files/PhysicalBeatmapsetFileSystem.cs`. Existing step-41 `IAudioGenerator`, `IAudioExporter`, `IMidiService`, `IAudioPlaybackService`, SoundFont renderer, effects, and spectrum boundary are reused; no duplicate decoder or spectrum implementation was added.
+- `Mapping_Tools.Infrastructure/Audio/NaudioAudioClipMixer.cs` is the only new audio adapter; file access is provided by the shared `Files/PhysicalBeatmapsetFileSystem.cs`. Existing step-41 `IAudioGenerator`, `IAudioExporter`, `IMidiService`, `IAudioPlaybackService`, SoundFont renderer, and effects are reused; no duplicate decoder implementation was added.
 - The neutral `MidiNote` contract carries optional instrument and note labels supplied by the NAudio adapter, so WPF's human-readable MIDI layer names are preserved without moving NAudio types into Application.
 - `Mapping_Tools.Desktop/` owns the Avalonia layer editor, typed import/export windows, compiled bindings, source/folder pickers, project commands, QuickRun, selection, and playback-session disposal.
 
@@ -40,8 +40,6 @@ The standard map writer intentionally keeps the WPF distinction between redlines
 - WPF `WasapiOut` ownership is replaced by step-41 `IAudioPlaybackSession`; the selected preview is stopped and disposed before another preview and when the view model is disposed.
 - WPF `ListView/GridView` is represented by the shared Avalonia `MaterialGridListView`, preserving read-only rows, integrated headers, extended selection, resizable columns, and the editor/preview/reorder actions.
 - WPF modal `DialogHost` surfaces are owner-modal Avalonia `Window` dialogs with typed result view models. Native source, sample, folder, and schema pickers remain behind Application picker/project ports.
-
-The normative WPF view has no spectrum visual; the step-41 D7 spectrum service remains available through the shared audio boundary and was not duplicated or forced into this view.
 
 ## Verification
 

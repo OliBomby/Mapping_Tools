@@ -142,28 +142,6 @@ public sealed class AudioInfrastructureTests
     }
 
     [TestMethod]
-    public async Task FastFourierSpectrumCalculator_ReturnsPeakBinsAndEmptyState()
-    {
-        // Arrange
-        var calculator = new FastFourierSpectrumCalculator();
-        var impulse = new AudioClip(new AudioFormat(8000, 1), [0f, 1f, 0f, 0f]);
-        var empty = new AudioClip(new AudioFormat(8000, 1), []);
-
-        // Act
-        var result = await calculator.CalculateAsync(
-            impulse,
-            new SpectrumCalculationOptions { FftSize = 4 });
-        var emptyResult = await calculator.CalculateAsync(
-            empty,
-            new SpectrumCalculationOptions { FftSize = 4 });
-
-        // Assert
-        result.Magnitudes.Should().HaveCount(3);
-        result.PeakMagnitude.Should().BeGreaterThan(0);
-        emptyResult.IsEmpty.Should().BeTrue();
-    }
-
-    [TestMethod]
     public async Task NaudioMidiService_ExportsAndImportsNeutralNoteData()
     {
         // Arrange
@@ -233,23 +211,6 @@ public sealed class AudioInfrastructureTests
         result.CopySamples().Should().Equal(rendered.CopySamples());
         renderer.LastRequest!.Sample.Panning.Should().Be(0.5);
         renderer.LastRequest.Sample.PitchShift.Should().Be(12);
-    }
-
-    [TestMethod]
-    public async Task FastFourierSpectrumCalculator_HonorsCancellation()
-    {
-        // Arrange
-        var calculator = new FastFourierSpectrumCalculator();
-        using var cancellation = new CancellationTokenSource();
-        cancellation.Cancel();
-
-        // Act
-        Func<Task> act = () => calculator.CalculateAsync(
-            new AudioClip(new AudioFormat(8000, 1), [1f]),
-            cancellationToken: cancellation.Token);
-
-        // Assert
-        await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
     private sealed class TemporaryDirectory : IDisposable

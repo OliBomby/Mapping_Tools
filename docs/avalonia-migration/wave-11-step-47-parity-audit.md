@@ -16,7 +16,7 @@ executable switch) and 49 (legacy removal) are explicitly out of scope.
 | 38 | Graph and value editor | Compared graph state cloning, bounds, interpolation, marker generation/snapping, context-menu commands, typed-value dialog, pointer gestures, keyboard deletion/Escape, wheel modifiers, and cancellation/clone semantics. Wheel zoom now ignores positions outside the graph bounds, matching WPF. Cursor warping remains the documented platform substitution. |
 | 39 | Sliderator | Compared import modes, lost-focus converters and validation ranges, graph bounds/markers, preview timing, navigation and Shift quick placement, empty-source branches, ordinary/QuickRun execution, persistence, and registration. No remaining parity defect was substantiated. |
 | 40 | Tumour Generator 2 | Compared layer commands/order, graph validation and serialization, import/empty states, preview cancellation/latest-request ownership, activation/disposal, ordinary/QuickRun completion/error branches, and registration. Preview work is now inactive until shell activation, and the migrated completion message matches WPF spelling. |
-| 41 | Audio and spectrum | Compared decode/generation/playback ownership, cancellation, preview session disposal, format compatibility, spectrum empty handling, rendering ownership, and architecture boundaries. The WPF empty spectrum canvas is intentionally represented by the reusable Avalonia peak-normalised spectrum renderer documented by the step-41 note. |
+| 41 | Audio | Compared decode/generation/playback ownership, cancellation, preview session disposal, format compatibility, and architecture boundaries. |
 | 42 | Hitsound Studio | Compared layer selection/editing, add/remove/reorder keyboard behavior, import/reload/preview/validation/export dialogs, empty/error/completion branches, legacy project-root serialization, audio-session disposal, and project registration. No remaining parity defect was substantiated. |
 | 43 | Geometry Dashboard core/project models | Compared generator reflection order, settings and locked-object ownership, legacy JSON names/colours/hotkeys, type-keyed settings, collection invariants, and Core/Application boundaries. Existing compatibility tests cover the serializer and locked-object formats. |
 | 44 | Windows adapters | Compared process/title discovery, editor-reader snapshots, global hotkeys, physical-pixel/DPI conversion, click-through overlay lifecycle, non-Windows no-op behavior, and exception guards. No remaining parity defect was substantiated. |
@@ -51,7 +51,7 @@ executable switch) and 49 (legacy removal) are explicitly out of scope.
 The audit does not treat framework-only replacements already recorded by the
 wave notes as parity defects: shared Avalonia tool controls, native owner-modal
 dialogs, `ItemsControl` grouping where Avalonia has no WPF
-`CollectionViewSource` equivalent, the reusable object/spectrum renderers, the
+`CollectionViewSource` equivalent, the reusable object renderers, the
 Windows adapter boundary, and Onova's updater gateway. These substitutions
 preserve the WPF behavior and are kept at their documented ownership boundary.
 

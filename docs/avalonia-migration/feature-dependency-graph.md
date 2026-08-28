@@ -60,7 +60,6 @@ Rules:
 | D4 | Timeline visual | `Components/TimeLine` | Display timestamped findings and navigation markers. | Avalonia reusable control. Required by Auto-fail Detector and Map Cleaner. |
 | D5 | Object visualizer | `Components/ObjectVisualiser` | Render hit objects/pattern thumbnails and markers. | Desktop presentation control based directly on Core hit-object data. Keep visualizer models, path preparation, fitting, and drawing out of Application/Core. Required by Pattern Gallery, Sliderator, and Tumour Generator. |
 | D6 | Graph/value editor | `Components/Graph`, `ValueOrGraphControl` | Editable anchors, interpolators, markers, snapping, derivatives/integrals, animations, and constant-or-curve parameters. | Interpolation/state models to Core; pointer/rendering control to Desktop. Required by Sliderator and Tumour Generator. |
-| D7 | Audio visualization | `Components/Spectrum` | Draw audio spectrum data used by hitsound workflows. | Audio analysis service plus Avalonia rendering control. |
 | I1 | osu! live integration | `EditorReader.dll`, `OsuMemoryDataProvider` | Locate the current map, inspect selected objects/editor state, read unsaved state, and request reload/save behavior. | Windows-specific Infrastructure adapters behind Application interfaces. |
 | I2 | Global input/process integration | keyboard-hook library, WinForms cursor/screen APIs, `Process.NET` | Global hotkeys, absolute cursor movement, screen coordinates, osu! process memory, and process/window access. | Windows-specific Infrastructure. Geometry Dashboard remains Windows-only until replacements are proven. |
 | I3 | Overlay rendering | `Overlay.NET`, `SnappingToolsOverlay` | Transparent on-screen geometry overlay aligned to osu!’s playfield. | Explicit Windows overlay host plus Desktop control/model boundary. |
@@ -123,7 +122,6 @@ flowchart TB
     HitsoundCopier["Hitsound Copier"] --> HitsoundDomain
     HitsoundStudio["Hitsound Studio"] --> HitsoundDomain
     HitsoundStudio --> Audio["I4 Audio import/export"]
-    HitsoundStudio --> Spectrum["D7 Spectrum"]
 
     Combo["Combo Colour Studio"] --> Editor
     Mapset["Mapset Merger"] --> Editor
@@ -176,7 +174,7 @@ Complexity is a relative migration estimate: S, M, L, or XL. It reflects UI coup
 | Rhythm Guide | Combines rhythms from multiple maps into circles, either on an existing map or in a new guide map, for hitsounding reference. | C1, C4 rhythm algorithm, A1–A6, A8, D2–D3. | Includes a resizable pop-out `RhythmGuideWindow`; prerequisite for Hitsound Preview Helper parity. | M |
 | Hitsound Preview Helper | Places provisional hitsounds by object position/hitsound zones so a mapper can preview a position-based hitsounding workflow. | Rhythm Guide window, C1, C5 zones/schema, A1–A7, D2–D3, I1. | View model directly constructs a WPF window; must become a view/window interaction. | M |
 | Hitsound Copier | Copies hitsounds from source to target maps, either overwriting all or only replacing defined hitsounds while preserving unspecified target values. | C1 events/storyboard, C5, A1–A6, A8, D2–D3, I1. | Large code-behind transformation with sample-schema and storyboard handling. | L |
-| Hitsound Studio | Imports hitsound layers from beatmaps, MIDI, samples and SoundFonts; reloads sources; edits layers; previews/generates samples; and exports a hitsounded difficulty/package. | C1, C5, A1–A6, A8, D2–D3, D7, I4. | Largest code-behind view, multiple dialogs, NAudio/Vorbis/MIDI/SF2, effects, waveform/spectrum, drag/drop, and complex persistence. | XL |
+| Hitsound Studio | Imports hitsound layers from beatmaps, MIDI, samples and SoundFonts; reloads sources; edits layers; previews/generates samples; and exports a hitsounded difficulty/package. | C1, C5, A1–A6, A8, D2–D3, I4. | Largest code-behind view, multiple dialogs, NAudio/Vorbis/MIDI/SF2, effects, waveform, drag/drop, and complex persistence. | XL |
 | Slider Completionator | Changes selected slider duration and/or length while automatically calculating slider velocity and preserving values marked unchanged. | C1, C2, C3, A1–A7, D2–D3, I1. | Good first slider-family feature; validates selection and slider-path service boundaries. | M |
 | Slider Merger | Merges selected sliders and circles into one Bézier slider, converting slider types and using linear circle connections. | C1, C2, C3, A1–A7, D2–D3, I1. | QuickRun and editor selection, but no custom rendering control. | M |
 | Slider Picturator | Imports an image and generates/distorts a slider path to reproduce it with configurable colors, resolution, quality, and rendering options. | C1–C3, C4 picturation, A1–A8, D2–D3, I1, image service. | `System.Drawing`, WPF bitmap interop, WinForms file dialogs, dispatcher calls, and optional GPU path. | L |
@@ -338,7 +336,7 @@ Exit: the two most complex custom-control tools have no WPF types and graph beha
 
 ### Wave 9 — Audio studio
 
-41. **I4 audio services and D7 spectrum.** Isolate decoding, playback, generation, effects, MIDI/SF2, Ogg export, and spectrum calculation behind interfaces.
+41. **I4 audio services.** Isolate decoding, playback, generation, effects, MIDI/SF2, and Ogg export behind interfaces.
 42. **Hitsound Studio.** Port layer import/reload, editing, preview, dialogs, schema persistence, and export in sub-slices rather than one large rewrite.
 
 Suggested Hitsound Studio sub-order: layer/model editor → beatmap/sample import → playback → MIDI/SF2 → effects/generation → export dialog/package.
