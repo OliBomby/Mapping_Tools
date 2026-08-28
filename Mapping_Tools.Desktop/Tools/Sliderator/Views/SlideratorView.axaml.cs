@@ -105,6 +105,8 @@ public sealed partial class SlideratorView : UserControl
 
     private void ViewModelPropertyChanged(object? sender, PropertyChangedEventArgs args)
     {
+        if (args.PropertyName is nameof(SlideratorViewModel.PreviewProgress)) return;
+
         previewClock.Restart();
         if (sender is SlideratorViewModel viewModel
             && args.PropertyName is nameof(SlideratorViewModel.GraphBeats) or

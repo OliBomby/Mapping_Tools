@@ -310,6 +310,20 @@ public sealed class SlideratorViewModelTests
         repeated.Should().BeGreaterThanOrEqualTo(0);
     }
 
+    [TestMethod]
+    public void EvaluatePreviewProgress_AfterElapsedTime_AdvancesThroughSlider()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+
+        // Act
+        double initial = viewModel.EvaluatePreviewProgress(1);
+        double later = viewModel.EvaluatePreviewProgress(viewModel.GraphDuration / 2);
+
+        // Assert
+        later.Should().BeGreaterThan(initial);
+    }
+
     private static SlideratorViewModel Create(
         RecordingSliderator service,
         RecordingCurrentBeatmapLocator? currentBeatmap = null,
