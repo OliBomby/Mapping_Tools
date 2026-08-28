@@ -1,12 +1,12 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Tools.TumourGenerator;
+using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Mapping_Tools.Core.Tests.Tools.TumourGenerator;
+namespace Mapping_Tools.Core.Tests.Tools.SliderVelocity;
 
 [TestClass]
-public sealed class TumourSliderVelocityFixerTests
+public sealed class SliderVelocityFixerTests
 {
     [TestMethod]
     public void Fix_WithGreenlineVelocity_LeavesObjectTimesAndAddsSelectedVelocityChanges()
@@ -19,7 +19,7 @@ public sealed class TumourSliderVelocityFixerTests
         double selectedVelocity = selected.SliderVelocity;
 
         // Act
-        TumourSliderVelocityFixer.Fix(beatmap, [selected], false, false);
+        SliderVelocityFixer.Fix(beatmap, [selected], false, false);
 
         // Assert
         selected.Time.Should().Be(selectedTime);
@@ -37,7 +37,7 @@ public sealed class TumourSliderVelocityFixerTests
         selected.SliderVelocity = -200;
 
         // Act
-        TumourSliderVelocityFixer.Fix(beatmap, [selected], true, true);
+        SliderVelocityFixer.Fix(beatmap, [selected], true, true);
 
         // Assert
         selected.Time.Should().Be(selectedTime - 1);
@@ -56,7 +56,7 @@ public sealed class TumourSliderVelocityFixerTests
         cancellation.Cancel();
 
         // Act
-        var act = () => TumourSliderVelocityFixer.Fix(
+        var act = () => SliderVelocityFixer.Fix(
             beatmap,
             [selected],
             true,

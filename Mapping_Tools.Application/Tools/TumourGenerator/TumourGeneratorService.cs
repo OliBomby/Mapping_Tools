@@ -5,6 +5,7 @@ using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Progress;
+using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Core.Tools.TumourGenerator;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
@@ -93,8 +94,7 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
             }
 
             if (project.FixSv)
-                // Reconstruct SliderVelocity (stolen from completionator)
-                TumourSliderVelocityFixer.Fix(
+                SliderVelocityFixer.Fix(
                     session.Editor.Beatmap,
                     markedObjects,
                     project.DelegateToBpm,

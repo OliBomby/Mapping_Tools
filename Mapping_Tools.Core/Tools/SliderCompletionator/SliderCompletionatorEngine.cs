@@ -1,5 +1,4 @@
 using Mapping_Tools.Core.BeatmapHelper;
-using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Progress;
 using Mapping_Tools.Core.ToolHelpers.Sliders;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
@@ -53,7 +52,6 @@ public static class SliderCompletionatorEngine
             ? currentEditorTime!.Value
             : options.EndTime;
         var timing = beatmap.BeatmapTiming;
-        HashSet<HitObject> markedObjectSet = new(markedObjects);
 
         for (int i = 0; i < markedObjects.Count; i++)
         {
@@ -134,56 +132,12 @@ public static class SliderCompletionatorEngine
         }
 
         cancellationToken.ThrowIfCancellationRequested();
-        // Reconstruct SliderVelocity
-        List<TimingPointChange> changes = [];
-        // Add Hitobject stuff
-        foreach (var hitObject in beatmap.HitObjects)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (!hitObject.IsSlider) continue;
-
-            // SliderVelocity changes
-            if (markedObjectSet.Contains(hitObject) && options.DelegateToBpm)
-            {
-                var redlineAfter = timing.GetRedlineAtTime(hitObject.Time).Copy();
-                var redlineOn = redlineAfter.Copy();
-
-                redlineAfter.Offset = hitObject.Time;
-                redlineOn.Offset = hitObject.Time - 1; // This one will be on the slider
-                redlineAfter.OmitFirstBarLine = true;
-                redlineOn.OmitFirstBarLine = true;
-                // Express velocity in BPM
-                redlineOn.MpB *= hitObject.SliderVelocity / -100;
-                // NaN SV results in removal of slider ticks
-                hitObject.SliderVelocity = options.RemoveSliderTicks ? double.NaN : -100;
-
-                // Add redlines
-                changes.Add(new TimingPointChange(
-                    redlineOn,
-                    true,
-                    uninherited: true,
-                    omitFirstBarLine: true,
-                    fuzziness: Precision.DOUBLE_EPSILON));
-                changes.Add(new TimingPointChange(
-                    redlineAfter,
-                    true,
-                    uninherited: true,
-                    omitFirstBarLine: true,
-                    fuzziness: Precision.DOUBLE_EPSILON));
-                hitObject.Time -= 1;
-            }
-
-            var timingPoint = hitObject.TimingPoint.Copy();
-            timingPoint.Offset = hitObject.Time;
-            timingPoint.MpB = hitObject.SliderVelocity;
-            changes.Add(new TimingPointChange(
-                timingPoint,
-                true,
-                fuzziness: Precision.DOUBLE_EPSILON));
-        }
-
-        // Add the new SliderVelocity changes
-        TimingPointChange.Apply(timing, changes);
+        SliderVelocityFixer.Fix(
+            beatmap,
+            markedObjects,
+            options.DelegateToBpm,
+            options.RemoveSliderTicks,
+            cancellationToken);
         progress?.Report(1);
         return slidersCompleted;
     }
