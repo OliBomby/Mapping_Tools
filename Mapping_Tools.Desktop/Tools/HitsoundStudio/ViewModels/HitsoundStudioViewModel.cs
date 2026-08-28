@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Audio.Contracts;
+using Mapping_Tools.Application.Audio.Models;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Interactions.Dialogs;
@@ -46,9 +47,11 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
 {
     private readonly ICurrentBeatmapLocator currentBeatmap;
     private readonly ProjectDefinition<HitsoundStudioProject> definition;
+    private readonly IAudioGenerator audioGenerator;
     private readonly IFilePicker filePicker;
     private readonly IBeatmapsetFileSystem files;
     private readonly IDialogService messageDialogs;
+    private readonly IAudioPlaybackService playback;
     private readonly IProjectStore projectStore;
 
     private readonly IHitsoundStudioService service;
@@ -63,7 +66,9 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     ///     Creates the Hitsound Studio presentation model and binds its persisted
     ///     state to the legacy autosave filename.
     /// </summary>
-    /// <param name="service">Runs imports, preview, validation, and export.</param>
+    /// <param name="service">Runs imports, validation, and export.</param>
+    /// <param name="audioGenerator">Generates audio clips for the UI preview.</param>
+    /// <param name="playback">Starts and owns the UI preview playback session.</param>
     /// <param name="messageDialogs">Shows typed confirmations and diagnostics.</param>
     /// <param name="execution">Coordinates keyed cancellation and completion.</param>
     /// <param name="currentBeatmap">Finds the beatmap open in osu!.</param>
@@ -75,6 +80,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// <param name="directories">Provides the default application export directory.</param>
     public HitsoundStudioViewModel(
         IHitsoundStudioService service,
+        IAudioGenerator audioGenerator,
+        IAudioPlaybackService playback,
         IDialogService messageDialogs,
         IToolExecutionService execution,
         ICurrentBeatmapLocator currentBeatmap,
@@ -87,6 +94,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         : base(execution, HitsoundStudioToolDefinition.Definition)
     {
         this.service = service ?? throw new ArgumentNullException(nameof(service));
+        this.audioGenerator = audioGenerator ?? throw new ArgumentNullException(nameof(audioGenerator));
+        this.playback = playback ?? throw new ArgumentNullException(nameof(playback));
         this.messageDialogs = messageDialogs ?? throw new ArgumentNullException(nameof(messageDialogs));
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
         this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
@@ -534,9 +543,10 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             gateEntered = true;
             await StopPreviewSessionAsync();
             cancellation.Token.ThrowIfCancellationRequested();
-            var session = await service.PreviewAsync(
-                SelectedLayer.SampleArgs.Snapshot(),
+            var clip = await audioGenerator.GenerateAsync(
+                new AudioGenerationRequest(SelectedLayer.SampleArgs.Snapshot()),
                 cancellation.Token);
+            var session = await playback.PlayAsync(clip, cancellationToken: cancellation.Token);
             if (cancellation.IsCancellationRequested)
             {
                 await session.StopAsync();

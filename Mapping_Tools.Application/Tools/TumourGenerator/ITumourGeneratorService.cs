@@ -1,11 +1,9 @@
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
-using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
-using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 
 namespace Mapping_Tools.Application.Tools.TumourGenerator;
 
-/// <summary>Coordinates Tumour Generator 2 import, preview, and destructive runs.</summary>
+/// <summary>Coordinates Tumour Generator 2 imports and destructive runs.</summary>
 public interface ITumourGeneratorService
 {
     /// <summary>Imports sliders through the shared disk/live beatmap gateway.</summary>
@@ -13,21 +11,11 @@ public interface ITumourGeneratorService
     /// <param name="mode">The import source.</param>
     /// <param name="timeCode">The time query when <paramref name="mode" /> is time-based.</param>
     /// <param name="cancellationToken">Cancels the read.</param>
-    /// <returns>The imported sliders and preview difficulty value.</returns>
+    /// <returns>The imported sliders and map difficulty value.</returns>
     Task<TumourImportResult> ImportAsync(
         string path,
         HitObjectSelectionMode mode,
         string? timeCode,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>Generates an independent preview without persistence or editor access.</summary>
-    /// <param name="previewHitObject">The preview slider to copy and transform.</param>
-    /// <param name="options">The framework-neutral tumour settings.</param>
-    /// <param name="cancellationToken">Cancels the generation.</param>
-    /// <returns>The generated slider and layer-length metadata.</returns>
-    Task<TumourPreviewResult> PreviewAsync(
-        HitObject previewHitObject,
-        TumourGeneratorEngineOptions options,
         CancellationToken cancellationToken = default);
 
     /// <summary>Runs, backs up, saves, and optionally reloads the requested maps.</summary>

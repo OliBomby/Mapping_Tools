@@ -1,6 +1,5 @@
 using System.Globalization;
 using Mapping_Tools.Application.Abstractions;
-using Mapping_Tools.Application.Audio;
 using Mapping_Tools.Application.Audio.Contracts;
 using Mapping_Tools.Application.Audio.Models;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
@@ -33,7 +32,6 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
     private readonly IAudioGenerator generator;
     private readonly IMidiService midi;
     private readonly IAudioClipMixer mixer;
-    private readonly AudioPreviewService preview;
     private readonly IFileRevealService reveal;
     private readonly IMapCleanerSampleService sampleAnalyzer;
 
@@ -41,7 +39,6 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
     /// <param name="beatmaps">Loads disk-only beatmaps and writes export copies.</param>
     /// <param name="sampleAnalyzer">Finds canonical sample paths in map folders.</param>
     /// <param name="generator">Generates audio through the step-41 audio port.</param>
-    /// <param name="preview">Owns playback and session lifetime through the step-41 service.</param>
     /// <param name="audioExporter">Encodes owned neutral clips.</param>
     /// <param name="mixer">Mixes owned neutral clips.</param>
     /// <param name="midi">Imports and exports neutral MIDI events.</param>
@@ -52,7 +49,6 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         IBeatmapEditingGateway beatmaps,
         IMapCleanerSampleService sampleAnalyzer,
         IAudioGenerator generator,
-        AudioPreviewService preview,
         IAudioExporter audioExporter,
         IAudioClipMixer mixer,
         IMidiService midi,
@@ -63,7 +59,6 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         this.beatmaps = beatmaps ?? throw new ArgumentNullException(nameof(beatmaps));
         this.sampleAnalyzer = sampleAnalyzer ?? throw new ArgumentNullException(nameof(sampleAnalyzer));
         this.generator = generator ?? throw new ArgumentNullException(nameof(generator));
-        this.preview = preview ?? throw new ArgumentNullException(nameof(preview));
         this.audioExporter = audioExporter ?? throw new ArgumentNullException(nameof(audioExporter));
         this.mixer = mixer ?? throw new ArgumentNullException(nameof(mixer));
         this.midi = midi ?? throw new ArgumentNullException(nameof(midi));
@@ -147,15 +142,6 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         }
 
         return failures;
-    }
-
-    /// <inheritdoc />
-    public Task<IAudioPlaybackSession> PreviewAsync(
-        SampleGeneratingArgs sample,
-        CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(sample);
-        return preview.PreviewGeneratedAsync(new AudioGenerationRequest(sample), cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />

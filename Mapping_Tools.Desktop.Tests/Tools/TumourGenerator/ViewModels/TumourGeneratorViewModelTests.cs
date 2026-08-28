@@ -183,7 +183,6 @@ public sealed class TumourGeneratorViewModelTests
         for (int attempt = 0; attempt < 50 && viewModel.TumouredPreviewHitObject is null; attempt++) await Task.Delay(10);
 
         // Assert
-        service.PreviewCalled.Should().BeGreaterThan(0);
         viewModel.TumouredPreviewHitObject.Should().NotBeNull();
         viewModel.LayerRangeSliderMaxes.Should().NotBeEmpty();
     }
@@ -194,9 +193,8 @@ public sealed class TumourGeneratorViewModelTests
         // Arrange
         RecordingGenerator service = new();
         var viewModel = Create(service);
-        for (int attempt = 0; attempt < 50 && service.PreviewCalled == 0; attempt++) await Task.Delay(10);
-
-        int previewCallsBeforeDispose = service.PreviewCalled;
+        for (int attempt = 0; attempt < 50 && viewModel.TumouredPreviewHitObject is null; attempt++) await Task.Delay(10);
+        var previewBeforeDispose = viewModel.TumouredPreviewHitObject;
 
         // Act
         viewModel.Dispose();
@@ -204,7 +202,7 @@ public sealed class TumourGeneratorViewModelTests
         await Task.Delay(20);
 
         // Assert
-        service.PreviewCalled.Should().Be(previewCallsBeforeDispose);
+        viewModel.TumouredPreviewHitObject.Should().BeSameAs(previewBeforeDispose);
     }
 
     private static TumourGeneratorViewModel Create(
@@ -239,8 +237,6 @@ public sealed class TumourGeneratorViewModelTests
 
         public Exception? ImportException { get; init; }
 
-        public int PreviewCalled { get; private set; }
-
         public bool RunCalled { get; private set; }
 
         public bool ReloadEditor { get; private set; }
@@ -262,17 +258,6 @@ public sealed class TumourGeneratorViewModelTests
                     ReturnEmptyImport ? [] : [new HitObject("64,64,0,2,0,L|164:64,1,100")],
                     4,
                     true));
-        }
-
-        public Task<TumourPreviewResult> PreviewAsync(
-            HitObject previewHitObject,
-            TumourGeneratorEngineOptions options,
-            CancellationToken cancellationToken = default)
-        {
-            PreviewCalled++;
-            return Task.FromResult(new TumourPreviewResult(
-                previewHitObject.DeepCopy(),
-                [previewHitObject.PixelLength]));
         }
 
         public Task<TumourRunResult> RunAsync(

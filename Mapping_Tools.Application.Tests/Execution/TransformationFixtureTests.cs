@@ -1,7 +1,6 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Mapping_Tools.Application.Audio;
 using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
@@ -317,10 +316,8 @@ public sealed class TransformationFixtureTests
     {
         NaudioAudioDecoder decoder = new();
         NaudioAudioGenerator generator = new(decoder, new NaudioSoundFontRenderer(), new NaudioAudioEffectService());
-        AudioPreviewService preview = new(
-            decoder, generator, new NaudioAudioPlaybackService(), new FastFourierSpectrumCalculator());
         return new HitsoundStudioService(
-            gateway, new EmptyMapCleanerSampleService(), generator, preview,
+            gateway, new EmptyMapCleanerSampleService(), generator,
             new NaudioAudioExporter(), new NaudioAudioClipMixer(), new NaudioMidiService(),
             new PhysicalBeatmapsetFileSystem(), new NoopFileRevealService(), new HitsoundStudioEngine());
     }

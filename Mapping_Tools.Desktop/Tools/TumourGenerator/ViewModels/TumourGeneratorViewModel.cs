@@ -17,12 +17,15 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.ToolHelpers.Sliders.Newgen;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.Tools.TumourGenerator.Templates;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Adapters;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Models;
 using Mapping_Tools.Desktop.ViewModels;
+
+using CoreTumourGenerator = Mapping_Tools.Core.Tools.TumourGenerator.TumourGenerator;
 
 namespace Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
 
@@ -60,7 +63,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <summary>
     ///     Creates the Tumour Generator 2 presentation model.
     /// </summary>
-    /// <param name="generator">Runs Core generation through Application ports.</param>
+    /// <param name="generator">Imports maps and runs ordinary Core generation through Application ports.</param>
     /// <param name="execution">Coordinates cancellation, progress, and reload.</param>
     /// <param name="currentBeatmap">Finds the beatmap currently open in osu!.</param>
     /// <param name="workspace">Supplies ordinary-run map selection.</param>
@@ -536,10 +539,14 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         try
         {
             var options = SnapshotOptions();
-            var result = await generator.PreviewAsync(
-                PreviewHitObject,
-                options,
-                cancellation.Token);
+            var result = await Task.Run(() =>
+            {
+                cancellation.Token.ThrowIfCancellationRequested();
+                var preview = PreviewHitObject.DeepCopy();
+                var tumourGenerator = CreateGenerator(options);
+                tumourGenerator.TumourGenerate(preview, cancellation.Token);
+                return (HitObject: preview, LayerLengths: tumourGenerator.LayerLengths.ToArray());
+            }, cancellation.Token);
             lock (previewGate)
             {
                 if (disposed || !isActive || !ReferenceEquals(previewCancellation, cancellation)) return;
@@ -635,6 +642,18 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             JustMiddleAnchors = JustMiddleAnchors,
             Scale = Scale,
             DebugConstruction = DebugConstruction,
+        };
+    }
+
+    private static CoreTumourGenerator CreateGenerator(TumourGeneratorEngineOptions options)
+    {
+        CoreTumourGenerator.Validate(options);
+        return new CoreTumourGenerator
+        {
+            TumourLayers = options.TumourLayers,
+            JustMiddleAnchors = options.JustMiddleAnchors,
+            Scalar = options.Scale,
+            Reconstructor = new Reconstructor { DebugConstruction = options.DebugConstruction },
         };
     }
 

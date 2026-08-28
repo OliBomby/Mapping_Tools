@@ -7,6 +7,7 @@ using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
+using Mapping_Tools.Core.Audio;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
@@ -25,7 +26,9 @@ public sealed class HitsoundStudioViewModelTests
     {
         // Arrange
         RecordingHitsoundStudioService service = new();
-        HitsoundStudioViewModel viewModel = CreateViewModel(service);
+        RecordingAudioGenerator audioGenerator = new();
+        RecordingPlaybackService playback = new();
+        HitsoundStudioViewModel viewModel = CreateViewModel(service, audioGenerator, playback);
         viewModel.SelectedLayer = new ObservableHitsoundLayer(
             new HitsoundLayer(
                 "layer",
@@ -36,24 +39,27 @@ public sealed class HitsoundStudioViewModelTests
 
         // Act
         Task firstPreview = viewModel.PreviewCommand.ExecuteAsync(null);
-        await service.FirstPreviewStarted.Task;
+        await audioGenerator.FirstGenerationStarted.Task;
         Task secondPreview = viewModel.PreviewCommand.ExecuteAsync(null);
-        await service.FirstPreviewCanceled.Task;
-        service.ReleaseFirstPreview();
+        await audioGenerator.FirstGenerationCanceled.Task;
+        audioGenerator.ReleaseFirstGeneration();
         await firstPreview;
         await secondPreview;
 
         // Assert
-        service.Sessions.Should().HaveCount(2);
-        service.Sessions[0].StopCount.Should().Be(1);
-        service.Sessions[1].StopCount.Should().Be(0);
+        playback.Sessions.Should().HaveCount(2);
+        playback.Sessions[0].StopCount.Should().Be(1);
+        playback.Sessions[1].StopCount.Should().Be(0);
         viewModel.ResultSummary.Should().Be("Playing selected layer.");
 
         await viewModel.DisposeAsync();
-        service.Sessions[1].StopCount.Should().Be(1);
+        playback.Sessions[1].StopCount.Should().Be(1);
     }
 
-    private static HitsoundStudioViewModel CreateViewModel(RecordingHitsoundStudioService service)
+    private static HitsoundStudioViewModel CreateViewModel(
+        RecordingHitsoundStudioService service,
+        RecordingAudioGenerator audioGenerator,
+        RecordingPlaybackService playback)
     {
         UserNotificationService notifications = new();
         ToolExecutionService execution = new(
@@ -63,6 +69,8 @@ public sealed class HitsoundStudioViewModelTests
             TimeProvider.System);
         return new HitsoundStudioViewModel(
             service,
+            audioGenerator,
+            playback,
             new TestDialogService(),
             execution,
             new RecordingCurrentBeatmapLocator(),
@@ -76,25 +84,6 @@ public sealed class HitsoundStudioViewModelTests
 
     private sealed class RecordingHitsoundStudioService : IHitsoundStudioService
     {
-        private readonly TaskCompletionSource<bool> firstPreviewStarted =
-            new(TaskCreationOptions.RunContinuationsAsynchronously);
-        private readonly TaskCompletionSource<bool> firstPreviewCanceled =
-            new(TaskCreationOptions.RunContinuationsAsynchronously);
-        private readonly TaskCompletionSource<bool> releaseFirstPreview =
-            new(TaskCreationOptions.RunContinuationsAsynchronously);
-        private int previewCount;
-
-        public List<RecordingPlaybackSession> Sessions { get; } = [];
-
-        public TaskCompletionSource<bool> FirstPreviewStarted => firstPreviewStarted;
-
-        public TaskCompletionSource<bool> FirstPreviewCanceled => firstPreviewCanceled;
-
-        public void ReleaseFirstPreview()
-        {
-            releaseFirstPreview.TrySetResult(true);
-        }
-
         public Task<IReadOnlyList<HitsoundLayer>> ImportAsync(
             HitsoundStudioImportRequest request,
             CancellationToken cancellationToken = default)
@@ -117,29 +106,62 @@ public sealed class HitsoundStudioViewModelTests
                 new Dictionary<SampleGeneratingArgs, Exception>());
         }
 
-        public async Task<IAudioPlaybackSession> PreviewAsync(
-            SampleGeneratingArgs sample,
-            CancellationToken cancellationToken = default)
-        {
-            if (Interlocked.Increment(ref previewCount) == 1)
-            {
-                firstPreviewStarted.TrySetResult(true);
-                using CancellationTokenRegistration registration = cancellationToken.Register(
-                    () => firstPreviewCanceled.TrySetResult(true));
-                await releaseFirstPreview.Task;
-            }
-
-            var session = new RecordingPlaybackSession();
-            Sessions.Add(session);
-            return session;
-        }
-
         public Task<HitsoundStudioExportResult> ExportAsync(
             HitsoundStudioServiceOptions project,
             IProgress<double>? progress = null,
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult<HitsoundStudioExportResult>(null!);
+        }
+    }
+
+    private sealed class RecordingAudioGenerator : IAudioGenerator
+    {
+        private readonly TaskCompletionSource<bool> firstGenerationStarted =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private readonly TaskCompletionSource<bool> firstGenerationCanceled =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private readonly TaskCompletionSource<bool> releaseFirstGeneration =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private int generationCount;
+
+        public TaskCompletionSource<bool> FirstGenerationStarted => firstGenerationStarted;
+
+        public TaskCompletionSource<bool> FirstGenerationCanceled => firstGenerationCanceled;
+
+        public void ReleaseFirstGeneration()
+        {
+            releaseFirstGeneration.TrySetResult(true);
+        }
+
+        public async Task<AudioClip> GenerateAsync(
+            AudioGenerationRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            if (Interlocked.Increment(ref generationCount) == 1)
+            {
+                firstGenerationStarted.TrySetResult(true);
+                using CancellationTokenRegistration registration = cancellationToken.Register(
+                    () => firstGenerationCanceled.TrySetResult(true));
+                await releaseFirstGeneration.Task;
+            }
+
+            return new AudioClip(new AudioFormat(8000, 1), [0.1f]);
+        }
+    }
+
+    private sealed class RecordingPlaybackService : IAudioPlaybackService
+    {
+        public List<RecordingPlaybackSession> Sessions { get; } = [];
+
+        public Task<IAudioPlaybackSession> PlayAsync(
+            AudioClip clip,
+            AudioPlaybackOptions? options = null,
+            CancellationToken cancellationToken = default)
+        {
+            var session = new RecordingPlaybackSession();
+            Sessions.Add(session);
+            return Task.FromResult<IAudioPlaybackSession>(session);
         }
     }
 

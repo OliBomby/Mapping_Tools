@@ -51,25 +51,6 @@ public sealed class TumourGeneratorService : ITumourGeneratorService
     }
 
     /// <inheritdoc />
-    public Task<TumourPreviewResult> PreviewAsync(
-        HitObject previewHitObject,
-        TumourGeneratorEngineOptions options,
-        CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(previewHitObject);
-        ArgumentNullException.ThrowIfNull(options);
-        CoreTumourGenerator.Validate(options);
-        return Task.Run(() =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var result = previewHitObject.DeepCopy();
-            var generator = CreateGenerator(options);
-            generator.TumourGenerate(result, cancellationToken);
-            return new TumourPreviewResult(result, generator.LayerLengths.ToArray());
-        }, cancellationToken);
-    }
-
-    /// <inheritdoc />
     public async Task<TumourRunResult> RunAsync(
         IReadOnlyList<string> paths,
         TumourGeneratorServiceOptions project,

@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.Audio.Contracts;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Core.HitsoundStuff;
 
@@ -26,13 +25,6 @@ public interface IHitsoundStudioService
     /// <param name="cancellationToken">Stops validation before the next source is decoded.</param>
     Task<IReadOnlyDictionary<SampleGeneratingArgs, Exception>> ValidateSamplesAsync(
         IReadOnlyList<SampleGeneratingArgs> samples,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>Previews one generated source and returns its owned playback session.</summary>
-    /// <param name="sample">The source and SoundFont parameters to render.</param>
-    /// <param name="cancellationToken">Stops generation or playback startup.</param>
-    Task<IAudioPlaybackSession> PreviewAsync(
-        SampleGeneratingArgs sample,
         CancellationToken cancellationToken = default);
 
     /// <summary>Builds and writes the requested map/package with cooperative cancellation.</summary>

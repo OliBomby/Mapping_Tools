@@ -21,8 +21,8 @@ The documented migration order was followed: layer/model editor, beatmap/sample 
 ## Architecture
 
 - `Mapping_Tools.Core/Tools/HitsoundStudio/HitsoundStudioEngine.cs` owns timestamp zipping, volume balancing, custom-index optimization, schema reuse/growth/conflict detection, deterministic sample naming, and standard/mania positions. It has no filesystem, audio-library, Avalonia, or WPF dependency.
-- `Mapping_Tools.Application/HitsoundStudio/` owns project/schema-compatible contracts, import/reload workflows, MIDI and beatmap use cases, package/export orchestration, progress/cancellation, preview ports, and filesystem/reveal ports.
-- `Mapping_Tools.Infrastructure/Audio/NaudioAudioClipMixer.cs` is the only new audio adapter; file access is provided by the shared `Files/PhysicalBeatmapsetFileSystem.cs`. Existing step-41 `IAudioGenerator`, `IAudioExporter`, `IMidiService`, `AudioPreviewService`, SoundFont renderer, effects, playback, and spectrum boundary are reused; no duplicate decoder or spectrum implementation was added.
+- `Mapping_Tools.Application/HitsoundStudio/` owns project/schema-compatible contracts, import/reload workflows, MIDI and beatmap use cases, package/export orchestration, progress/cancellation, audio generation/playback ports, and filesystem/reveal ports.
+- `Mapping_Tools.Infrastructure/Audio/NaudioAudioClipMixer.cs` is the only new audio adapter; file access is provided by the shared `Files/PhysicalBeatmapsetFileSystem.cs`. Existing step-41 `IAudioGenerator`, `IAudioExporter`, `IMidiService`, `IAudioPlaybackService`, SoundFont renderer, effects, and spectrum boundary are reused; no duplicate decoder or spectrum implementation was added.
 - The neutral `MidiNote` contract carries optional instrument and note labels supplied by the NAudio adapter, so WPF's human-readable MIDI layer names are preserved without moving NAudio types into Application.
 - `Mapping_Tools.Desktop/` owns the Avalonia layer editor, typed import/export windows, compiled bindings, source/folder pickers, project commands, QuickRun, selection, and playback-session disposal.
 

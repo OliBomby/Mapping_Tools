@@ -49,26 +49,6 @@ public sealed class TumourGeneratorServiceTests
     }
 
     [TestMethod]
-    public async Task PreviewAsync_CopiesInputAndReportsGeneratedLayerLengths()
-    {
-        // Arrange
-        TumourGeneratorService service = new(new RecordingBeatmapEditingGateway(CreateSession(BeatmapEditingSource.Disk)));
-        HitObject input = new("0,0,0,2,0,L|256:0,1,256");
-        string original = input.Line;
-        TumourGeneratorServiceOptions project = new();
-        project.TumourLayers[0].TumourCount = 1;
-
-        // Act
-        var result = await service.PreviewAsync(input, project);
-
-        // Assert
-        input.Line.Should().Be(original);
-        result.HitObject.Should().NotBeSameAs(input);
-        result.HitObject.Line.Should().NotBe(original);
-        result.LayerLengths.Should().ContainSingle();
-    }
-
-    [TestMethod]
     public async Task RunAsync_WithLiveSession_SavesAndRequestsEditorReloadWithProgress()
     {
         // Arrange
@@ -132,24 +112,6 @@ public sealed class TumourGeneratorServiceTests
         // Assert
         await act.Should().ThrowAsync<OperationCanceledException>();
         gateway.SessionSaveRequests.Should().BeEmpty();
-    }
-
-    [TestMethod]
-    public async Task PreviewAsync_WhenCancelled_StopsBeforeGeneration()
-    {
-        // Arrange
-        TumourGeneratorService service = new(new RecordingBeatmapEditingGateway(CreateSession(BeatmapEditingSource.Disk)));
-        using CancellationTokenSource cancellation = new();
-        cancellation.Cancel();
-
-        // Act
-        Func<Task> act = () => service.PreviewAsync(
-            new HitObject("0,0,0,2,0,L|256:0,1,256"),
-            new TumourGeneratorServiceOptions(),
-            cancellation.Token);
-
-        // Assert
-        await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
     private static BeatmapEditingSession CreateSession(
