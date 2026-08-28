@@ -863,23 +863,6 @@ public sealed class GraphControl : Control
         SetCurrentValue(GraphStateProperty, state.Clone());
     }
 
-    internal void SetGraphStatePreservingView(CoreGraphState state)
-    {
-        ArgumentNullException.ThrowIfNull(state);
-        committingState = true;
-        try
-        {
-            SetCurrentValue(GraphStateProperty, state.Clone());
-        }
-        finally
-        {
-            committingState = false;
-        }
-
-        RebaseTensionGesture(lastPointerPosition.Y);
-        InvalidateVisual();
-    }
-
     /// <inheritdoc />
     public override void Render(DrawingContext context)
     {

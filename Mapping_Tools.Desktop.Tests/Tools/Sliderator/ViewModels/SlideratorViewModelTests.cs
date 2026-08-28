@@ -63,6 +63,33 @@ public sealed class SlideratorViewModelTests
     }
 
     [TestMethod]
+    public void GraphState_WhenAnchorExceedsVelocityLimit_ClipsTheAnchor()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        viewModel.VelocityLimit = 0.5;
+        viewModel.GraphState = new GraphState(
+            [
+                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(0, 0)),
+                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(1, 0.2f)),
+                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(2, 1)),
+            ],
+            0,
+            0,
+            2,
+            1);
+        GraphState candidate = viewModel.GraphState.Clone();
+        candidate.Anchors[1].Pos = new Mapping_Tools.Core.MathUtil.Vector2(1, 1);
+
+        // Act
+        viewModel.GraphState = candidate;
+
+        // Assert
+        viewModel.GraphState.Anchors[1].Pos.Y.Should().BeLessThan(1);
+        viewModel.IsGraphWithinVelocityLimit(viewModel.GraphState).Should().BeTrue();
+    }
+
+    [TestMethod]
     public void InstallProjectWithoutGraph_UsesCurrentModeResetGraph()
     {
         // Arrange

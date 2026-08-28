@@ -18,6 +18,7 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.Graph.Interpolation;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
@@ -48,6 +49,9 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     private readonly ApplicationSettings settings;
 
     private readonly ISlideratorService sliderator;
+    private GraphState? acceptedGraphState;
+    private GraphState graphState = SlideratorEngineOptions.CreatePositionGraph(3);
+    private bool settingGraphState;
 
     /// <summary>
     ///     Creates a Sliderator presentation model.
@@ -80,6 +84,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             OnPropertyChanged(nameof(VisibleHitObject));
             OnPropertyChanged(nameof(ExpectedSegments));
         };
+        acceptedGraphState = GraphState.Clone();
         UpdateGraphDerivedValues();
     }
 
@@ -218,9 +223,23 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     public partial bool ExportAsInvisibleSlider { get; set; }
 
     /// <summary>Gets or sets the shared Core graph state.</summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ExpectedSegments))]
-    public partial GraphState GraphState { get; set; } = SlideratorEngineOptions.CreatePositionGraph(3);
+    public GraphState GraphState
+    {
+        get => graphState;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            if (!settingGraphState) ClipGraphAnchorToVelocityLimit(value);
+
+            if (ReferenceEquals(graphState, value)) return;
+
+            graphState = value;
+            acceptedGraphState = value.Clone();
+            OnPropertyChanged(nameof(GraphState));
+            OnPropertyChanged(nameof(ExpectedSegments));
+            UpdateGraphDerivedValues();
+        }
+    }
 
     /// <summary>Gets the graph's display label.</summary>
     public string GraphModeText => GraphModeSetting == SlideratorGraphMode.Position ? "X" : "V";
@@ -378,15 +397,6 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     public Task MoveRightAsync(bool fast)
     {
         return MoveAsync(true, fast);
-    }
-
-    /// <summary>Refreshes the preview geometry after the graph control changes state.</summary>
-    /// <param name="state">The state emitted by the shared graph control.</param>
-    public void ApplyGraphState(GraphState state)
-    {
-        ArgumentNullException.ThrowIfNull(state);
-        GraphState = state.Clone();
-        UpdateGraphDerivedValues();
     }
 
     /// <summary>Checks whether a graph state stays within the configured normal-slider SV limit.</summary>
@@ -558,7 +568,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         GraphState state = project.GraphState.Clone();
         state.MinY = GraphMinY;
         state.MaxY = GraphMaxY;
-        GraphState = state;
+        SetGraphState(state);
         LoadedHitObjects.Clear();
         VisibleHitObjectIndex = 0;
         DoEditorRead = false;
@@ -622,7 +632,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             GraphState state = GraphState.Clone();
             state.MinY = -value;
             state.MaxY = value;
-            GraphState = state;
+            SetGraphState(state);
             return;
         }
 
@@ -640,9 +650,225 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         UpdateGraphDerivedValues();
     }
 
-    partial void OnGraphStateChanged(GraphState value)
+    private void SetGraphState(GraphState state)
     {
-        UpdateGraphDerivedValues();
+        settingGraphState = true;
+        try
+        {
+            GraphState = state;
+        }
+        finally
+        {
+            settingGraphState = false;
+        }
+    }
+
+    private void ClipGraphAnchorToVelocityLimit(GraphState candidate)
+    {
+        if (!ExportAsNormal || acceptedGraphState is null)
+            return;
+
+        int anchorIndex = FindChangedAnchorIndex(acceptedGraphState, candidate);
+        if (anchorIndex <= 0 || anchorIndex >= candidate.Anchors.Count || acceptedGraphState.Anchors.Count != candidate.Anchors.Count)
+            return;
+
+        var candidateAnchor = candidate.Anchors[anchorIndex];
+        var acceptedAnchor = acceptedGraphState.Anchors[anchorIndex];
+        bool positionChanged = Math.Abs(candidateAnchor.Pos.X - acceptedAnchor.Pos.X) > 1e-9
+            || Math.Abs(candidateAnchor.Pos.Y - acceptedAnchor.Pos.Y) > 1e-9;
+        bool tensionChanged = Math.Abs(candidateAnchor.Tension - acceptedAnchor.Tension) > 1e-9;
+        bool interpolatorChanged = candidateAnchor.Interpolator.GetType() != acceptedAnchor.Interpolator.GetType();
+        if (!positionChanged && !tensionChanged && !interpolatorChanged)
+            return;
+
+        if (!IsGraphOverSpeedLimit(candidate, anchorIndex)) return;
+
+        if (tensionChanged && !positionChanged)
+        {
+            ClipAnchorTensionToVelocityLimit(candidate, acceptedGraphState, anchorIndex);
+            if (IsGraphOverSpeedLimit(candidate, anchorIndex)) CopyGraphState(acceptedGraphState, candidate);
+            return;
+        }
+
+        if (GraphModeSetting != SlideratorGraphMode.Position) return;
+
+        List<(double Min, double Max)> bounds = [];
+        AddPreviousVelocityBounds(candidate, anchorIndex, bounds);
+        AddNextVelocityBounds(candidate, anchorIndex, bounds);
+        if (bounds.Count == 0) return;
+
+        double lowerBound = bounds.Max(bound => bound.Min);
+        double upperBound = bounds.Min(bound => bound.Max);
+        if (lowerBound <= upperBound)
+        {
+            double clippedY = Math.Clamp(candidateAnchor.Pos.Y, lowerBound, upperBound);
+            candidateAnchor.Pos = new Vector2(candidateAnchor.Pos.X, clippedY);
+        }
+        else
+        {
+            ClipAnchorAlongMovement(candidate, acceptedGraphState, anchorIndex);
+        }
+
+        if (IsGraphOverSpeedLimit(candidate, anchorIndex)) CopyGraphState(acceptedGraphState, candidate);
+    }
+
+    private void ClipAnchorTensionToVelocityLimit(GraphState candidate, GraphState accepted, int anchorIndex)
+    {
+        double acceptedTension = Math.Clamp(accepted.Anchors[anchorIndex].Tension, -1, 1);
+        double candidateTension = Math.Clamp(candidate.Anchors[anchorIndex].Tension, -1, 1);
+        double lower = 0;
+        double upper = 1;
+        for (int iteration = 0; iteration < 24; iteration++)
+        {
+            double progress = (lower + upper) / 2;
+            candidate.Anchors[anchorIndex].Tension = acceptedTension + (candidateTension - acceptedTension) * progress;
+            if (IsGraphOverSpeedLimit(candidate, anchorIndex)) upper = progress;
+            else lower = progress;
+        }
+
+        candidate.Anchors[anchorIndex].Tension = Math.Clamp(
+            acceptedTension + (candidateTension - acceptedTension) * lower,
+            -1,
+            1);
+    }
+
+    private void ClipAnchorAlongMovement(GraphState candidate, GraphState accepted, int anchorIndex)
+    {
+        var acceptedPosition = accepted.Anchors[anchorIndex].Pos;
+        var candidateAnchor = candidate.Anchors[anchorIndex];
+        var candidatePosition = candidateAnchor.Pos;
+        double lower = 0;
+        double upper = 1;
+        for (int iteration = 0; iteration < 24; iteration++)
+        {
+            double progress = (lower + upper) / 2;
+            candidateAnchor.Pos = new Vector2(
+                acceptedPosition.X + (candidatePosition.X - acceptedPosition.X) * progress,
+                acceptedPosition.Y + (candidatePosition.Y - acceptedPosition.Y) * progress);
+            if (IsGraphOverSpeedLimit(candidate, anchorIndex)) upper = progress;
+            else lower = progress;
+        }
+
+        candidateAnchor.Pos = new Vector2(
+            acceptedPosition.X + (candidatePosition.X - acceptedPosition.X) * lower,
+            acceptedPosition.Y + (candidatePosition.Y - acceptedPosition.Y) * lower);
+    }
+
+    private static int FindChangedAnchorIndex(GraphState previous, GraphState candidate)
+    {
+        for (int index = 0; index < candidate.Anchors.Count; index++)
+        {
+            if (index >= previous.Anchors.Count
+                || Math.Abs(previous.Anchors[index].Pos.X - candidate.Anchors[index].Pos.X) > 1e-9
+                || Math.Abs(previous.Anchors[index].Pos.Y - candidate.Anchors[index].Pos.Y) > 1e-9
+                || Math.Abs(previous.Anchors[index].Tension - candidate.Anchors[index].Tension) > 1e-9
+                || previous.Anchors[index].Interpolator.GetType() != candidate.Anchors[index].Interpolator.GetType())
+                return index;
+        }
+
+        return -1;
+    }
+
+    private bool IsGraphOverSpeedLimit(GraphState state, int anchorIndex)
+    {
+        return IsAnchorOverSpeedLimit(state, anchorIndex) || !IsGraphWithinVelocityLimit(state);
+    }
+
+    private bool IsAnchorOverSpeedLimit(GraphState state, int anchorIndex)
+    {
+        return IsPreviousSegmentOverSpeedLimit(state, anchorIndex)
+            || IsNextSegmentOverSpeedLimit(state, anchorIndex);
+    }
+
+    private bool IsPreviousSegmentOverSpeedLimit(GraphState state, int anchorIndex)
+    {
+        if (anchorIndex <= 0) return false;
+
+        var anchor = state.Anchors[anchorIndex];
+        var previous = state.Anchors[anchorIndex - 1];
+        if (GraphModeSetting == SlideratorGraphMode.Velocity)
+            return Math.Abs(GraphInterpolatorCatalog.GetBiggestValue(anchor.Interpolator)) > VelocityLimit;
+
+        double difference = anchor.Pos.Y - previous.Pos.Y;
+        double distance = anchor.Pos.X - previous.Pos.X;
+        if (!double.IsFinite(distance) || Math.Abs(distance) <= Precision.DOUBLE_EPSILON)
+            return true;
+
+        double maximumDerivative = GraphInterpolatorCatalog.GetBiggestDerivative(anchor.Interpolator);
+        double velocity = Math.Abs(maximumDerivative * difference / distance) / SvGraphMultiplier;
+        return !double.IsFinite(velocity) || velocity > VelocityLimit + Precision.DOUBLE_EPSILON;
+    }
+
+    private bool IsNextSegmentOverSpeedLimit(GraphState state, int anchorIndex)
+    {
+        if (anchorIndex >= state.Anchors.Count - 1) return false;
+
+        var anchor = state.Anchors[anchorIndex];
+        var next = state.Anchors[anchorIndex + 1];
+        if (GraphModeSetting == SlideratorGraphMode.Velocity)
+            return Math.Abs(GraphInterpolatorCatalog.GetBiggestValue(next.Interpolator)) > VelocityLimit;
+
+        double difference = next.Pos.Y - anchor.Pos.Y;
+        double distance = next.Pos.X - anchor.Pos.X;
+        if (!double.IsFinite(distance) || Math.Abs(distance) <= Precision.DOUBLE_EPSILON)
+            return true;
+
+        double maximumDerivative = GraphInterpolatorCatalog.GetBiggestDerivative(next.Interpolator);
+        double velocity = Math.Abs(maximumDerivative * difference / distance) / SvGraphMultiplier;
+        return !double.IsFinite(velocity) || velocity > VelocityLimit + Precision.DOUBLE_EPSILON;
+    }
+
+    private void AddPreviousVelocityBounds(
+        GraphState state,
+        int anchorIndex,
+        ICollection<(double Min, double Max)> bounds)
+    {
+        var anchor = state.Anchors[anchorIndex];
+        var previous = state.Anchors[anchorIndex - 1];
+        double maximumDerivative = GraphInterpolatorCatalog.GetBiggestDerivative(anchor.Interpolator);
+        double distance = anchor.Pos.X - previous.Pos.X;
+        if (Math.Abs(distance) <= Precision.DOUBLE_EPSILON)
+        {
+            bounds.Add((previous.Pos.Y, previous.Pos.Y));
+            return;
+        }
+
+        double allowedDifference = VelocityLimit * SvGraphMultiplier * distance / maximumDerivative;
+        bounds.Add((
+            previous.Pos.Y + Precision.DOUBLE_EPSILON - allowedDifference,
+            previous.Pos.Y - Precision.DOUBLE_EPSILON + allowedDifference));
+    }
+
+    private void AddNextVelocityBounds(
+        GraphState state,
+        int anchorIndex,
+        ICollection<(double Min, double Max)> bounds)
+    {
+        if (anchorIndex >= state.Anchors.Count - 1) return;
+
+        var anchor = state.Anchors[anchorIndex];
+        var next = state.Anchors[anchorIndex + 1];
+        double maximumDerivative = GraphInterpolatorCatalog.GetBiggestDerivative(next.Interpolator);
+        double distance = next.Pos.X - anchor.Pos.X;
+        if (Math.Abs(distance) <= Precision.DOUBLE_EPSILON)
+        {
+            bounds.Add((next.Pos.Y, next.Pos.Y));
+            return;
+        }
+
+        double allowedDifference = VelocityLimit * SvGraphMultiplier * distance / maximumDerivative;
+        bounds.Add((
+            next.Pos.Y + Precision.DOUBLE_EPSILON - allowedDifference,
+            next.Pos.Y - Precision.DOUBLE_EPSILON + allowedDifference));
+    }
+
+    private static void CopyGraphState(GraphState source, GraphState target)
+    {
+        target.Anchors = source.Anchors.Select(anchor => anchor.Clone()).ToList();
+        target.MinX = source.MinX;
+        target.MinY = source.MinY;
+        target.MaxX = source.MaxX;
+        target.MaxY = source.MaxY;
     }
 
     private void UpdateGraphDerivedValues()
@@ -738,7 +964,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
             state.Anchors[0].Pos = new Vector2(state.Anchors[0].Pos.X, 0);
 
         GraphModeSetting = mode;
-        GraphState = state;
+        SetGraphState(state);
     }
 
     private GraphState CreateResetGraphState()
@@ -770,7 +996,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                 false));
         if (!confirmed) return;
 
-        GraphState = CreateResetGraphState();
+        SetGraphState(CreateResetGraphState());
     }
 
     private async Task ScaleCompleteAsync()
@@ -790,10 +1016,10 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
         double target = result.Value;
 
-        GraphState = GraphState.Clone();
-        foreach (var anchor in GraphState.Anchors) anchor.Pos = new Vector2(anchor.Pos.X, (float)(anchor.Pos.Y * target / maximum));
+        GraphState state = GraphState.Clone();
+        foreach (var anchor in state.Anchors) anchor.Pos = new Vector2(anchor.Pos.X, (float)(anchor.Pos.Y * target / maximum));
 
-        UpdateGraphDerivedValues();
+        SetGraphState(state);
     }
 
     private async Task ShowMessageAsync(string message)
