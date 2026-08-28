@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.QuickRun.Contracts;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -8,16 +7,16 @@ using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.ComboColourStudio;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
-using Mapping_Tools.Desktop.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
-
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;

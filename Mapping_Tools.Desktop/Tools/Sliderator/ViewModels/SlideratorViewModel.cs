@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.QuickRun.Contracts;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -9,6 +8,7 @@ using Mapping_Tools.Application.Interactions.Converters;
 using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.Sliderator;
@@ -23,8 +23,7 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.Shell;
-using SlideratorProject = Mapping_Tools.Desktop.Tools.Sliderator.Models.SlideratorProject;
-
+using Mapping_Tools.Desktop.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;

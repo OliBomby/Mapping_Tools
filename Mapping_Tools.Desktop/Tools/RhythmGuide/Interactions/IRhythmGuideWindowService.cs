@@ -1,5 +1,5 @@
-using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
+using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.RhythmGuide.Interactions;
 

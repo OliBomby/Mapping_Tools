@@ -5,7 +5,6 @@ using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-using ApplicationDefinition = Mapping_Tools.Application.Tools.TumourGenerator.TumourGeneratorToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.TumourGenerator;
 
@@ -29,7 +28,7 @@ public sealed class TumourGeneratorToolRegistration : IMappingToolDefinition
     public int Order => 240;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => TumourGeneratorToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(TumourGeneratorViewModel);

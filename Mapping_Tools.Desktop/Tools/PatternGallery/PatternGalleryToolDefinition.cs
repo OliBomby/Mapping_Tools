@@ -7,7 +7,6 @@ using Mapping_Tools.Desktop.Tools.PatternGallery.Views;
 using Mapping_Tools.Infrastructure.Tools.PatternGallery;
 using Microsoft.Extensions.DependencyInjection;
 
-using ApplicationDefinition = Mapping_Tools.Application.Tools.PatternGallery.PatternGalleryToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.PatternGallery;
 
@@ -31,7 +30,7 @@ public sealed class PatternGalleryToolRegistration : IMappingToolDefinition
     public int Order => 270;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => PatternGalleryToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(PatternGalleryViewModel);

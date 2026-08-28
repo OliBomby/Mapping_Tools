@@ -4,7 +4,6 @@ using Mapping_Tools.Desktop.Plugin;
 using Mapping_Tools.Desktop.Tools.TimingHelper.ViewModels;
 using Mapping_Tools.Desktop.Tools.TimingHelper.Views;
 using Microsoft.Extensions.DependencyInjection;
-using ApplicationDefinition = Mapping_Tools.Application.Tools.TimingHelper.TimingHelperToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.TimingHelper;
 
@@ -28,7 +27,7 @@ public sealed class TimingHelperToolRegistration : IMappingToolDefinition
     public int Order => 190;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => TimingHelperToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(TimingHelperViewModel);

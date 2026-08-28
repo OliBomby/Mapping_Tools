@@ -11,7 +11,7 @@ public sealed partial class ObservableHitsoundLayer : ObservableObject
     /// <param name="model">The plain layer edited by this adapter.</param>
     public ObservableHitsoundLayer(HitsoundLayer model)
     {
-        this.Model = model ?? throw new ArgumentNullException(nameof(model));
+        Model = model ?? throw new ArgumentNullException(nameof(model));
         Name = model.Name;
         SampleSet = model.SampleSet;
         Hitsound = model.Hitsound;

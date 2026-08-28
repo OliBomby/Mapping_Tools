@@ -10,7 +10,7 @@ public sealed partial class ObservableComboColour : ObservableObject
     /// <param name="model">The plain colour edited by this adapter.</param>
     public ObservableComboColour(ComboColour model)
     {
-        this.Model = model ?? throw new ArgumentNullException(nameof(model));
+        Model = model ?? throw new ArgumentNullException(nameof(model));
         Color = model.Color;
     }
 

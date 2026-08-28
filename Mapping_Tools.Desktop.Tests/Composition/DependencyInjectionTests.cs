@@ -29,9 +29,11 @@ using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
+using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.MapCleaner.ViewModels;
+using Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Interactions;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
@@ -41,8 +43,6 @@ using Mapping_Tools.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using GeometryDashboardViewModel = Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels.GeometryDashboardViewModel;
-using PatternGalleryViewModel = Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels.PatternGalleryViewModel;
 
 namespace Mapping_Tools.Desktop.Tests.Composition;
 

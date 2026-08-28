@@ -2,9 +2,9 @@ using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.TimingCopier;
-using Mapping_Tools.Desktop.Tools.TimingCopier.ViewModels;
 using Mapping_Tools.Core.Tools.TimingCopier.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tools.TimingCopier.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

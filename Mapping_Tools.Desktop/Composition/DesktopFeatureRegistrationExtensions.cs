@@ -1,10 +1,11 @@
+using System.Reflection;
 using Avalonia.Controls.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
+using Mapping_Tools.Desktop.ViewModels.GetStarted;
 using Microsoft.Extensions.DependencyInjection;
-using GetStartedViewModel = Mapping_Tools.Desktop.ViewModels.GetStarted.GetStartedViewModel;
 
 namespace Mapping_Tools.Desktop.Composition;
 
@@ -12,7 +13,7 @@ internal static class DesktopFeatureRegistrationExtensions
 {
     internal static IServiceCollection AddDesktopFeatures(
         this IServiceCollection services,
-        IEnumerable<System.Reflection.Assembly> toolAssemblies)
+        IEnumerable<Assembly> toolAssemblies)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(toolAssemblies);

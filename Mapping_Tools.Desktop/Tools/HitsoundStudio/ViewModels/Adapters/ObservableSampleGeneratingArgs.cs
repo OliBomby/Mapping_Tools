@@ -10,7 +10,7 @@ public sealed partial class ObservableSampleGeneratingArgs : ObservableObject
     /// <param name="model">The plain settings edited by this adapter.</param>
     public ObservableSampleGeneratingArgs(SampleGeneratingArgs model)
     {
-        this.Model = model ?? throw new ArgumentNullException(nameof(model));
+        Model = model ?? throw new ArgumentNullException(nameof(model));
         Path = model.Path;
         Volume = model.Volume;
         Panning = model.Panning;

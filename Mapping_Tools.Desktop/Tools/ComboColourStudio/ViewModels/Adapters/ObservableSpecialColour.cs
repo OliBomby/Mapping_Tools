@@ -10,7 +10,7 @@ public sealed partial class ObservableSpecialColour : ObservableObject
     /// <param name="model">The plain colour edited by this adapter.</param>
     public ObservableSpecialColour(SpecialColour model)
     {
-        this.Model = model ?? throw new ArgumentNullException(nameof(model));
+        Model = model ?? throw new ArgumentNullException(nameof(model));
         Name = model.Name;
         Color = model.Color;
     }

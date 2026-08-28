@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.QuickRun.Contracts;
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -10,6 +9,7 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.PatternGallery;
@@ -18,16 +18,15 @@ using Mapping_Tools.Application.Tools.PatternGallery.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
-using Mapping_Tools.Desktop.Tools.PatternGallery.Interactions;
-using Mapping_Tools.Desktop.Tools.PatternGallery.Models;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Shell.Models;
-using Mapping_Tools.Desktop.Views.Dialogs;
+using Mapping_Tools.Desktop.Tools.PatternGallery.Interactions;
+using Mapping_Tools.Desktop.Tools.PatternGallery.Models;
 using Mapping_Tools.Desktop.Tools.PatternGallery.Views;
-using Material.Icons;
-
 using Mapping_Tools.Desktop.ViewModels;
+using Mapping_Tools.Desktop.Views.Dialogs;
+using Material.Icons;
 
 namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 

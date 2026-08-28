@@ -7,7 +7,6 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Mapping_Tools.Desktop.Views.Dialogs;
-using CoreGraphState = Mapping_Tools.Core.Graph.GraphState;
 
 namespace Mapping_Tools.Desktop.Tools.TumourGenerator.Controls;
 
@@ -15,8 +14,8 @@ namespace Mapping_Tools.Desktop.Tools.TumourGenerator.Controls;
 public partial class ValueOrGraphControl : UserControl
 {
     /// <summary>Identifies the graph state edited by this value control.</summary>
-    public static readonly StyledProperty<CoreGraphState?> GraphStateProperty =
-        AvaloniaProperty.Register<ValueOrGraphControl, CoreGraphState?>(
+    public static readonly StyledProperty<GraphState?> GraphStateProperty =
+        AvaloniaProperty.Register<ValueOrGraphControl, GraphState?>(
             nameof(GraphState),
             defaultBindingMode: BindingMode.TwoWay);
 
@@ -28,7 +27,7 @@ public partial class ValueOrGraphControl : UserControl
     }
 
     /// <summary>Gets or sets the scalar or graph state exposed to the host feature.</summary>
-    public CoreGraphState? GraphState
+    public GraphState? GraphState
     {
         get => GetValue(GraphStateProperty);
         set => SetValue(GraphStateProperty, value);
@@ -51,9 +50,9 @@ public partial class ValueOrGraphControl : UserControl
         eventArgs.Handled = true;
     }
 
-    private static CoreGraphState CreateDefaultValueGraphState()
+    private static GraphState CreateDefaultValueGraphState()
     {
-        return new CoreGraphState(
+        return new GraphState(
             [
                 new GraphAnchor(new Vector2(0, 0)),
                 new GraphAnchor(new Vector2(1, 1)),

@@ -3,14 +3,15 @@ using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.Sliderator.Contracts;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
-using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
-using Mapping_Tools.Desktop.Tools.Sliderator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
-using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tools.Sliderator.Models;
+using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -58,8 +59,8 @@ public sealed class SlideratorViewModelTests
         state.MinY.Should().Be(0);
         state.MaxX.Should().Be(1);
         state.MaxY.Should().Be(1);
-        state.Anchors[0].Pos.Should().Be(new Mapping_Tools.Core.MathUtil.Vector2(0, 0));
-        state.Anchors[^1].Pos.Should().Be(new Mapping_Tools.Core.MathUtil.Vector2(1, 1));
+        state.Anchors[0].Pos.Should().Be(new Vector2(0, 0));
+        state.Anchors[^1].Pos.Should().Be(new Vector2(1, 1));
     }
 
     [TestMethod]
@@ -70,16 +71,16 @@ public sealed class SlideratorViewModelTests
         viewModel.VelocityLimit = 0.5;
         viewModel.GraphState = new GraphState(
             [
-                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(0, 0)),
-                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(1, 0.2f)),
-                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(2, 0.9f)),
+                new GraphAnchor(new Vector2(0, 0)),
+                new GraphAnchor(new Vector2(1, 0.2f)),
+                new GraphAnchor(new Vector2(2, 0.9f)),
             ],
             0,
             0,
             2,
             1);
         GraphState candidate = viewModel.GraphState.Clone();
-        candidate.Anchors[1].Pos = new Mapping_Tools.Core.MathUtil.Vector2(1, 1);
+        candidate.Anchors[1].Pos = new Vector2(1, 1);
 
         // Act
         viewModel.GraphState = candidate;
@@ -97,17 +98,17 @@ public sealed class SlideratorViewModelTests
         viewModel.VelocityLimit = 0.5;
         viewModel.GraphState = new GraphState(
             [
-                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(0, 0)),
-                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(1, 0.2f)),
-                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(2, 1)),
-                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(3, 2)),
+                new GraphAnchor(new Vector2(0, 0)),
+                new GraphAnchor(new Vector2(1, 0.2f)),
+                new GraphAnchor(new Vector2(2, 1)),
+                new GraphAnchor(new Vector2(3, 2)),
             ],
             0,
             0,
             3,
             2);
         GraphState candidate = viewModel.GraphState.Clone();
-        candidate.Anchors[2].Pos = new Mapping_Tools.Core.MathUtil.Vector2(2, 1.1f);
+        candidate.Anchors[2].Pos = new Vector2(2, 1.1f);
 
         // Act
         viewModel.GraphState = candidate;
@@ -123,9 +124,9 @@ public sealed class SlideratorViewModelTests
         var viewModel = Create(new RecordingSliderator());
         viewModel.GraphState = new GraphState(
             [
-                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(2, 0)),
-                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(4, 0.5f)),
-                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(7, 1)),
+                new GraphAnchor(new Vector2(2, 0)),
+                new GraphAnchor(new Vector2(4, 0.5f)),
+                new GraphAnchor(new Vector2(7, 1)),
             ],
             2,
             0,
@@ -139,9 +140,9 @@ public sealed class SlideratorViewModelTests
         viewModel.GraphState.MaxX.Should().Be(12);
         viewModel.GraphState.MaxX.Should().Be(viewModel.GraphState.MinX + viewModel.GraphBeats);
         viewModel.GraphState.Anchors.Select(anchor => anchor.Pos).Should().Equal(
-            new Mapping_Tools.Core.MathUtil.Vector2(2, 0),
-            new Mapping_Tools.Core.MathUtil.Vector2(6, 0.5f),
-            new Mapping_Tools.Core.MathUtil.Vector2(12, 1));
+            new Vector2(2, 0),
+            new Vector2(6, 0.5f),
+            new Vector2(12, 1));
     }
 
     [TestMethod]
@@ -151,8 +152,8 @@ public sealed class SlideratorViewModelTests
         var viewModel = Create(new RecordingSliderator());
         GraphState state = new(
             [
-                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(1, 0)),
-                new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(6, 1)),
+                new GraphAnchor(new Vector2(1, 0)),
+                new GraphAnchor(new Vector2(6, 1)),
             ],
             1,
             0,
@@ -183,8 +184,8 @@ public sealed class SlideratorViewModelTests
         viewModel.GraphState.MinX.Should().Be(0);
         viewModel.GraphState.MaxX.Should().Be(project.GraphBeats);
         viewModel.GraphState.Anchors.Select(anchor => anchor.Pos).Should().Equal(
-            new Mapping_Tools.Core.MathUtil.Vector2(0, 0),
-            new Mapping_Tools.Core.MathUtil.Vector2((float)project.GraphBeats, 1));
+            new Vector2(0, 0),
+            new Vector2((float)project.GraphBeats, 1));
     }
 
     [TestMethod]
@@ -237,7 +238,7 @@ public sealed class SlideratorViewModelTests
         TestDialogService dialogs = new() { BooleanResult = true };
         var viewModel = Create(new RecordingSliderator(), dialogs: dialogs);
         viewModel.GraphState = new GraphState(
-            [new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(0, 0)), new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(0.25f, 0.9f)), new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(1, 1))],
+            [new GraphAnchor(new Vector2(0, 0)), new GraphAnchor(new Vector2(0.25f, 0.9f)), new GraphAnchor(new Vector2(1, 1))],
             0,
             0,
             1,
@@ -248,8 +249,8 @@ public sealed class SlideratorViewModelTests
 
         // Assert
         viewModel.GraphState.Anchors.Should().HaveCount(2);
-        viewModel.GraphState.Anchors[0].Pos.Should().Be(new Mapping_Tools.Core.MathUtil.Vector2(0, 0));
-        viewModel.GraphState.Anchors[1].Pos.Should().Be(new Mapping_Tools.Core.MathUtil.Vector2((float)viewModel.GraphBeats, 1));
+        viewModel.GraphState.Anchors[0].Pos.Should().Be(new Vector2(0, 0));
+        viewModel.GraphState.Anchors[1].Pos.Should().Be(new Vector2((float)viewModel.GraphBeats, 1));
     }
 
     [TestMethod]

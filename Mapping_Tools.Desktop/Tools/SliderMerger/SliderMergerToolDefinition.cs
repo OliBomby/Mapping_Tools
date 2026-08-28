@@ -5,7 +5,6 @@ using Mapping_Tools.Desktop.Tools.SliderMerger.ViewModels;
 using Mapping_Tools.Desktop.Tools.SliderMerger.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-using ApplicationDefinition = Mapping_Tools.Application.Tools.SliderMerger.SliderMergerToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.SliderMerger;
 
@@ -29,7 +28,7 @@ public sealed class SliderMergerToolRegistration : IMappingToolDefinition
     public int Order => 210;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => SliderMergerToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(SliderMergerViewModel);

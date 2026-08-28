@@ -1,3 +1,4 @@
+using System.Reflection;
 using Avalonia.Controls;
 using Mapping_Tools.Application.Abstractions;
 using Mapping_Tools.Application.Audio;
@@ -62,7 +63,6 @@ using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Settings;
 using Mapping_Tools.Infrastructure.Updates;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace Mapping_Tools.Desktop.Composition;
 

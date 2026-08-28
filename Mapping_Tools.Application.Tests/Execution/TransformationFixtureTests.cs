@@ -43,12 +43,11 @@ using Mapping_Tools.Core.Tools.PatternGallery.Models;
 using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Infrastructure.Audio;
 using Mapping_Tools.Infrastructure.Files;
+using Mapping_Tools.Infrastructure.Projects;
 using Mapping_Tools.Infrastructure.Tools.PatternGallery;
 using Mapping_Tools.Infrastructure.Tools.SliderPicturator;
-using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
-using TextJsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Mapping_Tools.Application.Tests.Execution;
 
@@ -150,7 +149,7 @@ public sealed class TransformationFixtureTests
                     autoFailOptions with { Path = RequiredPath(options, "NegativeControl", fixtureRoot) },
                     cancellationToken);
                 return new FixtureExecutionResult(
-                    JsonOutput: TextJsonSerializer.Serialize(new
+                    JsonOutput: JsonSerializer.Serialize(new
                     {
                         autoFailDetected = positive.Analysis.HasAutoFail,
                         unloadingObjects = positive.Analysis.UnloadingObjects.Count,

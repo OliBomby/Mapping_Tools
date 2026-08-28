@@ -1,14 +1,14 @@
 using Mapping_Tools.Application.Audio.Contracts;
 using Mapping_Tools.Application.Audio.Models;
 using Mapping_Tools.Application.Platform;
-using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
-using Mapping_Tools.Infrastructure.Tools.HitsoundCopier;
+using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Core.Audio;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Infrastructure.Files;
+using Mapping_Tools.Infrastructure.Tools.HitsoundCopier;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Infrastructure.Tests.Tools.HitsoundCopier;

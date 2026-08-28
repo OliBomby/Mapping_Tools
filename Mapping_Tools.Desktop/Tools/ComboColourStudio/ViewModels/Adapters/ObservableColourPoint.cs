@@ -11,7 +11,7 @@ public sealed partial class ObservableColourPoint : ObservableObject
     /// <param name="model">The persisted point edited by this adapter.</param>
     public ObservableColourPoint(ColourPoint model)
     {
-        this.Model = model ?? throw new ArgumentNullException(nameof(model));
+        Model = model ?? throw new ArgumentNullException(nameof(model));
         Time = model.Time;
         Mode = model.Mode;
         ColourSequence = new ObservableCollection<ObservableSpecialColour>(

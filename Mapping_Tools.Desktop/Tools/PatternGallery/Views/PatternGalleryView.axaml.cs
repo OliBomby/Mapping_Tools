@@ -1,8 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using PatternGalleryItemViewModel = Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels.PatternGalleryItemViewModel;
-using PatternGalleryViewModel = Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels.PatternGalleryViewModel;
+using Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.PatternGallery.Views;
 

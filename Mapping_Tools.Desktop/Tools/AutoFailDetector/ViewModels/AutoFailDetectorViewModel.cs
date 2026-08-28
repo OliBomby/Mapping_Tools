@@ -1,10 +1,10 @@
-using Mapping_Tools.Application.QuickRun.Contracts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Platform;
+using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Tools;
@@ -12,7 +12,6 @@ using Mapping_Tools.Application.Tools.AutoFail;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Tools.AutoFail.Models;
 using Mapping_Tools.Desktop.Shell;
-
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels;

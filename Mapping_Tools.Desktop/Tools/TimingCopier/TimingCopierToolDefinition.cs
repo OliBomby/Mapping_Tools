@@ -4,7 +4,6 @@ using Mapping_Tools.Desktop.Plugin;
 using Mapping_Tools.Desktop.Tools.TimingCopier.ViewModels;
 using Mapping_Tools.Desktop.Tools.TimingCopier.Views;
 using Microsoft.Extensions.DependencyInjection;
-using ApplicationDefinition = Mapping_Tools.Application.Tools.TimingCopier.TimingCopierToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.TimingCopier;
 
@@ -28,7 +27,7 @@ public sealed class TimingCopierToolRegistration : IMappingToolDefinition
     public int Order => 180;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => TimingCopierToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(TimingCopierViewModel);

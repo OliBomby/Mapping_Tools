@@ -4,8 +4,8 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.MapsetMerger;
 using Mapping_Tools.Application.Tools.MapsetMerger.Contracts;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
-using Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

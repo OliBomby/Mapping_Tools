@@ -6,7 +6,6 @@ using Mapping_Tools.Desktop.Tools.SliderPicturator.Views;
 using Mapping_Tools.Infrastructure.Tools.SliderPicturator;
 using Microsoft.Extensions.DependencyInjection;
 
-using ApplicationDefinition = Mapping_Tools.Application.Tools.SliderPicturator.SliderPicturatorToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.SliderPicturator;
 
@@ -30,7 +29,7 @@ public sealed class SliderPicturatorToolRegistration : IMappingToolDefinition
     public int Order => 220;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => SliderPicturatorToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(SliderPicturatorViewModel);

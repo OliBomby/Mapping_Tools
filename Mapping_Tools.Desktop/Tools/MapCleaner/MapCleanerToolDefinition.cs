@@ -5,7 +5,6 @@ using Mapping_Tools.Desktop.Tools.MapCleaner.ViewModels;
 using Mapping_Tools.Desktop.Tools.MapCleaner.Views;
 using Mapping_Tools.Infrastructure.Tools.MapCleaner;
 using Microsoft.Extensions.DependencyInjection;
-using ApplicationDefinition = Mapping_Tools.Application.Tools.MapCleaner.MapCleanerToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.MapCleaner;
 
@@ -29,7 +28,7 @@ public sealed class MapCleanerToolRegistration : IMappingToolDefinition
     public int Order => 110;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => MapCleanerToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(MapCleanerViewModel);

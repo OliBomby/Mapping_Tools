@@ -4,7 +4,6 @@ using Mapping_Tools.Desktop.Plugin;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.Views;
 using Microsoft.Extensions.DependencyInjection;
-using ApplicationDefinition = Mapping_Tools.Application.Tools.HitsoundPreviewHelper.HitsoundPreviewHelperToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper;
 
@@ -28,7 +27,7 @@ public sealed class HitsoundPreviewHelperToolRegistration : IMappingToolDefiniti
     public int Order => 130;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => HitsoundPreviewHelperToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(HitsoundPreviewHelperViewModel);

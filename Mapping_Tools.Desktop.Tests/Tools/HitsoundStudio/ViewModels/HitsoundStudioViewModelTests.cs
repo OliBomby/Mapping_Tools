@@ -1,5 +1,5 @@
-using Mapping_Tools.Application.Audio.Contracts;
 using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.Audio.Contracts;
 using Mapping_Tools.Application.Audio.Models;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
@@ -7,12 +7,12 @@ using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
-using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
-using Mapping_Tools.Desktop.ViewModels;
+using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels.Adapters;
+using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.HitsoundStudio.ViewModels;

@@ -1,8 +1,6 @@
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
 using Mapping_Tools.Desktop.Tools.PatternGallery.Interactions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PatternGalleryDetailsViewModel = Mapping_Tools.Desktop.Tools.PatternGallery.Interactions.PatternGalleryDetailsViewModel;
-using PatternGalleryInputViewModel = Mapping_Tools.Desktop.Tools.PatternGallery.Interactions.PatternGalleryInputViewModel;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.PatternGallery.Interactions;
 

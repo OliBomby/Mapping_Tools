@@ -11,7 +11,7 @@ public sealed partial class ObservableSample : ObservableObject
     /// <param name="model">The plain sample edited by this adapter.</param>
     public ObservableSample(Sample model)
     {
-        this.Model = model ?? throw new ArgumentNullException(nameof(model));
+        Model = model ?? throw new ArgumentNullException(nameof(model));
         SampleSet = model.SampleSet;
         Hitsound = model.Hitsound;
         SampleArgs = new ObservableSampleGeneratingArgs(model.SampleArgs);

@@ -6,7 +6,6 @@ using Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
 using Mapping_Tools.Desktop.Tools.MapsetMerger.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-using ApplicationDefinition = Mapping_Tools.Application.Tools.MapsetMerger.MapsetMergerToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.MapsetMerger;
 
@@ -30,7 +29,7 @@ public sealed class MapsetMergerToolRegistration : IMappingToolDefinition
     public int Order => 260;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => MapsetMergerToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(MapsetMergerViewModel);

@@ -1,8 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Input;
-using Mapping_Tools.Desktop.ViewModels;
-using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Adapters;
+using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
+using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.TumourGenerator.Views;
 

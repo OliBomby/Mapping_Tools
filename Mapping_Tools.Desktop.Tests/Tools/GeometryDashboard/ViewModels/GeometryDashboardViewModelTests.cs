@@ -12,7 +12,6 @@ using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using GeometryDashboardViewModel = Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels.GeometryDashboardViewModel;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.GeometryDashboard.ViewModels;
 

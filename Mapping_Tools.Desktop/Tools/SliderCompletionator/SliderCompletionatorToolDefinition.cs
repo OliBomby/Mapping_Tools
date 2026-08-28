@@ -5,7 +5,6 @@ using Mapping_Tools.Desktop.Tools.SliderCompletionator.ViewModels;
 using Mapping_Tools.Desktop.Tools.SliderCompletionator.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-using ApplicationDefinition = Mapping_Tools.Application.Tools.SliderCompletionator.SliderCompletionatorToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.SliderCompletionator;
 
@@ -29,7 +28,7 @@ public sealed class SliderCompletionatorToolRegistration : IMappingToolDefinitio
     public int Order => 200;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => SliderCompletionatorToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(SliderCompletionatorViewModel);

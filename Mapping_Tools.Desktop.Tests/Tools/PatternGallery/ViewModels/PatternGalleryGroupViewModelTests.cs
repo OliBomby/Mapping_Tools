@@ -1,7 +1,6 @@
 using Mapping_Tools.Core.Tools.PatternGallery.Models;
 using Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PatternGalleryItemViewModel = Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels.PatternGalleryItemViewModel;
 
 namespace Mapping_Tools.Desktop.Tests.Tools.PatternGallery.ViewModels;
 

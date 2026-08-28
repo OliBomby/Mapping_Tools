@@ -3,9 +3,9 @@ using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.MetadataManager;
-using Mapping_Tools.Desktop.Tools.MetadataManager.ViewModels;
 using Mapping_Tools.Core.Tools.MetadataManager;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tools.MetadataManager.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

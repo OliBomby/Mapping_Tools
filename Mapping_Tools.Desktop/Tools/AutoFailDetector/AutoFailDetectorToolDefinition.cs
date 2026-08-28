@@ -4,7 +4,6 @@ using Mapping_Tools.Desktop.Plugin;
 using Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels;
 using Mapping_Tools.Desktop.Tools.AutoFailDetector.Views;
 using Microsoft.Extensions.DependencyInjection;
-using ApplicationDefinition = Mapping_Tools.Application.Tools.AutoFail.AutoFailDetectorToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.AutoFailDetector;
 
@@ -28,7 +27,7 @@ public sealed class AutoFailDetectorToolRegistration : IMappingToolDefinition
     public int Order => 100;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => AutoFailDetectorToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(AutoFailDetectorViewModel);

@@ -16,10 +16,9 @@ using Mapping_Tools.Application.Tools.MetadataManager;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Tools.MetadataManager;
-using Mapping_Tools.Desktop.Tools.MetadataManager.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
-
+using Mapping_Tools.Desktop.Tools.MetadataManager.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.MetadataManager.ViewModels;

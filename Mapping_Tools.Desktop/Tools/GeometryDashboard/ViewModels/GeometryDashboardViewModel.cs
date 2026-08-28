@@ -23,11 +23,11 @@ using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGen
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorCollection;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
+using Mapping_Tools.Desktop.Shell;
+using Mapping_Tools.Desktop.Shell.Models;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
-using Mapping_Tools.Desktop.Shell;
-using Mapping_Tools.Desktop.Shell.Models;
 using Material.Icons;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;

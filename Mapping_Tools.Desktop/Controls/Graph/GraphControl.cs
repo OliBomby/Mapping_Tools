@@ -5,8 +5,6 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
-using Material.Icons;
-using Material.Icons.Avalonia;
 using Mapping_Tools.Application.Interactions.Converters;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Graph.Interpolation;
@@ -16,7 +14,8 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Mapping_Tools.Desktop.Views.Dialogs;
-using CoreGraphState = Mapping_Tools.Core.Graph.GraphState;
+using Material.Icons;
+using Material.Icons.Avalonia;
 
 namespace Mapping_Tools.Desktop.Controls.Graph;
 
@@ -33,8 +32,8 @@ public sealed class GraphControl : Control
     private const int maximum_curve_samples = 1000;
 
     /// <summary>Identifies the graph state edited by the control.</summary>
-    public static readonly StyledProperty<CoreGraphState?> GraphStateProperty =
-        AvaloniaProperty.Register<GraphControl, CoreGraphState?>(
+    public static readonly StyledProperty<GraphState?> GraphStateProperty =
+        AvaloniaProperty.Register<GraphControl, GraphState?>(
             nameof(GraphState),
             defaultBindingMode: BindingMode.TwoWay);
 
@@ -216,7 +215,7 @@ public sealed class GraphControl : Control
     public bool IgnoreAnchorUpdates { get; set; }
 
     /// <summary>Gets or sets the graph state edited by the control.</summary>
-    public CoreGraphState? GraphState
+    public GraphState? GraphState
     {
         get => GetValue(GraphStateProperty);
         set => SetValue(GraphStateProperty, value);
@@ -613,9 +612,9 @@ public sealed class GraphControl : Control
 
     /// <summary>Returns a deep editable copy of the current state, using the legacy default when empty.</summary>
     /// <returns>A graph state safe for independent editing.</returns>
-    public CoreGraphState GetGraphState()
+    public GraphState GetGraphState()
     {
-        return GraphState?.Clone() ?? CoreGraphState.CreateDefault();
+        return GraphState?.Clone() ?? GraphState.CreateDefault();
     }
 
     /// <summary>Resets the viewport to the graph bounds.</summary>
@@ -859,7 +858,7 @@ public sealed class GraphControl : Control
 
     /// <summary>Replaces the graph with an independent state snapshot.</summary>
     /// <param name="state">The graph state to display and edit.</param>
-    public void SetGraphState(CoreGraphState state)
+    public void SetGraphState(GraphState state)
     {
         ArgumentNullException.ThrowIfNull(state);
         SetCurrentValue(GraphStateProperty, state.Clone());
@@ -1045,7 +1044,7 @@ public sealed class GraphControl : Control
         }
     }
 
-    internal static bool IsWheelZoomPositionInLegacyBounds(Vector2 zoomPoint, CoreGraphState state)
+    internal static bool IsWheelZoomPositionInLegacyBounds(Vector2 zoomPoint, GraphState state)
     {
         return zoomPoint.X >= 0 && zoomPoint.Y >= 0 && zoomPoint.X <= state.MaxX && zoomPoint.Y <= state.MaxY;
     }
@@ -1176,7 +1175,7 @@ public sealed class GraphControl : Control
             : panCursor ??= new Cursor(StandardCursorType.SizeAll);
     }
 
-    private void CommitState(CoreGraphState state)
+    private void CommitState(GraphState state)
     {
         committingState = true;
         try
@@ -1206,7 +1205,7 @@ public sealed class GraphControl : Control
         return closest is not null && Math.Abs(closest.Value - value) <= tolerance ? closest.Value : value;
     }
 
-    private void UpdateBounds(Action<CoreGraphState> update)
+    private void UpdateBounds(Action<GraphState> update)
     {
         var state = GetGraphState();
         double oldMinX = state.MinX;

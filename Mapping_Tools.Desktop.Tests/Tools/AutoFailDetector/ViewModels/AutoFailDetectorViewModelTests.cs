@@ -6,10 +6,10 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.AutoFail;
-using Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels;
 using Mapping_Tools.Core.Tools.AutoFail.Models;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

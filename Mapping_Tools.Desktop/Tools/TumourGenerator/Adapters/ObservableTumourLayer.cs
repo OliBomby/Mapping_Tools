@@ -14,7 +14,7 @@ public sealed partial class ObservableTumourLayer : ObservableObject
     /// <param name="model">The domain layer edited by this adapter.</param>
     public ObservableTumourLayer(TumourLayer model)
     {
-        this.Model = model ?? throw new ArgumentNullException(nameof(model));
+        Model = model ?? throw new ArgumentNullException(nameof(model));
         TumourTemplateEnum = model.TumourTemplateEnum;
         WrappingMode = model.WrappingMode;
         TumourSidedness = model.TumourSidedness;

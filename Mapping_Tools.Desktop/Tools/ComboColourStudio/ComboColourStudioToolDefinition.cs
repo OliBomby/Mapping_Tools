@@ -5,7 +5,6 @@ using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-using ApplicationDefinition = Mapping_Tools.Application.Tools.ComboColourStudio.ComboColourStudioToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.ComboColourStudio;
 
@@ -29,7 +28,7 @@ public sealed class ComboColourStudioToolRegistration : IMappingToolDefinition
     public int Order => 250;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => ComboColourStudioToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(ComboColourStudioViewModel);

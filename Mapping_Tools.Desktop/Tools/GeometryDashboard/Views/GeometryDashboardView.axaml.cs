@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using GeometryDashboardViewModel = Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels.GeometryDashboardViewModel;
+using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
 

@@ -2,9 +2,9 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Mapping_Tools.Desktop.Controls;
-using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels.Adapters;
+using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.Views;
 

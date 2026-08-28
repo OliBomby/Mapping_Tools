@@ -3,8 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Mapping_Tools.Desktop.ViewModels.GetStarted;
-using GetStartedViewModel = Mapping_Tools.Desktop.ViewModels.GetStarted.GetStartedViewModel;
-using VisualExtensions = Avalonia.VisualTree.VisualExtensions;
 
 namespace Mapping_Tools.Desktop.Views.GetStarted;
 
@@ -43,7 +41,7 @@ public partial class GetStartedView : UserControl
         RecentPathColumn.Width = new GridLength(width);
         RecentMapsTable.InvalidateMeasure();
 
-        foreach (var descendant in VisualExtensions.GetVisualDescendants(RecentMapsTable).OfType<Control>()) descendant.InvalidateMeasure();
+        foreach (var descendant in Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(RecentMapsTable).OfType<Control>()) descendant.InvalidateMeasure();
     }
 
     private void SelectRecentMaps(object? sender, TappedEventArgs eventArgs)

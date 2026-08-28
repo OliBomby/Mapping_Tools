@@ -4,9 +4,8 @@ using Mapping_Tools.Desktop.Plugin;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Interactions;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 using Mapping_Tools.Desktop.Tools.RhythmGuide.Views;
+using Mapping_Tools.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
-using ApplicationDefinition = Mapping_Tools.Application.Tools.RhythmGuide.RhythmGuideToolDefinition;
-using MainWindow = Mapping_Tools.Desktop.Views.MainWindow;
 
 namespace Mapping_Tools.Desktop.Tools.RhythmGuide;
 
@@ -30,7 +29,7 @@ public sealed class RhythmGuideToolRegistration : IMappingToolDefinition
     public int Order => 120;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => RhythmGuideToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(RhythmGuideViewModel);

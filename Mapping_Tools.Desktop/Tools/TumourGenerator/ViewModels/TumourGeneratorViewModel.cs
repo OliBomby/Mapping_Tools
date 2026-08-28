@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.QuickRun.Contracts;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -9,6 +8,7 @@ using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.TumourGenerator;
@@ -19,10 +19,9 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.Tools.TumourGenerator.Templates;
-using Mapping_Tools.Desktop.Tools.TumourGenerator.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Adapters;
-
+using Mapping_Tools.Desktop.Tools.TumourGenerator.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;

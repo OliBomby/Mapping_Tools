@@ -718,9 +718,9 @@ public struct Quaterniond : IEquatable<Quaterniond>
         {
             double halfAngle = Functions.DTOR * angle / 2;
 
-            this.W = System.Math.Cos(halfAngle);
+            this.W = Math.Cos(halfAngle);
 
-            double sin = System.Math.Sin(halfAngle);
+            double sin = Math.Sin(halfAngle);
             Vector3d axisNormalized;
             Vector3d.Normalize(ref axis, out axisNormalized);
             this.X = axisNormalized.X * sin;
@@ -757,12 +757,12 @@ public struct Quaterniond : IEquatable<Quaterniond>
         /// <param name="matrix">The matrix for the components of the Quaterniond.</param>
         public Quaterniond(ref Matrix4d matrix)
         {
-            double scale = System.Math.Pow(matrix.Determinant, 1.0d/3.0d);
+            double scale = Math.Pow(matrix.Determinant, 1.0d/3.0d);
 
-            W = System.Math.Sqrt(System.Math.Max(0, scale + matrix[0, 0] + matrix[1, 1] + matrix[2, 2])) / 2;
-            X = System.Math.Sqrt(System.Math.Max(0, scale + matrix[0, 0] - matrix[1, 1] - matrix[2, 2])) / 2;
-            Y = System.Math.Sqrt(System.Math.Max(0, scale - matrix[0, 0] + matrix[1, 1] - matrix[2, 2])) / 2;
-            Z = System.Math.Sqrt(System.Math.Max(0, scale - matrix[0, 0] - matrix[1, 1] + matrix[2, 2])) / 2;
+            W = Math.Sqrt(Math.Max(0, scale + matrix[0, 0] + matrix[1, 1] + matrix[2, 2])) / 2;
+            X = Math.Sqrt(Math.Max(0, scale + matrix[0, 0] - matrix[1, 1] - matrix[2, 2])) / 2;
+            Y = Math.Sqrt(Math.Max(0, scale - matrix[0, 0] + matrix[1, 1] - matrix[2, 2])) / 2;
+            Z = Math.Sqrt(Math.Max(0, scale - matrix[0, 0] - matrix[1, 1] + matrix[2, 2])) / 2;
             if( matrix[2,1] - matrix[1,2] < 0 ) X = -X;
             if( matrix[0,2] - matrix[2,0] < 0 ) Y = -Y;
             if( matrix[1,0] - matrix[0,1] < 0 ) Z = -Z;
@@ -770,12 +770,12 @@ public struct Quaterniond : IEquatable<Quaterniond>
 
         public Quaterniond(ref Matrix3d matrix)
         {
-            double scale = System.Math.Pow(matrix.Determinant, 1.0d / 3.0d);
+            double scale = Math.Pow(matrix.Determinant, 1.0d / 3.0d);
 
-            W = System.Math.Sqrt(System.Math.Max(0, scale + matrix[0, 0] + matrix[1, 1] + matrix[2, 2])) / 2;
-            X = System.Math.Sqrt(System.Math.Max(0, scale + matrix[0, 0] - matrix[1, 1] - matrix[2, 2])) / 2;
-            Y = System.Math.Sqrt(System.Math.Max(0, scale - matrix[0, 0] + matrix[1, 1] - matrix[2, 2])) / 2;
-            Z = System.Math.Sqrt(System.Math.Max(0, scale - matrix[0, 0] - matrix[1, 1] + matrix[2, 2])) / 2;
+            W = Math.Sqrt(Math.Max(0, scale + matrix[0, 0] + matrix[1, 1] + matrix[2, 2])) / 2;
+            X = Math.Sqrt(Math.Max(0, scale + matrix[0, 0] - matrix[1, 1] - matrix[2, 2])) / 2;
+            Y = Math.Sqrt(Math.Max(0, scale - matrix[0, 0] + matrix[1, 1] - matrix[2, 2])) / 2;
+            Z = Math.Sqrt(Math.Max(0, scale - matrix[0, 0] - matrix[1, 1] + matrix[2, 2])) / 2;
             if (matrix[2, 1] - matrix[1, 2] < 0) X = -X;
             if (matrix[0, 2] - matrix[2, 0] < 0) Y = -Y;
             if (matrix[1, 0] - matrix[0, 1] < 0) Z = -Z;
@@ -901,7 +901,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
         {
             get
             {
-                return System.Math.Sqrt(W * W + X * X + Y * Y + Z * Z);
+                return Math.Sqrt(W * W + X * X + Y * Y + Z * Z);
             }
         }
         public double ModulusSquared
@@ -919,7 +919,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
 
         public void Normalize()
         {
-            double modulus = System.Math.Sqrt(W * W + X * X + Y * Y + Z * Z);
+            double modulus = Math.Sqrt(W * W + X * X + Y * Y + Z * Z);
             if (modulus == 0) throw new DivideByZeroException();
             W = W / modulus;
             X = X / modulus;
@@ -928,7 +928,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
         }
         public void Normalize( out Quaterniond result )
         {
-            double modulus = System.Math.Sqrt(W * W + X * X + Y * Y + Z * Z);
+            double modulus = Math.Sqrt(W * W + X * X + Y * Y + Z * Z);
             if (modulus == 0) throw new DivideByZeroException();
             result.W = W / modulus;
             result.X = X / modulus;
@@ -937,7 +937,7 @@ public struct Quaterniond : IEquatable<Quaterniond>
         }
         public static void Normalize(ref Quaterniond Quaterniond, out Quaterniond result)
         {
-            double modulus = System.Math.Sqrt(Quaterniond.W * Quaterniond.W + Quaterniond.X * Quaterniond.X + Quaterniond.Y * Quaterniond.Y + Quaterniond.Z * Quaterniond.Z);
+            double modulus = Math.Sqrt(Quaterniond.W * Quaterniond.W + Quaterniond.X * Quaterniond.X + Quaterniond.Y * Quaterniond.Y + Quaterniond.Z * Quaterniond.Z);
             if (modulus == 0) throw new DivideByZeroException();
             result.W = Quaterniond.W / modulus;
             result.X = Quaterniond.X / modulus;
@@ -999,12 +999,12 @@ public struct Quaterniond : IEquatable<Quaterniond>
 
         public void Log()
         {
-            if (System.Math.Abs(W) < 1.0)
+            if (Math.Abs(W) < 1.0)
             {
-                double angle = System.Math.Acos(W);
-                double sin = System.Math.Sin(angle);
+                double angle = Math.Acos(W);
+                double sin = Math.Sin(angle);
 
-                if (System.Math.Abs(sin) >= 0)
+                if (Math.Abs(sin) >= 0)
                 {
                     double coefficient = angle / sin;
                     X = X * coefficient;
@@ -1023,12 +1023,12 @@ public struct Quaterniond : IEquatable<Quaterniond>
         }
         public void Log( out Quaterniond result )
         {
-            if (System.Math.Abs(W) < 1.0)
+            if (Math.Abs(W) < 1.0)
             {
-                double angle = System.Math.Acos(W);
-                double sin = System.Math.Sin(angle);
+                double angle = Math.Acos(W);
+                double sin = Math.Sin(angle);
 
-                if (System.Math.Abs(sin) >= 0)
+                if (Math.Abs(sin) >= 0)
                 {
                     double coefficient = angle / sin;
                     result.X = X * coefficient;
@@ -1053,12 +1053,12 @@ public struct Quaterniond : IEquatable<Quaterniond>
         }
         public static void Log(ref Quaterniond Quaterniond, out Quaterniond result)
         {
-            if (System.Math.Abs(Quaterniond.W) < 1.0)
+            if (Math.Abs(Quaterniond.W) < 1.0)
             {
-                double angle = System.Math.Acos(Quaterniond.W);
-                double sin = System.Math.Sin(angle);
+                double angle = Math.Acos(Quaterniond.W);
+                double sin = Math.Sin(angle);
 
-                if (System.Math.Abs(sin) >= 0)
+                if (Math.Abs(sin) >= 0)
                 {
                     double coefficient = angle / sin;
                     result.X = Quaterniond.X * coefficient;
@@ -1084,10 +1084,10 @@ public struct Quaterniond : IEquatable<Quaterniond>
 
         public void Exp()
         {
-            double angle = System.Math.Sqrt(X * X + Y * Y + Z * Z);
-            double sin = System.Math.Sin(angle);
+            double angle = Math.Sqrt(X * X + Y * Y + Z * Z);
+            double sin = Math.Sin(angle);
 
-            if (System.Math.Abs(sin) > 0)
+            if (Math.Abs(sin) > 0)
             {
                 double coefficient = angle / sin;
                 W = 0;
@@ -1102,10 +1102,10 @@ public struct Quaterniond : IEquatable<Quaterniond>
         }
         public void Exp(out Quaterniond result)
         {
-            double angle = System.Math.Sqrt(X * X + Y * Y + Z * Z);
-            double sin = System.Math.Sin(angle);
+            double angle = Math.Sqrt(X * X + Y * Y + Z * Z);
+            double sin = Math.Sin(angle);
 
-            if (System.Math.Abs(sin) > 0)
+            if (Math.Abs(sin) > 0)
             {
                 double coefficient = angle / sin;
                 result.W = 0;
@@ -1123,10 +1123,10 @@ public struct Quaterniond : IEquatable<Quaterniond>
         }
         public static void Exp(ref Quaterniond Quaterniond, out Quaterniond result)
         {
-            double angle = System.Math.Sqrt(Quaterniond.X * Quaterniond.X + Quaterniond.Y * Quaterniond.Y + Quaterniond.Z * Quaterniond.Z);
-            double sin = System.Math.Sin(angle);
+            double angle = Math.Sqrt(Quaterniond.X * Quaterniond.X + Quaterniond.Y * Quaterniond.Y + Quaterniond.Z * Quaterniond.Z);
+            double sin = Math.Sin(angle);
 
-            if (System.Math.Abs(sin) > 0)
+            if (Math.Abs(sin) > 0)
             {
                 double coefficient = angle / sin;
                 result.W = 0;
@@ -1155,9 +1155,9 @@ public struct Quaterniond : IEquatable<Quaterniond>
             Quaterniond Quaterniond;
             Normalize(out Quaterniond);
             double cos = Quaterniond.W;
-            angle = System.Math.Acos(cos) * 2 * Functions.RTOD;
-            double sin = System.Math.Sqrt( 1.0d - cos * cos );
-            if ( System.Math.Abs( sin ) < 0.0001 ) sin = 1;
+            angle = Math.Acos(cos) * 2 * Functions.RTOD;
+            double sin = Math.Sqrt( 1.0d - cos * cos );
+            if ( Math.Abs( sin ) < 0.0001 ) sin = 1;
             axis = new Vector3d(X / sin, Y / sin, Z / sin);
         }
 
@@ -1205,11 +1205,11 @@ public struct Quaterniond : IEquatable<Quaterniond>
             if (cosHalfAngle < 0.99f)
             {
                 // do proper slerp for big angles
-                double halfAngle = (double)System.Math.Acos(cosHalfAngle);
-                double sinHalfAngle = (double)System.Math.Sin(halfAngle);
+                double halfAngle = (double)Math.Acos(cosHalfAngle);
+                double sinHalfAngle = (double)Math.Sin(halfAngle);
                 double oneOverSinHalfAngle = 1.0f / sinHalfAngle;
-                blendA = (double)System.Math.Sin(halfAngle * (1.0f - blend)) * oneOverSinHalfAngle;
-                blendB = (double)System.Math.Sin(halfAngle * blend) * oneOverSinHalfAngle;
+                blendA = (double)Math.Sin(halfAngle * (1.0f - blend)) * oneOverSinHalfAngle;
+                blendB = (double)Math.Sin(halfAngle * blend) * oneOverSinHalfAngle;
             }
             else
             {

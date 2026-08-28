@@ -15,9 +15,8 @@ using Mapping_Tools.Application.Tools.MapsetMerger.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Tools.MapsetMerger;
 using Mapping_Tools.Core.Tools.MapsetMerger.Models;
-using Mapping_Tools.Desktop.Tools.MapsetMerger.Models;
 using Mapping_Tools.Desktop.Shell;
-
+using Mapping_Tools.Desktop.Tools.MapsetMerger.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;

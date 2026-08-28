@@ -5,7 +5,6 @@ using Mapping_Tools.Desktop.Tools.HitsoundCopier.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundCopier.Views;
 using Mapping_Tools.Infrastructure.Tools.HitsoundCopier;
 using Microsoft.Extensions.DependencyInjection;
-using ApplicationDefinition = Mapping_Tools.Application.Tools.HitsoundCopier.HitsoundCopierToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.HitsoundCopier;
 
@@ -29,7 +28,7 @@ public sealed class HitsoundCopierToolRegistration : IMappingToolDefinition
     public int Order => 150;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => HitsoundCopierToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(HitsoundCopierViewModel);

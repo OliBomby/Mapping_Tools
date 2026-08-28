@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
-using GeometryDashboardGeneratorSettingsDialogViewModel = Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions.GeometryDashboardGeneratorSettingsDialogViewModel;
+using Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
 
@@ -41,4 +41,3 @@ public sealed partial class GeometryDashboardGeneratorSettingsWindow : Window
         GeometryDashboardWindowChrome.Resize(this, sender, eventArgs);
     }
 }
-

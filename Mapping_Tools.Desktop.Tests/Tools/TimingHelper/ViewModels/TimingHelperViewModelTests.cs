@@ -6,11 +6,11 @@ using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.TimingHelper;
-using Mapping_Tools.Desktop.Tools.TimingHelper.ViewModels;
 using Mapping_Tools.Core.Tools.TimingHelper;
 using Mapping_Tools.Desktop.Converters;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tools.TimingHelper.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

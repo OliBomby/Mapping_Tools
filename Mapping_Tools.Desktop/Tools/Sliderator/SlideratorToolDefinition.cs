@@ -6,7 +6,6 @@ using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
 using Mapping_Tools.Desktop.Tools.Sliderator.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-using ApplicationDefinition = Mapping_Tools.Application.Tools.Sliderator.SlideratorToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.Sliderator;
 
@@ -30,7 +29,7 @@ public sealed class SlideratorToolRegistration : IMappingToolDefinition
     public int Order => 230;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => SlideratorToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(SlideratorViewModel);

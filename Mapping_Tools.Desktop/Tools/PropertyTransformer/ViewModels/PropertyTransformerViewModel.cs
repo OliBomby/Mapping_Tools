@@ -9,8 +9,7 @@ using Mapping_Tools.Application.Tools.PropertyTransformer;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Tools.PropertyTransformer;
 using Mapping_Tools.Desktop.Shell;
-using PropertyTransformerProject = Mapping_Tools.Desktop.Tools.PropertyTransformer.Models.PropertyTransformerProject;
-
+using Mapping_Tools.Desktop.Tools.PropertyTransformer.Models;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.PropertyTransformer.ViewModels;

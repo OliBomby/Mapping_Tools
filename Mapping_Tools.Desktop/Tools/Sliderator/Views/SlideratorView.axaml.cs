@@ -12,8 +12,8 @@ using Mapping_Tools.Core.Tools.Sliderator;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Controls.Graph;
-using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
+using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.Sliderator.Views;
 

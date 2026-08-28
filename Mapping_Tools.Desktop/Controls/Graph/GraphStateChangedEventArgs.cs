@@ -1,4 +1,4 @@
-using CoreGraphState = Mapping_Tools.Core.Graph.GraphState;
+using Mapping_Tools.Core.Graph;
 
 namespace Mapping_Tools.Desktop.Controls.Graph;
 
@@ -7,12 +7,11 @@ public sealed class GraphStateChangedEventArgs : EventArgs
 {
     /// <summary>Creates graph change information.</summary>
     /// <param name="state">The cloned state after the edit.</param>
-    public GraphStateChangedEventArgs(CoreGraphState state)
+    public GraphStateChangedEventArgs(GraphState state)
     {
         State = state;
     }
 
     /// <summary>Gets the cloned state after the edit.</summary>
-    public CoreGraphState State { get; }
+    public GraphState State { get; }
 }
-

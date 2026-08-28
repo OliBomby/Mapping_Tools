@@ -4,7 +4,6 @@ using Mapping_Tools.Desktop.Plugin;
 using Mapping_Tools.Desktop.Tools.PropertyTransformer.ViewModels;
 using Mapping_Tools.Desktop.Tools.PropertyTransformer.Views;
 using Microsoft.Extensions.DependencyInjection;
-using ApplicationDefinition = Mapping_Tools.Application.Tools.PropertyTransformer.PropertyTransformerToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.PropertyTransformer;
 
@@ -28,7 +27,7 @@ public sealed class PropertyTransformerToolRegistration : IMappingToolDefinition
     public int Order => 170;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => PropertyTransformerToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(PropertyTransformerViewModel);

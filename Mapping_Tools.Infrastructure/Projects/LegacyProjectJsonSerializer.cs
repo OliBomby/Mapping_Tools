@@ -1,15 +1,16 @@
+using System.Globalization;
 using System.Reflection;
 using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Application.Tools.ComboColourStudio;
+using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
-using Mapping_Tools.Application.Tools.ComboColourStudio;
-using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Application.Tools.MapsetMerger.Models;
 using Mapping_Tools.Application.Tools.MetadataManager;
-using Mapping_Tools.Application.Tools.PropertyTransformer;
 using Mapping_Tools.Application.Tools.PatternGallery.Models;
+using Mapping_Tools.Application.Tools.PropertyTransformer;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
@@ -1143,7 +1144,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             if (reader.TokenType == JsonToken.Null) return Array.Empty<double>();
 
             if (reader.TokenType is JsonToken.Integer or JsonToken.Float)
-                return new[] { Convert.ToDouble(reader.Value, System.Globalization.CultureInfo.InvariantCulture) };
+                return new[] { Convert.ToDouble(reader.Value, CultureInfo.InvariantCulture) };
 
             if (reader.TokenType != JsonToken.StartArray)
                 throw new JsonSerializationException("A legacy double array must contain a number or an array.");

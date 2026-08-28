@@ -1,4 +1,3 @@
-using Mapping_Tools.Application.QuickRun.Contracts;
 using System.Collections.ObjectModel;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -10,6 +9,7 @@ using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.SliderPicturator;
@@ -19,9 +19,8 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Images;
 using Mapping_Tools.Core.Tools.SliderPicturator;
 using Mapping_Tools.Desktop.Shell;
-using SliderPicturatorProject = Mapping_Tools.Desktop.Tools.SliderPicturator.Models.SliderPicturatorProject;
+using Mapping_Tools.Desktop.Tools.SliderPicturator.Models;
 using Mapping_Tools.Desktop.Utilities;
-
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.SliderPicturator.ViewModels;

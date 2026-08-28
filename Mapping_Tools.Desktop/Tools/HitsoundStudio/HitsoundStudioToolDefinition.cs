@@ -6,7 +6,6 @@ using Mapping_Tools.Desktop.Plugin;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.Views;
 using Microsoft.Extensions.DependencyInjection;
-using ApplicationDefinition = Mapping_Tools.Application.Tools.HitsoundStudio.HitsoundStudioToolDefinition;
 
 namespace Mapping_Tools.Desktop.Tools.HitsoundStudio;
 
@@ -30,7 +29,7 @@ public sealed class HitsoundStudioToolRegistration : IMappingToolDefinition
     public int Order => 140;
 
     /// <inheritdoc />
-    public ToolDefinition Definition => ApplicationDefinition.Definition;
+    public ToolDefinition Definition => HitsoundStudioToolDefinition.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(HitsoundStudioViewModel);

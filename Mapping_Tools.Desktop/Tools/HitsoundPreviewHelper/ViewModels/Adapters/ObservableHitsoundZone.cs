@@ -20,7 +20,7 @@ public sealed partial class ObservableHitsoundZone : ObservableObject
     /// <param name="model">The domain snapshot to edit through this adapter.</param>
     public ObservableHitsoundZone(HitsoundZone model)
     {
-        this.Model = model ?? throw new ArgumentNullException(nameof(model));
+        Model = model ?? throw new ArgumentNullException(nameof(model));
         Name = model.Name;
         Filename = model.Filename;
         XPos = model.XPos;
