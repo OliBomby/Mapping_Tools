@@ -232,6 +232,7 @@ public partial class MainWindow : Window
 
     private void CloseWithoutSaving(object? sender, RoutedEventArgs eventArgs)
     {
+        if (DataContext is MainViewModel viewModel) viewModel.SuppressProjectAutosave();
         settingsPersistence?.SuppressSave();
         Close();
     }

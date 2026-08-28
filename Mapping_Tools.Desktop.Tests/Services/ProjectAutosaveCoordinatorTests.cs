@@ -70,6 +70,23 @@ public sealed class ProjectAutosaveCoordinatorTests
     }
 
     [TestMethod]
+    public void SaveOnShutdown_AfterSuppressSave_DoesNotPersistProject()
+    {
+        // Arrange
+        RecordingProjectService projects = new();
+        TestProjectFeature feature = new() { Value = 7 };
+        var coordinator = CreateCoordinator(projects);
+        coordinator.Activate(feature);
+        coordinator.SuppressSave();
+
+        // Act
+        coordinator.SaveOnShutdown(feature);
+
+        // Assert
+        projects.AutoSavedProjects.Should().BeEmpty();
+    }
+
+    [TestMethod]
     public async Task SaveAsync_WithActiveFeature_UsesFeatureSnapshot()
     {
         // Arrange

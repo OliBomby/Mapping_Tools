@@ -15,6 +15,7 @@ public sealed class ProjectAutosaveCoordinator
     private readonly Dictionary<IShellProjectFeature, Task> loadTasks = [];
     private readonly IUserNotificationService notifications;
     private readonly IProjectService projects;
+    private bool saveOnShutdown = true;
 
     /// <summary>
     ///     Creates the shared project lifecycle coordinator.
@@ -52,7 +53,15 @@ public sealed class ProjectAutosaveCoordinator
     public void SaveOnShutdown(IShellProjectFeature feature)
     {
         ArgumentNullException.ThrowIfNull(feature);
+        if (!saveOnShutdown) return;
+
         _ = SaveAutosaveAfterLoadAsync(feature);
+    }
+
+    /// <summary>Prevents project recovery snapshots from being written during shutdown.</summary>
+    public void SuppressSave()
+    {
+        saveOnShutdown = false;
     }
 
     /// <summary>

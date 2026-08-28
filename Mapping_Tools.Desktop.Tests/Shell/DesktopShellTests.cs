@@ -262,6 +262,27 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    public void MainViewModel_SuppressProjectAutosave_BeforeDispose_DoesNotAutoSaveProjects()
+    {
+        // Arrange
+        StubProjectFeatureViewModel project = new();
+        RecordingProjectService projectService = new();
+        using var viewModel = CreateMainViewModel(
+        [
+            Registration("home", "Home"),
+            Registration("project", "Project", () => project),
+        ], projectService: projectService);
+        viewModel.FeatureItems.Single(item => item.Id == "project").ActivateCommand.Execute(null);
+
+        // Act
+        viewModel.SuppressProjectAutosave();
+        viewModel.Dispose();
+
+        // Assert
+        projectService.AutoSaveCount.Should().Be(0);
+    }
+
+    [TestMethod]
     public void MainViewModel_ActivatesQuickRunFeature_UpdatesCurrentRegistryTool()
     {
         // Arrange

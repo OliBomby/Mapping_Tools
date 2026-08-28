@@ -181,6 +181,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(ProjectMenuItems));
     }
 
+    /// <summary>Prevents project recovery snapshots from being written during the current shutdown.</summary>
+    public void SuppressProjectAutosave()
+    {
+        projectCoordinator.SuppressSave();
+    }
+
     private void Activate(ShellFeatureItemViewModel item)
     {
         HighlightedFeature = item;
