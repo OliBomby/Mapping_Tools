@@ -304,6 +304,29 @@ public sealed class SlideratorViewModelTests
         viewModel.LoadedHitObjects.Should().ContainSingle().Which.Should().BeSameAs(slider);
     }
 
+    [DataTestMethod]
+    [DataRow(HitObjectSelectionMode.Bookmarked)]
+    [DataRow(HitObjectSelectionMode.Time)]
+    [DataRow(HitObjectSelectionMode.Everything)]
+    public async Task ImportCommand_WithNonSelectedMode_UsesWorkspacePathWithoutLookingForLiveEditor(
+        HitObjectSelectionMode mode)
+    {
+        // Arrange
+        RecordingSliderator service = new();
+        RecordingCurrentBeatmapLocator currentBeatmap = new();
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        var viewModel = Create(service, currentBeatmap, workspace: workspace);
+        viewModel.ImportModeSetting = mode;
+
+        // Act
+        await viewModel.ImportCommand.ExecuteAsync(null);
+
+        // Assert
+        service.ImportPath.Should().Be("selected.osu");
+        currentBeatmap.FindCount.Should().Be(0);
+    }
+
     [TestMethod]
     public async Task RunQuickAsync_WhenImportReturnsNoSliders_DoesNotRunPreviousPreview()
     {
@@ -354,7 +377,8 @@ public sealed class SlideratorViewModelTests
     private static SlideratorViewModel Create(
         RecordingSliderator service,
         RecordingCurrentBeatmapLocator? currentBeatmap = null,
-        TestDialogService? dialogs = null)
+        TestDialogService? dialogs = null,
+        TestBeatmapWorkspace? workspace = null)
     {
         return new SlideratorViewModel(
             service,
@@ -364,6 +388,7 @@ public sealed class SlideratorViewModelTests
                 new ApplicationSettings(),
                 TimeProvider.System),
             currentBeatmap ?? new RecordingCurrentBeatmapLocator(null),
+            workspace ?? new TestBeatmapWorkspace(),
             new ApplicationSettings(),
             dialogs ?? new TestDialogService());
     }

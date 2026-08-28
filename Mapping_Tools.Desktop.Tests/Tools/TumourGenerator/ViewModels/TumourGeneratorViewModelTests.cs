@@ -65,6 +65,32 @@ public sealed class TumourGeneratorViewModelTests
         viewModel.PreviewHitObject.Should().BeSameAs(original);
     }
 
+    [DataTestMethod]
+    [DataRow(HitObjectSelectionMode.Bookmarked)]
+    [DataRow(HitObjectSelectionMode.Time)]
+    [DataRow(HitObjectSelectionMode.Everything)]
+    public async Task ImportCommand_WithNonSelectedMode_UsesWorkspacePathWithoutLookingForLiveEditor(
+        HitObjectSelectionMode mode)
+    {
+        // Arrange
+        RecordingGenerator service = new();
+        RecordingCurrentBeatmapLocator currentBeatmap = new();
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        var viewModel = Create(
+            service,
+            currentBeatmap,
+            workspace: workspace);
+        viewModel.ImportModeSetting = mode;
+
+        // Act
+        await viewModel.ImportCommand.ExecuteAsync(null);
+
+        // Assert
+        service.ImportPath.Should().Be("selected.osu");
+        currentBeatmap.FindCount.Should().Be(0);
+    }
+
     [TestMethod]
     public async Task ImportCommand_WhenServiceFails_ShowsErrorDialog()
     {
@@ -186,7 +212,8 @@ public sealed class TumourGeneratorViewModelTests
         RecordingCurrentBeatmapLocator? locator = null,
         RecordingEditorReloadService? reload = null,
         bool autoReload = false,
-        TestDialogService? dialogs = null)
+        TestDialogService? dialogs = null,
+        TestBeatmapWorkspace? workspace = null)
     {
         ApplicationSettings settings = new() { AutoReload = autoReload };
         TumourGeneratorViewModel viewModel = new(
@@ -197,7 +224,7 @@ public sealed class TumourGeneratorViewModelTests
                 settings,
                 TimeProvider.System),
             locator ?? new RecordingCurrentBeatmapLocator(null),
-            new TestBeatmapWorkspace(),
+            workspace ?? new TestBeatmapWorkspace(),
             settings,
             dialogs ?? new TestDialogService());
         viewModel.Activate();
@@ -206,6 +233,8 @@ public sealed class TumourGeneratorViewModelTests
 
     private sealed class RecordingGenerator : ITumourGeneratorService
     {
+        public string? ImportPath { get; private set; }
+
         public bool ReturnEmptyImport { get; init; }
 
         public Exception? ImportException { get; init; }
@@ -226,6 +255,7 @@ public sealed class TumourGeneratorViewModelTests
             string? timeCode,
             CancellationToken cancellationToken = default)
         {
+            ImportPath = path;
             return ImportException is not null
                 ? Task.FromException<TumourImportResult>(ImportException)
                 : Task.FromResult(new TumourImportResult(

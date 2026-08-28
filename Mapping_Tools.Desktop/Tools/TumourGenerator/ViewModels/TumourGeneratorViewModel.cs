@@ -315,10 +315,15 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ImportAsync()
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
+        string? path = ImportModeSetting == HitObjectSelectionMode.Selected
+            ? await currentBeatmap.FindCurrentBeatmapAsync()
+            : workspace.SelectedPaths.FirstOrDefault();
         if (string.IsNullOrWhiteSpace(path))
         {
-            await ShowMessageAsync("No beatmap is open in osu!.");
+            await ShowMessageAsync(
+                ImportModeSetting == HitObjectSelectionMode.Selected
+                    ? "No beatmap is open in osu!."
+                    : "Select a beatmap to import from.");
             return;
         }
 

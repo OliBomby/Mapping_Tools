@@ -49,6 +49,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     private readonly ApplicationSettings settings;
 
     private readonly ISlideratorService sliderator;
+    private readonly IBeatmapWorkspace workspace;
     private GraphState? acceptedGraphState;
     private GraphState graphState = SlideratorEngineOptions.CreatePositionGraph(3);
     private bool settingGraphState;
@@ -60,18 +61,21 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <param name="sliderator">Runs the Core engine through Application ports.</param>
     /// <param name="execution">Coordinates background work, cancellation, and notifications.</param>
     /// <param name="currentBeatmap">Finds the map currently open in osu!.</param>
+    /// <param name="workspace">Supplies the shell's selected beatmap paths for disk-based imports.</param>
     /// <param name="settings">Supplies the AlwaysQuickRun preference.</param>
     /// <param name="dialogs">Presents validation, confirmation, and scaling dialogs.</param>
     public SlideratorViewModel(
         ISlideratorService sliderator,
         IToolExecutionService execution,
         ICurrentBeatmapLocator currentBeatmap,
+        IBeatmapWorkspace workspace,
         ApplicationSettings settings,
         IDialogService dialogs)
         : base(execution, SlideratorToolDefinition.Definition)
     {
         this.sliderator = sliderator ?? throw new ArgumentNullException(nameof(sliderator));
         this.currentBeatmap = currentBeatmap ?? throw new ArgumentNullException(nameof(currentBeatmap));
+        this.workspace = workspace ?? throw new ArgumentNullException(nameof(workspace));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.dialogs = dialogs ?? throw new ArgumentNullException(nameof(dialogs));
         ImportCommand = new AsyncRelayCommand(ImportAsync);
@@ -444,10 +448,15 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private async Task ImportAsync()
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
+        string? path = ImportModeSetting == HitObjectSelectionMode.Selected
+            ? await currentBeatmap.FindCurrentBeatmapAsync()
+            : workspace.SelectedPaths.FirstOrDefault();
         if (string.IsNullOrWhiteSpace(path))
         {
-            await ShowMessageAsync("No beatmap is open in osu!.");
+            await ShowMessageAsync(
+                ImportModeSetting == HitObjectSelectionMode.Selected
+                    ? "No beatmap is open in osu!."
+                    : "Select a beatmap to import from.");
             return;
         }
 
