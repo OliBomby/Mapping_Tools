@@ -218,6 +218,33 @@ public sealed class GraphControlTests
     }
 
     [TestMethod]
+    public void WheelZoomFactor_UsesScrollUpToZoomInDirection()
+    {
+        // Arrange
+        const double scrollDelta = 1;
+
+        // Act
+        double zoomInFactor = GraphControl.GetWheelZoomFactor(scrollDelta);
+        double zoomOutFactor = GraphControl.GetWheelZoomFactor(-scrollDelta);
+
+        // Assert
+        zoomInFactor.Should().BeGreaterThan(1);
+        zoomOutFactor.Should().BeLessThan(1);
+    }
+
+    [TestMethod]
+    public void ClampTension_UsesInterpolatorTensionBounds()
+    {
+        // Act
+        double lower = GraphControl.ClampTension(-10);
+        double upper = GraphControl.ClampTension(10);
+
+        // Assert
+        lower.Should().Be(-1);
+        upper.Should().Be(1);
+    }
+
+    [TestMethod]
     public void BoundsChange_WithScalingEnabled_TransformsAnchorCoordinatesAndResetsView()
     {
         // Arrange

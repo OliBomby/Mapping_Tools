@@ -86,6 +86,17 @@ public sealed class TumourTemplateTests
     }
 
     [TestMethod]
+    public void LayerGraphState_UsesLegacyDoubleValueViewportForZero()
+    {
+        // Act
+        var state = TumourLayer.GetGraphState(0);
+
+        // Assert
+        state.MinY.Should().Be(0);
+        state.MaxY.Should().Be(1);
+    }
+
+    [TestMethod]
     public void SquareTemplate_ParameterGraphValue_ChangesTheShapeMargin()
     {
         // Arrange

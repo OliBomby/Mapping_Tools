@@ -1,6 +1,6 @@
 using System.Globalization;
-using Avalonia.Data;
 using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Desktop.Converters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,50 +11,46 @@ namespace Mapping_Tools.Desktop.Tests.Converters;
 public sealed class GraphStateTextConverterTests
 {
     [TestMethod]
-    public void Convert_ConstantGraph_UsesScalarMode()
+    public void Convert_CurveGraph_PreservesGraphTextInsteadOfReturningScalar()
     {
         // Arrange
         GraphStateTextConverter converter = new();
-
-        // Act
-        object result = converter.Convert(GraphStateTextCodec.CreateConstant(2.5), typeof(string), null, CultureInfo.InvariantCulture);
-
-        // Assert
-        result.Should().Be("2.5");
-    }
-
-    [TestMethod]
-    public void ConvertBack_CurveText_ReturnsIndependentGraphState()
-    {
-        // Arrange
-        GraphStateTextConverter converter = new();
-        GraphState source = new(
-            [new GraphAnchor(new Vector2(0, 0)), new GraphAnchor(new Vector2(1, 1))],
+        GraphState state = new(
+            [
+                new GraphAnchor(new Vector2(0, 0), new SingleCurveInterpolator()),
+                new GraphAnchor(new Vector2(1, 2), new SingleCurveInterpolator(), 0.5),
+            ],
             0,
             0,
             1,
-            1);
-        string text = GraphStateTextCodec.Format(source);
+            2);
 
         // Act
-        object result = converter.ConvertBack(text, typeof(GraphState), null, CultureInfo.InvariantCulture);
+        string text = (string)converter.Convert(state, typeof(string), null, CultureInfo.InvariantCulture);
 
         // Assert
-        result.Should().BeOfType<GraphState>();
-        ((GraphState)result).Should().NotBeSameAs(source);
+        text.Should().Contain("0:0:");
+        text.Should().Contain("1:2:");
+        text.Should().Contain("|");
     }
 
     [TestMethod]
-    public void ConvertBack_EmptyText_ReturnsBindingValidationError()
+    public void ConvertBack_CurveText_RestoresAnchorsAndBounds()
     {
         // Arrange
         GraphStateTextConverter converter = new();
 
         // Act
-        object result = converter.ConvertBack(string.Empty, typeof(GraphState), null, CultureInfo.InvariantCulture);
+        object result = converter.ConvertBack(
+            "0:0:0:0|1:2:0:0.5",
+            typeof(GraphState),
+            null,
+            CultureInfo.InvariantCulture);
 
         // Assert
-        result.Should().BeOfType<BindingNotification>();
-        ((BindingNotification)result).ErrorType.Should().Be(BindingErrorType.DataValidationError);
+        result.Should().BeOfType<GraphState>();
+        var state = (GraphState)result;
+        state.Anchors.Select(anchor => anchor.Pos.Y).Should().Equal(0, 2);
+        state.MaxY.Should().Be(2);
     }
 }

@@ -4,10 +4,13 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.Sliderator.Contracts;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
+using Mapping_Tools.Desktop.Tools.Sliderator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
+using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -39,6 +42,66 @@ public sealed class SlideratorViewModelTests
         service.ReloadEditor.Should().BeTrue();
         viewModel.DoEditorRead.Should().BeFalse();
         viewModel.IsRunning.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void DefaultGraphState_UsesUnitPositionViewport()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+
+        // Act
+        var state = viewModel.GraphState;
+
+        // Assert
+        state.MinX.Should().Be(0);
+        state.MinY.Should().Be(0);
+        state.MaxX.Should().Be(1);
+        state.MaxY.Should().Be(1);
+        state.Anchors[0].Pos.Should().Be(new Mapping_Tools.Core.MathUtil.Vector2(0, 0));
+        state.Anchors[^1].Pos.Should().Be(new Mapping_Tools.Core.MathUtil.Vector2(1, 1));
+    }
+
+    [TestMethod]
+    public void InstallProjectWithoutGraph_UsesCurrentModeResetGraph()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingSliderator());
+        viewModel.GraphModeSetting = SlideratorGraphMode.Position;
+        SlideratorProject project = new();
+        project.GraphState.Should().BeNull();
+
+        // Act
+        ((IShellProjectFeature)viewModel).Install(project);
+
+        // Assert
+        viewModel.GraphState.MinX.Should().Be(0);
+        viewModel.GraphState.MaxX.Should().Be(project.GraphBeats);
+        viewModel.GraphState.Anchors.Select(anchor => anchor.Pos).Should().Equal(
+            new Mapping_Tools.Core.MathUtil.Vector2(0, 0),
+            new Mapping_Tools.Core.MathUtil.Vector2((float)project.GraphBeats, 1));
+    }
+
+    [TestMethod]
+    public async Task ClearGraphCommand_ResetsTheGraphToCurrentModeDefaults()
+    {
+        // Arrange
+        TestDialogService dialogs = new() { BooleanResult = true };
+        var viewModel = Create(new RecordingSliderator(), dialogs: dialogs);
+        viewModel.GraphState = new GraphState(
+            [new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(0, 0)), new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(0.25f, 0.9f)), new GraphAnchor(new Mapping_Tools.Core.MathUtil.Vector2(1, 1))],
+            0,
+            0,
+            1,
+            1);
+
+        // Act
+        await viewModel.ClearGraphCommand.ExecuteAsync(null);
+
+        // Assert
+        viewModel.GraphState.Anchors.Should().HaveCount(2);
+        viewModel.GraphState.Anchors[0].Pos.Should().Be(new Mapping_Tools.Core.MathUtil.Vector2(0, 0));
+        viewModel.GraphState.Anchors[1].Pos.Should().Be(new Mapping_Tools.Core.MathUtil.Vector2((float)viewModel.GraphBeats, 1));
     }
 
     [TestMethod]
@@ -128,7 +191,8 @@ public sealed class SlideratorViewModelTests
 
     private static SlideratorViewModel Create(
         RecordingSliderator service,
-        RecordingCurrentBeatmapLocator? currentBeatmap = null)
+        RecordingCurrentBeatmapLocator? currentBeatmap = null,
+        TestDialogService? dialogs = null)
     {
         return new SlideratorViewModel(
             service,
@@ -139,7 +203,7 @@ public sealed class SlideratorViewModelTests
                 TimeProvider.System),
             currentBeatmap ?? new RecordingCurrentBeatmapLocator(null),
             new ApplicationSettings(),
-            new TestDialogService());
+            dialogs ?? new TestDialogService());
     }
 
     private sealed class RecordingSliderator : ISlideratorService

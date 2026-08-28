@@ -25,22 +25,20 @@
             <dialogHost:DialogHost Grid.Row="0"
                                    Grid.Column="1"
                                    Grid.ColumnSpan="3"
-                                   Margin="43,0,0,43"
                                    Identifier="GraphDialog"
+                                   ClipToBounds="False"
                                    CloseOnClickAway="True"
                                    OverlayBackground="{DynamicResource MappingToolsDialogOverlayBrush}">
                 <graph:GraphControl x:Name="GraphControlElement"
                                        MinMarkerSpacing="20"
-                                       GraphState="{Binding GraphState, Mode=TwoWay}"
+                                       Margin="43,0,12,43"
                                        HorizontalAxisVisible="{Binding HorizontalAxisVisible}"
                                        VerticalAxisVisible="{Binding VerticalAxisVisible}"
                                        StartPointLockedY="{Binding StartPointLockedY}"
                                        IsEditable="True"
                                        MarkerSnappingHorizontal="True"
                                        MarkerSnappingVertical="True"
-                                       MarkerSnappingRangeVertical="0.01"
-                                       Stroke="Cyan"
-                                       ToolTip.Tip="Edit the position/velocity graph with pointer gestures and the context menu." />
+                                       MarkerSnappingRangeVertical="0.01" />
             </dialogHost:DialogHost>
 
             <Border Grid.Row="1"

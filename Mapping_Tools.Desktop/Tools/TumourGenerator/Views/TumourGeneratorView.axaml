@@ -12,7 +12,6 @@
              x:DataType="vm:TumourGeneratorViewModel"
              x:CompileBindings="True">
     <UserControl.Resources>
-        <converters:GraphStateToDoubleConverter x:Key="GraphStateToDoubleConverter" />
         <converters:BooleanNotConverter x:Key="BooleanNotConverter" />
         <converters:EnumEqualsConverter x:Key="EnumEqualsConverter" />
         <toolConverters:TumourGeneratorTemplateIconConverter x:Key="TumourGeneratorTemplateIconConverter" />
@@ -112,7 +111,7 @@
                                                   IsVisible="{Binding AdvancedOptions}"
                                                   ToolTip.Tip="The scale of the tumour determines how far it protrudes from the slider." />
                     <Slider Minimum="0" Maximum="500"
-                            Value="{Binding CurrentLayer.TumourScale, Mode=TwoWay, Converter={StaticResource GraphStateToDoubleConverter}}"
+                            Value="{Binding CurrentLayer.TumourScaleValue, Mode=TwoWay}"
                             IsVisible="{Binding AdvancedOptions, Converter={StaticResource BooleanNotConverter}}"
                             ToolTip.Tip="The scale of the tumour determines how far it protrudes from the slider." />
                     <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Length" />
@@ -120,7 +119,7 @@
                                                   IsVisible="{Binding AdvancedOptions}"
                                                   ToolTip.Tip="The length of the tumour determines how much length it takes up on the slider." />
                     <Slider Minimum="0" Maximum="500"
-                            Value="{Binding CurrentLayer.TumourLength, Mode=TwoWay, Converter={StaticResource GraphStateToDoubleConverter}}"
+                            Value="{Binding CurrentLayer.TumourLengthValue, Mode=TwoWay}"
                             IsVisible="{Binding AdvancedOptions, Converter={StaticResource BooleanNotConverter}}"
                             ToolTip.Tip="The length of the tumour determines how much length it takes up on the slider." />
                     <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Angle" />
@@ -128,7 +127,7 @@
                                                   IsVisible="{Binding AdvancedOptions}"
                                                   ToolTip.Tip="The angle of the tumour determines which way the tumour points in relation to the slider." />
                     <Slider Minimum="0" Maximum="360"
-                            Value="{Binding CurrentLayer.TumourRotation, Mode=TwoWay, Converter={StaticResource GraphStateToDoubleConverter}}"
+                            Value="{Binding CurrentLayer.TumourRotationValue, Mode=TwoWay}"
                             IsVisible="{Binding AdvancedOptions, Converter={StaticResource BooleanNotConverter}}"
                             ToolTip.Tip="The angle of the tumour determines which way the tumour points in relation to the slider." />
                     <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Parameter"
@@ -137,7 +136,7 @@
                                                   IsVisible="{Binding TumourParameterGraphVisible}"
                                                   ToolTip.Tip="The special parameter changes the shape of this tumour template." />
                     <Slider Minimum="0" Maximum="500"
-                            Value="{Binding CurrentLayer.TumourParameter, Mode=TwoWay, Converter={StaticResource GraphStateToDoubleConverter}}"
+                            Value="{Binding CurrentLayer.TumourParameterValue, Mode=TwoWay}"
                             IsVisible="{Binding CurrentLayer.TumourTemplate.NeedsParameter}"
                             ToolTip.Tip="The special parameter changes the shape of this tumour template." />
                     <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Wrapping" />
@@ -166,7 +165,7 @@
                                                   IsVisible="{Binding AdvancedOptions}"
                                                   ToolTip.Tip="The tumour distance determines the distance between the centre of each tumour." />
                     <Slider Minimum="5" Maximum="500"
-                            Value="{Binding CurrentLayer.TumourDistance, Mode=TwoWay, Converter={StaticResource GraphStateToDoubleConverter}}"
+                            Value="{Binding CurrentLayer.TumourDistanceValue, Mode=TwoWay}"
                             IsVisible="{Binding AdvancedOptions, Converter={StaticResource BooleanNotConverter}}"
                             ToolTip.Tip="The tumour distance determines the distance between the centre of each tumour." />
                     <TextBlock Margin="0,8,0,0" FontWeight="Bold" Text="Count" />

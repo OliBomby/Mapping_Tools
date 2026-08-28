@@ -1,7 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.Tools.TumourGenerator.Templates;
+using Mapping_Tools.Desktop.Converters;
 
 namespace Mapping_Tools.Desktop.Tools.TumourGenerator.Adapters;
 
@@ -70,6 +72,61 @@ public sealed partial class ObservableTumourLayer : ObservableObject
     [ObservableProperty]
     public partial GraphState TumourDistance { get; set; }
 
+    /// <summary>Gets or sets the scalar projection used by the compact scale slider.</summary>
+    public double TumourScaleValue
+    {
+        get => GraphStateToDoubleConverter.GetScalarValue(TumourScale);
+        set
+        {
+            if (!Precision.AlmostEquals(GraphStateToDoubleConverter.GetScalarValue(TumourScale), value))
+                TumourScale = GraphStateTextCodec.CreateConstant(value);
+        }
+    }
+
+    /// <summary>Gets or sets the scalar projection used by the compact length slider.</summary>
+    public double TumourLengthValue
+    {
+        get => GraphStateToDoubleConverter.GetScalarValue(TumourLength);
+        set
+        {
+            if (!Precision.AlmostEquals(GraphStateToDoubleConverter.GetScalarValue(TumourLength), value))
+                TumourLength = GraphStateTextCodec.CreateConstant(value);
+        }
+    }
+
+    /// <summary>Gets or sets the scalar projection used by the compact rotation slider.</summary>
+    public double TumourRotationValue
+    {
+        get => GraphStateToDoubleConverter.GetScalarValue(TumourRotation);
+        set
+        {
+            if (!Precision.AlmostEquals(GraphStateToDoubleConverter.GetScalarValue(TumourRotation), value))
+                TumourRotation = GraphStateTextCodec.CreateConstant(value);
+        }
+    }
+
+    /// <summary>Gets or sets the scalar projection used by the compact parameter slider.</summary>
+    public double TumourParameterValue
+    {
+        get => GraphStateToDoubleConverter.GetScalarValue(TumourParameter);
+        set
+        {
+            if (!Precision.AlmostEquals(GraphStateToDoubleConverter.GetScalarValue(TumourParameter), value))
+                TumourParameter = GraphStateTextCodec.CreateConstant(value);
+        }
+    }
+
+    /// <summary>Gets or sets the scalar projection used by the compact distance slider.</summary>
+    public double TumourDistanceValue
+    {
+        get => GraphStateToDoubleConverter.GetScalarValue(TumourDistance);
+        set
+        {
+            if (!Precision.AlmostEquals(GraphStateToDoubleConverter.GetScalarValue(TumourDistance), value))
+                TumourDistance = GraphStateTextCodec.CreateConstant(value);
+        }
+    }
+
     /// <summary>Gets or sets the explicit tumour count.</summary>
     [ObservableProperty]
     public partial int TumourCount { get; set; }
@@ -127,26 +184,31 @@ public sealed partial class ObservableTumourLayer : ObservableObject
     partial void OnTumourLengthChanged(GraphState value)
     {
         Model.TumourLength = value;
+        OnPropertyChanged(nameof(TumourLengthValue));
     }
 
     partial void OnTumourScaleChanged(GraphState value)
     {
         Model.TumourScale = value;
+        OnPropertyChanged(nameof(TumourScaleValue));
     }
 
     partial void OnTumourRotationChanged(GraphState value)
     {
         Model.TumourRotation = value;
+        OnPropertyChanged(nameof(TumourRotationValue));
     }
 
     partial void OnTumourParameterChanged(GraphState value)
     {
         Model.TumourParameter = value;
+        OnPropertyChanged(nameof(TumourParameterValue));
     }
 
     partial void OnTumourDistanceChanged(GraphState value)
     {
         Model.TumourDistance = value;
+        OnPropertyChanged(nameof(TumourDistanceValue));
     }
 
     partial void OnTumourCountChanged(int value)

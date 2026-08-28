@@ -1,3 +1,4 @@
+using System.Globalization;
 using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Core.Graph.Markers;
@@ -60,10 +61,14 @@ public sealed class DoubleMarkerGenerator : IGraphMarkerGenerator
             {
                 Orientation = orientation,
                 Value = value,
-                Text = $"{value:g2}{Unit}",
+                Text = $"{FormatMarkerValue(value)}{Unit}",
                 Snappable = Snappable,
             };
         }
     }
-}
 
+    private static string FormatMarkerValue(double value)
+    {
+        return value.ToString(Math.Abs(value) >= 1_000_000 ? "g2" : "0.##", CultureInfo.CurrentCulture);
+    }
+}

@@ -26,6 +26,8 @@ public sealed class GraphControl : Control
     private const double minimum_view_size = 1e-9;
     private const double anchor_hit_radius = 10;
     private const double tension_hit_radius = 9;
+    private const double minimum_tension = -1;
+    private const double maximum_tension = 1;
     private const int maximum_curve_samples = 1000;
 
     /// <summary>Identifies the graph state edited by the control.</summary>
@@ -167,6 +169,11 @@ public sealed class GraphControl : Control
 
     private double viewMinX;
     private double viewMinY;
+    private Cursor? arrowCursor;
+    private Cursor? crossCursor;
+    private Cursor? hiddenCursor;
+    private Cursor? panCursor;
+    private Cursor? verticalResizeCursor;
 
     static GraphControl()
     {
@@ -195,11 +202,12 @@ public sealed class GraphControl : Control
         GraphStateProperty.Changed.AddClassHandler<GraphControl>((control, _) => control.GraphStateChanged());
     }
 
-    /// <summary>Creates a focusable, clipped graph editor.</summary>
+    /// <summary>Creates a focusable graph editor whose labels and edge handles may extend into its layout margin.</summary>
     public GraphControl()
     {
         Focusable = true;
         IsTabStop = true;
+        ClipToBounds = false;
     }
 
     /// <summary>Suppresses state-change notifications while a host batches anchor updates.</summary>
@@ -855,6 +863,23 @@ public sealed class GraphControl : Control
         SetCurrentValue(GraphStateProperty, state.Clone());
     }
 
+    internal void SetGraphStatePreservingView(CoreGraphState state)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        committingState = true;
+        try
+        {
+            SetCurrentValue(GraphStateProperty, state.Clone());
+        }
+        finally
+        {
+            committingState = false;
+        }
+
+        RebaseTensionGesture(lastPointerPosition.Y);
+        InvalidateVisual();
+    }
+
     /// <inheritdoc />
     public override void Render(DrawingContext context)
     {
@@ -866,10 +891,9 @@ public sealed class GraphControl : Control
 
         DrawMarkers(context);
         DrawAxes(context);
+        if (EdgeBrush is not null) context.DrawRectangle(null, new Pen(EdgeBrush, 2), bounds);
         DrawCurve(context);
         if (drawAnchors && IsEditable) DrawAnchors(context);
-
-        if (EdgeBrush is not null) context.DrawRectangle(null, new Pen(EdgeBrush, 2), bounds);
     }
 
     /// <inheritdoc />
@@ -877,6 +901,7 @@ public sealed class GraphControl : Control
     {
         base.OnPointerEntered(eventArgs);
         drawAnchors = true;
+        UpdateCursor(eventArgs.GetPosition(this));
         InvalidateVisual();
     }
 
@@ -887,6 +912,7 @@ public sealed class GraphControl : Control
         if (ActiveGesture == GraphPointerGesture.None)
         {
             drawAnchors = false;
+            Cursor = null;
             InvalidateVisual();
         }
     }
@@ -898,6 +924,7 @@ public sealed class GraphControl : Control
         Focus();
         var point = eventArgs.GetCurrentPoint(this).Position;
         var properties = eventArgs.GetCurrentPoint(this).Properties;
+        UpdateCursor(point);
 
         if (properties.IsRightButtonPressed && IsEditable)
         {
@@ -971,7 +998,11 @@ public sealed class GraphControl : Control
     {
         base.OnPointerMoved(eventArgs);
         var point = eventArgs.GetCurrentPoint(this).Position;
+        UpdateCursor(point);
         if (capturedPointer != eventArgs.Pointer || ActiveGesture == GraphPointerGesture.None) return;
+
+        Point previousPointerPosition = lastPointerPosition;
+        lastPointerPosition = point;
 
         switch (ActiveGesture)
         {
@@ -982,11 +1013,10 @@ public sealed class GraphControl : Control
                 MoveTension(gestureAnchorIndex, point.Y, eventArgs.KeyModifiers);
                 break;
             case GraphPointerGesture.Pan:
-                PanBy(new Vector2((float)(lastPointerPosition.X - point.X), (float)(lastPointerPosition.Y - point.Y)));
+                PanBy(new Vector2((float)(previousPointerPosition.X - point.X), (float)(previousPointerPosition.Y - point.Y)));
                 break;
         }
 
-        lastPointerPosition = point;
         eventArgs.Handled = true;
     }
 
@@ -1007,7 +1037,7 @@ public sealed class GraphControl : Control
         if (capturedPointer == eventArgs.Pointer) EndGesture(eventArgs.Pointer);
     }
 
-        /// <inheritdoc />
+    /// <inheritdoc />
     protected override void OnPointerWheelChanged(PointerWheelEventArgs eventArgs)
     {
         base.OnPointerWheelChanged(eventArgs);
@@ -1015,7 +1045,9 @@ public sealed class GraphControl : Control
         var zoomPoint = GetGraphPosition(eventArgs.GetPosition(this));
         if (!IsWheelZoomPositionInLegacyBounds(zoomPoint, state)) return;
 
-        double factor = Math.Pow(2, -eventArgs.Delta.Y / 240d);
+        // Avalonia reports one wheel notch as a delta of roughly one, while
+        // WPF reports 120. Normalize both to one octave per notch.
+        double factor = GetWheelZoomFactor(eventArgs.Delta.Y);
         if (double.IsFinite(factor) && factor > 0)
         {
             ZoomAt(
@@ -1023,6 +1055,7 @@ public sealed class GraphControl : Control
                 factor,
                 eventArgs.KeyModifiers.HasAllFlags(KeyModifiers.Control),
                 eventArgs.KeyModifiers.HasAllFlags(KeyModifiers.Shift));
+            UpdateCursor(eventArgs.GetPosition(this));
             eventArgs.Handled = true;
         }
     }
@@ -1030,6 +1063,17 @@ public sealed class GraphControl : Control
     internal static bool IsWheelZoomPositionInLegacyBounds(Vector2 zoomPoint, CoreGraphState state)
     {
         return zoomPoint.X >= 0 && zoomPoint.Y >= 0 && zoomPoint.X <= state.MaxX && zoomPoint.Y <= state.MaxY;
+    }
+
+    internal static double GetWheelZoomFactor(double deltaY)
+    {
+        double notches = Math.Abs(deltaY) > 10 ? deltaY / 120d : deltaY;
+        return Math.Pow(2, notches);
+    }
+
+    internal static double ClampTension(double tension)
+    {
+        return Math.Clamp(tension, minimum_tension, maximum_tension);
     }
 
     /// <inheritdoc />
@@ -1082,6 +1126,7 @@ public sealed class GraphControl : Control
         lastPointerPosition = point;
         pointer.Capture(this);
         drawAnchors = true;
+        UpdateCursor(point);
         InvalidateVisual();
     }
 
@@ -1092,8 +1137,58 @@ public sealed class GraphControl : Control
         ActiveGesture = GraphPointerGesture.None;
         gestureAnchorIndex = -1;
         if (!IsPointerOver) drawAnchors = false;
+        if (IsPointerOver) UpdateCursor(lastPointerPosition);
+        else Cursor = null;
 
         InvalidateVisual();
+    }
+
+    private void UpdateCursor(Point? pointerPosition = null)
+    {
+        if (!viewInitialized) EnsureView();
+
+        if (ActiveGesture == GraphPointerGesture.Tension)
+        {
+            Cursor = hiddenCursor ??= new Cursor(StandardCursorType.None);
+            return;
+        }
+
+        if (ActiveGesture == GraphPointerGesture.Anchor)
+        {
+            Cursor = crossCursor ??= new Cursor(StandardCursorType.Cross);
+            return;
+        }
+
+        if (ActiveGesture == GraphPointerGesture.Pan)
+        {
+            Cursor = panCursor ??= new Cursor(StandardCursorType.SizeAll);
+            return;
+        }
+
+        if (pointerPosition is { } point && IsEditable)
+        {
+            if (HitTestAnchor(point) is not null)
+            {
+                Cursor = crossCursor ??= new Cursor(StandardCursorType.Cross);
+                return;
+            }
+
+            if (HitTestTension(point) is not null)
+            {
+                Cursor = verticalResizeCursor ??= new Cursor(StandardCursorType.SizeNorthSouth);
+                return;
+            }
+        }
+
+        var state = GraphState;
+        bool isReset = state is not null
+            && viewMinX == state.MinX
+            && viewMaxX == state.MaxX
+            && viewMinY == state.MinY
+            && viewMaxY == state.MaxY;
+        Cursor = isReset
+            ? arrowCursor ??= new Cursor(StandardCursorType.Arrow)
+            : panCursor ??= new Cursor(StandardCursorType.SizeAll);
     }
 
     private void CommitState(CoreGraphState state)
@@ -1386,11 +1481,31 @@ public sealed class GraphControl : Control
         if (anchor.Interpolator.GetType().IsDefined(typeof(VerticalMirrorInterpolatorAttribute), false) && anchor.Pos.Y < state.Anchors[anchorIndex - 1].Pos.Y)
             verticalDrag = -verticalDrag;
 
-        double tension = gestureStartTension - verticalDrag / 200;
+        double requestedTension = gestureStartTension - verticalDrag / 200;
+        double tension = ClampTension(requestedTension);
+        bool tensionWasClipped = Math.Abs(requestedTension - tension) > 1e-9;
 
-        if (Math.Abs(anchor.Tension - tension) <= 1e-9) return;
+        if (Math.Abs(anchor.Tension - tension) <= 1e-9)
+        {
+            if (tensionWasClipped) RebaseTensionGesture(pointerY);
+            return;
+        }
+
         anchor.Tension = tension;
         CommitState(state);
+        if (tensionWasClipped) RebaseTensionGesture(pointerY);
+    }
+
+    private void RebaseTensionGesture(double pointerY)
+    {
+        if (ActiveGesture != GraphPointerGesture.Tension
+            || gestureAnchorIndex <= 0
+            || GraphState is null
+            || gestureAnchorIndex >= GraphState.Anchors.Count)
+            return;
+
+        gestureStartPosition = new Point(gestureStartPosition.X, pointerY);
+        gestureStartTension = GraphState.Anchors[gestureAnchorIndex].Tension;
     }
 
     private void OpenContextMenu(int anchorIndex)

@@ -106,6 +106,7 @@ public sealed class GraphStateTests
         constantText.Should().Be("12.5");
         constantParsed.Should().BeTrue();
         parsedConstant.GetValue(0.5).Should().Be(12.5);
+        parsedConstant.MaxY.Should().Be(25);
         curveParsed.Should().BeTrue();
         parsedCurve.Anchors.Should().HaveCount(3);
         parsedCurve.Anchors[1].Tension.Should().BeApproximately(-0.25, Precision.DOUBLE_EPSILON);
@@ -190,5 +191,20 @@ public sealed class GraphStateTests
         markers.Should().OnlyContain(marker => marker.Snappable);
         markers[0].Value.Should().Be(0);
         markers[0].Orientation.Should().Be(GraphMarkerOrientation.Vertical);
+    }
+
+    [TestMethod]
+    public void DoubleMarkerGenerator_UsesDecimalNotationBelowOneMillion()
+    {
+        // Arrange
+        DoubleMarkerGenerator generator = new(0, 1);
+
+        // Act
+        string normalText = generator.GenerateMarkers(110, 110, GraphMarkerOrientation.Horizontal, 1).Single().Text!;
+        string millionText = generator.GenerateMarkers(1_000_000, 1_000_000, GraphMarkerOrientation.Horizontal, 1).Single().Text!;
+
+        // Assert
+        normalText.Should().Be("110");
+        millionText.ToLowerInvariant().Should().Contain("e+");
     }
 }

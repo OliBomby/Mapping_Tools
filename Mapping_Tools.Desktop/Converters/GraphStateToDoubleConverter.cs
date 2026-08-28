@@ -1,6 +1,7 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
 using Mapping_Tools.Core.Graph;
+using Mapping_Tools.Core.MathUtil;
 
 namespace Mapping_Tools.Desktop.Converters;
 
@@ -10,7 +11,20 @@ public sealed class GraphStateToDoubleConverter : IValueConverter
     /// <inheritdoc />
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return value is GraphState state ? state.GetValue(0) : 0d;
+        return GetScalarValue(value as GraphState);
+    }
+
+    internal static double GetScalarValue(GraphState? state)
+    {
+        if (state is null || state.Anchors.Count == 0) return 0d;
+
+        double firstValue = state.Anchors[0].Pos.Y;
+        if (state.Anchors.All(anchor => Precision.AlmostEquals(anchor.Pos.Y, firstValue))) return firstValue;
+
+        double width = state.MaxX - state.MinX;
+        return Math.Abs(width) <= Precision.DOUBLE_EPSILON
+            ? firstValue
+            : state.GetIntegral(state.MinX, state.MaxX) / width;
     }
 
     /// <inheritdoc />
@@ -18,6 +32,6 @@ public sealed class GraphStateToDoubleConverter : IValueConverter
     {
         if (value is double number && double.IsFinite(number)) return GraphStateTextCodec.CreateConstant(number);
 
-        return GraphStateTextCodec.CreateConstant(0);
+        return null!;
     }
 }

@@ -106,7 +106,7 @@ public sealed class TumourLayer
             0,
             Math.Min(0, value * 2),
             1,
-            Math.Max(0, value * 2));
+            Math.Max(1, value * 2));
     }
 
     /// <summary>Creates a deep copy suitable for editing independently.</summary>
@@ -134,4 +134,3 @@ public sealed class TumourLayer
         };
     }
 }
-

@@ -555,7 +555,10 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         ExportAsNormal = project.ExportAsNormal;
         ExportAsStream = project.ExportAsStream;
         ExportAsInvisibleSlider = project.ExportAsInvisibleSlider;
-        GraphState = project.GraphState?.Clone() ?? new GraphState();
+        GraphState state = project.GraphState.Clone();
+        state.MinY = GraphMinY;
+        state.MaxY = GraphMaxY;
+        GraphState = state;
         LoadedHitObjects.Clear();
         VisibleHitObjectIndex = 0;
         DoEditorRead = false;
@@ -614,6 +617,15 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     partial void OnVelocityLimitChanged(double value)
     {
+        if (GraphModeSetting == SlideratorGraphMode.Velocity)
+        {
+            GraphState state = GraphState.Clone();
+            state.MinY = -value;
+            state.MaxY = value;
+            GraphState = state;
+            return;
+        }
+
         UpdateGraphDerivedValues();
     }
 
@@ -715,15 +727,34 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private void ToggleGraphMode()
     {
-        GraphModeSetting = GraphModeSetting == SlideratorGraphMode.Position
+        SlideratorGraphMode mode = GraphModeSetting == SlideratorGraphMode.Position
             ? SlideratorGraphMode.Velocity
             : SlideratorGraphMode.Position;
-        GraphState = GraphState.Clone();
-        GraphState.MinY = GraphModeSetting == SlideratorGraphMode.Position ? 0 : -VelocityLimit;
-        GraphState.MaxY = GraphModeSetting == SlideratorGraphMode.Position ? 1 : VelocityLimit;
-        if (GraphModeSetting == SlideratorGraphMode.Position && GraphState.Anchors.Count > 0) GraphState.Anchors[0].Pos = new Vector2(GraphState.Anchors[0].Pos.X, 0);
 
-        UpdateGraphDerivedValues();
+        GraphState state = GraphState.Clone();
+        state.MinY = mode == SlideratorGraphMode.Position ? 0 : -VelocityLimit;
+        state.MaxY = mode == SlideratorGraphMode.Position ? 1 : VelocityLimit;
+        if (mode == SlideratorGraphMode.Position && state.Anchors.Count > 0)
+            state.Anchors[0].Pos = new Vector2(state.Anchors[0].Pos.X, 0);
+
+        GraphModeSetting = mode;
+        GraphState = state;
+    }
+
+    private GraphState CreateResetGraphState()
+    {
+        if (GraphModeSetting == SlideratorGraphMode.Position)
+            return SlideratorEngineOptions.CreatePositionGraph(GraphBeats);
+
+        return new GraphState(
+            [
+                new GraphAnchor(new Vector2(0, 1)),
+                new GraphAnchor(new Vector2(GraphBeats, 1)),
+            ],
+            0,
+            -VelocityLimit,
+            GraphBeats,
+            VelocityLimit);
     }
 
     private async Task ClearGraphAsync()
@@ -739,25 +770,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                 false));
         if (!confirmed) return;
 
-        GraphState = SlideratorEngineOptions.CreatePositionGraph(GraphBeats);
-        if (GraphModeSetting == SlideratorGraphMode.Velocity)
-        {
-            double velocity = MathHelper.Clamp(
-                PixelLength / GraphBeats / GlobalSv / 100,
-                -VelocityLimit,
-                VelocityLimit);
-            GraphState = new GraphState(
-                [
-                    new GraphAnchor(new Vector2(0, (float)velocity)),
-                    new GraphAnchor(new Vector2((float)GraphBeats, (float)velocity)),
-                ],
-                0,
-                -VelocityLimit,
-                GraphBeats,
-                VelocityLimit);
-        }
-
-        UpdateGraphDerivedValues();
+        GraphState = CreateResetGraphState();
     }
 
     private async Task ScaleCompleteAsync()

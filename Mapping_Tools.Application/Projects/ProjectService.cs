@@ -135,7 +135,7 @@ public sealed class ProjectService : IProjectService
         foreach (string path in paths)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await store.SaveAsync(path, project, cancellationToken);
+            await store.SaveAsync(path, project, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -153,7 +153,7 @@ public sealed class ProjectService : IProjectService
         foreach (string path in ResolveAutoSavePaths(definition, additionalPaths))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await definition.SaveAsync(store, path, project, cancellationToken);
+            await definition.SaveAsync(store, path, project, cancellationToken).ConfigureAwait(false);
         }
     }
 
