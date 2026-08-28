@@ -39,10 +39,10 @@ public sealed class NaudioAudioExporter : IAudioExporter
         switch (request.Format)
         {
             case AudioExportFormat.WaveIeeeFloat:
-                WriteWave(request.Path, new ClipSampleProvider(clip).ToWaveProvider(), cancellationToken);
+                WriteWave(request.Path, new AudioClipSampleProvider(clip).ToWaveProvider(), cancellationToken);
                 break;
             case AudioExportFormat.WavePcm:
-                WriteWave(request.Path, new ClipSampleProvider(exportClip).ToWaveProvider16(), cancellationToken);
+                WriteWave(request.Path, new AudioClipSampleProvider(exportClip).ToWaveProvider16(), cancellationToken);
                 break;
             case AudioExportFormat.OggVorbis:
                 WriteVorbis(request.Path, exportClip, request.Quality, cancellationToken);
@@ -71,7 +71,7 @@ public sealed class NaudioAudioExporter : IAudioExporter
     private static void WriteVorbis(string path, AudioClip clip, float quality, CancellationToken cancellationToken)
     {
         int sampleRate = OggVorbisFileWriter.GetSupportedSampleRate(clip.Format.SampleRate);
-        ISampleProvider sampleProvider = new ClipSampleProvider(clip);
+        ISampleProvider sampleProvider = new AudioClipSampleProvider(clip);
         if (sampleProvider.WaveFormat.SampleRate != sampleRate) sampleProvider = new WdlResamplingSampleProvider(sampleProvider, sampleRate);
 
         var source = sampleProvider.ToWaveProvider();
@@ -87,27 +87,4 @@ public sealed class NaudioAudioExporter : IAudioExporter
         }
     }
 
-    private sealed class ClipSampleProvider : ISampleProvider
-    {
-        private readonly float[] samples;
-        private int position;
-
-        public ClipSampleProvider(AudioClip clip)
-        {
-            samples = clip.CopySamples();
-            WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(clip.Format.SampleRate, clip.Format.Channels);
-        }
-
-        public WaveFormat WaveFormat { get; }
-
-        public int Read(float[] buffer, int offset, int count)
-        {
-            int read = Math.Min(count, samples.Length - position);
-            if (read <= 0) return 0;
-
-            for (int index = 0; index < read; index++) buffer[offset + index] = samples[position + index];
-            position += read;
-            return read;
-        }
-    }
 }

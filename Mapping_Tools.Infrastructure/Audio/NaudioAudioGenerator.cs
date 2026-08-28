@@ -55,7 +55,7 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
         SampleGeneratingArgs arguments,
         CancellationToken cancellationToken)
     {
-        ISampleProvider provider = new ClipSampleProvider(source);
+        ISampleProvider provider = new AudioClipSampleProvider(source);
         if (!NearlyEqual(arguments.Volume, 1))
             provider = new VolumeSampleProvider(provider)
             {
@@ -96,27 +96,4 @@ public sealed class NaudioAudioGenerator : IAudioGenerator
         return Math.Abs(left - right) < 1e-12;
     }
 
-    private sealed class ClipSampleProvider : ISampleProvider
-    {
-        private readonly float[] samples;
-        private int position;
-
-        public ClipSampleProvider(AudioClip clip)
-        {
-            samples = clip.CopySamples();
-            WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(clip.Format.SampleRate, clip.Format.Channels);
-        }
-
-        public WaveFormat WaveFormat { get; }
-
-        public int Read(float[] buffer, int offset, int count)
-        {
-            int read = Math.Min(count, samples.Length - position);
-            if (read <= 0) return 0;
-
-            for (int index = 0; index < read; index++) buffer[offset + index] = samples[position + index];
-            position += read;
-            return read;
-        }
-    }
 }
