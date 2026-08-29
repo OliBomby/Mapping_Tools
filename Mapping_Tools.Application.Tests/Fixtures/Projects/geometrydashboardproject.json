@@ -1,11 +1,11 @@
 {
-  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsEngineOptions, Mapping Tools",
+  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.Serialization.GeometryDashboardEngineOptions, Mapping Tools",
   "CurrentPreferences": {
-    "$type": "Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsPreferences, Mapping Tools",
+    "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.Serialization.GeometryDashboardPreferences, Mapping Tools",
     "RelevantObjectPreferences": {
-      "$type": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools]], System.Private.CoreLib",
+      "$type": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools]], System.Private.CoreLib",
       "Virtual point preferences": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
         "Name": "Virtual point preferences",
         "Color": "#FF00FFFF",
         "Opacity": 0.8,
@@ -15,7 +15,7 @@
         "HasSizeOption": true
       },
       "Virtual line preferences": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
         "Name": "Virtual line preferences",
         "Color": "#FF7CFC00",
         "Opacity": 0.8,
@@ -25,7 +25,7 @@
         "HasSizeOption": false
       },
       "Virtual circle preferences": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
         "Name": "Virtual circle preferences",
         "Color": "#FFFF0000",
         "Opacity": 0.8,
@@ -36,31 +36,31 @@
       }
     },
     "GeneratorSettings": {
-      "$type": "System.Collections.Generic.Dictionary`2[[System.Type, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools]], System.Private.CoreLib",
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AnchorPointGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "$type": "System.Collections.Generic.Dictionary`2[[System.Type, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools]], System.Private.CoreLib",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AnchorPointGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": true,
         "IsSequential": false,
         "IsDeep": false,
         "RelevancyRatio": 0.8,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": []
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AngleBisectorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AngleBisectorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": false,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -70,18 +70,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AveragePointGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AveragePointGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": false,
         "IsDeep": true,
         "RelevancyRatio": 1.0,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -91,18 +91,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AveragePointGenerator3, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AveragePointGenerator3, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": true,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -112,18 +112,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.CircleTangentGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.CircleTangentGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": false,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -133,18 +133,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.EqualSpacingGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.EqualSpacingGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": true,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -154,18 +154,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.IntersectionGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.IntersectionGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": false,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": false,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -175,42 +175,42 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.LastAnchorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.LastAnchorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": true,
         "IsSequential": false,
         "IsDeep": false,
         "RelevancyRatio": 1.0,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": []
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.LinearLineGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.LinearLineGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": true,
         "IsSequential": false,
         "IsDeep": false,
         "RelevancyRatio": 1.0,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": []
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.LineGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.LineGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": true,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -220,18 +220,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.ParallelismGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.ParallelismGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": false,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -241,42 +241,42 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.PerfectCircleBlanketGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.PerfectCircleBlanketGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": true,
         "IsSequential": false,
         "IsDeep": false,
         "RelevancyRatio": 0.8,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": []
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.PerfectCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.PerfectCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": true,
         "IsSequential": false,
         "IsDeep": false,
         "RelevancyRatio": 1.0,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": []
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.PerpendicularGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.PerpendicularGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": false,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -286,18 +286,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.PointBisectorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.PointBisectorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": true,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -307,18 +307,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": true,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -326,7 +326,7 @@
               "MinRelevancy": 0.5
             },
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": false,
               "NeedLocked": false,
               "NeedGeneratedByThis": true,
@@ -336,18 +336,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator3, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator3, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": true,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -355,7 +355,7 @@
               "MinRelevancy": 0.5
             },
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": false,
               "NeedLocked": false,
               "NeedGeneratedByThis": true,
@@ -365,18 +365,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator3Reversed, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator3Reversed, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": true,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -384,7 +384,7 @@
               "MinRelevancy": 0.5
             },
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": false,
               "NeedLocked": false,
               "NeedGeneratedByThis": true,
@@ -394,18 +394,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator4, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator4, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": true,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -413,7 +413,7 @@
               "MinRelevancy": 0.5
             },
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": false,
               "NeedLocked": false,
               "NeedGeneratedByThis": true,
@@ -423,15 +423,15 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.ScaleRotateGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.ScaleRotateGeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.ScaleRotateGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.ScaleRotateGeneratorSettings, Mapping Tools",
         "Angle": 196.0,
         "Scalar": 1.0,
         "OriginInputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": true,
               "NeedGeneratedByThis": false,
@@ -441,10 +441,10 @@
           ]
         },
         "OtherInputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -459,12 +459,12 @@
         "RelevancyRatio": 1.0,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": []
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SinglePointCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SinglePointCircleGeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SinglePointCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SinglePointCircleGeneratorSettings, Mapping Tools",
         "Radius": 100.0,
         "IsActive": false,
         "IsSequential": false,
@@ -472,10 +472,10 @@
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -485,20 +485,20 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SliderEndGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SliderEndGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": false,
         "IsDeep": false,
         "RelevancyRatio": 0.8,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": []
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SliderPathGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SliderPathGeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SliderPathGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SliderPathGeneratorSettings, Mapping Tools",
         "PointDensity": 0.5,
         "IsActive": false,
         "IsSequential": false,
@@ -506,22 +506,22 @@
         "RelevancyRatio": 0.6,
         "GeneratesInheritable": false,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": []
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SquareGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SquareGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": false,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -531,18 +531,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SquareGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SquareGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": false,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -552,25 +552,25 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.StartPointGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.StartPointGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": true,
         "IsSequential": false,
         "IsDeep": false,
         "RelevancyRatio": 1.0,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": []
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SymmetryGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SymmetryGeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SymmetryGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SymmetryGeneratorSettings, Mapping Tools",
         "AxisInputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": true,
               "NeedGeneratedByThis": false,
@@ -580,7 +580,7 @@
           ]
         },
         "OtherInputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": []
         },
         "IsActive": true,
@@ -589,22 +589,22 @@
         "RelevancyRatio": 0.8,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": []
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.TangentCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.TangentCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": false,
         "IsDeep": false,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -614,18 +614,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.TriangleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.TriangleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": false,
         "IsDeep": true,
         "RelevancyRatio": 1.0,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -633,7 +633,7 @@
               "MinRelevancy": 0.5
             },
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": false,
               "NeedLocked": false,
               "NeedGeneratedByThis": true,
@@ -643,18 +643,18 @@
           ]
         }
       },
-      "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.TriangleGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+      "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.TriangleGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
         "IsActive": false,
         "IsSequential": false,
         "IsDeep": true,
         "RelevancyRatio": 0.4,
         "GeneratesInheritable": true,
         "InputPredicate": {
-          "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+          "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
           "Predicates": [
             {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
               "NeedSelected": true,
               "NeedLocked": false,
               "NeedGeneratedByThis": false,
@@ -715,7 +715,7 @@
   },
   "SaveSlots": [
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsSaveSlot, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.Serialization.GeometryDashboardSaveSlot, Mapping Tools",
       "Name": "Save 1",
       "ProjectHotkey": {
         "$type": "Mapping_Tools.Classes.SystemTools.Hotkey, Mapping Tools",
@@ -723,11 +723,11 @@
         "Modifiers": 0
       },
       "Preferences": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsPreferences, Mapping Tools",
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.Serialization.GeometryDashboardPreferences, Mapping Tools",
         "RelevantObjectPreferences": {
-          "$type": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools]], System.Private.CoreLib",
+          "$type": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools]], System.Private.CoreLib",
           "Virtual point preferences": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
             "Name": "Virtual point preferences",
             "Color": "#FF00FFFF",
             "Opacity": 0.8,
@@ -737,7 +737,7 @@
             "HasSizeOption": true
           },
           "Virtual line preferences": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
             "Name": "Virtual line preferences",
             "Color": "#FF7CFC00",
             "Opacity": 0.8,
@@ -747,7 +747,7 @@
             "HasSizeOption": false
           },
           "Virtual circle preferences": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
             "Name": "Virtual circle preferences",
             "Color": "#FFFF0000",
             "Opacity": 0.8,
@@ -758,31 +758,31 @@
           }
         },
         "GeneratorSettings": {
-          "$type": "System.Collections.Generic.Dictionary`2[[System.Type, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools]], System.Private.CoreLib",
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AnchorPointGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "$type": "System.Collections.Generic.Dictionary`2[[System.Type, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools]], System.Private.CoreLib",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AnchorPointGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 0.8,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AngleBisectorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AngleBisectorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -792,18 +792,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AveragePointGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AveragePointGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -813,18 +813,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AveragePointGenerator3, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AveragePointGenerator3, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -834,18 +834,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.CircleTangentGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.CircleTangentGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -855,18 +855,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.EqualSpacingGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.EqualSpacingGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -876,18 +876,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.IntersectionGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.IntersectionGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": false,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -897,42 +897,42 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.LastAnchorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.LastAnchorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 1.0,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.LinearLineGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.LinearLineGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 1.0,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.LineGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.LineGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -942,18 +942,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.ParallelismGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.ParallelismGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -963,42 +963,42 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.PerfectCircleBlanketGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.PerfectCircleBlanketGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 0.8,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.PerfectCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.PerfectCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 1.0,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.PerpendicularGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.PerpendicularGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1008,18 +1008,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.PointBisectorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.PointBisectorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1029,18 +1029,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1048,7 +1048,7 @@
                   "MinRelevancy": 0.5
                 },
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": false,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": true,
@@ -1058,18 +1058,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator3, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator3, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1077,7 +1077,7 @@
                   "MinRelevancy": 0.5
                 },
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": false,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": true,
@@ -1087,18 +1087,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator3Reversed, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator3Reversed, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1106,7 +1106,7 @@
                   "MinRelevancy": 0.5
                 },
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": false,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": true,
@@ -1116,18 +1116,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator4, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator4, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1135,7 +1135,7 @@
                   "MinRelevancy": 0.5
                 },
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": false,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": true,
@@ -1145,15 +1145,15 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.ScaleRotateGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.ScaleRotateGeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.ScaleRotateGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.ScaleRotateGeneratorSettings, Mapping Tools",
             "Angle": 180.0,
             "Scalar": 1.0,
             "OriginInputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": true,
                   "NeedGeneratedByThis": false,
@@ -1163,7 +1163,7 @@
               ]
             },
             "OtherInputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             },
             "IsActive": true,
@@ -1172,12 +1172,12 @@
             "RelevancyRatio": 0.8,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SinglePointCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SinglePointCircleGeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SinglePointCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SinglePointCircleGeneratorSettings, Mapping Tools",
             "Radius": 100.0,
             "IsActive": false,
             "IsSequential": false,
@@ -1185,10 +1185,10 @@
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1198,20 +1198,20 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SliderEndGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SliderEndGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 0.8,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SliderPathGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SliderPathGeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SliderPathGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SliderPathGeneratorSettings, Mapping Tools",
             "PointDensity": 0.5,
             "IsActive": false,
             "IsSequential": false,
@@ -1219,22 +1219,22 @@
             "RelevancyRatio": 0.6,
             "GeneratesInheritable": false,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SquareGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SquareGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1244,18 +1244,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SquareGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SquareGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1265,25 +1265,25 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.StartPointGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.StartPointGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 1.0,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SymmetryGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SymmetryGeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SymmetryGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SymmetryGeneratorSettings, Mapping Tools",
             "AxisInputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": true,
                   "NeedGeneratedByThis": false,
@@ -1293,7 +1293,7 @@
               ]
             },
             "OtherInputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             },
             "IsActive": true,
@@ -1302,22 +1302,22 @@
             "RelevancyRatio": 0.8,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.TangentCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.TangentCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1327,18 +1327,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.TriangleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.TriangleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1346,7 +1346,7 @@
                   "MinRelevancy": 0.5
                 },
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": false,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": true,
@@ -1356,18 +1356,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.TriangleGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.TriangleGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1428,7 +1428,7 @@
       }
     },
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsSaveSlot, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.Serialization.GeometryDashboardSaveSlot, Mapping Tools",
       "Name": "Making hexgrid",
       "ProjectHotkey": {
         "$type": "Mapping_Tools.Classes.SystemTools.Hotkey, Mapping Tools",
@@ -1436,11 +1436,11 @@
         "Modifiers": 0
       },
       "Preferences": {
-        "$type": "Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsPreferences, Mapping Tools",
+        "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.Serialization.GeometryDashboardPreferences, Mapping Tools",
         "RelevantObjectPreferences": {
-          "$type": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools]], System.Private.CoreLib",
+          "$type": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools]], System.Private.CoreLib",
           "Virtual point preferences": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
             "Name": "Virtual point preferences",
             "Color": "#FF00FFFF",
             "Opacity": 0.8,
@@ -1450,7 +1450,7 @@
             "HasSizeOption": true
           },
           "Virtual line preferences": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
             "Name": "Virtual line preferences",
             "Color": "#FF7CFC00",
             "Opacity": 0.8,
@@ -1460,7 +1460,7 @@
             "HasSizeOption": false
           },
           "Virtual circle preferences": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools",
             "Name": "Virtual circle preferences",
             "Color": "#FFFF0000",
             "Opacity": 0.8,
@@ -1471,31 +1471,31 @@
           }
         },
         "GeneratorSettings": {
-          "$type": "System.Collections.Generic.Dictionary`2[[System.Type, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools]], System.Private.CoreLib",
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AnchorPointGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "$type": "System.Collections.Generic.Dictionary`2[[System.Type, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools]], System.Private.CoreLib",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AnchorPointGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 0.8,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AngleBisectorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AngleBisectorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1505,18 +1505,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AveragePointGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AveragePointGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 1.0,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": false,
                   "NeedLocked": true,
                   "NeedGeneratedByThis": false,
@@ -1526,18 +1526,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AveragePointGenerator3, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AveragePointGenerator3, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1547,18 +1547,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.CircleTangentGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.CircleTangentGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1568,18 +1568,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.EqualSpacingGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.EqualSpacingGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1589,18 +1589,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.IntersectionGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.IntersectionGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": false,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1610,42 +1610,42 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.LastAnchorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.LastAnchorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 1.0,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.LinearLineGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.LinearLineGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 1.0,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.LineGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.LineGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1655,18 +1655,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.ParallelismGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.ParallelismGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1676,42 +1676,42 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.PerfectCircleBlanketGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.PerfectCircleBlanketGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 0.8,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.PerfectCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.PerfectCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 1.0,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.PerpendicularGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.PerpendicularGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1721,18 +1721,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.PointBisectorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.PointBisectorGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1742,18 +1742,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1761,7 +1761,7 @@
                   "MinRelevancy": 0.5
                 },
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": false,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": true,
@@ -1771,18 +1771,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator3, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator3, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1790,7 +1790,7 @@
                   "MinRelevancy": 0.5
                 },
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": false,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": true,
@@ -1800,18 +1800,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator3Reversed, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator3Reversed, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1819,7 +1819,7 @@
                   "MinRelevancy": 0.5
                 },
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": false,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": true,
@@ -1829,18 +1829,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator4, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SameTransformGenerator4, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": true,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1848,7 +1848,7 @@
                   "MinRelevancy": 0.5
                 },
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": false,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": true,
@@ -1858,15 +1858,15 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.ScaleRotateGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.ScaleRotateGeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.ScaleRotateGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.ScaleRotateGeneratorSettings, Mapping Tools",
             "Angle": 180.0,
             "Scalar": 1.0,
             "OriginInputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": true,
                   "NeedGeneratedByThis": false,
@@ -1876,7 +1876,7 @@
               ]
             },
             "OtherInputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             },
             "IsActive": false,
@@ -1885,12 +1885,12 @@
             "RelevancyRatio": 0.8,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SinglePointCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SinglePointCircleGeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SinglePointCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SinglePointCircleGeneratorSettings, Mapping Tools",
             "Radius": 100.0,
             "IsActive": false,
             "IsSequential": false,
@@ -1898,10 +1898,10 @@
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1911,20 +1911,20 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SliderEndGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SliderEndGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 0.8,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SliderPathGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SliderPathGeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SliderPathGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SliderPathGeneratorSettings, Mapping Tools",
             "PointDensity": 0.5,
             "IsActive": false,
             "IsSequential": false,
@@ -1932,22 +1932,22 @@
             "RelevancyRatio": 0.6,
             "GeneratesInheritable": false,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SquareGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SquareGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1957,18 +1957,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SquareGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SquareGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -1978,25 +1978,25 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.StartPointGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.StartPointGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 1.0,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.SymmetryGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SymmetryGeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.SymmetryGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SymmetryGeneratorSettings, Mapping Tools",
             "AxisInputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": true,
                   "NeedGeneratedByThis": false,
@@ -2006,7 +2006,7 @@
               ]
             },
             "OtherInputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             },
             "IsActive": false,
@@ -2015,22 +2015,22 @@
             "RelevancyRatio": 0.8,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": []
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.TangentCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.TangentCircleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": false,
             "IsDeep": false,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -2040,18 +2040,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.TriangleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.TriangleGenerator, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": true,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 1.0,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,
@@ -2059,7 +2059,7 @@
                   "MinRelevancy": 0.5
                 },
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": false,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": true,
@@ -2069,18 +2069,18 @@
               ]
             }
           },
-          "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.TriangleGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
-            "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
+          "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.TriangleGenerator2, Mapping Tools, Version=1.12.28.0, Culture=neutral, PublicKeyToken=null": {
+            "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools",
             "IsActive": false,
             "IsSequential": false,
             "IsDeep": true,
             "RelevancyRatio": 0.4,
             "GeneratesInheritable": true,
             "InputPredicate": {
-              "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
+              "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicateCollection, Mapping Tools",
               "Predicates": [
                 {
-                  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
+                  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection.SelectionPredicate, Mapping Tools",
                   "NeedSelected": true,
                   "NeedLocked": false,
                   "NeedGeneratedByThis": false,

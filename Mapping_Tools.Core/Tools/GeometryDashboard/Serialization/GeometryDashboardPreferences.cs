@@ -6,10 +6,10 @@ using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGen
 namespace Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 
 /// <summary>Stores the persistent appearance and input settings of one dashboard.</summary>
-public sealed class SnappingToolsPreferences : ICloneable
+public sealed class GeometryDashboardPreferences : ICloneable
 {
     /// <summary>Creates the legacy default Geometry Dashboard settings.</summary>
-    public SnappingToolsPreferences()
+    public GeometryDashboardPreferences()
     {
         RelevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences>
         {
@@ -125,7 +125,7 @@ public sealed class SnappingToolsPreferences : ICloneable
     /// <inheritdoc />
     public object Clone()
     {
-        var clone = (SnappingToolsPreferences)MemberwiseClone();
+        var clone = (GeometryDashboardPreferences)MemberwiseClone();
         clone.GeneratorSettings = new Dictionary<Type, GeneratorSettings>();
         foreach (var (key, value) in GeneratorSettings) clone.GeneratorSettings.Add(key, (GeneratorSettings)value.Clone());
 

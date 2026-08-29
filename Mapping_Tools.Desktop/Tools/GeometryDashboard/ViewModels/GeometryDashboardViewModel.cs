@@ -44,13 +44,13 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     private const double special_bias = 2;
     private const double selection_range = 80;
     private static readonly HitObjectComparer hitObjectComparer = new();
-    private readonly HashSet<SnappingToolsSaveSlot> activeSaveSlots = [];
+    private readonly HashSet<GeometryDashboardSaveSlot> activeSaveSlots = [];
 
     private readonly ApplicationSettings applicationSettings;
-    private readonly ProjectDefinition<SnappingToolsProject> definition = new(
+    private readonly ProjectDefinition<GeometryDashboardProject> definition = new(
         "geometrydashboardproject.json",
         "Geometry Dashboard Projects",
-        static () => new SnappingToolsProject(),
+        static () => new GeometryDashboardProject(),
         "geometry-dashboard-project.json");
 
     private readonly IUiDispatcher dispatcher;
@@ -115,7 +115,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
         this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
-        Project = new SnappingToolsProject();
+        Project = new GeometryDashboardProject();
         Generators = new ObservableCollection<GeometryDashboardGeneratorViewModel>(CreateGenerators());
         Project.SetGenerators(Generators.Select(generator => generator.Model));
         layers = CreateLayers();
@@ -123,7 +123,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     }
 
     /// <summary>Gets the serializable project currently edited by the dashboard.</summary>
-    public SnappingToolsProject Project { get; }
+    public GeometryDashboardProject Project { get; }
 
     /// <summary>Gets generator rows in the legacy reflection order.</summary>
     public ObservableCollection<GeometryDashboardGeneratorViewModel> Generators { get; }
@@ -151,7 +151,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     }
 
     /// <summary>Gets the active preferences object edited by the dashboard.</summary>
-    public SnappingToolsPreferences Preferences => Project.CurrentPreferences;
+    public GeometryDashboardPreferences Preferences => Project.CurrentPreferences;
 
     /// <summary>Gets the generated geometry count displayed in diagnostics.</summary>
     public int DrawableCount => layers.GetAllRelevantDrawables().Count();
@@ -222,7 +222,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     void IShellProjectFeature.Install(object project)
     {
-        if (project is not SnappingToolsProject loaded)
+        if (project is not GeometryDashboardProject loaded)
             throw new InvalidDataException("The Geometry Dashboard project is incomplete.");
 
         lock (stateGate)
@@ -284,10 +284,10 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     public async Task ShowPreferencesAsync()
     {
         GeometryDashboardPreferencesDialogViewModel viewModel = new(
-            (SnappingToolsPreferences)Preferences.Clone());
+            (GeometryDashboardPreferences)Preferences.Clone());
         GeometryDashboardPreferencesWindow window = new() { DataContext = viewModel };
         viewModel.Close = result => window.Close(result);
-        var preferences = await window.ShowDialog<SnappingToolsPreferences?>(owner());
+        var preferences = await window.ShowDialog<GeometryDashboardPreferences?>(owner());
         if (preferences is not null)
         {
             Project.SetCurrentPreferences(preferences);
@@ -866,7 +866,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         });
     }
 
-    private void LoadSaveSlot(SnappingToolsSaveSlot slot)
+    private void LoadSaveSlot(GeometryDashboardSaveSlot slot)
     {
         dispatcher.Post(() =>
         {

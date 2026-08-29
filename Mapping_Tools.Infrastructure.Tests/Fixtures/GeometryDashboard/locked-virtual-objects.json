@@ -1,9 +1,9 @@
 {
-  "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectCollection.RelevantObjectCollection, Mapping Tools",
-  "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantHitObject, Mapping Tools, Version=1.12.30.0, Culture=neutral, PublicKeyToken=null": [],
-  "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools, Version=1.12.30.0, Culture=neutral, PublicKeyToken=null": [
+  "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection.RelevantObjectCollection, Mapping Tools",
+  "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantHitObject, Mapping Tools, Version=1.12.30.0, Culture=neutral, PublicKeyToken=null": [],
+  "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools, Version=1.12.30.0, Culture=neutral, PublicKeyToken=null": [
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
       "PreferencesName": "Virtual point preferences",
       "Child": {
         "X": 342.0,
@@ -21,7 +21,7 @@
       "IsInheritable": true
     },
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
       "PreferencesName": "Virtual point preferences",
       "Child": {
         "X": 489.0,
@@ -39,7 +39,7 @@
       "IsInheritable": true
     },
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
       "PreferencesName": "Virtual point preferences",
       "Child": {
         "X": 361.0,
@@ -57,7 +57,7 @@
       "IsInheritable": true
     },
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
       "PreferencesName": "Virtual point preferences",
       "Child": {
         "X": 308.0,
@@ -75,7 +75,7 @@
       "IsInheritable": true
     },
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
       "PreferencesName": "Virtual point preferences",
       "Child": {
         "X": 224.0,
@@ -93,7 +93,7 @@
       "IsInheritable": true
     },
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
       "PreferencesName": "Virtual point preferences",
       "Child": {
         "X": 359.5868603916614,
@@ -111,7 +111,7 @@
       "IsInheritable": true
     },
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
       "PreferencesName": "Virtual point preferences",
       "Child": {
         "X": 84.0,
@@ -129,7 +129,7 @@
       "IsInheritable": true
     },
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
       "PreferencesName": "Virtual point preferences",
       "Child": {
         "X": 103.0,
@@ -147,7 +147,7 @@
       "IsInheritable": true
     },
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
       "PreferencesName": "Virtual point preferences",
       "Child": {
         "X": 125.0,
@@ -165,7 +165,7 @@
       "IsInheritable": true
     },
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
       "PreferencesName": "Virtual point preferences",
       "Child": {
         "X": -17.97921760391198,
@@ -183,9 +183,9 @@
       "IsInheritable": true
     }
   ],
-  "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantCircle, Mapping Tools, Version=1.12.30.0, Culture=neutral, PublicKeyToken=null": [
+  "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantCircle, Mapping Tools, Version=1.12.30.0, Culture=neutral, PublicKeyToken=null": [
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantCircle, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantCircle, Mapping Tools",
       "PreferencesName": "Virtual circle preferences",
       "Child": {
         "$type": "Mapping_Tools.Classes.MathUtil.Circle, Mapping Tools",
@@ -207,7 +207,7 @@
       "IsInheritable": true
     },
     {
-      "$type": "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantCircle, Mapping Tools",
+      "$type": "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantCircle, Mapping Tools",
       "PreferencesName": "Virtual circle preferences",
       "Child": {
         "$type": "Mapping_Tools.Classes.MathUtil.Circle, Mapping Tools",

@@ -16,10 +16,10 @@ namespace Mapping_Tools.Core.Tests.Tools.GeometryDashboard;
 public sealed class GeometryDashboardDomainTests
 {
     [TestMethod]
-    public void SnappingToolsPreferences_Defaults_PreserveLegacyDashboardValues()
+    public void GeometryDashboardPreferences_Defaults_PreserveLegacyDashboardValues()
     {
         // Arrange
-        SnappingToolsPreferences preferences = new();
+        GeometryDashboardPreferences preferences = new();
 
         // Act
         var pointPreferences = preferences.GetReleventObjectPreferences(RelevantPoint.PreferencesNameStatic);

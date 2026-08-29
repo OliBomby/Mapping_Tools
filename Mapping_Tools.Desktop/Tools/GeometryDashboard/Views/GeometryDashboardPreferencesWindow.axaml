@@ -7,7 +7,7 @@
         xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions"
         x:Class="Mapping_Tools.Desktop.Tools.GeometryDashboard.Views.GeometryDashboardPreferencesWindow"
         x:DataType="geometryDashboard:GeometryDashboardPreferencesDialogViewModel"
-        Title="Snapping Tools Preferences" Width="575" Height="500" MinWidth="575" MinHeight="360"
+        Title="Geometry Dashboard Preferences" Width="575" Height="500" MinWidth="575" MinHeight="360"
         CanResize="True" WindowStartupLocation="CenterOwner" WindowDecorations="None"
         Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}">
     <Grid RowDefinitions="35,*,Auto">

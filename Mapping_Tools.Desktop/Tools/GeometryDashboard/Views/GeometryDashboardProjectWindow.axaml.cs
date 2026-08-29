@@ -18,7 +18,7 @@ public sealed partial class GeometryDashboardProjectWindow : Window
     private void SaveSlotsSelectionChanged(object? sender, SelectionChangedEventArgs eventArgs)
     {
         if (DataContext is GeometryDashboardProjectSlotsViewModel viewModel && sender is ListBox listBox)
-            viewModel.SetSelectedSlots(listBox.SelectedItems?.OfType<SnappingToolsSaveSlot>() ?? []);
+            viewModel.SetSelectedSlots(listBox.SelectedItems?.OfType<GeometryDashboardSaveSlot>() ?? []);
     }
 
     private void CloseWindow(object? sender, RoutedEventArgs eventArgs)

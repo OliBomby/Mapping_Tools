@@ -62,7 +62,7 @@ Rules:
 | D6 | Graph/value editor | `Components/Graph`, `ValueOrGraphControl` | Editable anchors, interpolators, markers, snapping, derivatives/integrals, animations, and constant-or-curve parameters. | Interpolation/state models to Core; pointer/rendering control to Desktop. Required by Sliderator and Tumour Generator. |
 | I1 | osu! live integration | `EditorReader.dll`, `OsuMemoryDataProvider` | Locate the current map, inspect selected objects/editor state, read unsaved state, and request reload/save behavior. | Windows-specific Infrastructure adapters behind Application interfaces. |
 | I2 | Global input/process integration | keyboard-hook library, WinForms cursor/screen APIs, `Process.NET` | Global hotkeys, absolute cursor movement, screen coordinates, osu! process memory, and process/window access. | Windows-specific Infrastructure. Geometry Dashboard remains Windows-only until replacements are proven. |
-| I3 | Overlay rendering | `Overlay.NET`, `SnappingToolsOverlay` | Transparent on-screen geometry overlay aligned to osu!’s playfield. | Explicit Windows overlay host plus Desktop control/model boundary. |
+| I3 | Overlay rendering | `Overlay.NET`, `GeometryDashboardOverlay` | Transparent on-screen geometry overlay aligned to osu!’s playfield. | Explicit Windows overlay host plus Desktop control/model boundary. |
 | I4 | Audio import/export | NAudio, NVorbis, OggVorbisEncoder, MIDI/SF2 helpers | Decode, preview, synthesize, limit, and export samples and hitsound packages. | Infrastructure audio services. Keep sample/hitsound rules in Core. |
 | I5 | Updates and release lifecycle | `Updater`, Onova, GitHub release lookup | Check, download, skip, stage, and apply application updates. | Infrastructure update service plus Avalonia progress/decision dialog. Port only after packaging format is settled. |
 
@@ -150,7 +150,7 @@ flowchart TB
 Direct feature-to-feature dependencies found in the current code:
 
 - **Hitsound Preview Helper → Rhythm Guide window.** Its view model constructs `RhythmGuideWindow` directly.
-- Other tool namespaces referenced from their own view models (`Sliderator`, `SnappingTools`) are internal feature layering violations, not dependencies on another user-facing feature.
+- Other tool namespaces referenced from their own view models (`Sliderator`, `GeometryDashboard`) are internal feature layering violations, not dependencies on another user-facing feature.
 - Slider Picturator consumes code in `SlideratorStuff`, but it depends on the shared slider/picturation algorithm, not on the Sliderator screen.
 
 ## Feature definitions and dependencies

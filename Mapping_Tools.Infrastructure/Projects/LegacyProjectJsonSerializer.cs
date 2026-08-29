@@ -224,20 +224,20 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string intermediate_core_hotkey = "Mapping_Tools.Core.Classes.SystemTools.Hotkey";
         private const string current_namespace_prefix = "Mapping_Tools.Core.";
         private const string legacy_relevant_objects_prefix =
-            "Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.";
+            "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.";
         private const string intermediate_relevant_objects_prefix =
-            "Mapping_Tools.Core.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.";
+            "Mapping_Tools.Core.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.";
         private const string current_relevant_objects_prefix =
-            "Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.";
+            "Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.";
         private const string current_relevant_object_prefix =
-            "Mapping_Tools.Core.Tools.SnappingTools.DataStructure.RelevantObject.";
+            "Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject.";
         private const string intermediate_current_relevant_objects_prefix =
             "Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.";
         private const string intermediate_current_relevant_object_prefix =
             "Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject.";
 
         private const string legacy_relevant_objects_prefix_without_tools =
-            "Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects.";
+            "Mapping_Tools.Classes.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.";
         private const string legacy_rhythm_guide_project = "Mapping_Tools.Viewmodels.RhythmGuideVm";
 
         private const string legacy_hitsound_preview_helper_project =
@@ -314,8 +314,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string legacy_mapset_merger_item =
             "Mapping_Tools.Viewmodels.MapsetMergerVm+MapsetItem";
 
-        private const string legacy_snapping_tools_project =
-            "Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsEngineOptions";
+        private const string legacy_geometry_dashboard_project =
+            "Mapping_Tools.Classes.Tools.GeometryDashboard.Serialization.GeometryDashboardEngineOptions";
 
         private const string legacy_combo_colour_project =
             "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourEngineOptions";
@@ -326,8 +326,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string migrated_combo_colour_project =
             "Mapping_Tools.Classes.Tools.ComboColourStudio.ComboColourProject";
 
-        private const string migrated_snapping_tools_project =
-            "Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsProject";
+        private const string migrated_geometry_dashboard_project =
+            "Mapping_Tools.Classes.Tools.GeometryDashboard.Serialization.GeometryDashboardProject";
 
         private const string legacy_combo_colour_point =
             "Mapping_Tools.Classes.Tools.ComboColourStudio.ColourPoint";
@@ -420,8 +420,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                     return ResolveDesktopProject("SlideratorProject", typeof(SlideratorServiceOptions));
                 if (typeName == typeof(SliderPicturatorServiceOptions).FullName)
                     return ResolveDesktopProject("SliderPicturatorProject", typeof(SliderPicturatorServiceOptions));
-                if (typeName == typeof(SnappingToolsServiceOptions).FullName)
-                    return ResolveDesktopProject("SnappingToolsProject", typeof(SnappingToolsServiceOptions));
+                if (typeName == typeof(GeometryDashboardServiceOptions).FullName)
+                    return ResolveDesktopProject("GeometryDashboardProject", typeof(GeometryDashboardServiceOptions));
                 if (typeName == typeof(TimingCopierServiceOptions).FullName)
                     return ResolveDesktopProject("TimingCopierProject", typeof(TimingCopierServiceOptions));
                 if (typeName == typeof(TimingHelperServiceOptions).FullName)
@@ -459,8 +459,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                     return ResolveDesktopProject("SliderPicturatorProject", typeof(SliderPicturatorServiceOptions));
                 if (typeName.EndsWith(".SlideratorProject", StringComparison.Ordinal))
                     return ResolveDesktopProject("SlideratorProject", typeof(SlideratorServiceOptions));
-                if (typeName.EndsWith(".SnappingToolsProject", StringComparison.Ordinal))
-                    return ResolveDesktopProject("SnappingToolsProject", typeof(SnappingToolsServiceOptions));
+                if (typeName.EndsWith(".GeometryDashboardProject", StringComparison.Ordinal))
+                    return ResolveDesktopProject("GeometryDashboardProject", typeof(GeometryDashboardServiceOptions));
                 if (typeName.EndsWith(".TimingCopierProject", StringComparison.Ordinal))
                     return ResolveDesktopProject("TimingCopierProject", typeof(TimingCopierServiceOptions));
                 if (typeName.EndsWith(".TimingHelperProject", StringComparison.Ordinal))
@@ -475,8 +475,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                     return ResolveDesktopProject("ComboColourProject", typeof(ComboColourServiceOptions));
                 if (typeName == typeof(PatternGalleryEngineOptions).FullName)
                     return ResolveDesktopProject("PatternGalleryProject", typeof(PatternGalleryServiceOptions));
-                if (typeName == typeof(SnappingToolsEngineOptions).FullName)
-                    return ResolveDesktopProject("SnappingToolsProject", typeof(SnappingToolsServiceOptions));
+                if (typeName == typeof(GeometryDashboardEngineOptions).FullName)
+                    return ResolveDesktopProject("GeometryDashboardProject", typeof(GeometryDashboardServiceOptions));
 
                 if (typeName == legacy_rhythm_guide_project) return ResolveDesktopProject("RhythmGuideProject", typeof(RhythmGuideServiceOptions));
                 if (typeName == legacy_hitsound_preview_helper_project) return ResolveDesktopProject("HitsoundPreviewHelperProject", typeof(HitsoundPreviewHelperServiceOptions));
@@ -522,9 +522,9 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 if (typeName == legacy_combo_colour_point_without_tools) return typeof(ColourPoint);
                 if (typeName == legacy_hitsound_sample_export_format) return typeof(HitsoundStudioSampleExportFormat);
                 if (typeName == legacy_pattern_gallery_project) return ResolveDesktopProject("PatternGalleryProject", typeof(PatternGalleryServiceOptions));
-                if (typeName == legacy_snapping_tools_project
-                    || typeName == migrated_snapping_tools_project)
-                    return ResolveDesktopProject("SnappingToolsProject", typeof(SnappingToolsServiceOptions));
+                if (typeName == legacy_geometry_dashboard_project
+                    || typeName == migrated_geometry_dashboard_project)
+                    return ResolveDesktopProject("GeometryDashboardProject", typeof(GeometryDashboardServiceOptions));
                 if (typeName == legacy_pattern_gallery_pattern) return typeof(PatternGalleryPattern);
                 if (typeName == legacy_pattern_gallery_handler) return typeof(PatternGalleryCollectionMetadata);
                 if (typeName == legacy_hotkey) return typeof(Hotkey);
@@ -562,7 +562,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                     "SliderMergerProject" => legacy_slider_merger_project,
                     "SliderPicturatorProject" => legacy_slider_picturator_project,
                     "SlideratorProject" => legacy_sliderator_project,
-                    "SnappingToolsProject" => legacy_snapping_tools_project,
+                    "GeometryDashboardProject" => legacy_geometry_dashboard_project,
                     "TimingCopierProject" => legacy_timing_copier_project,
                     "TimingHelperProject" => legacy_timing_helper_project,
                     "TumourGeneratorProject" => legacy_tumour_generator_project,
@@ -645,10 +645,10 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 return;
             }
 
-            if (serializedType == typeof(SnappingToolsServiceOptions))
+            if (serializedType == typeof(GeometryDashboardServiceOptions))
             {
                 assemblyName = legacy_assembly_name;
-                typeName = legacy_snapping_tools_project;
+                typeName = legacy_geometry_dashboard_project;
                 return;
             }
 
@@ -979,24 +979,24 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         {
             yield return typeName;
 
-            if (typeName.StartsWith("Mapping_Tools.Classes.Tools.SnappingTools.", StringComparison.Ordinal))
+            if (typeName.StartsWith("Mapping_Tools.Classes.Tools.GeometryDashboard.", StringComparison.Ordinal))
                 yield return "Mapping_Tools.Core.Tools.GeometryDashboard."
-                             + typeName["Mapping_Tools.Classes.Tools.SnappingTools.".Length..];
+                             + typeName["Mapping_Tools.Classes.Tools.GeometryDashboard.".Length..];
 
-            if (typeName.StartsWith("Mapping_Tools.Core.Classes.Tools.SnappingTools.", StringComparison.Ordinal))
+            if (typeName.StartsWith("Mapping_Tools.Core.Classes.Tools.GeometryDashboard.", StringComparison.Ordinal))
                 yield return "Mapping_Tools.Core.Tools.GeometryDashboard."
-                             + typeName["Mapping_Tools.Core.Classes.Tools.SnappingTools.".Length..];
+                             + typeName["Mapping_Tools.Core.Classes.Tools.GeometryDashboard.".Length..];
 
-            if (typeName.StartsWith("Mapping_Tools.Core.Tools.SnappingTools.", StringComparison.Ordinal))
+            if (typeName.StartsWith("Mapping_Tools.Core.Tools.GeometryDashboard.", StringComparison.Ordinal))
                 yield return "Mapping_Tools.Core.Tools.GeometryDashboard."
-                             + typeName["Mapping_Tools.Core.Tools.SnappingTools.".Length..];
+                             + typeName["Mapping_Tools.Core.Tools.GeometryDashboard.".Length..];
 
-            if (typeName.StartsWith("Mapping_Tools.Classes.SnappingTools.", StringComparison.Ordinal))
+            if (typeName.StartsWith("Mapping_Tools.Classes.GeometryDashboard.", StringComparison.Ordinal))
             {
-                yield return "Mapping_Tools.Core.Tools.SnappingTools."
-                             + typeName["Mapping_Tools.Classes.SnappingTools.".Length..];
                 yield return "Mapping_Tools.Core.Tools.GeometryDashboard."
-                             + typeName["Mapping_Tools.Classes.SnappingTools.".Length..];
+                             + typeName["Mapping_Tools.Classes.GeometryDashboard.".Length..];
+                yield return "Mapping_Tools.Core.Tools.GeometryDashboard."
+                             + typeName["Mapping_Tools.Classes.GeometryDashboard.".Length..];
             }
 
             if (typeName.StartsWith(legacy_relevant_objects_prefix, StringComparison.Ordinal))
@@ -1071,7 +1071,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             const string current_geometry_dashboard_namespace_prefix =
                 "Mapping_Tools.Core.Tools.GeometryDashboard.";
             if (typeName?.StartsWith(current_geometry_dashboard_namespace_prefix, StringComparison.Ordinal) == true)
-                return "Mapping_Tools.Classes.Tools.SnappingTools."
+                return "Mapping_Tools.Classes.Tools.GeometryDashboard."
                        + typeName[current_geometry_dashboard_namespace_prefix.Length..];
 
             return typeName?.StartsWith("Mapping_Tools.Core.Graph.", StringComparison.Ordinal) == true
@@ -1323,10 +1323,10 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
     private sealed class GeometryGeneratorSettingsDictionaryConverter : JsonConverter
     {
         private const string preferences_dictionary_type =
-            "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools]], System.Private.CoreLib";
+            "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjectPreferences, Mapping Tools]], System.Private.CoreLib";
 
         private const string generator_dictionary_type =
-            "System.Collections.Generic.Dictionary`2[[System.Type, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools]], System.Private.CoreLib";
+            "System.Collections.Generic.Dictionary`2[[System.Type, System.Private.CoreLib],[Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettings, Mapping Tools]], System.Private.CoreLib";
 
         public override bool CanConvert(Type objectType)
         {
@@ -1419,7 +1419,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
 
             writer.WriteStartObject();
             writer.WritePropertyName("$type");
-            writer.WriteValue("Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectCollection.RelevantObjectCollection, Mapping Tools");
+            writer.WriteValue("Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection.RelevantObjectCollection, Mapping Tools");
             foreach (var (type, objects) in collection)
             {
                 writer.WritePropertyName(ToLegacyObjectTypeKey(type));

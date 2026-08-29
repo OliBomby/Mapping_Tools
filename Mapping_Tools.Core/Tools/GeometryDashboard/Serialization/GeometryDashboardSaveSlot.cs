@@ -1,10 +1,10 @@
 namespace Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 
 /// <summary>A named saved snapshot of Geometry Dashboard preferences.</summary>
-public sealed class SnappingToolsSaveSlot : ICloneable
+public sealed class GeometryDashboardSaveSlot : ICloneable
 {
     private string name = string.Empty;
-    private SnappingToolsPreferences preferences = new();
+    private GeometryDashboardPreferences preferences = new();
     private Hotkey projectHotkey = new();
 
     /// <summary>Gets or sets the user-visible slot name.</summary>
@@ -14,20 +14,20 @@ public sealed class SnappingToolsSaveSlot : ICloneable
     public Hotkey ProjectHotkey { get => projectHotkey; set => projectHotkey = value ?? new Hotkey(); }
 
     /// <summary>Gets or sets the preference snapshot stored by this slot.</summary>
-    public SnappingToolsPreferences Preferences
+    public GeometryDashboardPreferences Preferences
     {
         get => preferences;
-        set => preferences = value ?? new SnappingToolsPreferences();
+        set => preferences = value ?? new GeometryDashboardPreferences();
     }
 
     /// <inheritdoc />
     public object Clone()
     {
-        return new SnappingToolsSaveSlot
+        return new GeometryDashboardSaveSlot
         {
             Name = Name,
             ProjectHotkey = (Hotkey)ProjectHotkey.Clone(),
-            Preferences = (SnappingToolsPreferences)Preferences.Clone(),
+            Preferences = (GeometryDashboardPreferences)Preferences.Clone(),
         };
     }
 }

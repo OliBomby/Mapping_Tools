@@ -9,7 +9,7 @@ namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
 public sealed partial class GeometryDashboardPreferencesDialogViewModel : ObservableObject
 {
     /// <summary>Creates the dialog over an independent preference clone.</summary>
-    public GeometryDashboardPreferencesDialogViewModel(SnappingToolsPreferences preferences)
+    public GeometryDashboardPreferencesDialogViewModel(GeometryDashboardPreferences preferences)
     {
         Preferences = preferences ?? throw new ArgumentNullException(nameof(preferences));
         Appearance = new ObservableCollection<GeometryDashboardPreferenceRowViewModel>(
@@ -17,7 +17,7 @@ public sealed partial class GeometryDashboardPreferencesDialogViewModel : Observ
     }
 
     /// <summary>Gets the independent document being edited.</summary>
-    public SnappingToolsPreferences Preferences { get; }
+    public GeometryDashboardPreferences Preferences { get; }
 
     /// <summary>Gets the supported root-hit-object selection modes.</summary>
     public IReadOnlyList<SelectedHitObjectMode> SelectedHitObjectModes { get; } = Enum.GetValues<SelectedHitObjectMode>();
@@ -134,7 +134,7 @@ public sealed partial class GeometryDashboardPreferencesDialogViewModel : Observ
     }
 
     /// <summary>Receives the window close callback.</summary>
-    public Action<SnappingToolsPreferences?>? Close { get; set; }
+    public Action<GeometryDashboardPreferences?>? Close { get; set; }
 
     /// <summary>Applies the clone to the caller.</summary>
     [RelayCommand]

@@ -33,7 +33,7 @@
                 </ContextMenu>
             </ListBox.ContextMenu>
             <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="model:SnappingToolsSaveSlot">
+                <DataTemplate x:DataType="model:GeometryDashboardSaveSlot">
                     <Grid ColumnDefinitions="150,130,Auto,Auto" Margin="0,2">
                         <TextBox Text="{Binding Name, Mode=TwoWay}" />
                         <controls:GeometryHotkeyEditor Grid.Column="1" Hotkey="{Binding ProjectHotkey, Mode=TwoWay}"

@@ -8,15 +8,15 @@ and overlay visualization UI remain step 45.
 
 The adapter contract was derived from the complete legacy integration path:
 
-- `Mapping_Tools/Viewmodels/SnappingToolsVm.cs`
-- `Mapping_Tools/Views/SnappingTools/SnappingToolsOverlay.cs`
-- `Mapping_Tools/Views/SnappingTools/SnappingToolsView.xaml.cs`
+- `Mapping_Tools/Viewmodels/GeometryDashboardVm.cs`
+- `Mapping_Tools/Views/GeometryDashboard/GeometryDashboardOverlay.cs`
+- `Mapping_Tools/Views/GeometryDashboard/GeometryDashboardView.xaml.cs`
 - `Mapping_Tools/Classes/ToolHelpers/EditorReaderStuff.cs`
 - `Mapping_Tools/Classes/SystemTools/ListenerManager.cs`
 - `Mapping_Tools/Classes/SystemTools/Hotkey.cs`
 - `Mapping_Tools/Classes/SystemTools/ActionHotkey.cs`
-- `Mapping_Tools/Classes/Tools/SnappingTools/CoordinateConverter.cs`
-- `Mapping_Tools/Classes/Tools/SnappingTools/Serialization/SnappingToolsSaveSlot.cs`
+- `Mapping_Tools/Classes/Tools/GeometryDashboard/CoordinateConverter.cs`
+- `Mapping_Tools/Classes/Tools/GeometryDashboard/Serialization/GeometryDashboardSaveSlot.cs`
 - all I2/I3 call sites in the Geometry Dashboard view model and overlay.
 
 ## Step-44 surface

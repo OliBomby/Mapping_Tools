@@ -25,7 +25,7 @@ public sealed class GeometryDashboardLockedObjectsPersistenceTests
         objects[typeof(RelevantCircle)].Should().HaveCount(2);
         objects.Values.SelectMany(values => values).Should().OnlyContain(value => value.IsLocked);
         ((RelevantPoint)objects[typeof(RelevantPoint)][0]).Child.Should().Be(new Vector2(342, 98));
-        json.Should().Contain("Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectCollection.RelevantObjectCollection, Mapping Tools");
-        json.Should().Contain("Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools");
+        json.Should().Contain("Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection.RelevantObjectCollection, Mapping Tools");
+        json.Should().Contain("Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools");
     }
 }

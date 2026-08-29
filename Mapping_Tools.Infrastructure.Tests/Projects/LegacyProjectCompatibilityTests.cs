@@ -277,10 +277,10 @@ public sealed class LegacyProjectCompatibilityTests
         // Arrange
         const string json = """
                            {
-                             "$type": "Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObjectCollection.RelevantObjectCollection, Mapping Tools",
-                             "Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools": [
+                             "$type": "Mapping_Tools.Classes.GeometryDashboard.DataStructure.RelevantObjectCollection.RelevantObjectCollection, Mapping Tools",
+                             "Mapping_Tools.Classes.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools": [
                                {
-                                 "$type": "Mapping_Tools.Classes.SnappingTools.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
+                                 "$type": "Mapping_Tools.Classes.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.RelevantPoint, Mapping Tools",
                                  "Child": {
                                    "$type": "Mapping_Tools.Classes.MathUtil.Vector2, Mapping Tools",
                                    "X": 12.0,

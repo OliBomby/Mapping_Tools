@@ -57,10 +57,10 @@ public sealed class SlideratorViewModelTests
         // Assert
         state.MinX.Should().Be(0);
         state.MinY.Should().Be(0);
-        state.MaxX.Should().Be(1);
+        state.MaxX.Should().Be(viewModel.GraphBeats);
         state.MaxY.Should().Be(1);
         state.Anchors[0].Pos.Should().Be(new Vector2(0, 0));
-        state.Anchors[^1].Pos.Should().Be(new Vector2(1, 1));
+        state.Anchors[^1].Pos.Should().Be(new Vector2((float)viewModel.GraphBeats, 1));
     }
 
     [TestMethod]
@@ -169,13 +169,12 @@ public sealed class SlideratorViewModelTests
     }
 
     [TestMethod]
-    public void InstallProjectWithoutGraph_UsesCurrentModeResetGraph()
+    public void InstallProject_WithDefaultGraph_UsesProjectGraph()
     {
         // Arrange
         var viewModel = Create(new RecordingSliderator());
         viewModel.GraphModeSetting = SlideratorGraphMode.Position;
         SlideratorProject project = new();
-        project.GraphState.Should().BeNull();
 
         // Act
         ((IShellProjectFeature)viewModel).Install(project);

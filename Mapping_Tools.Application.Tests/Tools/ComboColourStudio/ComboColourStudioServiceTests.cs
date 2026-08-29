@@ -28,14 +28,14 @@ public sealed class ComboColourStudioServiceTests
         project.ComboColours.Clear();
         project.ComboColours.Add(new SpecialColour(RgbaColour.FromRgb(10, 20, 30), "Combo1"));
         project.AddColourPoint(0, [project.ComboColours[0]]);
-        List<double> progress = [];
+        RecordingProgress<double> progress = new();
         ComboColourStudioService service = new(gateway);
 
         // Act
         var result = await service.ApplyAsync(
             [editor.Path],
             project,
-            new Progress<double>(progress.Add));
+            progress);
 
         // Assert
         result.ProcessedCount.Should().Be(1);
@@ -43,7 +43,7 @@ public sealed class ComboColourStudioServiceTests
         gateway.SessionSaveRequests.Single().Session.Editor.Should().BeSameAs(editor);
         gateway.SessionSaveRequests.Single().ReloadEditor.Should().BeFalse();
         editor.Beatmap.ComboColours.Single().Color.Should().Be(RgbaColour.FromRgb(10, 20, 30));
-        progress.Should().Equal(1);
+        progress.Values.Should().Equal(1);
     }
 
     [TestMethod]

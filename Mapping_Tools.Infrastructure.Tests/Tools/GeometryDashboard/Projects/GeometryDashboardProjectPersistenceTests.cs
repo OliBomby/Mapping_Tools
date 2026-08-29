@@ -19,7 +19,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<SnappingToolsEngineOptions>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<GeometryDashboardEngineOptions>(File.ReadAllText(fixture));
         string json = serializer.Serialize(project);
 
         // Assert
@@ -33,18 +33,18 @@ public sealed class GeometryDashboardProjectPersistenceTests
         project.CurrentPreferences.RelevantObjectPreferences["Virtual point preferences"].Color
             .Should().Be(RgbaColour.FromArgb(255, 0, 255, 255));
         project.SaveSlots.Should().ContainSingle(slot => slot.Name == "Save 1");
-        json.Should().Contain("Mapping_Tools.Classes.Tools.SnappingTools.Serialization.SnappingToolsEngineOptions, Mapping Tools");
-        json.Should().Contain("Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.Generators.AnchorPointGenerator, Mapping Tools");
-        json.Should().Contain("Mapping_Tools.Classes.Tools.SnappingTools.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SymmetryGeneratorSettings, Mapping Tools");
+        json.Should().Contain("Mapping_Tools.Classes.Tools.GeometryDashboard.Serialization.GeometryDashboardEngineOptions, Mapping Tools");
+        json.Should().Contain("Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AnchorPointGenerator, Mapping Tools");
+        json.Should().Contain("Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SymmetryGeneratorSettings, Mapping Tools");
         json.Should().Contain("\"Color\": \"#FF00FFFF\"");
     }
 
     [TestMethod]
-    public void SnappingToolsProject_SaveAndLoadSlot_UsesIndependentPreferencesSnapshot()
+    public void GeometryDashboardProject_SaveAndLoadSlot_UsesIndependentPreferencesSnapshot()
     {
         // Arrange
-        SnappingToolsEngineOptions project = new();
-        SnappingToolsSaveSlot slot = new() { Name = "Test" };
+        GeometryDashboardEngineOptions project = new();
+        GeometryDashboardSaveSlot slot = new() { Name = "Test" };
         project.SaveSlots.Add(slot);
         project.CurrentPreferences.AcceptableDifference = 70.1;
 
@@ -71,7 +71,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<SnappingToolsEngineOptions>(versionedJson);
+        var project = serializer.Deserialize<GeometryDashboardEngineOptions>(versionedJson);
 
         // Assert
         project.CurrentPreferences.RelevantObjectPreferences.Should().ContainKey(RelevantPoint.PreferencesNameStatic);
@@ -89,7 +89,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<SnappingToolsEngineOptions>(intermediateJson);
+        var project = serializer.Deserialize<GeometryDashboardEngineOptions>(intermediateJson);
 
         // Assert
         project.CurrentPreferences.GeneratorSettings.Should().ContainKey(typeof(SymmetryGenerator));
@@ -97,18 +97,18 @@ public sealed class GeometryDashboardProjectPersistenceTests
     }
 
     [TestMethod]
-    public void Deserialize_WithWaveZeroSnappingToolsFixture_PreservesPreferences()
+    public void Deserialize_WithWaveZeroGeometryDashboardFixture_PreservesPreferences()
     {
         // Arrange
         string fixture = Path.Combine(
             AppContext.BaseDirectory,
             "Fixtures",
             "Projects",
-            "snappingtoolsproject.json");
+            "geometrydashboardlegacyproject.json");
         LegacyProjectJsonSerializer serializer = new();
 
         // Act
-        var project = serializer.Deserialize<SnappingToolsEngineOptions>(File.ReadAllText(fixture));
+        var project = serializer.Deserialize<GeometryDashboardEngineOptions>(File.ReadAllText(fixture));
 
         // Assert
         project.CurrentPreferences.InceptionLevel.Should().Be(5);

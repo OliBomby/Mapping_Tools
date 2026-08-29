@@ -9,13 +9,13 @@ namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
 /// <summary>Edits ordered Geometry Dashboard save slots.</summary>
 public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableObject
 {
-    private readonly Action<SnappingToolsSaveSlot> loadSlot;
+    private readonly Action<GeometryDashboardSaveSlot> loadSlot;
     private readonly Action refreshHotkeys;
 
     /// <summary>Creates the save-slot editor over the live project.</summary>
     public GeometryDashboardProjectSlotsViewModel(
-        SnappingToolsProject project,
-        Action<SnappingToolsSaveSlot> loadSlot,
+        GeometryDashboardProject project,
+        Action<GeometryDashboardSaveSlot> loadSlot,
         Action refreshHotkeys)
     {
         Project = project ?? throw new ArgumentNullException(nameof(project));
@@ -24,21 +24,21 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
     }
 
     /// <summary>Gets the live project slots.</summary>
-    public SnappingToolsProject Project { get; }
+    public GeometryDashboardProject Project { get; }
 
     /// <summary>Gets or sets the selected slot.</summary>
     [ObservableProperty]
-    public partial SnappingToolsSaveSlot? SelectedSlot { get; set; }
+    public partial GeometryDashboardSaveSlot? SelectedSlot { get; set; }
 
     /// <summary>Gets the extended-selection save slots currently selected in the list.</summary>
-    public ObservableCollection<SnappingToolsSaveSlot> SelectedSlots { get; } = [];
+    public ObservableCollection<GeometryDashboardSaveSlot> SelectedSlots { get; } = [];
 
     /// <summary>Receives the window close action.</summary>
     public Action? Close { get; set; }
 
     /// <summary>Replaces the extended list selection supplied by the Avalonia list control.</summary>
     /// <param name="slots">The selected live save slots.</param>
-    public void SetSelectedSlots(IEnumerable<SnappingToolsSaveSlot> slots)
+    public void SetSelectedSlots(IEnumerable<GeometryDashboardSaveSlot> slots)
     {
         SelectedSlots.Clear();
         foreach (var slot in slots) SelectedSlots.Add(slot);
@@ -49,10 +49,10 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
     [RelayCommand]
     private void Add()
     {
-        SnappingToolsSaveSlot slot;
+        GeometryDashboardSaveSlot slot;
         lock (Project)
         {
-            slot = new SnappingToolsSaveSlot { Name = $"Save {Project.SaveSlots.Count + 1}" };
+            slot = new GeometryDashboardSaveSlot { Name = $"Save {Project.SaveSlots.Count + 1}" };
             Project.SaveToSlot(slot);
             Project.SaveSlots.Add(slot);
         }
@@ -91,12 +91,12 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
             : SelectedSlot is not null
                 ? [SelectedSlot]
                 : [];
-        SnappingToolsSaveSlot? lastCopy = null;
+        GeometryDashboardSaveSlot? lastCopy = null;
         lock (Project)
         {
             foreach (var slot in slots)
             {
-                var copy = (SnappingToolsSaveSlot)slot.Clone();
+                var copy = (GeometryDashboardSaveSlot)slot.Clone();
                 copy.Name += " - Copy";
                 Project.SaveSlots.Insert(Project.SaveSlots.IndexOf(slot) + 1, copy);
                 lastCopy = copy;
@@ -108,7 +108,7 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
 
     /// <summary>Loads the selected slot into the active dashboard.</summary>
     [RelayCommand]
-    private void Load(SnappingToolsSaveSlot? slot = null)
+    private void Load(GeometryDashboardSaveSlot? slot = null)
     {
         if (slot is not null) loadSlot(slot);
         else if (SelectedSlot is not null) loadSlot(SelectedSlot);
@@ -116,7 +116,7 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
 
     /// <summary>Saves current dashboard preferences into the selected slot.</summary>
     [RelayCommand]
-    private void Save(SnappingToolsSaveSlot? slot = null)
+    private void Save(GeometryDashboardSaveSlot? slot = null)
     {
         lock (Project)
         {
