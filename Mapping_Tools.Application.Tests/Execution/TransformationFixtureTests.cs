@@ -120,6 +120,8 @@ public sealed class TransformationFixtureTests
         {
             actual.OutputPaths.Should().ContainSingle();
             AssertTextOutputEquivalent(expectedOutputPath, actual.OutputPaths.Single());
+            if (fixtureName == "hitsound-studio")
+                actual.Progress.Should().Equal(0.1, 0.2, 0.3, 0.6, 0.7, 0.8, 0.99, 1);
         }
     }
 
@@ -184,9 +186,10 @@ public sealed class TransformationFixtureTests
                     fixtureRoot,
                     fixtureName);
                 project.ExportFolder = Path.Combine(Path.GetDirectoryName(target)!, "hitsound-studio-export");
+                RecordingProgress<double> progress = new();
                 var result = await CreateHitsoundStudioService(gateway)
-                    .ExportAsync(project, cancellationToken: cancellationToken);
-                return new FixtureExecutionResult([result.MapPath!]);
+                    .ExportAsync(project, progress, cancellationToken);
+                return new FixtureExecutionResult([result.MapPath!], Progress: progress.Values);
             }
             case "map-cleaner":
             {
@@ -482,7 +485,8 @@ public sealed class TransformationFixtureTests
     private sealed record FixtureExecutionResult(
         IReadOnlyList<string>? OutputPaths = null,
         string? JsonOutput = null,
-        string? OutputDirectory = null)
+        string? OutputDirectory = null,
+        IReadOnlyList<double>? Progress = null)
     {
         public bool WasExecuted => OutputPaths is not null || JsonOutput is not null || OutputDirectory is not null;
     }

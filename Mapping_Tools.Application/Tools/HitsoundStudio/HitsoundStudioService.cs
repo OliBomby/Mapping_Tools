@@ -153,170 +153,280 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
         ArgumentNullException.ThrowIfNull(project);
         Validate(project);
         files.EnsureDirectoryExists(project.ExportFolder);
-        bool writesFiles = project.HitsoundExportModeSetting == HitsoundStudioExportMode.Midi
-            ? project.ExportMap
-            : project.ExportMap || project.ExportSamples;
-
-        Report(progress, 0.05);
         bool validateSampleFile = project.SingleSampleExportFormat != HitsoundStudioSampleExportFormat.MidiChords
                                   && project.MixedSampleExportFormat != HitsoundStudioSampleExportFormat.MidiChords;
         SampleGeneratingArgsComparer comparer = new(validateSampleFile);
-        Func<SampleGeneratingArgs, bool> isValid = sample =>
-            !validateSampleFile || IsValidSource(sample);
-        var mode = project.HitsoundExportModeSetting;
-        // Convert the multiple layers into packages that have the samples from all the layers at one specific time
-        // Don't add default sample when exporting midi files because that's not a final export.
-        var packages = engine.ZipLayers(
-            project.HitsoundLayers,
-            project.DefaultSample,
-            mode == HitsoundStudioExportMode.Standard ? project.ZipLayersLeniency : 0,
-            mode == HitsoundStudioExportMode.Standard && validateSampleFile).ToList();
-        Report(progress, mode == HitsoundStudioExportMode.Midi ? 0.2 : 0.1);
-
-        // Balance the volume between greenlines and samples
-        engine.BalanceVolumes(
-            packages,
-            0,
-            false,
-            mode is HitsoundStudioExportMode.Coinciding or
-                HitsoundStudioExportMode.Storyboard);
-        Report(progress, 0.2);
-        Report(progress, mode == HitsoundStudioExportMode.Standard
-            ? 0.3
-            : mode == HitsoundStudioExportMode.Midi
-                ? 0.2
-                : 0.5);
-
-        HitsoundStudioStandardResult? standard = null;
-        HitsoundStudioNamedResult? named = null;
-        SampleSchema schema;
-        IReadOnlyList<HitsoundEvent> events;
         if (project.UsePreviousSampleSchema && project.PreviousSampleSchema is null)
             throw new InvalidDataException("A previous sample schema is required when that option is enabled.");
 
-        if (mode == HitsoundStudioExportMode.Standard)
+        return project.HitsoundExportModeSetting switch
         {
-            // Convert the packages to hitsounds that fit on an osu standard map
-            standard = engine.BuildStandard(
-                packages,
-                project.UsePreviousSampleSchema ? project.PreviousSampleSchema : null,
-                project.AllowGrowthPreviousSampleSchema,
-                project.FirstCustomIndex,
-                isValid,
-                comparer);
-            schema = standard.Schema;
-            events = standard.Events;
-        }
-        else if (mode == HitsoundStudioExportMode.Midi)
-        {
-            schema = project.PreviousSampleSchema ?? new SampleSchema();
-            events = [];
-        }
-        else
-        {
-            named = engine.BuildNamed(
-                packages,
-                project.UsePreviousSampleSchema ? project.PreviousSampleSchema : null,
-                mode == HitsoundStudioExportMode.Coinciding && project.HitsoundExportGameMode == GameMode.Mania,
-                mode == HitsoundStudioExportMode.Coinciding && project.AddCoincidingRegularHitsounds,
-                project.AllowGrowthPreviousSampleSchema,
-                isValid,
-                comparer);
-            schema = named.Schema;
-            events = named.Events;
-        }
+            HitsoundStudioExportMode.Standard => await ExportStandardAsync(project, validateSampleFile, comparer, progress, cancellationToken).ConfigureAwait(false),
+            HitsoundStudioExportMode.Coinciding => await ExportCoincidingAsync(project, validateSampleFile, comparer, progress, cancellationToken).ConfigureAwait(false),
+            HitsoundStudioExportMode.Storyboard => await ExportStoryboardAsync(project, validateSampleFile, comparer, progress, cancellationToken).ConfigureAwait(false),
+            _ => await ExportMidiProjectAsync(project, progress, cancellationToken).ConfigureAwait(false),
+        };
+    }
 
-        Report(progress, mode == HitsoundStudioExportMode.Midi
-            ? 0.4
-            : mode == HitsoundStudioExportMode.Standard
-                ? 0.6
-                : 0.5);
-        if (project.DeleteAllInExportFirst && writesFiles)
-        {
-            // Delete all files in the export folder before filling it again.
-            foreach (string path in files.EnumerateFiles(
-                         project.ExportFolder,
-                         "*",
-                         SearchOption.TopDirectoryOnly))
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                files.Delete(path);
-            }
-        }
+    private async Task<HitsoundStudioExportResult> ExportStandardAsync(
+        HitsoundStudioServiceOptions project,
+        bool validateSampleFile,
+        SampleGeneratingArgsComparer comparer,
+        IProgress<double>? progress,
+        CancellationToken cancellationToken)
+    {
+        Func<SampleGeneratingArgs, bool> isValid = sample =>
+            !validateSampleFile || IsValidSource(sample);
 
-        Report(progress, mode == HitsoundStudioExportMode.Midi
-            ? 0.4
-            : mode == HitsoundStudioExportMode.Standard
-                ? 0.7
-                : 0.6);
+        // Convert the multiple layers into packages that have the samples from all the layers at one specific time.
+        var packages = engine.ZipLayers(project.HitsoundLayers, project.DefaultSample,
+            project.ZipLayersLeniency, validateSampleFile).ToList();
+        Report(progress, 0.1);
 
-        // Count the number of samples
-        int sampleCount = 0;
+        // Balance the volume between greenlines and samples.
+        engine.BalanceVolumes(packages, 0, false);
+        Report(progress, 0.2);
+
+        // Keep the legacy progress milestone for sample validation. The engine
+        // performs that validation while converting the packages below.
+        Report(progress, 0.3);
+
+        // Convert the packages to hitsounds that fit on an osu standard map.
+        var standard = engine.BuildStandard(
+            packages,
+            project.UsePreviousSampleSchema ? project.PreviousSampleSchema : null,
+            project.AllowGrowthPreviousSampleSchema,
+            project.FirstCustomIndex,
+            isValid,
+            comparer);
+        Report(progress, 0.6);
+
+        string detailedSummary =
+            $"Number of sample indices: {standard.Schema.GetCustomIndices(comparer).Count}, "
+            + $"Number of samples: {standard.Schema.Count(entry => entry.Value.Any(isValid))}, "
+            + $"Number of greenlines: {CountIndexChanges(standard.Events)}";
+
+        bool writesFiles = project.ExportSamples || project.ExportMap;
+        DeleteExportFilesIfRequested(project, writesFiles, cancellationToken);
+        Report(progress, 0.7);
+
         string? mapPath = null;
-        Beatmap? midiBeatmap = null;
-        if (project.ExportMap && mode != HitsoundStudioExportMode.Midi)
+        if (project.ExportMap)
         {
             var session = await beatmaps.OpenBeatmapAsync(
                 project.BaseBeatmap,
                 LiveBeatmapPreference.DiskOnly,
                 cancellationToken).ConfigureAwait(false);
-            // Export the hitsound map and sound samples
-            ApplyExport(session.Editor.Beatmap, events, project);
+            ApplyExport(session.Editor.Beatmap, standard.Events, project);
             mapPath = Path.Combine(project.ExportFolder, session.Editor.Beatmap.GetFileName());
             session.Editor.SaveFile(mapPath);
-            Report(progress, mode == HitsoundStudioExportMode.Standard ? 0.8 : 0.7);
         }
-        else if (mode == HitsoundStudioExportMode.Midi)
+        Report(progress, 0.8);
+
+        int sampleCount = project.ExportSamples
+            ? await ExportStandardSamplesAsync(standard.Schema, project, comparer, cancellationToken)
+                .ConfigureAwait(false)
+            : 0;
+        Report(progress, 0.99);
+
+        return await ShowResultsAsync(
+            project,
+            writesFiles,
+            mapPath,
+            sampleCount,
+            standard.Schema,
+            standard.Events.Count,
+            detailedSummary,
+            progress,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    private Task<HitsoundStudioExportResult> ExportCoincidingAsync(
+        HitsoundStudioServiceOptions project,
+        bool validateSampleFile,
+        SampleGeneratingArgsComparer comparer,
+        IProgress<double>? progress,
+        CancellationToken cancellationToken)
+    {
+        return ExportNamedAsync(
+            project,
+            validateSampleFile,
+            comparer,
+            maniaPositions: project.HitsoundExportGameMode == GameMode.Mania,
+            includeRegularHitsounds: project.AddCoincidingRegularHitsounds,
+            progress,
+            cancellationToken);
+    }
+
+    private Task<HitsoundStudioExportResult> ExportStoryboardAsync(
+        HitsoundStudioServiceOptions project,
+        bool validateSampleFile,
+        SampleGeneratingArgsComparer comparer,
+        IProgress<double>? progress,
+        CancellationToken cancellationToken)
+    {
+        return ExportNamedAsync(
+            project,
+            validateSampleFile,
+            comparer,
+            maniaPositions: false,
+            includeRegularHitsounds: false,
+            progress,
+            cancellationToken);
+    }
+
+    private async Task<HitsoundStudioExportResult> ExportNamedAsync(
+        HitsoundStudioServiceOptions project,
+        bool validateSampleFile,
+        SampleGeneratingArgsComparer comparer,
+        bool maniaPositions,
+        bool includeRegularHitsounds,
+        IProgress<double>? progress,
+        CancellationToken cancellationToken)
+    {
+        Func<SampleGeneratingArgs, bool> isValid = sample =>
+            !validateSampleFile || IsValidSource(sample);
+
+        var packages = engine.ZipLayers(project.HitsoundLayers, project.DefaultSample, 0, false).ToList();
+
+        // Balance the volume between greenlines and samples.
+        engine.BalanceVolumes(packages, 0, false, true);
+        Report(progress, 0.2);
+
+        var named = engine.BuildNamed(
+            packages,
+            project.UsePreviousSampleSchema ? project.PreviousSampleSchema : null,
+            maniaPositions,
+            includeRegularHitsounds,
+            project.AllowGrowthPreviousSampleSchema,
+            isValid,
+            comparer);
+        Report(progress, 0.5);
+
+        string detailedSummary =
+            "Number of sample indices: 0, Number of samples: "
+            + $"{packages.SelectMany(package => package.Samples).Select(sample => sample.SampleArgs).Distinct(comparer).Count()}, "
+            + "Number of greenlines: 0";
+
+        bool writesFiles = project.ExportSamples || project.ExportMap;
+        DeleteExportFilesIfRequested(project, writesFiles, cancellationToken);
+        Report(progress, 0.6);
+
+        string? mapPath = null;
+        if (project.ExportMap)
         {
             var session = await beatmaps.OpenBeatmapAsync(
                 project.BaseBeatmap,
                 LiveBeatmapPreference.DiskOnly,
                 cancellationToken).ConfigureAwait(false);
-            midiBeatmap = session.Editor.Beatmap;
-            if (project.ExportMap)
-            {
-                string midiPath = Path.Combine(project.ExportFolder, project.HitsoundDiffName + ".mid");
-                await ExportMidiAsync(packages, midiBeatmap, midiPath, project.AddGreenLineVolumeToMidi, cancellationToken)
-                    .ConfigureAwait(false);
-                mapPath = midiPath;
-            }
+            ApplyExport(session.Editor.Beatmap, named.Events, project);
+            mapPath = Path.Combine(project.ExportFolder, session.Editor.Beatmap.GetFileName());
+            session.Editor.SaveFile(mapPath);
+        }
+        Report(progress, 0.7);
+
+        int sampleCount = project.ExportSamples
+            ? await ExportNamedSamplesAsync(named, project, comparer, cancellationToken).ConfigureAwait(false)
+            : 0;
+
+        return await ShowResultsAsync(
+            project,
+            writesFiles,
+            mapPath,
+            sampleCount,
+            named.Schema,
+            named.Events.Count,
+            detailedSummary,
+            progress,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task<HitsoundStudioExportResult> ExportMidiProjectAsync(
+        HitsoundStudioServiceOptions project,
+        IProgress<double>? progress,
+        CancellationToken cancellationToken)
+    {
+        // Don't add the default sample when exporting MIDI files because that is not a final export.
+        var packages = engine.ZipLayers(project.HitsoundLayers, project.DefaultSample, 0, false).ToList();
+        var session = await beatmaps.OpenBeatmapAsync(
+            project.BaseBeatmap,
+            LiveBeatmapPreference.DiskOnly,
+            cancellationToken).ConfigureAwait(false);
+        var beatmap = session.Editor.Beatmap;
+
+        string detailedSummary =
+            $"Number of notes: {packages.Sum(package => package.Samples.Count)}, "
+            + $"Number of volume changes: {(project.AddGreenLineVolumeToMidi ? beatmap.BeatmapTiming.TimingPoints.Count : 0)}";
+        Report(progress, 0.2);
+
+        bool writesFiles = project.ExportMap;
+        DeleteExportFilesIfRequested(project, writesFiles, cancellationToken);
+        Report(progress, 0.4);
+
+        string? mapPath = null;
+        if (project.ExportMap)
+        {
+            mapPath = Path.Combine(project.ExportFolder, project.HitsoundDiffName + ".mid");
+            await ExportMidiAsync(
+                packages,
+                beatmap,
+                mapPath,
+                project.AddGreenLineVolumeToMidi,
+                cancellationToken).ConfigureAwait(false);
         }
 
-        if (project.ExportSamples && mode != HitsoundStudioExportMode.Midi)
-            sampleCount = standard is not null
-                ? await ExportStandardSamplesAsync(standard.Schema, project, comparer, cancellationToken)
-                    .ConfigureAwait(false)
-                : await ExportNamedSamplesAsync(named!, project, comparer, cancellationToken)
-                    .ConfigureAwait(false);
+        return await ShowResultsAsync(
+            project,
+            writesFiles,
+            mapPath,
+            sampleCount: 0,
+            schema: project.PreviousSampleSchema ?? new SampleSchema(),
+            eventCount: packages.Sum(package => package.Samples.Count),
+            detailedSummary: detailedSummary,
+            progress: progress,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
+    }
 
-        Report(progress, mode == HitsoundStudioExportMode.Midi ? 1 : 0.99);
-
-        if (writesFiles) await reveal.RevealAsync(project.ExportFolder, cancellationToken).ConfigureAwait(false);
+    private async Task<HitsoundStudioExportResult> ShowResultsAsync(
+        HitsoundStudioServiceOptions project,
+        bool writesFiles,
+        string? mapPath,
+        int sampleCount,
+        SampleSchema schema,
+        int eventCount,
+        string detailedSummary,
+        IProgress<double>? progress,
+        CancellationToken cancellationToken)
+    {
+        if (writesFiles)
+            await reveal.RevealAsync(project.ExportFolder, cancellationToken).ConfigureAwait(false);
 
         Report(progress, 1);
-        // Count the number of changes of custom index
-        string detailedSummary = mode switch
-        {
-            HitsoundStudioExportMode.Standard =>
-                $"Number of sample indices: {standard!.Schema.GetCustomIndices(comparer).Count}, "
-                + $"Number of samples: {standard.Schema.Count(entry => entry.Value.Any(isValid))}, "
-                + $"Number of greenlines: {CountIndexChanges(events)}",
-            HitsoundStudioExportMode.Coinciding or HitsoundStudioExportMode.Storyboard =>
-                $"Number of sample indices: 0, Number of samples: "
-                + $"{packages.SelectMany(package => package.Samples).Select(sample => sample.SampleArgs).Distinct(comparer).Count()}, "
-                + "Number of greenlines: 0",
-            _ => $"Number of notes: {packages.Sum(package => package.Samples.Count)}, "
-                 + $"Number of volume changes: {(project.AddGreenLineVolumeToMidi ? midiBeatmap?.BeatmapTiming.TimingPoints.Count ?? 0 : 0)}",
-        };
         return new HitsoundStudioExportResult(
             mapPath,
             sampleCount,
             project.HitsoundLayers.Count,
-            project.HitsoundExportModeSetting == HitsoundStudioExportMode.Midi
-                ? packages.Sum(package => package.Samples.Count)
-                : events.Count,
+            eventCount,
             schema,
             detailedSummary);
+    }
+
+    private void DeleteExportFilesIfRequested(
+        HitsoundStudioServiceOptions project,
+        bool writesFiles,
+        CancellationToken cancellationToken)
+    {
+        if (!project.DeleteAllInExportFirst || !writesFiles) return;
+
+        // Delete all files in the export folder before filling it again.
+        foreach (string path in files.EnumerateFiles(
+                     project.ExportFolder,
+                     "*",
+                     SearchOption.TopDirectoryOnly))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            files.Delete(path);
+        }
     }
 
     private async Task<IReadOnlyList<HitsoundLayer>> ImportStackAsync(
