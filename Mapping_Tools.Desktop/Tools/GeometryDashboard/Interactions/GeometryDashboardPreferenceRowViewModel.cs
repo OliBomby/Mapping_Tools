@@ -10,16 +10,26 @@ namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
 /// <summary>Edits one neutral geometry appearance group.</summary>
 public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
 {
+    private readonly bool hasSizeOption;
+    private readonly string name;
     private string? pendingColorText;
 
     /// <summary>Creates a row over one cloned appearance group.</summary>
-    public GeometryDashboardPreferenceRowViewModel(RelevantObjectPreferences preference)
+    /// <param name="name">The stable preference-group label.</param>
+    /// <param name="preference">The cloned Core appearance settings.</param>
+    /// <param name="hasSizeOption">Whether this row exposes the point-size editor.</param>
+    public GeometryDashboardPreferenceRowViewModel(
+        string name,
+        RelevantObjectPreferences preference,
+        bool hasSizeOption)
     {
+        this.name = name;
         Preference = preference;
+        this.hasSizeOption = hasSizeOption;
     }
 
     /// <summary>Gets the stable preference-group label.</summary>
-    public string Name => Preference.Name;
+    public string Name => name;
 
     /// <summary>Gets the Core appearance settings.</summary>
     public RelevantObjectPreferences Preference { get; }
@@ -106,7 +116,7 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
     }
 
     /// <summary>Gets whether point size applies to this group.</summary>
-    public bool HasSizeOption => Preference.HasSizeOption;
+    public bool HasSizeOption => hasSizeOption;
 
     /// <summary>Gets or sets the dash pattern.</summary>
     public DashStylesEnum DashStyle
@@ -122,4 +132,3 @@ public sealed class GeometryDashboardPreferenceRowViewModel : ObservableObject
     /// <summary>Gets all available dash patterns.</summary>
     public IReadOnlyList<DashStylesEnum> DashStyles { get; } = Enum.GetValues<DashStylesEnum>();
 }
-

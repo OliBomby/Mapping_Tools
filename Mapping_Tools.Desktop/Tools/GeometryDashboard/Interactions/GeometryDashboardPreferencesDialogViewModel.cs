@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
@@ -20,7 +21,10 @@ public sealed partial class GeometryDashboardPreferencesDialogViewModel : Observ
         Preferences = preferences ?? throw new ArgumentNullException(nameof(preferences));
         this.keepRunning = keepRunning;
         Appearance = new ObservableCollection<GeometryDashboardPreferenceRowViewModel>(
-            Preferences.RelevantObjectPreferences.Values.Select(value => new GeometryDashboardPreferenceRowViewModel(value)));
+            Preferences.RelevantObjectPreferences.Select(pair => new GeometryDashboardPreferenceRowViewModel(
+                pair.Key,
+                pair.Value,
+                pair.Key == RelevantPoint.PreferencesNameStatic)));
     }
 
     /// <summary>Gets the independent document being edited.</summary>

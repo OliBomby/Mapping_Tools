@@ -16,31 +16,25 @@ public sealed class GeometryDashboardPreferences : ICloneable
         {
             [RelevantPoint.PreferencesNameStatic] = new()
             {
-                Name = RelevantPoint.PreferencesNameStatic,
                 Color = RgbaColour.FromArgb(255, 0, 255, 255),
                 Dashstyle = DashStylesEnum.Solid,
                 Opacity = 0.8,
                 Size = 5,
                 Thickness = 3,
-                HasSizeOption = true,
             },
             [RelevantLine.PreferencesNameStatic] = new()
             {
-                Name = RelevantLine.PreferencesNameStatic,
                 Color = RgbaColour.FromArgb(255, 124, 252, 0),
                 Dashstyle = DashStylesEnum.Dash,
                 Opacity = 0.8,
                 Thickness = 3,
-                HasSizeOption = false,
             },
             [RelevantCircle.PreferencesNameStatic] = new()
             {
-                Name = RelevantCircle.PreferencesNameStatic,
                 Color = RgbaColour.FromArgb(255, 255, 0, 0),
                 Dashstyle = DashStylesEnum.Dash,
                 Opacity = 0.8,
                 Thickness = 3,
-                HasSizeOption = false,
             },
         };
 

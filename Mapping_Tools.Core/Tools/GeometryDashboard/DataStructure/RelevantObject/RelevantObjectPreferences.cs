@@ -5,9 +5,6 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjec
 /// <summary>Stores the rendering preferences associated with one geometry kind.</summary>
 public sealed class RelevantObjectPreferences : ICloneable
 {
-    /// <summary>Gets or sets the display name of this preference group.</summary>
-    public string Name { get; set; } = string.Empty;
-
     /// <summary>Gets or sets the neutral ARGB colour consumed by a frontend renderer.</summary>
     public RgbaColour Color { get; set; }
 
@@ -23,13 +20,9 @@ public sealed class RelevantObjectPreferences : ICloneable
     /// <summary>Gets or sets the point radius/size when this kind supports one.</summary>
     public double Size { get; set; }
 
-    /// <summary>Gets or sets whether the size setting applies to this geometry kind.</summary>
-    public bool HasSizeOption { get; set; }
-
     /// <inheritdoc />
     public object Clone()
     {
         return MemberwiseClone();
     }
 }
-
