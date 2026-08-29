@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using System.Diagnostics;
-using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
-using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Contracts;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Models;
 
-namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Platform;
+namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 
 /// <summary>
 ///     Discovers the first osu! stable process whose executable and product name

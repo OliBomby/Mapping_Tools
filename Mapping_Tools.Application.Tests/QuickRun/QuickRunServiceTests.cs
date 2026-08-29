@@ -338,6 +338,8 @@ public sealed class QuickRunServiceTests
             -1,
             1.4,
             1,
+            5,
+            5,
             selectedHitObjects: hitObjects.Take(selectedCount).ToArray());
     }
 

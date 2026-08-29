@@ -43,6 +43,8 @@ public sealed class BeatmapEditingGatewayTests
             1234,
             1.8,
             2,
+            9,
+            4,
             2222,
             [selected]);
         RecordingLiveBeatmapReader reader = new(snapshot);
@@ -95,7 +97,9 @@ public sealed class BeatmapEditingGatewayTests
             [],
             -1,
             1.4,
-            1);
+            1,
+            5,
+            5);
         var gateway = CreateGateway(
             store,
             new RecordingLiveBeatmapReader(snapshot));

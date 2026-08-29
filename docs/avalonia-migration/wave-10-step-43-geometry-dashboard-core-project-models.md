@@ -17,11 +17,11 @@ The legacy WPF implementation was read as the normative behavioral specification
 - every source under `Mapping_Tools/Classes/Tools/SnappingTools/DataStructure/RelevantObjectGenerators/`
 - `Mapping_Tools.Infrastructure.Tests/Projects/GeometryDashboardProjectPersistenceTests.cs` and the Geometry Dashboard fixtures under `Mapping_Tools.Infrastructure.Tests/Fixtures/GeometryDashboard/`
 
-Step 43 moves the neutral geometry graph, all reflection-discovered generators and settings, layer/allocation rules, project preferences/save-slot models, and coordinate formulas. It does not move process discovery, editor memory reads, global hotkeys, cursor/window tracking, overlay drawing, WPF commands, or any view.
+Step 43 moves the neutral geometry graph, all reflection-discovered generators and settings, layer/allocation rules, and project preferences/save-slot models. Windows coordinate formulas are implemented with the step-44 Infrastructure boundary. Step 43 does not move process discovery, editor memory reads, global hotkeys, cursor/window tracking, overlay drawing, WPF commands, or any view.
 
 ## Architecture
 
-- `Mapping_Tools.Core/Classes/Tools/SnappingTools/` owns geometry primitives, relevant-object ownership and mutation, layer generation, selection predicates, generator settings and calculations, project state/defaults, and pure coordinate conversion.
+- `Mapping_Tools.Core/Classes/Tools/SnappingTools/` owns geometry primitives, relevant-object ownership and mutation, layer generation, selection predicates, generator settings and calculations, and project state/defaults. Desktop coordinate conversion is intentionally outside Core.
 - `Mapping_Tools.Application/GeometryDashboard/` exposes the typed `ProjectDefinition<SnappingToolsProject>` used by later project workflows and the existing generic project-store/service ports.
 - `Mapping_Tools.Infrastructure/Projects/LegacyProjectJsonSerializer.cs` reuses the shared legacy serializer and adds Geometry Dashboard dictionary/object-collection converters for legacy `Type` keys and nested `$type` metadata.
 - `Mapping_Tools.Desktop/` remains unchanged in this step. WPF drawing and keyboard commands are not represented in Core.
@@ -34,14 +34,14 @@ The project serializer continues to emit the legacy root and nested type names, 
 
 ## Explicit platform substitutions
 
-- Configuration-file reads, screen discovery, DPI queries, and window/process coordinates were removed from the Core coordinate converter. The converter now receives `ScreenBox` and `DpiMultiplier` from the step-44 platform boundary while retaining every legacy coordinate formula and default.
+- Configuration-file reads, screen discovery, DPI queries, and window/process coordinates are owned by the Infrastructure coordinate context. Core contains no Geometry Dashboard coordinate converter.
 - WPF `Color` is represented by the existing Core `RgbaColour` value type; its serializer keeps the legacy `#AARRGGBB` shape. Rendering dash conversion remains a Desktop concern; the neutral `DashStylesEnum` is retained as persisted data.
 - WPF `Hotkey` is represented by a neutral Core key/modifier pair whose numeric values match the legacy WPF enums. Global registration and activation callbacks remain step 44/45 behavior.
 - WPF `CommandImplementation`, `CollectionView` grouping, `DrawingContext`, Overlay.NET, Process.NET, and editor-reader integration remain outside Core/Application.
 
 ## Verification
 
-Focused tests cover legacy Geometry Dashboard project settings and type aliases, locked virtual-object collections, project save/load-slot ownership, generator/layer calculation, default values, and coordinate round-tripping:
+Focused tests cover legacy Geometry Dashboard project settings and type aliases, locked virtual-object collections, project save/load-slot ownership, generator/layer calculation, and default values:
 
 - `Mapping_Tools.Core.Tests/Classes/Tools/SnappingTools/GeometryDashboardDomainTests.cs`
 - `Mapping_Tools.Application.Tests/GeometryDashboard/GeometryDashboardContractsTests.cs`

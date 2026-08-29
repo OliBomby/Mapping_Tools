@@ -1,10 +1,10 @@
 using System.Collections.ObjectModel;
-using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform.FilePicker;
@@ -47,8 +47,6 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     private readonly HashSet<SnappingToolsSaveSlot> activeSaveSlots = [];
 
     private readonly ApplicationSettings applicationSettings;
-    private readonly CoordinateConverter converter = new();
-
     private readonly ProjectDefinition<SnappingToolsProject> definition = new(
         "geometrydashboardproject.json",
         "Geometry Dashboard Projects",
@@ -64,14 +62,13 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     private readonly CancellationTokenSource lifetime = new();
     private readonly List<IRelevantDrawable> lockedDrawables = [];
     private readonly IUserNotificationService notifications;
-    private readonly IGeometryDashboardOverlayHostFactory overlayFactory;
+    private readonly IGeometryDashboardOverlayService overlayService;
     private readonly IGeometryDashboardRuntime runtime;
     private readonly List<IRelevantDrawable> selectedDrawables = [];
     private readonly IProjectSerializer serializer;
     private readonly Func<Window> owner;
     private readonly object stateGate = new();
     private bool active;
-    private string? configurationStatus;
     private bool disposed;
     private string filter = string.Empty;
     private RelevantHitObject? heldHitObject;
@@ -80,7 +77,6 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     private IRelevantDrawable? lastSnapped;
     private bool lockedToggle;
     private Task? loop;
-    private IGeometryDashboardOverlayHost? overlay;
     private int readerFailures;
     private GeometryDashboardRuntimeSnapshot? runtimeSnapshot;
     private bool unlockedSomething;
@@ -89,10 +85,10 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <param name="applicationSettings">Shared process settings.</param>
     /// <param name="runtime">Reads the external osu!/editor snapshot.</param>
     /// <param name="input">Reads global keyboard, mouse, and cursor state.</param>
-    /// <param name="overlayFactory">Creates the click-through geometry overlay.</param>
+    /// <param name="overlayService">Renders osu!-space geometry through the platform overlay.</param>
     /// <param name="serializer">Reads and writes legacy-compatible JSON.</param>
     /// <param name="filePicker">Presents locked-object import/export pickers.</param>
-    /// <param name="files">Reads the osu! configuration file.</param>
+    /// <param name="files">Reads and writes project and virtual-object files.</param>
     /// <param name="notifications">Publishes user-visible operation outcomes.</param>
     /// <param name="owner">Returns the shell window that owns dashboard dialogs.</param>
     /// <param name="dispatcher">Marshals observable state changes to Avalonia's UI thread.</param>
@@ -100,7 +96,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         ApplicationSettings applicationSettings,
         IGeometryDashboardRuntime runtime,
         IGeometryDashboardInputService input,
-        IGeometryDashboardOverlayHostFactory overlayFactory,
+        IGeometryDashboardOverlayService overlayService,
         IProjectSerializer serializer,
         IFilePicker filePicker,
         ITextFileStore files,
@@ -111,7 +107,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         this.applicationSettings = applicationSettings ?? throw new ArgumentNullException(nameof(applicationSettings));
         this.runtime = runtime ?? throw new ArgumentNullException(nameof(runtime));
         this.input = input ?? throw new ArgumentNullException(nameof(input));
-        this.overlayFactory = overlayFactory ?? throw new ArgumentNullException(nameof(overlayFactory));
+        this.overlayService = overlayService ?? throw new ArgumentNullException(nameof(overlayService));
         this.serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         this.filePicker = filePicker ?? throw new ArgumentNullException(nameof(filePicker));
         this.files = files ?? throw new ArgumentNullException(nameof(files));
@@ -164,7 +160,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     public int SelectedCount => layers.GetAllRelevantObjects().Count(objectModel => objectModel.IsSelected);
 
     /// <summary>Gets whether the platform and editor state are currently active.</summary>
-    public bool IsConnected => runtimeSnapshot is not null && overlay?.IsVisible == true;
+    public bool IsConnected => runtimeSnapshot is not null && overlayService.IsVisible;
 
     /// <summary>Gets whether the current feature should keep its background loop alive.</summary>
     public bool KeepRunning => Preferences.KeepRunning;
@@ -179,7 +175,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         try { loop?.Wait(TimeSpan.FromSeconds(1)); }
         catch { }
 
-        overlay?.Dispose();
+        overlayService.Dispose();
         lifetime.Dispose();
         lock (stateGate)
         {
@@ -208,7 +204,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     {
         if (Preferences.KeepRunning) return;
         active = false;
-        overlay?.Disable();
+        overlayService.Hide();
     }
 
     IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
@@ -407,7 +403,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
                     SetStatus(readerFailures >= 3
                         ? "Editor Reader seems to be failing a lot..."
                         : exception.Message);
-                    overlay?.Disable();
+                    overlayService.Hide();
                 }
 
             try { await Task.Delay(runtimeSnapshot is null ? 1000 : 100, cancellationToken).ConfigureAwait(false); }
@@ -420,14 +416,14 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         if (!input.IsSupported)
         {
             SetStatus("Geometry Dashboard requires Windows.");
-            overlay?.Disable();
+            overlayService.Hide();
             return;
         }
 
         if (!applicationSettings.UseEditorReader)
         {
             SetStatus("Enable Editor Reader in Preferences to use Geometry Dashboard.");
-            overlay?.Disable();
+            overlayService.Hide();
             return;
         }
 
@@ -436,7 +432,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         {
             SetStatus("Waiting for an open editor...");
             runtimeSnapshot = null;
-            overlay?.Disable();
+            overlayService.Hide();
             return;
         }
 
@@ -446,24 +442,24 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
                                  {
                                      UpdateMode.AnyChange => true,
                                      UpdateMode.TimeChange => previousSnapshot.Editor.EditorTime != snapshot.Editor.EditorTime,
-                                     UpdateMode.OsuActivated => snapshot.Window.IsActivated && !previousSnapshot.Window.IsActivated,
+                                     UpdateMode.OsuActivated => snapshot.IsEditorActive && !previousSnapshot.IsEditorActive,
                                      UpdateMode.HotkeyDown => false,
                                      _ => true,
                                  };
         runtimeSnapshot = snapshot;
         readerFailures = 0;
-        UpdateConverter(snapshot);
+        UpdatePreferences();
         if (shouldUpdateRoots || input.IsHotkeyDown(Preferences.RefreshHotkey)) UpdateRootObjects(snapshot.Editor);
-        if (!snapshot.Window.IsActivated)
+        if (!snapshot.IsEditorActive)
         {
-            UpdateOverlay(snapshot);
+            UpdateOverlay();
             SetStatus("Waiting for osu! to become active...");
             return;
         }
 
         UpdateHotkeys();
-        UpdateOverlay(snapshot);
-        SetStatus(configurationStatus
+        UpdateOverlay();
+        SetStatus(overlayService.ConfigurationStatus
                   ?? (layers.GetAllRelevantObjects().Any()
                       ? $"{DrawableCount} virtual object(s)"
                       : "No visible hit objects."));
@@ -471,50 +467,24 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         NotifyPropertyChanged(nameof(SelectedCount));
     }
 
-    private void UpdateConverter(GeometryDashboardRuntimeSnapshot snapshot)
+    private void UpdatePreferences()
     {
-        configurationStatus = null;
-        converter.OsuWindowPosition = new Vector2(snapshot.Window.Bounds.Left, snapshot.Window.Bounds.Top);
-        converter.ScreenBox = snapshot.PrimaryScreen?.Bounds ?? snapshot.Window.Bounds;
-        converter.DpiMultiplier = snapshot.Window.DpiScale;
-        converter.DpiSourceAvailable = snapshot.Window.DpiSourceAvailable;
-
-        if (!string.IsNullOrWhiteSpace(applicationSettings.OsuConfigPath))
-            try
-            {
-                var values = ReadConfig(applicationSettings.OsuConfigPath);
-                converter.Fullscreen = GetBool(values, "Fullscreen", true);
-                converter.Letterboxing = GetBool(values, "Letterboxing", true);
-                converter.OsuResolution = new Vector2(
-                    GetDouble(values, converter.Fullscreen ? "WidthFullscreen" : "Width", converter.OsuResolution.X),
-                    GetDouble(values, converter.Fullscreen ? "HeightFullscreen" : "Height", converter.OsuResolution.Y));
-                converter.LetterboxingPosition = new Vector2(
-                    GetDouble(values, "LetterboxPositionX", converter.LetterboxingPosition.X),
-                    GetDouble(values, "LetterboxPositionY", converter.LetterboxingPosition.Y));
-            }
-            catch (Exception exception)
-            {
-                configurationStatus = "Could not read osu! configuration: " + exception.Message;
-            }
-        else
-            configurationStatus = "Specify your osu! user configuration file in Mapping Tools Preferences.";
-
-        converter.EditorBoxOffset = Preferences.OverlayOffset;
         layers.AcceptableDifference = Preferences.AcceptableDifference;
         layers.SetInceptionLevel(Preferences.InceptionLevel);
     }
 
-    private bool UpdateRootObjects(GeometryDashboardEditorSnapshot editor)
+    private bool UpdateRootObjects(LiveBeatmapSnapshot editor)
     {
         lock (stateGate)
         {
             double approachTime = Beatmap.GetApproachTime(editor.ApproachRate);
+            double editorTime = editor.EditorTime ?? 0;
             var candidates = Preferences.SelectedHitObjectMode switch
             {
                 SelectedHitObjectMode.OnlySelected => editor.SelectedHitObjects,
                 SelectedHitObjectMode.VisibleOrSelected when editor.SelectedHitObjects.Count > 0 =>
                     editor.SelectedHitObjects,
-                _ => editor.HitObjects.Where(objectModel => editor.EditorTime > objectModel.Time - approachTime && editor.EditorTime < objectModel.EndTime + approachTime),
+                _ => editor.HitObjects.Where(objectModel => editorTime > objectModel.Time - approachTime && editorTime < objectModel.EndTime + approachTime),
             };
             var objects = candidates.ToArray();
             var existing = layers.GetRootRelevantHitObjects().ToArray();
@@ -563,7 +533,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     {
         lock (stateGate)
         {
-            Vector2 screen;
+            Vector2 cursor;
             lock (Project)
             {
                 foreach (var slot in Project.SaveSlots.ToArray())
@@ -574,9 +544,8 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
                 }
             }
 
-            if (input.IsMouseButtonDown(GeometryDashboardMouseButton.Left) && input.TryGetCursorPosition(out screen))
+            if (input.IsMouseButtonDown(GeometryDashboardMouseButton.Left) && input.TryGetCursorPosition(out cursor))
             {
-                var cursor = converter.ScreenToEditorCoordinate(screen);
                 var selected = layers.GetRootRelevantHitObjects().Where(objectModel => objectModel.IsSelected).ToArray();
                 heldHitObjects = selected;
                 heldHitObject = selected.OrderBy(objectModel => Vector2.Distance(objectModel.HitObject.Pos, cursor))
@@ -592,9 +561,8 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
             bool snap = input.IsHotkeyDown(Preferences.SnapHotkey);
             if (!snap) lastSnapped = null;
-            if (snap && input.TryGetCursorPosition(out screen))
+            if (snap && input.TryGetCursorPosition(out cursor))
             {
-                var cursor = converter.ScreenToEditorCoordinate(screen);
                 var nearest = GetNearestDrawable(
                     cursor + heldMouseOffset,
                     heldObjects: heldHitObjects,
@@ -603,8 +571,8 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
                 if (nearest is not null)
                 {
                     lastSnapped = nearest;
-                    input.TrySetCursorPosition(converter.EditorToScreenCoordinate(
-                        nearest.NearestPoint(cursor + heldMouseOffset) - heldMouseOffset));
+                    input.TrySetCursorPosition(
+                        nearest.NearestPoint(cursor + heldMouseOffset) - heldMouseOffset);
                 }
             }
 
@@ -627,24 +595,21 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         }
     }
 
-    private void UpdateOverlay(GeometryDashboardRuntimeSnapshot snapshot)
+    private void UpdateOverlay()
     {
-        overlay ??= overlayFactory.Create();
-        if (!overlay.IsSupported) return;
-        if (overlay.TargetWindow != snapshot.Window.Id) overlay.Initialize(snapshot.Window.Id);
-        overlay.Enable();
-        var editorBox = converter.GetEditorBox();
-        var frame = BuildFrame();
-        overlay.SetFrame(frame);
-        overlay.SetBorder(Preferences.DebugEnabled);
-        overlay.Update(editorBox, snapshot.Window.DpiScale, snapshot.Window.DpiSourceAvailable);
+        if (!overlayService.IsSupported) return;
+        overlayService.Update(
+            BuildScene(),
+            new GeometryDashboardOverlayOptions(
+                Preferences.OverlayOffset,
+                Preferences.DebugEnabled));
     }
 
-    private GeometryDashboardOverlayFrame BuildFrame()
+    private GeometryDashboardOverlayScene BuildScene()
     {
         lock (stateGate)
         {
-            if (runtimeSnapshot is null) return GeometryDashboardOverlayFrame.Empty;
+            if (runtimeSnapshot is null) return GeometryDashboardOverlayScene.Empty;
             var drawables = layers.GetAllRelevantDrawables();
             if (input.IsHotkeyDown(Preferences.SnapHotkey))
             {
@@ -674,20 +639,15 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             List<GeometryDashboardOverlayShape> shapes = [];
             if (Preferences.VisiblePlayfieldBoundary)
             {
-                Vector2[] boundary =
-                [
-                    new(-65, -57), new(576, -57), new(576, 423), new(-65, 423), new(-65, -57),
-                ];
-                for (int index = 0; index < boundary.Length - 1; index++)
-                    shapes.Add(new GeometryDashboardOverlayShape(
-                        GeometryDashboardOverlayShapeKind.Line,
-                        ToOverlayPoint(boundary[index]),
-                        ToOverlayPoint(boundary[index + 1]),
-                        0,
-                        RgbaColour.FromRgb(255, 140, 0),
-                        2,
-                        1,
-                        DashStylesEnum.Solid));
+                shapes.Add(new GeometryDashboardOverlayShape(
+                    GeometryDashboardOverlayShapeKind.Box,
+                    new Vector2(-65, -57),
+                    new Vector2(576, 423),
+                    0,
+                    RgbaColour.FromRgb(255, 140, 0),
+                    1,
+                    1,
+                    DashStylesEnum.Solid));
             }
 
             foreach (var drawable in drawables.OfType<IRelevantDrawable>().Distinct())
@@ -698,7 +658,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
                 AddDrawableShape(shapes, drawable, preferences, false);
             }
 
-            return new GeometryDashboardOverlayFrame(shapes);
+            return new GeometryDashboardOverlayScene(shapes);
         }
     }
 
@@ -722,7 +682,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             case RelevantPoint point:
                 shapes.Add(new GeometryDashboardOverlayShape(
                     GeometryDashboardOverlayShapeKind.Point,
-                    ToOverlayPoint(point.Child),
+                    point.Child,
                     default,
                     preferences.Size,
                     colour,
@@ -733,9 +693,9 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             case RelevantCircle circle:
                 shapes.Add(new GeometryDashboardOverlayShape(
                     GeometryDashboardOverlayShapeKind.Circle,
-                    ToOverlayPoint(circle.Child.Centre),
+                    circle.Child.Centre,
                     default,
-                    converter.ToDpi(converter.ScaleByRatio(new Vector2(circle.Child.Radius, 0))).X,
+                    circle.Child.Radius,
                     colour,
                     opacity,
                     thickness,
@@ -746,8 +706,8 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
                                         && intersections.Length >= 2:
                 shapes.Add(new GeometryDashboardOverlayShape(
                     GeometryDashboardOverlayShapeKind.Line,
-                    ToOverlayPoint(intersections[0]),
-                    ToOverlayPoint(intersections[1]),
+                    intersections[0],
+                    intersections[1],
                     0,
                     colour,
                     opacity,
@@ -757,18 +717,11 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         }
     }
 
-    private Vector2 ToOverlayPoint(Vector2 editorCoordinate)
-    {
-        var editorBox = converter.GetEditorBox();
-        var relative = converter.EditorToRelativeCoordinate(editorCoordinate);
-        return new Vector2(editorBox.Left + relative.X, editorBox.Top + relative.Y);
-    }
-
     private void ApplyNearestToggle(List<IRelevantDrawable> handled, Func<IRelevantDrawable, bool> read, Action<IRelevantDrawable, bool> write)
     {
-        if (!input.TryGetCursorPosition(out var screen)) return;
+        if (!input.TryGetCursorPosition(out var cursor)) return;
         var nearest = GetNearestDrawable(
-            converter.ScreenToEditorCoordinate(screen),
+            cursor,
             selection_range,
             specialPriority: read);
         if (nearest is null || handled.Contains(nearest)) return;
@@ -782,9 +735,9 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     private void ApplyNearestLock()
     {
-        if (!input.TryGetCursorPosition(out var screen)) return;
+        if (!input.TryGetCursorPosition(out var cursor)) return;
         var nearest = GetNearestDrawable(
-            converter.ScreenToEditorCoordinate(screen),
+            cursor,
             selection_range,
             specialPriority: static objectModel => objectModel.IsLocked);
         if (nearest is null || lockedDrawables.Contains(nearest)) return;
@@ -881,8 +834,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         lock (stateGate)
         {
             layers.GetRootLayer().GenerateNewObjects(true);
-            overlay?.SetFrame(BuildFrame());
-            overlay?.Invalidate();
+            UpdateOverlay();
             NotifyPropertyChanged(nameof(DrawableCount));
             NotifyPropertyChanged(nameof(SelectedCount));
         }
@@ -892,7 +844,6 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     {
         lock (stateGate)
         {
-            converter.EditorBoxOffset = Preferences.OverlayOffset;
             layers.AcceptableDifference = Preferences.AcceptableDifference;
             layers.SetInceptionLevel(Preferences.InceptionLevel);
             Regenerate();
@@ -991,28 +942,6 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     private static bool SameHitObject(HitObject first, HitObject second)
     {
         return hitObjectComparer.Equals(first, second);
-    }
-
-    private Dictionary<string, string> ReadConfig(string path)
-    {
-        return new Dictionary<string, string>(
-            files.ReadAllLines(path)
-                .Select(line => line.Split(['=', ':'], 2))
-                .Where(parts => parts.Length == 2)
-                .ToDictionary(parts => parts[0].Trim(), parts => parts[1].Trim(), StringComparer.OrdinalIgnoreCase),
-            StringComparer.OrdinalIgnoreCase);
-    }
-
-    private static bool GetBool(Dictionary<string, string> values, string key, bool fallback)
-    {
-        return values.TryGetValue(key, out string? value) ? value == "1" || bool.TryParse(value, out bool result) && result : fallback;
-    }
-
-    private static double GetDouble(Dictionary<string, string> values, string key, double fallback)
-    {
-        return values.TryGetValue(key, out string? value) && double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double result)
-            ? result
-            : fallback;
     }
 
     private static RgbaColour AdjustColour(RgbaColour colour, double saturationMultiplier, double brightnessMultiplier)

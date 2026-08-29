@@ -1,10 +1,10 @@
 using System.Runtime.InteropServices;
-using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
-using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Infrastructure.Platform;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Contracts;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Models;
 
-namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Platform;
+namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 
 /// <summary>
 ///     Enumerates the Windows virtual desktop and translates monitor rectangles

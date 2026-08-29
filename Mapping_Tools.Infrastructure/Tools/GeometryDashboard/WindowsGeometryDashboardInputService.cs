@@ -4,7 +4,7 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Infrastructure.Platform;
 
-namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Platform;
+namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 
 /// <summary>
 ///     Reads and moves global Windows input for Geometry Dashboard while keeping
@@ -21,16 +21,26 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
     private const int virtual_key_left_windows = 0x5B;
     private const int virtual_key_right_windows = 0x5C;
     private const int virtual_key_left_button = 0x01;
+    private readonly WindowsGeometryDashboardCoordinateContext? coordinates;
     private readonly Func<bool> isWindows;
 
-    /// <summary>Creates the adapter using the current platform guard.</summary>
-    public WindowsGeometryDashboardInputService()
-        : this(OperatingSystem.IsWindows)
+    /// <summary>Creates the input adapter using the shared live coordinate context.</summary>
+    /// <param name="coordinates">Resolves the latest osu! editor transform.</param>
+    public WindowsGeometryDashboardInputService(WindowsGeometryDashboardCoordinateContext coordinates)
+        : this(coordinates, OperatingSystem.IsWindows)
     {
     }
 
     internal WindowsGeometryDashboardInputService(Func<bool> isWindows)
+        : this(null, isWindows)
     {
+    }
+
+    private WindowsGeometryDashboardInputService(
+        WindowsGeometryDashboardCoordinateContext? coordinates,
+        Func<bool> isWindows)
+    {
+        this.coordinates = coordinates;
         this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
@@ -76,9 +86,13 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
     public bool TryGetCursorPosition(out Vector2 position)
     {
         position = Vector2.Zero;
-        if (!isWindows() || !WindowsNativeMethods.GetCursorPos(out var point)) return false;
+        if (!isWindows()
+            || coordinates is null
+            || !coordinates.TryRefresh(out var snapshot)
+            || !WindowsNativeMethods.GetCursorPos(out var point))
+            return false;
 
-        position = new Vector2(point.X, point.Y);
+        position = snapshot.Transform.ScreenToEditorCoordinate(new Vector2(point.X, point.Y));
         return true;
     }
 
@@ -86,6 +100,7 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
     public bool TrySetCursorPosition(Vector2 position)
     {
         if (!isWindows()
+            || coordinates is null
             || !double.IsFinite(position.X)
             || !double.IsFinite(position.Y)
             || position.X < int.MinValue
@@ -94,9 +109,18 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
             || position.Y > int.MaxValue)
             return false;
 
-        return WindowsNativeMethods.SetCursorPos(
-            Convert.ToInt32(Math.Round(position.X)),
-            Convert.ToInt32(Math.Round(position.Y)));
+        if (!coordinates.TryRefresh(out var snapshot)) return false;
+
+        Vector2 screen = snapshot.Transform.EditorToScreenCoordinate(position);
+        return double.IsFinite(screen.X)
+               && double.IsFinite(screen.Y)
+               && screen.X >= int.MinValue
+               && screen.X <= int.MaxValue
+               && screen.Y >= int.MinValue
+               && screen.Y <= int.MaxValue
+               && WindowsNativeMethods.SetCursorPos(
+                   Convert.ToInt32(Math.Round(screen.X)),
+                   Convert.ToInt32(Math.Round(screen.Y)));
     }
 
     private static bool HasModifier(int modifiers, int flag, int leftKey, int rightKey)

@@ -1,5 +1,6 @@
 using Avalonia.Input;
 using Mapping_Tools.Application.Abstractions;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Projects.Contracts;
@@ -98,7 +99,7 @@ public sealed class GeometryDashboardViewModelTests
             new ApplicationSettings(),
             new RuntimeStub(snapshots),
             new InputStub(inputSupported),
-            new OverlayFactoryStub(),
+            new OverlayStub(),
             new SerializerStub(),
             new TestFilePicker
             {
@@ -118,24 +119,19 @@ public sealed class GeometryDashboardViewModelTests
         IReadOnlyList<HitObject> selectedHitObjects)
     {
         return new GeometryDashboardRuntimeSnapshot(
-            new GeometryDashboardProcess(1, new PlatformWindowId(2), "osu!.exe"),
-            new GeometryDashboardWindow(
-                new PlatformWindowId(2),
-                1,
-                "map.osu",
-                new Box2(0, 0, 800, 600),
-                true,
-                true,
-                new Vector2(1, 1),
-                true),
-            new GeometryDashboardEditorSnapshot(
+            new LiveBeatmapSnapshot(
                 "C:/Songs/map/map.osu",
+                [],
+                [],
+                [hitObject],
+                0,
+                1.4,
+                1,
                 5,
                 4,
                 editorTime,
-                [hitObject],
                 selectedHitObjects),
-            null);
+            true);
     }
 
     private sealed class RuntimeStub(IEnumerable<GeometryDashboardRuntimeSnapshot?> snapshots) : IGeometryDashboardRuntime
@@ -174,26 +170,13 @@ public sealed class GeometryDashboardViewModelTests
         }
     }
 
-    private sealed class OverlayFactoryStub : IGeometryDashboardOverlayHostFactory
-    {
-        public IGeometryDashboardOverlayHost Create()
-        {
-            return new OverlayStub();
-        }
-    }
-
-    private sealed class OverlayStub : IGeometryDashboardOverlayHost
+    private sealed class OverlayStub : IGeometryDashboardOverlayService
     {
         public bool IsSupported => false;
         public bool IsVisible => false;
-        public PlatformWindowId? TargetWindow => null;
-        public void Initialize(PlatformWindowId targetWindow) { }
-        public void Enable() { }
-        public void Disable() { }
-        public void Update(Box2 physicalBounds, Vector2 dpiMultiplier, bool dpiSourceAvailable) { }
-        public void SetBorder(bool enabled) { }
-        public void SetFrame(GeometryDashboardOverlayFrame frame) { }
-        public void Invalidate() { }
+        public string? ConfigurationStatus => null;
+        public void Update(GeometryDashboardOverlayScene scene, GeometryDashboardOverlayOptions options) { }
+        public void Hide() { }
         public void Dispose() { }
     }
 

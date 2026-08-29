@@ -68,6 +68,7 @@ completing a migration.
 
 - Insert whitespace between logical blocks of code to improve readability.
 - Test project file structure should always match that of the production project. If the file moves, the test file moves with it.
+- One file may only contain one public type. Multiple public types must be split up into multiple files.
 
 ## Layer boundaries
 
@@ -82,6 +83,7 @@ The legacy WPF implementation is the normative specification for every migrated 
 ## Original project reference
 
 The original project is available locally at [.reference/Mapping_Tools-Original](.reference/Mapping_Tools-Original/). Consult it for legacy implementation details.
+Another Avalonia port of this program was made by NiceAesth. It is available locally at [.reference/NiceAesth-Mapping_Tools](.reference/NiceAesth-Mapping_Tools). Consult it if asked.
 
 - Keep the AXAML structurally identical to the WPF XAML. Only replace WPF-only controls or properties, move non-visual behavior out of code-behind, modernize view models, and substitute the approved shared tool controls.
 - Do not paraphrase copy, remove tooltips, change spacing, invent validation limits, add commands, or redesign interactions during a migration. Treat product improvements as separate work requiring explicit approval.

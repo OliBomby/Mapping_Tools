@@ -1,8 +1,13 @@
 using Mapping_Tools.Application.Tools.GeometryDashboard;
+using Mapping_Tools.Application.BeatmapEditing.Contracts;
+using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Contracts;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Application.Tests.Tools.GeometryDashboard;
@@ -27,39 +32,34 @@ public sealed class GeometryDashboardPlatformContractTests
             true,
             Vector2.One,
             true);
-        GeometryDashboardEditorSnapshot editor = new(
+        HitObject hitObject = new() { Time = 1000 };
+        LiveBeatmapSnapshot editor = new(
             @"C:\osu!\Songs\map.osu",
+            [],
+            [],
+            [hitObject],
+            0,
+            1.4,
+            1,
             9,
             4,
             1000,
-            [new HitObject { Time = 1000 }]);
-        GeometryDashboardScreen screen = new(
-            1,
-            new Box2(0, 0, 1920, 1080),
-            new Box2(0, 0, 1920, 1040),
-            true,
-            Vector2.One,
-            true);
+            [hitObject]);
         FakeProcessDiscovery processes = new(process);
-        FakeEditorReader reader = new(editor);
+        FakeLiveBeatmapReader reader = new(editor);
         FakeWindowService windows = new(window);
-        FakeScreenService screens = new(screen);
-        GeometryDashboardRuntimeService sut = new(processes, reader, windows, screens);
+        WindowsGeometryDashboardRuntimeService sut = new(processes, reader, windows);
 
         // Act
         var result = await sut.ReadAsync();
 
         // Assert
         result.Should().NotBeNull();
-        result!.Process.Should().Be(process);
-        result.Window.Should().Be(window);
         result.Editor.Should().Be(editor);
-        result.PrimaryScreen.Should().Be(screen);
+        result.IsEditorActive.Should().BeTrue();
         processes.CallCount.Should().Be(1);
         reader.CallCount.Should().Be(1);
-        reader.LastProcess.Should().Be(process);
         windows.CallCount.Should().Be(1);
-        screens.CallCount.Should().Be(1);
     }
 
     [TestMethod]
@@ -67,10 +67,9 @@ public sealed class GeometryDashboardPlatformContractTests
     {
         // Arrange
         FakeProcessDiscovery processes = new(null);
-        FakeEditorReader reader = new(null);
+        FakeLiveBeatmapReader reader = new(null);
         FakeWindowService windows = new(null);
-        FakeScreenService screens = new(null);
-        GeometryDashboardRuntimeService sut = new(processes, reader, windows, screens);
+        WindowsGeometryDashboardRuntimeService sut = new(processes, reader, windows);
 
         // Act
         var result = await sut.ReadAsync();
@@ -80,7 +79,6 @@ public sealed class GeometryDashboardPlatformContractTests
         processes.CallCount.Should().Be(1);
         windows.CallCount.Should().Be(0);
         reader.CallCount.Should().Be(0);
-        screens.CallCount.Should().Be(0);
     }
 
     [TestMethod]
@@ -100,12 +98,11 @@ public sealed class GeometryDashboardPlatformContractTests
             true,
             Vector2.One,
             true);
-        FakeEditorReader reader = new(null);
-        GeometryDashboardRuntimeService sut = new(
+        FakeLiveBeatmapReader reader = new(null);
+        WindowsGeometryDashboardRuntimeService sut = new(
             new FakeProcessDiscovery(process),
             reader,
-            new FakeWindowService(window),
-            new FakeScreenService(null));
+            new FakeWindowService(window));
 
         // Act
         var result = await sut.ReadAsync();
@@ -119,11 +116,10 @@ public sealed class GeometryDashboardPlatformContractTests
     public async Task ReadAsync_WhenCancellationIsRequested_ThrowsOperationCanceledException()
     {
         // Arrange
-        GeometryDashboardRuntimeService sut = new(
+        WindowsGeometryDashboardRuntimeService sut = new(
             new FakeProcessDiscovery(null),
-            new FakeEditorReader(null),
-            new FakeWindowService(null),
-            new FakeScreenService(null));
+            new FakeLiveBeatmapReader(null),
+            new FakeWindowService(null));
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
 
@@ -135,18 +131,23 @@ public sealed class GeometryDashboardPlatformContractTests
     }
 
     [TestMethod]
-    public void GeometryDashboardEditorSnapshot_WithMutableInput_CopiesHitObjects()
+    public void LiveBeatmapSnapshot_WithMutableInput_CopiesHitObjectsAndDifficultyValues()
     {
         // Arrange
         List<HitObject> hitObjects = [new() { Time = 1000 }];
 
         // Act
-        GeometryDashboardEditorSnapshot snapshot = new(
+        LiveBeatmapSnapshot snapshot = new(
             @"C:\osu!\Songs\map.osu",
+            [],
+            [],
+            hitObjects,
+            0,
+            1.4,
+            1,
             9,
             4,
-            1000,
-            hitObjects);
+            editorTime: 1000);
         hitObjects.Clear();
 
         // Assert
@@ -209,19 +210,15 @@ public sealed class GeometryDashboardPlatformContractTests
         }
     }
 
-    private sealed class FakeEditorReader(GeometryDashboardEditorSnapshot? snapshot)
-        : IGeometryDashboardEditorReader
+    private sealed class FakeLiveBeatmapReader(LiveBeatmapSnapshot? snapshot)
+        : ILiveBeatmapReader
     {
         public int CallCount { get; private set; }
 
-        public GeometryDashboardProcess? LastProcess { get; private set; }
-
-        public Task<GeometryDashboardEditorSnapshot?> ReadGeometryDashboardAsync(
-            GeometryDashboardProcess process,
+        public Task<LiveBeatmapSnapshot?> ReadAsync(
             CancellationToken cancellationToken = default)
         {
             CallCount++;
-            LastProcess = process;
             return Task.FromResult(snapshot);
         }
     }
@@ -250,27 +247,4 @@ public sealed class GeometryDashboardPlatformContractTests
         }
     }
 
-    private sealed class FakeScreenService(GeometryDashboardScreen? screen)
-        : IGeometryDashboardScreenService
-    {
-        public int CallCount { get; private set; }
-
-        public bool IsSupported => true;
-
-        public IReadOnlyList<GeometryDashboardScreen> GetScreens()
-        {
-            return [];
-        }
-
-        public GeometryDashboardScreen? GetPrimaryScreen()
-        {
-            CallCount++;
-            return screen;
-        }
-
-        public GeometryDashboardScreen? GetScreenForWindow(PlatformWindowId window)
-        {
-            throw new NotSupportedException();
-        }
-    }
 }

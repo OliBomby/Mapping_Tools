@@ -15,11 +15,13 @@ public sealed record LiveBeatmapSnapshot
     /// <param name="bookmarks">Editor bookmark times in milliseconds.</param>
     /// <param name="timingPoints">The redlines and greenlines currently held by the editor.</param>
     /// <param name="hitObjects">The editor's plain hit objects.</param>
-    /// <param name="selectedHitObjects">The editor-selected objects, kept separately from object data.</param>
     /// <param name="previewTime">The preview timestamp currently configured in the editor.</param>
     /// <param name="sliderMultiplier">The base slider velocity currently configured in the editor.</param>
     /// <param name="sliderTickRate">The slider tick rate currently configured in the editor.</param>
+    /// <param name="approachRate">The live approach-rate value.</param>
+    /// <param name="circleSize">The live circle-size value.</param>
     /// <param name="editorTime">The current editor playhead in milliseconds, when available.</param>
+    /// <param name="selectedHitObjects">The editor-selected objects, kept separately from object data.</param>
     public LiveBeatmapSnapshot(
         string path,
         IReadOnlyList<double> bookmarks,
@@ -28,6 +30,8 @@ public sealed record LiveBeatmapSnapshot
         int previewTime,
         double sliderMultiplier,
         double sliderTickRate,
+        double approachRate,
+        double circleSize,
         double? editorTime = null,
         IReadOnlyList<HitObject>? selectedHitObjects = null)
     {
@@ -45,6 +49,8 @@ public sealed record LiveBeatmapSnapshot
         SliderMultiplier = sliderMultiplier;
         SliderTickRate = sliderTickRate;
         EditorTime = editorTime;
+        ApproachRate = approachRate;
+        CircleSize = circleSize;
     }
 
     /// <summary>
@@ -91,5 +97,10 @@ public sealed record LiveBeatmapSnapshot
     ///     can supply it.
     /// </summary>
     public double? EditorTime { get; }
-}
 
+    /// <summary>Gets the live approach-rate value from the editor.</summary>
+    public double ApproachRate { get; }
+
+    /// <summary>Gets the live circle-size value from the editor.</summary>
+    public double CircleSize { get; }
+}

@@ -21,26 +21,26 @@ The adapter contract was derived from the complete legacy integration path:
 
 ## Step-44 surface
 
-`Mapping_Tools.Application/GeometryDashboard/GeometryDashboardPlatformContracts.cs`
-defines framework-neutral ports for:
+Infrastructure defines the desktop-only ports and adapters for:
 
 - exact osu! stable process discovery;
 - validated editor-memory snapshots containing the current path, AR, CS,
   editor time, and selected hit objects;
-- exact legacy hotkey state, left-button state, and absolute cursor movement;
+- exact legacy hotkey state and left-button state;
 - monitor enumeration, primary-monitor selection, physical bounds, working
   areas, and effective DPI;
 - top-level window enumeration, process-main-window selection, foreground
   activation, physical bounds, and effective DPI; and
 - target-bound overlay lifecycle, activation visibility, DPI conversion, debug
-  border, invalidation, and deterministic disposal.
+  border, invalidation, and deterministic disposal. The application-facing
+  overlay contract accepts only osu!-space scenes and neutral options.
 
-`GeometryDashboardRuntimeService` provides the later UI's application-facing
-read sequence: discover osu!, select its current main window, read validated
-editor memory from that same process/window identity, and obtain the legacy
-primary monitor. A window title that does not end in `.osu` is rejected before
-memory access. Missing process/window/editor state returns `null` in that
-order; cancellation and reader-validation exceptions are not swallowed.
+`WindowsGeometryDashboardRuntimeService` provides the application-facing read
+sequence: discover osu!, select its current main window, read validated editor
+memory, and return only semantic editor state plus activation. A window title
+that does not end in `.osu` is rejected before memory access. Missing
+process/window/editor state returns `null` in that order; cancellation and
+reader-validation exceptions are not swallowed.
 
 `WindowsEditorReaderAdapter` implements the new editor snapshot port in
 addition to the existing I1 application ports. It shares the existing reader
@@ -56,9 +56,9 @@ does not introduce another Editor Reader or memory interop path.
   no active editor. A missing process/editor returns `null`; malformed memory
   data follows the existing validated-reader failure and diagnostic-log path.
 - Screen and window rectangles are expressed in physical desktop pixels,
-  including negative coordinates on a virtual desktop. The primary screen is
-  selected by the Windows primary-monitor flag, matching the legacy
-  `Screen.PrimaryScreen` choice.
+  including negative coordinates on a virtual desktop. The coordinate context
+  selects the monitor containing the osu! window and falls back to the Windows
+  primary monitor when that lookup is unavailable.
 - DPI scales are effective-DPI / 96. When Windows cannot supply DPI, the
   adapter reports a `Vector2.One` fallback with `DpiSourceAvailable == false`.
   The overlay preserves the legacy no-source path; with a live source it
@@ -68,10 +68,10 @@ does not introduce another Editor Reader or memory interop path.
   modifier variants are equivalent. Invalid persisted key values are treated
   as inactive by polling, while the existing global callback adapter retains
   its validation behavior.
-- Cursor reads and writes use absolute physical desktop pixels. Writes round
-  fractional coordinates before calling Windows, matching the legacy
-  `Math.Round` conversion. The left mouse button is exposed for the held-object
-  path.
+- Cursor reads and writes use osu! editor coordinates at the application
+  boundary. Infrastructure maps to and from absolute physical desktop pixels,
+  rounding only before the final Windows call. The left mouse button remains
+  exposed for the held-object path.
 - The overlay is a non-activating, tool-window, click-through popup. It hides
   whenever the tracked osu! window is not foreground, follows the editor bounds
   while active, supports the green-yellow three-pixel debug border, and makes
@@ -86,34 +86,34 @@ does not introduce another Editor Reader or memory interop path.
 ## Required platform substitutions
 
 - The legacy `Process.NET.Windows.IWindow` wrapper is replaced by a shared
-  `user32.dll` window adapter. This keeps process IDs and window IDs opaque in
-  Application while retaining title, activation, bounds, and lifetime checks.
+  `user32.dll` window adapter kept entirely in Infrastructure, retaining title,
+  activation, bounds, and lifetime checks.
 - WinForms `Screen`, `Cursor`, and `Control.MouseButtons` are replaced by
-  shared `user32.dll`/`shcore.dll` adapters. This avoids adding WPF or WinForms
-  references to Core, Application, or Infrastructure.
+  shared `user32.dll`/`shcore.dll` adapters. Screen, window, process, and
+  platform-coordinate DTOs remain entirely in Infrastructure.
 - `Overlay.NET.Wpf.OverlayWindow` is replaced by a small native popup host.
-  The host owns positioning, activation visibility, click-through behavior,
-  border state, and disposal. Geometry rendering remains Desktop step 45 and
-  is deliberately not implemented here.
+  `WindowsGeometryDashboardOverlayService` owns positioning, activation
+  visibility, click-through behavior, border state, coordinate conversion, and
+  disposal. It renders the application-provided osu!-space scene.
 - Win32 APIs require integer window coordinates. The adapter rounds the
   converted logical position and size at the final `SetWindowPos` call; all
   preceding geometry remains double-precision Core data.
 
 ## Scope boundary
 
-Step 44 does not migrate the WPF Geometry Dashboard view model, generator
-controls, project/preferences windows, save-slot commands, timer orchestration,
-or geometry drawing. Those are step 45 presentation/use-case work. The legacy
-WPF feature remains intact and continues to use its existing adapters.
+The Geometry Dashboard runtime, input, coordinate, and overlay boundaries are
+now migrated. Generator controls, project/preferences windows, and save-slot
+commands remain Desktop presentation work.
 
 ## Verification
 
 Focused tests cover unavailable-platform process, editor-memory, input, screen,
-window, overlay, and global-hook paths, same-process runtime sequencing,
-malformed reader data, neutral snapshot copying, legacy key translation, and
-physical-coordinate/DPI contracts. Architecture tests assert that the new
-Application Geometry Dashboard ports contain no native process, window, input,
-overlay, or interop types.
+window, overlay, and global-hook paths, semantic runtime sequencing, malformed
+reader data, neutral snapshot copying, legacy key translation, immutable
+coordinate transforms, live window movement, configuration reloads, and
+physical-coordinate/DPI contracts. Architecture tests assert that the
+application Geometry Dashboard contracts contain no native process, window,
+input, overlay, or interop types.
 
 ## Avalonia migration references consulted
 

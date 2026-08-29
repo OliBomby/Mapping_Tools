@@ -1,19 +1,20 @@
 using System.Runtime.InteropServices;
-using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.GeometryDashboard;
 using Mapping_Tools.Infrastructure.Platform;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Contracts;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Models;
 using SkiaSharp;
 
-namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Platform;
+namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 
 /// <summary>
 ///     Owns a click-through, non-activating native popup window that follows the
 ///     active osu! window and retains the legacy overlay coordinate conversion.
 /// </summary>
-public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOverlayHost
+internal sealed class WindowsGeometryDashboardOverlayHost
 {
     private const uint extended_style_tool_window = 0x00000080;
     private const uint extended_style_transparent = 0x00000020;
@@ -42,7 +43,7 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
     ///     Creates a native overlay host using the supplied window tracker.
     /// </summary>
     /// <param name="windows">Tracks target activation without exposing native handles to Application.</param>
-    public WindowsGeometryDashboardOverlayHost(
+    internal WindowsGeometryDashboardOverlayHost(
         IGeometryDashboardWindowService windows)
         : this(windows, OperatingSystem.IsWindows)
     {
@@ -56,17 +57,13 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
-    /// <inheritdoc />
-    public bool IsSupported => isWindows() && windows.IsSupported;
+    internal bool IsSupported => isWindows() && windows.IsSupported;
 
-    /// <inheritdoc />
-    public bool IsVisible { get; private set; }
+    internal bool IsVisible { get; private set; }
 
-    /// <inheritdoc />
-    public PlatformWindowId? TargetWindow { get; private set; }
+    internal PlatformWindowId? TargetWindow { get; private set; }
 
-    /// <inheritdoc />
-    public void Initialize(PlatformWindowId targetWindow)
+    internal void Initialize(PlatformWindowId targetWindow)
     {
         ThrowIfDisposed();
         if (!IsSupported) return;
@@ -106,23 +103,20 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         IsVisible = false;
     }
 
-    /// <inheritdoc />
-    public void Enable()
+    internal void Enable()
     {
         ThrowIfDisposed();
         enabled = true;
     }
 
-    /// <inheritdoc />
-    public void Disable()
+    internal void Disable()
     {
         ThrowIfDisposed();
         enabled = false;
         HideNativeWindow();
     }
 
-    /// <inheritdoc />
-    public void Update(
+    internal void Update(
         Box2 physicalBounds,
         Vector2 dpiMultiplier,
         bool dpiSourceAvailable)
@@ -150,11 +144,7 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         lock (classGate)
         {
             if (paintStates.TryGetValue(window, out var state))
-            {
                 state.PhysicalBounds = physicalBounds;
-                state.DpiMultiplier = dpiMultiplier;
-                state.DpiSourceAvailable = dpiSourceAvailable;
-            }
         }
 
         WindowsNativeMethods.ShowWindow(
@@ -176,8 +166,7 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         IsVisible = true;
     }
 
-    /// <inheritdoc />
-    public void SetBorder(bool enabled)
+    internal void SetBorder(bool enabled)
     {
         if (disposed) return;
 
@@ -192,29 +181,33 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
         Invalidate();
     }
 
-    /// <inheritdoc />
-    public void SetFrame(GeometryDashboardOverlayFrame frame)
+    internal void SetScene(
+        GeometryDashboardOverlayScene scene,
+        WindowsGeometryDashboardCoordinateTransform transform)
     {
-        ArgumentNullException.ThrowIfNull(frame);
+        ArgumentNullException.ThrowIfNull(scene);
+        ArgumentNullException.ThrowIfNull(transform);
         if (disposed || window == 0) return;
 
         lock (classGate)
         {
-            if (paintStates.TryGetValue(window, out var state)) state.Frame = frame;
+            if (paintStates.TryGetValue(window, out var state))
+            {
+                state.Scene = scene;
+                state.Transform = transform;
+            }
         }
 
         Invalidate();
     }
 
-    /// <inheritdoc />
-    public void Invalidate()
+    internal void Invalidate()
     {
         ThrowIfDisposed();
         if (window != 0) WindowsNativeMethods.InvalidateRect(window, 0, false);
     }
 
-    /// <inheritdoc />
-    public void Dispose()
+    internal void Dispose()
     {
         if (disposed) return;
 
@@ -489,7 +482,7 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
 
     private static void DrawFrame(SKCanvas canvas, OverlayPaintState state)
     {
-        foreach (var shape in state.Frame.Shapes)
+        foreach (var shape in state.Scene.Shapes)
         {
             using SKPathEffect? pathEffect = ToPathEffect(shape.DashStyle);
             using SKPaint paint = new()
@@ -505,7 +498,6 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
             switch (shape.Kind)
             {
                 case GeometryDashboardOverlayShapeKind.Point:
-                case GeometryDashboardOverlayShapeKind.Circle:
                     canvas.DrawOval(
                         new SKRect(
                             start.X - (float)shape.Radius,
@@ -514,8 +506,29 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
                             start.Y + (float)shape.Radius),
                         paint);
                     break;
+                case GeometryDashboardOverlayShapeKind.Circle:
+                    double radius = state.Transform is null
+                        ? 0
+                        : state.Transform.ToDpi(state.Transform.ScaleByRatio(new Vector2(shape.Radius, 0))).X;
+                    canvas.DrawOval(
+                        new SKRect(
+                            start.X - (float)radius,
+                            start.Y - (float)radius,
+                            start.X + (float)radius,
+                            start.Y + (float)radius),
+                        paint);
+                    break;
                 case GeometryDashboardOverlayShapeKind.Line:
                     canvas.DrawLine(start, ToClientPoint(shape.End, state), paint);
+                    break;
+                case GeometryDashboardOverlayShapeKind.Box:
+                    canvas.DrawRect(
+                        new SKRect(
+                            start.X,
+                            start.Y,
+                            ToClientPoint(shape.End, state).X,
+                            ToClientPoint(shape.End, state).Y),
+                        paint);
                     break;
             }
         }
@@ -540,10 +553,13 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
 
     private static SKPoint ToClientPoint(Vector2 point, OverlayPaintState state)
     {
+        if (state.Transform is null) return default;
+
+        Vector2 overlayPoint = state.Transform.EditorToOverlayCoordinate(point);
         Vector2 relative = new(
-            point.X - state.PhysicalBounds.Left,
-            point.Y - state.PhysicalBounds.Top);
-        var logical = ToDpi(relative, state.DpiMultiplier, state.DpiSourceAvailable);
+            overlayPoint.X - state.PhysicalBounds.Left,
+            overlayPoint.Y - state.PhysicalBounds.Top);
+        var logical = state.Transform.ToDpi(relative);
         return new SKPoint((float)logical.X, (float)logical.Y);
     }
 
@@ -569,9 +585,8 @@ public sealed class WindowsGeometryDashboardOverlayHost : IGeometryDashboardOver
 
     private sealed class OverlayPaintState
     {
-        public GeometryDashboardOverlayFrame Frame { get; set; } = GeometryDashboardOverlayFrame.Empty;
+        public GeometryDashboardOverlayScene Scene { get; set; } = GeometryDashboardOverlayScene.Empty;
+        public WindowsGeometryDashboardCoordinateTransform? Transform { get; set; }
         public Box2 PhysicalBounds { get; set; }
-        public Vector2 DpiMultiplier { get; set; } = Vector2.One;
-        public bool DpiSourceAvailable { get; set; }
     }
 }

@@ -12,6 +12,8 @@ public sealed class EditorReaderSnapshotConverterTests
     {
         // Arrange
         var reader = CreateValidReader();
+        reader.ApproachRate = 9;
+        reader.CircleSize = 4;
         reader.hitObjects[0] = new HitObject
         {
             SpatialLength = 160,
@@ -48,6 +50,8 @@ public sealed class EditorReaderSnapshotConverterTests
             "123 Artist - Title",
             "map.osu"));
         snapshot.EditorTime.Should().Be(2222);
+        snapshot.ApproachRate.Should().Be(9);
+        snapshot.CircleSize.Should().Be(4);
         snapshot.SelectedHitObjects.Should().ContainSingle().Which.Should().BeSameAs(converted);
         converted.Repeat.Should().Be(2);
         converted.CurvePoints.Count.Should().Be(2);

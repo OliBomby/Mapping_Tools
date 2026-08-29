@@ -1,11 +1,14 @@
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Infrastructure.Editor;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Platform;
-using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Platform;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Contracts;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Infrastructure.Tests.Tools.GeometryDashboard.Platform;
@@ -28,7 +31,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
     }
 
     [TestMethod]
-    public async Task ReadGeometryDashboardAsync_WhenPlatformIsUnavailable_ReturnsNoSnapshot()
+    public async Task ReadAsync_WhenPlatformIsUnavailable_ReturnsNoSnapshot()
     {
         // Arrange
         WindowsEditorReaderAdapter sut = new(
@@ -37,9 +40,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
             () => false);
 
         // Act
-        var result =
-            await sut.ReadGeometryDashboardAsync(
-                new GeometryDashboardProcess(7, new PlatformWindowId(42), "map.osu"));
+        var result = await sut.ReadAsync();
 
         // Assert
         result.Should().BeNull();
@@ -66,6 +67,150 @@ public sealed class GeometryDashboardWindowsAdapterTests
         cursorRead.Should().BeFalse();
         cursorWrite.Should().BeFalse();
         position.Should().Be(Vector2.Zero);
+    }
+
+    [TestMethod]
+    public void CoordinateTransform_EditorScreenRoundTrip_PreservesOsuCoordinate()
+    {
+        // Arrange
+        var window = new GeometryDashboardWindow(
+            new PlatformWindowId(42),
+            7,
+            "map.osu",
+            new Box2(0, 0, 2560, 1440),
+            true,
+            true,
+            Vector2.One,
+            true);
+        WindowsGeometryDashboardCoordinateTransform sut = new(
+            window,
+            new GeometryDashboardScreen(
+                1,
+                new Box2(0, 0, 2560, 1440),
+                new Box2(0, 0, 2560, 1400),
+                true,
+                Vector2.One,
+                true),
+            new WindowsGeometryDashboardOsuDisplaySettings(
+                new Vector2(2560, 1440),
+                true,
+                true,
+                new Vector2(0.5, 0.5)),
+            new Box2(0, 1, 0, 1));
+        Vector2 editorCoordinate = new(256, 192);
+
+        // Act
+        var screenCoordinate = sut.EditorToScreenCoordinate(editorCoordinate);
+        var roundTrip = sut.ScreenToEditorCoordinate(screenCoordinate);
+
+        // Assert
+        roundTrip.X.Should().BeApproximately(editorCoordinate.X, 0.000001);
+        roundTrip.Y.Should().BeApproximately(editorCoordinate.Y, 0.000001);
+    }
+
+    [TestMethod]
+    public void CoordinateContext_Refresh_ReplacesTransformWhenWindowMoves()
+    {
+        // Arrange
+        string configPath = Path.Combine(Path.GetTempPath(), $"mapping-tools-geometry-{Guid.NewGuid():N}.cfg");
+        File.WriteAllLines(configPath, ["Fullscreen=0", "Letterboxing=0", "Width=1280", "Height=720"]);
+        GeometryDashboardProcess process = new(7, new PlatformWindowId(42), "map.osu");
+        MutableWindowService windows = new(new GeometryDashboardWindow(
+            process.MainWindow,
+            process.ProcessId,
+            process.MainWindowTitle,
+            new Box2(0, 0, 1920, 1080),
+            true,
+            true,
+            Vector2.One,
+            true));
+        WindowsGeometryDashboardCoordinateContext sut = new(
+            new ApplicationSettings { OsuConfigPath = configPath },
+            new PhysicalBeatmapsetFileSystem(),
+            new FixedProcessDiscovery(process),
+            windows,
+            new FixedScreenService(new GeometryDashboardScreen(
+                1,
+                new Box2(0, 0, 1920, 1080),
+                new Box2(0, 0, 1920, 1040),
+                true,
+                Vector2.One,
+                true)),
+            () => true);
+
+        try
+        {
+            // Act
+            sut.TryRefresh(new Box2(0, 1, 0, 1), out var first);
+            windows.Window = windows.Window with { Bounds = new Box2(400, 100, 2320, 1180) };
+            sut.TryRefresh(out var second);
+            sut.TryGetCurrent(out var current);
+            File.WriteAllLines(configPath, ["Fullscreen=0", "Letterboxing=0", "Width=1600", "Height=900"]);
+            File.SetLastWriteTimeUtc(configPath, DateTime.UtcNow.AddSeconds(1));
+            sut.TryRefresh(out var afterConfigurationChange);
+
+            // Assert
+            first.Transform.EditorToScreenCoordinate(Vector2.Zero).Should().NotBe(
+                second.Transform.EditorToScreenCoordinate(Vector2.Zero));
+            current.Should().Be(second);
+            afterConfigurationChange.Transform.EditorResolution.X.Should().Be(1600);
+        }
+        finally
+        {
+            File.Delete(configPath);
+        }
+    }
+
+    [TestMethod]
+    public void CoordinateContext_Refresh_UsesMonitorContainingWindowForFullscreenLayout()
+    {
+        // Arrange
+        string configPath = Path.Combine(Path.GetTempPath(), $"mapping-tools-geometry-{Guid.NewGuid():N}.cfg");
+        File.WriteAllLines(configPath, ["Fullscreen=1", "Letterboxing=1", "WidthFullscreen=1920", "HeightFullscreen=1080"]);
+        GeometryDashboardProcess process = new(7, new PlatformWindowId(42), "map.osu");
+        GeometryDashboardWindow window = new(
+            process.MainWindow,
+            process.ProcessId,
+            process.MainWindowTitle,
+            new Box2(1920, 0, 3840, 1080),
+            true,
+            true,
+            Vector2.One,
+            true);
+        GeometryDashboardScreen primary = new(
+            1,
+            new Box2(0, 0, 1920, 1080),
+            new Box2(0, 0, 1920, 1040),
+            true,
+            Vector2.One,
+            true);
+        GeometryDashboardScreen windowScreen = new(
+            2,
+            new Box2(1920, 0, 3840, 1080),
+            new Box2(1920, 0, 3840, 1040),
+            false,
+            Vector2.One,
+            true);
+        WindowsGeometryDashboardCoordinateContext sut = new(
+            new ApplicationSettings { OsuConfigPath = configPath },
+            new PhysicalBeatmapsetFileSystem(),
+            new FixedProcessDiscovery(process),
+            new MutableWindowService(window),
+            new FixedScreenService(primary, windowScreen),
+            () => true);
+
+        try
+        {
+            // Act
+            sut.TryRefresh(new Box2(0, 1, 0, 1), out var snapshot);
+
+            // Assert
+            snapshot.Transform.EditorToScreenCoordinate(Vector2.Zero).X.Should().BeGreaterThan(1900);
+        }
+        finally
+        {
+            File.Delete(configPath);
+        }
     }
 
     [TestMethod]
@@ -103,29 +248,34 @@ public sealed class GeometryDashboardWindowsAdapterTests
     }
 
     [TestMethod]
-    public void Create_WhenPlatformIsUnavailable_ReturnsSafeNoOpHost()
+    public void OverlayService_WhenPlatformIsUnavailable_IsSafeNoOp()
     {
         // Arrange
         WindowsGeometryDashboardWindowService windows = new(() => false);
-        WindowsGeometryDashboardOverlayHostFactory factory = new(windows, () => false);
+        WindowsOsuProcessDiscovery processes = new(() => false);
+        WindowsGeometryDashboardScreenService screens = new(() => false);
+        WindowsGeometryDashboardCoordinateContext coordinates = new(
+            new ApplicationSettings(),
+            new EmptyTextFileStore(),
+            processes,
+            windows,
+            screens,
+            () => false);
 
         // Act
-        using var host = factory.Create();
+        using var host = new WindowsGeometryDashboardOverlayService(coordinates, windows, () => false);
         var act = () =>
         {
-            host.Initialize(new PlatformWindowId(1));
-            host.Enable();
-            host.SetBorder(true);
-            host.Update(new Box2(1, 2, 3, 4), new Vector2(1.5, 1.5), true);
-            host.Invalidate();
-            host.Disable();
+            host.Update(
+                GeometryDashboardOverlayScene.Empty,
+                new GeometryDashboardOverlayOptions(new Box2(0, 1, 0, 1), true));
+            host.Hide();
         };
 
         // Assert
         host.IsSupported.Should().BeFalse();
         act.Should().NotThrow();
         host.IsVisible.Should().BeFalse();
-        host.TargetWindow.Should().BeNull();
     }
 
     [TestMethod]
@@ -133,16 +283,24 @@ public sealed class GeometryDashboardWindowsAdapterTests
     {
         // Arrange
         WindowsGeometryDashboardWindowService windows = new(() => false);
-        using var host =
-            new WindowsGeometryDashboardOverlayHostFactory(windows, () => false).Create();
+        WindowsOsuProcessDiscovery processes = new(() => false);
+        WindowsGeometryDashboardScreenService screens = new(() => false);
+        WindowsGeometryDashboardCoordinateContext coordinates = new(
+            new ApplicationSettings(),
+            new EmptyTextFileStore(),
+            processes,
+            windows,
+            screens,
+            () => false);
+        using var host = new WindowsGeometryDashboardOverlayService(coordinates, windows, () => false);
 
         // Act
         host.Dispose();
         host.Dispose();
-        var setBorder = () => host.SetBorder(true);
+        var hide = () => host.Hide();
 
         // Assert
-        setBorder.Should().NotThrow();
+        hide.Should().NotThrow();
     }
 
     [TestMethod]
@@ -252,5 +410,39 @@ public sealed class GeometryDashboardWindowsAdapterTests
         // Act
         // Assert
         act.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    private sealed class EmptyTextFileStore : Mapping_Tools.Application.Abstractions.ITextFileStore
+    {
+        public IReadOnlyList<string> ReadAllLines(string path) => [];
+        public void WriteAllLines(string path, IEnumerable<string> lines) { }
+        public void Delete(string path) { }
+        public string GetParentFolder(string path) => string.Empty;
+        public string CombinePath(string parent, string child) => child;
+    }
+
+    private sealed class FixedProcessDiscovery(GeometryDashboardProcess process) : IGeometryDashboardProcessDiscovery
+    {
+        public bool IsSupported => true;
+        public Task<GeometryDashboardProcess?> FindAsync(CancellationToken cancellationToken = default) => Task.FromResult<GeometryDashboardProcess?>(process);
+    }
+
+    private sealed class MutableWindowService(GeometryDashboardWindow window) : IGeometryDashboardWindowService
+    {
+        public GeometryDashboardWindow Window { get; set; } = window;
+        public bool IsSupported => true;
+        public GeometryDashboardWindow? GetWindow(PlatformWindowId window) => Window.Id == window ? Window : null;
+        public GeometryDashboardWindow? GetMainWindow(GeometryDashboardProcess process) => Window;
+        public IReadOnlyList<GeometryDashboardWindow> GetTopLevelWindows() => [Window];
+    }
+
+    private sealed class FixedScreenService(
+        GeometryDashboardScreen screen,
+        GeometryDashboardScreen? windowScreen = null) : IGeometryDashboardScreenService
+    {
+        public bool IsSupported => true;
+        public IReadOnlyList<GeometryDashboardScreen> GetScreens() => [screen];
+        public GeometryDashboardScreen? GetPrimaryScreen() => screen;
+        public GeometryDashboardScreen? GetScreenForWindow(PlatformWindowId window) => windowScreen ?? screen;
     }
 }

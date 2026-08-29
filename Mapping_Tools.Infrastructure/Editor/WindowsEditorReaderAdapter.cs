@@ -5,13 +5,11 @@ using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
-using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
-using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Platform;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 using DomainHitObject = Mapping_Tools.Core.BeatmapHelper.HitObject;
 using ReaderHitObject = Editor_Reader.HitObject;
 
@@ -24,7 +22,6 @@ namespace Mapping_Tools.Infrastructure.Editor;
 public sealed class WindowsEditorReaderAdapter :
     ILiveBeatmapReader,
     ICurrentBeatmapLocator,
-    IGeometryDashboardEditorReader,
     IDisposable
 {
     private readonly IApplicationDirectories directories;
@@ -92,41 +89,6 @@ public sealed class WindowsEditorReaderAdapter :
         }
 
         if (disposeReaderLock) readerLock.Dispose();
-    }
-
-    /// <inheritdoc />
-    public async Task<GeometryDashboardEditorSnapshot?> ReadGeometryDashboardAsync(
-        GeometryDashboardProcess process,
-        CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(process);
-        ObjectDisposedException.ThrowIf(disposed, this);
-        if (!isWindows()) return null;
-
-        EnterRead();
-        bool lockTaken = false;
-        try
-        {
-            await readerLock.WaitAsync(cancellationToken).ConfigureAwait(false);
-            lockTaken = true;
-            using var nativeProcess = OsuProcessDiscovery.FindStableProcess(process.ProcessId);
-            if (nativeProcess is null || !IsActiveEditor(nativeProcess, process.MainWindow))
-                return null;
-
-            cancellationToken.ThrowIfCancellationRequested();
-            var snapshot = await Task.Run(
-                    () => ReadGeometrySnapshot(nativeProcess),
-                    cancellationToken)
-                .ConfigureAwait(false);
-            cancellationToken.ThrowIfCancellationRequested();
-            return snapshot;
-        }
-        finally
-        {
-            if (lockTaken) readerLock.Release();
-
-            ExitRead();
-        }
     }
 
     /// <inheritdoc />
@@ -202,29 +164,11 @@ public sealed class WindowsEditorReaderAdapter :
         }
     }
 
-    private GeometryDashboardEditorSnapshot ReadGeometrySnapshot(Process process)
-    {
-        var snapshot = ReadSnapshot(process);
-        int editorTime = snapshot.EditorTime is null
-            ? 0
-            : checked((int)snapshot.EditorTime.Value);
-        return new GeometryDashboardEditorSnapshot(
-            snapshot.Path,
-            reader.ApproachRate,
-            reader.CircleSize,
-            editorTime,
-            snapshot.HitObjects,
-            snapshot.SelectedHitObjects);
-    }
-
-    private static bool IsActiveEditor(
-        Process process,
-        PlatformWindowId? expectedWindow = null)
+    private static bool IsActiveEditor(Process process)
     {
         try
         {
-            return (expectedWindow is null || process.MainWindowHandle.ToInt64() == expectedWindow.Value.Value)
-                   && process.MainWindowTitle.EndsWith(".osu", StringComparison.Ordinal);
+            return process.MainWindowTitle.EndsWith(".osu", StringComparison.Ordinal);
         }
         catch (InvalidOperationException)
         {
@@ -319,6 +263,8 @@ internal static class EditorReaderSnapshotConverter
             reader.PreviewTime,
             reader.SliderMultiplier,
             reader.SliderTickRate,
+            reader.ApproachRate,
+            reader.CircleSize,
             editorTime,
             selectedHitObjects);
     }

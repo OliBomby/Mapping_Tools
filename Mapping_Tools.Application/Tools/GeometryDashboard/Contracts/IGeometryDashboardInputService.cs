@@ -27,17 +27,16 @@ public interface IGeometryDashboardInputService
     bool IsMouseButtonDown(GeometryDashboardMouseButton button);
 
     /// <summary>
-    ///     Attempts to read the absolute cursor position in physical desktop pixels.
+    ///     Attempts to read the cursor position in osu! editor coordinates.
     /// </summary>
     /// <param name="position">Receives the cursor position when the read succeeds.</param>
-    /// <returns><see langword="true" /> when Windows supplied a position.</returns>
+    /// <returns><see langword="true" /> when the platform supplied a position.</returns>
     bool TryGetCursorPosition(out Vector2 position);
 
     /// <summary>
-    ///     Attempts to move the absolute cursor in physical desktop pixels.
+    ///     Attempts to move the cursor to an osu! editor coordinate.
     /// </summary>
-    /// <param name="position">The destination; fractional values are rounded like the legacy adapter.</param>
-    /// <returns><see langword="true" /> when Windows accepted the move.</returns>
+    /// <param name="position">The osu! editor destination; fractional values are mapped by Infrastructure.</param>
+    /// <returns><see langword="true" /> when the platform accepted the mapped move.</returns>
     bool TrySetCursorPosition(Vector2 position);
 }
-

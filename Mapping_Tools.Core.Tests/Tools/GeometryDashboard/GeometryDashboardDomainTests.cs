@@ -59,26 +59,6 @@ public sealed class GeometryDashboardDomainTests
     }
 
     [TestMethod]
-    public void CoordinateConverter_EditorScreenRoundTrip_PreservesCoordinate()
-    {
-        // Arrange
-        CoordinateConverter converter = new()
-        {
-            ScreenBox = new Box2(0, 0, 2560, 1440),
-            OsuResolution = new Vector2(2560, 1440),
-        };
-        Vector2 editorCoordinate = new(256, 192);
-
-        // Act
-        var screenCoordinate = converter.EditorToScreenCoordinate(editorCoordinate);
-        var roundTrip = converter.ScreenToEditorCoordinate(screenCoordinate);
-
-        // Assert
-        roundTrip.X.Should().BeApproximately(editorCoordinate.X, 0.000001);
-        roundTrip.Y.Should().BeApproximately(editorCoordinate.Y, 0.000001);
-    }
-
-    [TestMethod]
     public void RelevantObject_ParentAssignment_RecomputesTimeAndRelevancy()
     {
         // Arrange

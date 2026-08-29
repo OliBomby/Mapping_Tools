@@ -4,8 +4,8 @@ using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Desktop.Plugin;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
-using Mapping_Tools.Infrastructure.Editor;
-using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Platform;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -44,14 +44,11 @@ public sealed class GeometryDashboardToolRegistration : IMappingToolDefinition
     {
         ArgumentNullException.ThrowIfNull(services);
         services.AddSingleton<IGeometryDashboardProcessDiscovery, WindowsOsuProcessDiscovery>();
-        services.AddSingleton<IGeometryDashboardInputService, WindowsGeometryDashboardInputService>();
         services.AddSingleton<IGeometryDashboardScreenService, WindowsGeometryDashboardScreenService>();
         services.AddSingleton<IGeometryDashboardWindowService, WindowsGeometryDashboardWindowService>();
-        services.AddSingleton<IGeometryDashboardRuntime, GeometryDashboardRuntimeService>();
-        services.AddSingleton<IGeometryDashboardEditorReader>(provider =>
-            provider.GetRequiredService<WindowsEditorReaderAdapter>());
-        services.AddSingleton<IGeometryDashboardOverlayHostFactory>(provider =>
-            new WindowsGeometryDashboardOverlayHostFactory(
-                provider.GetRequiredService<IGeometryDashboardWindowService>()));
+        services.AddSingleton<IGeometryDashboardRuntime, WindowsGeometryDashboardRuntimeService>();
+        services.AddSingleton<WindowsGeometryDashboardCoordinateContext>();
+        services.AddSingleton<IGeometryDashboardInputService, WindowsGeometryDashboardInputService>();
+        services.AddSingleton<IGeometryDashboardOverlayService, WindowsGeometryDashboardOverlayService>();
     }
 }

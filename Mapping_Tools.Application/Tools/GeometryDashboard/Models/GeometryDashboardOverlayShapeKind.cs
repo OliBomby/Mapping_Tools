@@ -11,5 +11,7 @@ public enum GeometryDashboardOverlayShapeKind
 
     /// <summary>An outline circle centered at Start with Radius.</summary>
     Circle,
-}
 
+    /// <summary>An outline rectangle from Start to End.</summary>
+    Box,
+}

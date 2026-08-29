@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Infrastructure.Platform;
-using Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Platform;
+using Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 
 namespace Mapping_Tools.Infrastructure.Editor;
 
