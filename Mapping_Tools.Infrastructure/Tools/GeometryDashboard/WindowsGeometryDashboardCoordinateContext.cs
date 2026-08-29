@@ -61,9 +61,6 @@ public sealed class WindowsGeometryDashboardCoordinateContext
         this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
-    /// <summary>Gets whether this context can query the current desktop.</summary>
-    public bool IsSupported => isWindows() && processes.IsSupported && windows.IsSupported && screens.IsSupported;
-
     /// <summary>Gets the latest configuration status observed while refreshing the context.</summary>
     public string? ConfigurationStatus => configuration.Status;
 
@@ -101,7 +98,7 @@ public sealed class WindowsGeometryDashboardCoordinateContext
         out WindowsGeometryDashboardCoordinateSnapshot snapshot)
     {
         snapshot = default!;
-        if (!IsSupported) return false;
+        if (!isWindows()) return false;
 
         var process = processes.FindAsync().GetAwaiter().GetResult();
         var window = process is null ? null : windows.GetMainWindow(process);

@@ -39,7 +39,7 @@ public sealed class WindowsGeometryDashboardOverlayService : IGeometryDashboardO
     }
 
     /// <inheritdoc />
-    public bool IsSupported => !disposed && isWindows() && coordinates.IsSupported;
+    public bool IsSupported => !disposed && isWindows();
 
     /// <inheritdoc />
     public bool IsVisible => host.IsVisible;

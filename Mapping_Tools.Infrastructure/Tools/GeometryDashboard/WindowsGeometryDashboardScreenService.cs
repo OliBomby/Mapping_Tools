@@ -26,9 +26,6 @@ public sealed class WindowsGeometryDashboardScreenService : IGeometryDashboardSc
     }
 
     /// <inheritdoc />
-    public bool IsSupported => isWindows();
-
-    /// <inheritdoc />
     public IReadOnlyList<GeometryDashboardScreen> GetScreens()
     {
         if (!isWindows()) return [];

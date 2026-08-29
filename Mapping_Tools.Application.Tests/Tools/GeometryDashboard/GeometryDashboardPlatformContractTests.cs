@@ -200,8 +200,6 @@ public sealed class GeometryDashboardPlatformContractTests
     {
         public int CallCount { get; private set; }
 
-        public bool IsSupported => true;
-
         public Task<GeometryDashboardProcess?> FindAsync(
             CancellationToken cancellationToken = default)
         {
@@ -227,8 +225,6 @@ public sealed class GeometryDashboardPlatformContractTests
         : IGeometryDashboardWindowService
     {
         public int CallCount { get; private set; }
-
-        public bool IsSupported => true;
 
         public GeometryDashboardWindow? GetWindow(PlatformWindowId windowId)
         {

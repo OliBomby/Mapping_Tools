@@ -25,9 +25,6 @@ public sealed class WindowsOsuProcessDiscovery : IGeometryDashboardProcessDiscov
     }
 
     /// <inheritdoc />
-    public bool IsSupported => isWindows();
-
-    /// <inheritdoc />
     public Task<GeometryDashboardProcess?> FindAsync(
         CancellationToken cancellationToken = default)
     {

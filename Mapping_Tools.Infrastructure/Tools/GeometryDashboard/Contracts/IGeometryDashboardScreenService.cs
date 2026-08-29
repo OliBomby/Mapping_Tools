@@ -5,9 +5,6 @@ namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard.Contracts;
 /// <summary>Enumerates monitors used by the Windows Geometry Dashboard adapters.</summary>
 public interface IGeometryDashboardScreenService
 {
-    /// <summary>Gets whether native monitor inspection is available.</summary>
-    bool IsSupported { get; }
-
     /// <summary>Enumerates readable monitors.</summary>
     /// <returns>Monitor snapshots in native enumeration order.</returns>
     IReadOnlyList<GeometryDashboardScreen> GetScreens();

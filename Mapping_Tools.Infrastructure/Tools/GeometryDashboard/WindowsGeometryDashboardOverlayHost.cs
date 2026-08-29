@@ -57,8 +57,6 @@ internal sealed class WindowsGeometryDashboardOverlayHost
         this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
     }
 
-    internal bool IsSupported => isWindows() && windows.IsSupported;
-
     internal bool IsVisible { get; private set; }
 
     internal PlatformWindowId? TargetWindow { get; private set; }
@@ -66,7 +64,7 @@ internal sealed class WindowsGeometryDashboardOverlayHost
     internal void Initialize(PlatformWindowId targetWindow)
     {
         ThrowIfDisposed();
-        if (!IsSupported) return;
+        if (!isWindows()) return;
 
         if (targetWindow.IsEmpty)
             throw new ArgumentException(
@@ -122,7 +120,7 @@ internal sealed class WindowsGeometryDashboardOverlayHost
         bool dpiSourceAvailable)
     {
         ThrowIfDisposed();
-        if (!IsSupported || !enabled || window == 0 || TargetWindow is null) return;
+        if (!isWindows() || !enabled || window == 0 || TargetWindow is null) return;
 
         var target = windows.GetWindow(TargetWindow.Value);
         if (target is null || !target.IsActivated)

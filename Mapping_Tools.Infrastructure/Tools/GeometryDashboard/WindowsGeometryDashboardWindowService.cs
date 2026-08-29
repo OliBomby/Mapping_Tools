@@ -26,9 +26,6 @@ public sealed class WindowsGeometryDashboardWindowService : IGeometryDashboardWi
     }
 
     /// <inheritdoc />
-    public bool IsSupported => isWindows();
-
-    /// <inheritdoc />
     public GeometryDashboardWindow? GetWindow(PlatformWindowId window)
     {
         if (!isWindows() || window.IsEmpty) return null;

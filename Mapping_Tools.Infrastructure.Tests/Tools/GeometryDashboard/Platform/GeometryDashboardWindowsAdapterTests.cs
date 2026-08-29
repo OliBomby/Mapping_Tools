@@ -26,7 +26,6 @@ public sealed class GeometryDashboardWindowsAdapterTests
         var result = await sut.FindAsync();
 
         // Assert
-        sut.IsSupported.Should().BeFalse();
         result.Should().BeNull();
     }
 
@@ -61,7 +60,6 @@ public sealed class GeometryDashboardWindowsAdapterTests
         bool cursorWrite = sut.TrySetCursorPosition(new Vector2(10, 20));
 
         // Assert
-        sut.IsSupported.Should().BeFalse();
         hotkeyDown.Should().BeFalse();
         mouseDown.Should().BeFalse();
         cursorRead.Should().BeFalse();
@@ -225,7 +223,6 @@ public sealed class GeometryDashboardWindowsAdapterTests
         var forWindow = sut.GetScreenForWindow(new PlatformWindowId(1));
 
         // Assert
-        sut.IsSupported.Should().BeFalse();
         screens.Should().BeEmpty();
         primary.Should().BeNull();
         forWindow.Should().BeNull();
@@ -242,7 +239,6 @@ public sealed class GeometryDashboardWindowsAdapterTests
         var windows = sut.GetTopLevelWindows();
 
         // Assert
-        sut.IsSupported.Should().BeFalse();
         result.Should().BeNull();
         windows.Should().BeEmpty();
     }
@@ -273,7 +269,6 @@ public sealed class GeometryDashboardWindowsAdapterTests
         };
 
         // Assert
-        host.IsSupported.Should().BeFalse();
         act.Should().NotThrow();
         host.IsVisible.Should().BeFalse();
     }
@@ -423,14 +418,12 @@ public sealed class GeometryDashboardWindowsAdapterTests
 
     private sealed class FixedProcessDiscovery(GeometryDashboardProcess process) : IGeometryDashboardProcessDiscovery
     {
-        public bool IsSupported => true;
         public Task<GeometryDashboardProcess?> FindAsync(CancellationToken cancellationToken = default) => Task.FromResult<GeometryDashboardProcess?>(process);
     }
 
     private sealed class MutableWindowService(GeometryDashboardWindow window) : IGeometryDashboardWindowService
     {
         public GeometryDashboardWindow Window { get; set; } = window;
-        public bool IsSupported => true;
         public GeometryDashboardWindow? GetWindow(PlatformWindowId window) => Window.Id == window ? Window : null;
         public GeometryDashboardWindow? GetMainWindow(GeometryDashboardProcess process) => Window;
         public IReadOnlyList<GeometryDashboardWindow> GetTopLevelWindows() => [Window];
@@ -440,7 +433,6 @@ public sealed class GeometryDashboardWindowsAdapterTests
         GeometryDashboardScreen screen,
         GeometryDashboardScreen? windowScreen = null) : IGeometryDashboardScreenService
     {
-        public bool IsSupported => true;
         public IReadOnlyList<GeometryDashboardScreen> GetScreens() => [screen];
         public GeometryDashboardScreen? GetPrimaryScreen() => screen;
         public GeometryDashboardScreen? GetScreenForWindow(PlatformWindowId window) => windowScreen ?? screen;
