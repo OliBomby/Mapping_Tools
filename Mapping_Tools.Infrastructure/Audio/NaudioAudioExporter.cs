@@ -26,12 +26,13 @@ public sealed class NaudioAudioExporter : IAudioExporter
         AudioExportRequest request,
         CancellationToken cancellationToken)
     {
-        var exportClip = request.Format == AudioExportFormat.WaveIeeeFloat
-            ? clip
-            : AudioEffectEngine.Apply(
+        var exportClip = request.Format != AudioExportFormat.WaveIeeeFloat
+                         && NeedsLimiter(clip, cancellationToken)
+            ? AudioEffectEngine.Apply(
                 clip,
                 [new SoftLimiterEffect()],
-                cancellationToken);
+                cancellationToken)
+            : clip;
 
         string? directory = Path.GetDirectoryName(request.Path);
         if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
@@ -52,6 +53,17 @@ public sealed class NaudioAudioExporter : IAudioExporter
         }
 
         return new AudioExportResult(request.Path, request.Format, new FileInfo(request.Path).Length);
+    }
+
+    private static bool NeedsLimiter(AudioClip clip, CancellationToken cancellationToken)
+    {
+        foreach (float sample in clip.Samples.Span)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (sample is < -1f or > 1f) return true;
+        }
+
+        return false;
     }
 
     private static void WriteWave(string path, IWaveProvider source, CancellationToken cancellationToken)

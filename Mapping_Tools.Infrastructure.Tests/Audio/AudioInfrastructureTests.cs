@@ -119,6 +119,53 @@ public sealed class AudioInfrastructureTests
     }
 
     [TestMethod]
+    public async Task NaudioAudioExporter_PcmExport_WithInRangeSamples_PreservesSamples()
+    {
+        // Arrange
+        using var directory = new TemporaryDirectory();
+        string path = Path.Combine(directory.Path, "in-range-pcm.wav");
+        var source = new AudioClip(new AudioFormat(8000, 1), [0.8f, -0.9f]);
+        var exporter = new NaudioAudioExporter();
+        var decoder = new NaudioAudioDecoder();
+
+        // Act
+        await exporter.ExportAsync(
+            source,
+            new AudioExportRequest(path, AudioExportFormat.WavePcm));
+        var result = await decoder.DecodeAsync(new AudioDecodeRequest(path));
+
+        // Assert
+        float[] actual = result.CopySamples();
+        float[] expected = source.CopySamples();
+        actual.Should().HaveSameCount(expected);
+        for (int index = 0; index < expected.Length; index++) actual[index].Should().BeApproximately(expected[index], 1e-4f);
+    }
+
+    [TestMethod]
+    public async Task NaudioAudioExporter_PcmExport_WithClippedSamples_AppliesLimiterBeforeQuantization()
+    {
+        // Arrange
+        using var directory = new TemporaryDirectory();
+        string path = Path.Combine(directory.Path, "clipped-pcm.wav");
+        var source = new AudioClip(new AudioFormat(8000, 1), [1.5f, -1.5f]);
+        var expected = AudioEffectEngine.Apply(source, [new SoftLimiterEffect()]);
+        var exporter = new NaudioAudioExporter();
+        var decoder = new NaudioAudioDecoder();
+
+        // Act
+        await exporter.ExportAsync(
+            source,
+            new AudioExportRequest(path, AudioExportFormat.WavePcm));
+        var result = await decoder.DecodeAsync(new AudioDecodeRequest(path));
+
+        // Assert
+        float[] actual = result.CopySamples();
+        actual.Should().HaveSameCount(expected.CopySamples());
+        for (int index = 0; index < actual.Length; index++)
+            actual[index].Should().BeApproximately(expected.Samples.Span[index], 1e-4f);
+    }
+
+    [TestMethod]
     public async Task NaudioAudioExporter_OggRoundTripsAClipAndClosesTheDestination()
     {
         // Arrange
