@@ -1,4 +1,5 @@
 using Mapping_Tools.Core.BeatmapHelper;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
@@ -34,6 +35,7 @@ public sealed class GeometryDashboardProjectPersistenceTests
             .Should().Be(RgbaColour.FromArgb(255, 0, 255, 255));
         project.SaveSlots.Should().ContainSingle(slot => slot.Name == "Save 1");
         json.Should().Contain("Mapping_Tools.Classes.Tools.GeometryDashboard.Serialization.GeometryDashboardEngineOptions, Mapping Tools");
+        json.Should().Contain("\"$type\": \"Mapping_Tools.Classes.SystemTools.Hotkey, Mapping Tools\"");
         json.Should().Contain("Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators.AnchorPointGenerator, Mapping Tools");
         json.Should().Contain("Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses.SymmetryGeneratorSettings, Mapping Tools");
         json.Should().Contain("\"Color\": \"#FF00FFFF\"");
@@ -51,12 +53,12 @@ public sealed class GeometryDashboardProjectPersistenceTests
         // Act
         project.SaveToSlot(slot);
         project.CurrentPreferences.AcceptableDifference = 2;
-        project.CurrentPreferences.SnapHotkey.Key = 1;
+        project.CurrentPreferences.SnapHotkey = new HotkeySettings(1, 0);
         project.LoadFromSlot(slot);
 
         // Assert
         project.CurrentPreferences.AcceptableDifference.Should().Be(70.1);
-        project.CurrentPreferences.SnapHotkey.Key.Should().Be(56);
+        project.CurrentPreferences.SnapHotkey!.Key.Should().Be(56);
     }
 
     [TestMethod]

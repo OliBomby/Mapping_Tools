@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions"
-        xmlns:controls="using:Mapping_Tools.Desktop.Tools.GeometryDashboard.Controls"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions"
@@ -36,7 +36,7 @@
                 <DataTemplate x:DataType="model:GeometryDashboardSaveSlot">
                     <Grid ColumnDefinitions="150,130,Auto,Auto" Margin="0,2">
                         <TextBox Text="{Binding Name, Mode=TwoWay}" />
-                        <controls:GeometryHotkeyEditor Grid.Column="1" Hotkey="{Binding ProjectHotkey, Mode=TwoWay}"
+                        <controls:HotkeyEditor Grid.Column="1" Hotkey="{Binding ProjectHotkey, Mode=TwoWay}"
                                                        Margin="8,0" />
                         <Button Grid.Column="2" Content="Save"
                                 Command="{Binding $parent[ListBox].((geometryDashboard:GeometryDashboardProjectSlotsViewModel)DataContext).SaveCommand}"

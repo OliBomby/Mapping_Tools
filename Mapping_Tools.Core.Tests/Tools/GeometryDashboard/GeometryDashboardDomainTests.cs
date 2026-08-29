@@ -29,10 +29,23 @@ public sealed class GeometryDashboardDomainTests
         preferences.InceptionLevel.Should().Be(5);
         preferences.SelectedHitObjectMode.Should().Be(SelectedHitObjectMode.AllwaysAllVisible);
         preferences.UpdateMode.Should().Be(UpdateMode.TimeChange);
-        preferences.SnapHotkey.Key.Should().Be(56);
-        preferences.LockHotkey.Modifiers.Should().Be(4);
+        preferences.SnapHotkey!.Key.Should().Be(56);
+        preferences.LockHotkey!.Modifiers.Should().Be(4);
         pointPreferences.Color.ToString().Should().Be("#FF00FFFF");
         pointPreferences.Dashstyle.Should().Be(DashStylesEnum.Solid);
+    }
+
+    [TestMethod]
+    public void GeometryDashboardPreferences_Clone_WithClearedHotkey_PreservesClearedValue()
+    {
+        // Arrange
+        GeometryDashboardPreferences preferences = new() { SnapHotkey = null };
+
+        // Act
+        var clone = (GeometryDashboardPreferences)preferences.Clone();
+
+        // Assert
+        clone.SnapHotkey.Should().BeNull();
     }
 
     [TestMethod]

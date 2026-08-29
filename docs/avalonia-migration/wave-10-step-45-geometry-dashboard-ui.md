@@ -13,7 +13,7 @@ Step 45 ports the Geometry Dashboard presentation layer to Avalonia while keepin
 
 - Avalonia 12.1 does not provide WPF `CollectionViewSource` grouping. The grouped generator list therefore uses an `ItemsControl` of expanded group rows with nested generator rows. The group headings, ordering, filtering, and row controls are retained; the dashboard's specialized inner generator scroller remains view-owned like the WPF view.
 - WPF custom chrome and `Window.ShowDialog` were replaced with the existing Avalonia borderless-window/drag pattern and owner-modal windows.
-- WPF `HotkeyEditorControl` was replaced by `GeometryHotkeyEditor`, which stores the same numeric Core key/modifier representation and preserves delete/backspace/escape clearing and modifier-only suppression.
+- WPF `HotkeyEditorControl` is represented by the shared `HotkeyEditor`, which stores the neutral Core key/modifier representation and preserves delete/backspace/escape clearing and modifier-only suppression for Geometry Dashboard settings and save slots.
 - The application overlay contract accepts `GeometryDashboardOverlayScene` primitives in osu! coordinates and `GeometryDashboardOverlayOptions`; Infrastructure performs all native placement and conversion while preserving click-through, nonactivating behavior. No native or screen-space types are exposed to the application.
 - The WPF `DispatcherTimer`/`FileSystemWatcher` pair is represented by the view-model lifetime loop and Infrastructure configuration refresh; the loop is cancelled/disposed with the feature and honors `KeepRunning`.
 

@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Backups.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Core.Settings.Models;
 using Microsoft.Extensions.Hosting;
 
 namespace Mapping_Tools.Desktop.Hosting;

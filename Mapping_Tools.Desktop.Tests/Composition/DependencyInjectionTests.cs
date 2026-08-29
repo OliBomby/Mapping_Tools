@@ -13,6 +13,7 @@ using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Application.Tools.AutoFail;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;

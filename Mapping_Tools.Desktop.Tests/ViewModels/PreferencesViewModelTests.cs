@@ -8,6 +8,7 @@ using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.ViewModels;

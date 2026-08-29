@@ -10,6 +10,7 @@ using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
@@ -58,7 +59,7 @@ public sealed class GeometryDashboardViewModelTests
         using var viewModel = CreateViewModel(globalHotkeys: globalHotkeys);
         var slot = new GeometryDashboardSaveSlot
         {
-            ProjectHotkey = new Hotkey(56, 2),
+            ProjectHotkey = new HotkeySettings(56, 2),
         };
         slot.Preferences.AcceptableDifference = 70;
         viewModel.Project.CurrentPreferences.AcceptableDifference = 2;
@@ -82,7 +83,7 @@ public sealed class GeometryDashboardViewModelTests
         using var viewModel = CreateViewModel(globalHotkeys: globalHotkeys);
         viewModel.Project.SaveSlots.Add(new GeometryDashboardSaveSlot
         {
-            ProjectHotkey = new Hotkey(56),
+            ProjectHotkey = new HotkeySettings(56, 0),
         });
         viewModel.Activate();
         string bindingId = globalHotkeys.Bindings.Single().Key;
@@ -195,7 +196,7 @@ public sealed class GeometryDashboardViewModelTests
     {
         public bool IsSupported => isSupported;
 
-        public bool IsHotkeyDown(Hotkey? hotkey)
+        public bool IsHotkeyDown(HotkeySettings? hotkey)
         {
             return false;
         }

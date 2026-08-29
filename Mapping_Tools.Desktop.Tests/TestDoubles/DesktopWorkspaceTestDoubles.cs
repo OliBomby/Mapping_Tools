@@ -9,6 +9,7 @@ using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Application.Workspace.Models;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.Tests.TestDoubles;

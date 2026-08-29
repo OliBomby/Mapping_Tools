@@ -1,6 +1,6 @@
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.MathUtil;
-using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
+using Mapping_Tools.Core.Settings.Models;
 
 namespace Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 
@@ -17,7 +17,7 @@ public interface IGeometryDashboardInputService
     /// </summary>
     /// <param name="hotkey">The legacy-compatible key and modifier values.</param>
     /// <returns><see langword="true" /> only while the complete combination is held.</returns>
-    bool IsHotkeyDown(Hotkey? hotkey);
+    bool IsHotkeyDown(HotkeySettings? hotkey);
 
     /// <summary>
     ///     Tests whether a pointer button is currently held.

@@ -2,8 +2,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Core.Settings.Models;
 
 namespace Mapping_Tools.Desktop.Controls;
 
@@ -32,6 +33,8 @@ public sealed class HotkeyEditor : TextBox
         CaretBrush = Brushes.Transparent;
         ContextFlyout = null;
         TextAlignment = TextAlignment.Center;
+        HorizontalContentAlignment = HorizontalAlignment.Center;
+        VerticalContentAlignment = VerticalAlignment.Center;
         UpdateText();
     }
 
@@ -101,11 +104,6 @@ public sealed class HotkeyEditor : TextBox
 
         parts.Add(FormatKey(hotkey.Key));
         return string.Join(" + ", parts);
-    }
-
-    internal static string FormatLegacy(int key, int modifiers)
-    {
-        return Format(new HotkeySettings(key, modifiers));
     }
 
     private static int ToLegacyModifiers(KeyModifiers modifiers)

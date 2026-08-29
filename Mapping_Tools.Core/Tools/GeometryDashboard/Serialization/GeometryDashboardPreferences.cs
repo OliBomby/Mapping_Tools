@@ -1,5 +1,6 @@
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 
@@ -44,11 +45,11 @@ public sealed class GeometryDashboardPreferences : ICloneable
         };
 
         GeneratorSettings = new Dictionary<Type, GeneratorSettings>();
-        SnapHotkey = new Hotkey(56);
-        SelectHotkey = new Hotkey(57);
-        LockHotkey = new Hotkey(57, 4);
-        InheritHotkey = new Hotkey(57, 1);
-        RefreshHotkey = new Hotkey(45);
+        SnapHotkey = new HotkeySettings(56, 0);
+        SelectHotkey = new HotkeySettings(57, 0);
+        LockHotkey = new HotkeySettings(57, 4);
+        InheritHotkey = new HotkeySettings(57, 1);
+        RefreshHotkey = new HotkeySettings(45, 0);
         OffsetTop = 1;
         OffsetBottom = 1;
         AcceptableDifference = 2;
@@ -66,19 +67,19 @@ public sealed class GeometryDashboardPreferences : ICloneable
     public Dictionary<Type, GeneratorSettings> GeneratorSettings { get; set; }
 
     /// <summary>Gets or sets the activation/snap key.</summary>
-    public Hotkey SnapHotkey { get; set; }
+    public HotkeySettings? SnapHotkey { get; set; }
 
     /// <summary>Gets or sets the selection key.</summary>
-    public Hotkey SelectHotkey { get; set; }
+    public HotkeySettings? SelectHotkey { get; set; }
 
     /// <summary>Gets or sets the lock/unlock key.</summary>
-    public Hotkey LockHotkey { get; set; }
+    public HotkeySettings? LockHotkey { get; set; }
 
     /// <summary>Gets or sets the inheritability key.</summary>
-    public Hotkey InheritHotkey { get; set; }
+    public HotkeySettings? InheritHotkey { get; set; }
 
     /// <summary>Gets or sets the refresh key.</summary>
-    public Hotkey RefreshHotkey { get; set; }
+    public HotkeySettings? RefreshHotkey { get; set; }
 
     /// <summary>Gets or sets the left editor-box correction in pixels.</summary>
     public double OffsetLeft { get; set; }
@@ -132,11 +133,11 @@ public sealed class GeometryDashboardPreferences : ICloneable
         clone.RelevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences>();
         foreach ((string key, var value) in RelevantObjectPreferences) clone.RelevantObjectPreferences.Add(key, (RelevantObjectPreferences)value.Clone());
 
-        clone.SnapHotkey = (Hotkey)SnapHotkey.Clone();
-        clone.SelectHotkey = (Hotkey)SelectHotkey.Clone();
-        clone.LockHotkey = (Hotkey)LockHotkey.Clone();
-        clone.InheritHotkey = (Hotkey)InheritHotkey.Clone();
-        clone.RefreshHotkey = (Hotkey)RefreshHotkey.Clone();
+        clone.SnapHotkey = CloneHotkey(SnapHotkey);
+        clone.SelectHotkey = CloneHotkey(SelectHotkey);
+        clone.LockHotkey = CloneHotkey(LockHotkey);
+        clone.InheritHotkey = CloneHotkey(InheritHotkey);
+        clone.RefreshHotkey = CloneHotkey(RefreshHotkey);
 
         return clone;
     }
@@ -172,5 +173,9 @@ public sealed class GeometryDashboardPreferences : ICloneable
 
         foreach (var generator in generators) GeneratorSettings[generator.GetType()] = generator.Settings;
     }
-}
 
+    private static HotkeySettings? CloneHotkey(HotkeySettings? hotkey)
+    {
+        return hotkey is null ? null : hotkey with { };
+    }
+}

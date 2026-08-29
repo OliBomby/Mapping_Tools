@@ -1,4 +1,4 @@
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Core.Settings.Models;
 
 namespace Mapping_Tools.Application.QuickRun.Contracts;
 
@@ -30,4 +30,3 @@ public interface IGlobalHotkeyService
     /// </summary>
     void Stop();
 }
-

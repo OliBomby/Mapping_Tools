@@ -16,6 +16,7 @@ using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
@@ -932,11 +933,11 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         return Task.CompletedTask;
     }
 
-    private static HotkeySettings? ToGlobalHotkey(Hotkey? hotkey)
+    private static HotkeySettings? ToGlobalHotkey(HotkeySettings? hotkey)
     {
         return hotkey is null || hotkey.Key == 0
             ? null
-            : new HotkeySettings(hotkey.Key, hotkey.Modifiers);
+            : hotkey;
     }
 
     private void RefreshSaveSlotHotkeys()

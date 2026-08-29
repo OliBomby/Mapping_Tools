@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.MathUtil;
-using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Infrastructure.Platform;
 
 namespace Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
@@ -48,7 +48,7 @@ public sealed class WindowsGeometryDashboardInputService : IGeometryDashboardInp
     public bool IsSupported => isWindows();
 
     /// <inheritdoc />
-    public bool IsHotkeyDown(Hotkey? hotkey)
+    public bool IsHotkeyDown(HotkeySettings? hotkey)
     {
         if (!isWindows() || hotkey is null || hotkey.Key == 0) return false;
 

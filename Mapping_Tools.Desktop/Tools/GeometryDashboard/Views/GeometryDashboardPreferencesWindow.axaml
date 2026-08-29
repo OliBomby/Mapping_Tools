@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions"
-        xmlns:controls="using:Mapping_Tools.Desktop.Tools.GeometryDashboard.Controls"
+        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions"
@@ -27,23 +27,23 @@
                 <TextBlock Text="Keyboard shortcuts" FontWeight="Bold" />
                 <Grid ColumnDefinitions="180,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
                     <TextBlock Text="Snap" VerticalAlignment="Center" />
-                    <controls:GeometryHotkeyEditor Grid.Column="1"
+                    <controls:HotkeyEditor Grid.Column="1"
                                                    Hotkey="{Binding Preferences.SnapHotkey, Mode=TwoWay}"
                                                    ToolTip.Tip="Press and hold this key to snap your cursor to the closest virtual object." />
                     <TextBlock Grid.Row="1" Text="Select" VerticalAlignment="Center" />
-                    <controls:GeometryHotkeyEditor Grid.Row="1" Grid.Column="1"
+                    <controls:HotkeyEditor Grid.Row="1" Grid.Column="1"
                                                    Hotkey="{Binding Preferences.SelectHotkey, Mode=TwoWay}"
                                                    ToolTip.Tip="Press or hold this key to select virtual objects." />
                     <TextBlock Grid.Row="2" Text="Lock" VerticalAlignment="Center" />
-                    <controls:GeometryHotkeyEditor Grid.Row="2" Grid.Column="1"
+                    <controls:HotkeyEditor Grid.Row="2" Grid.Column="1"
                                                    Hotkey="{Binding Preferences.LockHotkey, Mode=TwoWay}"
                                                    ToolTip.Tip="Press or hold this key to lock virtual objects." />
                     <TextBlock Grid.Row="3" Text="Usability" VerticalAlignment="Center" />
-                    <controls:GeometryHotkeyEditor Grid.Row="3" Grid.Column="1"
+                    <controls:HotkeyEditor Grid.Row="3" Grid.Column="1"
                                                    Hotkey="{Binding Preferences.InheritHotkey, Mode=TwoWay}"
                                                    ToolTip.Tip="Press or hold this key to select which virtual objects can get used by generators." />
                     <TextBlock Grid.Row="4" Text="Refresh" VerticalAlignment="Center" />
-                    <controls:GeometryHotkeyEditor Grid.Row="4" Grid.Column="1"
+                    <controls:HotkeyEditor Grid.Row="4" Grid.Column="1"
                                                    Hotkey="{Binding Preferences.RefreshHotkey, Mode=TwoWay}"
                                                    ToolTip.Tip="Press and hold this key to continuously refresh the hit objects in the root layer of the object tree." />
                 </Grid>

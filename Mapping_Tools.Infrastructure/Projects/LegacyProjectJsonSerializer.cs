@@ -24,6 +24,7 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
@@ -222,6 +223,8 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         private const string desktop_assembly_name = "Mapping_Tools.Desktop";
         private const string legacy_hotkey = "Mapping_Tools.Classes.SystemTools.Hotkey";
         private const string intermediate_core_hotkey = "Mapping_Tools.Core.Classes.SystemTools.Hotkey";
+        private const string current_geometry_hotkey =
+            "Mapping_Tools.Core.Tools.GeometryDashboard.Serialization.Hotkey";
         private const string current_namespace_prefix = "Mapping_Tools.Core.";
         private const string legacy_relevant_objects_prefix =
             "Mapping_Tools.Classes.Tools.GeometryDashboard.DataStructure.RelevantObject.RelevantObjects.";
@@ -527,8 +530,11 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                     return ResolveDesktopProject("GeometryDashboardProject", typeof(GeometryDashboardServiceOptions));
                 if (typeName == legacy_pattern_gallery_pattern) return typeof(PatternGalleryPattern);
                 if (typeName == legacy_pattern_gallery_handler) return typeof(PatternGalleryCollectionMetadata);
-                if (typeName == legacy_hotkey) return typeof(Hotkey);
-                if (typeName == intermediate_core_hotkey) return typeof(Hotkey);
+                if (typeName == legacy_hotkey
+                    || typeName == intermediate_core_hotkey
+                    || typeName == current_geometry_hotkey
+                    || typeName == typeof(HotkeySettings).FullName)
+                    return typeof(HotkeySettings);
 
                 // Accept both the former namespace and documents emitted by
                 // an intermediate migration build that already used Core names.
@@ -827,7 +833,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                 return;
             }
 
-            if (serializedType == typeof(Hotkey))
+            if (serializedType == typeof(HotkeySettings))
             {
                 assemblyName = legacy_assembly_name;
                 typeName = legacy_hotkey;

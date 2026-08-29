@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Infrastructure.Editor;
 using Mapping_Tools.Infrastructure.Files;
@@ -51,7 +52,7 @@ public sealed class GeometryDashboardWindowsAdapterTests
     {
         // Arrange
         WindowsGeometryDashboardInputService sut = new(() => false);
-        Hotkey hotkey = new(56);
+        HotkeySettings hotkey = new(56, 0);
 
         // Act
         bool hotkeyDown = sut.IsHotkeyDown(hotkey);

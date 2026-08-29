@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Workspace.Models;
+using Mapping_Tools.Core.Settings.Models;
 
 namespace Mapping_Tools.Application.Settings.Models;
 
@@ -143,4 +144,3 @@ public sealed class ApplicationSettings
     /// </summary>
     public string? SkipVersion { get; set; }
 }
-

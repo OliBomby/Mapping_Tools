@@ -36,7 +36,7 @@ The project serializer continues to emit the legacy root and nested type names, 
 
 - Configuration-file reads, screen discovery, DPI queries, and window/process coordinates are owned by the Infrastructure coordinate context. Core contains no Geometry Dashboard coordinate converter.
 - WPF `Color` is represented by the existing Core `RgbaColour` value type; its serializer keeps the legacy `#AARRGGBB` shape. Rendering dash conversion remains a Desktop concern; the neutral `DashStylesEnum` is retained as persisted data.
-- WPF `Hotkey` is represented by a neutral Core key/modifier pair whose numeric values match the legacy WPF enums. Global registration and activation callbacks remain step 44/45 behavior.
+- WPF `Hotkey` is represented by the shared neutral Core `HotkeySettings` key/modifier pair whose numeric values match the legacy WPF enums. Global registration and activation callbacks remain step 44/45 behavior.
 - WPF `CommandImplementation`, `CollectionView` grouping, `DrawingContext`, Overlay.NET, Process.NET, and editor-reader integration remain outside Core/Application.
 
 ## Verification
