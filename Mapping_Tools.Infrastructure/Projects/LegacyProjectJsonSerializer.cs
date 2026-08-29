@@ -979,6 +979,18 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
         {
             yield return typeName;
 
+            if (typeName.StartsWith("Mapping_Tools.Classes.Tools.SnappingTools.", StringComparison.Ordinal))
+                yield return "Mapping_Tools.Core.Tools.GeometryDashboard."
+                             + typeName["Mapping_Tools.Classes.Tools.SnappingTools.".Length..];
+
+            if (typeName.StartsWith("Mapping_Tools.Core.Classes.Tools.SnappingTools.", StringComparison.Ordinal))
+                yield return "Mapping_Tools.Core.Tools.GeometryDashboard."
+                             + typeName["Mapping_Tools.Core.Classes.Tools.SnappingTools.".Length..];
+
+            if (typeName.StartsWith("Mapping_Tools.Core.Tools.SnappingTools.", StringComparison.Ordinal))
+                yield return "Mapping_Tools.Core.Tools.GeometryDashboard."
+                             + typeName["Mapping_Tools.Core.Tools.SnappingTools.".Length..];
+
             if (typeName.StartsWith("Mapping_Tools.Classes.SnappingTools.", StringComparison.Ordinal))
             {
                 yield return "Mapping_Tools.Core.Tools.SnappingTools."
@@ -988,24 +1000,44 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             }
 
             if (typeName.StartsWith(legacy_relevant_objects_prefix, StringComparison.Ordinal))
+            {
+                yield return intermediate_current_relevant_object_prefix
+                             + typeName[legacy_relevant_objects_prefix.Length..];
                 yield return current_relevant_object_prefix
                              + typeName[legacy_relevant_objects_prefix.Length..];
+            }
 
             if (typeName.StartsWith(legacy_relevant_objects_prefix_without_tools, StringComparison.Ordinal))
+            {
+                yield return intermediate_current_relevant_object_prefix
+                             + typeName[legacy_relevant_objects_prefix_without_tools.Length..];
                 yield return current_relevant_object_prefix
                              + typeName[legacy_relevant_objects_prefix_without_tools.Length..];
+            }
 
             if (typeName.StartsWith(intermediate_relevant_objects_prefix, StringComparison.Ordinal))
+            {
+                yield return intermediate_current_relevant_object_prefix
+                             + typeName[intermediate_relevant_objects_prefix.Length..];
                 yield return current_relevant_object_prefix
                              + typeName[intermediate_relevant_objects_prefix.Length..];
+            }
 
             if (typeName.StartsWith(current_relevant_objects_prefix, StringComparison.Ordinal))
+            {
+                yield return intermediate_current_relevant_object_prefix
+                             + typeName[current_relevant_objects_prefix.Length..];
                 yield return current_relevant_object_prefix
                              + typeName[current_relevant_objects_prefix.Length..];
+            }
 
             if (typeName.StartsWith(intermediate_current_relevant_objects_prefix, StringComparison.Ordinal))
+            {
+                yield return intermediate_current_relevant_object_prefix
+                             + typeName[intermediate_current_relevant_objects_prefix.Length..];
                 yield return current_relevant_object_prefix
                              + typeName[intermediate_current_relevant_objects_prefix.Length..];
+            }
 
             if (typeName.StartsWith("Mapping_Tools.Core.Classes.", StringComparison.Ordinal))
                 yield return "Mapping_Tools.Core." + typeName["Mapping_Tools.Core.Classes.".Length..];
@@ -1035,6 +1067,12 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
                     : intermediate_current_relevant_object_prefix;
                 return legacy_relevant_objects_prefix + typeName[prefix.Length..];
             }
+
+            const string current_geometry_dashboard_namespace_prefix =
+                "Mapping_Tools.Core.Tools.GeometryDashboard.";
+            if (typeName?.StartsWith(current_geometry_dashboard_namespace_prefix, StringComparison.Ordinal) == true)
+                return "Mapping_Tools.Classes.Tools.SnappingTools."
+                       + typeName[current_geometry_dashboard_namespace_prefix.Length..];
 
             return typeName?.StartsWith("Mapping_Tools.Core.Graph.", StringComparison.Ordinal) == true
                 ? "Mapping_Tools.Components.Graph" + typeName["Mapping_Tools.Core.Graph".Length..]
