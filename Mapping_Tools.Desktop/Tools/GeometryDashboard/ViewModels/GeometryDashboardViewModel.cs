@@ -33,8 +33,8 @@ using Material.Icons;
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 /// <summary>
-///     Coordinates the Geometry Dashboard UI, Core graph, project persistence, and
-///     the step-44 platform adapters. The view model owns no native handles.
+///     Coordinates the Geometry Dashboard UI, Core graph, and project persistence.
+///     The view model owns no native handles.
 /// </summary>
 public sealed partial class GeometryDashboardViewModel : ObservableObject,
     IShellProjectFeature, IShellExtraProjectMenuFeature, IShellFeatureActivation, IDisposable

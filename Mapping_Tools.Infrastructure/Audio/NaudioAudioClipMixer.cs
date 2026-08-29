@@ -5,7 +5,7 @@ using NAudio.Wave.SampleProviders;
 
 namespace Mapping_Tools.Infrastructure.Audio;
 
-/// <summary>Mixes step-41 owned clips through NAudio behind the Application port.</summary>
+/// <summary>Mixes owned clips through NAudio behind the Application port.</summary>
 public sealed class NaudioAudioClipMixer : IAudioClipMixer
 {
     /// <inheritdoc />

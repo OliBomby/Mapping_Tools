@@ -38,7 +38,7 @@ public sealed class HitsoundStudioService : IHitsoundStudioService
     /// <summary>Creates the Hitsound Studio application service.</summary>
     /// <param name="beatmaps">Loads disk-only beatmaps and writes export copies.</param>
     /// <param name="sampleAnalyzer">Finds canonical sample paths in map folders.</param>
-    /// <param name="generator">Generates audio through the step-41 audio port.</param>
+    /// <param name="generator">Generates audio through the audio port.</param>
     /// <param name="audioExporter">Encodes owned neutral clips.</param>
     /// <param name="mixer">Mixes owned neutral clips.</param>
     /// <param name="midi">Imports and exports neutral MIDI events.</param>
