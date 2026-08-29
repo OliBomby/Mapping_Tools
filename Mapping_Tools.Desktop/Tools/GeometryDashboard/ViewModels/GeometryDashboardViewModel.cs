@@ -102,10 +102,6 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <summary>Gets filtered generator groups for the dashboard list.</summary>
     public ObservableCollection<GeometryDashboardGeneratorGroupViewModel> GeneratorGroups { get; } = [];
 
-    /// <summary>Gets the current progress value used by the dashboard footer.</summary>
-    [ObservableProperty]
-    public partial double Progress { get; private set; }
-
     /// <summary>Gets the current connection, validation, or empty-state message.</summary>
     [ObservableProperty]
     public partial string Status { get; private set; } = "Waiting for osu!...";
@@ -369,7 +365,6 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         {
             if (disposed) return;
             Status = state.Status;
-            Progress = state.Progress;
             OnPropertyChanged(nameof(DrawableCount));
             OnPropertyChanged(nameof(SelectedCount));
             OnPropertyChanged(nameof(IsConnected));

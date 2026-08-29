@@ -20,13 +20,14 @@ executable switch) and 49 (legacy removal) are explicitly out of scope.
 | 42 | Hitsound Studio | Compared layer selection/editing, add/remove/reorder keyboard behavior, import/reload/preview/validation/export dialogs, empty/error/completion branches, legacy project-root serialization, audio-session disposal, and project registration. No remaining parity defect was substantiated. |
 | 43 | Geometry Dashboard core/project models | Compared generator reflection order, settings and locked-object ownership, legacy JSON names/colours/hotkeys, type-keyed settings, collection invariants, and Core/Application boundaries. Existing compatibility tests cover the serializer and locked-object formats. |
 | 44 | Windows adapters | Compared process/title discovery, editor-reader snapshots, global hotkeys, physical-pixel/DPI conversion, click-through overlay lifecycle, non-Windows no-op behavior, and exception guards. No remaining parity defect was substantiated. |
-| 45 | Geometry Dashboard UI | Compared generator grouping/filtering, specialized inner scrolling and wheel/mouse ownership, toggle/configure actions, empty/status branches, dialogs, hotkeys, progress, and registration. The inner generator scroller remains view-owned as in WPF; the `ToggleSwitch` and generator-group `ItemsControl` are approved Avalonia substitutions. The progress color is now owned by the application resource dictionary. |
+| 45 | Geometry Dashboard UI | Compared generator grouping/filtering, specialized inner scrolling and wheel/mouse ownership, toggle/configure actions, empty/status branches, dialogs, hotkeys, and registration. The inner generator scroller remains view-owned as in WPF; the `ToggleSwitch` and generator-group `ItemsControl` are approved Avalonia substitutions. The unused legacy footer progress bar was not carried into the current Avalonia view. |
 | 46 | Updater | Compared release metadata/asset selection, skip policy, preparation progress/cancellation, install-now/install-after-close/skip branches, owner-modal windows, close lifecycle, Onova ownership, and project/build registration. `UpdateService` now waits for in-flight preparation and coordination before disposing its gateway. |
 
 ## Corrective changes
 
-- Moved the Geometry Dashboard progress color from view markup into
-  `MappingToolsColors.axaml`.
+- Removed the unused Geometry Dashboard footer progress bar and its
+  application-state/resource plumbing; the legacy WPF control had no value
+  binding or update path and remained empty.
 - Restored Pattern Gallery's `ListBox`/`ListBoxItem` selection semantics and
   shell-owned extra project commands; removed duplicate feature-local project
   actions and non-WPF selection controls.

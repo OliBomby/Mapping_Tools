@@ -102,13 +102,9 @@
             </ScrollViewer>
         </Grid>
 
-        <Grid Grid.Row="2" ColumnDefinitions="Auto,*" Margin="0,10,0,0">
+        <Grid Grid.Row="2" Margin="0,10,0,0">
             <TextBlock VerticalAlignment="Bottom"
                        FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
-            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0"
-                                      Foreground="{DynamicResource MappingToolsGeometryProgressBrush}"
-                                      BorderBrush="{x:Null}"
-                                      Maximum="100" Value="{Binding Progress}" />
         </Grid>
     </Grid>
 </UserControl>

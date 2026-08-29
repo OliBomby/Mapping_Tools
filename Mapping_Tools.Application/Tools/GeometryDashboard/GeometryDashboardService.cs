@@ -41,7 +41,6 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
     private readonly List<IRelevantDrawable> selectedDrawables = [];
     private GeometryDashboardServiceState state = new(
         "Waiting for osu!...",
-        0,
         false,
         0,
         0);
@@ -766,7 +765,6 @@ public sealed class GeometryDashboardService : IGeometryDashboardService
         {
             next = new(
                 status,
-                state.Progress,
                 runtimeSnapshot is not null && overlayService.IsVisible,
                 layers.GetAllRelevantDrawables().Count(),
                 layers.GetAllRelevantObjects().Count(objectModel => objectModel.IsSelected));
