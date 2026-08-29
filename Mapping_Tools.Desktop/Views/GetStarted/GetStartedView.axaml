@@ -69,7 +69,11 @@
                                        FontSize="18"
                                        FontWeight="Bold"
                                        TextWrapping="Wrap" />
-                            <md:MarkdownScrollViewer Markdown="{Binding Text}" />
+                            <md:MarkdownScrollViewer Markdown="{Binding Text}">
+                                <md:MarkdownScrollViewer.Styles>
+                                    <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Markdown.axaml" />
+                                </md:MarkdownScrollViewer.Styles>
+                            </md:MarkdownScrollViewer>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

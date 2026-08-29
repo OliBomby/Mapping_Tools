@@ -45,7 +45,11 @@
                                    TextWrapping="Wrap"
                                    FontSize="18"
                                    FontWeight="Bold" />
-                        <md:MarkdownScrollViewer Markdown="{Binding ReleaseBody}" />
+                        <md:MarkdownScrollViewer Markdown="{Binding ReleaseBody}">
+                            <md:MarkdownScrollViewer.Styles>
+                                <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Markdown.axaml" />
+                            </md:MarkdownScrollViewer.Styles>
+                        </md:MarkdownScrollViewer>
                     </StackPanel>
                 </ScrollViewer>
             </materialControls:Card>
