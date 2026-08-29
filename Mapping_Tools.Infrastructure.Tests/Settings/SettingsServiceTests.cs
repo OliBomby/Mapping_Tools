@@ -37,34 +37,35 @@ public sealed class SettingsServiceTests
     }
 
     [TestMethod]
-    public void SaveAndLoad_LegacySettings_PreservesJsonShapes()
+    public void Load_WithLegacySettings_WritesPreferencesWithoutChangingConfiguration()
     {
         // Arrange
         using var test = TestDirectory.FromFixture("legacy-config.json");
         JsonSettingsStore store = new(test.Directories, typeof(TestApplicationSettings));
-        var settings = (TestApplicationSettings)store.Load();
-        settings.Theme = ApplicationTheme.Light;
+        string legacyJson = File.ReadAllText(test.Directories.ConfigurationFile);
 
         // Act
-        store.Save(settings);
-        var reloaded = (TestApplicationSettings)store.Load();
+        var settings = (TestApplicationSettings)store.Load();
 
         // Assert
-        reloaded.MainWindowRestoreBounds.Should().Be(settings.MainWindowRestoreBounds);
-        reloaded.QuickUndoHotkey.Should().Be(settings.QuickUndoHotkey);
-        reloaded.Theme.Should().Be(ApplicationTheme.Light);
+        settings.RecentMaps.Should().HaveCount(20);
+        settings.MainWindowRestoreBounds.Should().Be(new WindowBounds(440, 256, 1407, 855));
+        File.Exists(test.Directories.PreferencesFile).Should().BeTrue();
+        File.ReadAllText(test.Directories.ConfigurationFile).Should().Be(legacyJson);
 
         using var document = JsonDocument.Parse(
-            File.ReadAllText(test.Directories.ConfigurationFile));
+            File.ReadAllText(test.Directories.PreferencesFile));
         var root = document.RootElement;
-        root.GetProperty("MainWindowRestoreBounds").GetString().Should().Be("440,256,1407,855");
+        root.GetProperty("$schema").GetString().Should().Be("mapping-tools.settings");
+        root.GetProperty("$version").GetInt32().Should().Be(1);
+        root.GetProperty("MainWindowRestoreBounds").GetProperty("X").GetDouble().Should().Be(440);
         root.GetProperty("QuickRunHotkey").GetProperty("Key").ValueKind.Should().Be(JsonValueKind.Number);
         root.GetProperty("PeriodicBackupInterval").GetString().Should().Be("00:10:00");
-        root.GetProperty("Theme").GetString().Should().Be("Light");
         var firstRecent = root.GetProperty("RecentMaps")[0];
-        firstRecent.ValueKind.Should().Be(JsonValueKind.Array);
-        firstRecent.GetArrayLength().Should().Be(2);
-        firstRecent[1].GetString().Should().Be(settings.RecentMaps[0].DisplayDate);
+        firstRecent.ValueKind.Should().Be(JsonValueKind.Object);
+        firstRecent.GetProperty("Path").GetString().Should().Be(settings.RecentMaps[0].Path);
+        firstRecent.GetProperty("DisplayDate").GetString().Should().Be(settings.RecentMaps[0].DisplayDate);
+        File.Exists(test.Directories.ConfigurationFile + ".bak").Should().BeFalse();
     }
 
     [TestMethod]
@@ -79,6 +80,27 @@ public sealed class SettingsServiceTests
 
         // Assert
         act1.Should().Throw<JsonException>();
+    }
+
+    [TestMethod]
+    public void Load_WithFutureVersion_ThrowsWithoutWritingLegacyConfiguration()
+    {
+        // Arrange
+        using var test = TestDirectory.Empty();
+        test.Directories.EnsureCreated();
+        File.WriteAllText(
+            test.Directories.PreferencesFile,
+            "{\"$schema\":\"mapping-tools.settings\",\"$version\":99}");
+        JsonSettingsStore store = new(test.Directories);
+
+        // Act
+        Action act = () => store.Load();
+
+        // Assert
+        act.Should().Throw<JsonException>();
+        File.ReadAllText(test.Directories.PreferencesFile)
+            .Should().Be("{\"$schema\":\"mapping-tools.settings\",\"$version\":99}");
+        File.Exists(test.Directories.ConfigurationFile).Should().BeFalse();
     }
 
     [TestMethod]

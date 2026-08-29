@@ -1,28 +1,34 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Workspace.Models;
 using Mapping_Tools.Infrastructure.Files;
+using Mapping_Tools.Infrastructure.Settings.Migrations;
 
 namespace Mapping_Tools.Infrastructure.Settings;
 
 /// <summary>
-///     Reads and atomically replaces the legacy-compatible Mapping Tools JSON
-///     configuration using a frontend-neutral settings model.
+///     Reads versioned Mapping Tools settings and atomically writes the current
+///     model-shaped JSON representation.
 /// </summary>
 public sealed class JsonSettingsStore : ISettingsStore
 {
     private readonly IApplicationDirectories directories;
-    private readonly JsonSerializerOptions options;
+    private readonly JsonSerializerOptions canonicalOptions;
+    private readonly JsonSerializerOptions legacyOptions;
     private readonly Type settingsType;
 
+    private const string schema = "mapping-tools.settings";
+
     /// <summary>
-    ///     Creates a store for the configuration path supplied by the application layout.
+    ///     Creates a store for the preferences and legacy configuration paths
+    ///     supplied by the application layout.
     /// </summary>
-    /// <param name="directories">Provides the configuration path and required parent directories.</param>
+    /// <param name="directories">Provides both settings paths and required parent directories.</param>
     public JsonSettingsStore(IApplicationDirectories directories)
         : this(directories, typeof(ApplicationSettings))
     {
@@ -47,45 +53,135 @@ public sealed class JsonSettingsStore : ISettingsStore
                 nameof(settingsType));
 
         this.settingsType = settingsType;
-        options = new JsonSerializerOptions
+        canonicalOptions = new JsonSerializerOptions
         {
             AllowTrailingCommas = true,
             PropertyNameCaseInsensitive = true,
             WriteIndented = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
-        options.Converters.Add(new WindowBoundsJsonConverter());
-        options.Converters.Add(new RecentBeatmapJsonConverter());
-        options.Converters.Add(new JsonStringEnumConverter<ApplicationTheme>());
+        canonicalOptions.Converters.Add(new JsonStringEnumConverter<ApplicationTheme>());
+
+        legacyOptions = new JsonSerializerOptions(canonicalOptions);
+        legacyOptions.Converters.Add(new WindowBoundsJsonConverter());
+        legacyOptions.Converters.Add(new RecentBeatmapJsonConverter());
     }
 
     /// <inheritdoc />
-    public bool Exists => File.Exists(directories.ConfigurationFile);
+    public bool Exists => File.Exists(directories.PreferencesFile)
+                          || File.Exists(directories.ConfigurationFile);
 
     /// <inheritdoc />
-    /// <exception cref="JsonException">The file is empty, malformed, or contains invalid legacy bounds.</exception>
+    /// <exception cref="JsonException">
+    ///     The file is empty, malformed, contains an unsupported future version,
+    ///     or contains invalid legacy bounds.
+    /// </exception>
     public ApplicationSettings Load()
     {
-        string json = File.ReadAllText(directories.ConfigurationFile);
-        return (JsonSerializer.Deserialize(json, settingsType, options) as ApplicationSettings)
-               ?? throw new JsonException("The settings document contained no JSON value.");
+        bool hasPreferences = File.Exists(directories.PreferencesFile);
+        string sourcePath = hasPreferences
+            ? directories.PreferencesFile
+            : directories.ConfigurationFile;
+        string json = File.ReadAllText(sourcePath);
+        JsonObject document = ParseObject(json);
+        if (!TryReadVersion(document, out int version))
+        {
+            ApplicationSettings legacySettings = Deserialize(json, legacyOptions);
+            if (!hasPreferences) Save(legacySettings);
+            return legacySettings;
+        }
+
+        string? documentSchema;
+        try
+        {
+            documentSchema = document["$schema"]?.GetValue<string>();
+        }
+        catch (InvalidOperationException exception)
+        {
+            throw new JsonException("The settings document schema must be a string.", exception);
+        }
+        if (!string.Equals(documentSchema, schema, StringComparison.Ordinal))
+            throw new JsonException($"The settings document has an unknown schema '{documentSchema}'.");
+
+        int currentVersion = SettingsMigrationCatalog.CurrentVersion;
+        if (version > currentVersion)
+            throw new JsonException(
+                $"The settings document uses unsupported version {version}; current version is {currentVersion}.");
+
+        bool requiresRewrite = version < currentVersion;
+        while (version < currentVersion)
+        {
+            int targetVersion = version + 1;
+            SettingsMigrationCatalog.Get(targetVersion).Apply(document);
+            version = targetVersion;
+            document["$version"] = version;
+        }
+
+        ApplicationSettings settings = Deserialize(document.ToJsonString(), canonicalOptions);
+        if (requiresRewrite || !hasPreferences) Save(settings);
+        return settings;
     }
 
     /// <inheritdoc />
     /// <remarks>
     ///     Serialization first targets a sibling <c>.tmp</c> file, which is moved
-    ///     over the configuration only after the complete JSON has been written.
+    ///     over <c>preferences.json</c> only after the complete JSON has been written.
     /// </remarks>
     public void Save(ApplicationSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
         directories.EnsureCreated();
 
-        string json = JsonSerializer.Serialize(settings, settings.GetType(), options);
+        JsonObject document = (JsonSerializer.SerializeToNode(
+                                   settings,
+                                   settings.GetType(),
+                                   canonicalOptions)
+                               as JsonObject)
+                               ?? throw new JsonException("The settings model did not serialize to a JSON object.");
+        document["$schema"] = schema;
+        document["$version"] = SettingsMigrationCatalog.CurrentVersion;
+
+        string json = document.ToJsonString(canonicalOptions);
         PhysicalAtomicFileWriter.WriteText(
-            directories.ConfigurationFile,
+            directories.PreferencesFile,
             json,
             PhysicalAtomicFileWriter.Utf8WithoutBom);
+    }
+
+    private static JsonObject ParseObject(string json)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(json);
+        return JsonNode.Parse(json) as JsonObject
+               ?? throw new JsonException("The settings document must contain a JSON object.");
+    }
+
+    private static bool TryReadVersion(JsonObject document, out int version)
+    {
+        JsonNode? value = document["$version"];
+        if (value is null)
+        {
+            version = default;
+            return false;
+        }
+
+        try
+        {
+            version = value.GetValue<int>();
+            if (version < 1)
+                throw new JsonException("The settings document version must be positive.");
+
+            return true;
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or FormatException)
+        {
+            throw new JsonException("The settings document version must be an integer.", exception);
+        }
+    }
+
+    private ApplicationSettings Deserialize(string json, JsonSerializerOptions serializerOptions)
+    {
+        return (JsonSerializer.Deserialize(json, settingsType, serializerOptions) as ApplicationSettings)
+               ?? throw new JsonException("The settings document contained no JSON value.");
     }
 
     private sealed class WindowBoundsJsonConverter : JsonConverter<WindowBounds>
@@ -122,20 +218,15 @@ public sealed class JsonSettingsStore : ISettingsStore
         }
 
         /// <summary>
-        ///     Writes bounds in the invariant comma-separated form understood by
-        ///     both the old Newtonsoft/WPF model and the new settings model.
+        ///     Rejects writes because the comma-separated legacy shape is only
+        ///     supported while reading the legacy configuration file.
         /// </summary>
         public override void Write(
             Utf8JsonWriter writer,
             WindowBounds value,
             JsonSerializerOptions options)
         {
-            writer.WriteStringValue(string.Join(
-                ",",
-                value.X.ToString(CultureInfo.InvariantCulture),
-                value.Y.ToString(CultureInfo.InvariantCulture),
-                value.Width.ToString(CultureInfo.InvariantCulture),
-                value.Height.ToString(CultureInfo.InvariantCulture)));
+            throw new NotSupportedException("Legacy settings values are read-only.");
         }
     }
 
@@ -170,10 +261,7 @@ public sealed class JsonSettingsStore : ISettingsStore
             RecentBeatmap value,
             JsonSerializerOptions options)
         {
-            writer.WriteStartArray();
-            writer.WriteStringValue(value.Path);
-            writer.WriteStringValue(value.DisplayDate);
-            writer.WriteEndArray();
+            throw new NotSupportedException("Legacy settings values are read-only.");
         }
     }
 }

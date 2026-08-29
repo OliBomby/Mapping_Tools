@@ -1,8 +1,8 @@
 namespace Mapping_Tools.Application.Projects.Models;
 
 /// <summary>
-///     Binds a feature's project model to its legacy autosave filename, user-facing
-///     project folder, and clean-project factory.
+///     Binds a feature's project model to its autosave filename, user-facing project
+///     folder, and clean-project factory.
 /// </summary>
 /// <typeparam name="TProject">The complete serializable state owned by one feature.</typeparam>
 public sealed class ProjectDefinition<TProject>
@@ -11,8 +11,8 @@ public sealed class ProjectDefinition<TProject>
     ///     Creates the persistence metadata for one project-bearing feature.
     /// </summary>
     /// <param name="autoSaveFileName">
-    ///     A filename, including extension, stored directly in the Mapping Tools
-    ///     application-data directory.
+    ///     A filename, including extension, used beneath the current Autosaves
+    ///     directory and the legacy application-data directory.
     /// </param>
     /// <param name="projectFolderName">
     ///     A single directory name beneath application data used as the initial
@@ -55,7 +55,7 @@ public sealed class ProjectDefinition<TProject>
     public Func<TProject> CreateProject { get; }
 
     /// <summary>
-    ///     Gets the legacy-compatible filename used for automatic session recovery.
+    ///     Gets the filename used for automatic session recovery.
     /// </summary>
     public string AutoSaveFileName { get; }
 

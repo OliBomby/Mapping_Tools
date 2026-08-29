@@ -241,6 +241,13 @@ public sealed class ProjectAutosaveCoordinatorTests
                 : Task.FromResult(project);
         }
 
+        public Task<TProject> LoadAutoSaveAsync<TProject>(
+            ProjectDefinition<TProject> definition,
+            CancellationToken cancellationToken = default)
+        {
+            return LoadAsync<TProject>(definition.AutoSaveFileName, cancellationToken);
+        }
+
         public Task AutoSaveAsync<TProject>(
             ProjectDefinition<TProject> definition,
             TProject project,

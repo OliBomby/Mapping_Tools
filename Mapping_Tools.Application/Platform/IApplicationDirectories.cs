@@ -21,9 +21,14 @@ public interface IApplicationDirectories
     string Exports { get; }
 
     /// <summary>
-    ///     Gets the full path of the user settings JSON file.
+    ///     Gets the full path of the legacy configuration JSON file.
     /// </summary>
     string ConfigurationFile { get; }
+
+    /// <summary>
+    ///     Gets the full path of the current Mapping Tools preferences JSON file.
+    /// </summary>
+    string PreferencesFile { get; }
 
     /// <summary>
     ///     Creates the application-owned directories required for normal operation.

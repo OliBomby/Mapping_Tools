@@ -25,7 +25,7 @@ public sealed class ProjectServiceTests
     }
 
     [TestMethod]
-    public void GetPrimaryPath_DefaultDefinition_PreservesLegacyLayout()
+    public void GetAutoSavePath_DefaultDefinition_UsesAutosavesDirectory()
     {
         // Arrange
         // Act
@@ -34,8 +34,29 @@ public sealed class ProjectServiceTests
         var definition = CreateDefinition();
 
         // Assert
-        service.GetAutoSavePath(definition).Should().Be(Path.Combine(directories.ApplicationData, "featureproject.json"));
+        service.GetAutoSavePath(definition).Should().Be(Path.Combine(directories.ApplicationData, "Autosaves", "featureproject.json"));
         service.GetProjectFolder(definition).Should().Be(Path.Combine(directories.ApplicationData, "Feature Projects"));
+    }
+
+    [TestMethod]
+    public async Task LoadAutoSaveAsync_WhenCurrentFileIsMissing_LoadsLegacyFile()
+    {
+        // Arrange
+        FakeProjectStore store = new();
+        TestDirectories directories = new(Path.GetTempPath());
+        ProjectService service = new(directories, new RecordingFilePicker(), store);
+        var definition = CreateDefinition();
+        string currentPath = service.GetAutoSavePath(definition);
+        store.MissingPaths.Add(currentPath);
+
+        // Act
+        TestProject project = await service.LoadAutoSaveAsync(definition);
+
+        // Assert
+        project.Name.Should().Be("loaded");
+        store.LoadedPaths.ToArray().Should().Equal(
+            currentPath,
+            Path.Combine(directories.ApplicationData, definition.AutoSaveFileName));
     }
 
     [TestMethod]
@@ -207,6 +228,8 @@ public sealed class ProjectServiceTests
 
         public string ConfigurationFile => Path.Combine(applicationData, "config.json");
 
+        public string PreferencesFile => Path.Combine(applicationData, "preferences.json");
+
         public void EnsureCreated()
         {
         }
@@ -221,6 +244,8 @@ public sealed class ProjectServiceTests
         public List<TestProject> SavedProjects { get; } = [];
 
         public List<string> LoadedPaths { get; } = [];
+
+        public HashSet<string> MissingPaths { get; } = [];
 
         public TestProject ProjectToLoad { get; init; } = new("loaded");
 
@@ -246,7 +271,11 @@ public sealed class ProjectServiceTests
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            LoadedPaths.Add(path);
+            string fullPath = Path.GetFullPath(path);
+            LoadedPaths.Add(fullPath);
+            if (MissingPaths.Contains(fullPath))
+                return Task.FromException<TProject>(new FileNotFoundException());
+
             return Task.FromResult((TProject)(object)ProjectToLoad);
         }
     }

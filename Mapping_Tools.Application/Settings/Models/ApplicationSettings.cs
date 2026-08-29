@@ -4,13 +4,14 @@ namespace Mapping_Tools.Application.Settings.Models;
 
 /// <summary>
 ///     Contains the application state and behavior preferences persisted in the
-///     legacy-compatible <c>config.json</c> document.
+///     current <c>preferences.json</c> document. The legacy <c>config.json</c>
+///     document remains a read-only startup fallback.
 /// </summary>
 public class ApplicationSettings
 {
     /// <summary>
     ///     Maintains recent-map entries from most to least recently selected while
-    ///     Infrastructure preserves their legacy two-element JSON-array representation.
+    ///     Infrastructure reads legacy arrays and writes model-shaped preference objects.
     /// </summary>
     public List<RecentBeatmap> RecentMaps { get; set; } = [];
 

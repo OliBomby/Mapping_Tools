@@ -318,6 +318,8 @@ internal sealed class TestApplicationDirectories : IApplicationDirectories
 
     public string ConfigurationFile => @"C:\Local\Mapping Tools\config.json";
 
+    public string PreferencesFile => @"C:\Local\Mapping Tools\preferences.json";
+
     public void EnsureCreated()
     {
     }

@@ -20,6 +20,7 @@ public sealed class DesktopPlatformAdapterTests
         directories.LocalApplicationData.Should().Be(Path.GetFullPath(root));
         directories.Exports.Should().Be(Path.Combine(Path.GetFullPath(root), "Mapping Tools", "Exports"));
         directories.ConfigurationFile.Should().Be(Path.Combine(Path.GetFullPath(root), "Mapping Tools", "config.json"));
+        directories.PreferencesFile.Should().Be(Path.Combine(Path.GetFullPath(root), "Mapping Tools", "preferences.json"));
     }
 
     [TestMethod]

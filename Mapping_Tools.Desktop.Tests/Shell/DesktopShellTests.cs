@@ -669,6 +669,13 @@ public sealed class DesktopShellTests
             return Task.FromException<TProject>(new FileNotFoundException());
         }
 
+        public Task<TProject> LoadAutoSaveAsync<TProject>(
+            ProjectDefinition<TProject> definition,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromException<TProject>(new FileNotFoundException());
+        }
+
         public Task AutoSaveAsync<TProject>(
             ProjectDefinition<TProject> definition,
             TProject project,

@@ -15,7 +15,8 @@ public interface IProjectSerializer
     string Serialize<TProject>(TProject project);
 
     /// <summary>
-    ///     Deserializes a project document and rejects a JSON <c>null</c> root.
+    ///     Deserializes a current or legacy project document and rejects a JSON
+    ///     <c>null</c> root.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model expected by the caller.</typeparam>
     /// <param name="json">The complete JSON document.</param>

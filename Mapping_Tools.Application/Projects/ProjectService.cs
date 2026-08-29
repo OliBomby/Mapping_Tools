@@ -12,6 +12,7 @@ namespace Mapping_Tools.Application.Projects;
 /// </summary>
 public sealed class ProjectService : IProjectService
 {
+    private const string autoSaveDirectoryName = "Autosaves";
     private readonly IApplicationDirectories directories;
     private readonly IFilePicker filePicker;
     private readonly IProjectStore store;
@@ -36,7 +37,31 @@ public sealed class ProjectService : IProjectService
     public string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition)
     {
         ArgumentNullException.ThrowIfNull(definition);
-        return Path.Combine(directories.ApplicationData, definition.AutoSaveFileName);
+        return Path.Combine(
+            directories.ApplicationData,
+            autoSaveDirectoryName,
+            definition.AutoSaveFileName);
+    }
+
+    /// <inheritdoc />
+    public async Task<TProject> LoadAutoSaveAsync<TProject>(
+        ProjectDefinition<TProject> definition,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        try
+        {
+            return await store.LoadAsync<TProject>(
+                GetAutoSavePath(definition),
+                cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception exception) when (
+            exception is FileNotFoundException or DirectoryNotFoundException)
+        {
+            return await store.LoadAsync<TProject>(
+                Path.Combine(directories.ApplicationData, definition.AutoSaveFileName),
+                cancellationToken).ConfigureAwait(false);
+        }
     }
 
     /// <inheritdoc />

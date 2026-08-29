@@ -222,8 +222,8 @@ public sealed class ProjectAutosaveCoordinator
             IShellProjectFeature<TProject> feature,
             CancellationToken cancellationToken = default)
         {
-            TProject project = await projects.LoadAsync<TProject>(
-                projects.GetAutoSavePath(feature.ProjectDefinition),
+            TProject project = await projects.LoadAutoSaveAsync(
+                feature.ProjectDefinition,
                 cancellationToken);
             feature.Install(project);
         }

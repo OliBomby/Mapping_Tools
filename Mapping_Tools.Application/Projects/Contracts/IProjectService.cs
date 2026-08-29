@@ -9,12 +9,24 @@ namespace Mapping_Tools.Application.Projects.Contracts;
 public interface IProjectService
 {
     /// <summary>
-    ///     Resolves the feature's automatic recovery file beneath application data.
+    ///     Resolves the feature's automatic recovery file beneath the Autosaves directory.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model.</typeparam>
     /// <param name="definition">The feature's persistence metadata.</param>
-    /// <returns>The absolute autosave path.</returns>
+    /// <returns>The absolute path beneath the current Autosaves directory.</returns>
     string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition);
+
+    /// <summary>
+    ///     Loads the current automatic recovery file, falling back to the legacy
+    ///     application-data location when the new file has not been created yet.
+    /// </summary>
+    /// <typeparam name="TProject">The feature-specific project model.</typeparam>
+    /// <param name="definition">Identifies the feature and its autosave filename.</param>
+    /// <param name="cancellationToken">Cancels either filesystem read.</param>
+    /// <returns>The recovered project.</returns>
+    Task<TProject> LoadAutoSaveAsync<TProject>(
+        ProjectDefinition<TProject> definition,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Resolves the directory offered by the feature's Open and Save As dialogs.

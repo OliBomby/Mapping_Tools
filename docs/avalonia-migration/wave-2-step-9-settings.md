@@ -30,19 +30,24 @@ on WPF. All consumers of `MainWindow.AppDataPath`, `MainWindow.AppCommon`, and
 `MainWindow.ExportPath` now use the settings/application-directory boundary,
 and those three globals have been removed.
 
-## Legacy compatibility
+## Settings compatibility
 
-- The configuration remains `%LOCALAPPDATA%\Mapping Tools\config.json`.
-- Existing JSON property names are unchanged.
-- Window bounds retain the Newtonsoft/WPF-compatible string representation
-  `x,y,width,height`.
+- Legacy settings remain at `%LOCALAPPDATA%\Mapping Tools\config.json` and are
+  never rewritten, so the legacy WPF tools can continue using them.
+- New settings are written to `%LOCALAPPDATA%\Mapping Tools\preferences.json`.
+- When `preferences.json` does not exist, the store reads `config.json` once and
+  immediately writes the current model-shaped settings to `preferences.json`.
+- Existing JSON property names are unchanged; canonical preferences follow the
+  application settings model closely.
+- Legacy window bounds retain the Newtonsoft/WPF-compatible string representation
+  `x,y,width,height` while canonical preferences use the `WindowBounds` object.
 - Hotkey keys and modifiers remain numeric JSON properties.
 - `TimeSpan` and skipped-version values retain their string representations.
 - Null settings continue to be omitted when saving.
 - New files persist clean defaults before machine-specific path defaults are
   applied, matching the legacy first-run sequence.
 - Writes use a sibling temporary file followed by replacement, avoiding a
-  partially written configuration file.
+  partially written preferences file.
 - Malformed JSON is rejected. The WPF bridge preserves its existing user
   notification and continues with in-memory defaults and derived paths rather
   than overwriting the corrupt file.
@@ -62,12 +67,13 @@ and those three globals have been removed.
 
 ## Automated coverage
 
-`Mapping_Tools.Platform.Tests` loads the versioned real-world legacy fixture
+`Mapping_Tools.Infrastructure.Tests` loads the versioned real-world legacy fixture
 and verifies:
 
 - recent maps, favorites, bounds, hotkeys, backup interval, and skipped
   version;
-- a save/reload round trip with the legacy JSON value shapes intact;
+- immediate creation of canonical `preferences.json` without changing legacy
+  `config.json`;
 - rejection of the corrupt JSON fixture;
 - first-run defaults, fallback osu! paths, derived config/Songs/backup paths,
   directory creation, and the legacy first-save ordering;

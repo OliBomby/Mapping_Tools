@@ -17,7 +17,8 @@ public sealed class FileSystemProjectStore : IProjectStore
     ///     Creates a filesystem store for the supplied project-document format.
     /// </summary>
     /// <param name="serializer">
-    ///     Encodes and reconstructs project models; production uses the legacy-compatible serializer.
+    ///     Encodes and reconstructs project models; production accepts current
+    ///     and legacy documents but writes only the current format.
     /// </param>
     public FileSystemProjectStore(IProjectSerializer serializer)
     {

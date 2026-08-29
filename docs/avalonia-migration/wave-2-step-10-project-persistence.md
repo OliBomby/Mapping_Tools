@@ -7,9 +7,9 @@ Status: implemented, 2026-07-25.
 The Application layer now owns the project lifecycle independently of a view:
 
 - `ProjectDefinition<TProject>` binds a feature's typed project model to its
-  legacy autosave filename, default project folder, and clean-project factory;
-- `IProjectService` provides New, Open, Save, Save As, primary autosave, and
-  ordered additional autosave targets;
+  autosave filename, default project folder, and clean-project factory;
+- `IProjectService` provides New, Open, Save, Save As, autosave recovery with
+  legacy fallback, and ordered additional autosave targets;
 - `IProjectStore` separates filesystem durability from use-case orchestration;
 - `IProjectSerializer` separates the legacy document format from both the
   feature and its presentation state;
@@ -34,9 +34,10 @@ rather than an interface implemented by its view.
 
 `Mapping_Tools.Infrastructure` supplies:
 
-- `LegacyProjectJsonSerializer`, preserving Newtonsoft type metadata, simple
-  assembly names, omitted nulls, ignored reference loops, indented output, and
-  the historical `{ "X": ..., "Y": ... }` `Vector2` representation;
+- `VersionedProjectJsonSerializer`, which writes the current model-shaped
+  document with a schema and version, while reading current and legacy files;
+- `LegacyProjectJsonReader`, a read-only compatibility boundary around the
+  historical Newtonsoft reader;
 - `FileSystemProjectStore`, which serializes before touching the destination,
   writes a unique sibling temporary file, and replaces the destination only
   after the complete UTF-8 document has been written.
@@ -54,8 +55,9 @@ through constructor injection.
 Existing project documents identify concrete CLR types with Newtonsoft
 `$type` metadata and the old WPF executable assembly name `Mapping Tools`.
 The compatibility binder redirects matching types that moved during Wave 1 to
-`Mapping_Tools.Core`. When newly serializing a Core domain type, it writes the
-old assembly name again so the current WPF release can still read the file.
+`Mapping_Tools.Core`. New project saves use stable identifiers and do not emit
+CLR type metadata. The legacy files remain readable, but are not rewritten in
+place.
 
 The WPF `ProjectManager` remains as a compatibility facade because its current
 views still implement `ISavable<T>`. Its JSON and filesystem methods now
@@ -75,7 +77,8 @@ allow-list or explicit schema migration.
 `Mapping_Tools.Platform.Tests` verifies:
 
 - rejection of project definitions that could escape application data;
-- legacy-compatible autosave and project-folder paths;
+- current `Autosaves` paths and fallback loading from the legacy application-data
+  location;
 - clean-project factories without presentation-state ownership;
 - primary and additional autosave ordering and duplicate suppression;
 - cancelled and successful Open and Save As behavior;

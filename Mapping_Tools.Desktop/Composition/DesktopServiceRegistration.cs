@@ -181,7 +181,7 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<AudioExportService>();
         services.AddSingleton<IBetterSaveOverrideService, WindowsBetterSaveOverrideService>();
         services.AddSingleton<IBeatmapWorkspace, BeatmapWorkspace>();
-        services.AddSingleton<IProjectSerializer, LegacyProjectJsonSerializer>();
+        services.AddSingleton<IProjectSerializer, VersionedProjectJsonSerializer>();
         services.AddSingleton<IProjectStore, FileSystemProjectStore>();
         services.AddSingleton<IProjectService, ProjectService>();
         services.AddSingleton<ProjectAutosaveCoordinator>();

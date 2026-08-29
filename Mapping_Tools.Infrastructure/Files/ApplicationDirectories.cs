@@ -45,6 +45,7 @@ public sealed class ApplicationDirectories : IApplicationDirectories
         ApplicationData = Path.Combine(LocalApplicationData, applicationFolderName);
         Exports = Path.Combine(ApplicationData, "Exports");
         ConfigurationFile = Path.Combine(ApplicationData, "config.json");
+        PreferencesFile = Path.Combine(ApplicationData, "preferences.json");
     }
 
     /// <inheritdoc />
@@ -58,6 +59,9 @@ public sealed class ApplicationDirectories : IApplicationDirectories
 
     /// <inheritdoc />
     public string ConfigurationFile { get; }
+
+    /// <inheritdoc />
+    public string PreferencesFile { get; }
 
     /// <inheritdoc />
     public void EnsureCreated()
