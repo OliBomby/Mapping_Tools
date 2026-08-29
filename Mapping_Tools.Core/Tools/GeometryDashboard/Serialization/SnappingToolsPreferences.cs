@@ -8,18 +8,10 @@ namespace Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 /// <summary>Stores the persistent appearance and input settings of one dashboard.</summary>
 public sealed class SnappingToolsPreferences : ICloneable
 {
-    private Dictionary<Type, GeneratorSettings> generatorSettings;
-    private Hotkey inheritHotkey;
-    private Hotkey lockHotkey;
-    private Hotkey refreshHotkey;
-    private Dictionary<string, RelevantObjectPreferences> relevantObjectPreferences;
-    private Hotkey selectHotkey;
-    private Hotkey snapHotkey;
-
     /// <summary>Creates the legacy default Geometry Dashboard settings.</summary>
     public SnappingToolsPreferences()
     {
-        relevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences>
+        RelevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences>
         {
             [RelevantPoint.PreferencesNameStatic] = new()
             {
@@ -51,12 +43,12 @@ public sealed class SnappingToolsPreferences : ICloneable
             },
         };
 
-        generatorSettings = new Dictionary<Type, GeneratorSettings>();
-        snapHotkey = new Hotkey(56);
-        selectHotkey = new Hotkey(57);
-        lockHotkey = new Hotkey(57, 4);
-        inheritHotkey = new Hotkey(57, 1);
-        refreshHotkey = new Hotkey(45);
+        GeneratorSettings = new Dictionary<Type, GeneratorSettings>();
+        SnapHotkey = new Hotkey(56);
+        SelectHotkey = new Hotkey(57);
+        LockHotkey = new Hotkey(57, 4);
+        InheritHotkey = new Hotkey(57, 1);
+        RefreshHotkey = new Hotkey(45);
         OffsetTop = 1;
         OffsetBottom = 1;
         AcceptableDifference = 2;
@@ -68,33 +60,25 @@ public sealed class SnappingToolsPreferences : ICloneable
     }
 
     /// <summary>Gets or sets appearance settings by stable preference-group name.</summary>
-    public Dictionary<string, RelevantObjectPreferences> RelevantObjectPreferences
-    {
-        get => relevantObjectPreferences;
-        set => relevantObjectPreferences = value ?? [];
-    }
+    public Dictionary<string, RelevantObjectPreferences> RelevantObjectPreferences { get; set; }
 
     /// <summary>Gets or sets generator settings keyed by concrete generator type.</summary>
-    public Dictionary<Type, GeneratorSettings> GeneratorSettings
-    {
-        get => generatorSettings;
-        set => generatorSettings = value ?? [];
-    }
+    public Dictionary<Type, GeneratorSettings> GeneratorSettings { get; set; }
 
     /// <summary>Gets or sets the activation/snap key.</summary>
-    public Hotkey SnapHotkey { get => snapHotkey; set => snapHotkey = value ?? new Hotkey(); }
+    public Hotkey SnapHotkey { get; set; }
 
     /// <summary>Gets or sets the selection key.</summary>
-    public Hotkey SelectHotkey { get => selectHotkey; set => selectHotkey = value ?? new Hotkey(); }
+    public Hotkey SelectHotkey { get; set; }
 
     /// <summary>Gets or sets the lock/unlock key.</summary>
-    public Hotkey LockHotkey { get => lockHotkey; set => lockHotkey = value ?? new Hotkey(); }
+    public Hotkey LockHotkey { get; set; }
 
     /// <summary>Gets or sets the inheritability key.</summary>
-    public Hotkey InheritHotkey { get => inheritHotkey; set => inheritHotkey = value ?? new Hotkey(); }
+    public Hotkey InheritHotkey { get; set; }
 
     /// <summary>Gets or sets the refresh key.</summary>
-    public Hotkey RefreshHotkey { get => refreshHotkey; set => refreshHotkey = value ?? new Hotkey(); }
+    public Hotkey RefreshHotkey { get; set; }
 
     /// <summary>Gets or sets the left editor-box correction in pixels.</summary>
     public double OffsetLeft { get; set; }
@@ -148,11 +132,11 @@ public sealed class SnappingToolsPreferences : ICloneable
         clone.RelevantObjectPreferences = new Dictionary<string, RelevantObjectPreferences>();
         foreach ((string key, var value) in RelevantObjectPreferences) clone.RelevantObjectPreferences.Add(key, (RelevantObjectPreferences)value.Clone());
 
-        clone.snapHotkey = (Hotkey)SnapHotkey.Clone();
-        clone.selectHotkey = (Hotkey)SelectHotkey.Clone();
-        clone.lockHotkey = (Hotkey)LockHotkey.Clone();
-        clone.inheritHotkey = (Hotkey)InheritHotkey.Clone();
-        clone.refreshHotkey = (Hotkey)RefreshHotkey.Clone();
+        clone.SnapHotkey = (Hotkey)SnapHotkey.Clone();
+        clone.SelectHotkey = (Hotkey)SelectHotkey.Clone();
+        clone.LockHotkey = (Hotkey)LockHotkey.Clone();
+        clone.InheritHotkey = (Hotkey)InheritHotkey.Clone();
+        clone.RefreshHotkey = (Hotkey)RefreshHotkey.Clone();
 
         return clone;
     }
