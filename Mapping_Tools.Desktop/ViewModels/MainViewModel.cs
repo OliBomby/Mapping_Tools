@@ -12,6 +12,7 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Desktop.Services;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Shell.Models;
 using Mapping_Tools.Desktop.Updates;
@@ -39,7 +40,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly ProjectAutosaveCoordinator projectCoordinator;
     private readonly IQuickRunCommandRegistry quickRunRegistry;
     private readonly IShellFeatureRegistry registry;
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
     private readonly IUpdaterInteractionService? updaterInteraction;
     private bool disposed;
     private string searchText = string.Empty;
@@ -63,7 +64,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public MainViewModel(
         IShellFeatureRegistry registry,
         IQuickRunCommandRegistry quickRunRegistry,
-        ApplicationSettings settings,
+        DesktopApplicationSettings settings,
         IUserNotificationService notifications,
         IPlatformLauncher launcher,
         BeatmapWorkspaceViewModel workspace,

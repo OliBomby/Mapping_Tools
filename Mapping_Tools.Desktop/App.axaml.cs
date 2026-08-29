@@ -9,6 +9,7 @@ using Avalonia.VisualTree;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Platform;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,7 +51,7 @@ public partial class App : Avalonia.Application
             {
                 host.Start();
                 var settings =
-                    host.Services.GetRequiredService<ApplicationSettings>();
+                    host.Services.GetRequiredService<DesktopApplicationSettings>();
                 host.Services
                     .GetRequiredService<IApplicationThemeService>()
                     .Apply(settings.Theme);

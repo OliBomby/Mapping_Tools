@@ -3,6 +3,7 @@ using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.AutoFail;
@@ -96,14 +97,14 @@ public sealed class AutoFailDetectorViewModelTests
         ToolExecutionService execution = new(
             notifications,
             new RecordingEditorReloadService(),
-            new ApplicationSettings(),
+            new DesktopApplicationSettings(),
             TimeProvider.System);
         return new AutoFailDetectorViewModel(
             service,
             execution,
             workspace ?? new TestBeatmapWorkspace(),
             new RecordingCurrentBeatmapLocator(currentPath),
-            new ApplicationSettings(),
+            new DesktopApplicationSettings(),
             new TestDialogService(),
             new RecordingPlatformLauncher());
     }

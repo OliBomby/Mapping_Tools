@@ -1,34 +1,18 @@
 using Mapping_Tools.Application.Workspace.Models;
-using Mapping_Tools.Core.Settings.Models;
 
 namespace Mapping_Tools.Application.Settings.Models;
 
 /// <summary>
-///     Contains the user preferences persisted in the legacy-compatible
-///     <c>config.json</c> document.
+///     Contains the application state and behavior preferences persisted in the
+///     legacy-compatible <c>config.json</c> document.
 /// </summary>
-public sealed class ApplicationSettings
+public class ApplicationSettings
 {
     /// <summary>
     ///     Maintains recent-map entries from most to least recently selected while
     ///     Infrastructure preserves their legacy two-element JSON-array representation.
     /// </summary>
     public List<RecentBeatmap> RecentMaps { get; set; } = [];
-
-    /// <summary>
-    ///     Lists tool names pinned into the shell's favorites section.
-    /// </summary>
-    public List<string> FavoriteTools { get; set; } = [];
-
-    /// <summary>
-    ///     Defines the main window's last non-maximized position and size.
-    /// </summary>
-    public WindowBounds? MainWindowRestoreBounds { get; set; }
-
-    /// <summary>
-    ///     Indicates that the next session should restore the main window maximized.
-    /// </summary>
-    public bool MainWindowMaximized { get; set; }
 
     /// <summary>
     ///     Identifies the directory containing the osu! executable and user configuration.
@@ -61,25 +45,9 @@ public sealed class ApplicationSettings
     public bool UseEditorReader { get; set; } = true;
 
     /// <summary>
-    ///     Allows Mapping Tools to replace the editor's on-disk save when reconciling live state.
-    /// </summary>
-    public bool OverrideOsuSave { get; set; }
-
-    /// <summary>
     ///     Requests that active tools reload their input after the workspace selection changes.
     /// </summary>
     public bool AutoReload { get; set; } = true;
-
-    /// <summary>
-    ///     Makes an ordinary tool Run action use that feature's quick path; global
-    ///     shortcut routing remains controlled by <see cref="SmartQuickRunEnabled" />.
-    /// </summary>
-    public bool AlwaysQuickRun { get; set; }
-
-    /// <summary>
-    ///     Defines the global key combination assigned to QuickRun.
-    /// </summary>
-    public HotkeySettings? QuickRunHotkey { get; set; }
 
     /// <summary>
     ///     Enables selection-count-based QuickRun target resolution.
@@ -102,11 +70,6 @@ public sealed class ApplicationSettings
     public string MultipleQuickRunTool { get; set; } = "<Current Tool>";
 
     /// <summary>
-    ///     Defines the global key combination assigned to BetterSave.
-    /// </summary>
-    public HotkeySettings? BetterSaveHotkey { get; set; }
-
-    /// <summary>
     ///     Limits the retained automatic backup set before older files are pruned.
     /// </summary>
     public int MaxBackupFiles { get; set; } = 1000;
@@ -126,17 +89,6 @@ public sealed class ApplicationSettings
     ///     to the configured Songs directory.
     /// </summary>
     public bool CurrentBeatmapDefaultFolder { get; set; } = true;
-
-    /// <summary>
-    ///     Selects the light or dark application palette independently of the
-    ///     operating-system theme.
-    /// </summary>
-    public ApplicationTheme Theme { get; set; } = ApplicationTheme.Dark;
-
-    /// <summary>
-    ///     Defines the global key combination assigned to QuickUndo.
-    /// </summary>
-    public HotkeySettings? QuickUndoHotkey { get; set; }
 
     /// <summary>
     ///     Identifies the updater version the user chose to skip, or

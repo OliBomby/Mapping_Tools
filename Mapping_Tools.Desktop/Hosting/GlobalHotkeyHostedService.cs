@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.Backups.Contracts;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Core.Settings.Models;
 using Microsoft.Extensions.Hosting;
 
@@ -16,14 +16,14 @@ internal sealed class GlobalHotkeyHostedService : IHostedService, IHotkeyBinding
     private readonly IGlobalHotkeyService hotkeys;
     private readonly IQuickRunService quickRun;
     private readonly IQuickUndoCommandService quickUndo;
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
 
     public GlobalHotkeyHostedService(
         IGlobalHotkeyService hotkeys,
         IQuickRunService quickRun,
         IQuickUndoCommandService quickUndo,
         IBetterSaveService betterSave,
-        ApplicationSettings settings)
+        DesktopApplicationSettings settings)
     {
         this.hotkeys = hotkeys ?? throw new ArgumentNullException(nameof(hotkeys));
         this.quickRun = quickRun ?? throw new ArgumentNullException(nameof(quickRun));

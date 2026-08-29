@@ -10,7 +10,7 @@ using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.PatternGallery;
 using Mapping_Tools.Application.Tools.PatternGallery.Contracts;
@@ -59,7 +59,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     private readonly IProjectService projects;
     private readonly IFileRevealService reveal;
     private readonly IProjectSerializer serializer;
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
     private PatternGalleryCollectionPaths? paths;
     private CancellationTokenSource? thumbnailCancellation;
@@ -91,7 +91,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         IProjectSerializer serializer,
         IApplicationDirectories directories,
         IDialogService dialogs,
-        ApplicationSettings settings)
+        DesktopApplicationSettings settings)
         : base(execution, PatternGalleryToolDefinition.Definition)
     {
         this.gallery = gallery ?? throw new ArgumentNullException(nameof(gallery));

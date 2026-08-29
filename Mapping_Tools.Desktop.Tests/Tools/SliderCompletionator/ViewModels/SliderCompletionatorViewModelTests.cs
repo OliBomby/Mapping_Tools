@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderCompletionator.Models;
@@ -66,7 +67,7 @@ public sealed class SliderCompletionatorViewModelTests
         RecordingCompletionator service = new();
         TestBeatmapWorkspace workspace = new();
         workspace.SetSelection(["one.osu", "two.osu"]);
-        ApplicationSettings settings = new() { AlwaysQuickRun = true };
+        DesktopApplicationSettings settings = new() { AlwaysQuickRun = true };
         var viewModel = Create(
             service,
             workspace,
@@ -134,18 +135,18 @@ public sealed class SliderCompletionatorViewModelTests
         RecordingCompletionator service,
         TestBeatmapWorkspace? workspace = null,
         RecordingCurrentBeatmapLocator? currentBeatmap = null,
-        ApplicationSettings? settings = null)
+        DesktopApplicationSettings? settings = null)
     {
         return new SliderCompletionatorViewModel(
             service,
             new ToolExecutionService(
                 new UserNotificationService(),
                 new RecordingEditorReloadService(),
-                new ApplicationSettings(),
+                new DesktopApplicationSettings(),
                 TimeProvider.System),
             currentBeatmap ?? new RecordingCurrentBeatmapLocator(null),
             workspace ?? new TestBeatmapWorkspace(),
-            settings ?? new ApplicationSettings());
+            settings ?? new DesktopApplicationSettings());
     }
 
     private sealed class RecordingCompletionator : ISliderCompletionatorService

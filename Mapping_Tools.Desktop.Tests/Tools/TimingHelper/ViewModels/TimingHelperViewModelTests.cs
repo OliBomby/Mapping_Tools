@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.TimingHelper;
 using Mapping_Tools.Core.Tools.TimingHelper;
@@ -195,11 +196,11 @@ public sealed class TimingHelperViewModelTests
             new ToolExecutionService(
                 notifications,
                 reload ?? new RecordingEditorReloadService(),
-                new ApplicationSettings(),
+                new DesktopApplicationSettings(),
                 TimeProvider.System),
             currentBeatmap ?? new RecordingCurrentBeatmapLocator(null),
             workspace ?? new TestBeatmapWorkspace(),
-            new ApplicationSettings());
+            new DesktopApplicationSettings());
     }
 
     private sealed class RecordingTimingHelper : ITimingHelperService

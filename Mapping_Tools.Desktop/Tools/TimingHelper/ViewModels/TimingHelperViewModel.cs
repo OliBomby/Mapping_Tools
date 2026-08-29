@@ -5,7 +5,7 @@ using Mapping_Tools.Application.Interactions.Validation;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.TimingHelper;
 using Mapping_Tools.Application.Workspace.Contracts;
@@ -32,7 +32,7 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
         static () => new TimingHelperProject(),
         "timing-helper-project.json");
 
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
 
     private readonly ITimingHelperService timingHelper;
     private readonly IBeatmapWorkspace workspace;
@@ -50,7 +50,7 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
         IToolExecutionService execution,
         ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
-        ApplicationSettings settings)
+        DesktopApplicationSettings settings)
         : base(execution, TimingHelperToolDefinition.Definition)
     {
         this.timingHelper = timingHelper ?? throw new ArgumentNullException(nameof(timingHelper));

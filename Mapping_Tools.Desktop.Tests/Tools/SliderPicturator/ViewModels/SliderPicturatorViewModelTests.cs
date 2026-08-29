@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools.SliderPicturator;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.Images;
@@ -53,7 +54,7 @@ public sealed class SliderPicturatorViewModelTests
         RecordingCurrentBeatmapLocator currentBeatmap)
     {
         UserNotificationService notifications = new();
-        ApplicationSettings settings = new();
+        DesktopApplicationSettings settings = new();
         return new SliderPicturatorViewModel(
             service,
             new StubImageFileService(),

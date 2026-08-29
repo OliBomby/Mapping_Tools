@@ -9,7 +9,7 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Workspace.Contracts;
@@ -39,7 +39,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     private readonly IHitsoundPreviewHelperService previewService;
     private readonly RhythmGuideViewModel rhythmGuideViewModel;
     private readonly IRhythmGuideWindowService rhythmGuideWindow;
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
 
     private bool? isAllItemsSelected;
@@ -61,7 +61,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         IToolExecutionService execution,
         IBeatmapWorkspace workspace,
         ICurrentBeatmapLocator currentBeatmap,
-        ApplicationSettings settings,
+        DesktopApplicationSettings settings,
         IUserNotificationService notifications,
         IRhythmGuideWindowService rhythmGuideWindow,
         RhythmGuideViewModel rhythmGuideViewModel,

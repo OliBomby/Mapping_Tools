@@ -13,6 +13,7 @@ using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Shell;
@@ -117,7 +118,7 @@ public sealed class DesktopShellTests
     public void MainViewModel_ToggleFavorite_UpdatesSettingsAndSortsFavoriteFirst()
     {
         // Arrange
-        ApplicationSettings settings = new();
+        DesktopApplicationSettings settings = new();
         using var viewModel = CreateMainViewModel(
             [Registration("alpha", "Alpha"), Registration("zulu", "Zulu")],
             settings);
@@ -136,7 +137,7 @@ public sealed class DesktopShellTests
     public void MainViewModel_WithFoundationalFavoritesAndTools_GroupsItemsWithInertDividers()
     {
         // Arrange
-        ApplicationSettings settings = new()
+        DesktopApplicationSettings settings = new()
         {
             FavoriteTools = ["favorite"],
         };
@@ -514,7 +515,7 @@ public sealed class DesktopShellTests
 
     private static MainViewModel CreateMainViewModel(
         IReadOnlyList<ShellFeatureRegistration>? registrations = null,
-        ApplicationSettings? settings = null,
+        DesktopApplicationSettings? settings = null,
         IUserNotificationService? notifications = null,
         IPlatformLauncher? launcher = null,
         IBetterSaveService? betterSave = null,
@@ -522,7 +523,7 @@ public sealed class DesktopShellTests
         IQuickRunCommandRegistry? quickRunRegistry = null,
         RecordingProjectService? projectService = null)
     {
-        var resolvedSettings = settings ?? new ApplicationSettings();
+        var resolvedSettings = settings ?? new DesktopApplicationSettings();
         var resolvedNotifications = notifications ?? new UserNotificationService();
         var resolvedDialogs = dialogs ?? new TestDialogService();
         var resolvedQuickRunRegistry = quickRunRegistry ?? new QuickRunCommandRegistry();

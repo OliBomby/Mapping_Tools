@@ -18,6 +18,7 @@ using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Contracts;
+using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.AutoFail;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
 using Mapping_Tools.Application.Tools.GeometryDashboard;
@@ -49,6 +50,7 @@ using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Tools.HitsoundStudio;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Platform;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Updates;
@@ -118,12 +120,22 @@ internal static class DesktopServiceRegistration
         services.AddSingleton<IFileRevealService, WindowsFileRevealService>();
         services.AddSingleton<IApplicationThemeService, AvaloniaApplicationThemeService>();
         services.AddSingleton<IApplicationDirectories, ApplicationDirectories>();
-        services.AddSingleton<ISettingsStore, JsonSettingsStore>();
+        services.AddSingleton<ISettingsStore>(provider =>
+            new JsonSettingsStore(
+                provider.GetRequiredService<IApplicationDirectories>(),
+                typeof(DesktopApplicationSettings)));
         services.AddSingleton<ISettingsPathEnvironment, WindowsSettingsPathEnvironment>();
         services.AddSingleton<ISettingsPathService, SettingsPathService>();
+        services.AddSingleton<Func<ApplicationSettings>>(
+            static _ => static () => new DesktopApplicationSettings());
         services.AddSingleton<ISettingsService, SettingsService>();
-        services.AddSingleton(provider =>
-            provider.GetRequiredService<ISettingsService>().LoadOrCreate().Settings);
+        services.AddSingleton<DesktopApplicationSettings>(provider =>
+            (DesktopApplicationSettings)provider
+                .GetRequiredService<ISettingsService>()
+                .LoadOrCreate()
+                .Settings);
+        services.AddSingleton<ApplicationSettings>(provider =>
+            provider.GetRequiredService<DesktopApplicationSettings>());
         services.AddSingleton<SettingsPersistenceHostedService>();
         services.AddHostedService(provider =>
             provider.GetRequiredService<SettingsPersistenceHostedService>());

@@ -1,5 +1,5 @@
 using Mapping_Tools.Application.Settings.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Microsoft.Extensions.Hosting;
 
 namespace Mapping_Tools.Desktop.Hosting;
@@ -9,7 +9,7 @@ namespace Mapping_Tools.Desktop.Hosting;
 /// </summary>
 public sealed class SettingsPersistenceHostedService : IHostedService
 {
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
     private readonly ISettingsService settingsService;
     private bool saveOnShutdown = true;
 
@@ -19,7 +19,7 @@ public sealed class SettingsPersistenceHostedService : IHostedService
     /// <param name="settings">The mutable settings document used by desktop services.</param>
     /// <param name="settingsService">The storage service invoked during host shutdown.</param>
     public SettingsPersistenceHostedService(
-        ApplicationSettings settings,
+        DesktopApplicationSettings settings,
         ISettingsService settingsService)
     {
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));

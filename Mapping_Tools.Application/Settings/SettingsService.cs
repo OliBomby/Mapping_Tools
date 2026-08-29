@@ -11,6 +11,7 @@ public sealed class SettingsService : ISettingsService
 {
     private readonly ISettingsPathService paths;
     private readonly ISettingsStore store;
+    private readonly Func<ApplicationSettings> settingsFactory;
 
     /// <summary>
     ///     Creates a settings coordinator.
@@ -18,9 +19,28 @@ public sealed class SettingsService : ISettingsService
     /// <param name="store">Persistence for the portable settings document.</param>
     /// <param name="paths">The service that completes machine-dependent paths.</param>
     public SettingsService(ISettingsStore store, ISettingsPathService paths)
+        : this(store, paths, static () => new ApplicationSettings())
+    {
+    }
+
+    /// <summary>
+    ///     Creates a settings coordinator with a factory for the concrete settings
+    ///     document used by the active frontend.
+    /// </summary>
+    /// <param name="store">Persistence for the portable settings document.</param>
+    /// <param name="paths">The service that completes machine-dependent paths.</param>
+    /// <param name="settingsFactory">
+    ///     Creates a clean settings document for first-run initialization. The
+    ///     factory may return a frontend-specific subclass.
+    /// </param>
+    public SettingsService(
+        ISettingsStore store,
+        ISettingsPathService paths,
+        Func<ApplicationSettings> settingsFactory)
     {
         this.store = store ?? throw new ArgumentNullException(nameof(store));
         this.paths = paths ?? throw new ArgumentNullException(nameof(paths));
+        this.settingsFactory = settingsFactory ?? throw new ArgumentNullException(nameof(settingsFactory));
     }
 
     /// <summary>
@@ -32,7 +52,7 @@ public sealed class SettingsService : ISettingsService
     {
         bool wasCreated = !store.Exists;
         var settings = wasCreated
-            ? new ApplicationSettings()
+            ? settingsFactory()
             : store.Load();
 
         if (wasCreated) store.Save(settings);

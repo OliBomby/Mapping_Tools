@@ -8,6 +8,7 @@ using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
@@ -374,9 +375,9 @@ public sealed class PreferencesViewModelTests
         published[0].Title.Should().Be("Could not select folder");
     }
 
-    private static ApplicationSettings CreateSettings()
+    private static DesktopApplicationSettings CreateSettings()
     {
-        return new ApplicationSettings
+        return new DesktopApplicationSettings
         {
             OsuPath = @"C:\osu!",
             SongsPath = @"C:\osu!\Songs",
@@ -390,7 +391,7 @@ public sealed class PreferencesViewModelTests
     }
 
     private static PreferencesViewModel CreateViewModel(
-        ApplicationSettings settings,
+        DesktopApplicationSettings settings,
         TestFilePicker? filePicker = null,
         RecordingThemeService? themeService = null,
         IUserNotificationService? notifications = null,

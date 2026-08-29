@@ -10,6 +10,7 @@ using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Desktop.Platform;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;
@@ -27,7 +28,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     private readonly IUserNotificationService notifications;
     private readonly IQuickRunCommandRegistry quickRunRegistry;
 
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
     private readonly IApplicationThemeService themeService;
 
     /// <summary>Gets or edits the directory that receives beatmap backups.</summary>
@@ -68,7 +69,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     /// <param name="hotkeyBindings">Applies shortcut changes to the running global listener.</param>
     /// <param name="betterSaveOverride">Reconfigures automatic save observation immediately.</param>
     public PreferencesViewModel(
-        ApplicationSettings settings,
+        DesktopApplicationSettings settings,
         IFilePicker filePicker,
         IApplicationThemeService themeService,
         IUserNotificationService notifications,
@@ -357,7 +358,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
 
     private void ApplyValidatedValue<T>(
         T value,
-        Action<ApplicationSettings, T> apply,
+        Action<DesktopApplicationSettings, T> apply,
         string propertyName)
     {
         ValidationContext context = new(this) { MemberName = propertyName };
@@ -451,7 +452,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     private void SetQuickRunTarget(
         string current,
         string value,
-        Action<ApplicationSettings, string> apply)
+        Action<DesktopApplicationSettings, string> apply)
     {
         if (string.IsNullOrWhiteSpace(value)) return;
 
@@ -461,7 +462,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
     private void SetHotkey(
         HotkeySettings? current,
         HotkeySettings? value,
-        Action<ApplicationSettings, HotkeySettings?> apply,
+        Action<DesktopApplicationSettings, HotkeySettings?> apply,
         Action<HotkeySettings?> applyBinding)
     {
         if (SetProperty(current, value, settings, apply, false)) applyBinding(value);

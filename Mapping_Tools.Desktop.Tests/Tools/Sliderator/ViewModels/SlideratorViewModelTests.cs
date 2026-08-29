@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools.Sliderator.Contracts;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -385,11 +386,11 @@ public sealed class SlideratorViewModelTests
             new ToolExecutionService(
                 new UserNotificationService(),
                 new RecordingEditorReloadService(),
-                new ApplicationSettings(),
+                new DesktopApplicationSettings(),
                 TimeProvider.System),
             currentBeatmap ?? new RecordingCurrentBeatmapLocator(null),
             workspace ?? new TestBeatmapWorkspace(),
-            new ApplicationSettings(),
+            new DesktopApplicationSettings(),
             dialogs ?? new TestDialogService());
     }
 

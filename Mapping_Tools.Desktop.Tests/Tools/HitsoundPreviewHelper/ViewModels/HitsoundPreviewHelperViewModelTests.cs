@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Tools.RhythmGuide;
 using Mapping_Tools.Core.MathUtil;
@@ -122,7 +123,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
         ToolExecutionService execution = new(
             notifications,
             reloadService ?? new RecordingEditorReloadService(),
-            new ApplicationSettings(),
+            new DesktopApplicationSettings(),
             TimeProvider.System);
         var windows = windowService ?? new RecordingRhythmGuideWindowService();
         RhythmGuideViewModel rhythmGuide = new(
@@ -137,7 +138,7 @@ public sealed class HitsoundPreviewHelperViewModelTests
             execution,
             workspace ?? new TestBeatmapWorkspace(),
             new RecordingCurrentBeatmapLocator("current.osu"),
-            new ApplicationSettings(),
+            new DesktopApplicationSettings(),
             notifications,
             windows,
             rhythmGuide,

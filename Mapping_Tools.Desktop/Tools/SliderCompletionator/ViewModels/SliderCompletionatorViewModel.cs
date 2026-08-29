@@ -5,7 +5,7 @@ using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
 using Mapping_Tools.Application.Workspace.Contracts;
@@ -35,7 +35,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
         static () => new SliderCompletionatorProject(),
         "slider-completionator-project.json");
 
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
 
     /// <summary>
@@ -51,7 +51,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
         IToolExecutionService execution,
         ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
-        ApplicationSettings settings)
+        DesktopApplicationSettings settings)
         : base(execution, SliderCompletionatorToolDefinition.Definition)
     {
         this.completionator = completionator ?? throw new ArgumentNullException(nameof(completionator));

@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Desktop.Hosting;
+using Mapping_Tools.Desktop.Settings.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Hosting;
@@ -12,7 +13,7 @@ public sealed class SettingsPersistenceHostedServiceTests
     public async Task StopAsync_WithChangedSettings_SavesSharedDocumentOnce()
     {
         // Arrange
-        ApplicationSettings settings = new()
+        DesktopApplicationSettings settings = new()
         {
             SongsPath = @"D:\osu!\Songs",
         };
@@ -32,7 +33,7 @@ public sealed class SettingsPersistenceHostedServiceTests
     {
         // Arrange
         RecordingSettingsService settingsService = new();
-        SettingsPersistenceHostedService service = new(new ApplicationSettings(), settingsService);
+        SettingsPersistenceHostedService service = new(new DesktopApplicationSettings(), settingsService);
         service.SuppressSave();
 
         // Act

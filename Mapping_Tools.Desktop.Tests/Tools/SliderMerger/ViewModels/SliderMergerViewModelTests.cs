@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools.SliderMerger;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderMerger.Models;
@@ -64,7 +65,7 @@ public sealed class SliderMergerViewModelTests
         // Arrange
         RecordingMerger service = new();
         RecordingEditorReloadService reload = new();
-        ApplicationSettings settings = new() { AutoReload = true };
+        DesktopApplicationSettings settings = new() { AutoReload = true };
         var viewModel = Create(
             service,
             currentBeatmap: new RecordingCurrentBeatmapLocator("current.osu"),
@@ -116,10 +117,10 @@ public sealed class SliderMergerViewModelTests
         RecordingMerger service,
         TestBeatmapWorkspace? workspace = null,
         RecordingCurrentBeatmapLocator? currentBeatmap = null,
-        ApplicationSettings? settings = null,
+        DesktopApplicationSettings? settings = null,
         RecordingEditorReloadService? reload = null)
     {
-        var effectiveSettings = settings ?? new ApplicationSettings();
+        var effectiveSettings = settings ?? new DesktopApplicationSettings();
         return new SliderMergerViewModel(
             service,
             new ToolExecutionService(

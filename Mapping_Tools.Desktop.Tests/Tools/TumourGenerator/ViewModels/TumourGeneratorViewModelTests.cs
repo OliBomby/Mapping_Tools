@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -213,7 +214,7 @@ public sealed class TumourGeneratorViewModelTests
         TestDialogService? dialogs = null,
         TestBeatmapWorkspace? workspace = null)
     {
-        ApplicationSettings settings = new() { AutoReload = autoReload };
+        DesktopApplicationSettings settings = new() { AutoReload = autoReload };
         TumourGeneratorViewModel viewModel = new(
             service,
             new ToolExecutionService(

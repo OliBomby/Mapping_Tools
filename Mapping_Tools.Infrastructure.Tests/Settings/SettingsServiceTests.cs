@@ -4,6 +4,7 @@ using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Infrastructure.Files;
 using Mapping_Tools.Infrastructure.Settings;
+using Mapping_Tools.Core.Settings.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Infrastructure.Tests.Settings;
@@ -16,10 +17,10 @@ public sealed class SettingsServiceTests
     {
         // Arrange
         using var test = TestDirectory.FromFixture("legacy-config.json");
-        JsonSettingsStore store = new(test.Directories);
+        JsonSettingsStore store = new(test.Directories, typeof(TestApplicationSettings));
 
         // Act
-        var settings = store.Load();
+        var settings = (TestApplicationSettings)store.Load();
 
         // Assert
         settings.RecentMaps.Count.Should().Be(20);
@@ -40,13 +41,13 @@ public sealed class SettingsServiceTests
     {
         // Arrange
         using var test = TestDirectory.FromFixture("legacy-config.json");
-        JsonSettingsStore store = new(test.Directories);
-        var settings = store.Load();
+        JsonSettingsStore store = new(test.Directories, typeof(TestApplicationSettings));
+        var settings = (TestApplicationSettings)store.Load();
         settings.Theme = ApplicationTheme.Light;
 
         // Act
         store.Save(settings);
-        var reloaded = store.Load();
+        var reloaded = (TestApplicationSettings)store.Load();
 
         // Assert
         reloaded.MainWindowRestoreBounds.Should().Be(settings.MainWindowRestoreBounds);
@@ -126,6 +127,27 @@ public sealed class SettingsServiceTests
             CreatedDirectories.Add(path);
             Directory.CreateDirectory(path);
         }
+    }
+
+    public sealed class TestApplicationSettings : ApplicationSettings
+    {
+        public List<string> FavoriteTools { get; set; } = [];
+
+        public WindowBounds? MainWindowRestoreBounds { get; set; }
+
+        public bool MainWindowMaximized { get; set; }
+
+        public bool AlwaysQuickRun { get; set; }
+
+        public HotkeySettings? QuickRunHotkey { get; set; }
+
+        public HotkeySettings? BetterSaveHotkey { get; set; }
+
+        public bool OverrideOsuSave { get; set; }
+
+        public ApplicationTheme Theme { get; set; } = ApplicationTheme.Dark;
+
+        public HotkeySettings? QuickUndoHotkey { get; set; }
     }
 
     private sealed class TestDirectory : IDisposable

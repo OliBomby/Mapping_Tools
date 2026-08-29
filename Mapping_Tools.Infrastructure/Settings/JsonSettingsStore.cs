@@ -17,14 +17,36 @@ public sealed class JsonSettingsStore : ISettingsStore
 {
     private readonly IApplicationDirectories directories;
     private readonly JsonSerializerOptions options;
+    private readonly Type settingsType;
 
     /// <summary>
     ///     Creates a store for the configuration path supplied by the application layout.
     /// </summary>
     /// <param name="directories">Provides the configuration path and required parent directories.</param>
     public JsonSettingsStore(IApplicationDirectories directories)
+        : this(directories, typeof(ApplicationSettings))
+    {
+    }
+
+    /// <summary>
+    ///     Creates a store that materializes the supplied concrete settings type
+    ///     while retaining the frontend-neutral persistence contract.
+    /// </summary>
+    /// <param name="directories">Provides the configuration path and required parent directories.</param>
+    /// <param name="settingsType">
+    ///     A non-abstract type derived from <see cref="ApplicationSettings" />.
+    ///     Its inherited and declared public properties are persisted together.
+    /// </param>
+    public JsonSettingsStore(IApplicationDirectories directories, Type settingsType)
     {
         this.directories = directories ?? throw new ArgumentNullException(nameof(directories));
+        ArgumentNullException.ThrowIfNull(settingsType);
+        if (!typeof(ApplicationSettings).IsAssignableFrom(settingsType) || settingsType.IsAbstract)
+            throw new ArgumentException(
+                $"Settings type must be a non-abstract {nameof(ApplicationSettings)} subtype.",
+                nameof(settingsType));
+
+        this.settingsType = settingsType;
         options = new JsonSerializerOptions
         {
             AllowTrailingCommas = true,
@@ -45,7 +67,7 @@ public sealed class JsonSettingsStore : ISettingsStore
     public ApplicationSettings Load()
     {
         string json = File.ReadAllText(directories.ConfigurationFile);
-        return JsonSerializer.Deserialize<ApplicationSettings>(json, options)
+        return (JsonSerializer.Deserialize(json, settingsType, options) as ApplicationSettings)
                ?? throw new JsonException("The settings document contained no JSON value.");
     }
 
@@ -59,7 +81,7 @@ public sealed class JsonSettingsStore : ISettingsStore
         ArgumentNullException.ThrowIfNull(settings);
         directories.EnsureCreated();
 
-        string json = JsonSerializer.Serialize(settings, options);
+        string json = JsonSerializer.Serialize(settings, settings.GetType(), options);
         PhysicalAtomicFileWriter.WriteText(
             directories.ConfigurationFile,
             json,

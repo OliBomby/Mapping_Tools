@@ -5,7 +5,7 @@ using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.SliderMerger;
 using Mapping_Tools.Application.Workspace.Contracts;
@@ -34,7 +34,7 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
         "slider-merger-project.json");
 
     private readonly ISliderMergerService merger;
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
 
     /// <summary>
@@ -50,7 +50,7 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
         IToolExecutionService execution,
         ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
-        ApplicationSettings settings)
+        DesktopApplicationSettings settings)
         : base(execution, SliderMergerToolDefinition.Definition)
     {
         this.merger = merger ?? throw new ArgumentNullException(nameof(merger));

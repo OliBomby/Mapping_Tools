@@ -9,7 +9,7 @@ using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
@@ -50,7 +50,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
 
     private readonly ITumourGeneratorService generator;
     private readonly object previewGate = new();
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
     private int currentLayerIndex;
     private bool disposed;
@@ -73,7 +73,7 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         IToolExecutionService execution,
         ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
-        ApplicationSettings settings,
+        DesktopApplicationSettings settings,
         IDialogService dialogs)
         : base(execution, TumourGeneratorToolDefinition.Definition)
     {

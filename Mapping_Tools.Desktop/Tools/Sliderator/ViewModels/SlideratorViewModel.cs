@@ -9,7 +9,7 @@ using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.Sliderator;
 using Mapping_Tools.Application.Tools.Sliderator.Contracts;
@@ -45,7 +45,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         "sliderator-project.json");
 
     private readonly IDialogService dialogs;
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
 
     private readonly ISlideratorService sliderator;
     private readonly IBeatmapWorkspace workspace;
@@ -68,7 +68,7 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         IToolExecutionService execution,
         ICurrentBeatmapLocator currentBeatmap,
         IBeatmapWorkspace workspace,
-        ApplicationSettings settings,
+        DesktopApplicationSettings settings,
         IDialogService dialogs)
         : base(execution, SlideratorToolDefinition.Definition)
     {

@@ -5,6 +5,7 @@ using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.QuickRun;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.MapCleaner;
@@ -222,7 +223,7 @@ public sealed class MapCleanerViewModelTests
         bool autoReload = false)
     {
         UserNotificationService notifications = new();
-        ApplicationSettings settings = new() { AutoReload = autoReload };
+        DesktopApplicationSettings settings = new() { AutoReload = autoReload };
         return new MapCleanerViewModel(
             cleaner,
             new ToolExecutionService(notifications, reload ?? new RecordingEditorReloadService(), settings, TimeProvider.System),

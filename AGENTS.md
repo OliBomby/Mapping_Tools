@@ -69,6 +69,7 @@ completing a migration.
 - Insert whitespace between logical blocks of code to improve readability.
 - Test project file structure should always match that of the production project. If the file moves, the test file moves with it.
 - One file may only contain one public type. Multiple public types must be split up into multiple files.
+- Dont introduce aliases in using statements.
 
 ## Layer boundaries
 

@@ -10,7 +10,7 @@ using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.SliderPicturator;
 using Mapping_Tools.Application.Workspace.Contracts;
@@ -39,7 +39,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     private readonly IImageFileService images;
     private readonly IUserNotificationService notifications;
     private readonly ISliderPicturatorService picturator;
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
     private CancellationTokenSource? colorRefreshCancellation;
     private CancellationTokenSource? imageLoadCancellation;
@@ -59,7 +59,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     /// <param name="notifications">Publishes picker and preview failures.</param>
     public SliderPicturatorViewModel(ISliderPicturatorService picturator, IImageFileService images,
         IFilePicker filePicker, IToolExecutionService execution, ICurrentBeatmapLocator currentBeatmap,
-        IBeatmapWorkspace workspace, ApplicationSettings settings, IUserNotificationService notifications)
+        IBeatmapWorkspace workspace, DesktopApplicationSettings settings, IUserNotificationService notifications)
         : base(execution, SliderPicturatorToolDefinition.Definition)
     {
         this.picturator = picturator ?? throw new ArgumentNullException(nameof(picturator));

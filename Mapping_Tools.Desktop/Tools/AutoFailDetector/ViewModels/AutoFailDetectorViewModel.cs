@@ -5,7 +5,7 @@ using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Timeline;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.AutoFail;
@@ -23,7 +23,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     private readonly ICurrentBeatmapLocator currentBeatmap;
     private readonly IDialogService dialogs;
     private readonly IPlatformLauncher launcher;
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
 
     /// <summary>Creates an Auto-fail Detector presentation model.</summary>
@@ -39,7 +39,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         IToolExecutionService execution,
         IBeatmapWorkspace workspace,
         ICurrentBeatmapLocator currentBeatmap,
-        ApplicationSettings settings,
+        DesktopApplicationSettings settings,
         IDialogService dialogs,
         IPlatformLauncher launcher)
         : base(execution, AutoFailDetectorToolDefinition.Definition)

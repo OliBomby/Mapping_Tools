@@ -5,6 +5,7 @@ using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Models;
 using Mapping_Tools.Core.Audio;
@@ -65,7 +66,7 @@ public sealed class HitsoundStudioViewModelTests
         ToolExecutionService execution = new(
             notifications,
             new RecordingEditorReloadService(),
-            new ApplicationSettings(),
+            new DesktopApplicationSettings(),
             TimeProvider.System);
         return new HitsoundStudioViewModel(
             service,
@@ -78,7 +79,7 @@ public sealed class HitsoundStudioViewModelTests
             new TestFilePicker(),
             new StubHitsoundStudioFileSystem(),
             new StubProjectStore(),
-            new ApplicationSettings(),
+            new DesktopApplicationSettings(),
             new TestApplicationDirectories());
     }
 

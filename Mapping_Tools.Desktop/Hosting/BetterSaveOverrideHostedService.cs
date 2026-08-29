@@ -1,5 +1,5 @@
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Microsoft.Extensions.Hosting;
 
 namespace Mapping_Tools.Desktop.Hosting;
@@ -7,11 +7,11 @@ namespace Mapping_Tools.Desktop.Hosting;
 internal sealed class BetterSaveOverrideHostedService : IHostedService
 {
     private readonly IBetterSaveOverrideService overrideService;
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
 
     public BetterSaveOverrideHostedService(
         IBetterSaveOverrideService overrideService,
-        ApplicationSettings settings)
+        DesktopApplicationSettings settings)
     {
         this.overrideService = overrideService ?? throw new ArgumentNullException(nameof(overrideService));
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));

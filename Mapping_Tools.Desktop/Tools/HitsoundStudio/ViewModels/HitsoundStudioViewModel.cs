@@ -13,7 +13,7 @@ using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.HitsoundStudio;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
@@ -55,7 +55,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     private readonly IProjectStore projectStore;
 
     private readonly IHitsoundStudioService service;
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;
     private readonly SemaphoreSlim previewGate = new(1, 1);
     private CancellationTokenSource? previewCancellation;
@@ -89,7 +89,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         IFilePicker filePicker,
         IBeatmapsetFileSystem files,
         IProjectStore projectStore,
-        ApplicationSettings settings,
+        DesktopApplicationSettings settings,
         IApplicationDirectories directories)
         : base(execution, HitsoundStudioToolDefinition.Definition)
     {

@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Shell.Models;
@@ -26,7 +27,7 @@ public partial class MainWindow : Window
 {
     private static readonly WindowBounds defaultBounds = new(80, 60, 1500, 800);
     private static readonly TimeSpan snackbarDuration = TimeSpan.FromSeconds(5);
-    private readonly ApplicationSettings settings;
+    private readonly DesktopApplicationSettings settings;
     private readonly IUserNotificationService? notifications;
     private readonly SettingsPersistenceHostedService? settingsPersistence;
     private readonly IUpdaterInteractionService? updaterInteraction;
@@ -39,7 +40,7 @@ public partial class MainWindow : Window
     ///     Runtime composition uses the settings-aware constructor.
     /// </summary>
     public MainWindow()
-        : this(new ApplicationSettings(), null, null)
+        : this(new DesktopApplicationSettings(), null, null)
     {
     }
 
@@ -47,7 +48,7 @@ public partial class MainWindow : Window
     ///     Loads the compiled shell and attaches the shared window-placement state.
     /// </summary>
     public MainWindow(
-        ApplicationSettings settings)
+        DesktopApplicationSettings settings)
         : this(settings, null, null)
     {
     }
@@ -58,7 +59,7 @@ public partial class MainWindow : Window
     /// <param name="settings">The process-lifetime settings document.</param>
     /// <param name="settingsPersistence">The orderly-shutdown boundary used by Exit without saving.</param>
     public MainWindow(
-        ApplicationSettings settings,
+        DesktopApplicationSettings settings,
         SettingsPersistenceHostedService? settingsPersistence)
         : this(settings, settingsPersistence, null)
     {
@@ -71,7 +72,7 @@ public partial class MainWindow : Window
     /// <param name="settingsPersistence">The orderly-shutdown boundary used by Exit without saving.</param>
     /// <param name="updaterInteraction">The updater interaction owned by runtime composition.</param>
     public MainWindow(
-        ApplicationSettings settings,
+        DesktopApplicationSettings settings,
         SettingsPersistenceHostedService? settingsPersistence,
         IUpdaterInteractionService? updaterInteraction)
         : this(settings, settingsPersistence, updaterInteraction, null)
@@ -86,7 +87,7 @@ public partial class MainWindow : Window
     /// <param name="updaterInteraction">The updater interaction owned by runtime composition.</param>
     /// <param name="notifications">The process-lifetime stream displayed through the material snackbar host.</param>
     public MainWindow(
-        ApplicationSettings settings,
+        DesktopApplicationSettings settings,
         SettingsPersistenceHostedService? settingsPersistence,
         IUpdaterInteractionService? updaterInteraction,
         IUserNotificationService? notifications)
