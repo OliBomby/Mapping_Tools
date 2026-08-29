@@ -77,8 +77,10 @@ structure and presentation: the original numbered text in a real `ListBox`,
 the selectable changelog list and recent-map table, two equal columns, movable
 `GridSplitter` controls, blue 32-point Get started, Changelog, and Recent
 headings, and the Path/Date recent-map table on the dark Material surface. No
-cards, badges, extra landing-page buttons, rewritten instructions, release
-notes, or empty-state prose are added.
+cards, badges, extra landing-page buttons, rewritten instructions, or
+empty-state prose are added. The changelog fetches the latest GitHub release
+metadata through the existing update gateway and renders its Markdown body in
+the Avalonia view.
 
 Recent maps use Avalonia 12.1's real `TableView`: column headers, rows,
 selection, scrolling, and resizer thumbs belong to the same control. The Path
@@ -87,8 +89,9 @@ user-resizable; the Date column consumes the remaining width. Both empty and
 populated WPF/Avalonia states were rendered because an empty table cannot
 verify shared header/cell column boundaries.
 
-The Avalonia view does not perform a network request during construction, so
-the legacy empty changelog state remains deterministic and safe offline.
+The Avalonia view starts a cancellable release-notes request during construction.
+If GitHub is unavailable or returns invalid metadata, the rest of the landing
+page remains usable without a changelog entry.
 Website and source links remain available from the shell's legacy-positioned
 About menu through `IPlatformLauncher`. If the operating system rejects a
 support link, the page publishes a warning through the shared notification

@@ -20,6 +20,10 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
     private const string release_metadata_url =
         "https://api.github.com/repos/OliBomby/Mapping_Tools/releases/latest";
 
+    private const string release_history_url =
+        "https://api.github.com/repos/OliBomby/Mapping_Tools/releases";
+    private const int release_page_size = 100;
+
     private readonly string assetName;
     private readonly bool disposeHttpClient;
     private readonly HttpClient httpClient;
@@ -84,7 +88,7 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
             .CheckForUpdatesAsync(cancellationToken)
             .ConfigureAwait(false);
         UpdateReleaseNotes? notes = null;
-        if (result.CanUpdate && result.LastVersion is not null) notes = await ReadReleaseNotesAsync(cancellationToken).ConfigureAwait(false);
+        if (result.CanUpdate && result.LastVersion is not null) notes = await ReadLatestReleaseNotesAsync(cancellationToken).ConfigureAwait(false);
 
         return new UpdatePackageInfo(
             updateManager.Updatee.Version,
@@ -92,6 +96,14 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
             notes?.Title,
             notes?.Body,
             assetName);
+    }
+
+    /// <inheritdoc />
+    public Task<IReadOnlyList<UpdateReleaseNotes>> GetReleaseNotesAsync(
+        CancellationToken cancellationToken = default)
+    {
+        ThrowIfDisposed();
+        return ReadReleaseNotesAsync(cancellationToken);
     }
 
     /// <inheritdoc />
@@ -128,7 +140,7 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
         if (disposeHttpClient) httpClient.Dispose();
     }
 
-    private async Task<UpdateReleaseNotes> ReadReleaseNotesAsync(
+    private async Task<UpdateReleaseNotes> ReadLatestReleaseNotesAsync(
         CancellationToken cancellationToken)
     {
         using var response = await httpClient
@@ -139,6 +151,27 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
             .ReadAsStringAsync(cancellationToken)
             .ConfigureAwait(false);
         return GithubReleaseMetadataParser.Parse(json);
+    }
+
+    private async Task<IReadOnlyList<UpdateReleaseNotes>> ReadReleaseNotesAsync(
+        CancellationToken cancellationToken)
+    {
+        List<UpdateReleaseNotes> releaseNotes = [];
+
+        for (int page = 1; ; page++)
+        {
+            using var response = await httpClient
+                .GetAsync($"{release_history_url}?per_page={release_page_size}&page={page}", cancellationToken)
+                .ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            string json = await response.Content
+                .ReadAsStringAsync(cancellationToken)
+                .ConfigureAwait(false);
+            IReadOnlyList<UpdateReleaseNotes> pageNotes = GithubReleaseMetadataParser.ParseMany(json);
+            releaseNotes.AddRange(pageNotes);
+
+            if (pageNotes.Count < release_page_size) return releaseNotes;
+        }
     }
 
     private void ThrowIfDisposed()

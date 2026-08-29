@@ -17,6 +17,15 @@ public interface IUpdateGateway : IDisposable
     Task<UpdatePackageInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Reads the public GitHub release titles and Markdown descriptions
+    ///     without checking or preparing an update package.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the release-metadata request.</param>
+    /// <returns>All published release titles and bodies returned by GitHub, newest first.</returns>
+    /// <exception cref="OperationCanceledException">The cancellation token was canceled.</exception>
+    Task<IReadOnlyList<UpdateReleaseNotes>> GetReleaseNotesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     ///     Downloads, validates, extracts, and stages one previously discovered package.
     /// </summary>
     /// <param name="version">The version returned by the last successful check.</param>
@@ -38,4 +47,3 @@ public interface IUpdateGateway : IDisposable
     /// <exception cref="PlatformNotSupportedException">The selected deployment platform has no supported updater process.</exception>
     void LaunchUpdater(Version version, bool restartAfterUpdate);
 }
-

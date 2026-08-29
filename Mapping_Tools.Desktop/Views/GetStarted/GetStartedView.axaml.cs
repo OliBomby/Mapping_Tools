@@ -7,7 +7,7 @@ using Mapping_Tools.Desktop.ViewModels.GetStarted;
 namespace Mapping_Tools.Desktop.Views.GetStarted;
 
 /// <summary>
-///     Renders the offline Get started landing page inside the main shell.
+///     Renders the Get started landing page inside the main shell.
 /// </summary>
 public partial class GetStartedView : UserControl
 {

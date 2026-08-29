@@ -253,6 +253,14 @@ public sealed class UpdateServiceTests
             return CheckAsync(cancellationToken);
         }
 
+        public Task<IReadOnlyList<UpdateReleaseNotes>> GetReleaseNotesAsync(
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult<IReadOnlyList<UpdateReleaseNotes>>
+            ([new UpdateReleaseNotes(Result.ReleaseTitle, Result.ReleaseBody)]);
+        }
+
         public Task PrepareUpdateAsync(
             Version version,
             IProgress<double> progress,

@@ -2,6 +2,7 @@
         xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+        xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
         xmlns:vm="using:Mapping_Tools.Desktop.Updates"
         x:DataType="vm:UpdaterViewModel"
         Title="Mapping Tools - Updater"
@@ -44,9 +45,7 @@
                                    TextWrapping="Wrap"
                                    FontSize="18"
                                    FontWeight="Bold" />
-                        <TextBlock Text="{Binding ReleaseBody}"
-                                   TextWrapping="Wrap"
-                                   FontSize="14" />
+                        <md:MarkdownScrollViewer Markdown="{Binding ReleaseBody}" />
                     </StackPanel>
                 </ScrollViewer>
             </materialControls:Card>

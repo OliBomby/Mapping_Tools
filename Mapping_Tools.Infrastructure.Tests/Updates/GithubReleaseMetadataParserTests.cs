@@ -73,4 +73,18 @@ public sealed class GithubReleaseMetadataParserTests
         // Assert
         act.Should().Throw<JsonException>();
     }
+
+    [TestMethod]
+    public void ParseMany_WithGitHubReleaseArray_ReturnsAllReleasesInSourceOrder()
+    {
+        // Arrange
+        const string json = "[{\"name\":\"Version 2.0\",\"body\":\"New\"},{\"name\":null,\"tag_name\":\"v1.0\",\"body\":\"Old\"}]";
+
+        // Act
+        var notes = GithubReleaseMetadataParser.ParseMany(json);
+
+        // Assert
+        notes.Select(note => note.Title).Should().Equal("Version 2.0", "v1.0");
+        notes.Select(note => note.Body).Should().Equal("New", "Old");
+    }
 }

@@ -180,7 +180,7 @@ Every row also inherits the common cases in section 9 and all applicable shell c
 
 | Feature | Minimum feature-specific scenarios | Required evidence |
 |---|---|---|
-| Get started | Empty and populated recent lists; help/website actions; offline changelog; keyboard and narrow-window layout. | Paired renders, link results, offline behavior. |
+| Get started | Empty and populated recent lists; help/website actions; live GitHub changelog; keyboard and narrow-window layout. | Paired renders, release-note Markdown, GitHub-unavailable fallback. |
 | Preferences | Default and migrated settings; each path picker; invalid/missing paths; backup policy; EditorReader toggle; theme; favorites; hotkeys; smart targets; restart persistence. | Settings before/after, screenshots, validation results. |
 | Current-map and backup workflows | One/many maps, current editor map, recent maps, drag/drop, missing map, backup creation/open/restore, QuickUndo, failed write. | Workspace state log, backup contents, restored-file comparison. |
 | Project lifecycle | New/Open/Save/Save As/autosave for each participating feature; legacy schema; unknown fields; invalid JSON; cancelled and failed write. | Project compatibility report and round-trip files. |

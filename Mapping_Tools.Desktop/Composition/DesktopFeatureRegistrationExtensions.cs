@@ -22,7 +22,7 @@ internal static class DesktopFeatureRegistrationExtensions
             "get-started",
             "Get started",
             "Home",
-            "Onboarding, bundled changelog, support links, and recent beatmaps.",
+            "Onboarding, GitHub release notes, support links, and recent beatmaps.",
             ["home", "help", "changelog", "recent", "faq"]);
         services.AddShellFeature<PreferencesViewModel>(
             "preferences",

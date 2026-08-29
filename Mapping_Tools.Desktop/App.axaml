@@ -51,6 +51,7 @@
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/MaterialListBoxes.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/ColorPickers.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Cards.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Markdown.axaml" />
 
         <!-- Styles owned by code-only custom controls. -->
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/TimelineControl.axaml" />
