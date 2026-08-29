@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Mapping_Tools.SamplePlugin"
+             xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="Mapping_Tools.SamplePlugin.SampleToolView"
+             x:DataType="vm:SampleToolViewModel">
+    <Grid RowDefinitions="*,Auto">
+        <Grid Margin="0,0,0,10">
+            <StackPanel>
+                <controls:ToolViewHeader
+                    Title="Sample Plugin"
+                    IsQuickRunSupported="True"
+                    HelpText="Adds the configured tag to the beatmaps selected in Mapping Tools. QuickRun uses the shell's current beatmap and reloads osu! after a successful edit." />
+
+                <TextBox Width="300"
+                         Margin="0,10,0,0"
+                         HorizontalAlignment="Left"
+                         materialAssists:TextFieldAssist.Label="Tag"
+                         Text="{Binding Tag, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="The whitespace-free tag to add to selected beatmaps." />
+            </StackPanel>
+
+            <controls:ToolRunButton Margin="10"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    RunCommand="{Binding RunCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <TextBlock VerticalAlignment="Bottom"
+                       FontWeight="Bold"
+                       Opacity="0.58"
+                       Text="Sample plugin" />
+            <controls:ToolProgressBar Grid.Column="1"
+                                      Height="20"
+                                      Margin="20,0"
+                                      Maximum="100"
+                                      Value="{Binding Progress}" />
+        </Grid>
+    </Grid>
+</UserControl>

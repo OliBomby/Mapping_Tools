@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!-- Disable Avalonia's build-time usage statistics task; developer tools remain enabled. -->
+    <UsedAvaloniaProducts></UsedAvaloniaProducts>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <PluginArtifactDirectory>$(MSBuildProjectDirectory)\bin\$(Configuration)\plugin</PluginArtifactDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The host supplies these assemblies at runtime. Excluding their runtime assets keeps the drop-in artifact to one DLL. -->
+    <PackageReference Include="Avalonia" Version="12.1.0" ExcludeAssets="runtime" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Keep this version aligned with the Mapping Tools host that loads the plugin. -->
+    <ProjectReference Include="..\Mapping_Tools.Desktop\Mapping_Tools.Desktop.csproj"
+                      Private="false" />
+    <ProjectReference Include="..\Mapping_Tools.Application\Mapping_Tools.Application.csproj"
+                      Private="false" />
+    <ProjectReference Include="..\Mapping_Tools.Core\Mapping_Tools.Core.csproj"
+                      Private="false" />
+  </ItemGroup>
+
+  <Target Name="PackagePlugin" AfterTargets="Build">
+    <MakeDir Directories="$(PluginArtifactDirectory)" />
+    <Copy SourceFiles="$(TargetPath)"
+          DestinationFiles="$(PluginArtifactDirectory)\$(TargetFileName)" />
+  </Target>
+</Project>
