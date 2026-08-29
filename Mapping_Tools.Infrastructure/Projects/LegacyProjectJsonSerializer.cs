@@ -80,8 +80,28 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
     public TProject Deserialize<TProject>(string json)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(json);
-        return JsonConvert.DeserializeObject<TProject>(json, CreateSettings())
-               ?? throw new InvalidDataException("The project document contained a JSON null root.");
+        TProject project = JsonConvert.DeserializeObject<TProject>(json, CreateSettings())
+                           ?? throw new InvalidDataException("The project document contained a JSON null root.");
+        MigrateGeometryDashboardKeepRunning(json, project);
+        return project;
+    }
+
+    private static void MigrateGeometryDashboardKeepRunning<TProject>(string json, TProject project)
+    {
+        if (project is not GeometryDashboardEngineOptions) return;
+
+        var property = project.GetType().GetProperty(
+            "KeepRunning",
+            BindingFlags.Instance | BindingFlags.Public);
+        if (property?.PropertyType != typeof(bool) || !property.CanWrite) return;
+
+        JObject root = JObject.Parse(json);
+        if (root["KeepRunning"] is not null) return;
+        if (root["CurrentPreferences"]?["KeepRunning"] is not JValue value
+            || value.Type != JTokenType.Boolean)
+            return;
+
+        property.SetValue(project, value.Value<bool>());
     }
 
     private static JsonSerializerSettings CreateSettings()

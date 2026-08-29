@@ -132,7 +132,7 @@
                              Text="{Binding Preferences.AcceptableDifference, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
                              ToolTip.Tip="Similar virtual objects get merged together to reduce clutter. This field sets the minimal difference that two objects must have to not get merged together." />
                 </Grid>
-                <CheckBox Content="Keep running" IsChecked="{Binding Preferences.KeepRunning, Mode=TwoWay}"
+                <CheckBox Content="Keep running" IsChecked="{Binding KeepRunning, Mode=TwoWay}"
                           ToolTip.Tip="Keep the tool running when another tool is selected." />
                 <CheckBox Content="See playfield"
                           IsChecked="{Binding Preferences.VisiblePlayfieldBoundary, Mode=TwoWay}"

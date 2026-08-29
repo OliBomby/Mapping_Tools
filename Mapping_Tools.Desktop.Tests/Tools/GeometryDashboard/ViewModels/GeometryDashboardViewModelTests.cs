@@ -6,6 +6,7 @@ using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Tools.GeometryDashboard;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -13,6 +14,8 @@ using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tools.GeometryDashboard;
+using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -142,12 +145,23 @@ public sealed class GeometryDashboardViewModelTests
         IGlobalHotkeyService? globalHotkeys = null,
         params GeometryDashboardRuntimeSnapshot?[] snapshots)
     {
-        return new GeometryDashboardViewModel(
+        var project = new GeometryDashboardProject();
+        var runtime = new RuntimeStub(snapshots);
+        var input = new InputStub(inputSupported);
+        var overlay = new OverlayStub();
+        var service = new GeometryDashboardService(
             new ApplicationSettings(),
+            project,
+            runtime,
+            input,
+            overlay);
+        var lifecycle = new GeometryDashboardLifecycleCoordinator(project, service);
+
+        return new GeometryDashboardViewModel(
+            project,
+            service,
+            lifecycle,
             globalHotkeys ?? new RecordingGlobalHotkeyService(),
-            new RuntimeStub(snapshots),
-            new InputStub(inputSupported),
-            new OverlayStub(),
             new SerializerStub(),
             new TestFilePicker
             {
@@ -294,6 +308,7 @@ public sealed class GeometryDashboardViewModelTests
 
         public Task PublishAsync(UserNotification notification, CancellationToken cancellationToken = default)
         {
+            Published?.Invoke(this, new UserNotificationPublishedEventArgs(notification));
             return Task.CompletedTask;
         }
     }

@@ -15,6 +15,8 @@ using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Application.Tools.AutoFail;
 using Mapping_Tools.Application.Tools.ComboColourStudio;
+using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
+using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Application.Tools.RhythmGuide;
@@ -30,6 +32,8 @@ using Mapping_Tools.Desktop.Platform;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
+using Mapping_Tools.Desktop.Tools.GeometryDashboard;
+using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
 using Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
@@ -70,6 +74,10 @@ public sealed class DependencyInjectionTests
             typeof(TumourGeneratorViewModel),
             typeof(PatternGalleryViewModel),
             typeof(GeometryDashboardViewModel),
+            typeof(GeometryDashboardProject),
+            typeof(GeometryDashboardServiceOptions),
+            typeof(IGeometryDashboardService),
+            typeof(GeometryDashboardLifecycleCoordinator),
             typeof(IUpdateService),
             typeof(IDialogService),
             typeof(IFilePicker),

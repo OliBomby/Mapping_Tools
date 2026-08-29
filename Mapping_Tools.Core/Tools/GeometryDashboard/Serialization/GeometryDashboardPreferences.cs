@@ -99,9 +99,6 @@ public sealed class GeometryDashboardPreferences : ICloneable
     /// <summary>Gets or sets the duplicate-distance tolerance in editor pixels.</summary>
     public double AcceptableDifference { get; set; }
 
-    /// <summary>Gets or sets whether the engine continues when the dashboard is hidden.</summary>
-    public bool KeepRunning { get; set; }
-
     /// <summary>Gets or sets whether the osu! playfield boundary is displayed.</summary>
     public bool VisiblePlayfieldBoundary { get; set; }
 

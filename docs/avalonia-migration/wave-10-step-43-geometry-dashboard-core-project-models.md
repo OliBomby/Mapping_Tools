@@ -17,7 +17,7 @@ The legacy WPF implementation was read as the normative behavioral specification
 - every source under `Mapping_Tools/Classes/Tools/GeometryDashboard/DataStructure/RelevantObjectGenerators/`
 - `Mapping_Tools.Infrastructure.Tests/Projects/GeometryDashboardProjectPersistenceTests.cs` and the Geometry Dashboard fixtures under `Mapping_Tools.Infrastructure.Tests/Fixtures/GeometryDashboard/`
 
-Step 43 moves the neutral geometry graph, all reflection-discovered generators and settings, layer/allocation rules, and project preferences/save-slot models. Windows coordinate formulas are implemented with the step-44 Infrastructure boundary. Step 43 does not move process discovery, editor memory reads, global hotkeys, cursor/window tracking, overlay drawing, WPF commands, or any view.
+Step 43 moves the neutral geometry graph, all reflection-discovered generators and settings, layer/allocation rules, and project preferences/save-slot models. Windows coordinate formulas are implemented with the step-44 Infrastructure boundary. The Desktop-only `KeepRunning` lifecycle preference is intentionally kept out of the Core preferences model and belongs to the Desktop project model. Step 43 does not move process discovery, editor memory reads, global hotkeys, cursor/window tracking, overlay drawing, WPF commands, or any view.
 
 ## Architecture
 

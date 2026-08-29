@@ -1,6 +1,8 @@
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.GeometryDashboard;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
+using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
+using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Desktop.Plugin;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
@@ -43,6 +45,13 @@ public sealed class GeometryDashboardToolRegistration : IMappingToolDefinition
     public void RegisterServices(IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
+        services.AddSingleton<GeometryDashboardProject>();
+        services.AddSingleton<GeometryDashboardServiceOptions>(provider =>
+            provider.GetRequiredService<GeometryDashboardProject>());
+        services.AddSingleton<IGeometryDashboardService, GeometryDashboardService>();
+        services.AddSingleton<GeometryDashboardLifecycleCoordinator>();
+        services.AddHostedService(provider =>
+            provider.GetRequiredService<GeometryDashboardLifecycleCoordinator>());
         services.AddSingleton<IGeometryDashboardProcessDiscovery, WindowsOsuProcessDiscovery>();
         services.AddSingleton<IGeometryDashboardScreenService, WindowsGeometryDashboardScreenService>();
         services.AddSingleton<IGeometryDashboardWindowService, WindowsGeometryDashboardWindowService>();

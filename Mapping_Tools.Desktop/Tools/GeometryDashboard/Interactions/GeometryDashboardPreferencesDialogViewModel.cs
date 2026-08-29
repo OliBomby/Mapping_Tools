@@ -8,16 +8,30 @@ namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
 /// <summary>Edits a cloned preference document until Apply or Cancel is selected.</summary>
 public sealed partial class GeometryDashboardPreferencesDialogViewModel : ObservableObject
 {
+    private bool keepRunning;
+
     /// <summary>Creates the dialog over an independent preference clone.</summary>
-    public GeometryDashboardPreferencesDialogViewModel(GeometryDashboardPreferences preferences)
+    /// <param name="preferences">The independent engine preference clone.</param>
+    /// <param name="keepRunning">The Desktop lifecycle preference to edit.</param>
+    public GeometryDashboardPreferencesDialogViewModel(
+        GeometryDashboardPreferences preferences,
+        bool keepRunning)
     {
         Preferences = preferences ?? throw new ArgumentNullException(nameof(preferences));
+        this.keepRunning = keepRunning;
         Appearance = new ObservableCollection<GeometryDashboardPreferenceRowViewModel>(
             Preferences.RelevantObjectPreferences.Values.Select(value => new GeometryDashboardPreferenceRowViewModel(value)));
     }
 
     /// <summary>Gets the independent document being edited.</summary>
     public GeometryDashboardPreferences Preferences { get; }
+
+    /// <summary>Gets or sets whether Desktop keeps the service running when this view is hidden.</summary>
+    public bool KeepRunning
+    {
+        get => keepRunning;
+        set => SetProperty(ref keepRunning, value);
+    }
 
     /// <summary>Gets the supported root-hit-object selection modes.</summary>
     public IReadOnlyList<SelectedHitObjectMode> SelectedHitObjectModes { get; } = Enum.GetValues<SelectedHitObjectMode>();
@@ -134,13 +148,13 @@ public sealed partial class GeometryDashboardPreferencesDialogViewModel : Observ
     }
 
     /// <summary>Receives the window close callback.</summary>
-    public Action<GeometryDashboardPreferences?>? Close { get; set; }
+    public Action<GeometryDashboardPreferencesDialogResult?>? Close { get; set; }
 
     /// <summary>Applies the clone to the caller.</summary>
     [RelayCommand]
     private void Apply()
     {
-        Close?.Invoke(Preferences);
+        Close?.Invoke(new GeometryDashboardPreferencesDialogResult(Preferences, KeepRunning));
     }
 
     /// <summary>Discards the clone.</summary>
@@ -188,4 +202,3 @@ public sealed partial class GeometryDashboardPreferencesDialogViewModel : Observ
         OnPropertyChanged(nameof(UpdatingOsuActivated));
     }
 }
-
