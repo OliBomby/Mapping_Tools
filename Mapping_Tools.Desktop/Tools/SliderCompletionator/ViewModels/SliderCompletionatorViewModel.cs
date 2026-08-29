@@ -23,7 +23,7 @@ namespace Mapping_Tools.Desktop.Tools.SliderCompletionator.ViewModels;
 /// </summary>
 public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewModel,
     IQuickRun,
-    IShellProjectFeature
+    IShellProjectFeature<SliderCompletionatorProject>
 {
 
     private readonly ISliderCompletionatorService completionator;
@@ -163,16 +163,16 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
             cancellationToken));
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<SliderCompletionatorProject> IShellProjectFeature<SliderCompletionatorProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    SliderCompletionatorProject IShellProjectFeature<SliderCompletionatorProject>.Snapshot()
     {
         return Snapshot();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<SliderCompletionatorProject>.Install(SliderCompletionatorProject project)
     {
-        Install((SliderCompletionatorProject)project);
+        Install(project);
     }
 
     /// <inheritdoc />

@@ -151,7 +151,7 @@ public sealed class ProjectAutosaveCoordinatorTests
             new UserNotificationService());
     }
 
-    private sealed class TestProjectFeature : IShellProjectFeature
+    private sealed class TestProjectFeature : IShellProjectFeature<TestProject>
     {
         private static readonly ProjectDefinition<TestProject> definition = new(
             "testproject.json",
@@ -168,19 +168,18 @@ public sealed class ProjectAutosaveCoordinatorTests
 
         public IReadOnlyList<string> AdditionalAutoSavePaths { get; init; } = [];
 
-        public IProjectDefinition ProjectDefinition => definition;
+        public ProjectDefinition<TestProject> ProjectDefinition => definition;
 
-        public object Snapshot()
+        public TestProject Snapshot()
         {
             return new TestProject(Value);
         }
 
-        public void Install(object project)
+        public void Install(TestProject project)
         {
-            var typed = (TestProject)project;
-            Value = typed.Value;
+            Value = project.Value;
             InstallCount++;
-            Installed.TrySetResult(typed);
+            Installed.TrySetResult(project);
         }
     }
 
@@ -194,7 +193,7 @@ public sealed class ProjectAutosaveCoordinatorTests
 
         public List<TestProject> AutoSavedProjects { get; } = [];
 
-        public TaskCompletionSource<object> LastAutoSave { get; } =
+        public TaskCompletionSource<TestProject> LastAutoSave { get; } =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public int SaveAsCount { get; private set; }
@@ -203,25 +202,15 @@ public sealed class ProjectAutosaveCoordinatorTests
 
         public IReadOnlyList<string> LastAdditionalAutoSavePaths { get; private set; } = [];
 
-        public IProjectDefinition? LastSaveAsDefinition { get; private set; }
+        public ProjectDefinition<TestProject>? LastSaveAsDefinition { get; private set; }
 
         public int OpenCount { get; private set; }
 
         public int CreateNewCount { get; private set; }
 
-        public string GetAutoSavePath(IProjectDefinition definition)
-        {
-            return definition.AutoSaveFileName;
-        }
-
         public string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition)
         {
             return definition.AutoSaveFileName;
-        }
-
-        public string GetProjectFolder(IProjectDefinition definition)
-        {
-            return definition.ProjectFolderName;
         }
 
         public string GetProjectFolder<TProject>(ProjectDefinition<TProject> definition)
@@ -229,14 +218,9 @@ public sealed class ProjectAutosaveCoordinatorTests
             return definition.ProjectFolderName;
         }
 
-        public object CreateNew(IProjectDefinition definition)
-        {
-            CreateNewCount++;
-            return new TestProject(3);
-        }
-
         public TProject CreateNew<TProject>(ProjectDefinition<TProject> definition)
         {
+            CreateNewCount++;
             return definition.CreateProject();
         }
 
@@ -252,17 +236,9 @@ public sealed class ProjectAutosaveCoordinatorTests
             string path,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromException<TProject>(new FileNotFoundException());
-        }
-
-        public Task<object> LoadAsync(
-            IProjectDefinition definition,
-            string path,
-            CancellationToken cancellationToken = default)
-        {
-            return LoadedProject is null
-                ? Task.FromException<object>(new FileNotFoundException())
-                : Task.FromResult<object>(LoadedProject);
+            return LoadedProject is not TProject project
+                ? Task.FromException<TProject>(new FileNotFoundException())
+                : Task.FromResult(project);
         }
 
         public Task AutoSaveAsync<TProject>(
@@ -271,18 +247,13 @@ public sealed class ProjectAutosaveCoordinatorTests
             IEnumerable<string>? additionalPaths = null,
             CancellationToken cancellationToken = default)
         {
-            return Task.CompletedTask;
-        }
+            if (project is not TestProject typed)
+                return Task.FromException(
+                    new InvalidOperationException("The test project service received an unexpected project type."));
 
-        public Task AutoSaveAsync(
-            IProjectDefinition definition,
-            object project,
-            IEnumerable<string>? additionalPaths = null,
-            CancellationToken cancellationToken = default)
-        {
-            AutoSavedProjects.Add((TestProject)project);
+            AutoSavedProjects.Add(typed);
             LastAdditionalAutoSavePaths = additionalPaths?.ToArray() ?? [];
-            LastAutoSave.TrySetResult(project);
+            LastAutoSave.TrySetResult(typed);
             return Task.CompletedTask;
         }
 
@@ -292,17 +263,14 @@ public sealed class ProjectAutosaveCoordinatorTests
             string? suggestedFileName = null,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<string?>(null);
-        }
+            if (definition is not ProjectDefinition<TestProject> typedDefinition
+                || project is not TestProject typed)
+                return Task.FromException<string?>(
+                    new InvalidOperationException("The test project service received an unexpected project type."));
 
-        public Task<string?> SaveAsAsync(
-            IProjectDefinition definition,
-            object project,
-            CancellationToken cancellationToken = default)
-        {
             SaveAsCount++;
-            LastSaveAsDefinition = definition;
-            LastSaveAsProject = (TestProject)project;
+            LastSaveAsDefinition = typedDefinition;
+            LastSaveAsProject = typed;
             return Task.FromResult<string?>("saved.json");
         }
 
@@ -310,18 +278,11 @@ public sealed class ProjectAutosaveCoordinatorTests
             ProjectDefinition<TProject> definition,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<ProjectOpenResult<TProject>?>(null);
-        }
-
-        public Task<ProjectOpenResult?> OpenAsync(
-            IProjectDefinition definition,
-            CancellationToken cancellationToken = default)
-        {
             OpenCount++;
-            return OpenedProject is null
-                ? Task.FromResult<ProjectOpenResult?>(null)
-                : Task.FromResult<ProjectOpenResult?>(
-                    new ProjectOpenResult("opened.json", OpenedProject));
+            return OpenedProject is not TProject project
+                ? Task.FromResult<ProjectOpenResult<TProject>?>(null)
+                : Task.FromResult<ProjectOpenResult<TProject>?>(
+                    new ProjectOpenResult<TProject>("opened.json", project));
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Mapping_Tools.Desktop.Tools.PropertyTransformer.ViewModels;
 ///     Owns Property Transformer form state, synchronized time fields, project persistence, and execution.
 /// </summary>
 public sealed partial class PropertyTransformerViewModel : SingleRunToolViewModel,
-    IShellProjectFeature
+    IShellProjectFeature<PropertyTransformerProject>
 {
 
     private readonly ProjectDefinition<PropertyTransformerProject> definition = new(
@@ -187,16 +187,16 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
     [ObservableProperty]
     public partial bool SyncTimeFields { get; set; }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<PropertyTransformerProject> IShellProjectFeature<PropertyTransformerProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    PropertyTransformerProject IShellProjectFeature<PropertyTransformerProject>.Snapshot()
     {
         return Snapshot();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<PropertyTransformerProject>.Install(PropertyTransformerProject project)
     {
-        Install((PropertyTransformerProject)project);
+        Install(project);
     }
 
     /// <inheritdoc />

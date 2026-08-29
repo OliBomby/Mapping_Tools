@@ -22,7 +22,7 @@ namespace Mapping_Tools.Desktop.Tools.MapCleaner.ViewModels;
 /// <summary>Coordinates Map Cleaner options, projects, QuickRun, and timeline results.</summary>
 public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     IQuickRun,
-    IShellProjectFeature
+    IShellProjectFeature<MapCleanerProject>
 {
     private readonly IMapCleanerService cleaner;
     private readonly ICurrentBeatmapLocator currentBeatmap;
@@ -134,16 +134,16 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<MapCleanerProject> IShellProjectFeature<MapCleanerProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    MapCleanerProject IShellProjectFeature<MapCleanerProject>.Snapshot()
     {
         return Snapshot();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<MapCleanerProject>.Install(MapCleanerProject project)
     {
-        Install((MapCleanerProject)project);
+        Install(project);
     }
 
     /// <inheritdoc />

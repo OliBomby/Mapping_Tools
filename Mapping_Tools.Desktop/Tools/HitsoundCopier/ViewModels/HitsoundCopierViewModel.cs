@@ -24,7 +24,7 @@ namespace Mapping_Tools.Desktop.Tools.HitsoundCopier.ViewModels;
 
 /// <summary>Owns Hitsound Copier state, picker actions, persistence, and execution.</summary>
 public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
-    IShellProjectFeature,
+    IShellProjectFeature<HitsoundCopierProject>,
     IQuickRun
 {
 
@@ -192,17 +192,16 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         await RunWithStateAsync(() => RunOptionsAsync(options, true));
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<HitsoundCopierProject> IShellProjectFeature<HitsoundCopierProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    HitsoundCopierProject IShellProjectFeature<HitsoundCopierProject>.Snapshot()
     {
         return Snapshot();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<HitsoundCopierProject>.Install(HitsoundCopierProject project)
     {
-        if (project is not HitsoundCopierProject typed) throw new InvalidDataException("Hitsound Copier project is incomplete.");
-        Install(typed);
+        Install(project);
     }
 
     partial void OnCopyToSliderTicksChanged(bool value)

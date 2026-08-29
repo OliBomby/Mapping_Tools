@@ -1,5 +1,3 @@
-using Mapping_Tools.Application.Projects.Contracts;
-
 namespace Mapping_Tools.Application.Projects.Models;
 
 /// <summary>
@@ -7,7 +5,7 @@ namespace Mapping_Tools.Application.Projects.Models;
 ///     project folder, and clean-project factory.
 /// </summary>
 /// <typeparam name="TProject">The complete serializable state owned by one feature.</typeparam>
-public sealed class ProjectDefinition<TProject> : IProjectDefinition
+public sealed class ProjectDefinition<TProject>
 {
     /// <summary>
     ///     Creates the persistence metadata for one project-bearing feature.
@@ -71,42 +69,6 @@ public sealed class ProjectDefinition<TProject> : IProjectDefinition
     ///     when the platform picker should choose its own default.
     /// </summary>
     public string? SuggestedFileName { get; }
-
-    object IProjectDefinition.CreateProject()
-    {
-        return CreateProject()!;
-    }
-
-    Task IProjectDefinition.SaveAsync(
-        IProjectStore store,
-        string path,
-        object project,
-        CancellationToken cancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(store);
-        return store.SaveAsync(path, CastProject(project), cancellationToken);
-    }
-
-    async Task<object> IProjectDefinition.LoadAsync(
-        IProjectStore store,
-        string path,
-        CancellationToken cancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(store);
-        var project = await store.LoadAsync<TProject>(path, cancellationToken);
-        return project is null
-            ? throw new InvalidDataException("The loaded project was null.")
-            : project;
-    }
-
-    private static TProject CastProject(object project)
-    {
-        return project is TProject typed
-            ? typed
-            : throw new ArgumentException(
-                $"The project must be a {typeof(TProject).FullName} instance.",
-                nameof(project));
-    }
 
     private static string ValidateSinglePathSegment(string value, string parameterName)
     {

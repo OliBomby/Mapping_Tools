@@ -178,7 +178,7 @@ public sealed class SlideratorViewModelTests
         SlideratorProject project = new();
 
         // Act
-        ((IShellProjectFeature)viewModel).Install(project);
+        ((IShellProjectFeature<SlideratorProject>)viewModel).Install(project);
 
         // Assert
         viewModel.GraphState.MinX.Should().Be(0);
@@ -203,7 +203,7 @@ public sealed class SlideratorViewModelTests
         };
 
         // Act
-        ((IShellProjectFeature)viewModel).Install(project);
+        ((IShellProjectFeature<SlideratorProject>)viewModel).Install(project);
 
         // Assert
         viewModel.LoadedHitObjects.Should().Equal(firstSlider, secondSlider);
@@ -224,7 +224,7 @@ public sealed class SlideratorViewModelTests
         viewModel.VisibleHitObjectIndex = 1;
 
         // Act
-        SlideratorProject snapshot = (SlideratorProject)((IShellProjectFeature)viewModel).Snapshot();
+        SlideratorProject snapshot = ((IShellProjectFeature<SlideratorProject>)viewModel).Snapshot();
 
         // Assert
         snapshot.LoadedHitObjects.Should().Equal(firstSlider, secondSlider);

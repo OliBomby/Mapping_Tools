@@ -39,7 +39,7 @@ public sealed class SliderPicturatorViewModelTests
         var viewModel = Create(new RecordingPicturator(), new RecordingCurrentBeatmapLocator("current.osu"));
         HitObject selectedSlider = new("32,64,100,2,0,L|200:64,1,168");
         SliderPicturatorProject project = new() { SelectedSlider = selectedSlider };
-        IShellProjectFeature feature = viewModel;
+        IShellProjectFeature<SliderPicturatorProject> feature = viewModel;
 
         // Act
         feature.Install(project);

@@ -40,7 +40,7 @@ namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels;
 /// </summary>
 public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     IQuickRun,
-    IShellProjectFeature,
+    IShellProjectFeature<HitsoundStudioProject>,
     IShellExtraProjectMenuFeature,
     IAsyncDisposable,
     IDisposable
@@ -413,17 +413,16 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
             BulkAssignSamplesCommand, MaterialIconKind.MusicBoxMultiple),
     ];
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<HitsoundStudioProject> IShellProjectFeature<HitsoundStudioProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    HitsoundStudioProject IShellProjectFeature<HitsoundStudioProject>.Snapshot()
     {
         return ToProject().Clone();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<HitsoundStudioProject>.Install(HitsoundStudioProject project)
     {
-        if (project is not HitsoundStudioProject typed) throw new InvalidDataException("Invalid Hitsound Studio project.");
-        InstallProject(typed);
+        InstallProject(project);
     }
 
     /// <inheritdoc />

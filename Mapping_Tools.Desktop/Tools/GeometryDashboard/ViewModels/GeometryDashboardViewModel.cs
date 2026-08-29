@@ -39,7 +39,7 @@ namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 ///     The view model owns no native handles.
 /// </summary>
 public sealed partial class GeometryDashboardViewModel : ObservableObject,
-    IShellProjectFeature, IShellExtraProjectMenuFeature, IShellFeatureActivation, IDisposable
+    IShellProjectFeature<GeometryDashboardProject>, IShellExtraProjectMenuFeature, IShellFeatureActivation, IDisposable
 {
     private const double relevancy_bias = 4;
     private const double points_bias = 3;
@@ -217,31 +217,29 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         overlayService.Hide();
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<GeometryDashboardProject> IShellProjectFeature<GeometryDashboardProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    GeometryDashboardProject IShellProjectFeature<GeometryDashboardProject>.Snapshot()
     {
         lock (stateGate)
         {
             lock (Project)
             {
-                return Project.GetThis();
+                Project.GetThis();
+                return Project;
             }
         }
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<GeometryDashboardProject>.Install(GeometryDashboardProject project)
     {
-        if (project is not GeometryDashboardProject loaded)
-            throw new InvalidDataException("The Geometry Dashboard project is incomplete.");
-
         lock (stateGate)
         {
             lock (Project)
             {
                 Project.SaveSlots.Clear();
-                foreach (var slot in loaded.SaveSlots) Project.SaveSlots.Add(slot);
-                Project.SetCurrentPreferences(loaded.CurrentPreferences);
+                foreach (var slot in project.SaveSlots) Project.SaveSlots.Add(slot);
+                Project.SetCurrentPreferences(project.CurrentPreferences);
             }
 
             SynchronizeSaveSlotHotkeys();

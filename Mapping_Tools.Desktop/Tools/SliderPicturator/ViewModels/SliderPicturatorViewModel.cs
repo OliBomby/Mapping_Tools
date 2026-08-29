@@ -26,7 +26,7 @@ using Mapping_Tools.Desktop.ViewModels;
 namespace Mapping_Tools.Desktop.Tools.SliderPicturator.ViewModels;
 
 /// <summary>Owns Slider Picturator state, preview generation, project persistence, and tool execution.</summary>
-public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, IQuickRun, IShellProjectFeature,
+public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, IQuickRun, IShellProjectFeature<SliderPicturatorProject>,
     IShellFeatureActivation
 {
     private readonly ICurrentBeatmapLocator currentBeatmap;
@@ -230,16 +230,16 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         PreviewImage = null;
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<SliderPicturatorProject> IShellProjectFeature<SliderPicturatorProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    SliderPicturatorProject IShellProjectFeature<SliderPicturatorProject>.Snapshot()
     {
         return Snapshot();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<SliderPicturatorProject>.Install(SliderPicturatorProject project)
     {
-        Install((SliderPicturatorProject)project);
+        Install(project);
     }
 
     /// <summary>Opens the legacy image filter and loads the selected image.</summary>

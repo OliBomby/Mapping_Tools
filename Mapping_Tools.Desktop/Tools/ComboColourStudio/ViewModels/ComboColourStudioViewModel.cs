@@ -26,7 +26,7 @@ namespace Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
 ///     execution, and QuickRun routing.
 /// </summary>
 public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
-    IShellProjectFeature,
+    IShellProjectFeature<ComboColourProject>,
     IQuickRun
 {
     private readonly ICurrentBeatmapLocator currentBeatmap;
@@ -124,18 +124,16 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<ComboColourProject> IShellProjectFeature<ComboColourProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    ComboColourProject IShellProjectFeature<ComboColourProject>.Snapshot()
     {
         return SnapshotProject();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<ComboColourProject>.Install(ComboColourProject project)
     {
-        if (project is not ComboColourProject typed) throw new InvalidDataException("Combo Colour Studio project is incomplete.");
-
-        Project = typed;
+        Project = project;
         Project.MatchComboColourReferences();
         RebuildPresentation();
         SelectedColourPoint = ColourPoints.FirstOrDefault();

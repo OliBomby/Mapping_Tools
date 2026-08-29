@@ -2,6 +2,7 @@ using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.Services;
@@ -113,12 +114,9 @@ public sealed class ProjectAutosaveCoordinator
     {
         try
         {
-            var definition = feature.ProjectDefinition;
-            object project = await projects.LoadAsync(
-                definition,
-                projects.GetAutoSavePath(definition),
+            await feature.ExecuteProjectOperationAsync(
+                new LoadAutosaveOperation(projects),
                 CancellationToken.None);
-            feature.Install(project);
         }
         catch (FileNotFoundException)
         {
@@ -137,10 +135,9 @@ public sealed class ProjectAutosaveCoordinator
         await AwaitLoadAsync(feature);
         try
         {
-            await projects.AutoSaveAsync(
-                feature.ProjectDefinition,
-                feature.Snapshot(),
-                feature.AdditionalAutoSavePaths);
+            await feature.ExecuteProjectOperationAsync(
+                new AutoSaveOperation(projects),
+                CancellationToken.None);
         }
         catch (Exception exception)
         {
@@ -153,9 +150,8 @@ public sealed class ProjectAutosaveCoordinator
         CancellationToken cancellationToken)
     {
         await AwaitLoadAsync(feature);
-        await projects.SaveAsAsync(
-            feature.ProjectDefinition,
-            feature.Snapshot(),
+        await feature.ExecuteProjectOperationAsync(
+            new SaveAsOperation(projects),
             cancellationToken);
     }
 
@@ -164,10 +160,9 @@ public sealed class ProjectAutosaveCoordinator
         CancellationToken cancellationToken)
     {
         await AwaitLoadAsync(feature);
-        var opened = await projects.OpenAsync(
-            feature.ProjectDefinition,
+        await feature.ExecuteProjectOperationAsync(
+            new OpenOperation(projects),
             cancellationToken);
-        if (opened is not null) feature.Install(opened.Project);
     }
 
     private async Task NewProjectAsync(
@@ -187,7 +182,9 @@ public sealed class ProjectAutosaveCoordinator
         if (!confirmed) return;
 
         await AwaitLoadAsync(feature);
-        feature.Install(projects.CreateNew(feature.ProjectDefinition));
+        await feature.ExecuteProjectOperationAsync(
+            new NewProjectOperation(projects),
+            cancellationToken);
     }
 
     private async Task AwaitLoadAsync(IShellProjectFeature feature)
@@ -217,5 +214,71 @@ public sealed class ProjectAutosaveCoordinator
             title,
             exception.Message,
             exception));
+    }
+
+    private sealed class LoadAutosaveOperation(IProjectService projects) : IProjectFeatureOperation
+    {
+        public async Task ExecuteAsync<TProject>(
+            IShellProjectFeature<TProject> feature,
+            CancellationToken cancellationToken = default)
+        {
+            TProject project = await projects.LoadAsync<TProject>(
+                projects.GetAutoSavePath(feature.ProjectDefinition),
+                cancellationToken);
+            feature.Install(project);
+        }
+    }
+
+    private sealed class AutoSaveOperation(IProjectService projects) : IProjectFeatureOperation
+    {
+        public Task ExecuteAsync<TProject>(
+            IShellProjectFeature<TProject> feature,
+            CancellationToken cancellationToken = default)
+        {
+            return projects.AutoSaveAsync(
+                feature.ProjectDefinition,
+                feature.Snapshot(),
+                feature.AdditionalAutoSavePaths,
+                cancellationToken);
+        }
+    }
+
+    private sealed class SaveAsOperation(IProjectService projects) : IProjectFeatureOperation
+    {
+        public Task ExecuteAsync<TProject>(
+            IShellProjectFeature<TProject> feature,
+            CancellationToken cancellationToken = default)
+        {
+            return projects.SaveAsAsync(
+                feature.ProjectDefinition,
+                feature.Snapshot(),
+                feature.ProjectDefinition.SuggestedFileName,
+                cancellationToken);
+        }
+    }
+
+    private sealed class OpenOperation(IProjectService projects) : IProjectFeatureOperation
+    {
+        public async Task ExecuteAsync<TProject>(
+            IShellProjectFeature<TProject> feature,
+            CancellationToken cancellationToken = default)
+        {
+            ProjectOpenResult<TProject>? opened = await projects.OpenAsync(
+                feature.ProjectDefinition,
+                cancellationToken);
+            if (opened is not null) feature.Install(opened.Project);
+        }
+    }
+
+    private sealed class NewProjectOperation(IProjectService projects) : IProjectFeatureOperation
+    {
+        public Task ExecuteAsync<TProject>(
+            IShellProjectFeature<TProject> feature,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            feature.Install(projects.CreateNew(feature.ProjectDefinition));
+            return Task.CompletedTask;
+        }
     }
 }

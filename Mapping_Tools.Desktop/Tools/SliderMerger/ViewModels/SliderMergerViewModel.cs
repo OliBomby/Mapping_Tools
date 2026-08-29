@@ -23,7 +23,7 @@ namespace Mapping_Tools.Desktop.Tools.SliderMerger.ViewModels;
 /// </summary>
 public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
     IQuickRun,
-    IShellProjectFeature
+    IShellProjectFeature<SliderMergerProject>
 {
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
@@ -110,16 +110,16 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<SliderMergerProject> IShellProjectFeature<SliderMergerProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    SliderMergerProject IShellProjectFeature<SliderMergerProject>.Snapshot()
     {
         return Snapshot();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<SliderMergerProject>.Install(SliderMergerProject project)
     {
-        Install((SliderMergerProject)project);
+        Install(project);
     }
 
     /// <inheritdoc />

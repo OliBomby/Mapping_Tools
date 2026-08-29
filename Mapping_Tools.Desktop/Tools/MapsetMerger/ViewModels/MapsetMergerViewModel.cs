@@ -26,7 +26,7 @@ namespace Mapping_Tools.Desktop.Tools.MapsetMerger.ViewModels;
 ///     project persistence. The feature intentionally has no QuickRun target
 ///     because its input is a collection of source directories.
 /// </summary>
-public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShellProjectFeature
+public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShellProjectFeature<MapsetMergerProject>
 {
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
@@ -82,21 +82,19 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
     [ObservableProperty]
     public partial string ResultSummary { get; private set; } = string.Empty;
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<MapsetMergerProject> IShellProjectFeature<MapsetMergerProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    MapsetMergerProject IShellProjectFeature<MapsetMergerProject>.Snapshot()
     {
         return Snapshot();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<MapsetMergerProject>.Install(MapsetMergerProject project)
     {
-        if (project is not MapsetMergerProject typed) throw new InvalidDataException("Mapset Merger project is incomplete.");
-
-        ExportPath = typed.ExportPath ?? string.Empty;
-        MoveSbToBeatmap = typed.MoveSbToBeatmap;
+        ExportPath = project.ExportPath ?? string.Empty;
+        MoveSbToBeatmap = project.MoveSbToBeatmap;
         Mapsets.Clear();
-        foreach (var item in typed.Mapsets ?? [])
+        foreach (var item in project.Mapsets ?? [])
             Mapsets.Add(new MapsetMergerItemViewModel(
                 filePicker,
                 item.Name ?? string.Empty,

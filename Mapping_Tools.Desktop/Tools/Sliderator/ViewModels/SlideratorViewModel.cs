@@ -34,7 +34,7 @@ namespace Mapping_Tools.Desktop.Tools.Sliderator.ViewModels;
 /// </summary>
 public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     IQuickRun,
-    IShellProjectFeature
+    IShellProjectFeature<SlideratorProject>
 {
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
@@ -347,16 +347,16 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         });
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<SlideratorProject> IShellProjectFeature<SlideratorProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    SlideratorProject IShellProjectFeature<SlideratorProject>.Snapshot()
     {
         return Snapshot();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<SlideratorProject>.Install(SlideratorProject project)
     {
-        Install((SlideratorProject)project);
+        Install(project);
     }
 
     /// <summary>Places the currently visible slider for Shift navigation without reloading the editor.</summary>

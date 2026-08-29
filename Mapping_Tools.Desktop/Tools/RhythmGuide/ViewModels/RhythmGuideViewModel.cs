@@ -21,7 +21,7 @@ namespace Mapping_Tools.Desktop.Tools.RhythmGuide.ViewModels;
 
 /// <summary>Owns Rhythm Guide inputs, execution, projects, and auxiliary-window interaction.</summary>
 public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
-    IShellProjectFeature
+    IShellProjectFeature<RhythmGuideProject>
 {
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
     private readonly ProjectDefinition<RhythmGuideProject> definition;
@@ -105,16 +105,16 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     /// <summary>Gets the number of non-empty source beatmap paths.</summary>
     public int SourceCount => SourcePaths.Length;
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<RhythmGuideProject> IShellProjectFeature<RhythmGuideProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    RhythmGuideProject IShellProjectFeature<RhythmGuideProject>.Snapshot()
     {
         return Snapshot();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<RhythmGuideProject>.Install(RhythmGuideProject project)
     {
-        Install((RhythmGuideProject)project);
+        Install(project);
     }
 
     [RelayCommand]

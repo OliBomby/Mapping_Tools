@@ -33,7 +33,7 @@ namespace Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
 ///     project persistence, and ordinary or QuickRun execution.
 /// </summary>
 public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
-    IShellProjectFeature,
+    IShellProjectFeature<TumourGeneratorProject>,
     IQuickRun,
     IShellFeatureActivation,
     IDisposable
@@ -298,18 +298,18 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     }
 
     /// <inheritdoc />
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<TumourGeneratorProject> IShellProjectFeature<TumourGeneratorProject>.ProjectDefinition => definition;
 
     /// <inheritdoc />
-    object IShellProjectFeature.Snapshot()
+    TumourGeneratorProject IShellProjectFeature<TumourGeneratorProject>.Snapshot()
     {
         return Snapshot();
     }
 
     /// <inheritdoc />
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<TumourGeneratorProject>.Install(TumourGeneratorProject project)
     {
-        Install(project as TumourGeneratorProject ?? throw new InvalidDataException("Tumour Generator project is incomplete."));
+        Install(project);
     }
 
     /// <summary>Imports the selected, bookmarked, time-filtered, or complete sliders.</summary>

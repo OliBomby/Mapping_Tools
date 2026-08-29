@@ -604,7 +604,7 @@ public sealed class DesktopShellTests
         }
     }
 
-    private sealed class StubProjectFeatureViewModel : ObservableObject, IShellProjectFeature
+    private sealed class StubProjectFeatureViewModel : ObservableObject, IShellProjectFeature<StubProject>
     {
         private static readonly ProjectDefinition<StubProject> definition = new(
             "stubproject.json",
@@ -613,14 +613,14 @@ public sealed class DesktopShellTests
 
         public int InstallCount { get; private set; }
 
-        public IProjectDefinition ProjectDefinition => definition;
+        public ProjectDefinition<StubProject> ProjectDefinition => definition;
 
-        public object Snapshot()
+        public StubProject Snapshot()
         {
             return new StubProject();
         }
 
-        public void Install(object project)
+        public void Install(StubProject project)
         {
             InstallCount++;
         }
@@ -638,19 +638,9 @@ public sealed class DesktopShellTests
 
         public int CreateNewCount { get; private set; }
 
-        public string GetAutoSavePath(IProjectDefinition definition)
-        {
-            return Path.Combine(Path.GetTempPath(), definition.AutoSaveFileName);
-        }
-
         public string GetAutoSavePath<TProject>(ProjectDefinition<TProject> definition)
         {
             return Path.Combine(Path.GetTempPath(), definition.AutoSaveFileName);
-        }
-
-        public string GetProjectFolder(IProjectDefinition definition)
-        {
-            return Path.GetTempPath();
         }
 
         public string GetProjectFolder<TProject>(ProjectDefinition<TProject> definition)
@@ -658,14 +648,9 @@ public sealed class DesktopShellTests
             return Path.GetTempPath();
         }
 
-        public object CreateNew(IProjectDefinition definition)
-        {
-            CreateNewCount++;
-            return definition.CreateProject();
-        }
-
         public TProject CreateNew<TProject>(ProjectDefinition<TProject> definition)
         {
+            CreateNewCount++;
             return definition.CreateProject();
         }
 
@@ -684,26 +669,9 @@ public sealed class DesktopShellTests
             return Task.FromException<TProject>(new FileNotFoundException());
         }
 
-        public Task<object> LoadAsync(
-            IProjectDefinition definition,
-            string path,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.FromException<object>(new FileNotFoundException());
-        }
-
         public Task AutoSaveAsync<TProject>(
             ProjectDefinition<TProject> definition,
             TProject project,
-            IEnumerable<string>? additionalPaths = null,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task AutoSaveAsync(
-            IProjectDefinition definition,
-            object project,
             IEnumerable<string>? additionalPaths = null,
             CancellationToken cancellationToken = default)
         {
@@ -717,32 +685,16 @@ public sealed class DesktopShellTests
             string? suggestedFileName = null,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<string?>(null);
-        }
-
-        public Task<string?> SaveAsAsync(
-            IProjectDefinition definition,
-            object project,
-            CancellationToken cancellationToken = default)
-        {
             SaveAsCount++;
-            return Task.FromResult<string?>("saved.json");
+            return Task.FromResult<string?>(null);
         }
 
         public Task<ProjectOpenResult<TProject>?> OpenAsync<TProject>(
             ProjectDefinition<TProject> definition,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<ProjectOpenResult<TProject>?>(null);
-        }
-
-        public Task<ProjectOpenResult?> OpenAsync(
-            IProjectDefinition definition,
-            CancellationToken cancellationToken = default)
-        {
             OpenCount++;
-            return Task.FromResult<ProjectOpenResult?>(
-                new ProjectOpenResult("opened.json", new StubProject()));
+            return Task.FromResult<ProjectOpenResult<TProject>?>(null);
         }
     }
 

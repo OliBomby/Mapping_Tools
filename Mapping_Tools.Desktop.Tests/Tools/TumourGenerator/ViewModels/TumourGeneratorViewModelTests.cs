@@ -11,6 +11,7 @@ using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.Tools.TumourGenerator.Templates;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
+using Mapping_Tools.Desktop.Tools.TumourGenerator.Models;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -139,10 +140,10 @@ public sealed class TumourGeneratorViewModelTests
         viewModel.CurrentLayer.TumourParameter = TumourLayer.GetGraphState(12);
         viewModel.CurrentLayer.Name = "Custom";
         viewModel.PreviewHitObject = new HitObject("32,64,100,2,0,L|200:64,1,168");
-        IShellProjectFeature feature = viewModel;
+        IShellProjectFeature<TumourGeneratorProject> feature = viewModel;
 
         // Act
-        var snapshot = (TumourGeneratorServiceOptions)feature.Snapshot();
+        var snapshot = feature.Snapshot();
         viewModel.CurrentLayer.Name = "Changed";
         feature.Install(snapshot);
 

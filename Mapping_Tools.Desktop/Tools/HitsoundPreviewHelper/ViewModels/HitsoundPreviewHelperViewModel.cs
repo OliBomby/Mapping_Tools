@@ -30,7 +30,7 @@ namespace Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
 /// </summary>
 public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewModel,
     IQuickRun,
-    IShellProjectFeature
+    IShellProjectFeature<HitsoundPreviewHelperProject>
 {
     private readonly ICurrentBeatmapLocator currentBeatmap;
     private readonly ProjectDefinition<HitsoundPreviewHelperProject> definition;
@@ -128,9 +128,9 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
             cancellationToken));
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<HitsoundPreviewHelperProject> IShellProjectFeature<HitsoundPreviewHelperProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    HitsoundPreviewHelperProject IShellProjectFeature<HitsoundPreviewHelperProject>.Snapshot()
     {
         return new HitsoundPreviewHelperProject
         {
@@ -138,13 +138,10 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         };
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<HitsoundPreviewHelperProject>.Install(HitsoundPreviewHelperProject project)
     {
-        if (project is not HitsoundPreviewHelperProject typed)
-            throw new InvalidDataException("Hitsound Preview Helper project is incomplete.");
-
         Items = new ObservableCollection<ObservableHitsoundZone>(
-            (typed.Items ?? []).Select(item => new ObservableHitsoundZone(item.Copy())));
+            (project.Items ?? []).Select(item => new ObservableHitsoundZone(item.Copy())));
     }
 
     /// <inheritdoc />

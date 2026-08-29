@@ -27,7 +27,7 @@ namespace Mapping_Tools.Desktop.Tools.MetadataManager.ViewModels;
 ///     Owns Metadata Manager form state, project persistence, file selection, and execution.
 /// </summary>
 public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
-    IShellProjectFeature
+    IShellProjectFeature<MetadataManagerProject>
 {
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
     private readonly ProjectDefinition<MetadataManagerProject> definition;
@@ -168,16 +168,16 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     public bool IsTagsOverflowVisible =>
         Tags.Length > 1024 || Tags.Split(' ').Length > 100;
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<MetadataManagerProject> IShellProjectFeature<MetadataManagerProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    MetadataManagerProject IShellProjectFeature<MetadataManagerProject>.Snapshot()
     {
         return Snapshot();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<MetadataManagerProject>.Install(MetadataManagerProject project)
     {
-        Install((MetadataManagerProject)project);
+        Install(project);
     }
 
     [RelayCommand]

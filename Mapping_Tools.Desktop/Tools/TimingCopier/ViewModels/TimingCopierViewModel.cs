@@ -23,7 +23,7 @@ namespace Mapping_Tools.Desktop.Tools.TimingCopier.ViewModels;
 ///     Owns Timing Copier form state, native file selection, project persistence, and execution.
 /// </summary>
 public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
-    IShellProjectFeature
+    IShellProjectFeature<TimingCopierProject>
 {
     private readonly ICurrentBeatmapLocator currentBeatmapLocator;
 
@@ -103,16 +103,16 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         }
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<TimingCopierProject> IShellProjectFeature<TimingCopierProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    TimingCopierProject IShellProjectFeature<TimingCopierProject>.Snapshot()
     {
         return Snapshot();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<TimingCopierProject>.Install(TimingCopierProject project)
     {
-        Install((TimingCopierProject)project);
+        Install(project);
     }
 
     /// <summary>Fetches the current osu! beatmap into the source field.</summary>

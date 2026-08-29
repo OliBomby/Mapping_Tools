@@ -35,7 +35,7 @@ namespace Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 ///     ZIP persistence, placement options, project recovery, and QuickRun.
 /// </summary>
 public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
-    IShellProjectFeature,
+    IShellProjectFeature<PatternGalleryProject>,
     IShellExtraProjectMenuFeature,
     IShellFeatureActivation,
     IQuickRun
@@ -286,25 +286,23 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     }
 
     /// <inheritdoc />
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<PatternGalleryProject> IShellProjectFeature<PatternGalleryProject>.ProjectDefinition => definition;
 
     /// <inheritdoc />
     IReadOnlyList<string> IShellProjectFeature.AdditionalAutoSavePaths =>
         paths is not null ? [paths.ProjectFile] : [];
 
     /// <inheritdoc />
-    object IShellProjectFeature.Snapshot()
+    PatternGalleryProject IShellProjectFeature<PatternGalleryProject>.Snapshot()
     {
         return Snapshot(false);
     }
 
     /// <inheritdoc />
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<PatternGalleryProject>.Install(PatternGalleryProject project)
     {
-        if (project is not PatternGalleryProject typed) throw new InvalidDataException("Pattern Gallery project is incomplete.");
-
         CancelThumbnailRefresh();
-        Project = typed;
+        Project = project;
         items.Clear();
         ConfigureProject();
         RebuildGroups();
@@ -699,7 +697,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
             {
                 if (Project.Patterns.Count > 0) await projects.SaveAsync(Paths.ProjectFile, Snapshot(false));
 
-                ((IShellProjectFeature)this).Install(imported);
+                ((IShellProjectFeature<PatternGalleryProject>)this).Install(imported);
             }
 
             ResultSummary = "Imported Pattern Gallery collection.";

@@ -22,7 +22,7 @@ namespace Mapping_Tools.Desktop.Tools.TimingHelper.ViewModels;
 /// </summary>
 public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     IQuickRun,
-    IShellProjectFeature
+    IShellProjectFeature<TimingHelperProject>
 {
     private readonly ICurrentBeatmapLocator currentBeatmap;
 
@@ -111,16 +111,16 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
             cancellationToken));
     }
 
-    IProjectDefinition IShellProjectFeature.ProjectDefinition => definition;
+    ProjectDefinition<TimingHelperProject> IShellProjectFeature<TimingHelperProject>.ProjectDefinition => definition;
 
-    object IShellProjectFeature.Snapshot()
+    TimingHelperProject IShellProjectFeature<TimingHelperProject>.Snapshot()
     {
         return Snapshot();
     }
 
-    void IShellProjectFeature.Install(object project)
+    void IShellProjectFeature<TimingHelperProject>.Install(TimingHelperProject project)
     {
-        Install((TimingHelperProject)project);
+        Install(project);
     }
 
     /// <inheritdoc />
