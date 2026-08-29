@@ -21,7 +21,7 @@ public sealed class AveragePointGenerator3 : RelevantObjectsGenerator
     public override string Name => "Average of Three Points";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes three virtual points and calculates the average of the points.";
+    public override string Description => "Takes three virtual points and calculates the average of the points.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Intermediate;
@@ -33,4 +33,3 @@ public sealed class AveragePointGenerator3 : RelevantObjectsGenerator
         return new RelevantPoint((point1.Child + point2.Child + point3.Child) / 3);
     }
 }
-

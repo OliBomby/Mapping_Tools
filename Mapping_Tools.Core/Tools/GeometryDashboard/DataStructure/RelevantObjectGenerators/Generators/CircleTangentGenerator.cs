@@ -22,7 +22,7 @@ public sealed class CircleTangentGenerator : RelevantObjectsGenerator
     public override string Name => "Tangent Lines on Circle";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes a pair of virtual circle and point and generates virtual lines that stretch to the sides of the circle and pass through the point.";
+    public override string Description => "Takes a pair of virtual circle and point and generates virtual lines that stretch to the sides of the circle and pass through the point.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Intermediate;
@@ -43,4 +43,3 @@ public sealed class CircleTangentGenerator : RelevantObjectsGenerator
         return [new RelevantLine(Line2.FromPoints(point.Child, centre + offset)), new RelevantLine(Line2.FromPoints(point.Child, centre - offset))];
     }
 }
-

@@ -22,7 +22,7 @@ public sealed class SameTransformGenerator3Reversed : RelevantObjectsGenerator
     public override string Name => "Successor of 3 Points Reversed";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes 3 virtual points and calculates the next virtual point using the same velocity change and opposite angle.";
+    public override string Description => "Takes 3 virtual points and calculates the next virtual point using the same velocity change and opposite angle.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Advanced;
@@ -42,4 +42,3 @@ public sealed class SameTransformGenerator3Reversed : RelevantObjectsGenerator
         return new RelevantPoint(Vector2.ComplexProduct(b, difference) + point3.Child);
     }
 }
-

@@ -14,7 +14,7 @@ public sealed class SliderEndGenerator : RelevantObjectsGenerator
     public override string Name => "Points on Slider Ends";
 
     /// <inheritdoc />
-    public override string Tooltip => "Generates virtual points on the actual ends of sliders.";
+    public override string Description => "Generates virtual points on the actual ends of sliders.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Basic;
@@ -32,4 +32,3 @@ public sealed class SliderEndGenerator : RelevantObjectsGenerator
             : null;
     }
 }
-

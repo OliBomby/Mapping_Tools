@@ -21,7 +21,7 @@ public sealed class SliderPathGenerator : RelevantObjectsGenerator
     public override string Name => "Points on Slider Paths";
 
     /// <inheritdoc />
-    public override string Tooltip => "Generates many virtual points on the paths of sliders. The density of generated points is configurable.";
+    public override string Description => "Generates many virtual points on the paths of sliders. The density of generated points is configurable.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Basic;
@@ -51,4 +51,3 @@ public sealed class SliderPathGenerator : RelevantObjectsGenerator
         return points;
     }
 }
-

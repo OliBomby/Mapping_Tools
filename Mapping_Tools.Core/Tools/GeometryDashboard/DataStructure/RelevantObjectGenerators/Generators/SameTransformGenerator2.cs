@@ -21,7 +21,7 @@ public sealed class SameTransformGenerator2 : RelevantObjectsGenerator
     public override string Name => "Successor of 2 Points";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes 2 virtual points and calculates the next virtual point using the same velocity.";
+    public override string Description => "Takes 2 virtual points and calculates the next virtual point using the same velocity.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Advanced;
@@ -37,4 +37,3 @@ public sealed class SameTransformGenerator2 : RelevantObjectsGenerator
         return Math.Abs(difference.X) < double.Epsilon && Math.Abs(difference.Y) < double.Epsilon ? null : new RelevantPoint(point2.Child + difference);
     }
 }
-

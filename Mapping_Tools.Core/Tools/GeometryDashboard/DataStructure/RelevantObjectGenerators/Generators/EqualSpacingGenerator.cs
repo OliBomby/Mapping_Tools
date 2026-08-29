@@ -22,7 +22,7 @@ public sealed class EqualSpacingGenerator : RelevantObjectsGenerator
     public override string Name => "Circles by Two Points";
 
     /// <inheritdoc />
-    public override string Tooltip =>
+    public override string Description =>
         "Takes a pair of virtual points and generates a pair of virtual circles with their centers on each point. Their radius is equal to the spacing between the two.";
 
     /// <inheritdoc />
@@ -36,4 +36,3 @@ public sealed class EqualSpacingGenerator : RelevantObjectsGenerator
         return [new RelevantCircle(new Circle(point1.Child, radius)), new RelevantCircle(new Circle(point2.Child, radius))];
     }
 }
-

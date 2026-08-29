@@ -24,7 +24,7 @@ public sealed class SinglePointCircleGenerator : RelevantObjectsGenerator
     public override string Name => "Circle from Single Point";
 
     /// <inheritdoc />
-    public override string Tooltip => "Generates circles with a specified radius on every virtual point.";
+    public override string Description => "Generates circles with a specified radius on every virtual point.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Intermediate;
@@ -38,4 +38,3 @@ public sealed class SinglePointCircleGenerator : RelevantObjectsGenerator
         return new RelevantCircle(new Circle(point.Child, MySettings.Radius));
     }
 }
-

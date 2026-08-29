@@ -21,7 +21,7 @@ public sealed class IntersectionGenerator : RelevantObjectsGenerator
     public override string Name => "Intersection Points";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes a pair of virtual lines or circles and generates a virtual point on each of their intersections.";
+    public override string Description => "Takes a pair of virtual lines or circles and generates a virtual point on each of their intersections.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Advanced;
@@ -47,4 +47,3 @@ public sealed class IntersectionGenerator : RelevantObjectsGenerator
         return Circle.Intersection(circle1.Child, circle2.Child, out var intersections) ? intersections.Select(point => new RelevantPoint(point)) : null;
     }
 }
-

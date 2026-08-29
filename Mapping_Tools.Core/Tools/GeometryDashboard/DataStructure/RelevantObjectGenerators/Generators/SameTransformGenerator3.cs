@@ -22,7 +22,7 @@ public sealed class SameTransformGenerator3 : RelevantObjectsGenerator
     public override string Name => "Successor of 3 Points";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes 3 virtual points and calculates the next virtual point using the same angle and velocity change.";
+    public override string Description => "Takes 3 virtual points and calculates the next virtual point using the same angle and velocity change.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Advanced;
@@ -39,4 +39,3 @@ public sealed class SameTransformGenerator3 : RelevantObjectsGenerator
         return Math.Abs(a.X) < double.Epsilon && Math.Abs(a.Y) < double.Epsilon ? null : new RelevantPoint(Vector2.ComplexProduct(b, Vector2.ComplexQuotient(b, a)) + point3.Child);
     }
 }
-

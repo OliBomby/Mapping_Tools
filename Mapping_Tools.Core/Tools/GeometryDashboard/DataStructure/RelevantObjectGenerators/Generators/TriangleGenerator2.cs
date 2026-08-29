@@ -21,7 +21,7 @@ public sealed class TriangleGenerator2 : RelevantObjectsGenerator
     public override string Name => "Equilateral Triangle from Two Points (Type II)";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes a pair of virtual points and generates a virtual point on each side to make two equilateral triangles.";
+    public override string Description => "Takes a pair of virtual points and generates a virtual point on each side to make two equilateral triangles.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Intermediate;

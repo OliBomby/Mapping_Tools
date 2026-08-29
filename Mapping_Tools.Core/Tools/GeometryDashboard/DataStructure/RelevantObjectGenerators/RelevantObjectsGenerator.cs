@@ -28,8 +28,8 @@ public abstract class RelevantObjectsGenerator
     /// <summary>Gets the stable display name retained for project compatibility.</summary>
     public abstract string Name { get; }
 
-    /// <summary>Gets the stable explanatory text retained for the desktop frontend.</summary>
-    public abstract string Tooltip { get; }
+    /// <summary>Gets the explanatory text for this generator.</summary>
+    public abstract string Description { get; }
 
     /// <summary>Gets the catalog group for this generator.</summary>
     public abstract GeneratorType GeneratorType { get; }

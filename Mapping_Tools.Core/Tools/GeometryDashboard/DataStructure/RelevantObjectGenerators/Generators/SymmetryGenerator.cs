@@ -24,7 +24,7 @@ public sealed class SymmetryGenerator : RelevantObjectsGenerator
     public override string Name => "Reflection across a Line";
 
     /// <inheritdoc />
-    public override string Tooltip =>
+    public override string Description =>
         "Mirrors any virtual object over a virtual line where the virtual line is the symmetry axis. In the settings you can set extra rules for selecting the symmetry axis.";
 
     /// <inheritdoc />
@@ -65,4 +65,3 @@ public sealed class SymmetryGenerator : RelevantObjectsGenerator
             Vector2.Mirror(line.Child.PositionVector + line.Child.DirectionVector, axis.Child)));
     }
 }
-

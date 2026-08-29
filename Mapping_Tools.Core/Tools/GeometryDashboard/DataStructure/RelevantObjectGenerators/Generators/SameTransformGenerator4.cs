@@ -22,7 +22,7 @@ public sealed class SameTransformGenerator4 : RelevantObjectsGenerator
     public override string Name => "Successor of 4 Points";
 
     /// <inheritdoc />
-    public override string Tooltip =>
+    public override string Description =>
         "Takes 4 virtual points and calculates the next virtual point using the same angle, angle change, velocity change and change of velocity change.";
 
     /// <inheritdoc />
@@ -47,4 +47,3 @@ public sealed class SameTransformGenerator4 : RelevantObjectsGenerator
         return new RelevantPoint(Vector2.ComplexProduct(c, Vector2.ComplexProduct(d2, dd)) + point4.Child);
     }
 }
-

@@ -22,7 +22,7 @@ public sealed class LineGenerator : RelevantObjectsGenerator
     public override string Name => "Lines by Two Points";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes a pair of virtual points and generates a virtual line that connects the two.";
+    public override string Description => "Takes a pair of virtual points and generates a virtual line that connects the two.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Intermediate;
@@ -34,4 +34,3 @@ public sealed class LineGenerator : RelevantObjectsGenerator
         return new RelevantLine(Line2.FromPoints(point1.Child, point2.Child));
     }
 }
-

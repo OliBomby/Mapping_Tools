@@ -21,7 +21,7 @@ public sealed class PerpendicularGenerator : RelevantObjectsGenerator
     public override string Name => "Perpendicular Lines";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes a pair of line and point and generates a virtual line across the point that is perpendicular to the line.";
+    public override string Description => "Takes a pair of line and point and generates a virtual line across the point that is perpendicular to the line.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Intermediate;
@@ -33,4 +33,3 @@ public sealed class PerpendicularGenerator : RelevantObjectsGenerator
         return new RelevantLine(new Line2(point.Child, line.Child.DirectionVector.PerpendicularLeft));
     }
 }
-

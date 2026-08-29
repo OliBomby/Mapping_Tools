@@ -20,7 +20,7 @@ public sealed class LinearLineGenerator : RelevantObjectsGenerator
     public override string Name => "Lines on Linear Sliders";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes a linear slider and generates a virtual line that matches it.";
+    public override string Description => "Takes a linear slider and generates a virtual line that matches it.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Basic;
@@ -35,4 +35,3 @@ public sealed class LinearLineGenerator : RelevantObjectsGenerator
             : null;
     }
 }
-

@@ -21,7 +21,7 @@ public sealed class AveragePointGenerator2 : RelevantObjectsGenerator
     public override string Name => "Average of Two Points";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes a pair of virtual points and calculates the average of the points.";
+    public override string Description => "Takes a pair of virtual points and calculates the average of the points.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Intermediate;
@@ -33,4 +33,3 @@ public sealed class AveragePointGenerator2 : RelevantObjectsGenerator
         return new RelevantPoint((point1.Child + point2.Child) / 2);
     }
 }
-

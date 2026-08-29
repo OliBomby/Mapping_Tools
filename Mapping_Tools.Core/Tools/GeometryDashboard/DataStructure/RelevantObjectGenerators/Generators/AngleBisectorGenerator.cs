@@ -21,7 +21,7 @@ public sealed class AngleBisectorGenerator : RelevantObjectsGenerator
     public override string Name => "Bisectors of Angles";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes a pair virtual lines and generates the bisector of the angle between those lines at the point of the intersection.";
+    public override string Description => "Takes a pair virtual lines and generates the bisector of the angle between those lines at the point of the intersection.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Intermediate;
@@ -36,4 +36,3 @@ public sealed class AngleBisectorGenerator : RelevantObjectsGenerator
         return [new RelevantLine(new Line2(intersection, direction1 + direction2)), new RelevantLine(new Line2(intersection, direction1 - direction2))];
     }
 }
-

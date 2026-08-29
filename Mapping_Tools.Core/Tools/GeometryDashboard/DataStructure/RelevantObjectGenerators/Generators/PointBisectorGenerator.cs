@@ -22,7 +22,7 @@ public sealed class PointBisectorGenerator : RelevantObjectsGenerator
     public override string Name => "Bisector of Two Points";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes a pair virtual points and generates the bisector of those points.";
+    public override string Description => "Takes a pair virtual points and generates the bisector of those points.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Intermediate;
@@ -34,4 +34,3 @@ public sealed class PointBisectorGenerator : RelevantObjectsGenerator
         return new RelevantLine(new Line2((point1.Child + point2.Child) / 2, (point2.Child - point1.Child).PerpendicularLeft));
     }
 }
-

@@ -26,7 +26,7 @@ public sealed class ScaleRotateGenerator : RelevantObjectsGenerator
     public override string Name => "Scale & Rotate around a Fixed Point";
 
     /// <inheritdoc />
-    public override string Tooltip =>
+    public override string Description =>
         "Spins and scales any virtual object around a fixed point by a specified angle and scalar. In the settings you can set the angle, scalar and extra rules for selecting the fixed point.";
 
     /// <inheritdoc />
@@ -69,4 +69,3 @@ public sealed class ScaleRotateGenerator : RelevantObjectsGenerator
         return Matrix2.Mult(Matrix2.CreateRotation(MathHelper.DegreesToRadians(MySettings.Angle)), point - origin) * MySettings.Scalar + origin;
     }
 }
-

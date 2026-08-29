@@ -22,7 +22,7 @@ public sealed class TangentCircleGenerator : RelevantObjectsGenerator
     public override string Name => "Tangent Circles on Circle";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes a virtual circle and two points and generates virtual circles which intersect the circle in exactly one point.";
+    public override string Description => "Takes a virtual circle and two points and generates virtual circles which intersect the circle in exactly one point.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Intermediate;

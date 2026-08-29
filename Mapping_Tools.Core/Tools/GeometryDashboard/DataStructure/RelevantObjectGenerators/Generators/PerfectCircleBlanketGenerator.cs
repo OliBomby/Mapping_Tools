@@ -20,7 +20,7 @@ public sealed class PerfectCircleBlanketGenerator : RelevantObjectsGenerator
     public override string Name => "Points on Blanket Centers";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes a circular arc slider and generates a virtual point on its blanket center.";
+    public override string Description => "Takes a circular arc slider and generates a virtual point on its blanket center.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Basic;
@@ -35,4 +35,3 @@ public sealed class PerfectCircleBlanketGenerator : RelevantObjectsGenerator
             : null;
     }
 }
-

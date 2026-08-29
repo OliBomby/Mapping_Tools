@@ -18,7 +18,7 @@ public sealed class AnchorPointGenerator : RelevantObjectsGenerator
     public override string Name => "Points on Slider Anchors";
 
     /// <inheritdoc />
-    public override string Tooltip => "Generates virtual points on the anchor points of sliders.";
+    public override string Description => "Generates virtual points on the anchor points of sliders.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Basic;
@@ -42,4 +42,3 @@ public sealed class AnchorPointGenerator : RelevantObjectsGenerator
         });
     }
 }
-

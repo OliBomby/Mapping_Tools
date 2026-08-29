@@ -18,7 +18,7 @@ public sealed class LastAnchorGenerator : RelevantObjectsGenerator
     public override string Name => "Points on Last Anchors";
 
     /// <inheritdoc />
-    public override string Tooltip => "Generates virtual points on the last anchors of sliders.";
+    public override string Description => "Generates virtual points on the last anchors of sliders.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Basic;
@@ -37,4 +37,3 @@ public sealed class LastAnchorGenerator : RelevantObjectsGenerator
             : null;
     }
 }
-

@@ -18,7 +18,7 @@ public sealed class StartPointGenerator : RelevantObjectsGenerator
     public override string Name => "Points on Circles and Slider Heads";
 
     /// <inheritdoc />
-    public override string Tooltip => "Generates virtual points on slider heads and circles.";
+    public override string Description => "Generates virtual points on slider heads and circles.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Basic;
@@ -30,4 +30,3 @@ public sealed class StartPointGenerator : RelevantObjectsGenerator
         return new RelevantPoint(hitObject.HitObject.Pos);
     }
 }
-

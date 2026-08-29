@@ -21,7 +21,7 @@ public sealed class SquareGenerator2 : RelevantObjectsGenerator
     public override string Name => "Square from Two Points (Type II)";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes a pair of virtual points and generates a pair of virtual points on each side to make two squares in total.";
+    public override string Description => "Takes a pair of virtual points and generates a pair of virtual points on each side to make two squares in total.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Intermediate;
@@ -38,4 +38,3 @@ public sealed class SquareGenerator2 : RelevantObjectsGenerator
         ];
     }
 }
-

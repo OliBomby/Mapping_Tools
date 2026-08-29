@@ -23,7 +23,7 @@ public sealed partial class GeometryDashboardGeneratorViewModel : ObservableObje
     public string Name => Model.Name;
 
     /// <summary>Gets the tooltip text.</summary>
-    public string Tooltip => Model.Tooltip;
+    public string Tooltip => Model.Description;
 
     /// <summary>Gets the settings object shown in the row.</summary>
     public GeneratorSettings Settings => Model.Settings;
@@ -35,4 +35,3 @@ public sealed partial class GeometryDashboardGeneratorViewModel : ObservableObje
         return owner.ShowGeneratorSettingsAsync(this);
     }
 }
-

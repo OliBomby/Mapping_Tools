@@ -20,7 +20,7 @@ public sealed class PerfectCircleGenerator : RelevantObjectsGenerator
     public override string Name => "Circles on 3-Point Sliders";
 
     /// <inheritdoc />
-    public override string Tooltip => "Takes a circular arc slider and generates a virtual circle that completes the arc.";
+    public override string Description => "Takes a circular arc slider and generates a virtual circle that completes the arc.";
 
     /// <inheritdoc />
     public override GeneratorType GeneratorType => GeneratorType.Basic;
@@ -35,4 +35,3 @@ public sealed class PerfectCircleGenerator : RelevantObjectsGenerator
             : null;
     }
 }
-
