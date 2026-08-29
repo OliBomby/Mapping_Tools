@@ -10,6 +10,7 @@ using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
@@ -43,8 +44,9 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     private const double points_bias = 3;
     private const double special_bias = 2;
     private const double selection_range = 80;
+    private const string save_slot_binding_prefix = "geometry-dashboard-save-slot";
     private static readonly HitObjectComparer hitObjectComparer = new();
-    private readonly HashSet<GeometryDashboardSaveSlot> activeSaveSlots = [];
+    private readonly Dictionary<GeometryDashboardSaveSlot, string> saveSlotBindingIds = [];
 
     private readonly ApplicationSettings applicationSettings;
     private readonly ProjectDefinition<GeometryDashboardProject> definition = new(
@@ -55,6 +57,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     private readonly IUiDispatcher dispatcher;
     private readonly IFilePicker filePicker;
+    private readonly IGlobalHotkeyService globalHotkeys;
     private readonly ITextFileStore files;
     private readonly List<IRelevantDrawable> inheritableDrawables = [];
     private readonly IGeometryDashboardInputService input;
@@ -83,6 +86,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
 
     /// <summary>Creates the dashboard presentation and its default generator catalog.</summary>
     /// <param name="applicationSettings">Shared process settings.</param>
+    /// <param name="globalHotkeys">Registers discrete process-wide save-slot commands.</param>
     /// <param name="runtime">Reads the external osu!/editor snapshot.</param>
     /// <param name="input">Reads global keyboard, mouse, and cursor state.</param>
     /// <param name="overlayService">Renders osu!-space geometry through the platform overlay.</param>
@@ -94,6 +98,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     /// <param name="dispatcher">Marshals observable state changes to Avalonia's UI thread.</param>
     public GeometryDashboardViewModel(
         ApplicationSettings applicationSettings,
+        IGlobalHotkeyService globalHotkeys,
         IGeometryDashboardRuntime runtime,
         IGeometryDashboardInputService input,
         IGeometryDashboardOverlayService overlayService,
@@ -105,6 +110,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         IUiDispatcher dispatcher)
     {
         this.applicationSettings = applicationSettings ?? throw new ArgumentNullException(nameof(applicationSettings));
+        this.globalHotkeys = globalHotkeys ?? throw new ArgumentNullException(nameof(globalHotkeys));
         this.runtime = runtime ?? throw new ArgumentNullException(nameof(runtime));
         this.input = input ?? throw new ArgumentNullException(nameof(input));
         this.overlayService = overlayService ?? throw new ArgumentNullException(nameof(overlayService));
@@ -171,6 +177,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         if (disposed) return;
         disposed = true;
         active = false;
+        SynchronizeSaveSlotHotkeys();
         lifetime.Cancel();
         try { loop?.Wait(TimeSpan.FromSeconds(1)); }
         catch { }
@@ -196,6 +203,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     {
         if (disposed) return;
         active = true;
+        SynchronizeSaveSlotHotkeys();
         loop ??= Task.Run(() => RunLoopAsync(lifetime.Token));
     }
 
@@ -204,6 +212,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
     {
         if (Preferences.KeepRunning) return;
         active = false;
+        SynchronizeSaveSlotHotkeys();
         overlayService.Hide();
     }
 
@@ -234,7 +243,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
                 Project.SetCurrentPreferences(loaded.CurrentPreferences);
             }
 
-            activeSaveSlots.Clear();
+            SynchronizeSaveSlotHotkeys();
             ApplyPreferences();
         }
     }
@@ -534,16 +543,6 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         lock (stateGate)
         {
             Vector2 cursor;
-            lock (Project)
-            {
-                foreach (var slot in Project.SaveSlots.ToArray())
-                {
-                    bool isDown = input.IsHotkeyDown(slot.ProjectHotkey);
-                    if (isDown && activeSaveSlots.Add(slot)) LoadSaveSlot(slot);
-                    if (!isDown) activeSaveSlots.Remove(slot);
-                }
-            }
-
             if (input.IsMouseButtonDown(GeometryDashboardMouseButton.Left) && input.TryGetCursorPosition(out cursor))
             {
                 var selected = layers.GetRootRelevantHitObjects().Where(objectModel => objectModel.IsSelected).ToArray();
@@ -883,12 +882,66 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         });
     }
 
-    private void RefreshSaveSlotHotkeys()
+    private void SynchronizeSaveSlotHotkeys()
     {
         lock (stateGate)
         {
-            activeSaveSlots.Clear();
+            GeometryDashboardSaveSlot[] slots;
+            lock (Project) slots = Project.SaveSlots.ToArray();
+
+            var currentSlots = slots.ToHashSet();
+            foreach (var (slot, bindingId) in saveSlotBindingIds.ToArray())
+            {
+                if (active && currentSlots.Contains(slot)) continue;
+
+                globalHotkeys.SetBinding(bindingId, null, static _ => Task.CompletedTask);
+                saveSlotBindingIds.Remove(slot);
+            }
+
+            if (!active) return;
+
+            foreach (var slot in slots)
+            {
+                if (!saveSlotBindingIds.TryGetValue(slot, out var bindingId))
+                {
+                    bindingId = $"{save_slot_binding_prefix}-{Guid.NewGuid():N}";
+                    saveSlotBindingIds.Add(slot, bindingId);
+                }
+
+                globalHotkeys.SetBinding(
+                    bindingId,
+                    ToGlobalHotkey(slot.ProjectHotkey),
+                    cancellationToken => LoadSaveSlotFromHotkeyAsync(slot, cancellationToken));
+            }
         }
+    }
+
+    private Task LoadSaveSlotFromHotkeyAsync(
+        GeometryDashboardSaveSlot slot,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (disposed || !active) return Task.CompletedTask;
+
+        lock (Project)
+        {
+            if (!Project.SaveSlots.Contains(slot)) return Task.CompletedTask;
+        }
+
+        LoadSaveSlot(slot);
+        return Task.CompletedTask;
+    }
+
+    private static HotkeySettings? ToGlobalHotkey(Hotkey? hotkey)
+    {
+        return hotkey is null || hotkey.Key == 0
+            ? null
+            : new HotkeySettings(hotkey.Key, hotkey.Modifiers);
+    }
+
+    private void RefreshSaveSlotHotkeys()
+    {
+        SynchronizeSaveSlotHotkeys();
     }
 
     private RelevantObjectCollection GetLockedObjects()

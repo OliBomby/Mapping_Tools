@@ -57,6 +57,7 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
             Project.SaveSlots.Add(slot);
         }
 
+        refreshHotkeys();
         SelectedSlot = slot;
     }
 
@@ -75,6 +76,7 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
             foreach (var slot in slots) Project.SaveSlots.Remove(slot);
         }
 
+        refreshHotkeys();
         SelectedSlots.Clear();
         lock (Project)
         {
@@ -103,7 +105,11 @@ public sealed partial class GeometryDashboardProjectSlotsViewModel : ObservableO
             }
         }
 
-        if (lastCopy is not null) SetSelectedSlots([lastCopy]);
+        if (lastCopy is not null)
+        {
+            refreshHotkeys();
+            SetSelectedSlots([lastCopy]);
+        }
     }
 
     /// <summary>Loads the selected slot into the active dashboard.</summary>

@@ -4,6 +4,7 @@ using Mapping_Tools.Application.BeatmapEditing.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
@@ -50,6 +51,50 @@ public sealed class GeometryDashboardViewModelTests
     }
 
     [TestMethod]
+    public async Task Activate_WithSaveSlot_RegistersGlobalBindingAndLoadsSlot()
+    {
+        // Arrange
+        var globalHotkeys = new RecordingGlobalHotkeyService();
+        using var viewModel = CreateViewModel(globalHotkeys: globalHotkeys);
+        var slot = new GeometryDashboardSaveSlot
+        {
+            ProjectHotkey = new Hotkey(56, 2),
+        };
+        slot.Preferences.AcceptableDifference = 70;
+        viewModel.Project.CurrentPreferences.AcceptableDifference = 2;
+        viewModel.Project.SaveSlots.Add(slot);
+
+        // Act
+        viewModel.Activate();
+        string bindingId = globalHotkeys.Bindings.Single().Key;
+        await globalHotkeys.Callbacks[bindingId](CancellationToken.None);
+
+        // Assert
+        globalHotkeys.Bindings[bindingId].Should().Be(new HotkeySettings(56, 2));
+        viewModel.Project.CurrentPreferences.AcceptableDifference.Should().Be(70);
+    }
+
+    [TestMethod]
+    public void Deactivate_WithActiveSaveSlot_RemovesGlobalBinding()
+    {
+        // Arrange
+        var globalHotkeys = new RecordingGlobalHotkeyService();
+        using var viewModel = CreateViewModel(globalHotkeys: globalHotkeys);
+        viewModel.Project.SaveSlots.Add(new GeometryDashboardSaveSlot
+        {
+            ProjectHotkey = new Hotkey(56),
+        });
+        viewModel.Activate();
+        string bindingId = globalHotkeys.Bindings.Single().Key;
+
+        // Act
+        viewModel.Deactivate();
+
+        // Assert
+        globalHotkeys.Bindings[bindingId].Should().BeNull();
+    }
+
+    [TestMethod]
     public void ToggleSelected_WithShiftModifierAndEmptyGraph_DoesNotCreateObjects()
     {
         // Arrange
@@ -93,10 +138,12 @@ public sealed class GeometryDashboardViewModelTests
 
     private static GeometryDashboardViewModel CreateViewModel(
         bool inputSupported = true,
+        IGlobalHotkeyService? globalHotkeys = null,
         params GeometryDashboardRuntimeSnapshot?[] snapshots)
     {
         return new GeometryDashboardViewModel(
             new ApplicationSettings(),
+            globalHotkeys ?? new RecordingGlobalHotkeyService(),
             new RuntimeStub(snapshots),
             new InputStub(inputSupported),
             new OverlayStub(),
@@ -167,6 +214,32 @@ public sealed class GeometryDashboardViewModelTests
         public bool TrySetCursorPosition(Vector2 position)
         {
             return false;
+        }
+    }
+
+    private sealed class RecordingGlobalHotkeyService : IGlobalHotkeyService
+    {
+        public Dictionary<string, HotkeySettings?> Bindings { get; } =
+            new(StringComparer.Ordinal);
+
+        public Dictionary<string, Func<CancellationToken, Task>> Callbacks { get; } =
+            new(StringComparer.Ordinal);
+
+        public void SetBinding(
+            string id,
+            HotkeySettings? hotkey,
+            Func<CancellationToken, Task> callback)
+        {
+            Bindings[id] = hotkey;
+            Callbacks[id] = callback;
+        }
+
+        public void Start()
+        {
+        }
+
+        public void Stop()
+        {
         }
     }
 
