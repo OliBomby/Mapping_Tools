@@ -72,6 +72,10 @@ public abstract class Event : ITextLine
             case "Break":
                 myEvent = new Break();
                 break;
+            case "3":
+            case "Colour":
+                myEvent = new Colour();
+                break;
             case "Sprite":
                 myEvent = new Sprite();
                 break;
