@@ -1,3 +1,6 @@
+using System.Text.Json.Nodes;
+using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Core.MathUtil;
@@ -31,6 +34,58 @@ public sealed class VersionedProjectJsonSerializerTests
         json.Should().Contain("\"Name\": \"current\"");
         json.Should().NotContain("$type");
         json.Should().NotContain("Mapping_Tools.");
+    }
+
+    [TestMethod]
+    public void Serialize_WithToolSchema_WritesToolIdentityAndSchemaVersion()
+    {
+        // Arrange
+        VersionedProjectJsonSerializer serializer = new();
+        ToolConfigSchema schema = new(
+            "mapping-tools.tool.test",
+            [new AddMarkerMigration()]);
+
+        // Act
+        string json = serializer.Serialize(schema, new SimpleDocument { Name = "current" });
+
+        // Assert
+        json.Should().Contain("\"$schema\": \"mapping-tools.tool.test\"");
+        json.Should().Contain("\"$version\": 2");
+    }
+
+    [TestMethod]
+    public void Deserialize_WithToolSchema_UsesOnlyThatSchemasMigrations()
+    {
+        // Arrange
+        VersionedProjectJsonSerializer serializer = new();
+        ToolConfigSchema schema = new(
+            "mapping-tools.tool.test",
+            [new AddMarkerMigration()]);
+        const string json =
+            "{\"$schema\":\"mapping-tools.tool.test\",\"$version\":1,\"Name\":\"old\"}";
+
+        // Act
+        SimpleDocument project = serializer.Deserialize<SimpleDocument>(schema, json);
+
+        // Assert
+        project.Name.Should().Be("old");
+        project.Marker.Should().Be("migrated");
+    }
+
+    [TestMethod]
+    public void Deserialize_WithDifferentToolSchema_RejectsTheDocument()
+    {
+        // Arrange
+        VersionedProjectJsonSerializer serializer = new();
+        ToolConfigSchema schema = new("mapping-tools.tool.expected");
+        const string json =
+            "{\"$schema\":\"mapping-tools.tool.other\",\"$version\":1,\"Name\":\"wrong\"}";
+
+        // Act
+        Action act = () => serializer.Deserialize<SimpleDocument>(schema, json);
+
+        // Assert
+        act.Should().Throw<JsonSerializationException>();
     }
 
     [TestMethod]
@@ -135,5 +190,17 @@ public sealed class VersionedProjectJsonSerializerTests
     private sealed class SimpleDocument
     {
         public string Name { get; set; } = "";
+
+        public string? Marker { get; set; }
+    }
+
+    private sealed class AddMarkerMigration : IConfigMigration
+    {
+        public int ToVersion => 2;
+
+        public void Apply(JsonObject document)
+        {
+            document["Marker"] = "migrated";
+        }
     }
 }

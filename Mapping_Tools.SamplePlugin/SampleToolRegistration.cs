@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Tools;
+using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Desktop.Plugin;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,6 +28,9 @@ public sealed class SampleToolRegistration : IMappingToolDefinition
 
     /// <inheritdoc />
     public ToolDefinition Definition => SampleToolDefinition.Definition;
+
+    /// <inheritdoc />
+    public ToolConfigSchema ConfigSchema => SampleToolConfigSchema.Definition;
 
     /// <inheritdoc />
     public Type ViewModelType => typeof(SampleToolViewModel);

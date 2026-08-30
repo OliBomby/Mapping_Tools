@@ -35,7 +35,8 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
         "hitsoundcopierproject.json",
         "Hitsound Copier Projects",
         () => new HitsoundCopierProject(),
-        "hitsound-copier-project.json");
+        "hitsound-copier-project.json",
+        ToolConfigSchema.ForTool(HitsoundCopierToolDefinition.Definition.Id));
 
     private readonly IFilePicker filePicker;
     private readonly IUserNotificationService notifications;

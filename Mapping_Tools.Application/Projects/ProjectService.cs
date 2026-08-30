@@ -53,6 +53,7 @@ public sealed class ProjectService : IProjectService
         try
         {
             return await store.LoadAsync<TProject>(
+                definition.ConfigSchema,
                 GetAutoSavePath(definition),
                 cancellationToken).ConfigureAwait(false);
         }
@@ -60,6 +61,7 @@ public sealed class ProjectService : IProjectService
             exception is FileNotFoundException or DirectoryNotFoundException)
         {
             return await store.LoadAsync<TProject>(
+                definition.ConfigSchema,
                 Path.Combine(directories.ApplicationData, definition.AutoSaveFileName),
                 cancellationToken).ConfigureAwait(false);
         }
@@ -94,11 +96,32 @@ public sealed class ProjectService : IProjectService
     }
 
     /// <inheritdoc />
+    public Task SaveAsync<TProject>(
+        ToolConfigSchema schema,
+        string path,
+        TProject project,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(schema);
+        return store.SaveAsync(schema, path, project, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public Task<TProject> LoadAsync<TProject>(
         string path,
         CancellationToken cancellationToken = default)
     {
         return store.LoadAsync<TProject>(path, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<TProject> LoadAsync<TProject>(
+        ToolConfigSchema schema,
+        string path,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(schema);
+        return store.LoadAsync<TProject>(schema, path, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -115,7 +138,11 @@ public sealed class ProjectService : IProjectService
         foreach (string path in ResolveAutoSavePaths(definition, additionalPaths))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await store.SaveAsync(path, project, cancellationToken).ConfigureAwait(false);
+            await store.SaveAsync(
+                definition.ConfigSchema,
+                path,
+                project,
+                cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -146,7 +173,11 @@ public sealed class ProjectService : IProjectService
 
         if (path is null) return null;
 
-        await store.SaveAsync(path, project, cancellationToken);
+        await store.SaveAsync(
+            definition.ConfigSchema,
+            path,
+            project,
+            cancellationToken);
         return path;
     }
 
@@ -173,7 +204,10 @@ public sealed class ProjectService : IProjectService
         if (paths.Count == 0) return null;
 
         string path = paths[0];
-        TProject project = await store.LoadAsync<TProject>(path, cancellationToken);
+        TProject project = await store.LoadAsync<TProject>(
+            definition.ConfigSchema,
+            path,
+            cancellationToken);
         return new ProjectOpenResult<TProject>(path, project);
     }
 

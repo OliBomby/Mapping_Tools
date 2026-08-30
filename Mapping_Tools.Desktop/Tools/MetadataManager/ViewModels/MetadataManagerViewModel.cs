@@ -64,7 +64,8 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
             "metadataproject.json",
             "Metadata Manager Projects",
             () => CreateDefaultProject(defaultExportPath),
-            "metadata-manager-project.json");
+            "metadata-manager-project.json",
+            ToolConfigSchema.ForTool(MetadataManagerToolDefinition.Definition.Id));
     }
 
     /// <summary>Gets or sets the beatmap whose metadata should be imported.</summary>

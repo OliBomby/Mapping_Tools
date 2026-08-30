@@ -25,6 +25,10 @@ public sealed class ProjectDefinition<TProject>
     /// <param name="suggestedFileName">
     ///     An optional filename proposed by the Save As picker.
     /// </param>
+    /// <param name="configSchema">
+    ///     The tool-owned configuration schema used for project persistence. When
+    ///     omitted, the standalone compatibility schema is used.
+    /// </param>
     /// <exception cref="ArgumentException">
     ///     A filename, folder name, or suggested filename is blank, rooted, or
     ///     contains a directory separator.
@@ -33,7 +37,8 @@ public sealed class ProjectDefinition<TProject>
         string autoSaveFileName,
         string projectFolderName,
         Func<TProject> createProject,
-        string? suggestedFileName = null)
+        string? suggestedFileName = null,
+        ToolConfigSchema? configSchema = null)
     {
         AutoSaveFileName = ValidateSinglePathSegment(
             autoSaveFileName,
@@ -46,6 +51,7 @@ public sealed class ProjectDefinition<TProject>
             : ValidateSinglePathSegment(suggestedFileName, nameof(suggestedFileName));
         CreateProject = createProject
                         ?? throw new ArgumentNullException(nameof(createProject));
+        ConfigSchema = configSchema ?? ToolConfigSchema.Default;
     }
 
     /// <summary>
@@ -69,6 +75,11 @@ public sealed class ProjectDefinition<TProject>
     ///     when the platform picker should choose its own default.
     /// </summary>
     public string? SuggestedFileName { get; }
+
+    /// <summary>
+    ///     Gets the tool-owned schema used when this project is serialized.
+    /// </summary>
+    public ToolConfigSchema ConfigSchema { get; }
 
     private static string ValidateSinglePathSegment(string value, string parameterName)
     {

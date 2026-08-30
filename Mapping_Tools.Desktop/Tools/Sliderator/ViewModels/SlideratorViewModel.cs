@@ -42,7 +42,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
         "slideratorproject.json",
         "Sliderator Projects",
         static () => new SlideratorProject(),
-        "sliderator-project.json");
+        "sliderator-project.json",
+        ToolConfigSchema.ForTool(SlideratorToolDefinition.Definition.Id));
 
     private readonly IDialogService dialogs;
     private readonly DesktopApplicationSettings settings;

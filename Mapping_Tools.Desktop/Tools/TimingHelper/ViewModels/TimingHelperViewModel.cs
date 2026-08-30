@@ -30,7 +30,8 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
         "timinghelperproject.json",
         "Timing Helper Projects",
         static () => new TimingHelperProject(),
-        "timing-helper-project.json");
+        "timing-helper-project.json",
+        ToolConfigSchema.ForTool(TimingHelperToolDefinition.Definition.Id));
 
     private readonly DesktopApplicationSettings settings;
 

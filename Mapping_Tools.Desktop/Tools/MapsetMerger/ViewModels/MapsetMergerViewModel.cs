@@ -34,7 +34,8 @@ public sealed partial class MapsetMergerViewModel : SingleRunToolViewModel, IShe
         "mapsetmergerproject.json",
         "Mapset Merger Projects",
         static () => new MapsetMergerProject(),
-        "mapset-merger-project.json");
+        "mapset-merger-project.json",
+        ToolConfigSchema.ForTool(MapsetMergerToolDefinition.Definition.Id));
 
     private readonly IFilePicker filePicker;
 

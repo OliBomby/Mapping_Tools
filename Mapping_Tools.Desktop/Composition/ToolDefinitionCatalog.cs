@@ -33,10 +33,17 @@ internal sealed class ToolDefinitionCatalog
             .ToArray();
 
         var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var schemaIds = new HashSet<string>(StringComparer.Ordinal);
         foreach (var definition in definitions)
+        {
             if (!ids.Add(definition.Definition.Id))
                 throw new InvalidOperationException(
                     $"Tool id '{definition.Definition.Id}' is registered more than once.");
+
+            if (!schemaIds.Add(definition.ConfigSchema.Id))
+                throw new InvalidOperationException(
+                    $"Configuration schema '{definition.ConfigSchema.Id}' is registered more than once.");
+        }
 
         return new ToolDefinitionCatalog(definitions);
     }
@@ -112,6 +119,10 @@ internal sealed class ToolDefinitionCatalog
     {
         if (definition.Definition is null)
             throw new InvalidOperationException($"Tool definition '{definitionType.FullName}' returned no metadata.");
+
+        if (definition.ConfigSchema is null)
+            throw new InvalidOperationException(
+                $"Tool definition '{definitionType.FullName}' returned no configuration schema.");
 
         if (definition.ViewModelType is null)
             throw new InvalidOperationException(

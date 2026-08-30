@@ -20,7 +20,8 @@ public sealed partial class SampleToolViewModel : SingleRunToolViewModel,
         "samplepluginproject.json",
         "Sample Plugin Projects",
         static () => new SampleToolProject(),
-        "sample-plugin-project.json");
+        "sample-plugin-project.json",
+        SampleToolConfigSchema.Definition);
     private readonly SampleToolService sampleTool;
     private readonly IBeatmapWorkspace workspace;
 

@@ -108,7 +108,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         definition = new ProjectDefinition<HitsoundStudioProject>(
             "hsstudioproject.json",
             "Hitsound Studio Projects",
-            () => new HitsoundStudioProject { ExportFolder = directories.Exports });
+            () => new HitsoundStudioProject { ExportFolder = directories.Exports },
+            configSchema: ToolConfigSchema.ForTool(HitsoundStudioToolDefinition.Definition.Id));
     }
 
     /// <summary>Gets or sets the beatmap used as the export baseline.</summary>

@@ -31,7 +31,8 @@ public sealed partial class SliderMergerViewModel : SingleRunToolViewModel,
         "slidermergerproject.json",
         "Slider Merger Projects",
         static () => new SliderMergerProject(),
-        "slider-merger-project.json");
+        "slider-merger-project.json",
+        ToolConfigSchema.ForTool(SliderMergerToolDefinition.Definition.Id));
 
     private readonly ISliderMergerService merger;
     private readonly DesktopApplicationSettings settings;

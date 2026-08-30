@@ -1,3 +1,5 @@
+using Mapping_Tools.Application.Projects.Models;
+
 namespace Mapping_Tools.Application.Projects.Contracts;
 
 /// <summary>
@@ -28,6 +30,25 @@ public interface IProjectStore
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Atomically replaces a local project file using the supplied
+    ///     tool-owned configuration schema.
+    /// </summary>
+    /// <typeparam name="TProject">The feature-specific project model.</typeparam>
+    /// <param name="schema">The schema that owns the document identity and migrations.</param>
+    /// <param name="path">The destination JSON file.</param>
+    /// <param name="project">The complete project snapshot.</param>
+    /// <param name="cancellationToken">Cancels serialization or writing before replacement is committed.</param>
+    Task SaveAsync<TProject>(
+        ToolConfigSchema schema,
+        string path,
+        TProject project,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(schema);
+        return SaveAsync(path, project, cancellationToken);
+    }
+
+    /// <summary>
     ///     Loads and deserializes a typed project from a local file.
     /// </summary>
     /// <typeparam name="TProject">The feature-specific project model expected by the caller.</typeparam>
@@ -37,4 +58,21 @@ public interface IProjectStore
     Task<TProject> LoadAsync<TProject>(
         string path,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Loads a typed project using the supplied tool-owned configuration schema.
+    /// </summary>
+    /// <typeparam name="TProject">The feature-specific project model expected by the caller.</typeparam>
+    /// <param name="schema">The schema that owns the document identity and migrations.</param>
+    /// <param name="path">The existing JSON file.</param>
+    /// <param name="cancellationToken">Cancels reading before deserialization begins.</param>
+    /// <returns>The reconstructed project.</returns>
+    Task<TProject> LoadAsync<TProject>(
+        ToolConfigSchema schema,
+        string path,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(schema);
+        return LoadAsync<TProject>(path, cancellationToken);
+    }
 }

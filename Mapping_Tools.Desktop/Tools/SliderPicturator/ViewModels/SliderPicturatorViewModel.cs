@@ -33,7 +33,8 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
 
     private readonly ProjectDefinition<SliderPicturatorProject> definition = new(
         "sliderpicturatorproject.json", "Slider Picturator Projects", static () => new SliderPicturatorProject(),
-        "slider-picturator-project.json");
+        "slider-picturator-project.json",
+        ToolConfigSchema.ForTool(SliderPicturatorToolDefinition.Definition.Id));
 
     private readonly IFilePicker filePicker;
     private readonly IImageFileService images;

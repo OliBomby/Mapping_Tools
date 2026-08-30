@@ -12,6 +12,7 @@ using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
+using Mapping_Tools.Application.Tools.GeometryDashboard;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
@@ -39,7 +40,8 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
         "geometrydashboardproject.json",
         "Geometry Dashboard Projects",
         static () => new GeometryDashboardProject(),
-        "geometry-dashboard-project.json");
+        "geometry-dashboard-project.json",
+        ToolConfigSchema.ForTool(GeometryDashboardToolDefinition.Definition.Id));
     private readonly IUiDispatcher dispatcher;
     private readonly IFilePicker filePicker;
     private readonly IGlobalHotkeyService globalHotkeys;
@@ -295,7 +297,9 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             });
             if (string.IsNullOrWhiteSpace(path)) return;
 
-            string json = serializer.Serialize(dashboardService.GetLockedObjects());
+            string json = serializer.Serialize(
+                definition.ConfigSchema,
+                dashboardService.GetLockedObjects());
             files.WriteAllLines(path, json.Split(["\r\n", "\n"], StringSplitOptions.None));
             await notifications.PublishAsync(new UserNotification(
                 UserNotificationSeverity.Success,
@@ -330,6 +334,7 @@ public sealed partial class GeometryDashboardViewModel : ObservableObject,
             if (paths.Count == 0) return;
 
             var objects = serializer.Deserialize<RelevantObjectCollection>(
+                definition.ConfigSchema,
                 string.Join(Environment.NewLine, files.ReadAllLines(paths[0])));
             dashboardService.SetLockedObjects(objects);
             ApplyDashboardState(dashboardService.State);

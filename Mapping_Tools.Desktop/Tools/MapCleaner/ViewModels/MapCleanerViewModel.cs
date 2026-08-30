@@ -31,7 +31,8 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
         "mapcleanerproject.json",
         "Map Cleaner Projects",
         () => new MapCleanerProject(),
-        "map-cleaner-project.json");
+        "map-cleaner-project.json",
+        ToolConfigSchema.ForTool(MapCleanerToolDefinition.Definition.Id));
 
     private readonly IPlatformLauncher launcher;
     private readonly DesktopApplicationSettings settings;

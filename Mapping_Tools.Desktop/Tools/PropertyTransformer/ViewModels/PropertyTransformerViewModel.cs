@@ -25,7 +25,8 @@ public sealed partial class PropertyTransformerViewModel : SingleRunToolViewMode
         "propertytransformerproject.json",
         "Property Transformer Projects",
         () => new PropertyTransformerProject(),
-        "property-transformer-project.json");
+        "property-transformer-project.json",
+        ToolConfigSchema.ForTool(PropertyTransformerToolDefinition.Definition.Id));
 
     private readonly IPropertyTransformerService propertyTransformer;
     private readonly IBeatmapWorkspace workspace;

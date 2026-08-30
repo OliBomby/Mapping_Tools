@@ -1,5 +1,6 @@
+using System.Text.Json.Nodes;
 using Mapping_Tools.Application.Projects.Contracts;
-using Mapping_Tools.Infrastructure.Projects.Migrations;
+using Mapping_Tools.Application.Projects.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -16,23 +17,39 @@ public sealed class VersionedProjectJsonSerializer : IProjectSerializer
     /// <inheritdoc />
     public string Serialize<TProject>(TProject project)
     {
-        return CanonicalProjectJsonSerializer.Serialize(project);
+        return Serialize(ToolConfigSchema.Default, project);
+    }
+
+    /// <inheritdoc />
+    public string Serialize<TProject>(ToolConfigSchema schema, TProject project)
+    {
+        ArgumentNullException.ThrowIfNull(schema);
+        return CanonicalProjectJsonSerializer.Serialize(schema, project);
     }
 
     /// <inheritdoc />
     public TProject Deserialize<TProject>(string json)
     {
+        return Deserialize<TProject>(ToolConfigSchema.Default, json);
+    }
+
+    /// <inheritdoc />
+    public TProject Deserialize<TProject>(ToolConfigSchema schema, string json)
+    {
+        ArgumentNullException.ThrowIfNull(schema);
         ArgumentException.ThrowIfNullOrWhiteSpace(json);
 
         JObject document = ParseObject(json);
         if (!TryReadVersion(document, out int version))
             return legacyReader.Read<TProject>(json);
 
-        string? schema = document["$schema"]?.Value<string>();
-        if (!string.Equals(schema, CanonicalProjectJsonSerializer.Schema, StringComparison.Ordinal))
-            throw new JsonSerializationException($"The project document has an unknown schema '{schema}'.");
+        string? documentSchema = document["$schema"]?.Value<string>();
+        if (!string.Equals(documentSchema, schema.Id, StringComparison.Ordinal)
+            && !string.Equals(documentSchema, ToolConfigSchema.Default.Id, StringComparison.Ordinal))
+            throw new JsonSerializationException(
+                $"The project document has an unknown schema '{documentSchema}'.");
 
-        int currentVersion = ProjectMigrationCatalog.CurrentVersion;
+        int currentVersion = schema.CurrentVersion;
         if (version > currentVersion)
             throw new JsonSerializationException(
                 $"The project document uses unsupported version {version}; current version is {currentVersion}.");
@@ -40,7 +57,15 @@ public sealed class VersionedProjectJsonSerializer : IProjectSerializer
         while (version < currentVersion)
         {
             int targetVersion = version + 1;
-            ProjectMigrationCatalog.Get(targetVersion).Apply(document);
+            IConfigMigration migration = schema.Migrations.FirstOrDefault(
+                candidate => candidate.ToVersion == targetVersion)
+                ?? throw new InvalidDataException(
+                    $"No configuration migration exists for schema '{schema.Id}' and target version {targetVersion}.");
+            JsonObject migrated = JsonNode.Parse(document.ToString(Formatting.None)) as JsonObject
+                                  ?? throw new JsonSerializationException(
+                                      "The project document root must be a JSON object.");
+            migration.Apply(migrated);
+            document = JObject.Parse(migrated.ToJsonString());
             version = targetVersion;
             document["$version"] = version;
         }

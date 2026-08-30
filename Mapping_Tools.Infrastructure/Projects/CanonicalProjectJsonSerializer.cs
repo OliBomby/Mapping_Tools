@@ -7,7 +7,7 @@ using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectCol
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
-using Mapping_Tools.Infrastructure.Projects.Migrations;
+using Mapping_Tools.Application.Projects.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -15,16 +15,15 @@ namespace Mapping_Tools.Infrastructure.Projects;
 
 internal static class CanonicalProjectJsonSerializer
 {
-    internal const string Schema = "mapping-tools.project";
-
-    internal static string Serialize<TProject>(TProject project)
+    internal static string Serialize<TProject>(ToolConfigSchema schema, TProject project)
     {
+        ArgumentNullException.ThrowIfNull(schema);
         ArgumentNullException.ThrowIfNull(project);
 
         JsonSerializer serializer = CreateSerializer();
         JObject document = JObject.FromObject(project, serializer);
-        document.AddFirst(new JProperty("$version", ProjectMigrationCatalog.CurrentVersion));
-        document.AddFirst(new JProperty("$schema", Schema));
+        document.AddFirst(new JProperty("$version", schema.CurrentVersion));
+        document.AddFirst(new JProperty("$schema", schema.Id));
         return document.ToString(Formatting.Indented);
     }
 

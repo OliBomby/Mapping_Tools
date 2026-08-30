@@ -35,7 +35,8 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         "combocolourproject.json",
         "Combo Colour Studio Projects",
         () => new ComboColourProject(),
-        "combo-colour-studio-project.json");
+        "combo-colour-studio-project.json",
+        ToolConfigSchema.ForTool(ComboColourStudioToolDefinition.Definition.Id));
 
     private readonly IFilePicker filePicker;
     private readonly ILiveBeatmapReader liveReader;

@@ -47,7 +47,8 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         "patterngalleryproject.json",
         "Pattern Gallery Projects",
         () => new PatternGalleryProject(),
-        "pattern-gallery-project.json");
+        "pattern-gallery-project.json",
+        ToolConfigSchema.ForTool(PatternGalleryToolDefinition.Definition.Id));
 
     private readonly IDialogService dialogs;
     private readonly IApplicationDirectories directories;
@@ -623,7 +624,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 archivePath,
                 snapshot.FileHandler.CollectionFolderName,
                 CollectionName + ".json",
-                serializer.Serialize(snapshot),
+                serializer.Serialize(definition.ConfigSchema, snapshot),
                 files);
             await reveal.RevealAsync(archivePath);
             ResultSummary = "Exported Pattern Gallery collection.";
@@ -659,7 +660,9 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 ],
                 false));
 
-            var imported = serializer.Deserialize<PatternGalleryProject>(archive.ProjectJson);
+            var imported = serializer.Deserialize<PatternGalleryProject>(
+                definition.ConfigSchema,
+                archive.ProjectJson);
             imported.FileHandler.CollectionFolderName = archive.CollectionFolderName;
             if (merge)
             {
@@ -695,7 +698,11 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
                 false));
             if (load)
             {
-                if (Project.Patterns.Count > 0) await projects.SaveAsync(Paths.ProjectFile, Snapshot(false));
+                if (Project.Patterns.Count > 0)
+                    await projects.SaveAsync(
+                        definition.ConfigSchema,
+                        Paths.ProjectFile,
+                        Snapshot(false));
 
                 ((IShellProjectFeature<PatternGalleryProject>)this).Install(imported);
             }

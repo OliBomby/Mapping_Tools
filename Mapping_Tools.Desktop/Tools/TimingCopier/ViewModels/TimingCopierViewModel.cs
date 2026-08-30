@@ -31,7 +31,8 @@ public sealed partial class TimingCopierViewModel : SingleRunToolViewModel,
         "timingcopierproject.json",
         "Timing Copier Projects",
         () => new TimingCopierProject(),
-        "timing-copier-project.json");
+        "timing-copier-project.json",
+        ToolConfigSchema.ForTool(TimingCopierToolDefinition.Definition.Id));
 
     private readonly IFilePicker filePicker;
     private readonly IUserNotificationService notifications;

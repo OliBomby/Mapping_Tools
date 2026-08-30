@@ -1,4 +1,5 @@
 using Mapping_Tools.Application.Tools;
+using Mapping_Tools.Application.Projects.Models;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mapping_Tools.Desktop.Plugin;
@@ -11,6 +12,12 @@ public interface IMappingToolDefinition
 {
     /// <summary>Gets the stable metadata used by shell and command catalogs.</summary>
     ToolDefinition Definition { get; }
+
+    /// <summary>
+    ///     Gets the schema used for the tool's persisted configuration. A tool
+    ///     can replace the conventional schema to supply its own migrations.
+    /// </summary>
+    ToolConfigSchema ConfigSchema => ToolConfigSchema.ForTool(Definition.Id);
 
     /// <summary>Gets the shell navigation category containing the tool.</summary>
     string Category { get; }

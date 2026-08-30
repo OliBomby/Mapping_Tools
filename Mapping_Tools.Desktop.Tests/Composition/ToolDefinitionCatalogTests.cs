@@ -24,6 +24,7 @@ public sealed class ToolDefinitionCatalogTests
 
         // Assert
         catalog.Definitions.Should().ContainSingle(definition => definition.Definition.Id == "external-test");
+        catalog.Definitions.Single().ConfigSchema.Id.Should().Be("mapping-tools.tool.external-test");
         services.Should().Contain(descriptor => descriptor.ServiceType == typeof(ExternalPluginService));
     }
 

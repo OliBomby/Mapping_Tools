@@ -58,7 +58,8 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
             "rhythmguideproject.json",
             "Rhythm Guide Projects",
             () => CreateDefaultProject(defaultExportPath),
-            "rhythm-guide-project.json");
+            "rhythm-guide-project.json",
+            ToolConfigSchema.ForTool(RhythmGuideToolDefinition.Definition.Id));
     }
 
     /// <summary>Gets or sets the source beatmap paths in selection order.</summary>

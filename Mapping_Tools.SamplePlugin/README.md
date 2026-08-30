@@ -5,6 +5,7 @@ version of Mapping Tools. It demonstrates the pieces a plugin needs:
 
 - an attributed `IMappingToolDefinition` implementation;
 - a `SingleRunToolViewModel` with one `IShellProjectFeature<T>` setting;
+- a tool-owned `ToolConfigSchema` with an example configuration migration;
 - a backup-aware edit through `IBeatmapEditingGateway`; and
 - an Avalonia `Control` view whose name matches the view model name.
 
@@ -32,6 +33,12 @@ Copy that single DLL into the `Plugins` directory in the Mapping Tools app-data
 folder (`%LOCALAPPDATA%\Mapping Tools\Plugins`), then restart Mapping Tools.
 The folder is created automatically when Mapping Tools starts. For a Debug
 build, use the equivalent `bin/Debug/plugin` directory.
+
+Plugin configuration schemas live in the plugin assembly and are exposed from
+`IMappingToolDefinition.ConfigSchema`. Implement `IConfigMigration` for each
+contiguous target version after version 1, then pass the same schema to the
+tool's `ProjectDefinition<T>`. The host writes the schema id and version into
+`$schema` and `$version`, and runs only migrations belonging to that schema.
 
 The plugin references the host's public `Mapping_Tools.Desktop.Plugin` API and
 the host's Avalonia/MVVM assemblies. Build it against the same Mapping Tools

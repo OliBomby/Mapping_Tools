@@ -81,7 +81,8 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
             "hspreviewproject.json",
             "Hitsound Preview Projects",
             static () => new HitsoundPreviewHelperProject(),
-            "hitsound-preview-project.json");
+            "hitsound-preview-project.json",
+            ToolConfigSchema.ForTool(HitsoundPreviewHelperToolDefinition.Definition.Id));
     }
 
     /// <summary>Gets or sets the zones edited by the tool.</summary>

@@ -1,5 +1,6 @@
 using System.Text;
 using Mapping_Tools.Application.Projects.Contracts;
+using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Infrastructure.Files;
 
 namespace Mapping_Tools.Infrastructure.Projects;
@@ -71,6 +72,35 @@ public sealed class FileSystemProjectStore : IProjectStore
             .ConfigureAwait(false);
     }
 
+    /// <inheritdoc />
+    public async Task SaveAsync<TProject>(
+        ToolConfigSchema schema,
+        string path,
+        TProject project,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(schema);
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        ArgumentNullException.ThrowIfNull(project);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        string json = serializer.Serialize(schema, project);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        string fullPath = Path.GetFullPath(path);
+        string parent = Path.GetDirectoryName(fullPath)
+                        ?? throw new ArgumentException("The project path has no parent directory.", nameof(path));
+        Directory.CreateDirectory(parent);
+
+        await PhysicalAtomicFileWriter
+            .WriteTextAsync(
+                fullPath,
+                json,
+                utf8WithoutByteOrderMark,
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     /// <summary>
     ///     Reads the complete UTF-8 document before invoking the serializer, so a
     ///     cancelled read never yields partially reconstructed feature state.
@@ -90,5 +120,21 @@ public sealed class FileSystemProjectStore : IProjectStore
             cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         return serializer.Deserialize<TProject>(json);
+    }
+
+    /// <inheritdoc />
+    public async Task<TProject> LoadAsync<TProject>(
+        ToolConfigSchema schema,
+        string path,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(schema);
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        string json = await File.ReadAllTextAsync(
+            Path.GetFullPath(path),
+            utf8WithoutByteOrderMark,
+            cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        return serializer.Deserialize<TProject>(schema, json);
     }
 }

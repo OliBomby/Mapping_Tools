@@ -33,7 +33,8 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
         "slidercompletionatorproject.json",
         "Slider Completionator Projects",
         static () => new SliderCompletionatorProject(),
-        "slider-completionator-project.json");
+        "slider-completionator-project.json",
+        ToolConfigSchema.ForTool(SliderCompletionatorToolDefinition.Definition.Id));
 
     private readonly DesktopApplicationSettings settings;
     private readonly IBeatmapWorkspace workspace;

@@ -44,7 +44,8 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         "tumourgeneratorproject.json",
         "Tumour Generator Projects",
         static () => new TumourGeneratorProject(),
-        "tumour-generator-project.json");
+        "tumour-generator-project.json",
+        ToolConfigSchema.ForTool(TumourGeneratorToolDefinition.Definition.Id));
 
     private readonly IDialogService dialogs;
 
