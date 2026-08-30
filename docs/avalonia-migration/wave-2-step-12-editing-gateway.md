@@ -57,8 +57,8 @@ unavailable, while a feature that requires live editing receives a meaningful
 failure from the editing gateway.
 
 `WindowsOsuEditorReloadService` replaces the legacy dependency on
-`System.Windows.Forms.SendKeys`. It focuses osu! and sends the established ten
-Ctrl+L gestures followed by Enter through Win32 keyboard input. The interface
+`System.Windows.Forms.SendKeys`. It focuses osu! and sends one Ctrl+L gesture
+followed by Enter through Win32 keyboard input. The interface
 is platform-neutral, but the implementation intentionally reports
 `PlatformNotSupportedException` outside Windows. Save completes before reload
 is requested, and cancellation is observed before saving and between the

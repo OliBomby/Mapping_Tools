@@ -53,11 +53,8 @@ public sealed class WindowsOsuEditorReloadService : IEditorReloadService
         }
 
         SendKeyboardInput(virtual_key_control, false);
-        for (int index = 0; index < 10; index++)
-        {
-            SendKeyboardInput(virtual_key_l, false);
-            SendKeyboardInput(virtual_key_l, true);
-        }
+        SendKeyboardInput(virtual_key_l, false);
+        SendKeyboardInput(virtual_key_l, true);
 
         SendKeyboardInput(virtual_key_control, true);
         await Task.Delay(100, cancellationToken).ConfigureAwait(false);
