@@ -10,14 +10,18 @@ using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
+using OsuMemoryDataProvider;
+using OsuMemoryDataProvider.OsuMemoryModels;
+using OsuMemoryDataProvider.OsuMemoryModels.Direct;
 using DomainHitObject = Mapping_Tools.Core.BeatmapHelper.HitObject;
 using ReaderHitObject = Editor_Reader.HitObject;
 
 namespace Mapping_Tools.Infrastructure.Editor;
 
 /// <summary>
-///     Reads and validates the active osu!stable editor through Editor Reader,
-///     then translates its vendor-specific memory model into application contracts.
+///     Reads the current osu!stable beatmap through its in-game memory model and
+///     reads unsaved editor state through Editor Reader, then translates the
+///     vendor-specific memory models into application contracts.
 /// </summary>
 public sealed class WindowsEditorReaderAdapter :
     ILiveBeatmapReader,
@@ -25,8 +29,10 @@ public sealed class WindowsEditorReaderAdapter :
     IDisposable
 {
     private readonly IApplicationDirectories directories;
+    private readonly Func<Process?> findProcess;
     private readonly Func<bool> isWindows;
     private readonly object lifecycleGate = new();
+    private readonly Func<Process, string?> readCurrentBeatmapFromMemory;
     private readonly EditorReader reader = new();
     private readonly SemaphoreSlim readerLock = new(1, 1);
     private readonly ApplicationSettings settings;
@@ -42,7 +48,12 @@ public sealed class WindowsEditorReaderAdapter :
     public WindowsEditorReaderAdapter(
         ApplicationSettings settings,
         IApplicationDirectories directories)
-        : this(settings, directories, OperatingSystem.IsWindows)
+        : this(
+            settings,
+            directories,
+            OperatingSystem.IsWindows,
+            OsuProcessDiscovery.FindStableProcess,
+            process => CurrentBeatmapMemoryReader.TryRead(process, settings.SongsPath))
     {
     }
 
@@ -50,19 +61,53 @@ public sealed class WindowsEditorReaderAdapter :
         ApplicationSettings settings,
         IApplicationDirectories directories,
         Func<bool> isWindows)
+        : this(
+            settings,
+            directories,
+            isWindows,
+            OsuProcessDiscovery.FindStableProcess,
+            process => CurrentBeatmapMemoryReader.TryRead(process, settings.SongsPath))
+    {
+    }
+
+    internal WindowsEditorReaderAdapter(
+        ApplicationSettings settings,
+        IApplicationDirectories directories,
+        Func<bool> isWindows,
+        Func<Process?> findProcess,
+        Func<Process, string?> readCurrentBeatmapFromMemory)
     {
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.directories = directories ?? throw new ArgumentNullException(nameof(directories));
         this.isWindows = isWindows ?? throw new ArgumentNullException(nameof(isWindows));
+        this.findProcess = findProcess ?? throw new ArgumentNullException(nameof(findProcess));
+        this.readCurrentBeatmapFromMemory = readCurrentBeatmapFromMemory
+                                            ?? throw new ArgumentNullException(nameof(readCurrentBeatmapFromMemory));
     }
 
     /// <inheritdoc />
     public async Task<string?> FindCurrentBeatmapAsync(
         CancellationToken cancellationToken = default)
     {
+        ObjectDisposedException.ThrowIf(disposed, this);
+        if (!isWindows()) return null;
+
+        EnterRead();
+        bool lockTaken = false;
         try
         {
-            return (await ReadAsync(cancellationToken).ConfigureAwait(false))?.Path;
+            await readerLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+            lockTaken = true;
+            using var process = findProcess();
+            if (process is null) return null;
+
+            cancellationToken.ThrowIfCancellationRequested();
+            string? path = await Task.Run(
+                    () => FindCurrentBeatmap(process),
+                    cancellationToken)
+                .ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            return path;
         }
         catch (OperationCanceledException)
         {
@@ -71,6 +116,12 @@ public sealed class WindowsEditorReaderAdapter :
         catch
         {
             return null;
+        }
+        finally
+        {
+            if (lockTaken) readerLock.Release();
+
+            ExitRead();
         }
     }
 
@@ -164,6 +215,35 @@ public sealed class WindowsEditorReaderAdapter :
         }
     }
 
+    private string? FindCurrentBeatmap(Process process)
+    {
+        string? path = null;
+        try
+        {
+            path = readCurrentBeatmapFromMemory(process);
+        }
+        catch
+        {
+            // Editor Reader is still a useful fallback when the in-game reader
+            // cannot read the current beatmap object.
+        }
+
+        if (!string.IsNullOrWhiteSpace(path)) return path;
+
+        if (string.IsNullOrWhiteSpace(settings.SongsPath)
+            || !settings.UseEditorReader
+            || !IsActiveEditor(process))
+            return null;
+
+        reader.SetProcess(process);
+        reader.FetchHOM();
+        reader.FetchBeatmap();
+        return Path.Combine(
+            settings.SongsPath,
+            reader.ContainingFolder,
+            reader.Filename);
+    }
+
     private static bool IsActiveEditor(Process process)
     {
         try
@@ -216,6 +296,45 @@ public sealed class WindowsEditorReaderAdapter :
             reader.controlPoints?.ToList().Select(item => item.ToString())
             ?? []);
         File.WriteAllLines(path, lines);
+    }
+}
+
+internal static class CurrentBeatmapMemoryReader
+{
+    private static readonly StructuredOsuMemoryReader structuredReader =
+        StructuredOsuMemoryReader.Instance;
+    private static readonly OsuBaseAddresses osuBaseAddresses = new();
+    private static readonly object readerGate = new();
+
+    internal static string? TryRead(Process process, string songsPath)
+    {
+        ArgumentNullException.ThrowIfNull(process);
+        if (string.IsNullOrWhiteSpace(songsPath)) return null;
+
+        lock (readerGate)
+        {
+            string? folder = ReadString(
+                osuBaseAddresses.Beatmap,
+                nameof(CurrentBeatmap.FolderName));
+            string? filename = ReadString(
+                osuBaseAddresses.Beatmap,
+                nameof(CurrentBeatmap.OsuFileName));
+            if (string.IsNullOrWhiteSpace(folder)
+                || string.IsNullOrWhiteSpace(filename))
+                return null;
+
+            return Path.Combine(songsPath, folder, filename);
+        }
+    }
+
+    private static string? ReadString(object readObject, string propertyName)
+    {
+        return structuredReader.TryReadProperty(
+            readObject,
+            propertyName,
+            out var readResult)
+            ? readResult as string
+            : null;
     }
 }
 
