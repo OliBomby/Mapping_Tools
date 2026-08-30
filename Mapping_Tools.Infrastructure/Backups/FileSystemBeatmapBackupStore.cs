@@ -75,6 +75,7 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
             .GetFiles()
             .Where(file => !file.Name.Contains(".mapping-tools-", StringComparison.Ordinal))
             .OrderByDescending(file => file.CreationTimeUtc)
+            .ThenByDescending(file => IsEditorReaderBackup(file.Name))
             .ThenByDescending(file => file.Name, StringComparer.Ordinal)
             .Select(file => new StoredBeatmapBackup(
                 file.FullName,
@@ -91,6 +92,16 @@ public sealed class FileSystemBeatmapBackupStore : IBeatmapBackupStore
         cancellationToken.ThrowIfCancellationRequested();
         File.Delete(path);
         return Task.CompletedTask;
+    }
+
+    private static bool IsEditorReaderBackup(string fileName)
+    {
+        const int timestampLength = 19;
+        if (fileName.Length <= timestampLength + 1) return false;
+
+        ReadOnlySpan<char> suffix = fileName.AsSpan(timestampLength + 1);
+        int separator = suffix.IndexOf('_');
+        return separator >= 0 && suffix[separator..].StartsWith("_2_", StringComparison.Ordinal);
     }
 
 }

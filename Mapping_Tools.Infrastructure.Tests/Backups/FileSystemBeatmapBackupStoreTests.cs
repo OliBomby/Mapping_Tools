@@ -106,4 +106,40 @@ public sealed class FileSystemBeatmapBackupStoreTests
             Directory.Delete(directory, true);
         }
     }
+
+    [TestMethod]
+    public async Task ListAsync_WithSameCreationTime_PrioritizesEditorReaderBackup()
+    {
+        // Arrange
+        string directory = Path.Combine(
+            Path.GetTempPath(),
+            $"MappingToolsBackupStore-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(directory);
+        try
+        {
+            string diskBackup = Path.Combine(
+                directory,
+                "2026-07-25 14-05-06___map.osu");
+            string editorReaderBackup = Path.Combine(
+                directory,
+                "2026-07-25 14-05-06__2_map.osu");
+            await File.WriteAllTextAsync(diskBackup, "disk");
+            await File.WriteAllTextAsync(editorReaderBackup, "editor");
+            DateTime creationTime = DateTime.UtcNow.AddMinutes(-1);
+            File.SetCreationTimeUtc(diskBackup, creationTime);
+            File.SetCreationTimeUtc(editorReaderBackup, creationTime);
+            FileSystemBeatmapBackupStore store = new();
+
+            // Act
+            var files = await store.ListAsync(directory);
+
+            // Assert
+            files[0].Path.Should().Be(editorReaderBackup);
+            files[1].Path.Should().Be(diskBackup);
+        }
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
+    }
 }

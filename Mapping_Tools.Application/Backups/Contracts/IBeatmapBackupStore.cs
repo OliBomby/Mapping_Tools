@@ -64,6 +64,9 @@ public interface IBeatmapBackupStore
 
     /// <summary>
     ///     Enumerates retained files newest first according to filesystem creation time.
+    ///     When creation times tie, an Editor Reader companion is ordered before
+    ///     the direct disk copy created by the same operation, followed by
+    ///     deterministic filename ordering.
     /// </summary>
     /// <param name="directory">The configured backup root.</param>
     /// <param name="cancellationToken">Cancels before enumeration begins.</param>
@@ -80,4 +83,3 @@ public interface IBeatmapBackupStore
     /// <returns>A task that completes when the file no longer exists.</returns>
     Task DeleteAsync(string path, CancellationToken cancellationToken = default);
 }
-

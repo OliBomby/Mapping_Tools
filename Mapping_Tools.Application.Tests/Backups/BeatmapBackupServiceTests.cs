@@ -301,6 +301,35 @@ public sealed class BeatmapBackupServiceTests
     }
 
     [TestMethod]
+    public async Task QuickUndoAsync_WithSameCreationTime_PrefersEditorReaderBackup()
+    {
+        // Arrange
+        var store = CreateStore();
+        string diskBackup = Path.Combine(
+            backup_directory,
+            "2026-07-25 14-05-06___map.osu");
+        string editorReaderBackup = Path.Combine(
+            backup_directory,
+            "2026-07-25 14-05-06__2_map.osu");
+        var diskLines = store.Files[map_path].ToList();
+        var editorReaderLines = store.Files[map_path].ToList();
+        int previewIndex = editorReaderLines.FindIndex(
+            line => line.StartsWith("PreviewTime:", StringComparison.Ordinal));
+        editorReaderLines[previewIndex] = "PreviewTime:3333";
+        store.AddFile(diskBackup, diskLines, now);
+        store.AddFile(editorReaderBackup, editorReaderLines, now);
+        var service = CreateService(store, CreateSettings());
+
+        // Act
+        var result = await service.QuickUndoAsync(map_path);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.BackupPath.Should().Be(editorReaderBackup);
+        store.Files[map_path].Should().Contain("PreviewTime:3333");
+    }
+
+    [TestMethod]
     public async Task CreateAsync_WhenRetentionRuns_PreservesCurrentSafetyCopy()
     {
         // Arrange
@@ -488,6 +517,7 @@ public sealed class BeatmapBackupServiceTests
             IReadOnlyList<StoredBeatmapBackup> result = Files.Keys
                 .Where(path => path.StartsWith(prefix, StringComparison.Ordinal))
                 .OrderByDescending(path => CreationTimes[path])
+                .ThenByDescending(path => IsEditorReaderBackup(path))
                 .ThenByDescending(path => path, StringComparer.Ordinal)
                 .Select(path => new StoredBeatmapBackup(path, CreationTimes[path]))
                 .ToArray();
@@ -538,6 +568,17 @@ public sealed class BeatmapBackupServiceTests
         {
             Files[path] = lines.ToList();
             CreationTimes[path] = createdAt;
+        }
+
+        private static bool IsEditorReaderBackup(string path)
+        {
+            const int timestampLength = 19;
+            string fileName = Path.GetFileName(path);
+            if (fileName.Length <= timestampLength + 1) return false;
+
+            ReadOnlySpan<char> suffix = fileName.AsSpan(timestampLength + 1);
+            int separator = suffix.IndexOf('_');
+            return separator >= 0 && suffix[separator..].StartsWith("_2_", StringComparison.Ordinal);
         }
     }
 }
