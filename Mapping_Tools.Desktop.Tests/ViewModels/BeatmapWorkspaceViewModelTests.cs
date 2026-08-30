@@ -77,7 +77,7 @@ public sealed class BeatmapWorkspaceViewModelTests
     }
 
     [TestMethod]
-    public async Task RestoreBackupCommand_WithMetadataMismatchAndOverride_RetriesExplicitly()
+    public async Task RestoreBackupCommand_WithMetadataMismatchAndOverride_DoesNotReloadEditor()
     {
         // Arrange
         TestBeatmapWorkspace workspace = new();
@@ -95,7 +95,8 @@ public sealed class BeatmapWorkspaceViewModelTests
             workspace,
             backups,
             picker,
-            dialogs);
+            dialogs,
+            autoReload: true);
 
         // Act
         await viewModel.RestoreBackupCommand.ExecuteAsync(null);
@@ -105,6 +106,8 @@ public sealed class BeatmapWorkspaceViewModelTests
         backups.RestoreRequests.Should().HaveCount(2);
         backups.RestoreRequests.Select(request => request.AllowDifferentFilename)
             .Should().Equal(false, true);
+        backups.RestoreRequests.Select(request => request.ReloadEditor)
+            .Should().Equal(false, false);
         backups.RestoreRequests.Should().OnlyContain(request =>
             request.Backup == @"C:\Backups\chosen.osu" && request.Destination == @"C:\current.osu");
     }
@@ -135,11 +138,13 @@ public sealed class BeatmapWorkspaceViewModelTests
         TestBeatmapBackupService? backups = null,
         TestFilePicker? picker = null,
         TestDialogService? dialogs = null,
-        IUserNotificationService? notifications = null)
+        IUserNotificationService? notifications = null,
+        bool autoReload = false)
     {
         ApplicationSettings settings = new()
         {
             BackupsPath = @"C:\Backups",
+            AutoReload = autoReload,
         };
         return new BeatmapWorkspaceViewModel(
             workspace,

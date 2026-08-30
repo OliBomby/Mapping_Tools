@@ -40,7 +40,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
     /// <param name="filePicker">Presents the native restore-source picker.</param>
     /// <param name="fileRevealService">Opens application-owned folders in the platform file manager.</param>
     /// <param name="applicationDirectories">Supplies the Mapping Tools data directory.</param>
-    /// <param name="settings">Supplies the configured backups directory and reload policy.</param>
+    /// <param name="settings">Supplies the configured backups directory.</param>
     /// <param name="dialogs">Asks for an explicit override when backup metadata differs.</param>
     /// <param name="notifications">Publishes completion and recoverable failure outcomes.</param>
     /// <param name="dispatcher">Marshals workspace notifications onto the UI thread.</param>
@@ -237,7 +237,7 @@ public sealed partial class BeatmapWorkspaceViewModel : ObservableObject, IDispo
             backupPath,
             destinationPath,
             allowDifferentFilename,
-            reloadEditor: settings.AutoReload);
+            reloadEditor: false);
 
     private async Task RevealAsync(string path, string description)
     {

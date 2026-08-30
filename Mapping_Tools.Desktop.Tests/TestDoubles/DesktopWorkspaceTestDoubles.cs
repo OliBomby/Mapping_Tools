@@ -145,7 +145,7 @@ internal sealed class TestBeatmapBackupService : IBeatmapBackupService
 {
     public List<(IReadOnlyList<string> Paths, BeatmapBackupReason Reason, bool Force)> CreateRequests { get; } = [];
 
-    public List<(string Backup, string Destination, bool AllowDifferentFilename)> RestoreRequests { get; } = [];
+    public List<(string Backup, string Destination, bool AllowDifferentFilename, bool ReloadEditor)> RestoreRequests { get; } = [];
 
     public bool RejectFirstRestoreAsIncompatible { get; set; }
 
@@ -203,7 +203,7 @@ internal sealed class TestBeatmapBackupService : IBeatmapBackupService
         bool reloadEditor = false,
         CancellationToken cancellationToken = default)
     {
-        RestoreRequests.Add((backupPath, destinationPath, allowDifferentFilename));
+        RestoreRequests.Add((backupPath, destinationPath, allowDifferentFilename, reloadEditor));
         if (RejectFirstRestoreAsIncompatible && RestoreRequests.Count == 1) throw new BeatmapBackupIncompatibleException("other.osu", "current.osu");
 
         return Task.FromResult(new BeatmapRestoreResult(
