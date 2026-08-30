@@ -12,12 +12,6 @@ namespace Mapping_Tools.SamplePlugin;
 public sealed class SampleToolRegistration : IMappingToolDefinition
 {
     /// <inheritdoc />
-    public string Category => "Tools";
-
-    /// <inheritdoc />
-    public bool StartsSection => true;
-
-    /// <inheritdoc />
     public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />

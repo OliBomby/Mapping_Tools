@@ -59,13 +59,12 @@ internal sealed class ToolDefinitionCatalog
             services.AddSingleton(provider => new ShellFeatureRegistration(
                 registration.Definition.Id,
                 registration.Definition.DisplayName,
-                registration.Category,
+                category: "Tools",
                 registration.Definition.Description,
                 registration.Definition.SearchTerms,
                 () => (ObservableObject)provider.GetRequiredService(registration.ViewModelType),
-                registration.StartsSection,
-                ToAvaloniaScrollBarVisibility(registration.HorizontalScrollBarVisibility),
-                ToAvaloniaScrollBarVisibility(registration.VerticalScrollBarVisibility)));
+                horizontalScrollBarVisibility: ToAvaloniaScrollBarVisibility(registration.HorizontalScrollBarVisibility),
+                verticalScrollBarVisibility: ToAvaloniaScrollBarVisibility(registration.VerticalScrollBarVisibility)));
 
             if (registration.Definition.QuickRunTargets is not null)
                 services.AddSingleton(provider => new MappingToolQuickRunRegistration(

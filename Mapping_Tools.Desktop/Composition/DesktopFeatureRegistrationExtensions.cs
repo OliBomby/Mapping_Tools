@@ -51,7 +51,6 @@ internal static class DesktopFeatureRegistrationExtensions
         string category,
         string description,
         IEnumerable<string> searchTerms,
-        bool startsSection = false,
         ScrollBarVisibility horizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
         ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled)
         where TViewModel : ObservableObject
@@ -64,7 +63,6 @@ internal static class DesktopFeatureRegistrationExtensions
             description,
             searchTerms,
             provider.GetRequiredService<TViewModel>,
-            startsSection,
             horizontalScrollBarVisibility,
             verticalScrollBarVisibility));
 

@@ -19,7 +19,6 @@ public sealed class ShellFeatureRegistration
     /// <param name="description">Short accessible feature summary.</param>
     /// <param name="searchTerms">Additional case-insensitive search terms.</param>
     /// <param name="createViewModel">Factory invoked when the feature is first activated.</param>
-    /// <param name="startsSection">Whether navigation draws a divider before this item.</param>
     /// <param name="horizontalScrollBarVisibility">How the shell scrolls this feature horizontally.</param>
     /// <param name="verticalScrollBarVisibility">How the shell scrolls this feature vertically.</param>
     public ShellFeatureRegistration(
@@ -29,7 +28,6 @@ public sealed class ShellFeatureRegistration
         string description,
         IEnumerable<string> searchTerms,
         Func<ObservableObject> createViewModel,
-        bool startsSection = false,
         ScrollBarVisibility horizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
         ScrollBarVisibility verticalScrollBarVisibility = ScrollBarVisibility.Disabled)
     {
@@ -45,7 +43,6 @@ public sealed class ShellFeatureRegistration
         Category = category;
         Description = description;
         SearchTerms = searchTerms.Where(term => !string.IsNullOrWhiteSpace(term)).ToArray();
-        StartsSection = startsSection;
         HorizontalScrollBarVisibility = horizontalScrollBarVisibility;
         VerticalScrollBarVisibility = verticalScrollBarVisibility;
         this.createViewModel = createViewModel;
@@ -65,9 +62,6 @@ public sealed class ShellFeatureRegistration
 
     /// <summary>Gets additional terms considered by shell search.</summary>
     public IReadOnlyList<string> SearchTerms { get; }
-
-    /// <summary>Gets whether this item begins a visually separated navigation group.</summary>
-    public bool StartsSection { get; }
 
     /// <summary>Gets the horizontal scrolling behavior owned by the feature shell.</summary>
     public ScrollBarVisibility HorizontalScrollBarVisibility { get; }

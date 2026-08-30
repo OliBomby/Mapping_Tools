@@ -12,12 +12,6 @@ namespace Mapping_Tools.Desktop.Tools.AutoFailDetector;
 public sealed class AutoFailDetectorToolRegistration : IMappingToolDefinition
 {
     /// <inheritdoc />
-    public string Category => "Tools";
-
-    /// <inheritdoc />
-    public bool StartsSection => true;
-
-    /// <inheritdoc />
     public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />

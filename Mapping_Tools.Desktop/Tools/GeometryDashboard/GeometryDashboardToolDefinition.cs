@@ -18,12 +18,6 @@ namespace Mapping_Tools.Desktop.Tools.GeometryDashboard;
 public sealed class GeometryDashboardToolRegistration : IMappingToolDefinition
 {
     /// <inheritdoc />
-    public string Category => "Tools";
-
-    /// <inheritdoc />
-    public bool StartsSection => false;
-
-    /// <inheritdoc />
     public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />

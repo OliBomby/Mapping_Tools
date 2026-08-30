@@ -31,10 +31,6 @@ public sealed class ToolDefinitionCatalogTests
     [MappingToolDefinition]
     public sealed class ExternalToolRegistration : IMappingToolDefinition
     {
-        public string Category => "Tools";
-
-        public bool StartsSection => false;
-
         public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
         public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Disabled;

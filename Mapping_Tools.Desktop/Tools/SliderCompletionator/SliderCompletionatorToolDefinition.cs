@@ -13,12 +13,6 @@ namespace Mapping_Tools.Desktop.Tools.SliderCompletionator;
 public sealed class SliderCompletionatorToolRegistration : IMappingToolDefinition
 {
     /// <inheritdoc />
-    public string Category => "Tools";
-
-    /// <inheritdoc />
-    public bool StartsSection => false;
-
-    /// <inheritdoc />
     public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />

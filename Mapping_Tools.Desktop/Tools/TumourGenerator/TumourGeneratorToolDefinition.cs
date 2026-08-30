@@ -13,12 +13,6 @@ namespace Mapping_Tools.Desktop.Tools.TumourGenerator;
 public sealed class TumourGeneratorToolRegistration : IMappingToolDefinition
 {
     /// <inheritdoc />
-    public string Category => "Tools";
-
-    /// <inheritdoc />
-    public bool StartsSection => false;
-
-    /// <inheritdoc />
     public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Auto;
 
     /// <inheritdoc />

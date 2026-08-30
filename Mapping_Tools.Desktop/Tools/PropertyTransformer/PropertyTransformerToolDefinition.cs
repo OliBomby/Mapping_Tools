@@ -12,12 +12,6 @@ namespace Mapping_Tools.Desktop.Tools.PropertyTransformer;
 public sealed class PropertyTransformerToolRegistration : IMappingToolDefinition
 {
     /// <inheritdoc />
-    public string Category => "Tools";
-
-    /// <inheritdoc />
-    public bool StartsSection => false;
-
-    /// <inheritdoc />
     public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Auto;
 
     /// <inheritdoc />

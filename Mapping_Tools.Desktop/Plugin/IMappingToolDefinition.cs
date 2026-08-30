@@ -19,12 +19,6 @@ public interface IMappingToolDefinition
     /// </summary>
     ToolConfigSchema ConfigSchema => ToolConfigSchema.ForTool(Definition.Id);
 
-    /// <summary>Gets the shell navigation category containing the tool.</summary>
-    string Category { get; }
-
-    /// <summary>Gets whether the shell draws a divider before this tool.</summary>
-    bool StartsSection { get; }
-
     /// <summary>Gets the shell's horizontal scrolling policy.</summary>
     ToolScrollBarVisibility HorizontalScrollBarVisibility { get; }
 
