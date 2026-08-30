@@ -13,6 +13,7 @@ namespace Mapping_Tools.Application.Projects;
 public sealed class ProjectService : IProjectService
 {
     private const string autoSaveDirectoryName = "Autosaves";
+    private const string projectsDirectoryName = "Projects";
     private readonly IApplicationDirectories directories;
     private readonly IFilePicker filePicker;
     private readonly IProjectStore store;
@@ -68,7 +69,10 @@ public sealed class ProjectService : IProjectService
     public string GetProjectFolder<TProject>(ProjectDefinition<TProject> definition)
     {
         ArgumentNullException.ThrowIfNull(definition);
-        return Path.Combine(directories.ApplicationData, definition.ProjectFolderName);
+        return Path.Combine(
+            directories.ApplicationData,
+            projectsDirectoryName,
+            definition.ProjectFolderName);
     }
 
     /// <inheritdoc />

@@ -250,7 +250,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
         .OrderBy(group => group, StringComparer.Ordinal)
         .ToArray();
 
-    private string CollectionBasePath => Path.Combine(directories.ApplicationData, "Pattern Gallery Projects");
+    private string CollectionBasePath => projects.GetProjectFolder(definition);
 
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)

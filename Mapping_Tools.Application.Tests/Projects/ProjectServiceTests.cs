@@ -28,14 +28,30 @@ public sealed class ProjectServiceTests
     public void GetAutoSavePath_DefaultDefinition_UsesAutosavesDirectory()
     {
         // Arrange
-        // Act
         TestDirectories directories = new(@"C:\MappingToolsData");
         ProjectService service = new(directories, new RecordingFilePicker(), new FakeProjectStore());
         var definition = CreateDefinition();
 
+        // Act
+        string path = service.GetAutoSavePath(definition);
+
         // Assert
-        service.GetAutoSavePath(definition).Should().Be(Path.Combine(directories.ApplicationData, "Autosaves", "featureproject.json"));
-        service.GetProjectFolder(definition).Should().Be(Path.Combine(directories.ApplicationData, "Feature Projects"));
+        path.Should().Be(Path.Combine(directories.ApplicationData, "Autosaves", "featureproject.json"));
+    }
+
+    [TestMethod]
+    public void GetProjectFolder_DefaultDefinition_UsesProjectsDirectory()
+    {
+        // Arrange
+        TestDirectories directories = new(@"C:\MappingToolsData");
+        ProjectService service = new(directories, new RecordingFilePicker(), new FakeProjectStore());
+        var definition = CreateDefinition();
+
+        // Act
+        string path = service.GetProjectFolder(definition);
+
+        // Assert
+        path.Should().Be(Path.Combine(directories.ApplicationData, "Projects", "Feature Projects"));
     }
 
     [TestMethod]
