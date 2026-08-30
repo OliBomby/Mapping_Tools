@@ -32,7 +32,8 @@ Avalonia shell slice:
 - `ShellFeatureRegistration` and `IShellFeatureRegistry` provide an ordered
   feature list with stable IDs, descriptions, categories, and search terms;
 - attributed per-tool definitions are discovered from the built-in desktop
-  assembly and the adjacent `Plugins` directory; discovery rejects duplicate
+  assembly and `%LOCALAPPDATA%\Mapping Tools\Plugins`; the directory is
+  created automatically at startup and discovery rejects duplicate
   IDs and delegates each tool's service registrations to its own definition;
 - `MainViewModel` supports case-insensitive partial and exact search, clearing
   the query, favorite-first ordering, immediate favorite persistence, lazy

@@ -28,9 +28,10 @@ The build packages the drop-in artifact at:
 Mapping_Tools.SamplePlugin/bin/Release/plugin/Mapping_Tools.SamplePlugin.dll
 ```
 
-Copy that single DLL into the `Plugins` directory next to the Mapping Tools
-executable, then restart Mapping Tools. For a Debug build, use the equivalent
-`bin/Debug/plugin` directory.
+Copy that single DLL into the `Plugins` directory in the Mapping Tools app-data
+folder (`%LOCALAPPDATA%\Mapping Tools\Plugins`), then restart Mapping Tools.
+The folder is created automatically when Mapping Tools starts. For a Debug
+build, use the equivalent `bin/Debug/plugin` directory.
 
 The plugin references the host's public `Mapping_Tools.Desktop.Plugin` API and
 the host's Avalonia/MVVM assemblies. Build it against the same Mapping Tools

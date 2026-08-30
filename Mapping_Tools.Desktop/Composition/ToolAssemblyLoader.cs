@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.Loader;
+using Mapping_Tools.Infrastructure.Files;
 
 namespace Mapping_Tools.Desktop.Composition;
 
@@ -7,12 +8,19 @@ internal static class ToolAssemblyLoader
 {
     internal static IReadOnlyList<Assembly> Load()
     {
-        var assemblies = new List<Assembly> { typeof(ToolAssemblyLoader).Assembly };
-        string pluginDirectory = Path.Combine(AppContext.BaseDirectory, "Plugins");
-        if (!Directory.Exists(pluginDirectory))
-            return assemblies;
+        var directories = new ApplicationDirectories();
+        return Load(Path.Combine(directories.ApplicationData, "Plugins"));
+    }
 
-        foreach (string path in Directory.EnumerateFiles(pluginDirectory, "*.dll", SearchOption.TopDirectoryOnly)
+    internal static IReadOnlyList<Assembly> Load(string pluginDirectory)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(pluginDirectory);
+
+        var assemblies = new List<Assembly> { typeof(ToolAssemblyLoader).Assembly };
+        string fullPluginDirectory = Path.GetFullPath(pluginDirectory);
+        Directory.CreateDirectory(fullPluginDirectory);
+
+        foreach (string path in Directory.EnumerateFiles(fullPluginDirectory, "*.dll", SearchOption.TopDirectoryOnly)
                      .OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
         {
             try
