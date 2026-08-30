@@ -155,9 +155,7 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await currentBeatmap
-            .FindCurrentBeatmapAsync(cancellationToken)
-            .ConfigureAwait(false);
+        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
         await RunWithStateAsync(() => RunPathsAsync(
             string.IsNullOrWhiteSpace(path) ? [] : [path],
             true,

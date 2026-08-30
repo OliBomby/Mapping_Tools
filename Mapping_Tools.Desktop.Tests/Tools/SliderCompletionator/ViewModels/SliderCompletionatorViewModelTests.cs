@@ -1,6 +1,7 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools.SliderCompletionator;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
@@ -58,6 +59,47 @@ public sealed class SliderCompletionatorViewModelTests
         // Assert
         service.Paths.Should().Equal("current.osu");
         service.Options!.ImportModeSetting.Should().Be(HitObjectSelectionMode.Selected);
+    }
+
+    [TestMethod]
+    public void RunQuickAsync_WithAsynchronousCurrentBeatmapLookupAndCurrentEditorTime_KeepsRunStateOnCallingContext()
+    {
+        // Arrange
+        int callingThread = Environment.CurrentManagedThreadId;
+        PumpingSynchronizationContext synchronizationContext = new();
+        SynchronizationContext? previousContext = SynchronizationContext.Current;
+        SynchronizationContext.SetSynchronizationContext(synchronizationContext);
+        try
+        {
+            RecordingCompletionator service = new();
+            AsynchronousCurrentBeatmapLocator currentBeatmap = new("current.osu");
+            var viewModel = Create(
+                service,
+                currentBeatmap: currentBeatmap);
+            viewModel.UseEndTime = true;
+            viewModel.UseCurrentEditorTime = true;
+            List<int> stateChangeThreads = [];
+            viewModel.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName == nameof(viewModel.IsRunning))
+                    stateChangeThreads.Add(Environment.CurrentManagedThreadId);
+            };
+
+            // Act
+            Task run = viewModel.RunQuickAsync(CancellationToken.None);
+            currentBeatmap.Complete();
+            synchronizationContext.RunUntilCompleted(run);
+
+            // Assert
+            stateChangeThreads.Should().NotBeEmpty();
+            stateChangeThreads.Should().OnlyContain(thread => thread == callingThread);
+            service.Options!.UseEndTime.Should().BeTrue();
+            service.Options.UseCurrentEditorTime.Should().BeTrue();
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previousContext);
+        }
     }
 
     [TestMethod]
@@ -134,7 +176,7 @@ public sealed class SliderCompletionatorViewModelTests
     private static SliderCompletionatorViewModel Create(
         RecordingCompletionator service,
         TestBeatmapWorkspace? workspace = null,
-        RecordingCurrentBeatmapLocator? currentBeatmap = null,
+        ICurrentBeatmapLocator? currentBeatmap = null,
         DesktopApplicationSettings? settings = null)
     {
         return new SliderCompletionatorViewModel(
@@ -147,6 +189,54 @@ public sealed class SliderCompletionatorViewModelTests
             currentBeatmap ?? new RecordingCurrentBeatmapLocator(null),
             workspace ?? new TestBeatmapWorkspace(),
             settings ?? new DesktopApplicationSettings());
+    }
+
+    private sealed class AsynchronousCurrentBeatmapLocator(string path) : ICurrentBeatmapLocator
+    {
+        private readonly TaskCompletionSource<string?> completion = new(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public Task<string?> FindCurrentBeatmapAsync(
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return completion.Task;
+        }
+
+        public void Complete() => completion.TrySetResult(path);
+    }
+
+    private sealed class PumpingSynchronizationContext : SynchronizationContext
+    {
+        private readonly Queue<(SendOrPostCallback Callback, object? State)> work = [];
+
+        public void RunUntilCompleted(Task task)
+        {
+            while (!task.IsCompleted)
+            {
+                (SendOrPostCallback Callback, object? State) item;
+                lock (work)
+                {
+                    while (work.Count == 0 && !task.IsCompleted) Monitor.Wait(work, 100);
+                    if (task.IsCompleted) break;
+
+                    item = work.Dequeue();
+                }
+
+                item.Callback(item.State);
+            }
+
+            task.GetAwaiter().GetResult();
+        }
+
+        public override void Post(SendOrPostCallback d, object? state)
+        {
+            lock (work)
+            {
+                work.Enqueue((d, state));
+                Monitor.PulseAll(work);
+            }
+        }
     }
 
     private sealed class RecordingCompletionator : ISliderCompletionatorService
