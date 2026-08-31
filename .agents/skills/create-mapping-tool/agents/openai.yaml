@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Mapping Tool"
+  short_description: "Build Mapping Tools features consistently"
+  default_prompt: "Use $create-mapping-tool to add a Mapping Tools feature with the correct components and defaults."
