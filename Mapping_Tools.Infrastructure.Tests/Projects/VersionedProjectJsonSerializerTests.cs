@@ -2,6 +2,8 @@ using System.Text.Json.Nodes;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.Tools.HitsoundCopier;
+using Mapping_Tools.Application.Tools.TimingHelper;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
@@ -105,6 +107,58 @@ public sealed class VersionedProjectJsonSerializerTests
         canonicalJson.Should().Contain("\"$schema\": \"mapping-tools.project\"");
         canonicalJson.Should().NotContain("$type");
         canonicalJson.Should().NotContain("Mapping_Tools.");
+    }
+
+    [TestMethod]
+    public void Deserialize_WithCanonicalBeatDivisorObjects_CreatesConcreteDivisors()
+    {
+        // Arrange
+        const string json = """
+                            {
+                              "$schema": "mapping-tools.project",
+                              "$version": 1,
+                              "BeatDivisors": [
+                                {
+                                  "Denominator": 4,
+                                  "Numerator": 1
+                                }
+                              ]
+                            }
+                            """;
+        VersionedProjectJsonSerializer serializer = new();
+
+        // Act
+        TimingHelperServiceOptions project = serializer.Deserialize<TimingHelperServiceOptions>(json);
+
+        // Assert
+        project.BeatDivisors.Should().ContainSingle();
+        project.BeatDivisors[0].Should().BeOfType<RationalBeatDivisor>();
+        project.BeatDivisors[0].Should().Be(new RationalBeatDivisor(1, 4));
+    }
+
+    [TestMethod]
+    public void SerializeAndDeserialize_WithRationalAndIrrationalBeatDivisors_PreservesValues()
+    {
+        // Arrange
+        VersionedProjectJsonSerializer serializer = new();
+        TimingHelperServiceOptions project = new()
+        {
+            BeatDivisors =
+            [
+                new RationalBeatDivisor(2, 3),
+                new IrrationalBeatDivisor(0.125),
+            ],
+        };
+
+        // Act
+        string json = serializer.Serialize(project);
+        TimingHelperServiceOptions reloaded = serializer.Deserialize<TimingHelperServiceOptions>(json);
+
+        // Assert
+        json.Should().NotContain("$type");
+        reloaded.BeatDivisors.Should().Equal(project.BeatDivisors);
+        reloaded.BeatDivisors[0].Should().BeOfType<RationalBeatDivisor>();
+        reloaded.BeatDivisors[1].Should().BeOfType<IrrationalBeatDivisor>();
     }
 
     [TestMethod]

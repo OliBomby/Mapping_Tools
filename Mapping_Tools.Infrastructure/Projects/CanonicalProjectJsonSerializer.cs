@@ -2,6 +2,7 @@ using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.Graph.Interpolation;
 using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 using Mapping_Tools.Core.MathUtil;
+using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
@@ -44,12 +45,92 @@ internal static class CanonicalProjectJsonSerializer
             Formatting = Formatting.Indented,
             Converters =
             [
+                new CanonicalBeatDivisorConverter(),
                 new CanonicalGeneratorSettingsDictionaryConverter(),
                 new CanonicalGraphStateConverter(),
                 new CanonicalRelevantObjectCollectionConverter(),
             ],
         });
         return serializer;
+    }
+
+    private sealed class CanonicalBeatDivisorConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return typeof(IBeatDivisor).IsAssignableFrom(objectType);
+        }
+
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+        {
+            switch (value)
+            {
+                case null:
+                    writer.WriteNull();
+                    return;
+                case RationalBeatDivisor rational:
+                    new JObject
+                    {
+                        ["Denominator"] = rational.Denominator,
+                        ["Numerator"] = rational.Numerator,
+                    }.WriteTo(writer);
+                    return;
+                case IrrationalBeatDivisor irrational:
+                    new JObject
+                    {
+                        ["Value"] = irrational.Value,
+                    }.WriteTo(writer);
+                    return;
+                default:
+                    throw new JsonSerializationException(
+                        $"The beat divisor type '{value.GetType().FullName}' is not supported by the canonical project format.");
+            }
+        }
+
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object? existingValue,
+            JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null)
+                return null!;
+
+            JObject json = JObject.Load(reader);
+            JToken? denominator = json["Denominator"];
+            JToken? numerator = json["Numerator"];
+            if (denominator is not null || numerator is not null)
+            {
+                if (denominator is null || numerator is null)
+                    throw new JsonSerializationException(
+                        "A rational beat divisor must contain both Denominator and Numerator.");
+
+                try
+                {
+                    return new RationalBeatDivisor(numerator.Value<int>(), denominator.Value<int>());
+                }
+                catch (Exception exception) when (exception is FormatException or InvalidCastException or OverflowException)
+                {
+                    throw new JsonSerializationException("A rational beat divisor contained an invalid number.", exception);
+                }
+            }
+
+            JToken? value = json["Value"];
+            if (value is not null)
+            {
+                try
+                {
+                    return new IrrationalBeatDivisor(value.Value<double>());
+                }
+                catch (Exception exception) when (exception is FormatException or InvalidCastException or OverflowException)
+                {
+                    throw new JsonSerializationException("An irrational beat divisor contained an invalid number.", exception);
+                }
+            }
+
+            throw new JsonSerializationException(
+                "A beat divisor must contain either Denominator and Numerator or Value.");
+        }
     }
 
     private sealed class CanonicalGeneratorSettingsDictionaryConverter : JsonConverter
