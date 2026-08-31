@@ -2,15 +2,15 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
-using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Desktop.Settings.Models;
-using Mapping_Tools.Application.Timeline;
+using Mapping_Tools.Desktop.Controls.Timeline;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.AutoFail;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.Tools.AutoFail.Models;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
 
@@ -168,13 +168,13 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         List<TimelineMarker> markers = [];
         if (ShowPotentialUnloadingObjects)
             markers.AddRange(run.Analysis.PotentialUnloadingObjects.Select(time =>
-                new TimelineMarker(time, TimelineMarkerKind.Added, "Potential unloading object")));
+                new TimelineMarker(time, TimelineMarkerKind.Added)));
         if (ShowPotentialDisruptors)
             markers.AddRange(run.Analysis.Disruptors.Select(time =>
-                new TimelineMarker(time, TimelineMarkerKind.Accent, "Potential disruptor")));
+                new TimelineMarker(time, TimelineMarkerKind.Accent)));
         if (ShowUnloadingObjects)
             markers.AddRange(run.Analysis.UnloadingObjects.Select(time =>
-                new TimelineMarker(time, TimelineMarkerKind.Removed, "Unloading object")));
+                new TimelineMarker(time, TimelineMarkerKind.Removed)));
         Markers = markers.OrderBy(marker => marker.Time).ToArray();
     }
 

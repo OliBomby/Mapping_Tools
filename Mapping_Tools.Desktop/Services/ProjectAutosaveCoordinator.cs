@@ -1,8 +1,8 @@
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.Services;

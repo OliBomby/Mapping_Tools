@@ -1,7 +1,7 @@
 using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Desktop.Hosting;
-using Mapping_Tools.Desktop.Settings.Models;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services.Hosted;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Desktop.Tests.Hosting;

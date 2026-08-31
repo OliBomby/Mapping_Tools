@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:timeline="using:Mapping_Tools.Desktop.Controls.Timeline"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              x:Class="Mapping_Tools.Desktop.Tools.AutoFailDetector.Views.AutoFailDetectorView"
              x:DataType="vm:AutoFailDetectorViewModel">
@@ -58,7 +59,7 @@
 
         <StackPanel Grid.Row="2" IsVisible="{Binding HasRun}"
                     ToolTip.Tip="This timeline shows where the auto-fail occurs. Red lines show the objects which unload and cause auto-fail. Green lines show the objects which could potentially unload with different object counts. Purple lines show objects which make other objects potentially unload. You can click the lines to go to that time.">
-            <controls:TimelineControl Height="66" StartTime="0" EndTime="{Binding EndTime}"
+            <timeline:TimelineControl Height="66" StartTime="0" EndTime="{Binding EndTime}"
                                       Markers="{Binding Markers}" NavigateCommand="{Binding NavigateCommand}" />
         </StackPanel>
     </Grid>

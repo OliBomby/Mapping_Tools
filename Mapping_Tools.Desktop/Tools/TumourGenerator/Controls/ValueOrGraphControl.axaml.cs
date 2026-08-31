@@ -4,7 +4,7 @@ using Avalonia.Data;
 using Avalonia.Interactivity;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.MathUtil;
-using Mapping_Tools.Desktop.Platform;
+using Mapping_Tools.Desktop.Utilities;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Mapping_Tools.Desktop.Views.Dialogs;
 

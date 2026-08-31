@@ -6,7 +6,6 @@ using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.ToolExecution.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Interactions.Validation;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects.Contracts;
@@ -19,6 +18,7 @@ using Mapping_Tools.Core.Tools.MetadataManager;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
 using Mapping_Tools.Desktop.Tools.MetadataManager.Models;
+using Mapping_Tools.Desktop.Validation;
 using Mapping_Tools.Desktop.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.MetadataManager.ViewModels;

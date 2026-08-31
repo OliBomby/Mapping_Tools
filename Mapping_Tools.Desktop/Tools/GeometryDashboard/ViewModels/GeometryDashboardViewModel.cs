@@ -18,8 +18,8 @@ using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectCol
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
-using Mapping_Tools.Desktop.Shell.Models;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Models;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;

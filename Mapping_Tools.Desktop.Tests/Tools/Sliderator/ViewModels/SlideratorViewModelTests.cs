@@ -1,7 +1,6 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools.Sliderator.Contracts;
 using Mapping_Tools.Application.Tools.Sliderator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -9,6 +8,7 @@ using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.Sliderator.Models;

@@ -1,7 +1,6 @@
 using System.Reflection;
 using Avalonia.Controls.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.ViewModels.GetStarted;

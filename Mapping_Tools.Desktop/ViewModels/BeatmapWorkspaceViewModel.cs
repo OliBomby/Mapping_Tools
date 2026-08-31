@@ -4,12 +4,12 @@ using Mapping_Tools.Application.Backups.Contracts;
 using Mapping_Tools.Application.Backups.Models;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Application.Workspace.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;

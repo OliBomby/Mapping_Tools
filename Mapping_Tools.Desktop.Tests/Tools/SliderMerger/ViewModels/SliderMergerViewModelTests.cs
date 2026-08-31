@@ -1,10 +1,10 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools.SliderMerger;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.SliderMerger.Models;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.SliderMerger.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;

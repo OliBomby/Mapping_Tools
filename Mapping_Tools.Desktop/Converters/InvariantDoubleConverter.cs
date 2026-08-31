@@ -1,6 +1,6 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
-using ApplicationInvariantDoubleConverter = Mapping_Tools.Application.Interactions.Converters.InvariantDoubleConverter;
+using Mapping_Tools.Core.SystemTools;
 
 namespace Mapping_Tools.Desktop.Converters;
 
@@ -9,8 +9,6 @@ namespace Mapping_Tools.Desktop.Converters;
 /// </summary>
 public sealed class InvariantDoubleConverter : IValueConverter
 {
-    private static readonly ApplicationInvariantDoubleConverter converter = new();
-
     /// <inheritdoc />
     public object Convert(
         object? value,
@@ -18,12 +16,13 @@ public sealed class InvariantDoubleConverter : IValueConverter
         object? parameter,
         CultureInfo culture)
     {
-        return ValueConverterHelper.Convert(
-            value,
-            targetType,
-            parameter,
-            culture,
-            converter);
+        return ValueConverterHelper.Convert(() =>
+        {
+            double converted = ValueConverterHelper.RequireValue<double>(value, targetType);
+            return converted == 727
+                ? "727 WYSI"
+                : converted.ToString("R", CultureInfo.InvariantCulture);
+        });
     }
 
     /// <inheritdoc />
@@ -33,11 +32,19 @@ public sealed class InvariantDoubleConverter : IValueConverter
         object? parameter,
         CultureInfo culture)
     {
-        return ValueConverterHelper.ConvertBack(
-            value,
-            targetType,
-            parameter,
-            culture,
-            converter);
+        return ValueConverterHelper.ConvertBack(() =>
+        {
+            ValueConverterHelper.RequireTarget<double>(targetType);
+            string text = ValueConverterHelper.RequireText(value, targetType);
+            if (text == "727 WYSI") return 727d;
+
+            if (TypeConverters.TryParseDouble(text, out double converted)) return converted;
+
+            if (parameter is not null
+                && TypeConverters.TryParseDouble(parameter.ToString()!, out double fallback))
+                return fallback;
+
+            throw new FormatException("Enter a valid number or arithmetic expression.");
+        });
     }
 }

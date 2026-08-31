@@ -78,7 +78,7 @@ public sealed class ToolControlTests
         InvalidCastException error = new(
             "Could not convert '{DataValidationError: System.FormatException: "
             + "Enter a whole number or arithmetic expression.\r\n"
-            + "   at Mapping_Tools.Application.Interactions.Converters.InvariantInt32Converter.ConvertBack()\r\n"
+            + "   at Mapping_Tools.Desktop.Converters.InvariantInt32Converter.ConvertBack()\r\n"
             + "   at Mapping_Tools.Desktop.Converters.ValueConverterHelper.ConvertBack()\r\n"
             + "}' (Avalonia.Data.BindingNotification) to System.Int32.");
 

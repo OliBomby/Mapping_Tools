@@ -11,7 +11,7 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Spacing="8">
                 <TextBox Text="{Binding Name, Mode=TwoWay}"
-                         Watermark="Name"
+                         PlaceholderText="Name"
                          ToolTip.Tip="The name shown for this pattern." />
                 <TextBlock Text="{Binding CreationTimeText, StringFormat='Creation time: {0}'}" />
                 <TextBlock Text="{Binding LastUsedTimeText, StringFormat='Time of last use: {0}'}" />

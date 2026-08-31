@@ -1,4 +1,4 @@
-using Mapping_Tools.Desktop.Shell.Models;
+using Mapping_Tools.Desktop.Models;
 
 namespace Mapping_Tools.Desktop.Shell;
 

@@ -4,8 +4,8 @@ using Avalonia.Controls.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Tools;
-using Mapping_Tools.Desktop.Hosting;
 using Mapping_Tools.Desktop.Plugin;
+using Mapping_Tools.Desktop.Services.Hosted;
 using Mapping_Tools.Desktop.Shell;
 using Microsoft.Extensions.DependencyInjection;
 

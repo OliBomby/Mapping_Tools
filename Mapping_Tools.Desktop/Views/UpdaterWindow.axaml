@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
-        xmlns:vm="using:Mapping_Tools.Desktop.Updates"
-        x:DataType="vm:UpdaterViewModel"
+        xmlns:viewModels="clr-namespace:Mapping_Tools.Desktop.ViewModels"
+        x:DataType="viewModels:UpdaterViewModel"
         Title="Mapping Tools - Updater"
         Width="700"
         Height="500"
@@ -47,7 +47,7 @@
                                    FontWeight="Bold" />
                         <md:MarkdownScrollViewer Markdown="{Binding ReleaseBody}">
                             <md:MarkdownScrollViewer.Styles>
-                                <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Markdown.axaml" />
+                                <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Markdown.axaml" />
                             </md:MarkdownScrollViewer.Styles>
                         </md:MarkdownScrollViewer>
                     </StackPanel>

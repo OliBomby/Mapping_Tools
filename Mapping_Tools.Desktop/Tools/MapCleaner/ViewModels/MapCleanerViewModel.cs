@@ -6,13 +6,13 @@ using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Projects.Contracts;
 using Mapping_Tools.Application.Projects.Models;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Desktop.Settings.Models;
-using Mapping_Tools.Application.Timeline;
+using Mapping_Tools.Desktop.Controls.Timeline;
 using Mapping_Tools.Application.Tools;
 using Mapping_Tools.Application.Tools.MapCleaner;
 using Mapping_Tools.Application.Workspace.Contracts;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.MapCleaner.Models;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tools.MapCleaner.Models;
 using Mapping_Tools.Desktop.ViewModels;
@@ -253,16 +253,13 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
         return result.TimingPointsAdded
             .Select(time => new TimelineMarker(
                 time,
-                TimelineMarkerKind.Added,
-                "Greenline added"))
+                TimelineMarkerKind.Added))
             .Concat(result.TimingPointsChanged.Select(time => new TimelineMarker(
                 time,
-                TimelineMarkerKind.Changed,
-                "Greenline changed")))
+                TimelineMarkerKind.Changed)))
             .Concat(result.TimingPointsRemovedAt.Select(time => new TimelineMarker(
                 time,
-                TimelineMarkerKind.Removed,
-                "Greenline removed")))
+                TimelineMarkerKind.Removed)))
             .OrderBy(marker => marker.Time)
             .ToArray();
     }

@@ -1,6 +1,6 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
-using ApplicationInvariantInt32Converter = Mapping_Tools.Application.Interactions.Converters.InvariantInt32Converter;
+using Mapping_Tools.Core.SystemTools;
 
 namespace Mapping_Tools.Desktop.Converters;
 
@@ -9,8 +9,6 @@ namespace Mapping_Tools.Desktop.Converters;
 /// </summary>
 public sealed class InvariantInt32Converter : IValueConverter
 {
-    private static readonly ApplicationInvariantInt32Converter converter = new();
-
     /// <inheritdoc />
     public object Convert(
         object? value,
@@ -18,12 +16,8 @@ public sealed class InvariantInt32Converter : IValueConverter
         object? parameter,
         CultureInfo culture)
     {
-        return ValueConverterHelper.Convert(
-            value,
-            targetType,
-            parameter,
-            culture,
-            converter);
+        return ValueConverterHelper.Convert(() => ValueConverterHelper.RequireValue<int>(value, targetType)
+            .ToString(CultureInfo.InvariantCulture));
     }
 
     /// <inheritdoc />
@@ -33,11 +27,13 @@ public sealed class InvariantInt32Converter : IValueConverter
         object? parameter,
         CultureInfo culture)
     {
-        return ValueConverterHelper.ConvertBack(
-            value,
-            targetType,
-            parameter,
-            culture,
-            converter);
+        return ValueConverterHelper.ConvertBack(() =>
+        {
+            ValueConverterHelper.RequireTarget<int>(targetType);
+            string text = ValueConverterHelper.RequireText(value, targetType);
+            if (TypeConverters.TryParseInt(text, out int converted)) return converted;
+
+            throw new FormatException("Enter a whole number or arithmetic expression.");
+        });
     }
 }

@@ -1,21 +1,38 @@
-using System.Globalization;
 using Avalonia.Data;
-using ApplicationValueConverter = Mapping_Tools.Application.Interactions.Converters.IValueConverter;
 
 namespace Mapping_Tools.Desktop.Converters;
 
 internal static class ValueConverterHelper
 {
-    public static object Convert(
-        object? value,
-        Type targetType,
-        object? parameter,
-        CultureInfo culture,
-        ApplicationValueConverter converter)
+    public static T RequireValue<T>(object? value, Type targetType)
+    {
+        if (targetType != typeof(string)) throw TypeErrorException(typeof(T), targetType);
+
+        return value is T typedValue
+            ? typedValue
+            : throw TypeErrorException(value?.GetType() ?? typeof(object), typeof(T));
+    }
+
+    public static string RequireText(object? value, Type targetType)
+    {
+        if (value is null) return string.Empty;
+
+        if (value is string text) return text;
+
+        throw TypeErrorException(value.GetType(), targetType);
+    }
+
+    public static void RequireTarget<T>(Type targetType)
+    {
+        if (targetType != typeof(T) && targetType != typeof(object))
+            throw TypeErrorException(typeof(string), targetType);
+    }
+
+    public static object Convert(Func<object?> conversion)
     {
         try
         {
-            return converter.Convert(value, targetType, parameter, culture)!;
+            return conversion()!;
         }
         catch (InvalidCastException exception)
         {
@@ -23,30 +40,15 @@ internal static class ValueConverterHelper
         }
     }
 
-    public static object ConvertBack(
-        object? value,
-        Type targetType,
-        object? parameter,
-        CultureInfo culture,
-        ApplicationValueConverter converter,
-        Action<string?>? reportConversionError = null)
+    public static object ConvertBack(Func<object?> conversion)
     {
         try
         {
-            object? converted = converter.ConvertBack(
-                value,
-                targetType,
-                parameter,
-                culture);
-            reportConversionError?.Invoke(null);
-            return converted!;
+            return conversion()!;
         }
         catch (FormatException exception)
         {
-            reportConversionError?.Invoke(exception.Message);
-            return new BindingNotification(
-                exception,
-                BindingErrorType.DataValidationError);
+            return new BindingNotification(exception, BindingErrorType.DataValidationError);
         }
         catch (InvalidCastException exception)
         {
@@ -62,5 +64,13 @@ internal static class ValueConverterHelper
             new InvalidCastException(
                 $"Cannot convert {sourceType.Name} to {targetType.Name}."),
             BindingErrorType.Error);
+    }
+
+    private static InvalidCastException TypeErrorException(
+        Type sourceType,
+        Type targetType)
+    {
+        return new InvalidCastException(
+            $"Cannot convert {sourceType.Name} to {targetType.Name}.");
     }
 }

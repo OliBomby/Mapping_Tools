@@ -2,8 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mapping_Tools.Application.Interactions.Converters;
-using Mapping_Tools.Desktop.ViewModels.Dialogs.Validation;
+using Avalonia.Data;
+using Avalonia.Data.Converters;
+using Mapping_Tools.Desktop.Validation;
 
 namespace Mapping_Tools.Desktop.ViewModels.Dialogs;
 
@@ -21,7 +22,7 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
     /// <param name="title">The native window title.</param>
     /// <param name="prompt">The field instruction.</param>
     /// <param name="initialValue">The initial typed value to format.</param>
-    /// <param name="converter">The application-layer text converter.</param>
+    /// <param name="converter">The shared Desktop text converter.</param>
     /// <param name="targetType">The typed value expected after parsing.</param>
     /// <param name="acceptLabel">The Enter/default action label.</param>
     /// <param name="cancelLabel">The Escape/cancel action label.</param>
@@ -103,6 +104,9 @@ public sealed partial class ValueDialogViewModel : ObservableValidator
         {
             return new ValidationResult(exception.Message);
         }
+
+        if (converted is BindingNotification notification)
+            return new ValidationResult(notification.Error?.Message ?? "The value could not be converted.");
 
         var result = validate(converted);
         if (result == ValidationResult.Success) parsedValue = converted;

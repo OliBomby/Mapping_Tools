@@ -3,13 +3,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
-using Mapping_Tools.Application.Interactions.Dialogs;
-using Mapping_Tools.Application.Interactions.Validation;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Desktop.Converters;
+using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Validation;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ApplicationConverters = Mapping_Tools.Application.Interactions.Converters;
 
 namespace Mapping_Tools.Desktop.Tests.ViewModels.Dialogs;
 
@@ -54,8 +53,7 @@ public sealed class DialogAndValidationTests
     public void ConvertBack_DoubleExpression_ReturnsEvaluatedValue()
     {
         // Arrange
-        ApplicationConverters.IValueConverter converter =
-            new ApplicationConverters.InvariantDoubleConverter();
+        IValueConverter converter = new InvariantDoubleConverter();
 
         // Act
         object? result = converter.ConvertBack(
@@ -72,8 +70,7 @@ public sealed class DialogAndValidationTests
     public void ConvertBack_CommaDecimal_ReturnsExpectedValue()
     {
         // Arrange
-        ApplicationConverters.IValueConverter converter =
-            new ApplicationConverters.InvariantDoubleConverter();
+        IValueConverter converter = new InvariantDoubleConverter();
 
         // Act
         object? result = converter.ConvertBack(
@@ -141,8 +138,7 @@ public sealed class DialogAndValidationTests
     public void ConvertBack_MillisecondExpression_ReturnsTypedDuration()
     {
         // Arrange
-        ApplicationConverters.IValueConverter converter =
-            new ApplicationConverters.ConstantTimeSpanConverter();
+        IValueConverter converter = new ConstantTimeSpanConverter();
 
         // Act
         object? result = converter.ConvertBack(
@@ -159,8 +155,7 @@ public sealed class DialogAndValidationTests
     public void ConvertBack_Int32Expression_ReturnsEvaluatedValue()
     {
         // Arrange
-        ApplicationConverters.IValueConverter converter =
-            new ApplicationConverters.InvariantInt32Converter();
+        IValueConverter converter = new InvariantInt32Converter();
 
         // Act
         object? result = converter.ConvertBack(
@@ -196,22 +191,6 @@ public sealed class DialogAndValidationTests
     }
 
     [TestMethod]
-    public void GetValidationResult_RequiredWhitespace_ReturnsFieldRequiredError()
-    {
-        // Arrange
-        ValidationAttribute validator = new RequiredTextAttribute();
-
-        // Act
-        var result = validator.GetValidationResult(
-            "   ",
-            new ValidationContext(new object()));
-
-        // Assert
-        result.Should().NotBe(ValidationResult.Success);
-        result!.ErrorMessage.Should().Be("Field is required.");
-    }
-
-    [TestMethod]
     public void GetValidationResult_InclusiveRangeBoundary_ReturnsSuccess()
     {
         // Arrange
@@ -227,56 +206,6 @@ public sealed class DialogAndValidationTests
 
         // Assert
         result.Should().Be(ValidationResult.Success);
-    }
-
-    [TestMethod]
-    public void Evaluate_ParsedValueOutsideRange_ReturnsFirstValidationError()
-    {
-        // Arrange
-        ValueDialogRequest<int> request = new(
-            "Backup interval",
-            "Minutes",
-            5,
-            new ApplicationConverters.InvariantInt32Converter(),
-            [
-                new InclusiveRangeAttribute<int>(1, 60)
-                {
-                    ErrorMessage = "Use 1 through 60.",
-                },
-            ]);
-
-        // Act
-        var evaluation = request.Evaluate("90");
-
-        // Assert
-        evaluation.IsValid.Should().BeFalse();
-        evaluation.Value.Should().Be(0);
-        evaluation.ErrorMessage.Should().Be("Use 1 through 60.");
-    }
-
-    [TestMethod]
-    public void Evaluate_ParsedValueWithinRange_ReturnsTypedValue()
-    {
-        // Arrange
-        ValueDialogRequest<int> request = new(
-            "Backup interval",
-            "Minutes",
-            5,
-            new ApplicationConverters.InvariantInt32Converter(),
-            [
-                new InclusiveRangeAttribute<int>(1, 60)
-                {
-                    ErrorMessage = "Use 1 through 60.",
-                },
-            ]);
-
-        // Act
-        var evaluation = request.Evaluate("15");
-
-        // Assert
-        evaluation.IsValid.Should().BeTrue();
-        evaluation.Value.Should().Be(15);
-        evaluation.ErrorMessage.Should().BeNull();
     }
 
     [TestMethod]
@@ -412,7 +341,7 @@ public sealed class DialogAndValidationTests
             "Type value",
             "Value",
             1,
-            new ApplicationConverters.InvariantInt32Converter(),
+            new InvariantInt32Converter(),
             typeof(int),
             "OK",
             "Cancel",
@@ -456,7 +385,7 @@ public sealed class DialogAndValidationTests
             "Type value",
             "Value",
             0,
-            new ApplicationConverters.InvariantInt32Converter(),
+            new InvariantInt32Converter(),
             typeof(int),
             "OK",
             "Cancel",

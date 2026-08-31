@@ -17,7 +17,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="avares://Mapping_Tools.Desktop/Resources/MappingToolsColors.axaml" />
+                <ResourceInclude Source="avares://Mapping_Tools.Desktop/Styles/MappingToolsColors.axaml" />
             </ResourceDictionary.MergedDictionaries>
             <converters:InvariantInt32Converter x:Key="InvariantInt32Converter" />
             <converters:InvariantDoubleConverter x:Key="InvariantDoubleConverter" />
@@ -42,18 +42,18 @@
         <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Simple/Simple.xaml" />
 
         <!-- Application-wide Material compatibility overrides. -->
-        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Validation.axaml" />
-        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/TextBlocks.axaml" />
-        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/TextBoxes.axaml" />
-        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Menus.axaml" />
-        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/ComboBoxes.axaml" />
-        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Buttons.axaml" />
-        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/MaterialListBoxes.axaml" />
-        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/ColorPickers.axaml" />
-        <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Cards.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Validation.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/TextBlocks.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/TextBoxes.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Menus.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/ComboBoxes.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Buttons.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/MaterialListBoxes.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/ColorPickers.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Cards.axaml" />
 
         <!-- Styles owned by code-only custom controls. -->
-        <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/TimelineControl.axaml" />
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/Timeline/TimelineControl.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/HotkeyEditor.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/ToolRunButton.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Controls/ToolProgressBar.axaml" />

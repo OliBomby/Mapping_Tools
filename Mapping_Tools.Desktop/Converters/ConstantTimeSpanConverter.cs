@@ -1,6 +1,6 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
-using ApplicationConstantTimeSpanConverter = Mapping_Tools.Application.Interactions.Converters.ConstantTimeSpanConverter;
+using Mapping_Tools.Core.SystemTools;
 
 namespace Mapping_Tools.Desktop.Converters;
 
@@ -9,8 +9,6 @@ namespace Mapping_Tools.Desktop.Converters;
 /// </summary>
 public sealed class ConstantTimeSpanConverter : IValueConverter
 {
-    private static readonly ApplicationConstantTimeSpanConverter converter = new();
-
     /// <inheritdoc />
     public object Convert(
         object? value,
@@ -18,12 +16,8 @@ public sealed class ConstantTimeSpanConverter : IValueConverter
         object? parameter,
         CultureInfo culture)
     {
-        return ValueConverterHelper.Convert(
-            value,
-            targetType,
-            parameter,
-            culture,
-            converter);
+        return ValueConverterHelper.Convert(() => ValueConverterHelper.RequireValue<TimeSpan>(value, targetType)
+            .ToString("c", CultureInfo.InvariantCulture));
     }
 
     /// <inheritdoc />
@@ -33,11 +27,14 @@ public sealed class ConstantTimeSpanConverter : IValueConverter
         object? parameter,
         CultureInfo culture)
     {
-        return ValueConverterHelper.ConvertBack(
-            value,
-            targetType,
-            parameter,
-            culture,
-            converter);
+        return ValueConverterHelper.ConvertBack(() =>
+        {
+            ValueConverterHelper.RequireTarget<TimeSpan>(targetType);
+            string text = ValueConverterHelper.RequireText(value, targetType);
+            if (TypeConverters.TryParseTimeSpan(text, out var converted)) return converted;
+
+            throw new FormatException(
+                "Use the format hh:mm:ss or enter an arithmetic expression in milliseconds.");
+        });
     }
 }

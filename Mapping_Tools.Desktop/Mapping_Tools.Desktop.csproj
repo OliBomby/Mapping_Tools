@@ -45,6 +45,20 @@
     <ProjectReference Include="..\Mapping_Tools.Infrastructure\Mapping_Tools.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="Styles\Buttons.axaml" />
+    <AdditionalFiles Include="Styles\Cards.axaml" />
+    <AdditionalFiles Include="Styles\ColorPickers.axaml" />
+    <AdditionalFiles Include="Styles\ComboBoxes.axaml" />
+    <AdditionalFiles Include="Styles\MappingToolsColors.axaml" />
+    <AdditionalFiles Include="Styles\Markdown.axaml" />
+    <AdditionalFiles Include="Styles\MaterialListBoxes.axaml" />
+    <AdditionalFiles Include="Styles\Menus.axaml" />
+    <AdditionalFiles Include="Styles\TextBlocks.axaml" />
+    <AdditionalFiles Include="Styles\TextBoxes.axaml" />
+    <AdditionalFiles Include="Styles\Validation.axaml" />
+  </ItemGroup>
+
   <Target Name="RenamePublishedAppHost" AfterTargets="Publish">
     <PropertyGroup>
       <PublishedAppHostSource>$(PublishDir)Mapping_Tools.Desktop</PublishedAppHostSource>

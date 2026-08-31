@@ -20,18 +20,17 @@ DataAnnotations error surface. Code-behind retains only focus/select-all.
 
 ## Scope delivered
 
-The Application layer now defines UI-independent primitives for the form and
-dialog workflows used by the rest of Wave 3:
+The presentation layer now defines primitives for the form and dialog
+workflows used by the Desktop features in Wave 3:
 
 - `ValidationOutcome`, `IValueValidator<T>`, and
   `DelegateValueValidator<T>` express validation without WPF or Avalonia
   types;
-- `RequiredTextAttribute`, `InclusiveRangeAttribute<T>`, and
-  `MinimumTimeSpanAttribute` provide reusable validation rules in individual
-  files under `Interactions/Validation`;
-- the UI-independent `Interactions.Converters.IValueConverter` contract and
-  its one-class-per-file implementations provide string, equation-aware
-  `double` and `int`, and duration editing formats;
+- `InclusiveRangeAttribute<T>` and the other active validation attributes
+  provide reusable validation rules in individual files under
+  `Interactions/Validation`;
+- the shared Desktop converters provide string, equation-aware `double` and
+  `int`, and duration editing formats;
 - `MessageDialogRequest<TResult>` returns caller-owned result types instead
   of framework button enums and requires exactly one Enter/default action and
   one Escape/cancel action;
@@ -62,6 +61,15 @@ code-behind. Both views use compiled bindings with explicit `x:DataType`.
 The service is a desktop-lifetime singleton and always resolves the current
 `MainWindow` as owner. The owner is disabled for the modal lifetime by
 `Window.ShowDialog<T>`.
+
+## Current ownership clarification
+
+These types were initially kept in `Mapping_Tools.Application` because they
+were framework-neutral. The dialog, converter, and form-validation workflows
+are not consumed by Application services, however, so their ownership is now
+`Mapping_Tools.Desktop/Interactions` and `Mapping_Tools.Desktop/Converters`.
+Framework neutrality alone does not make a presentation abstraction part of
+the Application layer.
 
 ## Legacy compatibility and visual parity
 

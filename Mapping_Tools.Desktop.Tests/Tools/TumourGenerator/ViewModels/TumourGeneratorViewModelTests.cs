@@ -1,14 +1,14 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Desktop.Settings.Models;
 using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.BeatmapHelper.Enums;
 using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 using Mapping_Tools.Core.Tools.TumourGenerator.Templates;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.TumourGenerator.Models;

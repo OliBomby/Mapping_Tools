@@ -14,8 +14,8 @@ records, a start/end viewport, and an optional navigation command. Marker kinds
 preserve the legacy neutral, added/green, changed/yellow, removed/red, and
 accent/purple semantics without placing colors or brushes in Application.
 Clicking the nearest marker invokes the command with its millisecond timestamp.
-Hover uses the same deterministic hit testing and displays either a
-consumer label or a normalized timestamp tooltip.
+Hover uses the same deterministic hit testing and displays a normalized
+timestamp tooltip.
 
 `TimelineScale` owns the non-visual behavior: the legacy 20-millisecond minimum
 span, eleven inclusive ticks, clamped timestamp projection, stable nearest-hit
@@ -33,8 +33,14 @@ control bounds, and invalid transient viewport values fall back safely.
 
 All literal marker colors live in the central `MappingToolsColors.axaml`
 resource dictionary. An application style maps those dynamic theme resources
-to the control's brush properties. The Application marker/scale types contain
-no Avalonia, WPF, WinForms, brush, process, or command dependency.
+to the control's brush properties. The Desktop marker/scale types contain no
+Avalonia, WPF, WinForms, brush, process, or command dependency, but remain
+presentation-owned because they model viewport, formatting, and hit testing.
+
+The timeline types were initially kept in `Mapping_Tools.Application` because
+they were framework-neutral. They are now owned by
+`Mapping_Tools.Desktop/Controls/Timeline`; the Application layer supplies the semantic
+finding data that Desktop maps into markers.
 
 The legacy control did not implement scrolling or zoom, so this parity slice
 does not invent those behaviors. Auto-fail Detector and Map Cleaner remain the

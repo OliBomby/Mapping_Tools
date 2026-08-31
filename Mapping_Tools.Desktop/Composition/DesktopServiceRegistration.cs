@@ -9,7 +9,6 @@ using Mapping_Tools.Application.BeatmapEditing;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
-using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.Platform.FilePicker;
 using Mapping_Tools.Application.Projects;
@@ -19,41 +18,18 @@ using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings;
 using Mapping_Tools.Application.Settings.Contracts;
 using Mapping_Tools.Application.Settings.Models;
-using Mapping_Tools.Application.Tools.AutoFail;
-using Mapping_Tools.Application.Tools.ComboColourStudio;
-using Mapping_Tools.Application.Tools.GeometryDashboard;
-using Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;
-using Mapping_Tools.Application.Tools.HitsoundCopier;
-using Mapping_Tools.Application.Tools.HitsoundPreviewHelper;
-using Mapping_Tools.Application.Tools.HitsoundStudio;
 using Mapping_Tools.Application.Tools.HitsoundStudio.Contracts;
-using Mapping_Tools.Application.Tools.MapCleaner;
-using Mapping_Tools.Application.Tools.MapsetMerger;
-using Mapping_Tools.Application.Tools.MapsetMerger.Contracts;
-using Mapping_Tools.Application.Tools.MetadataManager;
-using Mapping_Tools.Application.Tools.PatternGallery;
-using Mapping_Tools.Application.Tools.PatternGallery.Contracts;
-using Mapping_Tools.Application.Tools.PropertyTransformer;
-using Mapping_Tools.Application.Tools.RhythmGuide;
-using Mapping_Tools.Application.Tools.Sliderator;
-using Mapping_Tools.Application.Tools.Sliderator.Contracts;
-using Mapping_Tools.Application.Tools.SliderCompletionator;
-using Mapping_Tools.Application.Tools.SliderMerger;
-using Mapping_Tools.Application.Tools.SliderPicturator;
-using Mapping_Tools.Application.Tools.TimingCopier;
-using Mapping_Tools.Application.Tools.TimingHelper;
-using Mapping_Tools.Application.Tools.TumourGenerator;
 using Mapping_Tools.Application.Updates;
 using Mapping_Tools.Application.Updates.Contracts;
 using Mapping_Tools.Application.Workspace;
 using Mapping_Tools.Application.Workspace.Contracts;
-using Mapping_Tools.Core.Tools.HitsoundStudio;
-using Mapping_Tools.Desktop.Hosting;
-using Mapping_Tools.Desktop.Platform;
-using Mapping_Tools.Desktop.Settings.Models;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
+using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Services.Hosted;
+using Mapping_Tools.Desktop.Services.Platform;
+using Mapping_Tools.Desktop.Services.Updates;
 using Mapping_Tools.Desktop.Shell;
-using Mapping_Tools.Desktop.Updates;
 using Mapping_Tools.Desktop.ViewModels;
 using Mapping_Tools.Desktop.Views;
 using Mapping_Tools.Infrastructure.Audio;
@@ -103,7 +79,7 @@ internal static class DesktopServiceRegistration
         services.AddDesktopFeatures(
             toolAssemblies ?? [typeof(DesktopServiceRegistration).Assembly]);
         services.AddSingleton<MainViewModel>();
-        services.AddSingleton<IDialogService, AvaloniaDialogService>();
+        services.AddSingleton<IDialogService, DialogService>();
 
         services.AddSingleton<IFilePicker>(provider =>
         {
@@ -121,7 +97,7 @@ internal static class DesktopServiceRegistration
             return new AvaloniaPlatformLauncher(() => window.Launcher);
         });
         services.AddSingleton<IFileRevealService, PortableFileRevealService>();
-        services.AddSingleton<IApplicationThemeService, AvaloniaApplicationThemeService>();
+        services.AddSingleton<IApplicationThemeService, ApplicationThemeService>();
         services.AddSingleton<IApplicationDirectories, ApplicationDirectories>();
         services.AddSingleton<ISettingsStore>(provider =>
             new JsonSettingsStore(

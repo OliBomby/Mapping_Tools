@@ -9,8 +9,8 @@ using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.QuickRun.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.Settings.Models;
-using Mapping_Tools.Desktop.Platform;
-using Mapping_Tools.Desktop.Settings.Models;
+using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Shell;
 
 namespace Mapping_Tools.Desktop.ViewModels;

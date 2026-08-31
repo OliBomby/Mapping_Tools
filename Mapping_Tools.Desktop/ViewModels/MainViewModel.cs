@@ -7,15 +7,13 @@ using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.BeatmapEditing.Contracts;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
-using Mapping_Tools.Application.Interactions.Dialogs;
 using Mapping_Tools.Application.Platform;
 using Mapping_Tools.Application.QuickRun.Contracts;
-using Mapping_Tools.Application.Settings.Models;
+using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
-using Mapping_Tools.Desktop.Settings.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
+using Mapping_Tools.Desktop.Services.Updates;
 using Mapping_Tools.Desktop.Shell;
-using Mapping_Tools.Desktop.Shell.Models;
-using Mapping_Tools.Desktop.Updates;
 using Material.Icons;
 
 namespace Mapping_Tools.Desktop.ViewModels;
@@ -131,10 +129,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         get => searchText;
         set
         {
-            string normalized = value ?? string.Empty;
-            if (searchText == normalized) return;
-
-            if (SetProperty(ref searchText, normalized)) RefreshVisibleFeatures();
+            if (SetProperty(ref searchText, value)) RefreshVisibleFeatures();
         }
     }
 

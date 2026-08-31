@@ -71,7 +71,7 @@
                                        TextWrapping="Wrap" />
                             <md:MarkdownScrollViewer Markdown="{Binding Text}">
                                 <md:MarkdownScrollViewer.Styles>
-                                    <StyleInclude Source="avares://Mapping_Tools.Desktop/Resources/Styles/Markdown.axaml" />
+                                    <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Markdown.axaml" />
                                 </md:MarkdownScrollViewer.Styles>
                             </md:MarkdownScrollViewer>
                         </StackPanel>
