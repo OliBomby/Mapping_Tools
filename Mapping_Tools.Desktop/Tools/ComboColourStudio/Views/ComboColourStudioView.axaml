@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
-             xmlns:combo="using:Mapping_Tools.Core.Tools.ComboColourStudio"
              xmlns:adapter="using:Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"

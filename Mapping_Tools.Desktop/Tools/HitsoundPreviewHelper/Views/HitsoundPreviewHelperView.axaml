@@ -3,7 +3,6 @@
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels"
              xmlns:adapter="using:Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels.Adapters"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
-             xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Name="Root"
              x:Class="Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.Views.HitsoundPreviewHelperView"

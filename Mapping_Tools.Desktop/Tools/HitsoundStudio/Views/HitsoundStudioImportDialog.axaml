@@ -1,6 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:Mapping_Tools.Desktop.Tools.HitsoundStudio.Interactions"
         xmlns:hitsoundStudio="clr-namespace:Mapping_Tools.Desktop.Tools.HitsoundStudio.Interactions"
         x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioImportDialog"
         x:DataType="hitsoundStudio:HitsoundStudioImportDialogViewModel"

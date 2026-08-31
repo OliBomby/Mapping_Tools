@@ -1,6 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="using:Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:patternGalleryControls="using:Mapping_Tools.Desktop.Tools.PatternGallery.Controls"
              xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"

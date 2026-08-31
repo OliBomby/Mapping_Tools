@@ -1,6 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="using:Mapping_Tools.Desktop.Controls"
         xmlns:vm="using:Mapping_Tools.Desktop.ViewModels.Dialogs"
         xmlns:graph="clr-namespace:Mapping_Tools.Desktop.Controls.Graph"
         xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
