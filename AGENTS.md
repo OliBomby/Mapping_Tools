@@ -73,3 +73,8 @@ The project adheres to Domain Driven Design.
 
 The original project is available locally at [.reference/Mapping_Tools-Original](.reference/Mapping_Tools-Original/). Consult it for legacy implementation details.
 Another Avalonia port of this program was made by NiceAesth. It is available locally at [.reference/NiceAesth-Mapping_Tools](.reference/NiceAesth-Mapping_Tools). Consult it if asked.
+
+## Building
+
+It can be that files in the standard build folder are locked, so build fails.
+In that case build to the `bin/agent` folder.
