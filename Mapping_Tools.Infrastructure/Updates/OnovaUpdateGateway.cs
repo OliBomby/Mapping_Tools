@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Mapping_Tools.Application.Updates.Contracts;
 using Mapping_Tools.Application.Updates.Models;
 using Onova;
@@ -59,7 +60,7 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
                 "User-Agent",
                 "Mapping Tools");
 
-        assetName = Environment.Is64BitProcess ? "release_x64.zip" : "release.zip";
+        assetName = GetAssetName();
         packageResolver = new GithubPackageResolver(
             this.httpClient,
             repository_owner,
@@ -195,5 +196,19 @@ public sealed class OnovaUpdateGateway : IUpdateGateway
         return File.Exists(publishedExecutablePath)
             ? publishedExecutablePath
             : entryAssembly.Location;
+    }
+
+    private static string GetAssetName()
+    {
+        if (OperatingSystem.IsWindows())
+            return RuntimeInformation.ProcessArchitecture == Architecture.X86
+                ? "release.zip"
+                : "release_x64.zip";
+
+        string platform = OperatingSystem.IsMacOS() ? "osx" : "linux";
+        string architecture = RuntimeInformation.ProcessArchitecture == Architecture.Arm64
+            ? "arm64"
+            : "x64";
+        return $"mapping-tools-{platform}-{architecture}.zip";
     }
 }

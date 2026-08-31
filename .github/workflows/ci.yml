@@ -7,7 +7,11 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
@@ -17,10 +21,10 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore Mapping_Tools.sln
+        run: dotnet restore Mapping_Tools.slnx
 
       - name: Build Avalonia frontend and shared layers
-        run: dotnet build Mapping_Tools.sln --configuration Release --no-restore
+        run: dotnet build Mapping_Tools.slnx --configuration Release --no-restore
 
       - name: Architecture guardrails
         run: dotnet test Mapping_Tools.Architecture.Tests/Mapping_Tools.Architecture.Tests.csproj --configuration Release --no-build

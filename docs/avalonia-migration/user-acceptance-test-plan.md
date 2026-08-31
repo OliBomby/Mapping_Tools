@@ -75,6 +75,7 @@ Record the exact values for every test session rather than relying on a shared i
 |---|---|
 | Operating system | Primary supported Windows version for all gates; each additional claimed OS before release acceptance. |
 | Architecture | Every architecture that will be published. |
+| Release assets | Windows x86/x64, Linux x64/arm64, and macOS x64/arm64 self-contained ZIPs; macOS ZIPs contain `Mapping Tools.app`; Windows x86/x64 installers. |
 | Display | 100% scaling; one high-DPI configuration; minimum supported window size; representative wide display. |
 | Theme | Dark and light where supported; operating-system default variant if selectable. |
 | Input | Mouse and keyboard; touch/pen only if claimed as supported. |
@@ -130,7 +131,7 @@ For text-based outputs, retain both exact expected files and a semantic comparis
 
 - Every feature has passed its feature gate or has an approved deprecation.
 - All wave integration gates have passed.
-- Installers/packages exist for every claimed platform and architecture.
+- The six desktop archives exist for every claimed platform and architecture; only Windows has x86/x64 Inno Setup installers.
 - Upgrade from legacy installations, update, uninstall, and rollback procedures are documented and testable.
 - No unresolved severity 1 or severity 2 defect remains.
 

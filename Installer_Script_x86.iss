@@ -60,7 +60,8 @@ SolidCompression=yes
 WizardStyle=modern   
 LicenseFile=LICENCE
 
-MinVersion=6.1
+; .NET 10 does not support Windows 7 or 8.1.
+MinVersion=10.0
 PrivilegesRequired=admin
 
 // remove next line if you only deploy 32-bit binaries and dependencies

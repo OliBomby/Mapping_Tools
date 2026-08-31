@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
-    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x86;win-x64;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
@@ -46,8 +46,32 @@
   </ItemGroup>
 
   <Target Name="RenamePublishedAppHost" AfterTargets="Publish">
-    <Move SourceFiles="$(PublishDir)Mapping_Tools.Desktop.exe"
-          DestinationFiles="$(PublishDir)Mapping Tools.exe"
-          Condition="Exists('$(PublishDir)Mapping_Tools.Desktop.exe')" />
+    <PropertyGroup>
+      <PublishedAppHostSource>$(PublishDir)Mapping_Tools.Desktop</PublishedAppHostSource>
+      <PublishedAppHostDestination>$(PublishDir)Mapping Tools</PublishedAppHostDestination>
+      <PublishedAppHostSource Condition="'$(RuntimeIdentifier)' == 'win-x86' Or '$(RuntimeIdentifier)' == 'win-x64'">$(PublishDir)Mapping_Tools.Desktop.exe</PublishedAppHostSource>
+      <PublishedAppHostDestination Condition="'$(RuntimeIdentifier)' == 'win-x86' Or '$(RuntimeIdentifier)' == 'win-x64'">$(PublishDir)Mapping Tools.exe</PublishedAppHostDestination>
+    </PropertyGroup>
+
+    <Move SourceFiles="$(PublishedAppHostSource)"
+          DestinationFiles="$(PublishedAppHostDestination)"
+          Condition="Exists('$(PublishedAppHostSource)')" />
+  </Target>
+
+  <!-- These assemblies back Windows-only live-editor, overlay, and global-hook
+       adapters. The shared Infrastructure assembly keeps compile-time
+       references, while Unix bundles omit those unused runtime assets. -->
+  <Target Name="ExcludeWindowsOnlyRuntimeAssets"
+          BeforeTargets="_GetCurrentAndPriorPublishFileWrites;_ComputeResolvedFilesToPublishTypes"
+          Condition="'$(RuntimeIdentifier)' == 'linux-x64' Or
+                     '$(RuntimeIdentifier)' == 'linux-arm64' Or
+                     '$(RuntimeIdentifier)' == 'osx-x64' Or
+                     '$(RuntimeIdentifier)' == 'osx-arm64'">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+                             Condition="'%(ResolvedFileToPublish.Filename)' == 'EditorReader' Or
+                                        '%(ResolvedFileToPublish.Filename)' == 'NonInvasiveKeyboardHookLibrary.Core' Or
+                                        '%(ResolvedFileToPublish.Filename)' == 'NAudio.Wasapi'" />
+    </ItemGroup>
   </Target>
 </Project>

@@ -4,11 +4,13 @@ using Mapping_Tools.Core.Audio;
 using NAudio.Vorbis;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using NLayer;
 
 namespace Mapping_Tools.Infrastructure.Audio;
 
 /// <summary>
-///     Decodes WAV, Ogg Vorbis, and Windows Media Foundation-supported files into owned clips.
+///     Decodes WAV, Ogg Vorbis, and MP3 files into owned clips without requiring
+///     an operating-system media framework.
 /// </summary>
 public sealed class NaudioAudioDecoder : IAudioDecoder
 {
@@ -29,32 +31,59 @@ public sealed class NaudioAudioDecoder : IAudioDecoder
         string extension = Path.GetExtension(path).ToLowerInvariant();
         if (!supportedExtensions.Contains(extension, StringComparer.Ordinal)) throw new NotSupportedException($"Audio decoding does not support '{extension}'.");
 
-        using var source = OpenSource(path, extension);
-        var provider = ToSampleProvider(source);
+        return OpenSource(path, extension, cancellationToken);
+    }
+
+    private static AudioClip OpenSource(string path, string extension, CancellationToken cancellationToken)
+    {
+        return extension switch
+        {
+            ".wav" => DecodeWave(new WaveFileReader(path), cancellationToken),
+            ".ogg" => DecodeWave(new VorbisWaveReader(path), cancellationToken),
+            ".mp3" => DecodeMp3(path, cancellationToken),
+            _ => throw new ArgumentOutOfRangeException(nameof(extension), extension, "The audio extension is not supported."),
+        };
+    }
+
+    private static AudioClip DecodeWave(WaveStream source, CancellationToken cancellationToken)
+    {
+        using (source)
+        {
+            var provider = ToSampleProvider(source);
+            var samples = new List<float>();
+            float[] buffer = new float[Math.Max(provider.WaveFormat.SampleRate * provider.WaveFormat.Channels, 4096)];
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                int read = provider.Read(buffer, 0, buffer.Length);
+                if (read == 0) break;
+
+                samples.AddRange(buffer.AsSpan(0, read).ToArray());
+            }
+
+            return new AudioClip(
+                new AudioFormat(provider.WaveFormat.SampleRate, provider.WaveFormat.Channels),
+                samples);
+        }
+    }
+
+    private static AudioClip DecodeMp3(string path, CancellationToken cancellationToken)
+    {
+        using var source = new MpegFile(path);
         var samples = new List<float>();
-        float[] buffer = new float[Math.Max(provider.WaveFormat.SampleRate * provider.WaveFormat.Channels, 4096)];
+        float[] buffer = new float[Math.Max(source.SampleRate * source.Channels, 4096)];
         while (true)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            int read = provider.Read(buffer, 0, buffer.Length);
+            int read = source.ReadSamples(buffer, 0, buffer.Length);
             if (read == 0) break;
 
             samples.AddRange(buffer.AsSpan(0, read).ToArray());
         }
 
         return new AudioClip(
-            new AudioFormat(provider.WaveFormat.SampleRate, provider.WaveFormat.Channels),
+            new AudioFormat(source.SampleRate, source.Channels),
             samples);
-    }
-
-    private static WaveStream OpenSource(string path, string extension)
-    {
-        return extension switch
-        {
-            ".wav" => new WaveFileReader(path),
-            ".ogg" => new VorbisWaveReader(path),
-            _ => new MediaFoundationReader(path),
-        };
     }
 
     private static ISampleProvider ToSampleProvider(WaveStream source)

@@ -2,7 +2,8 @@
 
 ## Scope
 
-Step 46 migrates the legacy updater use case and its user interface. Steps 47–49 remain out of scope: this change does not switch the release workflow, change the default executable, or remove the WPF implementation.
+Step 46 migrated the legacy updater use case and its user interface. The later
+parity audit, executable switch, and legacy removal are recorded in steps 47–49.
 
 The normative sources read for this migration were:
 
@@ -29,7 +30,13 @@ The normative sources read for this migration were:
 - Reuses one preparation task between the decision window and shutdown, reports normalized `0..1` progress, propagates cancellation/network/archive/staging failures, and retains the exact `UPDATER_EXCEPTION: ...` and `Error fetching update: ...` failure text.
 - Leaves package download, ZIP extraction, staging, lock handling, replacement, rollback, permissions, and external process shutdown/restart to Onova, the same adapter used by the WPF implementation. The non-Windows gateway does not attempt to launch the Windows updater process.
 
-The existing release workflow publishes the WPF executable and the same x86/x64 ZIP asset names. The current release contract contains no checksum or signature artifacts, so step 46 does not invent a new validation format or claim validation behavior that the legacy package did not provide.
+The current release workflow publishes the Avalonia desktop application as
+deterministically named Windows, Linux, and macOS runtime archives. The
+historical `release.zip` and `release_x64.zip` aliases remain for the Windows
+updater; the Windows-only updater and installer path does not claim to support
+the portable Linux/macOS archives. The current release contract contains no
+checksum or signature artifacts, so step 46 does not invent a new validation
+format or claim validation behavior that the legacy package did not provide.
 
 ## Independent review follow-up
 

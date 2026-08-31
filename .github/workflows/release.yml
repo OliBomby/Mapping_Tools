@@ -6,10 +6,10 @@ on:
       - "v*.*.*"
 
 permissions:
-  contents: write   # needed for creating releases
+  contents: write
 
 jobs:
-  build:
+  windows:
     runs-on: windows-latest
 
     steps:
@@ -19,10 +19,8 @@ jobs:
       - name: Determine version from tag
         shell: pwsh
         run: |
-          # e.g. GITHUB_REF_NAME = v1.2.3 -> VERSION = 1.2.3
           $version = "${env:GITHUB_REF_NAME}".TrimStart('v')
           "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
-          Write-Host "Version: $version"
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
@@ -32,38 +30,27 @@ jobs:
       - name: Cache NuGet
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.nuget/packages
+          path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
 
       - name: Restore dependencies
-        run: dotnet restore Mapping_Tools.sln
+        run: dotnet restore Mapping_Tools.slnx
 
-      # Update versions in installer scripts and the shipped frontend project using PowerShell regex.
-      - name: Set version in Inno Setup (x86)
+      - name: Set release version
         shell: pwsh
         run: |
-          (Get-Content -Raw Installer_Script_x86.iss) `
-            -replace '(?<=#define\s+MyAppVersion\s+")\d+\.\d+\.\d+(?=")', "${env:VERSION}" `
-            | Set-Content Installer_Script_x86.iss -Encoding UTF8
-
-      - name: Set version in Inno Setup (x64)
-        shell: pwsh
-        run: |
-          (Get-Content -Raw Installer_Script_x64.iss) `
-            -replace '(?<=#define\s+MyAppVersion\s+")\d+\.\d+\.\d+(?=")', "${env:VERSION}" `
-            | Set-Content Installer_Script_x64.iss -Encoding UTF8
-
-      - name: Set AssemblyVersion/FileVersion in csproj
-        shell: pwsh
-        run: |
-          foreach ($p in @("Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj")) {
-            $c = Get-Content -Raw $p
-            $c = $c -replace '(?<=<AssemblyVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
-            $c = $c -replace '(?<=<FileVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
-            $c | Set-Content $p -Encoding UTF8
+          foreach ($path in @(
+            "Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj",
+            "Installer_Script_x86.iss",
+            "Installer_Script_x64.iss"
+          )) {
+            $content = Get-Content -Raw $path
+            $content = $content -replace '(?<=<AssemblyVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
+            $content = $content -replace '(?<=<FileVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
+            $content = $content -replace '(?<=#define\s+MyAppVersion\s+")\d+\.\d+\.\d+(?=")', "${env:VERSION}"
+            $content | Set-Content $path -Encoding UTF8
           }
 
       - name: Publish Avalonia x86
@@ -84,41 +71,300 @@ jobs:
         shell: pwsh
         run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "Installer_Script_x64.iss"'
 
-      - name: Zip x86 app
+      - name: Create Windows release archives
         shell: pwsh
         run: |
-          $outDir = "Mapping_Tools.Desktop/bin/Release/net10.0/win-x86/publish"
-          $files = (Get-ChildItem -LiteralPath $outDir -File | Where-Object Extension -ne ".zip").FullName
-          Compress-Archive -Path $files -DestinationPath "$outDir/release.zip" -Force
+          $assetDirectory = "release-assets"
+          New-Item -ItemType Directory -Path $assetDirectory -Force | Out-Null
 
-      - name: Zip x64 app
-        shell: pwsh
-        run: |
-          $outDir = "Mapping_Tools.Desktop/bin/Release/net10.0/win-x64/publish"
-          $files = (Get-ChildItem -LiteralPath $outDir -File | Where-Object Extension -ne ".zip").FullName
-          Compress-Archive -Path $files -DestinationPath "$outDir/release_x64.zip" -Force
+          $publishes = @(
+            @{ Rid = "win-x86"; Asset = "mapping-tools-windows-x86.zip" },
+            @{ Rid = "win-x64"; Asset = "mapping-tools-windows-x64.zip" }
+          )
 
-      - name: Validate release layout
+          foreach ($publish in $publishes) {
+            $outDir = "Mapping_Tools.Desktop/bin/Release/net10.0/$($publish.Rid)/publish"
+            $files = Get-ChildItem -LiteralPath $outDir -File |
+              Sort-Object Name |
+              Select-Object -ExpandProperty FullName
+            Compress-Archive -Path $files -DestinationPath (Join-Path $assetDirectory $publish.Asset) -Force
+          }
+
+          Copy-Item (Join-Path $assetDirectory "mapping-tools-windows-x86.zip") (Join-Path $assetDirectory "release.zip") -Force
+          Copy-Item (Join-Path $assetDirectory "mapping-tools-windows-x64.zip") (Join-Path $assetDirectory "release_x64.zip") -Force
+          Copy-Item "mapping_tools_installer_x86.exe" (Join-Path $assetDirectory "mapping_tools_installer_x86.exe") -Force
+          Copy-Item "mapping_tools_installer_x64.exe" (Join-Path $assetDirectory "mapping_tools_installer_x64.exe") -Force
+
+      - name: Validate Windows release layout
         shell: pwsh
         run: |
           ./tools/validate-release-layout.ps1 `
             -ExpectedVersion "${env:VERSION}" `
-            -PrimaryX86 "Mapping_Tools.Desktop/bin/Release/net10.0/win-x86/publish" `
-            -PrimaryX64 "Mapping_Tools.Desktop/bin/Release/net10.0/win-x64/publish" `
-            -PrimaryArchiveX86 "Mapping_Tools.Desktop/bin/Release/net10.0/win-x86/publish/release.zip" `
-            -PrimaryArchiveX64 "Mapping_Tools.Desktop/bin/Release/net10.0/win-x64/publish/release_x64.zip" `
-            -InstallerX86 "mapping_tools_installer_x86.exe" `
-            -InstallerX64 "mapping_tools_installer_x64.exe"
+            -PublishDirectory @(
+              "Mapping_Tools.Desktop/bin/Release/net10.0/win-x86/publish",
+              "Mapping_Tools.Desktop/bin/Release/net10.0/win-x64/publish"
+            ) `
+            -Archive @(
+              "release-assets/mapping-tools-windows-x86.zip",
+              "release-assets/mapping-tools-windows-x64.zip"
+            ) `
+            -ExecutableName @("Mapping Tools.exe", "Mapping Tools.exe") `
+            -AssetName @("mapping-tools-windows-x86.zip", "mapping-tools-windows-x64.zip") `
+            -CompatibilityArchiveX86 "release-assets/release.zip" `
+            -CompatibilityArchiveX64 "release-assets/release_x64.zip" `
+            -InstallerX86 "release-assets/mapping_tools_installer_x86.exe" `
+            -InstallerX64 "release-assets/mapping_tools_installer_x64.exe"
+
+      - name: Test release layout validator
+        shell: pwsh
+        run: ./tools/test-release-layout.ps1
+
+      - name: Upload Windows release files
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: release-assets/*
+          if-no-files-found: error
+
+  linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Determine version from tag
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore Mapping_Tools.slnx
+
+      - name: Set release version
+        shell: pwsh
+        run: |
+          $path = "Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj"
+          $content = Get-Content -Raw $path
+          $content = $content -replace '(?<=<AssemblyVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
+          $content = $content -replace '(?<=<FileVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
+          $content | Set-Content $path -Encoding UTF8
+
+      - name: Publish Avalonia Linux x64
+        run: dotnet publish Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj -c Release -r linux-x64 --no-restore --self-contained true
+
+      - name: Publish Avalonia Linux arm64
+        run: dotnet publish Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj -c Release -r linux-arm64 --no-restore --self-contained true
+
+      - name: Create Linux release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          for definition in \
+            "linux-x64:mapping-tools-linux-x64.zip" \
+            "linux-arm64:mapping-tools-linux-arm64.zip"; do
+            IFS=: read -r rid asset <<< "$definition"
+            out_dir="Mapping_Tools.Desktop/bin/Release/net10.0/${rid}/publish"
+            chmod +x "$out_dir/Mapping Tools"
+            (
+              cd "$out_dir"
+              for file in *; do
+                if [[ -f "$file" ]]; then
+                  zip -q -9 "$GITHUB_WORKSPACE/release-assets/$asset" "$file"
+                fi
+              done
+            )
+          done
+
+      - name: Validate Linux release layout
+        shell: pwsh
+        run: |
+          ./tools/validate-release-layout.ps1 `
+            -ExpectedVersion "${env:VERSION}" `
+            -PublishDirectory @(
+              "Mapping_Tools.Desktop/bin/Release/net10.0/linux-x64/publish",
+              "Mapping_Tools.Desktop/bin/Release/net10.0/linux-arm64/publish"
+            ) `
+            -Archive @(
+              "release-assets/mapping-tools-linux-x64.zip",
+              "release-assets/mapping-tools-linux-arm64.zip"
+            ) `
+            -ExecutableName @("Mapping Tools", "Mapping Tools") `
+            -AssetName @("mapping-tools-linux-x64.zip", "mapping-tools-linux-arm64.zip")
+
+      - name: Upload Linux release files
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-release
+          path: release-assets/*
+          if-no-files-found: error
+
+  macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Determine version from tag
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore Mapping_Tools.slnx
+
+      - name: Set release version
+        shell: pwsh
+        run: |
+          $path = "Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj"
+          $content = Get-Content -Raw $path
+          $content = $content -replace '(?<=<AssemblyVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
+          $content = $content -replace '(?<=<FileVersion>)\d+\.\d+\.\d+', "${env:VERSION}"
+          $content | Set-Content $path -Encoding UTF8
+
+      - name: Publish Avalonia macOS x64
+        run: dotnet publish Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj -c Release -r osx-x64 --no-restore --self-contained true
+
+      - name: Publish Avalonia macOS arm64
+        run: dotnet publish Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj -c Release -r osx-arm64 --no-restore --self-contained true
+
+      - name: Create macOS release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          for definition in \
+            "osx-x64:mapping-tools-osx-x64.zip" \
+            "osx-arm64:mapping-tools-osx-arm64.zip"; do
+            IFS=: read -r rid asset <<< "$definition"
+            out_dir="Mapping_Tools.Desktop/bin/Release/net10.0/${rid}/publish"
+            app_dir="$RUNNER_TEMP/Mapping Tools.app"
+            rm -rf "$app_dir"
+            mkdir -p "$app_dir/Contents/MacOS"
+            cp -R "$out_dir"/. "$app_dir/Contents/MacOS/"
+            chmod +x "$app_dir/Contents/MacOS/Mapping Tools"
+            cat > "$app_dir/Contents/Info.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleDevelopmentRegion</key>
+            <string>en</string>
+            <key>CFBundleDisplayName</key>
+            <string>Mapping Tools</string>
+            <key>CFBundleExecutable</key>
+            <string>Mapping Tools</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.olibomby.mappingtools</string>
+            <key>CFBundleInfoDictionaryVersion</key>
+            <string>6.0</string>
+            <key>CFBundleName</key>
+            <string>Mapping Tools</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>CFBundleShortVersionString</key>
+            <string>${VERSION}</string>
+            <key>CFBundleVersion</key>
+            <string>${VERSION}</string>
+          </dict>
+          </plist>
+          EOF
+            (
+              cd "$RUNNER_TEMP"
+              zip -q -9 -r "$GITHUB_WORKSPACE/release-assets/$asset" "Mapping Tools.app"
+            )
+          done
+
+      - name: Validate macOS release layout
+        shell: pwsh
+        run: |
+          ./tools/validate-release-layout.ps1 `
+            -ExpectedVersion "${env:VERSION}" `
+            -PublishDirectory @(
+              "Mapping_Tools.Desktop/bin/Release/net10.0/osx-x64/publish",
+              "Mapping_Tools.Desktop/bin/Release/net10.0/osx-arm64/publish"
+            ) `
+            -Archive @(
+              "release-assets/mapping-tools-osx-x64.zip",
+              "release-assets/mapping-tools-osx-arm64.zip"
+            ) `
+            -ExecutableName @("Mapping Tools", "Mapping Tools") `
+            -AssetName @("mapping-tools-osx-x64.zip", "mapping-tools-osx-arm64.zip") `
+            -ArchiveExecutableName @(
+              "Mapping Tools.app/Contents/MacOS/Mapping Tools",
+              "Mapping Tools.app/Contents/MacOS/Mapping Tools"
+            )
+
+      - name: Upload macOS release files
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-release
+          path: release-assets/*
+          if-no-files-found: error
+
+  publish:
+    needs: [windows, linux, macos]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download release files
+        uses: actions/download-artifact@v4
+        with:
+          pattern: '*-release'
+          path: release-assets
+          merge-multiple: true
+
+      - name: Verify release file set
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(find release-assets -maxdepth 1 -type f | wc -l)" -eq 10
+          find release-assets -maxdepth 1 -type f -print | sort
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: Release version ${{ env.VERSION }}
+          name: Release version ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
           draft: false
           prerelease: false
           files: |
-            Mapping_Tools.Desktop/bin/Release/net10.0/win-x86/publish/release.zip
-            Mapping_Tools.Desktop/bin/Release/net10.0/win-x64/publish/release_x64.zip
-            mapping_tools_installer_x86.exe
-            mapping_tools_installer_x64.exe
+            release-assets/mapping-tools-windows-x86.zip
+            release-assets/mapping-tools-windows-x64.zip
+            release-assets/mapping-tools-linux-x64.zip
+            release-assets/mapping-tools-linux-arm64.zip
+            release-assets/mapping-tools-osx-x64.zip
+            release-assets/mapping-tools-osx-arm64.zip
+            release-assets/release.zip
+            release-assets/release_x64.zip
+            release-assets/mapping_tools_installer_x86.exe
+            release-assets/mapping_tools_installer_x64.exe

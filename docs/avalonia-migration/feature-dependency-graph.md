@@ -411,7 +411,9 @@ The whole migration is complete only when:
 - Saved settings, projects, pattern collections, map files, and other user data either load unchanged or have tested migrations.
 - Destructive tools always create/offer the same backup protections as the legacy application.
 - Windows-only functionality is isolated and clearly reported rather than silently preventing other platforms from running.
-- The shipped installer/update path has a tested rollback story.
+- The shipped Windows installer/update path has a tested rollback story, and
+  every claimed Linux/macOS desktop archive has a deterministic name and
+  validated root layout; the Windows installer is not treated as cross-platform.
 
 ## Avalonia sources used for this plan
 

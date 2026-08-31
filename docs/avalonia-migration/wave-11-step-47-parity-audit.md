@@ -6,7 +6,10 @@ This audit covers the migrated feature work assigned to graph steps 37–46. The
 legacy WPF view, view model, converters, custom controls, event handlers,
 project serializers, platform adapters, updater gateway, and registration
 were treated as the normative specification. Graph steps 48 (default
-executable switch) and 49 (legacy removal) are explicitly out of scope.
+executable switch) and 49 (legacy removal) were completed after this audit;
+their current release and removal records are in
+`wave-11-step-48-default-executable.md` and
+`wave-11-step-49-legacy-removal.md`.
 
 ## Audit coverage
 
@@ -68,5 +71,6 @@ preserve the WPF behavior and are kept at their documented ownership boundary.
 - Core, Application, Infrastructure, and Architecture builds/tests completed
   through the full solution verification.
 
-No commit was created. Steps 48 and 49 were not implemented, and no legacy
-project was removed.
+No commit was created for this audit. The later completion of steps 48 and 49
+removed the obsolete legacy frontend without changing the audited feature
+contracts.

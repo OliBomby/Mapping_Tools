@@ -3,39 +3,47 @@
 Status: implemented 2026-08-18.
 
 Step 48 makes `Mapping_Tools.Desktop` the default development and shipped
-frontend after the step-47 parity audit. Step 49 remains out of scope: the WPF
-project, WPF packages, and WPF source remain buildable and are not selected by
-any default launch or installer path.
+frontend after the step-47 parity audit. The legacy WPF project is no longer
+part of the shipped solution; the removal and compatibility record is in
+step 49.
 
 ## Executable and package contract
 
-- The Avalonia project keeps the user-facing `Mapping Tools.exe` published
-  apphost name, version, icon, and Windows application manifest while
-  publishing from its own `net10.0/win-x86` and `net10.0/win-x64` directories.
-- `release.zip` and `release_x64.zip`, both Inno installers, the VS Code launch
-  profile, the VS Code build/watch/publish tasks, and the Avalonia project
-  launch profile all target `Mapping_Tools.Desktop`. The VS Code prelaunch
-  build intentionally builds only the default frontend; solution-wide builds
-  remain the CI and transition verification path.
-- The release workflow also publishes WPF from the unchanged legacy project as
-  `legacy-wpf_x86.zip` and `legacy-wpf_x64.zip`. These archives are documented
-  fallback artifacts and are not included in the primary installer payload.
-- `tools/validate-release-layout.ps1` checks both architecture-specific primary
-  and fallback outputs, matching file versions, both installer outputs, the
-  user-facing executable names, and the required root-level contents of all
-  four release archives before upload. It rejects nested ZIPs and cross-frontend
-  assemblies so a fallback archive cannot silently become the shipped payload.
+- The Avalonia project publishes `Mapping Tools.exe` for Windows and the
+  extensionless `Mapping Tools` apphost for Linux and macOS. The managed
+  payload remains rooted in `Mapping_Tools.Desktop` for every runtime
+  identifier.
+- The release workflow publishes self-contained Windows x86/x64, Linux x64/arm64,
+  and macOS x64/arm64 assets. Canonical
+  archive names are `mapping-tools-{windows,linux,osx}-{architecture}.zip`.
+  Linux and macOS archives are created on native runners after marking the
+  extensionless apphost executable, preserving the Unix mode in the ZIP; the
+  macOS apphost is wrapped in a standard `Mapping Tools.app` bundle.
+- The historical Windows updater names `release.zip` and `release_x64.zip`
+  remain byte-for-byte aliases of the canonical Windows x86/x64 assets. The
+  Inno Setup outputs `mapping_tools_installer_x86.exe` and
+  `mapping_tools_installer_x64.exe` remain Windows-only and continue to use
+  the existing Windows publish directories.
+- `tools/validate-release-layout.ps1` checks all six publish directories and
+  archives, their platform-specific apphost names, required root-level
+  or bundle payload contents, deterministic archive names, Windows compatibility aliases, and
+  Windows installers before upload. It rejects nested ZIPs and stale apphost
+  names.
 
 ## Runtime compatibility
 
-The Avalonia updater continues to use the existing `release.zip` asset names,
-Onova staging/replacement behavior, original command-line arguments, and the
-current process architecture. The production gateway gives Onova the actual
-running/published `Mapping Tools.exe` path explicitly (falling back to the
-development assembly path for DLL launches), so installed update handoff and
-restart do not depend on the `Mapping_Tools.Desktop.dll` assembly name.
+The Windows Avalonia updater continues to use the existing `release.zip` asset
+names, Onova staging/replacement behavior, original command-line arguments,
+and the current process architecture. The production gateway gives Onova the
+actual running/published `Mapping Tools.exe` path explicitly (falling back to
+the development assembly path for DLL launches), so installed Windows update
+handoff and restart do not depend on the `Mapping_Tools.Desktop.dll` assembly
+name. The portable Linux/macOS archives are release downloads; the existing
+Windows installer and updater path does not make those platforms installer-
+compatible.
 Application settings, project JSON, backups, exports, and crash reports remain
-under `%LOCALAPPDATA%\Mapping Tools`.
+under the operating system's local application-data directory (`%LOCALAPPDATA%\Mapping Tools`
+on Windows).
 
 The Avalonia entry point now writes the legacy-compatible `crash-log.txt` for
 dispatcher, domain, unobserved-task, and startup exceptions. Windows-only
@@ -46,11 +54,10 @@ restart semantics.
 
 ## Verification contract
 
-`DefaultExecutableTests` guards the solution ordering and the development,
-release, installer, and WPF-fallback references. The release workflow validates
-the concrete publish layout before uploading assets. Both frontend projects
-remain in the solution and continue to be built and tested during the
-transition.
+The release-layout fixture test covers all six desktop runtime identifiers and
+the release workflow validates the concrete publish layout before uploading
+assets. Windows installer behavior remains covered separately by the existing
+installer sources; no installer is claimed for Linux or macOS.
 
 Avalonia 12.1 sources consulted for the startup exception boundary:
 

@@ -1,5 +1,4 @@
 using Mapping_Tools.Infrastructure.Files;
-using Mapping_Tools.Infrastructure.Platform;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Mapping_Tools.Infrastructure.Tests.Platform;
@@ -43,19 +42,5 @@ public sealed class DesktopPlatformAdapterTests
         {
             if (Directory.Exists(root)) Directory.Delete(root, true);
         }
-    }
-
-    [TestMethod]
-    public async Task RevealAsync_WithMissingPath_ThrowsWithoutStartingExplorer()
-    {
-        // Arrange
-        WindowsFileRevealService reveal = new();
-        string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".missing");
-
-        // Act
-        Func<Task> act1 = () => reveal.RevealAsync(path);
-
-        // Assert
-        await act1.Should().ThrowAsync<FileNotFoundException>();
     }
 }
