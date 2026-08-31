@@ -3,8 +3,7 @@
 Read this reference before choosing controls or styles for any migrated UI.
 The legacy WPF view is the source, visual, and behavioral specification unless
 the user explicitly requests a redesign. Start from that XAML and keep a
-minimal structural diff; matching a resting screenshot after rewriting the
-control tree is not parity.
+minimal structural diff.
 
 ## Inventory before implementation
 

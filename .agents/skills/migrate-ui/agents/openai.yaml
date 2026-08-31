@@ -1,4 +1,0 @@
-interface:
-  display_name: "Avalonia UI Migration"
-  short_description: "Port WPF UI with source and behavior parity"
-  default_prompt: "Use $migrate-ui to port one WPF view to Avalonia with the smallest structural diff and full current-wave behavior parity."

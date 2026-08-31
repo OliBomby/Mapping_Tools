@@ -7,6 +7,15 @@ It exists next to an osu! editor and does not aim to replace the editor itself.
 
 Here's a brief list of things we can never compromise on:
 
+### Open source and free
+
+Anyone can use and reuse Mapping Tools or components and contribute to it free of charge.
+
+### Cross-platform and cross-client
+
+You can use Mapping Tools on Windows, Linux, and MacOS, 
+and interact with any version of osu! be it osu! stable in Wine or osu! Lazer.
+
 ### Simple and user friendly
 
 Learning to use a tool should be as simple as randomly clicking buttons.
@@ -33,27 +42,6 @@ Understand the real constraint, then fight for the smallest model that makes the
 Channel both "The Grug Brained Developer" and "yagni". Fight scope creep.
 Try to honor the dev's intent in both a minimal and realistic fashion.
 
-## XML documentation standard
-
-Every public or protected API added to production projects
-must have meaningful XML documentation. This includes types, constructors,
-methods, properties, fields, events, delegates, operators, enum types and enum
-members. Document parameters, type parameters, return values, exceptions, and
-important platform or cancellation behavior where applicable. Prefer a
-specific summary of the contract or behavior over restating the identifier.
-Never generate documentation mechanically from a symbol name or signature.
-Read the implementation and relevant call sites before writing each comment,
-and make the documentation add information that the identifier does not:
-units, ranges, invariants, ordering, ownership, mutation, side effects,
-fallbacks, format compatibility, cancellation, or failure behavior.
-Use `<inheritdoc/>` only when an inherited or implemented contract already
-describes the member accurately.
-
-All test projects are exempt. `Directory.Build.targets` generates documentation files
-and treats CS1591 as an error for every other project. Do not suppress CS1591;
-build every affected non-test project and resolve the diagnostic before
-completing a migration.
-
 ## A small glossary
 
 - **osu!** - A rhythm game where players click circles, slide sliders, and spin spinners to the beat of a song. The game has a large community of mappers who create beatmaps for others to play.
@@ -69,29 +57,19 @@ completing a migration.
 - Insert whitespace between logical blocks of code to improve readability.
 - Test project file structure should always match that of the production project. If the file moves, the test file moves with it.
 - One file may only contain one public type. Multiple public types must be split up into multiple files.
-- Dont introduce aliases in using statements.
+- Don't introduce aliases in using statements.
+- Every public or protected API added to production projects must have meaningful XML documentation.
 
-## Layer boundaries
+## Project boundaries
 
 The project adheres to Domain Driven Design.
 
-- Any code that is used solely for the frontend belongs in the Desktop project. It may not exist in the Application or Core projects.
-
-## Avalonia migration standard
-
-The legacy WPF implementation is the normative specification for every migrated view. Read the WPF XAML, code-behind, view model, converters, and custom controls before editing the Avalonia version.
+- Put pure models, value objects, calculations, and domain rules in `Mapping_Tools.Core`.
+- Put feature use cases and OS abstraction interfaces in `Mapping_Tools.Application`.
+- Put filesystem, osu!, audio, network, and platform adapter implementations in `Mapping_Tools.Infrastructure`.
+- Put Avalonia views, CommunityToolkit.Mvvm presentation state, navigation, and UI-only adapters in `Mapping_Tools.Desktop`.
 
 ## Original project reference
 
 The original project is available locally at [.reference/Mapping_Tools-Original](.reference/Mapping_Tools-Original/). Consult it for legacy implementation details.
 Another Avalonia port of this program was made by NiceAesth. It is available locally at [.reference/NiceAesth-Mapping_Tools](.reference/NiceAesth-Mapping_Tools). Consult it if asked.
-
-- Keep the AXAML structurally identical to the WPF XAML. Only replace WPF-only controls or properties, move non-visual behavior out of code-behind, modernize view models, and substitute the approved shared tool controls.
-- Do not paraphrase copy, remove tooltips, change spacing, invent validation limits, add commands, or redesign interactions during a migration. Treat product improvements as separate work requiring explicit approval.
-- Inventory every legacy binding, converter, event handler, command, validation rule, tooltip, context-menu item, dialog, and completion/error branch. Preserve all behavior that belongs to the current migration wave.
-- Consult `docs/avalonia-migration/feature-dependency-graph.md` before treating absent behavior as a violation. Behavior explicitly assigned to a later wave is deferred scope, not part of the current view migration.
-- Preserve shell-owned behavior such as feature scrolling. Add view-owned scrolling only when the WPF view itself owns a specialized inner scroller.
-- Keep a custom control's styles in its control AXAML or a co-located control-owned style file. Keep view-only styles in the view and shell-only styles in the shell.
-- Put application-wide Material compatibility overrides in focused dictionaries under `Mapping_Tools.Desktop/Resources/Styles`. `App.axaml` composes those dictionaries and global resources; it must not become the owner of unrelated component styles.
-- Record any unavoidable platform substitution in the migration notes. An unapproved difference blocks completion.
-- Verify migrations with a minimal WPF-to-Avalonia source diff, focused behavior tests, and builds of both affected frontends. Do not use the WPF/Avalonia PNG renderer as migration acceptance evidence.
