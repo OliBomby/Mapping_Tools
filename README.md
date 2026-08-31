@@ -3,27 +3,6 @@
 Mapping Tools is a collection of tools which help you create osu! beatmaps more easily!
 [Website](https://mappingtools.github.io/)
 
-The shipped application is the Avalonia desktop frontend. Releases provide
-self-contained Windows x86/x64 ZIPs and Inno Setup installers, plus self-contained
-ZIPs for Linux x64/arm64 and macOS x64/arm64; macOS archives contain a standard
-`Mapping Tools.app` bundle. The
-historical Windows updater assets remain available as `release.zip` and
-`release_x64.zip`; the canonical assets use deterministic OS/architecture
-names such as `mapping-tools-linux-x64.zip`. The installers are Windows-only.
-Development launches should use `Mapping_Tools.Desktop/Mapping_Tools.Desktop.csproj`.
-
-The core beatmap tools, project persistence, file dialogs, editing, audio
-decoding/export, and MIDI file workflows run on all three desktop platforms.
-Linux preview playback requires one of `paplay`, `aplay`, or `ffplay` to be
-installed. osu! live-memory/editor integration, Geometry Dashboard overlays,
-global hotkeys, and automatic BetterSave remain Windows-only because they use
-Win32 and osu! stable process interfaces; those adapters are isolated so they
-do not prevent the portable tools from starting.
-
-The legacy WPF/WinForms frontend has been removed after the Avalonia migration.
-Existing settings, project JSON, maps, backups, exports, and updater handoff
-remain compatible with the shipped application.
-
 <p align="left">
   <img src="https://i.imgur.com/7JqvlNY.png" alt="Mapping Tools logo"/>
   <br/>Logo by <a href="https://osu.ppy.sh/users/1882522">Karoo</a>
