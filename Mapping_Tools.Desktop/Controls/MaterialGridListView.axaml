@@ -156,10 +156,4 @@
     <Style Selector="controls|MaterialGridListView TableViewRow">
         <Setter Property="Theme" Value="{StaticResource MaterialGridListRowTheme}" />
     </Style>
-    <Style
-        Selector="controls|MaterialGridListView /template/ ScrollViewer /template/ :is(ScrollBar):horizontal /template/ Thumb">
-        <Setter Property="Background" Value="{DynamicResource MappingToolsScrollbarThumbBrush}" />
-        <Setter Property="Opacity" Value="1" />
-        <Setter Property="RenderTransform" Value="none" />
-    </Style>
 </Styles>

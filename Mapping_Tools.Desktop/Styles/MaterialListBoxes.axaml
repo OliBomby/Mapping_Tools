@@ -14,13 +14,4 @@
     <Style Selector="ListBox.material-list-view ListBoxItem:pointerover /template/ Border#PART_HoverEffect">
         <Setter Property="Opacity" Value="0.05" />
     </Style>
-    <Style
-        Selector="ListBox.material-list-view /template/ ScrollViewer /template/ :is(ScrollBar):horizontal /template/ Thumb">
-        <Setter Property="Background" Value="{DynamicResource MappingToolsScrollbarThumbBrush}" />
-        <Setter Property="Opacity" Value="1" />
-        <Setter Property="RenderTransform" Value="none" />
-    </Style>
-    <Style Selector="ListBox.material-list-view /template/ ScrollViewer /template/ ScrollBar:horizontal">
-        <Setter Property="AllowAutoHide" Value="False" />
-    </Style>
 </Styles>

@@ -117,18 +117,6 @@
             <Setter Property="Background" Value="{DynamicResource MaterialDividerBrush}" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
-        <Style Selector="ScrollViewer /template/ :is(ScrollBar):vertical">
-            <Setter Property="Width" Value="13" />
-            <Setter Property="MinWidth" Value="13" />
-            <Setter Property="MaxWidth" Value="13" />
-        </Style>
-        <Style Selector="ScrollViewer.navigation-scroll /template/ ScrollBar:vertical /template/ Track#PART_Track">
-            <Setter Property="Width" Value="10" />
-            <Setter Property="RenderTransform" Value="translateX(-3px)" />
-        </Style>
-        <Style Selector="ScrollViewer.navigation-scroll /template/ ScrollBar:vertical /template/ Thumb#PART_Thumb">
-            <Setter Property="Width" Value="10" />
-        </Style>
         <Style Selector="TextBox#ToolSearchBox /template/ Panel#PART_TextFieldPanel">
             <Setter Property="MinHeight" Value="35" />
         </Style>
