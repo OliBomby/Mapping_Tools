@@ -39,9 +39,19 @@
                            TextWrapping="Wrap" />
             </StackPanel>
         </ScrollViewer>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">
-            <Button Content="CANCEL" Command="{Binding CancelCommand}" IsCancel="True" />
-            <Button Content="ACCEPT" Command="{Binding AcceptCommand}" IsDefault="True" />
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0,16,0,0">
+            <Button Classes="dialog-action"
+                    Content="CANCEL"
+                    Command="{Binding CancelCommand}"
+                    MinWidth="88"
+                    MinHeight="36"
+                    IsCancel="True" />
+            <Button Classes="dialog-action"
+                    Content="ACCEPT"
+                    Command="{Binding AcceptCommand}"
+                    MinWidth="88"
+                    MinHeight="36"
+                    IsDefault="True" />
         </StackPanel>
     </Grid>
 </UserControl>

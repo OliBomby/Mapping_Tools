@@ -11,9 +11,17 @@
         CanResize="True" WindowStartupLocation="CenterOwner" WindowDecorations="None"
         Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}">
     <Grid RowDefinitions="35,*,Auto">
-        <Grid Grid.Row="0">
-            <TextBlock Text="Savestates" Margin="12,0" VerticalAlignment="Center" FontSize="18" FontWeight="Bold"
-                       IsHitTestVisible="False" />
+        <Grid Grid.Row="0" Background="{DynamicResource MaterialCardBackgroundBrush}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" IsHitTestVisible="False">
+                <Border Width="24" Height="24" Margin="9,5,0,0"
+                        Background="{DynamicResource MaterialBodyBrush}">
+                    <Border.OpacityMask>
+                        <ImageBrush Source="/Assets/mt_logo_white_24.png" Stretch="Uniform" />
+                    </Border.OpacityMask>
+                </Border>
+                <TextBlock Text="Savestates" Margin="8,0,0,0" VerticalAlignment="Center"
+                           FontWeight="Normal" />
+            </StackPanel>
             <Border Margin="0,0,47,0" Background="Transparent"
                     PointerPressed="DragWindow" DoubleTapped="ToggleMaximizeWindow" />
             <Button Width="47" Height="35" Padding="0" HorizontalAlignment="Right" Background="Transparent"

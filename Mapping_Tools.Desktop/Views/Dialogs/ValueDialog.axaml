@@ -28,19 +28,23 @@
                  FontWeight="Medium"
                  Text="{Binding ValueText, Mode=TwoWay}"
                  materialAssists:TextFieldAssist.Label="{Binding Prompt}" />
-        <StackPanel Grid.Row="1"
+            <StackPanel Grid.Row="1"
                     Margin="16,16,16,16"
-                    HorizontalAlignment="Left"
+                    HorizontalAlignment="Center"
                     Orientation="Horizontal"
                     Spacing="8">
             <Button Classes="dialog-action"
                     Content="{Binding AcceptLabel}"
                     Command="{Binding AcceptCommand}"
                     IsEnabled="{Binding IsValid}"
+                    MinWidth="88"
+                    MinHeight="36"
                     IsDefault="True" />
             <Button Classes="dialog-action"
                     Content="{Binding CancelLabel}"
                     Command="{Binding CancelCommand}"
+                    MinWidth="88"
+                    MinHeight="36"
                     IsCancel="True" />
         </StackPanel>
     </Grid>

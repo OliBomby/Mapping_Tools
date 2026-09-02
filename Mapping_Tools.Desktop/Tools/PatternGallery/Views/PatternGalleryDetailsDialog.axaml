@@ -26,11 +26,20 @@
         </ScrollViewer>
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
-                    HorizontalAlignment="Right"
+                    HorizontalAlignment="Center"
                     Spacing="8"
                     Margin="0,16,0,0">
-            <Button Content="Cancel" Command="{Binding CancelCommand}" />
-            <Button Content="OK" Command="{Binding AcceptCommand}" IsDefault="True" />
+            <Button Classes="dialog-action"
+                    Content="Cancel"
+                    Command="{Binding CancelCommand}"
+                    MinWidth="88"
+                    MinHeight="36" />
+            <Button Classes="dialog-action"
+                    Content="OK"
+                    Command="{Binding AcceptCommand}"
+                    MinWidth="88"
+                    MinHeight="36"
+                    IsDefault="True" />
         </StackPanel>
     </Grid>
 </UserControl>

@@ -14,7 +14,17 @@
         Background="{DynamicResource MaterialPaperBrush}"
         Foreground="{DynamicResource MaterialBodyBrush}">
     <Grid RowDefinitions="35,*">
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0" Background="{DynamicResource MaterialCardBackgroundBrush}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" IsHitTestVisible="False">
+                <Border Width="24" Height="24" Margin="9,5,0,0"
+                        Background="{DynamicResource MaterialBodyBrush}">
+                    <Border.OpacityMask>
+                    <ImageBrush Source="/Assets/mt_logo_white_24.png" Stretch="Uniform" />
+                    </Border.OpacityMask>
+                </Border>
+                <TextBlock Text="Rhythm Guide" Margin="8,0,0,0" VerticalAlignment="Center"
+                           FontWeight="Normal" />
+            </StackPanel>
             <Border Margin="0,0,47,0"
                     Background="Transparent"
                     PointerPressed="DragWindow"

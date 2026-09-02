@@ -2,6 +2,7 @@
         xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
         xmlns:viewModels="clr-namespace:Mapping_Tools.Desktop.ViewModels"
         x:DataType="viewModels:UpdaterViewModel"
@@ -11,13 +12,44 @@
         CanResize="True"
         ShowInTaskbar="True"
         WindowStartupLocation="CenterOwner"
+        WindowDecorations="None"
         Icon="/Assets/mt_icon.ico"
         Background="{DynamicResource MaterialPaperBrush}"
         Foreground="{DynamicResource MaterialBodyBrush}"
         FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
         FontSize="14"
         FontWeight="Medium">
-    <Grid Margin="30,10,30,30">
+    <Grid RowDefinitions="35,*">
+        <Grid Grid.Row="0" Background="{DynamicResource MaterialCardBackgroundBrush}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" IsHitTestVisible="False">
+                <Border Width="24" Height="24" Margin="9,5,0,0"
+                        Background="{DynamicResource MaterialBodyBrush}">
+                    <Border.OpacityMask>
+                        <ImageBrush Source="/Assets/mt_logo_white_24.png" Stretch="Uniform" />
+                    </Border.OpacityMask>
+                </Border>
+                <TextBlock Text="Mapping Tools - Updater" Margin="8,0,0,0" VerticalAlignment="Center"
+                           FontWeight="Normal" />
+            </StackPanel>
+            <Border Margin="0,0,145,0" Background="Transparent"
+                    PointerPressed="DragWindow" DoubleTapped="ToggleMaximizeWindow" />
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button Width="49" Height="35" Padding="0" Background="Transparent"
+                        BorderThickness="0" Click="MinimizeWindow" ToolTip.Tip="Minimize">
+                    <materialIcons:MaterialIcon Kind="WindowMinimize" Width="16" Height="16" />
+                </Button>
+                <Button Width="47" Height="35" Padding="0" Background="Transparent"
+                        BorderThickness="0" Click="ToggleMaximizeWindow" ToolTip.Tip="Maximize or restore">
+                    <materialIcons:MaterialIcon Kind="WindowMaximize" Width="16" Height="16" />
+                </Button>
+                <Button Width="49" Height="35" Padding="0" Background="Transparent"
+                        BorderThickness="0" Click="CloseWindow" ToolTip.Tip="Close">
+                    <materialIcons:MaterialIcon Kind="WindowClose" Width="16" Height="16" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="30,10,30,30">
         <Grid IsVisible="{Binding IsReadyPanelVisible}"
               RowDefinitions="Auto,*,Auto"
               ColumnDefinitions="*,200">
@@ -95,6 +127,7 @@
                              Maximum="1"
                              Value="{Binding DownloadProgress}" />
             </Grid>
+        </Grid>
         </Grid>
     </Grid>
 </Window>

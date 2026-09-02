@@ -21,17 +21,21 @@
                                    Margin="54,36,12,24" />
             <StackPanel Grid.Row="1"
                         Orientation="Horizontal"
-                        HorizontalAlignment="Right"
+                        HorizontalAlignment="Center"
                         Spacing="8"
                         Margin="0,12,0,0">
-                <Button Content="OK"
+                <Button Classes="dialog-action"
+                        Content="OK"
                         Command="{Binding AcceptCommand}"
                         IsDefault="True"
-                        MinWidth="72" />
-                <Button Content="CANCEL"
+                        MinWidth="88"
+                        MinHeight="36" />
+                <Button Classes="dialog-action"
+                        Content="CANCEL"
                         Command="{Binding CancelCommand}"
                         IsCancel="True"
-                        MinWidth="72" />
+                        MinWidth="88"
+                        MinHeight="36" />
             </StackPanel>
         </Grid>
     </dialogHost:DialogHost>

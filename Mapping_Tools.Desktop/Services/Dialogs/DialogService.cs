@@ -1,4 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using Mapping_Tools.Desktop.Utilities;
 using Mapping_Tools.Desktop.ViewModels.Dialogs;
@@ -7,12 +10,13 @@ using Mapping_Tools.Desktop.Views.Dialogs;
 namespace Mapping_Tools.Desktop.Services.Dialogs;
 
 /// <summary>
-///     Presents application dialog contracts in the shell's Material-styled DialogHost.
+///     Presents application dialog contracts as owner-modal Avalonia windows and
+///     shell-hosted Material dialogs.
 /// </summary>
 public sealed class DialogService : IDialogService
 {
     /// <summary>
-    ///     Creates a service that uses the shell's root DialogHost.
+    ///     Creates a service that presents dialogs through the desktop application lifetime.
     /// </summary>
     public DialogService()
     {
@@ -48,9 +52,7 @@ public sealed class DialogService : IDialogService
                 choice.Label,
                 choice.IsDefault,
                 choice.IsCancel,
-                () => DialogHostInteraction.Close(
-                    DialogHostInteraction.RootIdentifier,
-                    new ResultBox<TResult>(choice.Result))))
+                () => dialog.Close(new ResultBox<TResult>(choice.Result))))
             .ToList();
         dialog.DataContext = new MessageDialogViewModel(
             request.Title,
@@ -58,10 +60,16 @@ public sealed class DialogService : IDialogService
             request.Details,
             choices);
 
-        object? result = await DialogHostInteraction.ShowAsync(
-            dialog,
-            DialogHostInteraction.RootIdentifier,
-            cancellationToken);
+        Task<object?> dialogTask = dialog.ShowDialog<object?>(GetOwnerWindow());
+        using CancellationTokenRegistration registration = cancellationToken.Register(
+            () => Dispatcher.UIThread.Post(
+                () =>
+                {
+                    if (dialog.IsVisible) dialog.Close();
+                }));
+
+        object? result = await dialogTask;
+        cancellationToken.ThrowIfCancellationRequested();
         return result is ResultBox<TResult> box
             ? box.Value
             : request.DismissResult;
@@ -132,6 +140,18 @@ public sealed class DialogService : IDialogService
         if (Dispatcher.UIThread.CheckAccess()) return await action();
 
         return await Dispatcher.UIThread.InvokeAsync(action);
+    }
+
+    private static Window GetOwnerWindow()
+    {
+        if (global::Avalonia.Application.Current?.ApplicationLifetime
+                is IClassicDesktopStyleApplicationLifetime
+                {
+                    MainWindow: Window mainWindow,
+                }) return mainWindow;
+
+        throw new InvalidOperationException(
+            "A desktop main window is required to show an owner-modal message dialog.");
     }
 
     private sealed record ResultBox<T>(T Value);

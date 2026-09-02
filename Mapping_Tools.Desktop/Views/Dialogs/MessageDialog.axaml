@@ -1,57 +1,102 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="using:Avalonia.Data.Converters"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:vm="using:Mapping_Tools.Desktop.ViewModels.Dialogs"
         x:Class="Mapping_Tools.Desktop.Views.Dialogs.MessageDialog"
         x:DataType="vm:MessageDialogViewModel"
+        Title="{Binding Title}"
         Width="460"
         MinWidth="360"
         MaxWidth="720"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center">
-    <UserControl.Styles>
+        SizeToContent="Height"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        WindowDecorations="None"
+        ShowInTaskbar="False"
+        Background="{DynamicResource MaterialPaperBrush}"
+        Foreground="{DynamicResource MaterialBodyBrush}"
+        FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
+        FontSize="14"
+        FontWeight="Medium">
+    <Window.Styles>
         <Style Selector="Button.dialog-action">
-            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="MinWidth" Value="88" />
+            <Setter Property="MinHeight" Value="36" />
+            <Setter Property="Padding" Value="12,6" />
         </Style>
-        <Style Selector="TextBlock">
-            <Setter Property="FontWeight" Value="Medium" />
+        <Style Selector="SelectableTextBlock">
+            <Setter Property="FontWeight" Value="Normal" />
         </Style>
-    </UserControl.Styles>
-    <Grid Width="363"
-          MaxWidth="363"
-          Margin="0"
-          HorizontalAlignment="Left"
-          VerticalAlignment="Top"
-          RowDefinitions="Auto,Auto">
-        <ScrollViewer MaxHeight="520"
+    </Window.Styles>
+    <Grid RowDefinitions="35,*,Auto">
+        <Grid Grid.Row="0"
+              Background="{DynamicResource MaterialCardBackgroundBrush}">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Left"
+                        IsHitTestVisible="False">
+                <Border Width="24"
+                        Height="24"
+                        Margin="9,5,0,0"
+                        Background="{DynamicResource MaterialBodyBrush}">
+                    <Border.OpacityMask>
+                        <ImageBrush Source="/Assets/mt_logo_white_24.png"
+                                    Stretch="Uniform" />
+                    </Border.OpacityMask>
+                </Border>
+                <TextBlock Text="{Binding Title}"
+                           Margin="8,0,0,0"
+                           VerticalAlignment="Center"
+                           FontWeight="Normal"
+                           IsVisible="{Binding Title, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+            <Border Margin="0,0,47,0"
+                    Background="Transparent"
+                    PointerPressed="DragWindow"
+                    DoubleTapped="ToggleMaximizeWindow" />
+            <Button Width="47"
+                    Height="35"
+                    Padding="0"
+                    HorizontalAlignment="Right"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="CloseWindow"
+                    ToolTip.Tip="Close dialog.">
+                <materialIcons:MaterialIcon Kind="WindowClose"
+                                            Width="22"
+                                            Height="22" />
+            </Button>
+        </Grid>
+        <ScrollViewer Grid.Row="1"
+                      MaxHeight="520"
                       Padding="0"
                       HorizontalScrollBarVisibility="Disabled"
                       VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="16" Spacing="12">
-                <TextBlock Text="{Binding Message}"
-                           MaxWidth="315"
-                           FontSize="18"
+                <SelectableTextBlock Text="{Binding Message}"
+                           FontSize="14"
                            TextWrapping="Wrap" />
                 <Expander Header="Show Error Details"
                           IsVisible="{Binding HasDetails}">
-                    <TextBlock Text="{Binding Details}"
+                    <SelectableTextBlock Text="{Binding Details}"
                                Opacity="0.75"
                                TextWrapping="Wrap" />
                 </Expander>
             </StackPanel>
         </ScrollViewer>
-        <ItemsControl Grid.Row="1"
+        <ItemsControl x:Name="ActionPanel"
+                      Grid.Row="2"
                       Margin="16,0,16,16"
-                      HorizontalAlignment="Left"
+                      HorizontalAlignment="Right"
                       ItemsSource="{Binding Choices}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" />
+                    <StackPanel Orientation="Horizontal" Spacing="8" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="vm:DialogChoiceViewModel">
                     <Button Classes="dialog-action"
-                            Margin="0,0,8,0"
                             Content="{Binding Label}"
                             Command="{Binding Command}"
                             IsDefault="{Binding IsDefault}"
@@ -60,4 +105,4 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
     </Grid>
-</UserControl>
+</Window>
