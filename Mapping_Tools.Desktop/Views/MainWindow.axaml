@@ -44,17 +44,24 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <Border Background="{TemplateBinding Background}">
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          HorizontalContentAlignment="Center"
-                                          VerticalContentAlignment="Center" />
+                        <Panel>
+                            <Border x:Name="PART_ChromeButtonHighlighter"
+                                    Background="{DynamicResource MaterialBodyBrush}" />
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              HorizontalContentAlignment="Center"
+                                              VerticalContentAlignment="Center" />
+                        </Panel>
                     </Border>
                 </ControlTemplate>
             </Setter>
-            <Style Selector="^:pointerover">
-                <Setter Property="Background" Value="{DynamicResource MappingToolsChromeHoverBrush}" />
+            <Style Selector="^ /template/ Border#PART_ChromeButtonHighlighter">
+                <Setter Property="Opacity" Value="0" />
             </Style>
-            <Style Selector="^:pressed">
-                <Setter Property="Background" Value="{DynamicResource MappingToolsChromePressedBrush}" />
+            <Style Selector="^:pointerover /template/ Border#PART_ChromeButtonHighlighter">
+                <Setter Property="Opacity" Value="0.13" />
+            </Style>
+            <Style Selector="^:pressed /template/ Border#PART_ChromeButtonHighlighter">
+                <Setter Property="Opacity" Value="0.13" />
             </Style>
         </ControlTheme>
         <ControlTheme x:Key="ChromeToggleButtonTheme"
@@ -68,17 +75,24 @@
             <Setter Property="Template">
                 <ControlTemplate>
                     <Border Background="{TemplateBinding Background}">
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          HorizontalContentAlignment="Center"
-                                          VerticalContentAlignment="Center" />
+                        <Panel>
+                            <Border x:Name="PART_ChromeButtonHighlighter"
+                                    Background="{DynamicResource MaterialBodyBrush}" />
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              HorizontalContentAlignment="Center"
+                                              VerticalContentAlignment="Center" />
+                        </Panel>
                     </Border>
                 </ControlTemplate>
             </Setter>
-            <Style Selector="^:pointerover">
-                <Setter Property="Background" Value="{DynamicResource MappingToolsChromeHoverBrush}" />
+            <Style Selector="^ /template/ Border#PART_ChromeButtonHighlighter">
+                <Setter Property="Opacity" Value="0" />
             </Style>
-            <Style Selector="^:pressed">
-                <Setter Property="Background" Value="{DynamicResource MappingToolsChromePressedBrush}" />
+            <Style Selector="^:pointerover /template/ Border#PART_ChromeButtonHighlighter">
+                <Setter Property="Opacity" Value="0.13" />
+            </Style>
+            <Style Selector="^:pressed /template/ Border#PART_ChromeButtonHighlighter">
+                <Setter Property="Opacity" Value="0.13" />
             </Style>
         </ControlTheme>
     </Window.Resources>
