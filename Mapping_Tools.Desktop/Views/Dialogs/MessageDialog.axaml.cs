@@ -38,15 +38,6 @@ public partial class MessageDialog : Window
             : WindowState.Maximized;
     }
 
-    private void ResizeWindow(object? sender, PointerPressedEventArgs eventArgs)
-    {
-        if (sender is not Control { Tag: string edge }
-            || !Enum.TryParse(edge, out WindowEdge windowEdge)
-            || !eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
-
-        BeginResizeDrag(windowEdge, eventArgs);
-    }
-
     private void UpdateActionAlignment()
     {
         ActionPanel.HorizontalAlignment = DataContext is MessageDialogViewModel { Choices.Count: 2 }

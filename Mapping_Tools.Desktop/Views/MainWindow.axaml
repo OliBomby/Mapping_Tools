@@ -491,10 +491,6 @@
                 </Grid>
             </SplitView>
         </Grid>
-        <Border x:Name="WindowBorder"
-                BorderBrush="{DynamicResource MaterialPrimaryDarkBrush}"
-                BorderThickness="1"
-                IsHitTestVisible="False" />
         </Grid>
         </materialControls:SnackbarHost>
     </dialogHost:DialogHost>

@@ -241,7 +241,6 @@ public partial class MainWindow : Window
     {
         bool maximized = WindowState == WindowState.Maximized;
         RootGrid.Margin = maximized ? new Thickness(7) : new Thickness(0);
-        WindowBorder.BorderThickness = maximized ? new Thickness(0) : new Thickness(1);
         MaximizeIcon.Kind = maximized ? MaterialIconKind.WindowRestore : MaterialIconKind.WindowMaximize;
     }
 

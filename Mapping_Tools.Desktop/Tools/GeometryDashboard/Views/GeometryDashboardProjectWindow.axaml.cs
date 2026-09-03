@@ -36,8 +36,4 @@ public sealed partial class GeometryDashboardProjectWindow : Window
         WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
     }
 
-    private void ResizeWindow(object? sender, PointerPressedEventArgs eventArgs)
-    {
-        GeometryDashboardWindowChrome.Resize(this, sender, eventArgs);
-    }
 }

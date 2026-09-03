@@ -37,10 +37,4 @@ public sealed partial class UpdaterWindow : Window
             : WindowState.Maximized;
     }
 
-    private void ResizeWindow(object? sender, PointerPressedEventArgs eventArgs)
-    {
-        if (sender is Control { Tag: string edge } && Enum.TryParse(edge, out WindowEdge windowEdge)
-            && eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-            BeginResizeDrag(windowEdge, eventArgs);
-    }
 }
