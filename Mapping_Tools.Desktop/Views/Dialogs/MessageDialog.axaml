@@ -22,24 +22,19 @@
         FontSize="14"
         FontWeight="Medium">
     <Window.Styles>
-        <Style Selector="Button.dialog-action">
-            <Setter Property="MinWidth" Value="88" />
-            <Setter Property="MinHeight" Value="36" />
-            <Setter Property="Padding" Value="12,6" />
-        </Style>
         <Style Selector="SelectableTextBlock">
             <Setter Property="FontWeight" Value="Normal" />
         </Style>
     </Window.Styles>
     <Grid RowDefinitions="35,*,Auto">
-        <Grid Grid.Row="0"
-              Background="{DynamicResource MaterialCardBackgroundBrush}">
+        <Grid Grid.Row="0">
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Left"
                         IsHitTestVisible="False">
                 <Border Width="24"
                         Height="24"
-                        Margin="9,5,0,0"
+                        Margin="6,0,0,0"
+                        VerticalAlignment="Center"
                         Background="{DynamicResource MaterialBodyBrush}">
                     <Border.OpacityMask>
                         <ImageBrush Source="/Assets/mt_logo_white_24.png"
@@ -60,8 +55,7 @@
                     Height="35"
                     Padding="0"
                     HorizontalAlignment="Right"
-                    Background="Transparent"
-                    BorderThickness="0"
+                    Theme="{StaticResource MaterialFlatButton}"
                     Click="CloseWindow"
                     ToolTip.Tip="Close dialog.">
                 <materialIcons:MaterialIcon Kind="WindowClose"
@@ -98,7 +92,8 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="vm:DialogChoiceViewModel">
-                    <Button Classes="dialog-action"
+                    <Button Classes="dialog-action primary"
+                            Theme="{StaticResource MaterialFlatButton}"
                             Content="{Binding Label}"
                             Command="{Binding Command}"
                             IsDefault="{Binding IsDefault}"

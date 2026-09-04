@@ -6,7 +6,7 @@
         Width="440"
         HorizontalAlignment="Center"
         VerticalAlignment="Center">
-    <Grid RowDefinitions="*,Auto" Margin="24">
+    <Grid RowDefinitions="*,Auto" Margin="12">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Spacing="8">
                 <TextBox Text="{Binding Name, Mode=TwoWay}"
@@ -27,19 +27,20 @@
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center"
-                    Spacing="8"
-                    Margin="0,16,0,0">
-            <Button Classes="dialog-action"
-                    Content="Cancel"
-                    Command="{Binding CancelCommand}"
-                    MinWidth="88"
-                    MinHeight="36" />
-            <Button Classes="dialog-action"
-                    Content="OK"
+                    Spacing="8">
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="ACCEPT"
                     Command="{Binding AcceptCommand}"
                     MinWidth="88"
                     MinHeight="36"
                     IsDefault="True" />
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="CANCEL"
+                    Command="{Binding CancelCommand}"
+                    MinWidth="88"
+                    MinHeight="36" />
         </StackPanel>
     </Grid>
 </UserControl>

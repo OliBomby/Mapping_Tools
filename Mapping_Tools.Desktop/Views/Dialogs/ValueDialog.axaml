@@ -4,47 +4,40 @@
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         x:Class="Mapping_Tools.Desktop.Views.Dialogs.ValueDialog"
         x:DataType="vm:ValueDialogViewModel"
-        Width="440"
-        MinWidth="360"
         HorizontalAlignment="Center"
         VerticalAlignment="Center">
     <UserControl.Styles>
-        <Style Selector="Button.dialog-action">
-            <Setter Property="Padding" Value="16,6" />
-        </Style>
         <Style Selector="TextBlock">
             <Setter Property="FontWeight" Value="Medium" />
         </Style>
     </UserControl.Styles>
-    <Grid Width="363"
+    <Grid
           MaxWidth="363"
           Margin="0"
           HorizontalAlignment="Left"
           VerticalAlignment="Top"
           RowDefinitions="Auto,Auto">
         <TextBox x:Name="ValueTextBox"
-                 Margin="16,16,16,0"
+                 Margin="12"
                  FontSize="18"
                  FontWeight="Medium"
                  Text="{Binding ValueText, Mode=TwoWay}"
                  materialAssists:TextFieldAssist.Label="{Binding Prompt}" />
             <StackPanel Grid.Row="1"
-                    Margin="16,16,16,16"
                     HorizontalAlignment="Center"
                     Orientation="Horizontal"
-                    Spacing="8">
-            <Button Classes="dialog-action"
+                    Margin="2"
+                    Spacing="16">
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
                     Content="{Binding AcceptLabel}"
                     Command="{Binding AcceptCommand}"
                     IsEnabled="{Binding IsValid}"
-                    MinWidth="88"
-                    MinHeight="36"
                     IsDefault="True" />
-            <Button Classes="dialog-action"
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
                     Content="{Binding CancelLabel}"
                     Command="{Binding CancelCommand}"
-                    MinWidth="88"
-                    MinHeight="36"
                     IsCancel="True" />
         </StackPanel>
     </Grid>

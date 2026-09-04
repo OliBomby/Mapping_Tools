@@ -15,25 +15,27 @@
     <dialogHost:DialogHost Identifier="GraphDialog"
                            CloseOnClickAway="True"
                            OverlayBackground="{DynamicResource MappingToolsDialogOverlayBrush}">
-        <Grid RowDefinitions="*,Auto" Margin="12">
+        <Grid RowDefinitions="*,Auto" Margin="10">
             <graph:GraphControl x:Name="GraphControlElement"
                                    GraphState="{Binding GraphState, Mode=TwoWay}"
-                                   Margin="54,36,12,24" />
+                                   Margin="32,24,12,30" />
             <StackPanel Grid.Row="1"
                         Orientation="Horizontal"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="Right"
                         Spacing="8"
                         Margin="0,12,0,0">
-                <Button Classes="dialog-action"
-                        Content="OK"
-                        Command="{Binding AcceptCommand}"
-                        IsDefault="True"
-                        MinWidth="88"
-                        MinHeight="36" />
-                <Button Classes="dialog-action"
+                <Button Classes="dialog-action primary"
+                        Theme="{StaticResource MaterialFlatButton}"
                         Content="CANCEL"
                         Command="{Binding CancelCommand}"
                         IsCancel="True"
+                        MinWidth="88"
+                        MinHeight="36" />
+                <Button Classes="dialog-action primary"
+                        Theme="{StaticResource MaterialFlatButton}"
+                        Content="OK"
+                        Command="{Binding AcceptCommand}"
+                        IsDefault="True"
                         MinWidth="88"
                         MinHeight="36" />
             </StackPanel>

@@ -25,8 +25,8 @@ public sealed class ValueDialogRequest<TValue>
         TValue initialValue,
         IValueConverter converter,
         IReadOnlyList<ValidationAttribute>? validators = null,
-        string acceptLabel = "OK",
-        string cancelLabel = "Cancel")
+        string acceptLabel = "ACCEPT",
+        string cancelLabel = "CANCEL")
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentException.ThrowIfNullOrWhiteSpace(prompt);

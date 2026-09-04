@@ -69,18 +69,18 @@
             </StackPanel>
         </ScrollViewer>
         <TextBlock Grid.Row="2" Foreground="OrangeRed" Text="{Binding Error}" TextWrapping="Wrap" />
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
-            <Button Classes="dialog-action"
-                    Content="Cancel"
-                    Command="{Binding CancelCommand}"
-                    MinWidth="88"
-                    MinHeight="36" />
-            <Button Classes="dialog-action"
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+            <Button Classes="dialog-action dark"
                     Content="Accept"
                     Command="{Binding AcceptCommand}"
                     MinWidth="88"
                     MinHeight="36"
                     IsDefault="True" />
+            <Button Classes="dialog-action dark"
+                    Content="Cancel"
+                    Command="{Binding CancelCommand}"
+                    MinWidth="88"
+                    MinHeight="36" />
         </StackPanel>
     </Grid>
 </UserControl>

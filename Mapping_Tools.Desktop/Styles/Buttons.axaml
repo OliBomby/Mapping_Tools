@@ -39,29 +39,8 @@
         <Setter Property="RenderTransform" Value="translateY(4px)" />
     </Style>
     <Style Selector="Button.dialog-action">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
-        <Setter Property="MinWidth" Value="0" />
-        <Setter Property="FontWeight" Value="Medium" />
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Border x:Name="PART_DialogActionBorder"
-                        Padding="{TemplateBinding Padding}"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="Transparent"
-                        BorderThickness="1"
-                        CornerRadius="2">
-                    <ContentPresenter Content="{TemplateBinding Content}"
-                                      HorizontalContentAlignment="Center"
-                                      VerticalContentAlignment="Center" />
-                </Border>
-            </ControlTemplate>
-        </Setter>
-        <Style Selector="^:pointerover /template/ Border#PART_DialogActionBorder">
-            <Setter Property="Background" Value="{DynamicResource MaterialFlatButtonClickBrush}" />
-        </Style>
-        <Style Selector="^:focus /template/ Border#PART_DialogActionBorder">
-            <Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
-        </Style>
+        <Setter Property="MinWidth" Value="88" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="Padding" Value="12,6" />
     </Style>
 </Styles>

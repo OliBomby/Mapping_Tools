@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <converters:HitsoundStudioSampleFormatDisplayConverter x:Key="HitsoundStudioSampleFormatDisplayConverter" />
     </UserControl.Resources>
-    <Grid Margin="24" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="12">
+    <Grid Margin="12" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="12">
         <TextBlock FontSize="24" FontWeight="Bold" Text="Export Hitsound Studio" />
         <ScrollViewer Grid.Row="1">
             <StackPanel Spacing="10">
@@ -81,18 +81,20 @@
             </StackPanel>
         </ScrollViewer>
         <TextBlock Grid.Row="2" Foreground="OrangeRed" Text="{Binding Error}" />
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
-            <Button Classes="dialog-action"
-                    Content="Cancel"
-                    Command="{Binding CancelCommand}"
-                    MinWidth="88"
-                    MinHeight="36" />
-            <Button Classes="dialog-action"
-                    Content="Accept"
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="ACCEPT"
                     Command="{Binding AcceptCommand}"
                     MinWidth="88"
                     MinHeight="36"
                     IsDefault="True" />
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="CANCEL"
+                    Command="{Binding CancelCommand}"
+                    MinWidth="88"
+                    MinHeight="36" />
         </StackPanel>
     </Grid>
 </UserControl>

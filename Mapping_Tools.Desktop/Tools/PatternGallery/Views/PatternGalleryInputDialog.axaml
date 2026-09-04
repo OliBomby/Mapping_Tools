@@ -7,7 +7,7 @@
         Width="620" Height="560"
         HorizontalAlignment="Center"
         VerticalAlignment="Center">
-    <Grid Margin="20" RowDefinitions="*,Auto">
+    <Grid Margin="12" RowDefinitions="*,Auto">
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
             <StackPanel Spacing="10">
                 <TextBox materialAssists:TextFieldAssist.Label="Name"
@@ -39,19 +39,21 @@
                            TextWrapping="Wrap" />
             </StackPanel>
         </ScrollViewer>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0,16,0,0">
-            <Button Classes="dialog-action"
-                    Content="CANCEL"
-                    Command="{Binding CancelCommand}"
-                    MinWidth="88"
-                    MinHeight="36"
-                    IsCancel="True" />
-            <Button Classes="dialog-action"
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
                     Content="ACCEPT"
                     Command="{Binding AcceptCommand}"
                     MinWidth="88"
                     MinHeight="36"
                     IsDefault="True" />
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="CANCEL"
+                    Command="{Binding CancelCommand}"
+                    MinWidth="88"
+                    MinHeight="36"
+                    IsCancel="True" />
         </StackPanel>
     </Grid>
 </UserControl>
