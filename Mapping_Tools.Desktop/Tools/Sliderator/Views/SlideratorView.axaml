@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.Sliderator.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="using:Material.Icons.Avalonia"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:graph="clr-namespace:Mapping_Tools.Desktop.Controls.Graph"
@@ -94,17 +95,17 @@
                         <TextBlock Grid.Column="0"
                                    Text="{Binding LoadedHitObjects.Count, StringFormat='Loaded {0} slider(s)'}" />
                         <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
-                            <Button Margin="0,0,5,0"
+                            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,5,0"
                                     x:Name="MoveLeftButton"
                                     Click="MoveLeft"
                                     ToolTip.Tip="Go to previous slider. Hold Shift for quick run before going to previous slider.">
                                 <materialIcons:MaterialIcon Kind="KeyboardArrowLeft" Width="24" Height="24" />
-                            </Button>
-                            <Button x:Name="MoveRightButton"
+                            </materialDesign:FloatingButton>
+                            <materialDesign:FloatingButton Classes="mini light no-transitions" x:Name="MoveRightButton"
                                     Click="MoveRight"
                                     ToolTip.Tip="Go to next slider. Hold Shift for quick run before going to next slider.">
                                 <materialIcons:MaterialIcon Kind="KeyboardArrowRight" Width="24" Height="24" />
-                            </Button>
+                            </materialDesign:FloatingButton>
                         </StackPanel>
                     </Grid>
 
@@ -197,17 +198,17 @@
                              materialAssists:TextFieldAssist.Label="SV limit"
                              ToolTip.Tip="Self-imposed SV limit to help you make sure the slope in the graph doesn't become greater than this speed limit. For example use 10x SV limit to match the osu! speed limit." />
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Margin="0,0,5,0" Command="{Binding ScaleCompleteCommand}"
+                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,5,0" Command="{Binding ScaleCompleteCommand}"
                                 ToolTip.Tip="Scale graph to completion.">
                             <materialIcons:MaterialIcon Kind="RelativeScale" Width="24" Height="24" />
-                        </Button>
-                        <Button Margin="0,0,5,0" Command="{Binding ClearGraphCommand}" ToolTip.Tip="Reset graph.">
+                        </materialDesign:FloatingButton>
+                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,5,0" Command="{Binding ClearGraphCommand}" ToolTip.Tip="Reset graph.">
                             <materialIcons:MaterialIcon Kind="Rocket" Width="24" Height="24" />
-                        </Button>
-                        <Button Command="{Binding GraphToggleCommand}" ToolTip.Tip="Toggle graph mode.">
+                        </materialDesign:FloatingButton>
+                        <materialDesign:FloatingButton Classes="mini accent no-transitions" Command="{Binding GraphToggleCommand}" ToolTip.Tip="Toggle graph mode.">
                             <TextBlock Text="{Binding GraphModeText}" FontWeight="Bold" Width="24"
                                        HorizontalAlignment="Center" />
-                        </Button>
+                        </materialDesign:FloatingButton>
                     </StackPanel>
                 </Grid>
 

@@ -49,15 +49,14 @@
                                     <TextBox Text="{Binding Path, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                              Classes="compact"
                                              Width="200" />
-                                    <Button
-                                            Classes="flat path-picker"
+                                    <materialDesign:FloatingButton Classes="mini light no-transitions"
                                             Margin="5,0,5,0"
                                             Command="{Binding BrowseCommand}"
                                             ToolTip.Tip="Browse">
                                         <materialIcons:MaterialIcon Kind="Folder"
                                                                     Width="24"
                                                                     Height="24" />
-                                    </Button>
+                                    </materialDesign:FloatingButton>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>

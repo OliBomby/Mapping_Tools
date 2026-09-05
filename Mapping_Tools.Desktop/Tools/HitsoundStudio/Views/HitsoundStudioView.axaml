@@ -3,6 +3,8 @@
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.HitsoundStudio.ViewModels"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:materialIcons="using:Material.Icons.Avalonia"
              x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioView"
              x:DataType="vm:HitsoundStudioViewModel">
     <Grid RowDefinitions="*,Auto">
@@ -206,14 +208,24 @@
                             Margin="0,8,0,0">
                     <Button Content="Preview" Command="{Binding PreviewCommand}"
                             ToolTip.Tip="Preview the selected layer." />
-                    <Button Content="Add" Command="{Binding AddCommand}" ToolTip.Tip="Add or import a hitsound layer." />
-                    <Button Content="Remove" Command="{Binding RemoveCommand}" ToolTip.Tip="Remove selected layers." />
-                    <Button x:Name="RaiseButton" Content="Raise"
+                    <materialDesign:FloatingButton Classes="mini light no-transitions" Command="{Binding AddCommand}"
+                                                   ToolTip.Tip="Add or import a hitsound layer.">
+                        <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
+                    </materialDesign:FloatingButton>
+                    <materialDesign:FloatingButton Classes="mini light no-transitions" Command="{Binding RemoveCommand}"
+                                                   ToolTip.Tip="Remove selected layers.">
+                        <materialIcons:MaterialIcon Kind="TrashCan" Width="24" Height="24" />
+                    </materialDesign:FloatingButton>
+                    <materialDesign:FloatingButton Classes="mini light no-transitions" x:Name="RaiseButton"
                             Click="RaiseLayers"
-                            ToolTip.Tip="Raise selected layers in priority. Hold Shift to move ten positions." />
-                    <Button x:Name="LowerButton" Content="Lower"
+                            ToolTip.Tip="Raise selected layers in priority. Hold Shift to move ten positions.">
+                        <materialIcons:MaterialIcon Kind="KeyboardArrowUp" Width="24" Height="24" />
+                    </materialDesign:FloatingButton>
+                    <materialDesign:FloatingButton Classes="mini light no-transitions" x:Name="LowerButton"
                             Click="LowerLayers"
-                            ToolTip.Tip="Lower selected layers in priority. Hold Shift to move ten positions." />
+                            ToolTip.Tip="Lower selected layers in priority. Hold Shift to move ten positions.">
+                        <materialIcons:MaterialIcon Kind="KeyboardArrowDown" Width="24" Height="24" />
+                    </materialDesign:FloatingButton>
                 </StackPanel>
             </Grid>
             <controls:ToolRunButton Grid.Column="2" Margin="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"

@@ -3,6 +3,7 @@
              xmlns:vm="using:Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels"
              xmlns:adapter="using:Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels.Adapters"
              xmlns:controls="using:Mapping_Tools.Desktop.Controls"
+             xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Name="Root"
              x:Class="Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.Views.HitsoundPreviewHelperView"
@@ -116,31 +117,31 @@
                             HorizontalAlignment="Right"
                             Margin="5,5,0,5"
                             Orientation="Horizontal">
-                    <Button Classes="flat path-picker"
+                    <materialDesign:FloatingButton Classes="mini light no-transitions"
                             Margin="5"
                             Command="{Binding OpenRhythmGuideCommand}"
                             ToolTip.Tip="Generate rhythm guide.">
                         <materialIcons:MaterialIcon Width="24" Height="24" Kind="AlternatingCurrent" />
-                    </Button>
-                    <Button Classes="flat path-picker"
+                    </materialDesign:FloatingButton>
+                    <materialDesign:FloatingButton Classes="mini light no-transitions"
                             x:Name="AddButton"
                             Margin="5"
                             Click="AddButtonClick"
                             ToolTip.Tip="Add a hitsound zone. Hold shift to add current selected coordinates.">
                         <materialIcons:MaterialIcon Width="24" Height="24" Kind="Plus" />
-                    </Button>
-                    <Button Classes="flat path-picker"
+                    </materialDesign:FloatingButton>
+                    <materialDesign:FloatingButton Classes="mini light no-transitions"
                             Margin="5"
                             Command="{Binding CopyCommand}"
                             ToolTip.Tip="Copy selected hitsound zones.">
                         <materialIcons:MaterialIcon Width="24" Height="24" Kind="ContentCopy" />
-                    </Button>
-                    <Button Classes="flat path-picker"
+                    </materialDesign:FloatingButton>
+                    <materialDesign:FloatingButton Classes="mini light no-transitions"
                             Margin="5"
                             Command="{Binding RemoveCommand}"
                             ToolTip.Tip="Remove selected hitsound zones.">
                         <materialIcons:MaterialIcon Width="24" Height="24" Kind="TrashCan" />
-                    </Button>
+                    </materialDesign:FloatingButton>
                 </StackPanel>
             </Grid>
 

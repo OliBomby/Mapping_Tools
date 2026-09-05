@@ -110,23 +110,23 @@
                             </ComboBox>
                         </Grid>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0">
-                            <Button Classes="flat" Command="{Binding AddCodeCommand}"
+                            <materialControls:FloatingButton Classes="mini light no-transitions" Command="{Binding AddCodeCommand}"
                                     ToolTip.Tip="Add a pattern from .osu code.">
                                 <materialIcons:MaterialIcon Kind="CodeBraces" Width="24" Height="24" />
-                            </Button>
-                            <Button Classes="flat" Command="{Binding AddFileCommand}"
+                            </materialControls:FloatingButton>
+                            <materialControls:FloatingButton Classes="mini light no-transitions" Command="{Binding AddFileCommand}"
                                     ToolTip.Tip="Add a pattern from a file.">
                                 <materialIcons:MaterialIcon Kind="FilePlus" Width="24" Height="24" />
-                            </Button>
-                            <Button Classes="flat" Command="{Binding AddSelectedCommand}"
+                            </materialControls:FloatingButton>
+                            <materialControls:FloatingButton Classes="mini light no-transitions" Command="{Binding AddSelectedCommand}"
                                     ToolTip.Tip="Add a pattern from selected hit objects.">
                                 <materialIcons:MaterialIcon Kind="PlusBox" Width="24" Height="24" />
-                            </Button>
-                            <Button Classes="flat" x:Name="RemoveButton"
+                            </materialControls:FloatingButton>
+                            <materialControls:FloatingButton Classes="mini light no-transitions" x:Name="RemoveButton"
                                     Click="RemoveButtonClick"
                                     ToolTip.Tip="Delete selected patterns. Hold shift to skip dialog.">
                                 <materialIcons:MaterialIcon Kind="TrashCan" Width="24" Height="24" />
-                            </Button>
+                            </materialControls:FloatingButton>
                         </StackPanel>
                     </Grid>
                 </Grid>

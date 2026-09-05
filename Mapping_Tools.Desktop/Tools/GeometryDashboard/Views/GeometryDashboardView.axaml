@@ -30,11 +30,11 @@
                                                Click="ToggleInheritableClick">
                     <materialIcons:MaterialIcon Kind="Pizza" Width="22" Height="22" />
                 </materialDesign:FloatingButton>
-                <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
+                <materialDesign:FloatingButton Classes="mini no-transitions" Margin="0,0,8,0"
                                                ToolTip.Tip="Savestates..." Click="ShowProjects">
                     <materialIcons:MaterialIcon Kind="ContentSaveAll" Width="22" Height="22" />
                 </materialDesign:FloatingButton>
-                <materialDesign:FloatingButton Classes="mini light no-transitions" ToolTip.Tip="Preferences..."
+                <materialDesign:FloatingButton Classes="mini no-transitions" ToolTip.Tip="Preferences..."
                                                Click="ShowPreferences">
                     <materialIcons:MaterialIcon Kind="SettingsOutline" Width="22" Height="22" />
                 </materialDesign:FloatingButton>
