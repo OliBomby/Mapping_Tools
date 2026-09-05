@@ -16,21 +16,21 @@ public sealed class PatternThumbnailControl : Control
     private const double maximum_pixel_length = 1e6;
     private const int maximum_anchor_count = 5000;
 
+    private static readonly IBrush circle_inside_brush = Brushes.Green;
+    private static readonly IBrush circle_outside_brush = Brushes.White;
+    private static readonly IBrush slider_inside_brush = Brushes.DarkSlateGray;
+    private static readonly IBrush slider_outside_brush = Brushes.White;
+    private static readonly IBrush combo_text_brush = Brushes.White;
+    private static readonly IBrush spinner_brush = Brushes.White;
+    private static readonly IBrush follow_point_brush = Brushes.White;
+
     /// <summary>Identifies the beatmap represented by the thumbnail.</summary>
     public static readonly StyledProperty<Beatmap?> BeatmapProperty =
         AvaloniaProperty.Register<PatternThumbnailControl, Beatmap?>(nameof(Beatmap));
 
-    /// <summary>Identifies the slider and circle interior brush.</summary>
-    public static readonly StyledProperty<IBrush?> FillProperty =
-        AvaloniaProperty.Register<PatternThumbnailControl, IBrush?>(nameof(Fill));
-
-    /// <summary>Identifies the object outline and spinner brush.</summary>
-    public static readonly StyledProperty<IBrush?> StrokeProperty =
-        AvaloniaProperty.Register<PatternThumbnailControl, IBrush?>(nameof(Stroke));
-
     static PatternThumbnailControl()
     {
-        AffectsRender<PatternThumbnailControl>(BeatmapProperty, FillProperty, StrokeProperty);
+        AffectsRender<PatternThumbnailControl>(BeatmapProperty);
     }
 
     /// <summary>Creates a clipped custom-drawn pattern thumbnail.</summary>
@@ -46,24 +46,12 @@ public sealed class PatternThumbnailControl : Control
         set => SetValue(BeatmapProperty, value);
     }
 
-    /// <summary>Gets or sets the slider and circle interior brush.</summary>
-    public IBrush? Fill
-    {
-        get => GetValue(FillProperty);
-        set => SetValue(FillProperty, value);
-    }
-
-    /// <summary>Gets or sets the object outline and spinner brush.</summary>
-    public IBrush? Stroke
-    {
-        get => GetValue(StrokeProperty);
-        set => SetValue(StrokeProperty, value);
-    }
-
     /// <inheritdoc />
     public override void Render(DrawingContext context)
     {
         base.Render(context);
+
+        context.DrawRectangle(Brushes.Black, null, new Rect(Bounds.Size));
         if (Beatmap is null || Bounds.Width <= 0 || Bounds.Height <= 0) return;
 
         double scale = Math.Min(
@@ -145,11 +133,11 @@ public sealed class PatternThumbnailControl : Control
                 using (context.PushTransform(GetThumbnailTransform(scale, offsetX, offsetY)))
                 {
                     context.DrawGeometry(null,
-                        new Pen(Stroke ?? Brushes.White, radius * 1.95,
+                        new Pen(slider_outside_brush, radius * 1.95,
                             lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round),
                         pathGeometry);
                     context.DrawGeometry(null,
-                        new Pen(Fill ?? Brushes.DarkSlateGray, radius * 1.65,
+                        new Pen(slider_inside_brush, radius * 1.65,
                             lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round),
                         pathGeometry);
                 }
@@ -179,8 +167,8 @@ public sealed class PatternThumbnailControl : Control
         double offsetY)
     {
         var point = ToPoint(position, scale, offsetX, offsetY);
-        context.DrawEllipse(Stroke ?? Brushes.White, null, point, radius * scale, radius * scale);
-        context.DrawEllipse(Fill ?? Brushes.Green, null, point, radius * 0.846 * scale, radius * 0.846 * scale);
+        context.DrawEllipse(circle_outside_brush, null, point, radius * scale, radius * scale);
+        context.DrawEllipse(circle_inside_brush, null, point, radius * 0.846 * scale, radius * 0.846 * scale);
     }
 
     private void DrawRing(
@@ -192,7 +180,7 @@ public sealed class PatternThumbnailControl : Control
         double offsetX,
         double offsetY)
     {
-        context.DrawEllipse(null, new Pen(Stroke ?? Brushes.White, thickness * scale),
+        context.DrawEllipse(null, new Pen(spinner_brush, thickness * scale),
             ToPoint(position, scale, offsetX, offsetY), radius * scale, radius * scale);
     }
 
@@ -210,7 +198,7 @@ public sealed class PatternThumbnailControl : Control
             FlowDirection.LeftToRight,
             new Typeface("Arial"),
             radius * 0.6 * scale,
-            Brushes.White);
+            combo_text_brush);
         var center = ToPoint(hitObject.StackedPos, scale, offsetX, offsetY);
         context.DrawText(text, new Point(center.X - text.Width / 2, center.Y - text.Height / 2));
     }
@@ -244,7 +232,7 @@ public sealed class PatternThumbnailControl : Control
         double offsetX,
         double offsetY)
     {
-        context.DrawLine(new Pen(Brushes.White, thickness * scale),
+        context.DrawLine(new Pen(follow_point_brush, thickness * scale),
             ToPoint(start, scale, offsetX, offsetY),
             ToPoint(end, scale, offsetX, offsetY));
     }

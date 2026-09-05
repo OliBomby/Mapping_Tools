@@ -94,9 +94,7 @@
                                                             <Grid RowDefinitions="*,40"
                                                                   ToolTip.Tip="Double-click to QuickRun this pattern.">
                                                                 <patternGalleryControls:PatternThumbnailControl
-                                                                    Beatmap="{Binding ThumbnailBeatmap}"
-                                                                    Fill="{DynamicResource MappingToolsTimelineAddedInnerBrush}"
-                                                                    Stroke="{DynamicResource MaterialLightForegroundBrush}" />
+                                                                    Beatmap="{Binding ThumbnailBeatmap}" />
                                                                 <TextBlock Grid.Row="1"
                                                                            VerticalAlignment="Center"
                                                                            Margin="8,0"
