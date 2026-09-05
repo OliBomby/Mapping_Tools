@@ -13,7 +13,7 @@ public class ImportReloadingArgsComparer : IEqualityComparer<ImportReloadingArgs
     /// <param name="x">The first reload descriptor.</param>
     /// <param name="y">The second reload descriptor.</param>
     /// <returns><see langword="true" /> when both requests would reload the same import.</returns>
-    public bool Equals(ImportReloadingArgs x, ImportReloadingArgs y)
+    public bool Equals(ImportReloadingArgs? x, ImportReloadingArgs? y)
     {
         if (x.ImportType != y.ImportType)
             return false;

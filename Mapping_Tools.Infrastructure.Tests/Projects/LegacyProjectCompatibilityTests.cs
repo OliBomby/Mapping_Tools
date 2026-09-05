@@ -5,8 +5,8 @@ using Mapping_Tools.Application.Tools.PropertyTransformer;
 using Mapping_Tools.Core.BeatmapHelper;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
+using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
-using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection;
 using Mapping_Tools.Infrastructure.Projects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

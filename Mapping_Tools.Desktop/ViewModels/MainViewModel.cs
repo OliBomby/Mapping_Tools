@@ -22,7 +22,7 @@ namespace Mapping_Tools.Desktop.ViewModels;
 ///     Coordinates explicit feature discovery, navigation, favorites, activation,
 ///     and shell-level commands.
 /// </summary>
-public sealed partial class MainViewModel : ObservableObject, IDisposable
+public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyncDisposable
 {
     private static readonly Uri websiteUri = new("https://mappingtools.github.io");
     private static readonly Uri gitHubUri = new("https://github.com/OliBomby/Mapping_Tools");
@@ -40,8 +40,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly IShellFeatureRegistry registry;
     private readonly DesktopApplicationSettings settings;
     private readonly IUpdaterInteractionService? updaterInteraction;
-    private bool disposed;
     private string searchText = string.Empty;
+    private Task? shutdownTask;
 
     /// <summary>
     ///     Creates the desktop shell and activates the first explicit registration.
@@ -166,15 +166,38 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (disposed) return;
+        DisposeAsync().AsTask().GetAwaiter().GetResult();
+    }
 
-        disposed = true;
-        foreach (var projectFeature in featureViewModels.Values.OfType<IShellProjectFeature>())
-            projectCoordinator.SaveOnShutdown(projectFeature);
-        if (CurrentFeature is IQuickRun) DeactivateQuickRun();
-        if (CurrentFeature is IShellFeatureActivation activation) activation.Deactivate();
-        ProjectMenuItems = [];
-        OnPropertyChanged(nameof(ProjectMenuItems));
+    /// <inheritdoc />
+    public ValueTask DisposeAsync()
+    {
+        if (shutdownTask is null)
+        {
+            shutdownTask = DisposeCoreAsync();
+        }
+
+        return new ValueTask(shutdownTask);
+    }
+
+    private async Task DisposeCoreAsync()
+    {
+        Task[] saveTasks = featureViewModels.Values
+            .OfType<IShellProjectFeature>()
+            .Select(projectCoordinator.SaveOnShutdown)
+            .ToArray();
+
+        try
+        {
+            await Task.WhenAll(saveTasks);
+        }
+        finally
+        {
+            if (CurrentFeature is IQuickRun) DeactivateQuickRun();
+            if (CurrentFeature is IShellFeatureActivation activation) activation.Deactivate();
+            ProjectMenuItems = [];
+            OnPropertyChanged(nameof(ProjectMenuItems));
+        }
     }
 
     /// <summary>Prevents project recovery snapshots from being written during the current shutdown.</summary>

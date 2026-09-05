@@ -41,8 +41,7 @@ public sealed class ProjectAutosaveCoordinatorTests
         coordinator.Activate(feature);
 
         // Act
-        coordinator.SaveOnShutdown(feature);
-        await projects.LastAutoSave.Task;
+        await coordinator.SaveOnShutdown(feature);
 
         // Assert
         projects.AutoSavedProjects.Should().ContainSingle()
@@ -62,11 +61,33 @@ public sealed class ProjectAutosaveCoordinatorTests
         var coordinator = CreateCoordinator(projects);
 
         // Act
-        coordinator.SaveOnShutdown(feature);
-        await projects.LastAutoSave.Task;
+        await coordinator.SaveOnShutdown(feature);
 
         // Assert
         projects.LastAdditionalAutoSavePaths.Should().Equal("gallery\\project.json");
+    }
+
+    [TestMethod]
+    public async Task SaveOnShutdown_WhenPersistenceIsDelayed_DoesNotCompleteEarly()
+    {
+        // Arrange
+        RecordingProjectService projects = new() { DelayAutoSave = true };
+        TestProjectFeature feature = new() { Value = 7 };
+        var coordinator = CreateCoordinator(projects);
+
+        // Act
+        Task saveTask = coordinator.SaveOnShutdown(feature);
+        await projects.AutoSaveStarted.Task;
+
+        // Assert
+        saveTask.IsCompleted.Should().BeFalse();
+
+        // Act
+        projects.ReleaseAutoSave.TrySetResult();
+        await saveTask;
+
+        // Assert
+        saveTask.IsCompletedSuccessfully.Should().BeTrue();
     }
 
     [TestMethod]
@@ -196,6 +217,14 @@ public sealed class ProjectAutosaveCoordinatorTests
         public TaskCompletionSource<TestProject> LastAutoSave { get; } =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
 
+        public TaskCompletionSource AutoSaveStarted { get; } =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public TaskCompletionSource ReleaseAutoSave { get; } =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public bool DelayAutoSave { get; init; }
+
         public int SaveAsCount { get; private set; }
 
         public TestProject? LastSaveAsProject { get; private set; }
@@ -248,20 +277,21 @@ public sealed class ProjectAutosaveCoordinatorTests
             return LoadAsync<TProject>(definition.AutoSaveFileName, cancellationToken);
         }
 
-        public Task AutoSaveAsync<TProject>(
+        public async Task AutoSaveAsync<TProject>(
             ProjectDefinition<TProject> definition,
             TProject project,
             IEnumerable<string>? additionalPaths = null,
             CancellationToken cancellationToken = default)
         {
             if (project is not TestProject typed)
-                return Task.FromException(
-                    new InvalidOperationException("The test project service received an unexpected project type."));
+                throw new InvalidOperationException(
+                    "The test project service received an unexpected project type.");
 
             AutoSavedProjects.Add(typed);
             LastAdditionalAutoSavePaths = additionalPaths?.ToArray() ?? [];
             LastAutoSave.TrySetResult(typed);
-            return Task.CompletedTask;
+            AutoSaveStarted.TrySetResult();
+            if (DelayAutoSave) await ReleaseAutoSave.Task;
         }
 
         public Task<string?> SaveAsAsync<TProject>(

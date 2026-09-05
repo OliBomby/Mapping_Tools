@@ -117,7 +117,7 @@ public class SamplePackage
     /// </summary>
     /// <param name="comparer">The identity policy used to deduplicate generation arguments.</param>
     /// <returns>A custom-index requirement whose sample family follows the resolved normal and addition sets.</returns>
-    public CustomIndex GetCustomIndex(SampleGeneratingArgsComparer comparer = null)
+    public CustomIndex GetCustomIndex(SampleGeneratingArgsComparer? comparer = null)
     {
         if (comparer == null)
             comparer = new SampleGeneratingArgsComparer();

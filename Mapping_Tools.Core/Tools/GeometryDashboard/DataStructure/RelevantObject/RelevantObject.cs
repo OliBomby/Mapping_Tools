@@ -1,4 +1,3 @@
-using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.Layers;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorTypes;
 

@@ -1,4 +1,4 @@
-namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorCollection;
+namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 
 /// <summary>Ordered generator catalog used by the layer calculation engine.</summary>
 public sealed class RelevantObjectsGeneratorCollection : List<RelevantObjectsGenerator>

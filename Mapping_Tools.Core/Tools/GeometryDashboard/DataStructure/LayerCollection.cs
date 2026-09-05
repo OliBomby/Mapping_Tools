@@ -1,6 +1,5 @@
-using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.Layers;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
-using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorCollection;
+using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 
 namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 

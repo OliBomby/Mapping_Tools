@@ -1,9 +1,8 @@
-using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.Layers;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorInputSelection;
 
-namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection;
+namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 
 /// <summary>Groups relevant objects by concrete type while preserving time order per group.</summary>
 public sealed class RelevantObjectCollection : Dictionary<Type, List<IRelevantObject>>

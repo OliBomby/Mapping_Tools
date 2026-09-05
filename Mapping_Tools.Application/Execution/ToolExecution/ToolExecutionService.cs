@@ -74,14 +74,15 @@ public sealed class ToolExecutionService : IToolExecutionService
                         false));
             }
 
+            var operation = new RunningOperation(linked);
+            running.Add(request.OperationId, operation);
+
             var task = RunAsync(
                 request,
                 progress,
                 linked,
                 startedAt);
-            running.Add(
-                request.OperationId,
-                new RunningOperation(linked, task));
+            operation.Task = task;
             return task;
         }
     }
@@ -221,10 +222,12 @@ public sealed class ToolExecutionService : IToolExecutionService
         }
     }
 
-    private sealed record RunningOperation(
-        CancellationTokenSource Cancellation,
-        Task Task)
+    private sealed class RunningOperation(CancellationTokenSource cancellation)
     {
+        internal CancellationTokenSource Cancellation { get; } = cancellation;
+
+        internal Task Task { get; set; } = Task.CompletedTask;
+
         internal void TryCancel()
         {
             try

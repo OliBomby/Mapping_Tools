@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:converters="using:Mapping_Tools.Desktop.Tools.HitsoundStudio.Converters"
         xmlns:hitsoundStudio="clr-namespace:Mapping_Tools.Desktop.Tools.HitsoundStudio.Interactions"
+        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioExportDialog"
         x:DataType="hitsoundStudio:HitsoundStudioExportDialogViewModel"
         Width="650" Height="650"
@@ -15,25 +16,27 @@
         <ScrollViewer Grid.Row="1">
             <StackPanel Spacing="10">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
-                    <TextBox Text="{Binding ExportFolder, Mode=TwoWay}" PlaceholderText="Export folder"
+                    <TextBox Text="{Binding ExportFolder, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Export folder"
                              ToolTip.Tip="Folder where the map, samples, or MIDI file are written." />
                     <Button Grid.Column="1" Content="…" Command="{Binding PickFolderCommand}"
                             ToolTip.Tip="Choose the export folder." />
                 </Grid>
-                <TextBox Text="{Binding HitsoundDiffName, Mode=TwoWay}" PlaceholderText="Hitsound map name"
+                <TextBox Text="{Binding HitsoundDiffName, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Hitsound map name"
                          ToolTip.Tip="Version name written to the exported difficulty." />
                 <ComboBox ItemsSource="{Binding ExportModes}"
                           SelectedItem="{Binding HitsoundExportModeSetting, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="Export mode"
                           ToolTip.Tip="Choose standard custom indices, coinciding samples, storyboard, or MIDI export." />
                 <ComboBox IsVisible="{Binding GameModeVisible}" ItemsSource="{Binding GameModes}"
                           SelectedItem="{Binding HitsoundExportGameMode, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="Export gamemode"
                           ToolTip.Tip="Game mode used by the exported map." />
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                     <TextBox IsVisible="{Binding StandardExtraSettingsVisible}"
-                             Text="{Binding ZipLayersLeniency, Mode=TwoWay}" PlaceholderText="Layer leniency (ms)"
+                             Text="{Binding ZipLayersLeniency, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Note grouping leniency"
                              ToolTip.Tip="Maximum timestamp distance for combining layers." />
                     <TextBox Grid.Column="1" IsVisible="{Binding StandardExtraSettingsVisible}"
-                             Text="{Binding FirstCustomIndex, Mode=TwoWay}" PlaceholderText="First custom index"
+                             Text="{Binding FirstCustomIndex, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="First custom index"
                              ToolTip.Tip="First index assigned to a new sample schema." />
                 </Grid>
                 <CheckBox Content="Export map" IsChecked="{Binding ExportMap, Mode=TwoWay}"
@@ -60,6 +63,7 @@
                           IsChecked="{Binding AddGreenLineVolumeToMidi, Mode=TwoWay}" />
                 <ComboBox IsVisible="{Binding SampleExportSettingsVisible}" ItemsSource="{Binding SampleExportFormats}"
                           SelectedItem="{Binding SingleSampleExportFormat, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="Sample file format"
                           ToolTip.Tip="Encoding for one-source samples.">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
@@ -70,6 +74,7 @@
                 </ComboBox>
                 <ComboBox IsVisible="{Binding SampleExportSettingsVisible}" ItemsSource="{Binding SampleExportFormats}"
                           SelectedItem="{Binding MixedSampleExportFormat, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="Mixed sample file format"
                           ToolTip.Tip="Encoding for mixed samples.">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>

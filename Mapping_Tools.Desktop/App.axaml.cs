@@ -6,7 +6,6 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Desktop.Composition;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
@@ -132,6 +131,12 @@ public partial class App : Avalonia.Application
 
         try
         {
+            host.Services
+                .GetRequiredService<MainViewModel>()
+                .DisposeAsync()
+                .AsTask()
+                .GetAwaiter()
+                .GetResult();
             host.StopAsync(TimeSpan.FromSeconds(5))
                 .GetAwaiter()
                 .GetResult();
@@ -155,6 +160,6 @@ public partial class App : Avalonia.Application
             if (current is InputElement { Focusable: true })
                 return;
 
-        TopLevel.GetTopLevel(window)?.FocusManager?.Focus(null);
+        TopLevel.GetTopLevel(window)?.FocusManager.Focus(null);
     }
 }

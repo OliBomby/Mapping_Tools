@@ -13,8 +13,6 @@ using Mapping_Tools.Infrastructure.Tools.GeometryDashboard;
 using OsuMemoryDataProvider;
 using OsuMemoryDataProvider.OsuMemoryModels;
 using OsuMemoryDataProvider.OsuMemoryModels.Direct;
-using DomainHitObject = Mapping_Tools.Core.BeatmapHelper.HitObject;
-using ReaderHitObject = Editor_Reader.HitObject;
 
 namespace Mapping_Tools.Infrastructure.Editor;
 
@@ -372,7 +370,7 @@ internal static class EditorReaderSnapshotConverter
         var hitObjects = reader.hitObjects.Select(ConvertHitObject).ToList();
         var selectedHitObjects = reader.hitObjects
             .Select((source, index) => source.IsSelected ? hitObjects[index] : null)
-            .OfType<DomainHitObject>()
+            .OfType<Core.BeatmapHelper.HitObject>()
             .ToList();
         return new LiveBeatmapSnapshot(
             path,
@@ -388,7 +386,7 @@ internal static class EditorReaderSnapshotConverter
             selectedHitObjects);
     }
 
-    private static bool IsInvalid(ReaderHitObject hitObject)
+    private static bool IsInvalid(Editor_Reader.HitObject hitObject)
     {
         return hitObject.SegmentCount > 9000 || hitObject.Type == 0 || hitObject.SampleSet > 1000 || hitObject.SampleSetAdditions > 1000 || hitObject.SampleVolume > 1000;
     }
@@ -407,9 +405,9 @@ internal static class EditorReaderSnapshotConverter
             (controlPoint.EffectFlags & 8) > 0);
     }
 
-    private static DomainHitObject ConvertHitObject(ReaderHitObject source)
+    private static Core.BeatmapHelper.HitObject ConvertHitObject(Editor_Reader.HitObject source)
     {
-        DomainHitObject hitObject = new()
+        Core.BeatmapHelper.HitObject hitObject = new()
         {
             PixelLength = source.SpatialLength,
             Time = source.StartTime,

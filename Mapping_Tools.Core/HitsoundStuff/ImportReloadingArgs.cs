@@ -81,9 +81,10 @@ public class ImportReloadingArgs : IEquatable<ImportReloadingArgs>
     /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
     /// <param name="other">An object to compare with this object.</param>
     /// <returns>true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.</returns>
-    public bool Equals(ImportReloadingArgs other)
+    public bool Equals(ImportReloadingArgs? other)
     {
-        return Path == other.Path
+        return other != null
+               && Path == other.Path
                && ImportType == other.ImportType
                && X == other.X
                && Y == other.Y
@@ -98,7 +99,7 @@ public class ImportReloadingArgs : IEquatable<ImportReloadingArgs>
     /// <summary>Determines whether the specified object is equal to the current object.</summary>
     /// <param name="obj">The object to compare with the current object. </param>
     /// <returns>true if the specified object  is equal to the current object; otherwise, false.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (!(obj is ImportReloadingArgs)) return false;
 

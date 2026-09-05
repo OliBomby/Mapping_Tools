@@ -732,7 +732,7 @@ public static class HitsoundCopierEngine
         string extensionless = Path.Combine(
             Path.GetDirectoryName(path) ?? mapDirectory,
             Path.GetFileNameWithoutExtension(path));
-        return firstSamples.TryGetValue(extensionless, out string first) ? first : path;
+        return firstSamples.TryGetValue(extensionless, out string? first) ? first : path;
     }
 
     private static IReadOnlyList<string> GetResolvedSamplePaths(

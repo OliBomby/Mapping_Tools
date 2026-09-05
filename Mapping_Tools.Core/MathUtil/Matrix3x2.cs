@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2006 - 2008 The Open Toolkit library.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -658,7 +658,7 @@ public struct Matrix3X2 : IEquatable<Matrix3X2>
     /// </summary>
     /// <param name="obj">The object to compare to.</param>
     /// <returns>True if the instances are equal; false otherwise.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (!(obj is Matrix3X2)) return false;
 

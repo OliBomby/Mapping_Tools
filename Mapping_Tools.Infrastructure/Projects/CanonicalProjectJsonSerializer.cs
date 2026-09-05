@@ -4,11 +4,11 @@ using Mapping_Tools.Core.Graph.Interpolation.Interpolators;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.BeatmapHelper.BeatDivisors;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
-using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Generators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorSettingses;
 using Mapping_Tools.Application.Projects.Models;
+using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

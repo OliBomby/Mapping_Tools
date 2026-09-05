@@ -17,16 +17,18 @@ public sealed class ToolRunButton : Viewbox
         AvaloniaProperty.Register<ToolRunButton, ICommand?>(nameof(RunCommand));
 
     private readonly FloatingButton button;
+    private readonly ValidationCommand validationCommand;
 
     static ToolRunButton()
     {
-        RunCommandProperty.Changed.AddClassHandler<ToolRunButton>(static (control, eventArgs) => control.button.Command = eventArgs.NewValue as ICommand);
+        RunCommandProperty.Changed.AddClassHandler<ToolRunButton>(static (control, eventArgs) => control.SetCommand(eventArgs.NewValue as ICommand));
     }
 
     /// <summary>Creates the WPF-compatible floating play action.</summary>
     public ToolRunButton()
     {
         Width = 70;
+        validationCommand = new ValidationCommand(this);
         button = new FloatingButton
         {
             Content = new MaterialIcon
@@ -37,6 +39,7 @@ public sealed class ToolRunButton : Viewbox
             },
         };
         ToolTip.SetTip(button, "Run this tool.");
+        button.Command = validationCommand;
         Child = button;
     }
 
@@ -45,5 +48,51 @@ public sealed class ToolRunButton : Viewbox
     {
         get => GetValue(RunCommandProperty);
         set => SetValue(RunCommandProperty, value);
+    }
+
+    private void SetCommand(ICommand? command)
+    {
+        validationCommand.Command = command;
+    }
+
+    private sealed class ValidationCommand(ToolRunButton owner) : ICommand
+    {
+        private ICommand? command;
+        private EventHandler? canExecuteChanged;
+
+        public event EventHandler? CanExecuteChanged
+        {
+            add => canExecuteChanged += value;
+            remove => canExecuteChanged -= value;
+        }
+
+        public ICommand? Command
+        {
+            get => command;
+            set
+            {
+                if (ReferenceEquals(command, value)) return;
+
+                if (command is not null) command.CanExecuteChanged -= OnCanExecuteChanged;
+                command = value;
+                if (command is not null) command.CanExecuteChanged += OnCanExecuteChanged;
+                canExecuteChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            return command?.CanExecute(parameter) == true && !ToolValidationHelper.HasErrors(owner);
+        }
+
+        public void Execute(object? parameter)
+        {
+            if (CanExecute(parameter)) command!.Execute(parameter);
+        }
+
+        private void OnCanExecuteChanged(object? sender, EventArgs e)
+        {
+            canExecuteChanged?.Invoke(this, e);
+        }
     }
 }

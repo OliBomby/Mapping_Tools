@@ -76,6 +76,9 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     /// <summary>Gets the Desktop-adapted colour points shown by the editing grid.</summary>
     public ObservableCollection<ObservableColourPoint> ColourPoints { get; } = [];
 
+    /// <summary>Gets the colour points currently selected in the editing grid.</summary>
+    public ObservableCollection<ObservableColourPoint> SelectedColourPoints { get; } = [];
+
     /// <summary>Gets the palette entries shown by the sequence editor.</summary>
     public ObservableCollection<ObservableSpecialColour> ComboColours { get; } = [];
 
@@ -140,6 +143,23 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         SelectedColourPoint = ColourPoints.FirstOrDefault();
     }
 
+    /// <summary>
+    ///     Replaces the extended colour-point selection supplied by the editing grid.
+    /// </summary>
+    /// <param name="points">The selected live colour-point adapters.</param>
+    public void SetSelectedColourPoints(IEnumerable<ObservableColourPoint> points)
+    {
+        ArgumentNullException.ThrowIfNull(points);
+
+        SelectedColourPoints.Clear();
+        foreach (var point in points)
+        {
+            if (ColourPoints.Contains(point)) SelectedColourPoints.Add(point);
+        }
+
+        SelectedColourPoint = SelectedColourPoints.LastOrDefault();
+    }
+
     /// <summary>Adds a new normal point after the selected or last point.</summary>
     [RelayCommand]
     private void AddColourPoint()
@@ -172,11 +192,22 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private void RemoveColourPoint()
     {
-        if (SelectedColourPoint is not null)
-            ColourPoints.Remove(SelectedColourPoint);
+        var selected = (SelectedColourPoints.Count > 0
+                ? SelectedColourPoints.ToArray()
+                : SelectedColourPoint is not null
+                    ? [SelectedColourPoint]
+                    : [])
+            .Where(ColourPoints.Contains)
+            .ToArray();
+
+        if (selected.Length > 0)
+        {
+            foreach (var point in selected) ColourPoints.Remove(point);
+        }
         else if (ColourPoints.Count > 0) ColourPoints.RemoveAt(ColourPoints.Count - 1);
 
         SyncProjectFromPresentation();
+        SelectedColourPoints.Clear();
         SelectedColourPoint = ColourPoints.LastOrDefault();
     }
 
@@ -219,10 +250,32 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
         if (SelectedColourPoint is null || SelectedColourPoint.ColourSequence.Count == 0) return;
 
         if (colour is null)
-            SelectedColourPoint.ColourSequence.RemoveAt(SelectedColourPoint.ColourSequence.Count - 1);
+            RemoveSequenceColourAt(SelectedColourPoint.ColourSequence.Count - 1);
         else
-            SelectedColourPoint.ColourSequence.Remove(colour);
+        {
+            int index = -1;
+            for (int entryIndex = SelectedColourPoint.ColourSequence.Count - 1; entryIndex >= 0; entryIndex--)
+            {
+                if (!ReferenceEquals(SelectedColourPoint.ColourSequence[entryIndex], colour)) continue;
 
+                index = entryIndex;
+                break;
+            }
+
+            if (index >= 0) RemoveSequenceColourAt(index);
+        }
+    }
+
+    /// <summary>Removes the sequence entry at the supplied displayed index.</summary>
+    /// <param name="index">The zero-based index of the sequence occurrence.</param>
+    public void RemoveSequenceColourAt(int index)
+    {
+        if (SelectedColourPoint is null
+            || index < 0
+            || index >= SelectedColourPoint.ColourSequence.Count)
+            return;
+
+        SelectedColourPoint.ColourSequence.RemoveAt(index);
         SyncProjectFromPresentation();
         OnPropertyChanged(nameof(SelectedSequence));
     }
@@ -357,6 +410,7 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     private void RebuildPresentation()
     {
         ColourPoints.Clear();
+        SelectedColourPoints.Clear();
         foreach (var point in Project.ColourPoints) ColourPoints.Add(new ObservableColourPoint(point));
 
         RebuildPalette();

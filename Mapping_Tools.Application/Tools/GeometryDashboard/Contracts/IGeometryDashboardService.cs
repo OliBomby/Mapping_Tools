@@ -1,5 +1,5 @@
 using Mapping_Tools.Application.Tools.GeometryDashboard.Models;
-using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection;
+using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 
 namespace Mapping_Tools.Application.Tools.GeometryDashboard.Contracts;

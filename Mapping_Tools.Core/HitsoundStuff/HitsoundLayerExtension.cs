@@ -17,15 +17,15 @@ public static class HitsoundLayerExtension
     /// <param name="func">Projects the editable value.</param>
     /// <param name="culture">The culture used by <see cref="Convert.ToString(object, IFormatProvider)" />.</param>
     /// <returns>The common value, or an empty string for an empty or mixed selection.</returns>
-    public static string AllToStringOrDefault<TObj, TResult>(this List<TObj> list, Func<TObj, TResult> func, CultureInfo culture = null)
+    public static string AllToStringOrDefault<TObj, TResult>(this List<TObj> list, Func<TObj, TResult> func, CultureInfo? culture = null)
     {
         if (list.Count == 0)
             return "";
         var first = func(list.First());
         foreach (var o in list)
-            if (!func(o).Equals(first))
+            if (!EqualityComparer<TResult>.Default.Equals(func(o), first))
                 return "";
-        return Convert.ToString(first, culture);
+        return Convert.ToString(first, culture) ?? string.Empty;
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public static class HitsoundLayerExtension
             return "";
         var first = func(list.First());
         foreach (var o in list)
-            if (!func(o).Equals(first))
+            if (!EqualityComparer<TResult>.Default.Equals(func(o), first))
                 return "";
         return stringConverter(first);
     }

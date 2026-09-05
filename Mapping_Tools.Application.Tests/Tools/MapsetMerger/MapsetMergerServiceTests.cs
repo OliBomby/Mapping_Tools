@@ -60,6 +60,30 @@ public sealed class MapsetMergerServiceTests : IDisposable
     }
 
     [TestMethod]
+    public async Task MergeAsync_WithMoreThanTwoHundredBeatmaps_WritesEveryBeatmap()
+    {
+        // Arrange
+        const int beatmapCount = 201;
+        string source = fixture.CreateMapsetWithBeatmaps("large", beatmapCount);
+        string exportPath = Path.Combine(fixture.Root, "export");
+        MapsetMergerServiceOptions project = new()
+        {
+            ExportPath = exportPath,
+            Mapsets = [new MapsetMergerServiceOptions.MapsetItem { Name = "Large", Path = source }],
+        };
+        MapsetMergerService service = new(
+            new FixtureEditingGateway(),
+            new PhysicalBeatmapsetFileSystem());
+
+        // Act
+        var result = await service.MergeAsync(project);
+
+        // Assert
+        result.BeatmapsWritten.Should().Be(beatmapCount);
+        Directory.GetFiles(exportPath, "*.osu").Should().HaveCount(beatmapCount);
+    }
+
+    [TestMethod]
     public async Task MergeAsync_WhenCancelledBeforeProcessing_LeavesExistingExportUntouched()
     {
         // Arrange
@@ -300,6 +324,21 @@ public sealed class MapsetMergerServiceTests : IDisposable
             File.WriteAllText(Path.Combine(path, "soft-hitfinish.wav"), "hit");
             File.WriteAllText(Path.Combine(path, "map.osu"), CreateBeatmap());
             File.WriteAllText(Path.Combine(path, "story.osb"), CreateStoryboard());
+            return path;
+        }
+
+        public string CreateMapsetWithBeatmaps(string name, int beatmapCount)
+        {
+            string path = Path.Combine(Root, name);
+            Directory.CreateDirectory(path);
+            File.WriteAllText(Path.Combine(path, "audio.mp3"), "audio");
+            for (int index = 0; index < beatmapCount; index++)
+            {
+                string contents = CreateBeatmap()
+                    .Replace("Version:Normal", $"Version:Large {index}", StringComparison.Ordinal);
+                File.WriteAllText(Path.Combine(path, $"map{index}.osu"), contents);
+            }
+
             return path;
         }
 

@@ -31,7 +31,9 @@ public partial class MainWindow : Window
     private readonly SettingsPersistenceHostedService? settingsPersistence;
     private readonly IUpdaterInteractionService? updaterInteraction;
     private WindowBounds normalBounds = defaultBounds;
+    private bool allowCloseAfterShutdown;
     private bool restored;
+    private bool shutdownCloseInProgress;
     private bool updateCloseInProgress;
 
     /// <summary>
@@ -133,6 +135,23 @@ public partial class MainWindow : Window
             return;
         }
 
+        if (allowCloseAfterShutdown)
+        {
+            allowCloseAfterShutdown = false;
+        }
+        else if (shutdownCloseInProgress)
+        {
+            eventArgs.Cancel = true;
+            return;
+        }
+        else if (DataContext is MainViewModel viewModel)
+        {
+            eventArgs.Cancel = true;
+            shutdownCloseInProgress = true;
+            _ = CompleteShutdownAndCloseAsync(viewModel);
+            return;
+        }
+
         if (!eventArgs.IsProgrammatic) CaptureNormalBounds();
 
         settings.MainWindowRestoreBounds = normalBounds;
@@ -144,9 +163,42 @@ public partial class MainWindow : Window
     {
         bool canClose = await updaterInteraction!.CompleteUpdateOnCloseAsync();
         if (canClose)
+        {
+            shutdownCloseInProgress = true;
+            if (DataContext is MainViewModel viewModel)
+            {
+                try
+                {
+                    await viewModel.DisposeAsync();
+                }
+                catch (Exception exception)
+                {
+                    App.WriteCrashLog(exception);
+                }
+            }
+
+            allowCloseAfterShutdown = true;
             Close();
+        }
         else
             updateCloseInProgress = false;
+    }
+
+    private async Task CompleteShutdownAndCloseAsync(MainViewModel viewModel)
+    {
+        try
+        {
+            await viewModel.DisposeAsync();
+        }
+        catch (Exception exception)
+        {
+            App.WriteCrashLog(exception);
+        }
+        finally
+        {
+            allowCloseAfterShutdown = true;
+            Close();
+        }
     }
 
     private void RestoreWindowPlacement()

@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:hitsoundStudio="clr-namespace:Mapping_Tools.Desktop.Tools.HitsoundStudio.Interactions"
+        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioImportDialog"
         x:DataType="hitsoundStudio:HitsoundStudioImportDialogViewModel"
         Width="620" Height="650"
@@ -10,41 +11,44 @@
         <TextBlock FontSize="24" FontWeight="Bold" Text="Import Hitsound Layer" />
         <ScrollViewer Grid.Row="1">
             <StackPanel Spacing="10">
-                <TextBox Text="{Binding Name, Mode=TwoWay}" PlaceholderText="Layer name"
+                <TextBox Text="{Binding Name, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Name"
                          ToolTip.Tip="The convenient name shown in the layer list." />
                 <ComboBox ItemsSource="{Binding ImportTypes}" SelectedItem="{Binding ImportType, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="Import type"
                           ToolTip.Tip="Choose a simple layer, stack, hitsound, MIDI, or storyboard import." />
                 <ComboBox IsVisible="{Binding IsSimpleOrStackImport}" ItemsSource="{Binding SampleSets}"
                           SelectedItem="{Binding SampleSet, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="Sample set"
                           ToolTip.Tip="Sample set used by a simple or stack layer." />
                 <ComboBox IsVisible="{Binding IsSimpleOrStackImport}" ItemsSource="{Binding Hitsounds}"
                           SelectedItem="{Binding Hitsound, Mode=TwoWay}"
+                          materialAssists:ComboBoxAssist.Label="Hitsound"
                           ToolTip.Tip="Hitsound used by a simple or stack layer." />
                 <Grid IsVisible="{Binding IsSimpleOrStackImport}" ColumnDefinitions="*,Auto" ColumnSpacing="6">
-                    <TextBox Text="{Binding SamplePath, Mode=TwoWay}" PlaceholderText="Sample or SoundFont path"
+                    <TextBox Text="{Binding SamplePath, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Hitsound sample or SoundFont"
                              ToolTip.Tip="Audio file or SoundFont used by a simple layer or SoundFont note." />
                     <Button Grid.Column="1" Content="…" Command="{Binding PickSampleCommand}"
                             ToolTip.Tip="Choose a sample or SoundFont." />
                 </Grid>
                 <Grid IsVisible="{Binding HasImportSource}" ColumnDefinitions="*,Auto" ColumnSpacing="6">
                     <TextBox Text="{Binding SourcePaths, Mode=TwoWay}" AcceptsReturn="True" Height="90"
-                             PlaceholderText="Source path(s), one per line"
+                             materialAssists:TextFieldAssist.Label="Source path(s)"
                              ToolTip.Tip="Beatmap, MIDI, or storyboard source paths. Multiple paths are supported for hitsound/storyboard imports." />
                     <Button Grid.Column="1" Content="…" Command="{Binding PickSourceCommand}"
                             ToolTip.Tip="Choose one or more import sources." />
                 </Grid>
                 <Grid IsVisible="{Binding IsStackImport}" ColumnDefinitions="*,*" ColumnSpacing="10">
-                    <TextBox Text="{Binding XText, Mode=TwoWay}" PlaceholderText="Stack X (-1 = any)" />
-                    <TextBox Grid.Column="1" Text="{Binding YText, Mode=TwoWay}" PlaceholderText="Stack Y (-1 = any)" />
+                    <TextBox Text="{Binding XText, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="X coordinate (-1 = any)" />
+                    <TextBox Grid.Column="1" Text="{Binding YText, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Y coordinate (-1 = any)" />
                 </Grid>
                 <TextBox IsVisible="{Binding IsMidiImport}" Text="{Binding OffsetText, Mode=TwoWay}"
-                         PlaceholderText="MIDI offset (ms)" />
+                         materialAssists:TextFieldAssist.Label="MIDI offset (ms)" />
                 <Grid IsVisible="{Binding IsMidiImport}" ColumnDefinitions="*,*" ColumnSpacing="10">
                     <TextBox IsVisible="{Binding IsLengthSettingsVisible}"
-                             Text="{Binding LengthRoughnessText, Mode=TwoWay}" PlaceholderText="MIDI length roughness" />
+                             Text="{Binding LengthRoughnessText, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Length rounding roughness" />
                     <TextBox Grid.Column="1" IsVisible="{Binding IsVelocitySettingsVisible}"
                              Text="{Binding VelocityRoughnessText, Mode=TwoWay}"
-                             PlaceholderText="MIDI velocity roughness" />
+                             materialAssists:TextFieldAssist.Label="Velocity rounding roughness" />
                 </Grid>
                 <CheckBox IsVisible="{Binding IsSampleImport}" Content="Discriminate volumes"
                           IsChecked="{Binding DiscriminateVolumes, Mode=TwoWay}"

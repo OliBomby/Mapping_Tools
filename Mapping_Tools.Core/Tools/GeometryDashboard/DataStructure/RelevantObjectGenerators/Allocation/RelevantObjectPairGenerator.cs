@@ -1,5 +1,4 @@
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
-using RelevantObjectCollectionType = Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection.RelevantObjectCollection;
 
 namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Allocation;
 
@@ -11,7 +10,7 @@ public static class RelevantObjectPairGenerator
     /// <param name="collection">The available objects, or <see langword="null" />.</param>
     /// <param name="sequential">Whether each tuple must use adjacent ordered objects.</param>
     /// <returns>Parameter arrays compatible with reflection invocation.</returns>
-    public static IEnumerable<object[]> GetParametersList(Type[] dependencies, RelevantObjectCollectionType? collection, bool sequential)
+    public static IEnumerable<object[]> GetParametersList(Type[] dependencies, RelevantObjectCollection? collection, bool sequential)
     {
         return sequential ? GeneratePairsSequential(dependencies, collection) : GeneratePairsDense(dependencies, collection);
     }
@@ -20,7 +19,7 @@ public static class RelevantObjectPairGenerator
     /// <param name="dependencies">The required concrete types.</param>
     /// <param name="collection">The available objects, or <see langword="null" />.</param>
     /// <returns>Sequential parameter tuples.</returns>
-    public static IEnumerable<IRelevantObject[]> GeneratePairsSequential(Type[] dependencies, RelevantObjectCollectionType? collection)
+    public static IEnumerable<IRelevantObject[]> GeneratePairsSequential(Type[] dependencies, RelevantObjectCollection? collection)
     {
         if (collection is null || dependencies.Length == 0)
             // Handle special case
@@ -79,7 +78,7 @@ public static class RelevantObjectPairGenerator
     /// <param name="dependencies">The required concrete types.</param>
     /// <param name="collection">The available objects, or <see langword="null" />.</param>
     /// <returns>Dense parameter tuples.</returns>
-    public static IEnumerable<IRelevantObject[]> GeneratePairsDense(Type[] dependencies, RelevantObjectCollectionType? collection)
+    public static IEnumerable<IRelevantObject[]> GeneratePairsDense(Type[] dependencies, RelevantObjectCollection? collection)
     {
         if (collection is null || dependencies.Length == 0)
             // Handle special case

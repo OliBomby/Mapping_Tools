@@ -235,6 +235,31 @@ public sealed class ToolExecutionServiceTests
     }
 
     [TestMethod]
+    public async Task ExecuteAsync_WithAlreadyCancelledToken_RemovesRegistrationBeforeRetry()
+    {
+        // Arrange
+        var service = CreateService();
+        using CancellationTokenSource source = new();
+        source.Cancel();
+        ToolExecutionRequest<int> request = new(
+            "retryable",
+            "Retryable",
+            _ => Task.FromResult(new ToolExecutionOutput<int>(7)));
+
+        // Act
+        var cancelledResult = await service.ExecuteAsync(
+            request,
+            cancellationToken: source.Token);
+        var retryResult = await service.ExecuteAsync(request);
+
+        // Assert
+        cancelledResult.Status.Should().Be(ToolExecutionStatus.Cancelled);
+        service.IsRunning("retryable").Should().BeFalse();
+        retryResult.Status.Should().Be(ToolExecutionStatus.Succeeded);
+        retryResult.Value.Should().Be(7);
+    }
+
+    [TestMethod]
     public async Task StopAsync_WithActiveOperations_CancelsAndJoinsAll()
     {
         // Arrange

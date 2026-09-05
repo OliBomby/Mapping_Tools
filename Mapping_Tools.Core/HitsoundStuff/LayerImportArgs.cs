@@ -110,7 +110,7 @@ public class LayerImportArgs : IEquatable<LayerImportArgs>
     /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
     /// <param name="other">An object to compare with this object.</param>
     /// <returns>true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.</returns>
-    public bool Equals(LayerImportArgs other)
+    public bool Equals(LayerImportArgs? other)
     {
         return Path == other.Path
                && ImportType == other.ImportType
@@ -173,7 +173,7 @@ public class LayerImportArgs : IEquatable<LayerImportArgs>
     }
 
     /// <inheritdoc />
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (!(obj is LayerImportArgs)) return false;
 

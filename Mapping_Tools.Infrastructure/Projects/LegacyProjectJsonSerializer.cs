@@ -26,6 +26,7 @@ using Mapping_Tools.Core.HitsoundStuff;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Settings.Models;
 using Mapping_Tools.Core.Tools.ComboColourStudio.Models;
+using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.Serialization;
@@ -37,7 +38,6 @@ using Mapping_Tools.Core.Tools.TumourGenerator.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
-using RelevantObjectCollectionType = Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection.RelevantObjectCollection;
 
 namespace Mapping_Tools.Infrastructure.Projects;
 
@@ -1436,12 +1436,12 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(RelevantObjectCollectionType);
+            return objectType == typeof(RelevantObjectCollection);
         }
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            if (value is not RelevantObjectCollectionType collection) throw new JsonSerializationException("Unexpected Geometry Dashboard object collection type.");
+            if (value is not RelevantObjectCollection collection) throw new JsonSerializationException("Unexpected Geometry Dashboard object collection type.");
 
             writer.WriteStartObject();
             writer.WritePropertyName("$type");
@@ -1462,7 +1462,7 @@ public sealed class LegacyProjectJsonSerializer : IProjectSerializer
             JsonSerializer serializer)
         {
             var json = JObject.Load(reader);
-            RelevantObjectCollectionType collection = new();
+            RelevantObjectCollection collection = new();
             LegacyProjectTypeBinder binder = new();
             foreach (var property in json.Properties().Where(property => property.Name != "$type"))
             {

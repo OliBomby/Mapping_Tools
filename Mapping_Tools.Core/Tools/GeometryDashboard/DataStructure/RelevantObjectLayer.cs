@@ -2,10 +2,8 @@ using System.Reflection;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObject;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators;
 using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.Allocation;
-using Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectGenerators.GeneratorCollection;
-using RelevantObjectCollectionType = Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.RelevantObjectCollection.RelevantObjectCollection;
 
-namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure.Layers;
+namespace Mapping_Tools.Core.Tools.GeometryDashboard.DataStructure;
 
 /// <summary>Contains one ordered layer of root or generated geometry objects.</summary>
 public sealed class RelevantObjectLayer
@@ -17,11 +15,11 @@ public sealed class RelevantObjectLayer
     {
         ParentCollection = parentCollection;
         GeneratorCollection = generatorCollection;
-        Objects = new RelevantObjectCollectionType();
+        Objects = new RelevantObjectCollection();
     }
 
     /// <summary>Gets the objects in this layer, grouped by concrete type.</summary>
-    public RelevantObjectCollectionType Objects { get; }
+    public RelevantObjectCollection Objects { get; }
 
     /// <summary>Gets the generators used to populate this layer.</summary>
     public RelevantObjectsGeneratorCollection? GeneratorCollection { get; }
@@ -114,14 +112,14 @@ public sealed class RelevantObjectLayer
         return true;
     }
 
-    private RelevantObjectCollectionType? GetAllPreviousLayersCollection()
+    private RelevantObjectCollection? GetAllPreviousLayersCollection()
     {
         if (PreviousLayer is null) return null;
 
         var collection = PreviousLayer.GetAllPreviousLayersCollection();
         return collection is null
             ? PreviousLayer.Objects
-            : RelevantObjectCollectionType.Merge(collection, PreviousLayer.Objects);
+            : RelevantObjectCollection.Merge(collection, PreviousLayer.Objects);
     }
 
     /// <summary>Regenerates this layer from active generators and its previous layers.</summary>

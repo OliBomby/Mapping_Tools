@@ -2,7 +2,6 @@ using Mapping_Tools.Application.QuickRun.Contracts;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Core.Settings.Models;
 using NonInvasiveKeyboardHookLibrary;
-using HookModifierKeys = NonInvasiveKeyboardHookLibrary.ModifierKeys;
 
 namespace Mapping_Tools.Infrastructure.Platform;
 
@@ -202,7 +201,7 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
             CancellationToken.None);
     }
 
-    private static HookModifierKeys[] ConvertModifiers(int modifiers)
+    private static NonInvasiveKeyboardHookLibrary.ModifierKeys[] ConvertModifiers(int modifiers)
     {
         const int known_modifiers = 1 | 2 | 4 | 8;
         if ((modifiers & ~known_modifiers) != 0)
@@ -211,14 +210,14 @@ public sealed class WindowsGlobalHotkeyService : IGlobalHotkeyService
                 modifiers,
                 "Only legacy Alt, Control, Shift, and Windows modifiers are supported.");
 
-        List<HookModifierKeys> result = [];
-        if ((modifiers & 1) != 0) result.Add(HookModifierKeys.Alt);
+        List<NonInvasiveKeyboardHookLibrary.ModifierKeys> result = [];
+        if ((modifiers & 1) != 0) result.Add(NonInvasiveKeyboardHookLibrary.ModifierKeys.Alt);
 
-        if ((modifiers & 2) != 0) result.Add(HookModifierKeys.Control);
+        if ((modifiers & 2) != 0) result.Add(NonInvasiveKeyboardHookLibrary.ModifierKeys.Control);
 
-        if ((modifiers & 4) != 0) result.Add(HookModifierKeys.Shift);
+        if ((modifiers & 4) != 0) result.Add(NonInvasiveKeyboardHookLibrary.ModifierKeys.Shift);
 
-        if ((modifiers & 8) != 0) result.Add(HookModifierKeys.WindowsKey);
+        if ((modifiers & 8) != 0) result.Add(NonInvasiveKeyboardHookLibrary.ModifierKeys.WindowsKey);
 
         return result.ToArray();
     }

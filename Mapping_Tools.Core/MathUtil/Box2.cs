@@ -1,4 +1,4 @@
-﻿// Copyright (c) Open Toolkit library.
+// Copyright (c) Open Toolkit library.
 // This file is subject to the terms and conditions defined in
 // file 'License.txt', which is part of this source code package.
 
@@ -174,7 +174,7 @@ public struct Box2 : IEquatable<Box2>
     /// <summary>
     ///     Implements Object.Equals.
     /// </summary>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return obj is Box2 && Equals((Box2)obj);
     }

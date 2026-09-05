@@ -36,6 +36,68 @@ public sealed class ComboColourStudioViewModelTests
         viewModel.SelectedColourPoint.ColourSequence.Should().ContainSingle();
     }
 
+    [TestMethod]
+    public void RemoveColourPointCommand_WithMultipleSelectedPoints_RemovesEverySelectedPoint()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
+        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
+        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
+        var points = viewModel.ColourPoints.ToArray();
+        viewModel.SetSelectedColourPoints([points[0], points[2]]);
+
+        // Act
+        ((IRelayCommand)viewModel.RemoveColourPointCommand).Execute(null);
+
+        // Assert
+        viewModel.ColourPoints.Should().ContainSingle().Which.Should().Be(points[1]);
+        viewModel.Project.ColourPoints.Should().ContainSingle();
+        viewModel.SelectedColourPoint.Should().Be(points[1]);
+    }
+
+    [TestMethod]
+    public void RemoveColourPointCommand_WithoutSelection_RemovesLastPoint()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
+        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
+        var points = viewModel.ColourPoints.ToArray();
+        viewModel.SetSelectedColourPoints([]);
+
+        // Act
+        ((IRelayCommand)viewModel.RemoveColourPointCommand).Execute(null);
+
+        // Assert
+        viewModel.ColourPoints.Should().ContainSingle().Which.Should().Be(points[0]);
+    }
+
+    [TestMethod]
+    public void RemoveSequenceColourAt_WithRepeatedPaletteReference_RemovesRequestedOccurrence()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        viewModel.AddComboColourCommand.Execute(null);
+        viewModel.AddComboColourCommand.Execute(null);
+        ((IRelayCommand)viewModel.AddColourPointCommand).Execute(null);
+        viewModel.SelectedSequenceColour = viewModel.ComboColours[0];
+        viewModel.AddSequenceColourCommand.Execute(viewModel.SelectedColourPoint);
+        viewModel.SelectedSequenceColour = viewModel.ComboColours[1];
+        viewModel.AddSequenceColourCommand.Execute(viewModel.SelectedColourPoint);
+        viewModel.SelectedSequenceColour = viewModel.ComboColours[0];
+        viewModel.AddSequenceColourCommand.Execute(viewModel.SelectedColourPoint);
+
+        // Act
+        viewModel.RemoveSequenceColourAt(2);
+
+        // Assert
+        viewModel.SelectedColourPoint!.ColourSequence
+            .Select(colour => colour.Name)
+            .Should()
+            .Equal("Combo1", "Combo2");
+    }
+
     private static ComboColourStudioViewModel CreateViewModel()
     {
         return new ComboColourStudioViewModel(

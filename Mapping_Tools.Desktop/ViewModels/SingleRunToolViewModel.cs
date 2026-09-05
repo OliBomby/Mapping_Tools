@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Mapping_Tools.Desktop.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mapping_Tools.Application.Execution.ToolExecution;
@@ -17,6 +18,7 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     private bool isRunning;
     private double progress;
     private long runGeneration;
+    private WeakReference<Visual>? validationScope;
 
     /// <summary>
     ///     Creates a single-run tool presentation model.
@@ -73,7 +75,7 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     protected virtual bool PrepareRun()
     {
         ValidateAllProperties();
-        return !HasErrors;
+        return !HasErrors && !HasControlValidationErrors();
     }
 
     /// <summary>Executes the feature-specific ordinary run.</summary>
@@ -89,7 +91,7 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     {
         ArgumentNullException.ThrowIfNull(operation);
 
-        if (IsRunning) return;
+        if (IsRunning || HasControlValidationErrors()) return;
 
         IsRunning = true;
         Progress = 0;
@@ -120,6 +122,23 @@ public abstract class SingleRunToolViewModel : ObservableValidator
     private bool CanRun()
     {
         return !IsRunning;
+    }
+
+    internal void SetValidationScope(Visual scope)
+    {
+        validationScope = new WeakReference<Visual>(scope);
+    }
+
+    internal void ClearValidationScope(Visual scope)
+    {
+        if (validationScope?.TryGetTarget(out Visual? target) != true || ReferenceEquals(target, scope))
+            validationScope = null;
+    }
+
+    private bool HasControlValidationErrors()
+    {
+        return validationScope?.TryGetTarget(out Visual? scope) == true
+            && ToolValidationHelper.HasErrors(scope);
     }
 
     private async Task RunAsync()

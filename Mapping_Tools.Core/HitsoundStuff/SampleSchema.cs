@@ -83,7 +83,7 @@ public class SampleSchema : Dictionary<string, List<SampleGeneratingArgs>>
     /// </summary>
     /// <param name="samples">The ordered generation arguments to match.</param>
     /// <returns>The export name, or <see langword="null" /> when no exact sequence exists.</returns>
-    public string FindFilename(List<SampleGeneratingArgs> samples)
+    public string? FindFilename(List<SampleGeneratingArgs> samples)
     {
         return (from kvp
                 in this
@@ -97,7 +97,7 @@ public class SampleSchema : Dictionary<string, List<SampleGeneratingArgs>>
     /// <param name="samples">The ordered generation arguments to match.</param>
     /// <param name="regexPattern">A regular expression applied to candidate export names.</param>
     /// <returns>The first matching name, or <see langword="null" />.</returns>
-    public string FindFilename(List<SampleGeneratingArgs> samples, string regexPattern)
+    public string? FindFilename(List<SampleGeneratingArgs> samples, string regexPattern)
     {
         return (from kvp
                 in this
@@ -110,8 +110,9 @@ public class SampleSchema : Dictionary<string, List<SampleGeneratingArgs>>
     ///     that sample sound.
     ///     Only maps the <see cref="SampleGeneratingArgs" /> which are non-mixed.
     /// </summary>
-    /// <returns></returns>
-    public Dictionary<SampleGeneratingArgs, string> GetSampleNames(SampleGeneratingArgsComparer comparer = null)
+    /// <param name="comparer">The identity policy for source samples, or null to use the default policy.</param>
+    /// <returns>The first export name assigned to each unmixed sample.</returns>
+    public Dictionary<SampleGeneratingArgs, string> GetSampleNames(SampleGeneratingArgsComparer? comparer = null)
     {
         var sampleNames = new Dictionary<SampleGeneratingArgs, string>(comparer ?? new SampleGeneratingArgsComparer());
 
@@ -127,7 +128,7 @@ public class SampleSchema : Dictionary<string, List<SampleGeneratingArgs>>
     /// </summary>
     /// <param name="comparer">The identity policy for source mixes.</param>
     /// <returns>Recognized custom indices; nonstandard names are ignored.</returns>
-    public List<CustomIndex> GetCustomIndices(SampleGeneratingArgsComparer comparer = null)
+    public List<CustomIndex> GetCustomIndices(SampleGeneratingArgsComparer? comparer = null)
     {
         if (comparer == null)
             comparer = new SampleGeneratingArgsComparer();

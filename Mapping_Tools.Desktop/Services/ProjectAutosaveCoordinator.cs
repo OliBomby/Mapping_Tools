@@ -51,12 +51,13 @@ public sealed class ProjectAutosaveCoordinator
     ///     application shutdown, after any pending restore has completed.
     /// </summary>
     /// <param name="feature">The feature whose state should be saved.</param>
-    public void SaveOnShutdown(IShellProjectFeature feature)
+    /// <returns>A task that completes after the shutdown save attempt.</returns>
+    public Task SaveOnShutdown(IShellProjectFeature feature)
     {
         ArgumentNullException.ThrowIfNull(feature);
-        if (!saveOnShutdown) return;
+        if (!saveOnShutdown) return Task.CompletedTask;
 
-        _ = SaveAutosaveAfterLoadAsync(feature);
+        return SaveAutosaveAfterLoadAsync(feature);
     }
 
     /// <summary>Prevents project recovery snapshots from being written during shutdown.</summary>

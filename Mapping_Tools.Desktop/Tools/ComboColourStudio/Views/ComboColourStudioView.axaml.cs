@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels.Adapters;
 using Mapping_Tools.Desktop.ViewModels;
@@ -16,6 +17,12 @@ public partial class ComboColourStudioView : UserControl
         InitializeComponent();
     }
 
+    private void ColourPointsSelectionChanged(object? sender, SelectionChangedEventArgs eventArgs)
+    {
+        if (DataContext is ComboColourStudioViewModel viewModel && sender is DataGrid grid)
+            viewModel.SetSelectedColourPoints(grid.SelectedItems?.OfType<ObservableColourPoint>() ?? []);
+    }
+
     private void AddColourPointButtonPointerPressed(object? sender, PointerPressedEventArgs eventArgs)
     {
         if ((eventArgs.KeyModifiers & KeyModifiers.Shift) == 0 || DataContext is not ComboColourStudioViewModel viewModel)
@@ -27,9 +34,14 @@ public partial class ComboColourStudioView : UserControl
 
     private void RemoveSequenceColour_OnClick(object? sender, RoutedEventArgs eventArgs)
     {
-        if (DataContext is not ComboColourStudioViewModel viewModel || sender is not Button { Tag: ObservableSpecialColour colour })
+        if (DataContext is not ComboColourStudioViewModel viewModel || sender is not Button button)
             return;
 
-        viewModel.RemoveSequenceColourCommand.Execute(colour);
+        var item = button.FindAncestorOfType<ListBoxItem>(includeSelf: true);
+        var listBox = item?.FindAncestorOfType<ListBox>(includeSelf: true);
+        if (item is null || listBox is null) return;
+
+        int index = listBox.IndexFromContainer(item);
+        if (index >= 0) viewModel.RemoveSequenceColourAt(index);
     }
 }

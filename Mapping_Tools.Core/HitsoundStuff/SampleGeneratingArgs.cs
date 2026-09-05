@@ -163,7 +163,7 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
     /// </summary>
     /// <param name="other">The specification to compare.</param>
     /// <returns><see langword="true" /> when both specifications generate the same configured sample.</returns>
-    public bool Equals(SampleGeneratingArgs other)
+    public bool Equals(SampleGeneratingArgs? other)
     {
         if (other is null) return false;
 
@@ -225,7 +225,7 @@ public class SampleGeneratingArgs : IEquatable<SampleGeneratingArgs>
     /// </summary>
     /// <param name="obj">The object to compare.</param>
     /// <returns><see langword="true" /> when it is an equal <see cref="SampleGeneratingArgs" />.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (!(obj is SampleGeneratingArgs)) return false;
 

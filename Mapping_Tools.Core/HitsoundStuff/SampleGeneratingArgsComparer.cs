@@ -27,7 +27,7 @@ public class SampleGeneratingArgsComparer : IEqualityComparer<SampleGeneratingAr
     /// <param name="x">The first specification.</param>
     /// <param name="y">The second specification.</param>
     /// <returns><see langword="true" /> when both resolve to the same identity under the configured policy.</returns>
-    public bool Equals(SampleGeneratingArgs x, SampleGeneratingArgs y)
+    public bool Equals(SampleGeneratingArgs? x, SampleGeneratingArgs? y)
     {
         if (x is null && y is null)
             return true;

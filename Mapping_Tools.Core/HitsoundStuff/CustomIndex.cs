@@ -33,8 +33,9 @@ public class CustomIndex
     /// <summary>
     ///     Creates an assigned, initially empty custom-index requirement.
     /// </summary>
-    /// <param name="index"></param>
-    public CustomIndex(int index, SampleGeneratingArgsComparer comparer = null)
+    /// <param name="index">The assigned custom sample index.</param>
+    /// <param name="comparer">The source identity policy, or null to use the default policy.</param>
+    public CustomIndex(int index, SampleGeneratingArgsComparer? comparer = null)
     {
         Index = index;
         this.comparer = comparer ?? new SampleGeneratingArgsComparer();
@@ -45,7 +46,8 @@ public class CustomIndex
     /// <summary>
     ///     Creates an unassigned, initially empty custom-index requirement.
     /// </summary>
-    public CustomIndex(SampleGeneratingArgsComparer comparer = null)
+    /// <param name="comparer">The source identity policy, or null to use the default policy.</param>
+    public CustomIndex(SampleGeneratingArgsComparer? comparer = null)
     {
         Index = -1;
         this.comparer = comparer ?? new SampleGeneratingArgsComparer();
@@ -56,9 +58,9 @@ public class CustomIndex
     /// <summary>
     ///     Tests whether an existing slot supports a requested slot exactly or the request is empty.
     /// </summary>
-    /// <param name="s1"></param>
-    /// <param name="s2"></param>
-    /// <returns></returns>
+    /// <param name="s1">The existing source mix.</param>
+    /// <param name="s2">The requested source mix.</param>
+    /// <returns>Whether the requested mix is empty or identical to the existing mix.</returns>
     public static bool CheckSupport(HashSet<SampleGeneratingArgs> s1, HashSet<SampleGeneratingArgs> s2)
     {
         // s2 fits in s1 or s2 is empty
@@ -68,9 +70,9 @@ public class CustomIndex
     /// <summary>
     ///     Tests whether two slots can merge because at least one is empty or both source sets match.
     /// </summary>
-    /// <param name="s1"></param>
-    /// <param name="s2"></param>
-    /// <returns></returns>
+    /// <param name="s1">The first source mix.</param>
+    /// <param name="s2">The second source mix.</param>
+    /// <returns>Whether either mix is empty or both mixes are identical.</returns>
     public static bool CheckCanSupport(HashSet<SampleGeneratingArgs> s1, HashSet<SampleGeneratingArgs> s2)
     {
         // s2 fits in s1 or s1 is empty or s2 is empty
@@ -80,8 +82,8 @@ public class CustomIndex
     /// <summary>
     ///     Determines whether every non-empty requirement in another index is already supported by this index.
     /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
+    /// <param name="other">The requested custom-index requirements.</param>
+    /// <returns>Whether this index satisfies every requested slot.</returns>
     public bool Fits(CustomIndex other)
     {
         // Every non-empty set from other == set from self
@@ -94,8 +96,8 @@ public class CustomIndex
     /// <summary>
     ///     Determines whether two custom-index requirements can combine without conflicting source mixes.
     /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
+    /// <param name="other">The custom index to combine with this index.</param>
+    /// <returns>Whether combining the indices introduces no conflicting source mix.</returns>
     public bool CanMerge(CustomIndex other)
     {
         // Every non-empty set from other == non-empty set from self
@@ -108,7 +110,7 @@ public class CustomIndex
     /// <summary>
     ///     Unions another compatible requirement into this instance and adopts its assigned index when needed.
     /// </summary>
-    /// <param name="other"></param>
+    /// <param name="other">The compatible custom index whose source mixes are added.</param>
     public void MergeWith(CustomIndex other)
     {
         foreach (string key in AllKeys) Samples[key].UnionWith(other.Samples[key]);
@@ -120,8 +122,8 @@ public class CustomIndex
     /// <summary>
     ///     Creates a combined requirement using the larger assigned index.
     /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
+    /// <param name="other">The custom index to combine with this index.</param>
+    /// <returns>A new custom index containing the combined source requirements.</returns>
     public CustomIndex Merge(CustomIndex other)
     {
         var ci = new CustomIndex(Math.Max(Index, other.Index));
@@ -132,7 +134,7 @@ public class CustomIndex
     /// <summary>
     ///     Copies every slot with the same sample-argument comparer.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An independent copy of the slot sets using the same identity policy.</returns>
     public CustomIndex Copy()
     {
         var ci = new CustomIndex(Index, comparer);
@@ -163,7 +165,7 @@ public class CustomIndex
     /// <summary>
     ///     Formats every standard slot and its source mix for diagnostics.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Each slot name followed by its source mix.</returns>
     public override string ToString()
     {
         var accumulator = new StringBuilder();

@@ -73,7 +73,7 @@ public static class MetadataManagerEngine
             foreach (var specialColour in options.SpecialColours)
             {
                 beatmap.SpecialColours.Add(
-                    specialColour.Name,
+                    specialColour.Name ?? throw new ArgumentException("A special colour must have a name.", nameof(options)),
                     new ComboColour(specialColour.Color));
             }
         }
