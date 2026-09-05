@@ -480,10 +480,10 @@
                 </SplitView.Pane>
 
                 <Grid Background="{DynamicResource MaterialPaperBrush}">
-                    <ScrollViewer Margin="20"
-                                  HorizontalScrollBarVisibility="{Binding ContentHorizontalScrollBarVisibility}"
+                    <ScrollViewer HorizontalScrollBarVisibility="{Binding ContentHorizontalScrollBarVisibility}"
                                   VerticalScrollBarVisibility="{Binding ContentVerticalScrollBarVisibility}">
-                        <ContentControl Content="{Binding CurrentFeature}"
+                        <ContentControl Margin="20"
+                                        Content="{Binding CurrentFeature}"
                                         HorizontalContentAlignment="Stretch"
                                         VerticalContentAlignment="Stretch" />
                     </ScrollViewer>
