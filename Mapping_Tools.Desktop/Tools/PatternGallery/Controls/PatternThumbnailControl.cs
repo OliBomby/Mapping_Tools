@@ -138,10 +138,23 @@ public sealed class PatternThumbnailControl : Control
             if (!sliderPaths.TryGetValue(hitObject, out var path)) return;
 
             var shift = position - hitObject.Pos;
-            DrawPolyline(context, path.CalculatedPath.Select(point => point + shift),
-                Stroke ?? Brushes.White, radius * 1.95, scale, offsetX, offsetY);
-            DrawPolyline(context, path.CalculatedPath.Select(point => point + shift),
-                Fill ?? Brushes.DarkSlateGray, radius * 1.65, scale, offsetX, offsetY);
+            Vector2[] pathPoints = path.CalculatedPath.Select(point => point + shift).ToArray();
+            if (pathPoints.Length > 0)
+            {
+                StreamGeometry pathGeometry = CreatePathGeometry(pathPoints);
+                using (context.PushTransform(GetThumbnailTransform(scale, offsetX, offsetY)))
+                {
+                    context.DrawGeometry(null,
+                        new Pen(Stroke ?? Brushes.White, radius * 1.95,
+                            lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round),
+                        pathGeometry);
+                    context.DrawGeometry(null,
+                        new Pen(Fill ?? Brushes.DarkSlateGray, radius * 1.65,
+                            lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round),
+                        pathGeometry);
+                }
+            }
+
             DrawFilledCircle(context, path.PositionAt(0) + shift, radius, scale, offsetX, offsetY);
             DrawComboNumber(context, hitObject, radius, scale, offsetX, offsetY);
         }
@@ -202,21 +215,24 @@ public sealed class PatternThumbnailControl : Control
         context.DrawText(text, new Point(center.X - text.Width / 2, center.Y - text.Height / 2));
     }
 
-    private static void DrawPolyline(
-        DrawingContext context,
-        IEnumerable<Vector2> points,
-        IBrush brush,
-        double thickness,
-        double scale,
-        double offsetX,
-        double offsetY)
+    private static StreamGeometry CreatePathGeometry(IReadOnlyList<Vector2> points)
     {
-        var pointArray = points.ToArray();
-        Pen pen = new(brush, thickness * scale);
-        for (int index = 1; index < pointArray.Length; index++)
-            context.DrawLine(pen,
-                ToPoint(pointArray[index - 1], scale, offsetX, offsetY),
-                ToPoint(pointArray[index], scale, offsetX, offsetY));
+        var geometry = new StreamGeometry();
+        using (StreamGeometryContext geometryContext = geometry.Open())
+        {
+            geometryContext.BeginFigure(new Point(points[0].X, points[0].Y), false);
+            for (int index = 1; index < points.Count; index++)
+                geometryContext.LineTo(new Point(points[index].X, points[index].Y));
+
+            geometryContext.EndFigure(false);
+        }
+
+        return geometry;
+    }
+
+    private static Matrix GetThumbnailTransform(double scale, double offsetX, double offsetY)
+    {
+        return Matrix.CreateScale(scale, scale) * Matrix.CreateTranslation(offsetX, offsetY);
     }
 
     private static void DrawLine(

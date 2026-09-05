@@ -76,6 +76,7 @@ public sealed class ObjectVisualiserControl : Control
     private double scale = 1;
 
     private SliderPath? sliderPath;
+    private StreamGeometry? sliderPathGeometry;
 
     static ObjectVisualiserControl()
     {
@@ -209,6 +210,7 @@ public sealed class ObjectVisualiserControl : Control
     private void SetHitObject()
     {
         sliderPath = null;
+        sliderPathGeometry = null;
         controlPoints = [];
         pathPoints = [];
 
@@ -233,6 +235,7 @@ public sealed class ObjectVisualiserControl : Control
                     sliderPath = path;
                     controlPoints = path.ControlPoints.ToArray();
                     pathPoints = [HitObject.Pos, .. path.CalculatedPath];
+                    sliderPathGeometry = CreatePathGeometry(pathPoints);
                 }
             }
             catch
@@ -281,11 +284,22 @@ public sealed class ObjectVisualiserControl : Control
 
     private void DrawSlider(DrawingContext context)
     {
-        var pathOutlinePen = Stroke is null ? null : new Pen(Stroke, Thickness * scale);
-        var pathFillPen = Fill is null ? null : new Pen(Fill, ThicknessInsideOutline * scale);
-        if (pathOutlinePen is not null) DrawPolyline(context, pathOutlinePen);
+        var pathOutlinePen = Stroke is null
+            ? null
+            : new Pen(Stroke, Thickness, lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round);
+        var pathFillPen = Fill is null
+            ? null
+            : new Pen(Fill, ThicknessInsideOutline, lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round);
 
-        if (pathFillPen is not null) DrawPolyline(context, pathFillPen);
+        if (sliderPathGeometry is not null)
+        {
+            using (context.PushTransform(GetFigureTransform()))
+            {
+                if (pathOutlinePen is not null) context.DrawGeometry(null, pathOutlinePen, sliderPathGeometry);
+
+                if (pathFillPen is not null) context.DrawGeometry(null, pathFillPen, sliderPathGeometry);
+            }
+        }
 
         DrawCircleAtProgress(context, Fill, GetOutlinePen(), 0);
         DrawCircleAtProgress(context, Fill, GetOutlinePen(), 1);
@@ -323,9 +337,25 @@ public sealed class ObjectVisualiserControl : Control
         return Stroke is null ? null : new Pen(Stroke, Thickness * BorderThickness * scale);
     }
 
-    private void DrawPolyline(DrawingContext context, Pen pen)
+    private static StreamGeometry CreatePathGeometry(IReadOnlyList<Vector2> points)
     {
-        for (int index = 1; index < pathPoints.Count; index++) context.DrawLine(pen, ToPoint(pathPoints[index - 1]), ToPoint(pathPoints[index]));
+        var geometry = new StreamGeometry();
+        using (StreamGeometryContext geometryContext = geometry.Open())
+        {
+            geometryContext.BeginFigure(new Point(points[0].X, points[0].Y), false);
+            for (int index = 1; index < points.Count; index++)
+                geometryContext.LineTo(new Point(points[index].X, points[index].Y));
+
+            geometryContext.EndFigure(false);
+        }
+
+        return geometry;
+    }
+
+    private Matrix GetFigureTransform()
+    {
+        return Matrix.CreateTranslation(-contentBounds.Left, -contentBounds.Top) *
+               Matrix.CreateScale(scale, scale);
     }
 
     private void DrawCircleAtProgress(DrawingContext context, IBrush? fill, Pen? pen, double progress)
