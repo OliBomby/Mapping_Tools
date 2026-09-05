@@ -22,13 +22,16 @@ public sealed partial class SlideratorView : UserControl
 {
     private readonly Stopwatch previewClock = new();
     private readonly DispatcherTimer previewTimer;
-    private bool fastNavigationRequested;
+    private readonly ButtonModifierCapture moveLeftButtonModifiers;
+    private readonly ButtonModifierCapture moveRightButtonModifiers;
     private SlideratorViewModel? observedViewModel;
 
     /// <summary>Creates the Sliderator view and connects shared Core-backed controls.</summary>
     public SlideratorView()
     {
         InitializeComponent();
+        moveLeftButtonModifiers = new ButtonModifierCapture(MoveLeftButton);
+        moveRightButtonModifiers = new ButtonModifierCapture(MoveRightButton);
         GraphControlElement.SetBrush(new SolidColorBrush(Color.FromArgb(255, 0, 255, 255)));
         DataContextChanged += DataContextChangedHandler;
         previewTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
@@ -56,8 +59,7 @@ public sealed partial class SlideratorView : UserControl
     {
         if (DataContext is not SlideratorViewModel viewModel) return;
 
-        bool fast = fastNavigationRequested;
-        fastNavigationRequested = false;
+        bool fast = moveLeftButtonModifiers.Consume().HasFlag(KeyModifiers.Shift);
         await viewModel.MoveLeftAsync(fast);
         args.Handled = true;
     }
@@ -69,15 +71,9 @@ public sealed partial class SlideratorView : UserControl
     {
         if (DataContext is not SlideratorViewModel viewModel) return;
 
-        bool fast = fastNavigationRequested;
-        fastNavigationRequested = false;
+        bool fast = moveRightButtonModifiers.Consume().HasFlag(KeyModifiers.Shift);
         await viewModel.MoveRightAsync(fast);
         args.Handled = true;
-    }
-
-    private void NavigationPointerPressed(object? sender, PointerPressedEventArgs args)
-    {
-        fastNavigationRequested = args.KeyModifiers.HasAllFlags(KeyModifiers.Shift);
     }
 
     private void DataContextChangedHandler(object? sender, EventArgs args)

@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Tools.PatternGallery.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.PatternGallery.Views;
@@ -8,12 +9,14 @@ namespace Mapping_Tools.Desktop.Tools.PatternGallery.Views;
 /// <summary>Displays Pattern Gallery's collection cards and placement options.</summary>
 public sealed partial class PatternGalleryView : UserControl
 {
+    private readonly ButtonModifierCapture removeButtonModifiers;
     private ListBox? selectedPatternList;
 
     /// <summary>Creates the Pattern Gallery view and loads its compiled AXAML.</summary>
     public PatternGalleryView()
     {
         InitializeComponent();
+        removeButtonModifiers = new ButtonModifierCapture(RemoveButton);
     }
 
     private void PatternPointerPressed(object? sender, PointerPressedEventArgs eventArgs)
@@ -60,13 +63,16 @@ public sealed partial class PatternGalleryView : UserControl
         }
     }
 
-    private async void RemoveButtonPointerPressed(object? sender, PointerPressedEventArgs eventArgs)
+    private async void RemoveButtonClick(object? sender, RoutedEventArgs eventArgs)
     {
-        if ((eventArgs.KeyModifiers & KeyModifiers.Shift) == 0 || DataContext is not PatternGalleryViewModel viewModel)
-            return;
+        if (DataContext is not PatternGalleryViewModel viewModel) return;
+
+        if (removeButtonModifiers.Consume().HasFlag(KeyModifiers.Shift))
+            await viewModel.RemoveSelectedAsync(true);
+        else
+            await viewModel.RemoveCommand.ExecuteAsync(null);
 
         eventArgs.Handled = true;
-        await viewModel.RemoveSelectedAsync(true);
     }
 
     private void PatternContextMenuOpened(object? sender, RoutedEventArgs eventArgs)

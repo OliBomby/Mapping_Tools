@@ -123,9 +123,9 @@
                         <materialIcons:MaterialIcon Width="24" Height="24" Kind="AlternatingCurrent" />
                     </Button>
                     <Button Classes="flat path-picker"
+                            x:Name="AddButton"
                             Margin="5"
-                            PointerPressed="AddButtonPointerPressed"
-                            Command="{Binding AddCommand}"
+                            Click="AddButtonClick"
                             ToolTip.Tip="Add a hitsound zone. Hold shift to add current selected coordinates.">
                         <materialIcons:MaterialIcon Width="24" Height="24" Kind="Plus" />
                     </Button>

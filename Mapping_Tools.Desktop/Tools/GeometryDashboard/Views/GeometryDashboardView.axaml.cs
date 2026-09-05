@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Tools.GeometryDashboard.ViewModels;
 
 namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
@@ -9,6 +10,9 @@ namespace Mapping_Tools.Desktop.Tools.GeometryDashboard.Views;
 /// <summary>Hosts the Geometry Dashboard generator list and dashboard actions.</summary>
 public sealed partial class GeometryDashboardView : UserControl
 {
+    private readonly ButtonModifierCapture toggleSelectedButtonModifiers;
+    private readonly ButtonModifierCapture toggleLockedButtonModifiers;
+    private readonly ButtonModifierCapture toggleInheritableButtonModifiers;
     private bool restoreGeneratorsOffset;
     private double savedGeneratorsOffset;
 
@@ -16,24 +20,27 @@ public sealed partial class GeometryDashboardView : UserControl
     public GeometryDashboardView()
     {
         InitializeComponent();
+        toggleSelectedButtonModifiers = new ButtonModifierCapture(ToggleSelectedButton);
+        toggleLockedButtonModifiers = new ButtonModifierCapture(ToggleLockedButton);
+        toggleInheritableButtonModifiers = new ButtonModifierCapture(ToggleInheritableButton);
     }
 
-    private void ToggleSelected(object? sender, PointerPressedEventArgs eventArgs)
+    private void ToggleSelectedClick(object? sender, RoutedEventArgs eventArgs)
     {
-        if (eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-            (DataContext as GeometryDashboardViewModel)?.ToggleSelected(eventArgs.KeyModifiers);
+        (DataContext as GeometryDashboardViewModel)?.ToggleSelected(toggleSelectedButtonModifiers.Consume());
+        eventArgs.Handled = true;
     }
 
-    private void ToggleLocked(object? sender, PointerPressedEventArgs eventArgs)
+    private void ToggleLockedClick(object? sender, RoutedEventArgs eventArgs)
     {
-        if (eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-            (DataContext as GeometryDashboardViewModel)?.ToggleLocked(eventArgs.KeyModifiers);
+        (DataContext as GeometryDashboardViewModel)?.ToggleLocked(toggleLockedButtonModifiers.Consume());
+        eventArgs.Handled = true;
     }
 
-    private void ToggleInheritable(object? sender, PointerPressedEventArgs eventArgs)
+    private void ToggleInheritableClick(object? sender, RoutedEventArgs eventArgs)
     {
-        if (eventArgs.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-            (DataContext as GeometryDashboardViewModel)?.ToggleInheritable(eventArgs.KeyModifiers);
+        (DataContext as GeometryDashboardViewModel)?.ToggleInheritable(toggleInheritableButtonModifiers.Consume());
+        eventArgs.Handled = true;
     }
 
     private async void ShowPreferences(object? sender, RoutedEventArgs eventArgs)

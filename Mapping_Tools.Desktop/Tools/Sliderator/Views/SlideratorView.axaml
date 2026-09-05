@@ -95,13 +95,13 @@
                                    Text="{Binding LoadedHitObjects.Count, StringFormat='Loaded {0} slider(s)'}" />
                         <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
                             <Button Margin="0,0,5,0"
+                                    x:Name="MoveLeftButton"
                                     Click="MoveLeft"
-                                    PointerPressed="NavigationPointerPressed"
                                     ToolTip.Tip="Go to previous slider. Hold Shift for quick run before going to previous slider.">
                                 <materialIcons:MaterialIcon Kind="KeyboardArrowLeft" Width="24" Height="24" />
                             </Button>
-                            <Button Click="MoveRight"
-                                    PointerPressed="NavigationPointerPressed"
+                            <Button x:Name="MoveRightButton"
+                                    Click="MoveRight"
                                     ToolTip.Tip="Go to next slider. Hold Shift for quick run before going to next slider.">
                                 <materialIcons:MaterialIcon Kind="KeyboardArrowRight" Width="24" Height="24" />
                             </Button>

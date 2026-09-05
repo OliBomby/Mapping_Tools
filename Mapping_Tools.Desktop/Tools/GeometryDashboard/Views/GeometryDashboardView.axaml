@@ -14,17 +14,20 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <materialDesign:FloatingButton Classes="mini light" Margin="0,0,8,0"
                                                ToolTip.Tip="Toggle selection on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
-                                               PointerPressed="ToggleSelected">
+                                               x:Name="ToggleSelectedButton"
+                                               Click="ToggleSelectedClick">
                     <materialIcons:MaterialIcon Kind="SelectAll" Width="22" Height="22" />
                 </materialDesign:FloatingButton>
                 <materialDesign:FloatingButton Classes="mini light" Margin="0,0,8,0"
                                                ToolTip.Tip="Toggle locked on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
-                                               PointerPressed="ToggleLocked">
+                                               x:Name="ToggleLockedButton"
+                                               Click="ToggleLockedClick">
                     <materialIcons:MaterialIcon Kind="Lock" Width="22" Height="22" />
                 </materialDesign:FloatingButton>
                 <materialDesign:FloatingButton Classes="mini light" Margin="0,0,28,0"
                                                ToolTip.Tip="Toggle usability on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
-                                               PointerPressed="ToggleInheritable">
+                                               x:Name="ToggleInheritableButton"
+                                               Click="ToggleInheritableClick">
                     <materialIcons:MaterialIcon Kind="Pizza" Width="22" Height="22" />
                 </materialDesign:FloatingButton>
                 <materialDesign:FloatingButton Classes="mini light" Margin="0,0,8,0"

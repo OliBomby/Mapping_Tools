@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using Mapping_Tools.Desktop.Controls;
 using Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.ViewModels;
 using Mapping_Tools.Desktop.ViewModels;
 
@@ -8,18 +10,30 @@ namespace Mapping_Tools.Desktop.Tools.HitsoundPreviewHelper.Views;
 /// <summary>Presents the Avalonia Hitsound Preview Helper form.</summary>
 public sealed partial class HitsoundPreviewHelperView : UserControl
 {
+    private readonly ButtonModifierCapture addButtonModifiers;
+
     /// <summary>Creates the Hitsound Preview Helper view.</summary>
     public HitsoundPreviewHelperView()
     {
         InitializeComponent();
+        addButtonModifiers = new ButtonModifierCapture(AddButton);
     }
 
-    private void AddButtonPointerPressed(object? sender, PointerPressedEventArgs e)
+    private void AddButtonClick(object? sender, RoutedEventArgs e)
     {
-        if ((e.KeyModifiers & KeyModifiers.Shift) == 0) return;
         if (DataContext is not HitsoundPreviewHelperViewModel viewModel) return;
 
+        bool addFromSelection = addButtonModifiers.Consume().HasFlag(KeyModifiers.Shift);
+
+        if (addFromSelection)
+        {
+            viewModel.AddFromSelectionCommand.Execute(null);
+        }
+        else
+        {
+            viewModel.AddCommand.Execute(null);
+        }
+
         e.Handled = true;
-        viewModel.AddFromSelectionCommand.Execute(null);
     }
 }

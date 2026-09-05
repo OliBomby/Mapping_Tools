@@ -122,8 +122,8 @@
                                     ToolTip.Tip="Add a pattern from selected hit objects.">
                                 <materialIcons:MaterialIcon Kind="PlusBox" Width="24" Height="24" />
                             </Button>
-                            <Button Classes="flat" Command="{Binding RemoveCommand}"
-                                    PointerPressed="RemoveButtonPointerPressed"
+                            <Button Classes="flat" x:Name="RemoveButton"
+                                    Click="RemoveButtonClick"
                                     ToolTip.Tip="Delete selected patterns. Hold shift to skip dialog.">
                                 <materialIcons:MaterialIcon Kind="TrashCan" Width="24" Height="24" />
                             </Button>

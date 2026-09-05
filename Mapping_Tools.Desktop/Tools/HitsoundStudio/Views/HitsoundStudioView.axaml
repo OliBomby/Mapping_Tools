@@ -209,8 +209,10 @@
                     <Button Content="Add" Command="{Binding AddCommand}" ToolTip.Tip="Add or import a hitsound layer." />
                     <Button Content="Remove" Command="{Binding RemoveCommand}" ToolTip.Tip="Remove selected layers." />
                     <Button x:Name="RaiseButton" Content="Raise"
+                            Click="RaiseLayers"
                             ToolTip.Tip="Raise selected layers in priority. Hold Shift to move ten positions." />
                     <Button x:Name="LowerButton" Content="Lower"
+                            Click="LowerLayers"
                             ToolTip.Tip="Lower selected layers in priority. Hold Shift to move ten positions." />
                 </StackPanel>
             </Grid>

@@ -74,8 +74,8 @@
                                 Orientation="Horizontal">
                         <materialDesign:FloatingButton Classes="mini light"
                                                        Margin="5"
-                                                       Command="{Binding AddMapsetCommand}"
-                                                       PointerPressed="AddMapsetButtonPointerPressed"
+                                                       x:Name="AddMapsetButton"
+                                                       Click="AddMapsetButtonClick"
                                                        ToolTip.Tip="Add a mapset. Hold shift to get current beatmap from osu! client.">
                             <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
                         </materialDesign:FloatingButton>

@@ -11,14 +11,15 @@ namespace Mapping_Tools.Desktop.Tools.HitsoundStudio.Views;
 /// <summary>Presents the Avalonia Hitsound Studio editor and export surface.</summary>
 public sealed partial class HitsoundStudioView : UserControl
 {
+    private readonly ButtonModifierCapture raiseButtonModifiers;
+    private readonly ButtonModifierCapture lowerButtonModifiers;
+
     /// <summary>Creates the Hitsound Studio view.</summary>
     public HitsoundStudioView()
     {
         InitializeComponent();
-        RaiseButton.PointerPressed += RaiseLayers;
-        RaiseButton.KeyDown += RaiseLayersKeyDown;
-        LowerButton.PointerPressed += LowerLayers;
-        LowerButton.KeyDown += LowerLayersKeyDown;
+        raiseButtonModifiers = new ButtonModifierCapture(RaiseButton);
+        lowerButtonModifiers = new ButtonModifierCapture(LowerButton);
     }
 
     private void LayersSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -32,33 +33,15 @@ public sealed partial class HitsoundStudioView : UserControl
         if (DataContext is HitsoundStudioViewModel viewModel) viewModel.PreviewCommand.Execute(null);
     }
 
-    private void RaiseLayers(object? sender, PointerEventArgs e)
+    private void RaiseLayers(object? sender, RoutedEventArgs e)
     {
-        MoveLayers(-1, e.KeyModifiers);
+        MoveLayers(-1, raiseButtonModifiers.Consume());
         e.Handled = true;
     }
 
-    private void LowerLayers(object? sender, PointerEventArgs e)
+    private void LowerLayers(object? sender, RoutedEventArgs e)
     {
-        MoveLayers(1, e.KeyModifiers);
-        e.Handled = true;
-    }
-
-    private void RaiseLayersKeyDown(object? sender, KeyEventArgs e)
-    {
-        MoveLayersFromKeyboard(-1, e);
-    }
-
-    private void LowerLayersKeyDown(object? sender, KeyEventArgs e)
-    {
-        MoveLayersFromKeyboard(1, e);
-    }
-
-    private void MoveLayersFromKeyboard(int direction, KeyEventArgs e)
-    {
-        if (e.Key is not (Key.Space or Key.Enter)) return;
-
-        MoveLayers(direction, e.KeyModifiers);
+        MoveLayers(1, lowerButtonModifiers.Consume());
         e.Handled = true;
     }
 
