@@ -116,7 +116,7 @@ public static class SliderPathUtil
                     var convert = BezierConverter.ConvertToBezier(sliderPath).ControlPoints;
 
                     // Find the last bezier segment and the pixel length at that part
-                    BezierSubdivision subdivision = null;
+                    BezierSubdivision? subdivision = null;
                     double totalLength = 0;
 
                     foreach (var bezierSubdivision in ChopAnchors(convert))

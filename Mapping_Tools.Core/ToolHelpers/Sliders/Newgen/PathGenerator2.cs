@@ -177,7 +177,7 @@ public class PathGenerator2
         }
 
         double lastAngleChange = 0;
-        var startSubRange = start;
+        LinkedListNode<PathPoint> startSubRange = start;
         var current = start;
         double subRangeAngleChange = 0;
         var subRanges = new List<(LinkedListNode<PathPoint>, LinkedListNode<PathPoint>, double)>();
@@ -201,7 +201,7 @@ public class PathGenerator2
                 startSubRange = current;
                 subRangeAngleChange = -Math.Abs(angleChange); // Negate the angle change because this point invalidates the angle
             }
-            else if (!Precision.AlmostEquals(angleChange, 0) && Precision.AlmostEquals(lastAngleChange, 0) && current != startSubRange && current.Previous != startSubRange)
+            else if (!Precision.AlmostEquals(angleChange, 0) && Precision.AlmostEquals(lastAngleChange, 0) && current != startSubRange && current.Previous is not null && current.Previous != startSubRange)
             {
                 // Extra check to prevent subranges going backwards with i - 1
                 // Place on the previous index for symmetry with the part going into the zero chain

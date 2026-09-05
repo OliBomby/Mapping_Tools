@@ -61,7 +61,7 @@ public class PathWithHints
 
             // Add the merged overlaps
             reconstructionHints.InsertRange(startIndex,
-                MergeOverlaps(hint, overlaps).Where(o => o.HasValue).Select(o => o.Value));
+                MergeOverlaps(hint, overlaps).Where(o => o.HasValue).Select(o => o!.Value));
         }
     }
 

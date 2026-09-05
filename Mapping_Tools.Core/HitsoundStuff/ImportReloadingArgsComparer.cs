@@ -15,6 +15,9 @@ public class ImportReloadingArgsComparer : IEqualityComparer<ImportReloadingArgs
     /// <returns><see langword="true" /> when both requests would reload the same import.</returns>
     public bool Equals(ImportReloadingArgs? x, ImportReloadingArgs? y)
     {
+        if (ReferenceEquals(x, y)) return true;
+        if (x is null || y is null) return false;
+
         if (x.ImportType != y.ImportType)
             return false;
 

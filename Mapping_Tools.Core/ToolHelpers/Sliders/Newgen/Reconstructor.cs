@@ -29,7 +29,6 @@ public class Reconstructor
         if (DebugConstruction) return (pathWithHints.Path.Select(o => o.Pos).ToList(), PathType.Linear);
 
         var hints = ConstructHints(pathWithHints.Path, pathWithHints.ReconstructionHints);
-        ;
 
         var anchors = new List<Vector2>();
         var pathType = hints.Count == 1 && hints[0].Start == pathWithHints.Path.First && hints[0].End == pathWithHints.Path.Last
@@ -129,7 +128,7 @@ public class Reconstructor
     /// </summary>
     /// <param name="path">The path to construct hints for</param>
     /// <param name="existingHints">Existing hints to be used instead of generated hints if they are more efficient.</param>
-    public List<ReconstructionHint> ConstructHints(LinkedList<PathPoint> path, IReadOnlyList<ReconstructionHint> existingHints = null)
+    public List<ReconstructionHint> ConstructHints(LinkedList<PathPoint> path, IReadOnlyList<ReconstructionHint>? existingHints = null)
     {
         var hints = existingHints is null
             ? new List<ReconstructionHint>()
@@ -139,7 +138,7 @@ public class Reconstructor
         var current = path.First;
         int nextHint = 0;
         ReconstructionHint? currentHint = null;
-        LinkedListNode<PathPoint> segmentStart = null;
+        LinkedListNode<PathPoint>? segmentStart = null;
 
         // Loop through path and find all segments which are either an existing hint or a gap between two hints
         // Also split on all red points
@@ -159,10 +158,13 @@ public class Reconstructor
                 // Construct a hint
                 var constructedHint = ConstructHint(segmentStart, segmentEnd, layer);
 
-                if (currentHint.HasValue)
+                if (currentHint is { } activeHint)
                 {
                     // Keep the better hint
-                    if (currentHint.Value.Anchors.Count > constructedHint.Anchors.Count) hints[nextHint - 1] = constructedHint;
+                    if (activeHint.Anchors is not null
+                        && constructedHint.Anchors is not null
+                        && activeHint.Anchors.Count > constructedHint.Anchors.Count)
+                        hints[nextHint - 1] = constructedHint;
                 }
                 else
                 {

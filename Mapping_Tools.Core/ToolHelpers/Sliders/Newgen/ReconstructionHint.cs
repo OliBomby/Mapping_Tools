@@ -28,7 +28,7 @@ public struct ReconstructionHint
     /// <summary>
     ///     Should not be used if empty or null.
     /// </summary>
-    public readonly List<Vector2> Anchors;
+    public readonly List<Vector2>? Anchors;
 
     /// <summary>
     ///     The path type path described by the anchors.
@@ -51,7 +51,7 @@ public struct ReconstructionHint
     ///     The relation [0,1] -> [0,1] between cumulative length on the curve and cumulative length on the hint path.
     ///     If null, this relation is assumed to be linear.
     /// </summary>
-    public readonly Func<double, double> DistFunc;
+    public readonly Func<double, double>? DistFunc;
 
     /// <summary>
     ///     Associates a path interval with source anchors, precedence, and completion mapping.
@@ -64,8 +64,8 @@ public struct ReconstructionHint
     /// <param name="startP">The start p.</param>
     /// <param name="endP">The end p.</param>
     /// <param name="distFunc">The dist func.</param>
-    public ReconstructionHint(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int layer, List<Vector2> anchors,
-        PathType pathType = PathType.Bezier, double startP = 0, double endP = 1, Func<double, double> distFunc = null)
+    public ReconstructionHint(LinkedListNode<PathPoint> start, LinkedListNode<PathPoint> end, int layer, List<Vector2>? anchors,
+        PathType pathType = PathType.Bezier, double startP = 0, double endP = 1, Func<double, double>? distFunc = null)
     {
         Start = start;
         End = end;
@@ -95,7 +95,7 @@ public struct ReconstructionHint
     /// </summary>
     /// <param name="distFunc">The dist func.</param>
     /// <returns>The updated immutable hint value.</returns>
-    public ReconstructionHint SetDistFunc(Func<double, double> distFunc)
+    public ReconstructionHint SetDistFunc(Func<double, double>? distFunc)
     {
         return new ReconstructionHint(Start, End, Layer, Anchors, PathType, StartP, EndP, distFunc);
     }

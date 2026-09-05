@@ -63,7 +63,8 @@ public class PathHelperTests
         foreach (var hint in result.ReconstructionHints)
         {
             i++;
-            (hint.Anchors.Count > 1).Should().BeTrue($"hint {i} does not have enough anchors");
+            hint.Anchors.Should().NotBeNull();
+            (hint.Anchors!.Count > 1).Should().BeTrue($"hint {i} does not have enough anchors");
         }
 
         result.Path.Count(o => o.Red).Should().Be(2);
@@ -95,10 +96,10 @@ public class PathHelperTests
 
         // Act
         var p1 = path.First!.Next;
-        PathHelper.Interpolate(p1, Enumerable.Range(1, 9).Select(i => i / 10d));
+        PathHelper.Interpolate(p1!, Enumerable.Range(1, 9).Select(i => i / 10d));
 
         var p2 = path2.First!.Next;
-        PathHelper.Interpolate(p2, Enumerable.Range(1, 9).Select(i => i / 10d));
+        PathHelper.Interpolate(p2!, Enumerable.Range(1, 9).Select(i => i / 10d));
 
         // Assert
         path.Should().HaveCount(13);
@@ -121,9 +122,9 @@ public class PathHelperTests
         PathHelper.Recalculate(path);
 
         // Act
-        var start = path.First!.Next;
+        var start = path.First!.Next!;
         var middle = start!.Next;
-        var end = path.Last;
+        var end = path.Last!;
         int added = path.Subdivide(start, end, 5);
 
         // Assert
@@ -135,7 +136,7 @@ public class PathHelperTests
         (start.Next.Next.Next!.Value > start.Next.Next.Value).Should().BeTrue();
         (start.Next.Next.Next.Next!.Value > start.Next.Next.Next.Value).Should().BeTrue();
         (start.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Value).Should().BeTrue();
-        (start.Next.Next.Next.Next.Next.Next!.Value > start.Next.Next.Next.Next.Next.Value).Should().BeTrue();
-        start.Next.Next.Next.Next.Next.Next.Should().BeSameAs(end);
+        (start.Next!.Next!.Next!.Next!.Next!.Next!.Value > start.Next!.Next!.Next!.Next!.Next!.Value).Should().BeTrue();
+        start.Next!.Next!.Next!.Next!.Next!.Next.Should().BeSameAs(end);
     }
 }

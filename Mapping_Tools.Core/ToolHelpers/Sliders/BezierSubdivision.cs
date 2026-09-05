@@ -264,8 +264,8 @@ public class BezierSubdivision
         if (length <= 0)
             return 0;
 
-        BezierSubdivision baseSubdivision = null;
-        LinkedListNode<BezierSubdivision> current = null;
+        BezierSubdivision? baseSubdivision = null;
+        LinkedListNode<BezierSubdivision>? current = null;
         double l = 0;
         double lnext = 0;
         while (length > lnext)
@@ -273,18 +273,18 @@ public class BezierSubdivision
             current = current?.Next;
             if (current == null)
             {
-                baseSubdivision = baseSubdivision == null ? this : baseSubdivision.Next();
+                baseSubdivision = baseSubdivision is null ? this : baseSubdivision.Next();
                 var pathApproximation = new LinkedList<BezierSubdivision>();
                 pathApproximation.AddLast(baseSubdivision);
                 Subdivide(ref pathApproximation, tolerance);
-                current = pathApproximation.First;
+                current = pathApproximation.First!;
             }
 
             l = lnext;
             lnext += current.Value.ApproximationLength();
         }
 
-        var curr = current.Value;
+        var curr = current!.Value;
         while (curr.ApproximationLength() > precision)
         {
             curr.Children(out var left, out var right);

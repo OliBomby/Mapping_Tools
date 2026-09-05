@@ -70,7 +70,7 @@ public class BezierSubdivisionTests
 
         // Act
         BezierSubdivision.Subdivide(ref slider);
-        var current = slider.First;
+        var current = slider.First!;
         // Assert
         (current.Value.Points[0] - new Vector2(0, 0)).Length.Should().BeApproximately(0, 0.001);
         (current.Value.Points[1] - new Vector2(0.25, 0.5)).Length.Should().BeApproximately(0, 0.001);

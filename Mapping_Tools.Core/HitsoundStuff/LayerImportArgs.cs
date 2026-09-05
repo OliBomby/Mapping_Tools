@@ -112,6 +112,8 @@ public class LayerImportArgs : IEquatable<LayerImportArgs>
     /// <returns>true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.</returns>
     public bool Equals(LayerImportArgs? other)
     {
+        if (other is null) return false;
+
         return Path == other.Path
                && ImportType == other.ImportType
                && X == other.X

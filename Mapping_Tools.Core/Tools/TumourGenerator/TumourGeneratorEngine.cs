@@ -408,25 +408,25 @@ public sealed class TumourGeneratorEngine
             {
                 // Copy point and leave one side at 0 offset
                 var newPosition = CalculateNewPos(point, position, offset, postAngle + rotation);
-                current.List.AddBefore(current, new PathPoint(point.Pos, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, -1, true));
+                path.AddBefore(current, new PathPoint(point.Pos, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, -1, true));
                 current.Value = new PathPoint(newPosition, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, 0, true);
-                start = current.Previous;
+                start = current.Previous!;
                 hintStart = current;
             }
             else if (current == end && end.Next is not null && offset.LengthSquared > Precision.DOUBLE_EPSILON)
             {
                 // Copy point and leave one side at 0 offset
                 var newPosition = CalculateNewPos(point, position, offset, preAngle + rotation);
-                current.List.AddBefore(current, new PathPoint(newPosition, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, 1, true));
+                path.AddBefore(current, new PathPoint(newPosition, point.OgPos, point.PreAngle, point.PreAngle, point.CumulativeLength, 1, true));
                 current.Value = new PathPoint(point.Pos, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, 2, true);
-                hintEnd = current.Previous;
+                hintEnd = current.Previous!;
             }
             else if (red && !double.IsNaN(preAngle) && !double.IsNaN(postAngle) && !Precision.AlmostEquals(preAngle, postAngle) && offset.LengthSquared > Precision.DOUBLE_EPSILON)
             {
                 // Copy point and offset it by both angles
                 var newPosition = CalculateNewPos(point, position, offset, preAngle + rotation);
                 var newPosition2 = CalculateNewPos(point, position, offset, postAngle + rotation);
-                current.List.AddBefore(current, new PathPoint(newPosition, point.OgPos, point.PreAngle, point.PostAngle, point.CumulativeLength, point.T, red));
+                path.AddBefore(current, new PathPoint(newPosition, point.OgPos, point.PreAngle, point.PostAngle, point.CumulativeLength, point.T, red));
                 current.Value = new PathPoint(newPosition2, point.OgPos, point.PostAngle, point.PostAngle, point.CumulativeLength, point.T, red);
             }
             else

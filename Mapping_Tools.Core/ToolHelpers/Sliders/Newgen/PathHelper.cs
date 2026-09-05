@@ -40,7 +40,7 @@ public static class PathHelper
         var segmentsStarts = sliderPath.SegmentStarts;
         int segmentIndex = 1;
         double cumulativeLength = 0d;
-        LinkedListNode<PathPoint> segmentStartNode = null;
+        LinkedListNode<PathPoint>? segmentStartNode = null;
         for (int i = 0; i < calculatedPath.Count; i++)
         {
             // This is a while loop because there could be multiple identical segment starts in a row
@@ -63,7 +63,7 @@ public static class PathHelper
             path.AddLast(new PathPoint(calculatedPath[i], calculatedPath[i], 0, 0, cumulativeLength, red: isRedAnchor));
 
             // Make sure the start node is initialized
-            segmentStartNode ??= path.Last;
+            segmentStartNode ??= path.Last!;
 
             if (!isRedAnchor && i != calculatedPath.Count - 1 || i == 0) continue;
 
@@ -83,7 +83,7 @@ public static class PathHelper
             }
 
             // Add a segment from the previous red anchor to this red anchor
-            pathWithHints.AddReconstructionHint(new ReconstructionHint(segmentStartNode, path.Last, -1,
+            pathWithHints.AddReconstructionHint(new ReconstructionHint(segmentStartNode!, path.Last!, -1,
                 segments[segmentIndex - 1], sliderPath.Type, endP: endP));
 
             segmentStartNode = path.Last;
@@ -544,7 +544,7 @@ public static class PathHelper
     /// </summary>
     /// <param name="start">The node before the forward search begins.</param>
     /// <returns>The next red or terminal node, or null when no successor exists.</returns>
-    public static LinkedListNode<PathPoint> FindNextRed(LinkedListNode<PathPoint> start)
+    public static LinkedListNode<PathPoint>? FindNextRed(LinkedListNode<PathPoint> start)
     {
         var current = start?.Next;
         while (current is not null)
@@ -561,7 +561,7 @@ public static class PathHelper
     /// </summary>
     /// <param name="start">The node after which the backward search begins.</param>
     /// <returns>The previous red or initial node, or null when no predecessor exists.</returns>
-    public static LinkedListNode<PathPoint> FindPreviousRed(LinkedListNode<PathPoint> start)
+    public static LinkedListNode<PathPoint>? FindPreviousRed(LinkedListNode<PathPoint> start)
     {
         var current = start?.Previous;
         while (current is not null)

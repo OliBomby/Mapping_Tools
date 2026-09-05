@@ -9,8 +9,8 @@ namespace Mapping_Tools.Core.Tests.ToolHelpers.Sliders.NewGen;
 public class PathWithHintsTests
 {
     private const int num_points = 11;
-    private PathWithHints path;
-    private List<LinkedListNode<PathPoint>> points;
+    private PathWithHints path = null!;
+    private List<LinkedListNode<PathPoint>> points = null!;
 
     [TestInitialize]
     public void Initialize()
@@ -20,10 +20,10 @@ public class PathWithHintsTests
         for (int i = 0; i < num_points; i++)
         {
             path.Path.AddLast(new PathPoint(new Vector2(i, 0), 0, 0, i));
-            points.Add(path.Path.Last);
+            points.Add(path.Path.Last!);
         }
 
-        path.AddReconstructionHint(new ReconstructionHint(path.Path.First, path.Path.Last, -1, new List<Vector2>
+        path.AddReconstructionHint(new ReconstructionHint(path.Path.First!, path.Path.Last!, -1, new List<Vector2>
         {
             new(0, 0),
             new(num_points - 1, 0),

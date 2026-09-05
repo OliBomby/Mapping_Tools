@@ -28,11 +28,11 @@ public class PathGenerator
         Best,
     }
 
-    private List<double> angle; // path segment angles
-    private List<Vector2> diff; // path segments
-    private List<double> diffL; // length of segments
-    private List<Vector2> path; // input path
-    private List<double> pathL; // cumulative length
+    private List<double> angle = null!; // path segment angles
+    private List<Vector2> diff = null!; // path segments
+    private List<double> diffL = null!; // length of segments
+    private List<Vector2> path = null!; // input path
+    private List<double> pathL = null!; // cumulative length
 
     /// <summary>
     ///     Builds cached segment, angle, and cumulative-distance data from a sampled path.
@@ -66,23 +66,23 @@ public class PathGenerator
     /// <param name="pathPoints">The path points.</param>
     public void SetPath(List<Vector2> pathPoints)
     {
-        path = new List<Vector2> { pathPoints.First() };
-        diff = new List<Vector2>();
-        angle = new List<double>();
-        diffL = new List<double>();
+        path = [pathPoints.First()];
+        diff = [];
+        angle = [];
+        diffL = [];
         double sum = 0;
-        pathL = new List<double> { sum };
+        pathL = [sum];
 
         foreach (var point in pathPoints.Skip(1))
         {
-            var diff = point - path.Last();
-            double dist = diff.Length;
+            var diffToLast = point - path.Last();
+            double dist = diffToLast.Length;
 
             if (dist < Precision.DOUBLE_EPSILON) continue;
 
             path.Add(point);
-            this.diff.Add(diff);
-            angle.Add(diff.Theta);
+            diff.Add(diffToLast);
+            angle.Add(diffToLast.Theta);
             diffL.Add(dist);
             sum += dist;
             pathL.Add(sum);
@@ -152,11 +152,7 @@ public class PathGenerator
         // Make sure start index is before end index
         // The results will be the same for flipped indices
         if (startIndex > endIndex)
-        {
-            double tempEndIndex = endIndex;
-            endIndex = startIndex;
-            startIndex = tempEndIndex;
-        }
+            (endIndex, startIndex) = (startIndex, endIndex);
 
         var p1 = GetContinuousPosition(startIndex);
         var p2 = GetContinuousPosition(endIndex);
@@ -165,10 +161,10 @@ public class PathGenerator
         var labels = path.GetRange((int)startIndex, (int)Math.Ceiling(endIndex) - (int)startIndex + 1);
 
         Vector2?[] middles =
-        {
+        [
             TangentIntersectionApproximation(startIndex, endIndex),
             DoubleMiddleApproximation(startIndex, endIndex),
-        };
+        ];
 
         Vector2? bestMiddle = null;
         double bestLoss = double.PositiveInfinity;
@@ -247,15 +243,11 @@ public class PathGenerator
     {
         int dir = Math.Sign(endIndex - startIndex);
 
-        if (dir == 0) return new List<Tuple<double, double>> { new(startIndex, endIndex) };
+        if (dir == 0) return [new(startIndex, endIndex)];
 
         // If the direction is reversed, just swap the start and end index and then reverse the result at the end
         if (dir == -1)
-        {
-            double temp = endIndex;
-            endIndex = startIndex;
-            startIndex = temp;
-        }
+            (endIndex, startIndex) = (startIndex, endIndex);
 
         endIndex = MathHelper.Clamp(endIndex, 0, angle.Count - 1);
 
@@ -273,8 +265,8 @@ public class PathGenerator
         for (int i = startIndexInt; i <= endIndexInt; i++)
         {
             var pos = path[i];
-            double angle = this.angle[i];
-            double angleChange = GetSmallestAngle(angle, lastAngle);
+            double currentAngle = angle[i];
+            double angleChange = GetSmallestAngle(currentAngle, lastAngle);
             //Console.WriteLine("Angle change: " + angleChange);
 
             // Check for inflection point or red anchors
@@ -313,7 +305,7 @@ public class PathGenerator
 
             subRangeAngleChange += Math.Abs(angleChange);
 
-            lastAngle = angle;
+            lastAngle = currentAngle;
             lastAngleChange = angleChange;
         }
 
@@ -342,8 +334,8 @@ public class PathGenerator
             //Console.WriteLine($"Iterating subrange from {segmentStartIndexInt} to {segmentEndIndexInt}");
             for (int i = segmentStartIndexInt; i <= segmentEndIndexInt; i++)
             {
-                double angle = this.angle[i];
-                double angleChange = GetSmallestAngle(angle, lastAngle);
+                double currentAngle = angle[i];
+                double angleChange = GetSmallestAngle(currentAngle, lastAngle);
 
                 segmentAngleChange += Math.Abs(angleChange);
 
@@ -356,7 +348,7 @@ public class PathGenerator
                     segmentAngleChange -= maxSegmentAngle;
                 }
 
-                lastAngle = angle;
+                lastAngle = currentAngle;
             }
 
             if (Math.Abs(startSegment - subRange.Item2) > Precision.DOUBLE_EPSILON) segments.Add(new Tuple<double, double>(startSegment, subRange.Item2));
