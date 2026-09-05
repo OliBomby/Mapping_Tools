@@ -23,7 +23,7 @@
         <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
     </Style>
 
-    <Style Selector=":is(Button)">
+    <Style Selector="Button">
         <Setter Property="Foreground" Value="{DynamicResource MaterialDarkForegroundBrush}" />
     </Style>
 
