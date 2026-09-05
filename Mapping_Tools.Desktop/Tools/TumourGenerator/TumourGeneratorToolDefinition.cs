@@ -13,10 +13,10 @@ namespace Mapping_Tools.Desktop.Tools.TumourGenerator;
 public sealed class TumourGeneratorToolRegistration : IMappingToolDefinition
 {
     /// <inheritdoc />
-    public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Auto;
+    public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />
-    public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Auto;
+    public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />
     public int Order => 240;

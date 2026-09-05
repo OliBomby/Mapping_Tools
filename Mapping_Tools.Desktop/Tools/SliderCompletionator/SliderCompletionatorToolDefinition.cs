@@ -13,7 +13,7 @@ namespace Mapping_Tools.Desktop.Tools.SliderCompletionator;
 public sealed class SliderCompletionatorToolRegistration : IMappingToolDefinition
 {
     /// <inheritdoc />
-    public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
+    public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Auto;
 
     /// <inheritdoc />
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Auto;

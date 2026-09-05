@@ -12,7 +12,7 @@ namespace Mapping_Tools.Desktop.Tools.TimingHelper;
 public sealed class TimingHelperToolRegistration : IMappingToolDefinition
 {
     /// <inheritdoc />
-    public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
+    public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Auto;
 
     /// <inheritdoc />
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Auto;

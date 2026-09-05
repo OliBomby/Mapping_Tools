@@ -14,10 +14,10 @@ namespace Mapping_Tools.Desktop.Tools.Sliderator;
 public sealed class SlideratorToolRegistration : IMappingToolDefinition
 {
     /// <inheritdoc />
-    public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Auto;
+    public ToolScrollBarVisibility HorizontalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />
-    public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Auto;
+    public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />
     public int Order => 230;
