@@ -131,20 +131,6 @@
             <Setter Property="Background" Value="{DynamicResource MaterialDividerBrush}" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
-        <Style Selector="TextBox#ToolSearchBox /template/ Panel#PART_TextFieldPanel">
-            <Setter Property="MinHeight" Value="35" />
-        </Style>
-        <Style Selector="TextBox#ToolSearchBox /template/ Border#PART_BackgroundTextField">
-            <Setter Property="Margin" Value="0" />
-        </Style>
-        <Style Selector="TextBox#ToolSearchBox /template/ Panel#PART_TextContainer">
-            <Setter Property="Margin" Value="10,0,4,0" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style
-            Selector="TextBox#ToolSearchBox /template/ DockPanel#PART_InnerPanel > ContentControl#PART_RightContentControl">
-            <Setter Property="Margin" Value="0" />
-        </Style>
     </Window.Styles>
 
     <Grid x:Name="RootGrid">
@@ -301,7 +287,6 @@
 
                     <StackPanel DockPanel.Dock="Right"
                                 Orientation="Horizontal"
-                                Panel.ZIndex="5"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Top"
                                 WindowDecorationProperties.ElementRole="User">
@@ -431,13 +416,12 @@
                                Background="{DynamicResource MaterialPaperBrush}">
                         <TextBox x:Name="ToolSearchBox"
                                  DockPanel.Dock="Top"
-                                 Classes="clearButton outline"
-                                 Margin="16,16,16,0"
-                                 Padding="8"
-                                 Height="35"
+                                 Margin="16,8,16,0"
+                                 Classes="outline clearButton"
+                                 Theme="{StaticResource OutlineTextBox}"
                                  AutomationProperties.Name="Tool search"
-                                 UseFloatingPlaceholder="False"
-                                 PlaceholderText="Search"
+                                 UseFloatingPlaceholder="True"
+                                 materialAssists:TextFieldAssist.Label="Search"
                                  Text="{Binding SearchText, Mode=TwoWay}"
                                  ToolTip.Tip="Search registered features">
                             <TextBox.KeyBindings>

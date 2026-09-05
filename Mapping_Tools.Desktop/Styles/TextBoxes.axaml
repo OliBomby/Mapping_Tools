@@ -5,34 +5,48 @@
         <Style Selector="^:not(.outline) /template/ Panel#PART_TextFieldPanel">
             <Setter Property="MinHeight" Value="40" />
         </Style>
+        <Style Selector="^.outline /template/ Panel#PART_TextFieldPanel">
+            <Setter Property="MinHeight" Value="44" />
+        </Style>
         <Style Selector="^:not(.outline):empty:not(:focus-within) /template/ Border#PART_LabelRootBorder">
-            <Setter Property="Margin" Value="0,16,1,1" />
             <Setter Property="RenderTransform" Value="scale(1)" />
+            <Setter Property="Margin" Value="0,16,1,1" />
         </Style>
         <Style
             Selector="^:not(.outline):focus-within:not(:empty) /template/ Border#PART_LabelRootBorder,
                          ^:not(.outline):focus-within /template/ Border#PART_LabelRootBorder,
                          ^:not(.outline):not(:empty) /template/ Border#PART_LabelRootBorder">
-            <Setter Property="Margin" Value="0,4,1,1" />
             <Setter Property="RenderTransform" Value="scale(0.75)" />
+            <Setter Property="Margin" Value="0,4,1,1" />
         </Style>
-        <Style Selector="^:not(.outline) /template/ TextBlock#PART_LabelText">
+        <Style Selector="^.outline:empty:not(:focus-within) /template/ Border#PART_LabelRootBorder">
+            <Setter Property="RenderTransform" Value="scale(1)" />
+            <Setter Property="Margin" Value="10,16,1,1" />
+        </Style>
+        <Style
+            Selector="^.outline:focus-within:not(:empty) /template/ Border#PART_LabelRootBorder,
+                         ^.outline:focus-within /template/ Border#PART_LabelRootBorder,
+                         ^.outline:not(:empty) /template/ Border#PART_LabelRootBorder">
+            <Setter Property="RenderTransform" Value="scale(0.70)" />
+            <Setter Property="Margin" Value="14,4,1,1" />
+        </Style>
+        <Style Selector="^ /template/ TextBlock#PART_LabelText">
             <Setter Property="Foreground" Value="{DynamicResource MaterialBodyLightBrush}" />
         </Style>
-        <Style Selector="^:not(.outline):focus-within /template/ TextBlock#PART_LabelText">
+        <Style Selector="^:focus-within /template/ TextBlock#PART_LabelText">
             <Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
         </Style>
-        <Style Selector="^:not(.outline):pointerover /template/ materialControls|MaterialUnderline#PART_Underline">
+        <Style Selector="^:pointerover /template/ materialControls|MaterialUnderline#PART_Underline">
             <Setter Property="IdleBrush" Value="{DynamicResource MaterialPrimaryMidBrush}" />
         </Style>
-        <Style Selector="^:not(.outline):error /template/ TextBlock#PART_LabelText">
+        <Style Selector="^:error /template/ TextBlock#PART_LabelText">
             <Setter Property="Foreground" Value="{DynamicResource MaterialValidationErrorBrush}" />
         </Style>
         <Style Selector="^:disabled">
             <Setter Property="Opacity" Value="0.5" />
         </Style>
         <Style
-            Selector="^:not(.outline) /template/ DataValidationErrors#PART_DataValidation /template/ ContentControl#PART_ErrorPresenter">
+            Selector="^ /template/ DataValidationErrors#PART_DataValidation /template/ ContentControl#PART_ErrorPresenter">
             <Setter Property="Margin" Value="0,2,0,0" />
         </Style>
         <Style Selector="^.compact">
