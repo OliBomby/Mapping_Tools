@@ -29,6 +29,7 @@ using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Services.Hosted;
+using Mapping_Tools.Desktop.Services.Notifications;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.AutoFailDetector.ViewModels;
 using Mapping_Tools.Desktop.Tools.ComboColourStudio.ViewModels;
@@ -62,6 +63,7 @@ public sealed class DependencyInjectionTests
         Type[] expectedSingletons =
         [
             typeof(MainWindow),
+            typeof(INotificationSurface),
             typeof(MainViewModel),
             typeof(PreferencesViewModel),
             typeof(RhythmGuideViewModel),
@@ -195,7 +197,7 @@ public sealed class DependencyInjectionTests
             .Where(descriptor => descriptor.ServiceType == typeof(IHostedService))
             .ToArray();
         // Assert
-        hosted.Length.Should().Be(4);
+        hosted.Length.Should().Be(5);
         hosted.All(descriptor => descriptor.Lifetime == ServiceLifetime.Singleton).Should().BeTrue();
     }
 

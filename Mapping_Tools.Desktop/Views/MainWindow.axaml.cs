@@ -5,11 +5,11 @@ using Avalonia.Interactivity;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
-using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services.Hosted;
+using Mapping_Tools.Desktop.Services.Notifications;
 using Mapping_Tools.Desktop.Services.Updates;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.ViewModels;
@@ -22,12 +22,11 @@ namespace Mapping_Tools.Desktop.Views;
 /// <summary>
 ///     Hosts registered Avalonia features and captures safe normal-state window geometry.
 /// </summary>
-public partial class MainWindow : Window
+public partial class MainWindow : Window, INotificationSurface
 {
     private static readonly WindowBounds defaultBounds = new(80, 60, 1500, 800);
     private static readonly TimeSpan snackbarDuration = TimeSpan.FromSeconds(5);
     private readonly DesktopApplicationSettings settings;
-    private readonly IUserNotificationService? notifications;
     private readonly SettingsPersistenceHostedService? settingsPersistence;
     private readonly IUpdaterInteractionService? updaterInteraction;
     private WindowBounds normalBounds = defaultBounds;
@@ -76,29 +75,11 @@ public partial class MainWindow : Window
         DesktopApplicationSettings settings,
         SettingsPersistenceHostedService? settingsPersistence,
         IUpdaterInteractionService? updaterInteraction)
-        : this(settings, settingsPersistence, updaterInteraction, null)
-    {
-    }
-
-    /// <summary>
-    ///     Loads the compiled shell with persisted placement, updater shutdown, and snackbar notification coordination.
-    /// </summary>
-    /// <param name="settings">The process-lifetime settings document.</param>
-    /// <param name="settingsPersistence">The orderly-shutdown boundary used by Exit without saving.</param>
-    /// <param name="updaterInteraction">The updater interaction owned by runtime composition.</param>
-    /// <param name="notifications">The process-lifetime stream displayed through the material snackbar host.</param>
-    public MainWindow(
-        DesktopApplicationSettings settings,
-        SettingsPersistenceHostedService? settingsPersistence,
-        IUpdaterInteractionService? updaterInteraction,
-        IUserNotificationService? notifications)
     {
         this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         this.settingsPersistence = settingsPersistence;
         this.updaterInteraction = updaterInteraction;
-        this.notifications = notifications;
         InitializeComponent();
-        if (notifications is not null) notifications.Published += OnNotificationPublished;
         AddHandler(KeyDownEvent, HandleWindowKeyDown, RoutingStrategies.Tunnel);
         PositionChanged += (_, _) => CaptureNormalBounds();
         Resized += (_, _) => CaptureNormalBounds();
@@ -115,13 +96,6 @@ public partial class MainWindow : Window
         base.OnOpened(eventArgs);
         RestoreWindowPlacement();
         if (DataContext is MainViewModel viewModel) _ = viewModel.CheckForUpdatesOnStartupAsync();
-    }
-
-    /// <inheritdoc />
-    protected override void OnClosed(EventArgs eventArgs)
-    {
-        if (notifications is not null) notifications.Published -= OnNotificationPublished;
-        base.OnClosed(eventArgs);
     }
 
     /// <inheritdoc />
@@ -296,11 +270,8 @@ public partial class MainWindow : Window
         MaximizeIcon.Kind = maximized ? MaterialIconKind.WindowRestore : MaterialIconKind.WindowMaximize;
     }
 
-    private void OnNotificationPublished(
-        object? sender,
-        UserNotificationPublishedEventArgs eventArgs)
+    void INotificationSurface.ShowSnackbar(UserNotification notification)
     {
-        UserNotification notification = eventArgs.Notification;
         Dispatcher.UIThread.Post(
             () => SnackbarHost.Post(
                 new SnackbarModel($"{notification.Title}: {notification.Message}", snackbarDuration),

@@ -27,6 +27,7 @@ using Mapping_Tools.Desktop.Models;
 using Mapping_Tools.Desktop.Services;
 using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Services.Hosted;
+using Mapping_Tools.Desktop.Services.Notifications;
 using Mapping_Tools.Desktop.Services.Platform;
 using Mapping_Tools.Desktop.Services.Updates;
 using Mapping_Tools.Desktop.Shell;
@@ -61,6 +62,8 @@ internal static class DesktopServiceRegistration
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddSingleton<MainWindow>();
+        services.AddSingleton<INotificationSurface>(provider =>
+            provider.GetRequiredService<MainWindow>());
         services.AddSingleton<Func<Window>>(provider => () => provider.GetRequiredService<MainWindow>());
         services.AddSingleton<IUiDispatcher, AvaloniaUiDispatcher>();
         services.AddSingleton<IUpdateGateway, OnovaUpdateGateway>();

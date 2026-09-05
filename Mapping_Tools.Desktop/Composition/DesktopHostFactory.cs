@@ -1,4 +1,5 @@
 using Mapping_Tools.Desktop.Services.Hosted;
+using Mapping_Tools.Desktop.Services.Notifications;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -22,6 +23,7 @@ internal static class DesktopHostFactory
         services.AddHostedService<BetterSaveOverrideHostedService>();
         services.AddSingleton<IHostedService>(provider =>
             provider.GetRequiredService<GlobalHotkeyHostedService>());
+        services.AddHostedService<NotificationPresenter>();
         return services;
     }
 }
