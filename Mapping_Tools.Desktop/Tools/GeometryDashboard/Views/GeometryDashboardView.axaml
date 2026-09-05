@@ -7,11 +7,19 @@
              x:Class="Mapping_Tools.Desktop.Tools.GeometryDashboard.Views.GeometryDashboardView"
              x:DataType="geometryDashboard:GeometryDashboardViewModel"
              x:CompileBindings="True">
-    <Grid RowDefinitions="Auto,*,Auto">
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
-            <controls:ToolViewHeader Title="Geometry Dashboard"
-                                     HelpText="This tool derives virtual points, lines and circles from the hit objects in your editor and overlays them over the editor.&#x0a;You can then snap your mouse to those virtual points, lines and circles using a hotkey, so you can use the geometry in your map.&#x0a;&#x0a;There are also hotkeys for selecting, locking and toggling usability on virtual objects. Locked objects don't disappear on themselves and non-usable objects always get ignored by generators.&#x0a;You can find and configure all the hotkeys in the preferences (top right gear button). You can configure just about everything else too.&#x0a;Hover your mouse over the names of things to probably get a tooltip which gives more explanation. I encourage you to try out everything!&#x0a;&#x0a;Virtual objects are generated in layers. The first layer has the hit objects of your editor, the second layer has virtual objects derived from those hit objects, the third layer has virtual objects derived from the previous virtual objects, etc.&#x0a;You can specify the number of layers in the preferences. More layers generally results in exponentially more virtual objects.&#x0a;&#x0a;In the big list below are all the generators. These generators generate new virtual objects from previous virtual objects or hit objects.&#x0a;All the generators in the basic section only take hit objects as an input, so when activating one of them you can instantly see the effect.&#x0a;The more advanced generators all take virtual objects as input, so you need to activate at least one basic generator active for them to work.&#x0a;&#x0a;Every generator also has it's own settings. You can access those settings by clicking the 'Configure' button on each generator.&#x0a;In these generator settings you can do thing like customize what virtual objects the generator accepts as input or change the properties of the output of the generator.&#x0a;&#x0a;Lastly there are savestates which you can use to quickly change out preferences and generator settings using hotkeys. As an advanced user this can save lots of time continuously changing generators and stuff.&#x0a;The savestates window is opened by clicking the button next to the preferences button.&#x0a;&#x0a;⚠ You must specify your user config file in the Mapping Tools Preferences (Options -&gt; Preferences) for this tool to function." />
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
+    <Grid RowDefinitions="*,Auto">
+        <Grid Grid.Row="0" RowDefinitions="Auto,*,Auto" MinHeight="0">
+            <StackPanel Grid.Row="0">
+                <controls:ToolViewHeader Title="Geometry Dashboard"
+                                         HelpText="This tool derives virtual points, lines and circles from the hit objects in your editor and overlays them over the editor.&#x0a;You can then snap your mouse to those virtual points, lines and circles using a hotkey, so you can use the geometry in your map.&#x0a;&#x0a;There are also hotkeys for selecting, locking and toggling usability on virtual objects. Locked objects don't disappear on themselves and non-usable objects always get ignored by generators.&#x0a;You can find and configure all the hotkeys in the preferences (top right gear button). You can configure just about everything else too.&#x0a;Hover your mouse over the names of things to probably get a tooltip which gives more explanation. I encourage you to try out everything!&#x0a;&#x0a;Virtual objects are generated in layers. The first layer has the hit objects of your editor, the second layer has virtual objects derived from those hit objects, the third layer has virtual objects derived from the previous virtual objects, etc.&#x0a;You can specify the number of layers in the preferences. More layers generally results in exponentially more virtual objects.&#x0a;&#x0a;In the big list below are all the generators. These generators generate new virtual objects from previous virtual objects or hit objects.&#x0a;All the generators in the basic section only take hit objects as an input, so when activating one of them you can instantly see the effect.&#x0a;The more advanced generators all take virtual objects as input, so you need to activate at least one basic generator active for them to work.&#x0a;&#x0a;Every generator also has it's own settings. You can access those settings by clicking the 'Configure' button on each generator.&#x0a;In these generator settings you can do thing like customize what virtual objects the generator accepts as input or change the properties of the output of the generator.&#x0a;&#x0a;Lastly there are savestates which you can use to quickly change out preferences and generator settings using hotkeys. As an advanced user this can save lots of time continuously changing generators and stuff.&#x0a;The savestates window is opened by clicking the button next to the preferences button.&#x0a;&#x0a;⚠ You must specify your user config file in the Mapping Tools Preferences (Options -&gt; Preferences) for this tool to function." />
+
+                <Grid Margin="0,0,0,10" ColumnDefinitions="Auto,*,Auto">
+                    <TextBlock Text="Search" VerticalAlignment="Center" Margin="10,0" />
+                    <TextBox Grid.Column="1" Margin="0,0,10,10"
+                             Text="{Binding Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip.Tip="Search for a generator." />
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
                 <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
                                                ToolTip.Tip="Toggle selection on all virtual objects. Hold shift for enable all, hold ctrl for disable all."
                                                x:Name="ToggleSelectedButton"
@@ -38,75 +46,80 @@
                                                Click="ShowPreferences">
                     <materialIcons:MaterialIcon Kind="SettingsOutline" Width="22" Height="22" />
                 </materialDesign:FloatingButton>
+                    </StackPanel>
+                </Grid>
             </StackPanel>
+
+            <Grid Grid.Row="1" RowDefinitions="Auto,*" MinHeight="0">
+                <Grid Grid.Row="0" ColumnDefinitions="55,90,500,90,50">
+                    <TextBlock Text="Active" />
+                    <TextBlock Grid.Column="1" Text="Settings" />
+                    <TextBlock Grid.Column="2" Text="Name" />
+                    <TextBlock Grid.Column="3" Text="Sequential" />
+                    <TextBlock Grid.Column="4" Text="Relevancy" />
+                </Grid>
+                <ScrollViewer Grid.Row="1" x:Name="GeneratorsScrollViewer"
+                              VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled"
+                              ScrollChanged="GeneratorsScrollChanged" PointerPressed="GeneratorsPointerPressed"
+                              PointerWheelChanged="GeneratorsPointerWheelChanged">
+                    <ItemsControl ItemsSource="{Binding GeneratorGroups}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="geometryDashboard:GeometryDashboardGeneratorGroupViewModel">
+                                <Expander IsExpanded="True">
+                                    <Expander.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Name}" FontSize="22" FontWeight="Bold"
+                                                       Foreground="Gray" VerticalAlignment="Bottom" />
+                                            <TextBlock Text="{Binding ItemCount}" FontSize="22" FontWeight="Bold"
+                                                       FontStyle="Italic" Foreground="Green" Margin="10,0,0,0"
+                                                       VerticalAlignment="Bottom" />
+                                            <TextBlock Text=" item(s)" FontSize="22" FontStyle="Italic" Foreground="Silver"
+                                                       VerticalAlignment="Bottom" />
+                                        </StackPanel>
+                                    </Expander.Header>
+                                    <ItemsControl ItemsSource="{Binding Generators}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="geometryDashboard:GeometryDashboardGeneratorViewModel">
+                                                <Grid ColumnDefinitions="55,90,500,90,50" Margin="0,2">
+                                                    <ToggleSwitch IsChecked="{Binding Settings.IsActive, Mode=TwoWay}"
+                                                                  Cursor="Hand" />
+                                                    <Button Grid.Column="1" Content="Configure" Width="82"
+                                                            Command="{Binding OpenSettingsCommand}"
+                                                            ToolTip.Tip="Generator settings..." />
+                                                    <TextBlock Grid.Column="2" Text="{Binding Name}"
+                                                               VerticalAlignment="Center"
+                                                               ToolTip.Tip="{Binding Tooltip}" />
+                                                    <ToggleSwitch Grid.Column="3"
+                                                                  IsChecked="{Binding Settings.IsSequential, Mode=TwoWay}"
+                                                                  Cursor="Hand" />
+                                                    <TextBox Grid.Column="4" Classes="compact" Width="50"
+                                                             Text="{Binding Settings.RelevancyRatio, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                                             Cursor="Hand"
+                                                             ToolTip.Tip="The relevance multiplier applied to generated objects." />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
         </Grid>
 
-        <Grid Grid.Row="1" RowDefinitions="Auto,Auto,*" MinHeight="0">
-            <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,8">
-                <TextBlock Text="Search" VerticalAlignment="Center" Margin="10,0" />
-                <TextBox Grid.Column="1" Margin="0,0,10,10"
-                         Text="{Binding Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         ToolTip.Tip="Search for a generator." />
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
+                               Text="Made by OliBomby" />
+                </WrapPanel>
             </Grid>
-            <Grid Grid.Row="1" ColumnDefinitions="55,90,500,90,50" Margin="0,0,0,4">
-                <TextBlock Text="Active" />
-                <TextBlock Grid.Column="1" Text="Settings" />
-                <TextBlock Grid.Column="2" Text="Name" />
-                <TextBlock Grid.Column="3" Text="Sequential" />
-                <TextBlock Grid.Column="4" Text="Relevancy" />
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20" Margin="20,0,20,0"
+                                          Background="{x:Null}" BorderBrush="{x:Null}"
+                                          Maximum="100" Value="0" />
             </Grid>
-            <ScrollViewer Grid.Row="2" x:Name="GeneratorsScrollViewer"
-                          VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled"
-                          ScrollChanged="GeneratorsScrollChanged" PointerPressed="GeneratorsPointerPressed"
-                          PointerWheelChanged="GeneratorsPointerWheelChanged">
-                <ItemsControl ItemsSource="{Binding GeneratorGroups}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="geometryDashboard:GeometryDashboardGeneratorGroupViewModel">
-                            <Expander IsExpanded="True">
-                                <Expander.Header>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Name}" FontSize="22" FontWeight="Bold"
-                                                   Foreground="Gray" VerticalAlignment="Bottom" />
-                                        <TextBlock Text="{Binding ItemCount}" FontSize="22" FontWeight="Bold"
-                                                   FontStyle="Italic" Foreground="Green" Margin="10,0,0,0"
-                                                   VerticalAlignment="Bottom" />
-                                        <TextBlock Text=" item(s)" FontSize="22" FontStyle="Italic" Foreground="Silver"
-                                                   VerticalAlignment="Bottom" />
-                                    </StackPanel>
-                                </Expander.Header>
-                                <ItemsControl ItemsSource="{Binding Generators}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="geometryDashboard:GeometryDashboardGeneratorViewModel">
-                                            <Grid ColumnDefinitions="55,90,500,90,50" Margin="0,2">
-                                                <ToggleSwitch IsChecked="{Binding Settings.IsActive, Mode=TwoWay}"
-                                                              Cursor="Hand" />
-                                                <Button Grid.Column="1" Content="Configure" Width="82"
-                                                        Command="{Binding OpenSettingsCommand}"
-                                                        ToolTip.Tip="Generator settings..." />
-                                                <TextBlock Grid.Column="2" Text="{Binding Name}"
-                                                           VerticalAlignment="Center"
-                                                           ToolTip.Tip="{Binding Tooltip}" />
-                                                <ToggleSwitch Grid.Column="3"
-                                                              IsChecked="{Binding Settings.IsSequential, Mode=TwoWay}"
-                                                              Cursor="Hand" />
-                                                <TextBox Grid.Column="4" Width="50"
-                                                         Text="{Binding Settings.RelevancyRatio, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
-                                                         Cursor="Hand"
-                                                         ToolTip.Tip="The relevance multiplier applied to generated objects." />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </Expander>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </Grid>
-
-        <Grid Grid.Row="2" Margin="0,10,0,0">
-            <TextBlock VerticalAlignment="Bottom"
-                       FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
         </Grid>
     </Grid>
 </UserControl>

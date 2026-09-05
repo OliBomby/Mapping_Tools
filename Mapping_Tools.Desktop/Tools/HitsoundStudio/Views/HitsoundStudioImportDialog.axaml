@@ -1,56 +1,80 @@
 <UserControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:hitsoundStudio="clr-namespace:Mapping_Tools.Desktop.Tools.HitsoundStudio.Interactions"
+        xmlns:materialControls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         x:Class="Mapping_Tools.Desktop.Tools.HitsoundStudio.Views.HitsoundStudioImportDialog"
         x:DataType="hitsoundStudio:HitsoundStudioImportDialogViewModel"
-        Width="620" Height="650"
+        Width="500" Height="540"
         HorizontalAlignment="Center"
         VerticalAlignment="Center">
-    <Grid Margin="24" RowDefinitions="Auto,*,Auto,Auto" RowSpacing="12">
-        <TextBlock FontSize="24" FontWeight="Bold" Text="Import Hitsound Layer" />
-        <ScrollViewer Grid.Row="1">
-            <StackPanel Spacing="10">
-                <TextBox Text="{Binding Name, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Name"
+    <Grid RowDefinitions="35,*,60">
+        <TextBlock Grid.Row="0"
+                   Margin="10,0,0,0"
+                   VerticalAlignment="Center"
+                   FontSize="14"
+                   FontWeight="Medium"
+                   Text="Import Hitsound Layer" />
+        <ScrollViewer Grid.Row="1"
+                      ClipToBounds="True"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10" Spacing="0">
+                <TextBox Margin="0,5,0,0"
+                         Text="{Binding Name, Mode=TwoWay}"
+                         materialAssists:TextFieldAssist.Label="Name"
                          ToolTip.Tip="The convenient name shown in the layer list." />
-                <ComboBox ItemsSource="{Binding ImportTypes}" SelectedItem="{Binding ImportType, Mode=TwoWay}"
+                <ComboBox Margin="0,5,0,0"
+                          ItemsSource="{Binding ImportTypes}"
+                          SelectedItem="{Binding ImportType, Mode=TwoWay}"
                           materialAssists:ComboBoxAssist.Label="Import type"
                           ToolTip.Tip="Choose a simple layer, stack, hitsound, MIDI, or storyboard import." />
-                <ComboBox IsVisible="{Binding IsSimpleOrStackImport}" ItemsSource="{Binding SampleSets}"
+                <ComboBox Margin="0,5,0,0"
+                          IsVisible="{Binding IsSimpleOrStackImport}"
+                          ItemsSource="{Binding SampleSets}"
                           SelectedItem="{Binding SampleSet, Mode=TwoWay}"
                           materialAssists:ComboBoxAssist.Label="Sample set"
                           ToolTip.Tip="Sample set used by a simple or stack layer." />
-                <ComboBox IsVisible="{Binding IsSimpleOrStackImport}" ItemsSource="{Binding Hitsounds}"
+                <ComboBox Margin="0,5,0,0"
+                          IsVisible="{Binding IsSimpleOrStackImport}"
+                          ItemsSource="{Binding Hitsounds}"
                           SelectedItem="{Binding Hitsound, Mode=TwoWay}"
                           materialAssists:ComboBoxAssist.Label="Hitsound"
                           ToolTip.Tip="Hitsound used by a simple or stack layer." />
-                <Grid IsVisible="{Binding IsSimpleOrStackImport}" ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                <Grid Margin="0,15,0,0"
+                      IsVisible="{Binding IsSimpleOrStackImport}"
+                      ColumnDefinitions="*,Auto">
                     <TextBox Text="{Binding SamplePath, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Hitsound sample or SoundFont"
                              ToolTip.Tip="Audio file or SoundFont used by a simple layer or SoundFont note." />
-                    <Button Grid.Column="1" Content="…" Command="{Binding PickSampleCommand}"
+                    <Button Grid.Column="1"
+                            VerticalAlignment="Bottom"
+                            Content="…"
+                            Command="{Binding PickSampleCommand}"
                             ToolTip.Tip="Choose a sample or SoundFont." />
                 </Grid>
-                <Grid IsVisible="{Binding HasImportSource}" ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                <Grid Margin="0,15,0,0"
+                      IsVisible="{Binding HasImportSource}"
+                      ColumnDefinitions="*,Auto">
                     <TextBox Text="{Binding SourcePaths, Mode=TwoWay}" AcceptsReturn="True" Height="90"
                              materialAssists:TextFieldAssist.Label="Source path(s)"
                              ToolTip.Tip="Beatmap, MIDI, or storyboard source paths. Multiple paths are supported for hitsound/storyboard imports." />
-                    <Button Grid.Column="1" Content="…" Command="{Binding PickSourceCommand}"
+                    <Button Grid.Column="1"
+                            VerticalAlignment="Bottom"
+                            Content="…"
+                            Command="{Binding PickSourceCommand}"
                             ToolTip.Tip="Choose one or more import sources." />
                 </Grid>
-                <Grid IsVisible="{Binding IsStackImport}" ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Grid IsVisible="{Binding IsStackImport}" ColumnDefinitions="*,5,*">
                     <TextBox Text="{Binding XText, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="X coordinate (-1 = any)" />
-                    <TextBox Grid.Column="1" Text="{Binding YText, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Y coordinate (-1 = any)" />
+                    <TextBox Grid.Column="2" Text="{Binding YText, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Y coordinate (-1 = any)" />
                 </Grid>
-                <TextBox IsVisible="{Binding IsMidiImport}" Text="{Binding OffsetText, Mode=TwoWay}"
+                <TextBox Margin="0,15,0,0"
+                         IsVisible="{Binding IsMidiImport}"
+                         Text="{Binding OffsetText, Mode=TwoWay}"
                          materialAssists:TextFieldAssist.Label="MIDI offset (ms)" />
-                <Grid IsVisible="{Binding IsMidiImport}" ColumnDefinitions="*,*" ColumnSpacing="10">
-                    <TextBox IsVisible="{Binding IsLengthSettingsVisible}"
-                             Text="{Binding LengthRoughnessText, Mode=TwoWay}" materialAssists:TextFieldAssist.Label="Length rounding roughness" />
-                    <TextBox Grid.Column="1" IsVisible="{Binding IsVelocitySettingsVisible}"
-                             Text="{Binding VelocityRoughnessText, Mode=TwoWay}"
-                             materialAssists:TextFieldAssist.Label="Velocity rounding roughness" />
-                </Grid>
-                <CheckBox IsVisible="{Binding IsSampleImport}" Content="Discriminate volumes"
+                <CheckBox Margin="0,15,0,0"
+                          IsVisible="{Binding IsSampleImport}"
+                          Content="Discriminate volumes"
                           IsChecked="{Binding DiscriminateVolumes, Mode=TwoWay}"
                           ToolTip.Tip="Keep source volume differences as separate layers." />
                 <CheckBox IsVisible="{Binding IsHitsoundsImport}" Content="Detect duplicate samples"
@@ -62,29 +86,54 @@
                 <CheckBox IsVisible="{Binding IsHitsoundsImport}" Content="Include storyboard sounds"
                           IsChecked="{Binding IncludeStoryboard, Mode=TwoWay}"
                           ToolTip.Tip="Include storyboard samples during hitsound import." />
-                <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI instruments"
+                <CheckBox Margin="0,15,0,0"
+                          IsVisible="{Binding IsMidiImport}"
+                          Content="Discriminate MIDI instruments"
                           IsChecked="{Binding DiscriminateInstruments, Mode=TwoWay}" />
                 <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI keys"
                           IsChecked="{Binding DiscriminateKeys, Mode=TwoWay}" />
                 <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI lengths"
                           IsChecked="{Binding DiscriminateLengths, Mode=TwoWay}" />
-                <CheckBox IsVisible="{Binding IsMidiImport}" Content="Discriminate MIDI velocities"
+                <TextBox Margin="0,8,0,8"
+                         IsVisible="{Binding IsLengthSettingsVisible}"
+                         Text="{Binding LengthRoughnessText, Mode=TwoWay}"
+                         materialAssists:TextFieldAssist.Label="Length rounding roughness" />
+                <CheckBox IsVisible="{Binding IsMidiImport}"
+                          Content="Discriminate MIDI velocities"
                           IsChecked="{Binding DiscriminateVelocities, Mode=TwoWay}" />
+                <TextBox Margin="0,8,0,8"
+                         IsVisible="{Binding IsVelocitySettingsVisible}"
+                         Text="{Binding VelocityRoughnessText, Mode=TwoWay}"
+                         materialAssists:TextFieldAssist.Label="Velocity rounding roughness" />
+                <TextBlock Foreground="OrangeRed"
+                           Text="{Binding Error}"
+                           TextWrapping="Wrap" />
             </StackPanel>
         </ScrollViewer>
-        <TextBlock Grid.Row="2" Foreground="OrangeRed" Text="{Binding Error}" TextWrapping="Wrap" />
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
-            <Button Classes="dialog-action dark"
-                    Content="Accept"
-                    Command="{Binding AcceptCommand}"
-                    MinWidth="88"
-                    MinHeight="36"
-                    IsDefault="True" />
-            <Button Classes="dialog-action dark"
-                    Content="Cancel"
-                    Command="{Binding CancelCommand}"
-                    MinWidth="88"
-                    MinHeight="36" />
-        </StackPanel>
+        <materialControls:ColorZone Grid.Row="2"
+                                    Padding="14"
+                                    Mode="PrimaryLight"
+                                    materialAssists:ShadowAssist.ShadowDepth="Depth0">
+            <Grid ColumnDefinitions="*,*">
+                <Button Grid.Column="0"
+                        Classes="dialog-action dark"
+                        Content="Accept"
+                        Command="{Binding AcceptCommand}"
+                        Margin="0,0,10,0"
+                        MinWidth="88"
+                        MinHeight="36"
+                        FontWeight="Bold"
+                        IsDefault="True" />
+                <Button Grid.Column="1"
+                        Classes="dialog-action dark"
+                        Content="Cancel"
+                        Command="{Binding CancelCommand}"
+                        Margin="10,0,0,0"
+                        MinWidth="88"
+                        MinHeight="36"
+                        FontWeight="Bold"
+                        IsCancel="True" />
+            </Grid>
+        </materialControls:ColorZone>
     </Grid>
 </UserControl>

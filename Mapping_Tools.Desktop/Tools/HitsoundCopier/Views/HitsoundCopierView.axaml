@@ -11,8 +11,8 @@
         <converters:HitsoundCopierCopyModeConverter x:Key="HitsoundCopierCopyModeConverter" />
     </UserControl.Resources>
     <Grid RowDefinitions="*,Auto">
-        <Grid Margin="0,0,120,10">
-            <StackPanel>
+        <Grid>
+            <StackPanel Margin="0,0,0,100">
                 <controls:ToolViewHeader
                     Title="Hitsound Copier"
                     IsQuickRunSupported="True"
@@ -22,11 +22,11 @@
                     <TextBox Margin="0,0,5,0" materialAssists:TextFieldAssist.Label="Copy hitsounds from"
                              Text="{Binding PathFrom, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                              ToolTip.Tip="Hitsounds get copied from this map." />
-                    <Button Grid.Column="1" Classes="flat path-picker" Command="{Binding ImportLoadCommand}"
+                    <Button Grid.Column="1" Classes="flat path-picker" Cursor="Hand" Command="{Binding ImportLoadCommand}"
                             VerticalAlignment="Bottom" ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
                         <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
                     </Button>
-                    <Button Grid.Column="3" Classes="flat path-picker" Command="{Binding ImportBrowseCommand}"
+                    <Button Grid.Column="3" Classes="flat path-picker" Cursor="Hand" Command="{Binding ImportBrowseCommand}"
                             VerticalAlignment="Bottom" ToolTip.Tip="Select beatmaps with File Explorer.">
                         <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
                     </Button>
@@ -37,17 +37,17 @@
                              ToolTip.Tip="Hitsounds get copied to these maps. You can input multiple maps separated with '|'." />
                     <TextBlock Grid.Column="1" Margin="3,15,2,0" Padding="0,0,3,0" FontStyle="Italic"
                                Text="{Binding ExportMapCountText}" />
-                    <Button Grid.Column="2" Classes="flat path-picker" Command="{Binding ExportLoadCommand}"
+                    <Button Grid.Column="2" Classes="flat path-picker" Cursor="Hand" Command="{Binding ExportLoadCommand}"
                             VerticalAlignment="Bottom" ToolTip.Tip="Fetch the selected beatmap from your osu! client.">
                         <materialIcons:MaterialIcon Width="30" Height="30" Kind="RestoreFromTrash" />
                     </Button>
-                    <Button Grid.Column="4" Classes="flat path-picker" Command="{Binding ExportBrowseCommand}"
+                    <Button Grid.Column="4" Classes="flat path-picker" Cursor="Hand" Command="{Binding ExportBrowseCommand}"
                             VerticalAlignment="Bottom" ToolTip.Tip="Select beatmaps with File Explorer.">
                         <materialIcons:MaterialIcon Width="30" Height="30" Kind="Folder" />
                     </Button>
                 </Grid>
 
-                <ComboBox Margin="0,20,0,0" ItemsSource="{Binding CopyModes}" SelectedItem="{Binding CopyMode}"
+                <ComboBox Margin="0,20,0,0" Cursor="Hand" ItemsSource="{Binding CopyModes}" SelectedItem="{Binding CopyMode}"
                           materialAssists:ComboBoxAssist.Label="Copying mode"
                           ToolTip.Tip="'Overwrite everything' works like traditional hitsound copiers and 'Overwrite only defined' will only copy over hitsounds from the source beatmap and keep all the other hitsounds intact.">
                     <ComboBox.ItemTemplate>
@@ -97,28 +97,29 @@
 
                 <CheckBox IsChecked="{Binding MuteSliderends}" Content="Mute sliderends"
                           ToolTip.Tip="Automatically mute eligible slider ends or spinner ends without source hitsounds." />
-                <StackPanel IsVisible="{Binding MuteSliderends}" Margin="0,5,0,0">
-                    <TextBlock FontSize="14" Margin="0,5,0,5" Text="Sliderend muting filter:" />
+                <StackPanel IsVisible="{Binding MuteSliderends}">
+                    <TextBlock FontSize="14" Margin="0,10,0,0" Text="Sliderend muting filter:" />
                     <Grid ColumnDefinitions="Auto,5,Auto,5,*">
-                        <TextBox MinWidth="100" Classes="compact"
+                        <TextBox MinWidth="100" FontSize="14" Cursor="Hand"
                                  materialAssists:TextFieldAssist.Label="All beat divisors"
                                  Text="{Binding BeatDivisors, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource BeatDivisorArrayToStringConverter}}"
                                  ToolTip.Tip="Input ALL the used beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499" />
-                        <TextBox Grid.Column="2" MinWidth="100" Classes="compact"
+                        <TextBox Grid.Column="2" MinWidth="100" FontSize="14" Cursor="Hand"
                                  materialAssists:TextFieldAssist.Label="Muted beat divisors"
                                  Text="{Binding MutedDivisors, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource BeatDivisorArrayToStringConverter}}"
                                  ToolTip.Tip="Input ALL the mutable beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499" />
-                        <TextBox Grid.Column="4" Classes="compact"
+                        <TextBox Grid.Column="4" FontSize="14" Cursor="Hand"
                                  materialAssists:TextFieldAssist.Label="Minimum duration"
                                  Text="{Binding MinLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
                                  ToolTip.Tip="Minimum duration of slider in beats to be eligible for sliderend muting. Use this to not accidentally mute kicksliders." />
                     </Grid>
-                    <Grid Margin="0,10,0,0" ColumnDefinitions="*,5,70">
+                    <TextBlock FontSize="14" Margin="0,10,0,0" Text="Muted config:" />
+                    <Grid ColumnDefinitions="*,5,70">
                         <TextBox Classes="compact" materialAssists:TextFieldAssist.Label="Muted custom index"
                                  Text="{Binding MutedIndex, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantInt32Converter}}"
                                  ToolTip.Tip="Custom index of the muted sliderend. Leave as -1 for no change." />
                         <ComboBox Grid.Column="2" ItemsSource="{Binding MutedSampleSets}"
-                                  SelectedItem="{Binding MutedSampleSet}" Classes="compact"
+                                  SelectedItem="{Binding MutedSampleSet}" Classes="compact" Cursor="Hand"
                                   ToolTip.Tip="Sampleset of the muted sliderend." />
                     </Grid>
                 </StackPanel>
@@ -128,9 +129,17 @@
                                     RunCommand="{Binding RunCommand}" />
         </Grid>
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
-            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
-            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100"
-                                      Value="{Binding Progress}" />
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
+                               Text="Made by OliBomby" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20" Margin="20,0,20,0"
+                                          Background="{x:Null}" BorderBrush="{x:Null}"
+                                          Maximum="100" Value="{Binding Progress}" />
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

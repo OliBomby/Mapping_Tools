@@ -3,56 +3,73 @@
         xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.Interactions"
         x:Class="Mapping_Tools.Desktop.Tools.PatternGallery.Views.PatternGalleryInputDialog"
-        x:DataType="patternGallery:PatternGalleryInputViewModel"
-        Width="620" Height="560"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center">
-    <Grid Margin="12" RowDefinitions="*,Auto">
-        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="10">
-                <TextBox materialAssists:TextFieldAssist.Label="Name"
-                         Text="{Binding Name, Mode=TwoWay}" />
-                <StackPanel IsVisible="{Binding IsCode}" Spacing="10">
-                    <TextBox materialAssists:TextFieldAssist.Label="Hit objects"
-                             Text="{Binding HitObjects, Mode=TwoWay}"
-                             AcceptsReturn="True" TextWrapping="NoWrap" MinHeight="120" />
-                    <TextBox materialAssists:TextFieldAssist.Label="Timing points"
-                             Text="{Binding TimingPoints, Mode=TwoWay}"
-                             AcceptsReturn="True" TextWrapping="NoWrap" MinHeight="90" />
-                    <TextBox materialAssists:TextFieldAssist.Label="Global SV"
-                             Text="{Binding GlobalSvText, Mode=TwoWay}" />
-                    <ComboBox materialAssists:ComboBoxAssist.Label="Game mode"
-                              ItemsSource="{Binding GameModes}"
-                              SelectedItem="{Binding GameMode, Mode=TwoWay}" />
-                </StackPanel>
-                <StackPanel IsVisible="{Binding IsFile}" Spacing="10">
-                    <TextBox materialAssists:TextFieldAssist.Label="Pattern file path"
-                             Text="{Binding FilePath, Mode=TwoWay}" />
-                    <TextBox materialAssists:TextFieldAssist.Label="Filter"
-                             Text="{Binding Filter, Mode=TwoWay}" />
-                    <TextBox materialAssists:TextFieldAssist.Label="Start time"
-                             Text="{Binding StartTimeText, Mode=TwoWay}" />
-                    <TextBox materialAssists:TextFieldAssist.Label="End time"
-                             Text="{Binding EndTimeText, Mode=TwoWay}" />
-                </StackPanel>
-                <TextBlock Text="{Binding Error}" Foreground="{DynamicResource MaterialValidationErrorBrush}"
-                           TextWrapping="Wrap" />
+        x:DataType="patternGallery:PatternGalleryInputViewModel">
+    <Grid Margin="16" RowDefinitions="*,*">
+        <StackPanel Grid.Row="0">
+            <TextBox materialAssists:TextFieldAssist.Label="Name"
+                     Text="{Binding Name, Mode=TwoWay}"
+                     MinWidth="100"
+                     Margin="0,0,0,5" />
+            <StackPanel IsVisible="{Binding IsCode}">
+                <TextBox materialAssists:TextFieldAssist.Label="Hit objects"
+                         Text="{Binding HitObjects, Mode=TwoWay}"
+                         AcceptsReturn="True"
+                         TextWrapping="NoWrap"
+                         MinWidth="100"
+                         Margin="0,0,0,5" />
+                <TextBox materialAssists:TextFieldAssist.Label="Timing points"
+                         Text="{Binding TimingPoints, Mode=TwoWay}"
+                         AcceptsReturn="True"
+                         TextWrapping="NoWrap"
+                         MinWidth="100"
+                         Margin="0,0,0,5" />
+                <TextBox materialAssists:TextFieldAssist.Label="Global SV"
+                         Text="{Binding GlobalSvText, Mode=TwoWay}"
+                         MinWidth="100"
+                         Margin="0,0,0,5" />
+                <ComboBox materialAssists:ComboBoxAssist.Label="Game mode"
+                          ItemsSource="{Binding GameModes}"
+                          SelectedItem="{Binding GameMode, Mode=TwoWay}"
+                          MinWidth="100"
+                          Margin="0,0,0,5" />
             </StackPanel>
-        </ScrollViewer>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+            <StackPanel IsVisible="{Binding IsFile}">
+                <TextBox materialAssists:TextFieldAssist.Label="Pattern file path"
+                         Text="{Binding FilePath, Mode=TwoWay}"
+                         MinWidth="100"
+                         MaxWidth="200"
+                         Margin="0,0,0,5" />
+                <TextBox materialAssists:TextFieldAssist.Label="Filter"
+                         Text="{Binding Filter, Mode=TwoWay}"
+                         MinWidth="100"
+                         Margin="0,0,0,5" />
+                <TextBox materialAssists:TextFieldAssist.Label="Start time"
+                         Text="{Binding StartTimeText, Mode=TwoWay}"
+                         MinWidth="100"
+                         Margin="0,0,0,5" />
+                <TextBox materialAssists:TextFieldAssist.Label="End time"
+                         Text="{Binding EndTimeText, Mode=TwoWay}"
+                         MinWidth="100"
+                         Margin="0,0,0,5" />
+            </StackPanel>
+            <TextBlock Text="{Binding Error}"
+                       Foreground="{DynamicResource MaterialValidationErrorBrush}"
+                       TextWrapping="Wrap" />
+        </StackPanel>
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0,16,0,0">
             <Button Classes="dialog-action primary"
                     Theme="{StaticResource MaterialFlatButton}"
                     Content="ACCEPT"
                     Command="{Binding AcceptCommand}"
-                    MinWidth="88"
-                    MinHeight="36"
                     IsDefault="True" />
             <Button Classes="dialog-action primary"
                     Theme="{StaticResource MaterialFlatButton}"
                     Content="CANCEL"
                     Command="{Binding CancelCommand}"
-                    MinWidth="88"
-                    MinHeight="36"
+                    Margin="8,0,0,0"
                     IsCancel="True" />
         </StackPanel>
     </Grid>

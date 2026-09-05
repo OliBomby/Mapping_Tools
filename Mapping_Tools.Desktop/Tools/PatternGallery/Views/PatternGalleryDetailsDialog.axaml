@@ -1,46 +1,63 @@
 <UserControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
         xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.Interactions"
         x:Class="Mapping_Tools.Desktop.Tools.PatternGallery.Views.PatternGalleryDetailsDialog"
-        x:DataType="patternGallery:PatternGalleryDetailsViewModel"
-        Width="440"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center">
-    <Grid RowDefinitions="*,Auto" Margin="12">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="8">
-                <TextBox Text="{Binding Name, Mode=TwoWay}"
-                         PlaceholderText="Name"
-                         ToolTip.Tip="The name shown for this pattern." />
-                <TextBlock Text="{Binding CreationTimeText, StringFormat='Creation time: {0}'}" />
-                <TextBlock Text="{Binding LastUsedTimeText, StringFormat='Time of last use: {0}'}" />
-                <TextBlock Text="{Binding UseCountText, StringFormat='Usage count: {0}'}" />
-                <TextBlock Text="{Binding ObjectCountText, StringFormat='Object count: {0}'}" />
-                <TextBlock Text="{Binding DurationText, StringFormat='Duration: {0}'}" />
-                <TextBlock Text="{Binding BeatLengthText, StringFormat='Beat length: {0}'}" />
-                <TextBlock Text="{Binding FileName, StringFormat='File name: {0}'}" TextWrapping="Wrap" />
-                <TextBlock Text="{Binding Error}"
-                           Foreground="{DynamicResource MaterialValidationErrorBrush}"
-                           TextWrapping="Wrap" />
+        x:DataType="patternGallery:PatternGalleryDetailsViewModel">
+    <Grid Margin="16" RowDefinitions="*,*">
+        <StackPanel Grid.Row="0">
+            <TextBox materialAssists:TextFieldAssist.Label="Name"
+                     Text="{Binding Name, Mode=TwoWay}"
+                     MinWidth="100"
+                     Margin="0,0,0,5"
+                     ToolTip.Tip="The name shown for this pattern." />
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Width="150" Text="Creation time" />
+                <TextBlock Text="{Binding CreationTimeText}" />
             </StackPanel>
-        </ScrollViewer>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Width="150" Text="Time of last use" />
+                <TextBlock Text="{Binding LastUsedTimeText}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Width="150" Text="Usage count" />
+                <TextBlock Text="{Binding UseCountText}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Width="150" Text="Object count" />
+                <TextBlock Text="{Binding ObjectCountText}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Width="150" Text="Duration" />
+                <TextBlock Text="{Binding DurationText}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Width="150" Text="Beat length" />
+                <TextBlock Text="{Binding BeatLengthText}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock Width="150" Text="File name" />
+                <TextBlock Text="{Binding FileName}" TextWrapping="Wrap" />
+            </StackPanel>
+            <TextBlock Text="{Binding Error}"
+                       Foreground="{DynamicResource MaterialValidationErrorBrush}"
+                       TextWrapping="Wrap" />
+        </StackPanel>
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center"
-                    Spacing="8">
+                    Margin="0,16,0,0">
             <Button Classes="dialog-action primary"
                     Theme="{StaticResource MaterialFlatButton}"
                     Content="ACCEPT"
                     Command="{Binding AcceptCommand}"
-                    MinWidth="88"
-                    MinHeight="36"
                     IsDefault="True" />
             <Button Classes="dialog-action primary"
                     Theme="{StaticResource MaterialFlatButton}"
                     Content="CANCEL"
                     Command="{Binding CancelCommand}"
-                    MinWidth="88"
-                    MinHeight="36" />
+                    Margin="8,0,0,0"
+                    IsCancel="True" />
         </StackPanel>
     </Grid>
 </UserControl>

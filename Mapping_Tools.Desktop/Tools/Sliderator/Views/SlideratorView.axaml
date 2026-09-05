@@ -33,7 +33,9 @@
                 <graph:GraphControl x:Name="GraphControlElement"
                                        GraphState="{Binding GraphState, Mode=TwoWay}"
                                        MinMarkerSpacing="20"
-                                       Margin="43,0,12,43"
+                                       Margin="43,0,0,43"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch"
                                        HorizontalAxisVisible="{Binding HorizontalAxisVisible}"
                                        VerticalAxisVisible="{Binding VerticalAxisVisible}"
                                        StartPointLockedY="{Binding StartPointLockedY}"
@@ -45,10 +47,14 @@
 
             <Border Grid.Row="1"
                     Grid.Column="2"
+                    Margin="0"
                     Padding="10"
                     Background="{DynamicResource MaterialPaperBrush}"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
                     ToolTip.Tip="Result preview">
                 <controls:ObjectVisualiserControl x:Name="PreviewControl"
+                                                  Width="200"
                                                   HitObject="{Binding VisibleHitObject}"
                                                   CustomPixelLength="{Binding PreviewPixelLength}"
                                                   Progress="{Binding PreviewProgress}"
@@ -64,15 +70,15 @@
                           Grid.RowSpan="2"
                           Grid.Column="0"
                           Margin="0,10,0,0"
-                          HorizontalScrollBarVisibility="Disabled"
+                          HorizontalScrollBarVisibility="Hidden"
                           VerticalScrollBarVisibility="Auto">
                 <StackPanel>
                     <Grid ColumnDefinitions="*,Auto,Auto">
                         <ComboBox Grid.Column="0"
+                                  Classes="compact"
                                   ItemsSource="{Binding ImportModes}"
                                   SelectedItem="{Binding ImportModeSetting}"
                                   Margin="0,0,5,0"
-                                  materialAssists:ComboBoxAssist.Label="Object selection mode"
                                   ToolTip.Tip="Import mode" />
                         <TextBox Grid.Column="1"
                                  Text="{Binding TimeCode, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -132,9 +138,9 @@
                              materialAssists:TextFieldAssist.Label="Time"
                              ToolTip.Tip="The time in the current beatmap to export the sliderated slider to." />
                     <ComboBox Margin="0,10,0,0"
+                              Classes="compact"
                               ItemsSource="{Binding ExportModes}"
                               SelectedItem="{Binding ExportModeSetting}"
-                              materialAssists:ComboBoxAssist.Label="Export mode"
                               ToolTip.Tip="Choose how you want to export sliders." />
 
                     <RadioButton Content="Export as slider"
@@ -167,7 +173,7 @@
                              materialAssists:TextFieldAssist.Label="Minimum tumour length"
                              ToolTip.Tip="Minimum length for tumours which slow down the sliderball in the sliderated slider. Longer tumours result in less lag but a more shaky sliderball." />
 
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                         <TextBlock Text="Expected segment count: "
                                    ToolTip.Tip="This is the estimated segment count for your result. More segments means more lag, so try to optimise this value." />
                         <TextBlock Text="{Binding ExpectedSegments}"
@@ -193,6 +199,7 @@
                              Margin="0,0,8,0"
                              MaxWidth="140"
                              MinWidth="100"
+                             HorizontalAlignment="Left"
                              IsVisible="{Binding ExportAsNormal}"
                              Text="{Binding VelocityLimit, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantDoubleConverter}}"
                              materialAssists:TextFieldAssist.Label="SV limit"
@@ -205,8 +212,8 @@
                         <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,5,0" Command="{Binding ClearGraphCommand}" ToolTip.Tip="Reset graph.">
                             <materialIcons:MaterialIcon Kind="Rocket" Width="24" Height="24" />
                         </materialDesign:FloatingButton>
-                        <materialDesign:FloatingButton Classes="mini accent no-transitions" Command="{Binding GraphToggleCommand}" ToolTip.Tip="Toggle graph mode.">
-                            <TextBlock Text="{Binding GraphModeText}" FontWeight="Bold" Width="24"
+                        <materialDesign:FloatingButton Classes="mini accent no-transitions" Margin="5,0,0,0" Command="{Binding GraphToggleCommand}" ToolTip.Tip="Toggle graph mode.">
+                            <TextBlock Text="{Binding GraphModeText}" FontWeight="Bold" Width="24" Height="24"
                                        HorizontalAlignment="Center" />
                         </materialDesign:FloatingButton>
                     </StackPanel>
@@ -219,7 +226,10 @@
                         ToolTip.Tip="Beat snap divisor."
                         Margin="0,5,0,0" />
 
-                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5,10,5,0">
+                <StackPanel Grid.Row="2"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Left"
+                            Margin="5,10,5,0">
                     <CheckBox IsChecked="{Binding ShowRedAnchors}"
                               Content="Show red anchors"
                               Margin="0,0,5,0"
@@ -232,18 +242,23 @@
 
             <controls:ToolRunButton Grid.Row="1"
                                     Grid.Column="3"
-                                    Margin="10"
+                                    Width="70"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
                                     RunCommand="{Binding RunCommand}" />
         </Grid>
 
         <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
-            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58"
+            <TextBlock VerticalAlignment="Bottom"
+                       FontWeight="Bold"
+                       Opacity="0.58"
+                       TextWrapping="NoWrap"
                        Text="Made by OliBomby, Karoo, &amp; JPK314" />
             <controls:ToolProgressBar Grid.Column="1"
                                       Height="20"
                                       Margin="20,0"
+                                      Background="{x:Null}"
+                                      BorderBrush="{x:Null}"
                                       Maximum="100"
                                       Value="{Binding Progress}" />
         </Grid>

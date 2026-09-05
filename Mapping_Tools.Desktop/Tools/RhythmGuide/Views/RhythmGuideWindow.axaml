@@ -14,8 +14,11 @@
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaTitleBarHeightHint="35"
         Background="{DynamicResource MaterialPaperBrush}"
-        Foreground="{DynamicResource MaterialBodyBrush}">
-    <Grid RowDefinitions="35,*">
+        Foreground="{DynamicResource MaterialBodyBrush}"
+        FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto"
+        FontSize="14"
+        FontWeight="Medium">
+    <Grid RowDefinitions="Auto,*">
         <Grid Grid.Row="0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" IsHitTestVisible="False">
                 <Border Width="24" Height="24" Margin="6,0,0,0"
@@ -39,9 +42,10 @@
             </Button>
         </Grid>
 
-        <ContentControl Grid.Row="1" Margin="10">
-            <views:RhythmGuideView />
-        </ContentControl>
-
+        <Grid Grid.Row="1">
+            <ContentControl Margin="10">
+                <views:RhythmGuideView />
+            </ContentControl>
+        </Grid>
     </Grid>
 </Window>

@@ -65,7 +65,7 @@ internal sealed class NotificationPresenter : IHostedService
         {
             await dialogs.ShowMessageAsync(
                 new MessageDialogRequest<bool>(
-                    $"{notification.Title} Error",
+                    $"Error: {notification.Title}",
                     notification.Message,
                     [new DialogChoice<bool>("OK", true, IsDefault: true, IsCancel: true)],
                     true,

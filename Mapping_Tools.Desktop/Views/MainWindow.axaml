@@ -147,18 +147,17 @@
         </Style>
     </Window.Styles>
 
-    <dialogHost:DialogHost Identifier="RootDialog"
-                           CloseOnClickAway="True"
-                           OverlayBackground="{DynamicResource MappingToolsDialogOverlayBrush}">
-        <materialControls:SnackbarHost HostName="Root"
-                                       SnackbarHorizontalAlignment="Center"
-                                       SnackbarVerticalAlignment="Bottom">
-        <Grid x:Name="RootGrid">
-        <Grid RowDefinitions="35,*">
+    <Grid x:Name="RootGrid">
+        <dialogHost:DialogHost Identifier="RootDialog"
+                               CloseOnClickAway="True"
+                               OverlayBackground="{DynamicResource MappingToolsDialogOverlayBrush}">
+        <Grid>
+        <Grid RowDefinitions="Auto,*">
             <materialControls:ColorZone Grid.Row="0"
                                         Height="35"
                                         Padding="0"
                                         Mode="PrimaryMid"
+                                        materialAssists:ShadowAssist.ShadowDepth="Depth2"
                                         WindowDecorationProperties.ElementRole="TitleBar">
                 <DockPanel LastChildFill="True">
                     <StackPanel DockPanel.Dock="Left"
@@ -168,6 +167,7 @@
                                       Theme="{StaticResource ChromeToggleButtonTheme}"
                                       Width="45"
                                       Height="35"
+                                      VerticalAlignment="Center"
                                       AutomationProperties.Name="Navigation menu"
                                       IsChecked="{Binding IsNavigationOpen, Mode=TwoWay}"
                                       ToolTip.Tip="Use Ctrl+K to open navigation.">
@@ -301,6 +301,9 @@
 
                     <StackPanel DockPanel.Dock="Right"
                                 Orientation="Horizontal"
+                                Panel.ZIndex="5"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
                                 WindowDecorationProperties.ElementRole="User">
                         <Button Theme="{StaticResource ChromeButtonTheme}"
                                 Width="49"
@@ -406,7 +409,7 @@
                                        FontWeight="Normal"
                                        Text="{Binding Workspace.SelectedMapNames}" />
                             <TextBlock Grid.Column="1"
-                                       Margin="2,0,1,0"
+                                       Margin="2,0,0,0"
                                        Text="{Binding Workspace.SelectedMapCountText}"
                                        TextWrapping="NoWrap"
                                        FontStyle="Italic"
@@ -423,6 +426,8 @@
                        CompactPaneLength="0">
                 <SplitView.Pane>
                     <DockPanel Width="200"
+                               MinWidth="200"
+                               MaxWidth="200"
                                Background="{DynamicResource MaterialPaperBrush}">
                         <TextBox x:Name="ToolSearchBox"
                                  DockPanel.Dock="Top"
@@ -479,7 +484,8 @@
                     </DockPanel>
                 </SplitView.Pane>
 
-                <Grid Background="{DynamicResource MaterialPaperBrush}">
+                <Grid RowDefinitions="*"
+                      Background="{DynamicResource MaterialPaperBrush}">
                     <ScrollViewer HorizontalScrollBarVisibility="{Binding ContentHorizontalScrollBarVisibility}"
                                   VerticalScrollBarVisibility="{Binding ContentVerticalScrollBarVisibility}">
                         <ContentControl Margin="20"
@@ -488,10 +494,15 @@
                                         VerticalContentAlignment="Stretch" />
                     </ScrollViewer>
 
+                    <materialControls:SnackbarHost x:Name="SnackbarHost"
+                                                   HostName="Root"
+                                                   SnackbarHorizontalAlignment="Center"
+                                                   SnackbarVerticalAlignment="Bottom" />
+
                 </Grid>
             </SplitView>
         </Grid>
         </Grid>
-        </materialControls:SnackbarHost>
-    </dialogHost:DialogHost>
+        </dialogHost:DialogHost>
+    </Grid>
 </Window>

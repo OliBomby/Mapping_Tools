@@ -10,7 +10,7 @@
              x:Name="Root"
              x:DataType="patternGallery:PatternGalleryViewModel">
     <Grid RowDefinitions="*,Auto">
-        <Grid Margin="0,0,0,10" RowDefinitions="Auto,*,Auto">
+        <Grid Grid.Row="0" RowDefinitions="Auto,*">
             <Grid ColumnDefinitions="*,Auto">
                 <controls:ToolViewHeader Title="Pattern Gallery"
                                          IsQuickRunSupported="True"
@@ -25,23 +25,42 @@
                            PointerPressed="CollectionNamePointerPressed" />
             </Grid>
 
-            <Grid Grid.Row="1" Margin="0,14,0,0" ColumnDefinitions="*,12,270">
+            <Grid Grid.Row="1" Margin="0,18,0,0" ColumnDefinitions="*,20,240">
                 <Grid Grid.Column="0" RowDefinitions="*,Auto">
-                    <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Grid.Row="0"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding Groups}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="patternGallery:PatternGalleryGroupViewModel">
                                     <Expander IsExpanded="True" Margin="0,0,0,10">
                                         <Expander.Header>
-                                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <TextBlock FontWeight="Bold" Text="{Binding Name}" />
-                                                <TextBlock Opacity="0.65"
-                                                           Text="{Binding ItemCount, StringFormat='({0})'}" />
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock FontSize="22"
+                                                           FontWeight="Bold"
+                                                           Foreground="{DynamicResource MaterialBodyLightBrush}"
+                                                           VerticalAlignment="Bottom"
+                                                           Text="{Binding Name}" />
+                                                <TextBlock Margin="10,0,0,0"
+                                                           FontSize="22"
+                                                           FontWeight="Bold"
+                                                           FontStyle="Italic"
+                                                           Foreground="{DynamicResource MappingToolsTimelineAddedInnerBrush}"
+                                                           VerticalAlignment="Bottom"
+                                                           Text="{Binding ItemCount}" />
+                                                <TextBlock FontSize="22"
+                                                           FontStyle="Italic"
+                                                           Foreground="{DynamicResource MaterialBodyLightBrush}"
+                                                           Opacity="0.75"
+                                                           VerticalAlignment="Bottom"
+                                                           Text=" item(s)" />
                                             </StackPanel>
                                         </Expander.Header>
                                         <ListBox ItemsSource="{Binding Patterns}"
                                                  SelectionMode="Single"
                                                  Background="Transparent"
+                                                 Padding="0"
+                                                 BorderThickness="0"
                                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
                                                  SelectionChanged="PatternSelectionChanged">
@@ -54,7 +73,10 @@
                                             </ListBox.ItemContainerTheme>
                                             <ListBox.ItemsPanel>
                                                 <ItemsPanelTemplate>
-                                                    <WrapPanel Orientation="Horizontal" />
+                                                    <WrapPanel Orientation="Horizontal"
+                                                                ItemWidth="166"
+                                                                ItemHeight="166"
+                                                                ItemsAlignment="Start" />
                                                 </ItemsPanelTemplate>
                                             </ListBox.ItemsPanel>
                                             <ListBox.ItemTemplate>
@@ -76,6 +98,7 @@
                                                                 <TextBlock Grid.Row="1"
                                                                            VerticalAlignment="Center"
                                                                            Margin="8,0"
+                                                                           FontWeight="Bold"
                                                                            Text="{Binding Name}"
                                                                            TextTrimming="CharacterEllipsis"
                                                                            ToolTip.Tip="{Binding Name}" />
@@ -91,88 +114,122 @@
                         </ItemsControl>
                     </ScrollViewer>
 
-                    <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,12,0,0">
-                        <Grid ColumnDefinitions="*,Auto,Auto">
-                            <TextBox materialAssists:TextFieldAssist.Label="Search"
-                                     Text="{Binding SearchFilter, Mode=TwoWay}"
-                                     ToolTip.Tip="Search for a pattern." />
-                            <ComboBox Grid.Column="1" Width="150" Margin="8,0,0,0"
-                                      Classes="compact"
-                                      ItemsSource="{Binding SortableProperties}"
-                                      SelectedItem="{Binding SortProperty, Mode=TwoWay}"
-                                      materialAssists:ComboBoxAssist.Label="Sort by" />
-                            <ComboBox Grid.Column="2" Width="120" Margin="8,0,0,0"
-                                      Classes="compact"
-                                      SelectedIndex="{Binding SortDirection, Mode=TwoWay}"
-                                      materialAssists:ComboBoxAssist.Label="Direction">
-                                <ComboBoxItem Content="Ascending" />
-                                <ComboBoxItem Content="Descending" />
-                            </ComboBox>
-                        </Grid>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0">
-                            <materialControls:FloatingButton Classes="mini light no-transitions" Command="{Binding AddCodeCommand}"
+                    <Grid Grid.Row="1">
+                        <StackPanel Margin="5"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Orientation="Horizontal">
+                            <materialControls:FloatingButton Classes="mini light no-transitions"
+                                    Margin="5"
+                                    Command="{Binding AddCodeCommand}"
                                     ToolTip.Tip="Add a pattern from .osu code.">
                                 <materialIcons:MaterialIcon Kind="CodeBraces" Width="24" Height="24" />
                             </materialControls:FloatingButton>
-                            <materialControls:FloatingButton Classes="mini light no-transitions" Command="{Binding AddFileCommand}"
+                            <materialControls:FloatingButton Classes="mini light no-transitions"
+                                    Margin="5"
+                                    Command="{Binding AddFileCommand}"
                                     ToolTip.Tip="Add a pattern from a file.">
                                 <materialIcons:MaterialIcon Kind="FilePlus" Width="24" Height="24" />
                             </materialControls:FloatingButton>
-                            <materialControls:FloatingButton Classes="mini light no-transitions" Command="{Binding AddSelectedCommand}"
+                            <materialControls:FloatingButton Classes="mini light no-transitions"
+                                    Margin="5"
+                                    Command="{Binding AddSelectedCommand}"
                                     ToolTip.Tip="Add a pattern from selected hit objects.">
                                 <materialIcons:MaterialIcon Kind="PlusBox" Width="24" Height="24" />
                             </materialControls:FloatingButton>
-                            <materialControls:FloatingButton Classes="mini light no-transitions" x:Name="RemoveButton"
+                            <materialControls:FloatingButton Classes="mini light no-transitions"
+                                    x:Name="RemoveButton"
+                                    Margin="5"
                                     Click="RemoveButtonClick"
                                     ToolTip.Tip="Delete selected patterns. Hold shift to skip dialog.">
                                 <materialIcons:MaterialIcon Kind="TrashCan" Width="24" Height="24" />
                             </materialControls:FloatingButton>
                         </StackPanel>
+
+                        <StackPanel Margin="5"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Orientation="Horizontal">
+                            <materialIcons:MaterialIcon Kind="Search"
+                                                        Width="24"
+                                                        Height="24"
+                                                        Margin="5" />
+                            <TextBox Classes="compact"
+                                     Width="120"
+                                     Height="24"
+                                     Margin="5"
+                                     Text="{Binding SearchFilter, Mode=TwoWay}"
+                                     ToolTip.Tip="Search for a pattern." />
+                            <ComboBox Width="120"
+                                      Height="24"
+                                      Margin="5"
+                                      Classes="compact"
+                                      ItemsSource="{Binding SortableProperties}"
+                                      SelectedItem="{Binding SortProperty, Mode=TwoWay}" />
+                            <ComboBox Width="100"
+                                      Height="24"
+                                      Margin="5"
+                                      Classes="compact"
+                                      SelectedIndex="{Binding SortDirection, Mode=TwoWay}">
+                                <ComboBoxItem Content="Ascending" />
+                                <ComboBoxItem Content="Descending" />
+                            </ComboBox>
+                        </StackPanel>
                     </Grid>
                 </Grid>
 
-                <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center"
+                <GridSplitter Grid.Column="1"
+                              Width="2"
+                              Margin="0,0,0,10"
+                              HorizontalAlignment="Center"
+                              ResizeDirection="Columns"
                               Background="{DynamicResource MaterialDividerBrush}" />
 
-                <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
-                    <StackPanel Spacing="8">
-                        <TextBlock FontSize="18" FontWeight="Bold" Text="{Binding CollectionName}"
-                                   PointerPressed="CollectionNamePointerPressed"
-                                   ToolTip.Tip="Rename this collection." />
-                        <TextBlock Margin="0,10,0,0" FontWeight="Bold" Text="Export options" />
-                        <ComboBox ItemsSource="{Binding ExportTimeModes}"
+                <Grid Grid.Column="2">
+                    <StackPanel>
+                        <ComboBox Margin="0,7,0,0"
+                                  ItemsSource="{Binding ExportTimeModes}"
                                   SelectedItem="{Binding ExportTimeMode, Mode=TwoWay}"
                                   materialAssists:ComboBoxAssist.Label="Export offset"
                                   ToolTip.Tip="Determines at what time to put the pattern." />
-                        <TextBox IsVisible="{Binding CustomExportTimeVisible}"
+                        <TextBox Margin="0,5,0,0"
+                                 IsVisible="{Binding CustomExportTimeVisible}"
                                  materialAssists:TextFieldAssist.Label="Custom export offset"
                                  Text="{Binding CustomExportTime, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
                                  ToolTip.Tip="Determines at what time to put the pattern for the custom offset mode." />
-                        <TextBox materialAssists:TextFieldAssist.Label="Padding"
+                        <TextBox Margin="0,5,0,0"
+                                 materialAssists:TextFieldAssist.Label="Padding"
                                  Text="{Binding Padding, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
                                  ToolTip.Tip="Extra time in milliseconds around the patterns for deleting parts of the original map." />
-                        <TextBox materialAssists:TextFieldAssist.Label="Parting distance"
+                        <TextBox Margin="0,5,0,0"
+                                 materialAssists:TextFieldAssist.Label="Parting distance"
                                  Text="{Binding PartingDistance, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
                                  ToolTip.Tip="Minimum number of beats required in a gap to split a pattern into smaller parts." />
-                        <ComboBox ItemsSource="{Binding PatternOverwriteModes}"
+                        <TextBox Margin="0,5,0,0"
+                                 materialAssists:TextFieldAssist.Label="Beat divisors"
+                                 Text="{Binding BeatDivisors, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource BeatDivisorArrayToStringConverter}}"
+                                 ToolTip.Tip="Input any number of beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499" />
+                        <Grid Margin="0,5,0,0" ColumnDefinitions="*,5,*">
+                            <TextBox materialAssists:TextFieldAssist.Label="Scale"
+                                     Text="{Binding CustomScale, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                     ToolTip.Tip="Scalar to change the size of the pattern." />
+                            <TextBox Grid.Column="2"
+                                     materialAssists:TextFieldAssist.Label="Rotate (degrees)"
+                                     Text="{Binding CustomRotate, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
+                                     ToolTip.Tip="Degrees to rotate the pattern clockwise." />
+                        </Grid>
+                        <ComboBox Margin="0,5,0,0"
+                                  ItemsSource="{Binding PatternOverwriteModes}"
                                   SelectedItem="{Binding PatternOverwriteMode, Mode=TwoWay}"
                                   materialAssists:ComboBoxAssist.Label="Pattern overwrite mode"
                                   ToolTip.Tip="Determines how to overwrite the objects in the original beatmap when a pattern gets placed on them." />
-                        <ComboBox ItemsSource="{Binding TimingOverwriteModes}"
+                        <ComboBox Margin="0,5,0,0"
+                                  ItemsSource="{Binding TimingOverwriteModes}"
                                   SelectedItem="{Binding TimingOverwriteMode, Mode=TwoWay}"
                                   materialAssists:ComboBoxAssist.Label="Timing overwrite mode"
                                   ToolTip.Tip="Determines how to combine the timing of the orignal beatmap and the timing of the pattern." />
-                        <TextBox materialAssists:TextFieldAssist.Label="Beat divisors"
-                                 Text="{Binding BeatDivisors, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource BeatDivisorArrayToStringConverter}}"
-                                 ToolTip.Tip="Input any number of beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499" />
-                        <TextBox materialAssists:TextFieldAssist.Label="Scale"
-                                 Text="{Binding CustomScale, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
-                                 ToolTip.Tip="Scalar to change the size of the pattern." />
-                        <TextBox materialAssists:TextFieldAssist.Label="Rotate (degrees)"
-                                 Text="{Binding CustomRotate, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
-                                 ToolTip.Tip="Degrees to rotate the pattern clockwise." />
 
-                        <CheckBox Content="Include hitsounds" IsChecked="{Binding IncludeHitsounds}"
+                        <CheckBox Margin="0,5,0,0" Content="Include hitsounds" IsChecked="{Binding IncludeHitsounds}"
                                   ToolTip.Tip="Export the pattern with the hitsound effects of the pattern timing points." />
                         <CheckBox Content="Include kiai" IsChecked="{Binding IncludeKiai}"
                                   ToolTip.Tip="Export the pattern with the kiai of the pattern." />
@@ -194,18 +251,30 @@
                                   ToolTip.Tip="Multiply BPM in the pattern so the slider tick rate in the pattern stays the same." />
                         <TextBlock Text="{Binding ResultSummary}" TextWrapping="Wrap" Opacity="0.75" />
                     </StackPanel>
-                </ScrollViewer>
+                </Grid>
             </Grid>
 
-            <Grid Grid.Row="2" Margin="0,12,0,0" ColumnDefinitions="*,Auto">
-                <controls:ToolRunButton Grid.Column="1" RunCommand="{Binding RunCommand}" />
-            </Grid>
+            <controls:ToolRunButton HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Margin="10"
+                                    RunCommand="{Binding RunCommand}" />
         </Grid>
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
-            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
-            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100"
-                                      Value="{Binding Progress}" />
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap"
+                               FontWeight="Bold"
+                               Opacity="0.58"
+                               Text="Made by OliBomby" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20"
+                                          Margin="20,0"
+                                          Maximum="100"
+                                          Value="{Binding Progress}" />
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

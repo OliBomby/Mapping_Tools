@@ -5,12 +5,13 @@
         xmlns:geometryDashboard="clr-namespace:Mapping_Tools.Desktop.Tools.GeometryDashboard.Interactions"
         x:Class="Mapping_Tools.Desktop.Tools.GeometryDashboard.Views.GeometryDashboardGeneratorSettingsWindow"
         x:DataType="geometryDashboard:GeometryDashboardGeneratorSettingsDialogViewModel"
-        Title="Generator Settings" Width="575" Height="500" MinWidth="575" MinHeight="360"
+        Title="Generator Settings" Width="570" Height="500" MinWidth="575" MinHeight="360"
         CanResize="True" WindowStartupLocation="CenterOwner" WindowDecorations="BorderOnly"
         ExtendClientAreaToDecorationsHint="True" ExtendClientAreaTitleBarHeightHint="35"
-        Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}">
-    <Grid RowDefinitions="35,*,Auto">
-        <Grid Grid.Row="0">
+        Background="{DynamicResource MaterialPaperBrush}" Foreground="{DynamicResource MaterialBodyBrush}"
+        FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto" FontSize="14" FontWeight="Medium">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Grid Grid.Row="0" VerticalAlignment="Top">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" IsHitTestVisible="False">
                 <Border Width="24" Height="24" Margin="6,0,0,0"
                         Background="{DynamicResource MaterialBodyBrush}">
@@ -29,26 +30,27 @@
                 <materialIcons:MaterialIcon Kind="Close" Width="22" Height="22" />
             </Button>
         </Grid>
-        <ScrollViewer Grid.Row="1" Padding="10" VerticalScrollBarVisibility="Auto">
-            <StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+            <Border Padding="15,10">
+                <StackPanel>
                 <ItemsControl ItemsSource="{Binding Rows}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid ColumnDefinitions="200,*" Margin="0,4">
+                            <Grid ColumnDefinitions="150,*" Margin="10">
                                 <TextBlock Text="{Binding Name}" VerticalAlignment="Center"
                                            ToolTip.Tip="{Binding Description}" />
                                 <ToggleButton Grid.Column="1" IsChecked="{Binding BooleanValue, Mode=TwoWay}"
-                                              IsVisible="{Binding IsBoolean}" />
-                                <TextBox Grid.Column="1" Text="{Binding ValueText, Mode=TwoWay}"
-                                         IsVisible="{Binding IsTextEditable}"
+                                              IsVisible="{Binding IsBoolean}" HorizontalAlignment="Left" Cursor="Hand" />
+                                <TextBox Grid.Column="1" Width="100" Text="{Binding ValueText, Mode=TwoWay}"
+                                         IsVisible="{Binding IsTextEditable}" HorizontalAlignment="Left"
                                          ToolTip.Tip="{Binding ValueTextError}" />
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <StackPanel Margin="0,12,0,0">
-                    <TextBlock Text="Input predicates" FontWeight="Bold" />
-                    <ListBox Width="270" ItemsSource="{Binding InputPredicates.Predicates}" SelectionMode="Multiple"
+                <Grid ColumnDefinitions="150,270,Auto,Auto" Margin="10">
+                    <TextBlock Text="Input predicates" VerticalAlignment="Center" />
+                    <ListBox Grid.Column="1" Width="270" ItemsSource="{Binding InputPredicates.Predicates}" SelectionMode="Multiple"
                              SelectedItem="{Binding SelectedPredicate, Mode=TwoWay}"
                              SelectionChanged="PredicatesSelectionChanged">
                         <ListBox.ContextMenu>
@@ -86,23 +88,26 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
-                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
+                    <materialDesign:FloatingButton Grid.Column="2" Classes="mini light no-transitions" Margin="5"
+                                                   VerticalAlignment="Bottom"
                                                        Command="{Binding AddPredicateCommand}"
                                                        ToolTip.Tip="Add a new selection predicate.">
                             <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
                         </materialDesign:FloatingButton>
-                        <materialDesign:FloatingButton Classes="mini light no-transitions" Command="{Binding RemovePredicateCommand}"
+                    <materialDesign:FloatingButton Grid.Column="3" Classes="mini light no-transitions" Margin="5"
+                                                   VerticalAlignment="Bottom" Command="{Binding RemovePredicateCommand}"
                                                        ToolTip.Tip="Remove all selected predicates or the last predicate if nothing is selected.">
                             <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
-                        </materialDesign:FloatingButton>
-                    </StackPanel>
+                    </materialDesign:FloatingButton>
+                </Grid>
                 </StackPanel>
-            </StackPanel>
+            </Border>
         </ScrollViewer>
-        <Grid Grid.Row="2" ColumnDefinitions="*,*" Margin="10">
-            <Button Width="200" Content="Apply" Command="{Binding ApplyCommand}" />
-            <Button Grid.Column="1" Width="200" Content="Cancel" Command="{Binding CancelCommand}" />
-        </Grid>
+        <Border Grid.Row="2" Padding="10">
+            <Grid ColumnDefinitions="*,*">
+                <Button Width="200" Content="Apply" Command="{Binding ApplyCommand}" />
+                <Button Grid.Column="1" Width="200" Content="Cancel" Command="{Binding CancelCommand}" />
+            </Grid>
+        </Border>
     </Grid>
 </Window>

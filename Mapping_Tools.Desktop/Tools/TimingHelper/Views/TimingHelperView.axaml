@@ -6,7 +6,7 @@
              x:Class="Mapping_Tools.Desktop.Tools.TimingHelper.Views.TimingHelperView"
              x:DataType="vm:TimingHelperViewModel">
     <Grid RowDefinitions="*,Auto">
-        <Grid Margin="0,0,120,10">
+        <Grid>
             <StackPanel>
                 <controls:ToolViewHeader
                     Title="Timing Helper"
@@ -35,7 +35,7 @@
 
                 <TextBlock Margin="0,20,0,0" FontSize="14" FontWeight="Bold"
                            Text="Signatures" ToolTip.Tip="Beat snap divisors for resnapping." />
-                <TextBox Classes="compact" HorizontalAlignment="Left" MinWidth="100" FontSize="14" Cursor="Hand"
+                <TextBox HorizontalAlignment="Left" MinWidth="100" FontSize="14" Cursor="Hand"
                          materialAssists:TextFieldAssist.Label="Beat divisors"
                          Text="{Binding BeatDivisors, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource BeatDivisorArrayToStringConverter}}"
                          ToolTip.Tip="Input any number of beat divisors here separated with commas. Example: 1/4, 1/12, 1/7, 4/5, 0.13435622499" />
@@ -46,10 +46,17 @@
         </Grid>
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
-            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58"
-                       Text="Made by OliBomby" />
-            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0"
-                                      Maximum="100" Value="{Binding Progress}" />
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
+                               Text="Made by OliBomby" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20" Margin="20,0,20,0"
+                                          Background="{x:Null}" BorderBrush="{x:Null}"
+                                          Maximum="100" Value="{Binding Progress}" />
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

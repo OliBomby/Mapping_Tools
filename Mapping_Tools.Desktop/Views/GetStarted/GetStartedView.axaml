@@ -12,8 +12,8 @@
              x:DataType="getStarted:GetStartedViewModel"
              Foreground="{DynamicResource MaterialBodyBrush}"
              FontFamily="avares://Mapping_Tools.Desktop/Assets/Fonts#Roboto">
-    <Grid RowDefinitions="5*,21,3*"
-          ColumnDefinitions="*,21,*">
+    <Grid RowDefinitions="0.5*,Auto,0.3*"
+          ColumnDefinitions="*,Auto,*">
         <Grid Grid.Row="0"
               Grid.Column="0"
               RowDefinitions="Auto,*">
@@ -45,6 +45,8 @@
                       Width="1"
                       Margin="10"
                       HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Background="{DynamicResource MaterialDividerBrush}"
                       ResizeBehavior="PreviousAndNext"
                       ResizeDirection="Columns" />
 
@@ -68,7 +70,8 @@
                                        FontSize="18"
                                        FontWeight="Bold"
                                        TextWrapping="Wrap" />
-                            <md:MarkdownScrollViewer Markdown="{Binding Text}">
+                            <md:MarkdownScrollViewer Margin="10,0,0,0"
+                                                     Markdown="{Binding Text}">
                                 <md:MarkdownScrollViewer.Styles>
                                     <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Markdown.axaml" />
                                 </md:MarkdownScrollViewer.Styles>
@@ -84,6 +87,7 @@
                       Height="1"
                       Margin="10"
                       HorizontalAlignment="Stretch"
+                      Background="{DynamicResource MaterialDividerBrush}"
                       ResizeBehavior="PreviousAndNext"
                       ResizeDirection="Rows" />
 

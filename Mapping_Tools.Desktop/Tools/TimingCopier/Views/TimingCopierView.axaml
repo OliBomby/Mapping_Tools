@@ -11,8 +11,8 @@
         <converters:TimingCopierResnapModeConverter x:Key="TimingCopierResnapModeConverter" />
     </UserControl.Resources>
     <Grid RowDefinitions="*,Auto">
-        <Grid Margin="0,0,120,10">
-            <StackPanel>
+        <Grid>
+            <StackPanel Margin="0,0,120,0">
                 <controls:ToolViewHeader
                     Title="Timing Copier"
                     HelpText="Copies timing from A to B.&#x0a;There are 3 modes that describe how this program will handle moving objects (hitobjects/timingpoints/bookmarks) to the new timing:&#x0a;&quot;Number of beats between objects stays the same&quot; will move the objects so that the number of beats between objects stays the same. After that it will also resnap to the specified snap divisors. Make sure everything is snapped and don't use this if your new timing is supposed to change the number of beats between objects.&#x0a;&quot;Just resnap&quot; will snap the objects to the new timing on the specified snap divisors. This doesn't resnap bookmarks.&#x0a;&quot;Don't move objects&quot; will not move the objects at all." />
@@ -86,10 +86,17 @@
         </Grid>
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
-            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58"
-                       Text="Made by OliBomby" />
-            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0"
-                                      Maximum="100" Value="{Binding Progress}" />
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
+                               Text="Made by OliBomby" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20" Margin="20,0,20,0"
+                                          Background="{x:Null}" BorderBrush="{x:Null}"
+                                          Maximum="100" Value="{Binding Progress}" />
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

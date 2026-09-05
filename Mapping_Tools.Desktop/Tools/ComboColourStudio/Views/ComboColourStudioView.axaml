@@ -10,14 +10,14 @@
              x:Name="Root"
              x:DataType="vm:ComboColourStudioViewModel">
     <Grid RowDefinitions="*,Auto">
-        <Grid Margin="0,0,0,10" RowDefinitions="Auto,*,Auto">
+        <Grid Grid.Row="0" RowDefinitions="Auto,*,Auto">
             <controls:ToolViewHeader
                 Title="Combo Colour Studio"
                 IsQuickRunSupported="True"
                 HelpText="With Combo Colour Studio you can easily customize the combo colours of your beatmap. AKA colour haxing.&#x0a;&#x0a;You define colored sections much like how you use timing points in the osu! editor. Just add a new colour point and define the sequence of combo colours.&#x0a;&#x0a;You can also define 'burst' colour points which only work for one combo, so you can emphasize specific patterns using colour.&#x0a;&#x0a;You can get started by adding a combo colour using the plus on the bottom left or by importing combo colours from an existing map. The combo colours can be edited by clicking on the coloured circles.&#x0a;&#x0a;Add a colour point by clicking on the plus on the bottom right. You can edit the colour sequence by double clicking the colour sequence cell." />
 
-            <Grid Grid.Row="1" Margin="0,10,0,0" ColumnDefinitions="2*,3*">
-                <DataGrid Grid.Column="0" ItemsSource="{Binding ColourPoints}"
+            <Grid Grid.Row="1" RowDefinitions="*,Auto">
+                <DataGrid Grid.Row="0" ItemsSource="{Binding ColourPoints}"
                           SelectedItem="{Binding SelectedColourPoint, Mode=TwoWay}"
                           SelectionChanged="ColourPointsSelectionChanged"
                           AutoGenerateColumns="False"
@@ -62,63 +62,59 @@
                                     </ItemsControl>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate x:DataType="adapter:ObservableColourPoint">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ComboBox ItemsSource="{Binding DataContext.ComboColours, ElementName=Root}"
+                                                  SelectedItem="{Binding DataContext.SelectedSequenceColour, ElementName=Root, Mode=TwoWay}"
+                                                  Classes="compact" />
+                                        <ListBox ItemsSource="{Binding ColourSequence}">
+                                            <ListBox.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </ListBox.ItemsPanel>
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate x:DataType="adapter:ObservableSpecialColour">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,2">
+                                                        <Border Width="28" Height="28" CornerRadius="14"
+                                                                Background="{Binding Color, Converter={StaticResource RgbaColourToAvaloniaBrushConverter}}"
+                                                                VerticalAlignment="Center" ToolTip.Tip="{Binding Name}" />
+                                                        <TextBlock Grid.Column="1" Margin="8,0" VerticalAlignment="Center"
+                                                                   Text="{Binding Name}" />
+                                                        <Button Grid.Column="2" Classes="flat" Tag="{Binding}"
+                                                                Click="RemoveSequenceColour_OnClick" ToolTip.Tip="Remove this colour.">
+                                                            <materialIcons:MaterialIcon Kind="Close" Width="18" Height="18" />
+                                                        </Button>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5,0"
+                                                                        Command="{Binding DataContext.AddSequenceColourCommand, ElementName=Root}"
+                                                                        CommandParameter="{Binding}"
+                                                                        ToolTip.Tip="Add the selected colour to this sequence.">
+                                            <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
+                                        </materialDesign:FloatingButton>
+                                        <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                                                        Command="{Binding DataContext.RemoveSequenceColourCommand, ElementName=Root}"
+                                                                        ToolTip.Tip="Remove the last colour from this sequence.">
+                                            <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
+                                        </materialDesign:FloatingButton>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
                         </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
-
-                <Grid Grid.Column="1" Margin="10,0,0,0" RowDefinitions="Auto,*,Auto">
-                    <TextBlock FontSize="16" FontWeight="Bold" Text="Sequence editor" />
-                    <Grid Grid.Row="1" RowDefinitions="Auto,*">
-                        <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,10,0,10">
-                            <ComboBox ItemsSource="{Binding ComboColours}"
-                                      SelectedItem="{Binding SelectedSequenceColour, Mode=TwoWay}"
-                                      Classes="compact" />
-                            <materialDesign:FloatingButton Grid.Column="1" Classes="mini light no-transitions" Margin="5,0"
-                                                           Command="{Binding AddSequenceColourCommand}"
-                                                           CommandParameter="{Binding SelectedColourPoint}"
-                                                           ToolTip.Tip="Add the selected colour to this sequence.">
-                                <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
-                            </materialDesign:FloatingButton>
-                            <materialDesign:FloatingButton Grid.Column="2" Classes="mini light no-transitions"
-                                                           Command="{Binding RemoveSequenceColourCommand}"
-                                                           ToolTip.Tip="Remove the last colour from this sequence.">
-                                <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
-                            </materialDesign:FloatingButton>
-                        </Grid>
-                        <ListBox Grid.Row="1"
-                                 ItemsSource="{Binding SelectedColourPoint.ColourSequence}">
-                            <ListBox.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel />
-                                </ItemsPanelTemplate>
-                            </ListBox.ItemsPanel>
-                            <ListBox.ItemTemplate>
-                                <DataTemplate x:DataType="adapter:ObservableSpecialColour">
-                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,2">
-                                        <Border Width="28" Height="28" CornerRadius="14"
-                                                Background="{Binding Color, Converter={StaticResource RgbaColourToAvaloniaBrushConverter}}"
-                                                VerticalAlignment="Center" ToolTip.Tip="{Binding Name}" />
-                                        <TextBlock Grid.Column="1" Margin="8,0" VerticalAlignment="Center"
-                                                   Text="{Binding Name}" />
-                                        <Button Grid.Column="2" Classes="flat" Tag="{Binding}"
-                                                Click="RemoveSequenceColour_OnClick" ToolTip.Tip="Remove this colour.">
-                                            <materialIcons:MaterialIcon Kind="Close" Width="18" Height="18" />
-                                        </Button>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </Grid>
-                    <TextBlock Grid.Row="2"
-                               Text="Select a colour point to edit its ordered sequence."
-                               TextWrapping="Wrap" Opacity="0.7" Margin="0,10,0,0" />
-                </Grid>
             </Grid>
 
-            <Grid Grid.Row="2" Margin="0,10,0,0" ColumnDefinitions="*,Auto">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:Card Padding="4">
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+                <Grid Grid.Column="0" RowDefinitions="Auto,Auto">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top"
+                                    Orientation="Horizontal">
+                            <materialDesign:Card>
                             <ListBox ItemsSource="{Binding ComboColours}">
                                 <ListBox.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -133,61 +129,80 @@
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
-                        </materialDesign:Card>
-                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="8,0,4,0"
-                                                       Command="{Binding AddComboColourCommand}"
-                                                       ToolTip.Tip="Add a new combo colour.">
-                            <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
-                        </materialDesign:FloatingButton>
-                        <materialDesign:FloatingButton Classes="mini light no-transitions"
-                                                       Command="{Binding RemoveComboColourCommand}"
-                                                       ToolTip.Tip="Remove the last combo colour.">
-                            <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
-                        </materialDesign:FloatingButton>
-                    </StackPanel>
-                    <Grid ColumnDefinitions="Auto,Auto,*" Margin="0,8,0,0">
-                        <Button Content="Import colours" Command="{Binding ImportColoursCommand}"
-                                ToolTip.Tip="Import combo colours from a beatmap." />
-                        <Button Grid.Column="1" Content="Import colourhax" Margin="8,0,0,0"
-                                Command="{Binding ImportColourHaxCommand}"
-                                ToolTip.Tip="Import colour haxing from a beatmap and populate colour points." />
-                        <TextBox Grid.Column="2" Margin="8,0,0,0"
-                                 materialAssists:TextFieldAssist.Label="Max burst length"
-                                 Text="{Binding Project.MaxBurstLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantInt32Converter}}"
-                                 ToolTip.Tip="Determines the maximum combo size for burst combos. Combos longer than this value can't get a colour from burst colour points." />
+                            </materialDesign:Card>
+                            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="10,5,5,5"
+                                                           Command="{Binding AddComboColourCommand}"
+                                                           ToolTip.Tip="Add a new combo colour.">
+                                <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
+                            </materialDesign:FloatingButton>
+                            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
+                                                           Command="{Binding RemoveComboColourCommand}"
+                                                           ToolTip.Tip="Remove the last combo colour.">
+                                <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
+                            </materialDesign:FloatingButton>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    Orientation="Horizontal">
+                            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
+                                                           x:Name="AddColourPointButton"
+                                                           Click="AddColourPointButtonClick"
+                                                           ToolTip.Tip="Add a new colour point.">
+                                <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
+                            </materialDesign:FloatingButton>
+                            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
+                                                           Command="{Binding RemoveColourPointCommand}"
+                                                           ToolTip.Tip="Remove selected colour points or the last point.">
+                                <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
+                            </materialDesign:FloatingButton>
+                        </StackPanel>
                     </Grid>
-                    <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
-                        <TextBox materialAssists:TextFieldAssist.Label="Import from beatmap"
-                                 Text="{Binding ImportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                        <Button Grid.Column="1" Classes="flat" Margin="8,0,0,0"
-                                Command="{Binding UseCurrentImportCommand}"
-                                ToolTip.Tip="Use the beatmap currently open in osu!.">
-                            <materialIcons:MaterialIcon Kind="RestoreFromTrash" Width="24" Height="24" />
-                        </Button>
-                    </Grid>
-                </StackPanel>
-                <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal"
-                            VerticalAlignment="Bottom">
-                    <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
-                                                   x:Name="AddColourPointButton"
-                                                   Click="AddColourPointButtonClick"
-                                                   ToolTip.Tip="Add a new colour point.">
-                        <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
-                    </materialDesign:FloatingButton>
-                    <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
-                                                   Command="{Binding RemoveColourPointCommand}"
-                                                   ToolTip.Tip="Remove selected colour points or the last point.">
-                        <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
-                    </materialDesign:FloatingButton>
-                    <controls:ToolRunButton Margin="10,0,0,0" RunCommand="{Binding RunCommand}" />
-                </StackPanel>
+
+                    <materialDesign:Card Grid.Row="1" Padding="2" Margin="0,10,5,5"
+                                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                        <StackPanel>
+                            <Grid ColumnDefinitions="Auto,Auto,120">
+                                <Button Content="Import colours" Margin="5,0"
+                                        Command="{Binding ImportColoursCommand}"
+                                        ToolTip.Tip="Import combo colours from a beatmap." />
+                                <Button Grid.Column="1" Content="Import colourhax" Margin="5,0,20,0"
+                                        Command="{Binding ImportColourHaxCommand}"
+                                        ToolTip.Tip="Import colour haxing from a beatmap and populate colour points." />
+                                <TextBox Grid.Column="2" Width="120" Margin="10,0,10,5"
+                                         materialAssists:TextFieldAssist.Label="Max burst length"
+                                         Text="{Binding Project.MaxBurstLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={StaticResource InvariantInt32Converter}}"
+                                         ToolTip.Tip="Determines the maximum combo size for burst combos. Combos longer than this value can't get a colour from burst colour points." />
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+                                <TextBox materialAssists:TextFieldAssist.Label="Import from beatmap"
+                                         Text="{Binding ImportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                                <Button Grid.Column="1" Classes="flat" Margin="8,0,0,0"
+                                        Command="{Binding UseCurrentImportCommand}"
+                                        ToolTip.Tip="Use the beatmap currently open in osu!.">
+                                    <materialIcons:MaterialIcon Kind="RestoreFromTrash" Width="24" Height="24" />
+                                </Button>
+                            </Grid>
+                        </StackPanel>
+                    </materialDesign:Card>
+                </Grid>
+
+                <controls:ToolRunButton Grid.Column="1" Margin="10"
+                                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                        RunCommand="{Binding RunCommand}" />
             </Grid>
         </Grid>
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
-            <TextBlock VerticalAlignment="Bottom" FontWeight="Bold" Opacity="0.58" Text="Made by OliBomby" />
-            <controls:ToolProgressBar Grid.Column="1" Height="20" Margin="20,0" Maximum="100"
-                                      Value="{Binding Progress}" />
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap" FontWeight="Bold" Opacity="0.58"
+                               Text="Made by OliBomby" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20" Margin="20,0,20,0" Maximum="100"
+                                          Value="{Binding Progress}" />
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

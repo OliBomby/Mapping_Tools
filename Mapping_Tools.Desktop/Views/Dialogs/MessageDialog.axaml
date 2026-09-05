@@ -75,6 +75,7 @@
                 <Expander Header="Show Error Details"
                           IsVisible="{Binding HasDetails}">
                     <SelectableTextBlock Text="{Binding Details}"
+                                         Padding="8"
                                Opacity="0.75"
                                TextWrapping="Wrap" />
                 </Expander>

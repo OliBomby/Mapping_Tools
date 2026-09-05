@@ -51,6 +51,7 @@
                                              Width="200" />
                                     <materialDesign:FloatingButton Classes="mini light no-transitions"
                                             Margin="5,0,5,0"
+                                            VerticalAlignment="Center"
                                             Command="{Binding BrowseCommand}"
                                             ToolTip.Tip="Browse">
                                         <materialIcons:MaterialIcon Kind="Folder"
@@ -65,51 +66,56 @@
                 </DataGrid>
             </Grid>
 
-            <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
                 <Grid Grid.Column="0" RowDefinitions="Auto,Auto">
-                    <StackPanel Grid.Row="0"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Center"
-                                Orientation="Horizontal">
-                        <materialDesign:FloatingButton Classes="mini light no-transitions"
-                                                       Margin="5"
-                                                       x:Name="AddMapsetButton"
-                                                       Click="AddMapsetButtonClick"
-                                                       ToolTip.Tip="Add a mapset. Hold shift to get current beatmap from osu! client.">
-                            <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
-                        </materialDesign:FloatingButton>
-                        <materialDesign:FloatingButton Classes="mini light no-transitions"
-                                                       Margin="5"
-                                                       Command="{Binding RemoveMapsetCommand}"
-                                                       ToolTip.Tip="Remove selected mapsets or last mapset.">
-                            <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
-                        </materialDesign:FloatingButton>
-                    </StackPanel>
+                    <Grid Grid.Row="1">
+                        <materialDesign:Card VerticalAlignment="Bottom"
+                                             HorizontalAlignment="Stretch"
+                                             Padding="10,5,10,10"
+                                             Margin="0,10,5,5">
+                            <Grid ColumnDefinitions="*,Auto,Auto">
+                                <TextBox Margin="0,0,10,0"
+                                         materialAssists:TextFieldAssist.Label="Export path"
+                                         Text="{Binding ExportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         ToolTip.Tip="The folder to put the merged mapset files in." />
+                                <Button Grid.Column="1"
+                                        Classes="flat path-picker"
+                                        VerticalAlignment="Bottom"
+                                        Command="{Binding BrowseExportPathCommand}"
+                                        ToolTip.Tip="Select export path with File Explorer.">
+                                    <materialIcons:MaterialIcon Width="30"
+                                                                Height="30"
+                                                                Kind="Folder" />
+                                </Button>
+                                <CheckBox Grid.Column="2"
+                                          Content="Move storyboard to .osu"
+                                          Margin="10,0,5,0"
+                                          IsChecked="{Binding MoveSbToBeatmap}"
+                                          ToolTip.Tip="Moves the content of any .osb files into the .osu for beatmap-specific storyboards." />
+                            </Grid>
+                        </materialDesign:Card>
+                    </Grid>
 
-                    <materialDesign:Card Grid.Row="1"
-                                         Padding="10,5,10,10"
-                                         Margin="0,10,5,5">
-                        <Grid ColumnDefinitions="*,Auto,Auto">
-                            <TextBox Margin="0,0,10,0"
-                                     materialAssists:TextFieldAssist.Label="Export path"
-                                     Text="{Binding ExportPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                     ToolTip.Tip="The folder to put the merged mapset files in." />
-                            <Button Grid.Column="1"
-                                    Classes="flat path-picker"
-                                    VerticalAlignment="Bottom"
-                                    Command="{Binding BrowseExportPathCommand}"
-                                    ToolTip.Tip="Select export path with File Explorer.">
-                                <materialIcons:MaterialIcon Width="30"
-                                                            Height="30"
-                                                            Kind="Folder" />
-                            </Button>
-                            <CheckBox Grid.Column="2"
-                                      Content="Move storyboard to .osu"
-                                      Margin="10,0,5,0"
-                                      IsChecked="{Binding MoveSbToBeatmap}"
-                                      ToolTip.Tip="Moves the content of any .osb files into the .osu for beatmap-specific storyboards." />
-                        </Grid>
-                    </materialDesign:Card>
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="1"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal">
+                            <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                                           Margin="5"
+                                                           x:Name="AddMapsetButton"
+                                                           Click="AddMapsetButtonClick"
+                                                           ToolTip.Tip="Add a mapset. Hold shift to get current beatmap from osu! client.">
+                                <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
+                            </materialDesign:FloatingButton>
+                            <materialDesign:FloatingButton Classes="mini light no-transitions"
+                                                           Margin="5"
+                                                           Command="{Binding RemoveMapsetCommand}"
+                                                           ToolTip.Tip="Remove selected mapsets or last mapset.">
+                                <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
+                            </materialDesign:FloatingButton>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
 
                 <controls:ToolRunButton Grid.Column="1"
@@ -121,15 +127,20 @@
         </Grid>
 
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
-            <TextBlock VerticalAlignment="Bottom"
-                       FontWeight="Bold"
-                       Opacity="0.58"
-                       Text="Made by OliBomby" />
-            <controls:ToolProgressBar Grid.Column="1"
-                                      Height="20"
-                                      Margin="20,0"
-                                      Maximum="100"
-                                      Value="{Binding Progress}" />
+            <Grid Grid.Column="0">
+                <WrapPanel VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="NoWrap"
+                               Text="Made by OliBomby"
+                               FontWeight="Bold"
+                               Opacity="0.58" />
+                </WrapPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <controls:ToolProgressBar Height="20"
+                                          Margin="20,0,20,0"
+                                          Maximum="100"
+                                          Value="{Binding Progress}" />
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

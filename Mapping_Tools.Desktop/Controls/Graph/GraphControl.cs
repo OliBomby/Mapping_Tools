@@ -1566,7 +1566,7 @@ public sealed class GraphControl : Control
             anchor.Pos.Y,
             new InvariantDoubleConverter(),
             typeof(double),
-            "OK",
+            "ACCEPT",
             "CANCEL",
             _ => ValidationResult.Success,
             value =>
