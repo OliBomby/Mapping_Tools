@@ -70,7 +70,7 @@ public sealed class SliderPicturatorService : ISliderPicturatorService
 
         var session = await editingGateway.OpenBeatmapAsync(
             path,
-            LiveBeatmapPreference.PreferLive,
+            LiveBeatmapPreference.DiskOnly,
             cancellationToken).ConfigureAwait(false);
         var beatmap = session.Editor.Beatmap;
         IReadOnlyList<ComboColour> comboColours = beatmap.ComboColours.Count == 0

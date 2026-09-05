@@ -1,5 +1,6 @@
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
+using Mapping_Tools.Application.Execution.UserNotification.Models;
 using Mapping_Tools.Application.Settings.Models;
 using Mapping_Tools.Application.Tools.SliderPicturator;
 using Mapping_Tools.Core.BeatmapHelper;
@@ -49,11 +50,76 @@ public sealed class SliderPicturatorViewModelTests
         viewModel.SelectedSlider!.Line.Should().Be(selectedSlider.Line);
     }
 
+    [TestMethod]
+    public void Activate_WithoutMapComboColors_DoesNotQueryLiveBeatmap()
+    {
+        // Arrange
+        RecordingCurrentBeatmapLocator currentBeatmap = new();
+        var viewModel = Create(new RecordingPicturator(), currentBeatmap);
+
+        // Act
+        viewModel.Activate();
+
+        // Assert
+        currentBeatmap.FindCount.Should().Be(0);
+    }
+
+    [TestMethod]
+    public void Activate_WithMapComboColors_UsesSelectedWorkspaceMapWithoutLiveLookup()
+    {
+        // Arrange
+        RecordingPicturator service = new()
+        {
+            AvailableColors = [RgbaColour.FromRgb(255, 0, 0)]
+        };
+        RecordingCurrentBeatmapLocator currentBeatmap = new();
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        var viewModel = Create(service, currentBeatmap, workspace);
+        viewModel.UseMapComboColors = true;
+
+        // Act
+        viewModel.Activate();
+
+        // Assert
+        currentBeatmap.FindCount.Should().Be(0);
+        service.ColorPaths.Should().ContainSingle().Which.Should().Be("selected.osu");
+        viewModel.AvailableColors.Should().Equal(RgbaColour.FromRgb(255, 0, 0));
+    }
+
+    [TestMethod]
+    public void WorkspaceSelectionChanged_WhenSelectionCleared_ClearsPaletteWithoutError()
+    {
+        // Arrange
+        RgbaColour colour = RgbaColour.FromRgb(255, 0, 0);
+        RecordingPicturator service = new() { AvailableColors = [colour] };
+        RecordingCurrentBeatmapLocator currentBeatmap = new();
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        UserNotificationService notifications = new();
+        List<UserNotification> published = [];
+        notifications.Published += (_, eventArgs) => published.Add(eventArgs.Notification);
+        var viewModel = Create(service, currentBeatmap, workspace, notifications);
+        viewModel.UseMapComboColors = true;
+        viewModel.Activate();
+
+        // Act
+        workspace.ClearSelection();
+
+        // Assert
+        currentBeatmap.FindCount.Should().Be(0);
+        service.ColorPaths.Should().ContainSingle().Which.Should().Be("selected.osu");
+        viewModel.AvailableColors.Should().BeEmpty();
+        published.Should().BeEmpty();
+    }
+
     private static SliderPicturatorViewModel Create(
         RecordingPicturator service,
-        RecordingCurrentBeatmapLocator currentBeatmap)
+        RecordingCurrentBeatmapLocator currentBeatmap,
+        TestBeatmapWorkspace? workspace = null,
+        UserNotificationService? notifications = null)
     {
-        UserNotificationService notifications = new();
+        notifications ??= new UserNotificationService();
         DesktopApplicationSettings settings = new();
         return new SliderPicturatorViewModel(
             service,
@@ -65,7 +131,7 @@ public sealed class SliderPicturatorViewModelTests
                 settings,
                 TimeProvider.System),
             currentBeatmap,
-            new TestBeatmapWorkspace(),
+            workspace ?? new TestBeatmapWorkspace(),
             settings,
             notifications);
     }
@@ -73,6 +139,10 @@ public sealed class SliderPicturatorViewModelTests
     private sealed class RecordingPicturator : ISliderPicturatorService
     {
         public long ResultSegmentCount { get; init; }
+
+        public List<string> ColorPaths { get; } = [];
+
+        public IReadOnlyList<RgbaColour> AvailableColors { get; init; } = [];
 
         public Task<SliderPicturatorResult> PicturateAsync(
             string path,
@@ -87,7 +157,8 @@ public sealed class SliderPicturatorViewModelTests
             string path,
             CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<IReadOnlyList<RgbaColour>>([]);
+            ColorPaths.Add(path);
+            return Task.FromResult(AvailableColors);
         }
 
         public Task<HitObject?> GetSelectedSliderAsync(

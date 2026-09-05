@@ -227,7 +227,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
 
         isActive = true;
         workspace.SelectionChanged += OnWorkspaceSelectionChanged;
-        _ = RefreshColorsAsync();
+        if (UseMapComboColors) _ = RefreshColorsAsync();
         if (sourceImage is not null) _ = GeneratePreviewAsync();
     }
 
@@ -301,13 +301,13 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         colorRefreshCancellation?.Cancel();
         CancellationTokenSource cancellation = new();
         colorRefreshCancellation = cancellation;
+        AvailableColors.Clear();
         try
         {
-            string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellation.Token);
+            string? path = workspace.SelectedPaths.FirstOrDefault();
             if (string.IsNullOrWhiteSpace(path)) return;
             var colours = await picturator.GetAvailableColorsAsync(path, cancellation.Token);
             cancellation.Token.ThrowIfCancellationRequested();
-            AvailableColors.Clear();
             foreach (var colour in colours) AvailableColors.Add(colour);
             if (AvailableColors.Count > 0 && UseMapComboColors && !AvailableColors.Contains(ComboColor)) ComboColor = AvailableColors[0];
         }
@@ -343,6 +343,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
         CurrentTrackColor = value ? ComboColor : TrackColorPickerColor;
         OnPropertyChanged(nameof(ShouldShowCcPicker));
         OnPropertyChanged(nameof(ShouldShowPalette));
+        if (value && isActive) _ = RefreshColorsAsync();
         _ = GeneratePreviewAsync();
     }
 
