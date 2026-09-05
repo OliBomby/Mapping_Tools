@@ -194,7 +194,7 @@ public sealed partial class SlideratorView : UserControl
                 SliderPathUtil.GetRedAnchorCompletions(sourcePath)
                     .Select(completion => new ObjectVisualiserMarker(
                         completion / maximum,
-                        0.2,
+                        6,
                         Brushes.Red)));
 
         if (viewModel.ShowGraphAnchors)
@@ -206,7 +206,7 @@ public sealed partial class SlideratorView : UserControl
             markers.AddRange(
                 completions.Select(completion => new ObjectVisualiserMarker(
                     completion / maximum,
-                    0.2,
+                    6,
                     Brushes.DodgerBlue)));
         }
 

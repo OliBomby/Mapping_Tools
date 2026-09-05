@@ -249,7 +249,7 @@
                     <controls:ObjectVisualiserControl HitObject="{Binding TumouredPreviewHitObject}"
                                                       ShowAnchors="True"
                                                       Thickness="{Binding CircleSize, Converter={StaticResource CircleSizeToThicknessConverter}}"
-                                                      AnchorSize="0.2"
+                                                      AnchorSize="6"
                                                       BorderThickness="0.1"
                                                       Fill="DarkSlateGray"
                                                       Stroke="YellowGreen"
