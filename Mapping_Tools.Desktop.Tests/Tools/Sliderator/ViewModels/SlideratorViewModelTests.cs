@@ -9,6 +9,7 @@ using Mapping_Tools.Core.Graph;
 using Mapping_Tools.Core.MathUtil;
 using Mapping_Tools.Core.Tools.Sliderator.Models;
 using Mapping_Tools.Desktop.Models;
+using Mapping_Tools.Desktop.Services.Dialogs;
 using Mapping_Tools.Desktop.Shell;
 using Mapping_Tools.Desktop.Tests.TestDoubles;
 using Mapping_Tools.Desktop.Tools.Sliderator.Models;
@@ -303,6 +304,26 @@ public sealed class SlideratorViewModelTests
 
         // Assert
         viewModel.LoadedHitObjects.Should().ContainSingle().Which.Should().BeSameAs(slider);
+    }
+
+    [TestMethod]
+    public async Task ImportCommand_WithSelectedModeAndUnavailableCurrentBeatmap_ShowsErrorDialogWithoutInvokingService()
+    {
+        // Arrange
+        RecordingSliderator service = new();
+        TestDialogService dialogs = new();
+        var viewModel = Create(
+            service,
+            new RecordingCurrentBeatmapLocator(null),
+            dialogs);
+
+        // Act
+        await viewModel.ImportCommand.ExecuteAsync(null);
+
+        // Assert
+        service.ImportPath.Should().BeNull();
+        ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!).Message
+            .Should().Contain("Open a beatmap in osu!");
     }
 
     [DataTestMethod]

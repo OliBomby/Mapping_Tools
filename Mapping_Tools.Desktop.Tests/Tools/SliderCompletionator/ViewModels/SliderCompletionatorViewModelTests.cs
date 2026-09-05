@@ -62,6 +62,24 @@ public sealed class SliderCompletionatorViewModelTests
     }
 
     [TestMethod]
+    public async Task RunCommand_WithSelectedModeAndUnavailableCurrentBeatmap_ThrowsWithoutInvokingService()
+    {
+        // Arrange
+        RecordingCompletionator service = new();
+        var viewModel = Create(
+            service,
+            currentBeatmap: new RecordingCurrentBeatmapLocator(null));
+
+        // Act
+        Func<Task> act = () => viewModel.RunCommand.ExecuteAsync(null);
+        var exception = await act.Should().ThrowAsync<InvalidOperationException>();
+
+        // Assert
+        service.Paths.Should().BeNull();
+        exception.Which.Message.Should().Contain("Open a beatmap in osu!");
+    }
+
+    [TestMethod]
     public void RunQuickAsync_WithAsynchronousCurrentBeatmapLookupAndCurrentEditorTime_KeepsRunStateOnCallingContext()
     {
         // Arrange
@@ -193,10 +211,10 @@ public sealed class SliderCompletionatorViewModelTests
 
     private sealed class AsynchronousCurrentBeatmapLocator(string path) : ICurrentBeatmapLocator
     {
-        private readonly TaskCompletionSource<string?> completion = new(
+        private readonly TaskCompletionSource<string> completion = new(
             TaskCreationOptions.RunContinuationsAsynchronously);
 
-        public Task<string?> FindCurrentBeatmapAsync(
+        public Task<string> FindCurrentBeatmapAsync(
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();

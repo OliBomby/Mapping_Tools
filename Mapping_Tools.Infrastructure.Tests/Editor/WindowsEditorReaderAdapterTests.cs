@@ -33,11 +33,36 @@ public sealed class WindowsEditorReaderAdapterTests
             });
 
         // Act
-        string? result = await sut.FindCurrentBeatmapAsync();
+        string result = await sut.FindCurrentBeatmapAsync();
 
         // Assert
         result.Should().Be(expectedPath);
         memoryReadCount.Should().Be(1);
         sut.Dispose();
+    }
+
+    [TestMethod]
+    public async Task FindCurrentBeatmapAsync_WhenOsuIsClosed_ThrowsUnavailableError()
+    {
+        // Arrange
+        using WindowsEditorReaderAdapter sut = new(
+            new ApplicationSettings
+            {
+                SongsPath = @"C:\osu!\Songs",
+                UseEditorReader = false,
+            },
+            new ApplicationDirectories(Path.Combine(
+                Path.GetTempPath(),
+                "Mapping Tools Tests")),
+            () => true,
+            () => null,
+            _ => "unused.osu");
+
+        // Act
+        Func<Task> act = () => sut.FindCurrentBeatmapAsync();
+
+        // Assert
+        var exception = await act.Should().ThrowAsync<InvalidOperationException>();
+        exception.Which.Message.Should().Contain("Open a beatmap in osu!");
     }
 }

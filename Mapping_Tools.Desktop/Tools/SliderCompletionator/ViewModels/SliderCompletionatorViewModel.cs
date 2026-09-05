@@ -155,9 +155,10 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string path = await currentBeatmap
+            .FindCurrentBeatmapAsync(cancellationToken);
         await RunWithStateAsync(() => RunPathsAsync(
-            string.IsNullOrWhiteSpace(path) ? [] : [path],
+            [path],
             true,
             cancellationToken));
     }
@@ -177,13 +178,13 @@ public sealed partial class SliderCompletionatorViewModel : SingleRunToolViewMod
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        string? currentPath = null;
-        if (ImportModeSetting == HitObjectSelectionMode.Selected) currentPath = await currentBeatmap.FindCurrentBeatmapAsync();
-
-        var paths = ImportModeSetting == HitObjectSelectionMode.Selected
-            ? string.IsNullOrWhiteSpace(currentPath) ? [] : [currentPath]
+        IReadOnlyList<string> paths = ImportModeSetting == HitObjectSelectionMode.Selected
+            ? [await currentBeatmap.FindCurrentBeatmapAsync()]
             : workspace.SelectedPaths;
-        await RunPathsAsync(paths, settings.AlwaysQuickRun, CancellationToken.None);
+        await RunPathsAsync(
+            paths,
+            settings.AlwaysQuickRun,
+            CancellationToken.None);
     }
 
     private async Task RunPathsAsync(

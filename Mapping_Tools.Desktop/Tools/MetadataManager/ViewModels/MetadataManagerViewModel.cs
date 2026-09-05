@@ -194,8 +194,20 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task UseCurrentImportAsync()
     {
-        string? path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
-        if (!string.IsNullOrWhiteSpace(path)) ImportPath = path;
+        try
+        {
+            ImportPath = await currentBeatmapLocator.FindCurrentBeatmapAsync();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception exception)
+        {
+            await PublishFailureAsync(
+                "Could not fetch the current beatmap",
+                "The current osu! beatmap could not be obtained.",
+                exception);
+        }
     }
 
     [RelayCommand]
@@ -249,8 +261,20 @@ public sealed partial class MetadataManagerViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task UseCurrentExportAsync()
     {
-        string? path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
-        if (!string.IsNullOrWhiteSpace(path)) ExportPath = path;
+        try
+        {
+            ExportPath = await currentBeatmapLocator.FindCurrentBeatmapAsync();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception exception)
+        {
+            await PublishFailureAsync(
+                "Could not fetch the current beatmap",
+                "The current osu! beatmap could not be obtained.",
+                exception);
+        }
     }
 
     [RelayCommand]

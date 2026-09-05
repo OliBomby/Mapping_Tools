@@ -128,7 +128,8 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     /// <returns>A task that completes after QuickRun finishes.</returns>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+
         await RunWithStateAsync(() => RunPathsAsync(
             string.IsNullOrWhiteSpace(path) ? [] : [path],
             true,
@@ -152,7 +153,7 @@ public sealed partial class MapCleanerViewModel : SingleRunToolViewModel,
     {
         if (settings.AlwaysQuickRun)
         {
-            string? path = await currentBeatmap.FindCurrentBeatmapAsync();
+            string path = await currentBeatmap.FindCurrentBeatmapAsync();
             await RunPathsAsync(
                 string.IsNullOrWhiteSpace(path) ? [] : [path],
                 true,

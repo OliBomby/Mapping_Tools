@@ -9,10 +9,11 @@ namespace Mapping_Tools.Infrastructure.Editor;
 public sealed class UnsupportedPlatformCurrentBeatmapLocator : ICurrentBeatmapLocator
 {
     /// <inheritdoc />
-    public Task<string?> FindCurrentBeatmapAsync(
+    public Task<string> FindCurrentBeatmapAsync(
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult<string?>(null);
+        return Task.FromException<string>(new InvalidOperationException(
+            "Current osu! beatmap lookup is unavailable on this platform."));
     }
 }

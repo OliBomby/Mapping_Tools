@@ -266,9 +266,23 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <param name="cancellationToken">Cancels lookup, generation, or saving.</param>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string path;
+        try
+        {
+            path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            await ShowMessageAsync(exception.Message);
+            return;
+        }
+
         await RunWithStateAsync(() => RunPathsAsync(
-            string.IsNullOrWhiteSpace(path) ? [] : [path],
+            [path],
             true,
             cancellationToken));
     }
@@ -317,9 +331,23 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task ImportAsync()
     {
-        string? path = ImportModeSetting == HitObjectSelectionMode.Selected
-            ? await currentBeatmap.FindCurrentBeatmapAsync()
-            : workspace.SelectedPaths.FirstOrDefault();
+        string? path;
+        try
+        {
+            path = ImportModeSetting == HitObjectSelectionMode.Selected
+                ? await currentBeatmap.FindCurrentBeatmapAsync()
+                : workspace.SelectedPaths.FirstOrDefault();
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            await ShowMessageAsync(exception.Message);
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(path))
         {
             await ShowMessageAsync(
@@ -420,12 +448,26 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        if (settings.AlwaysQuickRun)
+        if (ImportModeSetting == HitObjectSelectionMode.Selected || settings.AlwaysQuickRun)
         {
-            string? path = await currentBeatmap.FindCurrentBeatmapAsync();
+            string path;
+            try
+            {
+                path = await currentBeatmap.FindCurrentBeatmapAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                await ShowMessageAsync(exception.Message);
+                return;
+            }
+
             await RunPathsAsync(
-                string.IsNullOrWhiteSpace(path) ? [] : [path],
-                true,
+                [path],
+                settings.AlwaysQuickRun,
                 CancellationToken.None);
             return;
         }

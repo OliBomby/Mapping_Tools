@@ -114,7 +114,27 @@ public sealed class TumourGeneratorViewModelTests
     }
 
     [TestMethod]
-    public async Task RunQuickAsync_WhenCurrentBeatmapIsMissing_ShowsEmptyTargetMessage()
+    public async Task RunCommand_WithSelectedMode_UsesCurrentBeatmapInsteadOfWorkspacePaths()
+    {
+        // Arrange
+        RecordingGenerator service = new();
+        TestBeatmapWorkspace workspace = new();
+        workspace.SetSelection(["selected.osu"]);
+        var viewModel = Create(
+            service,
+            new RecordingCurrentBeatmapLocator("current.osu"),
+            workspace: workspace);
+
+        // Act
+        await viewModel.RunCommand.ExecuteAsync(null);
+
+        // Assert
+        service.RunPaths.Should().Equal("current.osu");
+        service.Project!.ImportModeSetting.Should().Be(HitObjectSelectionMode.Selected);
+    }
+
+    [TestMethod]
+    public async Task RunQuickAsync_WhenCurrentBeatmapIsMissing_ShowsCurrentBeatmapError()
     {
         // Arrange
         TestDialogService dialogs = new();
@@ -128,7 +148,7 @@ public sealed class TumourGeneratorViewModelTests
 
         // Assert
         ((MessageDialogRequest<bool>)dialogs.LastMessageRequest!).Message
-            .Should().Contain("Select at least one beatmap");
+            .Should().Contain("Open a beatmap in osu!");
     }
 
     [TestMethod]

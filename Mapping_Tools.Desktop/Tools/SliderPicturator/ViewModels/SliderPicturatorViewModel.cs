@@ -202,7 +202,21 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken).ConfigureAwait(false);
+        string path;
+        try
+        {
+            path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            await PublishFailureAsync("Could not run Slider Picturator", "The current beatmap could not be found.", exception);
+            return;
+        }
+
         await RunWithStateAsync(() => RunPathAsync(path, true, cancellationToken));
     }
 
@@ -267,9 +281,11 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     [RelayCommand]
     private async Task ImportAsync()
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
-        if (string.IsNullOrWhiteSpace(path)) return;
-        try { SelectedSlider = await picturator.GetSelectedSliderAsync(path); }
+        try
+        {
+            string path = await currentBeatmap.FindCurrentBeatmapAsync();
+            SelectedSlider = await picturator.GetSelectedSliderAsync(path);
+        }
         catch (Exception exception) { await PublishFailureAsync("Could not import slider", "The selected hit object could not be read.", exception); }
     }
 
@@ -308,8 +324,7 @@ public sealed partial class SliderPicturatorViewModel : SingleRunToolViewModel, 
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
-        if (string.IsNullOrWhiteSpace(path)) path = workspace.SelectedPaths.FirstOrDefault();
+        string path = await currentBeatmap.FindCurrentBeatmapAsync();
         await RunPathAsync(path, settings.AlwaysQuickRun, CancellationToken.None);
     }
 

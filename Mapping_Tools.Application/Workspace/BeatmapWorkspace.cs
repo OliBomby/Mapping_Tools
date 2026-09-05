@@ -148,14 +148,20 @@ public sealed class BeatmapWorkspace : IBeatmapWorkspace
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        string? path = await currentBeatmapLocator.FindCurrentBeatmapAsync(
-            cancellationToken);
-        cancellationToken.ThrowIfCancellationRequested();
-
-        if (string.IsNullOrWhiteSpace(path))
+        string path;
+        try
+        {
+            path = await currentBeatmapLocator.FindCurrentBeatmapAsync(
+                cancellationToken);
+        }
+        catch (InvalidOperationException)
+        {
             return new CurrentBeatmapSelectionResult(
                 CurrentBeatmapSelectionStatus.Unavailable,
                 null);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         if (!fileSystem.FileExists(path))
             return new CurrentBeatmapSelectionResult(

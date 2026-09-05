@@ -7,13 +7,13 @@ namespace Mapping_Tools.Application.Workspace.Contracts;
 public interface ICurrentBeatmapLocator
 {
     /// <summary>
-    ///     Attempts to resolve osu!'s current beatmap to a local file.
+    ///     Resolves osu!'s current beatmap to a local file.
     /// </summary>
     /// <param name="cancellationToken">Cancels process discovery or editor-state reading.</param>
-    /// <returns>
-    ///     The candidate local path, or <see langword="null" /> when osu! or its
-    ///     current beatmap cannot be determined.
-    /// </returns>
-    Task<string?> FindCurrentBeatmapAsync(
+    /// <returns>The path of the beatmap currently open in osu!.</returns>
+    /// <exception cref="InvalidOperationException">
+    ///     osu! is unavailable or has no current beatmap.
+    /// </exception>
+    Task<string> FindCurrentBeatmapAsync(
         CancellationToken cancellationToken = default);
 }

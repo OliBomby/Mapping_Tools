@@ -60,6 +60,24 @@ public sealed class SliderMergerViewModelTests
     }
 
     [TestMethod]
+    public async Task RunCommand_WithSelectedModeAndUnavailableCurrentBeatmap_ThrowsWithoutInvokingService()
+    {
+        // Arrange
+        RecordingMerger service = new();
+        var viewModel = Create(
+            service,
+            currentBeatmap: new RecordingCurrentBeatmapLocator(null));
+
+        // Act
+        Func<Task> act = () => viewModel.RunCommand.ExecuteAsync(null);
+        var exception = await act.Should().ThrowAsync<InvalidOperationException>();
+
+        // Assert
+        service.Paths.Should().BeNull();
+        exception.Which.Message.Should().Contain("Open a beatmap in osu!");
+    }
+
+    [TestMethod]
     public async Task RunQuickAsync_WithAutoReloadEnabled_ReloadsEditorAfterSuccessfulMerge()
     {
         // Arrange

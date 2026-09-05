@@ -84,11 +84,13 @@ public sealed class WindowsEditorReaderAdapter :
     }
 
     /// <inheritdoc />
-    public async Task<string?> FindCurrentBeatmapAsync(
+    public async Task<string> FindCurrentBeatmapAsync(
         CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(disposed, this);
-        if (!isWindows()) return null;
+        if (!isWindows())
+            throw new InvalidOperationException(
+                "Current osu! beatmap lookup is unavailable on this platform.");
 
         EnterRead();
         bool lockTaken = false;
@@ -97,7 +99,9 @@ public sealed class WindowsEditorReaderAdapter :
             await readerLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             lockTaken = true;
             using var process = findProcess();
-            if (process is null) return null;
+            if (process is null)
+                throw new InvalidOperationException(
+                    "Open a beatmap in osu! before using the current editor state.");
 
             cancellationToken.ThrowIfCancellationRequested();
             string? path = await Task.Run(
@@ -105,15 +109,25 @@ public sealed class WindowsEditorReaderAdapter :
                     cancellationToken)
                 .ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
+            if (string.IsNullOrWhiteSpace(path))
+                throw new InvalidOperationException(
+                    "Open a beatmap in osu! before using the current editor state.");
+
             return path;
         }
         catch (OperationCanceledException)
         {
             throw;
         }
-        catch
+        catch (InvalidOperationException)
         {
-            return null;
+            throw;
+        }
+        catch (Exception exception)
+        {
+            throw new InvalidOperationException(
+                "Could not determine the beatmap currently open in osu!.",
+                exception);
         }
         finally
         {

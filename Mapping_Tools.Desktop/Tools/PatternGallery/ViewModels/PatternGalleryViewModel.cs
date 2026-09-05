@@ -255,7 +255,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? current = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string current = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
         await RunWithStateAsync(() => RunPathsAsync(
             string.IsNullOrWhiteSpace(current) ? [] : [current],
             true,
@@ -380,7 +380,17 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task AddSelectedAsync()
     {
-        string? sourcePath = await currentBeatmap.FindCurrentBeatmapAsync();
+        string sourcePath;
+        try
+        {
+            sourcePath = await currentBeatmap.FindCurrentBeatmapAsync();
+        }
+        catch (Exception exception)
+        {
+            ResultSummary = $"Could not read the current osu! beatmap: {exception.Message}";
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(sourcePath))
         {
             ResultSummary = "Open a beatmap in osu! before importing selected objects.";
@@ -788,7 +798,7 @@ public sealed partial class PatternGalleryViewModel : SingleRunToolViewModel,
     {
         if (ExportTimeMode == ExportTimeMode.Current)
         {
-            string? current = await currentBeatmap.FindCurrentBeatmapAsync();
+            string current = await currentBeatmap.FindCurrentBeatmapAsync();
             await RunPathsAsync(
                 string.IsNullOrWhiteSpace(current) ? [] : [current],
                 settings.AlwaysQuickRun,

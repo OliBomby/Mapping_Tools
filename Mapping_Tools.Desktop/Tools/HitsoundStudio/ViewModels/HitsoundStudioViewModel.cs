@@ -400,7 +400,8 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+
         if (!string.IsNullOrWhiteSpace(path)) BaseBeatmap = path;
         await RunWithStateAsync(() => RunExportAsync([path ?? string.Empty], cancellationToken));
     }
@@ -431,7 +432,7 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
         var paths = workspace.SelectedPaths;
         if (settings.AlwaysQuickRun)
         {
-            string? current = await currentBeatmap.FindCurrentBeatmapAsync();
+            string current = await currentBeatmap.FindCurrentBeatmapAsync();
             paths = string.IsNullOrWhiteSpace(current) ? [] : [current];
         }
 
@@ -673,8 +674,14 @@ public sealed partial class HitsoundStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task LoadEditImportPathAsync()
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
-        if (!string.IsNullOrWhiteSpace(path)) EditImportPath = path;
+        try
+        {
+            EditImportPath = await currentBeatmap.FindCurrentBeatmapAsync();
+        }
+        catch (InvalidOperationException exception)
+        {
+            ResultSummary = $"Could not load the current beatmap: {exception.Message}";
+        }
     }
 
     /// <summary>Chooses the focused layer's imported source sample.</summary>

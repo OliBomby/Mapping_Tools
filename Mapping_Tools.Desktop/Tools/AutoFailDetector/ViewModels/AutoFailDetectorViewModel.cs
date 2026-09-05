@@ -106,7 +106,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
     /// <returns>A task that completes after QuickRun finishes.</returns>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
         await RunWithStateAsync(() => RunPathAsync(path, cancellationToken));
     }
 
@@ -116,6 +116,7 @@ public sealed partial class AutoFailDetectorViewModel : SingleRunToolViewModel, 
         string? path = settings.AlwaysQuickRun
             ? await currentBeatmap.FindCurrentBeatmapAsync()
             : workspace.SelectedPaths.FirstOrDefault();
+
         await RunPathAsync(path, CancellationToken.None);
     }
 

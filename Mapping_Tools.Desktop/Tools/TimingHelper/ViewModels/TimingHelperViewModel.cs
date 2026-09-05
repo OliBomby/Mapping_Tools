@@ -103,9 +103,10 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     /// <returns>A task that completes after QuickRun reaches a terminal state.</returns>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await currentBeatmap
+        string path = await currentBeatmap
             .FindCurrentBeatmapAsync(cancellationToken)
             .ConfigureAwait(false);
+
         await RunWithStateAsync(() => RunPathsAsync(
             string.IsNullOrWhiteSpace(path) ? [] : [path],
             true,
@@ -129,7 +130,7 @@ public sealed partial class TimingHelperViewModel : SingleRunToolViewModel,
     {
         if (settings.AlwaysQuickRun)
         {
-            string? path = await currentBeatmap.FindCurrentBeatmapAsync();
+            string path = await currentBeatmap.FindCurrentBeatmapAsync();
             await RunPathsAsync(
                 string.IsNullOrWhiteSpace(path) ? [] : [path],
                 true,

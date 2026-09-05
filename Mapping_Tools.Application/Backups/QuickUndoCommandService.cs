@@ -48,10 +48,14 @@ public sealed class QuickUndoCommandService : IQuickUndoCommandService
     {
         try
         {
-            string? path = await currentBeatmapLocator
-                .FindCurrentBeatmapAsync(cancellationToken)
-                .ConfigureAwait(false);
-            if (string.IsNullOrWhiteSpace(path))
+            string path;
+            try
+            {
+                path = await currentBeatmapLocator
+                    .FindCurrentBeatmapAsync(cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (InvalidOperationException)
             {
                 await PublishAsync(
                         UserNotificationSeverity.Warning,

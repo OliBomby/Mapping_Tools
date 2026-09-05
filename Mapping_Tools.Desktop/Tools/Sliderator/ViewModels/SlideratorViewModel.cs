@@ -337,8 +337,20 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <param name="cancellationToken">Cancels editor discovery or generation.</param>
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
-        if (string.IsNullOrWhiteSpace(path)) return;
+        string path;
+        try
+        {
+            path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            await ShowMessageAsync(exception.Message);
+            return;
+        }
 
         await RunWithStateAsync(async () =>
         {
@@ -365,8 +377,22 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <returns><see langword="true" /> when the placement completed successfully.</returns>
     public async Task<bool> RunFastPlacementAsync(CancellationToken cancellationToken = default)
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
-        if (string.IsNullOrWhiteSpace(path) || VisibleHitObject is null) return false;
+        string path;
+        try
+        {
+            path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            await ShowMessageAsync(exception.Message);
+            return false;
+        }
+
+        if (VisibleHitObject is null) return false;
 
         bool succeeded = false;
         await RunWithStateAsync(async () =>
@@ -432,8 +458,22 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     protected override async Task RunCoreAsync()
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
-        if (string.IsNullOrWhiteSpace(path) || VisibleHitObject is null)
+        string path;
+        try
+        {
+            path = await currentBeatmap.FindCurrentBeatmapAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            await ShowMessageAsync(exception.Message);
+            return;
+        }
+
+        if (VisibleHitObject is null)
         {
             await ShowMessageAsync("Import a slider before running Sliderator.");
             return;
@@ -448,9 +488,23 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
 
     private async Task ImportAsync()
     {
-        string? path = ImportModeSetting == HitObjectSelectionMode.Selected
-            ? await currentBeatmap.FindCurrentBeatmapAsync()
-            : workspace.SelectedPaths.FirstOrDefault();
+        string? path;
+        try
+        {
+            path = ImportModeSetting == HitObjectSelectionMode.Selected
+                ? await currentBeatmap.FindCurrentBeatmapAsync()
+                : workspace.SelectedPaths.FirstOrDefault();
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            await ShowMessageAsync(exception.Message);
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(path))
         {
             await ShowMessageAsync(

@@ -135,8 +135,13 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task UseCurrentSourceAsync()
     {
-        string? path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
-        if (!string.IsNullOrWhiteSpace(path)) SourcePaths = [path];
+        try
+        {
+            SourcePaths = [await currentBeatmapLocator.FindCurrentBeatmapAsync()];
+        }
+        catch (InvalidOperationException)
+        {
+        }
     }
 
     [RelayCommand]
@@ -156,8 +161,13 @@ public sealed partial class RhythmGuideViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task UseCurrentExportAsync()
     {
-        string? path = await currentBeatmapLocator.FindCurrentBeatmapAsync();
-        if (!string.IsNullOrWhiteSpace(path)) ExportPath = path;
+        try
+        {
+            ExportPath = await currentBeatmapLocator.FindCurrentBeatmapAsync();
+        }
+        catch (InvalidOperationException)
+        {
+        }
     }
 
     /// <inheritdoc />

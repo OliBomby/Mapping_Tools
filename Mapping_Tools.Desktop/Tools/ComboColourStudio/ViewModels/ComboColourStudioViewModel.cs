@@ -115,7 +115,8 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+
         if (string.IsNullOrWhiteSpace(path))
         {
             ResultSummary = "Open a target beatmap in osu! before using QuickRun.";
@@ -298,8 +299,14 @@ public sealed partial class ComboColourStudioViewModel : SingleRunToolViewModel,
     [RelayCommand]
     private async Task UseCurrentImportAsync()
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
-        if (!string.IsNullOrWhiteSpace(path)) ImportPath = path;
+        try
+        {
+            ImportPath = await currentBeatmap.FindCurrentBeatmapAsync();
+        }
+        catch (InvalidOperationException exception)
+        {
+            ResultSummary = exception.Message;
+        }
     }
 
     /// <inheritdoc />

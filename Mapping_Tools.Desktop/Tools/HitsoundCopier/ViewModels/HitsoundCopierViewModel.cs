@@ -181,7 +181,8 @@ public sealed partial class HitsoundCopierViewModel : SingleRunToolViewModel,
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+        string path = await currentBeatmap.FindCurrentBeatmapAsync(cancellationToken);
+
         if (string.IsNullOrWhiteSpace(path))
         {
             ResultSummary = "Open a target beatmap in osu! before using QuickRun.";

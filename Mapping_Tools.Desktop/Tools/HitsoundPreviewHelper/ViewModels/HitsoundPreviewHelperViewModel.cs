@@ -120,9 +120,10 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     /// <inheritdoc />
     public async Task RunQuickAsync(CancellationToken cancellationToken)
     {
-        string? path = await currentBeatmap
+        string path = await currentBeatmap
             .FindCurrentBeatmapAsync(cancellationToken)
             .ConfigureAwait(false);
+
         await RunWithStateAsync(() => RunPathsAsync(
             string.IsNullOrWhiteSpace(path) ? [] : [path],
             true,
@@ -151,7 +152,7 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
         IReadOnlyList<string> paths = workspace.SelectedPaths;
         if (settings.AlwaysQuickRun)
         {
-            string? quickPath = await currentBeatmap.FindCurrentBeatmapAsync();
+            string quickPath = await currentBeatmap.FindCurrentBeatmapAsync();
             paths = string.IsNullOrWhiteSpace(quickPath) ? [] : [quickPath];
         }
 
@@ -169,15 +170,9 @@ public sealed partial class HitsoundPreviewHelperViewModel : SingleRunToolViewMo
     [RelayCommand]
     private async Task AddFromSelectionAsync()
     {
-        string? path = await currentBeatmap.FindCurrentBeatmapAsync();
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            await PublishSelectionWarningAsync();
-            return;
-        }
-
         try
         {
+            string path = await currentBeatmap.FindCurrentBeatmapAsync();
             var positions =
                 await previewService.GetSelectedZonePositionsAsync(path);
             if (positions.Count == 0)

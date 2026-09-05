@@ -10,11 +10,14 @@ internal sealed class RecordingCurrentBeatmapLocator(string? path = null) : ICur
 
     public int FindCount { get; private set; }
 
-    public Task<string?> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
+    public Task<string> FindCurrentBeatmapAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         FindCount++;
-        return Task.FromResult(Path);
+        return string.IsNullOrWhiteSpace(Path)
+            ? Task.FromException<string>(new InvalidOperationException(
+                "Open a beatmap in osu! before using the current editor state."))
+            : Task.FromResult(Path);
     }
 }
 

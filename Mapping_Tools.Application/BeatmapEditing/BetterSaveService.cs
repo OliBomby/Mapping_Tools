@@ -41,10 +41,13 @@ public sealed class BetterSaveService : IBetterSaveService
         string? path = null;
         try
         {
-            path = await currentBeatmapLocator
-                .FindCurrentBeatmapAsync(cancellationToken)
-                .ConfigureAwait(false);
-            if (string.IsNullOrWhiteSpace(path))
+            try
+            {
+                path = await currentBeatmapLocator
+                    .FindCurrentBeatmapAsync(cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (InvalidOperationException)
             {
                 await PublishAsync(
                     UserNotificationSeverity.Warning,
