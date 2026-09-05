@@ -72,14 +72,14 @@
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
                                 Orientation="Horizontal">
-                        <materialDesign:FloatingButton Classes="mini light"
+                        <materialDesign:FloatingButton Classes="mini light no-transitions"
                                                        Margin="5"
                                                        x:Name="AddMapsetButton"
                                                        Click="AddMapsetButtonClick"
                                                        ToolTip.Tip="Add a mapset. Hold shift to get current beatmap from osu! client.">
                             <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
                         </materialDesign:FloatingButton>
-                        <materialDesign:FloatingButton Classes="mini light"
+                        <materialDesign:FloatingButton Classes="mini light no-transitions"
                                                        Margin="5"
                                                        Command="{Binding RemoveMapsetCommand}"
                                                        ToolTip.Tip="Remove selected mapsets or last mapset.">

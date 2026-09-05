@@ -59,16 +59,16 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
-            <materialDesign:FloatingButton Classes="mini light" Margin="0,0,8,0"
+            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
                                            ToolTip.Tip="Re-register hotkeys in case something broke."
                                            Command="{Binding RefreshHotkeysCommand}">
                 <materialIcons:MaterialIcon Kind="Reload" Width="22" Height="22" />
             </materialDesign:FloatingButton>
-            <materialDesign:FloatingButton Classes="mini light" Margin="0,0,8,0"
+            <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
                                            ToolTip.Tip="Add a new save slot." Command="{Binding AddCommand}">
                 <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
             </materialDesign:FloatingButton>
-            <materialDesign:FloatingButton Classes="mini light"
+            <materialDesign:FloatingButton Classes="mini light no-transitions"
                                            ToolTip.Tip="Remove all selected save slots or the last save if nothing is selected."
                                            Command="{Binding RemoveCommand}">
                 <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />

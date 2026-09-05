@@ -38,6 +38,7 @@ public sealed class ToolRunButton : Viewbox
                 Kind = MaterialIconKind.Play,
             },
         };
+        button.Classes.Add("no-transitions");
         ToolTip.SetTip(button, "Run this tool.");
         button.Command = validationCommand;
         Child = button;

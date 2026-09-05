@@ -165,7 +165,7 @@
                                   ToolTip.Tip="Enable this to synchronize the fields of all time-related elements." />
                     <TextBlock Text="Synchronize time fields" VerticalAlignment="Center" Margin="5,0,0,0"
                                ToolTip.Tip="Enable this to synchronize the fields of all time-related elements." />
-                    <materialDesign:FloatingButton Classes="mini light" Margin="200,0,0,0"
+                    <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="200,0,0,0"
                                                    Command="{Binding ResetCommand}"
                                                    ToolTip.Tip="Reset all multipliers and offsets.">
                         <materialIcons:MaterialIcon Kind="Rocket" Height="24" Width="24" />

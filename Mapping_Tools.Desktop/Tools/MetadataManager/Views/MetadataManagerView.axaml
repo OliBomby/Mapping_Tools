@@ -133,13 +133,13 @@
                                                 </ListBox.ItemTemplate>
                                             </ListBox>
                                         </materialDesign:Card>
-                                        <materialDesign:FloatingButton Classes="mini light" Margin="5"
+                                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                                        VerticalAlignment="Bottom"
                                                                        Command="{Binding AddComboColourCommand}"
                                                                        ToolTip.Tip="Add a new combo colour.">
                                             <materialIcons:MaterialIcon Width="24" Height="24" Kind="Plus" />
                                         </materialDesign:FloatingButton>
-                                        <materialDesign:FloatingButton Classes="mini light" Margin="5"
+                                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                                        VerticalAlignment="Bottom"
                                                                        Command="{Binding RemoveComboColourCommand}"
                                                                        ToolTip.Tip="Remove last combo colour.">
@@ -163,13 +163,13 @@
                                                 </ListBox.ItemTemplate>
                                             </ListBox>
                                         </materialDesign:Card>
-                                        <materialDesign:FloatingButton Classes="mini light" Margin="5"
+                                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                                        VerticalAlignment="Bottom"
                                                                        Command="{Binding AddSpecialColourCommand}"
                                                                        ToolTip.Tip="Add a new special colour.">
                                             <materialIcons:MaterialIcon Width="24" Height="24" Kind="Plus" />
                                         </materialDesign:FloatingButton>
-                                        <materialDesign:FloatingButton Classes="mini light" Margin="5"
+                                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                                        VerticalAlignment="Bottom"
                                                                        Command="{Binding RemoveSpecialColourCommand}"
                                                                        ToolTip.Tip="Remove last special colour.">

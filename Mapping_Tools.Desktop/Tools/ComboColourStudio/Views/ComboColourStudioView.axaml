@@ -73,13 +73,13 @@
                             <ComboBox ItemsSource="{Binding ComboColours}"
                                       SelectedItem="{Binding SelectedSequenceColour, Mode=TwoWay}"
                                       Classes="compact" />
-                            <materialDesign:FloatingButton Grid.Column="1" Classes="mini light" Margin="5,0"
+                            <materialDesign:FloatingButton Grid.Column="1" Classes="mini light no-transitions" Margin="5,0"
                                                            Command="{Binding AddSequenceColourCommand}"
                                                            CommandParameter="{Binding SelectedColourPoint}"
                                                            ToolTip.Tip="Add the selected colour to this sequence.">
                                 <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
                             </materialDesign:FloatingButton>
-                            <materialDesign:FloatingButton Grid.Column="2" Classes="mini light"
+                            <materialDesign:FloatingButton Grid.Column="2" Classes="mini light no-transitions"
                                                            Command="{Binding RemoveSequenceColourCommand}"
                                                            ToolTip.Tip="Remove the last colour from this sequence.">
                                 <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
@@ -134,12 +134,12 @@
                                 </ListBox.ItemTemplate>
                             </ListBox>
                         </materialDesign:Card>
-                        <materialDesign:FloatingButton Classes="mini light" Margin="8,0,4,0"
+                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="8,0,4,0"
                                                        Command="{Binding AddComboColourCommand}"
                                                        ToolTip.Tip="Add a new combo colour.">
                             <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
                         </materialDesign:FloatingButton>
-                        <materialDesign:FloatingButton Classes="mini light"
+                        <materialDesign:FloatingButton Classes="mini light no-transitions"
                                                        Command="{Binding RemoveComboColourCommand}"
                                                        ToolTip.Tip="Remove the last combo colour.">
                             <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />
@@ -168,13 +168,13 @@
                 </StackPanel>
                 <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal"
                             VerticalAlignment="Bottom">
-                    <materialDesign:FloatingButton Classes="mini light" Margin="5"
+                    <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                    x:Name="AddColourPointButton"
                                                    Click="AddColourPointButtonClick"
                                                    ToolTip.Tip="Add a new colour point.">
                         <materialIcons:MaterialIcon Kind="Plus" Width="24" Height="24" />
                     </materialDesign:FloatingButton>
-                    <materialDesign:FloatingButton Classes="mini light" Margin="5"
+                    <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="5"
                                                    Command="{Binding RemoveColourPointCommand}"
                                                    ToolTip.Tip="Remove selected colour points or the last point.">
                         <materialIcons:MaterialIcon Kind="Minus" Width="24" Height="24" />

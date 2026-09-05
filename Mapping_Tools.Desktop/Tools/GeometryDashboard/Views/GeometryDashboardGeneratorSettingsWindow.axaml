@@ -87,12 +87,12 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
-                        <materialDesign:FloatingButton Classes="mini light" Margin="0,0,8,0"
+                        <materialDesign:FloatingButton Classes="mini light no-transitions" Margin="0,0,8,0"
                                                        Command="{Binding AddPredicateCommand}"
                                                        ToolTip.Tip="Add a new selection predicate.">
                             <materialIcons:MaterialIcon Kind="Plus" Width="22" Height="22" />
                         </materialDesign:FloatingButton>
-                        <materialDesign:FloatingButton Classes="mini light" Command="{Binding RemovePredicateCommand}"
+                        <materialDesign:FloatingButton Classes="mini light no-transitions" Command="{Binding RemovePredicateCommand}"
                                                        ToolTip.Tip="Remove all selected predicates or the last predicate if nothing is selected.">
                             <materialIcons:MaterialIcon Kind="Minus" Width="22" Height="22" />
                         </materialDesign:FloatingButton>
