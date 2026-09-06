@@ -24,9 +24,6 @@ public sealed class GeometryDashboardToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />
-    public int Order => 280;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => GeometryDashboardToolDefinition.Definition;
 
     /// <inheritdoc />

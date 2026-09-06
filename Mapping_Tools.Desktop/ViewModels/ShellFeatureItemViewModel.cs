@@ -14,7 +14,6 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
 
     internal ShellFeatureItemViewModel(
         ShellFeatureRegistration registration,
-        int order,
         bool isFavorite,
         Action<ShellFeatureItemViewModel> activate,
         Action<ShellFeatureItemViewModel> toggleFavorite)
@@ -23,7 +22,6 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
         DisplayName = registration.DisplayName;
         Category = registration.Category;
         Description = registration.Description;
-        Order = order;
         this.activate = activate;
         this.toggleFavorite = toggleFavorite;
         SearchableText = string.Join(
@@ -67,8 +65,6 @@ public sealed partial class ShellFeatureItemViewModel : ObservableObject
         : 41;
 
     internal string SearchableText { get; }
-
-    internal int Order { get; }
 
     [RelayCommand]
     private void Activate()

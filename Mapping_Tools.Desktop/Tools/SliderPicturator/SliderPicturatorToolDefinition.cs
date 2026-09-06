@@ -20,9 +20,6 @@ public sealed class SliderPicturatorToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Auto;
 
     /// <inheritdoc />
-    public int Order => 220;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => SliderPicturatorToolDefinition.Definition;
 
     /// <inheritdoc />

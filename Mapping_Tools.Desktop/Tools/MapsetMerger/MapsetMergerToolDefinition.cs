@@ -20,9 +20,6 @@ public sealed class MapsetMergerToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />
-    public int Order => 260;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => MapsetMergerToolDefinition.Definition;
 
     /// <inheritdoc />

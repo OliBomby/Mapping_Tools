@@ -20,9 +20,6 @@ public sealed class SlideratorToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />
-    public int Order => 230;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => SlideratorToolDefinition.Definition;
 
     /// <inheritdoc />

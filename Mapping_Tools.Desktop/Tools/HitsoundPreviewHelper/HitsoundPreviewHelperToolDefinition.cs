@@ -18,9 +18,6 @@ public sealed class HitsoundPreviewHelperToolRegistration : IMappingToolDefiniti
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />
-    public int Order => 130;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => HitsoundPreviewHelperToolDefinition.Definition;
 
     /// <inheritdoc />

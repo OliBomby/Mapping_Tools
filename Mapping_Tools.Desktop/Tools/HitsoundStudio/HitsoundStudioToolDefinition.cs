@@ -20,9 +20,6 @@ public sealed class HitsoundStudioToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />
-    public int Order => 140;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => HitsoundStudioToolDefinition.Definition;
 
     /// <inheritdoc />

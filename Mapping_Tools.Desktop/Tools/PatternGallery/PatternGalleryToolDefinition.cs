@@ -21,9 +21,6 @@ public sealed class PatternGalleryToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />
-    public int Order => 270;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => PatternGalleryToolDefinition.Definition;
 
     /// <inheritdoc />

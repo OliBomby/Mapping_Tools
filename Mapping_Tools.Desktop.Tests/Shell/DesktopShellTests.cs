@@ -133,6 +133,29 @@ public sealed class DesktopShellTests
     }
 
     [TestMethod]
+    public void MainViewModel_WithToolsInUnsortedRegistrationOrder_SortsFavoritesAndToolsAlphabetically()
+    {
+        // Arrange
+        DesktopApplicationSettings settings = new()
+        {
+            FavoriteTools = ["zulu", "bravo"],
+        };
+        using var viewModel = CreateMainViewModel(
+        [
+            Registration("zulu", "Zulu"),
+            Registration("alpha", "Alpha"),
+            Registration("charlie", "Charlie"),
+            Registration("bravo", "Bravo"),
+        ], settings);
+
+        // Act
+        var visibleToolIds = viewModel.VisibleFeatures.Select(item => item.Id).ToArray();
+
+        // Assert
+        visibleToolIds.Should().Equal("bravo", "zulu", "alpha", "charlie");
+    }
+
+    [TestMethod]
     public void MainViewModel_WithFoundationalFavoritesAndTools_GroupsItemsWithInertDividers()
     {
         // Arrange
@@ -173,7 +196,6 @@ public sealed class DesktopShellTests
         var registration = Registration("feature", "Feature");
         ShellFeatureItemViewModel feature = new(
             registration,
-            0,
             false,
             _ => { },
             _ => { });

@@ -222,7 +222,7 @@ public sealed class PreferencesViewModelTests
     }
 
     [TestMethod]
-    public void Activate_WithRegisteredCommands_RefreshesTargetsBySelectionSize()
+    public void Activate_WithUnsortedRegisteredCommands_RefreshesTargetsAlphabeticallyBySelectionSize()
     {
         // Arrange
         var settings = CreateSettings();
@@ -231,14 +231,14 @@ public sealed class PreferencesViewModelTests
             settings,
             quickRunRegistry: registry);
         registry.Register(new QuickRunCommand(
-            "always",
-            "Always",
-            QuickRunTargets.Always,
-            _ => Task.CompletedTask));
-        registry.Register(new QuickRunCommand(
             "selected",
             "Selected",
             QuickRunTargets.AnySelection,
+            _ => Task.CompletedTask));
+        registry.Register(new QuickRunCommand(
+            "always",
+            "Always",
+            QuickRunTargets.Always,
             _ => Task.CompletedTask));
 
         // Act

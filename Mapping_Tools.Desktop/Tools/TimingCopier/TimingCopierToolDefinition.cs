@@ -18,9 +18,6 @@ public sealed class TimingCopierToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Auto;
 
     /// <inheritdoc />
-    public int Order => 180;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => TimingCopierToolDefinition.Definition;
 
     /// <inheritdoc />

@@ -445,6 +445,7 @@ public sealed partial class PreferencesViewModel : ObservableValidator, IShellFe
         [
             current_tool,
             .. quickRunRegistry.GetCommandsFor(target)
+                .OrderBy(command => command.DisplayName, StringComparer.CurrentCultureIgnoreCase)
                 .Select(command => command.DisplayName),
         ];
     }

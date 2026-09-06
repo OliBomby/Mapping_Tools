@@ -19,9 +19,6 @@ public sealed class ComboColourStudioToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />
-    public int Order => 250;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => ComboColourStudioToolDefinition.Definition;
 
     /// <inheritdoc />

@@ -20,9 +20,6 @@ public sealed class RhythmGuideToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Auto;
 
     /// <inheritdoc />
-    public int Order => 120;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => RhythmGuideToolDefinition.Definition;
 
     /// <inheritdoc />

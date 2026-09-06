@@ -18,9 +18,6 @@ public sealed class TimingHelperToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Auto;
 
     /// <inheritdoc />
-    public int Order => 190;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => TimingHelperToolDefinition.Definition;
 
     /// <inheritdoc />

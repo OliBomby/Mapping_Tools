@@ -35,8 +35,6 @@ public sealed class ToolDefinitionCatalogTests
 
         public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
-        public int Order => 1_000;
-
         public ToolDefinition Definition { get; } = new(
             "external-test",
             "External Test",

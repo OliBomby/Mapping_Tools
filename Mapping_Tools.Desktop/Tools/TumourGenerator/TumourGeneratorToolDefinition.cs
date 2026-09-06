@@ -19,9 +19,6 @@ public sealed class TumourGeneratorToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />
-    public int Order => 240;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => TumourGeneratorToolDefinition.Definition;
 
     /// <inheritdoc />

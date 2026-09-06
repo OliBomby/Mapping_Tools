@@ -19,9 +19,6 @@ public sealed class SliderCompletionatorToolRegistration : IMappingToolDefinitio
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Auto;
 
     /// <inheritdoc />
-    public int Order => 200;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => SliderCompletionatorToolDefinition.Definition;
 
     /// <inheritdoc />

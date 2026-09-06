@@ -18,9 +18,6 @@ public sealed class AutoFailDetectorToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Auto;
 
     /// <inheritdoc />
-    public int Order => 100;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => AutoFailDetectorToolDefinition.Definition;
 
     /// <inheritdoc />

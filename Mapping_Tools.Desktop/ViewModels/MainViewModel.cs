@@ -83,9 +83,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
         this.updaterInteraction = updaterInteraction;
 
         FeatureItems = registry.Features
-            .Select((registration, order) => new ShellFeatureItemViewModel(
+            .Select(registration => new ShellFeatureItemViewModel(
                 registration,
-                order,
                 settings.FavoriteTools.Contains(registration.Id, StringComparer.OrdinalIgnoreCase),
                 item => SelectedFeature = item,
                 ToggleFavorite))
@@ -384,17 +383,16 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable, IAsyn
             .ToArray();
         var foundational = matches
             .Where(item => !item.Category.Equals("Tools", StringComparison.OrdinalIgnoreCase))
-            .OrderBy(item => item.Order)
             .ToArray();
         var favorites = matches
             .Where(item =>
                 item.Category.Equals("Tools", StringComparison.OrdinalIgnoreCase) && item.IsFavorite)
-            .OrderBy(item => item.Order)
+            .OrderBy(item => item.DisplayName, StringComparer.CurrentCultureIgnoreCase)
             .ToArray();
         var tools = matches
             .Where(item =>
                 item.Category.Equals("Tools", StringComparison.OrdinalIgnoreCase) && !item.IsFavorite)
-            .OrderBy(item => item.Order)
+            .OrderBy(item => item.DisplayName, StringComparer.CurrentCultureIgnoreCase)
             .ToArray();
 
         VisibleFeatures.Clear();

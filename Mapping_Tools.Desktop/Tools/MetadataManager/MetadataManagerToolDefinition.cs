@@ -18,9 +18,6 @@ public sealed class MetadataManagerToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Disabled;
 
     /// <inheritdoc />
-    public int Order => 160;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => MetadataManagerToolDefinition.Definition;
 
     /// <inheritdoc />

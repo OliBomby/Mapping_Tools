@@ -18,9 +18,6 @@ public sealed class PropertyTransformerToolRegistration : IMappingToolDefinition
     public ToolScrollBarVisibility VerticalScrollBarVisibility => ToolScrollBarVisibility.Auto;
 
     /// <inheritdoc />
-    public int Order => 170;
-
-    /// <inheritdoc />
     public ToolDefinition Definition => PropertyTransformerToolDefinition.Definition;
 
     /// <inheritdoc />

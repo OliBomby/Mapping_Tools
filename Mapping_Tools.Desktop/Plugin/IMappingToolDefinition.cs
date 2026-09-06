@@ -25,9 +25,6 @@ public interface IMappingToolDefinition
     /// <summary>Gets the shell's vertical scrolling policy.</summary>
     ToolScrollBarVisibility VerticalScrollBarVisibility { get; }
 
-    /// <summary>Gets the stable navigation order used when definitions are discovered.</summary>
-    int Order { get; }
-
     /// <summary>Gets the view-model type created for the tool's shell feature.</summary>
     Type ViewModelType { get; }
 

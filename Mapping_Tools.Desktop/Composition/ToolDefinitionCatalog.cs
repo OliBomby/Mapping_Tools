@@ -27,8 +27,7 @@ internal sealed class ToolDefinitionCatalog
         var definitions = assemblies
             .Distinct()
             .SelectMany(DiscoverAssembly)
-            .OrderBy(definition => definition.Order)
-            .ThenBy(definition => definition.Definition.Id, StringComparer.OrdinalIgnoreCase)
+            .OrderBy(definition => definition.Definition.Id, StringComparer.OrdinalIgnoreCase)
             .ThenBy(definition => definition.GetType().Assembly.GetName().Name, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
