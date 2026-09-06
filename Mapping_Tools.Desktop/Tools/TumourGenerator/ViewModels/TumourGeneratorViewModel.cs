@@ -232,9 +232,18 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
             : 0;
 
     /// <summary>Gets the current layer's maximum range slider value.</summary>
-    public double TumourRangeSliderMax => CurrentLayerIndex >= 0 && CurrentLayerIndex < LayerRangeSliderMaxes.Count && CurrentLayer?.UseAbsoluteRange == true
-        ? LayerRangeSliderMaxes[CurrentLayerIndex]
-        : 1;
+    public double TumourRangeSliderMax
+    {
+        get
+        {
+            if (CurrentLayer is not { UseAbsoluteRange: true } layer) return 1;
+
+            double configuredMaximum = Math.Max(1, layer.TumourEnd);
+            return CurrentLayerIndex >= 0 && CurrentLayerIndex < LayerRangeSliderMaxes.Count
+                ? Math.Max(LayerRangeSliderMaxes[CurrentLayerIndex], configuredMaximum)
+                : configuredMaximum;
+        }
+    }
 
     /// <summary>Gets the range slider step matching relative or absolute units.</summary>
     public double TumourRangeSliderSmallChange => CurrentLayer?.UseAbsoluteRange == true ? 1 : 0.0001;
@@ -547,6 +556,9 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
 
     private void OnLayerChanged(object? sender, PropertyChangedEventArgs eventArgs)
     {
+        if (ReferenceEquals(sender, CurrentLayer) && eventArgs.PropertyName == nameof(TumourLayer.TumourEnd))
+            OnPropertyChanged(nameof(TumourRangeSliderMax));
+
         if (ReferenceEquals(sender, CurrentLayer) && eventArgs.PropertyName == nameof(TumourLayer.UseAbsoluteRange))
         {
             OnPropertyChanged(nameof(TumourStartSliderMin));
@@ -712,7 +724,15 @@ public sealed partial class TumourGeneratorViewModel : SingleRunToolViewModel,
         RemoveSliderTicks = project.RemoveSliderTicks;
 
         TumourLayers.Clear();
-        foreach (var layer in project.TumourLayers ?? []) TumourLayers.Add(new ObservableTumourLayer(layer.Copy()));
+        foreach (var layer in project.TumourLayers ?? [])
+        {
+            ObservableTumourLayer observableLayer = new(layer.Copy());
+            TumourLayers.Add(observableLayer);
+
+            // Reapply the persisted end after the collection change so the old
+            // two-way slider value cannot overwrite it during CurrentLayer replacement.
+            observableLayer.TumourEnd = layer.TumourEnd;
+        }
 
         CurrentLayerIndex = 0;
         QueuePreview();

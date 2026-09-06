@@ -1,3 +1,5 @@
+using Avalonia.Controls;
+using Avalonia.Data;
 using Mapping_Tools.Application.Execution.ToolExecution;
 using Mapping_Tools.Application.Execution.UserNotification;
 using Mapping_Tools.Application.Settings.Models;
@@ -176,6 +178,35 @@ public sealed class TumourGeneratorViewModelTests
     }
 
     [TestMethod]
+    public void TumourRangeSliderMax_WhenAbsoluteLayerIsInstalledBeforePreview_ContainsConfiguredEnd()
+    {
+        // Arrange
+        var viewModel = Create(new RecordingGenerator(), activate: false);
+        var project = new TumourGeneratorProject
+        {
+            TumourLayers = [TumourLayer.GetDefaultLayer()],
+        };
+        double savedEnd = project.TumourLayers[0].TumourEnd;
+        Slider slider = new() { DataContext = viewModel };
+        slider.Bind(
+            Slider.MaximumProperty,
+            new Binding(nameof(TumourGeneratorViewModel.TumourRangeSliderMax)));
+        slider.Bind(
+            Slider.ValueProperty,
+            new Binding("CurrentLayer.TumourEnd") { Mode = BindingMode.TwoWay });
+        IShellProjectFeature<TumourGeneratorProject> feature = viewModel;
+
+        // Act
+        feature.Install(project);
+
+        // Assert
+        viewModel.LayerRangeSliderMaxes.Should().BeEmpty();
+        slider.Maximum.Should().BeGreaterThanOrEqualTo(savedEnd);
+        viewModel.TumourRangeSliderMax.Should().BeGreaterThanOrEqualTo(savedEnd);
+        viewModel.CurrentLayer!.TumourEnd.Should().Be(savedEnd);
+    }
+
+    [TestMethod]
     public void LayerCommands_AddCopyRemoveAndReorder_PreserveSelectionRules()
     {
         // Arrange
@@ -233,7 +264,8 @@ public sealed class TumourGeneratorViewModelTests
         RecordingEditorReloadService? reload = null,
         bool autoReload = false,
         TestDialogService? dialogs = null,
-        TestBeatmapWorkspace? workspace = null)
+        TestBeatmapWorkspace? workspace = null,
+        bool activate = true)
     {
         DesktopApplicationSettings settings = new() { AutoReload = autoReload };
         TumourGeneratorViewModel viewModel = new(
@@ -247,7 +279,7 @@ public sealed class TumourGeneratorViewModelTests
             workspace ?? new TestBeatmapWorkspace(),
             settings,
             dialogs ?? new TestDialogService());
-        viewModel.Activate();
+        if (activate) viewModel.Activate();
         return viewModel;
     }
 
