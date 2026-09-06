@@ -1114,8 +1114,8 @@ public sealed partial class SlideratorViewModel : SingleRunToolViewModel,
                 "Confirm deletion",
                 "Clear the graph?",
                 [
-                    new DialogChoice<bool>("Delete", true, true),
-                    new DialogChoice<bool>("Cancel", false, IsCancel: true),
+                    new DialogChoice<bool>("YES", true, true),
+                    new DialogChoice<bool>("NO", false, IsCancel: true),
                 ],
                 false));
         if (!confirmed) return;
