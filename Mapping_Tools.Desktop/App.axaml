@@ -45,6 +45,7 @@
         <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Simple/Simple.xaml" />
 
         <!-- Application-wide Material compatibility overrides. -->
+        <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/DataGrids.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/Validation.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/TextBlocks.axaml" />
         <StyleInclude Source="avares://Mapping_Tools.Desktop/Styles/TextBoxes.axaml" />

@@ -1,0 +1,9 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Material.Avalonia gives every DataGrid a visible outer box. Keep the
+         internal header and row separators, but let the surrounding layout
+         provide the surface boundary. -->
+    <Style Selector="DataGrid">
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+</Styles>
