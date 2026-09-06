@@ -32,8 +32,8 @@ public sealed partial class PatternGalleryView : UserControl
     {
         if (DataContext is PatternGalleryViewModel viewModel && sender is Control { DataContext: PatternGalleryItemViewModel item })
         {
-            viewModel.SelectOnly(item);
-            await viewModel.RunQuickAsync(CancellationToken.None);
+            eventArgs.Handled = true;
+            await viewModel.RunPatternQuickAsync(item, CancellationToken.None);
         }
     }
 

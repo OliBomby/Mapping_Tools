@@ -32,10 +32,18 @@
                                   HorizontalScrollBarVisibility="Disabled"
                                   VerticalScrollBarVisibility="Auto"
                                   AllowAutoHide="False">
-                        <ItemsControl ItemsSource="{Binding Groups}">
+                        <ItemsControl ItemsSource="{Binding Groups}"
+                                      Margin="0,0,16,0"
+                                      ClipToBounds="False">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="patternGallery:PatternGalleryGroupViewModel">
-                                    <Expander IsExpanded="True" Margin="0,0,0,10">
+                                    <Expander IsExpanded="True" Margin="0,0,0,10"
+                                              Background="Transparent">
+                                        <Expander.Styles>
+                                            <Style Selector="Expander /template/ ToggleButton#PART_ToggleButton">
+                                                <Setter Property="Background" Value="{DynamicResource MaterialCardBackgroundBrush}" />
+                                            </Style>
+                                        </Expander.Styles>
                                         <Expander.Header>
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock FontSize="22"
@@ -68,6 +76,7 @@
                                                  SelectionChanged="PatternSelectionChanged">
                                             <ListBox.ItemContainerTheme>
                                                 <ControlTheme TargetType="ListBoxItem"
+                                                              BasedOn="{StaticResource {x:Type ListBoxItem}}"
                                                               x:DataType="patternGallery:PatternGalleryItemViewModel">
                                                     <Setter Property="IsSelected"
                                                             Value="{Binding IsSelected, Mode=TwoWay}" />
@@ -155,6 +164,7 @@
                                                         Height="24"
                                                         Margin="5" />
                             <TextBox Classes="compact"
+                                     PlaceholderText="Search"
                                      Width="120"
                                      Height="24"
                                      Margin="5"
@@ -199,7 +209,7 @@
                                  Text="{Binding CustomExportTime, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
                                  ToolTip.Tip="Determines at what time to put the pattern for the custom offset mode." />
                         <TextBox Margin="0,5,0,0"
-                                 materialAssists:TextFieldAssist.Label="Padding"
+                                 materialAssists:TextFieldAssist.Label="Deletion margin"
                                  Text="{Binding Padding, Mode=TwoWay, Converter={StaticResource InvariantDoubleConverter}}"
                                  ToolTip.Tip="Extra time in milliseconds around the patterns for deleting parts of the original map." />
                         <TextBox Margin="0,5,0,0"
@@ -250,7 +260,6 @@
                                   ToolTip.Tip="Adjust colour skip such that the colour indices of objects stay the same for the pattern and the original beatmap." />
                         <CheckBox Content="Fix slider tick rate" IsChecked="{Binding FixTickRate}"
                                   ToolTip.Tip="Multiply BPM in the pattern so the slider tick rate in the pattern stays the same." />
-                        <TextBlock Text="{Binding ResultSummary}" TextWrapping="Wrap" Opacity="0.75" />
                     </StackPanel>
                 </ScrollViewer>
                 </Grid>

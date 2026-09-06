@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+        xmlns:patternGallery="clr-namespace:Mapping_Tools.Desktop.Tools.PatternGallery.Interactions"
+        x:Class="Mapping_Tools.Desktop.Tools.PatternGallery.Views.PatternGalleryCollectionRenameDialog"
+        x:DataType="patternGallery:PatternGalleryCollectionRenameViewModel">
+    <Grid Margin="8" RowDefinitions="Auto,Auto">
+        <StackPanel Grid.Row="0">
+            <TextBox x:Name="NewNameTextBox"
+                     materialAssists:TextFieldAssist.Label="New name"
+                     Text="{Binding NewName, Mode=TwoWay}"
+                     MinWidth="100"
+                     Margin="0,0,0,5"
+                     ToolTip.Tip="The new name for the collection." />
+            <TextBox materialAssists:TextFieldAssist.Label="New directory name"
+                     Text="{Binding NewFolderName, Mode=TwoWay}"
+                     MinWidth="100"
+                     Margin="0,0,0,5"
+                     ToolTip.Tip="The new name for the collection's directory in the Pattern Files directory." />
+            <TextBlock Text="{Binding Error}"
+                       Foreground="{DynamicResource MaterialValidationErrorBrush}"
+                       TextWrapping="Wrap" />
+        </StackPanel>
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="ACCEPT"
+                    Command="{Binding AcceptCommand}"
+                    IsDefault="True" />
+            <Button Classes="dialog-action primary"
+                    Theme="{StaticResource MaterialFlatButton}"
+                    Content="CANCEL"
+                    Command="{Binding CancelCommand}"
+                    Margin="8,0,0,0"
+                    IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</UserControl>
