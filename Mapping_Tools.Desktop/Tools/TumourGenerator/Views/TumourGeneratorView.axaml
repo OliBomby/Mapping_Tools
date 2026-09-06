@@ -9,6 +9,7 @@
              xmlns:materialIcons="using:Material.Icons.Avalonia"
              xmlns:materialAssists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:materialDesign="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             ClipToBounds="False"
              x:Class="Mapping_Tools.Desktop.Tools.TumourGenerator.Views.TumourGeneratorView"
              x:DataType="vm:TumourGeneratorViewModel"
              x:CompileBindings="True">

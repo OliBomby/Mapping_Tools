@@ -474,6 +474,7 @@
                     <ScrollViewer HorizontalScrollBarVisibility="{Binding ContentHorizontalScrollBarVisibility}"
                                   VerticalScrollBarVisibility="{Binding ContentVerticalScrollBarVisibility}">
                         <ContentControl Margin="20"
+                                        ClipToBounds="False"
                                         Content="{Binding CurrentFeature}"
                                         HorizontalContentAlignment="Stretch"
                                         VerticalContentAlignment="Stretch" />
