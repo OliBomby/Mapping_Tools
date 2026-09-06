@@ -36,7 +36,7 @@ public sealed class NotificationPresenterTests
             .Should()
             .BeOfType<MessageDialogRequest<bool>>()
             .Subject;
-        request.Title.Should().Be("Test tool Error");
+        request.Title.Should().Be("Error: Test tool");
         request.Message.Should().Be("Operation failed");
         request.Choices.Should().ContainSingle();
         request.Choices[0].Label.Should().Be("OK");
